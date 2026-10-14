@@ -133,6 +133,25 @@ python examples/08_rss_via_saebase.py --paper-dir /path/to/RSS-repo
 
 ---
 
+## ⚡ 批量特征干预与 Steering（M2）
+
+现在可以在多组 prompt 上批量执行 feature ablation、scaling、clamping、
+coalition 干预和 SAE reconstruction 对照，并在可恢复、带哈希校验的
+JSONL 分片中保存测量结果。M1 的 activation/code 缓存也可直接复用。
+
+```bash
+# 不下载模型，先查看实验规模和资源预算。
+saebase-intervene --config conf/interventions/m2_pythia_example.json --dry-run
+# 执行完全离线的批量干预与短文本 steering 示例。
+python examples/11_batch_interventions_offline.py
+```
+
+真实模型运行需要明确提供 `--real` 并安装分析依赖。短文本 steering
+以完整前缀重新计算作为数值参考，不宣称已有 KV cache 加速。
+参阅[**M2 技术说明与验收**](docs/M2_BATCH_INTERVENTIONS.md)。
+
+---
+
 ## 🏗️ 项目结构
 
 | 组件 | 职责 |
