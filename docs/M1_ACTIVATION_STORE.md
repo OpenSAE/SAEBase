@@ -170,3 +170,12 @@ error before use in a publication. M1's reference storage remains FP32.
 The data format is **versioned as v1**. A future format upgrade must provide
 an explicit migration; silently interpreting older shards with new semantics
 is not allowed.
+
+## M1 streaming-size acceptance
+
+An additional offline acceptance ran 4,096 samples of 512-dimensional FP32
+activations (8,388,608 raw numeric bytes), split into 128 shards using a 64 KiB
+writer buffer target. The observed pending numeric buffer never exceeded
+65,536 bytes. Iteration in 64-row windows returned all 4,096 samples while
+the reader retained at most two shard memory maps. This is an engineering
+I/O check on synthetic arrays, not a claim about GPU forward throughput.
