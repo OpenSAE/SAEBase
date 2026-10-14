@@ -67,7 +67,9 @@ therefore performs **zero additional model forward passes**.
 
 The raw cache key includes loaded model weight SHA-256, tokenizer SHA-256,
 chat-template hash when present, the hook and layer, requested dtype,
-preprocessing configuration, and execution configuration. It deliberately does
+preprocessing configuration, and execution configuration. Live collection verifies the full actual model
+state digest before capturing; SAE encoding likewise verifies the actual SAE
+state digest. It deliberately does
 **not** include the SAE. The code cache key is a child of the activation cache
 and includes SAE full-state SHA-256, dimensions, checkpoint revision, inference
 mode and normalization details.
@@ -76,7 +78,10 @@ mode and normalization details.
 prompt text), optional attention mask, prompt group, split, variant role and
 target site policy. Reusing a `sample_id` with different input tokens or split
 metadata raises `CacheIntegrityError` rather than silently treating it as a
-hit. Caller-provided full-weight and tokenizer digests must be truthful;
+hit. A code sample also binds to the byte digest of its source activation rows:
+if a repaired/raw sample changes its activations, stale SAE codes are rejected
+instead of silently reused. Rebuild the affected code cache after auditing the
+changed source. Caller-provided full-weight and tokenizer digests must be truthful;
 hashing the entire model state can be expensive. An unpinned branch name alone
 is **not** an acceptable substitute for a weight digest.
 

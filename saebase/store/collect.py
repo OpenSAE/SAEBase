@@ -1,15 +1,16 @@
 """Collect explicit token sites, then reuse cached activations across SAEs."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
+import hashlib
 from typing import Any, Iterable
 
 import numpy as np
 import torch
 
 from saebase.api import ActivationSite, ModelAdapter
-from .identity import CodeIdentity, SampleRecord, resolve_positions
+from .identity import CodeIdentity, SampleRecord, resolve_positions, sha256_state_dict
 from .shards import ActivationWriter, CodeWriter, ShardedReader
 
 
@@ -65,6 +66,8 @@ def collect_activations(model: ModelAdapter, samples: Iterable[SampleRecord],
     ident = writer.activation_identity
     if ident.hook_name != site.hook_name or ident.layer != site.layer:
         raise ValueError("requested hook/layer differs from activation identity")
+    if sha256_state_dict(model.model) != ident.model_state_sha256:
+        raise ValueError("loaded model state SHA-256 does not match ActivationIdentity")
     new, reused, rows = 0, 0, 0
     for record in samples:
         if writer.has(record):
@@ -108,6 +111,8 @@ def encode_from_store(activation_path: str | Path, sae: Any,
         raise ValueError("loaded SAE dimensions differ from CodeIdentity")
     if not callable(getattr(sae, "encode", None)):
         raise TypeError("sae.encode() is required")
+    if sha256_state_dict(sae) != identity.sae_state_sha256:
+        raise ValueError("loaded SAE state SHA-256 does not match CodeIdentity")
     try:
         param = next(sae.parameters())
         device, dtype = param.device, param.dtype
@@ -119,16 +124,21 @@ def encode_from_store(activation_path: str | Path, sae: Any,
         # iter_batches caps intermediate encoded tensor allocations for a group.
         for batch in reader.iter_batches(max_rows=max_rows):
             for sample in batch:
-                if writer.has(sample.record):
+                # The code cache must reject stale rows after a repaired or
+                # recaptured activation shard, even if sample_id is unchanged.
+                source_values = np.asarray(sample.values, dtype=np.float32)
+                source_sha = hashlib.sha256(source_values.tobytes(order="C")).hexdigest()
+                code_record = replace(sample.record, source_activation_sha256=source_sha)
+                if writer.has(code_record):
                     reused += 1
                     continue
-                matrix = np.array(sample.values, dtype=np.float32, copy=True)
+                matrix = np.array(source_values, dtype=np.float32, copy=True)
                 inputs = torch.as_tensor(matrix, dtype=dtype, device=device)
                 encoded = sae.encode(inputs)
                 if (not isinstance(encoded, torch.Tensor) or encoded.shape != (len(sample.positions), identity.d_sae)
                         or not bool(torch.isfinite(encoded).all())):
                     raise RuntimeError("sae.encode must return finite [selected_positions, d_sae]")
-                if writer.append(sample.record, encoded):
+                if writer.append(code_record, encoded):
                     written += 1
                     rows += len(sample.positions)
         path = writer.path

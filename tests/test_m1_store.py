@@ -14,7 +14,7 @@ from saebase.api import ActivationSite, ModelAdapter
 from saebase.store import (ActivationIdentity, ActivationWriter, CacheIntegrityError,
                            CodeIdentity, SampleRecord, TokenSelection, ShardedReader,
                            capture_selected, collect_activations, encode_from_store,
-                           resolve_positions)
+                           resolve_positions, sha256_state_dict)
 
 
 def identity(**changes):
@@ -32,6 +32,10 @@ def sample(name="one", tokens=(1, 2, 3), *, selection=None, mask=None, offsets=N
 
 def site():
     return ActivationSite(layer=0, hook_name="blocks.0.hook_resid_post")
+
+
+def live_identity(model):
+    return identity(model_state_sha256=sha256_state_dict(model))
 
 
 def codes(key="sae-a", digest="c"):
@@ -228,11 +232,11 @@ def test_capture_multi_site_matches_existing_api_and_skips_repeats(tmp_path):
         np.testing.assert_allclose(actual[i], adapter.capture(tokens=ids, site=replace(site(), position=pos)))
     records = [sample('a', (1, 2, 3), selection=TokenSelection('all_valid')),
                sample('b', (1, 2, 3, 4))]
-    with ActivationWriter(tmp_path, identity(), width=4, shard_target_bytes=256) as w:
+    with ActivationWriter(tmp_path, live_identity(model), width=4, shard_target_bytes=256) as w:
         assert collect_activations(adapter, records, w, site=site()).collected == 2
         path = w.path
     before = model.cache_calls
-    with ActivationWriter(tmp_path, identity(), width=4) as w:
+    with ActivationWriter(tmp_path, live_identity(model), width=4) as w:
         stats = collect_activations(adapter, records, w, site=site())
         assert stats.collected == 0 and stats.reused == 2
     assert model.cache_calls == before
@@ -274,7 +278,7 @@ def test_second_sae_uses_cached_rows_without_model_forward(tmp_path):
     adapter = ModelAdapter(model)
     records = [sample('one', (1, 2, 3)), sample('two', (4, 5, 6)),
                sample('three', (3, 3, 7), selection=TokenSelection('indices', (0, 2)))]
-    with ActivationWriter(tmp_path, identity(), width=4, shard_target_bytes=256) as w:
+    with ActivationWriter(tmp_path, live_identity(model), width=4, shard_target_bytes=256) as w:
         collect_activations(adapter, records, w, site=site())
         raw_path = w.path
     forwards = model.capture_calls
@@ -282,9 +286,9 @@ def test_second_sae_uses_cached_rows_without_model_forward(tmp_path):
     sae2 = ResearchToySAE().eval()
     with torch.no_grad():
         sae2.bias.add_(0.5)
-    code_path1, stats1 = encode_from_store(raw_path, sae1, codes('A', 'c'), layout='csr', max_rows=3,
+    code_path1, stats1 = encode_from_store(raw_path, sae1, replace(codes('A', 'c'), sae_state_sha256=sha256_state_dict(sae1)), layout='csr', max_rows=3,
                                            shard_target_bytes=256)
-    code_path2, stats2 = encode_from_store(raw_path, sae2, codes('B', 'd'), layout='dense', max_rows=3,
+    code_path2, stats2 = encode_from_store(raw_path, sae2, replace(codes('B', 'd'), sae_state_sha256=sha256_state_dict(sae2)), layout='dense', max_rows=3,
                                            shard_target_bytes=256)
     assert model.capture_calls == forwards
     assert stats1.collected == 3 and stats2.collected == 3
@@ -295,7 +299,7 @@ def test_second_sae_uses_cached_rows_without_model_forward(tmp_path):
         expected = sae1.encode(torch.as_tensor(np.array(cached.values))).detach().numpy()
         np.testing.assert_array_equal(ShardedReader(code_path1).get(r.sample_id).values, expected)
         np.testing.assert_array_equal(ShardedReader(code_path2).get(r.sample_id).values, expected)
-    new_path, stats = encode_from_store(raw_path, sae1, codes('A', 'c'), layout='csr',
+    new_path, stats = encode_from_store(raw_path, sae1, replace(codes('A', 'c'), sae_state_sha256=sha256_state_dict(sae1)), layout='csr',
                                         max_rows=3, shard_target_bytes=256)
     assert new_path == code_path1 and stats.collected == 0 and stats.reused == 3
 
@@ -318,12 +322,12 @@ def test_csr_exact_zeros_and_all_features_preserved(tmp_path):
 def test_mask_right_padding_supported_and_left_padding_rejected(tmp_path):
     adapter = ModelAdapter(ResearchToyModel().eval())
     good = sample('a', (1,2,3,0,0), mask=(1,1,1,0,0))
-    with ActivationWriter(tmp_path, identity(), width=4) as w:
+    with ActivationWriter(tmp_path, live_identity(adapter.model), width=4) as w:
         collect_activations(adapter, [good], w, site=site())
         np.testing.assert_allclose(ShardedReader(w.path).get('a').values[0],
                                    adapter.capture(tokens=torch.tensor([[1,2,3,0,0]]),
                                                    site=replace(site(), position=2)))
-    with ActivationWriter(tmp_path, identity(), width=4) as w:
+    with ActivationWriter(tmp_path, live_identity(adapter.model), width=4) as w:
         bad = sample('b', (0,0,1,2,3), mask=(0,0,1,1,1))
         with pytest.raises(ValueError, match="right-side padding"):
             collect_activations(adapter, [bad], w, site=site())
@@ -364,3 +368,48 @@ def test_frozen_m0_reference_fixture_is_actual_verified_public_checkpoint_data()
     assert reference["sample_count"] == 3
     assert reference["model_state_sha256"] == "dc595ff7ad9263a3ef34ce8975beadfe76b7271916c63a7a67b8a195d7e50a12"
     assert reference["sae_state_sha256"] == "cde8b7c669860ec0dbd4b8ede465ff08868b317fc80010dac2703bc553c6585f"
+
+
+def test_collect_refuses_incorrect_model_weight_fingerprint(tmp_path):
+    adapter = ModelAdapter(ResearchToyModel().eval())
+    with ActivationWriter(tmp_path, identity(), width=4) as writer:
+        with pytest.raises(ValueError, match="model state SHA-256"):
+            collect_activations(adapter, [sample()], writer, site=site())
+
+
+def test_encoding_refuses_different_checkpoint_using_existing_identity(tmp_path):
+    adapter = ModelAdapter(ResearchToyModel().eval())
+    with ActivationWriter(tmp_path, live_identity(adapter.model), width=4) as writer:
+        collect_activations(adapter, [sample()], writer, site=site())
+        path = writer.path
+    sae = ResearchToySAE().eval()
+    with pytest.raises(ValueError, match="SAE state SHA-256"):
+        encode_from_store(path, sae, codes(), shard_target_bytes=256)
+
+
+def test_code_cache_detects_recaptured_activation_content_drift(tmp_path):
+    r = sample()
+    original = np.array([[1, 2, 3, 4]], dtype=np.float32)
+    sae = ResearchToySAE().eval()
+    codeid = replace(codes(), sae_state_sha256=sha256_state_dict(sae))
+    with ActivationWriter(tmp_path, identity(), width=4) as w:
+        w.append(r, original)
+        raw_path = w.path
+    codepath, _ = encode_from_store(raw_path, sae, codeid, shard_target_bytes=256)
+    assert ShardedReader(codepath).sample_count == 1
+    # Corrupt the original activation file and explicitly repair the shard.
+    target = raw_path / "shards/shard-00000.npy"
+    with target.open("ab") as f:
+        f.write(b"broken")
+    with ActivationWriter(tmp_path, identity(), width=4, repair_corruption=True) as w:
+        w.append(r, original + 1)
+    with pytest.raises(CacheIntegrityError, match="differs|changed"):
+        encode_from_store(raw_path, sae, codeid, shard_target_bytes=256)
+
+
+def test_m0_and_m1_state_hashes_agree_for_model_and_sae():
+    from scripts.m0_reference_smoke import _sha_weights
+    model = ResearchToyModel()
+    sae = ResearchToySAE()
+    assert sha256_state_dict(model) == _sha_weights(model)
+    assert sha256_state_dict(sae) == _sha_weights(sae)

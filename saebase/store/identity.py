@@ -12,6 +12,8 @@ import json
 import re
 from typing import Any, Mapping
 
+import torch
+
 _SHA = re.compile(r"^[0-9a-f]{64}$")
 
 
@@ -22,6 +24,24 @@ def stable_json(value: Any) -> str:
 
 def fingerprint(value: Any) -> str:
     return hashlib.sha256(stable_json(value).encode("utf-8")).hexdigest()
+
+
+def sha256_state_dict(module: Any) -> str:
+    """Hash the complete sorted loaded state, identical to M0's reference format."""
+    if not callable(getattr(module, "state_dict", None)):
+        raise TypeError("module must expose state_dict() for checkpoint verification")
+    state = module.state_dict()
+    if not state:
+        raise ValueError("cannot fingerprint an empty state_dict")
+    digest = hashlib.sha256()
+    for name, value in sorted(state.items()):
+        if not isinstance(value, torch.Tensor):
+            raise TypeError(f"non-tensor state_dict value: {name!r}")
+        tensor = value.detach().contiguous().cpu()
+        digest.update(json.dumps([name, str(tensor.dtype), list(tensor.shape)],
+                                 separators=(",", ":")).encode())
+        digest.update(tensor.reshape(-1).view(torch.uint8).numpy().tobytes())
+    return digest.hexdigest()
 
 
 def _sha(value: str, label: str) -> None:
@@ -161,6 +181,7 @@ class SampleRecord:
     split: str = "unspecified"
     variant_role: str = "clean"
     token_offsets: tuple[tuple[int, int], ...] | None = None
+    source_activation_sha256: str | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.sample_id, str) or not self.sample_id.strip():
@@ -182,6 +203,8 @@ class SampleRecord:
             raise ValueError("variant_role must not be empty")
         if self.prompt_group_id is not None and not isinstance(self.prompt_group_id, str):
             raise TypeError("prompt_group_id must be a string or None")
+        if self.source_activation_sha256 is not None:
+            _sha(self.source_activation_sha256, "source_activation_sha256")
         resolve_positions(self)
 
     def to_dict(self) -> dict[str, Any]:
@@ -190,7 +213,8 @@ class SampleRecord:
                 "attention_mask": list(self.attention_mask) if self.attention_mask is not None else None,
                 "prompt_group_id": self.prompt_group_id, "split": self.split,
                 "variant_role": self.variant_role,
-                "token_offsets": [list(p) for p in self.token_offsets] if self.token_offsets is not None else None}
+                "token_offsets": [list(p) for p in self.token_offsets] if self.token_offsets is not None else None,
+                "source_activation_sha256": self.source_activation_sha256}
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "SampleRecord":
@@ -199,7 +223,8 @@ class SampleRecord:
                    attention_mask=tuple(data["attention_mask"]) if data.get("attention_mask") is not None else None,
                    prompt_group_id=data.get("prompt_group_id"), split=data.get("split", "unspecified"),
                    variant_role=data.get("variant_role", "clean"),
-                   token_offsets=tuple(map(tuple, data["token_offsets"])) if data.get("token_offsets") is not None else None)
+                   token_offsets=tuple(map(tuple, data["token_offsets"])) if data.get("token_offsets") is not None else None,
+                   source_activation_sha256=data.get("source_activation_sha256"))
 
     @property
     def key(self) -> str:
