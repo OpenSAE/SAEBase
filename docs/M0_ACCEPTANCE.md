@@ -88,12 +88,26 @@ checkpoint acceptance.
 
 ## 4. M0 exit criteria
 
-- [ ] Python 3.11/3.12 development install, CLI and offline CI green.
-- [ ] Analysis extra clean installation and import probes green.
-- [ ] Wheel and source distribution build and inspect successfully.
-- [ ] One actual Pythia-70M+SAE activation-health and identity-patch run succeeds.
-- [ ] Numerical reference includes full model and SAE weight hashes, tokens,
+- [x] Python 3.11/3.12 development install, CLI and offline CI green.
+- [x] Analysis extra clean installation and import probes green.
+- [x] Wheel and source distribution build and inspect successfully.
+- [x] One actual Pythia-70M+SAE activation-health and identity-patch run succeeds.
+- [x] Numerical reference includes full model and SAE weight hashes, tokens,
       activation/logit probes, and actual edit effects.
-- [ ] Rerunning against the same cached weights/data passes `--compare-to`.
+- [x] Rerunning against the same cached weights/data passes `--compare-to`.
 
 Check these boxes only after seeing evidence from the corresponding run.
+
+## 5. Verified October 14, 2026 acceptance evidence
+
+- Implementation merged in [PR #1](https://github.com/OpenSAE/SAEBase/pull/1), commit `2daa855`.
+- Clean environment and package CI: [successful run 38634415319](https://github.com/OpenSAE/SAEBase/actions/runs/38634415319), with Python 3.11, Python 3.12, analysis installation, and package jobs all successful.
+- **Real pretrained checkpoint**: [successful CPU GitHub Actions run 38634372619](https://github.com/OpenSAE/SAEBase/actions/runs/38634372619), artifact [saebase-m0-reference](https://github.com/OpenSAE/SAEBase/actions/runs/38634372619/artifacts/11927288030).
+- Real model profile: `pythia70m`, SAE `pythia70m_resid_sm`, `blocks.3.hook_resid_post`, input width 512, SAE width 32768.
+- Real reference: `schema=saebase.m0.reference.v1`, `status=passed`, `real_checkpoint_validated=true`, 3 evaluated prompts, identity-patch maximum absolute logit error **0.0**.
+- Tested per-sample SAE L0 counts: 172, 66, and 53. Ablating each prompt's highest absolute active feature resulted in a nonzero logit delta (L2 values approximately 195.95, 76.99, 82.20).
+- Existing activation-health evaluation ran on the same prepared dataset: `n_ok=3`, `n_fail=0`, median L0=66, median reconstruction MSE≈0.09825, median FVE≈0.80736.
+- A **second real model/SAE load** completed with the cached prompts and `--compare-to`, producing `m0_reference_replay.json` with `reference_comparison=passed`, matching full model and SAE state SHA-256 digests.
+- The original real-run failures revealed previously undetected scalar-tensor hashing and TransformerLens keyword-hook issues. Both were fixed in `main` and covered by new regression tests.
+
+M0 acceptance is complete. These small-model measurements are **engineering acceptance evidence**, not a claim about SAE generalization or statistical quality.
