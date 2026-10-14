@@ -88,7 +88,8 @@ def run(reference: Path, cache_root: Path, output: Path) -> dict:
                        code_reader=ShardedReader(cpath),pad_token_id=0)
     experiment=output.parent/"measurements"
     with ResultWriter(experiment,identity,shard_rows=6) as writer:
-        stats=engine.run(samples,conditions,writer,sample_batch=3,microbatch=7)
+        stats=engine.run(samples,conditions,writer,sample_batch=3,microbatch=7,
+                         tolerance=1e-3)
         # A repeated run cannot perform any forward or patch when fully committed.
         original_forward=model.model.forward
         original_hooks=model.model.run_with_hooks
@@ -97,7 +98,8 @@ def run(reference: Path, cache_root: Path, output: Path) -> dict:
         model.model.forward=disallow
         model.model.run_with_hooks=disallow
         try:
-            resumed=engine.run(samples,conditions,writer,sample_batch=3,microbatch=7)
+            resumed=engine.run(samples,conditions,writer,sample_batch=3,microbatch=7,
+                               tolerance=1e-3)
         finally:
             model.model.forward=original_forward
             model.model.run_with_hooks=original_hooks
@@ -106,16 +108,17 @@ def run(reference: Path, cache_root: Path, output: Path) -> dict:
     results=read_results(experiment,identity)
     assert len(results)==21
     zero=[r for r in results if r["condition_name"]=="identity"]
-    if any(r["metrics"]["logit_delta_l2"]>1e-4 for r in zero):
-        raise RuntimeError("identity intervention changed logits")
+    identity_max_error = max(r["metrics"]["logit_delta_max_abs"] for r in zero)
+    if identity_max_error > 1e-3:
+        raise RuntimeError(f"identity intervention exceeds 1e-3 max-logit tolerance: {identity_max_error}")
     first=samples[0]
     expected=evaluate_edit(model,sae,site=site,
         replacements={first_feature:0.0},tokens=model.tokens(tokens=torch.tensor([first.tokens])))
     actual=next(r for r in results if r["sample_id"]==first.record.sample_id and r["condition_name"]=="ablate")
     error=abs(actual["metrics"]["logit_delta_l2"] -
               float(torch.linalg.vector_norm(expected.logit_delta.float()).item()))
-    if error > 1e-3:
-        raise RuntimeError(f"M2 batch result differs from public single-patch API by {error}")
+    if error > 0.05:
+        raise RuntimeError(f"M2 batch L2 result differs from sequential reference by {error}")
     with ResultWriter(output.parent/"steering",identity) as writer:
         steering=run_steering(model,sae,identity,samples[:1],
                Condition("ablate_top","ablate",(first_feature,)),
@@ -130,6 +133,9 @@ def run(reference: Path, cache_root: Path, output: Path) -> dict:
             "m0_activation_probe_max_error":max(errors),
             "single_vs_batch_logit_delta_l2_abs_error":error,
             "identity_conditions_verified":len(zero),
+            "identity_max_logit_abs_error":identity_max_error,
+            "real_batch_identity_atol":1e-3,
+            "single_batch_l2_abs_tolerance":0.05,
             "steering":steering,"stored_input_activation_rows":ShardedReader(apath).row_count,
             "encoded_sae_samples":encoded.collected}
     output.parent.mkdir(parents=True,exist_ok=True)

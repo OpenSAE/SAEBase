@@ -115,6 +115,11 @@ is supplied. `read_results()` verifies committed JSONL shard hashes.
   checkpoint SHA-256 and sample/position IDs must all match. **New logits
   forwards are still required for causal patch experiments**; M1 caching
   does not eliminate the downstream network computation.
+- For CPU real-checkpoint batched GEMMs, floating-point kernel order may
+  produce small differences from a single-example forward. Report the maximum
+  absolute **individual logit** error and specify a tested absolute tolerance
+  (the Pythia-70M M2 smoke uses 1e-3 and relative tolerance 1e-5); do not
+  confuse this bound with the Euclidean norm across the entire vocabulary.
 - The current public interface requires exactly one selected patch position
   per measurement sample. M1 itself supports multiple positions; M2 can make
   distinct samples for each site as an explicit future extension.

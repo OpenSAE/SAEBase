@@ -3,6 +3,7 @@
   "sae_key": "pythia70m_resid_sm",
   "layer": 3,
   "sample_batch": 4,
+  "tolerance": 0.001,
   "microbatch": 8,
   "max_measurements": 10000,
   "max_generated_tokens": 100,

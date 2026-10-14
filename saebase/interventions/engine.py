@@ -97,6 +97,7 @@ def _metrics(baseline: torch.Tensor, patched: torch.Tensor, sample: MeasurementS
     b, p = baseline.float(), patched.float()
     out: dict[str, Any] = {
         "logit_delta_l2": float(torch.linalg.vector_norm(p - b).item()),
+        "logit_delta_max_abs": float((p - b).abs().max().item()),
         # The analytic KL is >=0; float32 reductions can give -1e-8 for
         # identity operations. Avoid displaying negative KL as a metric.
         "kl_baseline_to_edited": max(0., float(F.kl_div(F.log_softmax(p, -1), F.softmax(b, -1), reduction="sum").item())),
@@ -313,7 +314,7 @@ class BatchEngine:
                     replay = self._patched_logits([(s, snap.activation) for s, snap in subset])
                     patches += 1 if self.model.backend == "transformer_lens" else len(subset)
                     for expected, actual in zip(ref_logits[start:start + microbatch], replay):
-                        if not torch.allclose(expected.float(), actual.float(), rtol=tolerance, atol=tolerance):
+                        if not torch.allclose(expected.float(), actual.float(), rtol=1e-5, atol=tolerance):
                             error = float((expected.float() - actual.float()).abs().max().item())
                             raise RuntimeError(f"identity patch mismatch; max logits error {error}")
             all_jobs: list[tuple[MeasurementSample, Condition, str, FeatureSnapshot, torch.Tensor, torch.Tensor]] = []
@@ -347,7 +348,7 @@ class BatchEngine:
                     sample, condition, mid, snapshot, baseline, activation = job
                     delta = activation.to(snapshot.activation.device) - snapshot.activation
                     if condition.operation == "identity" and not torch.allclose(
-                            baseline.float(), edited.float(), rtol=tolerance, atol=tolerance):
+                            baseline.float(), edited.float(), rtol=1e-5, atol=tolerance):
                         raise RuntimeError("identity patch changes model logits")
                     result = {
                         "schema": "saebase.m2.measurement.v1",

@@ -62,7 +62,8 @@ def test_all_operators_match_single_reference(tmp_path):
             expected = m.patch_logits(tokens=snapshot.tokens, site=snapshot.site, activation=patch.activation)
             assert r["metrics"]["logit_delta_l2"] == pytest.approx(float(torch.linalg.vector_norm(expected-base)), abs=1e-5)
             assert r["metrics"]["target_logit_delta"] == pytest.approx(float(expected[1]-base[1]),abs=1e-5)
-            assert r["metrics"]["kl_baseline_to_edited"] >= -1e-6
+            assert r["metrics"]["kl_baseline_to_edited"] >= 0.0
+            assert r["metrics"]["logit_delta_max_abs"] >= 0.0
         assert target["identity"]["metrics"]["logit_delta_l2"] == pytest.approx(0,abs=1e-6)
         assert target["ablate0"]["metrics"]["activation_delta_l2"] > 0
     assert stats.interventions_per_second > 0
