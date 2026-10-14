@@ -24,6 +24,15 @@ saebase --task sae --model pythia70m --sae pythia70m_resid_sm \
   --data-dir "$DATA_DIR" --n-prompts "$N_PROMPTS" \
   --run-dir "$OUT_DIR/activation_health"
 
+# Re-load the SAME published checkpoints and stored prompts, checking exact
+# weight/token/feature identities and the numerical probes against the first run.
+python scripts/m0_reference_smoke.py \
+  --device "$DEVICE" --data-dir "$DATA_DIR" \
+  --output "$OUT_DIR/m0_reference_replay.json" \
+  --seed "$SEED" --n-generate "$N_GENERATE" \
+  --min-kept "$MIN_KEPT" --n-prompts "$N_PROMPTS" \
+  --reuse-prompts --compare-to "$OUT_DIR/m0_reference.json"
+
 python - "$OUT_DIR/m0_reference.json" "$OUT_DIR/activation_health/sae_activation_summary.json" <<'PY'
 import json, sys
 from pathlib import Path
