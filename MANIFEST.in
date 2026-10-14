@@ -1,4 +1,4 @@
-include README.md LICENSE NOTICE CONTRIBUTING.md SECURITY.md CHANGELOG.md CITATION.cff
+include README.md README_cn.md LICENSE NOTICE CONTRIBUTING.md SECURITY.md CHANGELOG.md CITATION.cff
 include requirements.txt requirements-generation.txt
 recursive-include .github *.yml *.md
 recursive-include conf *.yaml *.md
