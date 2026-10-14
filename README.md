@@ -1,35 +1,72 @@
-# SAEBase
+# 🧱 SAEBase: Research Infrastructure for Sparse Autoencoders
 
-**Shared infrastructure for reproducible sparse autoencoder experiments.**
+🌍 Languages: [English](README.md) | [中文](README_cn.md) &nbsp; [![CI](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml)
 
-SAEBase provides a model registry, SAE checkpoint profiles, structured prompt
-artifacts, activation capture, and SAE encoding/reconstruction diagnostics.
-The Phase B API adds backend-aware activation reads, feature interventions,
-SAE provenance, and explicit token positions. The original **SAE activation-health**
-workflow remains available, starting with Pythia and a public SAE.
+👉 **TL;DR.** SAEBase unifies model and SAE loading, prompt datasets, activation analysis, feature interventions, and reproducible evaluation into one research toolkit.
 
-## Install and quickstart
+<p align="center">
+  <a href="#-quickstart"><b>🚀 Quickstart</b></a> &nbsp; | &nbsp;
+  <a href="#-public-python-api"><b>🔬 Python API</b></a> &nbsp; | &nbsp;
+  <a href="#-research-integrations"><b>🧩 SAR & RSS</b></a> &nbsp; | &nbsp;
+  <a href="#-documentation"><b>📚 Documentation</b></a>
+</p>
 
-SAEBase 0.1.0 is a standalone research package. Python 3.11–3.12 is the
-validated target for the standard model/SAE stack. Install from this source
-checkout (checkpoints and datasets download only when requested):
+---
 
-```bash
-python -m pip install -e ".[analysis]"
-saebase --list
-saebase-check-env --mode analysis
+## 🧭 Overview
+
+SAEBase provides common infrastructure for investigating learned representations, measuring activation-level properties, and evaluating the behavioral effects of SAE features.
+
+```mermaid
+flowchart LR
+    A["Model & SAE registries"] --> C["Load & validate"]
+    B["Prompt artifacts"] --> C
+    C --> D["Capture activations"]
+    D --> E["SAE encode / decode"]
+    E --> F["Reconstruction diagnostics"]
+    E --> G["Feature interventions"]
+    F --> H["Evaluation & artifacts"]
+    G --> H
 ```
 
-The lighter `pip install -e .` provides the offline public API, registries,
-configuration and CLI. `pip install -e ".[dev]"` adds packaging and testing
-tools, and `pip install -e ".[generation]"` adds the experimental GPU
-backends. Their hardware and package compatibility require separate checks.
+## ✨ Highlights
 
-From any working directory, `saebase --list` and
-`saebase-prepare-prompts --help` work using the installed package. The
-commands below also work from this repository root.
+- 🧠 **Model and SAE registry.** Model configurations, checkpoint profiles, layers, hooks, and compatibility checks in a shared interface.
+- 🔎 **Activation analysis.** Capture activations, inspect SAE codes, and measure L0, activation norms, reconstruction error, and explained variance.
+- 🎛️ **Feature interventions.** Edit SAE codes, patch selected activation sites, and compare downstream logits while retaining reconstruction residuals.
+- 🗂️ **Reproducible prompts.** Versioned JSONL datasets and manifests with consistent model, behavior, and seed metadata.
+- 🧩 **Research integrations.** Shared capture and intervention tools for [SAR](https://github.com/OpenSAE/SAE-Behavioral-Compositionality) and [RSS](https://github.com/OpenSAE/Redistribution-Sensitivity-Score), using their original estimators.
+- ⚙️ **Reusable tooling.** Python API, command-line utilities, Hydra configurations, tests, and distributable packages.
 
-**1. Prepare deterministic SimpleCopying prompts** (downloads public model weights):
+---
+
+## ⚙️ Install
+
+Install the standard analysis environment from a source checkout (Python 3.11–3.12):
+
+```bash
+git clone https://github.com/OpenSAE/SAEBase.git
+cd SAEBase
+python -m pip install -e ".[analysis]"
+saebase --list
+```
+
+<details>
+<summary>📦 Other installation options</summary>
+
+The lightweight environment supports the registries, CLI, and offline public API:
+
+```bash
+python -m pip install -e .
+```
+
+For tests and packaging, use `pip install -e ".[dev]"`. For experimental GPU generation backends, see `.[generation]` and [the runtime notes](docs/PHASE_C.md).
+
+</details>
+
+## 🚀 Quickstart
+
+**1. Prepare prompts** with the registered Pythia-70M model:
 
 ```bash
 saebase-prepare-prompts \
@@ -38,15 +75,9 @@ saebase-prepare-prompts \
   --data-dir ./data
 ```
 
-The step filters prompts with Pythia logits and writes:
+This creates `prompts.jsonl` and `manifest.json` in `data/SimpleCopying/pythia70m/v1/`.
 
-```text
-data/SimpleCopying/pythia70m/v1/
-  prompts.jsonl
-  manifest.json
-```
-
-**2. Evaluate SAE activations** (downloads the published SAE checkpoint):
+**2. Evaluate a public SAE** at layer 3:
 
 ```bash
 saebase \
@@ -56,126 +87,99 @@ saebase \
   --run-dir ./experiment/pythia70m-smoke
 ```
 
-The run saves `sae_activation_summary.json` and Hydra configuration files
-inside `experiment/pythia70m-smoke`. A failed prompt is recorded with an
-explicit error; successful rows contain token count, L0, activation norm,
-reconstruction MSE, and fraction of variance explained.
+The evaluation saves `sae_activation_summary.json` with per-prompt diagnostics and Hydra run configuration. This workflow downloads the requested public model and SAE checkpoints.
 
-For a combined acceptance run, use `bash scripts/phase_a_smoke.sh` (or
-`DEVICE=cuda bash scripts/phase_a_smoke.sh`). This verifies the artifacts and
-actual activation-health output after downloading the published checkpoints.
+💻 **End-to-end acceptance:** `bash scripts/phase_a_smoke.sh`. Set `DEVICE=cuda` for a configured GPU environment.
 
-CUDA users can change both commands to `--device cuda`.
-Model/SAE downloads require access to their respective published repositories.
-The two commands use the same explicitly selected prompt artifact directory.
+---
 
-### Alternative: inspect the registries
+## 🔬 Public Python API
 
-```bash
-python -m saebase.sae.verify_registry --list
-python main.py --list
-```
-
-## Public Python API (Phase B)
-
-Run the full **offline demonstration**, using a small deterministic model and SAE:
+Run the self-contained **offline example**, which uses a small synthetic model and SAE:
 
 ```bash
 python examples/05_public_api_offline.py
 ```
 
-For a real published Pythia model and SAE (downloads checkpoints):
+The public interface in [`saebase.api`](saebase/api/__init__.py) provides activation sites, model adapters, SAE provenance, feature capture, code editing, and baseline-versus-patched logit evaluation.
 
-```bash
-python examples/06_public_api_pythia.py
+Feature edits follow:
+
+```text
+edited_activation = original_activation + decode(edited_codes) - decode(original_codes)
 ```
 
-Both entrypoints use `saebase.api`. The API separates model capabilities,
-activation locations, SAE checkpoint identity, feature-code editing, and
-baseline-versus-patched logit readouts. Identity replay checks that patching the
-original activation reproduces the unmodified model output.
+This keeps the original activation's reconstruction residual. Identity replay checks verify the unedited model output.
 
-The built-in prompt package is now `saebase.data`; Hugging Face retains the
-`datasets` package name. Existing Phase A CLI commands and artifact layouts are
-maintained. See [Phase B API and migration guide](docs/PHASE_B.md).
+For a real Pythia checkpoint example, run `python examples/06_public_api_pythia.py`.
 
-## Research integrations (Phase C)
+## 🧩 Research Integrations
 
-SAR and RSS use the shared capture/patch API while retaining their **original**
-estimators in separate paper repositories. Two small CPU-only examples:
+SAEBase supplies shared model operations; each research project retains its own metric and experimental definition.
+
+| Project | Use of SAEBase | Example |
+| :--- | :--- | :--- |
+| 🧩 **[SAR — Behavioral Compositionality](https://github.com/OpenSAE/SAE-Behavioral-Compositionality)** | Capture feature contributions, apply coalition interventions, and call the original SAR estimator. | [SAR integration](examples/07_sar_via_saebase.py) |
+| 🔀 **[RSS — Representation Redistribution](https://github.com/OpenSAE/Redistribution-Sensitivity-Score)** | Capture clean, selection, and held-out activations and call the original RSS estimator. | [RSS integration](examples/08_rss_via_saebase.py) |
+
+Run the integration demos with local copies of the original research repositories:
 
 ```bash
 python examples/07_sar_via_saebase.py --paper-dir /path/to/SAR-repo
 python examples/08_rss_via_saebase.py --paper-dir /path/to/RSS-repo
 ```
 
-These examples use deterministic synthetic models by default; the `--real`
-option downloads a public Pythia/SAE checkpoint. An additional registered
-Gemma-3 270M/SAE pairing has a separate opt-in acceptance script:
+Both examples default to deterministic synthetic data. The `--real` option uses public checkpoints. See [integration details](docs/PHASE_C.md).
+
+---
+
+## 🏗️ Architecture
+
+| Component | Responsibility |
+| :--- | :--- |
+| [`saebase/api/`](saebase/api/) | Model adapters, activation capture, feature editing, intervention results |
+| [`saebase/sae/`](saebase/sae/) | Checkpoint profiles, SAE loading, activation diagnostics |
+| [`saebase/data/`](saebase/data/) | Prompt preparation, compatibility matrix, JSONL and manifest I/O |
+| [`models/`](models/) · [`conf/`](conf/) | Model plugins and Hydra configurations |
+| [`tasks/`](tasks/) · [`scripts/`](scripts/) | Registered evaluation tasks, preparation and runtime checks |
+
+## ✅ Validation
+
+Run the offline test suite:
 
 ```bash
-python examples/09_second_model_smoke.py --model gemma270m
-```
-
-[Phase C integration, reference checks and backend status](docs/PHASE_C.md).
-
-## Design
-
-```text
-conf/       Hydra configuration for model, SAE, prompt source, and evaluation
-models/     Model registration and loader wrappers
-saebase/data/  Prompt builders, compatibility matrix, JSONL and manifest I/O
-saebase/   Public API, model/SAE loading, task runner, activation diagnostics, results
-tasks/     Registered implementations shipped with this package (sae)
-scripts/   Prompt preparation and environment checks
-tests/     Offline contracts and small model-independent integration tests
-```
-
-The `saebase/sae/registry.py` SAE profiles specify checkpoint identifiers,
-allowed models, layer and hook locations, and loader types. Registry entries
-are configurations; successful weight loading is evaluated separately.
-
-## Supported and archived functionality
-
-| Capability | Current status |
-| --- | --- |
-| SAE/model registry and compatibility checks | Implemented; tested offline |
-| Public capture / feature-edit / patch API | Implemented; both adapter styles tested offline |
-| Feature-site metadata and prompt namespace | Implemented; source namespace migrated |
-| SimpleCopying prompt preparation and versioned artifacts | Implemented; tested with a deterministic mock model |
-| SAE activation health and JSON results | Implemented; tested with a deterministic mock model/SAE |
-| Public Pythia-70M + pretrained SAE weights | Runnable configuration; requires real-weight integration run |
-| Additional research protocols in `conf/evaluation/` | Configuration references; task implementations not bundled |
-| vLLM / NNsight high-performance research backend | Optional; integration and external task dependencies remain to be validated |
-
-Only `task=sae` / `evaluation=activation_health` is registered as an executable
-Phase A task. Advanced generation dependencies may be installed into the same
-environment with `python -m pip install -r requirements-generation.txt` when
-needed for later validation.
-
-The uploaded SAEBase source ZIP remains the reference for its original internal
-research protocols. This standalone README covers the packaged public capabilities.
-
-## Testing
-
-```bash
+python -m pip install -e ".[dev]"
 python -m pytest -q
 ```
 
-Hydra-based tests run when `hydra-core` is installed. The test suite includes
-prompt → manifest → activation → SAE → JSON output using small deterministic
-objects that require neither model downloads nor CUDA.
+| Area | Validation |
+| :--- | :--- |
+| Registry, prompt artifacts, and core public API | Automated offline tests |
+| Activation capture and intervention adapters | Synthetic backend and small-model checks |
+| SAR and RSS integrations | Offline contracts against original estimator interfaces |
+| Pythia / Gemma public checkpoints | Registered with opt-in real-model acceptance scripts |
+| vLLM / NNsight backends | Optional experimental backends; GPU acceptance tracked separately |
 
-See [`docs/PHASE_A.md`](docs/PHASE_A.md) for Phase A's implementation boundary,
-and [`docs/PHASE_B.md`](docs/PHASE_B.md) for the public API, namespace migration,
-behavioral intervention semantics and real-model integration checks.
+<details>
+<summary>🔧 Runtime and compatibility details</summary>
 
-## Contributing and releasing
+- The current bundled executable evaluation is `task=sae` with `activation_health`.
+- Additional protocol configurations are retained as references; their original task implementations belong to the source research workspace.
+- Real-model examples download the requested weights and require the corresponding model/SAE dependencies.
+- Registry inspection works with `python -m saebase.sae.verify_registry --list`.
+- The source distribution includes CLI commands and versioned Hydra configuration resources.
 
-- [API reference](docs/API.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md)
-- [Provenance and third-party assets](docs/PROVENANCE.md) · [Release checklist](docs/RELEASE_CHECKLIST.md)
-- [Changelog](CHANGELOG.md) · [Apache-2.0 license](LICENSE)
+</details>
 
-The continuous integration workflow runs offline tests and builds a wheel and
-source distribution. Live model, SAE and GPU backend validation is recorded
-separately.
+---
+
+## 📚 Documentation
+
+[API Reference](docs/API.md) · [Getting Started](docs/PHASE_A.md) · [Feature Interventions](docs/PHASE_B.md) · [Research Integrations](docs/PHASE_C.md) · [Changelog](CHANGELOG.md)
+
+[Contributing](CONTRIBUTING.md) · [Provenance](docs/PROVENANCE.md) · [Release Checklist](docs/RELEASE_CHECKLIST.md) · [Security](SECURITY.md) · [Apache-2.0 License](LICENSE)
+
+<p align="center">
+  <b>Open research infrastructure for faithful representation analysis.</b><br>
+  <a href="https://github.com/OpenSAE">OpenSAE</a> · <a href="https://github.com/OpenSAE/SAEBase/issues">Issues & contributions</a>
+</p>
