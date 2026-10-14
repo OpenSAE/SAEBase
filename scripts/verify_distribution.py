@@ -32,7 +32,7 @@ NEEDED_WHEEL = {
     "conf/task/sae.yaml",
 }
 NEEDED_SDIST = NEEDED_WHEEL | {
-    "pyproject.toml", "README.md", "LICENSE", "NOTICE",
+    "pyproject.toml", "README.md", "README_cn.md", "LICENSE", "NOTICE",
     "CONTRIBUTING.md", "SECURITY.md", "CHANGELOG.md", "CITATION.cff",
     "MANIFEST.in", ".github/workflows/ci.yml",
     "docs/RELEASE_CHECKLIST.md", "docs/PROVENANCE.md", "docs/API.md",
