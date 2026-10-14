@@ -458,17 +458,35 @@ class ShardedWriter:
                "sidecar_sha256": _file_hash(sidecar_path)}
         self.manifest["shards"].append(new)
         _atomic_json(self.path / "manifest.json", self.manifest)
+        # Extend the in-memory index incrementally. Reopening and re-indexing
+        # every historical sidecar on each flush would be quadratic in shard count.
+        self._reader.manifest = self.manifest
+        self._reader._verified.add(index)
+        for entry in entries:
+            rec = SampleRecord.from_dict(entry["record"])
+            self._reader._index[rec.sample_id] = (new, entry)
+            self._reader._ordered_ids.append(rec.sample_id)
         self._pending.clear(); self._pending_ids.clear(); self._pending_bytes = 0
-        self._reader = ShardedReader(self.path, verify_shards=False, expected_identity=self._identity)
 
     def close(self) -> None:
         if self._closed:
             return
         try:
             self.flush()
-            # Convenience index, rebuilt from committed sidecars; not an authority.
-            lines = [stable_json(self._reader.metadata(sid).to_dict()) for sid in self._reader._ordered_ids]
-            _atomic_bytes(self.path / "samples.jsonl", ("\n".join(lines) + ("\n" if lines else "")).encode("utf-8"))
+            # Convenience index is not authoritative. Stream it into a temp
+            # file so closing a huge cache never duplicates the full index RAM.
+            output = self.path / "samples.jsonl"
+            fd, temp = tempfile.mkstemp(prefix=".sample-index-", dir=self.path)
+            try:
+                with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                    for sid in self._reader._ordered_ids:
+                        handle.write(stable_json(self._reader.metadata(sid).to_dict()) + "\n")
+                    handle.flush()
+                    os.fsync(handle.fileno())
+                os.replace(temp, output)
+            finally:
+                if os.path.exists(temp):
+                    os.unlink(temp)
         finally:
             self.abort()
 

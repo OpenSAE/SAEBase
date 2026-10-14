@@ -413,3 +413,22 @@ def test_m0_and_m1_state_hashes_agree_for_model_and_sae():
     sae = ResearchToySAE()
     assert sha256_state_dict(model) == _sha_weights(model)
     assert sha256_state_dict(sae) == _sha_weights(sae)
+
+
+def test_many_shards_use_incremental_metadata_index(tmp_path, monkeypatch):
+    import saebase.store.shards as mod
+    original = mod.ShardedReader
+    calls = []
+
+    class CountingReader(original):
+        def __init__(self, *a, **k):
+            calls.append(1)
+            super().__init__(*a, **k)
+    monkeypatch.setattr(mod, "ShardedReader", CountingReader)
+    with ActivationWriter(tmp_path, identity(), width=4, shard_target_bytes=128) as w:
+        for idx in range(190):
+            w.append(sample(f"item-{idx:05d}", (idx, idx+1)), np.full((1, 4), idx, np.float32))
+        path = w.path
+    assert len(calls) == 1, "writer should not reindex every prior shard after each flush"
+    assert original(path).sample_count == 190
+    assert len(original(path).manifest["shards"]) >= 20
