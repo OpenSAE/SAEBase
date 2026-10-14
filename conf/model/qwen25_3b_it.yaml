@@ -1,0 +1,6 @@
+# @package _global_
+model:
+  name: qwen25_3b_it
+  pretrained_name: Qwen/Qwen2.5-3B-Instruct
+  family: qwen
+  device: cuda

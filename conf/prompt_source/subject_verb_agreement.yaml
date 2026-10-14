@@ -1,0 +1,9 @@
+# @package _global_
+prompt_source:
+  name: SubjectVerbAgreement
+  input_format: text
+  data_path: ${paths.data_dir}/SubjectVerbAgreement
+  prepare:
+    n_generate: 300
+    min_kept: 20
+    seed: 0

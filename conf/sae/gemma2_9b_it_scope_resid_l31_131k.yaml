@@ -1,0 +1,6 @@
+# @package _global_
+sae:
+  name: gemma2_9b_it_scope_resid_l31_131k
+  layer: 31
+  device: cuda
+  require_prepared_prompts: true

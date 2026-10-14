@@ -1,0 +1,6 @@
+# @package _global_
+task:
+  name: sae
+  evaluation: activation_health
+  facets:
+    post_run_summary: true

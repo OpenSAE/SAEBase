@@ -1,0 +1,5 @@
+# @package _global_
+prompt_source:
+  name: MATH500
+  input_format: text
+  data_path: ${paths.data_dir}/MATH500

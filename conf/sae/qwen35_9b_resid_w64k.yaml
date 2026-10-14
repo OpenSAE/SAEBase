@@ -1,0 +1,6 @@
+# @package _global_
+sae:
+  name: qwen35_9b_resid_w64k
+  layer: 16
+  device: cuda
+  require_prepared_prompts: true

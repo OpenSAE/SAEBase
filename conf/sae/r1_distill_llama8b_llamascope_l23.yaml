@@ -1,0 +1,6 @@
+# @package _global_
+sae:
+  name: r1_distill_llama8b_llamascope_l23
+  layer: 23
+  device: cuda
+  require_prepared_prompts: true

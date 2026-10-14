@@ -1,0 +1,6 @@
+# @package _global_
+model:
+  name: qwen35_9b
+  pretrained_name: Qwen/Qwen3.5-9B-Base
+  family: qwen
+  device: cuda

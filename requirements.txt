@@ -1,0 +1,2 @@
+# Full analysis environment, including Pythia and public SAE checkpoint loading.
+-e ".[analysis,dev]"

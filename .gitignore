@@ -1,0 +1,21 @@
+# Local datasets, experiment runs, and model caches
+data/
+experiment/
+*.safetensors
+*.pt
+*.pth
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hydra/
+sae_activation_summary.json
+
+# Distribution and QA artifacts
+dist/
+build/
+*.egg-info/
+.coverage
+htmlcov/

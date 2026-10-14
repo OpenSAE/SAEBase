@@ -1,0 +1,18 @@
+# @package _global_
+prompt_source:
+  name: MMLUPro
+  input_format: text
+  data_path: ${paths.data_dir}/MMLUPro
+  prepare:
+    n_generate: 300
+    min_kept: 20
+    seed: 0
+    split: test
+    categories: all
+    n_shot: 0
+    scoring: direct
+    max_prompt_tokens: 2048
+    drop_na_options: true
+    balance_per_category: false
+    source_path: /workspace/data/MMLU-Pro
+    hf_name: TIGER-Lab/MMLU-Pro

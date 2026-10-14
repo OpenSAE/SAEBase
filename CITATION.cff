@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use SAEBase in research, please cite the version you used and the relevant underlying SAE/model papers."
+title: "SAEBase: Research Infrastructure for Sparse Autoencoder Evaluation"
+type: software
+authors:
+  - name: "OpenSAE contributors"
+version: 0.1.0
+repository-code: "https://github.com/OpenSAE/SAEBase"
+license: Apache-2.0

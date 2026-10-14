@@ -1,0 +1,6 @@
+# @package _global_
+sae:
+  name: gemma270m_scope_resid
+  layer: null
+  device: cuda
+  require_prepared_prompts: true

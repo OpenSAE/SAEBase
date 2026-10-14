@@ -1,0 +1,6 @@
+# @package _global_
+model:
+  name: pythia70m
+  pretrained_name: pythia-70m-deduped
+  family: pythia
+  device: cuda

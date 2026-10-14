@@ -1,0 +1,6 @@
+# @package _global_
+model:
+  name: llama31_8b_instruct
+  pretrained_name: meta-llama/Llama-3.1-8B-Instruct
+  family: llama
+  device: cuda

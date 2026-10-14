@@ -1,0 +1,10 @@
+# @package _global_
+evaluation:
+  name: discovery
+  n_prompts: 4
+  max_new_tokens: 256
+  n_keep: 2000
+  min_count: 5
+  device: cuda
+  reuse_cache: true
+  require_prepared_prompts: false

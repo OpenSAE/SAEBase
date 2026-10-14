@@ -1,0 +1,6 @@
+# @package _global_
+model:
+  name: gemma3_4b_pt
+  pretrained_name: google/gemma-3-4b-pt
+  family: gemma
+  device: cuda

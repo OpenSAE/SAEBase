@@ -1,0 +1,3 @@
+# @package _global_
+evaluation:
+  name: cross_model_transfer

@@ -1,0 +1,6 @@
+# @package _global_
+sae:
+  name: gemma1b_pt_l25_transfer_big
+  layer: 25
+  device: cuda
+  require_prepared_prompts: true

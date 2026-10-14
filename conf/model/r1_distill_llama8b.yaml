@@ -1,0 +1,6 @@
+# @package _global_
+model:
+  name: r1_distill_llama8b
+  pretrained_name: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+  family: llama
+  device: cuda

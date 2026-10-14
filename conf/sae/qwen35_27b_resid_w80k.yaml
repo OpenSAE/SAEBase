@@ -1,0 +1,6 @@
+# @package _global_
+sae:
+  name: qwen35_27b_resid_w80k
+  layer: 32
+  device: cuda
+  require_prepared_prompts: true

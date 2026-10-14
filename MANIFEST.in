@@ -1,0 +1,13 @@
+include README.md LICENSE NOTICE CONTRIBUTING.md SECURITY.md CHANGELOG.md CITATION.cff
+include requirements.txt requirements-generation.txt
+recursive-include .github *.yml *.md
+recursive-include conf *.yaml *.md
+recursive-include docs *.md
+recursive-include saebase *.md
+recursive-include tests *.py
+recursive-include examples *.py *.sh
+recursive-include scripts *.sh *.py
+prune data
+prune experiment
+prune .venv
+global-exclude __pycache__ *.py[cod] .DS_Store

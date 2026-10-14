@@ -1,0 +1,6 @@
+# @package _global_
+evaluation:
+  name: activation_health
+  n_prompts: 5
+  device: cuda
+  require_prepared_prompts: true

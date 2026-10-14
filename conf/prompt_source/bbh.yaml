@@ -1,0 +1,10 @@
+# @package _global_
+prompt_source:
+  name: BBH
+  input_format: text
+  data_path: ${paths.data_dir}/BBH
+  prepare:
+    n_generate: 80
+    min_kept: 10
+    seed: 0
+    source_path: /workspace/data/BBH

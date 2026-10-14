@@ -1,0 +1,6 @@
+# @package _global_
+model:
+  name: r1_distill_qwen15b
+  pretrained_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
+  family: qwen
+  device: cuda

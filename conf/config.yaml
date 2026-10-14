@@ -1,0 +1,22 @@
+defaults:
+  - prompt_source: simple_copying
+  - model: pythia70m
+  - sae: pythia70m_resid_sm
+  - evaluation: activation_health
+  - paths: default
+  - experiment: default
+  - task: sae
+  - _self_
+
+seed: 1
+
+exp_run_leaf: ${experiment.sub_name}_${seed}
+
+hydra:
+  run:
+    dir: ${paths.root}/experiment/${prompt_source.name}/${model.name}/${sae.name}/${task.name}/${exp_run_leaf}
+  sweep:
+    dir: ${paths.root}/experiment/multirun/${prompt_source.name}/${model.name}/${sae.name}/${task.name}/${now:%Y-%m-%d}_${now:%H-%M-%S}
+    subdir: ${hydra.job.num}
+  job:
+    chdir: true

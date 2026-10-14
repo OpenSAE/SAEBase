@@ -1,0 +1,6 @@
+# @package _global_
+sae:
+  name: none
+  layer: null
+  device: cuda
+  require_prepared_prompts: false

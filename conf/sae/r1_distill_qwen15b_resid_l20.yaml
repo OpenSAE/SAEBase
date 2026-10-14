@@ -1,0 +1,6 @@
+# @package _global_
+sae:
+  name: r1_distill_qwen15b_resid_l20
+  layer: 20
+  device: cuda
+  require_prepared_prompts: true

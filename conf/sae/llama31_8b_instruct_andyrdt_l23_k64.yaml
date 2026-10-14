@@ -1,0 +1,6 @@
+# @package _global_
+sae:
+  name: llama31_8b_instruct_andyrdt_l23_k64
+  layer: 23
+  device: cuda
+  require_prepared_prompts: false

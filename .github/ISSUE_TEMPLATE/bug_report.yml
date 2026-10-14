@@ -1,0 +1,22 @@
+name: Bug report
+description: Report reproducible SAEBase behavior
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Description
+      description: Describe what happened and what you expected.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Include the model/SAE identity, layer, hook, token position, command, and traceback.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Python, PyTorch, SAEBase version, backend, and CPU/GPU details.

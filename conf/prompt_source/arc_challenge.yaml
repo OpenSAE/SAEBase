@@ -1,0 +1,5 @@
+# @package _global_
+prompt_source:
+  name: ARCChallenge
+  input_format: text
+  data_path: ${paths.data_dir}/ARCChallenge

@@ -1,0 +1,6 @@
+# @package _global_
+evaluation:
+  name: cross_model_filtering
+  n_prompts: 500
+  device: cuda
+  require_prepared_prompts: false

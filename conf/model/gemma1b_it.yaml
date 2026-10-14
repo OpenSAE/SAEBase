@@ -1,0 +1,7 @@
+# @package _global_
+model:
+  name: gemma1b_it
+  pretrained_name: google/gemma-3-1b-it
+  # Candidates tried by load_from_spec (in gemma1b_it.py): google official then unsloth.
+  family: gemma
+  device: cuda
