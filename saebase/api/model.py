@@ -222,7 +222,7 @@ class ModelAdapter:
             return result.detach().clone()
 
         # Tensor clone is essential: multiple hooks may consume the same data.
-        def replace(h: torch.Tensor, _hook: Any) -> torch.Tensor:
+        def replace(h: torch.Tensor, hook: Any) -> torch.Tensor:
             if not isinstance(h, torch.Tensor) or h.ndim != 3 or h.shape[:2] != ids.shape:
                 raise RuntimeError("patch hook must receive shape [1, seq, d_model]")
             if h.shape[-1] != activation.numel():
