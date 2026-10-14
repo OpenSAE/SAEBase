@@ -1,0 +1,272 @@
+{
+  "schema": "saebase.m0.reference.v1",
+  "status": "passed",
+  "reference_type": "real_pythia70m_sae",
+  "real_checkpoint_validated": true,
+  "model_key": "pythia70m",
+  "sae_key": "pythia70m_resid_sm",
+  "site": {
+    "hook": "blocks.3.hook_resid_post",
+    "layer": 3,
+    "position": -1
+  },
+  "identity": {
+    "model_key": "pythia70m",
+    "sae_key": "pythia70m_resid_sm",
+    "checkpoint": "pythia-70m-deduped-res-sm",
+    "sae_id": "blocks.3.hook_resid_post",
+    "hook_name": "blocks.3.hook_resid_post",
+    "layer": 3,
+    "loader": "sae_lens",
+    "d_in": 512,
+    "d_sae": 32768,
+    "revision": null,
+    "model_revision": null,
+    "loaded_model_name": "pythia-70m-deduped",
+    "trained_on_model_key": "pythia70m",
+    "target_model_key": "pythia70m",
+    "transfer_kind": "none",
+    "normalization": "unspecified",
+    "dtype": "torch.float32"
+  },
+  "model_state_sha256": "dc595ff7ad9263a3ef34ce8975beadfe76b7271916c63a7a67b8a195d7e50a12",
+  "sae_state_sha256": "cde8b7c669860ec0dbd4b8ede465ff08868b317fc80010dac2703bc553c6585f",
+  "tokenizer": {
+    "class": "transformers.models.gpt_neox.tokenization_gpt_neox.GPTNeoXTokenizer",
+    "name_or_path": "EleutherAI/pythia-70m-deduped",
+    "bos_token_id": 0,
+    "eos_token_id": 0,
+    "chat_template_sha256": null
+  },
+  "seed": 0,
+  "tolerances": {
+    "rtol": 0.0001,
+    "atol": 0.0001
+  },
+  "environment": {
+    "python": "3.11.17",
+    "packages": {
+      "torch": "2.14.1",
+      "numpy": "2.4.6",
+      "omegaconf": "2.3.1",
+      "hydra-core": "1.3.7",
+      "transformer-lens": "3.9.0",
+      "sae-lens": "6.54.5",
+      "huggingface-hub": "2.2.0",
+      "safetensors": "0.8.0",
+      "transformers": "5.19.0"
+    }
+  },
+  "sample_count": 3,
+  "max_identity_error": 0.0,
+  "samples": [
+    {
+      "sample_id": "simple_copying-000000",
+      "prompt_sha256": "751681815f4f1ec176a35cf22f807b26682fe57c76675adf84eba3e1313bb02d",
+      "token_ids": [
+        40587,
+        37083,
+        15458
+      ],
+      "token_count": 3,
+      "site": {
+        "hook": "blocks.3.hook_resid_post",
+        "layer": 3,
+        "position": -1
+      },
+      "activation_dim": 512,
+      "sae_width": 32768,
+      "activation_l2": 124.56318664550781,
+      "activation_probe": [
+        4.048466205596924,
+        0.00023692846298217773,
+        -1.2104532718658447,
+        -0.26908230781555176,
+        5.140810966491699,
+        0.6939141750335693,
+        -1.2378699779510498,
+        -0.3001174330711365,
+        0.2480672299861908,
+        5.784839153289795,
+        -1.1501299142837524,
+        0.27534019947052
+      ],
+      "codes_l0": 172,
+      "selected_feature": 20526,
+      "selected_feature_value": 40.133140563964844,
+      "reconstruction_mse": 3.7515499591827393,
+      "baseline_logit_probe": [
+        -1204.6993408203125,
+        -1330.2060546875,
+        16.13620376586914,
+        14.904975891113281,
+        11.967967987060547,
+        13.15124225616455,
+        12.023601531982422,
+        14.298827171325684,
+        16.335033416748047,
+        14.91014289855957,
+        15.742301940917969,
+        14.510580062866211
+      ],
+      "identity_max_logit_abs_error": 0.0,
+      "edit_logit_delta_l2": 195.95372009277344,
+      "edited_logit_probe": [
+        -1201.66845703125,
+        -1325.783447265625,
+        15.312317848205566,
+        14.62505054473877,
+        13.254007339477539,
+        12.112163543701172,
+        11.623078346252441,
+        14.236397743225098,
+        16.59284019470215,
+        13.279460906982422,
+        15.899115562438965,
+        13.406972885131836
+      ]
+    },
+    {
+      "sample_id": "simple_copying-000002",
+      "prompt_sha256": "6e348007a2fb26fa5c0e2f0d9aaa83b72b36a6f63f8fdb5053ff6b3884cf5837",
+      "token_ids": [
+        6300,
+        249,
+        29040,
+        20839
+      ],
+      "token_count": 4,
+      "site": {
+        "hook": "blocks.3.hook_resid_post",
+        "layer": 3,
+        "position": -1
+      },
+      "activation_dim": 512,
+      "sae_width": 32768,
+      "activation_l2": 15.814818382263184,
+      "activation_probe": [
+        1.429884910583496,
+        -0.232003852725029,
+        0.3793489933013916,
+        -0.8001391887664795,
+        0.6940852403640747,
+        -0.40242889523506165,
+        -0.10038959980010986,
+        -0.23337316513061523,
+        -0.049638181924819946,
+        1.0922482013702393,
+        -0.07456454634666443,
+        -0.12915511429309845
+      ],
+      "codes_l0": 66,
+      "selected_feature": 16509,
+      "selected_feature_value": 1.870795488357544,
+      "reconstruction_mse": 0.09825146198272705,
+      "baseline_logit_probe": [
+        -1201.702880859375,
+        -1327.138427734375,
+        16.761709213256836,
+        15.657622337341309,
+        13.417108535766602,
+        12.248799324035645,
+        12.951762199401855,
+        13.247861862182617,
+        16.694231033325195,
+        15.959040641784668,
+        14.3121976852417,
+        13.84432601928711
+      ],
+      "identity_max_logit_abs_error": 0.0,
+      "edit_logit_delta_l2": 76.98534393310547,
+      "edited_logit_probe": [
+        -1201.4512939453125,
+        -1326.9444580078125,
+        16.8763370513916,
+        15.665397644042969,
+        13.748126983642578,
+        12.63505744934082,
+        13.088667869567871,
+        13.333966255187988,
+        16.803144454956055,
+        15.992742538452148,
+        14.104451179504395,
+        14.016424179077148
+      ]
+    },
+    {
+      "sample_id": "simple_copying-000003",
+      "prompt_sha256": "34f43fd190167e0832d6e25d34c38d677375565f960a21acadb3cd6a66e1c287",
+      "token_ids": [
+        53,
+        50177,
+        38150,
+        308,
+        50177
+      ],
+      "token_count": 5,
+      "site": {
+        "hook": "blocks.3.hook_resid_post",
+        "layer": 3,
+        "position": -1
+      },
+      "activation_dim": 512,
+      "sae_width": 32768,
+      "activation_l2": 14.778555870056152,
+      "activation_probe": [
+        -0.03158870339393616,
+        0.23531702160835266,
+        -1.0866535902023315,
+        -0.04902690649032593,
+        0.27071473002433777,
+        -0.7051417231559753,
+        -0.9719196557998657,
+        0.25824928283691406,
+        -0.18809974193572998,
+        1.2929383516311646,
+        -0.18799521028995514,
+        -0.15544603765010834
+      ],
+      "codes_l0": 53,
+      "selected_feature": 31453,
+      "selected_feature_value": 2.2875189781188965,
+      "reconstruction_mse": 0.08217436075210571,
+      "baseline_logit_probe": [
+        -1205.150634765625,
+        -1330.999267578125,
+        17.375328063964844,
+        17.02664566040039,
+        14.885026931762695,
+        15.62764835357666,
+        12.313346862792969,
+        16.34450340270996,
+        16.531774520874023,
+        16.373245239257812,
+        16.743938446044922,
+        15.404630661010742
+      ],
+      "identity_max_logit_abs_error": 0.0,
+      "edit_logit_delta_l2": 82.19823455810547,
+      "edited_logit_probe": [
+        -1204.906982421875,
+        -1330.634765625,
+        17.05880355834961,
+        16.795791625976562,
+        15.225522994995117,
+        16.155500411987305,
+        12.412033081054688,
+        16.3499813079834,
+        16.098064422607422,
+        16.177833557128906,
+        16.85019302368164,
+        15.364095687866211
+      ]
+    }
+  ],
+  "prompt_manifest": {
+    "behavior": "SimpleCopying",
+    "model_key": "pythia70m",
+    "kept_count": 85,
+    "manifest_sha256": "71e5f1130adcbe51d9140d25f0c25c0d2061ada39decd165c0dd95491d8a2f1b",
+    "prompts_sha256": "5363c2616bcc3589f935657ca55a1f8c23172df3a898b0703109ee6d72d6bdb2"
+  }
+}
