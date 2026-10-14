@@ -14,6 +14,8 @@ NEEDED_WHEEL = {
     "saebase/__init__.py",
     "saebase/api/__init__.py",
     "saebase/api/features.py",
+    "saebase/store/__init__.py", "saebase/store/identity.py",
+    "saebase/store/shards.py", "saebase/store/collect.py",
     "saebase/integrations/sar.py",
     "saebase/integrations/rss.py",
     "saebase/sae/registry.py",
@@ -35,6 +37,9 @@ NEEDED_SDIST = NEEDED_WHEEL | {
     "MANIFEST.in", ".github/workflows/ci.yml",
     "docs/RELEASE_CHECKLIST.md", "docs/PROVENANCE.md", "docs/API.md",
     "tests/test_phase_a.py", "tests/test_phase_d.py",
+    "tests/test_m1_store.py", "tests/fixtures/m0_reference_public.json",
+    "docs/M1_ACTIVATION_STORE.md", "examples/10_activation_store_offline.py",
+    ".github/workflows/m1-real.yml",
 }
 BAD_PARTS = {"__pycache__", ".pytest_cache", ".venv", ".git"}
 BAD_TOP_LEVEL = {"experiment", "data", "dist", "build"}
