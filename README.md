@@ -133,6 +133,27 @@ Both examples default to deterministic synthetic data. The `--real` option uses 
 
 ---
 
+## ⚡ Batch Interventions & Steering (M2)
+
+Batch feature ablation, scaling, clamping, coalition interventions, and SAE
+reconstruction controls can now run over multiple prompts in one experiment.
+Results use verified, resumable JSONL shards; optional M1 activation/code
+caches are validated against the exact model/SAE state and source activations.
+
+```bash
+# Inspect the experiment and token budget without downloading model weights.
+saebase-intervene --config conf/interventions/m2_pythia_example.json --dry-run
+# Run a deterministic offline multi-prompt/steering example.
+python examples/11_batch_interventions_offline.py
+```
+
+The **real** run requires `--real` and a configured analysis environment. Short
+steering uses full-prefix autoregressive recomputation as the correctness
+reference; no KV cache or GPU batching speedup is implied. See
+[**M2 batch intervention documentation**](docs/M2_BATCH_INTERVENTIONS.md).
+
+---
+
 ## 🏗️ Architecture
 
 | Component | Responsibility |

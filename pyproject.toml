@@ -58,6 +58,7 @@ dev = ["pytest>=7", "build>=1.2", "twine>=5", "PyYAML>=6"]
 saebase = "main:main"
 saebase-prepare-prompts = "scripts.sae_prepare_prompts:main"
 saebase-check-env = "scripts.check_env:main"
+saebase-intervene = "scripts.m2_batch:main"
 
 [project.urls]
 Repository = "https://github.com/OpenSAE/SAEBase"
@@ -74,7 +75,7 @@ include = ["saebase*", "models*", "tasks*", "scripts*", "conf*"]
 exclude = ["tests*", "examples*"]
 
 [tool.setuptools.package-data]
-conf = ["**/*.yaml", "**/*.yml", "**/*.md"]
+conf = ["**/*.yaml", "**/*.yml", "**/*.md", "**/*.json"]
 saebase = ["**/*.md", "**/*.yaml", "**/*.json"]
 models = ["**/*.json", "**/*.yaml"]
 

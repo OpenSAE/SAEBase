@@ -14,6 +14,10 @@ NEEDED_WHEEL = {
     "saebase/__init__.py",
     "saebase/api/__init__.py",
     "saebase/api/features.py",
+    "saebase/interventions/__init__.py", "saebase/interventions/engine.py",
+    "saebase/interventions/specs.py", "saebase/interventions/operators.py",
+    "saebase/interventions/results.py", "saebase/interventions/steering.py",
+    "scripts/m2_batch.py", "conf/interventions/m2_pythia_example.json",
     "saebase/store/__init__.py", "saebase/store/identity.py",
     "saebase/store/shards.py", "saebase/store/collect.py",
     "saebase/integrations/sar.py",
@@ -37,9 +41,11 @@ NEEDED_SDIST = NEEDED_WHEEL | {
     "MANIFEST.in", ".github/workflows/ci.yml",
     "docs/RELEASE_CHECKLIST.md", "docs/PROVENANCE.md", "docs/API.md",
     "tests/test_phase_a.py", "tests/test_phase_d.py",
-    "tests/test_m1_store.py", "tests/fixtures/m0_reference_public.json",
+    "tests/test_m1_store.py", "tests/test_m2_interventions.py", "tests/fixtures/m0_reference_public.json",
     "docs/M1_ACTIVATION_STORE.md", "examples/10_activation_store_offline.py",
     ".github/workflows/m1-real.yml",
+    ".github/workflows/m2-real.yml", "docs/M2_BATCH_INTERVENTIONS.md",
+    "scripts/m2_real_smoke.py", "examples/11_batch_interventions_offline.py",
 }
 BAD_PARTS = {"__pycache__", ".pytest_cache", ".venv", ".git"}
 BAD_TOP_LEVEL = {"experiment", "data", "dist", "build"}
@@ -59,7 +65,7 @@ def validate(dist_dir: Path) -> dict[str, object]:
         if entry_file is None:
             raise AssertionError("Wheel entry points are missing")
         entries = z.read(entry_file).decode("utf-8")
-        if not all(e in entries for e in ("saebase = main:main", "saebase-prepare-prompts", "saebase-check-env")):
+        if not all(e in entries for e in ("saebase = main:main", "saebase-prepare-prompts", "saebase-check-env", "saebase-intervene")):
             raise AssertionError("Installed command entry points missing")
         metadata_file = next((p for p in wheel_files if p.endswith(".dist-info/METADATA")), None)
         if metadata_file is None:

@@ -1,0 +1,19 @@
+{
+  "model_key": "pythia70m",
+  "sae_key": "pythia70m_resid_sm",
+  "layer": 3,
+  "sample_batch": 4,
+  "microbatch": 8,
+  "max_measurements": 10000,
+  "max_generated_tokens": 100,
+  "samples": [
+    {"sample_id": "example-user-token-ids", "token_ids": [40587, 37083, 15458], "target_token_id": 1, "reference_token_id": 0}
+  ],
+  "conditions": [
+    {"name": "identity", "operation": "identity"},
+    {"name": "ablate_feature_0", "operation": "ablate", "feature_ids": [0]},
+    {"name": "scale_feature_0", "operation": "scale", "feature_ids": [0], "value": 0.5},
+    {"name": "replace_with_sae_reconstruction", "operation": "reconstruction"}
+  ],
+  "steering": {"condition_name": "ablate_feature_0", "max_new_tokens": 3, "seed": 0, "temperature": 0.0}
+}
