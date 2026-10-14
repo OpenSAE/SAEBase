@@ -133,3 +133,20 @@ def test_reference_hash_supports_zero_dimensional_state_tensors():
     assert len(old_hash) == 64
     module.scalar += 1
     assert _sha_weights(module) != old_hash
+
+
+def test_transformerlens_keyword_hook_callback_compatibility():
+    import torch
+
+    class KeywordHookModel(ResearchToyModel):
+        def run_with_hooks(self, tokens, fwd_hooks):
+            h = self._hidden(tokens)
+            for name, fn in fwd_hooks:
+                assert name == self.site_name
+                h = fn(h, hook=None)
+            return self._logits(h)
+
+    model = ModelAdapter(KeywordHookModel().eval())
+    site = ActivationSite(layer=0, hook_name="blocks.0.hook_resid_post")
+    tokens = model.tokens(prompt="1 2 3")
+    model.assert_identity_patch(tokens=tokens, site=site)
