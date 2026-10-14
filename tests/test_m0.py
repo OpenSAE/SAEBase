@@ -119,3 +119,17 @@ def test_m0_real_runner_documents_explicit_inputs():
     assert "--reuse-prompts" in p.stdout
     assert "--compare-to" in p.stdout
     assert (ROOT / "scripts/m0_real_smoke.sh").is_file()
+
+
+def test_reference_hash_supports_zero_dimensional_state_tensors():
+    import torch
+    class ScalarState(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.register_buffer("scalar", torch.tensor(0.5))
+            self.register_buffer("vector", torch.arange(5.0))
+    module = ScalarState()
+    old_hash = _sha_weights(module)
+    assert len(old_hash) == 64
+    module.scalar += 1
+    assert _sha_weights(module) != old_hash
