@@ -312,3 +312,33 @@ def test_configurable_cli_dry_run_requires_no_remote_weights(tmp_path):
     r=subprocess.run([sys.executable,'scripts/m2_batch.py','--config',str(conf)],
                      cwd=repo,capture_output=True,text=True,timeout=20)
     assert r.returncode!=0 and '--real' in r.stderr
+
+
+def test_m0_probe_uses_recorded_atol_and_rtol_and_rejects_drift():
+    """Fixed absolute-only thresholds incorrectly rejected valid M0 comparisons."""
+    import numpy as np
+    from scripts.m2_real_smoke import compare_m0_activation_probe
+
+    ref = np.array([5.0, -2.0, 0.0002, 0.0])
+    # A 1.2e-4 change is legitimate at a reference magnitude of 5,
+    # but the same change is not legitimate close to zero.
+    seen = ref + np.array([0.00012, -0.00011, 0.00009, 0.00009])
+    assert compare_m0_activation_probe(ref, seen, atol=1e-4, rtol=1e-4) == pytest.approx(0.00012)
+    with pytest.raises(RuntimeError, match="coordinate 2"):
+        compare_m0_activation_probe(ref, ref + [0., 0., 0.00012, 0.], atol=1e-4, rtol=1e-4)
+    with pytest.raises(RuntimeError, match="coordinate 3"):
+        compare_m0_activation_probe(ref, ref + [0., 0., 0., 0.000101], atol=1e-4, rtol=1e-4)
+    with pytest.raises(ValueError, match="tolerances"):
+        compare_m0_activation_probe(ref, seen, atol=-1e-4, rtol=1e-4)
+    with pytest.raises(RuntimeError, match="dimensions"):
+        compare_m0_activation_probe(ref, seen[:2], atol=1e-4, rtol=1e-4)
+    with pytest.raises(RuntimeError, match="non-finite"):
+        compare_m0_activation_probe(ref, [1., 2., float('nan'), 0.], atol=1e-4, rtol=1e-4)
+
+
+def test_m0_public_reference_has_recorded_tolerances():
+    from pathlib import Path
+    source = Path(__file__).resolve().parent / "fixtures/m0_reference_public.json"
+    record = json.loads(source.read_text())
+    assert record["real_checkpoint_validated"] is True
+    assert record["tolerances"] == {"atol": 1e-4, "rtol": 1e-4}

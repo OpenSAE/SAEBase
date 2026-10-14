@@ -28,6 +28,34 @@ from saebase.interventions import (BatchEngine, Condition, ExperimentIdentity,
                                    RunBudget, dry_run, read_results, run_steering)
 
 
+
+def compare_m0_activation_probe(reference, observed, *, atol: float, rtol: float) -> float:
+    """Check the stored M0 probe coordinatewise using its recorded tolerances.
+
+    M0 uses numpy-style |observed-reference| <= atol + rtol*|reference|.
+    The returned max *absolute* difference is a diagnostic, not the acceptance
+    criterion. Reject changed probe geometry or non-finite values explicitly.
+    """
+    if not np.isfinite(atol) or not np.isfinite(rtol) or atol < 0 or rtol < 0:
+        raise ValueError("M0 numerical tolerances must be finite and nonnegative")
+    expected = np.asarray(reference, dtype=np.float64)
+    actual = np.asarray(observed, dtype=np.float64)
+    if expected.ndim != 1 or expected.size == 0 or expected.shape != actual.shape:
+        raise RuntimeError("M0 activation probe dimensions differ")
+    if not np.isfinite(expected).all() or not np.isfinite(actual).all():
+        raise RuntimeError("M0 activation probe contains non-finite values")
+    delta = np.abs(actual - expected)
+    allowed = atol + rtol * np.abs(expected)
+    if np.any(delta > allowed):
+        pos = int(np.argmax(delta > allowed))
+        raise RuntimeError(
+            f"M0 activation probe numerical drift at coordinate {pos}: "
+            f"abs_error={delta[pos]:.9g}, allowed={allowed[pos]:.9g}, "
+            f"reference={expected[pos]:.9g}"
+        )
+    return float(delta.max())
+
+
 def run(reference: Path, cache_root: Path, output: Path) -> dict:
     m0 = json.loads(reference.read_text())
     if m0.get("real_checkpoint_validated") is not True or m0.get("status") != "passed":
@@ -48,16 +76,23 @@ def run(reference: Path, cache_root: Path, output: Path) -> dict:
         prompt_group_id=row["sample_id"]),target_token_id=1,reference_token_id=0)
         for row in sample_rows]
     # Validate exact public-reference probes before trusting cached interventions.
+    reference_tolerance = m0.get("tolerances")
+    if not isinstance(reference_tolerance, dict) or not all(
+        name in reference_tolerance for name in ("atol", "rtol")
+    ):
+        raise ValueError("M0 reference is missing its recorded numerical tolerances")
     errors = []
     for sample,old in zip(samples,sample_rows):
         snap = capture_features(model,sae,site=site,
                 tokens=model.tokens(tokens=torch.tensor([sample.tokens])))
-        errors.append(float(np.max(np.abs(np.array(old["activation_probe"]) -
-                                         snap.activation.cpu().numpy()[:len(old["activation_probe"])]))))
+        errors.append(compare_m0_activation_probe(
+            old["activation_probe"],
+            snap.activation.detach().cpu().numpy()[:len(old["activation_probe"])],
+            atol=float(reference_tolerance["atol"]),
+            rtol=float(reference_tolerance["rtol"]),
+        ))
         if int(torch.count_nonzero(snap.codes)) != old["codes_l0"]:
             raise RuntimeError("M0 SAE code sparsity mismatch")
-    if max(errors) > 1e-4:
-        raise RuntimeError(f"M0 activation probe numerical drift: {max(errors)}")
     tokenizer=model.model.tokenizer
     token_digest=fingerprint({"vocab":tokenizer.get_vocab(),
                               "special_tokens":getattr(tokenizer,"special_tokens_map",{}),
@@ -131,6 +166,10 @@ def run(reference: Path, cache_root: Path, output: Path) -> dict:
             "conditions":len(conditions),"batch_stats":asdict(stats),
             "resume_reused":resumed.reused,"resume_model_forward_calls":0,
             "m0_activation_probe_max_error":max(errors),
+            "m0_activation_probe_tolerances": {
+                "atol": float(reference_tolerance["atol"]),
+                "rtol": float(reference_tolerance["rtol"]),
+            },
             "single_vs_batch_logit_delta_l2_abs_error":error,
             "identity_conditions_verified":len(zero),
             "identity_max_logit_abs_error":identity_max_error,
