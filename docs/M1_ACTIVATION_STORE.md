@@ -179,3 +179,30 @@ writer buffer target. The observed pending numeric buffer never exceeded
 65,536 bytes. Iteration in 64-row windows returned all 4,096 samples while
 the reader retained at most two shard memory maps. This is an engineering
 I/O check on synthetic arrays, not a claim about GPU forward throughput.
+
+## M1 verified release acceptance — October 14, 2026
+
+M1 is now **accepted** as the resumable local Activation Store foundation for the v0.2 roadmap. This records evidence from the actual `main` branch, not from synthetic tests alone.
+
+| Gate | Evidence | Result |
+| --- | --- | --- |
+| Offline regression | [main CI run #38642950680](https://github.com/OpenSAE/SAEBase/actions/runs/38642950680), Python 3.11 and 3.12 | Passed |
+| Analysis dependencies | Same clean GitHub Actions CI, separate `analysis-install` job | Passed |
+| Wheel and sdist | Same CI, `package` job | Passed |
+| Real pretrained checkpoint | [real M1 run #38642950452](https://github.com/OpenSAE/SAEBase/actions/runs/38642950452), public Pythia-70M + registered pretrained SAE | Passed |
+| Original reference comparison | [M0 fixture](../tests/fixtures/m0_reference_public.json), same model/SAE full-state SHA-256 and stored activation probes | Passed |
+| Resume and SAE code reuse | Actual real-model artifact, zero model calls during resumed capture/SAE code encoding | Passed |
+
+The [real-model artifact](https://github.com/OpenSAE/SAEBase/actions/runs/38642950452/artifacts/11931745526) contains `m1_reference.json` with:
+
+- `real_checkpoint_validated=true`, `m0_reference_verified=true`, `status=passed`.
+- `sample_count=4` (three original M0 prompts plus one two-position sample), `row_count=5`, `code_sample_count=4`.
+- `activation_shards=3`, `code_shards=1`.
+- `max_m0_activation_probe_abs_error=0.0` (for the stored reference probes; this is not a bound on all hidden-state coordinates).
+- `resumed_samples=4`, `encoded_samples=4`, `repeat_code_cache_reused=4`.
+- `model_forward_calls_during_resume_and_sae_encoding=0` (deliberately blocked live model cache calls during those phases).
+- SAE L0 for M0 prompts was `[172, 66, 53]`, matching the saved real M0 reference.
+
+The code also has tested crash recovery, sparse/dense round-trip, precision errors, identity invalidation, and deliberate corrupted-shard rejection. A separate local synthetic streaming test processed 4,096 activation samples with bounded pending data and two active memory maps. Neither test implies that all future model/SAE/checkpoint combinations are already supported.
+
+The authoritative release is the merged source at [OpenSAE/SAEBase](https://github.com/OpenSAE/SAEBase) (merge commit `88248988b33a1379a8db8012e24e6ebca27d6282`). M2 batch interventions, M3 benchmark runner and M4 reliability audit remain separate milestones.
