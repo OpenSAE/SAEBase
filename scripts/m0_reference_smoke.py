@@ -57,7 +57,7 @@ def _sha_weights(module: Any) -> str:
             raise TypeError(f"State value {name!r} is not a tensor")
         a = value.detach().contiguous().cpu()
         sha.update(json.dumps([name, str(a.dtype), list(a.shape)], separators=(",", ":")).encode())
-        sha.update(a.view(torch.uint8).numpy().tobytes())
+        sha.update(a.reshape(-1).view(torch.uint8).numpy().tobytes())
     return sha.hexdigest()
 
 
