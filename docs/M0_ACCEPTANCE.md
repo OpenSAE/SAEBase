@@ -1,0 +1,99 @@
+# M0 — Clean installs, verified imports, and reference checkpoint acceptance
+
+This is the foundation gate for SAEBase v0.2. **M0 does not implement the P0
+activation store or the batch intervention engine.** It restores the clean
+installation contract and introduces a real-model numerical reference for
+future M1/M2 comparisons.
+
+## 1. Dependency and package boundaries
+
+| Environment | Install in a fresh Python 3.11–3.12 virtual environment | Acceptance |
+|---|---|---|
+| Core | `python -m pip install -e .` | `saebase-check-env --mode core`, CLI, Python API imports |
+| Development | `python -m pip install -e ".[dev]"` | Core checks, `python -m pytest -q`, wheel install test |
+| Analysis | `python -m pip install -e ".[analysis]"` | `saebase-check-env --mode analysis`, check `sae_lens`, `transformer_lens`, `huggingface_hub`, `safetensors` imports |
+| Generation | `python -m pip install -e ".[generation]"` | Experimental GPU backend; not an M0 acceptance requirement |
+
+`huggingface_hub` and `safetensors` are imported only when the loader actually
+requires the corresponding remote checkpoint. Core use and offline tests no
+longer require them. `required_packages('core')` lists all four core runtime
+requirements (`numpy`, `torch`, `hydra-core`, `omegaconf`); the analysis check
+adds the libraries defined in `pyproject.toml`'s `analysis` extra.
+
+The GitHub CI has **separate fresh installations** for development, analysis,
+and wheel packaging on supported Python versions. A missing dependency failure
+is not counted as a passed model check.
+
+## 2. Real checkpoint end-to-end acceptance
+
+Do **not** label a run as real until its actual weights were downloaded or
+loaded from a verified local cache and the test below succeeded:
+
+```bash
+# In an environment with network access to public Hugging Face weights:
+python -m pip install -e '.[analysis]'
+DEVICE=cpu bash scripts/m0_real_smoke.sh
+```
+
+The default run executes the following work on the **published**
+Pythia-70M-deduped model + `pythia70m_resid_sm` SAE at layer 3:
+
+1. Load both checkpoints using the registered production loaders.
+2. Prepare versioned SimpleCopying prompts, including tokenizer identity and
+   model-based logit filtering; retain a validated manifest.
+3. Verify prepared token IDs against live tokenization for each reference.
+4. Capture the actual residual-stream activation and SAE codes.
+5. Check original activation patch identity against the model logits.
+6. Ablate the strongest active feature while preserving SAE reconstruction
+   residual; record the output logit change.
+7. Hash the complete model and SAE parameter/state tensors and persist
+   activated features, token IDs, sampled activation/logit values, package
+   versions, selected site, tolerances and error measures.
+8. Run the established `saebase --task sae` activation-health CLI against the
+   same prompt directory, require all tested prompts succeed, and cross-check
+   the selected hook/layer and sample count.
+
+Success produces `m0-artifacts/m0_reference.json` and
+`m0-artifacts/activation_health/sae_activation_summary.json`. No model weights,
+private prompts or large activation caches are committed to Git.
+
+To reproduce and compare the same reference in a second environment:
+
+```bash
+python scripts/m0_reference_smoke.py \
+  --device cpu --seed 0 --n-generate 120 --min-kept 5 --n-prompts 3 \
+  --data-dir m0-artifacts/data \
+  --output m0-artifacts/rechecked.json \
+  --reuse-prompts --compare-to m0-artifacts/m0_reference.json
+```
+
+The comparison requires matching model/SAE weight hashes, selected feature
+indices, prepared token IDs and sample identities. Floating numerical probes
+are compared under the stored tolerance. An unresolved upstream revision is
+not invented: exact weight digests are recorded even if a revision is unknown.
+
+**The structured report distinguishes `real_checkpoint_validated: true`
+from synthetic offline tests.** The latter must never be presented as live
+checkpoint acceptance.
+
+## 3. GitHub CI gate
+
+- `.github/workflows/ci.yml` installs development and analysis extras in
+  separate clean environments; it executes offline tests and packaging checks.
+- `.github/workflows/m0-real.yml` has a manual Run Workflow trigger. A main
+  commit containing the explicit `[m0-real]` marker runs the CPU checkpoint
+  acceptance once. Ordinary pushes do not download weights.
+- Inspect the final Actions job status and produced artifact before claiming
+  real M0 acceptance. Pythia/SAE availability is external to the source tree.
+
+## 4. M0 exit criteria
+
+- [ ] Python 3.11/3.12 development install, CLI and offline CI green.
+- [ ] Analysis extra clean installation and import probes green.
+- [ ] Wheel and source distribution build and inspect successfully.
+- [ ] One actual Pythia-70M+SAE activation-health and identity-patch run succeeds.
+- [ ] Numerical reference includes full model and SAE weight hashes, tokens,
+      activation/logit probes, and actual edit effects.
+- [ ] Rerunning against the same cached weights/data passes `--compare-to`.
+
+Check these boxes only after seeing evidence from the corresponding run.

@@ -22,7 +22,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install SAEBase for development
-        run: python -m pip install -e ".[dev]" "huggingface-hub>=0.23"
+        run: python -m pip install -e ".[dev]"
+      - name: Verify minimal development installation
+        run: |
+          python -m pip check
+          saebase-check-env --mode core
+          python -c "from saebase.sae.loading import load_sae_for_profile; print('lazy SAE imports OK')"
       - name: Run offline tests
         run: python -m pytest -q
       - name: Check CLI
@@ -37,6 +42,21 @@ jobs:
         run: |
           python -m build --wheel
           python scripts/check_installed_wheel.py dist
+
+  analysis-install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install complete analysis extra in a fresh environment
+        run: python -m pip install -e ".[analysis]"
+      - name: Verify analysis dependencies and model loading imports
+        run: |
+          python -m pip check
+          saebase-check-env --mode analysis
+          python -c "from saebase.sae.loading import load_sae_lens; from models.hf_compat import import_sae_lens, import_transformer_lens; import_sae_lens(); import_transformer_lens(); print('analysis imports OK')"
 
   package:
     runs-on: ubuntu-latest

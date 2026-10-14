@@ -8,14 +8,22 @@ from typing import Literal
 Mode = Literal["core", "analysis", "generation"]
 
 _PACKAGES: dict[Mode, tuple[tuple[str, str], ...]] = {
-    "core": (("hydra", "hydra-core"), ("omegaconf", "omegaconf")),
-    "analysis": (
+    "core": (
+        ("hydra", "hydra-core"),
+        ("omegaconf", "omegaconf"),
         ("torch", "torch"),
         ("numpy", "numpy"),
+    ),
+    "analysis": (
         ("transformer_lens", "transformer-lens"),
         ("sae_lens", "sae-lens"),
         ("huggingface_hub", "huggingface-hub"),
         ("safetensors", "safetensors"),
+        ("transformers", "transformers"),
+        ("datasets", "datasets"),
+        ("scipy", "scipy"),
+        ("pandas", "pandas"),
+        ("tqdm", "tqdm"),
     ),
     "generation": (("vllm", "vllm==0.27.1"), ("nnsight", "nnsight[vllm]==0.8.0rc1")),
 }
@@ -45,10 +53,12 @@ def verify_runtime(*, context: str = "SAEBase", mode: Mode = "core") -> None:
     missing = missing_packages(mode)
     if not missing:
         return
-    req = "requirements-generation.txt" if mode == "generation" else "requirements.txt"
+    requirement = {
+        "core": ".", "analysis": ".[analysis]", "generation": ".[generation]"
+    }[mode]
     details = ", ".join(f"{mod} ({pip})" for mod, pip in missing)
     raise RuntimeError(
         f"{context}: missing dependencies for {mode}: {details}. "
-        f"Run `{sys.executable} -m pip install -r {req}` in the interpreter "
+        f"Run `{sys.executable} -m pip install -e \"{requirement}\"` from the repository in the interpreter "
         "that runs SAEBase."
     )

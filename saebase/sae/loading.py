@@ -8,8 +8,6 @@ from pathlib import Path
 from typing import Any
 
 import torch
-from huggingface_hub import hf_hub_download
-from safetensors.torch import load_file
 
 from models.hooked_lm_common import (
     load_hooked_model,
@@ -72,6 +70,10 @@ def load_eleutherai_topk_mlp_sae(
     TopKSAEConfig = sl.saes.TopKSAEConfig
     SAEMetadata = sl.saes.sae.SAEMetadata
 
+    # These packages belong to the optional analysis extra, not the base API.
+    from huggingface_hub import hf_hub_download
+    from safetensors.torch import load_file
+
     dev = device or require_cuda()
     cfg_path = hf_hub_download(repo_id=release, filename=f"{folder}/cfg.json")
     weights_path = hf_hub_download(
@@ -124,6 +126,9 @@ def load_qwen_resid_topk_sae(
     TopKSAE = sl.saes.TopKSAE
     TopKSAEConfig = sl.saes.TopKSAEConfig
     SAEMetadata = sl.saes.sae.SAEMetadata
+
+    # Hugging Face is only needed for remote checkpoint loading.
+    from huggingface_hub import hf_hub_download
 
     dev = device or require_cuda()
     fname = filename or f"layer{int(layer)}.sae.pt"

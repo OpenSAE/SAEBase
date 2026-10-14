@@ -17,7 +17,8 @@ def main():
     for mod,package in required_packages(a.mode):
         print(f"[{ 'missing' if any(x[0]==mod for x in missing) else 'ok' }] {mod} ({package})")
     if missing:
-        print("[env] Install: python -m pip install -r " + ("requirements-generation.txt" if a.mode=="generation" else "requirements.txt"))
+        extra = {"core": ".", "analysis": ".[analysis]", "generation": ".[generation]"}[a.mode]
+        print(f"[env] Install from the repository: python -m pip install -e \"{extra}\"")
         return 1
     print(f"[env] {a.mode} dependency probes passed (checkpoint download and GPU runtime not tested)")
     return 0

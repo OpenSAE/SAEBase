@@ -19,3 +19,6 @@ build/
 *.egg-info/
 .coverage
 htmlcov/
+
+# M0 real-weight local acceptance outputs (not source artifacts)
+m0-artifacts/
