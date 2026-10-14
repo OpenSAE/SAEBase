@@ -173,6 +173,22 @@ python -m pytest -q
 
 ---
 
+
+## 🗃️ Activation Store（M1）
+
+SAEBase 新增可恢复的分片激活缓存：模型只需提取一次激活，即可在多个
+SAE checkpoint 上重复编码与评估。系统会独立保存模型身份、输入 token、
+选择位置、prompt group 和数据划分，并以 Dense 或 CSR 格式无损保存完整 SAE 编码。
+
+```bash
+python examples/10_activation_store_offline.py
+```
+
+该示例使用合成模型，不需要下载权重。缓存格式、span 对齐、损坏恢复与真实
+Pythia 验收流程参见 [M1 Activation Store](docs/M1_ACTIVATION_STORE.md)。
+
+---
+
 ## 📚 文档
 
 [API 文档](docs/API.md) · [入门与数据准备](docs/PHASE_A.md) · [特征干预](docs/PHASE_B.md) · [研究接入](docs/PHASE_C.md) · [更新记录](CHANGELOG.md)

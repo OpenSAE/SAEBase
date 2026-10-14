@@ -173,6 +173,24 @@ python -m pytest -q
 
 ---
 
+
+## 🗃️ Activation Store (M1)
+
+SAEBase now includes a **sharded and resumable Activation Store**. Capture
+model activations once, reuse them across multiple SAE checkpoints, and save
+lossless full-width SAE codes as dense or CSR arrays. Each cache records
+checkpoint hashes, token positions, sample groups and split identities.
+
+```bash
+python examples/10_activation_store_offline.py
+```
+
+The example uses a small synthetic model. For data layouts, token/span
+alignment, cache integrity, corruption recovery, and opt-in real Pythia
+validation, see [M1 Activation Store](docs/M1_ACTIVATION_STORE.md).
+
+---
+
 ## 📚 Documentation
 
 [API Reference](docs/API.md) · [Getting Started](docs/PHASE_A.md) · [Feature Interventions](docs/PHASE_B.md) · [Research Integrations](docs/PHASE_C.md) · [Changelog](CHANGELOG.md)

@@ -22,3 +22,8 @@ htmlcov/
 
 # M0 real-weight local acceptance outputs (not source artifacts)
 m0-artifacts/
+
+# M1 model activation and SAE code caches are local data
+activation-cache/
+m1-cache/
+m1-artifacts/

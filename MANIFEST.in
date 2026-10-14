@@ -5,6 +5,7 @@ recursive-include conf *.yaml *.md
 recursive-include docs *.md
 recursive-include saebase *.md
 recursive-include tests *.py
+recursive-include tests/fixtures *.json
 recursive-include examples *.py *.sh
 recursive-include scripts *.sh *.py
 prune data
