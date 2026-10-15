@@ -62,6 +62,7 @@ saebase-intervene = "scripts.m2_batch:main"
 saebase-benchmark = "scripts.m3_benchmark:main"
 saebase-audit = "scripts.m4_reliability:main"
 saebase-ground-truth = "scripts.m4_ground_truth:main"
+saebase-release-matrix = "scripts.m5_release_matrix:main"
 
 [project.urls]
 Repository = "https://github.com/OpenSAE/SAEBase"

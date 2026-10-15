@@ -1,0 +1,89 @@
+name: M5 real two-family checkpoint matrix acceptance
+
+on:
+  pull_request:
+    paths:
+      - 'saebase/release/**'
+      - 'models/gpt2small/**'
+      - 'saebase/sae/registry.py'
+      - 'scripts/m5_release_matrix.py'
+      - 'conf/release/**'
+      - 'tests/test_m5_matrix.py'
+      - '.github/workflows/m5-matrix.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'saebase/release/**'
+      - 'conf/release/**'
+      - '.github/workflows/m5-matrix.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: m5-matrix-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  real-matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - name: Install actual model and SAE environment
+        run: |
+          python -m pip install -e '.[analysis,dev]'
+          python -m pip check
+      - name: Dry-run matrix without downloads
+        run: |
+          saebase-release-matrix --config conf/release/m5_matrix.json --dry-run
+          python -m pytest -q tests/test_m5_matrix.py
+      - name: Download and validate all four real model-SAE pairs
+        env:
+          HF_HUB_DISABLE_TELEMETRY: '1'
+          TOKENIZERS_PARALLELISM: 'false'
+          OMP_NUM_THREADS: '2'
+        run: |
+          set -euo pipefail
+          saebase-release-matrix --config conf/release/m5_matrix.json --real \
+            --device cpu --output "$RUNNER_TEMP/m5"
+          saebase-release-matrix --config conf/release/m5_matrix.json --real \
+            --device cpu --output "$RUNNER_TEMP/m5"
+          saebase-release-matrix --config conf/release/m5_matrix.json --report-only \
+            --output "$RUNNER_TEMP/m5"
+          python - <<'PY'
+          from pathlib import Path
+          import os
+          from saebase.release import load_matrix
+          from saebase.release.runner import verify_matrix
+          conf=load_matrix("conf/release/m5_matrix.json")
+          root=Path(os.environ["RUNNER_TEMP"])/"m5"/conf.matrix_id
+          result=verify_matrix(root,expected_id=conf.matrix_id)
+          assert result["real_checkpoints"]
+          assert result["n_models"]==2
+          assert result["n_distinct_saes"]>=4
+          assert set(result["families"])=={"pythia","gpt2"}
+          assert all(group["audit_groups"]==6 for group in result["models"])
+          print("M5 real four-checkpoint cross-family acceptance PASSED")
+          PY
+      - name: Archive complete real checkpoint evidence (not weights)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: saebase-m5-real-evidence
+          path: |
+            ${{ runner.temp }}/m5/*/matrix_results.json
+            ${{ runner.temp }}/m5/*/matrix_manifest.json
+            ${{ runner.temp }}/m5/*/matrix_report.html
+            ${{ runner.temp }}/m5/*/matrix_summary.csv
+            ${{ runner.temp }}/m5/*/benchmarks/*/metrics.jsonl
+            ${{ runner.temp }}/m5/*/benchmarks/*/metrics_manifest.json
+            ${{ runner.temp }}/m5/*/benchmarks/*/provenance.json
+            ${{ runner.temp }}/m5/*/benchmarks/*/reliability.json
+            ${{ runner.temp }}/m5/*/benchmarks/*/reliability_manifest.json
+          if-no-files-found: warn
+          retention-days: 30
