@@ -1,21 +1,78 @@
 {
-  "schema":"saebase.benchmark.config.v1",
-  "name":"M4 Pythia-70M real grouped audit smoke",
-  "targets":[{"model_key":"pythia70m","sae_keys":["pythia70m_resid_sm"],
-              "layer":3,"hook_name":"blocks.3.hook_resid_post"}],
-  "dataset":{"id":"m0-three-frozen-reference-prompts","samples":[
-    {"sample_id":"simple_copying-000000","token_ids":[40587,37083,15458],
-     "prompt_group_id":"m0-group-000","split":"test","target_token_id":1,"reference_token_id":0},
-    {"sample_id":"simple_copying-000002","token_ids":[6300,249,29040,20839],
-     "prompt_group_id":"m0-group-002","split":"test","target_token_id":1,"reference_token_id":0},
-    {"sample_id":"simple_copying-000003","token_ids":[53,50177,38150,308,50177],
-     "prompt_group_id":"m0-group-003","split":"test","target_token_id":1,"reference_token_id":0}
-  ]},
-  "metrics":["core.l0","intervention.logit_delta_l2","intervention.kl_baseline_to_edited"],
-  "conditions":[{"name":"identity","operation":"identity"},
-                {"name":"reconstruction","operation":"reconstruction"}],
-  "seed":0,
-  "max_measurements":16,
-  "max_activation_rows":16,
-  "tolerance":0.01
+  "schema": "saebase.benchmark.config.v1",
+  "name": "M4 Pythia-70M real grouped audit smoke",
+  "targets": [
+    {
+      "model_key": "pythia70m",
+      "sae_keys": [
+        "pythia70m_resid_sm"
+      ],
+      "layer": 3,
+      "hook_name": "blocks.3.hook_resid_post"
+    }
+  ],
+  "dataset": {
+    "id": "m0-three-frozen-reference-prompts",
+    "samples": [
+      {
+        "sample_id": "simple_copying-000000",
+        "token_ids": [
+          40587,
+          37083,
+          15458
+        ],
+        "prompt_group_id": "m0-group-000",
+        "split": "test",
+        "target_token_id": 1,
+        "reference_token_id": 0
+      },
+      {
+        "sample_id": "simple_copying-000002",
+        "token_ids": [
+          6300,
+          249,
+          29040,
+          20839
+        ],
+        "prompt_group_id": "m0-group-002",
+        "split": "test",
+        "target_token_id": 1,
+        "reference_token_id": 0
+      },
+      {
+        "sample_id": "simple_copying-000003",
+        "token_ids": [
+          53,
+          50177,
+          38150,
+          308,
+          50177
+        ],
+        "prompt_group_id": "m0-group-003",
+        "split": "test",
+        "target_token_id": 1,
+        "reference_token_id": 0
+      }
+    ]
+  },
+  "metrics": [
+    "core.l0",
+    "intervention.logit_delta_l2",
+    "intervention.kl_baseline_to_edited"
+  ],
+  "conditions": [
+    {
+      "name": "identity",
+      "operation": "identity"
+    },
+    {
+      "name": "reconstruction",
+      "operation": "reconstruction"
+    }
+  ],
+  "seed": 0,
+  "max_measurements": 16,
+  "max_activation_rows": 16,
+  "tolerance": 0.01,
+  "sample_batch": 1
 }
