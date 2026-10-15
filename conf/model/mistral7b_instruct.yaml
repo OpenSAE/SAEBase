@@ -1,0 +1,6 @@
+# @package _global_
+model:
+  name: mistral7b_instruct
+  pretrained_name: mistralai/Mistral-7B-Instruct-v0.1
+  family: mistral
+  device: cuda
