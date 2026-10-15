@@ -208,6 +208,20 @@ Pythia 验收流程参见 [M1 Activation Store](docs/M1_ACTIVATION_STORE.md)。
 
 ---
 
+## 📊 Unified SAE Benchmark（M3）
+
+通过版本化配置执行多 SAE、多指标评估；共享 M1/M2 缓存，输出
+可追溯的 JSONL、CSV、HTML 报告。
+
+```bash
+saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
+```
+
+只有显式提供 `--real` 才会加载真实模型。指标定义、原版 SAR/RSS
+适配及 SAEBench 验证边界参见 [M3 Benchmark 技术说明](docs/M3_UNIFIED_BENCHMARK.md)。
+
+---
+
 ## 📚 文档
 
 [API 文档](docs/API.md) · [入门与数据准备](docs/PHASE_A.md) · [特征干预](docs/PHASE_B.md) · [研究接入](docs/PHASE_C.md) · [更新记录](CHANGELOG.md)

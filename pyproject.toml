@@ -59,6 +59,7 @@ saebase = "main:main"
 saebase-prepare-prompts = "scripts.sae_prepare_prompts:main"
 saebase-check-env = "scripts.check_env:main"
 saebase-intervene = "scripts.m2_batch:main"
+saebase-benchmark = "scripts.m3_benchmark:main"
 
 [project.urls]
 Repository = "https://github.com/OpenSAE/SAEBase"

@@ -1,0 +1,59 @@
+name: M3 SAEBench Core and Sparse Probing native parity
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'saebase/benchmarks/**'
+      - 'scripts/m3_native_saebench_smoke.py'
+      - 'tests/test_m3_saebench_native.py'
+      - '.github/workflows/m3-saebench-native.yml'
+
+concurrency:
+  group: m3-saebench-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  native-saebench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: adamkarvonen/SAEBench
+          ref: 8042bb3828c6340da8d12062324e92b2077c571c
+          path: upstream
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - name: Install SAEBase and pinned native SAEBench
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+          python -m pip install -e ./upstream
+          python -m pip install 'pyarrow==19.0.1' 'numpy==1.26.4'
+          python -m pip check
+      - name: Execute bounded original upstream Core and Sparse Probing evaluation
+        env:
+          HF_HUB_DISABLE_TELEMETRY: '1'
+          TOKENIZERS_PARALLELISM: 'false'
+          SAEBASE_NATIVE_RESULTS: ${{ runner.temp }}/m3-native-results
+        run: |
+          python scripts/m3_native_saebench_smoke.py
+      - name: Validate official upstream reference fixtures and native outputs
+        env:
+          SAEBASE_SAEBENCH_ROOT: upstream
+          SAEBASE_NATIVE_RESULTS: ${{ runner.temp }}/m3-native-results
+        run: python -m pytest -q tests/test_m3_saebench_native.py
+      - name: Archive complete upstream native evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: saebase-m3-native-saebench
+          path: ${{ runner.temp }}/m3-native-results/
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,19 @@
+{
+  "schema": "saebase.benchmark.config.v1",
+  "name": "Pythia M3 bounded smoke",
+  "targets": [
+    {"model_key":"pythia70m","sae_keys":["pythia70m_resid_sm"],"layer":3,"hook_name":"blocks.3.hook_resid_post"}
+  ],
+  "dataset": {"id":"m0-example-tokens", "samples":[
+    {"sample_id":"m0-smoke-1","token_ids":[40587,37083,15458],"prompt_group_id":"m0-1","split":"test",
+     "target_token_id":1,"reference_token_id":0}
+  ]},
+  "metrics":["core.l0","core.reconstruction_mse","core.fvu",
+             "intervention.logit_delta_l2","intervention.kl_baseline_to_edited"],
+  "conditions":[{"name":"identity","operation":"identity"},
+                {"name":"reconstruction","operation":"reconstruction"}],
+  "seed":0,
+  "max_measurements":16,
+  "max_activation_rows":8,
+  "tolerance":0.01
+}
