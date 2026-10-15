@@ -52,6 +52,12 @@ def main() -> None:
     np.random.seed(44)
     output = Path(os.environ.get("SAEBASE_NATIVE_RESULTS", "native-results")).resolve()
     output.mkdir(parents=True, exist_ok=True)
+    # Upstream get_sae_bench_version() shells out to git in the current
+    # directory. Without this, provenance would mistakenly identify SAEBase.
+    upstream = (Path.cwd() / "upstream").resolve()
+    if not (upstream / ".git").exists():
+        raise FileNotFoundError("expected a pinned SAEBench checkout at ./upstream")
+    os.chdir(upstream)
     core_root = output / "core"
     sparse_root = output / "sparse_probing"
 
