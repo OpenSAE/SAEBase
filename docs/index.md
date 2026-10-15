@@ -14,6 +14,7 @@ Start with the task you want to perform. The documentation is organized by **cap
 
 ## Research capabilities
 
+- [Controlled Input Designs](controlled-inputs.md) — complete binary factor grids, state mapping, cache identity and Localize handoff.
 - [Activation Capture and Storage](activation-store.md) — reusable, integrity-checked activation and SAE code caches.
 - [Feature Interventions and Steering](feature-interventions.md) — residual-preserving edits, conditions and downstream measurements.
 - [SAE Benchmarking](benchmarking.md) — metrics, versioned configurations, experiment planning, reports and external native results.
