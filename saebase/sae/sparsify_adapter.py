@@ -22,7 +22,7 @@ class SparsifyDenseAdapter(nn.Module):
             raise TypeError("expected original EleutherAI sparsify SparseCoder")
         if getattr(native.cfg, "transcode", False) or getattr(native.cfg, "skip_connection", False):
             raise ValueError("Sparsify transcoders/skip connections need their own adapter")
-        if getattr(native.cfg, "activation", "topk") not in ("topk",):
+        if str(getattr(native.cfg, "activation", "relu")) not in ("topk", "relu"):
             raise ValueError("only native TopK SparseCoder is supported here")
         if getattr(native, "W_dec", None) is None:
             raise ValueError("Sparsify checkpoint lacks a decoder")
