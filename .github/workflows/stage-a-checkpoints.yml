@@ -44,7 +44,7 @@ jobs:
       MKL_NUM_THREADS: '2'
       TOKENIZERS_PARALLELISM: 'false'
       HF_HUB_DISABLE_TELEMETRY: '1'
-      HF_HOME: ${{ runner.temp }}/stage-a-hf-cache
+      HF_HOME: ${{ github.workspace }}/.hf-cache
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
