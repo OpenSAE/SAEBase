@@ -39,7 +39,7 @@ flowchart LR
 - 🧭 **受控输入设计。** 枚举完整二元输入组合，记录输入状态与样本的映射，并在不同输入映射间复用已有激活。
 - 🗃️ **激活提取与复用。** 支持可恢复分片缓存、无损 Dense/CSR SAE 编码、精确 token 选择、样本分组及 checkpoint SHA-256 校验。
 - 🎛️ **特征干预与 Steering。** 支持 identity、ablation、scaling、clamping、addition、coalition、完整重构对照和批量下游输出测量；特征编辑可保留原始重构残差。
-- 📊 **SAE Benchmark。** 分别评估 L0、重构 MSE、FVU/解释方差、目标 token 损失、logits/KL 变化及不同干预条件的行为指标。
+- 📊 **SAE Benchmark。** 分别评估 L0、重构 MSE、FVU/解释方差、目标 token 损失、logits/KL 变化、Input Localization Budget 及不同干预条件的行为指标。
 - 📈 **统计可靠性。** 基于 prompt group 的 Bootstrap、配对 SAE 比较、置信区间、样本量敏感性、排名稳定性及已知真值/负对照。
 - 🧩 **研究指标接入。** 支持 [输入局部性分析（Localize）](https://github.com/OpenSAE/SAE-Input-Localization)，并调用原始 [SAR](https://github.com/OpenSAE/SAE-Behavioral-Compositionality)、[RSS](https://github.com/OpenSAE/Redistribution-Sensitivity-Score) 估计器，并验证来自原生 SAEBench 的结果。
 - ⚙️ **实验可复现性。** 资源预检、精确缓存身份、中断恢复、来源与模型权重哈希，以及 JSONL/JSON、CSV、HTML 报告。
@@ -198,7 +198,7 @@ python examples/08_rss_via_saebase.py --paper-dir /path/to/RSS-repo
 
 ---
 
-受控输入网格与缓存复用可运行 `python examples/16_controlled_input_design.py`，接口参见[受控输入设计文档](docs/controlled-inputs.md)。
+受控输入网格与缓存复用可运行 `python examples/16_controlled_input_design.py`，接口参见[受控输入设计文档](docs/controlled-inputs.md)；Benchmark、Scope Curve 存储和可靠性分析详见 [Localization Benchmark](docs/localization-benchmark.md)。
 
 ---
 
