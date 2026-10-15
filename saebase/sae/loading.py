@@ -121,85 +121,34 @@ def load_qwen_resid_topk_sae(
     k: int = 50,
     filename: str | None = None,
 ) -> tuple[Any, dict, None]:
-    """Build a TopKSAE from an official Qwen residual ``layer{L}.sae.pt`` blob."""
-    sl = import_sae_lens()
-    TopKSAE = sl.saes.TopKSAE
-    TopKSAEConfig = sl.saes.TopKSAEConfig
-    SAEMetadata = sl.saes.sae.SAEMetadata
-
-    # Hugging Face is only needed for remote checkpoint loading.
+    """Load official Qwen-Scope TopK tensors without requiring SAE Lens."""
     from huggingface_hub import hf_hub_download
+    from saebase.sae.qwen_topk import from_official_checkpoint
 
     dev = device or require_cuda()
     fname = filename or f"layer{int(layer)}.sae.pt"
+    if fname != f"layer{int(layer)}.sae.pt":
+        raise ValueError("Qwen-Scope SAE ID must identify the requested layer file")
     weights_path = hf_hub_download(repo_id=release, filename=fname)
-    blob = torch.load(weights_path, map_location="cpu", weights_only=False)
-    if not isinstance(blob, dict):
-        raise TypeError(f"{release}/{fname}: expected a state dict, got {type(blob)}")
-
-    def _first(*names: str) -> torch.Tensor:
-        for name in names:
-            if name in blob:
-                return blob[name]
-        raise KeyError(f"{release}/{fname}: missing keys among {names}")
-
-    w_enc = _first("W_enc", "w_enc", "encoder.weight")
-    b_enc = _first("b_enc", "encoder.bias")
-    w_dec = _first("W_dec", "w_dec", "decoder.weight")
-    b_dec = blob.get("b_dec", blob.get("decoder.bias"))
-    if b_dec is None:
-        b_dec = torch.zeros(w_dec.shape[-1] if w_dec.ndim == 2 else int(w_enc.shape[-1]))
-
-    if w_enc.ndim != 2 or w_dec.ndim != 2:
-        raise ValueError(f"{release}/{fname}: W_enc/W_dec must be rank-2")
-    if w_enc.shape[0] > w_enc.shape[1]:
-        # Official Qwen dumps are (d_sae, d_in).
-        d_sae, d_in = int(w_enc.shape[0]), int(w_enc.shape[1])
-        w_enc_tl = w_enc.T.contiguous()
-    else:
-        d_in, d_sae = int(w_enc.shape[0]), int(w_enc.shape[1])
-        w_enc_tl = w_enc.contiguous()
-    if tuple(w_dec.shape) == (d_sae, d_in):
-        w_dec_tl = w_dec
-    elif tuple(w_dec.shape) == (d_in, d_sae):
-        w_dec_tl = w_dec.T.contiguous()
-    else:
-        raise ValueError(
-            f"{release}/{fname}: W_dec shape {tuple(w_dec.shape)} "
-            f"incompatible with d_in={d_in} d_sae={d_sae}"
-        )
-
-    k_val = int(blob.get("k", blob.get("top_k", k)))
-    cfg = TopKSAEConfig(
-        d_in=d_in,
-        d_sae=d_sae,
-        k=k_val,
-        device=dev,
-        dtype="float32",
-        metadata=SAEMetadata(
-            model_name=model_name,
-            hook_name=hook_name,
-        ),
+    expected = {
+        "Qwen/SAE-Res-Qwen3.5-2B-Base-W32K-L0_50": (2048, 32768),
+        "Qwen/SAE-Res-Qwen3-8B-Base-W64K-L0_50": (4096, 65536),
+    }.get(release)
+    sae = from_official_checkpoint(
+        weights_path, hook_name=hook_name, device=dev,
+        expected_hidden=expected[0] if expected else None,
+        expected_features=expected[1] if expected else None,
+        k=k,
     )
-    sae = TopKSAE(cfg)
-    state = {
-        "W_enc": w_enc_tl.float(),
-        "b_enc": b_enc.float().reshape(-1),
-        "W_dec": w_dec_tl.float(),
-        "b_dec": b_dec.float().reshape(-1),
-    }
-    sae.load_state_dict(state, strict=True)
-    sae.eval()
-    for p in sae.parameters():
-        p.requires_grad_(False)
-    raw_cfg = {
-        "d_in": d_in,
-        "d_sae": d_sae,
-        "k": k_val,
+    return sae, {
+        "d_in": sae.cfg.d_in,
+        "d_sae": sae.cfg.d_sae,
+        "k": sae.cfg.k,
         "filename": fname,
         "repo_id": release,
-    }
-    return sae, raw_cfg, None
+        "model_name": model_name,
+        "format": "official-qwen-scope-topk",
+    }, None
 
 
 def resolve_hook_name(sae: Any, profile: SAEProfile, layer: int) -> str:
