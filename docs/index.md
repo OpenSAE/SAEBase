@@ -19,6 +19,7 @@ Start with the task you want to perform. The documentation is organized by **cap
 - [Feature Interventions and Steering](feature-interventions.md) — residual-preserving edits, conditions and downstream measurements.
 - [SAE Benchmarking](benchmarking.md) — metrics, versioned configurations, experiment planning, reports and external native results.
 - [Reliability Analysis](reliability.md) — prompt-group bootstrap, paired comparisons and scientific ground-truth controls.
+- [Input Localization Benchmarking](localization-benchmark.md) — exact curves, metric artifacts, native paired-estimator stability and matched SAE comparisons.
 - [Research Integrations](research-integrations.md) — using original SAR/RSS/Localize estimators and native SAEBench results.
 
 ## Evidence and maintenance
