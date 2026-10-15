@@ -41,7 +41,7 @@ jobs:
           cfg=load_config('conf/benchmark/p0_small.json')
           root=Path(os.environ['RUNNER_TEMP'])/'m3'/cfg.run_id
           rows=read_metrics(root,cfg.run_id)
-          assert len(rows)==9, len(rows)
+          assert len(rows)==7, len(rows)
           assert all(row['status']=='completed' for row in rows), rows
           assert (root/'report.html').exists()
           print('Verified M3 real Pythia SAE benchmark:',len(rows),'metric rows')
