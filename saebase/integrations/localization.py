@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 import numpy as np
+import torch
 
 from saebase.api import ActivationSite, ModelAdapter, SAEIdentity, capture_features
 from saebase.data.controlled_inputs import (
@@ -149,8 +150,10 @@ def collect_localization_grid(
             raise ValueError("provide design or legacy prompts_by_state/n_factors, not both")
         prompts = tuple(state.prompt for state in design.states)
         n_factors = design.n_factors
+        records = design.sample_records(model)  # fail before model forwards on token collisions
     else:
         prompts = _ordered_states(prompts_by_state, n_factors, label="prompts_by_state")
+        records = None
     codes, activations = [], []
     if identity is not None and (identity.hook_name != site.hook_name
                                  or identity.layer != site.layer):
@@ -158,7 +161,11 @@ def collect_localization_grid(
     for index, prompt in enumerate(prompts):
         selected_site = (replace(site, position=design.states[index].position)
                          if design is not None else site)
-        snapshot = capture_features(model, sae, site=selected_site, prompt=prompt)
+        if records is None:
+            snapshot = capture_features(model, sae, site=selected_site, prompt=prompt)
+        else:
+            token_ids = torch.tensor([records[index].token_ids], dtype=torch.long)
+            snapshot = capture_features(model, sae, site=selected_site, tokens=token_ids)
         codes.append(snapshot.codes.detach().cpu().numpy().astype(np.float64, copy=True))
         activations.append(snapshot.activation.detach().cpu().numpy().astype(np.float64, copy=True))
     return LocalizationGrid(
