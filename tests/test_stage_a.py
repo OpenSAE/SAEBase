@@ -41,6 +41,8 @@ def test_all_six_public_profiles_come_from_exact_registry_and_have_public_source
     assert get_profile("gemma1b_scope_resid").sae_release == "gemma-scope-2-1b-pt-resid_post"
     assert get_profile("gemma2_2b_stagea_resid_l25_16k").sae_id(25) == "layer_25/width_16k/average_l0_116"
     assert get_profile("qwen35_2b_resid_w32k").sae_id(12) == "layer12.sae.pt"
+    assert get_profile("llama31_8b_stagea_scope_l16_8x").sae_release == "llama_scope_lxr_8x"
+    assert get_profile("llama31_8b_stagea_scope_l16_8x").sae_id(16) == "l16r_8x"
     assert DEFAULT_SAE_FOR_MODEL["qwen35_2b"] == "qwen35_2b_resid_w32k"
 
 
