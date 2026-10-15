@@ -149,3 +149,9 @@ benchmark smoke cannot hide a numerically different SAE behind a generic success
 
 Custom metrics registered without an executable adapter are reported
 `unsupported` with a reason, never silently omitted.
+
+## Controlled Input Localization
+
+The registered `localization.budget_at_90pct` and `localization.budget_fraction_at_90pct` metrics use the original input-scope estimator on the complete controlled input grid. Every completed scalar points to a checksum-bound artifact containing the full optimal curve, scope assignment, input-state manifest and source provenance. These are contextual dependency metrics rather than universal SAE-quality rankings.
+
+See [Input Localization Benchmarking](localization-benchmark.md) for configuration, examples and validation.
