@@ -73,6 +73,12 @@ def main(argv=None) -> int:
             failed.append(model_key)
             print(f"{model_key}: blocked ({reason}; {type(exc).__name__})",
                   file=sys.stderr, flush=True)
+            # Diagnostics are opt-in and reserved for publicly accessible
+            # checkpoints: traceback strings can contain private source paths.
+            import os
+            if os.environ.get("SAEBASE_STAGE_A_DEBUG") == "1":
+                import traceback
+                traceback.print_exc(file=sys.stderr)
         path = folder / f"{model_key}.json"
         write_evidence(path, evidence)
     summary = {
