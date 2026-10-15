@@ -108,7 +108,7 @@ SAEBase 注册了多种模型和 SAE 配置，但**注册成功不代表真实�
 | **Pythia-70M（去重版）** | `blocks.3.hook_resid_post` | Residual-stream SAE 与另一份独立训练的 Gated SAE |
 | **GPT-2 Small** | `blocks.8.hook_resid_pre` | 原始 Residual SAE 与 Feature-Splitting SAE |
 
-两种模型均验证了两个不同 SAE checkpoint 的权重哈希，每个模型使用六组固定 prompts。其他模型（含 Gemma 与更大模型）虽已注册，但可能有额外的依赖、权限、算力或独立验收要求。参见[模型与 Checkpoint 支持](docs/model-support.md)。
+两种模型均验证了两个不同 SAE checkpoint 的权重哈希，每个模型使用六组固定 prompts。现已增加 **Stage A 六模型阵容**，覆盖 Gemma 3（270M、1B）、Gemma 2（2B）、Qwen3.5（2B）、Qwen3（8B）和 Llama 3.1（8B），并提供真实权重的独立验收程序。运行 `saebase-stage-a --dry-run` 查看具体组合，详见 [Stage A 模型覆盖](docs/stage-a-coverage.md) 和 [模型与 Checkpoint 支持](docs/model-support.md)。
 
 ---
 
