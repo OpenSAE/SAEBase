@@ -30,6 +30,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e '.[dev]'
           python -m pip install -e ./upstream
+          python -m pip install 'pyarrow==19.0.1' 'numpy==1.26.4'
           python -m pip check
       - name: Run original upstream Core and Sparse Probing evaluations
         env:
