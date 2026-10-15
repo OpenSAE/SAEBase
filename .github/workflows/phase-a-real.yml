@@ -1,0 +1,64 @@
+name: Phase A real model SAE acceptance
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: Model/SAE pair to validate
+        required: true
+        default: gemma270m
+        type: choice
+        options:
+          - gemma270m
+          - gemma1b
+          - gemma2_2b
+          - qwen35_2b
+          - qwen3_8b
+          - llama31_8b
+      runner:
+        description: Runner type; large models need configured GPU self-hosted runner
+        required: true
+        default: ubuntu-latest
+        type: choice
+        options:
+          - ubuntu-latest
+          - self-hosted
+      device:
+        description: Compute device (cuda needs a CUDA-enabled runner)
+        required: true
+        default: cpu
+        type: choice
+        options: [cpu, cuda]
+
+permissions:
+  contents: read
+
+jobs:
+  real-weights:
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - name: Install actual SAE analysis stack
+        run: |
+          python -m pip install -e '.[analysis]'
+          python -m pip check
+      - name: Load real model and SAE checkpoints, capture and patch activations
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_HUB_DISABLE_TELEMETRY: '1'
+          TOKENIZERS_PARALLELISM: 'false'
+          OMP_NUM_THREADS: '2'
+        run: |
+          python scripts/phase_a_verify.py --model "${{ inputs.model }}"             --device "${{ inputs.device }}" --output "$RUNNER_TEMP/phase-a"
+      - name: Upload verified real-checkpoint evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-a-${{ inputs.model }}-evidence
+          path: ${{ runner.temp }}/phase-a/*.json
+          if-no-files-found: warn
+          retention-days: 30
