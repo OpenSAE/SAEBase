@@ -167,3 +167,22 @@ def test_upstream_native_import_never_loads_model_and_rejects_stale_outputs(tmp_
     source.write_text(source.read_text()+" ")
     with pytest.raises(ValueError,match="output changed"):
         execute(cfg,tmp_path,real=True,loader=no_weights)
+
+def test_rss_metric_units_keep_selection_and_heldout_separate():
+    import copy
+    from saebase.benchmarks.runner import _metric
+    from saebase.benchmarks.registry import get_metric
+    data=copy.deepcopy(BASE)
+    data["metrics"]=["rss.mean_rss","rss.held_out_persistence"]
+    data["dataset"]["samples"]=[
+        {"sample_id":"sel"+str(i),"token_ids":[1,2,3],"variant_role":"selection"}
+        for i in range(3)] + [
+        {"sample_id":"held"+str(i),"token_ids":[1,2,4],"variant_role":"held_out"}
+        for i in range(5)]
+    data["conditions"]=[]
+    cfg=BenchmarkConfig.from_dict(data)
+    t=cfg.targets[0]
+    mean=_metric(cfg,t,"toy",get_metric("rss.mean_rss"),"completed",.8,n_valid=3)
+    persistence=_metric(cfg,t,"toy",get_metric("rss.held_out_persistence"),"completed",.9,n_valid=5)
+    assert mean.n_requested==mean.n_valid==3
+    assert persistence.n_requested==persistence.n_valid==5

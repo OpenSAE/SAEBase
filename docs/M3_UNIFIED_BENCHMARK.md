@@ -123,3 +123,12 @@ The source JSON's SHA-256 and expected model, SAE and upstream commit are
 validated. Both `--resume` and `--report-only` reject a changed original
 estimator file or native SAEBench result instead of silently returning stale
 metrics. The planner omits M1/M2 compute nodes for import-only experiments.
+
+### Execution costs and observation units
+
+Metric rows for Core record how many activation cache entries and SAE code
+entries were created versus reused. Intervention rows record actual measured
+and reused interventions, forward-batch counts, microbatch retries, elapsed
+seconds and backend from M2 ExecutionStats. SAR/RSS preserve the upstream
+evaluation count. RSS mean score counts selection variants; held-out
+persistence counts held-out variants. These units must never be combined.

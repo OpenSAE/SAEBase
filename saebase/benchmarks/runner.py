@@ -188,13 +188,19 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
             wants_m2=any(s.metric_id.startswith("intervention.") for s in specs)
             wants_recon=any(s.metric_id.startswith("reconstruction.") for s in specs)
             core_data={};n_core=0
+            cache_cost={}
+            m2_cost={}
             act_path=None;code_path=None
             if wants_core or wants_m2:
                 with ActivationWriter(cache_root,act_id,width=int(sae.cfg.d_in)) as writer:
-                    collect_activations(model,records,writer,site=target.site)
+                    cache_stats=collect_activations(model,records,writer,site=target.site)
                     act_path=writer.path
                 code_id=CodeIdentity(sae_key,sae_sha,int(sae.cfg.d_in),int(sae.cfg.d_sae))
-                code_path,_=encode_from_store(act_path,sae,code_id)
+                code_path,code_stats=encode_from_store(act_path,sae,code_id)
+                cache_cost={"activations_collected":cache_stats.collected,
+                            "activations_reused":cache_stats.reused,
+                            "sae_codes_encoded":code_stats.collected,
+                            "sae_codes_reused":code_stats.reused}
             if wants_core:
                 core_data,n_core=calculate_core(act_path,code_path,sae,
                                              sample_ids=[s.record.sample_id for s in config.samples])
@@ -204,16 +210,23 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
                     results.append(_metric(config,target,sae_key,spec,
                         "completed" if value is not None else "undefined",
                         value,n_valid=n_core if value is not None else 0,
-                        reason=None if value is not None else "no valid M1 rows"))
+                        reason=None if value is not None else "no valid M1 rows",cost=cache_cost))
             if wants_m2:
                 meas=Path(output)/"_cache"/"m2"/act_id.key/sae_sha
                 with ResultWriter(meas,identity,resume=True) as writer:
-                    BatchEngine(model,sae,identity,activation_reader=ShardedReader(act_path),
+                    m2_stats=BatchEngine(model,sae,identity,activation_reader=ShardedReader(act_path),
                                 code_reader=ShardedReader(code_path)).run(
                         config.samples,config.conditions,writer,
                         sample_batch=config.sample_batch,microbatch=config.microbatch,
                         budget=RunBudget(max_measurements=config.max_measurements),
                         tolerance=config.tolerance)
+                m2_cost={"interventions_measured":m2_stats.measured,
+                         "interventions_reused":m2_stats.reused,
+                         "baseline_batches":m2_stats.baseline_batches,
+                         "patch_batches":m2_stats.patch_batches,
+                         "microbatch_retries":m2_stats.microbatch_retries,
+                         "elapsed_seconds":m2_stats.elapsed_seconds,
+                         "backend":m2_stats.backend}
                 measurements,raw=calculate_interventions(meas,identity,conditions=config.conditions)
                 for spec in specs:
                     if not spec.metric_id.startswith("intervention."):
@@ -223,7 +236,7 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
                         if item:
                             value,n,refs=item
                             results.append(_metric(config,target,sae_key,spec,"completed",value,
-                                                   n_valid=n,condition=c.name,refs=refs))
+                                                   n_valid=n,condition=c.name,refs=refs,cost=m2_cost))
                         else:
                             results.append(_metric(config,target,sae_key,spec,"undefined",
                                 reason="metric not recorded for this condition",condition=c.name))
@@ -272,9 +285,11 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
                         results.append(_metric(config,target,sae_key,spec,
                             "completed" if item is not None and math.isfinite(item) else "undefined",
                             float(item) if item is not None and math.isfinite(item) else None,
-                            n_valid=n if item is not None and math.isfinite(item) else 0,
+                            n_valid=(sum(s.record.variant_role=="selection" for s in config.samples)
+                                if paper=="rss" and spec.metric_id=="rss.mean_rss"
+                                else n) if item is not None and math.isfinite(item) else 0,
                             reason=None if item is not None and math.isfinite(item) else "upstream estimator undefined",
-                            source_sha=digest))
+                            source_sha=digest,cost={"upstream_evaluations":n}))
                 except Exception as exc:
                     for spec in subset:
                         results.append(_metric(config,target,sae_key,spec,"blocked",
