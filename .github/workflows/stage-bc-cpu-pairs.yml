@@ -1,0 +1,74 @@
+name: Stage B genuine small-model CPU acceptance
+
+on:
+  pull_request:
+    paths:
+      - 'saebase/sae/loading.py'
+      - 'saebase/sae/sparsify_adapter.py'
+      - 'saebase/sae/coverage.py'
+      - 'saebase/sae/registry.py'
+      - 'models/qwen3_1_7b_base/**'
+      - 'scripts/phase_bc_cpu_pair.py'
+      - 'conf/coverage/stage_bc.json'
+      - '.github/workflows/stage-bc-cpu-pairs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  small-model-real:
+    name: Real CPU pair (${{ matrix.sae_key }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    strategy:
+      fail-fast: false
+      matrix:
+        sae_key:
+          - pythia410m_mlp_topk
+          - qwen3_1_7b_base_resid_w32k
+          - r1_distill_qwen15b_resid_l20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install analysis stack and original Sparsify library
+        run: |
+          python -m pip install -e '.[analysis]'
+          python -m pip install 'eai-sparsify==1.3.3'
+          python -m pip check
+      - name: Load authentic model and SAE, test reconstruction, identity patch and feature ablation
+        id: probe
+        continue-on-error: true
+        env:
+          OMP_NUM_THREADS: '2'
+          MKL_NUM_THREADS: '2'
+          TOKENIZERS_PARALLELISM: 'false'
+          HF_HUB_DISABLE_TELEMETRY: '1'
+        run: |
+          python scripts/phase_bc_cpu_pair.py \
+            --sae-key '${{ matrix.sae_key }}' --output "$RUNNER_TEMP/stage-bc"
+      - name: Upload real CPU model-pair evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage-bc-cpu-pair-${{ matrix.sae_key }}
+          path: ${{ runner.temp }}/stage-bc/*.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Show actual acceptance status
+        if: always()
+        shell: bash
+        env:
+          SAE_KEY: ${{ matrix.sae_key }}
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          file=Path(os.environ['RUNNER_TEMP'])/'stage-bc'/f"{os.environ['SAE_KEY']}_pair.json"
+          status=json.loads(file.read_text()).get("status") if file.exists() else "no_evidence"
+          print("Real CPU model-SAE acceptance:",status)
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as fd:
+              fd.write(f"**{os.environ['SAE_KEY']}**: {status}\n\n")
+          PY
