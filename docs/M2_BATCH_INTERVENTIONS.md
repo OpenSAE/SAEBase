@@ -190,9 +190,53 @@ Pythia/Gemma weights work.
 
 ## M2 completion gates
 
-- [ ] Existing M0/M1 tests and M2 contracts pass in Python 3.11 and 3.12 CI.
-- [ ] Clean wheel + source distribution includes Python, CLI and JSON config.
-- [ ] Real Pythia/SAE run completes with M0/M1 numerical comparisons.
-- [ ] Real multi-prompt batch output equals sequential reference to tolerance.
-- [ ] Identity, recovery, OOM, mixed-length and steering tests pass.
-- [ ] Real JSON artifact is archived and linked from here after inspection.
+- [x] Existing M0/M1 tests and M2 contracts pass in Python 3.11 and 3.12 CI.
+- [x] Clean wheel + source distribution includes Python, CLI and JSON config.
+- [x] Real Pythia/SAE run completes with M0/M1 numerical comparisons.
+- [x] Real multi-prompt batch output equals sequential reference to tolerance.
+- [x] Identity, recovery, OOM, mixed-length and steering tests pass.
+- [x] Real JSON artifact is archived and linked from here after inspection.
+
+## Verified M2 acceptance — October 14, 2026
+
+M2 is now accepted as a research-infrastructure implementation, after independently
+verifying the final real-model artifacts and full GitHub CI.
+
+| Gate | Observed evidence |
+| --- | --- |
+| Clean Python 3.11/3.12 | [CI run 38657989630](https://github.com/OpenSAE/SAEBase/actions/runs/38657989630): 153 passed, 2 skipped on each supported Python version |
+| Analysis installation and packaging | Same CI: analysis-install and package both succeeded |
+| Real pretrained Pythia and SAE | [Real M2 run 38657989544](https://github.com/OpenSAE/SAEBase/actions/runs/38657989544): passed |
+| Auditable measurements | [Real M2 result artifact](https://github.com/OpenSAE/SAEBase/actions/runs/38657989544/artifacts/11937144923): JSON reference, four measurement shards, native-identity and steering results |
+
+The real run loaded the matching Pythia-70M and registered SAE full-state
+SHA-256 digests, checked the saved M0 activation probes under M0's recorded
+relative/absolute tolerance, and used M1 activation and full SAE code caches.
+
+The run evaluated **3 real prompts × 7 conditions = 21 measurements**,
+performed **1 baseline batch and 4 patch batches**, then successfully resumed
+all 21 measurements with **0 new model forward calls**.
+
+The acceptance explicitly separates two numerical conditions:
+
+- **Native same-batch identity:** Capture the current batch activation and
+  reinsert it at the same hook and positions. Maximum per-logit error was
+  **0.0**, with a strict `1e-4` absolute tolerance.
+- **M1 cached-singleton identity replay in a multi-prompt batch:** The exact
+  same upstream state and prompt identities are preserved, but floating point
+  execution with a different batch shape can change the output slightly.
+  Observed maximum per-logit absolute error was **0.0033216476**, within the
+  explicitly declared `1e-2` absolute plus `1e-5` relative envelope.
+  This is tracked as numerical cache replay drift, **not** as exact identity.
+  A feature's behavior change smaller than this observed control error must
+  be interpreted with that numerical floor in mind.
+
+The M0 activation probe maximum absolute error was **0.0**. Comparing the
+same ablation via the public single-patch API and the real M2 batched engine
+gave a logit-delta L2 difference of **0.0052185059**, inside the explicit
+`0.05` acceptance tolerance. The run also generated a real, greedy 2-token
+steering continuation using Pythia. This verifies execution, not behavior
+improvement or interpretability claims.
+
+The M2 work is part of SAEBase v0.2 development. **M3 benchmarks, M4 reliability
+audits and M5 release acceptance remain future milestones.**
