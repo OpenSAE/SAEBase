@@ -1,31 +1,23 @@
-# SAEBase v0.2.0 — release checklist
+# SAEBase v0.2.0 Release Verification
 
-This checklist covers a **code distribution** only. The release must not
-contain third-party language-model or SAE weights.
+The [official v0.2.0 GitHub Release](https://github.com/OpenSAE/SAEBase/releases/tag/v0.2.0) has been published. Its annotated tag identifies the exact validated source commit. The release distributes SAEBase software, **not third-party model or SAE weights**.
 
-## Automated gates
+## Completed publication checks
 
-- [x] M0–M4 interfaces, provenance and original metric math remain unchanged.
-- [x] Minimum real release matrix: Pythia-70M and GPT-2 Small, at least two
-  **different actual SAE weights** per family with SHA-256 checkpoint identity.
-- [x] Real M1 caching, M2 condition measurement, M3 reports, M4 grouped
-  audits and repeated resume/report-only are tested in CI.
-- [x] Python 3.11/3.12 offline tests, `.[analysis]` install, wheel and
-  source distribution inspection run in GitHub Actions.
-- [x] Third-party model/SAE source cards and license *status* are inventoried;
-  distribution files contain no external checkpoint weights.
-- [ ] Exact final `main` commit has successful CI and M5 real matrix runs.
-- [ ] Final wheel/sdist and source SHA256SUMS reverified by the release workflow.
-- [ ] `v0.2.0` GitHub tag and Release exist with artifacts and evidence.
+- [x] Python 3.11 and 3.12 tests, analysis-dependency installation, wheel build and source-archive verification.
+- [x] Real checkpoint matrix for two independent model families with two different SAE weight hashes per model.
+- [x] Identity-bound activation, SAE code and intervention caches; resume and integrity checks.
+- [x] Per-metric benchmark results, original-estimator checks and prompt-group reliability audits.
+- [x] Model and SAE source-card inventory and explicit licensing status.
+- [x] GitHub Release with wheel, source archive, release-evidence JSON and SHA256SUMS.
+- [x] Success of real multi-checkpoint acceptance and standard CI for the same source commit as the published tag.
 
-Human/legal review remains separate: contributors must have rights to license
-their code; upstream model/SAE licenses and datasets may impose conditions.
-This checklist is **not** a legal certification.
+The release verifier refuses missing, failed or mismatched results. The six-prompt real checkpoint matrix is engineering acceptance, not a population-level scientific ranking.
 
-## Verify code and distributions
+## Reproduce the code and distribution checks
 
 ```bash
-python -m pip install -e '.[dev]'
+python -m pip install -e ".[dev]"
 python -m pytest -q
 python -m build
 python -m twine check dist/*
@@ -34,23 +26,22 @@ python scripts/check_installed_wheel.py dist
 saebase-release-matrix --config conf/release/m5_matrix.json --dry-run
 ```
 
-To reproduce the real matrix (opt-in downloads, additional CPU/RAM):
+For actual model/SAE execution, install `.[analysis]`, allow on-demand
+checkpoint downloads, and provide sufficient RAM:
 
 ```bash
-python -m pip install -e '.[analysis]'
 saebase-release-matrix --config conf/release/m5_matrix.json --real --device cpu
 saebase-release-matrix --config conf/release/m5_matrix.json --report-only
 ```
 
-Given the verified M5 matrix root, distributions and exact commit,
-`saebase-release-gate` produces `release-evidence.json` and `SHA256SUMS`.
+`saebase-release-gate` checks the original evidence, source inventory,
+release archives, SHA-256 digests and source commit.
 
-The GitHub release workflow listens for a successful main-branch
-`M5 real two-family checkpoint matrix acceptance`, verifies CI on the
-*same commit*, downloads its test evidence and the CI-built distributions,
-audits/checksums both, and publishes an annotated `v0.2.0` tag and release.
-It refuses failed/missing/mismatched proof. No PyPI upload occurs.
+## Boundaries that require separate confirmation
 
-See [docs/M5_RELEASE_MATRIX.md](M5_RELEASE_MATRIX.md),
-[docs/M5_RELEASE_NOTES.md](M5_RELEASE_NOTES.md) and
-[docs/PROVENANCE.md](PROVENANCE.md).
+- The maintainers remain responsible for contributor licensing rights and upstream attributions.
+- Model, SAE, tokenizer and dataset assets retain the original providers' access and redistribution conditions.
+- Optional GPU backend performance requires its own hardware acceptance.
+- Meaningful population-level model/SAE quality claims need representative data and protocols beyond the small engineering smoke.
+
+This checklist is not a legal certification. Read [Release Notes](releases/v0.2.0.md), [Checkpoint Validation](checkpoint-validation.md), [Validation](validation.md) and [Provenance](PROVENANCE.md).

@@ -3,7 +3,7 @@
 ## Source inventory
 
 This standalone SAEBase package was prepared from the user-supplied SAEBase
-source and Phase A/B/C transformations. The original internal SAEReasoning
+source and its initial standalone packaging transformations. The original internal SAEReasoning
 workspace is not part of this source distribution. The public release bundles
 SAEBase's own model adapters, registries, Hydra configurations, evaluation
 code, examples, and tests.
@@ -39,11 +39,11 @@ upstream asset is Apache-licensed.
 
 ## v0.2.0 external asset inventory
 
-The machine-readable [M5 asset inventory](../conf/release/m5_asset_provenance.json)
+The machine-readable [release asset inventory](../conf/release/m5_asset_provenance.json)
 lists external model/checkpoint cards and documented license status.
 The SAEBase source archive and wheel **do not include checkpoint weights,
 tokenizers, or third-party evaluation datasets**. Real model and SAE
-weight state SHA-256 values are recorded in the opt-in M5 test evidence.
+weight state SHA-256 values are recorded in the opt-in real-checkpoint validation evidence.
 
 Unverified checkpoint license terms are not treated as permission to
 redistribute weights. Software licensing rights and contributor ownership
