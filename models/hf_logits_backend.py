@@ -39,6 +39,14 @@ class HFLogitsModel:
             model_name=str(model_name),
         )
 
+    def state_dict(self, *args, **kwargs):
+        """Expose the actual loaded model state for SAEBase provenance hashes."""
+        return self._model.state_dict(*args, **kwargs)
+
+    def parameters(self, *args, **kwargs):
+        """Expose the real model device and immutable weights."""
+        return self._model.parameters(*args, **kwargs)
+
     def to_tokens(self, text: str, prepend_bos: bool = True) -> torch.Tensor:
         if not isinstance(text, str):
             raise TypeError(f"to_tokens expects str, got {type(text).__name__}")

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **Phase A genuine-weight acceptance:** actual original checkpoints for six SAEs passed isolated load/encode/decode; Qwen3.5-2B model+SAE passed live capture, reconstruction, and identity-patch checks. Added native Gemma Scope 2 and Llama Scope checkpoint converters and Llama-Scope norm folding. Gated Gemma and Meta models and larger 8B model-pair checks retain explicit access/compute blockers.
+
 - **Phase A model coverage:** register the official Qwen3.5-2B Base / 32K TopK SAE, align two Gemma Scope 2 release identifiers with upstream, and add a six-model 270M–8B real-checkpoint acceptance runner, workflow, reproducible evidence fields and offline registry tests. Verified status remains contingent on actual weight and hook tests.
 
 - **Input Localization benchmarks:** exact 90%-variance scope budget and normalized-budget metrics, with source-checked full scope curves, feature assignments, design manifests, and JSON/HTML report links.

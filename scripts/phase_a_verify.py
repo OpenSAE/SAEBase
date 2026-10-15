@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import platform
 import sys
 from dataclasses import asdict
@@ -16,7 +17,7 @@ from pathlib import Path
 
 import torch
 
-from saebase.api import ActivationSite, ModelAdapter, capture_features
+from saebase.api import ActivationSite, ModelAdapter, capture_features, edit_features
 from saebase.sae.loading import load_model_and_sae
 from saebase.sae.registry import get_profile
 from saebase.store import sha256_state_dict
@@ -81,11 +82,28 @@ def verify_target(name: str, *, device: str = "cuda", prompts=PROMPTS) -> dict:
         err = identity_patch(model, snap, site)
         if not err <= 1e-2:
             raise ValueError(f"identity patch maximum logit error {err} > 0.01")
+        # One genuine SAE feature ablation must also propagate through the
+        # captured model hook and change the downstream logits.
+        if not torch.count_nonzero(z):
+            raise ValueError("SAE has no active features on acceptance prompt")
+        selected = int(torch.argmax(torch.abs(z)).item())
+        edited = edit_features(sae, snap, replacements={selected: 0.0})
+        base_logits = model.forward_logits(tokens=snap.tokens).detach().float()
+        edited_logits = model.patch_logits(
+            tokens=snap.tokens, site=site, activation=edited.activation
+        ).detach().float()
+        feature_logit_delta_l2 = float(torch.linalg.vector_norm(
+            base_logits - edited_logits
+        ).item())
+        if not torch.isfinite(torch.tensor(feature_logit_delta_l2)) or feature_logit_delta_l2 <= 1e-8:
+            raise ValueError("active SAE feature ablation did not measurably affect logits")
         results.append({
             "prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(),
             "l0": int(torch.count_nonzero(z).item()),
             "reconstruction_mse": float(torch.mean((x-recon)**2).item()),
             "identity_patch_max_abs_logit_error": err,
+            "ablated_feature_id": selected,
+            "feature_ablation_logit_delta_l2": feature_logit_delta_l2,
         })
     return {
         "schema": "saebase.phase_a.real_acceptance.v1",
@@ -106,7 +124,7 @@ def verify_target(name: str, *, device: str = "cuda", prompts=PROMPTS) -> dict:
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--model", choices=(*TARGETS, "all"), required=True)
+    parser.add_argument("--model", choices=(*TARGETS, "all"))
     parser.add_argument("--device", choices=("cuda", "cpu"), default="cuda")
     parser.add_argument("--output", type=Path, default=Path("phase-a-results"))
     parser.add_argument("--list", action="store_true")
@@ -114,18 +132,42 @@ def main(argv=None):
     if args.list:
         print(json.dumps(TARGETS, indent=2))
         return 0
+    if args.model is None:
+        parser.error("--model is required unless --list is set")
     args.output.mkdir(parents=True, exist_ok=True)
     selected = list(TARGETS) if args.model == "all" else [args.model]
     complete = []
+    failures = 0
     for name in selected:
-        # Never advance the global "verified" count if a target fails.
-        result = verify_target(name, device=args.device)
+        # A real checkpoint run must produce evidence even when unavailable.
+        # Never count a failed, missing, or memory-killed job as verified.
+        try:
+            result = verify_target(name, device=args.device)
+        except Exception as exc:
+            failures += 1
+            message = str(exc)
+            token = os.environ.get("HF_TOKEN")
+            if token:
+                message = message.replace(token, "[redacted]")
+            result = {
+                "schema": "saebase.phase_a.real_acceptance.v1",
+                "status": "blocked" if isinstance(exc, (OSError, ImportError, RuntimeError))
+                          else "failed",
+                "model": name, "device": args.device,
+                "error_type": type(exc).__name__,
+                "error": message[:1500],
+                "verified_at_utc": datetime.now(timezone.utc).isoformat(),
+                "real_weights_validated": False,
+            }
         target = args.output / f"{name}.json"
         target.write_text(json.dumps(result, indent=2, allow_nan=False)+"\n")
-        complete.append({"model": name, "status": "passed", "evidence": str(target)})
-        print(f"PASSED: {name}: {target}", flush=True)
+        complete.append({"model": name, "status": result["status"], "evidence": str(target)})
+        print(f'{result["status"].upper()}: {name}: {target}', flush=True)
+        if result["status"] != "passed":
+            print(json.dumps({"error_type": result["error_type"],
+                              "error": result["error"]}, ensure_ascii=False), flush=True)
     print(json.dumps(complete, indent=2))
-    return 0
+    return 1 if failures else 0
 
 
 if __name__ == "__main__":

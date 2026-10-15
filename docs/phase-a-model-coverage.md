@@ -1,5 +1,23 @@
 # Phase A — Six Model and SAE Pairs
 
+## Actual acceptance evidence — October 15, 2026
+
+Real checks ran on GitHub-hosted CPU with original public SAE checkpoints. These results describe what actually completed, not merely the registry.
+
+| Model | Original SAE weights, encode/decode | Model + SAE real capture and patch | Reason where incomplete |
+| --- | --- | --- | --- |
+| Gemma 3 270M | Passed, 65,536 features | Blocked | Gated model returned HTTP 401, missing authorized `HF_TOKEN` |
+| Gemma 3 1B | Passed, 16,384 features | Blocked | Gated model returned HTTP 401, missing authorized `HF_TOKEN` |
+| Gemma 2 2B | Passed, 16,384 features | Blocked | Gated model returned HTTP 401, missing authorized `HF_TOKEN` |
+| Qwen3.5 2B Base | Passed, 32,768 features | **Passed** | Real model/SAE capture, reconstruction, identity patch and active feature ablation |
+| Qwen3 8B Base | Passed, 65,536 features | Not yet run | No connected high-memory GPU runner |
+| Llama 3.1 8B Base | Passed, 32,768 features | Not yet run | Meta model gated, no connected high-memory GPU runner |
+
+Proof: [Qwen3.5 real model and feature-ablation artifact](https://github.com/OpenSAE/SAEBase/actions/runs/38824111274/artifacts/12014521241), [SAE-only six-checkpoint results](https://github.com/OpenSAE/SAEBase/actions/runs/38824111301), [real Gemma access failures](https://github.com/OpenSAE/SAEBase/actions/runs/38822802463). Full provenance and checkpoints are recorded in [phase_a_targets.json](../conf/release/phase_a_targets.json). The SAE-only status is separate from full model validation.
+
+Real Qwen3.5-2B M3/M4 acceptance also passed: 5 benchmark metric rows, 3 reliability metric audits, L0 50, reconstruction MSE 0.01046, explained variance 0.55957, and measured feature-ablation logit L2 91.89. See the [full M3/M4 evidence](https://github.com/OpenSAE/SAEBase/actions/runs/38824324783/artifacts/12014277351). Three short prompts establish engineering integration, not statistical SAE quality.\n\nThe Gemma models require accepting upstream access terms and then adding an appropriately authorized Hugging Face token as the `HF_TOKEN` GitHub Actions secret. For both 8B models, connect a GPU runner with sufficient VRAM, then invoke [Phase A real checkpoint workflow](../.github/workflows/phase-a-real.yml) with the appropriate model and CUDA device. Do not promote any pair to Verified until its original weight/activation/feature-patch evidence JSON says `status=passed`.
+
+
 SAEBase's first expansion target is a **real-weight six-model coverage matrix** across 270M, 1B, 2B, and 8B. The baseline M5 verified checkpoint matrix (Pythia-70M and GPT-2 Small) remains separately preserved.
 
 | Model | Public SAE source | SAE profile | Layer | Current evidence |

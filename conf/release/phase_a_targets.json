@@ -1,7 +1,7 @@
 {
   "schema": "saebase.phase_a.targets.v1",
-  "status": "configured_pending_real_checkpoint_acceptance",
-  "description": "Six model/SAE pair targets. These are candidate checkpoints, not claims of completed real-model validation.",
+  "status": "partial_real_acceptance",
+  "description": "Six original SAE checkpoint loads verified with real weights; Qwen3.5-2B Base model+SAE completed real activation/reconstruction/identity-patch checks. Remaining model-pair acceptance is blocked by access or compute, not counted as passed.",
   "acceptance": {
     "prompts": 3,
     "strict_identity_patch_max_abs_logit_error": 0.01,
@@ -26,7 +26,12 @@
       "layer": 5,
       "d_in": 640,
       "access": "Gemma model license acceptance may be required",
-      "status": "pending_real"
+      "status": "sae_only_verified_model_access_blocked",
+      "sae_only_verified": true,
+      "model_sae_pair_verified": false,
+      "sae_state_sha256": "c8d81c4a60f18e4dc7a97efdf2988dd22ea428931a94ff49326b541360e9df88",
+      "d_sae": 65536,
+      "blocker": "Hugging Face model gated, HTTP 401, no configured HF_TOKEN"
     },
     {
       "key": "gemma1b",
@@ -37,7 +42,12 @@
       "layer": 13,
       "d_in": 1152,
       "access": "Gemma model license acceptance may be required",
-      "status": "pending_real"
+      "status": "sae_only_verified_model_access_blocked",
+      "sae_only_verified": true,
+      "model_sae_pair_verified": false,
+      "sae_state_sha256": "97e478af2ba7c150c2cc144602bed081003067451c604879ab2533dca62c1468",
+      "d_sae": 16384,
+      "blocker": "Hugging Face model gated, HTTP 401, no configured HF_TOKEN"
     },
     {
       "key": "gemma2_2b",
@@ -48,7 +58,12 @@
       "layer": 25,
       "d_in": 2304,
       "access": "Gemma model license acceptance may be required",
-      "status": "pending_real"
+      "status": "sae_only_verified_model_access_blocked",
+      "sae_only_verified": true,
+      "model_sae_pair_verified": false,
+      "sae_state_sha256": "61f521f1c188093c2091e4d1834f0e78d59d50deb7922992dcfa66c9b58cc8b9",
+      "d_sae": 16384,
+      "blocker": "Hugging Face model gated, HTTP 401, no configured HF_TOKEN"
     },
     {
       "key": "qwen35_2b",
@@ -59,7 +74,41 @@
       "layer": 12,
       "d_in": 2048,
       "access": "Qwen SAE has separate Qwen license",
-      "status": "pending_real"
+      "status": "model_and_sae_verified",
+      "sae_only_verified": true,
+      "model_sae_pair_verified": true,
+      "sae_state_sha256": "279987d646f6f6b687fea090c0b089383c564d0c5c8345708b0bfeb797445b6b",
+      "d_sae": 32768,
+      "blocker": null,
+      "model_state_sha256": "3d12539bb2cea2fed29b8091197ab2f0dec089cd1c65f98c7a17379607ba5955",
+      "pair_evidence_artifact": "https://github.com/OpenSAE/SAEBase/actions/runs/38824111274/artifacts/12014521241",
+      "feature_intervention_verified": true,
+      "feature_ablation_logit_l2": [
+        126.3478012084961,
+        86.88372039794922,
+        62.297908782958984
+      ],
+      "identity_patch_max_abs_logit_error": 0,
+      "reconstruction_mse": [
+        0.009684507735073566,
+        0.011271940544247627,
+        0.010423067957162857
+      ],
+      "m3m4_verified": true,
+      "m3m4_artifact": "https://github.com/OpenSAE/SAEBase/actions/runs/38824324783/artifacts/12014277351",
+      "m3m4_run_id": "e59773a0301a4259377539f8",
+      "m3m4_metric_values": {
+        "mean_l0": 50,
+        "reconstruction_mse": 0.010458761105782229,
+        "explained_variance": 0.5595688604484166,
+        "identity_logit_delta_l2": 0,
+        "feature_ablation_logit_delta_l2": 91.89060465494792
+      },
+      "m3m4_results": {
+        "metric_rows_completed": 5,
+        "reliability_audits_completed": 3,
+        "model_forwards_during_audit": 0
+      }
     },
     {
       "key": "qwen3_8b",
@@ -70,7 +119,12 @@
       "layer": 18,
       "d_in": 4096,
       "access": "SAE license may differ from base model",
-      "status": "pending_real"
+      "status": "sae_only_verified_model_compute_pending",
+      "sae_only_verified": true,
+      "model_sae_pair_verified": false,
+      "sae_state_sha256": "15a1b8c0c73612e976a0d49a115611b9c6df0d7646432cb8517cc82dcacdb1c7",
+      "d_sae": 65536,
+      "blocker": "8B model not run on adequate-memory GPU runner"
     },
     {
       "key": "llama31_8b",
@@ -81,7 +135,21 @@
       "layer": 16,
       "d_in": 4096,
       "access": "Meta Llama gated license",
-      "status": "pending_real"
+      "status": "sae_only_verified_model_access_and_compute_blocked",
+      "sae_only_verified": true,
+      "model_sae_pair_verified": false,
+      "sae_state_sha256": "42b68a4ed22d6cbf6cc2aa03324f386847f66e7cef1aa8704b45086f7646101e",
+      "d_sae": 32768,
+      "blocker": "Meta Llama model gated and no adequate-memory GPU runner"
     }
-  ]
+  ],
+  "last_checked_utc": "2026-10-15",
+  "sae_only_evidence": {
+    "workflow_run": "https://github.com/OpenSAE/SAEBase/actions/runs/38824111301",
+    "source_commit": "e7394aab0aacfb82627cb996a767c5f46fc15055"
+  },
+  "full_pair_evidence": {
+    "workflow_run": "https://github.com/OpenSAE/SAEBase/actions/runs/38824111274",
+    "source_commit": "e7394aab0aacfb82627cb996a767c5f46fc15055"
+  }
 }

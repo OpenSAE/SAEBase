@@ -1,0 +1,109 @@
+name: Phase A real-weight CPU feasibility probes
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/phase_a_verify.py'
+      - 'scripts/phase_a_benchmark.py'
+      - 'models/qwen35_2b/**'
+      - 'models/hf_logits_backend.py'
+      - 'models/hf_hooks_backend.py'
+      - 'saebase/sae/loading.py'
+      - 'saebase/sae/registry.py'
+      - '.github/workflows/phase-a-cpu-probes.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-small-model-probe:
+    name: Real CPU probe (${{ matrix.model }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [gemma270m, gemma1b, gemma2_2b, qwen35_2b]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Print resource availability and authenticated access readiness
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os
+          print("Hosted CPU resource probe, torch installed in next step")
+          print("HF_TOKEN configured:",bool(os.environ.get("HF_TOKEN")))
+          print("Available bytes:",os.statvfs('/tmp').f_bavail * os.statvfs('/tmp').f_frsize)
+          PY
+      - name: Install analysis dependencies
+        run: |
+          python -m pip install -e '.[analysis]'
+          python -m pip check
+      - name: Attempt real model plus SAE forward, reconstruction, identity patch and hashing
+        id: probe
+        continue-on-error: true
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_HUB_DISABLE_TELEMETRY: '1'
+          TOKENIZERS_PARALLELISM: 'false'
+          OMP_NUM_THREADS: '2'
+          MKL_NUM_THREADS: '2'
+        run: |
+          python scripts/phase_a_verify.py --model ${{ matrix.model }}             --device cpu --output "$RUNNER_TEMP/phase-a"
+      - name: Run genuine M3/M4 benchmark on verified Qwen3.5 2B
+        if: matrix.model == 'qwen35_2b' && steps.probe.outcome == 'success'
+        env:
+          HF_HUB_DISABLE_TELEMETRY: '1'
+          TOKENIZERS_PARALLELISM: 'false'
+          OMP_NUM_THREADS: '2'
+          MKL_NUM_THREADS: '2'
+        run: |
+          python scripts/phase_a_benchmark.py --device cpu --output "$RUNNER_TEMP/phase-a-m3m4"
+      - name: Upload real Qwen benchmark and audit evidence
+        if: always() && matrix.model == 'qwen35_2b'
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-a-qwen35-2b-m3m4
+          path: |
+            ${{ runner.temp }}/phase-a-m3m4/real_qwen35_2b_m3m4_summary.json
+            ${{ runner.temp }}/phase-a-m3m4/*/metrics_manifest.json
+            ${{ runner.temp }}/phase-a-m3m4/*/metrics.jsonl
+            ${{ runner.temp }}/phase-a-m3m4/*/reliability.json
+            ${{ runner.temp }}/phase-a-m3m4/*/reliability_manifest.json
+            ${{ runner.temp }}/phase-a-m3m4/*/report.html
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Upload real probe evidence including blocked results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-a-cpu-${{ matrix.model }}
+          path: ${{ runner.temp }}/phase-a/*.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Summarize outcome from persisted artifact
+        if: always()
+        shell: bash
+        env:
+          TARGET: ${{ matrix.model }}
+          PROBE_OUTCOME: ${{ steps.probe.outcome }}
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          path=Path(os.environ['RUNNER_TEMP'])/'phase-a'/f"{os.environ['TARGET']}.json"
+          if path.exists():
+              data=json.loads(path.read_text())
+              status=data.get('status','unavailable')
+          else:
+              status='no_artifact_runtime_failure'
+          print(f"Phase A {os.environ['TARGET']}: {status}; probe outcome {os.environ['PROBE_OUTCOME']}")
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as out:
+              out.write(f"### {os.environ['TARGET']}\n\nReal weight acceptance status: **{status}**\n\n")
+          PY
