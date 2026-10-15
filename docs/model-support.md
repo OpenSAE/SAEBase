@@ -17,7 +17,7 @@ The verified release matrix has six distinct prompts per model. It checks compat
 
 ## Phase A 270M–8B expansion
 
-Six candidate model/SAE pairs are now tracked in [Phase A Model Coverage](phase-a-model-coverage.md), including the newly registered Qwen3.5-2B Base + Qwen-Scope 32K SAE. Their real-checkpoint status must be derived from individual acceptance run artifacts, not from registry presence.
+Six model/SAE pairs are tracked in [Phase A Model Coverage](phase-a-model-coverage.md). **Qwen3.5-2B Base + the original Qwen-Scope 32K SAE has passed genuine CPU model+SAE capture and identity-patch acceptance.** All six original SAE checkpoints independently loaded and encoded/decoded with genuine weights; the other five model+SAE pairs remain blocked or untested pending gated model access or high-memory GPU compute. Details and raw evidence are linked in the Phase A page.
 
 ## Registered configurations and optional models
 
