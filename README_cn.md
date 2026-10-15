@@ -2,7 +2,7 @@
 
 🌍 语言：[English](README.md) | [中文](README_cn.md) &nbsp; [![CI](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml)
 
-👉 **一句话总结。** SAEBase 将模型与 SAE 加载、Prompt 数据集、激活分析、特征干预和可复现评估整合为一套公共研究工具。
+👉 **一句话总结。** SAEBase 为稀疏自编码器（SAE）研究提供可复现的公共工具：统一加载模型与 SAE、提取并复用激活、干预特征、评估重构及下游行为，并用可验证的来源记录与统计审计报告结果。
 
 <p align="center">
   <a href="#-快速上手"><b>🚀 快速上手</b></a> &nbsp; | &nbsp;
@@ -15,34 +15,39 @@
 
 ## 🧭 概览
 
-SAEBase 为学习表征分析、激活层面的量化测量，以及 SAE 特征对下游行为的影响评估提供通用基础设施。
+SAEBase 提供研究稀疏自编码器的统一流程，不只衡量重构质量，还能分析特征干预后的模型行为。它把预训练模型、SAE 字典、版本化输入、激活测量、特征编辑与可靠性检验连接起来，同时保留不同指标各自的定义。
 
 ```mermaid
 flowchart LR
     A["模型与 SAE 注册表"] --> C["加载与校验"]
-    B["Prompt 数据"] --> C
+    B["版本化 Prompt"] --> C
     C --> D["提取激活"]
-    D --> E["SAE 编码 / 解码"]
-    E --> F["重构诊断"]
-    E --> G["特征干预"]
-    F --> H["评估结果与记录"]
-    G --> H
+    D --> E["共享激活缓存"]
+    E --> F["SAE 编码 / 解码"]
+    F --> G["重构诊断"]
+    F --> H["特征干预"]
+    G --> I["基准评估与可靠性"]
+    H --> I
+    I --> J["来源追踪与报告"]
 ```
+
+核心工作方式是 **一次提取，多 SAE 评估**：在同一模型和激活位置上，经过身份校验的激活缓存可以由多个 SAE checkpoint 共享。随后可以测量特征编辑造成的输出变化，并分别报告各项指标，不合成为一个缺乏统一含义的 SAE 总分。
 
 ## ✨ 核心能力
 
-- 🧠 **模型与 SAE 管理。** 统一配置模型、checkpoint、层、hook 和兼容性检查。
-- 🔎 **激活分析。** 提取激活与 SAE 特征，并计算 L0、激活范数、重构误差和解释方差。
-- 🎛️ **特征干预。** 修改 SAE 特征编码，在指定位置写回激活，比较行为输出并保留原始重构残差。
-- 🗂️ **可复现数据。** 通过 JSONL 和 manifest 记录模型、行为任务、随机种子及数据版本。
-- 🧩 **研究项目接入。** 为 [SAR](https://github.com/OpenSAE/SAE-Behavioral-Compositionality) 与 [RSS](https://github.com/OpenSAE/Redistribution-Sensitivity-Score) 提供公共读取和干预接口，保留各自的原始指标实现。
-- ⚙️ **可复用工具。** Python API、命令行、Hydra 配置、自动化测试和 Python 发行包。
+- 🧠 **模型与 SAE 集成。** 统一管理 checkpoint、模型适配器、layer、hook、兼容性及已注册或自定义 SAE 的身份。
+- 🗃️ **激活提取与复用。** 支持可恢复分片缓存、无损 Dense/CSR SAE 编码、精确 token 选择、样本分组及 checkpoint SHA-256 校验。
+- 🎛️ **特征干预与 Steering。** 支持 identity、ablation、scaling、clamping、addition、coalition、完整重构对照和批量下游输出测量；特征编辑可保留原始重构残差。
+- 📊 **SAE Benchmark。** 分别评估 L0、重构 MSE、FVU/解释方差、目标 token 损失、logits/KL 变化及不同干预条件的行为指标。
+- 📈 **统计可靠性。** 基于 prompt group 的 Bootstrap、配对 SAE 比较、置信区间、样本量敏感性、排名稳定性及已知真值/负对照。
+- 🧩 **研究指标接入。** 调用原始 [SAR](https://github.com/OpenSAE/SAE-Behavioral-Compositionality)、[RSS](https://github.com/OpenSAE/Redistribution-Sensitivity-Score) 估计器，并验证来自原生 SAEBench 的结果。
+- ⚙️ **实验可复现性。** 资源预检、精确缓存身份、中断恢复、来源与模型权重哈希，以及 JSONL/JSON、CSV、HTML 报告。
 
 ---
 
 ## ⚙️ 安装
 
-从源码安装标准分析环境（Python 3.11–3.12）：
+支持 Python 3.11–3.12。执行真实模型与 SAE 分析，可从源码安装完整分析依赖：
 
 ```bash
 git clone https://github.com/OpenSAE/SAEBase.git
@@ -54,101 +59,158 @@ saebase --list
 <details>
 <summary>📦 其他安装方式</summary>
 
-基础安装提供注册表、CLI 和离线公共 API：
+仅使用注册表、离线示例及轻量公共 API：
 
 ```bash
 python -m pip install -e .
 ```
 
-测试与打包使用 `pip install -e ".[dev]"`。GPU 生成后端对应 `.[generation]`，具体环境要求见[运行说明](docs/PHASE_C.md)。
+开发测试与打包使用 `.[dev]`。实验性的 GPU 生成依赖位于 `.[generation]`，默认 CPU 验收并不代表 vLLM/NNsight GPU 加速已被全面验证。已发布的 wheel 与源码包可从 [GitHub Releases](https://github.com/OpenSAE/SAEBase/releases) 获取；目前不宣称已经发布到 PyPI。
 
 </details>
 
 ## 🚀 快速上手
 
-**1. 准备 Prompt 数据**，使用已注册的 Pythia-70M 模型：
-
-```bash
-saebase-prepare-prompts \
-  --model-key pythia70m --behavior SimpleCopying \
-  --device cpu --n-generate 300 --min-kept 20 --seed 0 \
-  --data-dir ./data
-```
-
-程序在 `data/SimpleCopying/pythia70m/v1/` 下生成 `prompts.jsonl` 和 `manifest.json`。
-
-**2. 评估公开 SAE**，读取第 3 层的激活：
-
-```bash
-saebase \
-  --task sae --model pythia70m --sae pythia70m_resid_sm \
-  --prompt-source SimpleCopying --layer 3 --n-prompts 5 \
-  --data-dir ./data --device cpu \
-  --run-dir ./experiment/pythia70m-smoke
-```
-
-评估结果保存在 `sae_activation_summary.json`，包含逐样本诊断和 Hydra 运行配置。该流程会按需下载公开模型与 SAE 权重。
-
-💻 **端到端验收：** `bash scripts/phase_a_smoke.sh`。GPU 环境可设置 `DEVICE=cuda`。
-
----
-
-## 🔬 公共 Python API
-
-先运行自包含的**离线示例**，使用小规模合成模型和 SAE：
+**1. 不下载 checkpoint，先体验公共 API：**
 
 ```bash
 python examples/05_public_api_offline.py
 ```
 
-[`saebase.api`](saebase/api/__init__.py) 提供激活位置、模型适配器、SAE 来源信息、特征读取、编码编辑和干预前后 logits 对比。
+示例使用小型合成模型与 SAE，演示激活提取、特征编辑、identity 检查和 logits 对比。示例数值不属于真实研究结果。
 
-特征编辑采用：
+**2. 预检可复现的 SAE Benchmark：**
+
+```bash
+saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
+```
+
+这一步会验证配置、干预测量数量和任务依赖，不加载模型权重。
+
+**3. 使用公开 checkpoint 执行相同评估：**
+
+```bash
+saebase-benchmark --config conf/benchmark/p0_small.json --real
+saebase-benchmark --config conf/benchmark/p0_small.json --report-only
+```
+
+真实运行会下载指定权重，在 `runs/<run_id>/` 输出 `metrics.jsonl`、`summary.csv`、`report.html`、配置与来源信息。这个固定 token 的小示例仅用于工程验证，并非正式研究数据集。Prompt Preparation 与原有 Activation Health 使用方法参见[入门指南](docs/getting-started.md)。
+
+---
+
+## 🧠 支持的模型与 SAE
+
+SAEBase 注册了多种模型和 SAE 配置，但**注册成功不代表真实权重已经通过验证**。正式发布的真实验收范围为：
+
+| 模型 | 验证的激活位置 | 已执行的真实 SAE checkpoint |
+| :--- | :--- | :--- |
+| **Pythia-70M（去重版）** | `blocks.3.hook_resid_post` | Residual-stream SAE 与另一份独立训练的 Gated SAE |
+| **GPT-2 Small** | `blocks.8.hook_resid_pre` | 原始 Residual SAE 与 Feature-Splitting SAE |
+
+两种模型均验证了两个不同 SAE checkpoint 的权重哈希，每个模型使用六组固定 prompts。其他模型（含 Gemma 与更大模型）虽已注册，但可能有额外的依赖、权限、算力或独立验收要求。参见[模型与 Checkpoint 支持](docs/model-support.md)。
+
+---
+
+## 🗃️ 激活提取与缓存
+
+在同一个模型和 hook 上提取一次激活，即可在多个 SAE checkpoint 之间共享缓存。每份记录都包含模型与 tokenizer 身份、token 位置、`sample_id`、`prompt_group_id`、数据 split 与激活校验和；SAE 编码以无损 Dense 或 CSR 格式单独保存。
+
+```bash
+python examples/10_activation_store_offline.py
+```
+
+Reader 验证 manifest 和分片的完整性，中断后可以从已提交的激活继续，而非重复运行整个模型。缓存复用要求模型、位置和输入身份精确一致，不会只根据文件名猜测。参见[Activation Store](docs/activation-store.md)。
+
+---
+
+## ⚡ 特征干预与 Steering
+
+SAEBase 可批量执行 identity、ablation、scaling、clamping、addition、coalition 和 reconstruction 条件。特征编辑支持保留重构残差：
 
 ```text
 edited_activation = original_activation + decode(edited_codes) - decode(original_codes)
 ```
 
-这一方式保留原激活中的重构残差，并通过原样回放检查模型输出一致性。
+**完整 SAE 重构替换**是不同的实验对照，不能与保留残差的特征编辑混为一谈。指标按条件分别记录下游 logits、KL divergence、可定义的目标 token 变化及激活差异。
 
-真实 Pythia 模型与 SAE 示例：`python examples/06_public_api_pythia.py`。
+```bash
+saebase-intervene --config conf/interventions/m2_pythia_example.json --dry-run
+python examples/11_batch_interventions_offline.py
+```
+
+真实权重执行需要显式提供 `--real`。短文本 Steering 使用完整前缀重新计算作为参考，不宣称已有 KV cache 或 GPU 吞吐加速。参见[特征干预](docs/feature-interventions.md)。
+
+---
+
+## 📊 SAE Benchmark
+
+Benchmark 根据版本化配置规划模型、SAE 与指标，复用精确校验过的激活、编码与干预缓存。每个指标独立记录单位、协议、有效样本数量、状态和来源。
+
+| 指标类别 | 典型指标 | 说明 |
+| :--- | :--- | :--- |
+| **表征与重构** | L0、重构 MSE、FVU、Explained Variance | 稀疏程度与重构性质；需要留意不同协议的分母和定义 |
+| **重构后的行为** | 目标 token NLL、Loss Recovered | 比较未经修改模型、完整重构替换和实际测量的零激活对照 |
+| **特征干预效果** | Logit differences、KL、Activation Delta、Target-token Changes | 分别量化每种已命名干预条件的下游效果 |
+| **外部研究指标** | SAR、RSS、SAEBench Core / Sparse Probing | 保留原始估计器或原生生成结果的协议与来源校验 |
+
+```bash
+saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
+python examples/12_benchmark_offline.py
+```
+
+SAEBase 的逐 token FVU 不应直接视为与 SAEBench 全局重构协议数值等价。原生 SAEBench 指标从**上游已经生成的 JSON** 导入，Benchmark Importer 不会自动重新运行全部上游评估。参见[基准评估](docs/benchmarking.md)。
+
+---
+
+## 📈 可靠性与可复现性
+
+可靠性审计复用已有测量，以完整的 **prompt group** 作为独立重采样单位，保证相同 prompt 的 token 或变体不会被错误视为独立样本。支持 Paired Confidence Intervals、样本量敏感性、合理方向指标的排名稳定性及明确的 undefined/unsupported 结果。
+
+```bash
+python examples/13_reliability_offline.py
+python examples/14_ground_truth_offline.py
+```
+
+对已完成的 Benchmark 可执行 `saebase-audit --m3-root runs/<run_id> --config conf/reliability/m4_pythia_smoke.json --run`。其中 `--m3-root` 为保持兼容性保留的 CLI 参数，含义是 Benchmark 结果目录，不代表用户必须理解某个开发阶段。
+
+独立的合成真值实验覆盖已知因子字典、Coalition 交互阶数、RSS 支持集及方向、可控退化和负对照。这些测试**不等于证明真实 SAE 的特征具有可解释性**。如需从原始缓存计算重构指标置信区间，可选 `--sae-only`，仅加载 SAE Decoder，不重新运行语言模型。参见[可靠性分析](docs/reliability.md)。
+
+---
 
 ## 🧩 研究项目接入
 
-SAEBase 提供公共模型操作，各研究项目继续维护自己的指标和实验定义。
+SAEBase 提供公共模型操作；各研究项目保留自身的原始指标定义与实验协议。
 
-| 项目 | SAEBase 提供的能力 | 示例 |
+| 项目 | SAEBase 接入方式 | 示例 |
 | :--- | :--- | :--- |
-| 🧩 **[SAR — 行为组合性](https://github.com/OpenSAE/SAE-Behavioral-Compositionality)** | 提取特征贡献、执行 coalition 干预并调用原始 SAR 估计器。 | [SAR 接入](examples/07_sar_via_saebase.py) |
-| 🔀 **[RSS — 表征重分布](https://github.com/OpenSAE/Redistribution-Sensitivity-Score)** | 分别读取 clean、selection、held-out activations 并调用原始 RSS 估计器。 | [RSS 接入](examples/08_rss_via_saebase.py) |
-
-在本地准备好对应研究仓库后运行：
+| 🧩 **[SAR — 行为组合性](https://github.com/OpenSAE/SAE-Behavioral-Compositionality)** | 提取特征贡献、执行 Coalition 编辑、调用未经改写的 SAR 估计器。 | [SAR 示例](examples/07_sar_via_saebase.py) |
+| 🔀 **[RSS — 表征重分布](https://github.com/OpenSAE/Redistribution-Sensitivity-Score)** | 分别提取 Clean、Selection、Held-out 数据，调用未经改写的 RSS 估计器。 | [RSS 示例](examples/08_rss_via_saebase.py) |
+| 📊 **[SAEBench](https://github.com/adamkarvonen/SAEBench)** | 将选定的原生 Core/Sparse Probing 结果与模型、SAE 身份和上游 commit 对齐后导入。 | [Benchmark 文档](docs/benchmarking.md) |
 
 ```bash
 python examples/07_sar_via_saebase.py --paper-dir /path/to/SAR-repo
 python examples/08_rss_via_saebase.py --paper-dir /path/to/RSS-repo
 ```
 
-两个示例默认使用确定性的合成数据；`--real` 可切换到公开 checkpoint。详见[接入说明](docs/PHASE_C.md)。
+两个示例默认采用确定性的合成输入；真实 checkpoint 使用需要明确启用。参见[研究项目集成](docs/research-integrations.md)。
 
 ---
 
-## ⚡ 批量特征干预与 Steering（M2）
+## 🔬 公共 Python API
 
-现在可以在多组 prompt 上批量执行 feature ablation、scaling、clamping、
-coalition 干预和 SAE reconstruction 对照，并在可恢复、带哈希校验的
-JSONL 分片中保存测量结果。M1 的 activation/code 缓存也可直接复用。
+稳定的 `saebase.api` 提供 `ModelAdapter`、`ActivationSite`、`load_registered`、`capture_features`、`edit_features` 和 `evaluate_edit`。研究者还可以直接使用 `saebase.store`、`saebase.interventions`、`saebase.benchmarks` 与 `saebase.reliability`。
 
-```bash
-# 不下载模型，先查看实验规模和资源预算。
-saebase-intervene --config conf/interventions/m2_pythia_example.json --dry-run
-# 执行完全离线的批量干预与短文本 steering 示例。
-python examples/11_batch_interventions_offline.py
+```python
+from saebase.api import load_registered, capture_features, evaluate_edit
+
+pair = load_registered(model_key="pythia70m",
+                       sae_key="pythia70m_resid_sm", layer=3, device="cpu")
+snapshot = capture_features(pair.model, pair.sae,
+                            site=pair.site, prompt="Alice Emma Alice")
+# 完整的特征干预代码参见 examples/06_public_api_pythia.py。
 ```
 
-真实模型运行需要明确提供 `--real` 并安装分析依赖。短文本 steering
-以完整前缀重新计算作为数值参考，不宣称已有 KV cache 加速。
-参阅[**M2 技术说明与验收**](docs/M2_BATCH_INTERVENTIONS.md)。
+以上代码会下载真实权重；如需无网络启动，请先执行离线示例。参见[Python API 指南](docs/python-api.md)、[API Reference](docs/API.md) 和[Examples 索引](examples/README.md)。
 
 ---
 
@@ -156,108 +218,44 @@ python examples/11_batch_interventions_offline.py
 
 | 组件 | 职责 |
 | :--- | :--- |
-| [`saebase/api/`](saebase/api/) | 模型适配、激活读取、特征编辑与干预结果 |
-| [`saebase/sae/`](saebase/sae/) | Checkpoint profiles、SAE 加载和激活诊断 |
-| [`saebase/data/`](saebase/data/) | Prompt 准备、兼容性矩阵、JSONL 与 manifest |
-| [`models/`](models/) · [`conf/`](conf/) | 模型插件和 Hydra 配置 |
-| [`tasks/`](tasks/) · [`scripts/`](scripts/) | 评估任务、数据准备和运行检查 |
+| [`saebase/api/`](saebase/api/) | 模型适配器、特征读取/编辑、激活位置与 SAE 身份 |
+| [`saebase/store/`](saebase/store/) | 激活/编码分片、存储 Reader 与中断恢复 |
+| [`saebase/interventions/`](saebase/interventions/) | 批量条件、测量日志、Patch 执行与 Steering |
+| [`saebase/benchmarks/`](saebase/benchmarks/) | 指标注册、实验规划、缓存执行及报告 |
+| [`saebase/reliability/`](saebase/reliability/) | Grouped Bootstrap、Paired Comparisons、Ground Truth 与审计 |
+| [`saebase/integrations/`](saebase/integrations/) | 原始 SAR/RSS 指标接入 |
+| [`saebase/sae/`](saebase/sae/) | SAE Profiles、加载与重构诊断 |
+| [`saebase/data/`](saebase/data/) | 版本化 Prompt 数据、Manifest 与兼容性协议 |
+| [`models/`](models/) · [`conf/`](conf/) | 模型插件与版本化实验配置 |
+| [`scripts/`](scripts/) · [`examples/`](examples/) | CLI、可运行演示及验证工具 |
 
 ## ✅ 验证情况
-
-运行离线测试：
 
 ```bash
 python -m pip install -e ".[dev]"
 python -m pytest -q
 ```
 
-| 范围 | 验证方式 |
+| 范围 | 已公开验证的内容 |
 | :--- | :--- |
-| 注册表、Prompt 记录和核心 API | 自动化离线测试 |
-| 激活读取及干预适配器 | 合成后端与小模型测试 |
-| SAR、RSS 接口 | 与原始指标接口的离线契约测试 |
-| Pythia / Gemma 公开 checkpoint | 已注册，并提供可选真实模型验收脚本 |
-| vLLM / NNsight | 可选实验后端；GPU 实测单独验收 |
+| 公共 API 与发行包 | Python 3.11/3.12 CI，wheel/sdist 构建和安装检查 |
+| 真实模型与 SAE | Pythia-70M、GPT-2 Small，每个模型两个不同的公开 SAE checkpoint |
+| 存储、干预和报告 | 精确缓存复用、按条件测量、中断恢复与完整性校验 |
+| 原始研究估计器 | SAR/RSS 原版源码测试，以及固定版本的 SAEBench Core/Sparse Probing 验收 |
+| 统计可靠性 | Prompt-group Bootstrap、Paired Comparisons、独立合成真值及负对照 |
+| 实验性后端 | vLLM/NNsight 为可选能力，本发行版不宣称 GPU 吞吐已全面验证 |
 
-<details>
-<summary>🔧 运行与兼容性说明</summary>
-
-- 当前打包提供的可执行评估任务为 `task=sae` 与 `activation_health`。
-- 其他实验协议配置作为参考保留，其原始任务实现位于研究工作区。
-- 真实模型示例按需下载权重，并使用相应的模型、SAE 依赖。
-- 注册项可通过 `python -m saebase.sae.verify_registry --list` 查看。
-- Python 发行包包含 CLI 入口和版本化 Hydra 配置。
-
-</details>
-
----
-
-
-## 🗃️ Activation Store（M1）
-
-SAEBase 新增可恢复的分片激活缓存：模型只需提取一次激活，即可在多个
-SAE checkpoint 上重复编码与评估。系统会独立保存模型身份、输入 token、
-选择位置、prompt group 和数据划分，并以 Dense 或 CSR 格式无损保存完整 SAE 编码。
-
-```bash
-python examples/10_activation_store_offline.py
-```
-
-该示例使用合成模型，不需要下载权重。缓存格式、span 对齐、损坏恢复与真实
-Pythia 验收流程参见 [M1 Activation Store](docs/M1_ACTIVATION_STORE.md)。
-
----
-
-## 📊 Unified SAE Benchmark（M3）
-
-通过版本化配置执行多 SAE、多指标评估；共享 M1/M2 缓存，输出
-可追溯的 JSONL、CSV、HTML 报告。
-
-```bash
-saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
-```
-
-只有显式提供 `--real` 才会加载真实模型。指标定义、原版 SAR/RSS
-适配及 SAEBench 验证边界参见 [M3 Benchmark 技术说明](docs/M3_UNIFIED_BENCHMARK.md)。
-
----
-
-## 📊 可靠性审计（M4）
-
-在不重新执行模型 forward 的前提下，复用 M3 原始测量，对
-`prompt_group_id` 整组重采样，计算 paired confidence intervals 与排名稳定性。
-
-```bash
-saebase-audit --m3-root runs/<run_id> --config conf/reliability/m4_pythia_smoke.json --run
-```
-
-具体协议、SAR/RSS 原版合成真值、可靠性区间、负对照和验收边界见 [M4 可靠性审计](docs/M4_RELIABILITY.md)。
-
----
-
-## 🚀 M5 — v0.2.0 双模型发布验收
-
-验收矩阵覆盖 **Pythia-70M 和 GPT-2 Small** 两种模型，各加载两个不同的
-真实 SAE checkpoint。M1–M4 原始指标、按 prompt group 审计和各类
-SHA-256 身份均可核查；模型及 SAE 权重只会在显式 `--real` 后加载。
-
-```bash
-saebase-release-matrix --config conf/release/m5_matrix.json --dry-run
-saebase-release-matrix --config conf/release/m5_matrix.json --real --device cpu
-```
-
-六个 prompt 的实验仅证明工程管线正常，不代表完整研究性能结论。
-详见 [M5 验收方法](docs/M5_RELEASE_MATRIX.md)、
-[发行说明](docs/M5_RELEASE_NOTES.md) 和
-[GitHub Releases](https://github.com/OpenSAE/SAEBase/releases)。
+公开的多 checkpoint 验收每个模型只采用六组固定 prompts，因此它证明的是**工程兼容性**，而不是 SAE 质量的大样本统计结论。模型权重没有打包进 GitHub Release，第三方 checkpoint 许可证以各自上游为准。参见[验证与证据](docs/validation.md)和[发行说明](docs/releases/v0.2.0.md)。
 
 ---
 
 ## 📚 文档
 
-[API 文档](docs/API.md) · [入门与数据准备](docs/PHASE_A.md) · [特征干预](docs/PHASE_B.md) · [研究接入](docs/PHASE_C.md) · [更新记录](CHANGELOG.md)
+[文档目录](docs/index.md) · [快速入门](docs/getting-started.md) · [Python API](docs/python-api.md) · [Examples](examples/README.md) · [模型支持](docs/model-support.md)
 
-[参与贡献](CONTRIBUTING.md) · [代码来源](docs/PROVENANCE.md) · [发行检查](docs/RELEASE_CHECKLIST.md) · [安全说明](SECURITY.md) · [Apache-2.0 许可证](LICENSE)
+[Activation Store](docs/activation-store.md) · [特征干预](docs/feature-interventions.md) · [Benchmark](docs/benchmarking.md) · [可靠性分析](docs/reliability.md) · [研究项目集成](docs/research-integrations.md)
+
+[验证与证据](docs/validation.md) · [更新记录](CHANGELOG.md) · [发行说明](docs/releases/v0.2.0.md) · [代码来源](docs/PROVENANCE.md) · [参与贡献](CONTRIBUTING.md) · [安全说明](SECURITY.md) · [Apache-2.0 许可证](LICENSE)
 
 <p align="center">
   <b>Open research infrastructure for faithful representation analysis.</b><br>
