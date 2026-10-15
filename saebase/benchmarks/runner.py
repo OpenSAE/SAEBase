@@ -22,6 +22,9 @@ from .metrics.intervention import calculate_interventions
 from .metrics.reconstruction import target_nll, loss_recovered
 from .adapters.papers import run_paper
 from .adapters.saebench import import_native
+from .adapters.localization import (
+    run_localization, parse_localization_options, validate_localization_result,
+)
 from .results import store_results,read_metrics
 from .report import write_report
 
@@ -46,7 +49,7 @@ def _identity(config,target,model,sae):
     return act,sae_sha
 
 def _metric(config,target,sae_key,spec,status,value=None,n_valid=0,
-            reason=None,condition=None,refs=(),source_sha=None,source_commit=None,cost=None):
+            reason=None,condition=None,refs=(),source_sha=None,source_commit=None,cost=None,metadata=None):
     from saebase.store import resolve_positions
     if spec.sample_unit == "token":
         requested=sum(len(resolve_positions(s.record)) for s in config.samples)
@@ -69,7 +72,7 @@ def _metric(config,target,sae_key,spec,status,value=None,n_valid=0,
         seed=config.seed,sample_unit=spec.sample_unit,n_requested=requested,
         n_valid=n_valid,status=status,value=value,condition_id=condition,
         reason=reason,measurement_refs=tuple(refs),source_sha256=source_sha,
-        source_commit=source_commit,cost=cost or {})
+        source_commit=source_commit,cost=cost or {},metadata=metadata or {})
 
 def _safe(config,target,sae_key,spec,fn,*,condition=None):
     try:
@@ -85,7 +88,8 @@ def _safe(config,target,sae_key,spec,fn,*,condition=None):
         return _metric(config,target,sae_key,spec,"blocked",
                 reason=f"{type(exc).__name__}: {exc}",condition=condition)
 
-def validate_external_sources(config: BenchmarkConfig, rows: list[dict[str, Any]]) -> None:
+def validate_external_sources(config: BenchmarkConfig, rows: list[dict[str, Any]], *,
+                              root: str | Path | None = None, localization_paper=None) -> None:
     """Reject stale original-estimator/native results, even on report-only runs.
 
     Model/SAE weights are not loaded; only the exact trusted local source files
@@ -101,6 +105,10 @@ def validate_external_sources(config: BenchmarkConfig, rows: list[dict[str, Any]
             source = config.sources.get(paper)
             if not source or source_identity(source, paper) != row.get("source_sha256"):
                 raise ValueError(f"external {paper} source changed after benchmark computation")
+        elif name.startswith("localization."):
+            if root is None:
+                raise ValueError("Localize source validation requires the completed benchmark root")
+            validate_localization_result(root,config,row,paper=localization_paper)
         elif name.startswith("saebench."):
             source = config.sources.get(name)
             if (not source or not Path(source).is_file()
@@ -139,7 +147,7 @@ def _import_saebench(config, target, sae_key, specs):
 
 
 def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
-            resume: bool=True, loader=None):
+            resume: bool=True, loader=None, localization_paper=None):
     """Execute a frozen matrix. A caller may inject a pair loader for offline tests.
 
     For real weights, caller explicitly passes real=True; failure to resolve an
@@ -152,7 +160,7 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
     root.mkdir(parents=True,exist_ok=True)
     if (root/"metrics_manifest.json").exists() and resume:
         prior=read_metrics(root,config.run_id)
-        validate_external_sources(config,prior)
+        validate_external_sources(config,prior,root=root,localization_paper=localization_paper)
         # A completed ledger is read-only. This never reexecutes model work.
         return prior
     if (root/"metrics_manifest.json").exists() and not resume:
@@ -163,6 +171,9 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
     load=loader or (lambda model_key,sae_key,layer:
                     load_registered(model_key=model_key,sae_key=sae_key,layer=layer))
     cache_root=Path(output)/"_cache"/"m1"
+    wants_localization=any(s.metric_id.startswith("localization.") for s in specs)
+    if wants_localization:
+        parse_localization_options(config)
     native_specs=[s for s in specs if s.metric_id.startswith("saebench.")]
     local_specs=[s for s in specs if not s.metric_id.startswith("saebench.")]
     for target in config.targets:
@@ -191,7 +202,7 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
             cache_cost={}
             m2_cost={}
             act_path=None;code_path=None
-            if wants_core or wants_m2:
+            if wants_core or wants_m2 or wants_localization:
                 with ActivationWriter(cache_root,act_id,width=int(sae.cfg.d_in)) as writer:
                     cache_stats=collect_activations(model,records,writer,site=target.site)
                     act_path=writer.path
@@ -201,6 +212,32 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
                             "activations_reused":cache_stats.reused,
                             "sae_codes_encoded":code_stats.collected,
                             "sae_codes_reused":code_stats.reused}
+            if wants_localization:
+                subset=[spec for spec in specs if spec.metric_id.startswith("localization.")]
+                try:
+                    artifact, ref=run_localization(
+                        config,target,sae_key,activation_store=act_path,
+                        code_store=code_path,root=root,paper=localization_paper
+                    )
+                    if artifact["total_variance"] <= 0:
+                        for spec in subset:
+                            results.append(_metric(config,target,sae_key,spec,"undefined",
+                                reason="zero SAE activation variance on complete input grid"))
+                    else:
+                        for spec in subset:
+                            value=(artifact["budget_at_90pct"] if spec.metric_id.endswith("budget_at_90pct")
+                                   else artifact["budget_fraction_at_90pct"])
+                            results.append(_metric(config,target,sae_key,spec,"completed",
+                                value=float(value),n_valid=1,refs=(ref,),
+                                source_sha=artifact["source_sha256"],cost=cache_cost,
+                                metadata={"design_key":artifact["design_manifest"]["design_key"],
+                                          "n_factors":artifact["n_factors"],
+                                          "n_features":artifact["n_features"],
+                                          "interpretation":"one controlled input grid, not independent samples"}))
+                except (ImportError,OSError,ValueError,TypeError,KeyError,RuntimeError,IndexError) as exc:
+                    for spec in subset:
+                        results.append(_metric(config,target,sae_key,spec,"blocked",
+                            reason=f"{type(exc).__name__}: {exc}"))
             if wants_core:
                 core_data,n_core=calculate_core(act_path,code_path,sae,
                                              sample_ids=[s.record.sample_id for s in config.samples])
@@ -297,7 +334,7 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
             results.extend(_import_saebench(config,target,sae_key,native_specs))
             # Registered but unsupported metric families must be visible in the
             # result set. Never silently drop a promised metric from a report.
-            known=("core.","intervention.","reconstruction.","sar.","rss.","saebench.")
+            known=("core.","intervention.","reconstruction.","sar.","rss.","saebench.","localization.")
             for spec in specs:
                 if not spec.metric_id.startswith(known):
                     results.append(_metric(config,target,sae_key,spec,"unsupported",

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **Input Localization benchmarks:** exact 90%-variance scope budget and normalized-budget metrics, with source-checked full scope curves, feature assignments, design manifests, and JSON/HTML report links.
+- **Localization reliability:** original paired-estimator seed stability on cached codes and matched descriptive cross-SAE comparisons, deliberately excluding invalid prompt-group bootstrap on full factorial input states.
+- **Reference testing:** benchmark preflight, cache/source integrity, offline M3/M4 contracts and a native Localize execution example.
+
 - **Controlled input designs:** complete binary factor enumeration, input-state permutations, stable underlying sample identities, explicit token-position selection and versioned provenance manifests that bind to existing activation/code caches.
 - **Localize bridge:** accept a controlled design for live feature capture or a verified design manifest for cached SAE code analysis; retain the original optional estimator package.
 

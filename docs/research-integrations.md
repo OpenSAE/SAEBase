@@ -43,7 +43,7 @@ python examples/15_input_localization_via_saebase.py
 python examples/16_controlled_input_design.py
 ```
 
-See [Controlled Input Designs](controlled-inputs.md) for enumeration, bijective reindexing, and sidecar provenance.
+See [Controlled Input Designs](controlled-inputs.md) for enumeration, bijective reindexing, and sidecar provenance. The original estimators also run through [Localize Benchmarking](localization-benchmark.md), with versioned full curves and finite-pair reliability analysis.
 
 Input state `i` represents the Boolean factors encoded in its bits. The caller supplies a complete, correctly aligned, uniformly weighted product design; prompt labels alone cannot establish causal validity. Exact grid optimization is exponential in factor count. Paired finite-sample results are *estimates*, not post-selection certificates.
 

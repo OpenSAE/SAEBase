@@ -80,3 +80,19 @@ jobs:
           name: saebase-distributions
           path: dist/*
           if-no-files-found: error
+
+  localization-native:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install SAEBase and original Localize reference
+        run: |
+          python -m pip install -e ".[dev]"
+          python -m pip install "git+https://github.com/OpenSAE/SAE-Input-Localization.git@82b86d7ca20051cc16f7528a0966f4531c4a8eb3"
+      - name: Run original-estimator benchmark acceptance
+        run: python -m pytest -q tests/test_m3_localization.py -k native
+      - name: Run full Localize benchmark and reliability demo
+        run: python examples/17_localization_benchmark.py --output "$(mktemp -d)"

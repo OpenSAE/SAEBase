@@ -64,8 +64,9 @@ python examples/14_ground_truth_offline.py
 | [`07_sar_via_saebase.py`](07_sar_via_saebase.py) | Coalition interventions and the unchanged external SAR estimator |
 | [`08_rss_via_saebase.py`](08_rss_via_saebase.py) | Clean, selection and held-out features with the unchanged RSS estimator |
 | [`15_input_localization_via_saebase.py`](15_input_localization_via_saebase.py) | Complete controlled input grid and original optimal Localize scope curve |
+| [`17_localization_benchmark.py`](17_localization_benchmark.py) | End-to-end Localize Benchmark with full curve artifacts and M4 stability audit |
 
-The SAR/RSS examples need their original research estimator repositories. The Localize example needs the independent `sae-input-localization` package installed from [OpenSAE/SAE-Input-Localization](https://github.com/OpenSAE/SAE-Input-Localization). Their defaults use synthetic demonstration data; real checkpoint runs are opt-in.
+The SAR/RSS examples need their original research estimator repositories. The Localize example needs the independent `sae-input-localization` package installed from [OpenSAE/SAE-Input-Localization](https://github.com/OpenSAE/SAE-Input-Localization). Their defaults use synthetic demonstration data; real checkpoint runs are opt-in. `17_localization_benchmark.py` additionally needs the installed original Localize package and writes complete M3/M4 reports.
 
 ## A real multi-checkpoint benchmark
 

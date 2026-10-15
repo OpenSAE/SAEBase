@@ -83,4 +83,4 @@ The complete `2**n_factors` input grid is uniform over all declared factor combi
 
 The input rendering function defines the actual experimental manipulations. SAEBase checks coverage, uniqueness, tokenization, positions and cache identity; **it cannot infer causal independence or semantic correctness from prompt strings**. Reindexing is not a new model forward pass and is not SAE feature ablation. The Localize estimator retains its own exact-curve and finite-sample interpretation.
 
-[Activation Store](activation-store.md) · [Research Integrations](research-integrations.md) · [Examples](../examples/README.md)
+[Activation Store](activation-store.md) · [Localize Benchmarking](localization-benchmark.md) · [Research Integrations](research-integrations.md) · [Examples](../examples/README.md)
