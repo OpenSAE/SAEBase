@@ -30,8 +30,9 @@ Do not interpret a held-out statistic as a selection result or treat repeated va
 
 [Input Localization](https://github.com/OpenSAE/SAE-Input-Localization) measures which controlled binary inputs are needed to explain frozen SAE feature activations. SAEBase provides two input routes without copying the original mathematical estimator.
 
-- `collect_localization_grid(...)` uses the SAEBase public capture API to encode every input configuration in explicit Boolean bitmask order.
-- `localization_grid_from_code_store(...)` reconstructs the same grid from identity-checked SAEBase code caches and verifies their associated activation checksums.
+- `ControlledInputDesign.from_renderer(...)` enumerates independent binary factors, and `collect_controlled_input_activations(...)` caches their complete, token-aligned grids with a checked state-to-sample manifest.
+- `collect_localization_grid(..., design=...)` uses the public capture API to encode each input configuration in explicit Boolean bitmask order.
+- `localization_grid_from_code_store(..., manifest=...)` reconstructs the same grid from identity-checked SAEBase code caches and verifies their associated activation checksums.
 - `evaluate_localization(...)` calls the original `sae_localize.exact_scope_curve`; optionally it also calls the original paired plug-in estimator. It returns the optimal curve, total variance, budget and feature scope assignment.
 
 Install the original project separately:
@@ -39,7 +40,10 @@ Install the original project separately:
 ```bash
 python -m pip install git+https://github.com/OpenSAE/SAE-Input-Localization.git
 python examples/15_input_localization_via_saebase.py
+python examples/16_controlled_input_design.py
 ```
+
+See [Controlled Input Designs](controlled-inputs.md) for enumeration, bijective reindexing, and sidecar provenance.
 
 Input state `i` represents the Boolean factors encoded in its bits. The caller supplies a complete, correctly aligned, uniformly weighted product design; prompt labels alone cannot establish causal validity. Exact grid optimization is exponential in factor count. Paired finite-sample results are *estimates*, not post-selection certificates.
 
