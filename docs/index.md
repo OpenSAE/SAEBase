@@ -8,6 +8,7 @@ Start with the task you want to perform. The documentation is organized by **cap
 
 - [Getting Started](getting-started.md) — installation, offline example, benchmark preflight and a real checkpoint walkthrough.
 - [Models and SAEs](model-support.md) — registry versus verified checkpoint coverage, public source links and access constraints.
+- [Stage A Model Coverage](stage-a-coverage.md) — six public SAE sources from 270M to 8B, exact hook sites and real-weight acceptance.
 - [Examples Index](../examples/README.md) — runnable demonstrations grouped by research task.
 - [Python API](python-api.md) — public research functions, store/benchmark/audit entrypoints and CLI commands.
 - [API Reference](API.md) — quick lookup of major public interfaces.
