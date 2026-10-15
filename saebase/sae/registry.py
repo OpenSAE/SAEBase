@@ -26,6 +26,8 @@ from models.pythia410m.pythia410m import SPEC as PYTHIA410M_SPEC
 from models.pythia70m.pythia70m import SPEC as PYTHIA70M_SPEC
 from models.qwen3_8b.qwen3_8b import SPEC as QWEN3_8B_SPEC
 from models.qwen3_1_7b.qwen3_1_7b import SPEC as QWEN3_1_7B_SPEC
+from models.qwen3_1_7b_base.qwen3_1_7b_base import SPEC as QWEN3_1_7B_BASE_SPEC
+from models.mistral7b_instruct.mistral7b_instruct import SPEC as MISTRAL7B_INSTRUCT_SPEC
 from models.qwen35_4b.qwen35_4b import SPEC as QWEN35_4B_SPEC
 from models.qwen35_2b.qwen35_2b import SPEC as QWEN35_2B_SPEC
 from models.r1_distill_qwen15b.r1_distill_qwen15b import SPEC as R1_DISTILL_QWEN15B_SPEC
@@ -33,7 +35,7 @@ from models.r1_distill_llama8b.r1_distill_llama8b import SPEC as R1_DISTILL_LLAM
 from models.qwen35_9b.qwen35_9b import SPEC as QWEN35_9B_SPEC
 from models.qwen35_27b.qwen35_27b import SPEC as QWEN35_27B_SPEC
 
-LoaderKind = Literal["sae_lens", "eleutherai_topk_mlp", "qwen_resid_topk", "dictionary_learning"]
+LoaderKind = Literal["sae_lens", "eleutherai_topk_mlp", "qwen_resid_topk", "dictionary_learning", "sparsify_topk"]
 TransferKind = Literal["none", "base_to_instruct"]
 
 _BASE_SPECS: dict[str, BaseModelSpec] = {
@@ -53,6 +55,8 @@ _BASE_SPECS: dict[str, BaseModelSpec] = {
     LLAMA31_8B_INSTRUCT_SPEC.key: LLAMA31_8B_INSTRUCT_SPEC,
     QWEN3_8B_SPEC.key: QWEN3_8B_SPEC,
     QWEN3_1_7B_SPEC.key: QWEN3_1_7B_SPEC,
+    QWEN3_1_7B_BASE_SPEC.key: QWEN3_1_7B_BASE_SPEC,
+    MISTRAL7B_INSTRUCT_SPEC.key: MISTRAL7B_INSTRUCT_SPEC,
     QWEN35_4B_SPEC.key: QWEN35_4B_SPEC,
     QWEN35_2B_SPEC.key: QWEN35_2B_SPEC,
     GEMMA2_9B_PT_SPEC.key: GEMMA2_9B_PT_SPEC,
@@ -581,6 +585,28 @@ _PROFILES: dict[str, SAEProfile] = {
         transfer_kind="base_to_instruct",
         hook_note="blocks.12.hook_resid_post (pre-final-norm)",
     ),
+    "qwen3_1_7b_base_resid_w32k": SAEProfile(
+        key="qwen3_1_7b_base_resid_w32k",
+        model_key="qwen3_1_7b_base",
+        sae_release="Qwen/SAE-Res-Qwen3-1.7B-Base-W32K-L0_50",
+        layers=(7, 14, 18, 23),
+        hook_kind="hook_resid_post",
+        loader="qwen_resid_topk",
+        sae_id_template="layer{L}.sae.pt",
+        repo_id="Qwen/SAE-Res-Qwen3-1.7B-Base-W32K-L0_50",
+        notes="Official Qwen Scope Base TopK-50 residual (32k); distinct from Qwen3-1.7B chat.",
+    ),
+    "mistral7b_instruct_tc_l16_131k": SAEProfile(
+        key="mistral7b_instruct_tc_l16_131k",
+        model_key="mistral7b_instruct",
+        sae_release="tylercosgrove/mistral-7b-sparse-autoencoder-layer16",
+        layers=(16,),
+        hook_kind="hook_resid_pre",
+        loader="sae_lens",
+        logical_sae_id=".",
+        repo_id="tylercosgrove/mistral-7b-sparse-autoencoder-layer16",
+        notes="Community TopK-128 131072-latent layer-16 pre-residual SAE (~4.3 GB), CPU source-metadata only by default.",
+    ),
     "qwen3_1_7b_ak_resid_l14_65k": SAEProfile(
         key="qwen3_1_7b_ak_resid_l14_65k",
         model_key="qwen3_1_7b",
@@ -677,6 +703,8 @@ DEFAULT_SAE_FOR_MODEL: dict[str, str] = {
     "qwen3_8b": "qwen3_8b_resid_w64k",
     "qwen35_2b": "qwen35_2b_resid_w32k",
     "qwen3_1_7b": "qwen3_1_7b_ak_resid_l14_65k",
+    "qwen3_1_7b_base": "qwen3_1_7b_base_resid_w32k",
+    "mistral7b_instruct": "mistral7b_instruct_tc_l16_131k",
     "qwen35_4b": "qwen35_4b_matryoshka_l15_65k",
     "gemma2_9b_pt": "gemma2_9b_pt_scope_resid",
     "gemma2_9b_it": "gemma2_9b_it_scope_resid",
