@@ -32,7 +32,9 @@ class HFLogitsModel:
     ) -> None:
         self._model = model
         self.tokenizer = tokenizer
-        n_layers = int(getattr(model.config, "num_hidden_layers", -1))
+        text_config = getattr(model.config, "text_config", None)
+        n_layers = int(getattr(model.config, "num_hidden_layers", None)
+                       or getattr(text_config, "num_hidden_layers", -1))
         self.cfg = HFLogitsModelCfg(
             device=str(device),
             n_layers=n_layers,
