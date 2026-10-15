@@ -1,0 +1,6 @@
+# @package _global_
+sae:
+  name: gemma2_2b_stagea_resid_l25_16k
+  layer: 25
+  device: cuda
+  require_prepared_prompts: true
