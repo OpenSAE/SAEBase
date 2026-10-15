@@ -73,8 +73,8 @@ Health metric semantics are explicit:
 
 The result directory is `runs/<run_id>/` and contains:
 `resolved_config.json`, `plan.json`, `provenance.json`, `metrics.jsonl`,
-`metrics_manifest.json`, `summary.csv`, `report.html`, `m1_cache/` and
-`measurements/`. M1 identities are independent of SAE; M2 measurement
+`metrics_manifest.json`, `summary.csv`, `report.html`. Shared M1/M2 measurement caches live below
+`runs/_cache/` rather than inside any metric-specific run. M1 identities are independent of SAE; M2 measurement
 identities bind both checkpoint hashes. Repeated complete run IDs are reused.
 
 ## Original-paper integrations
@@ -105,3 +105,12 @@ native runs under an explicitly pinned protocol.
 M3 has no composite SAE ranking. M4 will add grouped bootstrap and synthetic
 ground truth audit to these frozen measurements. M5 will execute a full
 multi-model multi-checkpoint matrix and publish verified v0.2 artifacts.
+
+### Reuse across benchmark configurations
+
+Cache paths are shared under `runs/_cache/m1/` and `runs/_cache/m2/`, keyed
+by exact model/SAE/site and their M1/M2 identity manifests rather than M3
+metric selections. Changing the benchmark's metric set changes `run_id` but
+not these physical caches; previously committed activation rows and M2
+interventions are reused after content and identity checks. `--no-resume`
+rejects only an existing completed M3 report, not valid shared caches.

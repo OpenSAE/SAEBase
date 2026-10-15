@@ -80,3 +80,29 @@ def test_native_saebench_import_matches_original_value(tmp_path,id,category,valu
     assert result==value and len(sha)==64 and commit=="f"*40
     with pytest.raises(ValueError):
         import_native(f,metric,expected_commit="a"*40)
+
+def test_changed_metric_config_reuses_m1_forward(tmp_path):
+    """Changing a metric must not collect the same activation samples again."""
+    import copy
+    model=ModelAdapter(ResearchToyModel().eval())
+    sae=ResearchToySAE().eval()
+    counter={"n":0}
+    # Count real hook-bearing model invocations, rather than calls to loader.
+    orig=model.model.run_with_cache
+    def counted(*args,**kwargs):
+        counter["n"]+=1
+        return orig(*args,**kwargs)
+    model.model.run_with_cache=counted
+    def loader(*args):
+        return SimpleNamespace(model=model,sae=sae)
+    cfg_data=copy.deepcopy(BASE)
+    cfg_data["metrics"]=["core.l0"]
+    first=BenchmarkConfig.from_dict(cfg_data)
+    execute(first,tmp_path,loader=loader,real=True)
+    count=counter["n"]
+    assert count==len(first.samples)
+    cfg_data["metrics"]=["core.l0","core.reconstruction_mse"]
+    second=BenchmarkConfig.from_dict(cfg_data)
+    assert first.run_id!=second.run_id
+    execute(second,tmp_path,loader=loader,real=True)
+    assert counter["n"]==count, "new metric must reuse existing M1 activation store"

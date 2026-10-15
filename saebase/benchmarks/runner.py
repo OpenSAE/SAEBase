@@ -108,7 +108,7 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
     specs=[get_metric(m) for m in config.metrics]
     load=loader or (lambda model_key,sae_key,layer:
                     load_registered(model_key=model_key,sae_key=sae_key,layer=layer))
-    cache_root=root/"m1_cache"
+    cache_root=Path(output)/"_cache"/"m1"
     for target in config.targets:
         for sae_key in target.sae_keys:
             pair=load(target.model_key,sae_key,target.site.layer)
@@ -147,8 +147,8 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
                         value,n_valid=n_core if value is not None else 0,
                         reason=None if value is not None else "no valid M1 rows"))
             if wants_m2:
-                meas=root/"measurements"/act_id.key/sae_sha
-                with ResultWriter(meas,identity,resume=resume) as writer:
+                meas=Path(output)/"_cache"/"m2"/act_id.key/sae_sha
+                with ResultWriter(meas,identity,resume=True) as writer:
                     BatchEngine(model,sae,identity,activation_reader=ShardedReader(act_path),
                                 code_reader=ShardedReader(code_path)).run(
                         config.samples,config.conditions,writer,
