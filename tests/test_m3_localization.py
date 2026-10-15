@@ -231,7 +231,7 @@ def test_corrupt_curve_or_wrong_source_is_rejected(tmp_path):
     # A function loaded from a genuinely different source file has a new digest.
     import importlib.util
     source = tmp_path / "revised_localize.py"
-    source.write_text("def exact_scope_curve(z, n_factors):\\n    return None\\n")
+    source.write_text("def exact_scope_curve(z, n_factors):" + chr(10) + "    return None" + chr(10))
     spec = importlib.util.spec_from_file_location("revised_localize", source)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
