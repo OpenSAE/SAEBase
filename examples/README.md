@@ -24,9 +24,11 @@ python examples/05_public_api_offline.py
 | --- | --- |
 | [`04_run_activation_health.sh`](04_run_activation_health.sh) | Activation-health task |
 | [`10_activation_store_offline.py`](10_activation_store_offline.py) | Verified activation/code shards and resuming previously captured data |
+| [`16_controlled_input_design.py`](16_controlled_input_design.py) | Enumerated binary factor grid, cached activations, bijective state reindexing, and Localize handoff |
 
 ```bash
 python examples/10_activation_store_offline.py
+python examples/16_controlled_input_design.py
 ```
 
 ## Interventions and downstream behavior
@@ -60,7 +62,8 @@ python examples/14_ground_truth_offline.py
 | Example | What it demonstrates |
 | --- | --- |
 | [`07_sar_via_saebase.py`](07_sar_via_saebase.py) | Coalition interventions and the unchanged external SAR estimator |
-| [`08_rss_via_saebase.py`](08_rss_via_saebase.py) | Clean, selection and held-out features with the unchanged RSS estimator |\n| [`15_input_localization_via_saebase.py`](15_input_localization_via_saebase.py) | Complete controlled input grid and original optimal Localize scope curve |
+| [`08_rss_via_saebase.py`](08_rss_via_saebase.py) | Clean, selection and held-out features with the unchanged RSS estimator |
+| [`15_input_localization_via_saebase.py`](15_input_localization_via_saebase.py) | Complete controlled input grid and original optimal Localize scope curve |
 
 The SAR/RSS examples need their original research estimator repositories. The Localize example needs the independent `sae-input-localization` package installed from [OpenSAE/SAE-Input-Localization](https://github.com/OpenSAE/SAE-Input-Localization). Their defaults use synthetic demonstration data; real checkpoint runs are opt-in.
 
