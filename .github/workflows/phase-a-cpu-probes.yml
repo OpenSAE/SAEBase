@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'scripts/phase_a_verify.py'
+      - 'scripts/phase_a_benchmark.py'
       - 'models/qwen35_2b/**'
       - 'models/hf_logits_backend.py'
       - 'models/hf_hooks_backend.py'
@@ -55,6 +56,29 @@ jobs:
           MKL_NUM_THREADS: '2'
         run: |
           python scripts/phase_a_verify.py --model ${{ matrix.model }}             --device cpu --output "$RUNNER_TEMP/phase-a"
+      - name: Run genuine M3/M4 benchmark on verified Qwen3.5 2B
+        if: matrix.model == 'qwen35_2b' && steps.probe.outcome == 'success'
+        env:
+          HF_HUB_DISABLE_TELEMETRY: '1'
+          TOKENIZERS_PARALLELISM: 'false'
+          OMP_NUM_THREADS: '2'
+          MKL_NUM_THREADS: '2'
+        run: |
+          python scripts/phase_a_benchmark.py --device cpu --output "$RUNNER_TEMP/phase-a-m3m4"
+      - name: Upload real Qwen benchmark and audit evidence
+        if: always() && matrix.model == 'qwen35_2b'
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-a-qwen35-2b-m3m4
+          path: |
+            ${{ runner.temp }}/phase-a-m3m4/real_qwen35_2b_m3m4_summary.json
+            ${{ runner.temp }}/phase-a-m3m4/*/metrics_manifest.json
+            ${{ runner.temp }}/phase-a-m3m4/*/metrics.jsonl
+            ${{ runner.temp }}/phase-a-m3m4/*/reliability.json
+            ${{ runner.temp }}/phase-a-m3m4/*/reliability_manifest.json
+            ${{ runner.temp }}/phase-a-m3m4/*/report.html
+          if-no-files-found: warn
+          retention-days: 30
       - name: Upload real probe evidence including blocked results
         if: always()
         uses: actions/upload-artifact@v4
