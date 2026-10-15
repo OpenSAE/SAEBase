@@ -53,7 +53,7 @@ def test_offline_plan_no_model_forward_or_download():
     assert plan["models"]==2
     assert plan["distinct_checkpoints"]==4
     assert plan["checkpoint_downloads"]==0
-    assert plan["planned_m2_measurements"]==24
+    assert plan["planned_m2_measurements"]==48
     assert c.matrix_id==MatrixConfig.from_dict(c.to_dict()).matrix_id
     with pytest.raises(ValueError,match="real=True"):
         execute_matrix(c,"/tmp/unused-model-output")

@@ -235,7 +235,7 @@ def execute_matrix(matrix:MatrixConfig,output:str|Path,*,device:str="cpu",
         checkpoints=_m3_summary(rows,target,matrix,provenance)
         audit_cfg=AuditConfig(evaluation_seeds=(0,1,2,3,4),
             bootstrap_replicates=matrix.bootstrap_replicates,
-            sample_sizes=(2,4,len(samples)),top_k=1)
+            sample_sizes=tuple(sorted({2,4,len(samples)})),top_k=1)
         audit=evaluate_m3(path,audit_cfg,
             sae_resolver=lambda key,sae,layer:get_sae(sae))
         if audit["status"]!="completed" or any(x["status"]!="completed" for x in audit["metric_audits"]):
