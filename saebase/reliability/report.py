@@ -41,7 +41,7 @@ def write_audit(root:str|Path,report:dict[str,Any])->Path:
                 "n_groups","point_estimate","ci_low","ci_high","reason")
         writer=csv.DictWriter(f,fieldnames=fields)
         writer.writeheader()
-        for row in report.get("metric_audits",[]):
+        for row in list(report.get("metric_audits",[]))+list(report.get("localization_audits",[])):
             stat=row.get("audit") or {}
             interval=stat.get("interval") or (None,None)
             writer.writerow({**{k:row.get(k) for k in fields},
@@ -85,6 +85,30 @@ def render_audit_fragment(report)->str:
                 row.get("status"),stat.get("n_groups"),stat.get("point_estimate"),
                 interval,row.get("reason"))
         cells.append("<tr>"+"".join("<td>"+html.escape(str(v))+"</td>" for v in values)+"</tr>")
+    localize_audits=report.get("localization_audits",[])
+    localize_comparisons=report.get("localization_comparisons",[])
+    localization_html=""
+    if localize_audits:
+        localization_html="<h3>Input localization reliability</h3>"
+        localization_html+=("<p>One complete controlled grid is one evaluation unit. "
+                            "Finite paired-input resampling across seeds measures estimator "
+                            "stability conditional on that fixed grid, not a confidence interval "
+                            "over independent prompts or evidence that one SAE is better.</p>")
+        localization_html+="<table><thead><tr><th>Metric</th><th>SAE</th><th>Status</th>"
+        localization_html+="<th>Exact budget</th><th>Paired sampling status</th></tr></thead><tbody>"
+        for row in localize_audits:
+            audit=row.get("audit") or {}
+            sampling=audit.get("sampling_stability") or {}
+            cells=(row.get("metric_id"),row.get("sae_id"),row.get("status"),
+                   audit.get("point_estimate"),sampling.get("status"))
+            localization_html+="<tr>"+"".join("<td>"+html.escape(str(x))+"</td>" for x in cells)+"</tr>"
+        localization_html+="</tbody></table>"
+        localization_html+="<p>Complete seed results are stored in reliability.json.</p>"
+    if localize_comparisons:
+        localization_html+="<h3>Matched Localize SAE comparisons</h3>"
+        localization_html+=("<p>Contextual dependency-budget differences only; "
+                             "feature counts and design identity are retained. No SAE quality ranking.</p>")
+        localization_html+="<pre>"+html.escape(json.dumps(localize_comparisons,indent=2,allow_nan=False))+"</pre>"
     truth=report.get("ground_truth")
     extra=""
     if truth:
@@ -109,7 +133,7 @@ def render_audit_fragment(report)->str:
             "<h3>Paired comparisons and rank stability</h3><pre>"
             +html.escape(json.dumps({"comparisons":report.get("paired_comparisons",[]),
                    "rank_stability":report.get("rank_stability",[])},indent=2,allow_nan=False))
-            +"</pre></section>")
+            +"</pre>"+localization_html+"</section>")
 
 def render_audit_html(report):
     return ("<!doctype html><html><meta charset='utf-8'>"
