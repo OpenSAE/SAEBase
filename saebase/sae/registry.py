@@ -235,6 +235,7 @@ _PROFILES: dict[str, SAEProfile] = {
         loader="sae_lens",
         sae_id_template="layer_{L}_width_65k_l0_medium",
         notes="Gemma Scope 2 residual SAEs (65k, l0 medium).",
+        repo_id="google/gemma-scope-2-270m-pt",
     ),
     "gemma1b_scope_resid": SAEProfile(
         key="gemma1b_scope_resid",
@@ -245,6 +246,7 @@ _PROFILES: dict[str, SAEProfile] = {
         loader="sae_lens",
         sae_id_template="layer_{L}_width_16k_l0_medium",
         notes="Gemma Scope 2 residual SAEs (16k, l0 medium).",
+        repo_id="google/gemma-scope-2-1b-pt",
         trained_on_model_key="gemma1b",
         target_model_key="gemma1b",
         transfer_kind="none",
