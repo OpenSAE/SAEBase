@@ -47,7 +47,7 @@ registered direction is `higher` or `lower`. Contextual metrics do not
 acquire artificial rankings. Tied ranks remain invalid and are counted.
 Subsample size curves use the configured sizes, clamped to actual groups.
 
-## benchmark measurement reuse and source verification
+## Reusing benchmark measurements and verifying sources
 
 Supported raw observation families in the initial reliability stage:
 

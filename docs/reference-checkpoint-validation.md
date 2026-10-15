@@ -85,7 +85,7 @@ checkpoint acceptance.
 - Inspect the final Actions job status and produced artifact before claiming
   real reference validation acceptance. Pythia/SAE availability is external to the source tree.
 
-## 4. reference validation exit criteria
+## 4. Reference acceptance criteria
 
 - [x] Python 3.11/3.12 development install, CLI and offline CI green.
 - [x] Analysis extra clean installation and import probes green.

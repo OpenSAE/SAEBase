@@ -187,7 +187,7 @@ differences and batch performance. It is not considered passed until the run
 and artifact are inspected. A synthetic test passing is not proof that public
 Pythia/Gemma weights work.
 
-## interventions completion gates
+## Intervention acceptance criteria
 
 - [x] Existing reference validation/activation storage tests and interventions contracts pass in Python 3.11 and 3.12 CI.
 - [x] Clean wheel + source distribution includes Python, CLI and JSON config.
@@ -196,7 +196,7 @@ Pythia/Gemma weights work.
 - [x] Identity, recovery, OOM, mixed-length and steering tests pass.
 - [x] Real JSON artifact is archived and linked from here after inspection.
 
-## Verified interventions acceptance — October 14, 2026
+## Verified intervention acceptance — October 14, 2026
 
 interventions is now accepted as a research-infrastructure implementation, after independently
 verifying the final real-model artifacts and full GitHub CI.
