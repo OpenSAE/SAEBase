@@ -91,3 +91,10 @@ have different meanings depending on the command. Check `<command> --help`.
 The `saebase-audit --m3-root` flag name is unchanged for backward compatibility.
 
 [API quick reference](API.md) · [Examples Index](../examples/README.md) · [Documentation Home](index.md)
+
+## Controlled input designs
+
+`saebase.data` supplies `BinaryFactor`, `ControlledInputDesign`, `collect_controlled_input_activations` and checked sidecar manifests for complete binary input experiments. Use `saebase.integrations.collect_localization_grid(..., design=...)` or `localization_grid_from_code_store(..., manifest=...)` to hand these inputs to the original Localize estimator.
+
+[Controlled Input Designs](controlled-inputs.md) · [Offline example](../examples/16_controlled_input_design.py)
+

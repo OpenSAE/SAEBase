@@ -36,6 +36,7 @@ flowchart LR
 ## ✨ 核心能力
 
 - 🧠 **模型与 SAE 集成。** 统一管理 checkpoint、模型适配器、layer、hook、兼容性及已注册或自定义 SAE 的身份。
+- 🧭 **受控输入设计。** 枚举完整二元输入组合，记录输入状态与样本的映射，并在不同输入映射间复用已有激活。
 - 🗃️ **激活提取与复用。** 支持可恢复分片缓存、无损 Dense/CSR SAE 编码、精确 token 选择、样本分组及 checkpoint SHA-256 校验。
 - 🎛️ **特征干预与 Steering。** 支持 identity、ablation、scaling、clamping、addition、coalition、完整重构对照和批量下游输出测量；特征编辑可保留原始重构残差。
 - 📊 **SAE Benchmark。** 分别评估 L0、重构 MSE、FVU/解释方差、目标 token 损失、logits/KL 变化及不同干预条件的行为指标。
@@ -185,7 +186,8 @@ SAEBase 提供公共模型操作；各研究项目保留自身的原始指标定
 | :--- | :--- | :--- |
 | 🧩 **[SAR — 行为组合性](https://github.com/OpenSAE/SAE-Behavioral-Compositionality)** | 提取特征贡献、执行 Coalition 编辑、调用未经改写的 SAR 估计器。 | [SAR 示例](examples/07_sar_via_saebase.py) |
 | 🔀 **[RSS — 表征重分布](https://github.com/OpenSAE/Redistribution-Sensitivity-Score)** | 分别提取 Clean、Selection、Held-out 数据，调用未经改写的 RSS 估计器。 | [RSS 示例](examples/08_rss_via_saebase.py) |
-| 🧭 **[Input Localization](https://github.com/OpenSAE/SAE-Input-Localization)** | 在完整受控输入网格上采集或复用 SAE 激活，并调用原始 Localize 算法计算最优 Input Scope Curve。 | [Localize 示例](examples/15_input_localization_via_saebase.py) |\n| 📊 **[SAEBench](https://github.com/adamkarvonen/SAEBench)** | 将选定的原生 Core/Sparse Probing 结果与模型、SAE 身份和上游 commit 对齐后导入。 | [Benchmark 文档](docs/benchmarking.md) |
+| 🧭 **[Input Localization](https://github.com/OpenSAE/SAE-Input-Localization)** | 在完整受控输入网格上采集或复用 SAE 激活，并调用原始 Localize 算法计算最优 Input Scope Curve。 | [Localize 示例](examples/15_input_localization_via_saebase.py) |
+| 📊 **[SAEBench](https://github.com/adamkarvonen/SAEBench)** | 将选定的原生 Core/Sparse Probing 结果与模型、SAE 身份和上游 commit 对齐后导入。 | [Benchmark 文档](docs/benchmarking.md) |
 
 ```bash
 python examples/07_sar_via_saebase.py --paper-dir /path/to/SAR-repo
@@ -193,6 +195,10 @@ python examples/08_rss_via_saebase.py --paper-dir /path/to/RSS-repo
 ```
 
 两个示例默认采用确定性的合成输入；真实 checkpoint 使用需要明确启用。参见[研究项目集成](docs/research-integrations.md)。
+
+---
+
+受控输入网格与缓存复用可运行 `python examples/16_controlled_input_design.py`，接口参见[受控输入设计文档](docs/controlled-inputs.md)。
 
 ---
 
@@ -223,9 +229,9 @@ snapshot = capture_features(pair.model, pair.sae,
 | [`saebase/interventions/`](saebase/interventions/) | 批量条件、测量日志、Patch 执行与 Steering |
 | [`saebase/benchmarks/`](saebase/benchmarks/) | 指标注册、实验规划、缓存执行及报告 |
 | [`saebase/reliability/`](saebase/reliability/) | Grouped Bootstrap、Paired Comparisons、Ground Truth 与审计 |
-| [`saebase/integrations/`](saebase/integrations/) | 原始 SAR/RSS 指标接入 |
+| [`saebase/integrations/`](saebase/integrations/) | 原始 SAR/RSS/Localize 指标接入 |
 | [`saebase/sae/`](saebase/sae/) | SAE Profiles、加载与重构诊断 |
-| [`saebase/data/`](saebase/data/) | 版本化 Prompt 数据、Manifest 与兼容性协议 |
+| [`saebase/data/`](saebase/data/) | 版本化 Prompt 数据、受控输入设计、Manifest 与兼容性协议 |
 | [`models/`](models/) · [`conf/`](conf/) | 模型插件与版本化实验配置 |
 | [`scripts/`](scripts/) · [`examples/`](examples/) | CLI、可运行演示及验证工具 |
 
