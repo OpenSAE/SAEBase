@@ -7,6 +7,7 @@ Start with the task you want to perform. The documentation is organized by **cap
 ## Getting started
 
 - [Getting Started](getting-started.md) — installation, offline example, benchmark preflight and a real checkpoint walkthrough.
+- [Phase A Model Coverage](phase-a-model-coverage.md) — six 270M–8B models, public SAE sources and real checkpoint acceptance.
 - [Models and SAEs](model-support.md) — registry versus verified checkpoint coverage, public source links and access constraints.
 - [Examples Index](../examples/README.md) — runnable demonstrations grouped by research task.
 - [Python API](python-api.md) — public research functions, store/benchmark/audit entrypoints and CLI commands.
