@@ -22,8 +22,12 @@ def build_plan(config: BenchmarkConfig) -> dict[str, Any]:
     # verified without resolving exact model/tokenizer/SAE SHA-256 identities.
     specs = [get_metric(m) for m in config.metrics]
     pairs = sum(len(t.sae_keys) for t in config.targets)
+    wants_localization=any("localization_codes" in s.required_inputs for s in specs)
+    if wants_localization:
+        from .adapters.localization import parse_localization_options
+        parse_localization_options(config)
     wants_m2=any("m2_measurements" in s.required_inputs for s in specs)
-    wants_m1=any(bool({"m1_activations","m1_codes","m2_measurements"} & set(s.required_inputs))
+    wants_m1=any(bool({"m1_activations","m1_codes","m2_measurements","localization_codes"} & set(s.required_inputs))
                  for s in specs)
     if wants_m2 and not config.conditions:
         raise ValueError("intervention metrics require explicit conditions")
@@ -46,6 +50,8 @@ def build_plan(config: BenchmarkConfig) -> dict[str, Any]:
             encode=prefix+"/codes"
             if wants_m1:
                 nodes.append(PlanNode(encode,"m1_encode",(act,),prefix))
+            if wants_localization:
+                nodes.append(PlanNode(prefix+"/localization","original_localize_eval",(encode,),prefix))
             if wants_m2:
                 nodes.append(PlanNode(prefix+"/measurements","m2_measure",(encode,),prefix))
             if any("model_reconstruction" in s.required_inputs for s in specs):
@@ -56,7 +62,9 @@ def build_plan(config: BenchmarkConfig) -> dict[str, Any]:
             for spec in specs:
                 req=set(spec.required_inputs)
                 deps=[]
-                if req & {"m1_activations","m1_codes"}:
+                if "localization_codes" in req:
+                    deps=[prefix+"/localization"]
+                elif req & {"m1_activations","m1_codes"}:
                     deps=[encode]
                 elif "m2_measurements" in req:
                     deps=[prefix+"/measurements"]
