@@ -99,9 +99,9 @@ def render_audit_fragment(report)->str:
         for row in localize_audits:
             audit=row.get("audit") or {}
             sampling=audit.get("sampling_stability") or {}
-            cells=(row.get("metric_id"),row.get("sae_id"),row.get("status"),
-                   audit.get("point_estimate"),sampling.get("status"))
-            localization_html+="<tr>"+"".join("<td>"+html.escape(str(x))+"</td>" for x in cells)+"</tr>"
+            local_cells=(row.get("metric_id"),row.get("sae_id"),row.get("status"),
+                         audit.get("point_estimate"),sampling.get("status"))
+            localization_html+="<tr>"+"".join("<td>"+html.escape(str(x))+"</td>" for x in local_cells)+"</tr>"
         localization_html+="</tbody></table>"
         localization_html+="<p>Complete seed results are stored in reliability.json.</p>"
     if localize_comparisons:
