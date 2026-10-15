@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run M4 independent analytical/known-factor SAR/RSS ground-truth controls."""
+"""Run independent analytical and known-factor SAR/RSS ground-truth controls."""
 from __future__ import annotations
 import argparse,json
 from pathlib import Path

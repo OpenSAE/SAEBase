@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Versioned M3 benchmark CLI. Dry-run never downloads checkpoints."""
+"""Versioned SAE benchmark CLI. Dry-run never downloads checkpoints."""
 from __future__ import annotations
 import argparse,json
 from pathlib import Path

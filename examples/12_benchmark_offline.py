@@ -1,4 +1,4 @@
-"""No downloads: inspect SAEBase M3 deterministic benchmark plan."""
+"""No downloads: inspect SAEBase deterministic benchmark plan."""
 from pathlib import Path
 from saebase.benchmarks import load_config,build_plan
 if __name__=="__main__":
@@ -7,4 +7,4 @@ if __name__=="__main__":
     print("Run ID:",plan["run_id"])
     print("SAE evaluations:",plan["sae_evaluations"])
     print("Metric jobs:",plan["metric_jobs"])
-    print("Planned M2 measurements:",plan["planned_measurements"])
+    print("Planned intervention measurements:",plan["planned_measurements"])

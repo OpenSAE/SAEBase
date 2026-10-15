@@ -63,11 +63,11 @@ def _absolute_from_caller(value: str | None, caller: Path) -> str | None:
 def build_overrides(args: argparse.Namespace, caller: Path) -> list[str]:
     if args.task != "sae":
         raise ValueError(
-            f"Task {args.task!r} is not packaged in standalone SAEBase Phase A. "
+            f"Task {args.task!r} is not available in the standalone SAEBase task runner. "
             "Available: sae (activation_health)."
         )
     if args.evaluation not in (None, "activation_health"):
-        raise ValueError("Phase A supports evaluation=activation_health only")
+        raise ValueError("The standalone task runner supports evaluation=activation_health only")
     if args.n_prompts < 1:
         raise ValueError("--n-prompts must be >= 1")
     if args.model not in DEFAULT_SAE_FOR_MODEL and args.sae is None:
