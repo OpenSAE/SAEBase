@@ -101,7 +101,7 @@ class MetricResult:
         fingerprint(asdict(self))
 
     def to_dict(self) -> dict[str, Any]:
-        return {"schema": RESULT_SCHEMA, **asdict(self)}
+        return json.loads(json.dumps({"schema": RESULT_SCHEMA, **asdict(self)}, allow_nan=False))
 
 @dataclass(frozen=True)
 class BenchmarkTarget:
