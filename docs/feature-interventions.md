@@ -108,9 +108,9 @@ is supplied. `read_results()` verifies committed JSONL shard hashes.
   halves the microbatch and retries without skipping conditions. If a
   single intervention cannot fit, the error is propagated.
 - HFHooksModel uses the already validated sequential API and the stats report
-  its actual call count; interventions does **not** claim this backend is vectorized.
-- An activation storage raw activation reader can bypass repeated activation capture. An activation storage
-  SAE code reader additionally bypasses encoding. Source-activation digests,
+  its actual call count; the engine does **not** claim this backend is vectorized.
+- An Activation Store reader can reuse raw activations without capturing them again.
+  A separate SAE code reader can also reuse previously encoded features. Source-activation digests,
   checkpoint SHA-256 and sample/position IDs must all match. **New logits
   forwards are still required for causal patch experiments**; activation caching
   does not eliminate the downstream network computation.
@@ -123,12 +123,12 @@ is supplied. `read_results()` verifies committed JSONL shard hashes.
   forward can have a small nonzero output delta even for an identity edit.
   We retain the exact checkpoint/cache identity checks and explicitly record
   the peak per-logit identity discrepancy; this tolerance applies only to
-  the cache replay path, not to reference validation activation-probe acceptance. The run
+  the cache replay path, not to reference activation-probe acceptance. The run
   also captures current-batch activations and proves a second, strict
   native hook identity control independently of cached activation reuse.
 - The current public interface requires exactly one selected patch position
-  per measurement sample. activation storage itself supports multiple positions; interventions can make
-  distinct samples for each site as an explicit future extension.
+  per measurement sample. The Activation Store supports multiple positions, but
+  the intervention runner currently requires one selected patch position per measurement.
 
 ## Crash recovery, resource budgets and measurements
 
@@ -171,12 +171,12 @@ steered continuation. A separate unmodified continuation supplies a baseline.
 The opt-in GitHub Actions workflow `.github/workflows/m2-real.yml` downloads
 public Pythia-70M and the `pythia70m_resid_sm` SAE and verifies:
 
-1. Exact loaded model and SAE full state digests from the [reference validation real fixture](../tests/fixtures/m0_reference_public.json).
-2. reference validation activation probes and SAE activation sparsity.
+1. Exact loaded model and SAE full state digests from the [real checkpoint reference fixture](../tests/fixtures/m0_reference_public.json).
+2. reference activation probes and SAE activation sparsity.
 3. Reused activation/code caches and selected feature IDs with real weights.
 4. A strict native, same-batch identity check (<=1e-4 maximum per-logit
-   absolute error), independently of activation storage's cached activation representation.
-5. All seven interventions conditions in a **real multi-prompt batch**.
+   absolute error), independently of the cached activation representation.
+5. All seven intervention conditions in a **real multi-prompt batch**.
 6. Numerical comparison between the batched intervention result and the existing
    single-prompt `evaluate_edit` reference.
 7. Zero model forward calls on a fully committed result resume.
@@ -189,16 +189,16 @@ Pythia/Gemma weights work.
 
 ## Intervention acceptance criteria
 
-- [x] Existing reference validation/activation storage tests and interventions contracts pass in Python 3.11 and 3.12 CI.
+- [x] Existing reference checkpoint, activation-store and intervention contracts pass in Python 3.11 and 3.12 CI.
 - [x] Clean wheel + source distribution includes Python, CLI and JSON config.
-- [x] Real Pythia/SAE run completes with reference validation/activation storage numerical comparisons.
+- [x] Real Pythia/SAE run completes with reference checkpoint and activation-store numerical comparisons.
 - [x] Real multi-prompt batch output equals sequential reference to tolerance.
 - [x] Identity, recovery, OOM, mixed-length and steering tests pass.
 - [x] Real JSON artifact is archived and linked from here after inspection.
 
 ## Verified intervention acceptance — October 14, 2026
 
-interventions is now accepted as a research-infrastructure implementation, after independently
+The batched intervention engine is a verified research-infrastructure component, after independently
 verifying the final real-model artifacts and full GitHub CI.
 
 | Gate | Observed evidence |
@@ -209,7 +209,7 @@ verifying the final real-model artifacts and full GitHub CI.
 | Auditable measurements | [Real interventions result artifact](https://github.com/OpenSAE/SAEBase/actions/runs/38657989544/artifacts/11937144923): JSON reference, four measurement shards, native-identity and steering results |
 
 The real run loaded the matching Pythia-70M and registered SAE full-state
-SHA-256 digests, checked the saved reference validation activation probes under reference validation's recorded
+SHA-256 digests, checked the saved reference activation probes under the original checkpoint reference's recorded
 relative/absolute tolerance, and used cached activations and full SAE codes.
 
 The run evaluated **3 real prompts × 7 conditions = 21 measurements**,
@@ -221,7 +221,7 @@ The acceptance explicitly separates two numerical conditions:
 - **Native same-batch identity:** Capture the current batch activation and
   reinsert it at the same hook and positions. Maximum per-logit error was
   **0.0**, with a strict `1e-4` absolute tolerance.
-- **activation storage cached-singleton identity replay in a multi-prompt batch:** The exact
+- **Cached-singleton identity replay in a multi-prompt batch:** The exact
   same upstream state and prompt identities are preserved, but floating point
   execution with a different batch shape can change the output slightly.
   Observed maximum per-logit absolute error was **0.0033216476**, within the

@@ -51,9 +51,9 @@ Subsample size curves use the configured sizes, clamped to actual groups.
 
 Supported raw observation families in the initial reliability stage:
 
-- `core.l0` uses the original activation storage SAE code cache and validates the exact
+- `core.l0` uses the original Activation Store SAE code cache and validates the exact
   code sample, token positions, stored checkpoint identity and benchmark numerical mean.
-- `intervention.*` loads interventions's checksum-verified measurement journal,
+- `intervention.*` loads the intervention engine's checksum-verified measurement journal,
   checks source identities, sample/condition and each benchmark measurement reference.
 - For `core.reconstruction_mse`, `core.fvu` and
   `core.explained_variance`, `--sae-only` explicitly loads the frozen SAE

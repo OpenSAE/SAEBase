@@ -69,13 +69,13 @@ Health metric semantics are explicit:
 - `reconstruction.loss_recovered`: uses an independently measured full-site zero
   ablation loss on the same model, samples and token readouts. It is undefined
   if ablated loss equals clean loss.
-- `intervention.*`: aggregates unchanged interventions `ResultWriter` per sample and
+- `intervention.*`: aggregates unchanged `ResultWriter` records per sample and
   per named condition. Conditional values are never mixed across interventions.
 
 The result directory is `runs/<run_id>/` and contains:
 `resolved_config.json`, `plan.json`, `provenance.json`, `metrics.jsonl`,
-`metrics_manifest.json`, `summary.csv`, `report.html`. Shared activation storage/interventions measurement caches live below
-`runs/_cache/` rather than inside any metric-specific run. activation storage identities are independent of SAE; interventions measurement
+`metrics_manifest.json`, `summary.csv`, `report.html`. Shared activation and intervention measurement caches live below
+`runs/_cache/` rather than inside any metric-specific run. activation cache identities are independent of SAE; intervention measurement
 identities bind both checkpoint hashes. Repeated complete run IDs are reused.
 
 ## Original-paper integrations
@@ -120,7 +120,7 @@ Completed native SAEBench imports do not require loading model or SAE weights.
 The source JSON's SHA-256 and expected model, SAE and upstream commit are
 validated. Both `--resume` and `--report-only` reject a changed original
 estimator file or native SAEBench result instead of silently returning stale
-metrics. The planner omits activation storage/interventions compute nodes for import-only experiments.
+metrics. The planner omits activation and intervention compute nodes for import-only experiments.
 
 ### Execution costs and observation units
 

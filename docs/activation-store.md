@@ -126,7 +126,7 @@ Readers return float32 for BF16; other dtypes retain native precision.
 The default shard target is **128 MiB**, and `iter_batches(max_rows=...)`
 provides bounded streaming iteration. A single sample (all selected positions)
 **must fit one shard**; if it does not, reduce the positions per sample or
-increase the bound. interventions will implement true intra-sample batching. Writers also
+increase the bound. The intervention engine batches measurement samples; it does not relax the one-sample-per-shard storage constraint. Writers also
 bound per-sample SAE encoding through `max_rows`; do not select more than that
 many positions per sample for code generation.
 

@@ -20,7 +20,7 @@ These are four independently SHA-256-fingerprinted weights across two
 language-model families, with two checkpoint choices sharing each model's
 hook position. Each family evaluates six distinct prompt groups under
 identity/reconstruction conditions, with separate benchmark Core and intervention
-metrics, verified activation storage/interventions reuse, and reliability grouped reliability results.
+metrics, verified activation and intervention cache reuse, and grouped reliability audit results.
 
 An optional `m5_extended_gpt2.json` lists two extra GPT-2 feature-splitting
 widths. The extended six-checkpoint matrix is **not** a prerequisite for
@@ -61,7 +61,7 @@ synthetic model tests are labeled `synthetic_test`, never `passed`.
   activation/code creation versus reuse, intervention batching and retries.
   Estimated time and RAM are null at preflight rather than fabricated.
 - A synthetic fault-injection test interrupts after the first family and
-  resumes from previously committed activation storage/interventions shards. Real mode separately checks
+  resumes from previously committed activation and intervention shards. Real mode separately checks
   complete-run replay and report integrity. Modified benchmark/reliability or matrix manifest
   digests fail verification.
 - No GPU vLLM/NNsight throughput or unrestricted/Gemma checkpoints are
