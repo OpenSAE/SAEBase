@@ -36,3 +36,16 @@ whether code adapted from separate repositories requires additional notices.
 
 This is a provenance checklist, not a legal certification or evidence that every
 upstream asset is Apache-licensed.
+
+## v0.2.0 external asset inventory
+
+The machine-readable [M5 asset inventory](../conf/release/m5_asset_provenance.json)
+lists external model/checkpoint cards and documented license status.
+The SAEBase source archive and wheel **do not include checkpoint weights,
+tokenizers, or third-party evaluation datasets**. Real model and SAE
+weight state SHA-256 values are recorded in the opt-in M5 test evidence.
+
+Unverified checkpoint license terms are not treated as permission to
+redistribute weights. Software licensing rights and contributor ownership
+are distinct from model checkpoint licensing, and legal review remains
+the maintainers' responsibility.

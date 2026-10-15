@@ -87,7 +87,6 @@ def audit_distributions(dist:Path,expected_version:str="0.2.0")->dict:
     source=list(dist.glob("opensae_saebase-*.tar.gz"))
     if len(wheel)!=1 or len(source)!=1:
         raise ValueError("expected exactly one SAEBase wheel and one source distribution")
-    metadata={}
     banned_suffix={".safetensors",".ckpt",".pth",".pkl",".gguf",".pt"}
     with zipfile.ZipFile(wheel[0]) as archive:
         files=archive.namelist()
@@ -135,4 +134,4 @@ def generate_release_evidence(matrix_root:Path,dist:Path,config_path:Path,
             "gates":gates,
             "real_matrix_evidence_sha256":
                 hashlib.sha256((matrix_root/"matrix_results.json").read_bytes()).hexdigest(),
-            "notes":"No external weights distributed; model/S AE license rights not certified."}
+            "notes":"No external weights distributed; model/SAE license rights not certified."}

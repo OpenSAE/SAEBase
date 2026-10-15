@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "opensae-saebase"
-version = "0.1.0"
+version = "0.2.0"
 description = "Research infrastructure for sparse autoencoder evaluation and interventions"
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
@@ -12,7 +12,7 @@ license = "Apache-2.0"
 license-files = ["LICENSE"]
 keywords = ["sparse autoencoder", "mechanistic interpretability", "sae", "evaluation"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
@@ -63,6 +63,7 @@ saebase-benchmark = "scripts.m3_benchmark:main"
 saebase-audit = "scripts.m4_reliability:main"
 saebase-ground-truth = "scripts.m4_ground_truth:main"
 saebase-release-matrix = "scripts.m5_release_matrix:main"
+saebase-release-gate = "scripts.m5_release_gate:main"
 
 [project.urls]
 Repository = "https://github.com/OpenSAE/SAEBase"

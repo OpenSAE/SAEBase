@@ -235,6 +235,24 @@ saebase-audit --m3-root runs/<run_id> --config conf/reliability/m4_pythia_smoke.
 
 ---
 
+## 🚀 M5 — v0.2.0 双模型发布验收
+
+验收矩阵覆盖 **Pythia-70M 和 GPT-2 Small** 两种模型，各加载两个不同的
+真实 SAE checkpoint。M1–M4 原始指标、按 prompt group 审计和各类
+SHA-256 身份均可核查；模型及 SAE 权重只会在显式 `--real` 后加载。
+
+```bash
+saebase-release-matrix --config conf/release/m5_matrix.json --dry-run
+saebase-release-matrix --config conf/release/m5_matrix.json --real --device cpu
+```
+
+六个 prompt 的实验仅证明工程管线正常，不代表完整研究性能结论。
+详见 [M5 验收方法](docs/M5_RELEASE_MATRIX.md)、
+[发行说明](docs/M5_RELEASE_NOTES.md) 和
+[GitHub Releases](https://github.com/OpenSAE/SAEBase/releases)。
+
+---
+
 ## 📚 文档
 
 [API 文档](docs/API.md) · [入门与数据准备](docs/PHASE_A.md) · [特征干预](docs/PHASE_B.md) · [研究接入](docs/PHASE_C.md) · [更新记录](CHANGELOG.md)

@@ -11,6 +11,19 @@ import zipfile
 
 NEEDED_WHEEL = {
     "main.py",
+    "saebase/benchmarks/__init__.py", "saebase/benchmarks/runner.py",
+    "saebase/benchmarks/planner.py", "saebase/benchmarks/results.py",
+    "saebase/reliability/__init__.py", "saebase/reliability/runner.py",
+    "saebase/reliability/ground_truth.py",
+    "saebase/release/__init__.py", "saebase/release/schema.py",
+    "saebase/release/planner.py", "saebase/release/runner.py",
+    "saebase/release/gates.py",
+    "models/gpt2small/gpt2small.py",
+    "scripts/m3_benchmark.py", "scripts/m4_reliability.py",
+    "scripts/m4_ground_truth.py", "scripts/m5_release_matrix.py",
+    "scripts/m5_release_gate.py",
+    "conf/release/m5_matrix.json", "conf/release/m5_extended_gpt2.json",
+    "conf/release/m5_asset_provenance.json",
     "saebase/__init__.py",
     "saebase/api/__init__.py",
     "saebase/api/features.py",
@@ -36,6 +49,9 @@ NEEDED_WHEEL = {
     "conf/task/sae.yaml",
 }
 NEEDED_SDIST = NEEDED_WHEEL | {
+    ".github/workflows/m5-matrix.yml", ".github/workflows/m5-release.yml",
+    "docs/M5_RELEASE_NOTES.md", "docs/M5_RELEASE_MATRIX.md",
+    "tests/test_m5_matrix.py", "tests/test_m5_gates.py",
     "pyproject.toml", "README.md", "README_cn.md", "LICENSE", "NOTICE",
     "CONTRIBUTING.md", "SECURITY.md", "CHANGELOG.md", "CITATION.cff",
     "MANIFEST.in", ".github/workflows/ci.yml",
@@ -65,13 +81,13 @@ def validate(dist_dir: Path) -> dict[str, object]:
         if entry_file is None:
             raise AssertionError("Wheel entry points are missing")
         entries = z.read(entry_file).decode("utf-8")
-        if not all(e in entries for e in ("saebase = main:main", "saebase-prepare-prompts", "saebase-check-env", "saebase-intervene")):
+        if not all(e in entries for e in ("saebase = main:main", "saebase-prepare-prompts", "saebase-check-env", "saebase-intervene", "saebase-benchmark", "saebase-audit", "saebase-ground-truth", "saebase-release-matrix", "saebase-release-gate")):
             raise AssertionError("Installed command entry points missing")
         metadata_file = next((p for p in wheel_files if p.endswith(".dist-info/METADATA")), None)
         if metadata_file is None:
             raise AssertionError("Wheel metadata missing")
         metadata = z.read(metadata_file).decode("utf-8")
-        if "Name: opensae-saebase" not in metadata or "Version: 0.1.0" not in metadata:
+        if "Name: opensae-saebase" not in metadata or "Version: 0.2.0" not in metadata:
             raise AssertionError("Distribution identity mismatch")
         if "License-Expression: Apache-2.0" not in metadata:
             raise AssertionError("Wheel license metadata missing")
