@@ -10,9 +10,9 @@ from models.hooked_lm_common import BaseModelSpec, HookedLMHandle, load_from_spe
 
 SPEC = BaseModelSpec(
     key="gemma270m",
-    model_name="gemma-3-270m",
+    model_name="google/gemma-3-270m",
     family="gemma",
-    model_candidates=("gemma-3-270m", "google/gemma-3-270m"),
+    model_candidates=("google/gemma-3-270m", "gemma-3-270m"),
     notes="Gemma-3 270M; residual SAEs via Gemma Scope 2.",
 )
 
