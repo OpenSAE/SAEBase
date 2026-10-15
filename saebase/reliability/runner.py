@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from pathlib import Path
 from itertools import combinations
+from dataclasses import replace
 
 from saebase.benchmarks.registry import get_metric
 from .schema import AuditConfig
@@ -10,7 +11,7 @@ from .observations import _read_m3, observations_for_metric
 from .bootstrap import bootstrap_metric,paired_bootstrap,sample_size_curve
 from .ranking import rank_stability
 
-def evaluate_m3(root:str|Path,cfg:AuditConfig)->dict:
+def evaluate_m3(root:str|Path,cfg:AuditConfig,*,sae_resolver=None)->dict:
     root=Path(root)
     config,metrics,provenance=_read_m3(root)
     if cfg.metric_ids:
@@ -18,13 +19,20 @@ def evaluate_m3(root:str|Path,cfg:AuditConfig)->dict:
         if unknown:
             raise ValueError(f"M4 audit requests metrics absent from M3: {sorted(unknown)}")
     entries=[]
+    sae_cache={}
     population=defaultdict(dict)
     all_by_metric=defaultdict(list)
     for m in metrics:
         if cfg.metric_ids and m["metric_id"] not in cfg.metric_ids:
             continue
         key=(m["model_id"],m["dataset_id"],m["split"],m["metric_id"],m["condition_id"])
-        rows,reason=observations_for_metric(root,config,m,provenance)
+        sae=None
+        if m["metric_id"] in {"core.reconstruction_mse","core.fvu","core.explained_variance"} and sae_resolver:
+            pair=(m["model_id"],m["sae_id"],m["site"]["layer"])
+            if pair not in sae_cache:
+                sae_cache[pair]=sae_resolver(*pair)
+            sae=sae_cache[pair]
+        rows,reason=observations_for_metric(root,config,m,provenance,sae=sae)
         if reason:
             entries.append({"status":"unsupported" if m["status"]=="completed" else "blocked",
                             "model_id":m["model_id"],"sae_id":m["sae_id"],
@@ -42,17 +50,29 @@ def evaluate_m3(root:str|Path,cfg:AuditConfig)->dict:
         population[key][m["sae_id"]]=list(rows)
     comparisons=[]
     rankings=[]
+    primary={tuple(sorted(x)) for x in cfg.primary_comparisons}
     for (model,dataset,split,metric,condition),saes in sorted(population.items(),key=lambda kv:str(kv[0])):
-        for left,right in combinations(sorted(saes),2):
-            result=paired_bootstrap(saes[left],saes[right],cfg)
+        candidates=[(a,b) for a,b in combinations(sorted(saes),2)
+                    if not primary or (a,b) in primary]
+        for left,right in candidates:
+            # Apply the family-wise Bonferroni adjustment to explicitly
+            # predeclared primary comparisons only; exploratory results
+            # retain unadjusted descriptive 95% intervals.
+            n_primary=len(primary) if primary else 0
+            adjusted=replace(cfg,confidence=1-(1-cfg.confidence)/n_primary) if n_primary>1 else cfg
+            result=paired_bootstrap(saes[left],saes[right],adjusted)
             comparisons.append({"model_id":model,"dataset_id":dataset,"split":split,
                                 "metric_id":metric,"condition_id":condition,
-                                "left_sae":left,"right_sae":right,**result})
+                                "left_sae":left,"right_sae":right,
+                                "comparison_type":"primary" if primary else "exploratory",
+                                "multiple_comparison_method":"bonferroni" if n_primary>1 else "none",
+                                **result})
         if len(saes)>1:
             rankings.append(rank_stability(saes,cfg))
     return {"schema":"saebase.m4.audit.v1","status":"completed",
             "m3_run_id":config.run_id,"audit_config":cfg.to_dict(),
             "resampling_unit":"prompt_group_id","ci_method":"percentile",
+            "comparison_policy":"family-wise Bonferroni for declared primary; exploratory unadjusted",
             "metric_audits":entries,"paired_comparisons":comparisons,
             "rank_stability":rankings,
             "unsupported_metrics":sum(x["status"]=="unsupported" for x in entries),

@@ -20,6 +20,7 @@ class AuditConfig:
     seed_kind: str="evaluation"
     training_seed: int|None=None
     metric_ids: tuple[str,...]=()
+    primary_comparisons: tuple[tuple[str,str],...]=()
     schema: str=SCHEMA
 
     def __post_init__(self):
@@ -45,6 +46,15 @@ class AuditConfig:
             raise ValueError("duplicate sample_sizes")
         if len(set(self.metric_ids))!=len(self.metric_ids):
             raise ValueError("duplicate metric IDs")
+        pairs=[]
+        for pair in self.primary_comparisons:
+            if (not isinstance(pair,tuple) or len(pair)!=2
+                    or any(not isinstance(x,str) or not x.strip() for x in pair)
+                    or pair[0]==pair[1]):
+                raise ValueError("primary comparisons need two distinct named SAEs")
+            pairs.append(tuple(sorted(pair)))
+        if len(pairs)!=len(set(pairs)):
+            raise ValueError("duplicate primary comparison")
         fingerprint(asdict(self))
 
     @classmethod
@@ -56,6 +66,8 @@ class AuditConfig:
         for name in ("evaluation_seeds","sample_sizes","metric_ids"):
             if name in kw:
                 kw[name]=tuple(kw[name])
+        if "primary_comparisons" in kw:
+            kw["primary_comparisons"]=tuple(tuple(pair) for pair in kw["primary_comparisons"])
         return cls(**kw)
 
     @classmethod

@@ -231,7 +231,7 @@ saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
 saebase-audit --m3-root runs/<run_id> --config conf/reliability/m4_pythia_smoke.json --run
 ```
 
-具体协议、合成真值和验收边界见 [M4 可靠性审计](docs/M4_RELIABILITY.md)。
+具体协议、SAR/RSS 原版合成真值、可靠性区间、负对照和验收边界见 [M4 可靠性审计](docs/M4_RELIABILITY.md)。
 
 ---
 
