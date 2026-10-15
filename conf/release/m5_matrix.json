@@ -1,0 +1,55 @@
+{
+  "schema": "saebase.m5.matrix.v1",
+  "status_schema": "saebase.m5.results.v1",
+  "name": "SAEBase 0.2.0 cross-family real release acceptance",
+  "version": "0.2.0",
+  "targets": [
+    {
+      "model_key": "pythia70m",
+      "family": "pythia",
+      "site": {"layer": 3, "hook_name": "blocks.3.hook_resid_post"},
+      "sae_keys": ["pythia70m_resid_sm", "pythia70m_saebench_gated_l3"],
+      "model_card": "https://huggingface.co/EleutherAI/pythia-70m-deduped",
+      "sae_cards": {
+        "pythia70m_resid_sm": "https://huggingface.co/ctigges/pythia-70m-deduped__res-sm_processed",
+        "pythia70m_saebench_gated_l3": "https://github.com/adamkarvonen/SAEBench"
+      }
+    },
+    {
+      "model_key": "gpt2small",
+      "family": "gpt2",
+      "site": {"layer": 8, "hook_name": "blocks.8.hook_resid_pre"},
+      "sae_keys": ["gpt2small_res_jb_l8", "gpt2small_fs_6144_l8"],
+      "model_card": "https://huggingface.co/openai-community/gpt2",
+      "sae_cards": {
+        "gpt2small_res_jb_l8": "https://huggingface.co/jbloom/GPT2-Small-SAEs-Reformatted",
+        "gpt2small_fs_6144_l8": "https://huggingface.co/jbloom/GPT2-Small-Feature-Splitting-Experiment-Layer-8"
+      }
+    }
+  ],
+  "prompts": [
+    "The city is full of beautiful buildings.",
+    "The weather was warm and sunny yesterday.",
+    "The scientist wrote the results on paper.",
+    "A small animal ran across the quiet garden.",
+    "The teacher explained the lesson to students.",
+    "The river flows through the mountains."
+  ],
+  "metrics": [
+    "core.l0",
+    "core.reconstruction_mse",
+    "core.fvu",
+    "core.explained_variance",
+    "intervention.logit_delta_l2",
+    "intervention.kl_baseline_to_edited"
+  ],
+  "conditions": [
+    {"name": "identity", "operation": "identity"},
+    {"name": "reconstruction", "operation": "reconstruction"}
+  ],
+  "seed": 0,
+  "max_measurements": 128,
+  "max_runtime_seconds": 2400,
+  "max_token_count": 80,
+  "bootstrap_replicates": 64
+}
