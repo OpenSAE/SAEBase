@@ -7,6 +7,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+import torch
 
 from examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ActivationSite, ModelAdapter
@@ -78,6 +79,19 @@ def test_reindex_is_bijection_and_preserves_source_identity():
         design.reindex({i: i for i in range(7)})
 
 
+def test_design_rejects_tokenizer_state_collisions_before_capture():
+    class CollidingTokens(ResearchToyModel):
+        def to_tokens(self, prompt):
+            return torch.tensor([[1, 2, 3]], dtype=torch.long)
+
+    model = ModelAdapter(CollidingTokens().eval())
+    with pytest.raises(ValueError, match="identical token IDs"):
+        collect_localization_grid(
+            model, ResearchToySAE().eval(),
+            site=ActivationSite(0, "blocks.0.hook_resid_post"), design=_design()
+        )
+
+
 def test_invalid_factor_states_and_positions():
     with pytest.raises(ValueError, match="distinct"):
         BinaryFactor("x", ("same", "same"))
@@ -136,6 +150,8 @@ def test_factorial_cache_and_manifest_reuse(tmp_path: Path):
     assert original_grid.state_sample_ids == tuple(s.sample_id for s in original.states)
     np.testing.assert_allclose(mapped_grid.codes, original_grid.codes[list(mapping.values())], rtol=0, atol=0)
     assert sorted(original_grid.state_sample_ids) == sorted(mapped_grid.state_sample_ids)
+    live_grid = collect_localization_grid(model, sae, site=site, design=original)
+    np.testing.assert_allclose(live_grid.codes, original_grid.codes, rtol=0, atol=0)
 
     with ActivationWriter(tmp_path, activation_id, width=sae.cfg.d_in) as writer:
         replay = collect_controlled_input_activations(model, original, writer, site=site)
