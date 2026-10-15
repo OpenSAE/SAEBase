@@ -140,7 +140,7 @@ def test_localization_preflight_and_contracts():
             build_plan(BenchmarkConfig.from_dict(d))
     d = copy.deepcopy(base)
     d["dataset"]["samples"][0]["selection"] = {"mode": "all_valid"}
-    with pytest.raises(ValueError, match="one selected token"):
+    with pytest.raises(ValueError, match="exactly one patch position"):
         build_plan(BenchmarkConfig.from_dict(d))
     d = copy.deepcopy(base)
     d["dataset"]["samples"][0]["prompt_group_id"] = "fake-independent-group"
