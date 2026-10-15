@@ -27,7 +27,7 @@ def main(argv=None):
     if args.report_only:
         root=args.output/cfg.run_id
         rows=read_metrics(root,cfg.run_id)
-        validate_external_sources(cfg,rows)
+        validate_external_sources(cfg,rows,root=root)
         write_report(root,cfg,plan,rows)
         print(json.dumps({"run_id":cfg.run_id,"metrics":len(rows),"report":str(root/"report.html")}))
         return 0
