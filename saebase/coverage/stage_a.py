@@ -65,8 +65,8 @@ STAGE_A = (
     StageAPair("qwen3_8b", "qwen3_8b_resid_w64k", 18,
                "Qwen/Qwen3-8B-Base", "Qwen/SAE-Res-Qwen3-8B-Base-W64K-L0_50",
                "qwen3", "8B", "apache-2.0", "qwen", False, 4096, 65536),
-    StageAPair("llama31_8b", "llama31_8b_lxr_8x", 16,
-               "meta-llama/Llama-3.1-8B", "OpenMOSS-Team/Llama3_1-8B-Base-LXR-8x",
+    StageAPair("llama31_8b", "llama31_8b_stagea_scope_l16_8x", 16,
+               "meta-llama/Llama-3.1-8B", "fnlp/Llama3_1-8B-Base-LXR-8x",
                "llama3.1", "8B", "llama3.1", "check upstream", True, 4096, 32768),
 )
 
