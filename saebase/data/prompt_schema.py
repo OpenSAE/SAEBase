@@ -54,6 +54,7 @@ MODEL_BEHAVIOR_MATRIX: dict[str, frozenset[str]] = {
     "llama31_8b_instruct": _EXP10_BEHAVIORS,
     "qwen3_8b": _LOGIC_BEHAVIORS,
     "qwen3_1_7b": _11B_BEHAVIORS,
+    "qwen35_2b": _LOGIC_BEHAVIORS,
     "qwen35_4b": _11B_BEHAVIORS,
     "gemma2_9b_pt": _LOGIC_BEHAVIORS,
     "gemma2_9b_it": _EXP10_BEHAVIORS,
