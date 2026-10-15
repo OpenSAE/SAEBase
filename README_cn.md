@@ -171,7 +171,7 @@ python examples/13_reliability_offline.py
 python examples/14_ground_truth_offline.py
 ```
 
-对已完成的 Benchmark 可执行 `saebase-audit --m3-root runs/<run_id> --config conf/reliability/m4_pythia_smoke.json --run`。其中 `--m3-root` 为保持兼容性保留的 CLI 参数，含义是 Benchmark 结果目录，不代表用户必须理解某个开发阶段。
+对已完成的 Benchmark 可执行 `saebase-audit --m3-root runs/<run_id> --config conf/reliability/m4_pythia_smoke.json --run --sae-only`。这里应使用对应的多 prompt Benchmark 结果。其中 `--m3-root` 为保持兼容性保留的 CLI 参数，含义是 Benchmark 结果目录，不代表用户必须理解某个开发阶段。
 
 独立的合成真值实验覆盖已知因子字典、Coalition 交互阶数、RSS 支持集及方向、可控退化和负对照。这些测试**不等于证明真实 SAE 的特征具有可解释性**。如需从原始缓存计算重构指标置信区间，可选 `--sae-only`，仅加载 SAE Decoder，不重新运行语言模型。参见[可靠性分析](docs/reliability.md)。
 

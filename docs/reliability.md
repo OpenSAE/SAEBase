@@ -17,12 +17,13 @@ saebase-benchmark --config conf/benchmark/m4_pythia_three_groups.json --dry-run
 saebase-benchmark --config conf/benchmark/m4_pythia_three_groups.json --real --output runs
 RUNID=$(python -c 'from saebase.benchmarks import load_config;print(load_config("conf/benchmark/m4_pythia_three_groups.json").run_id)')
 saebase-audit --m3-root "runs/$RUNID" --config conf/reliability/m4_pythia_smoke.json --dry-run
-saebase-audit --m3-root "runs/$RUNID" --config conf/reliability/m4_pythia_smoke.json --run
+saebase-audit --m3-root "runs/$RUNID" --config conf/reliability/m4_pythia_smoke.json --run --sae-only
 saebase-audit --m3-root "runs/$RUNID" --config conf/reliability/m4_pythia_smoke.json --report-only
 ```
 
-`--real` belongs to the benchmark model execution stage. The reliability audit stage does
-not load model/SAE checkpoints or call a model forward.
+`--real` belongs to the benchmark model execution stage. The reliability audit stage does not run additional language-model forwards. The optional `--sae-only`
+flag loads the exact SAE decoder to audit reconstruction metrics, but does
+not reload the language model.
 
 Each `Observation` must have an exact `prompt_group_id`, dataset,
 split, SAE, metric, condition, evaluation seed and sample ID. The default

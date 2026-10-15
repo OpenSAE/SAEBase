@@ -59,7 +59,7 @@ h_new = h_original + decode(z_edited) - decode(z_original)
 ```
 
 This preserves content not reconstructed by the SAE. The `reconstruction`
-control is intentionally different and can later support Loss Recovered.
+control is intentionally different and supports a separately measured Loss Recovered metric.
 Feature indices are **absolute SAE dictionary indices**; coalition retained
 indices must be a subset of the selected set. The decoder is invoked through
 its loaded implementation so biases and normalization are applied consistently.

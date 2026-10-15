@@ -171,7 +171,7 @@ python examples/13_reliability_offline.py
 python examples/14_ground_truth_offline.py
 ```
 
-To audit a completed benchmark, run `saebase-audit --m3-root runs/<run_id> --config conf/reliability/m4_pythia_smoke.json --run`. The legacy `--m3-root` flag is retained for CLI compatibility; it refers to the benchmark's output directory, not a required workflow stage.
+To audit a completed benchmark, run `saebase-audit --m3-root runs/<run_id> --config conf/reliability/m4_pythia_smoke.json --run --sae-only`. Use a matching multi-prompt benchmark run for this audit. The legacy `--m3-root` flag is retained for CLI compatibility; it refers to the benchmark's output directory, not a required workflow stage.
 
 Analytical controls include known factor dictionaries, coalition interaction orders, RSS support/direction persistence, controllable degradation, and negative controls. These synthetic tests **do not certify the interpretability of a real SAE**. For reconstruction uncertainty, `--sae-only` can decode verified cached codes without re-running the language model. See [Reliability Analysis](docs/reliability.md).
 
