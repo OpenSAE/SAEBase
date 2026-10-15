@@ -15,6 +15,17 @@ The first GPT-2 SAE was released by [jbloom](https://huggingface.co/jbloom/GPT2-
 
 The verified release matrix has six distinct prompts per model. It checks compatibility, exact state SHA-256 and downstream measurement integrity, not broad ranking or interpretability quality.
 
+## Stage A: six-model multi-scale coverage
+
+Stage A introduces a separate [six-model acceptance roster](stage-a-coverage.md) for Gemma 3 270M, Gemma 3 1B, Gemma 2 2B, Qwen3.5 2B, Qwen3 8B and Llama 3.1 8B. The experimental loader supports native Qwen-Scope TopK tensors and HF layer hooks, while the existing SAE Lens integration serves Gemma Scope and Llama Scope sources.
+
+```bash
+saebase-stage-a --dry-run
+saebase-stage-a --real --target qwen35_2b --device cpu --output stage-a-results
+```
+
+A pair receives a real-checkpoint verification label **only** when its own evidence JSON records actual model and SAE state digests, a matching residual layer, live capture, reconstruction, identity patch and measurable feature-ablation effect. License-restricted Gemma and Llama downloads require separate user acceptance. Check the [Stage A coverage documentation](stage-a-coverage.md) and its GitHub Actions acceptance logs for current evidence, not only the presence of configuration files.
+
 ## Registered configurations and optional models
 
 Additional model and SAE profiles exist for Pythia, Gemma, Llama and other families. Their availability in `saebase.sae.registry` or Hydra configurations should not be read as evidence that every checkpoint was downloaded, that every hook was tested, or that results are comparable across training/data protocols.
