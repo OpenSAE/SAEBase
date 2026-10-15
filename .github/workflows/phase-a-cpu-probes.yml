@@ -35,9 +35,8 @@ jobs:
         shell: bash
         run: |
           python - <<'PY'
-          import os,torch
-          print("CPU threads:",torch.get_num_threads())
-          print("CUDA available:",torch.cuda.is_available())
+          import os
+          print("Hosted CPU resource probe, torch installed in next step")
           print("HF_TOKEN configured:",bool(os.environ.get("HF_TOKEN")))
           print("Available bytes:",os.statvfs('/tmp').f_bavail * os.statvfs('/tmp').f_frsize)
           PY
