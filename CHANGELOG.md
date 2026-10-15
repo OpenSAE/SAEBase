@@ -2,8 +2,11 @@
 
 ## Unreleased
 
+- **Controlled input designs:** complete binary factor enumeration, input-state permutations, stable underlying sample identities, explicit token-position selection and versioned provenance manifests that bind to existing activation/code caches.
+- **Localize bridge:** accept a controlled design for live feature capture or a verified design manifest for cached SAE code analysis; retain the original optional estimator package.
+
 - **Input Localization integration:** capture or reuse complete Boolean input grids of SAE codes, delegate optimal scope curves and optional paired estimates to the original independent Localize implementation, and provide an offline example and tests.
-- **Documentation:** add Localize to the English/Chinese research integration overview and examples index. 
+- **Documentation:** add Localize to the English/Chinese research integration overview and examples index.
 
 ## 0.2.0 — Reproducible SAE Evaluation, Interventions, and Reliability
 
