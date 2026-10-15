@@ -4,6 +4,8 @@ No model is loaded until `real=True`; no external source is downloaded.
 """
 from __future__ import annotations
 from collections import defaultdict
+import hashlib
+import json
 import math
 from pathlib import Path
 from typing import Any
@@ -26,9 +28,18 @@ from .report import write_report
 def _identity(config,target,model,sae):
     model_sha=sha256_state_dict(model.model)
     sae_sha=sha256_state_dict(sae)
-    tokenizer_hash=config.options.get("tokenizer_sha256","0"*64)
-    if not isinstance(tokenizer_hash,str) or len(tokenizer_hash)!=64:
-        raise ValueError("options.tokenizer_sha256 must be SHA-256 hex")
+    tokenizer_hash=config.options.get("tokenizer_sha256")
+    if tokenizer_hash is None:
+        tokenizer=getattr(model.model,"tokenizer",None)
+        if tokenizer is None or not callable(getattr(tokenizer,"get_vocab",None)):
+            raise ValueError("exact tokenizer identity required: set options.tokenizer_sha256")
+        payload={"vocab":tokenizer.get_vocab(),
+                 "special_tokens_map":getattr(tokenizer,"special_tokens_map",{}),
+                 "added_vocab":tokenizer.get_added_vocab() if callable(getattr(tokenizer,"get_added_vocab",None)) else {}}
+        tokenizer_hash=hashlib.sha256(json.dumps(payload,sort_keys=True,ensure_ascii=False,
+                separators=(",",":"),allow_nan=False).encode("utf-8")).hexdigest()
+    if not isinstance(tokenizer_hash,str) or len(tokenizer_hash)!=64 or any(ch not in "0123456789abcdef" for ch in tokenizer_hash):
+        raise ValueError("options.tokenizer_sha256 must be lowercase SHA-256 hex")
     act=ActivationIdentity(model_key=target.model_key,model_state_sha256=model_sha,
             tokenizer_sha256=tokenizer_hash,hook_name=target.site.hook_name,layer=target.site.layer,
             preprocessing={"dataset":config.dataset_id,"site_position":target.site.position})
