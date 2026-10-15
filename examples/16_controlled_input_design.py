@@ -16,6 +16,8 @@ import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+import torch
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from examples._synthetic_common import ResearchToyModel, ResearchToySAE
@@ -27,6 +29,19 @@ from saebase.integrations import localization_grid_from_code_store, evaluate_loc
 from saebase.store import (
     ActivationIdentity, ActivationWriter, CodeIdentity, encode_from_store, sha256_state_dict,
 )
+
+
+class FactorialToyModel(ResearchToyModel):
+    """A deterministic model representation that uses all three input factors."""
+
+    def _hidden(self, tokens: torch.Tensor) -> torch.Tensor:
+        if tokens.shape[1] != 3:
+            raise ValueError("expected three independently controlled input tokens")
+        first = (tokens[:, 0] - 1).float()
+        second = (tokens[:, 1] - 3).float()
+        third = (tokens[:, 2] - 5).float()
+        h = torch.stack((first, second, third, first * second), dim=-1)
+        return h[:, None, :].expand(-1, tokens.shape[1], -1).contiguous()
 
 
 def main() -> None:
@@ -48,12 +63,12 @@ def main() -> None:
     xor_map = {i: ((i & 1) ^ ((i >> 1) & 1)) | (i & ~1) for i in range(8)}
     mixed_design = identity_design.reindex(xor_map, name="three-factor-xor")
 
-    model = ModelAdapter(ResearchToyModel().eval())
+    model = ModelAdapter(FactorialToyModel().eval())
     sae = ResearchToySAE().eval()
     site = ActivationSite(0, "blocks.0.hook_resid_post")
     activation_id = ActivationIdentity(
         model_key="controlled-toy", model_state_sha256=sha256_state_dict(model.model),
-        tokenizer_sha256=hashlib.sha256(b"ResearchToyModel.to_tokens").hexdigest(),
+        tokenizer_sha256=hashlib.sha256(b"FactorialToyModel.to_tokens.v1").hexdigest(),
         hook_name=site.hook_name, layer=site.layer,
     )
     sae_id = CodeIdentity(
