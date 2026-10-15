@@ -81,7 +81,19 @@
       "d_sae": 32768,
       "blocker": null,
       "model_state_sha256": "3d12539bb2cea2fed29b8091197ab2f0dec089cd1c65f98c7a17379607ba5955",
-      "pair_evidence_artifact": "https://github.com/OpenSAE/SAEBase/actions/runs/38822802463/artifacts/12013997427"
+      "pair_evidence_artifact": "https://github.com/OpenSAE/SAEBase/actions/runs/38824111274/artifacts/12014521241",
+      "feature_intervention_verified": true,
+      "feature_ablation_logit_l2": [
+        126.3478012084961,
+        86.88372039794922,
+        62.297908782958984
+      ],
+      "identity_patch_max_abs_logit_error": 0,
+      "reconstruction_mse": [
+        0.009684507735073566,
+        0.011271940544247627,
+        0.010423067957162857
+      ]
     },
     {
       "key": "qwen3_8b",
@@ -122,7 +134,7 @@
     "source_commit": "e7394aab0aacfb82627cb996a767c5f46fc15055"
   },
   "full_pair_evidence": {
-    "workflow_run": "https://github.com/OpenSAE/SAEBase/actions/runs/38822802463",
-    "source_commit": "7016fab5800d107bfd60bd706241bde62afcab86"
+    "workflow_run": "https://github.com/OpenSAE/SAEBase/actions/runs/38824111274",
+    "source_commit": "e7394aab0aacfb82627cb996a767c5f46fc15055"
   }
 }
