@@ -295,6 +295,13 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
                         results.append(_metric(config,target,sae_key,spec,"blocked",
                                                reason=f"{type(exc).__name__}: {exc}"))
             results.extend(_import_saebench(config,target,sae_key,native_specs))
+            # Registered but unsupported metric families must be visible in the
+            # result set. Never silently drop a promised metric from a report.
+            known=("core.","intervention.","reconstruction.","sar.","rss.","saebench.")
+            for spec in specs:
+                if not spec.metric_id.startswith(known):
+                    results.append(_metric(config,target,sae_key,spec,"unsupported",
+                        reason="no executable adapter registered for this metric family"))
     store_results(root,results,run_id=config.run_id)
     write_report(root,config,plan,results,provenance=provenance)
     return [r.to_dict() for r in results]

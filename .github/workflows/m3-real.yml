@@ -43,6 +43,15 @@ jobs:
           rows=read_metrics(root,cfg.run_id)
           assert len(rows)==7, len(rows)
           assert all(row['status']=='completed' for row in rows), rows
+          # Same real checkpoint, token IDs and site as the frozen M0 reference.
+          # M3 must preserve measured L0 and reconstruction MSE, not merely
+          # produce finite but arbitrary scores.
+          import json
+          ref=json.loads(Path('tests/fixtures/m0_reference_public.json').read_text())
+          original=next(x for x in ref['samples'] if x['token_ids']==[40587,37083,15458])
+          by_id={r['metric_id']:r['value'] for r in rows if r['condition_id'] is None}
+          assert by_id['core.l0']==original['codes_l0']
+          assert abs(by_id['core.reconstruction_mse']-original['reconstruction_mse'])<0.02
           assert (root/'report.html').exists()
           print('Verified M3 real Pythia SAE benchmark:',len(rows),'metric rows')
           PY

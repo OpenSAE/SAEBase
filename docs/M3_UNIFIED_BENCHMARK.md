@@ -140,3 +140,14 @@ exactly the `SampleRecord.token_ids` declared in its experiment configuration.
 A mismatch blocks the metric. Selection variants are never chosen using
 held-out variants. Mismatched textual input cannot silently change the
 experiment protocol while retaining the same dataset identity.
+
+### Frozen M0 cross-check
+
+The real Pythia M3 CI compares the exact frozen M0 sample token IDs
+`[40587, 37083, 15458]`, checkpoint and layer-3 site. It asserts the
+Core L0 equals the original reference count of 172 and reconstruction
+MSE is within 0.02 of the original 3.7515499591827393. A passing
+M3 smoke cannot hide a numerically different SAE behind a generic success flag.
+
+Custom metrics registered without an executable adapter are reported
+`unsupported` with a reason, never silently omitted.

@@ -186,3 +186,25 @@ def test_rss_metric_units_keep_selection_and_heldout_separate():
     persistence=_metric(cfg,t,"toy",get_metric("rss.held_out_persistence"),"completed",.9,n_valid=5)
     assert mean.n_requested==mean.n_valid==3
     assert persistence.n_requested==persistence.n_valid==5
+
+def test_new_registered_metric_without_executor_is_explicitly_unsupported(tmp_path):
+    import copy
+    from saebase.benchmarks.schema import MetricSpec
+    from saebase.benchmarks.registry import register_metric,get_metric
+    key="experimental.m3_no_executor"
+    try:
+        get_metric(key)
+    except ValueError:
+        register_metric(MetricSpec(key,"1",("external_fixture",),"dataset"))
+    data=copy.deepcopy(BASE)
+    data["metrics"]=[key]
+    data["conditions"]=[]
+    cfg=BenchmarkConfig.from_dict(data)
+    model=ModelAdapter(ResearchToyModel().eval())
+    sae=ResearchToySAE().eval()
+    rows=execute(cfg,tmp_path,real=True,
+                 loader=lambda *args: SimpleNamespace(model=model,sae=sae))
+    assert len(rows)==1
+    assert rows[0]["metric_id"]==key
+    assert rows[0]["status"]=="unsupported"
+    assert "no executable adapter" in rows[0]["reason"]
