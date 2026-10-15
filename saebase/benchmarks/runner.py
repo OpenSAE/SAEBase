@@ -47,12 +47,26 @@ def _identity(config,target,model,sae):
 
 def _metric(config,target,sae_key,spec,status,value=None,n_valid=0,
             reason=None,condition=None,refs=(),source_sha=None,source_commit=None,cost=None):
+    from saebase.store import resolve_positions
+    if spec.sample_unit == "token":
+        requested=sum(len(resolve_positions(s.record)) for s in config.samples)
+    elif spec.sample_unit == "coalition":
+        requested=int(config.options.get("sar",{}).get("M",80))
+    elif spec.sample_unit == "variant":
+        role="held_out" if spec.metric_id.endswith("held_out_persistence") else "selection"
+        requested=sum(s.record.variant_role==role for s in config.samples)
+    elif spec.sample_unit == "dataset":
+        requested=1
+    else:
+        requested=len(config.samples)
+    if n_valid > requested:
+        raise ValueError(f"metric {spec.metric_id} has {n_valid} valid units > {requested} requested")
     return MetricResult(metric_id=spec.metric_id,metric_version=spec.version,
         protocol_id=spec.protocol_id,model_id=target.model_key,sae_id=sae_key,
         site={"layer":target.site.layer,"hook_name":target.site.hook_name,
               "position":target.site.position},dataset_id=config.dataset_id,
         split="mixed" if len({s.record.split for s in config.samples})>1 else config.samples[0].record.split,
-        seed=config.seed,sample_unit=spec.sample_unit,n_requested=len(config.samples),
+        seed=config.seed,sample_unit=spec.sample_unit,n_requested=requested,
         n_valid=n_valid,status=status,value=value,condition_id=condition,
         reason=reason,measurement_refs=tuple(refs),source_sha256=source_sha,
         source_commit=source_commit,cost=cost or {})
