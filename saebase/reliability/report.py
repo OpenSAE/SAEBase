@@ -65,6 +65,13 @@ def read_audit(root:str|Path)->dict:
     report=json.loads(data)
     if report.get("schema")!=AUDIT_SCHEMA or report.get("m3_run_id")!=m3["run_id"]:
         raise ValueError("M4 audit content identity mismatch")
+    truth=report.get("ground_truth")
+    if truth is not None:
+        from saebase.benchmarks.adapters.papers import source_identity
+        for paper in ("sar","rss"):
+            source=truth["source_provenance"][paper]
+            if source_identity(source["path"],paper)!=source["sha256"]:
+                raise ValueError(f"M4 ground truth {paper} source changed since audit")
     return report
 
 def render_audit_fragment(report)->str:
@@ -78,11 +85,27 @@ def render_audit_fragment(report)->str:
                 row.get("status"),stat.get("n_groups"),stat.get("point_estimate"),
                 interval,row.get("reason"))
         cells.append("<tr>"+"".join("<td>"+html.escape(str(v))+"</td>" for v in values)+"</tr>")
+    truth=report.get("ground_truth")
+    extra=""
+    if truth:
+        fields=[]
+        for label,details in sorted(truth.get("factor_cases",{}).items()):
+            fields.append((f"Factors: {label}",details["status"]))
+        for label,details in sorted(truth.get("known_interaction_cases",{}).items()):
+            fields.append((f"SAR order: {label}",details["status"]))
+        fields.append(("RSS direction and held-out",truth["known_rss_direction_case"]["status"]))
+        for label,details in sorted(truth.get("negative_invariance_controls",{}).items()):
+            fields.append((f"Control: {label}",details["status"]))
+        extra="<h3>Synthetic ground truth and negative controls</h3>"
+        extra+="<p>Analytical fixtures, independent calibration and test. Not a claim about real SAE quality.</p>"
+        extra+="<table><tr><th>Known-truth case</th><th>Status</th></tr>"
+        extra+="".join("<tr><td>"+html.escape(x)+"</td><td>"+html.escape(y)+"</td></tr>" for x,y in fields)
+        extra+="</table><p>Full seeds, effect sizes, intervals and original source hashes are in reliability.json.</p>"
     return ("<section id='reliability-audit'><h2>M4 Reliability Audit</h2>"
             "<p>Paired/grouped evaluation resampling of frozen M3 measurements. "
             "Intervals are descriptive, not causal claims. No new model forwards.</p>"
             "<table><thead><tr>"+"".join("<th>"+html.escape(x)+"</th>" for x in headers)
-            +"</tr></thead><tbody>"+"".join(cells)+"</tbody></table>"
+            +"</tr></thead><tbody>"+"".join(cells)+"</tbody></table>"+extra+
             "<h3>Paired comparisons and rank stability</h3><pre>"
             +html.escape(json.dumps({"comparisons":report.get("paired_comparisons",[]),
                    "rank_stability":report.get("rank_stability",[])},indent=2,allow_nan=False))

@@ -124,3 +124,34 @@ def test_ranking_does_not_rank_contextual_metrics_or_unmatched_data():
     assert stable["mean_kendall_tau"]==1.
     assert stable["mean_top_k_overlap"]==1.
     assert stable["ranking_reversal_frequency"]==0.
+
+def test_recovery_of_core_mse_fvu_variance_without_model_forward(tmp_path):
+    data=base(False)
+    data["metrics"]=["core.l0","core.reconstruction_mse",
+                     "core.fvu","core.explained_variance"]
+    data["conditions"]=[]
+    cfg=BenchmarkConfig.from_dict(data)
+    model=ModelAdapter(ResearchToyModel().eval())
+    sae=ResearchToySAE().eval()
+    counter={"n":0}
+    original=model.model.run_with_cache
+    def capture(*args,**kwargs):
+        counter["n"]+=1
+        return original(*args,**kwargs)
+    model.model.run_with_cache=capture
+    execute(cfg,tmp_path,real=True,
+        loader=lambda mk,sk,layer: SimpleNamespace(model=model,sae=sae))
+    initial=counter["n"]
+    report=evaluate_m3(tmp_path/cfg.run_id,audit_cfg(),
+                       sae_resolver=lambda model_key,sae_key,layer:sae)
+    assert len(report["metric_audits"])==4
+    assert all(x["status"]=="completed" for x in report["metric_audits"]),report
+    assert all(x["audit"]["n_groups"]==4 for x in report["metric_audits"])
+    assert counter["n"]==initial, "SAE-only decode must not use the model"
+    again=evaluate_m3(tmp_path/cfg.run_id,audit_cfg(),
+                      sae_resolver=lambda *args:sae)
+    assert report==again
+    with __import__("torch").no_grad():
+        sae.bias.add_(1.)
+    with pytest.raises(ValueError,match="decoder checkpoint differs"):
+        evaluate_m3(tmp_path/cfg.run_id,audit_cfg(),sae_resolver=lambda *args:sae)

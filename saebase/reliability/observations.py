@@ -12,7 +12,7 @@ from saebase.api import ActivationSite
 from saebase.benchmarks import BenchmarkConfig
 from saebase.benchmarks.results import read_metrics
 from saebase.interventions import ExperimentIdentity,read_results
-from saebase.store import ShardedReader,resolve_positions
+from saebase.store import ShardedReader,resolve_positions,sha256_state_dict
 from .schema import Observation
 
 def _read_config(root:Path):
@@ -89,7 +89,7 @@ def _find_m1_codes(root,metric,provenance,config):
         raise ValueError(f"expected one verified M1 code cache: found {len(matches)}")
     return matches[0]
 
-def observations_for_metric(root,config,row,provenance):
+def observations_for_metric(root,config,row,provenance,*,sae=None):
     """Build exactly the M3 observation set for a supported audited metric."""
     metric=row["metric_id"]
     if row["status"]!="completed":
@@ -139,6 +139,42 @@ def observations_for_metric(root,config,row,provenance):
                 out.append(Observation(row["model_id"],row["sae_id"],metric,row["dataset_id"],
                     row["split"],sample.record.prompt_group_id,sample.record.sample_id,
                     float(np.count_nonzero(z)),measurement_ref=f"m1:{sample.record.sample_id}:{pos}",
+                    seed=row["seed"]))
+    elif metric in {"core.reconstruction_mse","core.fvu","core.explained_variance"}:
+        if sae is None:
+            return (),"SAE-only decoder opt-in required; no model forward is needed"
+        import torch
+        from saebase.sae.contracts import reconstruction_stats
+        reader=_find_m1_codes(Path(root),row,provenance,config)
+        activation=ShardedReader(reader.path.parents[1],verify_shards=True)
+        prefix=f"{row['model_id']}/{row['site']['layer']}/{row['sae_id']}"
+        if sha256_state_dict(sae)!=provenance[prefix]["sae_state_sha256"]:
+            raise ValueError("SAE decoder checkpoint differs from the frozen M3 weight identity")
+        param=next(sae.parameters())
+        for sample in config.samples:
+            if sample.record.split!=row["split"] or not sample.record.prompt_group_id:
+                raise ValueError("M4 requires split-matched nonempty prompt_group_id")
+            source=activation.get(sample.record.sample_id)
+            code=reader.get(sample.record.sample_id)
+            if source.positions!=code.positions or source.positions!=resolve_positions(sample.record):
+                raise ValueError("M1 activation/code token selection mismatch")
+            with torch.no_grad():
+                z=torch.as_tensor(np.asarray(code.values,dtype=np.float32),
+                                  dtype=param.dtype,device=param.device)
+                reconstructed=sae.decode(z).detach().float().cpu().numpy()
+            original=np.asarray(source.values,dtype=np.float64)
+            if reconstructed.shape!=original.shape:
+                raise ValueError("M1 decoded SAE reconstruction has wrong shape")
+            for pos,h,recon in zip(source.positions,original,reconstructed):
+                stat=reconstruction_stats(torch.as_tensor(h,dtype=torch.float64),
+                    torch.as_tensor(recon,dtype=torch.float64))
+                value={"core.reconstruction_mse":stat["reconstruction_mse"],
+                       "core.fvu":1.-stat["fve"],
+                       "core.explained_variance":stat["fve"]}[metric]
+                out.append(Observation(row["model_id"],row["sae_id"],metric,
+                    row["dataset_id"],row["split"],sample.record.prompt_group_id,
+                    sample.record.sample_id,float(value),
+                    measurement_ref=f"m1:{sample.record.sample_id}:{pos}",
                     seed=row["seed"]))
     else:
         return (),f"no raw group-observation adapter for {metric}; original M3 result unchanged"

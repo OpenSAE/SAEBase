@@ -57,6 +57,9 @@
   },
   "metrics": [
     "core.l0",
+    "core.reconstruction_mse",
+    "core.fvu",
+    "core.explained_variance",
     "intervention.logit_delta_l2",
     "intervention.kl_baseline_to_edited"
   ],

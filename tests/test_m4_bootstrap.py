@@ -61,3 +61,12 @@ def test_config_rejects_invalid_seed_or_ci():
     with pytest.raises(ValueError,match="distinct"):
         AuditConfig(evaluation_seeds=(1,1))
     assert AuditConfig.from_dict(cfg().to_dict())==cfg()
+
+def test_primary_pair_contract_and_bonferroni_policy():
+    c=AuditConfig.from_dict({
+        "schema":"saebase.m4.audit.config.v1",
+        "primary_comparisons":[["sae-a","sae-b"],["sae-a","sae-c"]]})
+    assert len(c.primary_comparisons)==2
+    assert AuditConfig.from_dict(c.to_dict())==c
+    with pytest.raises(ValueError,match="duplicate primary"):
+        AuditConfig.from_dict({"primary_comparisons":[["a","b"],["b","a"]]})

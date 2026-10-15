@@ -235,8 +235,8 @@ intervals and ranking-stability checks, without new model forwards.
 saebase-audit --m3-root runs/<run_id> --config conf/reliability/m4_pythia_smoke.json --run
 ```
 
-See [M4 Reliability Audit](docs/M4_RELIABILITY.md) for audit status, protocols,
-synthetic-ground-truth checks and validation limits.
+See [M4 Reliability Audit](docs/M4_RELIABILITY.md) for original SAR/RSS
+ground-truth controls, discriminability, audit status and validation limits.
 
 ---
 

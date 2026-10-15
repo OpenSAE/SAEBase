@@ -7,3 +7,5 @@ __all__=["AuditConfig","Observation","bootstrap_metric","paired_bootstrap",
 from .runner import evaluate_m3
 from .report import write_audit,read_audit
 __all__ += ["evaluate_m3","write_audit","read_audit"]
+from .ground_truth_report import evaluate_ground_truth,append_ground_truth
+__all__ += ["evaluate_ground_truth","append_ground_truth"]

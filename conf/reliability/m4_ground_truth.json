@@ -1,0 +1,10 @@
+{
+  "schema":"saebase.m4.audit.config.v1",
+  "evaluation_seeds":[0,1,2,3,4],
+  "bootstrap_replicates":128,
+  "confidence":0.95,
+  "sample_sizes":[32,64,128],
+  "top_k":1,
+  "training_seed":null,
+  "metric_ids":[]
+}

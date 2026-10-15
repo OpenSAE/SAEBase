@@ -61,6 +61,7 @@ saebase-check-env = "scripts.check_env:main"
 saebase-intervene = "scripts.m2_batch:main"
 saebase-benchmark = "scripts.m3_benchmark:main"
 saebase-audit = "scripts.m4_reliability:main"
+saebase-ground-truth = "scripts.m4_ground_truth:main"
 
 [project.urls]
 Repository = "https://github.com/OpenSAE/SAEBase"
