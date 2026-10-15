@@ -25,8 +25,14 @@ def target_nll(model: ModelAdapter, sae, sample: MeasurementSample, site: Activa
     t = sample.target_token_id
     if t >= len(baseline):
         raise ValueError("target token outside output vocab")
+    # Full-site zero ablation is measured in the same model and at the same
+    # token position, rather than trusting an unrelated user-entered scalar.
+    ablated = model.patch_logits(tokens=ids,
+        site=ActivationSite(site.layer,site.hook_name,sample.patch_position),
+        activation=torch.zeros_like(h), readout_position=sample.readout_position)
     return (float(-torch.log_softmax(baseline.float(),-1)[t].item()),
-            float(-torch.log_softmax(patched.float(),-1)[t].item()))
+            float(-torch.log_softmax(patched.float(),-1)[t].item()),
+            float(-torch.log_softmax(ablated.float(),-1)[t].item()))
 
 def loss_recovered(clean_loss: float, reconstructed_loss: float, ablated_loss: float):
     """(L_ablated - L_reconstructed)/(L_ablated - L_original)."""

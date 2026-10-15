@@ -177,20 +177,20 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
                     if not spec.metric_id.startswith("reconstruction."):
                         continue
                     if spec.metric_id=="reconstruction.target_nll":
-                        val=sum(patched for _,patched in observations)/len(observations) if observations else None
+                        val=sum(patched for _,patched,_ in observations)/len(observations) if observations else None
                         results.append(_metric(config,target,sae_key,spec,
                             "completed" if val is not None else "undefined",val,
                             n_valid=len(observations) if val is not None else 0,
                             reason=None if val is not None else "no target tokens"))
                     else:
-                        ablation=config.options.get("ablation_reference_nll")
-                        if type(ablation) not in (float,int) or not observations:
+                        if not observations:
                             results.append(_metric(config,target,sae_key,spec,"undefined",
-                                    reason="loss recovered requires explicit ablation_reference_nll and target tokens"))
+                                    reason="loss recovered requires target tokens"))
                         else:
                             base=sum(v[0] for v in observations)/len(observations)
                             patch=sum(v[1] for v in observations)/len(observations)
-                            val=loss_recovered(base,patch,float(ablation))
+                            ablation=sum(v[2] for v in observations)/len(observations)
+                            val=loss_recovered(base,patch,ablation)
                             results.append(_metric(config,target,sae_key,spec,
                                 "completed" if val is not None else "undefined",val,
                                 n_valid=len(observations) if val is not None else 0,

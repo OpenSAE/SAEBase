@@ -66,8 +66,9 @@ Health metric semantics are explicit:
   explained variance.
 - `reconstruction.target_nll`: mean negative log probability at an explicitly
   requested next-token position after full SAE reconstruction replacement.
-- `reconstruction.loss_recovered`: requires the explicitly supplied baseline
-  ablation reference. It is undefined if ablated loss equals clean loss.
+- `reconstruction.loss_recovered`: uses an independently measured full-site zero
+  ablation loss on the same model, samples and token readouts. It is undefined
+  if ablated loss equals clean loss.
 - `intervention.*`: aggregates unchanged M2 `ResultWriter` per sample and
   per named condition. Conditional values are never mixed across interventions.
 
