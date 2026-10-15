@@ -17,7 +17,7 @@ from pathlib import Path
 
 import torch
 
-from saebase.api import ActivationSite, ModelAdapter, capture_features
+from saebase.api import ActivationSite, ModelAdapter, capture_features, edit_features
 from saebase.sae.loading import load_model_and_sae
 from saebase.sae.registry import get_profile
 from saebase.store import sha256_state_dict
@@ -82,11 +82,28 @@ def verify_target(name: str, *, device: str = "cuda", prompts=PROMPTS) -> dict:
         err = identity_patch(model, snap, site)
         if not err <= 1e-2:
             raise ValueError(f"identity patch maximum logit error {err} > 0.01")
+        # One genuine SAE feature ablation must also propagate through the
+        # captured model hook and change the downstream logits.
+        if not torch.count_nonzero(z):
+            raise ValueError("SAE has no active features on acceptance prompt")
+        selected = int(torch.argmax(torch.abs(z)).item())
+        edited = edit_features(sae, snap, replacements={selected: 0.0})
+        base_logits = model.forward_logits(tokens=snap.tokens).detach().float()
+        edited_logits = model.patch_logits(
+            tokens=snap.tokens, site=site, activation=edited.activation
+        ).detach().float()
+        feature_logit_delta_l2 = float(torch.linalg.vector_norm(
+            base_logits - edited_logits
+        ).item())
+        if not torch.isfinite(torch.tensor(feature_logit_delta_l2)) or feature_logit_delta_l2 <= 1e-8:
+            raise ValueError("active SAE feature ablation did not measurably affect logits")
         results.append({
             "prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(),
             "l0": int(torch.count_nonzero(z).item()),
             "reconstruction_mse": float(torch.mean((x-recon)**2).item()),
             "identity_patch_max_abs_logit_error": err,
+            "ablated_feature_id": selected,
+            "feature_ablation_logit_delta_l2": feature_logit_delta_l2,
         })
     return {
         "schema": "saebase.phase_a.real_acceptance.v1",
