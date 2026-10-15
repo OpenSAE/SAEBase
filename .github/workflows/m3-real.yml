@@ -1,0 +1,56 @@
+name: Real M3 Pythia benchmark acceptance
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'saebase/benchmarks/**'
+      - 'scripts/m3_benchmark.py'
+      - 'conf/benchmark/**'
+      - '.github/workflows/m3-real.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  m3-pythia:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - name: Install real analysis dependencies
+        run: python -m pip install -e '.[analysis]'
+      - name: Run bounded real Pythia M1-M2-M3 pipeline
+        env:
+          HF_HUB_DISABLE_TELEMETRY: '1'
+          TOKENIZERS_PARALLELISM: 'false'
+        run: |
+          set -euo pipefail
+          saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
+          saebase-benchmark --config conf/benchmark/p0_small.json --real --output "$RUNNER_TEMP/m3"
+          saebase-benchmark --config conf/benchmark/p0_small.json --real --resume --output "$RUNNER_TEMP/m3"
+          saebase-benchmark --config conf/benchmark/p0_small.json --report-only --output "$RUNNER_TEMP/m3"
+          python - <<'PY'
+          from pathlib import Path
+          from saebase.benchmarks import load_config
+          from saebase.benchmarks.results import read_metrics
+          import os
+          cfg=load_config('conf/benchmark/p0_small.json')
+          root=Path(os.environ['RUNNER_TEMP'])/'m3'/cfg.run_id
+          rows=read_metrics(root,cfg.run_id)
+          assert len(rows)==9, len(rows)
+          assert all(row['status']=='completed' for row in rows), rows
+          assert (root/'report.html').exists()
+          print('Verified M3 real Pythia SAE benchmark:',len(rows),'metric rows')
+          PY
+      - name: Save Pythia M3 benchmark evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: saebase-m3-real-pythia
+          path: ${{ runner.temp }}/m3/
+          if-no-files-found: warn
+          retention-days: 14
