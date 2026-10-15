@@ -60,6 +60,7 @@ MODEL_BEHAVIOR_MATRIX: dict[str, frozenset[str]] = {
     "gemma3_12b_pt": _LOGIC_BEHAVIORS,
     "gemma3_12b_it": _LOGIC_BEHAVIORS,
     "qwen35_9b": _LOGIC_BEHAVIORS,
+    "qwen35_2b": _LOGIC_BEHAVIORS,
     "gemma3_27b_pt": _LOGIC_BEHAVIORS,
     "gemma3_27b_it": _LOGIC_BEHAVIORS,
     "qwen35_27b": _LOGIC_BEHAVIORS,
