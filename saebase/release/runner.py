@@ -72,7 +72,7 @@ def _prompt_samples(model:ModelAdapter,matrix:MatrixConfig,target:MatrixTarget):
             "split":"test","readout_position":-1})
     return result
 
-def _make_m3(matrix:MatrixConfig,target:MatrixTarget,samples):
+def _make_m3(matrix:MatrixConfig,target:MatrixTarget,samples,*,synthetic:bool=False):
     return BenchmarkConfig.from_dict({
         "schema":"saebase.benchmark.config.v1",
         "name":f"M5 {matrix.version}: {target.model_key}, {len(target.sae_keys)} SAEs",
@@ -85,6 +85,8 @@ def _make_m3(matrix:MatrixConfig,target:MatrixTarget,samples):
         "seed":matrix.seed,"max_measurements":matrix.max_measurements,
         "max_activation_rows":len(samples),
         "sample_batch":1,"microbatch":2,"tolerance":0.01,
+        "options":{"tokenizer_sha256":_sha(("synthetic-tokenizer:"+target.model_key).encode())}
+                  if synthetic else {},
     })
 
 def _peak_rss_bytes():
@@ -216,7 +218,7 @@ def execute_matrix(matrix:MatrixConfig,output:str|Path,*,device:str="cpu",
         if not model.capabilities.capture or not model.capabilities.patch:
             raise ValueError("M5 requires real capture and patch capable backend")
         samples=_prompt_samples(model,matrix,target)
-        m3=_make_m3(matrix,target,samples)
+        m3=_make_m3(matrix,target,samples,synthetic=model_loader is not None)
         cached_saes={}
         def get_sae(key):
             if key not in cached_saes:
