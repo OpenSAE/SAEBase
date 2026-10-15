@@ -229,8 +229,18 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
                         reason="native SAEBench output path required; no local upstream run executed"))
                     continue
                 try:
+                    expected_ids=config.options.get("saebench_sae_lens_ids",{})
+                    expected_models=config.options.get("saebench_model_names",{})
+                    expected_releases=config.options.get("saebench_sae_releases",{})
+                    if not isinstance(expected_ids,dict) or not expected_ids.get(sae_key):
+                        raise ValueError("options.saebench_sae_lens_ids must identify the native SAE checkpoint")
+                    if not isinstance(expected_models,dict) or not expected_models.get(target.model_key):
+                        raise ValueError("options.saebench_model_names must identify the native model")
                     val,digest,commit=import_native(source,spec.metric_id,
-                            expected_commit=config.options.get("saebench_commit"))
+                            expected_commit=config.options.get("saebench_commit"),
+                            expected_sae_id=expected_ids[sae_key],
+                            expected_model_name=expected_models[target.model_key],
+                            expected_sae_release=expected_releases.get(sae_key))
                     results.append(_metric(config,target,sae_key,spec,"completed",val,n_valid=1,
                         source_sha=digest,source_commit=commit))
                 except Exception as exc:

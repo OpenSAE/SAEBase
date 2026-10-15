@@ -14,7 +14,7 @@ PATHS={
  "saebench.sparse_probing.sae_top_1_test_accuracy":(("sae","sae_top_1_test_accuracy"),),
 }
 
-def import_native(path,metric_id,*,expected_commit=None,expected_sae_id=None):
+def import_native(path,metric_id,*,expected_commit=None,expected_sae_id=None,expected_model_name=None,expected_sae_release=None):
     if metric_id not in PATHS:
         raise ValueError("unsupported SAEBench metric")
     file=Path(path)
@@ -30,6 +30,12 @@ def import_native(path,metric_id,*,expected_commit=None,expected_sae_id=None):
         raise ValueError("native SAEBench commit mismatch")
     if expected_sae_id is not None and item.get("sae_lens_id")!=expected_sae_id:
         raise ValueError("native SAEBench SAE mismatch")
+    if expected_sae_release is not None and item.get("sae_lens_release_id")!=expected_sae_release:
+        raise ValueError("native SAEBench SAE release mismatch")
+    if expected_model_name is not None:
+        conf=item.get("eval_config")
+        if not isinstance(conf,dict) or conf.get("model_name")!=expected_model_name:
+            raise ValueError("native SAEBench model_name mismatch")
     metrics=item.get("eval_result_metrics")
     if not isinstance(metrics,dict):
         raise ValueError("native SAEBench eval_result_metrics missing")

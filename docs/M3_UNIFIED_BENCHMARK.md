@@ -90,7 +90,13 @@ Native SAEBench integration accepts `sources.saebench.core.l0`,
 `sources.saebench.core.mse` and
 `sources.saebench.sparse_probing.sae_top_1_test_accuracy` pointing to
 **upstream-generated** JSON files. It verifies the declared upstream evaluation
-type and commit; it does not rerun, reinterpret or copy upstream estimators.
+type, commit, exact SAE lens id and native model name; it does not rerun,
+reinterpret or copy upstream estimators. A benchmark with SAEBench metrics must
+set `options.saebench_sae_lens_ids` mapping every SAEBase SAE key to the
+official upstream checkpoint ID, and `options.saebench_model_names` mapping
+each model key to the native SAEBench model name. Optional
+`options.saebench_sae_releases` maps each SAE key to the upstream release ID.
+A provenance mismatch produces a blocked metric, never a mislabeled score.
 For formal comparisons, independently verify input matching and conduct two
 native runs under an explicitly pinned protocol.
 
