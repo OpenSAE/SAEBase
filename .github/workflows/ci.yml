@@ -38,6 +38,8 @@ jobs:
           python -m saebase.sae.verify_registry --list
       - name: Run offline public API example
         run: python examples/05_public_api_offline.py
+      - name: Run controlled input cache example
+        run: python examples/16_controlled_input_design.py
       - name: Validate installed wheel outside checkout
         run: |
           python -m build --wheel
