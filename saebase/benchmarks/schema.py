@@ -204,8 +204,8 @@ class BenchmarkConfig:
             r = _fields(row, {"sample_id", "token_ids", "selection", "attention_mask", "prompt_group_id",
                               "split", "variant_role", "token_offsets", "source_activation_sha256",
                               "readout_position", "target_token_id", "reference_token_id"}, "sample")
-            record = SampleRecord.from_dict({k:v for k,v in r.items()
-                if k not in {"readout_position", "target_token_id", "reference_token_id"}})
+            record = SampleRecord.from_dict({"selection": {"mode": "last_valid"}, **{k:v for k,v in r.items()
+                if k not in {"readout_position", "target_token_id", "reference_token_id"}}})
             samples.append(MeasurementSample(record, readout_position=r.get("readout_position", -1),
                                              target_token_id=r.get("target_token_id"),
                                              reference_token_id=r.get("reference_token_id")))
