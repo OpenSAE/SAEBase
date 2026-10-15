@@ -63,7 +63,7 @@ def _absolute_from_caller(value: str | None, caller: Path) -> str | None:
 def build_overrides(args: argparse.Namespace, caller: Path) -> list[str]:
     if args.task != "sae":
         raise ValueError(
-            f"Task {args.task!r} is not available in the standalone SAEBase task runner. "
+            f"Task {args.task!r} is not packaged in the standalone SAEBase task runner. "
             "Available: sae (activation_health)."
         )
     if args.evaluation not in (None, "activation_health"):
