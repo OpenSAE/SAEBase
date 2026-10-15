@@ -38,6 +38,8 @@ for name, inputs, unit, direction in (
     ("sar.rho2", ("paper_sar",), "coalition", "higher"),
     ("rss.mean_rss", ("paper_rss",), "variant", "contextual"),
     ("rss.held_out_persistence", ("paper_rss",), "variant", "higher"),
+    ("localization.budget_at_90pct", ("localization_codes",), "dataset", "contextual"),
+    ("localization.budget_fraction_at_90pct", ("localization_codes",), "dataset", "contextual"),
     ("saebench.core.l0", ("saebench_core",), "token", "contextual"),
     ("saebench.core.mse", ("saebench_core",), "token", "lower"),
     ("saebench.sparse_probing.sae_top_1_test_accuracy", ("saebench_sparse_probing",), "dataset", "higher"),
