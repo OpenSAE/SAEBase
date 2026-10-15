@@ -1,0 +1,6 @@
+# @package _global_
+model:
+  name: gpt2small
+  pretrained_name: gpt2-small
+  family: gpt2
+  device: cuda

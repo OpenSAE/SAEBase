@@ -36,6 +36,7 @@ _11B_BEHAVIORS: frozenset[str] = _LOGIC_BEHAVIORS | _11B_TARGET_EXTRA
 
 # Central capability matrix (do not import from model modules).
 MODEL_BEHAVIOR_MATRIX: dict[str, frozenset[str]] = {
+    "gpt2small": frozenset({"CounterFact", "SimpleCopying", "SubjectVerbAgreement"}),
     "pythia70m": frozenset({"CounterFact", "SimpleCopying", "SubjectVerbAgreement"}),
     "pythia410m": frozenset({"SimpleCopying", "SubjectVerbAgreement"}),
     "gemma270m": frozenset({"SimpleCopying", "SubjectVerbAgreement"}),
