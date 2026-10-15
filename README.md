@@ -2,7 +2,7 @@
 
 🌍 Languages: [English](README.md) | [中文](README_cn.md) &nbsp; [![CI](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml)
 
-👉 **TL;DR.** SAEBase unifies model and SAE loading, prompt datasets, activation analysis, feature interventions, and reproducible evaluation into one research toolkit.
+👉 **TL;DR.** SAEBase is an open-source toolkit for reproducible sparse autoencoder research. Load models and SAEs, capture and reuse activations, intervene on features, benchmark reconstruction and downstream effects, and audit results with verifiable provenance.
 
 <p align="center">
   <a href="#-quickstart"><b>🚀 Quickstart</b></a> &nbsp; | &nbsp;
@@ -15,34 +15,39 @@
 
 ## 🧭 Overview
 
-SAEBase provides common infrastructure for investigating learned representations, measuring activation-level properties, and evaluating the behavioral effects of SAE features.
+SAEBase provides a common research workflow for evaluating sparse autoencoders (SAEs) beyond reconstruction alone. It connects pretrained models, SAE dictionaries, versioned input samples, activation-level measurements, controlled feature edits, and statistical reliability checks without conflating their results.
 
 ```mermaid
 flowchart LR
     A["Model & SAE registries"] --> C["Load & validate"]
-    B["Prompt artifacts"] --> C
+    B["Versioned prompts"] --> C
     C --> D["Capture activations"]
-    D --> E["SAE encode / decode"]
-    E --> F["Reconstruction diagnostics"]
-    E --> G["Feature interventions"]
-    F --> H["Evaluation & artifacts"]
-    G --> H
+    D --> E["Shared activation store"]
+    E --> F["SAE encode / decode"]
+    F --> G["Reconstruction diagnostics"]
+    F --> H["Feature interventions"]
+    G --> I["Benchmark & reliability"]
+    H --> I
+    I --> J["Provenance & reports"]
 ```
+
+The workflow is **capture once, evaluate multiple SAEs**: a verified activation cache can be reused by different SAE checkpoints at the same model site. Feature edits can then be measured against original model outputs, and independently interpretable metrics are reported without producing a single composite SAE score.
 
 ## ✨ Highlights
 
-- 🧠 **Model and SAE registry.** Model configurations, checkpoint profiles, layers, hooks, and compatibility checks in a shared interface.
-- 🔎 **Activation analysis.** Capture activations, inspect SAE codes, and measure L0, activation norms, reconstruction error, and explained variance.
-- 🎛️ **Feature interventions.** Edit SAE codes, patch selected activation sites, and compare downstream logits while retaining reconstruction residuals.
-- 🗂️ **Reproducible prompts.** Versioned JSONL datasets and manifests with consistent model, behavior, and seed metadata.
-- 🧩 **Research integrations.** Shared capture and intervention tools for [SAR](https://github.com/OpenSAE/SAE-Behavioral-Compositionality) and [RSS](https://github.com/OpenSAE/Redistribution-Sensitivity-Score), using their original estimators.
-- ⚙️ **Reusable tooling.** Python API, command-line utilities, Hydra configurations, tests, and distributable packages.
+- 🧠 **Model and SAE integration.** Unified checkpoint profiles, model adapters, layers, named hooks, compatibility checks, and identities for registered or custom SAEs.
+- 🗃️ **Activation capture and reuse.** Sharded, resumable activation stores; lossless dense/CSR SAE codes; exact token selection, sample groups, splits, and checkpoint SHA-256 verification.
+- 🎛️ **Feature interventions and steering.** Identity, ablation, scaling, clamping, addition, coalition, and full-reconstruction controls, with batch evaluation and downstream logit readouts. Feature edits can preserve the original reconstruction residual.
+- 📊 **SAE benchmarking.** Separate L0, reconstruction MSE, FVU/explained variance, token-level behavioral loss, logit/KL changes, and condition-specific metrics under reproducible configurations.
+- 📈 **Reliability analysis.** Prompt-group bootstrap, paired SAE comparisons, confidence intervals, sample-size curves, ranking stability, and analytical ground-truth/negative-control tests.
+- 🧩 **Research integrations.** Original [SAR](https://github.com/OpenSAE/SAE-Behavioral-Compositionality) and [RSS](https://github.com/OpenSAE/Redistribution-Sensitivity-Score) estimators plus provenance-checked imports of native SAEBench outputs.
+- ⚙️ **Reproducible experiments.** Compute preflight, exact cache identities, interrupted-run recovery, source/checkpoint hashes, and standalone JSONL/JSON, CSV, and HTML reports.
 
 ---
 
 ## ⚙️ Install
 
-Install the standard analysis environment from a source checkout (Python 3.11–3.12):
+SAEBase supports Python 3.11–3.12. Install the analysis environment from a source checkout to run real model/SAE experiments:
 
 ```bash
 git clone https://github.com/OpenSAE/SAEBase.git
@@ -54,103 +59,158 @@ saebase --list
 <details>
 <summary>📦 Other installation options</summary>
 
-The lightweight environment supports the registries, CLI, and offline public API:
+For registries, offline examples, and the lightweight core API:
 
 ```bash
 python -m pip install -e .
 ```
 
-For tests and packaging, use `pip install -e ".[dev]"`. For experimental GPU generation backends, see `.[generation]` and [the runtime notes](docs/PHASE_C.md).
+For tests and packaging, install `.[dev]`. Optional experimental GPU generation integrations use `.[generation]`; GPU vLLM/NNsight acceleration is not part of the default verified CPU workflow. Versioned wheels and source archives are available under [GitHub Releases](https://github.com/OpenSAE/SAEBase/releases); this project does not claim a PyPI upload.
 
 </details>
 
 ## 🚀 Quickstart
 
-**1. Prepare prompts** with the registered Pythia-70M model:
-
-```bash
-saebase-prepare-prompts \
-  --model-key pythia70m --behavior SimpleCopying \
-  --device cpu --n-generate 300 --min-kept 20 --seed 0 \
-  --data-dir ./data
-```
-
-This creates `prompts.jsonl` and `manifest.json` in `data/SimpleCopying/pythia70m/v1/`.
-
-**2. Evaluate a public SAE** at layer 3:
-
-```bash
-saebase \
-  --task sae --model pythia70m --sae pythia70m_resid_sm \
-  --prompt-source SimpleCopying --layer 3 --n-prompts 5 \
-  --data-dir ./data --device cpu \
-  --run-dir ./experiment/pythia70m-smoke
-```
-
-The evaluation saves `sae_activation_summary.json` with per-prompt diagnostics and Hydra run configuration. This workflow downloads the requested public model and SAE checkpoints.
-
-💻 **End-to-end acceptance:** `bash scripts/phase_a_smoke.sh`. Set `DEVICE=cuda` for a configured GPU environment.
-
----
-
-## 🔬 Public Python API
-
-Run the self-contained **offline example**, which uses a small synthetic model and SAE:
+**1. Explore the public API without downloading checkpoints:**
 
 ```bash
 python examples/05_public_api_offline.py
 ```
 
-The public interface in [`saebase.api`](saebase/api/__init__.py) provides activation sites, model adapters, SAE provenance, feature capture, code editing, and baseline-versus-patched logit evaluation.
+This self-contained example uses a small synthetic model and SAE to demonstrate activation capture, feature editing, identity checks, and downstream logit comparisons. Its numerical outputs are not research findings.
 
-Feature edits follow:
+**2. Inspect a benchmark before committing compute:**
+
+```bash
+saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
+```
+
+This validates the experiment, its measurement count, and the execution dependencies without loading model weights.
+
+**3. Run the same configuration using public checkpoints:**
+
+```bash
+saebase-benchmark --config conf/benchmark/p0_small.json --real
+saebase-benchmark --config conf/benchmark/p0_small.json --report-only
+```
+
+Real runs download the requested weights and produce `metrics.jsonl`, `summary.csv`, `report.html`, configuration, and provenance under `runs/<run_id>/`. This tiny fixed-token example is an engineering smoke test, not a study dataset. For prompt preparation and the original activation-health command, see [Getting Started](docs/getting-started.md).
+
+---
+
+## 🧠 Model and SAE Support
+
+SAEBase can register many model/SAE configurations, but **registration is not evidence of runtime validation**. The published real-checkpoint acceptance uses:
+
+| Model | Verified activation site | Real SAE checkpoints exercised |
+| :--- | :--- | :--- |
+| **Pythia-70M (deduped)** | `blocks.3.hook_resid_post` | Residual-stream SAE and a separately trained gated SAE |
+| **GPT-2 Small** | `blocks.8.hook_resid_pre` | Original residual SAE and feature-splitting SAE |
+
+Both model families were executed with two distinct SAE checkpoint weight hashes and six fixed prompts per model. Additional model profiles, including Gemma and larger checkpoints, are available in the registry but may require other dependencies, access permissions, hardware, or separate acceptance. See [Supported Models and Checkpoints](docs/model-support.md).
+
+---
+
+## 🗃️ Activation Capture and Storage
+
+Capture model activations once and reuse the stored rows when evaluating multiple SAEs at the same hook. The store records the model and tokenizer identity, selected token positions, `sample_id`, `prompt_group_id`, split, and source activation checksums. SAE codes are stored separately in lossless dense or CSR representations.
+
+```bash
+python examples/10_activation_store_offline.py
+```
+
+Readers verify manifests and shards, and interrupted runs can resume instead of repeating committed captures. Reuse is conditional on exact model/site/input identities; it is never inferred solely from a file name. See [Activation Store](docs/activation-store.md).
+
+---
+
+## ⚡ Feature Interventions and Steering
+
+SAEBase supports batched identity, ablation, scaling, clamping, addition, coalition, and reconstruction conditions. Feature-level edits can use residual-preserving patching:
 
 ```text
 edited_activation = original_activation + decode(edited_codes) - decode(original_codes)
 ```
 
-This keeps the original activation's reconstruction residual. Identity replay checks verify the unedited model output.
+A **full SAE reconstruction replacement** is a separate experimental control and must not be confused with residual-preserving feature edits. Results distinguish interventions by condition and include downstream logits, KL divergence, target-token effects (when defined), and activation changes.
 
-For a real Pythia checkpoint example, run `python examples/06_public_api_pythia.py`.
+```bash
+saebase-intervene --config conf/interventions/m2_pythia_example.json --dry-run
+python examples/11_batch_interventions_offline.py
+```
+
+Real checkpoint execution requires `--real`. Short-text steering uses reference full-prefix recomputation; no KV-cache or GPU throughput speedup is implied. See [Feature Interventions](docs/feature-interventions.md).
+
+---
+
+## 📊 SAE Benchmarking
+
+The benchmark runner expands model/SAE/metric configurations into a deterministic plan, reuses identity-verified activation/code and intervention caches, and emits each metric with its own units, protocol, sample counts, status, and source provenance.
+
+| Metric family | Examples | Interpretation |
+| :--- | :--- | :--- |
+| **Core representations** | L0, reconstruction MSE, FVU, explained variance | SAE sparsity and reconstruction properties; denominator/protocol definitions matter |
+| **Behavioral reconstruction** | Target-token negative log-likelihood, loss recovered | Full reconstruction relative to the unmodified model and a measured zero-site ablation |
+| **Feature interventions** | Logit differences, KL, activation delta, target-token changes | Downstream effects for individual, named edit conditions |
+| **External research metrics** | SAR, RSS, native SAEBench Core and Sparse Probing | Original estimators or original externally generated results, with source and protocol checks |
+
+```bash
+saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
+python examples/12_benchmark_offline.py
+```
+
+SAEBase's per-token FVU is not automatically numerically interchangeable with SAEBench's global reconstruction protocol. Native SAEBench metrics are **imported from an upstream-generated JSON result**; the benchmark importer does not silently rerun upstream evaluations. See [Benchmarking](docs/benchmarking.md).
+
+---
+
+## 📈 Reliability and Reproducibility
+
+Reliability audits reuse already computed measurements and resample complete **prompt groups**, keeping tokens or prompt variants within the same independent group. They report paired confidence intervals, subsample-size sensitivity, ranking stability for metrics with a meaningful direction, and explicitly undefined or unsupported comparisons.
+
+```bash
+python examples/13_reliability_offline.py
+python examples/14_ground_truth_offline.py
+```
+
+To audit a completed benchmark, run `saebase-audit --m3-root runs/<run_id> --config conf/reliability/m4_pythia_smoke.json --run --sae-only`. Use a matching multi-prompt benchmark run for this audit. The legacy `--m3-root` flag is retained for CLI compatibility; it refers to the benchmark's output directory, not a required workflow stage.
+
+Analytical controls include known factor dictionaries, coalition interaction orders, RSS support/direction persistence, controllable degradation, and negative controls. These synthetic tests **do not certify the interpretability of a real SAE**. For reconstruction uncertainty, `--sae-only` can decode verified cached codes without re-running the language model. See [Reliability Analysis](docs/reliability.md).
+
+---
 
 ## 🧩 Research Integrations
 
-SAEBase supplies shared model operations; each research project retains its own metric and experimental definition.
+SAEBase supplies shared model operations; original research projects retain their own metric definitions and scientific protocols.
 
-| Project | Use of SAEBase | Example |
+| Project | SAEBase integration | Example |
 | :--- | :--- | :--- |
-| 🧩 **[SAR — Behavioral Compositionality](https://github.com/OpenSAE/SAE-Behavioral-Compositionality)** | Capture feature contributions, apply coalition interventions, and call the original SAR estimator. | [SAR integration](examples/07_sar_via_saebase.py) |
-| 🔀 **[RSS — Representation Redistribution](https://github.com/OpenSAE/Redistribution-Sensitivity-Score)** | Capture clean, selection, and held-out activations and call the original RSS estimator. | [RSS integration](examples/08_rss_via_saebase.py) |
-
-Run the integration demos with local copies of the original research repositories:
+| 🧩 **[SAR — Behavioral Compositionality](https://github.com/OpenSAE/SAE-Behavioral-Compositionality)** | Capture feature contributions, apply coalition edits, call the unchanged SAR estimator. | [SAR example](examples/07_sar_via_saebase.py) |
+| 🔀 **[RSS — Representation Redistribution](https://github.com/OpenSAE/Redistribution-Sensitivity-Score)** | Capture disjoint clean/selection/held-out observations, call the unchanged RSS estimator. | [RSS example](examples/08_rss_via_saebase.py) |
+| 📊 **[SAEBench](https://github.com/adamkarvonen/SAEBench)** | Import and verify selected native Core and Sparse Probing result fields against the original model/SAE identity and upstream commit. | [Benchmark documentation](docs/benchmarking.md) |
 
 ```bash
 python examples/07_sar_via_saebase.py --paper-dir /path/to/SAR-repo
 python examples/08_rss_via_saebase.py --paper-dir /path/to/RSS-repo
 ```
 
-Both examples default to deterministic synthetic data. The `--real` option uses public checkpoints. See [integration details](docs/PHASE_C.md).
+The two examples use deterministic synthetic inputs by default; real checkpoint use is opt-in. See [Research Integrations](docs/research-integrations.md).
 
 ---
 
-## ⚡ Batch Interventions & Steering (M2)
+## 🔬 Public Python API
 
-Batch feature ablation, scaling, clamping, coalition interventions, and SAE
-reconstruction controls can now run over multiple prompts in one experiment.
-Results use verified, resumable JSONL shards; optional M1 activation/code
-caches are validated against the exact model/SAE state and source activations.
+The stable `saebase.api` includes `ModelAdapter`, `ActivationSite`, `load_registered`, `capture_features`, `edit_features`, and `evaluate_edit`. Research workflows can also use `saebase.store`, `saebase.interventions`, `saebase.benchmarks`, and `saebase.reliability` directly.
 
-```bash
-# Inspect the experiment and token budget without downloading model weights.
-saebase-intervene --config conf/interventions/m2_pythia_example.json --dry-run
-# Run a deterministic offline multi-prompt/steering example.
-python examples/11_batch_interventions_offline.py
+```python
+from saebase.api import load_registered, capture_features, evaluate_edit
+
+pair = load_registered(model_key="pythia70m",
+                       sae_key="pythia70m_resid_sm", layer=3, device="cpu")
+snapshot = capture_features(pair.model, pair.sae,
+                            site=pair.site, prompt="Alice Emma Alice")
+# See examples/06_public_api_pythia.py for a complete feature-edit example.
 ```
 
-The **real** run requires `--real` and a configured analysis environment. Short
-steering uses full-prefix autoregressive recomputation as the correctness
-reference; no KV cache or GPU batching speedup is implied. See
-[**M2 batch intervention documentation**](docs/M2_BATCH_INTERVENTIONS.md).
+The code above downloads real weights. Prefer the offline example for a no-network start. See the complete [Python API Guide](docs/python-api.md), [API Reference](docs/API.md), and [Examples Index](examples/README.md).
 
 ---
 
@@ -158,113 +218,44 @@ reference; no KV cache or GPU batching speedup is implied. See
 
 | Component | Responsibility |
 | :--- | :--- |
-| [`saebase/api/`](saebase/api/) | Model adapters, activation capture, feature editing, intervention results |
-| [`saebase/sae/`](saebase/sae/) | Checkpoint profiles, SAE loading, activation diagnostics |
-| [`saebase/data/`](saebase/data/) | Prompt preparation, compatibility matrix, JSONL and manifest I/O |
-| [`models/`](models/) · [`conf/`](conf/) | Model plugins and Hydra configurations |
-| [`tasks/`](tasks/) · [`scripts/`](scripts/) | Registered evaluation tasks, preparation and runtime checks |
+| [`saebase/api/`](saebase/api/) | Model adapters, capture/edit functions, activation sites and SAE identity |
+| [`saebase/store/`](saebase/store/) | Identity-bound activation/code shards, storage readers and resumable capture |
+| [`saebase/interventions/`](saebase/interventions/) | Batch conditions, measurement journals, patch execution and steering |
+| [`saebase/benchmarks/`](saebase/benchmarks/) | Metric registry, experiment planning, cached execution and reports |
+| [`saebase/reliability/`](saebase/reliability/) | Grouped bootstrap, paired comparisons, ground truth and audits |
+| [`saebase/integrations/`](saebase/integrations/) | Original SAR/RSS interface adapters |
+| [`saebase/sae/`](saebase/sae/) | SAE profiles, loading and reconstruction diagnostics |
+| [`saebase/data/`](saebase/data/) | Versioned prompt data, manifests and compatibility contracts |
+| [`models/`](models/) · [`conf/`](conf/) | Model plugins and versioned experiment configurations |
+| [`scripts/`](scripts/) · [`examples/`](examples/) | CLIs, executable demonstrations and validation utilities |
 
 ## ✅ Validation
-
-Run the offline test suite:
 
 ```bash
 python -m pip install -e ".[dev]"
 python -m pytest -q
 ```
 
-| Area | Validation |
+| Area | Publicly validated scope |
 | :--- | :--- |
-| Registry, prompt artifacts, and core public API | Automated offline tests |
-| Activation capture and intervention adapters | Synthetic backend and small-model checks |
-| SAR and RSS integrations | Offline contracts against original estimator interfaces |
-| Pythia / Gemma public checkpoints | Registered with opt-in real-model acceptance scripts |
-| vLLM / NNsight backends | Optional experimental backends; GPU acceptance tracked separately |
+| Core APIs and packaging | Python 3.11/3.12 CI, wheel/sdist construction and installation checks |
+| Real model/SAE interoperability | Pythia-70M and GPT-2 Small, two distinct public SAE checkpoints per model |
+| Storage, interventions and reports | Identity-aware cache reuse, condition-specific evaluation, resume and integrity checks |
+| Research estimators | Original SAR/RSS estimator tests and pinned native SAEBench Core/Sparse Probing checks |
+| Reliability | Prompt-group bootstrap, paired comparisons and independently generated analytical controls |
+| Experimental backends | vLLM/NNsight remain optional; this release does not claim GPU throughput validation |
 
-<details>
-<summary>🔧 Runtime and compatibility details</summary>
-
-- The current bundled executable evaluation is `task=sae` with `activation_health`.
-- Additional protocol configurations are retained as references; their original task implementations belong to the source research workspace.
-- Real-model examples download the requested weights and require the corresponding model/SAE dependencies.
-- Registry inspection works with `python -m saebase.sae.verify_registry --list`.
-- The source distribution includes CLI commands and versioned Hydra configuration resources.
-
-</details>
-
----
-
-
-## 🗃️ Activation Store (M1)
-
-SAEBase now includes a **sharded and resumable Activation Store**. Capture
-model activations once, reuse them across multiple SAE checkpoints, and save
-lossless full-width SAE codes as dense or CSR arrays. Each cache records
-checkpoint hashes, token positions, sample groups and split identities.
-
-```bash
-python examples/10_activation_store_offline.py
-```
-
-The example uses a small synthetic model. For data layouts, token/span
-alignment, cache integrity, corruption recovery, and opt-in real Pythia
-validation, see [M1 Activation Store](docs/M1_ACTIVATION_STORE.md).
-
----
-
-## 📊 Unified SAE Benchmark (M3)
-
-Run multiple SAE metrics from a versioned configuration, reusing shared M1/M2
-caches and exporting traceable CSV, JSONL and standalone HTML reports.
-
-```bash
-saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
-```
-
-Weights load only with explicit `--real`. See the [M3 Benchmark documentation](docs/M3_UNIFIED_BENCHMARK.md)
-for metric definitions, original-paper adapters and validation boundaries.
-
----
-
-## 📊 Reliability Audit (M4)
-
-Reuse frozen M3 measurements for prompt-group bootstrap, paired confidence
-intervals and ranking-stability checks, without new model forwards.
-
-```bash
-saebase-audit --m3-root runs/<run_id> --config conf/reliability/m4_pythia_smoke.json --run
-```
-
-See [M4 Reliability Audit](docs/M4_RELIABILITY.md) for original SAR/RSS
-ground-truth controls, discriminability, audit status and validation limits.
-
----
-
-## 🚀 M5 — v0.2.0 real checkpoint matrix
-
-SAEBase validates **Pythia-70M and GPT-2 Small**, each with two independently
-fingerprinted public SAE checkpoints at the same activation site. M1–M4
-results and grouped reliability audits retain model/SAE hashes, input
-lineage and independent per-metric reports. External weights are downloaded
-only with `--real`.
-
-```bash
-saebase-release-matrix --config conf/release/m5_matrix.json --dry-run
-saebase-release-matrix --config conf/release/m5_matrix.json --real --device cpu
-```
-
-This six-prompt engineering acceptance is not a population-level SAE
-quality ranking. See [M5 methods](docs/M5_RELEASE_MATRIX.md),
-[release notes](docs/M5_RELEASE_NOTES.md) and
-[GitHub Releases](https://github.com/OpenSAE/SAEBase/releases).
+The published multi-checkpoint run uses six fixed prompts per model and is **engineering acceptance**, not large-sample evidence about SAE quality. Checkpoint and dataset licenses remain with their original publishers; model weights are not bundled in the GitHub Release. See [Validation and Evidence](docs/validation.md) and [Release Notes](docs/releases/v0.2.0.md).
 
 ---
 
 ## 📚 Documentation
 
-[API Reference](docs/API.md) · [Getting Started](docs/PHASE_A.md) · [Feature Interventions](docs/PHASE_B.md) · [Research Integrations](docs/PHASE_C.md) · [Changelog](CHANGELOG.md)
+[Documentation Index](docs/index.md) · [Getting Started](docs/getting-started.md) · [Python API](docs/python-api.md) · [Examples](examples/README.md) · [Model Support](docs/model-support.md)
 
-[Contributing](CONTRIBUTING.md) · [Provenance](docs/PROVENANCE.md) · [Release Checklist](docs/RELEASE_CHECKLIST.md) · [Security](SECURITY.md) · [Apache-2.0 License](LICENSE)
+[Activation Store](docs/activation-store.md) · [Feature Interventions](docs/feature-interventions.md) · [Benchmarking](docs/benchmarking.md) · [Reliability](docs/reliability.md) · [Research Integrations](docs/research-integrations.md)
+
+[Validation](docs/validation.md) · [Changelog](CHANGELOG.md) · [Release Notes](docs/releases/v0.2.0.md) · [Provenance](docs/PROVENANCE.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Apache-2.0 License](LICENSE)
 
 <p align="center">
   <b>Open research infrastructure for faithful representation analysis.</b><br>

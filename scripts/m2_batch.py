@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SAEBase M2 JSON experiment entrypoint (batch + optional token steering).
+"""SAEBase JSON feature-intervention experiment entrypoint (batch + optional token steering).
 
 Dry-run never loads pretrained weights, imports SAE Lens, or creates artifacts.
 Actual execution is opt-in with --real; it may download public checkpoints.

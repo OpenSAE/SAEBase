@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit an already completed M3 benchmark using existing raw M1/M2 caches."""
+"""Audit a completed SAE benchmark from its verified activation and intervention caches."""
 from __future__ import annotations
 import argparse,json
 from pathlib import Path
@@ -12,7 +12,7 @@ from saebase.reliability.report import write_audit,read_audit
 def main(argv=None)->int:
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--m3-root",type=Path,required=True,
-                   help="runs/<m3_run_id> with verified M3 metrics and source caches")
+                   help="runs/<run_id> containing verified benchmark metrics and source caches")
     p.add_argument("--config",type=Path,required=True)
     action=p.add_mutually_exclusive_group(required=True)
     action.add_argument("--dry-run",action="store_true")
@@ -42,7 +42,7 @@ def main(argv=None)->int:
     if args.report_only:
         report=read_audit(args.m3_root)
         if AuditConfig.from_dict(report["audit_config"]).config_id!=cfg.config_id:
-            raise ValueError("--report-only configuration differs from stored M4 audit; use --run")
+            raise ValueError("--report-only configuration differs from the stored reliability audit; use --run")
     else:
         resolver=None
         if args.sae_only:
@@ -57,8 +57,8 @@ def main(argv=None)->int:
                                         rss_source=args.rss_source,config=cfg)
             report=append_ground_truth(report,truth)
         write_audit(args.m3_root,report)
-    # Rebuild native M3 report with the M4 section. This also verifies that
-    # the audit belongs to the unchanged M3 metric ledger.
+    # Rebuild the benchmark report with the reliability section. This verifies
+    # that the audit belongs to the unchanged source metric ledger.
     from saebase.benchmarks.report import write_report
     from saebase.benchmarks.planner import build_plan
     write_report(args.m3_root,m3,build_plan(m3),rows,provenance=provenance)

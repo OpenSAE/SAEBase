@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""M5 real release matrix: deterministic dry-run, verified execute and report."""
+"""Real multi-checkpoint release matrix: deterministic preflight and verified execution."""
 from __future__ import annotations
 import argparse,json
 from pathlib import Path

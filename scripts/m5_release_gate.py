@@ -19,12 +19,12 @@ def main(argv=None):
     evidence=generate_release_evidence(args.matrix_root,args.dist,args.config,
         args.inventory,args.license,args.commit)
     if evidence["status"]!="passed":
-        raise RuntimeError("M5 release gates incomplete")
+        raise RuntimeError("Release integrity checks are incomplete")
     atomic_json(args.output,evidence)
     digests=evidence["gates"]["distributions"]["artifacts"]
     (args.output.parent/"SHA256SUMS").write_text("".join(
         f"{digest}  {name}\n" for name,digest in sorted(digests.items())),encoding="utf-8")
-    print(f"M5 RELEASE GATE PASSED: {len(digests)} artifacts, "
+    print(f"RELEASE INTEGRITY GATE PASSED: {len(digests)} artifacts, "
           f"{evidence['gates']['matrix']['checkpoints']} real SAE checkpoints")
     return 0
 

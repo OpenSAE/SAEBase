@@ -1,25 +1,22 @@
 # Changelog
 
-## 0.2.0 — P0 M0–M5 release
+## 0.2.0 — Reproducible SAE Evaluation, Interventions, and Reliability
 
-- M1 identity-bound, sharded activation and SAE code stores; M2 batch interventions and steering.
-- M3 versioned SAE metrics, source-pinned original SAR/RSS estimators, native SAEBench parity, JSONL/CSV/HTML outputs and shared caches.
-- M4 grouped bootstrap, paired SAE confidence intervals and ranking stability; original-paper synthetic known truth and negative controls.
-- M5 cross-family checkpoint validation on Pythia-70M and GPT-2 Small with two distinct public SAE checkpoints per model, six reproducible prompts per model, M1/M2/M3/M4 evidence, checkpoint SHA-256, runtime stats and replay validation.
-- New fail-closed source, build and provenance checks; SHA256SUMS and checksum-verifiable release evidence.
-- External model/SAE weights stay upstream and are **not redistributed**. No single SAE-quality score is computed.
+- **Activation storage:** identity-bound sharded activation and dense/CSR code stores, with independently verified inputs and resumable execution.
+- **Feature interventions:** batched ablation, scaling, clamping, addition, coalition and reconstruction conditions, downstream behavior measurements and reference steering.
+- **Benchmarking:** versioned configurations, execution preflight, activation/measurement cache reuse, separate Core, reconstruction and intervention metrics, plus JSONL/CSV/HTML reports.
+- **Research integrations:** unmodified original SAR/RSS estimators and provenance-checked native SAEBench Core and Sparse Probing imports.
+- **Reliability audits:** grouped prompt bootstrap, paired comparisons, confidence intervals, sample-size curves, rank stability, known synthetic factors/interactions and negative controls.
+- **Real checkpoint validation:** Pythia-70M and GPT-2 Small, with two different publicly available SAE checkpoint hashes per model, six fixed prompts per model and repeatability evidence.
+- **Release integrity:** Python 3.11/3.12 checks, wheel/sdist verification, external checkpoint-source inventory and a GitHub Release with machine-readable evidence and SHA256SUMS.
 
-**Limits:** bounded engineering acceptance, not large-scale comparative model quality or legal certification. vLLM/NNsight GPU acceptance and optional extended SAE widths are outside this release.
+**Scope:** Bounded engineering compatibility, not a broad comparative ranking of SAE quality. Third-party weights are not redistributed, and publication to PyPI is not implied.
 
-## 0.1.0 — initial standalone release candidate
+## 0.1.0 — Initial Standalone Release Candidate
 
-- Packaged SAEBase's model/SAE registry and configuration resources.
-- Provided public activation capture and residual-preserving SAE feature editing.
-- Added versioned prompt artifacts and SAE activation-health evaluation.
-- Added SAR and RSS integration examples that load paper estimators externally.
-- Added package installation, console commands, CI, source/build verification,
-  contribution guidelines, and a release-readiness checklist.
+- Packaged model and SAE registry, configuration resources and core research interfaces.
+- Added activation capture, residual-preserving feature edits and activation-health evaluation.
+- Added versioned prompt artifacts and original-estimator integration examples.
+- Added installation, command-line utilities, initial CI and contributor documentation.
 
-**Scope:** The public checkpoint and GPU generation integration tests require a
-compatible external runtime; successful local offline tests are not publication
-result reproductions. Version 0.1.0 is a release candidate pending sign-off.
+This earlier release candidate did not establish broad external checkpoint or GPU generation reproducibility.

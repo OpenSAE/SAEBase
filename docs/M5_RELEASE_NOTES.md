@@ -1,46 +1,7 @@
-# SAEBase v0.2.0
+# SAEBase v0.2.0 Release Notes
 
-The first P0 release of OpenSAE SAEBase. M0–M5 deliver reference checkpoint
-acceptance, activation caching, intervention evaluation, multi-metric
-benchmarking, statistical reliability auditing and a real checkpoint
-release matrix.
+This historical documentation URL is retained so existing external links, references and package manifests continue to work.
 
-## What's included
+Read the current, feature-oriented **[SAEBase v0.2.0 Release Notes](releases/v0.2.0.md)** guide for the full technical explanation and examples.
 
-- Python 3.11 and 3.12 distribution with the original SAEBase API and
-  `saebase-benchmark`, `saebase-audit`, `saebase-ground-truth` and
-  `saebase-release-matrix` command-line interfaces.
-- Two verified public language-model families: Pythia-70M deduped and
-  GPT-2 Small, **two real SAE checkpoints per family** at the same hook.
-- Six fixed prompt groups per model, identity and reconstruction conditions,
-  verified activation/code sharing, original metric measurements, grouped
-  confidence intervals, and hash-linked portable reports.
-- Checkpoint identity SHA-256, execution time and RSS metadata, synthetic
-  failure-injection resume tests and a machine-verifiable release gate.
-- No global SAE-quality score, model/SAE weight binaries, or third-party
-  evaluation datasets bundled into the package.
-
-## Install
-
-Install the wheel attached to this GitHub Release with Python 3.11 or 3.12.
-Optional analysis integrations require their separate dependencies. Real
-checkpoint reproduction downloads upstream public weights on demand.
-
-```bash
-python -m pip install opensae_saebase-0.2.0-py3-none-any.whl
-saebase-release-matrix --help
-```
-
-The package is under the stated SAEBase Apache-2.0 software license.
-Each external model/SAE remains subject to its own upstream license.
-Some SAE checkpoint redistribution rights are **not independently verified**,
-so weights are never included here. This is not a license certification.
-
-The four-checkpoint, six-prompt real run validates the engineering pipeline.
-It does not establish universal model behavior, population confidence limits,
-interpretability quality or a comprehensive benchmark ranking. The optional
-extended SAE widths, gated Gemma models, and GPU generation backends are not
-covered by this minimum release matrix. No PyPI deployment is implied.
-
-For reproducible protocols, identifiers, provenance and release validation
-steps, see [M5 release matrix](M5_RELEASE_MATRIX.md).
+For the rest of the toolkit, see the [Documentation Index](index.md) and [Examples Index](../examples/README.md).

@@ -1,4 +1,4 @@
-"""Offline M4 grouped bootstrap demonstration, no downloads or model calls."""
+"""Offline grouped-bootstrap reliability demonstration, no downloads or model calls."""
 from saebase.reliability import Observation,AuditConfig,bootstrap_metric,paired_bootstrap
 
 def main():
