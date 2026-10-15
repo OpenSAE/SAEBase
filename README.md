@@ -212,6 +212,20 @@ validation, see [M1 Activation Store](docs/M1_ACTIVATION_STORE.md).
 
 ---
 
+## 📊 Unified SAE Benchmark (M3)
+
+Run multiple SAE metrics from a versioned configuration, reusing shared M1/M2
+caches and exporting traceable CSV, JSONL and standalone HTML reports.
+
+```bash
+saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
+```
+
+Weights load only with explicit `--real`. See the [M3 Benchmark documentation](docs/M3_UNIFIED_BENCHMARK.md)
+for metric definitions, original-paper adapters and validation boundaries.
+
+---
+
 ## 📚 Documentation
 
 [API Reference](docs/API.md) · [Getting Started](docs/PHASE_A.md) · [Feature Interventions](docs/PHASE_B.md) · [Research Integrations](docs/PHASE_C.md) · [Changelog](CHANGELOG.md)
