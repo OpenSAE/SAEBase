@@ -101,6 +101,9 @@ saebase-benchmark --config conf/benchmark/p0_small.json --report-only
 
 ## 🧠 支持的模型与 SAE
 
+阶段 A 扩展至六个覆盖 **270M–8B** 的代表性模型与 SAE 组合，包括 Qwen3.5-2B。实际权重验收要求与最新状态请查看 [Phase A Model Coverage](docs/phase-a-model-coverage.md)。已注册不等于真实权重验证通过。
+
+
 SAEBase 注册了多种模型和 SAE 配置，但**注册成功不代表真实权重已经通过验证**。正式发布的真实验收范围为：
 
 | 模型 | 验证的激活位置 | 已执行的真实 SAE checkpoint |
