@@ -31,12 +31,16 @@ def load_sae_lens(
     release: str,
     sae_id: str,
     device: str | None = None,
+    converter: Any | None = None,
 ) -> tuple[Any, dict, Any]:
     SAE = import_sae_lens().SAE
     dev = device or require_cuda()
     legacy = getattr(SAE, "from_pretrained_with_cfg_and_sparsity", None)
     loader = legacy if callable(legacy) else SAE.from_pretrained
-    out = loader(release=release, sae_id=sae_id, device=dev)
+    kwargs = {"release": release, "sae_id": sae_id, "device": dev}
+    if converter is not None:
+        kwargs["converter"] = converter
+    out = loader(**kwargs)
     if isinstance(out, tuple):
         if not out:
             raise RuntimeError(f"SAE loader returned an empty tuple for {release}/{sae_id}")
@@ -209,6 +213,28 @@ def resolve_hook_name(sae: Any, profile: SAEProfile, layer: int) -> str:
     return profile.hook_name(layer)
 
 
+def _phase_a_sae_lens_source(profile: SAEProfile, layer: int) -> tuple[str, str, str | None]:
+    """Resolve exact public SAE source paths independently of SAELens release aliases.
+
+    The official Gemma Scope 2 SAEs use config.json + params.safetensors,
+    and Llama Scope uses hyperparams.json + checkpoints/final.safetensors.
+    SAELens' named release directory may lag the public repositories.
+    """
+    if profile.key in {"gemma270m_scope_resid", "gemma1b_scope_resid"}:
+        return (
+            str(profile.repo_id),
+            f"resid_post/{profile.sae_id(layer)}",
+            "gemma_3_sae_huggingface_loader",
+        )
+    if profile.key == "llama31_8b_lxr_8x":
+        return (
+            str(profile.repo_id),
+            profile.sae_id(layer),
+            "llama_scope_sae_huggingface_loader",
+        )
+    return profile.sae_release, profile.sae_id(layer), None
+
+
 def load_sae_for_profile(
     sae_key: str,
     layer: int,
@@ -221,10 +247,16 @@ def load_sae_for_profile(
     folder = profile.sae_folder(layer)
 
     if profile.loader == "sae_lens":
+        source_release, source_id, converter_name = _phase_a_sae_lens_source(profile, layer)
+        converter = None
+        if converter_name is not None:
+            from sae_lens.loading import pretrained_sae_loaders
+            converter = getattr(pretrained_sae_loaders, converter_name)
         sae, cfg_dict, sparsity = load_sae_lens(
-            release=profile.sae_release,
-            sae_id=sae_id,
+            release=source_release,
+            sae_id=source_id,
             device=dev,
+            converter=converter,
         )
         hook_name = resolve_hook_name(sae, profile, layer)
         meta: dict[str, Any] = {
@@ -234,6 +266,8 @@ def load_sae_for_profile(
             "layer": layer,
             "sae_release": profile.sae_release,
             "sae_id": sae_id,
+            "resolved_source_release": source_release,
+            "resolved_source_sae_id": source_id,
             "hook_name": hook_name,
             "hook_note": (
                 profile.hook_note.replace("{L}", str(layer))
