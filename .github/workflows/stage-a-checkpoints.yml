@@ -44,6 +44,7 @@ jobs:
       MKL_NUM_THREADS: '2'
       TOKENIZERS_PARALLELISM: 'false'
       HF_HUB_DISABLE_TELEMETRY: '1'
+      SAEBASE_STAGE_A_DEBUG: '1'
       HF_HOME: ${{ github.workspace }}/.hf-cache
     steps:
       - uses: actions/checkout@v7
