@@ -2,7 +2,6 @@
 
 This page preserves detailed technical contracts and verification context. For current product-facing coverage, see [Validation and Reproducibility](validation.md) and [Documentation Home](index.md).
 
-
 ## Scope
 
 Baseline: `SAEBase_Phase_B_Ready.zip`. research integrations adds two research integrations

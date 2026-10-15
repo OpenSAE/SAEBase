@@ -2,10 +2,7 @@
 
 For the main research workflow, see [Documentation Home](index.md). The original checkpoint and experimental schema identifiers remain stable for compatibility.
 
-
-release validation completes SAEBase's initial release roadmap. The release matrix checks genuine public
-model and SAE weights, deterministic activation storage/interventions/benchmark execution and an reliability reliability
-audit. It does **not** combine unrelated metrics into a single SAE quality
+The public release matrix verifies genuine model and SAE weights together with deterministic activation capture, intervention measurements, benchmarking and a reliability audit. It does **not** combine unrelated metrics into a single SAE quality
 number or constitute a large-scale scientific comparison.
 
 ## Validated release matrix
@@ -42,7 +39,7 @@ The dry-run downloads nothing. The real run requires network access and
 sufficient RAM. The same GitHub Actions test also reruns in `--resume`
 mode and validates read-only reports without repeating model forwards.
 
-activation storage activations must be reused across both SAEs sharing the model/hook.
+Cached activations must be reused across both SAEs sharing the model/hook.
 interventions measurements retain identity-bound original shards, and benchmark/reliability reports
 keep distinct per-metric values and prompt-group uncertainty.
 The release verifier compares two model families, ≥2 SAE hashes per model,
@@ -61,7 +58,7 @@ synthetic model tests are labeled `synthetic_test`, never `passed`.
 - CPU or CUDA can be selected explicitly; reported performance refers to the
   specific hardware, prompt set, batch schedule and installed dependency versions.
 - The matrix records elapsed seconds per model, peak process RSS,
-  activation storage activation/code creation vs reuse, interventions batching and retries.
+  activation/code creation versus reuse, intervention batching and retries.
   Estimated time and RAM are null at preflight rather than fabricated.
 - A synthetic fault-injection test interrupts after the first family and
   resumes from previously committed activation storage/interventions shards. Real mode separately checks

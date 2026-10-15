@@ -2,12 +2,11 @@
 
 For the main research workflow, see [Documentation Home](index.md). The original checkpoint and experimental schema identifiers remain stable for compatibility.
 
-
-benchmark builds a versioned benchmark planner, a bounded activation storage/interventions orchestration layer,
+The benchmark runner provides a versioned experiment planner, bounded orchestration of activation and intervention caches,
 separate metric implementations, adapters to the *original* SAR/RSS estimators
 and provenance-checked imports for native SAEBench Core / Sparse Probing output.
 
-## Status and scientific validation
+## Numerical validation and scope
 
 Engineering implementation is distinct from numerical validation. The offline
 example proves only the synthetic execution contract. SAEBench JSON import tests
@@ -109,7 +108,7 @@ The benchmark produces no composite SAE ranking. Grouped bootstrap and synthetic
 ### Reuse across benchmark configurations
 
 Cache paths are shared under `runs/_cache/m1/` and `runs/_cache/m2/`, keyed
-by exact model/SAE/site and their activation storage/interventions identity manifests rather than benchmark
+by exact model/SAE/site and their activation-store and intervention identity manifests rather than benchmark
 metric selections. Changing the benchmark's metric set changes `run_id` but
 not these physical caches; previously committed activation rows and interventions
 interventions are reused after content and identity checks. `--no-resume`

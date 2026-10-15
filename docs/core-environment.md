@@ -2,7 +2,6 @@
 
 This page preserves detailed technical contracts and verification context. For current product-facing coverage, see [Validation and Reproducibility](validation.md) and [Documentation Home](index.md).
 
-
 ## Implemented
 
 - Restored `tasks.plugins` registration with the bundled `SAETask` and its `activation_health` evaluation.

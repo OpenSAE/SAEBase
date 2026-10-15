@@ -2,13 +2,10 @@
 
 For the main research workflow, see [Documentation Home](index.md). The original checkpoint and experimental schema identifiers remain stable for compatibility.
 
-
-reliability is the reliability layer on top of benchmark, not another SAE benchmark.
-We distinguish an benchmark metric's point estimate from uncertainty about that
-metric and from validity against known ground truth. All audit outputs are
+Reliability auditing evaluates already completed benchmark measurements instead of defining another SAE score. It distinguishes a metric's point estimate from its uncertainty and from its validity against known ground truth. All audit outputs are
 versioned and are explicitly linked to the unchanged benchmark metric manifest.
 
-## reliability: evaluation stability and paired confidence intervals
+## Evaluation stability and paired confidence intervals
 
 A stable `saebase-audit` entrypoint accepts a previously completed benchmark run.
 For example:
@@ -59,7 +56,7 @@ Supported raw observation families in the initial reliability stage:
   checks source identities, sample/condition and each benchmark measurement reference.
 - For `core.reconstruction_mse`, `core.fvu` and
   `core.explained_variance`, `--sae-only` explicitly loads the frozen SAE
-  checkpoint and decodes activation storage activations/codes **without a model forward**.
+  checkpoint and decodes cached activations and codes **without a language-model forward**.
   Full decoder weight SHA-256 is checked against benchmark provenance.
 - Other scalar-only benchmark result families without subgroup data are explicitly
   labeled `unsupported`, not assigned synthetic uncertainty.
@@ -75,7 +72,7 @@ The real Pythia smoke exercises three published reference validation reference p
 Three prompt groups are sufficient to validate engineering behavior but
 not to claim narrow, generalizable population confidence intervals.
 
-## ground-truth: known truth, controllable degradation and negative controls
+## Known truth, controllable degradation and negative controls
 
 ground-truth adds deterministic independent synthetic controls. The tests never
 represent the training of actual published SAE checkpoints. The fixture

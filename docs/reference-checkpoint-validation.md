@@ -2,11 +2,7 @@
 
 For the main research workflow, see [Documentation Home](index.md). The original checkpoint and experimental schema identifiers remain stable for compatibility.
 
-
-This is the foundation gate for SAEBase v0.2. **reference validation does not implement the initial release
-activation store or the batch intervention engine.** It restores the clean
-installation contract and introduces a real-model numerical reference for
-future activation storage/interventions comparisons.
+This reference experiment established a clean installation contract and a numerical baseline with genuine public model and SAE weights. The shipped Activation Store and intervention engine use this frozen checkpoint reference to verify compatibility; their implementation and acceptance are documented separately.
 
 ## 1. Dependency and package boundaries
 
@@ -15,7 +11,7 @@ future activation storage/interventions comparisons.
 | Core | `python -m pip install -e .` | `saebase-check-env --mode core`, CLI, Python API imports |
 | Development | `python -m pip install -e ".[dev]"` | Core checks, `python -m pytest -q`, wheel install test |
 | Analysis | `python -m pip install -e ".[analysis]"` | `saebase-check-env --mode analysis`, check `sae_lens`, `transformer_lens`, `huggingface_hub`, `safetensors` imports |
-| Generation | `python -m pip install -e ".[generation]"` | Experimental GPU backend; not an reference validation acceptance requirement |
+| Generation | `python -m pip install -e ".[generation]"` | Experimental GPU backend; not required for the reference checkpoint acceptance |
 
 `huggingface_hub` and `safetensors` are imported only when the loader actually
 requires the corresponding remote checkpoint. Core use and offline tests no

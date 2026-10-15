@@ -2,7 +2,6 @@
 
 This page preserves detailed technical contracts and verification context. For current product-facing coverage, see [Validation and Reproducibility](validation.md) and [Documentation Home](index.md).
 
-
 public API adds a common read, edit and replay interface for model activations and
 SAE features. It runs on a registered pretrained SAE or a user-supplied SAE.
 The core `saebase/sae/` implementation from core setup remains available.
@@ -151,9 +150,7 @@ existing core setup evaluation metric definitions are preserved.
   missing capabilities, SAE metadata, biased-decoder residual preservation,
   identity replay, and downstream changes.
 - The offline example is executed as an additional end-to-end smoke test.
-- The actual Pythia-70M pretrained model/SAE integration remains an external
-  acceptance test pending a Python environment with the model dependencies
-  and published checkpoint access.
+- The real Pythia-70M model/SAE integration has been exercised in separate published acceptance workflows. Current verified model coverage is documented in [Model Support](model-support.md).
 
 Standard check:
 
@@ -169,10 +166,10 @@ python examples/06_public_api_pythia.py
 bash scripts/phase_a_smoke.sh
 ```
 
-## Phase boundary
+## API boundaries
 
 public API focuses on shared model capability, provenance, positions and
 activation/SAE interventions. It does not alter SAR or RSS estimators,
 archive-specific missing research tasks, model training or GPU generation
 integration. Model-specific NNsight / vLLM intervention capabilities are kept
-separate for later verification.
+separate from the CPU-verified release scope.

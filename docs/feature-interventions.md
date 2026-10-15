@@ -2,11 +2,7 @@
 
 For the main research workflow, see [Documentation Home](index.md). The original checkpoint and experimental schema identifiers remain stable for compatibility.
 
-
-interventions adds a bounded measurement engine on top of the **reference validation verified real model**
-and **activation storage Activation Store**. It is the second implementation milestone of
-SAEBase v0.2, *not* a unified benchmark suite or a claim of causal explanations
-from a single intervention.
+The intervention engine builds on verified model/SAE adapters and the resumable **Activation Store**. It supports bounded feature-edit measurements and downstream readouts; a single intervention alone does not establish a complete causal explanation.
 
 ## Quickstart (offline, no downloads)
 
@@ -116,7 +112,7 @@ is supplied. `read_results()` verifies committed JSONL shard hashes.
 - An activation storage raw activation reader can bypass repeated activation capture. An activation storage
   SAE code reader additionally bypasses encoding. Source-activation digests,
   checkpoint SHA-256 and sample/position IDs must all match. **New logits
-  forwards are still required for causal patch experiments**; activation storage caching
+  forwards are still required for causal patch experiments**; activation caching
   does not eliminate the downstream network computation.
 - For CPU real-checkpoint batched GEMMs, floating-point kernel order may
   produce small differences from a single-example forward. Report the maximum
@@ -177,11 +173,11 @@ public Pythia-70M and the `pythia70m_resid_sm` SAE and verifies:
 
 1. Exact loaded model and SAE full state digests from the [reference validation real fixture](../tests/fixtures/m0_reference_public.json).
 2. reference validation activation probes and SAE activation sparsity.
-3. activation storage activation/code caches and feature IDs in a real run.
+3. Reused activation/code caches and selected feature IDs with real weights.
 4. A strict native, same-batch identity check (<=1e-4 maximum per-logit
    absolute error), independently of activation storage's cached activation representation.
 5. All seven interventions conditions in a **real multi-prompt batch**.
-6. Numerical comparison between the interventions batch result and the existing
+6. Numerical comparison between the batched intervention result and the existing
    single-prompt `evaluate_edit` reference.
 7. Zero model forward calls on a fully committed result resume.
 8. Actual greedy 2-token continuation with and without feature ablation.
@@ -214,7 +210,7 @@ verifying the final real-model artifacts and full GitHub CI.
 
 The real run loaded the matching Pythia-70M and registered SAE full-state
 SHA-256 digests, checked the saved reference validation activation probes under reference validation's recorded
-relative/absolute tolerance, and used activation storage activation and full SAE code caches.
+relative/absolute tolerance, and used cached activations and full SAE codes.
 
 The run evaluated **3 real prompts × 7 conditions = 21 measurements**,
 performed **1 baseline batch and 4 patch batches**, then successfully resumed
@@ -241,5 +237,4 @@ gave a logit-delta L2 difference of **0.0052185059**, inside the explicit
 steering continuation using Pythia. This verifies execution, not behavior
 improvement or interpretability claims.
 
-The interventions work is part of SAEBase v0.2 development. **benchmark benchmarks, reliability reliability
-audits and release validation release acceptance remain future milestones.**
+The shipped SAEBase release integrates these feature interventions with the benchmark runner and reliability audits. The intervention controls remain explicitly separate from full SAE reconstruction replacement and from claims about improvement in model behavior.

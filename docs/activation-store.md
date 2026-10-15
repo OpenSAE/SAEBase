@@ -2,11 +2,7 @@
 
 For the main research workflow, see [Documentation Home](index.md). The original checkpoint and experimental schema identifiers remain stable for compatibility.
 
-
-activation storage is the first implementation milestone of SAEBase v0.2. It provides a
-sharded, resumable local store of **raw activations** and **separately keyed,
-lossless SAE feature codes**. It does not implement the batch intervention,
-benchmark runner, or reliability audit planned for interventions–reliability.
+The Activation Store provides a sharded, resumable local store of **raw activations** and **separately keyed, lossless SAE feature codes**. Those cached measurements can now be reused by the intervention engine, benchmark runner and reliability analysis.
 
 ## Quickstart
 
@@ -17,11 +13,11 @@ python -m pytest -q tests/test_m1_store.py
 ```
 
 The example is synthetic, with no model downloads. A real, opt-in Pythia
-acceptance run is defined in `.github/workflows/m1-real.yml`, which checks the **frozen real reference validation reference** in
+acceptance run is defined in `.github/workflows/m1-real.yml`, which checks the **frozen real checkpoint reference** in
 `tests/fixtures/m0_reference_public.json` against live loaded checkpoint
 weights and activations. The fixture was copied byte-for-byte from the
 successful [reference validation run](https://github.com/OpenSAE/SAEBase/actions/runs/38634372619),
-so future activation storage reruns do not depend on an expiring Actions artifact.
+so subsequent activation-cache acceptance runs do not depend on an expiring Actions artifact.
 
 ## Python API
 
@@ -152,7 +148,7 @@ caller then recaptures only missing samples. This is not silent data repair.
 
 `max_quantization_error` is an **absolute activation error in model units**.
 Low-precision caches must separately demonstrate acceptable downstream metric
-error before use in a publication. activation storage's reference storage remains FP32.
+error before use in a publication. The verified reference cache uses FP32.
 
 ### Reproducibility and release boundary
 
@@ -167,14 +163,14 @@ error before use in a publication. activation storage's reference storage remain
   and publishes a `m1_reference.json` artifact. Never label the job passed
   until its real-model step and the numeric checks have succeeded.
 - User prompts, activations, checkpoint weights and local cache files should
-  not be committed to the source repository. The activation storage acceptance report contains
+  not be committed to the source repository. The activation-store acceptance report contains
   only digests, sample counts, error measures and aggregate statistics.
 
-The data format is **versioned as v1**. A future format upgrade must provide
+The stored data format is **versioned as v1**. A future format upgrade must provide
 an explicit migration; silently interpreting older shards with new semantics
 is not allowed.
 
-## activation storage streaming-size acceptance
+## Streaming-size acceptance
 
 An additional offline acceptance ran 4,096 samples of 512-dimensional FP32
 activations (8,388,608 raw numeric bytes), split into 128 shards using a 64 KiB
@@ -183,16 +179,16 @@ writer buffer target. The observed pending numeric buffer never exceeded
 the reader retained at most two shard memory maps. This is an engineering
 I/O check on synthetic arrays, not a claim about GPU forward throughput.
 
-## activation storage verified release acceptance — October 14, 2026
+## Verified release acceptance — October 14, 2026
 
-activation storage is now **accepted** as the resumable local Activation Store foundation for the v0.2 roadmap. This records evidence from the actual `main` branch, not from synthetic tests alone.
+The resumable Activation Store has been accepted and shipped as part of SAEBase v0.2.0. This records evidence from the actual `main` branch, not from synthetic tests alone.
 
 | Gate | Evidence | Result |
 | --- | --- | --- |
 | Offline regression | [main CI run #38642950680](https://github.com/OpenSAE/SAEBase/actions/runs/38642950680), Python 3.11 and 3.12 | Passed |
 | Analysis dependencies | Same clean GitHub Actions CI, separate `analysis-install` job | Passed |
 | Wheel and sdist | Same CI, `package` job | Passed |
-| Real pretrained checkpoint | [real activation storage run #38642950452](https://github.com/OpenSAE/SAEBase/actions/runs/38642950452), public Pythia-70M + registered pretrained SAE | Passed |
+| Real pretrained checkpoint | [real activation-store run #38642950452](https://github.com/OpenSAE/SAEBase/actions/runs/38642950452), public Pythia-70M + registered pretrained SAE | Passed |
 | Original reference comparison | [reference validation fixture](../tests/fixtures/m0_reference_public.json), same model/SAE full-state SHA-256 and stored activation probes | Passed |
 | Resume and SAE code reuse | Actual real-model artifact, zero model calls during resumed capture/SAE code encoding | Passed |
 
@@ -208,4 +204,4 @@ The [real-model artifact](https://github.com/OpenSAE/SAEBase/actions/runs/386429
 
 The code also has tested crash recovery, sparse/dense round-trip, precision errors, identity invalidation, and deliberate corrupted-shard rejection. A separate local synthetic streaming test processed 4,096 activation samples with bounded pending data and two active memory maps. Neither test implies that all future model/SAE/checkpoint combinations are already supported.
 
-The authoritative release is the merged source at [OpenSAE/SAEBase](https://github.com/OpenSAE/SAEBase) (merge commit `88248988b33a1379a8db8012e24e6ebca27d6282`). interventions batch interventions, benchmark benchmark runner and reliability reliability audit remain separate milestones.
+The [current SAEBase release](https://github.com/OpenSAE/SAEBase/releases) integrates the verified Activation Store with batch interventions, benchmark metrics and reliability audits. The historical merge commit `88248988b33a1379a8db8012e24e6ebca27d6282` documents the original storage acceptance.

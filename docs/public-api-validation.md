@@ -2,7 +2,6 @@
 
 This page preserves detailed technical contracts and verification context. For current product-facing coverage, see [Validation and Reproducibility](validation.md) and [Documentation Home](index.md).
 
-
 **Source baseline:** `SAEBase_Phase_A_Ready.zip`, kept as an unchanged source artifact.
 
 ## Work completed
