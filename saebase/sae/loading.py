@@ -258,6 +258,28 @@ def load_sae_for_profile(
             device=dev,
             converter=converter,
         )
+        # Direct Llama-Scope repository IDs are not in older SAE Lens release
+        # directories, so its upstream norm-scaling lookup returns None.
+        # Recover the *published* expected activation norm from hyperparams.
+        # The native loader already scales the JumpReLU threshold by the same
+        # factor; fold only W_enc/W_dec/b_dec to match raw HF/TransformerLens h.
+        if profile.key == "llama31_8b_lxr_8x" and cfg_dict.get(
+            "normalize_activations"
+        ) == "expected_average_only_in":
+            import math
+            from huggingface_hub import hf_hub_download
+            params = hf_hub_download(
+                repo_id=source_release,
+                filename=f"{source_id}/hyperparams.json",
+            )
+            original = json.loads(Path(params).read_text(encoding="utf-8"))
+            mean_norm = float(original["dataset_average_activation_norm"]["in"])
+            scaling = math.sqrt(float(sae.cfg.d_in)) / mean_norm
+            if not math.isfinite(scaling) or scaling <= 0:
+                raise ValueError("invalid published Llama Scope input activation norm")
+            sae.fold_activation_norm_scaling_factor(scaling)
+            cfg_dict["normalize_activations"] = "none"
+            cfg_dict["saebase_activation_norm_folded"] = scaling
         hook_name = resolve_hook_name(sae, profile, layer)
         meta: dict[str, Any] = {
             "sae_key": profile.key,
