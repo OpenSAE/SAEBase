@@ -9,11 +9,11 @@ Real checks ran on GitHub-hosted CPU with original public SAE checkpoints. These
 | Gemma 3 270M | Passed, 65,536 features | Blocked | Gated model returned HTTP 401, missing authorized `HF_TOKEN` |
 | Gemma 3 1B | Passed, 16,384 features | Blocked | Gated model returned HTTP 401, missing authorized `HF_TOKEN` |
 | Gemma 2 2B | Passed, 16,384 features | Blocked | Gated model returned HTTP 401, missing authorized `HF_TOKEN` |
-| Qwen3.5 2B Base | Passed, 32,768 features | **Passed** | Real model/SAE capture, reconstruction and identity patch |
+| Qwen3.5 2B Base | Passed, 32,768 features | **Passed** | Real model/SAE capture, reconstruction, identity patch and active feature ablation |
 | Qwen3 8B Base | Passed, 65,536 features | Not yet run | No connected high-memory GPU runner |
 | Llama 3.1 8B Base | Passed, 32,768 features | Not yet run | Meta model gated, no connected high-memory GPU runner |
 
-Proof: [Qwen3.5 real model and SAE artifact](https://github.com/OpenSAE/SAEBase/actions/runs/38822802463/artifacts/12013997427), [SAE-only six-checkpoint results](https://github.com/OpenSAE/SAEBase/actions/runs/38824111301), [real Gemma access failures](https://github.com/OpenSAE/SAEBase/actions/runs/38822802463). Full provenance and checkpoints are recorded in [phase_a_targets.json](../conf/release/phase_a_targets.json). The SAE-only status is separate from full model validation.
+Proof: [Qwen3.5 real model and feature-ablation artifact](https://github.com/OpenSAE/SAEBase/actions/runs/38824111274/artifacts/12014521241), [SAE-only six-checkpoint results](https://github.com/OpenSAE/SAEBase/actions/runs/38824111301), [real Gemma access failures](https://github.com/OpenSAE/SAEBase/actions/runs/38822802463). Full provenance and checkpoints are recorded in [phase_a_targets.json](../conf/release/phase_a_targets.json). The SAE-only status is separate from full model validation.
 
 The Gemma models require accepting upstream access terms and then adding an appropriately authorized Hugging Face token as the `HF_TOKEN` GitHub Actions secret. For both 8B models, connect a GPU runner with sufficient VRAM, then invoke [Phase A real checkpoint workflow](../.github/workflows/phase-a-real.yml) with the appropriate model and CUDA device. Do not promote any pair to Verified until its original weight/activation/feature-patch evidence JSON says `status=passed`.
 
