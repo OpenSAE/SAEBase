@@ -7,7 +7,7 @@
 <p align="center">
   <a href="#-快速上手"><b>🚀 快速上手</b></a> &nbsp; | &nbsp;
   <a href="#-公共-python-api"><b>🔬 Python API</b></a> &nbsp; | &nbsp;
-  <a href="#-研究项目接入"><b>🧩 SAR 与 RSS</b></a> &nbsp; | &nbsp;
+  <a href="#-研究项目接入"><b>🧩 研究集成</b></a> &nbsp; | &nbsp;
   <a href="#-文档"><b>📚 文档</b></a>
 </p>
 
@@ -40,7 +40,7 @@ flowchart LR
 - 🎛️ **特征干预与 Steering。** 支持 identity、ablation、scaling、clamping、addition、coalition、完整重构对照和批量下游输出测量；特征编辑可保留原始重构残差。
 - 📊 **SAE Benchmark。** 分别评估 L0、重构 MSE、FVU/解释方差、目标 token 损失、logits/KL 变化及不同干预条件的行为指标。
 - 📈 **统计可靠性。** 基于 prompt group 的 Bootstrap、配对 SAE 比较、置信区间、样本量敏感性、排名稳定性及已知真值/负对照。
-- 🧩 **研究指标接入。** 调用原始 [SAR](https://github.com/OpenSAE/SAE-Behavioral-Compositionality)、[RSS](https://github.com/OpenSAE/Redistribution-Sensitivity-Score) 估计器，并验证来自原生 SAEBench 的结果。
+- 🧩 **研究指标接入。** 支持 [输入局部性分析（Localize）](https://github.com/OpenSAE/SAE-Input-Localization)，并调用原始 [SAR](https://github.com/OpenSAE/SAE-Behavioral-Compositionality)、[RSS](https://github.com/OpenSAE/Redistribution-Sensitivity-Score) 估计器，并验证来自原生 SAEBench 的结果。
 - ⚙️ **实验可复现性。** 资源预检、精确缓存身份、中断恢复、来源与模型权重哈希，以及 JSONL/JSON、CSV、HTML 报告。
 
 ---
@@ -185,7 +185,7 @@ SAEBase 提供公共模型操作；各研究项目保留自身的原始指标定
 | :--- | :--- | :--- |
 | 🧩 **[SAR — 行为组合性](https://github.com/OpenSAE/SAE-Behavioral-Compositionality)** | 提取特征贡献、执行 Coalition 编辑、调用未经改写的 SAR 估计器。 | [SAR 示例](examples/07_sar_via_saebase.py) |
 | 🔀 **[RSS — 表征重分布](https://github.com/OpenSAE/Redistribution-Sensitivity-Score)** | 分别提取 Clean、Selection、Held-out 数据，调用未经改写的 RSS 估计器。 | [RSS 示例](examples/08_rss_via_saebase.py) |
-| 📊 **[SAEBench](https://github.com/adamkarvonen/SAEBench)** | 将选定的原生 Core/Sparse Probing 结果与模型、SAE 身份和上游 commit 对齐后导入。 | [Benchmark 文档](docs/benchmarking.md) |
+| 🧭 **[Input Localization](https://github.com/OpenSAE/SAE-Input-Localization)** | 在完整受控输入网格上采集或复用 SAE 激活，并调用原始 Localize 算法计算最优 Input Scope Curve。 | [Localize 示例](examples/15_input_localization_via_saebase.py) |\n| 📊 **[SAEBench](https://github.com/adamkarvonen/SAEBench)** | 将选定的原生 Core/Sparse Probing 结果与模型、SAE 身份和上游 commit 对齐后导入。 | [Benchmark 文档](docs/benchmarking.md) |
 
 ```bash
 python examples/07_sar_via_saebase.py --paper-dir /path/to/SAR-repo
