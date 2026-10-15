@@ -15,6 +15,10 @@ The first GPT-2 SAE was released by [jbloom](https://huggingface.co/jbloom/GPT2-
 
 The verified release matrix has six distinct prompts per model. It checks compatibility, exact state SHA-256 and downstream measurement integrity, not broad ranking or interpretability quality.
 
+## Phase A 270M–8B expansion
+
+Six candidate model/SAE pairs are now tracked in [Phase A Model Coverage](phase-a-model-coverage.md), including the newly registered Qwen3.5-2B Base + Qwen-Scope 32K SAE. Their real-checkpoint status must be derived from individual acceptance run artifacts, not from registry presence.
+
 ## Registered configurations and optional models
 
 Additional model and SAE profiles exist for Pythia, Gemma, Llama and other families. Their availability in `saebase.sae.registry` or Hydra configurations should not be read as evidence that every checkpoint was downloaded, that every hook was tested, or that results are comparable across training/data protocols.

@@ -27,6 +27,7 @@ from models.pythia70m.pythia70m import SPEC as PYTHIA70M_SPEC
 from models.qwen3_8b.qwen3_8b import SPEC as QWEN3_8B_SPEC
 from models.qwen3_1_7b.qwen3_1_7b import SPEC as QWEN3_1_7B_SPEC
 from models.qwen35_4b.qwen35_4b import SPEC as QWEN35_4B_SPEC
+from models.qwen35_2b.qwen35_2b import SPEC as QWEN35_2B_SPEC
 from models.r1_distill_qwen15b.r1_distill_qwen15b import SPEC as R1_DISTILL_QWEN15B_SPEC
 from models.r1_distill_llama8b.r1_distill_llama8b import SPEC as R1_DISTILL_LLAMA8B_SPEC
 from models.qwen35_9b.qwen35_9b import SPEC as QWEN35_9B_SPEC
@@ -53,6 +54,7 @@ _BASE_SPECS: dict[str, BaseModelSpec] = {
     QWEN3_8B_SPEC.key: QWEN3_8B_SPEC,
     QWEN3_1_7B_SPEC.key: QWEN3_1_7B_SPEC,
     QWEN35_4B_SPEC.key: QWEN35_4B_SPEC,
+    QWEN35_2B_SPEC.key: QWEN35_2B_SPEC,
     GEMMA2_9B_PT_SPEC.key: GEMMA2_9B_PT_SPEC,
     GEMMA2_9B_IT_SPEC.key: GEMMA2_9B_IT_SPEC,
     GEMMA3_12B_PT_SPEC.key: GEMMA3_12B_PT_SPEC,
@@ -227,22 +229,24 @@ _PROFILES: dict[str, SAEProfile] = {
     "gemma270m_scope_resid": SAEProfile(
         key="gemma270m_scope_resid",
         model_key="gemma270m",
-        sae_release="gemma-scope-2-270m-pt-res",
+        sae_release="gemma-scope-2-270m-pt-resid_post",
         layers=(5, 9, 12),
         hook_kind="hook_resid_post",
         loader="sae_lens",
         sae_id_template="layer_{L}_width_65k_l0_medium",
         notes="Gemma Scope 2 residual SAEs (65k, l0 medium).",
+        repo_id="google/gemma-scope-2-270m-pt",
     ),
     "gemma1b_scope_resid": SAEProfile(
         key="gemma1b_scope_resid",
         model_key="gemma1b",
-        sae_release="gemma-scope-2-1b-pt-res",
+        sae_release="gemma-scope-2-1b-pt-resid_post",
         layers=(7, 13, 17),
         hook_kind="hook_resid_post",
         loader="sae_lens",
         sae_id_template="layer_{L}_width_16k_l0_medium",
         notes="Gemma Scope 2 residual SAEs (16k, l0 medium).",
+        repo_id="google/gemma-scope-2-1b-pt",
         trained_on_model_key="gemma1b",
         target_model_key="gemma1b",
         transfer_kind="none",
@@ -385,6 +389,18 @@ _PROFILES: dict[str, SAEProfile] = {
         notes="Llama-Scope 8x residual (32k, TopK≈50) at ~25/50/65/85%.",
         repo_id="OpenMOSS-Team/Llama3_1-8B-Base-LXR-8x",
         hook_note="blocks.{L}.hook_resid_post (post-MLP residual)",
+    ),
+    "qwen35_2b_resid_w32k": SAEProfile(
+        key="qwen35_2b_resid_w32k",
+        model_key="qwen35_2b",
+        sae_release="Qwen/SAE-Res-Qwen3.5-2B-Base-W32K-L0_50",
+        layers=(6, 12, 15, 20),
+        hook_kind="hook_resid_post",
+        loader="qwen_resid_topk",
+        sae_id_template="layer{L}.sae.pt",
+        notes="Official Qwen Scope 3.5 2B, 32k TopK-50 residual SAEs; pending end-to-end real-model verification.",
+        repo_id="Qwen/SAE-Res-Qwen3.5-2B-Base-W32K-L0_50",
+        hook_note="blocks.{L}.hook_resid_post",
     ),
     "qwen3_8b_resid_w64k": SAEProfile(
         key="qwen3_8b_resid_w64k",
@@ -659,6 +675,7 @@ DEFAULT_SAE_FOR_MODEL: dict[str, str] = {
     "llama31_8b": "llama31_8b_lxr_8x",
     "llama31_8b_instruct": "llama31_8b_instruct_andyrdt_l19_k64",
     "qwen3_8b": "qwen3_8b_resid_w64k",
+    "qwen35_2b": "qwen35_2b_resid_w32k",
     "qwen3_1_7b": "qwen3_1_7b_ak_resid_l14_65k",
     "qwen35_4b": "qwen35_4b_matryoshka_l15_65k",
     "gemma2_9b_pt": "gemma2_9b_pt_scope_resid",

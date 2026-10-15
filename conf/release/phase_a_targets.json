@@ -1,0 +1,87 @@
+{
+  "schema": "saebase.phase_a.targets.v1",
+  "status": "configured_pending_real_checkpoint_acceptance",
+  "description": "Six model/SAE pair targets. These are candidate checkpoints, not claims of completed real-model validation.",
+  "acceptance": {
+    "prompts": 3,
+    "strict_identity_patch_max_abs_logit_error": 0.01,
+    "requires": [
+      "actual_model_weights",
+      "actual_sae_weights",
+      "activation_capture",
+      "dimension_checks",
+      "finite_reconstruction",
+      "identity_patch",
+      "full_loaded_state_SHA256",
+      "run_artifact"
+    ]
+  },
+  "targets": [
+    {
+      "key": "gemma270m",
+      "parameters": "270M",
+      "model": "google/gemma-3-270m",
+      "sae": "google/gemma-scope-2-270m-pt",
+      "profile": "gemma270m_scope_resid",
+      "layer": 5,
+      "d_in": 640,
+      "access": "Gemma model license acceptance may be required",
+      "status": "pending_real"
+    },
+    {
+      "key": "gemma1b",
+      "parameters": "1B",
+      "model": "google/gemma-3-1b-pt",
+      "sae": "google/gemma-scope-2-1b-pt",
+      "profile": "gemma1b_scope_resid",
+      "layer": 13,
+      "d_in": 1152,
+      "access": "Gemma model license acceptance may be required",
+      "status": "pending_real"
+    },
+    {
+      "key": "gemma2_2b",
+      "parameters": "2B class",
+      "model": "google/gemma-2-2b",
+      "sae": "google/gemma-scope-2b-pt-res",
+      "profile": "gemma2_2b_pt_l25_canonical",
+      "layer": 25,
+      "d_in": 2304,
+      "access": "Gemma model license acceptance may be required",
+      "status": "pending_real"
+    },
+    {
+      "key": "qwen35_2b",
+      "parameters": "2B",
+      "model": "Qwen/Qwen3.5-2B-Base",
+      "sae": "Qwen/SAE-Res-Qwen3.5-2B-Base-W32K-L0_50",
+      "profile": "qwen35_2b_resid_w32k",
+      "layer": 12,
+      "d_in": 2048,
+      "access": "Qwen SAE has separate Qwen license",
+      "status": "pending_real"
+    },
+    {
+      "key": "qwen3_8b",
+      "parameters": "8B",
+      "model": "Qwen/Qwen3-8B-Base",
+      "sae": "Qwen/SAE-Res-Qwen3-8B-Base-W64K-L0_50",
+      "profile": "qwen3_8b_resid_w64k",
+      "layer": 18,
+      "d_in": 4096,
+      "access": "SAE license may differ from base model",
+      "status": "pending_real"
+    },
+    {
+      "key": "llama31_8b",
+      "parameters": "8B",
+      "model": "meta-llama/Llama-3.1-8B",
+      "sae": "OpenMOSS-Team/Llama3_1-8B-Base-LXR-8x",
+      "profile": "llama31_8b_lxr_8x",
+      "layer": 16,
+      "d_in": 4096,
+      "access": "Meta Llama gated license",
+      "status": "pending_real"
+    }
+  ]
+}
