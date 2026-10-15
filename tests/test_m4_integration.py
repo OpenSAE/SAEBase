@@ -75,7 +75,7 @@ def test_m4_audits_verified_m3_measures_and_embeds_report(tmp_path):
     write_report(root,cfg,build_plan(cfg),rows)
     html=(root/"report.html").read_text()
     assert "M4 Reliability Audit" in html
-    assert "no model forwards" in html.lower()
+    assert "no new model forwards" in html.lower()
     assert (root/"reliability_summary.csv").exists()
     again=evaluate_m3(root,audit_cfg())
     assert again==audit
