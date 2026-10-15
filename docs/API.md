@@ -87,3 +87,12 @@ The `saebase-audit --m3-root` flag and machine-readable schema IDs remain
 unchanged for backward compatibility.
 
 [Getting Started](getting-started.md) · [Python API](python-api.md) · [Documentation Index](index.md)
+
+## Controlled input designs
+
+- `saebase.data.BinaryFactor` and `ControlledInputDesign` define an ordered complete binary input grid.
+- `collect_controlled_input_activations` captures its existing SAEBase `SampleRecord` objects and writes a checked state-to-sample sidecar.
+- `load_controlled_input_manifest` restores a verified input-design manifest.
+- `saebase.integrations.collect_localization_grid(..., design=...)` and `localization_grid_from_code_store(..., manifest=...)` supply frozen code grids to `evaluate_localization`.
+
+See [Controlled Input Designs](controlled-inputs.md).
