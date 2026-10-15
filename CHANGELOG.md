@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- **Input Localization integration:** capture or reuse complete Boolean input grids of SAE codes, delegate optimal scope curves and optional paired estimates to the original independent Localize implementation, and provide an offline example and tests.
+- **Documentation:** add Localize to the English/Chinese research integration overview and examples index. 
+
 ## 0.2.0 — Reproducible SAE Evaluation, Interventions, and Reliability
 
 - **Activation storage:** identity-bound sharded activation and dense/CSR code stores, with independently verified inputs and resumable execution.
