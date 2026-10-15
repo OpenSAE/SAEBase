@@ -1,0 +1,6 @@
+# @package _global_
+sae:
+  name: gpt2small_res_jb_l8
+  layer: null
+  device: cuda
+  require_prepared_prompts: true

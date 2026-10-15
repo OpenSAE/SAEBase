@@ -7,6 +7,7 @@ from typing import Literal
 
 from models.gemma1b.gemma1b import SPEC as GEMMA1B_SPEC
 from models.gemma1b_it.gemma1b_it import SPEC as GEMMA1B_IT_SPEC
+from models.gpt2small.gpt2small import SPEC as GPT2SMALL_SPEC
 from models.gemma270m.gemma270m import SPEC as GEMMA270M_SPEC
 from models.gemma2_2b_base.gemma2_2b_base import SPEC as GEMMA2_2B_BASE_SPEC
 from models.gemma2_2b_it.gemma2_2b_it import SPEC as GEMMA2_2B_IT_SPEC
@@ -35,6 +36,7 @@ LoaderKind = Literal["sae_lens", "eleutherai_topk_mlp", "qwen_resid_topk", "dict
 TransferKind = Literal["none", "base_to_instruct"]
 
 _BASE_SPECS: dict[str, BaseModelSpec] = {
+    GPT2SMALL_SPEC.key: GPT2SMALL_SPEC,
     PYTHIA70M_SPEC.key: PYTHIA70M_SPEC,
     PYTHIA410M_SPEC.key: PYTHIA410M_SPEC,
     GEMMA270M_SPEC.key: GEMMA270M_SPEC,
@@ -159,6 +161,50 @@ class SAEProfile:
 ModelProfile = SAEProfile
 
 _PROFILES: dict[str, SAEProfile] = {
+    "gpt2small_res_jb_l8": SAEProfile(
+        key="gpt2small_res_jb_l8",
+        model_key="gpt2small",
+        sae_release="gpt2-small-res-jb",
+        layers=(8,), hook_kind="hook_resid_pre", loader="sae_lens",
+        logical_sae_id="blocks.8.hook_resid_pre",
+        repo_id="jbloom/GPT2-Small-SAEs-Reformatted",
+        notes="Original GPT-2 Small layer-8 residual SAE (24,576 latents).",
+    ),
+    "gpt2small_fs_6144_l8": SAEProfile(
+        key="gpt2small_fs_6144_l8",
+        model_key="gpt2small",
+        sae_release="gpt2-small-res-jb-feature-splitting",
+        layers=(8,), hook_kind="hook_resid_pre", loader="sae_lens",
+        logical_sae_id="blocks.8.hook_resid_pre_6144",
+        repo_id="jbloom/GPT2-Small-Feature-Splitting-Experiment-Layer-8",
+        notes="Same GPT-2 layer-8 site, separately trained feature-splitting SAE (6,144 latents).",
+    ),
+    "gpt2small_fs_12288_l8": SAEProfile(
+        key="gpt2small_fs_12288_l8",
+        model_key="gpt2small",
+        sae_release="gpt2-small-res-jb-feature-splitting",
+        layers=(8,), hook_kind="hook_resid_pre", loader="sae_lens",
+        logical_sae_id="blocks.8.hook_resid_pre_12288",
+        repo_id="jbloom/GPT2-Small-Feature-Splitting-Experiment-Layer-8",
+        notes="Optional M5 extended width, same layer-8 residual site (12,288 latents).",
+    ),
+    "gpt2small_fs_24576_l8": SAEProfile(
+        key="gpt2small_fs_24576_l8",
+        model_key="gpt2small",
+        sae_release="gpt2-small-res-jb-feature-splitting",
+        layers=(8,), hook_kind="hook_resid_pre", loader="sae_lens",
+        logical_sae_id="blocks.8.hook_resid_pre_24576",
+        repo_id="jbloom/GPT2-Small-Feature-Splitting-Experiment-Layer-8",
+        notes="Optional M5 extended width, same layer-8 residual site (24,576 latents).",
+    ),
+    "pythia70m_saebench_gated_l3": SAEProfile(
+        key="pythia70m_saebench_gated_l3",
+        model_key="pythia70m",
+        sae_release="sae_bench_pythia70m_sweep_gated_ctx128_0730",
+        layers=(3,), hook_kind="hook_resid_post", loader="sae_lens",
+        logical_sae_id="blocks.3.hook_resid_post__trainer_5",
+        notes="SAEBench gated SAE checkpoint validated natively in M3; same layer as res-sm.",
+    ),
     "pythia70m_resid_sm": SAEProfile(
         key="pythia70m_resid_sm",
         model_key="pythia70m",
@@ -598,6 +644,7 @@ _PROFILES: dict[str, SAEProfile] = {
 
 # Default SAE profile for each base model (IT models use transfer/native explicitly).
 DEFAULT_SAE_FOR_MODEL: dict[str, str] = {
+    "gpt2small": "gpt2small_res_jb_l8",
     "pythia70m": "pythia70m_resid_sm",
     "pythia410m": "pythia410m_mlp_topk",
     "gemma270m": "gemma270m_scope_resid",

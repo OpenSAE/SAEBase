@@ -1,0 +1,141 @@
+name: Publish SAEBase v0.2.0 from verified real M5 acceptance
+
+# This privileged workflow runs only for a successful *push to main* real
+# matrix run, never for a PR artifact or a synthetic/manual shortcut.
+on:
+  workflow_run:
+    workflows: ["M5 real two-family checkpoint matrix acceptance"]
+    types: [completed]
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: release-saebase-v0.2.0
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      ${{ github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'push' &&
+          github.event.workflow_run.head_branch == 'main' &&
+          github.event.workflow_run.head_repository.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_SHA: ${{ github.event.workflow_run.head_sha }}
+      M5_RUN_ID: ${{ github.event.workflow_run.id }}
+      REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - name: Confirm current main and exact verified real-matrix SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$RELEASE_SHA"
+          REMOTE_HEAD="$(gh api "repos/$REPO/branches/main" --jq '.commit.sha')"
+          test "$REMOTE_HEAD" = "$RELEASE_SHA"
+          REAL_RUN="$(gh api "repos/$REPO/actions/runs/$M5_RUN_ID")"
+          echo "$REAL_RUN" | jq -e --arg sha "$RELEASE_SHA" '
+            .head_sha == $sha and .head_branch == "main" and
+            .event == "push" and .conclusion == "success"'
+      - name: Require successful standard CI on the identical source commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 90); do
+            DATA="$(gh api -X GET "repos/$REPO/actions/workflows/ci.yml/runs?head_sha=$RELEASE_SHA&branch=main&per_page=30")"
+            CI_RUN_ID="$(echo "$DATA" | jq -r '.workflow_runs[] | select(.event == "push" and .conclusion == "success") | .id' | head -n 1)"
+            if [ -n "$CI_RUN_ID" ]; then
+              echo "CI_RUN_ID=$CI_RUN_ID" >> "$GITHUB_ENV"
+              echo "CI run $CI_RUN_ID passed for $RELEASE_SHA"
+              exit 0
+            fi
+            if echo "$DATA" | jq -e '.workflow_runs[] | select(.event == "push" and .status == "completed" and .conclusion != "success")' >/dev/null; then
+              echo "Standard CI failed for source $RELEASE_SHA" >&2
+              exit 1
+            fi
+            sleep 10
+          done
+          echo "Timed out waiting for successful matching standard CI" >&2
+          exit 1
+      - name: Download genuine real-matrix evidence and CI-built distributions
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run download "$M5_RUN_ID" --repo "$REPO" \
+            --name saebase-m5-real-evidence --dir evidence
+          gh run download "$CI_RUN_ID" --repo "$REPO" \
+            --name saebase-distributions --dir dist
+          mapfile -t CANDIDATES < <(find evidence -type f -name matrix_results.json)
+          test "${#CANDIDATES[@]}" = 1
+          MATRIX_ROOT="$(dirname "${CANDIDATES[0]}")"
+          test -f "$MATRIX_ROOT/matrix_manifest.json"
+          echo "MATRIX_ROOT=$MATRIX_ROOT" >> "$GITHUB_ENV"
+          ls -l dist/
+      - name: Install pinned source's gate and inspect actual shipped archives
+        run: |
+          python -m pip install -e '.[dev]'
+          python scripts/verify_distribution.py dist
+          python scripts/check_installed_wheel.py dist
+          python -m twine check dist/*
+      - name: Run fail-closed source, model evidence, license and distribution gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          saebase-release-gate \
+            --matrix-root "$MATRIX_ROOT" \
+            --dist dist \
+            --config conf/release/m5_matrix.json \
+            --inventory conf/release/m5_asset_provenance.json \
+            --license LICENSE \
+            --commit "$RELEASE_SHA" \
+            --output release-evidence.json
+          (cd dist && sha256sum -c ../SHA256SUMS)
+          python - <<'PY'
+          import json,os
+          with open("release-evidence.json") as f:
+              record=json.load(f)
+          assert record["status"] == "passed"
+          assert record["source_commit"] == os.environ["RELEASE_SHA"]
+          assert record["gates"]["matrix"]["checkpoints"] >= 4
+          assert record["gates"]["matrix"]["families"] >= 2
+          assert record["gates"]["distributions"]["model_weights_bundled"] is False
+          print("Exact-commit release evidence confirmed")
+          PY
+      - name: Create annotated v0.2.0 tag and publish the GitHub Release
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(gh api "repos/$REPO/branches/main" --jq '.commit.sha')" = "$RELEASE_SHA"
+          if git ls-remote --tags origin refs/tags/v0.2.0 | grep -q refs/tags/v0.2.0; then
+            git fetch origin tag v0.2.0
+            test "$(git rev-list -n 1 v0.2.0)" = "$RELEASE_SHA"
+            echo "Verified existing v0.2.0 annotated tag"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a v0.2.0 -m "SAEBase v0.2.0 — verified M0–M5 release"
+            git push origin refs/tags/v0.2.0
+          fi
+          if gh release view v0.2.0 --repo "$REPO" >/dev/null 2>&1; then
+            echo "Existing release verified; refusing to overwrite existing assets"
+            gh release view v0.2.0 --repo "$REPO" --json url,tagName
+          else
+            gh release create v0.2.0 \
+              dist/opensae_saebase-0.2.0-*.whl \
+              dist/opensae_saebase-0.2.0.tar.gz \
+              release-evidence.json SHA256SUMS \
+              --repo "$REPO" --verify-tag \
+              --title "SAEBase v0.2.0 — M0–M5" \
+              --notes-file docs/M5_RELEASE_NOTES.md --latest
+          fi

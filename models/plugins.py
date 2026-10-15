@@ -10,6 +10,7 @@ from saebase.registry import register_model, register_sae
 from saebase.sae.registry import DEFAULT_SAE_FOR_MODEL, SAE_KEYS, get_profile
 
 _HOOKED_KEYS = (
+    "gpt2small",
     "pythia70m",
     "pythia410m",
     "gemma270m",

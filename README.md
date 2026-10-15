@@ -240,6 +240,26 @@ ground-truth controls, discriminability, audit status and validation limits.
 
 ---
 
+## 🚀 M5 — v0.2.0 real checkpoint matrix
+
+SAEBase validates **Pythia-70M and GPT-2 Small**, each with two independently
+fingerprinted public SAE checkpoints at the same activation site. M1–M4
+results and grouped reliability audits retain model/SAE hashes, input
+lineage and independent per-metric reports. External weights are downloaded
+only with `--real`.
+
+```bash
+saebase-release-matrix --config conf/release/m5_matrix.json --dry-run
+saebase-release-matrix --config conf/release/m5_matrix.json --real --device cpu
+```
+
+This six-prompt engineering acceptance is not a population-level SAE
+quality ranking. See [M5 methods](docs/M5_RELEASE_MATRIX.md),
+[release notes](docs/M5_RELEASE_NOTES.md) and
+[GitHub Releases](https://github.com/OpenSAE/SAEBase/releases).
+
+---
+
 ## 📚 Documentation
 
 [API Reference](docs/API.md) · [Getting Started](docs/PHASE_A.md) · [Feature Interventions](docs/PHASE_B.md) · [Research Integrations](docs/PHASE_C.md) · [Changelog](CHANGELOG.md)

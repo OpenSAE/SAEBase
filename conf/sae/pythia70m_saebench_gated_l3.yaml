@@ -1,0 +1,6 @@
+# @package _global_
+sae:
+  name: pythia70m_saebench_gated_l3
+  layer: null
+  device: cuda
+  require_prepared_prompts: true

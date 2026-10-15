@@ -1,0 +1,50 @@
+{
+  "schema":"saebase.m5.asset_provenance.v1",
+  "bundled_model_or_sae_weights":false,
+  "software_license":"Apache-2.0",
+  "third_party_assets":[
+    {
+      "key":"pythia70m",
+      "kind":"external_model",
+      "source":"https://huggingface.co/EleutherAI/pythia-70m-deduped",
+      "declared_license":"Apache-2.0",
+      "distribution":"download-on-demand; no weights bundled"
+    },
+    {
+      "key":"gpt2small",
+      "kind":"external_model",
+      "source":"https://huggingface.co/openai-community/gpt2",
+      "declared_license":"MIT",
+      "distribution":"download-on-demand; no weights bundled"
+    },
+    {
+      "key":"pythia70m_resid_sm",
+      "kind":"external_sae",
+      "source":"https://huggingface.co/ctigges/pythia-70m-deduped__res-sm_processed",
+      "declared_license":"not independently verified",
+      "distribution":"download-on-demand; no weights bundled; user must respect upstream terms"
+    },
+    {
+      "key":"pythia70m_saebench_gated_l3",
+      "kind":"external_sae",
+      "source":"https://github.com/adamkarvonen/SAEBench",
+      "declared_license":"checkpoint license not independently verified",
+      "distribution":"SAE Lens download on demand; no weights bundled"
+    },
+    {
+      "key":"gpt2small_res_jb_l8",
+      "kind":"external_sae",
+      "source":"https://huggingface.co/jbloom/GPT2-Small-SAEs-Reformatted",
+      "declared_license":"MIT",
+      "distribution":"download-on-demand; no weights bundled"
+    },
+    {
+      "key":"gpt2small_fs_6144_l8",
+      "kind":"external_sae",
+      "source":"https://huggingface.co/jbloom/GPT2-Small-Feature-Splitting-Experiment-Layer-8",
+      "declared_license":"MIT",
+      "distribution":"download-on-demand; no weights bundled"
+    }
+  ],
+  "licensing_note":"This machine-readable inventory cites external pages; it is not a legal certification of third-party assets. GitHub Releases include only SAEBase source/distributions, never model or SAE weights."
+}

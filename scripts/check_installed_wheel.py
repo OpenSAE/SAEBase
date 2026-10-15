@@ -39,11 +39,17 @@ def smoke(dist_dir: Path) -> dict[str, str]:
             [str(script), "--list"],
             [str(target / "bin" / "saebase-prepare-prompts"), "--help"],
             [str(target / "bin" / "saebase-check-env"), "--help"],
+            [str(target / "bin" / "saebase-benchmark"), "--help"],
+            [str(target / "bin" / "saebase-audit"), "--help"],
+            [str(target / "bin" / "saebase-release-matrix"), "--help"],
+            [str(target / "bin" / "saebase-release-gate"), "--help"],
             [sys.executable, "-c", (
                 "from pathlib import Path; from importlib.resources import files; "
                 "import saebase, main, conf; "
                 "from saebase.api import ModelAdapter, ActivationSite; "
                 "assert (files('conf')/'config.yaml').is_file(); "
+                "assert (files('conf')/'release'/'m5_matrix.json').is_file(); "
+                "assert (files('conf')/'release'/'m5_asset_provenance.json').is_file(); "
                 "assert (files('conf')/'sae'/'pythia70m_resid_sm.yaml').is_file(); "
                 "from main import parse_args, build_overrides; "
                 "from pathlib import Path as _P; "
