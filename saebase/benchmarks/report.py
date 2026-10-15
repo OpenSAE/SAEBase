@@ -33,6 +33,32 @@ def write_report(folder,config,plan,results,*,provenance=None):
               "<p>Each metric retains its native units and interpretation. No composite SAE score.</p>"
               f"<p>{len(rows)} metric rows. Status and failed/unsupported reasons are preserved.</p>"
               f"<div class='scroll'><table><thead><tr>{heads}</tr></thead><tbody>{body}</tbody></table></div></html>")
+    # Full exact Localize curves are stored as checksum-bound JSON artifacts.
+    # The report exposes only run-local links to verified completed results.
+    localize_refs=sorted({
+        ref for row in rows if row["status"]=="completed"
+        and row["metric_id"].startswith("localization.")
+        for ref in row.get("measurement_refs",[])
+    })
+    if localize_refs:
+        from .adapters.localization import read_localization_artifact
+        entries=[]
+        for ref in localize_refs:
+            artifact=read_localization_artifact(root,ref)
+            entries.append(
+                "<li><a href='"+html.escape(ref,quote=True)+"'>"+
+                html.escape(artifact["model_id"]+" / "+artifact["sae_id"]+
+                            " / full exact scope curve")+"</a>"+
+                " — budget @ 90%: "+str(artifact["budget_at_90pct"])+
+                ", fractional budget: "+format(artifact["budget_fraction_at_90pct"],".5g")+
+                ", features: "+str(artifact["n_features"])+
+                "</li>"
+            )
+        document=document.replace("</html>",
+            "<section><h2>Input Localization Curves</h2><p>Verified full curves, "
+            "assignments, controlled input designs and source provenance; "
+            "each result describes one complete grid, not independent input states.</p><ul>"+
+            "".join(entries)+"</ul></section></html>")
     # M4 appends a checksum-verified audit without changing existing M3 rows.
     if (root/"reliability_manifest.json").exists():
         from saebase.reliability.report import read_audit,render_audit_fragment
