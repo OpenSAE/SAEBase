@@ -34,6 +34,7 @@ _HOOKED_KEYS = (
     "gemma3_12b_pt",
     "gemma3_12b_it",
     "qwen35_9b",
+    "qwen35_2b",
     "gemma3_27b_pt",
     "gemma3_27b_it",
     "qwen35_27b",
