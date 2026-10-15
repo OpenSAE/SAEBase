@@ -228,12 +228,15 @@ def test_corrupt_curve_or_wrong_source_is_rejected(tmp_path):
     path.write_text(before)
     assert validate_external_sources(cfg, rows, root=root, localization_paper=stub) is None
 
-    class ChangedNative(NativeContract):
-        def exact_scope_curve(self, z, n_factors):
-            return super().exact_scope_curve(z, n_factors)
-
+    # A function loaded from a genuinely different source file has a new digest.
+    import importlib.util
+    source = tmp_path / "revised_localize.py"
+    source.write_text("def exact_scope_curve(z, n_factors):\\n    return None\\n")
+    spec = importlib.util.spec_from_file_location("revised_localize", source)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
     with pytest.raises(ValueError, match="estimator changed"):
-        validate_external_sources(cfg, rows, root=root, localization_paper=ChangedNative())
+        validate_external_sources(cfg, rows, root=root, localization_paper=module)
     with pytest.raises(ValueError, match="artifact reference"):
         read_localization_artifact(root, "../../arbitrary.json")
 
