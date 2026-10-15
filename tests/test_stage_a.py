@@ -131,3 +131,21 @@ def test_stage_a_probe_rejects_checkpoint_site_and_size_mismatches():
     sae.cfg.hook_name = "blocks.5.hook_resid_post"
     with pytest.raises(ValueError, match="incompatible hook"):
         probe_pair(toy, adapter, sae, prompts=("1 2 3",))
+
+
+def test_composite_text_backbone_depth_is_extracted_without_network():
+    from models.hf_logits_backend import HFLogitsModel
+    class Backbone:
+        config = SimpleNamespace(text_config=SimpleNamespace(num_hidden_layers=24))
+
+    class Tokenizer:
+        bos_token_id = 1
+        def encode(self, text, add_special_tokens=False):
+            return [2, 3]
+
+    wrapped = HFLogitsModel(
+        Backbone(), Tokenizer(),
+        model_name="Qwen/Qwen3.5-2B-Base", device="cpu",
+    )
+    assert wrapped.cfg.n_layers == 24
+    assert wrapped.to_tokens("hello").tolist() == [[1, 2, 3]]
