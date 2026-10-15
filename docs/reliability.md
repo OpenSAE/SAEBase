@@ -151,3 +151,9 @@ selection/held-out variants while keeping the truth fixed. Their raw
 seed-specific SAR1/SAR2, support, direction and persistence are retained.
 These synthetic tests are not equivalent to retraining real SAEs or fitting
 new probes on empirical datasets; that distinction is explicit.
+
+## Input Localization Reliability
+
+A complete controlled factorial grid is **one evaluation population**. Its states are not independent prompt groups, so the standard grouped bootstrap is not applied to Localize metrics. Instead, M4 runs the original paired scope estimator across independent evaluation RNG seeds using frozen cached codes and reports the observed Monte Carlo variation. Matched across-SAE differences are descriptive with no population confidence interval or quality ranking.
+
+See [Input Localization Benchmarking](localization-benchmark.md).
