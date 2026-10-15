@@ -70,6 +70,38 @@ jobs:
           assert all(group["audit_groups"]==6 for group in result["models"])
           print("M5 real four-checkpoint cross-family acceptance PASSED")
           PY
+      - name: Build candidate v0.2.0 distributions and dry-run full release gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m build
+          python -m twine check dist/*
+          python scripts/verify_distribution.py dist
+          python scripts/check_installed_wheel.py dist
+          MATRIX_ID="$(python - <<'PY'
+          from saebase.release import load_matrix
+          print(load_matrix('conf/release/m5_matrix.json').matrix_id)
+          PY
+          )"
+          saebase-release-gate \
+            --matrix-root "$RUNNER_TEMP/m5/$MATRIX_ID" \
+            --dist dist \
+            --config conf/release/m5_matrix.json \
+            --inventory conf/release/m5_asset_provenance.json \
+            --license LICENSE \
+            --commit "$GITHUB_SHA" \
+            --output "$RUNNER_TEMP/m5-release-evidence.json"
+          (cd dist && sha256sum -c "$RUNNER_TEMP/SHA256SUMS")
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          record=json.loads((Path(os.environ["RUNNER_TEMP"])/"m5-release-evidence.json").read_text())
+          assert record["status"] == "passed"
+          assert record["gates"]["matrix"]["families"] == 2
+          assert record["gates"]["matrix"]["checkpoints"] == 4
+          assert record["source_commit"] == os.environ["GITHUB_SHA"]
+          print("v0.2.0 release gate preflight PASSED (no tag created in PR)")
+          PY
       - name: Archive complete real checkpoint evidence (not weights)
         if: always()
         uses: actions/upload-artifact@v4
