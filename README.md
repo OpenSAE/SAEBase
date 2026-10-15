@@ -101,6 +101,9 @@ Real runs download the requested weights and produce `metrics.jsonl`, `summary.c
 
 ## 🧠 Model and SAE Support
 
+Phase A extends the registered coverage to six representative **270M–8B** model/SAE pairs, including Qwen3.5-2B. See [Phase A Model Coverage](docs/phase-a-model-coverage.md) for the real-checkpoint acceptance entrypoint and per-model status; only completed live checkpoint runs count as verified.
+
+
 SAEBase can register many model/SAE configurations, but **registration is not evidence of runtime validation**. The published real-checkpoint acceptance uses:
 
 | Model | Verified activation site | Real SAE checkpoints exercised |
