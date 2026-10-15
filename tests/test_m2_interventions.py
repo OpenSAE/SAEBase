@@ -359,3 +359,17 @@ def test_batched_identity_tolerance_keeps_strict_per_logit_bound(tmp_path, monke
         with pytest.raises(RuntimeError, match="identity patch mismatch"):
             eng.run(records()[:2], controls()[:1], writer,
                     sample_batch=2, microbatch=2, tolerance=0.001)
+
+def test_native_same_batch_identity_remains_strict(tmp_path):
+    m, sae, identity = context()
+    samples = records()
+    engine = BatchEngine(m, sae, identity, pad_token_id=0)
+    with ResultWriter(tmp_path, identity) as writer:
+        stat = engine.run(
+            samples, [Condition("native_identity", "identity")], writer,
+            sample_batch=3, microbatch=3, tolerance=1e-4,
+        )
+    assert stat.measured == 3
+    rows = read_results(tmp_path, identity)
+    assert len(rows) == 3
+    assert max(row["metrics"]["logit_delta_max_abs"] for row in rows) <= 1e-4

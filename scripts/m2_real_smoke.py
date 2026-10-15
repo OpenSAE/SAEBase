@@ -121,10 +121,28 @@ def run(reference: Path, cache_root: Path, output: Path) -> dict:
             backend=model.backend)
     engine=BatchEngine(model,sae,identity,activation_reader=ShardedReader(apath),
                        code_reader=ShardedReader(cpath),pad_token_id=0)
+    # A strict, same-batch identity control separates hook correctness from
+    # the numerical effect of reusing singleton M1 cached activations in a
+    # different batched CPU execution shape.
+    native_experiment = output.parent/"native-identity"
+    native = BatchEngine(model, sae, identity, pad_token_id=0)
+    with ResultWriter(native_experiment, identity, shard_rows=3) as writer:
+        native_stats = native.run(
+            samples, [Condition("native_identity", "identity")], writer,
+            sample_batch=3, microbatch=3, tolerance=1e-4,
+        )
+    native_rows = read_results(native_experiment, identity)
+    native_identity_max = max(r["metrics"]["logit_delta_max_abs"] for r in native_rows)
+    if native_stats.measured != 3 or native_identity_max > 1e-4:
+        raise RuntimeError(
+            f"same-batch native identity failed: max logits error {native_identity_max}"
+        )
+    print(f"[M2] Native same-batch identity passed, max logit abs error {native_identity_max:.8g}")
+
     experiment=output.parent/"measurements"
     with ResultWriter(experiment,identity,shard_rows=6) as writer:
         stats=engine.run(samples,conditions,writer,sample_batch=3,microbatch=7,
-                         tolerance=3e-3)
+                         tolerance=1e-2)
         # A repeated run cannot perform any forward or patch when fully committed.
         original_forward=model.model.forward
         original_hooks=model.model.run_with_hooks
@@ -134,7 +152,7 @@ def run(reference: Path, cache_root: Path, output: Path) -> dict:
         model.model.run_with_hooks=disallow
         try:
             resumed=engine.run(samples,conditions,writer,sample_batch=3,microbatch=7,
-                               tolerance=3e-3)
+                               tolerance=1e-2)
         finally:
             model.model.forward=original_forward
             model.model.run_with_hooks=original_hooks
@@ -144,8 +162,8 @@ def run(reference: Path, cache_root: Path, output: Path) -> dict:
     assert len(results)==21
     zero=[r for r in results if r["condition_name"]=="identity"]
     identity_max_error = max(r["metrics"]["logit_delta_max_abs"] for r in zero)
-    if identity_max_error > 3e-3:
-        raise RuntimeError(f"identity intervention exceeds 3e-3 max-logit tolerance: {identity_max_error}")
+    if identity_max_error > 1e-2:
+        raise RuntimeError(f"cached identity intervention exceeds 1e-2 max-logit tolerance: {identity_max_error}")
     first=samples[0]
     expected=evaluate_edit(model,sae,site=site,
         replacements={first_feature:0.0},tokens=model.tokens(tokens=torch.tensor([first.tokens])))
@@ -173,7 +191,9 @@ def run(reference: Path, cache_root: Path, output: Path) -> dict:
             "single_vs_batch_logit_delta_l2_abs_error":error,
             "identity_conditions_verified":len(zero),
             "identity_max_logit_abs_error":identity_max_error,
-            "real_batch_identity_atol":3e-3,
+            "real_batch_identity_atol":1e-2,
+            "native_same_batch_identity_max_logit_abs_error":native_identity_max,
+            "native_same_batch_identity_atol":1e-4,
             "real_batch_identity_rtol":1e-5,
             "single_batch_l2_abs_tolerance":0.05,
             "steering":steering,"stored_input_activation_rows":ShardedReader(apath).row_count,

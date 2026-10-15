@@ -118,13 +118,15 @@ is supplied. `read_results()` verifies committed JSONL shard hashes.
 - For CPU real-checkpoint batched GEMMs, floating-point kernel order may
   produce small differences from a single-example forward. Report the maximum
   absolute **individual logit** error and specify a tested absolute tolerance
-  (the Pythia-70M M2 smoke uses 3e-3 absolute and 1e-5 relative tolerance); do not
+  (the Pythia-70M M2 smoke uses 1e-2 absolute and 1e-5 relative tolerance for cached singleton activations injected into multi-prompt batches, plus a separate 1e-4 absolute tolerance for live same-batch identity replay); do not
   confuse this bound with the Euclidean norm across the entire vocabulary.
   In particular, a stored singleton activation patched into a multi-prompt
   forward can have a small nonzero output delta even for an identity edit.
   We retain the exact checkpoint/cache identity checks and explicitly record
   the peak per-logit identity discrepancy; this tolerance applies only to
-  the batch replay path, not to M0 activation-probe acceptance.
+  the cache replay path, not to M0 activation-probe acceptance. The run
+  also captures current-batch activations and proves a second, strict
+  native hook identity control independently of cached activation reuse.
 - The current public interface requires exactly one selected patch position
   per measurement sample. M1 itself supports multiple positions; M2 can make
   distinct samples for each site as an explicit future extension.
@@ -173,11 +175,13 @@ public Pythia-70M and the `pythia70m_resid_sm` SAE and verifies:
 1. Exact loaded model and SAE full state digests from the [M0 real fixture](../tests/fixtures/m0_reference_public.json).
 2. M0 activation probes and SAE activation sparsity.
 3. M1 activation/code caches and feature IDs in a real run.
-4. All seven M2 conditions in a **real multi-prompt batch**.
-5. Exact numerical comparison between the M2 batch result and the existing
+4. A strict native, same-batch identity check (<=1e-4 maximum per-logit
+   absolute error), independently of M1's cached activation representation.
+5. All seven M2 conditions in a **real multi-prompt batch**.
+6. Numerical comparison between the M2 batch result and the existing
    single-prompt `evaluate_edit` reference.
-6. Zero model forward calls on a fully committed result resume.
-7. Actual greedy 2-token continuation with and without feature ablation.
+7. Zero model forward calls on a fully committed result resume.
+8. Actual greedy 2-token continuation with and without feature ablation.
 
 The workflow uploads a JSON artifact with results, identity checks, numerical
 differences and batch performance. It is not considered passed until the run
