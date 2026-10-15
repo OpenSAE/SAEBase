@@ -45,10 +45,15 @@ def build_plan(config: BenchmarkConfig) -> dict[str, Any]:
             if n_inter:
                 raw = prefix + "/measurements"
                 nodes.append(PlanNode(raw, "m2_measure", (encode,), prefix))
+            if any("model_reconstruction" in s.required_inputs for s in specs):
+                nodes.append(PlanNode(prefix + "/reconstruction",
+                                      "behavioral_reconstruction", (), prefix))
             for spec in specs:
                 deps = [encode] if "m1_codes" in spec.required_inputs or "m1_activations" in spec.required_inputs else []
                 if "m2_measurements" in spec.required_inputs:
                     deps = [prefix + "/measurements"]
+                if "model_reconstruction" in spec.required_inputs:
+                    deps = [prefix + "/reconstruction"]
                 nodes.append(PlanNode(prefix + "/metric/" + spec.metric_id, "metric", tuple(deps), prefix))
     metric_jobs = tuple(n.job_id for n in nodes if n.operation == "metric")
     nodes.append(PlanNode(config.run_id + "/report", "report", metric_jobs, config.run_id))
