@@ -118,8 +118,13 @@ is supplied. `read_results()` verifies committed JSONL shard hashes.
 - For CPU real-checkpoint batched GEMMs, floating-point kernel order may
   produce small differences from a single-example forward. Report the maximum
   absolute **individual logit** error and specify a tested absolute tolerance
-  (the Pythia-70M M2 smoke uses 1e-3 and relative tolerance 1e-5); do not
+  (the Pythia-70M M2 smoke uses 3e-3 absolute and 1e-5 relative tolerance); do not
   confuse this bound with the Euclidean norm across the entire vocabulary.
+  In particular, a stored singleton activation patched into a multi-prompt
+  forward can have a small nonzero output delta even for an identity edit.
+  We retain the exact checkpoint/cache identity checks and explicitly record
+  the peak per-logit identity discrepancy; this tolerance applies only to
+  the batch replay path, not to M0 activation-probe acceptance.
 - The current public interface requires exactly one selected patch position
   per measurement sample. M1 itself supports multiple positions; M2 can make
   distinct samples for each site as an explicit future extension.

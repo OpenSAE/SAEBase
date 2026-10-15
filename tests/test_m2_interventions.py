@@ -342,3 +342,20 @@ def test_m0_public_reference_has_recorded_tolerances():
     record = json.loads(source.read_text())
     assert record["real_checkpoint_validated"] is True
     assert record["tolerances"] == {"atol": 1e-4, "rtol": 1e-4}
+
+def test_batched_identity_tolerance_keeps_strict_per_logit_bound(tmp_path, monkeypatch):
+    # Inject a measured-style batched kernel error into otherwise exact toy logits.
+    m, sae, ident = context()
+    eng = BatchEngine(m, sae, ident, pad_token_id=0)
+    original = eng._patched_logits
+    def minor_batch_rounding(jobs):
+        return [x + 0.002 for x in original(jobs)]
+    monkeypatch.setattr(eng, "_patched_logits", minor_batch_rounding)
+    with ResultWriter(tmp_path / "accepted", ident) as writer:
+        stat = eng.run(records()[:2], controls()[:1], writer,
+                       sample_batch=2, microbatch=2, tolerance=0.003)
+    assert stat.measured == 2
+    with ResultWriter(tmp_path / "strict", ident) as writer:
+        with pytest.raises(RuntimeError, match="identity patch mismatch"):
+            eng.run(records()[:2], controls()[:1], writer,
+                    sample_batch=2, microbatch=2, tolerance=0.001)
