@@ -28,6 +28,7 @@ _HOOKED_KEYS = (
     "llama31_8b_instruct",
     "qwen3_8b",
     "qwen3_1_7b",
+    "qwen35_2b",
     "qwen35_4b",
     "gemma2_9b_pt",
     "gemma2_9b_it",
