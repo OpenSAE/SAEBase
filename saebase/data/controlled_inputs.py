@@ -394,7 +394,7 @@ def collect_controlled_input_activations(
     records = design.sample_records(model)
     stats = collect_activations(model, records, writer, site=site)
     manifest = make_controlled_input_manifest(
-        design, records, activation_identity_key=writer.activation_identity.key
+        design, records, activation_identity_key=writer.manifest["identity_key"]
     )
     destination = (Path(writer.path) / "controlled_inputs" / f"{design.key}.json"
                    if manifest_path is None else Path(manifest_path))
