@@ -153,12 +153,20 @@ def load_hf_hooks_model(
     """Load HF model wrapped for residual hook capture/patch."""
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
+    # Qwen3.5's top-level config is conditional-generation multimodal,
+    # even though this Stage A path supplies text-only input_ids.
+    if model_name.startswith("Qwen/Qwen3.5-"):
+        from transformers import Qwen3_5ForConditionalGeneration
+        model_class = Qwen3_5ForConditionalGeneration
+    else:
+        model_class = AutoModelForCausalLM
+
     dev = device
     if dev == "cuda":
         dev = require_cuda()
 
     tok = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForCausalLM.from_pretrained(
+    model = model_class.from_pretrained(
         model_name,
         torch_dtype=dtype,
         low_cpu_mem_usage=True,
