@@ -386,6 +386,18 @@ _PROFILES: dict[str, SAEProfile] = {
         repo_id="google/gemma-scope-2-4b-it",
         hook_note="blocks.{L}.hook_resid_post (pre-final-norm)",
     ),
+    "llama31_8b_stagea_scope_l16_8x": SAEProfile(
+        key="llama31_8b_stagea_scope_l16_8x",
+        model_key="llama31_8b",
+        sae_release="llama_scope_lxr_8x",
+        layers=(16,),
+        hook_kind="hook_resid_post",
+        loader="sae_lens",
+        sae_id_by_layer=((16, "l16r_8x"),),
+        repo_id="fnlp/Llama3_1-8B-Base-LXR-8x",
+        notes="Original SAELens Llama Scope 8x residual L16/32k JumpReLU; valid SAE Lens release alias.",
+        hook_note="blocks.16.hook_resid_post (post-MLP)",
+    ),
     "llama31_8b_lxr_8x": SAEProfile(
         key="llama31_8b_lxr_8x",
         model_key="llama31_8b",
