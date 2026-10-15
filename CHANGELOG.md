@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **Multi-scale Stage A:** six-model 270M–8B public SAE roster, Qwen3.5-2B official TopK checkpoint adapter, safe tensor loading, HF hybrid-backbone layer support and optional real-checkpoint acceptance with hashed evidence.
+
 - **Input Localization benchmarks:** exact 90%-variance scope budget and normalized-budget metrics, with source-checked full scope curves, feature assignments, design manifests, and JSON/HTML report links.
 - **Localization reliability:** original paired-estimator seed stability on cached codes and matched descriptive cross-SAE comparisons, deliberately excluding invalid prompt-group bootstrap on full factorial input states.
 - **Reference testing:** benchmark preflight, cache/source integrity, offline M3/M4 contracts and a native Localize execution example.
