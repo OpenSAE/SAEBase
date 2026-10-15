@@ -132,3 +132,11 @@ and reused interventions, forward-batch counts, microbatch retries, elapsed
 seconds and backend from M2 ExecutionStats. SAR/RSS preserve the upstream
 evaluation count. RSS mean score counts selection variants; held-out
 persistence counts held-out variants. These units must never be combined.
+
+### RSS prompt verification
+
+The RSS adapter verifies that every supplied prompt string tokenizes to
+exactly the `SampleRecord.token_ids` declared in its experiment configuration.
+A mismatch blocks the metric. Selection variants are never chosen using
+held-out variants. Mismatched textual input cannot silently change the
+experiment protocol while retaining the same dataset identity.

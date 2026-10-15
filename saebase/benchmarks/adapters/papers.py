@@ -61,6 +61,11 @@ def run_paper(metric_ids, model, sae, site, *, source, options, samples, seed):
         result=mapping.get(s.record.sample_id)
         if not isinstance(result,str) or not result:
             raise ValueError(f"RSS requires text for sample_id {s.record.sample_id} in options.rss.prompts")
+        # M1's exact token IDs, rather than unchecked text, define the data
+        # identity and split. Do not silently evaluate a different sequence.
+        ids=model.tokens(prompt=result)[0].detach().cpu().tolist()
+        if ids != list(s.record.token_ids):
+            raise ValueError(f"RSS text/token IDs mismatch for sample_id {s.record.sample_id}")
         return result
     features=collect_rss_features(model,sae,site=site,clean_prompt=prompt(clean[0]),
             selection_variants=[prompt(s) for s in select],

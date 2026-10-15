@@ -35,7 +35,7 @@ def test_m3_calls_original_rss_unmodified():
     raw=[("clean","clean","1 2 3")]+[
        (f"selection{i}","selection",f"1 2 {i}") for i in range(4,9)]+[
        (f"held{i}","held_out",f"1 2 {i}") for i in range(9,14)]
-    samples=[MeasurementSample(SampleRecord(i,(1,2,3),variant_role=role,
+    samples=[MeasurementSample(SampleRecord(i,tuple(map(int,prompt.split())),variant_role=role,
                 split="selection" if role=="selection" else "held_out" if role=="held_out" else "test"))
              for i,role,prompt in raw]
     opts={"rss":{"prompts":{i:p for i,_,p in raw},"M":20,"K":5}}
