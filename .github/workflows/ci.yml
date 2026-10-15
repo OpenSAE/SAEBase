@@ -30,6 +30,8 @@ jobs:
           python -c "from saebase.sae.loading import load_sae_for_profile; print('lazy SAE imports OK')"
       - name: Run offline tests
         run: python -m pytest -q
+      - name: Validate six-model Stage A registration
+        run: saebase-stage-a --dry-run
       - name: Check CLI
         run: |
           cd "$(mktemp -d)"
