@@ -39,6 +39,11 @@ analysis = [
     "pandas>=2.0",
     "tqdm>=4.65",
 ]
+stage-a = [
+    "transformers>=5.2",
+    "huggingface-hub>=0.23",
+    "safetensors>=0.4",
+]
 generation = [
     "transformer-lens>=2.0",
     "sae-lens>=4.0",
@@ -63,6 +68,7 @@ saebase-benchmark = "scripts.m3_benchmark:main"
 saebase-audit = "scripts.m4_reliability:main"
 saebase-ground-truth = "scripts.m4_ground_truth:main"
 saebase-release-matrix = "scripts.m5_release_matrix:main"
+saebase-stage-a = "scripts.stage_a_matrix:main"
 saebase-release-gate = "scripts.m5_release_gate:main"
 
 [project.urls]
