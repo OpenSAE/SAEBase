@@ -7,7 +7,7 @@ It does not turn SAE feature ablation into an input-factor intervention.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import hashlib
 import importlib
 from pathlib import Path
@@ -16,6 +16,9 @@ from typing import Any, Mapping
 import numpy as np
 
 from saebase.api import ActivationSite, ModelAdapter, SAEIdentity, capture_features
+from saebase.data.controlled_inputs import (
+    ControlledInputDesign, ControlledInputManifest, load_controlled_input_manifest,
+)
 
 
 def _ordered_states(values: Mapping[int, str], n_factors: int, *, label: str) -> tuple[str, ...]:
@@ -48,6 +51,7 @@ class LocalizationGrid:
     site: ActivationSite | None = None
     identity: SAEIdentity | None = None
     activations: np.ndarray | None = None
+    design_key: str | None = None
 
     def __post_init__(self) -> None:
         if type(self.n_factors) is not int or self.n_factors < 1:
@@ -112,6 +116,7 @@ class LocalizationResult:
             "scope_budget": self.budget,
             "assignment_cost": sum(int(mask).bit_count() for mask in self.assignment),
             "source": self.grid.source,
+            "design_key": self.grid.design_key,
             "site": ({"layer": site.layer, "hook_name": site.hook_name,
                        "position": site.position} if site is not None else None),
             "identity": self.grid.identity.to_dict() if self.grid.identity else None,
@@ -128,9 +133,10 @@ def collect_localization_grid(
     sae: Any,
     *,
     site: ActivationSite,
-    prompts_by_state: Mapping[int, str],
-    n_factors: int,
+    prompts_by_state: Mapping[int, str] | None = None,
+    n_factors: int | None = None,
     identity: SAEIdentity | None = None,
+    design: ControlledInputDesign | None = None,
 ) -> LocalizationGrid:
     """Capture one SAE code at each controlled input state in bitmask order.
 
@@ -138,30 +144,41 @@ def collect_localization_grid(
     the same semantic activation position across prompts. No feature patches
     are performed; input interventions are represented by the supplied prompts.
     """
-    prompts = _ordered_states(prompts_by_state, n_factors, label="prompts_by_state")
+    if design is not None:
+        if prompts_by_state is not None or n_factors is not None:
+            raise ValueError("provide design or legacy prompts_by_state/n_factors, not both")
+        prompts = tuple(state.prompt for state in design.states)
+        n_factors = design.n_factors
+    else:
+        prompts = _ordered_states(prompts_by_state, n_factors, label="prompts_by_state")
     codes, activations = [], []
     if identity is not None and (identity.hook_name != site.hook_name
                                  or identity.layer != site.layer):
         raise ValueError("SAE identity site differs from requested site")
-    for prompt in prompts:
-        snapshot = capture_features(model, sae, site=site, prompt=prompt)
+    for index, prompt in enumerate(prompts):
+        selected_site = (replace(site, position=design.states[index].position)
+                         if design is not None else site)
+        snapshot = capture_features(model, sae, site=selected_site, prompt=prompt)
         codes.append(snapshot.codes.detach().cpu().numpy().astype(np.float64, copy=True))
         activations.append(snapshot.activation.detach().cpu().numpy().astype(np.float64, copy=True))
     return LocalizationGrid(
         codes=np.stack(codes), activations=np.stack(activations),
         n_factors=n_factors,
-        state_sample_ids=tuple(f"state-{i}" for i in range(len(prompts))),
+        state_sample_ids=(tuple(state.sample_id for state in design.states)
+                          if design is not None else tuple(f"state-{i}" for i in range(len(prompts)))),
         source="saebase.capture_features", site=site, identity=identity,
+        design_key=design.key if design is not None else None,
     )
 
 
 def localization_grid_from_code_store(
     code_store_path: str | Path,
     *,
-    sample_ids_by_state: Mapping[int, str],
-    n_factors: int,
+    sample_ids_by_state: Mapping[int, str] | None = None,
+    n_factors: int | None = None,
     site: ActivationSite | None = None,
     identity: SAEIdentity | None = None,
+    manifest: ControlledInputManifest | str | Path | None = None,
 ) -> LocalizationGrid:
     """Read a complete input grid from SAEBase's integrity-checked code cache.
 
@@ -170,7 +187,15 @@ def localization_grid_from_code_store(
     """
     from saebase.store import ShardedReader
 
-    sample_ids = _ordered_states(sample_ids_by_state, n_factors, label="sample_ids_by_state")
+    controlled = None
+    if manifest is not None:
+        if sample_ids_by_state is not None or n_factors is not None:
+            raise ValueError("provide a controlled design manifest or legacy state IDs, not both")
+        controlled = load_controlled_input_manifest(manifest)
+        n_factors = controlled.n_factors
+        sample_ids = tuple(controlled.sample_ids_by_state[i] for i in range(1 << n_factors))
+    else:
+        sample_ids = _ordered_states(sample_ids_by_state, n_factors, label="sample_ids_by_state")
     if len(set(sample_ids)) != len(sample_ids):
         raise ValueError("sample_ids_by_state must use distinct samples for all states")
     path = Path(code_store_path)
@@ -182,6 +207,8 @@ def localization_grid_from_code_store(
         raise ValueError("code store must have its SAEBase parent activation store")
     code_identity = codes_reader.manifest["identity"]
     activation_identity = activation_reader.manifest["identity"]
+    if controlled is not None and controlled.activation_identity_key != activation_reader.manifest["identity_key"]:
+        raise ValueError("controlled input manifest belongs to a different activation cache")
     if code_identity["activation_key"] != activation_reader.manifest["identity_key"]:
         raise ValueError("SAE code cache no longer matches its parent activation store")
     if site is not None and (site.hook_name != activation_identity["hook_name"]
@@ -197,7 +224,8 @@ def localization_grid_from_code_store(
                 or identity.layer != activation_identity["layer"]):
             raise ValueError("SAE identity site differs from cached activation site")
     rows = []
-    for sample_id in sample_ids:
+    from saebase.store import fingerprint
+    for mask, sample_id in enumerate(sample_ids):
         if not codes_reader.has(sample_id) or not activation_reader.has(sample_id):
             raise ValueError(f"missing cached input state: {sample_id}")
         code_sample = codes_reader.get(sample_id)
@@ -206,6 +234,17 @@ def localization_grid_from_code_store(
             raise ValueError("Localize requires exactly one captured token position per state")
         if code_sample.positions != activation_sample.positions:
             raise ValueError("code and activation positions differ")
+        if replace(code_sample.record, source_activation_sha256=None).key != activation_sample.record.key:
+            raise ValueError("SAE codes and parent activations have different sample metadata")
+        if controlled is not None:
+            expected = controlled.states[mask]
+            site_digest = fingerprint({
+                "token_ids": list(code_sample.record.token_ids),
+                "positions": list(code_sample.positions),
+            })
+            if (site_digest != expected["token_site_sha256"]
+                    or code_sample.positions[0] != expected["position"]):
+                raise ValueError("controlled input manifest token or position mismatch")
         sha = hashlib.sha256(np.asarray(activation_sample.values, dtype=np.float32).tobytes(order="C")).hexdigest()
         if code_sample.record.source_activation_sha256 != sha:
             raise ValueError("cached SAE code source-activation checksum mismatch")
@@ -213,6 +252,7 @@ def localization_grid_from_code_store(
     return LocalizationGrid(
         codes=np.stack(rows), n_factors=n_factors, state_sample_ids=sample_ids,
         source="saebase.code_store", site=site, identity=identity,
+        design_key=controlled.design_key if controlled is not None else None,
     )
 
 
