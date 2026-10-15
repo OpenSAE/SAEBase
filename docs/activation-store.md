@@ -4,6 +4,8 @@ For the main research workflow, see [Documentation Home](index.md). The original
 
 The Activation Store provides a sharded, resumable local store of **raw activations** and **separately keyed, lossless SAE feature codes**. Those cached measurements can now be reused by the intervention engine, benchmark runner and reliability analysis.
 
+Complete binary input experiments and their checked cache sidecars are described in [Controlled Input Designs](controlled-inputs.md).
+
 ## Quickstart
 
 ```bash
