@@ -7,7 +7,7 @@
 <p align="center">
   <a href="#-quickstart"><b>🚀 Quickstart</b></a> &nbsp; | &nbsp;
   <a href="#-public-python-api"><b>🔬 Python API</b></a> &nbsp; | &nbsp;
-  <a href="#-research-integrations"><b>🧩 SAR & RSS</b></a> &nbsp; | &nbsp;
+  <a href="#-research-integrations"><b>🧩 Research Integrations</b></a> &nbsp; | &nbsp;
   <a href="#-documentation"><b>📚 Documentation</b></a>
 </p>
 
@@ -185,14 +185,14 @@ SAEBase supplies shared model operations; original research projects retain thei
 | :--- | :--- | :--- |
 | 🧩 **[SAR — Behavioral Compositionality](https://github.com/OpenSAE/SAE-Behavioral-Compositionality)** | Capture feature contributions, apply coalition edits, call the unchanged SAR estimator. | [SAR example](examples/07_sar_via_saebase.py) |
 | 🔀 **[RSS — Representation Redistribution](https://github.com/OpenSAE/Redistribution-Sensitivity-Score)** | Capture disjoint clean/selection/held-out observations, call the unchanged RSS estimator. | [RSS example](examples/08_rss_via_saebase.py) |
-| 📊 **[SAEBench](https://github.com/adamkarvonen/SAEBench)** | Import and verify selected native Core and Sparse Probing result fields against the original model/SAE identity and upstream commit. | [Benchmark documentation](docs/benchmarking.md) |
+| 🧭 **[Input Localization](https://github.com/OpenSAE/SAE-Input-Localization)** | Capture or reuse complete, ordered Boolean input grids of SAE codes; delegate optimal scope curves to the original Localize package. | [Localize example](examples/15_input_localization_via_saebase.py) |\n| 📊 **[SAEBench](https://github.com/adamkarvonen/SAEBench)** | Import and verify selected native Core and Sparse Probing result fields against the original model/SAE identity and upstream commit. | [Benchmark documentation](docs/benchmarking.md) |
 
 ```bash
 python examples/07_sar_via_saebase.py --paper-dir /path/to/SAR-repo
 python examples/08_rss_via_saebase.py --paper-dir /path/to/RSS-repo
 ```
 
-The two examples use deterministic synthetic inputs by default; real checkpoint use is opt-in. See [Research Integrations](docs/research-integrations.md).
+The examples use deterministic synthetic inputs by default; real checkpoint use is opt-in. For Localize, install the independent `sae-input-localization` package first and run `python examples/15_input_localization_via_saebase.py`. See [Research Integrations](docs/research-integrations.md).
 
 ---
 
@@ -223,7 +223,7 @@ The code above downloads real weights. Prefer the offline example for a no-netwo
 | [`saebase/interventions/`](saebase/interventions/) | Batch conditions, measurement journals, patch execution and steering |
 | [`saebase/benchmarks/`](saebase/benchmarks/) | Metric registry, experiment planning, cached execution and reports |
 | [`saebase/reliability/`](saebase/reliability/) | Grouped bootstrap, paired comparisons, ground truth and audits |
-| [`saebase/integrations/`](saebase/integrations/) | Original SAR/RSS interface adapters |
+| [`saebase/integrations/`](saebase/integrations/) | Original SAR/RSS/Localize interface adapters |
 | [`saebase/sae/`](saebase/sae/) | SAE profiles, loading and reconstruction diagnostics |
 | [`saebase/data/`](saebase/data/) | Versioned prompt data, manifests and compatibility contracts |
 | [`models/`](models/) · [`conf/`](conf/) | Model plugins and versioned experiment configurations |
@@ -241,7 +241,7 @@ python -m pytest -q
 | Core APIs and packaging | Python 3.11/3.12 CI, wheel/sdist construction and installation checks |
 | Real model/SAE interoperability | Pythia-70M and GPT-2 Small, two distinct public SAE checkpoints per model |
 | Storage, interventions and reports | Identity-aware cache reuse, condition-specific evaluation, resume and integrity checks |
-| Research estimators | Original SAR/RSS estimator tests and pinned native SAEBench Core/Sparse Probing checks |
+| Research estimators | Original SAR/RSS estimator tests; Localize delegation contracts and pinned native SAEBench Core/Sparse Probing checks |
 | Reliability | Prompt-group bootstrap, paired comparisons and independently generated analytical controls |
 | Experimental backends | vLLM/NNsight remain optional; this release does not claim GPU throughput validation |
 
