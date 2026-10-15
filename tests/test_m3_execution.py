@@ -106,3 +106,24 @@ def test_changed_metric_config_reuses_m1_forward(tmp_path):
     assert first.run_id!=second.run_id
     execute(second,tmp_path,loader=loader,real=True)
     assert counter["n"]==count, "new metric must reuse existing M1 activation store"
+
+def test_reconstruction_behavior_computes_measured_ablation(tmp_path):
+    """Reconstruction and zero-site ablation use the exact same model/readout."""
+    import copy
+    data=copy.deepcopy(BASE)
+    data["metrics"]=["reconstruction.target_nll","reconstruction.loss_recovered"]
+    data["conditions"]=[]
+    cfg=BenchmarkConfig.from_dict(data)
+    model=ModelAdapter(ResearchToyModel().eval())
+    sae=ResearchToySAE().eval()
+    rows=execute(cfg,tmp_path,real=True,
+                 loader=lambda *args: SimpleNamespace(model=model,sae=sae))
+    assert len(rows)==2
+    assert rows[0]["metric_id"]=="reconstruction.target_nll"
+    assert rows[0]["status"]=="completed"
+    assert np.isfinite(rows[0]["value"])
+    assert rows[1]["metric_id"]=="reconstruction.loss_recovered"
+    # Denominator zero is explicitly undefined, not converted to 0 or NaN.
+    assert rows[1]["status"] in {"completed","undefined"}
+    if rows[1]["status"]=="completed":
+        assert np.isfinite(rows[1]["value"])
