@@ -115,3 +115,11 @@ metric selections. Changing the benchmark's metric set changes `run_id` but
 not these physical caches; previously committed activation rows and M2
 interventions are reused after content and identity checks. `--no-resume`
 rejects only an existing completed M3 report, not valid shared caches.
+
+### External provenance and import-only execution
+
+Completed native SAEBench imports do not require loading model or SAE weights.
+The source JSON's SHA-256 and expected model, SAE and upstream commit are
+validated. Both `--resume` and `--report-only` reject a changed original
+estimator file or native SAEBench result instead of silently returning stale
+metrics. The planner omits M1/M2 compute nodes for import-only experiments.

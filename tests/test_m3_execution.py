@@ -127,3 +127,43 @@ def test_reconstruction_behavior_computes_measured_ablation(tmp_path):
     assert rows[1]["status"] in {"completed","undefined"}
     if rows[1]["status"]=="completed":
         assert np.isfinite(rows[1]["value"])
+
+def test_intervention_preflight_requires_conditions():
+    import copy
+    data=copy.deepcopy(BASE)
+    data["conditions"]=[]
+    cfg=BenchmarkConfig.from_dict(data)
+    with pytest.raises(ValueError,match="require explicit conditions"):
+        build_plan(cfg)
+
+def test_upstream_native_import_never_loads_model_and_rejects_stale_outputs(tmp_path):
+    import copy
+    data=copy.deepcopy(BASE)
+    data["metrics"]=["saebench.core.l0"]
+    data["conditions"]=[]
+    source=tmp_path/"core_native.json"
+    source.write_text(json.dumps({
+        "eval_type_id":"core","sae_bench_commit_hash":"a"*40,
+        "sae_lens_id":"toy-official","sae_lens_release_id":"toy-official-release",
+        "eval_config":{"model_name":"synthetic-official"},
+        "eval_result_metrics":{"sparsity":{"l0":7.5}},
+    }))
+    data["sources"]={"saebench.core.l0":str(source)}
+    data["options"]={"saebench_sae_lens_ids":{"toy":"toy-official"},
+                     "saebench_model_names":{"synthetic":"synthetic-official"},
+                     "saebench_sae_releases":{"toy":"toy-official-release"},
+                     "saebench_commit":"a"*40}
+    cfg=BenchmarkConfig.from_dict(data)
+    plan=build_plan(cfg)
+    assert plan["planned_activation_rows"]==0
+    assert not any(n["operation"].startswith("m1_") for n in plan["nodes"])
+    def no_weights(*args):
+        raise AssertionError("import-only benchmark must not download weights")
+    rows=execute(cfg,tmp_path,real=True,loader=no_weights)
+    assert len(rows)==1
+    assert rows[0]["status"]=="completed" and rows[0]["value"]==7.5
+    again=execute(cfg,tmp_path,real=True,loader=no_weights)
+    assert again==rows
+    source.write_text(source.read_text()+" ")
+    with pytest.raises(ValueError,match="output changed"):
+        execute(cfg,tmp_path,real=True,loader=no_weights)

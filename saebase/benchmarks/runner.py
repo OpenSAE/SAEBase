@@ -85,6 +85,59 @@ def _safe(config,target,sae_key,spec,fn,*,condition=None):
         return _metric(config,target,sae_key,spec,"blocked",
                 reason=f"{type(exc).__name__}: {exc}",condition=condition)
 
+def validate_external_sources(config: BenchmarkConfig, rows: list[dict[str, Any]]) -> None:
+    """Reject stale original-estimator/native results, even on report-only runs.
+
+    Model/SAE weights are not loaded; only the exact trusted local source files
+    named in the immutable experiment configuration are fingerprinted.
+    """
+    from .adapters.papers import source_identity
+    for row in rows:
+        if row.get("status") != "completed":
+            continue
+        name = row.get("metric_id", "")
+        if name.startswith(("sar.", "rss.")):
+            paper = name.split(".")[0]
+            source = config.sources.get(paper)
+            if not source or source_identity(source, paper) != row.get("source_sha256"):
+                raise ValueError(f"external {paper} source changed after benchmark computation")
+        elif name.startswith("saebench."):
+            source = config.sources.get(name)
+            if (not source or not Path(source).is_file()
+                    or hashlib.sha256(Path(source).read_bytes()).hexdigest() != row.get("source_sha256")):
+                raise ValueError(f"native {name} output changed after benchmark computation")
+
+
+def _import_saebench(config, target, sae_key, specs):
+    """Pure verified native result import: no SAE/model weights or forwards."""
+    out = []
+    expected_ids = config.options.get("saebench_sae_lens_ids", {})
+    expected_models = config.options.get("saebench_model_names", {})
+    expected_releases = config.options.get("saebench_sae_releases", {})
+    for spec in specs:
+        source = config.sources.get(spec.metric_id)
+        if not source:
+            out.append(_metric(config,target,sae_key,spec,"blocked",
+                reason="native SAEBench output path required; no local upstream run executed"))
+            continue
+        try:
+            if not isinstance(expected_ids,dict) or not expected_ids.get(sae_key):
+                raise ValueError("options.saebench_sae_lens_ids must identify the native SAE checkpoint")
+            if not isinstance(expected_models,dict) or not expected_models.get(target.model_key):
+                raise ValueError("options.saebench_model_names must identify the native model")
+            value, sha, commit = import_native(
+                source, spec.metric_id, expected_commit=config.options.get("saebench_commit"),
+                expected_sae_id=expected_ids[sae_key],
+                expected_model_name=expected_models[target.model_key],
+                expected_sae_release=expected_releases.get(sae_key))
+            out.append(_metric(config,target,sae_key,spec,"completed",value,n_valid=1,
+                source_sha=sha,source_commit=commit))
+        except (ValueError,TypeError,KeyError,FileNotFoundError,OSError) as exc:
+            out.append(_metric(config,target,sae_key,spec,"blocked",
+                reason=f"{type(exc).__name__}: {exc}"))
+    return out
+
+
 def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
             resume: bool=True, loader=None):
     """Execute a frozen matrix. A caller may inject a pair loader for offline tests.
@@ -99,6 +152,7 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
     root.mkdir(parents=True,exist_ok=True)
     if (root/"metrics_manifest.json").exists() and resume:
         prior=read_metrics(root,config.run_id)
+        validate_external_sources(config,prior)
         # A completed ledger is read-only. This never reexecutes model work.
         return prior
     if (root/"metrics_manifest.json").exists() and not resume:
@@ -109,8 +163,13 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
     load=loader or (lambda model_key,sae_key,layer:
                     load_registered(model_key=model_key,sae_key=sae_key,layer=layer))
     cache_root=Path(output)/"_cache"/"m1"
+    native_specs=[s for s in specs if s.metric_id.startswith("saebench.")]
+    local_specs=[s for s in specs if not s.metric_id.startswith("saebench.")]
     for target in config.targets:
         for sae_key in target.sae_keys:
+            if not local_specs:
+                results.extend(_import_saebench(config,target,sae_key,native_specs))
+                continue
             pair=load(target.model_key,sae_key,target.site.layer)
             model=pair.model if hasattr(pair,"model") else pair[0]
             sae=pair.sae if hasattr(pair,"sae") else pair[1]
@@ -220,32 +279,7 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
                     for spec in subset:
                         results.append(_metric(config,target,sae_key,spec,"blocked",
                                                reason=f"{type(exc).__name__}: {exc}"))
-            for spec in specs:
-                if not spec.metric_id.startswith("saebench."):
-                    continue
-                source=config.sources.get(spec.metric_id)
-                if not source:
-                    results.append(_metric(config,target,sae_key,spec,"blocked",
-                        reason="native SAEBench output path required; no local upstream run executed"))
-                    continue
-                try:
-                    expected_ids=config.options.get("saebench_sae_lens_ids",{})
-                    expected_models=config.options.get("saebench_model_names",{})
-                    expected_releases=config.options.get("saebench_sae_releases",{})
-                    if not isinstance(expected_ids,dict) or not expected_ids.get(sae_key):
-                        raise ValueError("options.saebench_sae_lens_ids must identify the native SAE checkpoint")
-                    if not isinstance(expected_models,dict) or not expected_models.get(target.model_key):
-                        raise ValueError("options.saebench_model_names must identify the native model")
-                    val,digest,commit=import_native(source,spec.metric_id,
-                            expected_commit=config.options.get("saebench_commit"),
-                            expected_sae_id=expected_ids[sae_key],
-                            expected_model_name=expected_models[target.model_key],
-                            expected_sae_release=expected_releases.get(sae_key))
-                    results.append(_metric(config,target,sae_key,spec,"completed",val,n_valid=1,
-                        source_sha=digest,source_commit=commit))
-                except Exception as exc:
-                    results.append(_metric(config,target,sae_key,spec,"blocked",
-                        reason=f"{type(exc).__name__}: {exc}"))
+            results.extend(_import_saebench(config,target,sae_key,native_specs))
     store_results(root,results,run_id=config.run_id)
     write_report(root,config,plan,results,provenance=provenance)
     return [r.to_dict() for r in results]

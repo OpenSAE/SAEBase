@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse,json
 from pathlib import Path
 from saebase.benchmarks import load_config,build_plan
-from saebase.benchmarks.runner import execute
+from saebase.benchmarks.runner import execute, validate_external_sources
 from saebase.benchmarks.results import read_metrics
 from saebase.benchmarks.report import write_report
 
@@ -27,6 +27,7 @@ def main(argv=None):
     if args.report_only:
         root=args.output/cfg.run_id
         rows=read_metrics(root,cfg.run_id)
+        validate_external_sources(cfg,rows)
         write_report(root,cfg,plan,rows)
         print(json.dumps({"run_id":cfg.run_id,"metrics":len(rows),"report":str(root/"report.html")}))
         return 0
