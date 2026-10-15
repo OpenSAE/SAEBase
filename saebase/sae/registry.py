@@ -229,7 +229,7 @@ _PROFILES: dict[str, SAEProfile] = {
     "gemma270m_scope_resid": SAEProfile(
         key="gemma270m_scope_resid",
         model_key="gemma270m",
-        sae_release="gemma-scope-2-270m-pt-res",
+        sae_release="gemma-scope-2-270m-pt-resid_post",
         layers=(5, 9, 12),
         hook_kind="hook_resid_post",
         loader="sae_lens",
@@ -239,7 +239,7 @@ _PROFILES: dict[str, SAEProfile] = {
     "gemma1b_scope_resid": SAEProfile(
         key="gemma1b_scope_resid",
         model_key="gemma1b",
-        sae_release="gemma-scope-2-1b-pt-res",
+        sae_release="gemma-scope-2-1b-pt-resid_post",
         layers=(7, 13, 17),
         hook_kind="hook_resid_post",
         loader="sae_lens",
