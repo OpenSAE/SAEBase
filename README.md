@@ -39,7 +39,7 @@ The workflow is **capture once, evaluate multiple SAEs**: a verified activation 
 - 🧭 **Controlled input designs.** Enumerate complete binary factor grids, track state-to-sample mappings, and reuse cached activations under bijective input reindexing.
 - 🗃️ **Activation capture and reuse.** Sharded, resumable activation stores; lossless dense/CSR SAE codes; exact token selection, sample groups, splits, and checkpoint SHA-256 verification.
 - 🎛️ **Feature interventions and steering.** Identity, ablation, scaling, clamping, addition, coalition, and full-reconstruction controls, with batch evaluation and downstream logit readouts. Feature edits can preserve the original reconstruction residual.
-- 📊 **SAE benchmarking.** Separate L0, reconstruction MSE, FVU/explained variance, token-level behavioral loss, logit/KL changes, and condition-specific metrics under reproducible configurations.
+- 📊 **SAE benchmarking.** Separate L0, reconstruction MSE, FVU/explained variance, token-level behavioral loss, logit/KL changes, localization budgets and condition-specific metrics under reproducible configurations.
 - 📈 **Reliability analysis.** Prompt-group bootstrap, paired SAE comparisons, confidence intervals, sample-size curves, ranking stability, and analytical ground-truth/negative-control tests.
 - 🧩 **Research integrations.** Original [SAR](https://github.com/OpenSAE/SAE-Behavioral-Compositionality) and [RSS](https://github.com/OpenSAE/Redistribution-Sensitivity-Score) and [Input Localization](https://github.com/OpenSAE/SAE-Input-Localization) estimators plus provenance-checked imports of native SAEBench outputs.
 - ⚙️ **Reproducible experiments.** Compute preflight, exact cache identities, interrupted-run recovery, source/checkpoint hashes, and standalone JSONL/JSON, CSV, and HTML reports.
@@ -194,7 +194,7 @@ python examples/07_sar_via_saebase.py --paper-dir /path/to/SAR-repo
 python examples/08_rss_via_saebase.py --paper-dir /path/to/RSS-repo
 ```
 
-The examples use deterministic synthetic inputs by default; real checkpoint use is opt-in. For Localize, install the independent `sae-input-localization` package first and run `python examples/15_input_localization_via_saebase.py`. Try the cached, reindexed grid via `python examples/16_controlled_input_design.py` (no model downloads). See [Controlled Input Designs](docs/controlled-inputs.md) and [Research Integrations](docs/research-integrations.md).
+The examples use deterministic synthetic inputs by default; real checkpoint use is opt-in. For Localize, install the independent `sae-input-localization` package first and run `python examples/15_input_localization_via_saebase.py`. Try the cached, reindexed grid via `python examples/16_controlled_input_design.py` (no model downloads). See [Controlled Input Designs](docs/controlled-inputs.md), [Localize Benchmarking](docs/localization-benchmark.md), and [Research Integrations](docs/research-integrations.md).
 
 ---
 
@@ -225,7 +225,7 @@ The code above downloads real weights. Prefer the offline example for a no-netwo
 | [`saebase/interventions/`](saebase/interventions/) | Batch conditions, measurement journals, patch execution and steering |
 | [`saebase/benchmarks/`](saebase/benchmarks/) | Metric registry, experiment planning, cached execution and reports |
 | [`saebase/reliability/`](saebase/reliability/) | Grouped bootstrap, paired comparisons, ground truth and audits |
-| [`saebase/integrations/`](saebase/integrations/) | Original SAR/RSS/Localize interface adapters |
+| [`saebase/integrations/`](saebase/integrations/) | Original SAR/RSS/Localize interface adapters and controlled-grid benchmark analysis |
 | [`saebase/sae/`](saebase/sae/) | SAE profiles, loading and reconstruction diagnostics |
 | [`saebase/data/`](saebase/data/) | Versioned prompt data, complete controlled input designs, manifests and compatibility contracts |
 | [`models/`](models/) · [`conf/`](conf/) | Model plugins and versioned experiment configurations |
