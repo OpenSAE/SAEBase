@@ -1,0 +1,57 @@
+name: M3 SAEBench Core and Sparse Probing native parity
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'saebase/benchmarks/adapters/saebench.py'
+      - 'tests/test_m3_saebench_native.py'
+      - '.github/workflows/m3-saebench-native.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  native-saebench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: adamkarvonen/SAEBench
+          ref: 8042bb3828c6340da8d12062324e92b2077c571c
+          path: upstream
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - name: Install SAEBase and native SAEBench
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+          python -m pip install -e ./upstream
+          python -m pip check
+      - name: Run original upstream Core and Sparse Probing evaluations
+        env:
+          HF_HUB_DISABLE_TELEMETRY: '1'
+          TOKENIZERS_PARALLELISM: 'false'
+          HF_HUB_ENABLE_HF_TRANSFER: '0'
+        run: |
+          cd upstream
+          python -m pytest -s -q \
+            tests/acceptance/test_core.py::test_end_to_end \
+            tests/acceptance/test_sparse_probing.py::test_end_to_end_different_seed
+      - name: Check SAEBase imports and exact upstream values
+        env:
+          SAEBASE_SAEBENCH_ROOT: upstream
+        run: python -m pytest -q tests/test_m3_saebench_native.py
+      - name: Archive upstream native result evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: saebase-m3-native-saebench
+          path: |
+            upstream/tests/acceptance/test_data/core/*eval_results.json
+            upstream/evals/sparse_probing/test_results/*eval_results.json
+          if-no-files-found: warn
+          retention-days: 14
