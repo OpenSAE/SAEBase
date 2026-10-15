@@ -56,15 +56,24 @@ class HFHooksModel(HFLogitsModel):
 
     def _layer_module(self, layer: int) -> Any:
         n = int(layer)
-        if hasattr(self._model, "model") and hasattr(self._model.model, "layers"):
-            layers = self._model.model.layers
-            if 0 <= n < len(layers):
-                return layers[n]
-        if hasattr(self._model, "transformer") and hasattr(self._model.transformer, "h"):
-            layers = self._model.transformer.h
-            if 0 <= n < len(layers):
-                return layers[n]
-        raise ValueError(f"Cannot resolve HF layer module for layer={layer}")
+        # Qwen3.5 conditional models nest the text blocks one level deeper.
+        # These are intentionally explicit decoder paths, not a heuristic scan
+        # through arbitrary submodules that might select vision-attention blocks.
+        for attributes in (
+            ("model", "layers"),
+            ("model", "language_model", "layers"),
+            ("model", "language_model", "model", "layers"),
+            ("language_model", "layers"),
+            ("transformer", "h"),
+        ):
+            module = self._model
+            for name in attributes:
+                module = getattr(module, name, None)
+                if module is None:
+                    break
+            if module is not None and 0 <= n < len(module):
+                return module[n]
+        raise ValueError(f"Cannot resolve HF decoder layer module for layer={layer}")
 
     @torch.no_grad()
     def get_resid(
@@ -153,20 +162,12 @@ def load_hf_hooks_model(
     """Load HF model wrapped for residual hook capture/patch."""
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
-    # Qwen3.5's top-level config is conditional-generation multimodal,
-    # even though this Stage A path supplies text-only input_ids.
-    if model_name.startswith("Qwen/Qwen3.5-"):
-        from transformers import Qwen3_5ForConditionalGeneration
-        model_class = Qwen3_5ForConditionalGeneration
-    else:
-        model_class = AutoModelForCausalLM
-
     dev = device
     if dev == "cuda":
         dev = require_cuda()
 
     tok = AutoTokenizer.from_pretrained(model_name)
-    model = model_class.from_pretrained(
+    model = AutoModelForCausalLM.from_pretrained(
         model_name,
         torch_dtype=dtype,
         low_cpu_mem_usage=True,
