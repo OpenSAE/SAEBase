@@ -1,0 +1,10 @@
+{
+  "schema":"saebase.m4.audit.config.v1",
+  "evaluation_seeds":[0,1,2,3,4],
+  "bootstrap_replicates":96,
+  "confidence":0.95,
+  "sample_sizes":[2,3,32,128,512],
+  "top_k":1,
+  "training_seed":null,
+  "metric_ids":["core.l0","intervention.logit_delta_l2","intervention.kl_baseline_to_edited"]
+}

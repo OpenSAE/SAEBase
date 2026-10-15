@@ -222,6 +222,19 @@ saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
 
 ---
 
+## 📊 可靠性审计（M4）
+
+在不重新执行模型 forward 的前提下，复用 M3 原始测量，对
+`prompt_group_id` 整组重采样，计算 paired confidence intervals 与排名稳定性。
+
+```bash
+saebase-audit --m3-root runs/<run_id> --config conf/reliability/m4_pythia_smoke.json --run
+```
+
+具体协议、合成真值和验收边界见 [M4 可靠性审计](docs/M4_RELIABILITY.md)。
+
+---
+
 ## 📚 文档
 
 [API 文档](docs/API.md) · [入门与数据准备](docs/PHASE_A.md) · [特征干预](docs/PHASE_B.md) · [研究接入](docs/PHASE_C.md) · [更新记录](CHANGELOG.md)

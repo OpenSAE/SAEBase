@@ -1,0 +1,70 @@
+name: Real M4 grouped Pythia reliability acceptance
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'saebase/reliability/**'
+      - 'saebase/benchmarks/report.py'
+      - 'scripts/m4_reliability.py'
+      - 'conf/reliability/**'
+      - 'conf/benchmark/m4_pythia_three_groups.json'
+      - '.github/workflows/m4-real.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  m4-pythia:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - name: Install M3/M4 analysis dependencies
+        run: python -m pip install -e '.[analysis,dev]'
+      - name: Execute M3 real Pythia and audit original M1/M2 data
+        env:
+          HF_HUB_DISABLE_TELEMETRY: '1'
+          TOKENIZERS_PARALLELISM: 'false'
+        run: |
+          set -euo pipefail
+          RUNID=$(python - <<'PY'
+          from saebase.benchmarks import load_config
+          print(load_config("conf/benchmark/m4_pythia_three_groups.json").run_id)
+          PY
+          )
+          OUT="$RUNNER_TEMP/m4"
+          saebase-benchmark --config conf/benchmark/m4_pythia_three_groups.json --dry-run
+          saebase-benchmark --config conf/benchmark/m4_pythia_three_groups.json --real --output "$OUT"
+          saebase-audit --m3-root "$OUT/$RUNID" --config conf/reliability/m4_pythia_smoke.json --dry-run
+          saebase-audit --m3-root "$OUT/$RUNID" --config conf/reliability/m4_pythia_smoke.json --run
+          saebase-audit --m3-root "$OUT/$RUNID" --config conf/reliability/m4_pythia_smoke.json --report-only
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from saebase.benchmarks import load_config
+          from saebase.reliability.report import read_audit
+          cfg=load_config("conf/benchmark/m4_pythia_three_groups.json")
+          root=Path(os.environ["RUNNER_TEMP"])/"m4"/cfg.run_id
+          audit=read_audit(root)
+          assert audit["model_forwards_during_audit"]==0
+          assert len(audit["metric_audits"])==5
+          assert all(r["status"]=="completed" for r in audit["metric_audits"]),audit
+          assert all(r["audit"]["n_groups"]==3 for r in audit["metric_audits"])
+          assert all(r["audit"]["n_valid"]==5*96 for r in audit["metric_audits"])
+          core=next(r for r in audit["metric_audits"] if r["metric_id"]=="core.l0")
+          assert core["audit"]["point_estimate"]==97.
+          assert "M4 Reliability Audit" in (root/"report.html").read_text()
+          print("Real M4 Pythia grouped bootstrap and M3 report integration PASSED")
+          PY
+      - name: Save M4 real model/cache/audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: saebase-m4-real-pythia
+          path: ${{ runner.temp }}/m4/
+          if-no-files-found: warn
+          retention-days: 14
