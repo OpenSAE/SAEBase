@@ -108,7 +108,7 @@ SAEBase can register many model/SAE configurations, but **registration is not ev
 | **Pythia-70M (deduped)** | `blocks.3.hook_resid_post` | Residual-stream SAE and a separately trained gated SAE |
 | **GPT-2 Small** | `blocks.8.hook_resid_pre` | Original residual SAE and feature-splitting SAE |
 
-Both model families were executed with two distinct SAE checkpoint weight hashes and six fixed prompts per model. Additional model profiles, including Gemma and larger checkpoints, are available in the registry but may require other dependencies, access permissions, hardware, or separate acceptance. See [Supported Models and Checkpoints](docs/model-support.md).
+Both model families were executed with two distinct SAE checkpoint weight hashes and six fixed prompts per model. A separate **Stage A six-model roster** now defines Gemma 3 (270M, 1B), Gemma 2 (2B), Qwen3.5 (2B), Qwen3 (8B), and Llama 3.1 (8B), with real-weight acceptance gates rather than registration-only claims. Run `saebase-stage-a --dry-run`; see [Stage A Model Coverage](docs/stage-a-coverage.md) and [Supported Models and Checkpoints](docs/model-support.md).
 
 ---
 
