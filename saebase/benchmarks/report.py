@@ -13,6 +13,8 @@ def write_report(folder,config,plan,results,*,provenance=None):
     rows=[r.to_dict() if hasattr(r,"to_dict") else r for r in results]
     atomic_json(root/"resolved_config.json",config.to_dict())
     atomic_json(root/"plan.json",plan)
+    if provenance is None and (root/"provenance.json").exists():
+        provenance=json.loads((root/"provenance.json").read_text())
     atomic_json(root/"provenance.json",provenance or {})
     with (root/"summary.csv").open("w",newline="",encoding="utf-8") as f:
         writer=csv.DictWriter(f,fieldnames=COLUMNS,extrasaction="ignore")
@@ -31,5 +33,10 @@ def write_report(folder,config,plan,results,*,provenance=None):
               "<p>Each metric retains its native units and interpretation. No composite SAE score.</p>"
               f"<p>{len(rows)} metric rows. Status and failed/unsupported reasons are preserved.</p>"
               f"<div class='scroll'><table><thead><tr>{heads}</tr></thead><tbody>{body}</tbody></table></div></html>")
+    # M4 appends a checksum-verified audit without changing existing M3 rows.
+    if (root/"reliability_manifest.json").exists():
+        from saebase.reliability.report import read_audit,render_audit_fragment
+        attached=read_audit(root)
+        document=document.replace("</html>",render_audit_fragment(attached)+"</html>")
     (root/"report.html").write_text(document,encoding="utf-8")
     return root/"report.html"

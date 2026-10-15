@@ -226,6 +226,20 @@ for metric definitions, original-paper adapters and validation boundaries.
 
 ---
 
+## 📊 Reliability Audit (M4)
+
+Reuse frozen M3 measurements for prompt-group bootstrap, paired confidence
+intervals and ranking-stability checks, without new model forwards.
+
+```bash
+saebase-audit --m3-root runs/<run_id> --config conf/reliability/m4_pythia_smoke.json --run
+```
+
+See [M4 Reliability Audit](docs/M4_RELIABILITY.md) for audit status, protocols,
+synthetic-ground-truth checks and validation limits.
+
+---
+
 ## 📚 Documentation
 
 [API Reference](docs/API.md) · [Getting Started](docs/PHASE_A.md) · [Feature Interventions](docs/PHASE_B.md) · [Research Integrations](docs/PHASE_C.md) · [Changelog](CHANGELOG.md)
