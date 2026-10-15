@@ -48,3 +48,17 @@ def test_phase_a_requires_real_weights_for_evidence():
     from scripts.phase_a_verify import verify_target
     with pytest.raises(KeyError):
         verify_target("imaginary",device="cpu")
+
+@pytest.mark.parametrize(("profile_key","layer","expected_repo","expected_path","converter"), [
+    ("gemma270m_scope_resid",5,"google/gemma-scope-2-270m-pt",
+     "resid_post/layer_5_width_65k_l0_medium","gemma_3_sae_huggingface_loader"),
+    ("gemma1b_scope_resid",13,"google/gemma-scope-2-1b-pt",
+     "resid_post/layer_13_width_16k_l0_medium","gemma_3_sae_huggingface_loader"),
+    ("llama31_8b_lxr_8x",16,"OpenMOSS-Team/Llama3_1-8B-Base-LXR-8x",
+     "Llama3_1-8B-Base-L16R-8x","llama_scope_sae_huggingface_loader"),
+])
+def test_exact_native_sae_source_paths(profile_key,layer,expected_repo,expected_path,converter):
+    from saebase.sae.loading import _phase_a_sae_lens_source
+    assert _phase_a_sae_lens_source(get_profile(profile_key), layer) == (
+        expected_repo, expected_path, converter
+    )
