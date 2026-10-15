@@ -40,6 +40,7 @@ def test_model_keys_match_specs():
     assert "gemma2_9b_pt" in MODEL_KEYS
     assert "qwen35_4b" in MODEL_KEYS
     assert "qwen35_9b" in MODEL_KEYS
+    assert "qwen35_2b" in MODEL_KEYS
     assert "gemma3_12b_it" in MODEL_KEYS
     assert "gemma3_27b_pt" in MODEL_KEYS
     assert "qwen35_27b" in MODEL_KEYS
@@ -90,6 +91,8 @@ def test_default_sae_profiles():
         "llama_scope_r1_distill"
     )
     assert get_profile("qwen3_8b_resid_w64k").loader == "qwen_resid_topk"
+    assert get_profile("qwen35_2b_resid_w32k").loader == "qwen_resid_topk"
+    assert get_profile("gemma270m_scope_resid").sae_release.endswith("-resid_post")
     assert get_profile("gemma2_9b_pt_scope_resid").sae_id(9) == (
         "layer_9/width_16k/average_l0_51"
     )
