@@ -21,12 +21,12 @@ def _read_config(root:Path):
         raise ValueError("M3 run directory does not match frozen configuration ID")
     return config
 
-def _read_m3(root):
+def _read_m3(root, *, localization_paper=None):
     root=Path(root)
     config=_read_config(root)
     rows=read_metrics(root,config.run_id)
     from saebase.benchmarks.runner import validate_external_sources
-    validate_external_sources(config,rows)
+    validate_external_sources(config,rows,root=root,localization_paper=localization_paper)
     provenance=json.loads((root/"provenance.json").read_text())
     return config,rows,provenance
 
