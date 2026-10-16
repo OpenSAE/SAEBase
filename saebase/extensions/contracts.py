@@ -18,9 +18,7 @@ API_VERSION = 1
 ENTRY_POINT_GROUP = "opensae.saebase.extensions.v1"
 _KEY = re.compile(r"ext\.[a-z][a-z0-9_]+(?:\.[a-z][a-z0-9_]*)+")
 _DTYPES = frozenset({"float16", "float32", "float64", "bfloat16"})
-_NORMALIZATIONS = frozenset(
-    {"none", "layer_norm", "unit_norm", "folded", "custom"}
-)
+_NORMALIZATIONS = frozenset({"none", "layer_norm", "unit_norm", "folded", "custom"})
 
 
 def _key(value: str) -> None:

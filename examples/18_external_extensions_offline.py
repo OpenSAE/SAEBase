@@ -105,9 +105,7 @@ def main() -> int:
                 ],
                 "dataset": {
                     "id": "synthetic",
-                    "samples": [
-                        {"sample_id": "demo1", "token_ids": [1, 2, 3], "split": "test"}
-                    ],
+                    "samples": [{"sample_id": "demo1", "token_ids": [1, 2, 3], "split": "test"}],
                 },
                 "metrics": [METRIC],
                 "sources": {METRIC: str(Path(__file__).resolve())},

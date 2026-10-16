@@ -43,9 +43,7 @@ def isolated_registry(monkeypatch):
         monkeypatch.setattr(extensions_registry, name, {})
     for name in ("_BUNDLES", "_DISCOVERED"):
         monkeypatch.setattr(extensions_registry, name, set())
-    monkeypatch.setattr(
-        benchmark_registry, "_METRICS", dict(benchmark_registry._METRICS)
-    )
+    monkeypatch.setattr(benchmark_registry, "_METRICS", dict(benchmark_registry._METRICS))
 
 
 def bundle(source_file: Path, *, use_codes: bool = False) -> ExtensionBundle:
@@ -61,9 +59,7 @@ def bundle(source_file: Path, *, use_codes: bool = False) -> ExtensionBundle:
         source="https://example.org/original/toy_metric.py",
         revision="demo-v1",
         source_file=source_file,
-        evaluator=lambda ctx: ExternalObservation(
-            0.25 if ctx.code_store is not None else 0.5, 1
-        ),
+        evaluator=lambda ctx: ExternalObservation(0.25 if ctx.code_store is not None else 0.5, 1),
     )
     return ExtensionBundle(
         name="ext.toy.extension",
@@ -110,9 +106,7 @@ def config(source: Path) -> BenchmarkConfig:
             ],
             "dataset": {
                 "id": "toy-data",
-                "samples": [
-                    {"sample_id": "toy1", "token_ids": [1, 2, 3], "split": "test"}
-                ],
+                "samples": [{"sample_id": "toy1", "token_ids": [1, 2, 3], "split": "test"}],
             },
             "metrics": [METRIC],
             "sources": {METRIC: str(source)},
@@ -204,8 +198,16 @@ def test_hook_and_width_conflicts_rejected_before_factory(tmp_path):
                 original.models,
                 (
                     ExternalSAE(
-                        SAE, MODEL, "https://example.org/sae", "revision-1", SITE,
-                        5, 7, "linear", "none", "float32",
+                        SAE,
+                        MODEL,
+                        "https://example.org/sae",
+                        "revision-1",
+                        SITE,
+                        5,
+                        7,
+                        "linear",
+                        "none",
+                        "float32",
                         lambda device: ResearchToySAE().eval(),
                     ),
                 ),
@@ -214,8 +216,17 @@ def test_hook_and_width_conflicts_rejected_before_factory(tmp_path):
     assert list_extensions()["models"] == ()
     with pytest.raises(ValueError, match="normalization"):
         ExternalSAE(
-            SAE, MODEL, "https://example.org", "rev", SITE,
-            4, 7, "linear", "unspecified", "float32", lambda device: None,
+            SAE,
+            MODEL,
+            "https://example.org",
+            "rev",
+            SITE,
+            4,
+            7,
+            "linear",
+            "unspecified",
+            "float32",
+            lambda device: None,
         )
 
 

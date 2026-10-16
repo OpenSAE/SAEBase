@@ -37,13 +37,15 @@ def validate_external_target(target: Any) -> None:
             raise ValueError(f"external target SAE not registered: {key}")
         if sae.model_key != target.model_key:
             raise ValueError(f"SAE {key} targets {sae.model_key}, not {target.model_key}")
-        if (sae.site.layer, sae.site.hook_name) != (
-            target.site.layer, target.site.hook_name
-        ):
+        if (sae.site.layer, sae.site.hook_name) != (target.site.layer, target.site.hook_name):
             raise ValueError("benchmark hook and layer differ from external SAE registration")
         expected = next(
-            (site.width for site in model.hooks if site.site.layer == target.site.layer
-             and site.site.hook_name == target.site.hook_name),
+            (
+                site.width
+                for site in model.hooks
+                if site.site.layer == target.site.layer
+                and site.site.hook_name == target.site.hook_name
+            ),
             None,
         )
         if expected != sae.d_in:
@@ -51,7 +53,11 @@ def validate_external_target(target: Any) -> None:
 
 
 def load_external_pair(
-    *, model_key: str, sae_key: str, layer: int, device: str = "cpu",
+    *,
+    model_key: str,
+    sae_key: str,
+    layer: int,
+    device: str = "cpu",
     probe_tokens: torch.Tensor | None = None,
 ) -> LoadedExternalPair:
     """Load explicitly registered providers. A token probe is optional.
@@ -67,15 +73,19 @@ def load_external_pair(
     if sae_spec.model_key != model_key or sae_spec.site.layer != layer:
         raise ValueError("external model/SAE identity or layer mismatch")
     model_hook = next(
-        (h for h in model_spec.hooks if h.site.layer == layer
-         and h.site.hook_name == sae_spec.site.hook_name),
+        (
+            h
+            for h in model_spec.hooks
+            if h.site.layer == layer and h.site.hook_name == sae_spec.site.hook_name
+        ),
         None,
     )
     if model_hook is None or model_hook.width != sae_spec.d_in:
         raise ValueError("external model hook/width differs from SAE specification")
     loaded_model = model_spec.factory(device)
     adapter = (
-        loaded_model if isinstance(loaded_model, ModelAdapter)
+        loaded_model
+        if isinstance(loaded_model, ModelAdapter)
         else ModelAdapter(loaded_model, backend=model_spec.backend)
     )
     adapter.capabilities.require("capture")
@@ -87,9 +97,7 @@ def load_external_pair(
         raise ValueError("external SAE must expose cfg.d_in and cfg.d_sae")
     if int(config.d_in) != sae_spec.d_in or int(config.d_sae) != sae_spec.d_sae:
         raise ValueError("loaded SAE dimensions differ from registered dimensions")
-    if not callable(getattr(sae, "encode", None)) or not callable(
-        getattr(sae, "decode", None)
-    ):
+    if not callable(getattr(sae, "encode", None)) or not callable(getattr(sae, "decode", None)):
         raise TypeError("external SAE must implement encode and decode")
     identity = SAEIdentity.from_loaded(
         sae=sae,

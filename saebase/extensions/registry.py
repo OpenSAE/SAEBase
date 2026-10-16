@@ -63,9 +63,7 @@ def register_extension(bundle: ExtensionBundle) -> None:
         model = available_models.get(sae.model_key)
         if model is None:
             raise ValueError(f"external SAE requires registered external model: {sae.model_key}")
-        widths = {
-            (hook.site.layer, hook.site.hook_name): hook.width for hook in model.hooks
-        }
+        widths = {(hook.site.layer, hook.site.hook_name): hook.width for hook in model.hooks}
         actual = widths.get((sae.site.layer, sae.site.hook_name))
         if actual is None:
             raise ValueError(f"SAE hook {sae.site.hook_name!r} not registered by model")
