@@ -1,0 +1,120 @@
+name: Research Integration Regression (pinned)
+
+# Fixed upstream SHAs for reproducible PR regression, never floating heads.
+on:
+  pull_request:
+    paths:
+      - "saebase/benchmarks/**"
+      - "saebase/reliability/**"
+      - "saebase/integrations/**"
+      - "tests/test_phase_c_reference_contract.py"
+      - "tests/test_m3_paper_adapters.py"
+      - "tests/test_m4_ground_truth.py"
+      - "scripts/m4_ground_truth.py"
+      - ".github/workflows/research-regression.yml"
+  push:
+    branches: [main]
+    paths:
+      - "saebase/benchmarks/**"
+      - "saebase/reliability/**"
+      - "saebase/integrations/**"
+      - "tests/test_phase_c_reference_contract.py"
+      - "tests/test_m3_paper_adapters.py"
+      - "tests/test_m4_ground_truth.py"
+      - "scripts/m4_ground_truth.py"
+      - ".github/workflows/research-regression.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: research-regression-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  original-estimators:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: OpenSAE/SAE-Behavioral-Compositionality
+          ref: c253dca303437318c1f4f4937557ac9d22143b19
+          path: originals/sar
+      - uses: actions/checkout@v7
+        with:
+          repository: OpenSAE/Redistribution-Sensitivity-Score
+          ref: 0b321851e7b79564bf72656e1dbcaaca513048d8
+          path: originals/rss
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install offline regression dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Log exact original estimator sources
+        run: |
+          echo "SAR source: $(git -C originals/sar rev-parse HEAD)"
+          echo "RSS source: $(git -C originals/rss rev-parse HEAD)"
+      - name: Verify original M3 SAR and RSS estimator parity
+        env:
+          SAEBASE_SAR_SOURCE: originals/sar/sar.py
+          SAEBASE_RSS_SOURCE: originals/rss/rss.py
+        run: python -m pytest -q tests/test_phase_c_reference_contract.py tests/test_m3_paper_adapters.py
+
+  synthetic-ground-truth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: OpenSAE/SAE-Behavioral-Compositionality
+          ref: c253dca303437318c1f4f4937557ac9d22143b19
+          path: originals/sar
+      - uses: actions/checkout@v7
+        with:
+          repository: OpenSAE/Redistribution-Sensitivity-Score
+          ref: 0b321851e7b79564bf72656e1dbcaaca513048d8
+          path: originals/rss
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install reproducibility tests
+        run: python -m pip install -e ".[dev]"
+      - name: Check original M4 estimators against known synthetic truth
+        env:
+          SAEBASE_SAR_SOURCE: originals/sar/sar.py
+          SAEBASE_RSS_SOURCE: originals/rss/rss.py
+        run: |
+          set -euo pipefail
+          python -m pytest -q tests/test_m4_ground_truth.py
+          saebase-ground-truth \
+            --config conf/reliability/m4_ground_truth.json \
+            --sar-source originals/sar/sar.py \
+            --rss-source originals/rss/rss.py \
+            --output "$RUNNER_TEMP/ground-truth.json"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          record = json.loads(
+              (Path(os.environ["RUNNER_TEMP"]) / "ground-truth.json").read_text()
+          )
+          assert record["status"] == "passed", record
+          assert len(record["factor_cases"]) == 4
+          assert len(record["known_interaction_cases"]) == 3
+          assert record["known_rss_direction_case"]["status"] == "passed"
+          assert len(record["negative_invariance_controls"]) == 3
+          print("Pinned SAR/RSS scientific controls passed")
+          PY
+      - name: Preserve native synthetic truth evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: saebase-pinned-research-controls
+          path: ${{ runner.temp }}/ground-truth.json
+          if-no-files-found: warn
+          retention-days: 30
