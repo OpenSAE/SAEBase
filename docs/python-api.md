@@ -73,6 +73,10 @@ status and source identity. It is not a universal metric score. See [Benchmarkin
 `evaluate_m3` is a stable internal-facing function name; user-facing
 documentation calls this a benchmark audit. See [Reliability Analysis](reliability.md).
 
+CLI entry points are provided by the canonical `saebase.cli` module. The
+original command names and legacy Python modules (`main`, `scripts`, `models`,
+`tasks`, and `conf`) remain available. See [Packaging and Compatibility](packaging.md).
+
 ## Command-line overview
 
 | Command | Main use |

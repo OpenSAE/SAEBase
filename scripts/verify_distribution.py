@@ -11,6 +11,8 @@ import zipfile
 
 NEEDED_WHEEL = {
     "main.py",
+    "saebase/cli.py", "saebase/model_plugins.py",
+    "saebase/tasks/__init__.py", "saebase/tasks/plugins.py",
     "saebase/benchmarks/__init__.py", "saebase/benchmarks/runner.py",
     "saebase/benchmarks/planner.py", "saebase/benchmarks/results.py",
     "saebase/reliability/__init__.py", "saebase/reliability/runner.py",
@@ -77,12 +79,29 @@ def validate(dist_dir: Path) -> dict[str, object]:
         missing = sorted(NEEDED_WHEEL - wheel_files)
         if missing:
             raise AssertionError(f"Wheel missing {missing}")
+        forbidden_wheel = sorted(p for p in wheel_files if p.startswith(
+            "conf/coverage/stage_d_evidence/") or p.startswith("work_plan/")
+            or p.endswith((".safetensors", ".pt", ".pth", ".ckpt")))
+        if forbidden_wheel:
+            raise AssertionError(f"Non-runtime assets leaked into wheel: {forbidden_wheel[:5]}")
         entry_file = next((p for p in wheel_files if p.endswith(".dist-info/entry_points.txt")), None)
         if entry_file is None:
             raise AssertionError("Wheel entry points are missing")
         entries = z.read(entry_file).decode("utf-8")
-        if not all(e in entries for e in ("saebase = main:main", "saebase-prepare-prompts", "saebase-check-env", "saebase-intervene", "saebase-benchmark", "saebase-audit", "saebase-ground-truth", "saebase-release-matrix", "saebase-release-gate")):
-            raise AssertionError("Installed command entry points missing")
+        expected_entries = {
+            "saebase": "saebase.cli:main",
+            "saebase-prepare-prompts": "saebase.cli:prepare_prompts",
+            "saebase-check-env": "saebase.cli:check_env",
+            "saebase-intervene": "saebase.cli:intervene",
+            "saebase-benchmark": "saebase.cli:benchmark",
+            "saebase-audit": "saebase.cli:audit",
+            "saebase-ground-truth": "saebase.cli:ground_truth",
+            "saebase-release-matrix": "saebase.cli:release_matrix",
+            "saebase-release-gate": "saebase.cli:release_gate",
+        }
+        for name, target in expected_entries.items():
+            if f"{name} = {target}" not in entries.splitlines():
+                raise AssertionError(f"Missing or misdirected CLI entry point: {name}")
         metadata_file = next((p for p in wheel_files if p.endswith(".dist-info/METADATA")), None)
         if metadata_file is None:
             raise AssertionError("Wheel metadata missing")
@@ -101,6 +120,10 @@ def validate(dist_dir: Path) -> dict[str, object]:
             if len(segments) < 2:
                 continue
             rest = segments[1:]
+            if rest[:3] == ("conf", "coverage", "stage_d_evidence") or (
+                rest and rest[0] == "work_plan"
+            ):
+                raise AssertionError(f"Archived experimental evidence in sdist: {member.name}")
             if any(part in BAD_PARTS for part in rest) or (rest and rest[0] in BAD_TOP_LEVEL):
                 raise AssertionError(f"Unexpected generated/runtime file: {member.name}")
             if member.isfile():

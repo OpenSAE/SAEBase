@@ -56,15 +56,15 @@ dev = ["pytest>=7", "build>=1.2", "twine>=5", "PyYAML>=6", "pytest-cov>=5,<8"]
 quality = ["ruff>=0.12,<0.16", "mypy>=1.15,<2", "pre-commit>=4,<5"]
 
 [project.scripts]
-saebase = "main:main"
-saebase-prepare-prompts = "scripts.sae_prepare_prompts:main"
-saebase-check-env = "scripts.check_env:main"
-saebase-intervene = "scripts.m2_batch:main"
-saebase-benchmark = "scripts.m3_benchmark:main"
-saebase-audit = "scripts.m4_reliability:main"
-saebase-ground-truth = "scripts.m4_ground_truth:main"
-saebase-release-matrix = "scripts.m5_release_matrix:main"
-saebase-release-gate = "scripts.m5_release_gate:main"
+saebase = "saebase.cli:main"
+saebase-prepare-prompts = "saebase.cli:prepare_prompts"
+saebase-check-env = "saebase.cli:check_env"
+saebase-intervene = "saebase.cli:intervene"
+saebase-benchmark = "saebase.cli:benchmark"
+saebase-audit = "saebase.cli:audit"
+saebase-ground-truth = "saebase.cli:ground_truth"
+saebase-release-matrix = "saebase.cli:release_matrix"
+saebase-release-gate = "saebase.cli:release_gate"
 
 [project.urls]
 Repository = "https://github.com/OpenSAE/SAEBase"
@@ -102,3 +102,8 @@ check_untyped_defs = true
 disallow_untyped_defs = true
 warn_unused_ignores = true
 show_error_codes = true
+
+# Original Stage D evidence is published separately as a checksum-verified
+# GitHub Evidence Release; keep configs in the wheel, not experiment records.
+[tool.setuptools.exclude-package-data]
+conf = ["coverage/stage_d_evidence/*", "coverage/stage_d_evidence/**/*"]

@@ -38,6 +38,8 @@ def smoke(dist_dir: Path) -> dict[str, str]:
         commands = [
             [str(script), "--list"],
             [str(target / "bin" / "saebase-prepare-prompts"), "--help"],
+            [str(target / "bin" / "saebase-intervene"), "--help"],
+            [str(target / "bin" / "saebase-ground-truth"), "--help"],
             [str(target / "bin" / "saebase-check-env"), "--help"],
             [str(target / "bin" / "saebase-benchmark"), "--help"],
             [str(target / "bin" / "saebase-audit"), "--help"],
@@ -47,6 +49,12 @@ def smoke(dist_dir: Path) -> dict[str, str]:
                 "from pathlib import Path; from importlib.resources import files; "
                 "import saebase, main, conf; "
                 "from saebase.api import ModelAdapter, ActivationSite; "
+                "import saebase.cli, saebase.model_plugins, saebase.tasks.plugins; "
+                "import models.plugins, tasks.plugins, scripts.m3_benchmark; "
+                "from saebase.registry import list_registered_task_keys; "
+                "assert 'sae' in list_registered_task_keys(); "
+                "assert models.plugins._HOOKED_KEYS is saebase.model_plugins._HOOKED_KEYS; "
+                "assert tasks.plugins.SAETask is saebase.tasks.plugins.SAETask; "
                 "assert (files('conf')/'config.yaml').is_file(); "
                 "assert (files('conf')/'release'/'m5_matrix.json').is_file(); "
                 "assert (files('conf')/'release'/'m5_asset_provenance.json').is_file(); "

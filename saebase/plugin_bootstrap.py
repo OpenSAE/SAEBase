@@ -10,7 +10,7 @@ def ensure_plugins_loaded() -> None:
     if _loaded:
         return
     import saebase.data.plugins  # noqa: F401
-    import models.plugins  # noqa: F401
-    import tasks.plugins  # noqa: F401
+    import saebase.model_plugins  # noqa: F401
+    import saebase.tasks.plugins  # noqa: F401
 
     _loaded = True

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **Packaging and namespace governance:** move command entrypoints under `saebase.cli` and plugin registration under `saebase.model_plugins` / `saebase.tasks.plugins`, retaining the old import paths as forwarding shims. Exclude archived Stage D evidence records from new wheel/sdist builds (still available in Git and the dedicated evidence release). Verify all nine installed CLI commands, original package resources and a clean build from the sdist.
+
 - **Stage D evidence archive:** Checksum-verified compact evidence release, offline verifier, explicit raw-file recovery checks, and a publication workflow gated on successful main-branch CI. Original GPU runs are not reconstructed from summaries.
 
 <!-- BEGIN VERIFIED_MODEL_SUPPORT -->
