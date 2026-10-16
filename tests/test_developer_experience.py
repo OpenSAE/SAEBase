@@ -7,7 +7,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
 import yaml
 
 from scripts.check_documentation import ROOT, missing_links, validate
@@ -30,9 +29,7 @@ def test_repository_docs_have_valid_relative_navigation():
 def test_relative_link_checker_detects_bad_paths(tmp_path):
     guide = tmp_path / "README.md"
     guide.write_text("[tutorial](docs/missing.md)\n", encoding="utf-8")
-    assert missing_links(guide, tmp_path) == [
-        "README.md:1: docs/missing.md"
-    ]
+    assert missing_links(guide, tmp_path) == ["README.md:1: docs/missing.md"]
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "missing.md").write_text("# Present\n", encoding="utf-8")
     assert missing_links(guide, tmp_path) == []
