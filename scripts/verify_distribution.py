@@ -65,6 +65,9 @@ NEEDED_SDIST = NEEDED_WHEEL | {
     ".github/workflows/real-smoke.yml",
     ".github/workflows/research-regression.yml",
     ".github/workflows/upstream-compatibility.yml",
+    ".github/workflows/software-release.yml",
+    "scripts/release_candidate.py",
+    "docs/release-process.md", "tests/test_release_candidate.py",
     "docs/M2_BATCH_INTERVENTIONS.md",
     "scripts/m2_real_smoke.py", "examples/11_batch_interventions_offline.py",
 }

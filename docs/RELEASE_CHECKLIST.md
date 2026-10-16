@@ -1,5 +1,7 @@
 # SAEBase v0.2.0 Release Verification
 
+For future software versions, see the [General Software Release Process](release-process.md). This checklist records the original v0.2.0 validation and must not be used to overwrite its tag or published assets.
+
 The [official v0.2.0 GitHub Release](https://github.com/OpenSAE/SAEBase/releases/tag/v0.2.0) has been published. Its annotated tag identifies the exact validated source commit. The release distributes SAEBase software, **not third-party model or SAE weights**.
 
 ## Completed publication checks

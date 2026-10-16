@@ -99,6 +99,14 @@ jobs:
           python scripts/verify_distribution.py dist
       - name: Rebuild wheel from clean source archive
         run: python scripts/check_sdist_roundtrip.py dist
+      - name: Verify generic software release candidate without publishing
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          python scripts/release_candidate.py prepare             --dist dist --output-dir "$RUNNER_TEMP/software-release"             --source-sha "$SOURCE_SHA"
+          python scripts/release_candidate.py verify-assets             --dist dist --output-dir "$RUNNER_TEMP/software-release"             --source-sha "$SOURCE_SHA"
       - uses: actions/upload-artifact@v4
         with:
           name: saebase-distributions
