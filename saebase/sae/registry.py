@@ -427,7 +427,7 @@ _PROFILES: dict[str, SAEProfile] = {
         loader="sae_lens",
         sae_id_by_layer=(
             (9, "layer_9/width_16k/average_l0_51"),
-            (20, "layer_20/width_16k/average_l0_57"),
+            (20, "layer_20/width_16k/average_l0_58"),
             (31, "layer_31/width_16k/average_l0_35"),
         ),
         notes="Gemma Scope 16k; 3 layers aligned with native IT SAE sites.",
