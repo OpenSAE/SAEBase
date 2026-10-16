@@ -22,3 +22,7 @@ model operations, SAE loading, interventions, and reproducible experiment I/O.
 - Record third-party source links, licenses, and attribution in the PR.
 
 Review `docs/API.md`, `docs/RELEASE_CHECKLIST.md`, and `SECURITY.md` before a release.
+
+## Code quality
+
+Install `python -m pip install -e ".[dev,quality]"` and see [Code Quality and Coverage](docs/code-quality.md). Ruff and mypy initially cover selected modules; new Python files must pass Ruff lint and formatting. Existing code will not be reformatted across the repository.

@@ -27,3 +27,7 @@ m0-artifacts/
 activation-cache/
 m1-cache/
 m1-artifacts/
+
+# Coverage artifacts
+coverage.xml
+coverage.json
