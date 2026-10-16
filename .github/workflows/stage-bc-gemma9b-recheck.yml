@@ -1,10 +1,6 @@
 name: Stage C Gemma 9B SAE checkpoint regression
 
 on:
-  pull_request:
-    paths:
-      - 'saebase/sae/registry.py'
-      - '.github/workflows/stage-bc-gemma9b-recheck.yml'
   workflow_dispatch:
 
 permissions:

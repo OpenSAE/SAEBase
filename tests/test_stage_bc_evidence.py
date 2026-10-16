@@ -120,3 +120,36 @@ def test_gemma_9b_uses_an_upstream_mapped_real_checkpoint():
     assert get_profile(key).sae_id(20) == "layer_20/width_16k/average_l0_58"
     catalog = load_coverage(CATALOG)
     assert catalog.find(key).source(20)["source_file_id"].endswith("average_l0_58")
+
+def test_published_real_stage_b_and_c_ledgers_are_consistent():
+    import json
+    import re
+    root = Path(__file__).resolve().parents[1] / "conf" / "coverage"
+    catalog = load_coverage(CATALOG)
+    stage_c = json.loads((root / "stage_c_cpu_verified.json").read_text())
+    expected = {(e.sae_key, layer) for e in catalog.entries for layer in e.cpu_probe_layers}
+    records = stage_c["entries"]
+    assert stage_c["checkpoint_count"] == 21 == len(records)
+    assert {(r["sae_key"], r["layer"]) for r in records} == expected
+    assert stage_c["distinct_sae_profiles"] == 17
+    assert all(re.fullmatch(r"[0-9a-f]{64}", r["sae_state_sha256"])
+               and re.fullmatch(r"[0-9a-f]{64}", r["evidence_json_sha256"])
+               and str(r["source_run"]) in stage_c["source_commits"]
+               and str(r["source_run"]) in r["artifact_url"]
+               for r in records)
+    assert stage_c["repaired"]["old_id"].endswith("average_l0_57")
+    assert stage_c["repaired"]["corrected_id"].endswith("average_l0_58")
+    stage_b = json.loads((root / "stage_b_cpu_verified.json").read_text())
+    pairs = stage_b["results"]
+    assert len(pairs) == 3
+    assert {r["sae_key"] for r in pairs} == {
+        "pythia410m_mlp_topk", "qwen3_1_7b_base_resid_w32k",
+        "r1_distill_qwen15b_resid_l20",
+    }
+    assert all(r["pair_verified"] and r["m3m4_verified"]
+               and r["benchmark_metric_rows"] == 5
+               and r["reliability_audits"] == 3
+               and r["sample_count"] == 2
+               and re.fullmatch(r"[0-9a-f]{64}", r["m3_sha256"])
+               and re.fullmatch(r"[0-9a-f]{64}", r["m4_sha256"])
+               for r in pairs)

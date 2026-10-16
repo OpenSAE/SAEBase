@@ -52,4 +52,5 @@ jobs:
           print(summary)
           with open(os.environ["GITHUB_STEP_SUMMARY"],"a") as f:
               f.write(f"Stage B/C source metadata: {summary}. A source HEAD response is not genuine SAE weight acceptance.\n")
+          raise SystemExit(0 if data["found"] == data["total"] and data["failed"] == data["unresolved"] == 0 else 1)
           PY
