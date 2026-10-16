@@ -101,17 +101,19 @@ Real runs download the requested weights and produce `metrics.jsonl`, `summary.c
 
 ## 🧠 Model and SAE Support
 
-**Open SAE coverage from 270M to 9B.** [Stages B+C](docs/stage-bc-model-sae-coverage.md) organize 15 representative models, three complementary SAE architectures and 48 selected layer checkpoints. **21/21 selected SAE checkpoints have passed genuine CPU weight and encode/decode acceptance**, with full artifact hashes. Real model–SAE capture, feature ablation, Benchmark and Reliability have also passed for Pythia 410M, Qwen3 1.7B Base and DeepSeek-R1-Distill-Qwen 1.5B, alongside Qwen3.5 2B. Larger model-pair runs remain for Stage D. See the [full model and SAE matrix](docs/stage-bc-model-sae-coverage.md) and [Phase A evidence](docs/phase-a-model-coverage.md).
+<!-- BEGIN VERIFIED_MODEL_SUPPORT -->
+**Current main (Stage D, 2026-10-16).** **48/48** selected model-SAE layer sites passed real pair acceptance; **48/48** completed the 64-group engineering benchmark and **48/48** completed reliability auditing, across **18** profiles (270M-9B). See the [verified layer matrix](docs/verified-model-matrix.md).
+<!-- END VERIFIED_MODEL_SUPPORT -->
 
 
-SAEBase can register many model/SAE configurations, but **registration is not evidence of runtime validation**. The published real-checkpoint acceptance uses:
+**Historical `v0.2.0` release acceptance (separate from current `main`):**
 
 | Model | Verified activation site | Real SAE checkpoints exercised |
 | :--- | :--- | :--- |
 | **Pythia-70M (deduped)** | `blocks.3.hook_resid_post` | Residual-stream SAE and a separately trained gated SAE |
 | **GPT-2 Small** | `blocks.8.hook_resid_pre` | Original residual SAE and feature-splitting SAE |
 
-Both model families were executed with two distinct SAE checkpoint weight hashes and six fixed prompts per model. Additional model profiles, including Gemma and larger checkpoints, are available in the registry but may require other dependencies, access permissions, hardware, or separate acceptance. See [Supported Models and Checkpoints](docs/model-support.md).
+The `v0.2.0` release exercised two SAE checkpoint hashes per model with six fixed prompts per model. Its validation scope is historical; see the Stage D matrix above for later `main` evidence. Individual checkpoints may still require access approval and suitable hardware. See [Supported Models and Checkpoints](docs/model-support.md).
 
 ---
 

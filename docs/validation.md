@@ -2,7 +2,13 @@
 
 SAEBase distinguishes **what can be configured**, **what has run with real public weights**, and **what its scientific results establish**. A successful registry lookup or a synthetic smoke test is not proof of a real checkpoint evaluation.
 
-## Verified capabilities
+<!-- BEGIN VERIFIED_MODEL_SUPPORT -->
+## Current main Stage D evidence
+
+**48/48** real pair acceptances, **48/48** 64-group engineering benchmark runs and **48/48** reliability audits across **18** profiles (2026-10-16). See the [per-site reports](verified-model-matrix.md).
+<!-- END VERIFIED_MODEL_SUPPORT -->
+
+## `v0.2.0` release acceptance (historical)
 
 | Validation area | Publicly exercised evidence |
 | --- | --- |
@@ -15,7 +21,7 @@ SAEBase distinguishes **what can be configured**, **what has run with real publi
 | Original research estimators | SAR/RSS original-source checks; native SAEBench Core and Sparse Probing evaluations and import parity |
 | Distribution | Verified GitHub `v0.2.0` wheel, source archive, release evidence, checksums and annotated tag |
 
-The verified multi-checkpoint matrix uses **six fixed prompts per model family** and at least two independent SAE checkpoint SHA-256 identities per model. This is sufficient to exercise the software pipeline, not to estimate population-level SAE quality with narrow confidence intervals.
+The historical `v0.2.0` multi-checkpoint matrix used **six fixed prompts per model family** and at least two independent SAE checkpoint SHA-256 identities per model. This is sufficient to exercise the software pipeline, not to estimate population-level SAE quality with narrow confidence intervals.
 
 ## Verification examples
 

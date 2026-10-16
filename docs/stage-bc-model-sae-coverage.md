@@ -1,5 +1,7 @@
 # Model and SAE Coverage — Stages B+C
 
+> **Historical Stage B+C snapshot.** This page preserves the CPU-era evidence at that stage. For current Stage D results, see the [verified layer matrix](verified-model-matrix.md).
+
 **Upstream source validation:** 48/48 selected SAE checkpoint file paths returned valid source metadata (size, ETag and upstream commit) without downloading weights. This is a lighter check than the 21 actual checkpoint evaluations. [Full 48-file metadata artifact](https://github.com/OpenSAE/SAEBase/actions/runs/38829795455/artifacts/12017011100). Both Matryoshka SAE folders have been mapped to their published `sae_weights.safetensors` files.\n\n**Validated CPU evidence:** [21/21 genuine SAE checkpoint ledger](../conf/coverage/stage_c_cpu_verified.json) and [three real model–SAE + M3/M4 acceptance records](../conf/coverage/stage_b_cpu_verified.json). The 21 SAE checkpoints were independently decoded using original public weights; one Gemma Scope 9B PT L20 checkpoint was fixed from nonexistent L0 57 to upstream-mapped L0 58, then [validated separately](https://github.com/OpenSAE/SAEBase/actions/runs/38828805176/artifacts/12015864245) without replaying the other 20. The other 27 registered layer positions have **not** undergone this CPU weight-acceptance protocol. CPU SAE-only acceptance is not a full LLM–SAE pair test.
 
 **Real M3/M4 acceptance:** Three smaller models each produced 5 completed Benchmark metric rows and 3 completed Reliability audits, with manifest and JSONL checksums verified against the archived results. See [Pythia 410M](https://github.com/OpenSAE/SAEBase/actions/runs/38827730625/artifacts/12016370395), [Qwen3 1.7B Base](https://github.com/OpenSAE/SAEBase/actions/runs/38827730625/artifacts/12015962255), and [DeepSeek R1 Distill Qwen 1.5B](https://github.com/OpenSAE/SAEBase/actions/runs/38827730625/artifacts/12015698101). Two real prompts per model establish engineering compatibility, not statistical SAE quality.
@@ -61,8 +63,8 @@ Each SAE-only acceptance reports full loaded state SHA-256, input/output dimensi
 
 Individual weight licenses, gated model permissions, and SAE architecture/site contracts remain the responsibility of the individual source. Do not treat an unvalidated YAML or model card as verified.
 
-## Stage D boundary
+## Stage D boundary at completion of B+C
 
-No 4B–9B language-model forward passes, feature interventions, cross-layer large-model Benchmark or GPU throughput claims are required by B+C. Those remain Stage D work on actual suitable GPU runners, along with gated Gemma and Meta Llama access.
+No 4B–9B language-model forward passes, feature interventions, cross-layer large-model Benchmark or GPU throughput claims are required by B+C. Those were Stage D work at the time. Later Stage D engineering-acceptance results are now documented in the [current verified layer matrix](verified-model-matrix.md).
 
 [Model Support](model-support.md) · [Phase A Results](phase-a-model-coverage.md) · [Research Integrations](research-integrations.md)

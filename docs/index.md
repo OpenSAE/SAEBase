@@ -6,9 +6,10 @@ Start with the task you want to perform. The documentation is organized by **cap
 
 ## Getting started
 
+- [Verified Model and SAE Layer Matrix](verified-model-matrix.md) — current `main` Stage D results and per-site evidence.
 - [Getting Started](getting-started.md) — installation, offline example, benchmark preflight and a real checkpoint walkthrough.
 - [Phase A Model Coverage](phase-a-model-coverage.md) — six initial 270M–8B models with real checkpoint evidence.
-- [Model and SAE Coverage: Stages B+C](stage-bc-model-sae-coverage.md) — 15 core model variants, 48 layer checkpoints, CPU evidence and Stage D boundary.
+- [Model and SAE Coverage: Stages B+C](stage-bc-model-sae-coverage.md) — 15 core model variants, 48 layer checkpoints, historical CPU-era evidence before Stage D.
 - [Models and SAEs](model-support.md) — registry versus verified checkpoint coverage, public source links and access constraints.
 - [Examples Index](../examples/README.md) — runnable demonstrations grouped by research task.
 - [Python API](python-api.md) — public research functions, store/benchmark/audit entrypoints and CLI commands.

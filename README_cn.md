@@ -101,17 +101,19 @@ saebase-benchmark --config conf/benchmark/p0_small.json --report-only
 
 ## 🧠 支持的模型与 SAE
 
-**模型与 SAE 规模覆盖 270M–9B。** 阶段 B+C 整理了 15 个代表性模型、三类额外 SAE 架构及 48 个已注册层位。**选取的 21/21 个 SAE checkpoint 均通过真实 CPU 权重加载、编码解码与哈希验收。** Pythia 410M、Qwen3 1.7B Base、DeepSeek-R1-Distill-Qwen 1.5B 均通过真实 CPU 模型–SAE 干预、Benchmark 与 Reliability 验收，原有 Qwen3.5 2B 的结果也保留。大模型完整前向与干预留待阶段 D。详见[模型与 SAE 覆盖矩阵](docs/stage-bc-model-sae-coverage.md)。
+<!-- BEGIN VERIFIED_MODEL_SUPPORT -->
+**当前 main（Stage D，2026-10-16）。** **48/48** 个已选模型-SAE 层位通过真实配对验收，**48/48** 个完成包含 64 个独立评估组的工程 Benchmark，**48/48** 个完成 Reliability 审计，共 **18** 组模型-SAE 配置（270M-9B）。详见[已验证层位矩阵](docs/verified-model-matrix.md)。
+<!-- END VERIFIED_MODEL_SUPPORT -->
 
 
-SAEBase 注册了多种模型和 SAE 配置，但**注册成功不代表真实权重已经通过验证**。正式发布的真实验收范围为：
+**历史 `v0.2.0` 发行版的验收范围（不同于当前 `main`）：**
 
 | 模型 | 验证的激活位置 | 已执行的真实 SAE checkpoint |
 | :--- | :--- | :--- |
 | **Pythia-70M（去重版）** | `blocks.3.hook_resid_post` | Residual-stream SAE 与另一份独立训练的 Gated SAE |
 | **GPT-2 Small** | `blocks.8.hook_resid_pre` | 原始 Residual SAE 与 Feature-Splitting SAE |
 
-两种模型均验证了两个不同 SAE checkpoint 的权重哈希，每个模型使用六组固定 prompts。其他模型（含 Gemma 与更大模型）虽已注册，但可能有额外的依赖、权限、算力或独立验收要求。参见[模型与 Checkpoint 支持](docs/model-support.md)。
+`v0.2.0` 发行版对上述两种模型各验证两个 SAE checkpoint 权重哈希，每个模型使用六组固定 prompts。这只代表历史发行版；当前 Stage D 验证结果请参见上方矩阵。参见[模型与 Checkpoint 支持](docs/model-support.md)。
 
 ---
 

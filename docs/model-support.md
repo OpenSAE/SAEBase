@@ -2,9 +2,15 @@
 
 SAEBase keeps model definitions separate from SAE checkpoint profiles, experimental activation sites, tokenizer identities and source artifacts. **Registered** does not necessarily mean **verified with real checkpoint weights**.
 
-## Verified public model/SAE pairs
+<!-- BEGIN VERIFIED_MODEL_SUPPORT -->
+## Current main: Stage D
 
-The real multi-checkpoint release acceptance covers exactly two independent language-model families, each with two different SAE weight hashes:
+As of 2026-10-16, **48/48** selected model-SAE sites passed real pair acceptance, **48/48** completed the 64-group engineering benchmark and **48/48** completed reliability audits across **18** profiles. See the [per-site verified matrix](verified-model-matrix.md).
+<!-- END VERIFIED_MODEL_SUPPORT -->
+
+## Historical `v0.2.0` release acceptance
+
+The historical `v0.2.0` acceptance covered two independent model families, each with two SAE checkpoint weight hashes:
 
 | Model | Hook site | SAE sources | Validation |
 | --- | --- | --- | --- |
@@ -17,11 +23,11 @@ The verified release matrix has six distinct prompts per model. It checks compat
 
 ## Phase A 270M–8B expansion
 
-Six model/SAE pairs are tracked in [Phase A Model Coverage](phase-a-model-coverage.md). **Qwen3.5-2B Base + the original Qwen-Scope 32K SAE has passed genuine CPU model+SAE capture and identity-patch acceptance.** All six original SAE checkpoints independently loaded and encoded/decoded with genuine weights; the other five model+SAE pairs remain blocked or untested pending gated model access or high-memory GPU compute. Details and raw evidence are linked in the Phase A page.
+Six model/SAE pairs are tracked in [Phase A Model Coverage](phase-a-model-coverage.md). **Qwen3.5-2B Base + the original Qwen-Scope 32K SAE has passed genuine CPU model+SAE capture and identity-patch acceptance.** All six original SAE checkpoints independently loaded and encoded/decoded with genuine weights; the other five model+SAE pairs were blocked or untested at the end of Phase A pending gated access or high-memory GPU compute. Details and raw evidence are linked in the Phase A page.
 
 ## Stages B+C: broader cross-scale and multi-layer coverage
 
-The [Stage B+C Matrix](stage-bc-model-sae-coverage.md) catalogs 15 model variants spanning 270M–9B and three additional SAE-architecture checks across 48 selected layer checkpoints. New authentic **CPU model–SAE feature-intervention acceptance** has passed for Pythia 410M, Qwen3 1.7B Base and DeepSeek R1 Distill Qwen 1.5B. The stage-C workflow completed **21/21 genuine SAE-only CPU checks** on selected layers; full checkpoint SHA-256 and GitHub Actions provenance are in [the Stage C ledger](../conf/coverage/stage_c_cpu_verified.json). Three real small-model M3/M4 evaluations are indexed in [the Stage B ledger](../conf/coverage/stage_b_cpu_verified.json). Absence of a full LLM run does not imply model-pair verification. GitHub workflow artifacts provide individual weight hashes and numerical probes. Large-model full runs are deferred to Stage D.
+The [Stage B+C Matrix](stage-bc-model-sae-coverage.md) catalogs 15 model variants spanning 270M–9B and three additional SAE-architecture checks across 48 selected layer checkpoints. New authentic **CPU model–SAE feature-intervention acceptance** has passed for Pythia 410M, Qwen3 1.7B Base and DeepSeek R1 Distill Qwen 1.5B. The stage-C workflow completed **21/21 genuine SAE-only CPU checks** on selected layers; full checkpoint SHA-256 and GitHub Actions provenance are in [the Stage C ledger](../conf/coverage/stage_c_cpu_verified.json). Three real small-model M3/M4 evaluations are indexed in [the Stage B ledger](../conf/coverage/stage_b_cpu_verified.json). Absence of a full LLM run does not imply model-pair verification. GitHub workflow artifacts provide individual weight hashes and numerical probes. At the end of B+C, large-model full runs were deferred; the subsequent Stage D results are recorded in the current matrix above.
 
 ## Registered configurations and optional models
 

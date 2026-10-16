@@ -28,6 +28,8 @@ jobs:
           python -m pip check
           saebase-check-env --mode core
           python -c "from saebase.sae.loading import load_sae_for_profile; print('lazy SAE imports OK')"
+      - name: Check current Stage D support documentation
+        run: python scripts/generate_model_support.py --check
       - name: Run offline tests
         run: python -m pytest -q
       - name: Check CLI
