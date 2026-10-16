@@ -38,6 +38,10 @@ def probe_file_path(entry: CoverageEntry, layer: int) -> str | None:
         return p["source_file_id"].rstrip("/") + "/checkpoints/final.safetensors"
     if key.startswith("r1_distill_llama8b_llamascope"):
         return p["source_file_id"].rstrip("/") + "/sae_weights.safetensors"
+    if key == "gemma2_2b_it_matryoshka_l12_32k":
+        return "standard/blocks.12.hook_resid_post/sae_weights.safetensors"
+    if key == "qwen35_4b_matryoshka_l15_65k":
+        return "qwen-3.5-4b/btk-mat-layer-15-k-100/sae_weights.safetensors"
     if key == "mistral7b_instruct_tc_l16_131k":
         return "sae_weights.safetensors"
     # SAE Lens alias resolution may have a different physical folder and
