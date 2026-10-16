@@ -13,6 +13,10 @@ Thanks for contributing to reproducible SAE research.
 Please keep research metrics in their paper repositories. SAEBase supplies shared
 model operations, SAE loading, interventions, and reproducible experiment I/O.
 
+## Packaging and imports
+
+Use `saebase.api` and `saebase.cli` for new public interfaces. The legacy top-level `main`, `models`, `scripts`, `tasks`, and `conf` names remain installed for compatibility. Do not remove or rename them without an explicit migration and independent installed-wheel tests. See [Packaging and Compatibility](docs/packaging.md).
+
 ## Standards
 
 - Preserve the SAE identity, hook, token position, and residual semantics.

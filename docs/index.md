@@ -13,6 +13,7 @@ Start with the task you want to perform. The documentation is organized by **cap
 - [Models and SAEs](model-support.md) — registry versus verified checkpoint coverage, public source links and access constraints.
 - [Examples Index](../examples/README.md) — runnable demonstrations grouped by research task.
 - [Python API](python-api.md) — public research functions, store/benchmark/audit entrypoints and CLI commands.
+- [Packaging and Compatibility](packaging.md) — installable namespaces, original CLI compatibility and distribution boundaries.
 - [API Reference](API.md) — quick lookup of major public interfaces.
 
 ## Research capabilities
