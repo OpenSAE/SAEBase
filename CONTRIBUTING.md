@@ -23,8 +23,6 @@ model operations, SAE loading, interventions, and reproducible experiment I/O.
 
 Review `docs/API.md`, `docs/RELEASE_CHECKLIST.md`, and `SECURITY.md` before a release.
 
-## Community and maintainership
+## Code quality
 
-OpenSAE-wide [Governance](https://github.com/OpenSAE/.github/blob/main/GOVERNANCE.md), [Code of Conduct](https://github.com/OpenSAE/.github/blob/main/CODE_OF_CONDUCT.md), and [Support](https://github.com/OpenSAE/.github/blob/main/SUPPORT.md) apply here. The [Maintainer Workflow](docs/maintainer-workflow.md) describes ownership and code review.
-
-Use the repository's Model / SAE checkpoint support issue form for new checkpoints, adapters, layers, or hooks. State clearly whether you verified the checkpoint bytes, a real model-SAE pair, downstream effects, or only an offline synthetic contract.
+Install `python -m pip install -e ".[dev,quality]"` and see [Code Quality and Coverage](docs/code-quality.md). Ruff and mypy initially cover selected modules; new Python files must pass Ruff lint and formatting. Existing code will not be reformatted across the repository.

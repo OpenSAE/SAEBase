@@ -6,7 +6,9 @@ model code in environments configured by the user.
 ## Reporting a security concern
 
 Use the GitHub **Report a vulnerability** option under the repository's Security
-tab when enabled. For a private report, email hma232@wisc.edu with the subject "SAEBase security report". Please avoid sharing credentials or exploit details in public issues.
+tab when enabled. For a private report, contact the repository maintainers
+through the organization profile contact information and request a private
+reporting channel. Please avoid sharing credentials or exploit details in public issues.
 
 ## Safe use
 
@@ -17,5 +19,3 @@ tab when enabled. For a private report, email hma232@wisc.edu with the subject "
 - Never commit tokens, private prompts, or personal data to the repository.
 
 See `docs/PROVENANCE.md` for the release provenance checklist.
-
-OpenSAE's shared [Security Policy](https://github.com/OpenSAE/.github/blob/main/SECURITY.md) also applies.

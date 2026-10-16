@@ -32,8 +32,26 @@ jobs:
         run: python scripts/generate_model_support.py --check
       - name: Verify committed Stage D evidence SHA256 and coverage
         run: python scripts/stage_d_archive.py --check
-      - name: Run offline tests
-        run: python -m pytest -q
+      - name: Run offline tests and collect Python 3.11 coverage
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ matrix.python-version }}" == "3.11" ]]; then
+            python -m pytest -q --cov=saebase --cov-branch \
+              --cov-report=term --cov-report=xml:coverage.xml \
+              --cov-report=json:coverage.json
+          else
+            python -m pytest -q
+          fi
+      - name: Upload Python 3.11 coverage baseline
+        if: matrix.python-version == '3.11'
+        uses: actions/upload-artifact@v4
+        with:
+          name: saebase-core-coverage-py311
+          path: |
+            coverage.xml
+            coverage.json
+          if-no-files-found: error
       - name: Check CLI
         run: |
           cd "$(mktemp -d)"
@@ -100,3 +118,32 @@ jobs:
         run: python -m pytest -q tests/test_m3_localization.py -k native
       - name: Run full Localize benchmark and reliability demo
         run: python examples/17_localization_benchmark.py --output "$(mktemp -d)"
+
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install scoped development quality tools
+        run: python -m pip install -e ".[dev,quality]"
+      - name: Ruff on adopted modules
+        run: ruff check saebase/seed.py saebase/data/artifact_layout.py saebase/data/prompt_schema.py saebase/benchmarks/registry.py
+      - name: Mypy on adopted modules
+        run: mypy --config-file pyproject.toml saebase/seed.py saebase/data/artifact_layout.py saebase/data/prompt_schema.py saebase/benchmarks/registry.py
+      - name: Enforce lint and formatting on new Python files
+        shell: bash
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            python scripts/check_new_python_quality.py --base-sha "$PR_BASE_SHA"
+          else
+            python scripts/check_new_python_quality.py --base-sha HEAD^
+          fi
+      - name: Validate pre-commit config
+        run: pre-commit validate-config .pre-commit-config.yaml
