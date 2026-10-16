@@ -1,0 +1,154 @@
+name: Stage B+C genuine multi-layer CPU SAE verification
+
+on:
+  pull_request:
+    paths:
+      - 'conf/coverage/stage_bc.json'
+      - 'saebase/sae/coverage.py'
+      - 'saebase/sae/loading.py'
+      - 'saebase/sae/sparsify_adapter.py'
+      - 'saebase/sae/registry.py'
+      - 'scripts/phase_bc_cpu_sae.py'
+      - 'scripts/phase_bc_source_metadata.py'
+      - '.github/workflows/stage-bc-cpu-sae.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.prepare.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate CPU-only checkpoint matrix from catalog
+        id: prepare
+        run: |
+          python - <<'PY'
+          import json,os
+          catalog=json.load(open("conf/coverage/stage_bc.json"))
+          rows=[{"sae_key":entry["sae_key"],"layer":layer}
+                for entry in catalog["targets"] for layer in entry["cpu_probe_layers"]]
+          assert len(rows)==21
+          with open(os.environ["GITHUB_OUTPUT"],"a") as f:
+              f.write("matrix="+json.dumps({"include":rows},separators=(",",":"))+"\n")
+          print("Genuine CPU SAE-only checkpoint probes:",len(rows))
+          PY
+
+  sources:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Hugging Face metadata client
+        run: python -m pip install 'huggingface-hub>=0.23'
+      - name: Check official checkpoint paths and metadata without downloading weights
+        continue-on-error: true
+        env:
+          HF_HUB_DISABLE_TELEMETRY: '1'
+        run: |
+          python scripts/phase_bc_source_metadata.py --output "$RUNNER_TEMP/stage-bc-source.json"
+      - name: Upload remote source-file metadata and unresolved paths
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage-bc-source-metadata
+          path: ${{ runner.temp }}/stage-bc-source.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  cpu-sae:
+    name: SAE-only (${{ matrix.sae_key }} L${{ matrix.layer }})
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install SAE loaders and the original Sparsify source
+        run: |
+          python -m pip install -e '.[analysis]'
+          python -m pip install 'eai-sparsify==1.3.3'
+          python -m pip check
+      - name: Load true SAE tensors, test encoding and decoding, persist weights hash
+        id: probe
+        continue-on-error: true
+        env:
+          HF_HUB_DISABLE_TELEMETRY: '1'
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          TOKENIZERS_PARALLELISM: 'false'
+          OMP_NUM_THREADS: '2'
+        run: |
+          python scripts/phase_bc_cpu_sae.py \
+            --sae-key '${{ matrix.sae_key }}' --layer '${{ matrix.layer }}' \
+            --output "$RUNNER_TEMP/stage-bc-evidence"
+      - name: Upload genuine CPU SAE checkpoint results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage-bc-sae-${{ matrix.sae_key }}-L${{ matrix.layer }}
+          path: ${{ runner.temp }}/stage-bc-evidence/*.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Write actual status to summary
+        if: always()
+        env:
+          SAE_KEY: ${{ matrix.sae_key }}
+          LAYER: ${{ matrix.layer }}
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          path=Path(os.environ["RUNNER_TEMP"])/"stage-bc-evidence"/(os.environ["SAE_KEY"]+"_l"+os.environ["LAYER"]+".json")
+          status=json.loads(path.read_text())["status"] if path.exists() else "no_artifact"
+          with open(os.environ["GITHUB_STEP_SUMMARY"],"a") as out:
+              out.write(f"{os.environ['SAE_KEY']} L{os.environ['LAYER']}: **{status}**\n")
+          print(status)
+          PY
+
+  aggregate:
+    needs: [prepare,cpu-sae]
+    if: always() && needs.prepare.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: stage-bc-sae-*
+          path: stage-bc-results
+          merge-multiple: true
+      - name: Merge stage B+C evidence without hiding failed checkpoints
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          rows=[json.loads(p.read_text()) for p in Path("stage-bc-results").glob("*.json")]
+          passed=[r for r in rows if r.get("status")=="sae_checkpoint_verified_only"]
+          failed=[r for r in rows if r.get("status")!="sae_checkpoint_verified_only"]
+          summary={
+              "schema":"saebase.coverage.cpu_sae_matrix_result.v1",
+              "expected":21, "with_artifact":len(rows),
+              "sae_only_verified":len(passed),
+              "failed_or_blocked":len(failed),
+              "missing_artifacts":21-len(rows),
+              "entries":sorted(rows,key=lambda x:(x["sae_key"],x["layer"]))
+          }
+          Path("stage_bc_cpu_result.json").write_text(json.dumps(summary,indent=2)+"\n")
+          with open(os.environ["GITHUB_STEP_SUMMARY"],"a") as file:
+              file.write(f"## Stage B+C\n\n{len(passed)}/21 original SAE checkpoint loads validated; {len(failed)} blocked, {21-len(rows)} lacking runtime evidence. This is SAE-only, not LLM-SAE acceptance.\n")
+          print("SAE-only verified:",len(passed),"blocked:",len(failed),"missing:",21-len(rows))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage-bc-aggregated-cpu-results
+          path: stage_bc_cpu_result.json
+          retention-days: 30
