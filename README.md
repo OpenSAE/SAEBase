@@ -80,6 +80,14 @@ python examples/05_public_api_offline.py
 
 This self-contained example uses a small synthetic model and SAE to demonstrate activation capture, feature editing, identity checks, and downstream logit comparisons. Its numerical outputs are not research findings.
 
+To generate a complete offline benchmark and reliability report that you can open in a browser:
+
+```bash
+python examples/19_first_experiment_offline.py --output runs/first-experiment
+```
+
+Follow the [first experiment walkthrough](docs/first-experiment.md) to inspect the generated metrics, cache and paired audit.
+
 **2. Inspect a benchmark before committing compute:**
 
 ```bash

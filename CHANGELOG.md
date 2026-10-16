@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **Developer onboarding and community:** add a persistent CPU-only first benchmark with M3/M4 reports, short first-experiment/contributor/troubleshooting guides, local documentation link checks and a CI smoke test. Restore CODEOWNERS and GitHub feature/model-SAE contribution forms.
+
 - **Third-party extension API:** explicitly discovered Python entry points for external model, SAE and benchmark providers, with strict hook/dimension/normalization/dtype and original source SHA256 checks. Integrates with the original M3 benchmark and preserves built-in model registration and scientific estimators.
 
 - **General software release gate:** add version-independent candidate validation, six exact-commit CI checks, wheel/sdist/CLI integrity verification and SHA256 manifest generation. Publishing a new version requires explicit manual confirmation, an unused version tag and source-bound assets. The historical v0.2.0 acceptance gate remains separate.

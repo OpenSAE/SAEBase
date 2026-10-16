@@ -73,6 +73,12 @@ NEEDED_SDIST = NEEDED_WHEEL | {
     "docs/release-process.md", "tests/test_release_candidate.py",
     "docs/extensions.md", "tests/test_external_extensions.py",
     "examples/18_external_extensions_offline.py",
+    "docs/first-experiment.md", "docs/troubleshooting.md",
+    "docs/contributor-guide.md", "docs/maintainer-workflow.md",
+    "scripts/check_documentation.py", "tests/test_developer_experience.py",
+    "examples/19_first_experiment_offline.py",
+    ".github/ISSUE_TEMPLATE/model_sae_support.yml",
+    ".github/ISSUE_TEMPLATE/feature_request.yml",
     "docs/M2_BATCH_INTERVENTIONS.md",
     "scripts/m2_real_smoke.py", "examples/11_batch_interventions_offline.py",
 }

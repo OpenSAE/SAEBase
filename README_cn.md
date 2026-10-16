@@ -80,6 +80,14 @@ python examples/05_public_api_offline.py
 
 示例使用小型合成模型与 SAE，演示激活提取、特征编辑、identity 检查和 logits 对比。示例数值不属于真实研究结果。
 
+如果希望一次运行就生成完整的 Benchmark 和 Reliability 报告，可以执行：
+
+```bash
+python examples/19_first_experiment_offline.py --output runs/first-experiment
+```
+
+运行结束后参见[完整入门实验](docs/first-experiment.md)，查看保存的指标、缓存和比较报告。
+
 **2. 预检可复现的 SAE Benchmark：**
 
 ```bash
