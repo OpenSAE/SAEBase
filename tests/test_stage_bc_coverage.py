@@ -47,7 +47,7 @@ def test_mistral_source_site_and_qwen3_9b_bands():
     m=load_coverage(CATALOG).find("mistral7b_instruct_tc_l16_131k")
     assert m.selected_layers == (16,) and m.cpu_probe_layers == ()
     source=m.source(16)
-    assert source["hook_name"] == "blocks.16.hook_resid_pre"
+    assert source["hook_name"] == "blocks.16.hook_mlp_out"
     assert source["repo_id"] == "tylercosgrove/mistral-7b-sparse-autoencoder-layer16"
     assert source["verification"] == "registered_only"
     q=load_coverage(CATALOG).find("qwen35_9b_resid_w64k")

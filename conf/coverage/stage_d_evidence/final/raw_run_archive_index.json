@@ -1,0 +1,97 @@
+{
+  "archives": [
+    {
+      "bytes": 46782,
+      "file": "gemma1b_population_20261016T061711Z.tar.gz",
+      "sha256": "3edee890ce4dc42874776b1995508e3090fecce2e8c582bd3b015bfe2285705a"
+    },
+    {
+      "bytes": 46827,
+      "file": "gemma270m_population_20261016T061322Z.tar.gz",
+      "sha256": "19c5ed2f66fff01ea120712f18a2aa96d4b6a8f444b7530eaf2a88ebe20bcf2d"
+    },
+    {
+      "bytes": 31854,
+      "file": "gemma2_2b_base_population_20261016T061054Z.tar.gz",
+      "sha256": "33336833592b79eb3b571eb5234cda41fcd4926cfd34068b7ad99d23b98ceed6"
+    },
+    {
+      "bytes": 17089,
+      "file": "gemma2_2b_it_population_20261016T045054Z.tar.gz",
+      "sha256": "99268cd962ca2db674243076284ab86db03338a1d4f0acff0343930eb6cfcbf5"
+    },
+    {
+      "bytes": 46960,
+      "file": "gemma2_9b_pt_population_20261016T054723Z.tar.gz",
+      "sha256": "e8da1fb4216586e11d445680a920640295d204401fa66544b29fb124aa4f30d6"
+    },
+    {
+      "bytes": 60723,
+      "file": "gemma3_4b_it_population_20261016T053401Z.tar.gz",
+      "sha256": "05424f6c722c962717a61d37a5cd3e0bc7665cd2f571226e5b90c9aa8042a810"
+    },
+    {
+      "bytes": 61650,
+      "file": "gemma3_4b_pt_population_20261016T052409Z.tar.gz",
+      "sha256": "0848bf946f8363cb3966482dc3c034bf2c879392b56349c256a0021d4f360a56"
+    },
+    {
+      "bytes": 58190,
+      "file": "llama31_8b_population_20261016T051433Z.tar.gz",
+      "sha256": "27cf9afd2b7961af50dcb1e59050ca9cffd70bc845831c4bf74afaae19ea96d5"
+    },
+    {
+      "bytes": 16724,
+      "file": "mistral7b_instruct_population_20261016T044851Z.tar.gz",
+      "sha256": "4e58e743514888c7ba38003f778a3bfe06bc4e16bac82858ea92441bfe7af5e4"
+    },
+    {
+      "bytes": 43445,
+      "file": "pythia410m_population_20261016T062426Z.tar.gz",
+      "sha256": "42ca3a05c5983538a1be97a0eaf31f5e0a9a4e82a266cf955c35595fc80173c5"
+    },
+    {
+      "bytes": 56564,
+      "file": "qwen35_2b_population_20261016T060704Z.tar.gz",
+      "sha256": "c01f53617e696817e712be2af86b0e943c4baae78e11eca1860f60a0c9bc2b66"
+    },
+    {
+      "bytes": 16934,
+      "file": "qwen35_4b_population_20261016T055951Z.tar.gz",
+      "sha256": "625cc8a3b6cacbbd69960583f46a0ef092931f8126e72b7323e1e4d0e03289c5"
+    },
+    {
+      "bytes": 56669,
+      "file": "qwen35_9b_population_20261016T055812Z.tar.gz",
+      "sha256": "f52b804b08dc98c148ca46999918a623607a23f4d1f5a9d5e5e6df3809802d47"
+    },
+    {
+      "bytes": 56641,
+      "file": "qwen3_1_7b_base_population_20261016T062040Z.tar.gz",
+      "sha256": "28a87d9dd9f3258ac40b7ddf944f09bd8aa4add0f7dc8f55e1aaf6b48d9cc0aa"
+    },
+    {
+      "bytes": 17867,
+      "file": "qwen3_1_7b_population_20261016T062157Z.tar.gz",
+      "sha256": "21927a03a860e53110e97b6daef8c0e9bb302abe5cc3d7fb7d9d0f3f0fdb7567"
+    },
+    {
+      "bytes": 56654,
+      "file": "qwen3_8b_population_20261016T050053Z.tar.gz",
+      "sha256": "a8849d3bc4c801a7379072575843c09406d75ac33ca1c9ee941c01f461e001bb"
+    },
+    {
+      "bytes": 17011,
+      "file": "r1_distill_llama8b_population_20261016T060315Z.tar.gz",
+      "sha256": "e86546f61dbc97dfab1b05dbb118275484ff3cb023d770912bdda104174132f7"
+    },
+    {
+      "bytes": 16606,
+      "file": "r1_distill_qwen15b_population_20261016T062639Z.tar.gz",
+      "sha256": "f60a9b06a1ffdc3313dc0abeebf1d0e1c492c7f965a739e9fb11f7d23757abbd"
+    }
+  ],
+  "location": "/workspace/stage_d_runs/archives",
+  "recorded_at_utc": "2026-10-16T06:28:03.706216+00:00",
+  "schema": "saebase.stage_d.raw_archive_index.v1"
+}

@@ -1,0 +1,85 @@
+{
+  "artifact_sha256": "ae01ea3db917405e6e5030427162415bbb9140458cd28ad4c4555bf931888c04",
+  "cuda": "12.8",
+  "d_in": 1024,
+  "d_sae": 65536,
+  "device": "cuda",
+  "feature_ablation_logit_l2": [
+    4.493410587310791,
+    6.024145126342773,
+    2.0772693157196045
+  ],
+  "git_commit": "e6995f78075342ee5ed218c1c39e7104af793674",
+  "gpu_name": "NVIDIA GeForce RTX 5090",
+  "hook_name": "blocks.12.hook_mlp_out",
+  "identity_patch_max_abs_logit_error": 0.0,
+  "layer": 12,
+  "loaded_model_name": "pythia-410m-deduped",
+  "model_key": "pythia410m",
+  "model_repo": "pythia-410m-deduped",
+  "model_state_sha256": "f7127cb94a25b63c030d2dd6b2b26c8dd7814eae34ddda2269b068066da22244",
+  "n_prompts": 3,
+  "peak_cuda_allocated_bytes": 2382403072,
+  "precision": "float32",
+  "probes": [
+    {
+      "ablated_feature_id": 50616,
+      "feature_ablation_logit_l2": 4.493410587310791,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 32,
+      "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762",
+      "reconstruction_mse": 0.043593283742666245,
+      "token_ids": [
+        510,
+        5347,
+        273,
+        6181,
+        310
+      ]
+    },
+    {
+      "ablated_feature_id": 44948,
+      "feature_ablation_logit_l2": 6.024145126342773,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 32,
+      "prompt_sha256": "20597a70cc5c4ea28eec56d56ff2b1f89c8277a62161210ecab7a65172639310",
+      "reconstruction_mse": 0.03852243348956108,
+      "token_ids": [
+        34,
+        20687,
+        5544,
+        253,
+        1543,
+        9257,
+        15
+      ]
+    },
+    {
+      "ablated_feature_id": 3022,
+      "feature_ablation_logit_l2": 2.0772693157196045,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 32,
+      "prompt_sha256": "9cb6dc0eb30bdbbe4f7bfa7cc774d834d83707e8ac5999120ba4c56f4c2b6449",
+      "reconstruction_mse": 0.039544735103845596,
+      "token_ids": [
+        25074,
+        11260,
+        8778,
+        2439,
+        253,
+        4131,
+        8467,
+        15
+      ]
+    }
+  ],
+  "python": "3.12.14",
+  "sae_file": "blocks.12.hook_mlp_out",
+  "sae_key": "pythia410m_mlp_topk",
+  "sae_repo": "EleutherAI/sae-pythia-410m-65k",
+  "sae_state_sha256": "0792d98e4129cadcd2481ccd3c11109d9ecde46cde2e7f0da597ea2cc4b0f6a8",
+  "schema": "saebase.stage_d.pair_acceptance.v1",
+  "status": "passed",
+  "torch": "2.11.0+cu128",
+  "verified_at_utc": "2026-10-16T01:29:13.275974+00:00"
+}

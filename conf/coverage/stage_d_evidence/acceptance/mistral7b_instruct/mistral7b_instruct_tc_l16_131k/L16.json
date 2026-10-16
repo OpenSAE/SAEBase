@@ -1,0 +1,95 @@
+{
+  "artifact_sha256": "50f21737d6a5b7c12755049098f5f70729727c7706457cd0c7535690b9d965c3",
+  "cuda": "12.8",
+  "d_in": 4096,
+  "d_sae": 131072,
+  "dataset_sha256": "e29dd1c54f616e3460ac3006dbaffb7590a10cae0b3bcc31ed7a254aa6d23624",
+  "device": "cuda",
+  "evaluation_host_model_key": "mistral7b_instruct",
+  "feature_ablation_logit_l2": [
+    8.30544662475586,
+    5.982665538787842,
+    8.365894317626953
+  ],
+  "git_commit": "098103b804d4d0dd6e3df5043656014ec7619705",
+  "gpu_name": "NVIDIA GeForce RTX 5090",
+  "hook_name": "blocks.16.hook_mlp_out",
+  "identity_patch_max_abs_logit_error": 0.0,
+  "layer": 16,
+  "loaded_model_name": "mistralai/Mistral-7B-Instruct-v0.1",
+  "model_key": "mistral7b_instruct",
+  "model_repo": "mistralai/Mistral-7B-Instruct-v0.1",
+  "model_state_sha256": "dbcf47c7772c668973ed24afe7a5002d3377095633c987cea0771bd9ce39cb30",
+  "model_weight_dtype": "torch.bfloat16",
+  "n_prompts": 3,
+  "peak_cuda_allocated_bytes": 19087952896,
+  "precision": "float32",
+  "probes": [
+    {
+      "ablated_feature_id": 124750,
+      "feature_ablation_logit_l2": 8.30544662475586,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 128,
+      "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762",
+      "reconstruction_mse": 0.0019674687646329403,
+      "token_ids": [
+        1,
+        415,
+        5565,
+        302,
+        4843,
+        349
+      ]
+    },
+    {
+      "ablated_feature_id": 116560,
+      "feature_ablation_logit_l2": 5.982665538787842,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 128,
+      "prompt_sha256": "20597a70cc5c4ea28eec56d56ff2b1f89c8277a62161210ecab7a65172639310",
+      "reconstruction_mse": 0.0017695330316200852,
+      "token_ids": [
+        1,
+        330,
+        24480,
+        7955,
+        272,
+        2903,
+        9547,
+        28723
+      ]
+    },
+    {
+      "ablated_feature_id": 116560,
+      "feature_ablation_logit_l2": 8.365894317626953,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 128,
+      "prompt_sha256": "9cb6dc0eb30bdbbe4f7bfa7cc774d834d83707e8ac5999120ba4c56f4c2b6449",
+      "reconstruction_mse": 0.0021605929359793663,
+      "token_ids": [
+        1,
+        12827,
+        12780,
+        8547,
+        2673,
+        272,
+        3970,
+        7212,
+        28723
+      ]
+    }
+  ],
+  "protocol": "stage_d.pair.v2",
+  "python": "3.12.14",
+  "sae_file": ".",
+  "sae_key": "mistral7b_instruct_tc_l16_131k",
+  "sae_repo": "tylercosgrove/mistral-7b-sparse-autoencoder-layer16",
+  "sae_state_sha256": "d29034cead813c85de169a9c646492b46044717ebc2c1fbabd75e70aa1ab9675",
+  "sae_weight_dtype": "float32",
+  "schema": "saebase.stage_d.pair_acceptance.v1",
+  "status": "passed",
+  "torch": "2.11.0+cu128",
+  "trained_on_model_key": "mistral7b_instruct",
+  "transfer_kind": "none",
+  "verified_at_utc": "2026-10-16T04:31:08.851626+00:00"
+}

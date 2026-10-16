@@ -1,0 +1,85 @@
+{
+  "artifact_sha256": "9771971c5addc3adfce38dea6a5b72bbe7ac54aa5246386c1ff87d5860a0eca1",
+  "cuda": "12.8",
+  "d_in": 4096,
+  "d_sae": 65536,
+  "device": "cuda",
+  "feature_ablation_logit_l2": [
+    124.72137451171875,
+    122.4491958618164,
+    159.6526336669922
+  ],
+  "git_commit": "e6995f78075342ee5ed218c1c39e7104af793674",
+  "gpu_name": "NVIDIA GeForce RTX 5090",
+  "hook_name": "blocks.27.hook_resid_post",
+  "identity_patch_max_abs_logit_error": 0.0,
+  "layer": 27,
+  "loaded_model_name": "Qwen/Qwen3.5-9B-Base",
+  "model_key": "qwen35_9b",
+  "model_repo": "Qwen/Qwen3.5-9B-Base",
+  "model_state_sha256": "bceb12bc08b514db0975e2ebfb5d9b9422596c0565d9f9309dc45b44364115d3",
+  "n_prompts": 3,
+  "peak_cuda_allocated_bytes": 20136623616,
+  "precision": "float32",
+  "probes": [
+    {
+      "ablated_feature_id": 28136,
+      "feature_ablation_logit_l2": 124.72137451171875,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 50,
+      "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762",
+      "reconstruction_mse": 2.7594377994537354,
+      "token_ids": [
+        760,
+        6511,
+        314,
+        9338,
+        369
+      ]
+    },
+    {
+      "ablated_feature_id": 28136,
+      "feature_ablation_logit_l2": 122.4491958618164,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 50,
+      "prompt_sha256": "20597a70cc5c4ea28eec56d56ff2b1f89c8277a62161210ecab7a65172639310",
+      "reconstruction_mse": 2.5482776165008545,
+      "token_ids": [
+        32,
+        26578,
+        10921,
+        279,
+        2961,
+        15060,
+        13
+      ]
+    },
+    {
+      "ablated_feature_id": 28136,
+      "feature_ablation_logit_l2": 159.6526336669922,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 50,
+      "prompt_sha256": "9cb6dc0eb30bdbbe4f7bfa7cc774d834d83707e8ac5999120ba4c56f4c2b6449",
+      "reconstruction_mse": 2.1129469871520996,
+      "token_ids": [
+        24504,
+        19053,
+        11137,
+        3808,
+        279,
+        6353,
+        12515,
+        13
+      ]
+    }
+  ],
+  "python": "3.12.14",
+  "sae_file": "layer27.sae.pt",
+  "sae_key": "qwen35_9b_resid_w64k",
+  "sae_repo": "Qwen/SAE-Res-Qwen3.5-9B-Base-W64K-L0_50",
+  "sae_state_sha256": "e731756235644992696ad561a9d8131fe5adbdd6df2cb3e72aceb7293f898905",
+  "schema": "saebase.stage_d.pair_acceptance.v1",
+  "status": "passed",
+  "torch": "2.11.0+cu128",
+  "verified_at_utc": "2026-10-16T02:11:08.380875+00:00"
+}

@@ -601,11 +601,16 @@ _PROFILES: dict[str, SAEProfile] = {
         model_key="mistral7b_instruct",
         sae_release="tylercosgrove/mistral-7b-sparse-autoencoder-layer16",
         layers=(16,),
-        hook_kind="hook_resid_pre",
+        hook_kind="hook_mlp_out",
         loader="sae_lens",
         logical_sae_id=".",
         repo_id="tylercosgrove/mistral-7b-sparse-autoencoder-layer16",
-        notes="Community TopK-128 131072-latent layer-16 pre-residual SAE (~4.3 GB), CPU source-metadata only by default.",
+        notes=(
+            "Community TopK-128 131072-latent layer-16 SAE (~4.3 GB). "
+            "Published cfg.json hook_name is blocks.16.hook_mlp_out "
+            "(catalog previously listed resid_pre; checkpoint metadata wins)."
+        ),
+        hook_note="blocks.16.hook_mlp_out per tylercosgrove cfg.json",
     ),
     "qwen3_1_7b_ak_resid_l14_65k": SAEProfile(
         key="qwen3_1_7b_ak_resid_l14_65k",

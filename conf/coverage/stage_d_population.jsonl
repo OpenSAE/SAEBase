@@ -1,0 +1,80 @@
+{"group_id": "sel-00", "prompt": "The capital of France is", "split": "selection"}
+{"group_id": "sel-01", "prompt": "A scientist explained the results carefully.", "split": "selection"}
+{"group_id": "sel-02", "prompt": "Small birds fly across the morning sky.", "split": "selection"}
+{"group_id": "sel-03", "prompt": "The river flows quietly past the village.", "split": "selection"}
+{"group_id": "sel-04", "prompt": "Students gathered notes before the lecture began.", "split": "selection"}
+{"group_id": "sel-05", "prompt": "The engineer inspected the circuit with care.", "split": "selection"}
+{"group_id": "sel-06", "prompt": "Rain gathered on the window during the storm.", "split": "selection"}
+{"group_id": "sel-07", "prompt": "The museum displayed ancient pottery from the coast.", "split": "selection"}
+{"group_id": "sel-08", "prompt": "A chef prepared vegetables for the evening meal.", "split": "selection"}
+{"group_id": "sel-09", "prompt": "The telescope revealed faint stars beyond the city lights.", "split": "selection"}
+{"group_id": "sel-10", "prompt": "Writers revised drafts until the story felt complete.", "split": "selection"}
+{"group_id": "sel-11", "prompt": "The gardener planted herbs along the stone path.", "split": "selection"}
+{"group_id": "sel-12", "prompt": "Trains arrived on time despite the heavy snow.", "split": "selection"}
+{"group_id": "sel-13", "prompt": "The pilot checked instruments before takeoff.", "split": "selection"}
+{"group_id": "sel-14", "prompt": "Children learned the names of nearby mountains.", "split": "selection"}
+{"group_id": "sel-15", "prompt": "The archive preserved letters from the early century.", "split": "selection"}
+{"group_id": "eval-00", "prompt": "Topic 1000: describe a reliable measurement procedure for sample set 1000.", "split": "evaluation"}
+{"group_id": "eval-01", "prompt": "Record 1001: summarize observations from experiment batch 1001 with clear units.", "split": "evaluation"}
+{"group_id": "eval-02", "prompt": "Case 1002: explain why hypothesis H1002 needs an independent control group.", "split": "evaluation"}
+{"group_id": "eval-03", "prompt": "Note 1003: list three concrete facts about object class C1003 without speculation.", "split": "evaluation"}
+{"group_id": "eval-04", "prompt": "Topic 1004: describe a reliable measurement procedure for sample set 1004.", "split": "evaluation"}
+{"group_id": "eval-05", "prompt": "Record 1005: summarize observations from experiment batch 1005 with clear units.", "split": "evaluation"}
+{"group_id": "eval-06", "prompt": "Case 1006: explain why hypothesis H1006 needs an independent control group.", "split": "evaluation"}
+{"group_id": "eval-07", "prompt": "Note 1007: list three concrete facts about object class C1007 without speculation.", "split": "evaluation"}
+{"group_id": "eval-08", "prompt": "Topic 1008: describe a reliable measurement procedure for sample set 1008.", "split": "evaluation"}
+{"group_id": "eval-09", "prompt": "Record 1009: summarize observations from experiment batch 1009 with clear units.", "split": "evaluation"}
+{"group_id": "eval-10", "prompt": "Case 1010: explain why hypothesis H1010 needs an independent control group.", "split": "evaluation"}
+{"group_id": "eval-11", "prompt": "Note 1011: list three concrete facts about object class C1011 without speculation.", "split": "evaluation"}
+{"group_id": "eval-12", "prompt": "Topic 1012: describe a reliable measurement procedure for sample set 1012.", "split": "evaluation"}
+{"group_id": "eval-13", "prompt": "Record 1013: summarize observations from experiment batch 1013 with clear units.", "split": "evaluation"}
+{"group_id": "eval-14", "prompt": "Case 1014: explain why hypothesis H1014 needs an independent control group.", "split": "evaluation"}
+{"group_id": "eval-15", "prompt": "Note 1015: list three concrete facts about object class C1015 without speculation.", "split": "evaluation"}
+{"group_id": "eval-16", "prompt": "Topic 1016: describe a reliable measurement procedure for sample set 1016.", "split": "evaluation"}
+{"group_id": "eval-17", "prompt": "Record 1017: summarize observations from experiment batch 1017 with clear units.", "split": "evaluation"}
+{"group_id": "eval-18", "prompt": "Case 1018: explain why hypothesis H1018 needs an independent control group.", "split": "evaluation"}
+{"group_id": "eval-19", "prompt": "Note 1019: list three concrete facts about object class C1019 without speculation.", "split": "evaluation"}
+{"group_id": "eval-20", "prompt": "Topic 1020: describe a reliable measurement procedure for sample set 1020.", "split": "evaluation"}
+{"group_id": "eval-21", "prompt": "Record 1021: summarize observations from experiment batch 1021 with clear units.", "split": "evaluation"}
+{"group_id": "eval-22", "prompt": "Case 1022: explain why hypothesis H1022 needs an independent control group.", "split": "evaluation"}
+{"group_id": "eval-23", "prompt": "Note 1023: list three concrete facts about object class C1023 without speculation.", "split": "evaluation"}
+{"group_id": "eval-24", "prompt": "Topic 1024: describe a reliable measurement procedure for sample set 1024.", "split": "evaluation"}
+{"group_id": "eval-25", "prompt": "Record 1025: summarize observations from experiment batch 1025 with clear units.", "split": "evaluation"}
+{"group_id": "eval-26", "prompt": "Case 1026: explain why hypothesis H1026 needs an independent control group.", "split": "evaluation"}
+{"group_id": "eval-27", "prompt": "Note 1027: list three concrete facts about object class C1027 without speculation.", "split": "evaluation"}
+{"group_id": "eval-28", "prompt": "Topic 1028: describe a reliable measurement procedure for sample set 1028.", "split": "evaluation"}
+{"group_id": "eval-29", "prompt": "Record 1029: summarize observations from experiment batch 1029 with clear units.", "split": "evaluation"}
+{"group_id": "eval-30", "prompt": "Case 1030: explain why hypothesis H1030 needs an independent control group.", "split": "evaluation"}
+{"group_id": "eval-31", "prompt": "Note 1031: list three concrete facts about object class C1031 without speculation.", "split": "evaluation"}
+{"group_id": "eval-32", "prompt": "Topic 1032: describe a reliable measurement procedure for sample set 1032.", "split": "evaluation"}
+{"group_id": "eval-33", "prompt": "Record 1033: summarize observations from experiment batch 1033 with clear units.", "split": "evaluation"}
+{"group_id": "eval-34", "prompt": "Case 1034: explain why hypothesis H1034 needs an independent control group.", "split": "evaluation"}
+{"group_id": "eval-35", "prompt": "Note 1035: list three concrete facts about object class C1035 without speculation.", "split": "evaluation"}
+{"group_id": "eval-36", "prompt": "Topic 1036: describe a reliable measurement procedure for sample set 1036.", "split": "evaluation"}
+{"group_id": "eval-37", "prompt": "Record 1037: summarize observations from experiment batch 1037 with clear units.", "split": "evaluation"}
+{"group_id": "eval-38", "prompt": "Case 1038: explain why hypothesis H1038 needs an independent control group.", "split": "evaluation"}
+{"group_id": "eval-39", "prompt": "Note 1039: list three concrete facts about object class C1039 without speculation.", "split": "evaluation"}
+{"group_id": "eval-40", "prompt": "Topic 1040: describe a reliable measurement procedure for sample set 1040.", "split": "evaluation"}
+{"group_id": "eval-41", "prompt": "Record 1041: summarize observations from experiment batch 1041 with clear units.", "split": "evaluation"}
+{"group_id": "eval-42", "prompt": "Case 1042: explain why hypothesis H1042 needs an independent control group.", "split": "evaluation"}
+{"group_id": "eval-43", "prompt": "Note 1043: list three concrete facts about object class C1043 without speculation.", "split": "evaluation"}
+{"group_id": "eval-44", "prompt": "Topic 1044: describe a reliable measurement procedure for sample set 1044.", "split": "evaluation"}
+{"group_id": "eval-45", "prompt": "Record 1045: summarize observations from experiment batch 1045 with clear units.", "split": "evaluation"}
+{"group_id": "eval-46", "prompt": "Case 1046: explain why hypothesis H1046 needs an independent control group.", "split": "evaluation"}
+{"group_id": "eval-47", "prompt": "Note 1047: list three concrete facts about object class C1047 without speculation.", "split": "evaluation"}
+{"group_id": "eval-48", "prompt": "Topic 1048: describe a reliable measurement procedure for sample set 1048.", "split": "evaluation"}
+{"group_id": "eval-49", "prompt": "Record 1049: summarize observations from experiment batch 1049 with clear units.", "split": "evaluation"}
+{"group_id": "eval-50", "prompt": "Case 1050: explain why hypothesis H1050 needs an independent control group.", "split": "evaluation"}
+{"group_id": "eval-51", "prompt": "Note 1051: list three concrete facts about object class C1051 without speculation.", "split": "evaluation"}
+{"group_id": "eval-52", "prompt": "Topic 1052: describe a reliable measurement procedure for sample set 1052.", "split": "evaluation"}
+{"group_id": "eval-53", "prompt": "Record 1053: summarize observations from experiment batch 1053 with clear units.", "split": "evaluation"}
+{"group_id": "eval-54", "prompt": "Case 1054: explain why hypothesis H1054 needs an independent control group.", "split": "evaluation"}
+{"group_id": "eval-55", "prompt": "Note 1055: list three concrete facts about object class C1055 without speculation.", "split": "evaluation"}
+{"group_id": "eval-56", "prompt": "Topic 1056: describe a reliable measurement procedure for sample set 1056.", "split": "evaluation"}
+{"group_id": "eval-57", "prompt": "Record 1057: summarize observations from experiment batch 1057 with clear units.", "split": "evaluation"}
+{"group_id": "eval-58", "prompt": "Case 1058: explain why hypothesis H1058 needs an independent control group.", "split": "evaluation"}
+{"group_id": "eval-59", "prompt": "Note 1059: list three concrete facts about object class C1059 without speculation.", "split": "evaluation"}
+{"group_id": "eval-60", "prompt": "Topic 1060: describe a reliable measurement procedure for sample set 1060.", "split": "evaluation"}
+{"group_id": "eval-61", "prompt": "Record 1061: summarize observations from experiment batch 1061 with clear units.", "split": "evaluation"}
+{"group_id": "eval-62", "prompt": "Case 1062: explain why hypothesis H1062 needs an independent control group.", "split": "evaluation"}
+{"group_id": "eval-63", "prompt": "Note 1063: list three concrete facts about object class C1063 without speculation.", "split": "evaluation"}

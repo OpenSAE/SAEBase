@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 import torch
 from saebase.store import ShardedReader
-from saebase.api.features import _sae_input
+from saebase.api.features import _decode, _sae_dimensions
 from saebase.sae.contracts import reconstruction_stats
 
 def calculate_core(activation_path, code_path, sae, *, sample_ids):
@@ -15,6 +15,7 @@ def calculate_core(activation_path, code_path, sae, *, sample_ids):
         raise ValueError("code provenance differs from activation cache")
     totals = {"core.l0":0., "core.reconstruction_mse":0., "core.fvu":0., "core.explained_variance":0.}
     n = 0
+    d_in, _ = _sae_dimensions(sae)
     for sample_id in sample_ids:
         a, c = acts.get(sample_id), codes.get(sample_id)
         if a.positions != c.positions or a.record.sample_id != c.record.sample_id:
@@ -31,7 +32,13 @@ def calculate_core(activation_path, code_path, sae, *, sample_ids):
         except (StopIteration, AttributeError, TypeError):
             device, dtype = torch.device("cpu"), torch.float32
         with torch.no_grad():
-            decoded = sae.decode(torch.as_tensor(z, device=device, dtype=dtype)).detach().float().cpu().numpy()
+            h_t = torch.as_tensor(h, device=device, dtype=dtype)
+            z_t = torch.as_tensor(z, device=device, dtype=dtype)
+            # Restore layer_norm stats from stored activations when the SAE
+            # decode path requires ln_mu/ln_std (e.g. Mistral TopK).
+            decoded = _decode(
+                sae, z_t, d_in, activation=h_t,
+            ).detach().float().cpu().numpy()
         if decoded.shape != h.shape or not np.all(np.isfinite(decoded)):
             raise ValueError("SAE decode mismatch or nonfinite output")
         for original, predicted, latent in zip(h, decoded, z):

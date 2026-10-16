@@ -1,0 +1,7 @@
+{
+  "final_matrix": "final/stage_d_final_matrix.json",
+  "n_acceptance_files": 45,
+  "n_m3m4_summaries": 17,
+  "note": "Compact Stage D evidence only; raw M3 run caches omitted from git.",
+  "schema": "saebase.stage_d.evidence_index.v1"
+}

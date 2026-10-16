@@ -1,19 +1,24 @@
-"""Qwen3-8B-Base HookedTransformer model."""
+"""Qwen3-8B-Base model identity for Stage D residual SAE coverage."""
 
 from __future__ import annotations
 
 from typing import Any
 
+import torch
 from omegaconf import DictConfig
 
-from models.hooked_lm_common import BaseModelSpec, HookedLMHandle, load_from_spec
+from models.hf_hooks_backend import load_hf_hooks_model
+from models.hooked_lm_common import BaseModelSpec, HookedLMHandle
 
 SPEC = BaseModelSpec(
     key="qwen3_8b",
     model_name="Qwen/Qwen3-8B-Base",
     family="qwen",
     model_candidates=("Qwen/Qwen3-8B-Base",),
-    notes="Qwen3 8B base; official residual TopK SAE W64K L0_50.",
+    notes=(
+        "Qwen3 8B base; official residual TopK SAE W64K L0_50. "
+        "Loaded via native HF residual hooks for TransformerLens gaps."
+    ),
 )
 
 from saebase.data.prompt_schema import behaviors_for_model
@@ -26,7 +31,13 @@ def get_spec() -> BaseModelSpec:
 
 
 def load_model(device: str | None = None) -> HookedLMHandle:
-    return load_from_spec(SPEC, device=device)
+    return load_hf_hooks_model(
+        SPEC.model_name,
+        key=SPEC.key,
+        family=SPEC.family,
+        device=device or ("cuda" if torch.cuda.is_available() else "cpu"),
+        dtype=torch.bfloat16,
+    )
 
 
 def construct(cfg: DictConfig) -> HookedLMHandle:

@@ -287,6 +287,10 @@ def load_sae_for_profile(
             sae.fold_activation_norm_scaling_factor(scaling)
             cfg_dict["normalize_activations"] = "none"
             cfg_dict["saebase_activation_norm_folded"] = scaling
+        # Keep native layer_norm for Mistral TopK. SAELens encode stores
+        # ln_mu/ln_std on the SAE; saebase.api.features restores them from the
+        # FeatureSnapshot before each independent decode so edit paths stay
+        # source-faithful. Do not silently disable normalize_activations.
         hook_name = resolve_hook_name(sae, profile, layer)
         meta: dict[str, Any] = {
             "sae_key": profile.key,

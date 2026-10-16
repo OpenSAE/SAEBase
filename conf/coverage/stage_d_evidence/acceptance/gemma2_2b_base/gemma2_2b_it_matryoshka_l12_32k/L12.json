@@ -1,0 +1,88 @@
+{
+  "artifact_sha256": "73f3eaf7c91ff3f10c9816546bc7f78192e1dd3e9db47707d9552c8b0ff71f4f",
+  "cuda": "12.8",
+  "d_in": 2304,
+  "d_sae": 32768,
+  "device": "cuda",
+  "feature_ablation_logit_l2": [
+    299.69677734375,
+    280.57373046875,
+    395.9465026855469
+  ],
+  "git_commit": "c7dc0d800dd6f55e71afbd055ea2f7b2848fa382",
+  "gpu_name": "NVIDIA GeForce RTX 5090",
+  "hook_name": "blocks.12.hook_resid_post",
+  "identity_patch_max_abs_logit_error": 0.0,
+  "layer": 12,
+  "loaded_model_name": "google/gemma-2-2b",
+  "model_key": "gemma2_2b_base",
+  "model_repo": "google/gemma-2-2b",
+  "model_state_sha256": "a3aa44f999c0869e4dd34faeb9ca4674e4dd838fe97a6ad74f5de0b22477677f",
+  "n_prompts": 3,
+  "peak_cuda_allocated_bytes": 8262637568,
+  "precision": "float32",
+  "probes": [
+    {
+      "ablated_feature_id": 44,
+      "feature_ablation_logit_l2": 299.69677734375,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 90,
+      "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762",
+      "reconstruction_mse": 1.9767873287200928,
+      "token_ids": [
+        2,
+        651,
+        6037,
+        576,
+        6081,
+        603
+      ]
+    },
+    {
+      "ablated_feature_id": 44,
+      "feature_ablation_logit_l2": 280.57373046875,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 96,
+      "prompt_sha256": "20597a70cc5c4ea28eec56d56ff2b1f89c8277a62161210ecab7a65172639310",
+      "reconstruction_mse": 1.90718674659729,
+      "token_ids": [
+        2,
+        235280,
+        38692,
+        11601,
+        573,
+        3190,
+        13237,
+        235265
+      ]
+    },
+    {
+      "ablated_feature_id": 44,
+      "feature_ablation_logit_l2": 395.9465026855469,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 96,
+      "prompt_sha256": "9cb6dc0eb30bdbbe4f7bfa7cc774d834d83707e8ac5999120ba4c56f4c2b6449",
+      "reconstruction_mse": 1.581104040145874,
+      "token_ids": [
+        2,
+        17670,
+        13141,
+        8960,
+        4492,
+        573,
+        5764,
+        8203,
+        235265
+      ]
+    }
+  ],
+  "python": "3.12.14",
+  "sae_file": "blocks.12.hook_resid_post",
+  "sae_key": "gemma2_2b_it_matryoshka_l12_32k",
+  "sae_repo": "chanind/gemma-2-2b-batch-topk-matryoshka-saes-w-32k-l0-40",
+  "sae_state_sha256": "ce14537f0ffb99af8aa12c6af6dced45fee5f2b2e66b246396ea119c3e40e8bd",
+  "schema": "saebase.stage_d.pair_acceptance.v1",
+  "status": "passed",
+  "torch": "2.11.0+cu128",
+  "verified_at_utc": "2026-10-16T02:30:01.351939+00:00"
+}

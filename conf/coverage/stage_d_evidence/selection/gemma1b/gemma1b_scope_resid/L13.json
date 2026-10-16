@@ -1,0 +1,256 @@
+{
+  "layer": 13,
+  "model_key": "gemma1b",
+  "n_rows": 16,
+  "rows": [
+    {
+      "group_id": "sel-00",
+      "prompt": "The capital of France is",
+      "token_ids": [
+        2,
+        818,
+        5279,
+        529,
+        7001,
+        563
+      ]
+    },
+    {
+      "group_id": "sel-01",
+      "prompt": "A scientist explained the results carefully.",
+      "token_ids": [
+        2,
+        236776,
+        30892,
+        9696,
+        506,
+        2536,
+        13058,
+        236761
+      ]
+    },
+    {
+      "group_id": "sel-02",
+      "prompt": "Small birds fly across the morning sky.",
+      "token_ids": [
+        2,
+        24497,
+        13923,
+        10240,
+        3418,
+        506,
+        5597,
+        7217,
+        236761
+      ]
+    },
+    {
+      "group_id": "sel-03",
+      "prompt": "The river flows quietly past the village.",
+      "token_ids": [
+        2,
+        818,
+        8858,
+        17752,
+        36574,
+        3068,
+        506,
+        9744,
+        236761
+      ]
+    },
+    {
+      "group_id": "sel-04",
+      "prompt": "Students gathered notes before the lecture began.",
+      "token_ids": [
+        2,
+        35247,
+        21508,
+        8687,
+        1680,
+        506,
+        22939,
+        6074,
+        236761
+      ]
+    },
+    {
+      "group_id": "sel-05",
+      "prompt": "The engineer inspected the circuit with care.",
+      "token_ids": [
+        2,
+        818,
+        19042,
+        57472,
+        506,
+        8659,
+        607,
+        2065,
+        236761
+      ]
+    },
+    {
+      "group_id": "sel-06",
+      "prompt": "Rain gathered on the window during the storm.",
+      "token_ids": [
+        2,
+        45060,
+        21508,
+        580,
+        506,
+        4771,
+        1913,
+        506,
+        12978,
+        236761
+      ]
+    },
+    {
+      "group_id": "sel-07",
+      "prompt": "The museum displayed ancient pottery from the coast.",
+      "token_ids": [
+        2,
+        818,
+        14871,
+        15205,
+        12440,
+        58318,
+        699,
+        506,
+        9383,
+        236761
+      ]
+    },
+    {
+      "group_id": "sel-08",
+      "prompt": "A chef prepared vegetables for the evening meal.",
+      "token_ids": [
+        2,
+        236776,
+        22637,
+        7759,
+        16062,
+        573,
+        506,
+        9137,
+        13294,
+        236761
+      ]
+    },
+    {
+      "group_id": "sel-09",
+      "prompt": "The telescope revealed faint stars beyond the city lights.",
+      "token_ids": [
+        2,
+        818,
+        54516,
+        9937,
+        44770,
+        8197,
+        6998,
+        506,
+        3207,
+        11544,
+        236761
+      ]
+    },
+    {
+      "group_id": "sel-10",
+      "prompt": "Writers revised drafts until the story felt complete.",
+      "token_ids": [
+        2,
+        236824,
+        41543,
+        26885,
+        66786,
+        3097,
+        506,
+        3925,
+        6345,
+        4133,
+        236761
+      ]
+    },
+    {
+      "group_id": "sel-11",
+      "prompt": "The gardener planted herbs along the stone path.",
+      "token_ids": [
+        2,
+        818,
+        95958,
+        29295,
+        32070,
+        3008,
+        506,
+        10810,
+        2479,
+        236761
+      ]
+    },
+    {
+      "group_id": "sel-12",
+      "prompt": "Trains arrived on time despite the heavy snow.",
+      "token_ids": [
+        2,
+        234921,
+        12208,
+        580,
+        990,
+        9785,
+        506,
+        7274,
+        7613,
+        236761
+      ]
+    },
+    {
+      "group_id": "sel-13",
+      "prompt": "The pilot checked instruments before takeoff.",
+      "token_ids": [
+        2,
+        818,
+        18336,
+        15593,
+        17747,
+        1680,
+        134234,
+        236761
+      ]
+    },
+    {
+      "group_id": "sel-14",
+      "prompt": "Children learned the names of nearby mountains.",
+      "token_ids": [
+        2,
+        21478,
+        8683,
+        506,
+        5618,
+        529,
+        14942,
+        13254,
+        236761
+      ]
+    },
+    {
+      "group_id": "sel-15",
+      "prompt": "The archive preserved letters from the early century.",
+      "token_ids": [
+        2,
+        818,
+        33563,
+        27750,
+        11739,
+        699,
+        506,
+        3649,
+        7691,
+        236761
+      ]
+    }
+  ],
+  "sae_key": "gemma1b_scope_resid",
+  "schema": "saebase.stage_d.selection_tokens.v1",
+  "sha256": "cc2a671f755ac6e8ca7e689b8ec49e00caa8438341fa39fcff58c0822e8d9462",
+  "tokenizer_name": "gemma-3-1b-pt"
+}

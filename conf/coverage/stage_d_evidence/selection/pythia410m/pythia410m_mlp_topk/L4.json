@@ -1,0 +1,244 @@
+{
+  "layer": 4,
+  "model_key": "pythia410m",
+  "n_rows": 16,
+  "rows": [
+    {
+      "group_id": "sel-00",
+      "prompt": "The capital of France is",
+      "token_ids": [
+        510,
+        5347,
+        273,
+        6181,
+        310
+      ]
+    },
+    {
+      "group_id": "sel-01",
+      "prompt": "A scientist explained the results carefully.",
+      "token_ids": [
+        34,
+        20687,
+        5544,
+        253,
+        1543,
+        9257,
+        15
+      ]
+    },
+    {
+      "group_id": "sel-02",
+      "prompt": "Small birds fly across the morning sky.",
+      "token_ids": [
+        25074,
+        11260,
+        8778,
+        2439,
+        253,
+        4131,
+        8467,
+        15
+      ]
+    },
+    {
+      "group_id": "sel-03",
+      "prompt": "The river flows quietly past the village.",
+      "token_ids": [
+        510,
+        8281,
+        14221,
+        16092,
+        2469,
+        253,
+        7773,
+        15
+      ]
+    },
+    {
+      "group_id": "sel-04",
+      "prompt": "Students gathered notes before the lecture began.",
+      "token_ids": [
+        41937,
+        13037,
+        7211,
+        1078,
+        253,
+        22077,
+        3407,
+        15
+      ]
+    },
+    {
+      "group_id": "sel-05",
+      "prompt": "The engineer inspected the circuit with care.",
+      "token_ids": [
+        510,
+        16518,
+        36560,
+        253,
+        5049,
+        342,
+        1557,
+        15
+      ]
+    },
+    {
+      "group_id": "sel-06",
+      "prompt": "Rain gathered on the window during the storm.",
+      "token_ids": [
+        50170,
+        13037,
+        327,
+        253,
+        3497,
+        1309,
+        253,
+        9902,
+        15
+      ]
+    },
+    {
+      "group_id": "sel-07",
+      "prompt": "The museum displayed ancient pottery from the coast.",
+      "token_ids": [
+        510,
+        16064,
+        8653,
+        9129,
+        1721,
+        18631,
+        432,
+        253,
+        8852,
+        15
+      ]
+    },
+    {
+      "group_id": "sel-08",
+      "prompt": "A chef prepared vegetables for the evening meal.",
+      "token_ids": [
+        34,
+        26540,
+        5480,
+        15737,
+        323,
+        253,
+        7237,
+        11484,
+        15
+      ]
+    },
+    {
+      "group_id": "sel-09",
+      "prompt": "The telescope revealed faint stars beyond the city lights.",
+      "token_ids": [
+        510,
+        29528,
+        4950,
+        16487,
+        6114,
+        4457,
+        253,
+        2846,
+        10654,
+        15
+      ]
+    },
+    {
+      "group_id": "sel-10",
+      "prompt": "Writers revised drafts until the story felt complete.",
+      "token_ids": [
+        25191,
+        398,
+        17265,
+        42000,
+        1919,
+        253,
+        2926,
+        3543,
+        3426,
+        15
+      ]
+    },
+    {
+      "group_id": "sel-11",
+      "prompt": "The gardener planted herbs along the stone path.",
+      "token_ids": [
+        510,
+        15934,
+        4330,
+        23846,
+        27495,
+        2112,
+        253,
+        8805,
+        1854,
+        15
+      ]
+    },
+    {
+      "group_id": "sel-12",
+      "prompt": "Trains arrived on time despite the heavy snow.",
+      "token_ids": [
+        14463,
+        968,
+        7244,
+        327,
+        673,
+        5747,
+        253,
+        5536,
+        8762,
+        15
+      ]
+    },
+    {
+      "group_id": "sel-13",
+      "prompt": "The pilot checked instruments before takeoff.",
+      "token_ids": [
+        510,
+        11572,
+        10141,
+        13225,
+        1078,
+        1379,
+        2727,
+        15
+      ]
+    },
+    {
+      "group_id": "sel-14",
+      "prompt": "Children learned the names of nearby mountains.",
+      "token_ids": [
+        22246,
+        6311,
+        253,
+        4454,
+        273,
+        10151,
+        14700,
+        15
+      ]
+    },
+    {
+      "group_id": "sel-15",
+      "prompt": "The archive preserved letters from the early century.",
+      "token_ids": [
+        510,
+        21429,
+        15296,
+        4876,
+        432,
+        253,
+        2393,
+        5331,
+        15
+      ]
+    }
+  ],
+  "sae_key": "pythia410m_mlp_topk",
+  "schema": "saebase.stage_d.selection_tokens.v1",
+  "sha256": "f29f0086478cbcb421742d3340e9a74e2dcf0e69261d4dc92f9ac739ede00ad7",
+  "tokenizer_name": "pythia-410m-deduped"
+}

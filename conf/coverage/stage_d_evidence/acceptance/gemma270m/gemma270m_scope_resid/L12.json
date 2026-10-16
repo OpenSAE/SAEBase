@@ -1,0 +1,88 @@
+{
+  "artifact_sha256": "95a3a016345ae52c57c854a8c2453cb29b70932aaee9e7bbbc9b877fb0dcf2d7",
+  "cuda": "12.8",
+  "d_in": 640,
+  "d_sae": 65536,
+  "device": "cuda",
+  "feature_ablation_logit_l2": [
+    626.5162353515625,
+    441.1580505371094,
+    748.4712524414062
+  ],
+  "git_commit": "e6995f78075342ee5ed218c1c39e7104af793674",
+  "gpu_name": "NVIDIA GeForce RTX 5090",
+  "hook_name": "blocks.12.hook_resid_post",
+  "identity_patch_max_abs_logit_error": 0.0,
+  "layer": 12,
+  "loaded_model_name": "gemma-3-270m",
+  "model_key": "gemma270m",
+  "model_repo": "gemma-3-270m",
+  "model_state_sha256": "1e1d3500f913a1c406f73c62bf8902d9e8aa0b4a255b45d36cadbfbdafca5ea4",
+  "n_prompts": 3,
+  "peak_cuda_allocated_bytes": 2847036928,
+  "precision": "float32",
+  "probes": [
+    {
+      "ablated_feature_id": 111,
+      "feature_ablation_logit_l2": 626.5162353515625,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 67,
+      "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762",
+      "reconstruction_mse": 7352.38525390625,
+      "token_ids": [
+        2,
+        818,
+        5279,
+        529,
+        7001,
+        563
+      ]
+    },
+    {
+      "ablated_feature_id": 2051,
+      "feature_ablation_logit_l2": 441.1580505371094,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 35,
+      "prompt_sha256": "20597a70cc5c4ea28eec56d56ff2b1f89c8277a62161210ecab7a65172639310",
+      "reconstruction_mse": 5308.6044921875,
+      "token_ids": [
+        2,
+        236776,
+        30892,
+        9696,
+        506,
+        2536,
+        13058,
+        236761
+      ]
+    },
+    {
+      "ablated_feature_id": 2051,
+      "feature_ablation_logit_l2": 748.4712524414062,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 58,
+      "prompt_sha256": "9cb6dc0eb30bdbbe4f7bfa7cc774d834d83707e8ac5999120ba4c56f4c2b6449",
+      "reconstruction_mse": 5380.21142578125,
+      "token_ids": [
+        2,
+        24497,
+        13923,
+        10240,
+        3418,
+        506,
+        5597,
+        7217,
+        236761
+      ]
+    }
+  ],
+  "python": "3.12.14",
+  "sae_file": "layer_12_width_65k_l0_medium",
+  "sae_key": "gemma270m_scope_resid",
+  "sae_repo": "google/gemma-scope-2-270m-pt",
+  "sae_state_sha256": "ad592b08c71c631fe41312f239a1d962f0f7b2cb27c70682ee0f43d06a03eb3d",
+  "schema": "saebase.stage_d.pair_acceptance.v1",
+  "status": "passed",
+  "torch": "2.11.0+cu128",
+  "verified_at_utc": "2026-10-16T02:22:42.456684+00:00"
+}

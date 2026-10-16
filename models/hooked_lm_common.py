@@ -82,6 +82,7 @@ def _default_load_kwargs(model_name: str) -> dict[str, Any]:
             "deepseek-r1-distill-llama-8b",
             "qwen3",
             "qwen3.5",
+            "mistral-7b",
         )
     ):
         return {"no_processing": True, "dtype": torch.bfloat16}
@@ -208,11 +209,15 @@ def load_from_spec(
     spec: BaseModelSpec,
     device: str | None = None,
     *,
+    dtype: torch.dtype | None = None,
+    no_processing: bool | None = None,
     architecture_aliases: dict[str, str] | None = None,
 ) -> HookedLMHandle:
     model, loaded = load_hooked_model_with_candidates(
         spec.candidates(),
         device=device,
+        dtype=dtype,
+        no_processing=no_processing,
         architecture_aliases=architecture_aliases,
     )
     # Attach source metadata for P0-D1 audit (non-invasive attribute).

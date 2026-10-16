@@ -135,6 +135,11 @@ def encode_from_store(activation_path: str | Path, sae: Any,
                 matrix = np.array(source_values, dtype=np.float32, copy=True)
                 inputs = torch.as_tensor(matrix, dtype=dtype, device=device)
                 encoded = sae.encode(inputs)
+                # layer_norm SAEs stash ln_mu/ln_std on encode; clear so later
+                # independent decodes cannot reuse a stale prompt's stats.
+                for _ln_name in ("ln_mu", "ln_std"):
+                    if hasattr(sae, _ln_name):
+                        delattr(sae, _ln_name)
                 if (not isinstance(encoded, torch.Tensor) or encoded.shape != (len(sample.positions), identity.d_sae)
                         or not bool(torch.isfinite(encoded).all())):
                     raise RuntimeError("sae.encode must return finite [selected_positions, d_sae]")

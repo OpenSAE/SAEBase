@@ -1,0 +1,88 @@
+{
+  "artifact_sha256": "7efd387dde96ebf1aec2bf05bb0b5253dc46dccffaf26367e12dea5f0ecfafbb",
+  "cuda": "12.8",
+  "d_in": 4096,
+  "d_sae": 32768,
+  "device": "cuda",
+  "feature_ablation_logit_l2": [
+    119.63335418701172,
+    128.24720764160156,
+    383.5643005371094
+  ],
+  "git_commit": "c7dc0d800dd6f55e71afbd055ea2f7b2848fa382",
+  "gpu_name": "NVIDIA GeForce RTX 5090",
+  "hook_name": "blocks.27.hook_resid_post",
+  "identity_patch_max_abs_logit_error": 0.0,
+  "layer": 27,
+  "loaded_model_name": "meta-llama/Llama-3.1-8B",
+  "model_key": "llama31_8b",
+  "model_repo": "meta-llama/Llama-3.1-8B",
+  "model_state_sha256": "2a9d33d2b7df6e962e0bb9d174a240322a450d1f7a7da09c8346570cdee625d3",
+  "n_prompts": 3,
+  "peak_cuda_allocated_bytes": 18233190400,
+  "precision": "float32",
+  "probes": [
+    {
+      "ablated_feature_id": 7872,
+      "feature_ablation_logit_l2": 119.63335418701172,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 41,
+      "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762",
+      "reconstruction_mse": 0.0803944319486618,
+      "token_ids": [
+        128000,
+        791,
+        6864,
+        315,
+        9822,
+        374
+      ]
+    },
+    {
+      "ablated_feature_id": 7872,
+      "feature_ablation_logit_l2": 128.24720764160156,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 26,
+      "prompt_sha256": "20597a70cc5c4ea28eec56d56ff2b1f89c8277a62161210ecab7a65172639310",
+      "reconstruction_mse": 0.06913501769304276,
+      "token_ids": [
+        128000,
+        32,
+        28568,
+        11497,
+        279,
+        3135,
+        15884,
+        13
+      ]
+    },
+    {
+      "ablated_feature_id": 4360,
+      "feature_ablation_logit_l2": 383.5643005371094,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 30,
+      "prompt_sha256": "9cb6dc0eb30bdbbe4f7bfa7cc774d834d83707e8ac5999120ba4c56f4c2b6449",
+      "reconstruction_mse": 0.06327284127473831,
+      "token_ids": [
+        128000,
+        26375,
+        20229,
+        11722,
+        4028,
+        279,
+        6693,
+        13180,
+        13
+      ]
+    }
+  ],
+  "python": "3.12.14",
+  "sae_file": "Llama3_1-8B-Base-L27R-8x",
+  "sae_key": "llama31_8b_lxr_8x",
+  "sae_repo": "OpenMOSS-Team/Llama3_1-8B-Base-LXR-8x",
+  "sae_state_sha256": "5497252bd437a63e5723fcfd2c8ed75196eb4f664d54f51dcabff13f323e2d44",
+  "schema": "saebase.stage_d.pair_acceptance.v1",
+  "status": "passed",
+  "torch": "2.11.0+cu128",
+  "verified_at_utc": "2026-10-16T02:55:59.267926+00:00"
+}
