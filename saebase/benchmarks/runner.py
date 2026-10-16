@@ -27,6 +27,10 @@ from .adapters.localization import (
 )
 from .results import store_results,read_metrics
 from .report import write_report
+from saebase.extensions.contracts import ExternalMetricContext
+from saebase.extensions.registry import is_external_metric, external_metric, has_external_pair
+from saebase.extensions.runtime import load_external_pair
+from saebase.extensions.metrics import execute_external_metric, validate_external_metric_source
 
 def _identity(config,target,model,sae):
     model_sha=sha256_state_dict(model.model)
@@ -109,6 +113,8 @@ def validate_external_sources(config: BenchmarkConfig, rows: list[dict[str, Any]
             if root is None:
                 raise ValueError("Localize source validation requires the completed benchmark root")
             validate_localization_result(root,config,row,paper=localization_paper)
+        elif is_external_metric(name):
+            validate_external_metric_source(name, row, config.sources)
         elif name.startswith("saebench."):
             source = config.sources.get(name)
             if (not source or not Path(source).is_file()
@@ -168,8 +174,11 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
     results=[]
     provenance={}
     specs=[get_metric(m) for m in config.metrics]
-    load=loader or (lambda model_key,sae_key,layer:
-                    load_registered(model_key=model_key,sae_key=sae_key,layer=layer))
+    def built_in_or_external(model_key, sae_key, layer):
+        if has_external_pair(model_key, sae_key):
+            return load_external_pair(model_key=model_key, sae_key=sae_key, layer=layer)
+        return load_registered(model_key=model_key, sae_key=sae_key, layer=layer)
+    load=loader or built_in_or_external
     cache_root=Path(output)/"_cache"/"m1"
     wants_localization=any(s.metric_id.startswith("localization.") for s in specs)
     if wants_localization:
@@ -194,15 +203,23 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
             provenance[prefix]={"model_state_sha256":act_id.model_state_sha256,
                         "sae_state_sha256":sae_sha,
                         "tokenizer_sha256":act_id.tokenizer_sha256}
+            if hasattr(pair, "identity") and hasattr(pair, "verification"):
+                provenance[prefix]["extension_identity"]=pair.identity.to_dict()
+                provenance[prefix]["extension_verification"]=pair.verification
             records=[s.record for s in config.samples]
             wants_core=any(s.metric_id.startswith("core.") for s in specs)
+            wants_external_codes=any(
+                is_external_metric(s.metric_id)
+                and bool({"m1_activations","m1_codes"} & set(s.required_inputs))
+                for s in specs
+            )
             wants_m2=any(s.metric_id.startswith("intervention.") for s in specs)
             wants_recon=any(s.metric_id.startswith("reconstruction.") for s in specs)
             core_data={};n_core=0
             cache_cost={}
             m2_cost={}
             act_path=None;code_path=None
-            if wants_core or wants_m2 or wants_localization:
+            if wants_core or wants_m2 or wants_localization or wants_external_codes:
                 with ActivationWriter(cache_root,act_id,width=int(sae.cfg.d_in)) as writer:
                     cache_stats=collect_activations(model,records,writer,site=target.site)
                     act_path=writer.path
@@ -331,12 +348,37 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
                     for spec in subset:
                         results.append(_metric(config,target,sae_key,spec,"blocked",
                                                reason=f"{type(exc).__name__}: {exc}"))
+            for spec in specs:
+                if not is_external_metric(spec.metric_id):
+                    continue
+                try:
+                    result, digest, revision = execute_external_metric(
+                        spec.metric_id,
+                        ExternalMetricContext(
+                            config=config, target=target, sae_key=sae_key,
+                            model=model, sae=sae, activation_store=act_path,
+                            code_store=code_path,
+                        ),
+                    )
+                    results.append(_metric(
+                        config,target,sae_key,spec,"completed",
+                        result.value,n_valid=result.n_valid,
+                        refs=result.measurement_refs,source_sha=digest,
+                        source_commit=revision,
+                        metadata={"extension_source":external_metric(spec.metric_id).source,
+                                  "verification":"metric_source_verified_not_model_certified"},
+                    ))
+                except (OSError,ValueError,TypeError,KeyError,RuntimeError,IndexError) as exc:
+                    results.append(_metric(
+                        config,target,sae_key,spec,"blocked",
+                        reason=f"{type(exc).__name__}: {exc}",
+                    ))
             results.extend(_import_saebench(config,target,sae_key,native_specs))
             # Registered but unsupported metric families must be visible in the
             # result set. Never silently drop a promised metric from a report.
             known=("core.","intervention.","reconstruction.","sar.","rss.","saebench.","localization.")
             for spec in specs:
-                if not spec.metric_id.startswith(known):
+                if not spec.metric_id.startswith(known) and not is_external_metric(spec.metric_id):
                     results.append(_metric(config,target,sae_key,spec,"unsupported",
                         reason="no executable adapter registered for this metric family"))
     store_results(root,results,run_id=config.run_id)

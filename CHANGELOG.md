@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **Third-party extension API:** explicitly discovered Python entry points for external model, SAE and benchmark providers, with strict hook/dimension/normalization/dtype and original source SHA256 checks. Integrates with the original M3 benchmark and preserves built-in model registration and scientific estimators.
+
 - **General software release gate:** add version-independent candidate validation, six exact-commit CI checks, wheel/sdist/CLI integrity verification and SHA256 manifest generation. Publishing a new version requires explicit manual confirmation, an unused version tag and source-bound assets. The historical v0.2.0 acceptance gate remains separate.
 
 - **CI maintenance lanes:** consolidate M0/M1/M2 real Pythia smoke jobs into one opt-in workflow, merge SAR/RSS reference parity and synthetic truth into a source-pinned research regression workflow, and add a separate weekly upstream-head compatibility check. Move expensive historical model/SAE and SAEBench validations to manual dispatch. Preserve existing GitHub run histories, source evidence and v0.2.0 release gates.

@@ -2,6 +2,8 @@
 
 SAEBase keeps model definitions separate from SAE checkpoint profiles, experimental activation sites, tokenizer identities and source artifacts. **Registered** does not necessarily mean **verified with real checkpoint weights**.
 
+External model/SAE providers may be registered with the [Third-Party Extension API](extensions.md). Registration and limited tensor probes do not confer the real checkpoint verification reported by Stage D.
+
 <!-- BEGIN VERIFIED_MODEL_SUPPORT -->
 ## Current main: Stage D
 

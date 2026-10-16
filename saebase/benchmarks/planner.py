@@ -21,6 +21,9 @@ def build_plan(config: BenchmarkConfig) -> dict[str, Any]:
     # No weights or real source code is loaded here. Cache hits cannot be
     # verified without resolving exact model/tokenizer/SAE SHA-256 identities.
     specs = [get_metric(m) for m in config.metrics]
+    from saebase.extensions.runtime import validate_external_target
+    for target in config.targets:
+        validate_external_target(target, config.sources)
     pairs = sum(len(t.sae_keys) for t in config.targets)
     wants_localization=any("localization_codes" in s.required_inputs for s in specs)
     if wants_localization:

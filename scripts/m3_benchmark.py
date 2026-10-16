@@ -11,6 +11,10 @@ from saebase.benchmarks.report import write_report
 def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--config",required=True,type=Path)
+    p.add_argument(
+        "--extension", action="append", default=[],
+        help="Opt in to an installed opensae.saebase.extensions.v1 entry-point by name",
+    )
     p.add_argument("--output",default="runs",type=Path)
     mode=p.add_mutually_exclusive_group(required=True)
     mode.add_argument("--dry-run",action="store_true")
@@ -19,6 +23,9 @@ def main(argv=None):
     p.add_argument("--resume",action="store_true",default=True)
     p.add_argument("--no-resume",dest="resume",action="store_false")
     args=p.parse_args(argv)
+    if args.extension:
+        from saebase.extensions import discover_extensions
+        discover_extensions(args.extension)
     cfg=load_config(args.config)
     plan=build_plan(cfg)
     if args.dry_run:
