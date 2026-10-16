@@ -84,4 +84,5 @@ jobs:
           print("Real CPU model-SAE acceptance:",status)
           with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as fd:
               fd.write(f"**{os.environ['SAE_KEY']}**: {status}\n\n")
+          raise SystemExit(0 if status == "model_and_sae_verified" else 1)
           PY
