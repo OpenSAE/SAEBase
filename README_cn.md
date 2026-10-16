@@ -264,7 +264,7 @@ python -m pytest -q
 
 [文档目录](docs/index.md) · [快速入门](docs/getting-started.md) · [Python API](docs/python-api.md) · [Examples](examples/README.md) · [模型支持](docs/model-support.md)
 
-[Activation Store](docs/activation-store.md) · [特征干预](docs/feature-interventions.md) · [Benchmark](docs/benchmarking.md) · [可靠性分析](docs/reliability.md) · [研究项目集成](docs/research-integrations.md)
+[Activation Store](docs/activation-store.md) · [特征干预](docs/feature-interventions.md) · [Benchmark](docs/benchmarking.md) · [可靠性分析](docs/reliability.md) · [研究项目集成](docs/research-integrations.md) · [第三方扩展](docs/extensions.md)
 
 [验证与证据](docs/validation.md) · [更新记录](CHANGELOG.md) · [发行说明](docs/releases/v0.2.0.md) · [代码来源](docs/PROVENANCE.md) · [参与贡献](CONTRIBUTING.md) · [安全说明](SECURITY.md) · [Apache-2.0 许可证](LICENSE)
 
