@@ -1,16 +1,6 @@
 name: Stage B+C genuine multi-layer CPU SAE verification
 
 on:
-  pull_request:
-    paths:
-      - 'conf/coverage/stage_bc.json'
-      - 'saebase/sae/coverage.py'
-      - 'saebase/sae/loading.py'
-      - 'saebase/sae/sparsify_adapter.py'
-      - 'saebase/sae/registry.py'
-      - 'scripts/phase_bc_cpu_sae.py'
-      - 'scripts/phase_bc_source_metadata.py'
-      - '.github/workflows/stage-bc-cpu-sae.yml'
   workflow_dispatch:
 
 permissions:
@@ -49,7 +39,6 @@ jobs:
           python -m pip install -e .
           python -m pip install 'huggingface-hub>=0.23'
       - name: Check official checkpoint paths and metadata without downloading weights
-        continue-on-error: true
         env:
           HF_HUB_DISABLE_TELEMETRY: '1'
         run: |
