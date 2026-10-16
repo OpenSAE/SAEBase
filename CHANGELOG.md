@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **Stages B+C acceptance evidence:** 21/21 original CPU SAE weight/encode/decode checks with loaded-parameter hashes, a separately rechecked Gemma Scope 9B L20 source, and three genuine small-model M3/M4 runs (5 metric rows and 3 reliability audits per model). Original artifacts are linked from machine-readable ledgers. Large-model forward and intervention runs remain for Stage D.
+
 - **Model and SAE coverage (Stages B+C):** 15-model core coverage with three additional SAE architecture profiles; a validated 48-layer catalog and four depth-band selection, exact checkpoint provenance, CPU-only SAE-weight verification and 3 small-model genuine CPU acceptance workflows.
 - **Native SAE loader compatibility:** official Qwen3 1.7B Base TopK, Mistral 7B community profile, native EleutherAI Sparsify reasoning SAE adapter and SAELens BatchTopK / Gemma Scope 2 4B / Llama Scope R1 converters.
 - **Real CPU checkpoint acceptance:** Pythia 410M, Qwen3 1.7B Base and DeepSeek R1 Distill Qwen 1.5B each passed real activation capture, reconstruction, identity patch and nontrivial feature ablation with full model/SAE state hashes; M3/M4 audit runners and per-layer provenance are maintained separately from Stage D larger-model evaluation.

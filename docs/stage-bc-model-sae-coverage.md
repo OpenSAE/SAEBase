@@ -1,5 +1,9 @@
 # Model and SAE Coverage — Stages B+C
 
+**Validated CPU evidence:** [21/21 genuine SAE checkpoint ledger](../conf/coverage/stage_c_cpu_verified.json) and [three real model–SAE + M3/M4 acceptance records](../conf/coverage/stage_b_cpu_verified.json). The 21 SAE checkpoints were independently decoded using original public weights; one Gemma Scope 9B PT L20 checkpoint was fixed from nonexistent L0 57 to upstream-mapped L0 58, then [validated separately](https://github.com/OpenSAE/SAEBase/actions/runs/38828805176/artifacts/12015864245) without replaying the other 20. The other 27 registered layer positions have **not** undergone this CPU weight-acceptance protocol. CPU SAE-only acceptance is not a full LLM–SAE pair test.
+
+**Real M3/M4 acceptance:** Three smaller models each produced 5 completed Benchmark metric rows and 3 completed Reliability audits, with manifest and JSONL checksums verified against the archived results. See [Pythia 410M](https://github.com/OpenSAE/SAEBase/actions/runs/38827730625/artifacts/12016370395), [Qwen3 1.7B Base](https://github.com/OpenSAE/SAEBase/actions/runs/38827730625/artifacts/12015962255), and [DeepSeek R1 Distill Qwen 1.5B](https://github.com/OpenSAE/SAEBase/actions/runs/38827730625/artifacts/12015698101). Two real prompts per model establish engineering compatibility, not statistical SAE quality.
+
 SAEBase selects representative, independently published open SAE checkpoints across model scales. **Registered** models are catalog entries; a **real-weight verified** checkpoint must have a successful GitHub Actions evidence artifact.
 
 ## Core model coverage

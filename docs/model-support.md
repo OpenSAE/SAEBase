@@ -21,7 +21,7 @@ Six model/SAE pairs are tracked in [Phase A Model Coverage](phase-a-model-covera
 
 ## Stages B+C: broader cross-scale and multi-layer coverage
 
-The [Stage B+C Matrix](stage-bc-model-sae-coverage.md) catalogs 15 model variants spanning 270M–9B and three additional SAE-architecture checks across 48 selected layer checkpoints. New authentic **CPU model–SAE feature-intervention acceptance** has passed for Pythia 410M, Qwen3 1.7B Base and DeepSeek R1 Distill Qwen 1.5B. The stage-C workflow additionally performs independent actual SAE-only CPU weight, encoding and reconstruction checks across selected layers; absence of a full LLM run does not imply model-pair verification. GitHub workflow artifacts provide individual weight hashes and numerical probes. Large-model full runs are deferred to Stage D.
+The [Stage B+C Matrix](stage-bc-model-sae-coverage.md) catalogs 15 model variants spanning 270M–9B and three additional SAE-architecture checks across 48 selected layer checkpoints. New authentic **CPU model–SAE feature-intervention acceptance** has passed for Pythia 410M, Qwen3 1.7B Base and DeepSeek R1 Distill Qwen 1.5B. The stage-C workflow completed **21/21 genuine SAE-only CPU checks** on selected layers; full checkpoint SHA-256 and GitHub Actions provenance are in [the Stage C ledger](../conf/coverage/stage_c_cpu_verified.json). Three real small-model M3/M4 evaluations are indexed in [the Stage B ledger](../conf/coverage/stage_b_cpu_verified.json). Absence of a full LLM run does not imply model-pair verification. GitHub workflow artifacts provide individual weight hashes and numerical probes. Large-model full runs are deferred to Stage D.
 
 ## Registered configurations and optional models
 

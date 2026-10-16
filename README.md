@@ -101,7 +101,7 @@ Real runs download the requested weights and produce `metrics.jsonl`, `summary.c
 
 ## 🧠 Model and SAE Support
 
-**Open SAE coverage from 270M to 9B.** [Stages B+C](docs/stage-bc-model-sae-coverage.md) organize 15 representative models, three complementary SAE architectures and 48 selected layer checkpoints. Real CPU model–SAE acceptance has also passed for Pythia 410M, Qwen3 1.7B Base and DeepSeek-R1-Distill-Qwen 1.5B, alongside the previously validated Qwen3.5 2B. Larger model-pair runs remain for Stage D. See the [full model and SAE matrix](docs/stage-bc-model-sae-coverage.md) and [Phase A evidence](docs/phase-a-model-coverage.md).
+**Open SAE coverage from 270M to 9B.** [Stages B+C](docs/stage-bc-model-sae-coverage.md) organize 15 representative models, three complementary SAE architectures and 48 selected layer checkpoints. **21/21 selected SAE checkpoints have passed genuine CPU weight and encode/decode acceptance**, with full artifact hashes. Real model–SAE capture, feature ablation, Benchmark and Reliability have also passed for Pythia 410M, Qwen3 1.7B Base and DeepSeek-R1-Distill-Qwen 1.5B, alongside Qwen3.5 2B. Larger model-pair runs remain for Stage D. See the [full model and SAE matrix](docs/stage-bc-model-sae-coverage.md) and [Phase A evidence](docs/phase-a-model-coverage.md).
 
 
 SAEBase can register many model/SAE configurations, but **registration is not evidence of runtime validation**. The published real-checkpoint acceptance uses:
