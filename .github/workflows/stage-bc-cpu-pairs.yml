@@ -1,17 +1,6 @@
 name: Stage B genuine small-model CPU acceptance
 
 on:
-  pull_request:
-    paths:
-      - 'saebase/sae/loading.py'
-      - 'saebase/sae/sparsify_adapter.py'
-      - 'saebase/sae/coverage.py'
-      - 'saebase/sae/registry.py'
-      - 'models/qwen3_1_7b_base/**'
-      - 'scripts/phase_bc_cpu_pair.py'
-      - 'scripts/phase_bc_cpu_benchmark.py'
-      - 'conf/coverage/stage_bc.json'
-      - '.github/workflows/stage-bc-cpu-pairs.yml'
   workflow_dispatch:
 
 permissions:
