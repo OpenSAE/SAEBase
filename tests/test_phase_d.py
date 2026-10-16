@@ -13,7 +13,7 @@ def test_package_metadata_matches_public_api_version():
     assert data["project"]["version"] == __version__
     assert data["project"]["name"] == "opensae-saebase"
     assert data["project"]["license"] == "Apache-2.0"
-    assert data["project"]["scripts"]["saebase"] == "main:main"
+    assert data["project"]["scripts"]["saebase"] == "saebase.cli:main"
 
 
 def test_public_distribution_has_required_files():
