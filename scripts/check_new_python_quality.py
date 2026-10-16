@@ -43,6 +43,8 @@ def verify_new_files(base_sha: str | None = None) -> int:
         result = subprocess.run(command, check=False)
         if result.returncode:
             status = 1
+            if command[1] == "format":
+                subprocess.run(["ruff", "format", "--diff", *files], check=False)
     return status
 
 
