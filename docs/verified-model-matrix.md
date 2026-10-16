@@ -1,0 +1,42 @@
+# Verified Model and SAE Layer Matrix
+
+Current `main` Stage D support, distinct from the historical `v0.2.0` release. The table is derived from the committed final matrix and catalog.
+
+<!-- BEGIN VERIFIED_MODEL_SUPPORT -->
+**Current main, Stage D (2026-10-16):** 48/48 real model-SAE pair checks; 48/48 benchmark runs; 48/48 reliability audits; 18 selected model-SAE profiles.
+
+| Model key | SAE key | Size | Architecture | Layers (per-site report) | Pair | Benchmark | Reliability |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `gemma270m` | `gemma270m_scope_resid` | 270M | JumpReLU | [L5](../conf/coverage/stage_d_evidence/reports/gemma270m_gemma270m_scope_resid_L5_m3m4.json), [L9](../conf/coverage/stage_d_evidence/reports/gemma270m_gemma270m_scope_resid_L9_m3m4.json), [L12](../conf/coverage/stage_d_evidence/reports/gemma270m_gemma270m_scope_resid_L12_m3m4.json) | 3/3 | 3/3 | 3/3 |
+| `gemma1b` | `gemma1b_scope_resid` | 1B | JumpReLU | [L7](../conf/coverage/stage_d_evidence/reports/gemma1b_gemma1b_scope_resid_L7_m3m4.json), [L13](../conf/coverage/stage_d_evidence/reports/gemma1b_gemma1b_scope_resid_L13_m3m4.json), [L17](../conf/coverage/stage_d_evidence/reports/gemma1b_gemma1b_scope_resid_L17_m3m4.json) | 3/3 | 3/3 | 3/3 |
+| `gemma2_2b_base` | `gemma2_2b_pt_l25_canonical` | 2B | JumpReLU | [L13](../conf/coverage/stage_d_evidence/reports/gemma2_2b_base_gemma2_2b_pt_l25_canonical_L13_m3m4.json), [L25](../conf/coverage/stage_d_evidence/reports/gemma2_2b_base_gemma2_2b_pt_l25_canonical_L25_m3m4.json) | 2/2 | 2/2 | 2/2 |
+| `qwen35_2b` | `qwen35_2b_resid_w32k` | 2B | TopK | [L6](../conf/coverage/stage_d_evidence/reports/qwen35_2b_qwen35_2b_resid_w32k_L6_m3m4.json), [L12](../conf/coverage/stage_d_evidence/reports/qwen35_2b_qwen35_2b_resid_w32k_L12_m3m4.json), [L15](../conf/coverage/stage_d_evidence/reports/qwen35_2b_qwen35_2b_resid_w32k_L15_m3m4.json), [L20](../conf/coverage/stage_d_evidence/reports/qwen35_2b_qwen35_2b_resid_w32k_L20_m3m4.json) | 4/4 | 4/4 | 4/4 |
+| `qwen3_8b` | `qwen3_8b_resid_w64k` | 8B | TopK | [L9](../conf/coverage/stage_d_evidence/reports/qwen3_8b_qwen3_8b_resid_w64k_L9_m3m4.json), [L18](../conf/coverage/stage_d_evidence/reports/qwen3_8b_qwen3_8b_resid_w64k_L18_m3m4.json), [L23](../conf/coverage/stage_d_evidence/reports/qwen3_8b_qwen3_8b_resid_w64k_L23_m3m4.json), [L31](../conf/coverage/stage_d_evidence/reports/qwen3_8b_qwen3_8b_resid_w64k_L31_m3m4.json) | 4/4 | 4/4 | 4/4 |
+| `llama31_8b` | `llama31_8b_lxr_8x` | 8B | JumpReLU | [L8](../conf/coverage/stage_d_evidence/reports/llama31_8b_llama31_8b_lxr_8x_L8_m3m4.json), [L16](../conf/coverage/stage_d_evidence/reports/llama31_8b_llama31_8b_lxr_8x_L16_m3m4.json), [L21](../conf/coverage/stage_d_evidence/reports/llama31_8b_llama31_8b_lxr_8x_L21_m3m4.json), [L27](../conf/coverage/stage_d_evidence/reports/llama31_8b_llama31_8b_lxr_8x_L27_m3m4.json) | 4/4 | 4/4 | 4/4 |
+| `pythia410m` | `pythia410m_mlp_topk` | 410M | TopK | [L4](../conf/coverage/stage_d_evidence/reports/pythia410m_pythia410m_mlp_topk_L4_m3m4.json), [L12](../conf/coverage/stage_d_evidence/reports/pythia410m_pythia410m_mlp_topk_L12_m3m4.json), [L20](../conf/coverage/stage_d_evidence/reports/pythia410m_pythia410m_mlp_topk_L20_m3m4.json) | 3/3 | 3/3 | 3/3 |
+| `qwen3_1_7b_base` | `qwen3_1_7b_base_resid_w32k` | 1.7B | TopK | [L7](../conf/coverage/stage_d_evidence/reports/qwen3_1_7b_base_qwen3_1_7b_base_resid_w32k_L7_m3m4.json), [L14](../conf/coverage/stage_d_evidence/reports/qwen3_1_7b_base_qwen3_1_7b_base_resid_w32k_L14_m3m4.json), [L18](../conf/coverage/stage_d_evidence/reports/qwen3_1_7b_base_qwen3_1_7b_base_resid_w32k_L18_m3m4.json), [L23](../conf/coverage/stage_d_evidence/reports/qwen3_1_7b_base_qwen3_1_7b_base_resid_w32k_L23_m3m4.json) | 4/4 | 4/4 | 4/4 |
+| `r1_distill_qwen15b` | `r1_distill_qwen15b_resid_l20` | 1.5B | TopK | [L20](../conf/coverage/stage_d_evidence/reports/r1_distill_qwen15b_r1_distill_qwen15b_resid_l20_L20_m3m4.json) | 1/1 | 1/1 | 1/1 |
+| `gemma3_4b_pt` | `gemma3_4b_pt_scope_resid` | 4B | JumpReLU | [L9](../conf/coverage/stage_d_evidence/reports/gemma3_4b_pt_gemma3_4b_pt_scope_resid_L9_m3m4.json), [L17](../conf/coverage/stage_d_evidence/reports/gemma3_4b_pt_gemma3_4b_pt_scope_resid_L17_m3m4.json), [L22](../conf/coverage/stage_d_evidence/reports/gemma3_4b_pt_gemma3_4b_pt_scope_resid_L22_m3m4.json), [L29](../conf/coverage/stage_d_evidence/reports/gemma3_4b_pt_gemma3_4b_pt_scope_resid_L29_m3m4.json) | 4/4 | 4/4 | 4/4 |
+| `gemma3_4b_it` | `gemma3_4b_it_scope_resid` | 4B | JumpReLU | [L9](../conf/coverage/stage_d_evidence/reports/gemma3_4b_it_gemma3_4b_it_scope_resid_L9_m3m4.json), [L17](../conf/coverage/stage_d_evidence/reports/gemma3_4b_it_gemma3_4b_it_scope_resid_L17_m3m4.json), [L22](../conf/coverage/stage_d_evidence/reports/gemma3_4b_it_gemma3_4b_it_scope_resid_L22_m3m4.json), [L29](../conf/coverage/stage_d_evidence/reports/gemma3_4b_it_gemma3_4b_it_scope_resid_L29_m3m4.json) | 4/4 | 4/4 | 4/4 |
+| `mistral7b_instruct` | `mistral7b_instruct_tc_l16_131k` | 7B | TopK | [L16](../conf/coverage/stage_d_evidence/reports/mistral7b_instruct_mistral7b_instruct_tc_l16_131k_L16_m3m4.json) | 1/1 | 1/1 | 1/1 |
+| `gemma2_9b_pt` | `gemma2_9b_pt_scope_resid` | 9B | JumpReLU | [L9](../conf/coverage/stage_d_evidence/reports/gemma2_9b_pt_gemma2_9b_pt_scope_resid_L9_m3m4.json), [L20](../conf/coverage/stage_d_evidence/reports/gemma2_9b_pt_gemma2_9b_pt_scope_resid_L20_m3m4.json), [L31](../conf/coverage/stage_d_evidence/reports/gemma2_9b_pt_gemma2_9b_pt_scope_resid_L31_m3m4.json) | 3/3 | 3/3 | 3/3 |
+| `qwen35_9b` | `qwen35_9b_resid_w64k` | 9B | TopK | [L8](../conf/coverage/stage_d_evidence/reports/qwen35_9b_qwen35_9b_resid_w64k_L8_m3m4.json), [L16](../conf/coverage/stage_d_evidence/reports/qwen35_9b_qwen35_9b_resid_w64k_L16_m3m4.json), [L21](../conf/coverage/stage_d_evidence/reports/qwen35_9b_qwen35_9b_resid_w64k_L21_m3m4.json), [L27](../conf/coverage/stage_d_evidence/reports/qwen35_9b_qwen35_9b_resid_w64k_L27_m3m4.json) | 4/4 | 4/4 | 4/4 |
+| `r1_distill_llama8b` | `r1_distill_llama8b_llamascope_l23` | 8B | JumpReLU | [L23](../conf/coverage/stage_d_evidence/reports/r1_distill_llama8b_r1_distill_llama8b_llamascope_l23_L23_m3m4.json) | 1/1 | 1/1 | 1/1 |
+| `qwen3_1_7b` | `qwen3_1_7b_ak_resid_l14_65k` | 1.7B | batchtopk | [L14](../conf/coverage/stage_d_evidence/reports/qwen3_1_7b_qwen3_1_7b_ak_resid_l14_65k_L14_m3m4.json) | 1/1 | 1/1 | 1/1 |
+| `gemma2_2b_it` | `gemma2_2b_it_matryoshka_l12_32k` | 2B | matryoshka_batchtopk | [L12](../conf/coverage/stage_d_evidence/reports/gemma2_2b_it_gemma2_2b_it_matryoshka_l12_32k_L12_m3m4.json) | 1/1 | 1/1 | 1/1 |
+| `qwen35_4b` | `qwen35_4b_matryoshka_l15_65k` | 4B | matryoshka_batchtopk | [L15](../conf/coverage/stage_d_evidence/reports/qwen35_4b_qwen35_4b_matryoshka_l15_65k_L15_m3m4.json) | 1/1 | 1/1 | 1/1 |
+<!-- END VERIFIED_MODEL_SUPPORT -->
+
+## What verification means
+
+**Pair acceptance** checks real model/SAE loading, the correct hook, identity replay and nontrivial feature edits. **Benchmark and reliability** indicate the Stage D engineering protocol with 64 independent held-out evaluation groups separated from feature selection. Those groups use repeating prompt templates, so this does not establish general SAE interpretability or comparative scientific quality.
+
+The three earlier CPU-verified pairs have separate historical pair evidence; their later M3/M4 reports are linked above. Model and SAE weight hashes are kept in the [final matrix](../conf/coverage/stage_d_evidence/final/stage_d_final_matrix.json).
+
+The [raw archive index](../conf/coverage/stage_d_evidence/final/raw_run_archive_index.json) lists machine-local paths, **not public download URLs**. The committed compact evidence is available, but archived raw runs are not yet advertised as independently downloadable.
+
+## Sources and regeneration
+
+[Stage B+C catalog](../conf/coverage/stage_bc.json) · [Stage D final matrix](../conf/coverage/stage_d_evidence/final/stage_d_final_matrix.json) · [Status ledger](../conf/coverage/stage_d_evidence/status.json) · [SHA256 manifest](../conf/coverage/stage_d_evidence/final/checksums.sha256) · [Historical v0.2.0 release](https://github.com/OpenSAE/SAEBase/releases/tag/v0.2.0)
+
+Run `python scripts/generate_model_support.py --write` to regenerate marked sections and `python scripts/generate_model_support.py --check` to verify evidence/doc consistency. CI performs the latter on every PR.

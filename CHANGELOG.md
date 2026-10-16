@@ -2,13 +2,17 @@
 
 ## Unreleased
 
-- **Stages B+C acceptance evidence:** 21/21 original CPU SAE weight/encode/decode checks with loaded-parameter hashes, a separately rechecked Gemma Scope 9B L20 source, and three genuine small-model M3/M4 runs (5 metric rows and 3 reliability audits per model). Original artifacts are linked from machine-readable ledgers. Large-model forward and intervention runs remain for Stage D.
+<!-- BEGIN VERIFIED_MODEL_SUPPORT -->
+- **Stage D support on current main (2026-10-16):** **48/48** real model-SAE pair acceptances, **48/48** 64-group engineering benchmarks and **48/48** reliability audits across **18** profiles. See the [verified layer matrix](docs/verified-model-matrix.md).
+<!-- END VERIFIED_MODEL_SUPPORT -->
+
+- **Stages B+C acceptance evidence:** 21/21 original CPU SAE weight/encode/decode checks with loaded-parameter hashes, a separately rechecked Gemma Scope 9B L20 source, and three genuine small-model M3/M4 runs (5 metric rows and 3 reliability audits per model). Original artifacts are linked from machine-readable ledgers. These CPU-era findings preceded the subsequently completed Stage D verification summarized above.
 
 - **Model and SAE coverage (Stages B+C):** 15-model core coverage with three additional SAE architecture profiles; a validated 48-layer catalog and four depth-band selection, exact checkpoint provenance, CPU-only SAE-weight verification and 3 small-model genuine CPU acceptance workflows.
 - **Native SAE loader compatibility:** official Qwen3 1.7B Base TopK, Mistral 7B community profile, native EleutherAI Sparsify reasoning SAE adapter and SAELens BatchTopK / Gemma Scope 2 4B / Llama Scope R1 converters.
-- **Real CPU checkpoint acceptance:** Pythia 410M, Qwen3 1.7B Base and DeepSeek R1 Distill Qwen 1.5B each passed real activation capture, reconstruction, identity patch and nontrivial feature ablation with full model/SAE state hashes; M3/M4 audit runners and per-layer provenance are maintained separately from Stage D larger-model evaluation.
+- **Real CPU checkpoint acceptance:** Pythia 410M, Qwen3 1.7B Base and DeepSeek R1 Distill Qwen 1.5B each passed real activation capture, reconstruction, identity patch and nontrivial feature ablation with full model/SAE state hashes; M3/M4 audit runners and per-layer provenance were established before the subsequent Stage D evaluation.
 
-- **Phase A genuine-weight acceptance:** actual original checkpoints for six SAEs passed isolated load/encode/decode; Qwen3.5-2B model+SAE passed live capture, reconstruction, and identity-patch checks. Added native Gemma Scope 2 and Llama Scope checkpoint converters and Llama-Scope norm folding. Gated Gemma and Meta models and larger 8B model-pair checks retain explicit access/compute blockers.
+- **Phase A genuine-weight acceptance:** actual original checkpoints for six SAEs passed isolated load/encode/decode; Qwen3.5-2B model+SAE passed live capture, reconstruction, and identity-patch checks. Added native Gemma Scope 2 and Llama Scope checkpoint converters and Llama-Scope norm folding. At the time, gated Gemma and Meta models and larger 8B model-pair checks retained access/compute blockers; later Stage D evidence is summarized above.
 
 - **Phase A model coverage:** register the official Qwen3.5-2B Base / 32K TopK SAE, align two Gemma Scope 2 release identifiers with upstream, and add a six-model 270M–8B real-checkpoint acceptance runner, workflow, reproducible evidence fields and offline registry tests. Verified status remains contingent on actual weight and hook tests.
 
