@@ -1,0 +1,6 @@
+# @package _global_
+sae:
+  name: mistral7b_instruct_tc_l16_131k
+  layer: 16
+  device: cuda
+  require_prepared_prompts: true

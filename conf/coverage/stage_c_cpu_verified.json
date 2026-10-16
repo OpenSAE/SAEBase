@@ -1,0 +1,189 @@
+{
+  "schema": "saebase.coverage.stage_c_verification.v1",
+  "status": "21_of_21_CPU_SAE_only_verified",
+  "meaning": "Actual public SAE weights passed standalone CPU encode/decode and checksum checks. 48 selected layer positions are registered, not all weight-verified. Large LLM model pair checks remain Stage D.",
+  "checkpoint_count": 21,
+  "distinct_sae_profiles": 17,
+  "source_commits": {
+    "38827078641": "f8505a34808d4f55380f39761ed347730ac7247f",
+    "38828805176": "278aa8518ea3ff9f6ecaaf15ee4c1a74267fbd59"
+  },
+  "repaired": {
+    "sae_key": "gemma2_9b_pt_scope_resid",
+    "layer": 20,
+    "old_id": "layer_20/width_16k/average_l0_57",
+    "corrected_id": "layer_20/width_16k/average_l0_58",
+    "old_artifact_id": 12015987090,
+    "new_artifact_id": 12015864245
+  },
+  "entries": [
+    {
+      "sae_key": "gemma1b_scope_resid",
+      "layer": 7,
+      "sae_state_sha256": "e7ae12cfa4fe05e9417da42b6b172588d649b41e1c024cd410086cab18811a99",
+      "evidence_json_sha256": "07ff9900d74fa76a19c710c9f384bb8bcb9401ea64ad47f980d8b2068b89145f",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12014464831"
+    },
+    {
+      "sae_key": "gemma1b_scope_resid",
+      "layer": 13,
+      "sae_state_sha256": "97e478af2ba7c150c2cc144602bed081003067451c604879ab2533dca62c1468",
+      "evidence_json_sha256": "17d1f3a51cf9593a392c39f56ef354d65b4c64d6fb1d3aee404d89e2c858a047",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12015492455"
+    },
+    {
+      "sae_key": "gemma270m_scope_resid",
+      "layer": 5,
+      "sae_state_sha256": "c8d81c4a60f18e4dc7a97efdf2988dd22ea428931a94ff49326b541360e9df88",
+      "evidence_json_sha256": "e98f896116ad13dc4e6cce3ffac894bbaf268a17c4d2073805db8103ca1c54cd",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12015289016"
+    },
+    {
+      "sae_key": "gemma270m_scope_resid",
+      "layer": 9,
+      "sae_state_sha256": "d913cf42760518b59bc07e88d97012a1ac8e9532afbc56b81016b21e473501d0",
+      "evidence_json_sha256": "4ee9c0af56deb840b940671c76c02643d2190093acab15e03d3806b453fafe25",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12015661618"
+    },
+    {
+      "sae_key": "gemma2_2b_it_matryoshka_l12_32k",
+      "layer": 12,
+      "sae_state_sha256": "ce14537f0ffb99af8aa12c6af6dced45fee5f2b2e66b246396ea119c3e40e8bd",
+      "evidence_json_sha256": "3b30ed9cc3a5d7b864a25d5f797c578c798dc83f45aaf6f3f7536dcf1a23420d",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12016630031"
+    },
+    {
+      "sae_key": "gemma2_2b_pt_l25_canonical",
+      "layer": 25,
+      "sae_state_sha256": "61f521f1c188093c2091e4d1834f0e78d59d50deb7922992dcfa66c9b58cc8b9",
+      "evidence_json_sha256": "5f802bfea761bd8a9cc5a8660c9d0ddfc722fd5101215efed4ea6cd05bc58e7d",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12014514816"
+    },
+    {
+      "sae_key": "gemma2_9b_pt_scope_resid",
+      "layer": 20,
+      "sae_state_sha256": "aba2bd64bcb3f52cb7dda41ed5ac4df1396a08dd704d18a0e2425c6787e866df",
+      "evidence_json_sha256": "91dc9a63ddb5b0b2e45b4869432c16d67afc40cd3c5037f13efb0947b8531364",
+      "source_run": 38828805176,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38828805176/artifacts/12015864245"
+    },
+    {
+      "sae_key": "gemma3_4b_it_scope_resid",
+      "layer": 17,
+      "sae_state_sha256": "244cc468bc5663ffa6fe18a1fc7920cb2fc91402ee460b02ee4bad36aeca67f3",
+      "evidence_json_sha256": "6408f2306ad84cb9f02959f1ab69b003efff3da261c90124b8133cb2b518ca2c",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12016060400"
+    },
+    {
+      "sae_key": "gemma3_4b_pt_scope_resid",
+      "layer": 17,
+      "sae_state_sha256": "4e57e53f5c91fdf4a664195941726dd6daeb5b4bf8a091ef08c58d21f2e42b3c",
+      "evidence_json_sha256": "1da438224884902e9a63b49ce74a2efbe85b45cf1e08e62c2d5b99f22a4d4c7e",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12015414943"
+    },
+    {
+      "sae_key": "llama31_8b_lxr_8x",
+      "layer": 16,
+      "sae_state_sha256": "42b68a4ed22d6cbf6cc2aa03324f386847f66e7cef1aa8704b45086f7646101e",
+      "evidence_json_sha256": "dd252797aa78b1fcbba00752c6f7c6c9c40f1bd7985443f1372e0c3354e5cab5",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12015940805"
+    },
+    {
+      "sae_key": "pythia410m_mlp_topk",
+      "layer": 4,
+      "sae_state_sha256": "85e65b001c48f63316aeca70d2f984adca54645cfd38b1674950e914c4a04365",
+      "evidence_json_sha256": "d597dbed91a2cc526ef29fe8b347fd222a1cd144ed0f3e90aae6f7583314002f",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12015592470"
+    },
+    {
+      "sae_key": "pythia410m_mlp_topk",
+      "layer": 12,
+      "sae_state_sha256": "0792d98e4129cadcd2481ccd3c11109d9ecde46cde2e7f0da597ea2cc4b0f6a8",
+      "evidence_json_sha256": "3b9d9e07b61197550edc59a6c6f3d2e1f171a09fd691fa8f65375fbb09f937ec",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12015408683"
+    },
+    {
+      "sae_key": "qwen35_2b_resid_w32k",
+      "layer": 12,
+      "sae_state_sha256": "279987d646f6f6b687fea090c0b089383c564d0c5c8345708b0bfeb797445b6b",
+      "evidence_json_sha256": "d3426991c62ac0cd75db2eca68eb988b63a461620607e1db4ae84f73e5819987",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12015970681"
+    },
+    {
+      "sae_key": "qwen35_4b_matryoshka_l15_65k",
+      "layer": 15,
+      "sae_state_sha256": "53915edc76bdd180899a6194441b7df8d920943aec980a5ecda1352e66a1f8fc",
+      "evidence_json_sha256": "0c4986399b519b0848caf8f78f46e3a78f2a2c079e39ae0d7186c7ab2367fde3",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12015464134"
+    },
+    {
+      "sae_key": "qwen35_9b_resid_w64k",
+      "layer": 16,
+      "sae_state_sha256": "2457b8332d54ae79e4d580581da948f34b3acc8df5ab325fdf84df3803e3eaa9",
+      "evidence_json_sha256": "11fbba643dd39c651b10c68a5799dc5b110f757198b1f9c885571a4a51861b76",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12015224980"
+    },
+    {
+      "sae_key": "qwen3_1_7b_ak_resid_l14_65k",
+      "layer": 14,
+      "sae_state_sha256": "2f9cb33fe85a2404f8b3a19cca6a6ba82b15ca5c2ea1afb63129eda0effe210f",
+      "evidence_json_sha256": "dfbcb40bc098d62f2c9ec71bc65f2379258040b6040c6c329f1c9b17627ea920",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12015229932"
+    },
+    {
+      "sae_key": "qwen3_1_7b_base_resid_w32k",
+      "layer": 7,
+      "sae_state_sha256": "d68dfbf3796d0d6f1bb27fcc4c905ae3085e5c783594b4e0315065d384f194b4",
+      "evidence_json_sha256": "255ce5c2938fe40cdccf8277a4a9788061fb40eebe0ea13a3d0bfc01717cd074",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12014719770"
+    },
+    {
+      "sae_key": "qwen3_1_7b_base_resid_w32k",
+      "layer": 14,
+      "sae_state_sha256": "3363d39a681ea052ca7262a564800bb55f1dd09f6cfb13b3d28276106b9d1ac0",
+      "evidence_json_sha256": "a8d9e07bc39e5884571aaf8babd0ba15eabbc943a2a020b8741bd5f572510043",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12015901710"
+    },
+    {
+      "sae_key": "qwen3_8b_resid_w64k",
+      "layer": 18,
+      "sae_state_sha256": "15a1b8c0c73612e976a0d49a115611b9c6df0d7646432cb8517cc82dcacdb1c7",
+      "evidence_json_sha256": "cde3beff6849b533b769ddc45ccd49d9c017cbbe8a6b3c5563eb26728458f3d4",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12014784379"
+    },
+    {
+      "sae_key": "r1_distill_llama8b_llamascope_l23",
+      "layer": 23,
+      "sae_state_sha256": "a5bee23105c617d20b038ae86620c765b40c8d5e993a5eef3bdb61f34447a65a",
+      "evidence_json_sha256": "7c94df0761ba2e25ac2a9fc9b2ef80245f8795e78663bcac64bf9db3c91fe085",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12015757764"
+    },
+    {
+      "sae_key": "r1_distill_qwen15b_resid_l20",
+      "layer": 20,
+      "sae_state_sha256": "07d287a9cd6765d60e1bcd40e17093d49af12ea35847635e66398857f097eb93",
+      "evidence_json_sha256": "47eb5fb6d1e7236606166a899813ebfb864857786c9fa2b6f3e11ee118dfc889",
+      "source_run": 38827078641,
+      "artifact_url": "https://github.com/OpenSAE/SAEBase/actions/runs/38827078641/artifacts/12015716972"
+    }
+  ]
+}

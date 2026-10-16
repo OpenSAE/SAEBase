@@ -1,0 +1,6 @@
+# @package _global_
+sae:
+  name: qwen3_1_7b_base_resid_w32k
+  layer: 14
+  device: cuda
+  require_prepared_prompts: true

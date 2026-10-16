@@ -1,0 +1,327 @@
+{
+  "schema": "saebase.coverage.stage_bc.v1",
+  "objective": "Representative open model/SAE coverage with exact layer topology, source files and independent real-weight status",
+  "model_pair_work": "CPU only for small ungated models; all large/Gemma gated model pairs deferred to D",
+  "targets": [
+    {
+      "model_key": "gemma270m",
+      "sae_key": "gemma270m_scope_resid",
+      "size": "270M",
+      "n_layers": 18,
+      "architecture": "jumprelu",
+      "selected_layers": [
+        5,
+        9,
+        12
+      ],
+      "cpu_probe_layers": [
+        5,
+        9
+      ],
+      "access": "gated_model",
+      "tier": "core",
+      "model_pair_cpu_candidate": false
+    },
+    {
+      "model_key": "gemma1b",
+      "sae_key": "gemma1b_scope_resid",
+      "size": "1B",
+      "n_layers": 26,
+      "architecture": "jumprelu",
+      "selected_layers": [
+        7,
+        13,
+        17
+      ],
+      "cpu_probe_layers": [
+        7,
+        13
+      ],
+      "access": "gated_model",
+      "tier": "core",
+      "model_pair_cpu_candidate": false
+    },
+    {
+      "model_key": "gemma2_2b_base",
+      "sae_key": "gemma2_2b_pt_l25_canonical",
+      "size": "2B",
+      "n_layers": 26,
+      "architecture": "jumprelu",
+      "selected_layers": [
+        13,
+        25
+      ],
+      "cpu_probe_layers": [
+        25
+      ],
+      "access": "gated_model",
+      "tier": "core",
+      "model_pair_cpu_candidate": false
+    },
+    {
+      "model_key": "qwen35_2b",
+      "sae_key": "qwen35_2b_resid_w32k",
+      "size": "2B",
+      "n_layers": 24,
+      "architecture": "topk",
+      "selected_layers": [
+        6,
+        12,
+        15,
+        20
+      ],
+      "cpu_probe_layers": [
+        12
+      ],
+      "access": "open",
+      "tier": "core",
+      "model_pair_cpu_candidate": false
+    },
+    {
+      "model_key": "qwen3_8b",
+      "sae_key": "qwen3_8b_resid_w64k",
+      "size": "8B",
+      "n_layers": 36,
+      "architecture": "topk",
+      "selected_layers": [
+        9,
+        18,
+        23,
+        31
+      ],
+      "cpu_probe_layers": [
+        18
+      ],
+      "access": "large_model",
+      "tier": "core",
+      "model_pair_cpu_candidate": false
+    },
+    {
+      "model_key": "llama31_8b",
+      "sae_key": "llama31_8b_lxr_8x",
+      "size": "8B",
+      "n_layers": 32,
+      "architecture": "jumprelu",
+      "selected_layers": [
+        8,
+        16,
+        21,
+        27
+      ],
+      "cpu_probe_layers": [
+        16
+      ],
+      "access": "gated_large_model",
+      "tier": "core",
+      "model_pair_cpu_candidate": false
+    },
+    {
+      "model_key": "pythia410m",
+      "sae_key": "pythia410m_mlp_topk",
+      "size": "410M",
+      "n_layers": 24,
+      "architecture": "topk",
+      "selected_layers": [
+        4,
+        12,
+        20
+      ],
+      "cpu_probe_layers": [
+        4,
+        12
+      ],
+      "access": "open",
+      "tier": "core",
+      "model_pair_cpu_candidate": true
+    },
+    {
+      "model_key": "qwen3_1_7b_base",
+      "sae_key": "qwen3_1_7b_base_resid_w32k",
+      "size": "1.7B",
+      "n_layers": 28,
+      "architecture": "topk",
+      "selected_layers": [
+        7,
+        14,
+        18,
+        23
+      ],
+      "cpu_probe_layers": [
+        7,
+        14
+      ],
+      "access": "open",
+      "tier": "core",
+      "model_pair_cpu_candidate": true
+    },
+    {
+      "model_key": "r1_distill_qwen15b",
+      "sae_key": "r1_distill_qwen15b_resid_l20",
+      "size": "1.5B",
+      "n_layers": 28,
+      "architecture": "topk",
+      "selected_layers": [
+        20
+      ],
+      "cpu_probe_layers": [
+        20
+      ],
+      "access": "open",
+      "tier": "core",
+      "model_pair_cpu_candidate": true
+    },
+    {
+      "model_key": "gemma3_4b_pt",
+      "sae_key": "gemma3_4b_pt_scope_resid",
+      "size": "4B",
+      "n_layers": 34,
+      "architecture": "jumprelu",
+      "selected_layers": [
+        9,
+        17,
+        22,
+        29
+      ],
+      "cpu_probe_layers": [
+        17
+      ],
+      "access": "gated_model",
+      "tier": "core",
+      "model_pair_cpu_candidate": false
+    },
+    {
+      "model_key": "gemma3_4b_it",
+      "sae_key": "gemma3_4b_it_scope_resid",
+      "size": "4B",
+      "n_layers": 34,
+      "architecture": "jumprelu",
+      "selected_layers": [
+        9,
+        17,
+        22,
+        29
+      ],
+      "cpu_probe_layers": [
+        17
+      ],
+      "access": "gated_model",
+      "tier": "core",
+      "model_pair_cpu_candidate": false
+    },
+    {
+      "model_key": "mistral7b_instruct",
+      "sae_key": "mistral7b_instruct_tc_l16_131k",
+      "size": "7B",
+      "n_layers": 32,
+      "architecture": "topk",
+      "selected_layers": [
+        16
+      ],
+      "cpu_probe_layers": [],
+      "access": "large_sae_4gb",
+      "tier": "core",
+      "model_pair_cpu_candidate": false
+    },
+    {
+      "model_key": "gemma2_9b_pt",
+      "sae_key": "gemma2_9b_pt_scope_resid",
+      "size": "9B",
+      "n_layers": 42,
+      "architecture": "jumprelu",
+      "selected_layers": [
+        9,
+        20,
+        31
+      ],
+      "cpu_probe_layers": [
+        20
+      ],
+      "access": "large_model",
+      "tier": "core",
+      "model_pair_cpu_candidate": false
+    },
+    {
+      "model_key": "qwen35_9b",
+      "sae_key": "qwen35_9b_resid_w64k",
+      "size": "9B",
+      "n_layers": 32,
+      "architecture": "topk",
+      "selected_layers": [
+        8,
+        16,
+        21,
+        27
+      ],
+      "cpu_probe_layers": [
+        16
+      ],
+      "access": "large_model",
+      "tier": "core",
+      "model_pair_cpu_candidate": false
+    },
+    {
+      "model_key": "r1_distill_llama8b",
+      "sae_key": "r1_distill_llama8b_llamascope_l23",
+      "size": "8B",
+      "n_layers": 32,
+      "architecture": "jumprelu",
+      "selected_layers": [
+        23
+      ],
+      "cpu_probe_layers": [
+        23
+      ],
+      "access": "large_model",
+      "tier": "core",
+      "model_pair_cpu_candidate": false
+    },
+    {
+      "model_key": "qwen3_1_7b",
+      "sae_key": "qwen3_1_7b_ak_resid_l14_65k",
+      "size": "1.7B",
+      "n_layers": 28,
+      "architecture": "batchtopk",
+      "selected_layers": [
+        14
+      ],
+      "cpu_probe_layers": [
+        14
+      ],
+      "access": "open",
+      "tier": "architecture",
+      "model_pair_cpu_candidate": false
+    },
+    {
+      "model_key": "gemma2_2b_it",
+      "sae_key": "gemma2_2b_it_matryoshka_l12_32k",
+      "size": "2B",
+      "n_layers": 26,
+      "architecture": "matryoshka_batchtopk",
+      "selected_layers": [
+        12
+      ],
+      "cpu_probe_layers": [
+        12
+      ],
+      "access": "gated_model",
+      "tier": "architecture",
+      "model_pair_cpu_candidate": false
+    },
+    {
+      "model_key": "qwen35_4b",
+      "sae_key": "qwen35_4b_matryoshka_l15_65k",
+      "size": "4B",
+      "n_layers": 32,
+      "architecture": "matryoshka_batchtopk",
+      "selected_layers": [
+        15
+      ],
+      "cpu_probe_layers": [
+        15
+      ],
+      "access": "large_model",
+      "tier": "architecture",
+      "model_pair_cpu_candidate": false
+    }
+  ]
+}

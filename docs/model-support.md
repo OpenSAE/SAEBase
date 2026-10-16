@@ -19,6 +19,10 @@ The verified release matrix has six distinct prompts per model. It checks compat
 
 Six model/SAE pairs are tracked in [Phase A Model Coverage](phase-a-model-coverage.md). **Qwen3.5-2B Base + the original Qwen-Scope 32K SAE has passed genuine CPU model+SAE capture and identity-patch acceptance.** All six original SAE checkpoints independently loaded and encoded/decoded with genuine weights; the other five model+SAE pairs remain blocked or untested pending gated model access or high-memory GPU compute. Details and raw evidence are linked in the Phase A page.
 
+## Stages B+C: broader cross-scale and multi-layer coverage
+
+The [Stage B+C Matrix](stage-bc-model-sae-coverage.md) catalogs 15 model variants spanning 270M–9B and three additional SAE-architecture checks across 48 selected layer checkpoints. New authentic **CPU model–SAE feature-intervention acceptance** has passed for Pythia 410M, Qwen3 1.7B Base and DeepSeek R1 Distill Qwen 1.5B. The stage-C workflow completed **21/21 genuine SAE-only CPU checks** on selected layers; full checkpoint SHA-256 and GitHub Actions provenance are in [the Stage C ledger](../conf/coverage/stage_c_cpu_verified.json). Three real small-model M3/M4 evaluations are indexed in [the Stage B ledger](../conf/coverage/stage_b_cpu_verified.json). Absence of a full LLM run does not imply model-pair verification. GitHub workflow artifacts provide individual weight hashes and numerical probes. Large-model full runs are deferred to Stage D.
+
 ## Registered configurations and optional models
 
 Additional model and SAE profiles exist for Pythia, Gemma, Llama and other families. Their availability in `saebase.sae.registry` or Hydra configurations should not be read as evidence that every checkpoint was downloaded, that every hook was tested, or that results are comparable across training/data protocols.
