@@ -165,6 +165,7 @@ python examples/12_benchmark_offline.py
 ```
 
 SAEBase's per-token FVU is not automatically numerically interchangeable with SAEBench's global reconstruction protocol. Native SAEBench metrics are **imported from an upstream-generated JSON result**; the benchmark importer does not silently rerun upstream evaluations. See [Benchmarking](docs/benchmarking.md).
+- [Third-party extensions](docs/extensions.md) — plug in external models, SAE checkpoints and source-verified benchmark methods.
 
 ---
 

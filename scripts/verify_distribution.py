@@ -13,6 +13,9 @@ import zipfile
 NEEDED_WHEEL = {
     "main.py",
     "saebase/cli.py", "saebase/model_plugins.py",
+    "saebase/extensions/__init__.py", "saebase/extensions/contracts.py",
+    "saebase/extensions/registry.py", "saebase/extensions/runtime.py",
+    "saebase/extensions/metrics.py",
     "saebase/tasks/__init__.py", "saebase/tasks/plugins.py",
     "saebase/benchmarks/__init__.py", "saebase/benchmarks/runner.py",
     "saebase/benchmarks/planner.py", "saebase/benchmarks/results.py",
@@ -68,6 +71,8 @@ NEEDED_SDIST = NEEDED_WHEEL | {
     ".github/workflows/software-release.yml",
     "scripts/release_candidate.py",
     "docs/release-process.md", "tests/test_release_candidate.py",
+    "docs/extensions.md", "tests/test_external_extensions.py",
+    "examples/18_external_extensions_offline.py",
     "docs/M2_BATCH_INTERVENTIONS.md",
     "scripts/m2_real_smoke.py", "examples/11_batch_interventions_offline.py",
 }

@@ -203,6 +203,9 @@ def execute(config: BenchmarkConfig, output: str|Path, *, real: bool=False,
             provenance[prefix]={"model_state_sha256":act_id.model_state_sha256,
                         "sae_state_sha256":sae_sha,
                         "tokenizer_sha256":act_id.tokenizer_sha256}
+            if hasattr(pair, "identity") and hasattr(pair, "verification"):
+                provenance[prefix]["extension_identity"]=pair.identity.to_dict()
+                provenance[prefix]["extension_verification"]=pair.verification
             records=[s.record for s in config.samples]
             wants_core=any(s.metric_id.startswith("core.") for s in specs)
             wants_external_codes=any(
