@@ -6,9 +6,7 @@ from subprocess import CompletedProcess
 from scripts import check_new_python_quality as quality
 
 
-def test_new_file_discovery_uses_pr_base_and_excludes_existing(
-    monkeypatch, tmp_path
-):
+def test_new_file_discovery_uses_pr_base_and_excludes_existing(monkeypatch, tmp_path):
     monkeypatch.chdir(tmp_path)
     Path("new.py").write_text("x = 1\n", encoding="utf-8")
     Path("old.py").write_text("x = 2\n", encoding="utf-8")
@@ -17,11 +15,7 @@ def test_new_file_discovery_uses_pr_base_and_excludes_existing(
 
     def fake_run(args, **kwargs):
         calls.append(args)
-        return CompletedProcess(
-            args,
-            0,
-            stdout=b"new.py\0notes.md\0removed.py\0",
-        )
+        return CompletedProcess(args, 0, stdout=b"new.py\0notes.md\0removed.py\0")
 
     monkeypatch.setattr(quality.subprocess, "run", fake_run)
     assert quality.added_python_files("BASE") == ["new.py"]

@@ -24,14 +24,8 @@ def added_python_files(base_sha: str | None = None) -> list[str]:
             "--",
         ]
     output = subprocess.run(args, check=True, capture_output=True).stdout
-    paths = [
-        name.decode("utf-8")
-        for name in output.split(b"\0")
-        if name
-    ]
-    return sorted(
-        path for path in paths if path.endswith(".py") and Path(path).is_file()
-    )
+    paths = [name.decode("utf-8") for name in output.split(b"\0") if name]
+    return sorted(path for path in paths if path.endswith(".py") and Path(path).is_file())
 
 
 def verify_new_files(base_sha: str | None = None) -> int:
