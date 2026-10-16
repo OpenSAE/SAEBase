@@ -1,0 +1,63 @@
+{
+  "benchmark_metric_rows": 5,
+  "dataset_sha256": "a5f31390d85e23d0ca03f8eba63c41700ae4f5364af9575f717863035fcaa7e1",
+  "evaluation_host_model_key": "r1_distill_qwen15b",
+  "feature_ablated": 40925,
+  "feature_selection_split": "selection",
+  "hook_name": "blocks.20.hook_resid_post",
+  "layer": 20,
+  "loaded_model_name": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+  "m3_metrics_sha256": "a38241217ec0f8faa6289dcf4e67170057f6b4bd8d2e62e58bd04bc29489a8e9",
+  "m3_run_id": "d15fa51e253399a8f903c40f",
+  "m4_audit_sha256": "6f87b1aed822e0500a38337173d760a78619e2a8220c138324ae56ddbc2d43bf",
+  "metric_results": [
+    {
+      "condition": null,
+      "metric_id": "core.l0",
+      "n_valid": 64,
+      "value": 32.0
+    },
+    {
+      "condition": null,
+      "metric_id": "core.reconstruction_mse",
+      "n_valid": 64,
+      "value": 3.873100533740864
+    },
+    {
+      "condition": null,
+      "metric_id": "core.explained_variance",
+      "n_valid": 64,
+      "value": 0.7829561668350811
+    },
+    {
+      "condition": "identity",
+      "metric_id": "intervention.logit_delta_l2",
+      "n_valid": 64,
+      "value": 0.0
+    },
+    {
+      "condition": "feature-ablation",
+      "metric_id": "intervention.logit_delta_l2",
+      "n_valid": 64,
+      "value": 379.62211990356445
+    }
+  ],
+  "model_key": "r1_distill_qwen15b",
+  "n_independent_evaluation_groups": 64,
+  "n_model_reloads_for_audit": 0,
+  "population_corpus_sha256": "a5f31390d85e23d0ca03f8eba63c41700ae4f5364af9575f717863035fcaa7e1",
+  "protocol": "population",
+  "protocol_id": "stage_d.population.v1",
+  "reconstruction_diagnostics": {
+    "reconstruction_mse_mean": 3.873100533740864,
+    "reconstruction_mse_n": 1,
+    "reconstruction_mse_var": 0.0
+  },
+  "reliability_metric_audits": 3,
+  "sae_key": "r1_distill_qwen15b_resid_l20",
+  "sample_count": 64,
+  "schema": "saebase.stage_d.real_m3m4_acceptance.v1",
+  "status": "passed",
+  "trained_on_model_key": "r1_distill_qwen15b",
+  "transfer_kind": "none"
+}

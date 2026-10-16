@@ -1,49 +1,63 @@
 {
   "benchmark_metric_rows": 5,
-  "feature_ablated": 18563,
+  "dataset_sha256": "a5f31390d85e23d0ca03f8eba63c41700ae4f5364af9575f717863035fcaa7e1",
+  "evaluation_host_model_key": "r1_distill_llama8b",
+  "feature_ablated": 15272,
+  "feature_selection_split": "selection",
   "hook_name": "blocks.23.hook_resid_post",
   "layer": 23,
-  "m3_metrics_sha256": "0123d45d1edffcdebe087aa45cfb94d6b7664668b76eef8852757cee95588343",
-  "m3_run_id": "3aa809bb049236450e19353a",
-  "m4_audit_sha256": "01ce15d17603028dda26cb2dc95e6346f840fd7b93420a3e1bf78f2b8b40c83d",
+  "loaded_model_name": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+  "m3_metrics_sha256": "6730c95418c90dcbcead2b1fad3729cfd7cedcab0f2f69cee916e5e9ebf87a9e",
+  "m3_run_id": "3c1489354f81bc0692fbf0fb",
+  "m4_audit_sha256": "53d0a468800d9b37bead83bb40f723eea84a6a4804f848489eef67bbbb22f87f",
   "metric_results": [
     {
       "condition": null,
       "metric_id": "core.l0",
-      "n_valid": 3,
-      "value": 9.666666666666666
+      "n_valid": 64,
+      "value": 8.125
     },
     {
       "condition": null,
       "metric_id": "core.reconstruction_mse",
-      "n_valid": 3,
-      "value": 0.0817531000923758
+      "n_valid": 64,
+      "value": 0.08067539281105633
     },
     {
       "condition": null,
       "metric_id": "core.explained_variance",
-      "n_valid": 3,
-      "value": 0.48702687582725
+      "n_valid": 64,
+      "value": 0.45463792560988686
     },
     {
       "condition": "identity",
       "metric_id": "intervention.logit_delta_l2",
-      "n_valid": 3,
+      "n_valid": 64,
       "value": 0.0
     },
     {
       "condition": "feature-ablation",
       "metric_id": "intervention.logit_delta_l2",
-      "n_valid": 3,
-      "value": 47.93434143066406
+      "n_valid": 64,
+      "value": 81.63063311576843
     }
   ],
   "model_key": "r1_distill_llama8b",
+  "n_independent_evaluation_groups": 64,
   "n_model_reloads_for_audit": 0,
-  "protocol": "smoke_only",
+  "population_corpus_sha256": "a5f31390d85e23d0ca03f8eba63c41700ae4f5364af9575f717863035fcaa7e1",
+  "protocol": "population",
+  "protocol_id": "stage_d.population.v1",
+  "reconstruction_diagnostics": {
+    "reconstruction_mse_mean": 0.08067539281105633,
+    "reconstruction_mse_n": 1,
+    "reconstruction_mse_var": 0.0
+  },
   "reliability_metric_audits": 3,
   "sae_key": "r1_distill_llama8b_llamascope_l23",
-  "sample_count": 3,
+  "sample_count": 64,
   "schema": "saebase.stage_d.real_m3m4_acceptance.v1",
-  "status": "passed"
+  "status": "passed",
+  "trained_on_model_key": "r1_distill_llama8b",
+  "transfer_kind": "none"
 }

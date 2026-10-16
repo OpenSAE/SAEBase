@@ -1,0 +1,107 @@
+{
+  "git_commit": "098103b804d4d0dd6e3df5043656014ec7619705",
+  "inventory": {
+    "acceptance_passed_files": 45,
+    "note": "18 smoke run dirs present; 17 complete with reliability; all treated as smoke_only only",
+    "smoke_run_dirs": 18,
+    "smoke_run_ids": [
+      "061c925d035810871adc57ac",
+      "11e75e0d7d76b92f0752cb9a",
+      "1b941344b1eed7d79bfe6521",
+      "2500e03f5a78059f8f6d941a",
+      "3aa809bb049236450e19353a",
+      "4361f8d1bae7fba84993ee77",
+      "4ed31ba53bc19371adc59dc7",
+      "4f5a32561df0b84569149903",
+      "6426a3b6768b055864e0fb75",
+      "76d1753dba8007ec96b0cde1",
+      "7c8908b0418a87c7f4018c4b",
+      "80a704a8d1b41a010afa425c",
+      "96247de8caf70f32c1135ff8",
+      "_cache",
+      "bf0859d520c9e76f67097ab1",
+      "c449fd336a2882fd39c0648f",
+      "d069b8b00b335359ddb508d6",
+      "f2681260f2bd8044290f3ee9"
+    ],
+    "stale_keys": [
+      "gemma2_2b_base|gemma2_2b_it_matryoshka_l12_32k|L12|blocks.12.hook_resid_post",
+      "mistral7b_instruct|mistral7b_instruct_tc_l16_131k|L16|blocks.16.hook_resid_pre"
+    ],
+    "status_keys": 50
+  },
+  "issues": [
+    {
+      "expected": "retain layer_norm with per-input ln_mu/ln_std for edit decode",
+      "file": "saebase/sae/loading.py",
+      "id": "P0-A",
+      "status": "resolved_with_evidence",
+      "title": "Mistral layer_norm disabled"
+    },
+    {
+      "expected": "load google/gemma-2-2b-it via model_key_override for catalog model_key gemma2_2b_it",
+      "file": "scripts/phase_d_verify.py",
+      "id": "P0-B",
+      "status": "resolved_with_evidence",
+      "title": "Gemma2 Matryoshka Base labeled as IT"
+    },
+    {
+      "expected": "hard-fail until frozen >=64 independent groups",
+      "file": "scripts/phase_d_benchmark.py",
+      "id": "P0-C",
+      "status": "resolved_with_evidence",
+      "title": "--population uses 3 smoke prompts"
+    },
+    {
+      "expected": "archive smoke runs; populate checksums; population raw runs",
+      "file": "conf/coverage/stage_d_evidence",
+      "id": "P0-D",
+      "status": "resolved_with_evidence",
+      "title": "compact M3 summaries without durable archive index"
+    },
+    {
+      "expected": "source-aware resume fingerprint",
+      "file": "saebase/sae/stage_d.py",
+      "id": "P0-E",
+      "status": "resolved_with_evidence",
+      "title": "resume ignores source fingerprint"
+    },
+    {
+      "expected": "exactly 48 canonical keys; stale resid_pre and Base matryoshka archived",
+      "file": "status.json",
+      "id": "P0-F",
+      "status": "resolved_with_evidence",
+      "title": "status.json has 50 keys not 48"
+    },
+    {
+      "expected": "64-group frozen dataset; 26 heavy then all 48",
+      "file": "scripts/phase_d_benchmark.py",
+      "id": "POP-48",
+      "status": "resolved_with_evidence",
+      "title": "population M3/M4 for 48 sites"
+    },
+    {
+      "expected": "nonempty verified listing",
+      "file": "final/checksums.sha256",
+      "id": "CHECKSUM",
+      "status": "resolved_with_evidence",
+      "title": "empty checksums.sha256"
+    },
+    {
+      "expected": "gates before complete summary",
+      "file": "scripts/phase_d_matrix.py",
+      "id": "FINALIZE",
+      "status": "resolved_with_evidence",
+      "title": "phase_d_matrix always finalizes"
+    }
+  ],
+  "population": {
+    "blocked": 0,
+    "completed": 48,
+    "failed": 0
+  },
+  "pr": "https://github.com/OpenSAE/SAEBase/pull/17",
+  "recorded_at_utc": "2026-10-16T04:26:21.981897+00:00",
+  "schema": "saebase.stage_d.gap_report.v1",
+  "updated_at_utc": "2026-10-16T06:30:32.626698+00:00"
+}

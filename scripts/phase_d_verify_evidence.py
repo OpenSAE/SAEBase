@@ -136,8 +136,10 @@ def verify_evidence(output: Path, *, evidence_root: Path | None = None) -> list[
         if summary.get("m3_metrics_sha256") and summary["m3_metrics_sha256"] != manifest.get("sha256"):
             errors.append(f"{path.name}: m3_metrics_sha256 disagrees with metrics_manifest")
 
-    # Acceptance checksums
+    # Acceptance checksums (canonical L<layer>.json only; notes stay in history).
     for acc in (output / "acceptance").rglob("L*.json") if (output / "acceptance").exists() else []:
+        if not acc.stem[1:].isdigit():
+            continue
         try:
             read_acceptance(acc)
         except ValueError as exc:

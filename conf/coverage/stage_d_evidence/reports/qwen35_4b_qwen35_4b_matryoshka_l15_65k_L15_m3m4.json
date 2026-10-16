@@ -1,49 +1,63 @@
 {
   "benchmark_metric_rows": 5,
-  "feature_ablated": 1037,
+  "dataset_sha256": "a5f31390d85e23d0ca03f8eba63c41700ae4f5364af9575f717863035fcaa7e1",
+  "evaluation_host_model_key": "qwen35_4b",
+  "feature_ablated": 1842,
+  "feature_selection_split": "selection",
   "hook_name": "blocks.15.hook_resid_post",
   "layer": 15,
-  "m3_metrics_sha256": "766505f72a9b40972491983de2e7690b75c3f827fb63aeaadb7253268b73422e",
-  "m3_run_id": "1b941344b1eed7d79bfe6521",
-  "m4_audit_sha256": "04fcc9619bfda4d5f2d29447d0badd115ece5b2574a92394a08a2d97e3529ce8",
+  "loaded_model_name": "Qwen/Qwen3.5-4B",
+  "m3_metrics_sha256": "52a525029f4aeed6cb92d27951d39141b57d70d1947e5f38a91ee085ffe63e01",
+  "m3_run_id": "44d315215c8c5afd9d50235a",
+  "m4_audit_sha256": "79ab57614244b5c7d6538ac0b0ba19c30947274708041644f1526f5a7fabfecf",
   "metric_results": [
     {
       "condition": null,
       "metric_id": "core.l0",
-      "n_valid": 3,
-      "value": 100.33333333333333
+      "n_valid": 64,
+      "value": 100.03125
     },
     {
       "condition": null,
       "metric_id": "core.reconstruction_mse",
-      "n_valid": 3,
-      "value": 0.0069920295595687935
+      "n_valid": 64,
+      "value": 0.007906571600660514
     },
     {
       "condition": null,
       "metric_id": "core.explained_variance",
-      "n_valid": 3,
-      "value": 0.842331485868948
+      "n_valid": 64,
+      "value": 0.8096178164397694
     },
     {
       "condition": "identity",
       "metric_id": "intervention.logit_delta_l2",
-      "n_valid": 3,
+      "n_valid": 64,
       "value": 0.0
     },
     {
       "condition": "feature-ablation",
       "metric_id": "intervention.logit_delta_l2",
-      "n_valid": 3,
-      "value": 140.4897664388021
+      "n_valid": 64,
+      "value": 633.4192380905151
     }
   ],
   "model_key": "qwen35_4b",
+  "n_independent_evaluation_groups": 64,
   "n_model_reloads_for_audit": 0,
-  "protocol": "smoke_only",
+  "population_corpus_sha256": "a5f31390d85e23d0ca03f8eba63c41700ae4f5364af9575f717863035fcaa7e1",
+  "protocol": "population",
+  "protocol_id": "stage_d.population.v1",
+  "reconstruction_diagnostics": {
+    "reconstruction_mse_mean": 0.007906571600660514,
+    "reconstruction_mse_n": 1,
+    "reconstruction_mse_var": 0.0
+  },
   "reliability_metric_audits": 3,
   "sae_key": "qwen35_4b_matryoshka_l15_65k",
-  "sample_count": 3,
+  "sample_count": 64,
   "schema": "saebase.stage_d.real_m3m4_acceptance.v1",
-  "status": "passed"
+  "status": "passed",
+  "trained_on_model_key": "qwen35_4b",
+  "transfer_kind": "none"
 }

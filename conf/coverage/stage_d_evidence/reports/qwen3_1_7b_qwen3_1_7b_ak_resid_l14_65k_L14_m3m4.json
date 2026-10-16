@@ -1,49 +1,63 @@
 {
   "benchmark_metric_rows": 5,
-  "feature_ablated": 30281,
+  "dataset_sha256": "a5f31390d85e23d0ca03f8eba63c41700ae4f5364af9575f717863035fcaa7e1",
+  "evaluation_host_model_key": "qwen3_1_7b",
+  "feature_ablated": 48579,
+  "feature_selection_split": "selection",
   "hook_name": "blocks.14.hook_resid_post",
   "layer": 14,
-  "m3_metrics_sha256": "d4a243b757da61978c4fa088e844b30435a07f72b46a1b7b22905e3e41a647bc",
-  "m3_run_id": "6426a3b6768b055864e0fb75",
-  "m4_audit_sha256": "27e79f356a2c124f574374501ec6447272f4449553f02213f4e7bc8541b7d5fb",
+  "loaded_model_name": "Qwen/Qwen3-1.7B",
+  "m3_metrics_sha256": "ad07d858a51b1a73f75885c633982d31c8baa6eb6a6c4439df2e9897e03290d7",
+  "m3_run_id": "d55f3136dcd09a609aabab4e",
+  "m4_audit_sha256": "f6631915f7ec369b13bb3e5f1a5c397d92cc62a108849c56f407ad8aa1711a63",
   "metric_results": [
     {
       "condition": null,
       "metric_id": "core.l0",
-      "n_valid": 3,
-      "value": 72.33333333333333
+      "n_valid": 64,
+      "value": 69.984375
     },
     {
       "condition": null,
       "metric_id": "core.reconstruction_mse",
-      "n_valid": 3,
-      "value": 2.4393820216223467
+      "n_valid": 64,
+      "value": 2.0263488726996317
     },
     {
       "condition": null,
       "metric_id": "core.explained_variance",
-      "n_valid": 3,
-      "value": 0.8286400607620829
+      "n_valid": 64,
+      "value": 0.8517183866628193
     },
     {
       "condition": "identity",
       "metric_id": "intervention.logit_delta_l2",
-      "n_valid": 3,
+      "n_valid": 64,
       "value": 0.0
     },
     {
       "condition": "feature-ablation",
       "metric_id": "intervention.logit_delta_l2",
-      "n_valid": 3,
-      "value": 78.22972361246745
+      "n_valid": 64,
+      "value": 512.9422640800476
     }
   ],
   "model_key": "qwen3_1_7b",
+  "n_independent_evaluation_groups": 64,
   "n_model_reloads_for_audit": 0,
-  "protocol": "smoke_only",
+  "population_corpus_sha256": "a5f31390d85e23d0ca03f8eba63c41700ae4f5364af9575f717863035fcaa7e1",
+  "protocol": "population",
+  "protocol_id": "stage_d.population.v1",
+  "reconstruction_diagnostics": {
+    "reconstruction_mse_mean": 2.0263488726996317,
+    "reconstruction_mse_n": 1,
+    "reconstruction_mse_var": 0.0
+  },
   "reliability_metric_audits": 3,
   "sae_key": "qwen3_1_7b_ak_resid_l14_65k",
-  "sample_count": 3,
+  "sample_count": 64,
   "schema": "saebase.stage_d.real_m3m4_acceptance.v1",
-  "status": "passed"
+  "status": "passed",
+  "trained_on_model_key": "qwen3_1_7b",
+  "transfer_kind": "none"
 }

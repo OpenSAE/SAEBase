@@ -1,49 +1,63 @@
 {
   "benchmark_metric_rows": 5,
-  "feature_ablated": 14325,
+  "dataset_sha256": "a5f31390d85e23d0ca03f8eba63c41700ae4f5364af9575f717863035fcaa7e1",
+  "evaluation_host_model_key": "gemma2_2b_base",
+  "feature_ablated": 3017,
+  "feature_selection_split": "selection",
   "hook_name": "blocks.25.hook_resid_post",
   "layer": 25,
-  "m3_metrics_sha256": "991e485787395bb78dfddae05ec20c1bd58ff4f6d5f681c8fde04b83e316d6b9",
-  "m3_run_id": "80a704a8d1b41a010afa425c",
-  "m4_audit_sha256": "1ea77a3095693cf917713b9ba9048396cdffbe670034d268c037f75ae9aae0a8",
+  "loaded_model_name": "google/gemma-2-2b",
+  "m3_metrics_sha256": "d6584456dc4df0ce9edb779978ad6fdd9a4b560d5f5f9469f9855536a4f1945e",
+  "m3_run_id": "fde5991a19804d69bf0e6343",
+  "m4_audit_sha256": "4953797e8dadffc5d02a5e416aed3c56c4d7ad1aa2be49acf4b62a651543b197",
   "metric_results": [
     {
       "condition": null,
       "metric_id": "core.l0",
-      "n_valid": 3,
-      "value": 85.66666666666667
+      "n_valid": 64,
+      "value": 88.234375
     },
     {
       "condition": null,
       "metric_id": "core.reconstruction_mse",
-      "n_valid": 3,
-      "value": 17.15288761496215
+      "n_valid": 64,
+      "value": 19.77263166884019
     },
     {
       "condition": null,
       "metric_id": "core.explained_variance",
-      "n_valid": 3,
-      "value": 0.8838147206747163
+      "n_valid": 64,
+      "value": 0.8849783429040522
     },
     {
       "condition": "identity",
       "metric_id": "intervention.logit_delta_l2",
-      "n_valid": 3,
+      "n_valid": 64,
       "value": 0.0
     },
     {
       "condition": "feature-ablation",
       "metric_id": "intervention.logit_delta_l2",
-      "n_valid": 3,
-      "value": 221.6819814046224
+      "n_valid": 64,
+      "value": 691.7528381347656
     }
   ],
   "model_key": "gemma2_2b_base",
+  "n_independent_evaluation_groups": 64,
   "n_model_reloads_for_audit": 0,
-  "protocol": "smoke_only",
+  "population_corpus_sha256": "a5f31390d85e23d0ca03f8eba63c41700ae4f5364af9575f717863035fcaa7e1",
+  "protocol": "population",
+  "protocol_id": "stage_d.population.v1",
+  "reconstruction_diagnostics": {
+    "reconstruction_mse_mean": 19.77263166884019,
+    "reconstruction_mse_n": 1,
+    "reconstruction_mse_var": 0.0
+  },
   "reliability_metric_audits": 3,
   "sae_key": "gemma2_2b_pt_l25_canonical",
-  "sample_count": 3,
+  "sample_count": 64,
   "schema": "saebase.stage_d.real_m3m4_acceptance.v1",
-  "status": "passed"
+  "status": "passed",
+  "trained_on_model_key": "gemma2_2b_base",
+  "transfer_kind": "base_to_instruct"
 }

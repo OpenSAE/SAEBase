@@ -1,0 +1,63 @@
+{
+  "benchmark_metric_rows": 5,
+  "dataset_sha256": "a5f31390d85e23d0ca03f8eba63c41700ae4f5364af9575f717863035fcaa7e1",
+  "evaluation_host_model_key": "gemma2_2b_base",
+  "feature_ablated": 8944,
+  "feature_selection_split": "selection",
+  "hook_name": "blocks.13.hook_resid_post",
+  "layer": 13,
+  "loaded_model_name": "google/gemma-2-2b",
+  "m3_metrics_sha256": "2c1bad03b22623faa4ff81c3de56f34905ab242c703b5c735499f7f569a92b4c",
+  "m3_run_id": "554fbcd04a59cb7de4875ddc",
+  "m4_audit_sha256": "4fc7f270b4a71e64722d82172f2b2e22c85da8897b32011e8fffa8e6bd47a643",
+  "metric_results": [
+    {
+      "condition": null,
+      "metric_id": "core.l0",
+      "n_valid": 64,
+      "value": 79.84375
+    },
+    {
+      "condition": null,
+      "metric_id": "core.reconstruction_mse",
+      "n_valid": 64,
+      "value": 1.8708208263731896
+    },
+    {
+      "condition": null,
+      "metric_id": "core.explained_variance",
+      "n_valid": 64,
+      "value": 0.8624282776229326
+    },
+    {
+      "condition": "identity",
+      "metric_id": "intervention.logit_delta_l2",
+      "n_valid": 64,
+      "value": 0.0
+    },
+    {
+      "condition": "feature-ablation",
+      "metric_id": "intervention.logit_delta_l2",
+      "n_valid": 64,
+      "value": 1187.5063619613647
+    }
+  ],
+  "model_key": "gemma2_2b_base",
+  "n_independent_evaluation_groups": 64,
+  "n_model_reloads_for_audit": 0,
+  "population_corpus_sha256": "a5f31390d85e23d0ca03f8eba63c41700ae4f5364af9575f717863035fcaa7e1",
+  "protocol": "population",
+  "protocol_id": "stage_d.population.v1",
+  "reconstruction_diagnostics": {
+    "reconstruction_mse_mean": 1.8708208263731896,
+    "reconstruction_mse_n": 1,
+    "reconstruction_mse_var": 0.0
+  },
+  "reliability_metric_audits": 3,
+  "sae_key": "gemma2_2b_pt_l25_canonical",
+  "sample_count": 64,
+  "schema": "saebase.stage_d.real_m3m4_acceptance.v1",
+  "status": "passed",
+  "trained_on_model_key": "gemma2_2b_base",
+  "transfer_kind": "base_to_instruct"
+}

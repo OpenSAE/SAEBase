@@ -1,0 +1,20 @@
+{
+  "archived_at_utc": "2026-10-16T04:29:23.978979+00:00",
+  "schema": "saebase.stage_d.status_archive.v1",
+  "sites": {
+    "gemma2_2b_base|gemma2_2b_it_matryoshka_l12_32k|L12|blocks.12.hook_resid_post": {
+      "acceptance_path": "/workspace/stage_d_runs/acceptance/gemma2_2b_base/gemma2_2b_it_matryoshka_l12_32k/L12.json",
+      "model_state_sha256": "a3aa44f999c0869e4dd34faeb9ca4674e4dd838fe97a6ad74f5de0b22477677f",
+      "pair_verified": true,
+      "sae_state_sha256": "ce14537f0ffb99af8aa12c6af6dced45fee5f2b2e66b246396ea119c3e40e8bd",
+      "status": "pair_verified"
+    },
+    "mistral7b_instruct|mistral7b_instruct_tc_l16_131k|L16|blocks.16.hook_resid_pre": {
+      "acceptance_path": "/workspace/stage_d_runs/acceptance/mistral7b_instruct/mistral7b_instruct_tc_l16_131k/L16.json",
+      "error": "'TopKSAE' object has no attribute 'ln_std'",
+      "error_type": "AttributeError",
+      "pair_verified": false,
+      "status": "failed_numeric"
+    }
+  }
+}
