@@ -4,6 +4,10 @@ SAEBase can use external model adapters, SAE checkpoints and metrics without
 modifying its built-in registry. Third-party Python extensions are strictly
 opt-in: importing SAEBase never executes an installed extension package.
 
+This API is available on the current development `main` branch. It is **not
+included in the previously published v0.2.0 wheel**. Until a newer software
+release is published, install SAEBase from a source checkout to use it.
+
 ## A working offline example
 
 From the repository checkout, run:

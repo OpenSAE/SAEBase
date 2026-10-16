@@ -165,7 +165,6 @@ python examples/12_benchmark_offline.py
 ```
 
 SAEBase's per-token FVU is not automatically numerically interchangeable with SAEBench's global reconstruction protocol. Native SAEBench metrics are **imported from an upstream-generated JSON result**; the benchmark importer does not silently rerun upstream evaluations. See [Benchmarking](docs/benchmarking.md).
-- [Third-party extensions](docs/extensions.md) — plug in external models, SAE checkpoints and source-verified benchmark methods.
 
 ---
 
@@ -261,7 +260,7 @@ The published multi-checkpoint run uses six fixed prompts per model and is **eng
 
 [Documentation Index](docs/index.md) · [Getting Started](docs/getting-started.md) · [Python API](docs/python-api.md) · [Examples](examples/README.md) · [Model Support](docs/model-support.md)
 
-[Activation Store](docs/activation-store.md) · [Feature Interventions](docs/feature-interventions.md) · [Benchmarking](docs/benchmarking.md) · [Reliability](docs/reliability.md) · [Research Integrations](docs/research-integrations.md)
+[Activation Store](docs/activation-store.md) · [Feature Interventions](docs/feature-interventions.md) · [Benchmarking](docs/benchmarking.md) · [Reliability](docs/reliability.md) · [Research Integrations](docs/research-integrations.md) · [Extensions](docs/extensions.md)
 
 [Validation](docs/validation.md) · [Changelog](CHANGELOG.md) · [Release Notes](docs/releases/v0.2.0.md) · [Provenance](docs/PROVENANCE.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Apache-2.0 License](LICENSE)
 
