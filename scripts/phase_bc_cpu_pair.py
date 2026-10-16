@@ -26,7 +26,8 @@ CATALOG = Path(__file__).resolve().parents[1] / "conf" / "coverage" / "stage_bc.
 PROMPTS = ("The capital of France is", "The scientist explained the experiment.")
 
 
-def verify_pair(sae_key: str, *, device: str = "cpu") -> dict:
+def load_cpu_pair(sae_key: str, *, device: str = "cpu"):
+    """Return one real CPU ModelAdapter + SAE using the registered native site."""
     if device != "cpu":
         raise ValueError("Stage B/C acceptance is intentionally CPU-only")
     entry = load_coverage(CATALOG).find(sae_key)
@@ -52,6 +53,14 @@ def verify_pair(sae_key: str, *, device: str = "cpu") -> dict:
         raise ValueError("SAE native checkpoint hook mismatch")
     model.capabilities.require("capture")
     model.capabilities.require("patch")
+    return entry, p, model, sae, meta, site, model_name, model_raw
+
+
+def verify_pair(sae_key: str, *, device: str = "cpu") -> dict:
+    entry, p, model, sae, meta, site, model_name, model_raw = load_cpu_pair(
+        sae_key, device=device
+    )
+    layer = site.layer
     observations = []
     for prompt in PROMPTS:
         snap = capture_features(model, sae, site=site, prompt=prompt)
