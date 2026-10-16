@@ -48,22 +48,22 @@ flowchart LR
 
 ## ⚙️ 安装
 
-支持 Python 3.11–3.12。执行真实模型与 SAE 分析，可从源码安装完整分析依赖：
+支持 Python 3.11–3.12。首先从源码安装轻量核心，便于直接运行离线教程：
 
 ```bash
 git clone https://github.com/OpenSAE/SAEBase.git
 cd SAEBase
-python -m pip install -e ".[analysis]"
+python -m pip install -e .
 saebase --list
 ```
 
 <details>
 <summary>📦 其他安装方式</summary>
 
-仅使用注册表、离线示例及轻量公共 API：
+需要加载真实预训练模型与 SAE checkpoint 时，再安装完整分析依赖：
 
 ```bash
-python -m pip install -e .
+python -m pip install -e ".[analysis]"
 ```
 
 开发测试与打包使用 `.[dev]`。实验性的 GPU 生成依赖位于 `.[generation]`，默认 CPU 验收并不代表 vLLM/NNsight GPU 加速已被全面验证。已发布的 wheel 与源码包可从 [GitHub Releases](https://github.com/OpenSAE/SAEBase/releases) 获取；目前不宣称已经发布到 PyPI。

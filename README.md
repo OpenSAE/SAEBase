@@ -48,22 +48,22 @@ The workflow is **capture once, evaluate multiple SAEs**: a verified activation 
 
 ## ⚙️ Install
 
-SAEBase supports Python 3.11–3.12. Install the analysis environment from a source checkout to run real model/SAE experiments:
+SAEBase supports Python 3.11–3.12. Install the lightweight core from a source checkout to run the offline tutorials:
 
 ```bash
 git clone https://github.com/OpenSAE/SAEBase.git
 cd SAEBase
-python -m pip install -e ".[analysis]"
+python -m pip install -e .
 saebase --list
 ```
 
 <details>
 <summary>📦 Other installation options</summary>
 
-For registries, offline examples, and the lightweight core API:
+To run experiments with real pretrained models and SAE checkpoints, install the optional analysis dependencies:
 
 ```bash
-python -m pip install -e .
+python -m pip install -e ".[analysis]"
 ```
 
 For tests and packaging, install `.[dev]`. Optional experimental GPU generation integrations use `.[generation]`; GPU vLLM/NNsight acceleration is not part of the default verified CPU workflow. Versioned wheels and source archives are available under [GitHub Releases](https://github.com/OpenSAE/SAEBase/releases); this project does not claim a PyPI upload.
