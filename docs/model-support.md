@@ -49,6 +49,8 @@ Real matrix evaluation is opt-in:
 saebase-release-matrix --config conf/release/m5_matrix.json --real --device cpu
 ```
 
+The latest committed evidence can be checked through the [Stage D Evidence Archive](stage-d-evidence-archive.md).
+
 ## Identity and checkpoint sources
 
 The repository stores SAE profile identifiers, public source cards, model and tokenizer revisions when available, and exact loaded state SHA-256 values for completed experiments. A key or model card alone is not sufficient to establish loaded weight identity.

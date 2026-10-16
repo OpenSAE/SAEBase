@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **Stage D evidence archive:** Checksum-verified compact evidence release, offline verifier, explicit raw-file recovery checks, and a publication workflow gated on successful main-branch CI. Original GPU runs are not reconstructed from summaries.
+
 <!-- BEGIN VERIFIED_MODEL_SUPPORT -->
 - **Stage D support on current main (2026-10-16):** **48/48** real model-SAE pair acceptances, **48/48** 64-group engineering benchmarks and **48/48** reliability audits across **18** profiles. See the [verified layer matrix](docs/verified-model-matrix.md).
 <!-- END VERIFIED_MODEL_SUPPORT -->

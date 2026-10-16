@@ -33,7 +33,7 @@ Current `main` Stage D support, distinct from the historical `v0.2.0` release. T
 
 The three earlier CPU-verified pairs have separate historical pair evidence; their later M3/M4 reports are linked above. Model and SAE weight hashes are kept in the [final matrix](../conf/coverage/stage_d_evidence/final/stage_d_final_matrix.json).
 
-The [raw archive index](../conf/coverage/stage_d_evidence/final/raw_run_archive_index.json) lists machine-local paths, **not public download URLs**. The committed compact evidence is available, but archived raw runs are not yet advertised as independently downloadable.
+The [raw archive index](../conf/coverage/stage_d_evidence/final/raw_run_archive_index.json) lists machine-local paths, **not public download URLs**. The [versioned compact evidence archive](stage-d-evidence-archive.md) is independently SHA256-verifiable; the separate original raw archives remain unavailable until recovered and checked.
 
 ## Sources and regeneration
 

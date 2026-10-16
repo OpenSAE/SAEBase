@@ -30,6 +30,8 @@ jobs:
           python -c "from saebase.sae.loading import load_sae_for_profile; print('lazy SAE imports OK')"
       - name: Check current Stage D support documentation
         run: python scripts/generate_model_support.py --check
+      - name: Verify committed Stage D evidence SHA256 and coverage
+        run: python scripts/stage_d_archive.py --check
       - name: Run offline tests
         run: python -m pytest -q
       - name: Check CLI
