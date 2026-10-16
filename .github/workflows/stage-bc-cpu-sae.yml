@@ -105,6 +105,7 @@ jobs:
           with open(os.environ["GITHUB_STEP_SUMMARY"],"a") as out:
               out.write(f"{os.environ['SAE_KEY']} L{os.environ['LAYER']}: **{status}**\n")
           print(status)
+          raise SystemExit(0 if status == 'sae_checkpoint_verified_only' else 1)
           PY
 
   aggregate:
@@ -117,28 +118,19 @@ jobs:
           pattern: stage-bc-sae-*
           path: stage-bc-results
           merge-multiple: true
-      - name: Merge stage B+C evidence without hiding failed checkpoints
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install validator
+        run: python -m pip install -e .
+      - name: Validate source identity, weights digest and finite CPU calculations
         run: |
-          python - <<'PY'
-          import json,os
-          from pathlib import Path
-          rows=[json.loads(p.read_text()) for p in Path("stage-bc-results").glob("*.json")]
-          passed=[r for r in rows if r.get("status")=="sae_checkpoint_verified_only"]
-          failed=[r for r in rows if r.get("status")!="sae_checkpoint_verified_only"]
-          summary={
-              "schema":"saebase.coverage.cpu_sae_matrix_result.v1",
-              "expected":21, "with_artifact":len(rows),
-              "sae_only_verified":len(passed),
-              "failed_or_blocked":len(failed),
-              "missing_artifacts":21-len(rows),
-              "entries":sorted(rows,key=lambda x:(x["sae_key"],x["layer"]))
-          }
-          Path("stage_bc_cpu_result.json").write_text(json.dumps(summary,indent=2)+"\n")
-          with open(os.environ["GITHUB_STEP_SUMMARY"],"a") as file:
-              file.write(f"## Stage B+C\n\n{len(passed)}/21 original SAE checkpoint loads validated; {len(failed)} blocked, {21-len(rows)} lacking runtime evidence. This is SAE-only, not LLM-SAE acceptance.\n")
-          print("SAE-only verified:",len(passed),"blocked:",len(failed),"missing:",21-len(rows))
-          PY
+          python scripts/phase_bc_aggregate.py \
+            --source-dir stage-bc-results --output stage_bc_cpu_result.json
+
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: stage-bc-aggregated-cpu-results
           path: stage_bc_cpu_result.json
