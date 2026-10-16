@@ -1,0 +1,74 @@
+{
+  "schema": "saebase.coverage.real_small_model_matrix.v1",
+  "notes": "Genuine public model and SAE checkpoints; two-prompt identity/feature-ablation engineering acceptance, 5 real M3 benchmark rows and 3 M4 audits per model. Results are not SAE-quality rankings.",
+  "pair_run_id": 38826854438,
+  "benchmark_run_id": 38827730625,
+  "results": [
+    {
+      "sae_key": "pythia410m_mlp_topk",
+      "model_key": "pythia410m",
+      "layer": 4,
+      "sae_state_sha256": "85e65b001c48f63316aeca70d2f984adca54645cfd38b1674950e914c4a04365",
+      "model_state_sha256": "f7127cb94a25b63c030d2dd6b2b26c8dd7814eae34ddda2269b068066da22244",
+      "l0": 32,
+      "identity_patch_max_abs_logit_error": 0,
+      "feature_ablation_logit_l2": [
+        8.55907154083252,
+        1.9296963214874268
+      ],
+      "pair_artifact": "https://github.com/OpenSAE/SAEBase/actions/runs/38826854438/artifacts/12015278473",
+      "m3_sha256": "8f33da81ca8ce389522380a8fcc58b75743181e4c97ce624a256fc7035a3a9a2",
+      "m4_sha256": "3d5f245c0ef6107c719e2fbc75b12b956363a1d63066afb22cd6405a7ccdf3ae",
+      "benchmark_artifact": "https://github.com/OpenSAE/SAEBase/actions/runs/38827730625/artifacts/12016370395",
+      "pair_verified": true,
+      "m3m4_verified": true,
+      "benchmark_metric_rows": 5,
+      "reliability_audits": 3,
+      "sample_count": 2
+    },
+    {
+      "sae_key": "qwen3_1_7b_base_resid_w32k",
+      "model_key": "qwen3_1_7b_base",
+      "layer": 7,
+      "sae_state_sha256": "d68dfbf3796d0d6f1bb27fcc4c905ae3085e5c783594b4e0315065d384f194b4",
+      "model_state_sha256": "8f952f43284eed52d505ed6e851a68e2c5bd9960209aa35a890e3ddbb34cdf4e",
+      "l0": 50,
+      "identity_patch_max_abs_logit_error": 0,
+      "feature_ablation_logit_l2": [
+        63.501304626464844,
+        79.4261245727539
+      ],
+      "pair_artifact": "https://github.com/OpenSAE/SAEBase/actions/runs/38826854438/artifacts/12016015144",
+      "m3_sha256": "7ea4e02669a020b1faa505e337e220430cc74370f61c156631be8f1096a0717b",
+      "m4_sha256": "ddf91a0b74ea4401b15a6d5e2134d547370a942fc6bb05f695a0105c8e06c8e4",
+      "benchmark_artifact": "https://github.com/OpenSAE/SAEBase/actions/runs/38827730625/artifacts/12015962255",
+      "pair_verified": true,
+      "m3m4_verified": true,
+      "benchmark_metric_rows": 5,
+      "reliability_audits": 3,
+      "sample_count": 2
+    },
+    {
+      "sae_key": "r1_distill_qwen15b_resid_l20",
+      "model_key": "r1_distill_qwen15b",
+      "layer": 20,
+      "sae_state_sha256": "07d287a9cd6765d60e1bcd40e17093d49af12ea35847635e66398857f097eb93",
+      "model_state_sha256": "41f6ac8f365d7229194a2a5bc47919f19a4b699f5c2ddc04eae6edb006d993b1",
+      "l0": 32,
+      "identity_patch_max_abs_logit_error": 0,
+      "feature_ablation_logit_l2": [
+        403.8452453613281,
+        447.3263244628906
+      ],
+      "pair_artifact": "https://github.com/OpenSAE/SAEBase/actions/runs/38826854438/artifacts/12014959027",
+      "m3_sha256": "8d9c92c5784f700aea4795cb34e9aab55e24bd1844749dd6592d72a1ba719925",
+      "m4_sha256": "5ab1e1b1b262c20d30942b12578a2a28efba2975fbaad60296d9175d948a0fbc",
+      "benchmark_artifact": "https://github.com/OpenSAE/SAEBase/actions/runs/38827730625/artifacts/12015698101",
+      "pair_verified": true,
+      "m3m4_verified": true,
+      "benchmark_metric_rows": 5,
+      "reliability_audits": 3,
+      "sample_count": 2
+    }
+  ]
+}
