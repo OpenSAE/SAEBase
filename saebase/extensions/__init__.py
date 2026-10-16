@@ -23,7 +23,7 @@ from .registry import (
     list_extensions,
     register_extension,
 )
-from .runtime import load_external_pair, validate_external_target
+from .runtime import external_pair_sources, load_external_pair, validate_external_target
 from .metrics import execute_external_metric, validate_external_metric_source
 
 __all__ = [
@@ -44,6 +44,7 @@ __all__ = [
     "register_extension",
     "load_external_pair",
     "validate_external_target",
+    "external_pair_sources",
     "execute_external_metric",
     "validate_external_metric_source",
 ]

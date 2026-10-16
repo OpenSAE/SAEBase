@@ -23,7 +23,44 @@ class LoadedExternalPair:
         return self.identity.site
 
 
-def validate_external_target(target: Any) -> None:
+def external_pair_sources(model_key: str, sae_key: str) -> dict[str, dict[str, Any]]:
+    """Return exact model/SAE provenance to freeze in BenchmarkConfig.sources."""
+    model = external_model(model_key)
+    sae = external_sae(sae_key)
+    if model is None or sae is None or sae.model_key != model_key:
+        raise ValueError("external model and SAE providers must be registered together")
+    return {
+        model_key: {
+            "source": model.source,
+            "revision": model.revision,
+            "hooks": [
+                {
+                    "layer": hook.site.layer,
+                    "hook_name": hook.site.hook_name,
+                    "position": hook.site.position,
+                    "width": hook.width,
+                }
+                for hook in model.hooks
+            ],
+        },
+        sae_key: {
+            "source": sae.source,
+            "revision": sae.revision,
+            "model_key": sae.model_key,
+            "layer": sae.site.layer,
+            "hook_name": sae.site.hook_name,
+            "position": sae.site.position,
+            "d_in": sae.d_in,
+            "d_sae": sae.d_sae,
+            "sae_id": sae.sae_id,
+            "architecture": sae.architecture,
+            "normalization": sae.normalization,
+            "dtype": sae.dtype,
+        },
+    }
+
+
+def validate_external_target(target: Any, sources: dict | None = None) -> None:
     """Offline preflight for an external benchmark target, before weights."""
     model = external_model(target.model_key)
     third_party = any(key.startswith("ext.") for key in (target.model_key, *target.sae_keys))
@@ -31,7 +68,16 @@ def validate_external_target(target: Any) -> None:
         return
     if model is None:
         raise ValueError(f"external target model not registered: {target.model_key}")
+    if sources is None:
+        raise ValueError("external benchmarks require frozen model/SAE provenance in sources")
     for key in target.sae_keys:
+        expected_sources = external_pair_sources(target.model_key, key)
+        for provider_key, record in expected_sources.items():
+            if sources.get(provider_key) != record:
+                raise ValueError(
+                    f"external provenance changed or missing for {provider_key}; "
+                    "freeze the original model and SAE source records in the benchmark config"
+                )
         sae = external_sae(key)
         if sae is None:
             raise ValueError(f"external target SAE not registered: {key}")

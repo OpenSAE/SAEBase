@@ -22,6 +22,7 @@ from saebase.extensions import (
     ExternalSAE,
     HookSpec,
     discover_extensions,
+    external_pair_sources,
     list_extensions,
     load_external_pair,
     register_extension,
@@ -109,7 +110,7 @@ def config(source: Path) -> BenchmarkConfig:
                 "samples": [{"sample_id": "toy1", "token_ids": [1, 2, 3], "split": "test"}],
             },
             "metrics": [METRIC],
-            "sources": {METRIC: str(source)},
+            "sources": {**external_pair_sources(MODEL, SAE), METRIC: str(source)},
             "options": {"tokenizer_sha256": SHA},
         }
     )
@@ -264,3 +265,21 @@ def test_opt_in_discovery_and_no_implicit_execution(monkeypatch, tmp_path):
     assert calls == ["load"]
     with pytest.raises(ValueError, match="already discovered"):
         discover_extensions(["toy"])
+
+
+def test_external_provider_changes_cannot_reuse_frozen_run(tmp_path):
+    source = tmp_path / "immutable_metric.py"
+    source.write_text("x=1\n", encoding="utf-8")
+    register_extension(bundle(source))
+    cfg = config(source)
+    original = external_pair_sources(MODEL, SAE)
+    assert cfg.sources[SAE] == original[SAE]
+    tampered = copy.deepcopy(cfg.to_dict())
+    tampered["sources"][SAE]["revision"] = "new-checkpoint"
+    new_cfg = BenchmarkConfig.from_dict(tampered)
+    with pytest.raises(ValueError, match="external provenance changed"):
+        build_plan(new_cfg)
+    tampered = copy.deepcopy(cfg.to_dict())
+    tampered["sources"][MODEL]["hooks"][0]["width"] = 128
+    with pytest.raises(ValueError, match="external provenance changed"):
+        build_plan(BenchmarkConfig.from_dict(tampered))

@@ -18,6 +18,7 @@ from saebase.extensions import (
     ExternalObservation,
     ExternalSAE,
     HookSpec,
+    external_pair_sources,
     load_external_pair,
     register_extension,
 )
@@ -108,7 +109,10 @@ def main() -> int:
                     "samples": [{"sample_id": "demo1", "token_ids": [1, 2, 3], "split": "test"}],
                 },
                 "metrics": [METRIC],
-                "sources": {METRIC: str(Path(__file__).resolve())},
+                "sources": {
+                    **external_pair_sources(MODEL, SAE),
+                    METRIC: str(Path(__file__).resolve()),
+                },
                 "options": {"tokenizer_sha256": "a" * 64},
             }
         )

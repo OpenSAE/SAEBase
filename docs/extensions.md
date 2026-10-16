@@ -137,6 +137,15 @@ references. This initial API supports required inputs
 When an input uses M1 activations or SAE codes, the existing
 identity-checked cache is reused.
 
+For every external benchmark, its frozen config must also include
+the model and SAE source/revision/site records. Generate their exact
+values with `external_pair_sources(MODEL_KEY, SAE_KEY)` and place
+them under `sources` next to the metric source path. SAEBase includes
+these records in the deterministic run identity. Any change to the
+registered checkpoint source, revision, hook, width, dtype or
+normalization invalidates the benchmark before it can silently resume
+an old result.
+
 For every external metric, the frozen benchmark config must include
 `sources["ext.my_lab.metric"]` pointing to the exact original local
 estimator source file. SAEBase records its SHA256 and the declared
