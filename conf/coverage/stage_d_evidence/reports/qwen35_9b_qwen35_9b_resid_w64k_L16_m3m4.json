@@ -1,0 +1,49 @@
+{
+  "benchmark_metric_rows": 5,
+  "feature_ablated": 24514,
+  "hook_name": "blocks.16.hook_resid_post",
+  "layer": 16,
+  "m3_metrics_sha256": "6ec4391fc2fa95fff5aff1e573b7112fe96c2da9c1bdf76b900d4c09e8e7fdbd",
+  "m3_run_id": "7c8908b0418a87c7f4018c4b",
+  "m4_audit_sha256": "cf1d7edfc2ec220ecdcacc6b4157fecb102004156a96dab9a9f0c822b20b824d",
+  "metric_results": [
+    {
+      "condition": null,
+      "metric_id": "core.l0",
+      "n_valid": 3,
+      "value": 50.0
+    },
+    {
+      "condition": null,
+      "metric_id": "core.reconstruction_mse",
+      "n_valid": 3,
+      "value": 0.2657778309316344
+    },
+    {
+      "condition": null,
+      "metric_id": "core.explained_variance",
+      "n_valid": 3,
+      "value": 0.3300000035352298
+    },
+    {
+      "condition": "identity",
+      "metric_id": "intervention.logit_delta_l2",
+      "n_valid": 3,
+      "value": 0.0
+    },
+    {
+      "condition": "feature-ablation",
+      "metric_id": "intervention.logit_delta_l2",
+      "n_valid": 3,
+      "value": 140.08901977539062
+    }
+  ],
+  "model_key": "qwen35_9b",
+  "n_model_reloads_for_audit": 0,
+  "protocol": "smoke_only",
+  "reliability_metric_audits": 3,
+  "sae_key": "qwen35_9b_resid_w64k",
+  "sample_count": 3,
+  "schema": "saebase.stage_d.real_m3m4_acceptance.v1",
+  "status": "passed"
+}

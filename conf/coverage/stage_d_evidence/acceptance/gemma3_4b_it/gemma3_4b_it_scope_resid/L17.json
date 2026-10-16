@@ -1,0 +1,88 @@
+{
+  "artifact_sha256": "a0a01fdd63a0c1b81bbc5eb8a2c2ae79676bf5f4bcc34b6a39c7de180b3f7bfb",
+  "cuda": "12.8",
+  "d_in": 2560,
+  "d_sae": 65536,
+  "device": "cuda",
+  "feature_ablation_logit_l2": [
+    102.18035888671875,
+    122.18958282470703,
+    190.8784942626953
+  ],
+  "git_commit": "c7dc0d800dd6f55e71afbd055ea2f7b2848fa382",
+  "gpu_name": "NVIDIA GeForce RTX 5090",
+  "hook_name": "blocks.17.hook_resid_post",
+  "identity_patch_max_abs_logit_error": 0.0,
+  "layer": 17,
+  "loaded_model_name": "google/gemma-3-4b-it",
+  "model_key": "gemma3_4b_it",
+  "model_repo": "google/gemma-3-4b-it",
+  "model_state_sha256": "9db3d023c3e510c17e3bbc420fd3ce8f519b636839f79b985ae05e9b90e77ae5",
+  "n_prompts": 3,
+  "peak_cuda_allocated_bytes": 11876338176,
+  "precision": "float32",
+  "probes": [
+    {
+      "ablated_feature_id": 1479,
+      "feature_ablation_logit_l2": 102.18035888671875,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 55,
+      "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762",
+      "reconstruction_mse": 896.4147338867188,
+      "token_ids": [
+        2,
+        818,
+        5279,
+        529,
+        7001,
+        563
+      ]
+    },
+    {
+      "ablated_feature_id": 42,
+      "feature_ablation_logit_l2": 122.18958282470703,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 61,
+      "prompt_sha256": "20597a70cc5c4ea28eec56d56ff2b1f89c8277a62161210ecab7a65172639310",
+      "reconstruction_mse": 1082.7105712890625,
+      "token_ids": [
+        2,
+        236776,
+        30892,
+        9696,
+        506,
+        2536,
+        13058,
+        236761
+      ]
+    },
+    {
+      "ablated_feature_id": 42,
+      "feature_ablation_logit_l2": 190.8784942626953,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 53,
+      "prompt_sha256": "9cb6dc0eb30bdbbe4f7bfa7cc774d834d83707e8ac5999120ba4c56f4c2b6449",
+      "reconstruction_mse": 866.41162109375,
+      "token_ids": [
+        2,
+        24497,
+        13923,
+        10240,
+        3418,
+        506,
+        5597,
+        7217,
+        236761
+      ]
+    }
+  ],
+  "python": "3.12.14",
+  "sae_file": "layer_17_width_65k_l0_medium",
+  "sae_key": "gemma3_4b_it_scope_resid",
+  "sae_repo": "google/gemma-scope-2-4b-it",
+  "sae_state_sha256": "244cc468bc5663ffa6fe18a1fc7920cb2fc91402ee460b02ee4bad36aeca67f3",
+  "schema": "saebase.stage_d.pair_acceptance.v1",
+  "status": "passed",
+  "torch": "2.11.0+cu128",
+  "verified_at_utc": "2026-10-16T02:43:28.664889+00:00"
+}

@@ -1,0 +1,49 @@
+{
+  "benchmark_metric_rows": 5,
+  "feature_ablated": 1601,
+  "hook_name": "blocks.5.hook_resid_post",
+  "layer": 5,
+  "m3_metrics_sha256": "aa84b189574af0555e523c1ba06a7bb3dff33c7e83eed0b3105484f9f610ec8a",
+  "m3_run_id": "bf0859d520c9e76f67097ab1",
+  "m4_audit_sha256": "ef2d5fc3c528c5874cddf920c84d35ed52dac7b3f51cdf46b730f21d0c525447",
+  "metric_results": [
+    {
+      "condition": null,
+      "metric_id": "core.l0",
+      "n_valid": 3,
+      "value": 37.0
+    },
+    {
+      "condition": null,
+      "metric_id": "core.reconstruction_mse",
+      "n_valid": 3,
+      "value": 39.79781731100464
+    },
+    {
+      "condition": null,
+      "metric_id": "core.explained_variance",
+      "n_valid": 3,
+      "value": 0.9946801665294321
+    },
+    {
+      "condition": "identity",
+      "metric_id": "intervention.logit_delta_l2",
+      "n_valid": 3,
+      "value": 0.0
+    },
+    {
+      "condition": "feature-ablation",
+      "metric_id": "intervention.logit_delta_l2",
+      "n_valid": 3,
+      "value": 389.494384765625
+    }
+  ],
+  "model_key": "gemma270m",
+  "n_model_reloads_for_audit": 0,
+  "protocol": "smoke_only",
+  "reliability_metric_audits": 3,
+  "sae_key": "gemma270m_scope_resid",
+  "sample_count": 3,
+  "schema": "saebase.stage_d.real_m3m4_acceptance.v1",
+  "status": "passed"
+}

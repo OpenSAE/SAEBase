@@ -1,0 +1,466 @@
+{
+  "counts": {
+    "not_found": 2,
+    "ok": 36
+  },
+  "n_probes": 38,
+  "notes": "Short TL names gemma-3-270m / pythia-410m-deduped resolve via google/ and EleutherAI/ aliases.",
+  "recorded_at_utc": "2026-10-16T01:25:48.730477+00:00",
+  "repos": [
+    {
+      "detail": {
+        "error": "404 Client Error. (Request ID: Root=1-6ad17cf8-63da0b7428e2a37543f5355e;ac55be58-eecf-4f1e-8b0a-26f06a69d580)\n\nRepository Not Found for url: https://huggingface.co/api/models/gemma-3-270m.\nPlease make sure you specified the correct `repo_id` and `repo_type`.\nIf you are trying to access a private or gated repo, make sure you are authenticated and your token has the required permissions.\nFor more de",
+        "error_type": "RepositoryNotFoundError"
+      },
+      "kind": "model",
+      "model_key": "gemma270m",
+      "repo_id": "gemma-3-270m",
+      "sae_key": "gemma270m_scope_resid",
+      "status": "not_found"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "b218cd5d69dc2fa71cff448b68d625e6c9702d49"
+      },
+      "kind": "sae",
+      "model_key": "gemma270m",
+      "repo_id": "google/gemma-scope-2-270m-pt",
+      "sae_key": "gemma270m_scope_resid",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": "manual",
+        "private": false,
+        "sha": "fcf18a2a879aab110ca39f8bffbccd5d49d8eb29"
+      },
+      "kind": "model",
+      "model_key": "gemma1b",
+      "repo_id": "google/gemma-3-1b-pt",
+      "sae_key": "gemma1b_scope_resid",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "b738dc06961818c011fb2e44a316352ca0f4e873"
+      },
+      "kind": "sae",
+      "model_key": "gemma1b",
+      "repo_id": "google/gemma-scope-2-1b-pt",
+      "sae_key": "gemma1b_scope_resid",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": "manual",
+        "private": false,
+        "sha": "c5ebcd40d208330abc697524c919956e692655cf"
+      },
+      "kind": "model",
+      "model_key": "gemma2_2b_base",
+      "repo_id": "google/gemma-2-2b",
+      "sae_key": "gemma2_2b_pt_l25_canonical",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "fd571b47c1c64851e9b1989792367b9babb4af63"
+      },
+      "kind": "sae",
+      "model_key": "gemma2_2b_base",
+      "repo_id": "google/gemma-scope-2b-pt-res",
+      "sae_key": "gemma2_2b_pt_l25_canonical",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "b1485b2fa6dfa1287294f269f5fb618e03d52d7c"
+      },
+      "kind": "model",
+      "model_key": "qwen35_2b",
+      "repo_id": "Qwen/Qwen3.5-2B-Base",
+      "sae_key": "qwen35_2b_resid_w32k",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "132ea3697b591df9ee46d738aa1d528e3c6082f7"
+      },
+      "kind": "sae",
+      "model_key": "qwen35_2b",
+      "repo_id": "Qwen/SAE-Res-Qwen3.5-2B-Base-W32K-L0_50",
+      "sae_key": "qwen35_2b_resid_w32k",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4"
+      },
+      "kind": "model",
+      "model_key": "qwen3_8b",
+      "repo_id": "Qwen/Qwen3-8B-Base",
+      "sae_key": "qwen3_8b_resid_w64k",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "9b7d647127c303dd371e5dbd992236bd9799b171"
+      },
+      "kind": "sae",
+      "model_key": "qwen3_8b",
+      "repo_id": "Qwen/SAE-Res-Qwen3-8B-Base-W64K-L0_50",
+      "sae_key": "qwen3_8b_resid_w64k",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": "manual",
+        "private": false,
+        "sha": "d04e592bb4f6aa9cfee91e2e20afa771667e1d4b"
+      },
+      "kind": "model",
+      "model_key": "llama31_8b",
+      "repo_id": "meta-llama/Llama-3.1-8B",
+      "sae_key": "llama31_8b_lxr_8x",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "8dbc1d85edfced43081c03c38b05514dbab1368b"
+      },
+      "kind": "sae",
+      "model_key": "llama31_8b",
+      "repo_id": "OpenMOSS-Team/Llama3_1-8B-Base-LXR-8x",
+      "sae_key": "llama31_8b_lxr_8x",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "error": "404 Client Error. (Request ID: Root=1-6ad17cf9-17713c7c2e4fb3a9178e116e;abd80a51-de3c-4403-911f-784e9413248f)\n\nRepository Not Found for url: https://huggingface.co/api/models/pythia-410m-deduped.\nPlease make sure you specified the correct `repo_id` and `repo_type`.\nIf you are trying to access a private or gated repo, make sure you are authenticated and your token has the required permissions.\nFor ",
+        "error_type": "RepositoryNotFoundError"
+      },
+      "kind": "model",
+      "model_key": "pythia410m",
+      "repo_id": "pythia-410m-deduped",
+      "sae_key": "pythia410m_mlp_topk",
+      "status": "not_found"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "8cd7db3a1471ec1690dd1116947c9d509f10f25a"
+      },
+      "kind": "sae",
+      "model_key": "pythia410m",
+      "repo_id": "EleutherAI/sae-pythia-410m-65k",
+      "sae_key": "pythia410m_mlp_topk",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "ea980cb0a6c2ae4b936e82123acc929f1cec04c1"
+      },
+      "kind": "model",
+      "model_key": "qwen3_1_7b_base",
+      "repo_id": "Qwen/Qwen3-1.7B-Base",
+      "sae_key": "qwen3_1_7b_base_resid_w32k",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "ce1a79d9c5163932d65c417380e53230e1086370"
+      },
+      "kind": "sae",
+      "model_key": "qwen3_1_7b_base",
+      "repo_id": "Qwen/SAE-Res-Qwen3-1.7B-Base-W32K-L0_50",
+      "sae_key": "qwen3_1_7b_base_resid_w32k",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
+      },
+      "kind": "model",
+      "model_key": "r1_distill_qwen15b",
+      "repo_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+      "sae_key": "r1_distill_qwen15b_resid_l20",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "520fae05002d39c9bcdd2e5b42c50f254c749d14"
+      },
+      "kind": "sae",
+      "model_key": "r1_distill_qwen15b",
+      "repo_id": "analist/sae-r1-distill-qwen-1.5b-resid-l20-reasoning",
+      "sae_key": "r1_distill_qwen15b_resid_l20",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": "manual",
+        "private": false,
+        "sha": "cc012e0a6d0787b4adcc0fa2c4da74402494554d"
+      },
+      "kind": "model",
+      "model_key": "gemma3_4b_pt",
+      "repo_id": "google/gemma-3-4b-pt",
+      "sae_key": "gemma3_4b_pt_scope_resid",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "a0ffd6132a985bc84077a66d1a1033e10b604fa8"
+      },
+      "kind": "sae",
+      "model_key": "gemma3_4b_pt",
+      "repo_id": "google/gemma-scope-2-4b-pt",
+      "sae_key": "gemma3_4b_pt_scope_resid",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": "manual",
+        "private": false,
+        "sha": "093f9f388b31de276ce2de164bdc2081324b9767"
+      },
+      "kind": "model",
+      "model_key": "gemma3_4b_it",
+      "repo_id": "google/gemma-3-4b-it",
+      "sae_key": "gemma3_4b_it_scope_resid",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "3e94b68be95290aada5b7525cf431d3040f81bb1"
+      },
+      "kind": "sae",
+      "model_key": "gemma3_4b_it",
+      "repo_id": "google/gemma-scope-2-4b-it",
+      "sae_key": "gemma3_4b_it_scope_resid",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "ec5deb64f2c6e6fa90c1abf74a91d5c93a9669ca"
+      },
+      "kind": "model",
+      "model_key": "mistral7b_instruct",
+      "repo_id": "mistralai/Mistral-7B-Instruct-v0.1",
+      "sae_key": "mistral7b_instruct_tc_l16_131k",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "f195ce48df2f244034225b538ee64ac35902137d"
+      },
+      "kind": "sae",
+      "model_key": "mistral7b_instruct",
+      "repo_id": "tylercosgrove/mistral-7b-sparse-autoencoder-layer16",
+      "sae_key": "mistral7b_instruct_tc_l16_131k",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": "manual",
+        "private": false,
+        "sha": "33c193028431c2fde6c6e51f29e6f17b60cbfac6"
+      },
+      "kind": "model",
+      "model_key": "gemma2_9b_pt",
+      "repo_id": "google/gemma-2-9b",
+      "sae_key": "gemma2_9b_pt_scope_resid",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "f9b689815814972562d28082f9f7d65d7e01fdc8"
+      },
+      "kind": "sae",
+      "model_key": "gemma2_9b_pt",
+      "repo_id": "google/gemma-scope-9b-pt-res",
+      "sae_key": "gemma2_9b_pt_scope_resid",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "68c46c4b3498877f3ef123c856ecfde50c39f404"
+      },
+      "kind": "model",
+      "model_key": "qwen35_9b",
+      "repo_id": "Qwen/Qwen3.5-9B-Base",
+      "sae_key": "qwen35_9b_resid_w64k",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "7bb2370d360e566b2d8acb8b3d15a0b2b88f52a8"
+      },
+      "kind": "sae",
+      "model_key": "qwen35_9b",
+      "repo_id": "Qwen/SAE-Res-Qwen3.5-9B-Base-W64K-L0_50",
+      "sae_key": "qwen35_9b_resid_w64k",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "6a6f4aa4197940add57724a7707d069478df56b1"
+      },
+      "kind": "model",
+      "model_key": "r1_distill_llama8b",
+      "repo_id": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+      "sae_key": "r1_distill_llama8b_llamascope_l23",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "61c4dd06f3edeafbe608ea288badf30fed60cc8f"
+      },
+      "kind": "sae",
+      "model_key": "r1_distill_llama8b",
+      "repo_id": "fnlp/Llama-Scope-R1-Distill",
+      "sae_key": "r1_distill_llama8b_llamascope_l23",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e"
+      },
+      "kind": "model",
+      "model_key": "qwen3_1_7b",
+      "repo_id": "Qwen/Qwen3-1.7B",
+      "sae_key": "qwen3_1_7b_ak_resid_l14_65k",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "74366c1b1ed3ecb75504e334659b54d6edded42a"
+      },
+      "kind": "sae",
+      "model_key": "qwen3_1_7b",
+      "repo_id": "adamkarvonen/qwen3-1.7b-saes",
+      "sae_key": "qwen3_1_7b_ak_resid_l14_65k",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "4c28e790b0213430d52dd8e5a09f681a53f5b79d"
+      },
+      "kind": "sae",
+      "model_key": "gemma2_2b_it",
+      "repo_id": "chanind/gemma-2-2b-batch-topk-matryoshka-saes-w-32k-l0-40",
+      "sae_key": "gemma2_2b_it_matryoshka_l12_32k",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+      },
+      "kind": "model",
+      "model_key": "qwen35_4b",
+      "repo_id": "Qwen/Qwen3.5-4B",
+      "sae_key": "qwen35_4b_matryoshka_l15_65k",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "gated": false,
+        "private": false,
+        "sha": "3a67187f0082a25634aa959092bb834957aeda02"
+      },
+      "kind": "sae",
+      "model_key": "qwen35_4b",
+      "repo_id": "decoderesearch/qwen-3.5-saes",
+      "sae_key": "qwen35_4b_matryoshka_l15_65k",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "alias_of_short_name": true,
+        "gated": "manual",
+        "sha": "9b0cfec892e2bc2afd938c98eabe4e4a7b1e0ca1"
+      },
+      "kind": "model",
+      "model_key": "gemma270m",
+      "repo_id": "google/gemma-3-270m",
+      "sae_key": "gemma270m_scope_resid",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "alias_of_short_name": true,
+        "gated": false,
+        "sha": "c4fc8d586d62df497f1f9b69d66d3ca419992d3e"
+      },
+      "kind": "model",
+      "model_key": "pythia410m",
+      "repo_id": "EleutherAI/pythia-410m-deduped",
+      "sae_key": "pythia410m_mlp_topk",
+      "status": "ok"
+    },
+    {
+      "detail": {
+        "alias_of_short_name": true,
+        "gated": "manual",
+        "sha": "299a8560bedf22ed1c72a8a11e7dce4a7f9f51f8"
+      },
+      "kind": "model",
+      "model_key": "gemma2_2b_it",
+      "repo_id": "google/gemma-2-2b-it",
+      "sae_key": "gemma2_2b_it_matryoshka_l12_32k",
+      "status": "ok"
+    }
+  ],
+  "schema": "saebase.stage_d.access_preflight.v1"
+}

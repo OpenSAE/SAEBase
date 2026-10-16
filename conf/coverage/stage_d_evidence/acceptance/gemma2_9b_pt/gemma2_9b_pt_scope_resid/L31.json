@@ -1,0 +1,88 @@
+{
+  "artifact_sha256": "e46145a7d09281691cc276fb9faebfdcdd54ef33a9b7b214cf528d8e1d1cd4e9",
+  "cuda": "12.8",
+  "d_in": 3584,
+  "d_sae": 16384,
+  "device": "cuda",
+  "feature_ablation_logit_l2": [
+    667.602783203125,
+    335.95458984375,
+    2331.77880859375
+  ],
+  "git_commit": "e6995f78075342ee5ed218c1c39e7104af793674",
+  "gpu_name": "NVIDIA GeForce RTX 5090",
+  "hook_name": "blocks.31.hook_resid_post",
+  "identity_patch_max_abs_logit_error": 0.0,
+  "layer": 31,
+  "loaded_model_name": "google/gemma-2-9b",
+  "model_key": "gemma2_9b_pt",
+  "model_repo": "google/gemma-2-9b",
+  "model_state_sha256": "baae1688e486a6b4cf513b9ed339af967342f79e115378e8f3e78b9606c52e5d",
+  "n_prompts": 3,
+  "peak_cuda_allocated_bytes": 22728903168,
+  "precision": "float32",
+  "probes": [
+    {
+      "ablated_feature_id": 13101,
+      "feature_ablation_logit_l2": 667.602783203125,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 37,
+      "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762",
+      "reconstruction_mse": 6.863918304443359,
+      "token_ids": [
+        2,
+        651,
+        6037,
+        576,
+        6081,
+        603
+      ]
+    },
+    {
+      "ablated_feature_id": 9419,
+      "feature_ablation_logit_l2": 335.95458984375,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 40,
+      "prompt_sha256": "20597a70cc5c4ea28eec56d56ff2b1f89c8277a62161210ecab7a65172639310",
+      "reconstruction_mse": 11.37126350402832,
+      "token_ids": [
+        2,
+        235280,
+        38692,
+        11601,
+        573,
+        3190,
+        13237,
+        235265
+      ]
+    },
+    {
+      "ablated_feature_id": 5330,
+      "feature_ablation_logit_l2": 2331.77880859375,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 45,
+      "prompt_sha256": "9cb6dc0eb30bdbbe4f7bfa7cc774d834d83707e8ac5999120ba4c56f4c2b6449",
+      "reconstruction_mse": 5.984676361083984,
+      "token_ids": [
+        2,
+        17670,
+        13141,
+        8960,
+        4492,
+        573,
+        5764,
+        8203,
+        235265
+      ]
+    }
+  ],
+  "python": "3.12.14",
+  "sae_file": "layer_31/width_16k/average_l0_35",
+  "sae_key": "gemma2_9b_pt_scope_resid",
+  "sae_repo": "google/gemma-scope-9b-pt-res",
+  "sae_state_sha256": "e58a2a054f163840dca8de757356059f7e1fadb99e81d9c73e678ffba583b088",
+  "schema": "saebase.stage_d.pair_acceptance.v1",
+  "status": "passed",
+  "torch": "2.11.0+cu128",
+  "verified_at_utc": "2026-10-16T02:21:17.524388+00:00"
+}

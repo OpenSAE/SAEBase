@@ -1,0 +1,88 @@
+{
+  "artifact_sha256": "42f4c84da125d44b0320eac12ee9cd5c39de30fd52f6d6e6e2106306f716cc57",
+  "cuda": "12.8",
+  "d_in": 4096,
+  "d_sae": 32768,
+  "device": "cuda",
+  "feature_ablation_logit_l2": [
+    143.6072235107422,
+    57.2381477355957,
+    614.8767700195312
+  ],
+  "git_commit": "e6995f78075342ee5ed218c1c39e7104af793674",
+  "gpu_name": "NVIDIA GeForce RTX 5090",
+  "hook_name": "blocks.23.hook_resid_post",
+  "identity_patch_max_abs_logit_error": 0.0,
+  "layer": 23,
+  "loaded_model_name": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+  "model_key": "r1_distill_llama8b",
+  "model_repo": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+  "model_state_sha256": "f96b77720d62413add77a8f2f8ac3172d2ea7d3fe377371f782bf6c1cae7aada",
+  "n_prompts": 3,
+  "peak_cuda_allocated_bytes": 18233190400,
+  "precision": "float32",
+  "probes": [
+    {
+      "ablated_feature_id": 18563,
+      "feature_ablation_logit_l2": 143.6072235107422,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 8,
+      "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762",
+      "reconstruction_mse": 0.0892205536365509,
+      "token_ids": [
+        128000,
+        791,
+        6864,
+        315,
+        9822,
+        374
+      ]
+    },
+    {
+      "ablated_feature_id": 4700,
+      "feature_ablation_logit_l2": 57.2381477355957,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 10,
+      "prompt_sha256": "20597a70cc5c4ea28eec56d56ff2b1f89c8277a62161210ecab7a65172639310",
+      "reconstruction_mse": 0.07554646581411362,
+      "token_ids": [
+        128000,
+        32,
+        28568,
+        11497,
+        279,
+        3135,
+        15884,
+        13
+      ]
+    },
+    {
+      "ablated_feature_id": 15272,
+      "feature_ablation_logit_l2": 614.8767700195312,
+      "identity_patch_max_abs_logit_error": 0.0,
+      "l0": 11,
+      "prompt_sha256": "9cb6dc0eb30bdbbe4f7bfa7cc774d834d83707e8ac5999120ba4c56f4c2b6449",
+      "reconstruction_mse": 0.08050365000963211,
+      "token_ids": [
+        128000,
+        26375,
+        20229,
+        11722,
+        4028,
+        279,
+        6693,
+        13180,
+        13
+      ]
+    }
+  ],
+  "python": "3.12.14",
+  "sae_file": "l23r_400m_slimpajama_400m_openr1_math",
+  "sae_key": "r1_distill_llama8b_llamascope_l23",
+  "sae_repo": "fnlp/Llama-Scope-R1-Distill",
+  "sae_state_sha256": "db6791a4675311b0099806eef1e87daeaaacc33c64b094fe269e0e0dae5d8f4c",
+  "schema": "saebase.stage_d.pair_acceptance.v1",
+  "status": "passed",
+  "torch": "2.11.0+cu128",
+  "verified_at_utc": "2026-10-16T01:43:59.860018+00:00"
+}
