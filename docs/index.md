@@ -28,6 +28,7 @@ Start with the task you want to perform. The documentation is organized by **cap
 
 ## Evidence and maintenance
 
+- [CI and Research Validation Lanes](ci-maintenance.md) — pinned regressions, optional real-checkpoint acceptance and release safeguards.
 - [Stage D Evidence Archive](stage-d-evidence-archive.md) — compact data bundle, SHA256 audit, original run recovery.
 - [Validation and Reproducibility](validation.md) — actual public-checkpoint acceptance versus optional and unverified capabilities.
 - [Checkpoint Acceptance Protocol](reference-checkpoint-validation.md) — detailed reference experiment and checksum requirements.

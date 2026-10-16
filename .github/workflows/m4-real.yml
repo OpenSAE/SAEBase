@@ -1,15 +1,9 @@
 name: Real M4 grouped Pythia reliability acceptance
 
+# Historical checkpoint acceptance is explicitly opt-in.
+# PR regression is covered by CI and pinned research-regression.yml.
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - 'saebase/reliability/**'
-      - 'saebase/benchmarks/report.py'
-      - 'scripts/m4_reliability.py'
-      - 'conf/reliability/**'
-      - 'conf/benchmark/m4_pythia_three_groups.json'
-      - '.github/workflows/m4-real.yml'
 
 permissions:
   contents: read

@@ -1,0 +1,49 @@
+name: Upstream Compatibility Watch (non-gating)
+
+# Latest upstream commits are checked separately; never trusted as pinned PR regression.
+on:
+  schedule:
+    - cron: "15 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: research-upstream-compatibility
+  cancel-in-progress: false
+
+jobs:
+  latest-original-estimators:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: OpenSAE/SAE-Behavioral-Compositionality
+          path: originals/sar
+      - uses: actions/checkout@v7
+        with:
+          repository: OpenSAE/Redistribution-Sensitivity-Score
+          path: originals/rss
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Record actual upstream heads
+        shell: bash
+        run: |
+          set -euo pipefail
+          SAR_SHA="$(git -C originals/sar rev-parse HEAD)"
+          RSS_SHA="$(git -C originals/rss rev-parse HEAD)"
+          echo "Current SAR: $SAR_SHA"
+          echo "Current RSS: $RSS_SHA"
+          printf 'SAR HEAD: `%s`\nRSS HEAD: `%s`\n' \
+            "$SAR_SHA" "$RSS_SHA" >> "$GITHUB_STEP_SUMMARY"
+      - name: Install minimal SAEBase development dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Check current upstream original estimators
+        env:
+          SAEBASE_SAR_SOURCE: originals/sar/sar.py
+          SAEBASE_RSS_SOURCE: originals/rss/rss.py
+        run: python -m pytest -q tests/test_phase_c_reference_contract.py tests/test_m3_paper_adapters.py

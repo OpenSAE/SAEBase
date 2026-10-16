@@ -30,3 +30,7 @@ Review `docs/API.md`, `docs/RELEASE_CHECKLIST.md`, and `SECURITY.md` before a re
 ## Code quality
 
 Install `python -m pip install -e ".[dev,quality]"` and see [Code Quality and Coverage](docs/code-quality.md). Ruff and mypy initially cover selected modules; new Python files must pass Ruff lint and formatting. Existing code will not be reformatted across the repository.
+
+## Validation lanes
+
+See [CI and Research Validation](docs/ci-maintenance.md) for always-on checks, source-pinned SAR/RSS regression and opt-in real model/SAE tests. Link actual successful manual validation runs for checkpoint-dependent changes; automatic offline CI is not proof of real-weight acceptance.
