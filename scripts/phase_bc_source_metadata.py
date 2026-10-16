@@ -27,6 +27,13 @@ def probe_file_path(entry: CoverageEntry, layer: int) -> str | None:
         "gemma270m_scope_resid", "gemma1b_scope_resid",
     }:
         return p["source_file_id"].rstrip("/") + "/params.safetensors"
+    if key == "gemma2_2b_pt_l25_canonical":
+        from saebase.sae.registry import get_profile
+        physical = get_profile(key).resolved_physical_path
+        if physical:
+            return physical.rstrip("/") + "/params.npz"
+    if key == "gemma2_9b_pt_scope_resid":
+        return p["source_file_id"].rstrip("/") + "/params.npz"
     if key == "llama31_8b_lxr_8x":
         return p["source_file_id"].rstrip("/") + "/checkpoints/final.safetensors"
     if key.startswith("r1_distill_llama8b_llamascope"):
