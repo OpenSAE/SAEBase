@@ -45,7 +45,9 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install Hugging Face metadata client
-        run: python -m pip install 'huggingface-hub>=0.23'
+        run: |
+          python -m pip install -e .
+          python -m pip install 'huggingface-hub>=0.23'
       - name: Check official checkpoint paths and metadata without downloading weights
         continue-on-error: true
         env:
