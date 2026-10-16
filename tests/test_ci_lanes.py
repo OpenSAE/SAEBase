@@ -12,6 +12,7 @@ WORKFLOWS = ROOT / ".github" / "workflows"
 
 MANUAL = {
     "real-smoke.yml",
+    "software-release.yml",
     "m3-real.yml",
     "m3-saebench-native.yml",
     "m4-real.yml",
@@ -39,7 +40,7 @@ def workflow(name: str) -> dict:
 
 def test_only_essential_ci_and_pinned_research_run_on_pull_requests():
     paths = sorted(WORKFLOWS.glob("*.yml"))
-    assert len(paths) == 17
+    assert len(paths) == 18
     auto = {path.name for path in paths if "pull_request" in workflow(path.name)["on"]}
     assert auto == {"ci.yml", "research-regression.yml"}
     for name in MANUAL:

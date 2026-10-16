@@ -35,6 +35,7 @@ Start with the task you want to perform. The documentation is organized by **cap
 - [Public API Validation](public-api-validation.md) — detailed API behavior and compatibility tests.
 - [Research Integration Validation](research-integration-validation.md) — original-source and protocol acceptance notes.
 - [Release and Checkpoint Matrix](checkpoint-validation.md) — versioned multi-checkpoint acceptance, performance and integrity checks.
+- [General Software Release Process](release-process.md) — exact-commit CI gate, candidate checksums and manual version publication.
 - [Release Notes: v0.2.0](releases/v0.2.0.md) — shipped capabilities, bounds and installation.
 - [Changelog](../CHANGELOG.md), [Provenance](PROVENANCE.md), [Release Checklist](RELEASE_CHECKLIST.md), [Contributing](../CONTRIBUTING.md) and [Security](../SECURITY.md).
 

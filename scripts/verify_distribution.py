@@ -6,6 +6,7 @@ import argparse
 from pathlib import Path
 import re
 import tarfile
+import tomllib
 import zipfile
 
 
@@ -64,6 +65,9 @@ NEEDED_SDIST = NEEDED_WHEEL | {
     ".github/workflows/real-smoke.yml",
     ".github/workflows/research-regression.yml",
     ".github/workflows/upstream-compatibility.yml",
+    ".github/workflows/software-release.yml",
+    "scripts/release_candidate.py",
+    "docs/release-process.md", "tests/test_release_candidate.py",
     "docs/M2_BATCH_INTERVENTIONS.md",
     "scripts/m2_real_smoke.py", "examples/11_batch_interventions_offline.py",
 }
@@ -71,11 +75,34 @@ BAD_PARTS = {"__pycache__", ".pytest_cache", ".venv", ".git"}
 BAD_TOP_LEVEL = {"experiment", "data", "dist", "build"}
 
 
+def project_version_from_sdist(source: Path) -> str:
+    """Read authoritative release version from the built source distribution."""
+    with tarfile.open(source, "r:gz") as archive:
+        files = [
+            member for member in archive.getmembers()
+            if member.isfile() and member.name.endswith("/pyproject.toml")
+        ]
+        if len(files) != 1:
+            raise ValueError("Expected one pyproject.toml in source distribution")
+        content = archive.extractfile(files[0])
+        if content is None:
+            raise ValueError("Cannot read source distribution project metadata")
+        project = tomllib.loads(content.read().decode("utf-8"))["project"]
+    if project["name"] != "opensae-saebase":
+        raise ValueError("Source distribution project name mismatch")
+    return str(project["version"])
+
+
 def validate(dist_dir: Path) -> dict[str, object]:
     wheels = sorted(dist_dir.glob("opensae_saebase-*.whl"))
     sdists = sorted(dist_dir.glob("opensae_saebase-*.tar.gz"))
     if len(wheels) != 1 or len(sdists) != 1:
         raise ValueError(f"Expected one wheel and one sdist in {dist_dir}; got {len(wheels)}, {len(sdists)}")
+    version = project_version_from_sdist(sdists[0])
+    if not wheels[0].name.startswith(f"opensae_saebase-{version}-"):
+        raise AssertionError("Wheel filename/version does not match source archive")
+    if sdists[0].name != f"opensae_saebase-{version}.tar.gz":
+        raise AssertionError("Source archive filename/version mismatch")
     with zipfile.ZipFile(wheels[0]) as z:
         wheel_files = set(z.namelist())
         missing = sorted(NEEDED_WHEEL - wheel_files)
@@ -108,7 +135,7 @@ def validate(dist_dir: Path) -> dict[str, object]:
         if metadata_file is None:
             raise AssertionError("Wheel metadata missing")
         metadata = z.read(metadata_file).decode("utf-8")
-        if "Name: opensae-saebase" not in metadata or "Version: 0.2.0" not in metadata:
+        if "Name: opensae-saebase" not in metadata or f"Version: {version}" not in metadata:
             raise AssertionError("Distribution identity mismatch")
         if "License-Expression: Apache-2.0" not in metadata:
             raise AssertionError("Wheel license metadata missing")
@@ -134,7 +161,7 @@ def validate(dist_dir: Path) -> dict[str, object]:
         if missing:
             raise AssertionError(f"Sdist missing {missing}")
     return {"wheel": str(wheels[0]), "wheel_files": len(wheel_files),
-            "sdist": str(sdists[0]), "sdist_files": len(names),
+            "sdist": str(sdists[0]), "version": version, "sdist_files": len(names),
             "bundled_config_yaml": len([p for p in wheel_files if p.startswith('conf/') and p.endswith('.yaml')])}
 
 

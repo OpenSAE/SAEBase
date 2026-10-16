@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **General software release gate:** add version-independent candidate validation, six exact-commit CI checks, wheel/sdist/CLI integrity verification and SHA256 manifest generation. Publishing a new version requires explicit manual confirmation, an unused version tag and source-bound assets. The historical v0.2.0 acceptance gate remains separate.
+
 - **CI maintenance lanes:** consolidate M0/M1/M2 real Pythia smoke jobs into one opt-in workflow, merge SAR/RSS reference parity and synthetic truth into a source-pinned research regression workflow, and add a separate weekly upstream-head compatibility check. Move expensive historical model/SAE and SAEBench validations to manual dispatch. Preserve existing GitHub run histories, source evidence and v0.2.0 release gates.
 
 - **Packaging and namespace governance:** move command entrypoints under `saebase.cli` and plugin registration under `saebase.model_plugins` / `saebase.tasks.plugins`, retaining the old import paths as forwarding shims. Exclude archived Stage D evidence records from new wheel/sdist builds (still available in Git and the dedicated evidence release). Verify all nine installed CLI commands, original package resources and a clean build from the sdist.
