@@ -40,11 +40,7 @@ def workflow(name: str) -> dict:
 def test_only_essential_ci_and_pinned_research_run_on_pull_requests():
     paths = sorted(WORKFLOWS.glob("*.yml"))
     assert len(paths) == 17
-    auto = {
-        path.name
-        for path in paths
-        if "pull_request" in workflow(path.name)["on"]
-    }
+    auto = {path.name for path in paths if "pull_request" in workflow(path.name)["on"]}
     assert auto == {"ci.yml", "research-regression.yml"}
     for name in MANUAL:
         assert set(workflow(name)["on"]) == {"workflow_dispatch"}, name
@@ -54,12 +50,8 @@ def test_every_pinned_research_job_uses_explicit_original_source_shas():
     jobs = workflow("research-regression.yml")["jobs"]
     assert set(jobs) == {"original-estimators", "synthetic-ground-truth"}
     expected = {
-        "OpenSAE/SAE-Behavioral-Compositionality": (
-            "c253dca303437318c1f4f4937557ac9d22143b19"
-        ),
-        "OpenSAE/Redistribution-Sensitivity-Score": (
-            "0b321851e7b79564bf72656e1dbcaaca513048d8"
-        ),
+        "OpenSAE/SAE-Behavioral-Compositionality": "c253dca303437318c1f4f4937557ac9d22143b19",
+        "OpenSAE/Redistribution-Sensitivity-Score": "0b321851e7b79564bf72656e1dbcaaca513048d8",
     }
     for job in jobs.values():
         sources = {
@@ -75,11 +67,7 @@ def test_latest_upstream_monitor_is_separate_and_non_gating():
     monitor = workflow("upstream-compatibility.yml")
     assert set(monitor["on"]) == {"schedule", "workflow_dispatch"}
     steps = monitor["jobs"]["latest-original-estimators"]["steps"]
-    sources = [
-        step["with"]
-        for step in steps
-        if "with" in step and "repository" in step["with"]
-    ]
+    sources = [step["with"] for step in steps if "with" in step and "repository" in step["with"]]
     assert len(sources) == 2
     assert all("ref" not in source for source in sources)
 
