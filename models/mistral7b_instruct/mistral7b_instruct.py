@@ -2,7 +2,10 @@
 from __future__ import annotations
 
 from typing import Any
+
+import torch
 from omegaconf import DictConfig
+
 from models.hooked_lm_common import BaseModelSpec, HookedLMHandle, load_from_spec
 
 SPEC = BaseModelSpec(
@@ -10,14 +13,17 @@ SPEC = BaseModelSpec(
     model_name="mistralai/Mistral-7B-Instruct-v0.1",
     family="mistral",
     model_candidates=("mistralai/Mistral-7B-Instruct-v0.1",),
-    notes="SAE at layer-16 resid_pre; 131K TopK features from tylercosgrove.",
+    notes=(
+        "SAE at layer-16 resid_pre; 131K TopK features from tylercosgrove. "
+        "Loaded in bfloat16 so model+131k SAE fit on ~32GB GPUs."
+    ),
 )
 
 def get_spec() -> BaseModelSpec:
     return SPEC
 
 def load_model(device: str | None = None) -> HookedLMHandle:
-    return load_from_spec(SPEC, device=device)
+    return load_from_spec(SPEC, device=device, dtype=torch.bfloat16)
 
 def construct(cfg: DictConfig) -> HookedLMHandle:
     return load_model(device=str(cfg.model.device) if cfg.model.get("device") is not None else None)
