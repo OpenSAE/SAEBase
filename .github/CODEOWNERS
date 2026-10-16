@@ -1,0 +1,19 @@
+# SAEBase code ownership.
+# The existing primary maintainer is the only assigned owner; delegate paths
+# here when other maintainers have repository write access.
+* @AtheavenMa
+
+# Critical workflow and contract paths
+/.github/ @AtheavenMa
+/saebase/api/ @AtheavenMa
+/saebase/sae/ @AtheavenMa
+/saebase/store/ @AtheavenMa
+/saebase/interventions/ @AtheavenMa
+/saebase/benchmarks/ @AtheavenMa
+/saebase/reliability/ @AtheavenMa
+/saebase/release/ @AtheavenMa
+/models/ @AtheavenMa
+/conf/ @AtheavenMa
+/tests/ @AtheavenMa
+/docs/ @AtheavenMa
+/pyproject.toml @AtheavenMa
