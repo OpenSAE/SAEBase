@@ -73,7 +73,7 @@ def test_default_sae_profiles():
     assert get_profile("llama31_8b_instruct_andyrdt_l19_k64").layers == (19,)
     assert get_profile("r1_distill_qwen15b_resid_l20").layers == (20,)
     assert get_profile("r1_distill_qwen15b").sae_id(20) == "resid_post_layer20"
-    assert get_profile("r1_distill_qwen15b_resid_l20").loader == "eleutherai_topk_mlp"
+    assert get_profile("r1_distill_qwen15b_resid_l20").loader == "sparsify_topk"
     assert get_profile("r1_distill_qwen15b_resid_l20").sae_folder(20) == (
         "resid_post_layer20"
     )
