@@ -79,9 +79,9 @@ checkpoint acceptance.
 
 - `.github/workflows/ci.yml` installs development and analysis extras in
   separate clean environments; it executes offline tests and packaging checks.
-- `.github/workflows/m0-real.yml` has a manual Run Workflow trigger. A main
-  commit containing the explicit `[m0-real]` marker runs the CPU checkpoint
-  acceptance once. Ordinary pushes do not download weights.
+- [Real Pythia Smoke Acceptance](../.github/workflows/real-smoke.yml) runs
+  manually with the `m0` input (or `all` for M0/M1/M2). Ordinary pushes
+  and commit-message markers no longer download real checkpoint weights.
 - Inspect the final Actions job status and produced artifact before claiming
   real reference validation acceptance. Pythia/SAE availability is external to the source tree.
 

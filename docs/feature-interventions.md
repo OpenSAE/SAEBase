@@ -168,7 +168,7 @@ steered continuation. A separate unmodified continuation supplies a baseline.
 
 ## Real checkpoint acceptance
 
-The opt-in GitHub Actions workflow `.github/workflows/m2-real.yml` downloads
+The [manual `m2` real-smoke workflow](../.github/workflows/real-smoke.yml) downloads
 public Pythia-70M and the `pythia70m_resid_sm` SAE and verifies:
 
 1. Exact loaded model and SAE full state digests from the [real checkpoint reference fixture](../tests/fixtures/m0_reference_public.json).

@@ -15,7 +15,8 @@ python -m pytest -q tests/test_m1_store.py
 ```
 
 The example is synthetic, with no model downloads. A real, opt-in Pythia
-acceptance run is defined in `.github/workflows/m1-real.yml`, which checks the **frozen real checkpoint reference** in
+acceptance run is defined in [Real Pythia Smoke Acceptance](../.github/workflows/real-smoke.yml)
+with the `m1` input, which checks the **frozen real checkpoint reference** in
 `tests/fixtures/m0_reference_public.json` against live loaded checkpoint
 weights and activations. The fixture was copied byte-for-byte from the
 successful [reference validation run](https://github.com/OpenSAE/SAEBase/actions/runs/38634372619),
@@ -160,8 +161,8 @@ error before use in a publication. The verified reference cache uses FP32.
 - `scripts/m1_real_smoke.py` loads **actual pretrained checkpoints**, compares
   their SHA-256 digests and activation probes with reference validation, then independently
   checks last-token and multi-position caches plus CSR SAE codes.
-- `.github/workflows/m1-real.yml` is manual or opt-in by `[m1-real]` commit.
-  It reads the verified reference validation reference from a committed fixture, runs on CPU,
+- The [manual `m1` smoke workflow](../.github/workflows/real-smoke.yml) reads
+  the verified reference from a committed fixture and runs on CPU,
   and publishes a `m1_reference.json` artifact. Never label the job passed
   until its real-model step and the numeric checks have succeeded.
 - User prompts, activations, checkpoint weights and local cache files should

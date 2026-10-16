@@ -61,8 +61,10 @@ NEEDED_SDIST = NEEDED_WHEEL | {
     "tests/test_phase_a.py", "tests/test_phase_d.py",
     "tests/test_m1_store.py", "tests/test_m2_interventions.py", "tests/fixtures/m0_reference_public.json",
     "docs/M1_ACTIVATION_STORE.md", "examples/10_activation_store_offline.py",
-    ".github/workflows/m1-real.yml",
-    ".github/workflows/m2-real.yml", "docs/M2_BATCH_INTERVENTIONS.md",
+    ".github/workflows/real-smoke.yml",
+    ".github/workflows/research-regression.yml",
+    ".github/workflows/upstream-compatibility.yml",
+    "docs/M2_BATCH_INTERVENTIONS.md",
     "scripts/m2_real_smoke.py", "examples/11_batch_interventions_offline.py",
 }
 BAD_PARTS = {"__pycache__", ".pytest_cache", ".venv", ".git"}
