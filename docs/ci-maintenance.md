@@ -84,8 +84,11 @@ continues to require successful main CI and refuses to overwrite an
 existing evidence release. Missing original GPU run archives remain
 tracked in [Issue #21](https://github.com/OpenSAE/SAEBase/issues/21).
 
-New software versions need their own reviewed release process rather
-than republishing or changing the historical `v0.2.0` tag.
+Future versions now use the [General Software Release Process](release-process.md)
+and its [manually dispatched release workflow](../.github/workflows/software-release.yml).
+This requires exact-source successful main CI, a matching version and
+verified distribution assets before creating a new tag. Existing tags,
+including the historical `v0.2.0` release, are never moved or overwritten.
 
 ## Future maintenance
 
