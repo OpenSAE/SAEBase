@@ -1,0 +1,23 @@
+# Install developer tools with: pip install -e ".[dev,quality]".
+# Existing modules are admitted to lint and type checking incrementally.
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-adopted
+        name: Ruff on adopted core modules
+        entry: ruff check saebase/seed.py saebase/data/artifact_layout.py saebase/data/prompt_schema.py saebase/benchmarks/registry.py
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: mypy-adopted
+        name: Mypy on adopted core modules
+        entry: mypy --config-file pyproject.toml saebase/seed.py saebase/data/artifact_layout.py saebase/data/prompt_schema.py saebase/benchmarks/registry.py
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: ruff-new
+        name: Ruff lint and format for newly added Python files
+        entry: python scripts/check_new_python_quality.py
+        language: system
+        pass_filenames: false
+        always_run: true
