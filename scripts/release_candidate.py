@@ -282,6 +282,31 @@ def verify_assets(
     return evidence
 
 
+def publish_eligible(root: Path = ROOT, expected_version: str | None = None) -> dict:
+    """Reject old, reused or lower version tags before a privileged publish."""
+    version, tag, _ = project_info(root)
+    if expected_version is not None and version != expected_version:
+        raise ValueError("requested publication version does not match project metadata")
+    tags = subprocess.check_output(
+        ["git", "-C", str(root), "tag", "--list", "v*"], text=True
+    ).splitlines()
+    found = []
+    for label in tags:
+        if VERSION.fullmatch(label.removeprefix("v")) and label.startswith("v"):
+            found.append((tuple(int(x) for x in label[1:].split(".")), label))
+    candidate = tuple(int(x) for x in version.split("."))
+    if found and candidate <= max(x[0] for x in found):
+        raise ValueError("release version must be newer than all existing software tags")
+    if any(label == tag for _, label in found):
+        raise ValueError("release tag already exists")
+    return {
+        "tag": tag,
+        "version": version,
+        "newer_than_existing_software_tags": True,
+        "existing_software_tag_count": len(found),
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_subparsers(dest="mode", required=True)
@@ -299,6 +324,8 @@ def main() -> int:
     c = mode.add_parser("verify-ci", help="confirm all six jobs passed on one commit")
     c.add_argument("--ci-jobs", type=Path, required=True)
     c.add_argument("--source-sha", required=True)
+    d = mode.add_parser("publish-eligible", help="reject existing and older release tags")
+    d.add_argument("--expected-version", required=True)
     args = parser.parse_args()
     try:
         if args.mode == "prepare":
@@ -310,10 +337,12 @@ def main() -> int:
             result = verify_assets(
                 args.dist, args.output_dir, args.source_sha, args.expected_version
             )
-        else:
+        elif args.mode == "verify-ci":
             result = verify_ci_jobs(
                 json.loads(args.ci_jobs.read_text(encoding="utf-8")), args.source_sha
             )
+        else:
+            result = publish_eligible(ROOT, args.expected_version)
     except (ValueError, OSError, KeyError, TypeError, json.JSONDecodeError) as err:
         parser.exit(1, f"Release candidate rejected: {err}\n")
     print(json.dumps(result, indent=2, sort_keys=True))
