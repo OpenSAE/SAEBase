@@ -1,13 +1,9 @@
 name: Real M3 Pythia benchmark acceptance
 
+# Historical checkpoint acceptance is explicitly opt-in.
+# PR regression is covered by CI and pinned research-regression.yml.
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - 'saebase/benchmarks/**'
-      - 'scripts/m3_benchmark.py'
-      - 'conf/benchmark/**'
-      - '.github/workflows/m3-real.yml'
 
 permissions:
   contents: read

@@ -1,10 +1,8 @@
 name: Stage C public SAE source metadata
 
+# Historical checkpoint acceptance is explicitly opt-in.
+# PR regression is covered by CI and pinned research-regression.yml.
 on:
-  pull_request:
-    paths:
-      - 'scripts/phase_bc_source_metadata.py'
-      - '.github/workflows/stage-bc-source-head.yml'
   workflow_dispatch:
 
 permissions:

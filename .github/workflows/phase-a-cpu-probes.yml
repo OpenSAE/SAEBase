@@ -1,16 +1,8 @@
 name: Phase A real-weight CPU feasibility probes
 
+# Historical checkpoint acceptance is explicitly opt-in.
+# PR regression is covered by CI and pinned research-regression.yml.
 on:
-  pull_request:
-    paths:
-      - 'scripts/phase_a_verify.py'
-      - 'scripts/phase_a_benchmark.py'
-      - 'models/qwen35_2b/**'
-      - 'models/hf_logits_backend.py'
-      - 'models/hf_hooks_backend.py'
-      - 'saebase/sae/loading.py'
-      - 'saebase/sae/registry.py'
-      - '.github/workflows/phase-a-cpu-probes.yml'
   workflow_dispatch:
 
 permissions:

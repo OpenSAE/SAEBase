@@ -1,21 +1,8 @@
 name: M5 real two-family checkpoint matrix acceptance
 
+# Historical checkpoint acceptance is explicitly opt-in.
+# PR regression is covered by CI and pinned research-regression.yml.
 on:
-  pull_request:
-    paths:
-      - 'saebase/release/**'
-      - 'models/gpt2small/**'
-      - 'saebase/sae/registry.py'
-      - 'scripts/m5_release_matrix.py'
-      - 'conf/release/**'
-      - 'tests/test_m5_matrix.py'
-      - '.github/workflows/m5-matrix.yml'
-  push:
-    branches: [main]
-    paths:
-      - 'saebase/release/**'
-      - 'conf/release/**'
-      - '.github/workflows/m5-matrix.yml'
   workflow_dispatch:
 
 permissions:
