@@ -101,7 +101,7 @@ saebase-benchmark --config conf/benchmark/p0_small.json --report-only
 
 ## 🧠 支持的模型与 SAE
 
-阶段 A 覆盖六组 **270M–8B** 的代表性模型与 SAE。**Qwen3.5-2B Base + 官方 32K SAE 已通过真实模型、特征干预、Benchmark 与 Reliability 验收**；六个 SAE checkpoint 均通过独立权重加载。其余模型联合验收仍需许可或 GPU 资源，详见 [Phase A Model Coverage](docs/phase-a-model-coverage.md)。
+**模型与 SAE 规模覆盖 270M–9B。** 阶段 B+C 整理了 15 个代表性模型、三类额外 SAE 架构及 48 个已注册层位。Pythia 410M、Qwen3 1.7B Base、DeepSeek-R1-Distill-Qwen 1.5B 已通过真实 CPU 模型与 SAE 联合干预验收，原有 Qwen3.5 2B 验收也保留。大模型完整前向与干预留待阶段 D。详见[模型与 SAE 覆盖矩阵](docs/stage-bc-model-sae-coverage.md)。
 
 
 SAEBase 注册了多种模型和 SAE 配置，但**注册成功不代表真实权重已经通过验证**。正式发布的真实验收范围为：
