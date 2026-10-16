@@ -76,9 +76,14 @@ def validate_data(catalog: dict, final: dict, status: dict, root: Path) -> dict:
         counts["population"] += int(a and b and row.get("protocol") == "population")
         counts["smoke"] += int(row.get("protocol") == "smoke_only")
         if p:
+            # Older accepted CPU pairs have separate pre-Stage-D provenance.
+            # Never manufacture a model SHA when the current matrix omits it.
             for name in ("model_state_sha256", "sae_state_sha256"):
-                if re.fullmatch(r"[0-9a-f]{64}", str(row.get(name, ""))) is None:
-                    raise ValueError(f"missing weight hash at {key}: {name}")
+                value = row.get(name)
+                if value is not None and re.fullmatch(r"[0-9a-f]{64}", str(value)) is None:
+                    raise ValueError(f"malformed weight hash at {key}: {name}")
+                if value is None and not row.get("prior_pair_verified"):
+                    raise ValueError(f"missing new-pair weight hash at {key}: {name}")
             if row.get("acceptance_path"):
                 _evidence_file(root, row["acceptance_path"])
             elif not row.get("prior_pair_verified"):
