@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- **Developer onboarding and community:** add a persistent CPU-only first benchmark with M3/M4 reports, short first-experiment/contributor/troubleshooting guides, local documentation link checks and a CI smoke test. Restore CODEOWNERS and GitHub feature/model-SAE contribution forms.
+- **Developer onboarding and community:** add a persistent CPU-only first benchmark with saved metrics and reliability reports, short first-experiment/contributor/troubleshooting guides, local documentation link checks and a CI smoke test. Restore CODEOWNERS and GitHub feature/model-SAE contribution forms.
 
 - **Third-party extension API:** explicitly discovered Python entry points for external model, SAE and benchmark providers, with strict hook/dimension/normalization/dtype and original source SHA256 checks. Integrates with the original M3 benchmark and preserves built-in model registration and scientific estimators.
 

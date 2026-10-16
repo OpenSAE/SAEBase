@@ -50,11 +50,11 @@ The run ID is derived from the complete frozen benchmark configuration.
 3. Computes selected-token feature count (`core.l0`), reconstruction
    MSE and downstream logit change under identity and feature-ablation
    interventions.
-4. Writes M3 metric rows, source/weight identities, measurement references,
+4. Writes metric rows, source/weight identities, measurement references,
    a CSV summary and a portable HTML report.
-5. Reads the actual M1/M2 observations and creates a grouped M4 reliability
-   audit. Independent groups, rather than individual feature activations,
-   are the resampling units.
+5. Reads the original cached activations and intervention measurements
+   to create a grouped reliability audit. Independent input groups, rather
+   than individual feature activations, are the resampling units.
 
 The `real=True` argument inside the example enables execution of the
 benchmark engine. The example still uses **synthetic, locally constructed**
@@ -93,7 +93,7 @@ and source-consistency machinery; they do not establish statistical
 evidence about pretrained representations.
 
 Run the same command again with the same output path. SAEBase verifies
-and reuses the committed result rather than recalculating the M3
+and reuses the committed result rather than recalculating its
 measurements. The integrity manifest binds the result to its run ID.
 Different metrics, inputs or checkpoints must have distinct identities.
 

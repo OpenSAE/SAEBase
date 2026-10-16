@@ -72,7 +72,7 @@ different hook solely because the embedding widths match.
 
 A source SHA, model/SAE hash, tokenizer, token selection, split or
 frozen benchmark option change can require a new run ID.
-An altered `metrics.jsonl` or M4 audit manifest correctly fails
+An altered `metrics.jsonl` or reliability audit manifest correctly fails
 integrity verification.
 
 Keep existing results, start the changed experiment in a separate

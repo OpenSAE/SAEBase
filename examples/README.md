@@ -4,7 +4,7 @@ This index groups executable examples by **what a researcher wants to do** rathe
 
 ## First experiment with saved results
 
-Start with one command that writes a versioned benchmark report, a CSV summary, an M4 reliability audit and reusable M1/M2 caches:
+Start with one command that writes a versioned benchmark report, a CSV summary, a reliability audit and reusable activation/intervention caches:
 
 ```bash
 python examples/19_first_experiment_offline.py --output runs/first-experiment
@@ -83,7 +83,7 @@ The SAR/RSS examples need their original research estimator repositories. The Lo
 | Example | What it demonstrates | Requires real weights? |
 | --- | --- | --- |
 | [`18_external_extensions_offline.py`](18_external_extensions_offline.py) | Opt-in model/SAE providers, source-hashed benchmark and identity patch checks | No |
-| [`19_first_experiment_offline.py`](19_first_experiment_offline.py) | Persistent M3 benchmark, shared caches, M4 reliability and HTML report | No |
+| [`19_first_experiment_offline.py`](19_first_experiment_offline.py) | Persistent benchmark, shared caches, reliability and HTML report | No |
 
 See [Third-Party Extensions](../docs/extensions.md) for registering an installed research adapter.
 
