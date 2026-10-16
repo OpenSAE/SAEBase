@@ -1,9 +1,13 @@
-"""Register tasks actually shipped with the standalone SAEBase package.
+"""Compatibility shim for historical tasks.plugins imports."""
 
-Experiment protocol configurations from SAEReasoning are reference data until their
-implementations are separately reviewed and distributed.
-"""
-from saebase.registry import register_task
-from saebase.sae.task import SAETask
+from __future__ import annotations
 
-register_task("sae", SAETask)
+from saebase.tasks import plugins as _canonical
+
+
+def __getattr__(name: str) -> object:
+    return getattr(_canonical, name)
+
+
+def __dir__() -> list[str]:
+    return sorted(set(globals()) | set(dir(_canonical)))
