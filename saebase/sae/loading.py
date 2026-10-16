@@ -370,6 +370,12 @@ def load_sae_for_profile(
         return sae, meta
 
     if profile.loader == "dictionary_learning":
+        if profile.key.startswith("llama31_8b_instruct_andyrdt"):
+            raise RuntimeError(
+                "The original Llama3.1 instruct BatchTopK checkpoint still requires "
+                "the SAEReasoning protocol-10 loader; no independent real weight "
+                "acceptance has been performed through SAEBase."
+            )
         from sae_lens.loading import pretrained_sae_loaders
         converter = pretrained_sae_loaders.dictionary_learning_sae_huggingface_loader_1
         sae, cfg_dict, sparsity = load_sae_lens(
