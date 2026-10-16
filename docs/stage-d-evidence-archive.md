@@ -14,7 +14,7 @@ The reports record 48/48 real model-SAE pair and 48/48 population benchmark/reli
 
 ## Scope of the archive
 
-**The compact release does not contain original GPU run caches or pretrained weights.** The original [raw-run archive index](../conf/coverage/stage_d_evidence/final/raw_run_archive_index.json) names 18 GPU archive files totaling 725,190 compressed bytes but stores a machine-local path, not a public download link. Original archives were not found among the repository files, existing Release assets or relevant GitHub Actions artifacts inspected during this work.
+**The compact release does not contain original GPU run caches or pretrained weights.** Those original bytes are the separate [original raw release](https://github.com/OpenSAE/SAEBase/releases/tag/stage-d-original-raw-20261016): 18 family archives totaling 725,190 bytes, plus `stage-d-evidence-20261016-original-raw.tar.gz` (`62f5c5b7af719114b999b4b59afb2ddf4798ae337f1a17fd49c11c87c6704958`). A clean redownload of that bundle matched the index and 48/48 native M3/M4 manifests. The [raw-run archive index](../conf/coverage/stage_d_evidence/final/raw_run_archive_index.json) still records the historical machine path; the public download is the release above.
 
 The compact evidence is independently hash-verifiable, but it cannot on its own support recomputing all metrics from the unavailable raw M3/M4 run directories. The original `README.json` value of 17 M3/M4 summaries is an earlier in-progress snapshot; the committed final matrix and 48 per-site reports are the final source. These historical records have not been rewritten.
 
@@ -53,6 +53,6 @@ python scripts/stage_d_archive.py --verify-raw-bundle dist/stage-d-raw/stage-d-e
 (cd dist/stage-d-raw && sha256sum -c stage-d-evidence-20261016-original-raw.tar.gz.sha256)
 ~~~
 
-Verification refuses absent files, incorrect sizes or SHA256 digests, and unsafe TAR members. Preserve the originals in a **separate immutable public release** only after these checks pass. Restore their raw run directories and apply the existing `scripts/phase_d_verify_evidence.py` for a subsequent audit against native metrics, manifests and compact summaries. Hash checking alone is not re-execution or independent numerical verification.
+Verification refuses absent files, incorrect sizes or SHA256 digests, and unsafe TAR members. The checked originals are published as [stage-d-original-raw-20261016](https://github.com/OpenSAE/SAEBase/releases/tag/stage-d-original-raw-20261016). Restoring their raw run directories and applying `scripts/phase_d_verify_evidence.py` audited 48/48 native M3/M4 manifests against the compact summaries. Hash checking alone is not re-execution or independent numerical verification.
 
 Original model/SAE weights remain subject to upstream access and license restrictions and are not included.
