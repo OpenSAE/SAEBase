@@ -2,6 +2,8 @@
 
 Thanks for contributing to reproducible SAE research.
 
+New to SAEBase? Start with the [first CPU experiment](docs/first-experiment.md) and the [Contributor Guide](docs/contributor-guide.md), which maps common first tasks to their code and tests.
+
 ## Start here
 
 1. Open an issue describing a model adapter, SAE checkpoint, evaluation improvement, or bug.
@@ -30,6 +32,10 @@ Review `docs/API.md`, `docs/RELEASE_CHECKLIST.md`, and `SECURITY.md` before a re
 ## Software releases
 
 Future version tags must follow the [General Software Release Process](docs/release-process.md). Keep package versions, changelog, release notes and CI evidence aligned. Do not rewrite an existing tag, v0.2.0 assets or scientific results.
+
+## Documentation checks
+
+After editing documentation, run `python scripts/check_documentation.py --check` to verify internal links. For runnable examples, test the corresponding command as well. See [Troubleshooting](docs/troubleshooting.md).
 
 ## Code quality
 

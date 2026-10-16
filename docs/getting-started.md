@@ -7,12 +7,22 @@ SAEBase provides a lightweight offline interface, and optional analysis dependen
 ```bash
 git clone https://github.com/OpenSAE/SAEBase.git
 cd SAEBase
-python -m pip install -e ".[analysis]"
+python -m pip install -e .
 ```
 
-For tests and packaging, add `.[dev]`. For basic API examples that do not need pretrained checkpoints, `python -m pip install -e .` is sufficient. Current wheels and source archives are available in [GitHub Releases](https://github.com/OpenSAE/SAEBase/releases); publication to PyPI is not implied.
+This installs the core APIs and CPU-only examples. Use `python -m pip install -e ".[dev]"` for tests and `python -m pip install -e ".[analysis]"` when you want to load pretrained checkpoints. GitHub [Releases](https://github.com/OpenSAE/SAEBase/releases) also contain archived versions; the current development APIs are available from this source checkout.
 
 ## Start without model downloads
+
+Run the [first experiment](first-experiment.md) to create benchmark and reliability results in one directory:
+
+```bash
+python examples/19_first_experiment_offline.py --output runs/first-experiment
+```
+
+The command prints the location of a standalone HTML report, CSV summaries and verified JSON/manifest files. You can rerun it to verify and resume the same experiment. It uses two synthetic SAEs and no downloads.
+
+To explore individual capabilities instead:
 
 ```bash
 python examples/05_public_api_offline.py
@@ -65,4 +75,4 @@ The output includes `sae_activation_summary.json` and a resolved Hydra configura
 
 If you want to evaluate two SAE dictionaries over shared model activations, see [Activation Store](activation-store.md) and [SAE Benchmarking](benchmarking.md). If you want to edit features and measure output changes, see [Feature Interventions](feature-interventions.md). For paired statistical comparisons and known-truth controls, see [Reliability Analysis](reliability.md).
 
-[Examples](../examples/README.md) · [Python API](python-api.md) · [Model Support](model-support.md)
+[Examples](../examples/README.md) · [Python API](python-api.md) · [Model Support](model-support.md) · [Troubleshooting](troubleshooting.md)

@@ -6,6 +6,8 @@ Start with the task you want to perform. The documentation is organized by **cap
 
 ## Getting started
 
+- [First Experiment](first-experiment.md) — a single CPU-only command that writes persistent metric, provenance and reliability reports.
+- [Troubleshooting](troubleshooting.md) — installation, checkpoint and benchmark error checks.
 - [Verified Model and SAE Layer Matrix](verified-model-matrix.md) — current `main` Stage D results and per-site evidence.
 - [Getting Started](getting-started.md) — installation, offline example, benchmark preflight and a real checkpoint walkthrough.
 - [Phase A Model Coverage](phase-a-model-coverage.md) — six initial 270M–8B models with real checkpoint evidence.
@@ -29,6 +31,8 @@ Start with the task you want to perform. The documentation is organized by **cap
 
 ## Evidence and maintenance
 
+- [Contributor Guide](contributor-guide.md) — find a first task, run tests and submit a reproducible pull request.
+- [Maintainer Workflow](maintainer-workflow.md) — ownership, code review and the CI/release process.
 - [CI and Research Validation Lanes](ci-maintenance.md) — pinned regressions, optional real-checkpoint acceptance and release safeguards.
 - [Stage D Evidence Archive](stage-d-evidence-archive.md) — compact data bundle, SHA256 audit, original run recovery.
 - [Validation and Reproducibility](validation.md) — actual public-checkpoint acceptance versus optional and unverified capabilities.

@@ -30,6 +30,8 @@ jobs:
           python -c "from saebase.sae.loading import load_sae_for_profile; print('lazy SAE imports OK')"
       - name: Check current Stage D support documentation
         run: python scripts/generate_model_support.py --check
+      - name: Check developer documentation links
+        run: python scripts/check_documentation.py --check
       - name: Verify committed Stage D evidence SHA256 and coverage
         run: python scripts/stage_d_archive.py --check
       - name: Run offline tests and collect Python 3.11 coverage
@@ -60,6 +62,8 @@ jobs:
           python -m saebase.sae.verify_registry --list
       - name: Run offline public API example
         run: python examples/05_public_api_offline.py
+      - name: Run persistent first experiment and reliability audit
+        run: python examples/19_first_experiment_offline.py --output "$RUNNER_TEMP/saebase-first-experiment"
       - name: Run external extension demo without model downloads
         run: python examples/18_external_extensions_offline.py
       - name: Run controlled input cache example

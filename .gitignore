@@ -31,3 +31,6 @@ m1-artifacts/
 # Coverage artifacts
 coverage.xml
 coverage.json
+
+# Local first-run benchmarks and saved reports
+runs/

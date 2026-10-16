@@ -2,6 +2,16 @@
 
 This index groups executable examples by **what a researcher wants to do** rather than their file creation order. Numbered filenames are retained for reproducibility and backward compatibility.
 
+## First experiment with saved results
+
+Start with one command that writes a versioned benchmark report, a CSV summary, a reliability audit and reusable activation/intervention caches:
+
+```bash
+python examples/19_first_experiment_offline.py --output runs/first-experiment
+```
+
+The [first experiment walkthrough](../docs/first-experiment.md) explains the generated files and identity-checked resume. The example uses a deterministic synthetic model and two toy SAE weights, so no checkpoint download or GPU is needed.
+
 ## Learn the public API
 
 | Example | What it demonstrates | Requires real weights? |
@@ -67,6 +77,15 @@ python examples/14_ground_truth_offline.py
 | [`17_localization_benchmark.py`](17_localization_benchmark.py) | End-to-end Localize Benchmark with full curve artifacts and M4 stability audit |
 
 The SAR/RSS examples need their original research estimator repositories. The Localize example needs the independent `sae-input-localization` package installed from [OpenSAE/SAE-Input-Localization](https://github.com/OpenSAE/SAE-Input-Localization). Their defaults use synthetic demonstration data; real checkpoint runs are opt-in. `17_localization_benchmark.py` additionally needs the installed original Localize package and writes complete M3/M4 reports.
+
+## Use third-party models and benchmarks
+
+| Example | What it demonstrates | Requires real weights? |
+| --- | --- | --- |
+| [`18_external_extensions_offline.py`](18_external_extensions_offline.py) | Opt-in model/SAE providers, source-hashed benchmark and identity patch checks | No |
+| [`19_first_experiment_offline.py`](19_first_experiment_offline.py) | Persistent benchmark, shared caches, reliability and HTML report | No |
+
+See [Third-Party Extensions](../docs/extensions.md) for registering an installed research adapter.
 
 ## A real multi-checkpoint benchmark
 
