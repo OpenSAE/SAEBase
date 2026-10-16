@@ -9,6 +9,7 @@ on:
       - 'saebase/sae/registry.py'
       - 'models/qwen3_1_7b_base/**'
       - 'scripts/phase_bc_cpu_pair.py'
+      - 'scripts/phase_bc_cpu_benchmark.py'
       - 'conf/coverage/stage_bc.json'
       - '.github/workflows/stage-bc-cpu-pairs.yml'
   workflow_dispatch:
@@ -49,6 +50,29 @@ jobs:
         run: |
           python scripts/phase_bc_cpu_pair.py \
             --sae-key '${{ matrix.sae_key }}' --output "$RUNNER_TEMP/stage-bc"
+      - name: Run genuine M3 Benchmark and M4 Reliability
+        if: steps.probe.outcome == 'success'
+        env:
+          OMP_NUM_THREADS: '2'
+          MKL_NUM_THREADS: '2'
+          TOKENIZERS_PARALLELISM: 'false'
+          HF_HUB_DISABLE_TELEMETRY: '1'
+        run: |
+          python scripts/phase_bc_cpu_benchmark.py \
+            --sae-key '${{ matrix.sae_key }}' --output "$RUNNER_TEMP/stage-bc-m3m4"
+      - name: Upload real M3/M4 benchmark evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage-bc-m3m4-${{ matrix.sae_key }}
+          path: |
+            ${{ runner.temp }}/stage-bc-m3m4/*_m3m4_summary.json
+            ${{ runner.temp }}/stage-bc-m3m4/*/metrics.jsonl
+            ${{ runner.temp }}/stage-bc-m3m4/*/metrics_manifest.json
+            ${{ runner.temp }}/stage-bc-m3m4/*/reliability.json
+            ${{ runner.temp }}/stage-bc-m3m4/*/reliability_manifest.json
+          if-no-files-found: warn
+          retention-days: 30
       - name: Upload real CPU model-pair evidence
         if: always()
         uses: actions/upload-artifact@v4
