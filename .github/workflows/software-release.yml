@@ -1,0 +1,223 @@
+name: SAEBase Software Release (manual)
+
+# Only an explicitly chosen source SHA, successful main CI, and an explicit
+# PUBLISH-vX.Y.Z confirmation can create a new software release.
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Exact 40-character source commit SHA; must be current main
+        required: true
+        type: string
+      version:
+        description: Version in pyproject.toml and saebase.__version__ (e.g. 0.3.0)
+        required: true
+        type: string
+      mode:
+        description: Verification only or explicitly publish a new version
+        required: true
+        type: choice
+        options: [verify, publish]
+        default: verify
+      confirmation:
+        description: For publish, enter PUBLISH-vX.Y.Z; ignored in verify mode
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: saebase-software-release
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify exact-source release candidate
+    if: >-
+      ${{ github.repository == 'OpenSAE/SAEBase' &&
+          github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      SOURCE_SHA: ${{ inputs.source_sha }}
+      VERSION: ${{ inputs.version }}
+      MODE: ${{ inputs.mode }}
+      CONFIRMATION: ${{ inputs.confirmation }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Verify source, version and current main HEAD
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_SHA" =~ ^[a-f0-9]{40}$ ]]
+          [[ "$VERSION" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(gh api "repos/$REPO/branches/main" --jq '.commit.sha')" = "$SOURCE_SHA"
+          python - <<'PY'
+          import os
+          from scripts.release_candidate import project_info
+
+          version, tag, _ = project_info()
+          assert version == os.environ["VERSION"], "version input does not match source"
+          print("Source and release metadata:", tag, os.environ["SOURCE_SHA"])
+          PY
+          if [[ "$MODE" == "publish" ]]; then
+            test "$CONFIRMATION" = "PUBLISH-v$VERSION"
+            test "$VERSION" != "0.2.0"
+            git fetch --tags --force origin
+            python scripts/release_candidate.py publish-eligible --expected-version "$VERSION"
+            TAG="v$VERSION"
+            if git ls-remote --tags origin "refs/tags/$TAG" | grep -q .; then
+              echo "Refusing to republish existing tag $TAG" >&2
+              exit 1
+            fi
+            if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+              echo "Refusing to replace existing Release $TAG" >&2
+              exit 1
+            fi
+          fi
+      - name: Require successful exact-source main CI and all six check contexts
+        shell: bash
+        run: |
+          set -euo pipefail
+          CI_JSON="$(gh api -X GET \
+            "repos/$REPO/actions/workflows/ci.yml/runs?head_sha=$SOURCE_SHA&branch=main&per_page=40")"
+          CI_RUN_ID="$(echo "$CI_JSON" | jq -r --arg sha "$SOURCE_SHA" '
+            .workflow_runs[] |
+            select(.event == "push" and .head_sha == $sha and
+                   .status == "completed" and .conclusion == "success") |
+            .id' | head -n 1)"
+          test -n "$CI_RUN_ID"
+          echo "CI_RUN_ID=$CI_RUN_ID" >> "$GITHUB_ENV"
+          gh api -X GET "repos/$REPO/actions/runs/$CI_RUN_ID/jobs?per_page=100" \
+            > "$RUNNER_TEMP/ci-jobs.json"
+          python scripts/release_candidate.py verify-ci \
+            --ci-jobs "$RUNNER_TEMP/ci-jobs.json" --source-sha "$SOURCE_SHA"
+      - name: Download distributions from the same successful CI run
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir dist
+          gh run download "$CI_RUN_ID" --repo "$REPO" \
+            --name saebase-distributions --dir dist
+          test "$(find dist -maxdepth 1 -name '*.whl' | wc -l)" = 1
+          test "$(find dist -maxdepth 1 -name '*.tar.gz' | wc -l)" = 1
+      - name: Validate wheel, sdist, installation and release metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -e ".[dev]"
+          python -m twine check dist/*
+          python scripts/verify_distribution.py dist
+          python scripts/check_installed_wheel.py dist
+          python scripts/check_sdist_roundtrip.py dist
+          python scripts/release_candidate.py prepare \
+            --dist dist --output-dir release \
+            --source-sha "$SOURCE_SHA" --expected-version "$VERSION" \
+            --ci-run-id "$CI_RUN_ID"
+          python scripts/release_candidate.py verify-assets \
+            --dist dist --output-dir release \
+            --source-sha "$SOURCE_SHA" --expected-version "$VERSION"
+      - name: Preserve exact-source candidate for human review
+        uses: actions/upload-artifact@v4
+        with:
+          name: software-release-candidate-${{ inputs.version }}
+          path: |
+            dist/*
+            release/release-evidence.json
+            release/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 30
+      - name: Report verification outcome
+        shell: bash
+        run: |
+          printf 'Software candidate: v%s\nSource: `%s`\nCI run: `%s`\nMode: %s\n' \
+            "$VERSION" "$SOURCE_SHA" "$CI_RUN_ID" "$MODE" >> "$GITHUB_STEP_SUMMARY"
+
+  publish:
+    name: Publish a new immutable software version
+    needs: verify
+    if: ${{ inputs.mode == 'publish' && needs.verify.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      SOURCE_SHA: ${{ inputs.source_sha }}
+      VERSION: ${{ inputs.version }}
+      CONFIRMATION: ${{ inputs.confirmation }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          name: software-release-candidate-${{ inputs.version }}
+          path: .
+      - name: Final source, hash, version and tag immutability gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$CONFIRMATION" = "PUBLISH-v$VERSION"
+          test "$VERSION" != "0.2.0"
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(gh api "repos/$REPO/branches/main" --jq '.commit.sha')" = "$SOURCE_SHA"
+          git fetch --tags --force origin
+          python scripts/release_candidate.py publish-eligible --expected-version "$VERSION"
+          python scripts/release_candidate.py verify-assets \
+            --dist dist --output-dir release \
+            --source-sha "$SOURCE_SHA" --expected-version "$VERSION"
+          TAG="v$VERSION"
+          if git ls-remote --tags origin "refs/tags/$TAG" | grep -q .; then
+            echo "Existing tag $TAG: refusing any overwrite" >&2
+            exit 1
+          fi
+          if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            echo "Existing Release $TAG: refusing any overwrite" >&2
+            exit 1
+          fi
+      - name: Create a new annotated tag and publish checked distributions
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="v$VERSION"
+          test "$(gh api "repos/$REPO/branches/main" --jq '.commit.sha')" = "$SOURCE_SHA"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "SAEBase $TAG verified software release at $SOURCE_SHA"
+          git push origin "refs/tags/$TAG"
+          gh release create "$TAG" \
+            dist/opensae_saebase-"$VERSION"-*.whl \
+            dist/opensae_saebase-"$VERSION".tar.gz \
+            release/release-evidence.json \
+            release/SHA256SUMS \
+            --repo "$REPO" --verify-tag --latest \
+            --title "SAEBase $TAG" \
+            --notes-file "docs/releases/$TAG.md"
+          gh release view "$TAG" --repo "$REPO" --json url,tagName,assets |
+            jq -e --arg tag "$TAG" '
+              .tagName == $tag and
+              ([.assets[].name] | sort) ==
+              (["SHA256SUMS", "release-evidence.json",
+                "opensae_saebase-" + ($tag[1:]) + ".tar.gz",
+                "opensae_saebase-" + ($tag[1:]) + "-py3-none-any.whl"] | sort)'
+          test "$(git rev-list -n 1 "$TAG")" = "$SOURCE_SHA"
+          echo "Published $TAG at immutable commit $SOURCE_SHA"
