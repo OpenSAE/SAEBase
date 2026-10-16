@@ -19,8 +19,8 @@ SHA = "a" * 40
 def fake_project(tmp_path: Path, version: str = "0.3.0") -> tuple[Path, Path]:
     root = tmp_path / "root"
     dist = tmp_path / "dist"
-    root.mkdir()
-    dist.mkdir()
+    root.mkdir(parents=True)
+    dist.mkdir(parents=True)
     (root / "saebase").mkdir()
     (root / "docs" / "releases").mkdir(parents=True)
     entrypoints = {
@@ -146,8 +146,9 @@ def test_publish_rejects_old_and_existing_tags(tmp_path, monkeypatch):
         lambda *args, **kw: "v0.2.0\nv0.2.1\nstage-d-evidence-20261016\n",
     )
     assert gate.publish_eligible(root, "0.3.0")["newer_than_existing_software_tags"]
+    old_root, _ = fake_project(tmp_path / "old", "0.2.1")
     with pytest.raises(ValueError, match="newer"):
-        gate.publish_eligible(root, "0.2.1")
+        gate.publish_eligible(old_root, "0.2.1")
 
 
 def test_release_workflow_is_manual_explicit_and_privileged_only_when_publish():
@@ -156,7 +157,8 @@ def test_release_workflow_is_manual_explicit_and_privileged_only_when_publish():
     assert set(workflow["on"]) == {"workflow_dispatch"}
     jobs = workflow["jobs"]
     assert set(jobs) == {"verify", "publish"}
-    assert jobs["verify"]["permissions"] if "permissions" in jobs["verify"] else True
+    assert workflow["permissions"]["contents"] == "read"
+    assert workflow["permissions"]["actions"] == "read"
     assert jobs["publish"]["permissions"]["contents"] == "write"
     assert jobs["publish"]["if"].count("publish") >= 1
     text = path.read_text(encoding="utf-8")
@@ -166,8 +168,13 @@ def test_release_workflow_is_manual_explicit_and_privileged_only_when_publish():
     assert "release-evidence.json" in text
 
 
-def test_current_repo_has_coherent_historical_release_metadata():
+def test_current_repository_version_and_release_notes_are_coherent():
+    import tomllib
+
     version, tag, entrypoints = gate.project_info()
-    assert version == "0.2.0"
-    assert tag == "v0.2.0"
+    declared = tomllib.loads(
+        (gate.ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    )["project"]["version"]
+    assert version == declared
+    assert tag == f"v{declared}"
     assert len(entrypoints) == 9

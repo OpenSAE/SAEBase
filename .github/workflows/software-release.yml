@@ -75,7 +75,7 @@ jobs:
           if [[ "$MODE" == "publish" ]]; then
             test "$CONFIRMATION" = "PUBLISH-v$VERSION"
             test "$VERSION" != "0.2.0"
-            git fetch --tags --force origin
+            git fetch --tags origin
             python scripts/release_candidate.py publish-eligible --expected-version "$VERSION"
             TAG="v$VERSION"
             if git ls-remote --tags origin "refs/tags/$TAG" | grep -q .; then
@@ -180,7 +180,7 @@ jobs:
           test "$VERSION" != "0.2.0"
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
           test "$(gh api "repos/$REPO/branches/main" --jq '.commit.sha')" = "$SOURCE_SHA"
-          git fetch --tags --force origin
+          git fetch --tags origin
           python scripts/release_candidate.py publish-eligible --expected-version "$VERSION"
           python scripts/release_candidate.py verify-assets \
             --dist dist --output-dir release \
@@ -212,12 +212,20 @@ jobs:
             --repo "$REPO" --verify-tag --latest \
             --title "SAEBase $TAG" \
             --notes-file "docs/releases/$TAG.md"
-          gh release view "$TAG" --repo "$REPO" --json url,tagName,assets |
-            jq -e --arg tag "$TAG" '
-              .tagName == $tag and
-              ([.assets[].name] | sort) ==
-              (["SHA256SUMS", "release-evidence.json",
-                "opensae_saebase-" + ($tag[1:]) + ".tar.gz",
-                "opensae_saebase-" + ($tag[1:]) + "-py3-none-any.whl"] | sort)'
+          gh release view "$TAG" --repo "$REPO" --json url,tagName,assets > release-remote.json
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          remote = json.loads(Path("release-remote.json").read_text())
+          evidence = json.loads(Path("release/release-evidence.json").read_text())
+          expected = set(evidence["distribution_artifacts"]) | {
+              "SHA256SUMS", "release-evidence.json"
+          }
+          assert remote["tagName"] == "v" + os.environ["VERSION"]
+          assert {a["name"] for a in remote["assets"]} == expected
+          print("Verified release assets:", sorted(expected))
+          PY
           test "$(git rev-list -n 1 "$TAG")" = "$SOURCE_SHA"
           echo "Published $TAG at immutable commit $SOURCE_SHA"
