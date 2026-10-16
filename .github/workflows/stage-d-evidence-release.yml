@@ -1,0 +1,75 @@
+name: Publish Stage D compact evidence archive
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stage-d-compact-evidence-20261016
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    if: >-
+      ${{ github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'push' &&
+          github.event.workflow_run.head_branch == 'main' &&
+          github.event.workflow_run.head_repository.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      REPO: ${{ github.repository }}
+      RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+      TAG: stage-d-evidence-20261016
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout exact successfully tested source
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Verify and build original committed compact evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$RUN_SHA"
+          python scripts/stage_d_archive.py --check
+          python scripts/stage_d_archive.py --build --output-dir dist/stage-d-evidence
+          python scripts/stage_d_archive.py --verify-bundle dist/stage-d-evidence/stage-d-evidence-20261016-compact.tar.gz
+          (cd dist/stage-d-evidence && sha256sum -c SHA256SUMS)
+      - name: Publish immutable evidence tag and four GitHub Release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            echo "Evidence release already exists; refusing to overwrite assets."
+            gh release view "$TAG" --repo "$REPO" --json url,tagName,assets
+            exit 0
+          fi
+          if git ls-remote --tags origin "refs/tags/$TAG" | grep -q "refs/tags/$TAG"; then
+            git fetch origin "refs/tags/$TAG:refs/tags/$TAG"
+            test "$(git rev-list -n 1 "$TAG")" = "$RUN_SHA"
+            echo "Existing evidence tag points at exact CI-tested source."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "$TAG" -m "Stage D compact evidence: not original M3/M4 run caches"
+            git push origin "refs/tags/$TAG"
+          fi
+          gh release create "$TAG" \
+            dist/stage-d-evidence/stage-d-evidence-20261016-compact.tar.gz \
+            dist/stage-d-evidence/stage-d-evidence-20261016-compact-manifest.json \
+            dist/stage-d-evidence/verify-stage-d.py \
+            dist/stage-d-evidence/SHA256SUMS \
+            --repo "$REPO" --verify-tag \
+            --title "Stage D compact verification evidence (48 sites)" \
+            --notes-file docs/stage-d-evidence-archive.md \
+            --latest=false
+          gh release view "$TAG" --repo "$REPO" --json url,tagName,assets
