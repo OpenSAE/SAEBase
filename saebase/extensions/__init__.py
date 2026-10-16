@@ -24,6 +24,7 @@ from .registry import (
     register_extension,
 )
 from .runtime import load_external_pair, validate_external_target
+from .metrics import execute_external_metric, validate_external_metric_source
 
 __all__ = [
     "API_VERSION",
@@ -43,4 +44,6 @@ __all__ = [
     "register_extension",
     "load_external_pair",
     "validate_external_target",
+    "execute_external_metric",
+    "validate_external_metric_source",
 ]
