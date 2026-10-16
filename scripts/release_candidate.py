@@ -72,17 +72,13 @@ def _static_version(text: str) -> str:
 
 
 def project_info(root: Path = ROOT) -> tuple[str, str, dict[str, str]]:
-    project = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))[
-        "project"
-    ]
+    project = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))["project"]
     version = str(project["version"])
     if not VERSION.fullmatch(version):
         raise ValueError(f"expected a stable semantic version x.y.z, got {version!r}")
     if project["name"] != "opensae-saebase":
         raise ValueError("unexpected Python project name")
-    declared = _static_version(
-        (root / "saebase" / "__init__.py").read_text(encoding="utf-8")
-    )
+    declared = _static_version((root / "saebase" / "__init__.py").read_text(encoding="utf-8"))
     if declared != version:
         raise ValueError("pyproject.toml and saebase.__version__ disagree")
     changelog = (root / "CHANGELOG.md").read_text(encoding="utf-8")
@@ -163,9 +159,9 @@ def inspect_distributions(
         versions = [n for n in names if n == root_path + "saebase/__init__.py"]
         if len(configs) != 1 or len(versions) != 1:
             raise ValueError("sdist lacks version metadata or package init")
-        src_project = tomllib.loads(
-            archive.extractfile(configs[0]).read().decode("utf-8")
-        )["project"]
+        src_project = tomllib.loads(archive.extractfile(configs[0]).read().decode("utf-8"))[
+            "project"
+        ]
         if src_project["version"] != version or src_project["name"] != "opensae-saebase":
             raise ValueError("sdist project metadata differs from source")
         if _static_version(archive.extractfile(versions[0]).read().decode("utf-8")) != version:
@@ -206,8 +202,12 @@ def verify_ci_jobs(record: dict, commit: str) -> dict[str, str]:
 
 
 def prepare(
-    root: Path, dist: Path, output: Path, commit: str,
-    expected_version: str | None = None, ci_run_id: int | None = None,
+    root: Path,
+    dist: Path,
+    output: Path,
+    commit: str,
+    expected_version: str | None = None,
+    ci_run_id: int | None = None,
 ) -> dict:
     if not SHA.fullmatch(commit) or source_sha(root) != commit:
         raise ValueError("release source commit does not equal checked-out HEAD")
@@ -223,7 +223,8 @@ def prepare(
         "source_commit": commit,
         "ci_run_id": ci_run_id,
         "ci_gate": "six successful main-branch push jobs checked by release workflow"
-        if ci_run_id else "not independently checked by this offline command",
+        if ci_run_id
+        else "not independently checked by this offline command",
         "software_license": "Apache-2.0",
         "distribution_artifacts": artifacts,
         "release_notes": f"docs/releases/{tag}.md",
@@ -236,9 +237,7 @@ def prepare(
     output.mkdir(parents=True, exist_ok=True)
     manifest = output / "release-evidence.json"
     manifest.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    lines = [
-        f"{data['sha256']}  {name}" for name, data in sorted(artifacts.items())
-    ]
+    lines = [f"{data['sha256']}  {name}" for name, data in sorted(artifacts.items())]
     lines.append(f"{sha256_file(manifest)}  release-evidence.json")
     (output / "SHA256SUMS").write_text("\n".join(lines) + "\n", encoding="ascii")
     verify_assets(dist, output, commit, version)
@@ -250,7 +249,10 @@ def verify_assets(
 ) -> dict:
     manifest_path = output / "release-evidence.json"
     evidence = json.loads(manifest_path.read_text(encoding="utf-8"))
-    if evidence.get("schema") != SCHEMA or evidence.get("status") != "software_distribution_verified":
+    if (
+        evidence.get("schema") != SCHEMA
+        or evidence.get("status") != "software_distribution_verified"
+    ):
         raise ValueError("invalid software release evidence")
     if commit is not None and evidence.get("source_commit") != commit:
         raise ValueError("release evidence source commit mismatch")
@@ -330,8 +332,12 @@ def main() -> int:
     try:
         if args.mode == "prepare":
             result = prepare(
-                ROOT, args.dist, args.output_dir, args.source_sha,
-                args.expected_version, args.ci_run_id,
+                ROOT,
+                args.dist,
+                args.output_dir,
+                args.source_sha,
+                args.expected_version,
+                args.ci_run_id,
             )
         elif args.mode == "verify-assets":
             result = verify_assets(

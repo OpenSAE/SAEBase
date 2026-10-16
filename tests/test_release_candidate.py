@@ -36,42 +36,39 @@ def fake_project(tmp_path: Path, version: str = "0.3.0") -> tuple[Path, Path]:
     project = (
         '[project]\nname = "opensae-saebase"\n'
         f'version = "{version}"\n'
-        '[project.scripts]\n'
+        "[project.scripts]\n"
         + "".join(f'{name} = "{command}"\n' for name, command in entrypoints.items())
     )
     (root / "pyproject.toml").write_text(project, encoding="utf-8")
-    (root / "saebase" / "__init__.py").write_text(
-        f'__version__ = "{version}"\n', encoding="utf-8"
-    )
+    (root / "saebase" / "__init__.py").write_text(f'__version__ = "{version}"\n', encoding="utf-8")
     (root / "CHANGELOG.md").write_text(
         f"# Changelog\n\n## {version} - Candidate\n", encoding="utf-8"
     )
     (root / "docs" / "releases" / f"v{version}.md").write_text(
         "# Candidate\n\nRelease notes.\n", encoding="utf-8"
     )
-    (root / "LICENSE").write_text(
-        "Apache License, Version 2.0\n", encoding="utf-8"
-    )
+    (root / "LICENSE").write_text("Apache License, Version 2.0\n", encoding="utf-8")
 
     wheel = dist / f"opensae_saebase-{version}-py3-none-any.whl"
     with zipfile.ZipFile(wheel, "w") as z:
         z.writestr(
             f"opensae_saebase-{version}.dist-info/METADATA",
-            f"Name: opensae-saebase\nVersion: {version}\n"
-            "License-Expression: Apache-2.0\n",
+            f"Name: opensae-saebase\nVersion: {version}\nLicense-Expression: Apache-2.0\n",
         )
         z.writestr(
             f"opensae_saebase-{version}.dist-info/entry_points.txt",
-            "[console_scripts]\n"
-            + "".join(f"{n} = {p}\n" for n, p in entrypoints.items()),
+            "[console_scripts]\n" + "".join(f"{n} = {p}\n" for n, p in entrypoints.items()),
         )
         z.writestr("saebase/cli.py", "def main():\n    return 0\n")
         z.writestr("conf/config.yaml", "defaults: []\n")
     sdist = dist / f"opensae_saebase-{version}.tar.gz"
     with tarfile.open(sdist, "w:gz") as t:
         for name in (
-            "pyproject.toml", "saebase/__init__.py", "LICENSE",
-            "CHANGELOG.md", f"docs/releases/v{version}.md",
+            "pyproject.toml",
+            "saebase/__init__.py",
+            "LICENSE",
+            "CHANGELOG.md",
+            f"docs/releases/v{version}.md",
         ):
             payload = (root / name).read_bytes()
             entry = tarfile.TarInfo(f"opensae_saebase-{version}/{name}")
@@ -97,14 +94,10 @@ def test_release_candidate_roundtrip_and_tamper_detection(tmp_path, monkeypatch)
 
 def test_version_must_match_package_source_and_notes(tmp_path, monkeypatch):
     root, dist = fake_project(tmp_path)
-    (root / "saebase" / "__init__.py").write_text(
-        '__version__ = "0.4.0"\n', encoding="utf-8"
-    )
+    (root / "saebase" / "__init__.py").write_text('__version__ = "0.4.0"\n', encoding="utf-8")
     with pytest.raises(ValueError, match="disagree"):
         gate.project_info(root)
-    (root / "saebase" / "__init__.py").write_text(
-        '__version__ = "0.3.0"\n', encoding="utf-8"
-    )
+    (root / "saebase" / "__init__.py").write_text('__version__ = "0.3.0"\n', encoding="utf-8")
     (root / "docs" / "releases" / "v0.3.0.md").unlink()
     with pytest.raises(ValueError, match="notes missing"):
         gate.project_info(root)
@@ -122,7 +115,9 @@ def test_source_commit_must_be_exact_and_match_checkout(tmp_path, monkeypatch):
 def test_ci_jobs_require_all_six_successful_for_one_commit():
     jobs = [
         {
-            "name": name, "head_sha": SHA, "status": "completed",
+            "name": name,
+            "head_sha": SHA,
+            "status": "completed",
             "conclusion": "success",
         }
         for name in gate.REQUIRED_CI
@@ -171,9 +166,9 @@ def test_current_repository_version_and_release_notes_are_coherent():
     import tomllib
 
     version, tag, entrypoints = gate.project_info()
-    declared = tomllib.loads(
-        (gate.ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    )["project"]["version"]
+    declared = tomllib.loads((gate.ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"][
+        "version"
+    ]
     assert version == declared
     assert tag == f"v{declared}"
     assert len(entrypoints) == 9
