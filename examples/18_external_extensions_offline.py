@@ -7,7 +7,7 @@ from pathlib import Path
 
 import torch
 
-from examples._synthetic_common import ResearchToyModel, ResearchToySAE
+from _synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ActivationSite
 from saebase.benchmarks import BenchmarkConfig, MetricSpec, build_plan
 from saebase.benchmarks.runner import execute
