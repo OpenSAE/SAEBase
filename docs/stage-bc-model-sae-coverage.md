@@ -20,7 +20,7 @@ SAEBase selects representative, independently published open SAE checkpoints acr
 | Gemma 2 2B | [Gemma Scope](https://huggingface.co/google/gemma-scope-2b-pt-res) | 13, 25 | JumpReLU residual | SAE-only CPU |
 | Qwen3.5 2B Base | [Qwen-Scope](https://huggingface.co/Qwen/SAE-Res-Qwen3.5-2B-Base-W32K-L0_50) | 6, 12, 15, 20 | TopK residual | Real CPU pair + M3/M4 |
 | Gemma 3 4B PT / IT | [Gemma Scope 2](https://huggingface.co/google/gemma-scope-2-4b-pt) | 9, 17, 22, 29 | JumpReLU residual | SAE-only CPU |
-| Mistral 7B Instruct | [tylercosgrove](https://huggingface.co/tylercosgrove/mistral-7b-sparse-autoencoder-layer16) | 16 | TopK resid_pre | Source metadata; 4.3GB SAE deferred |
+| Mistral 7B Instruct | [tylercosgrove](https://huggingface.co/tylercosgrove/mistral-7b-sparse-autoencoder-layer16) | 16 | TopK `blocks.16.hook_mlp_out` (native `layer_norm`) | Stage D pair + population; SAELens LN stats preserved per prompt via `FeatureSnapshot` |
 | Qwen3 8B Base | [Qwen-Scope](https://huggingface.co/Qwen/SAE-Res-Qwen3-8B-Base-W64K-L0_50) | 9, 18, 23, 31 | TopK residual | SAE-only CPU |
 | Llama 3.1 8B Base | [Llama-Scope](https://huggingface.co/OpenMOSS-Team/Llama3_1-8B-Base-LXR-8x) | 8, 16, 21, 27 | JumpReLU residual | SAE-only CPU |
 | DeepSeek R1 Distill Llama 8B | [Llama-Scope R1](https://huggingface.co/fnlp/Llama-Scope-R1-Distill) | 23 | JumpReLU reasoning | SAE-only CPU |

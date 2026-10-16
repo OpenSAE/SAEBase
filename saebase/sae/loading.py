@@ -287,23 +287,10 @@ def load_sae_for_profile(
             sae.fold_activation_norm_scaling_factor(scaling)
             cfg_dict["normalize_activations"] = "none"
             cfg_dict["saebase_activation_norm_folded"] = scaling
-        # tylercosgrove TopK SAE declares normalize_activations=layer_norm, but
-        # current SAELens TopKSAE never materializes ln_mu/ln_std for standalone
-        # decode used by interventions. Encode already runs without those
-        # buffers, so disable the broken inverse-LN path and record it.
-        if (
-            profile.key == "mistral7b_instruct_tc_l16_131k"
-            and cfg_dict.get("normalize_activations") == "layer_norm"
-            and not hasattr(sae, "ln_std")
-        ):
-            sae.cfg.normalize_activations = "none"
-            if hasattr(sae, "_setup_activation_normalization"):
-                sae._setup_activation_normalization()
-            cfg_dict["normalize_activations"] = "none"
-            cfg_dict["saebase_layer_norm_disabled"] = (
-                "TopKSAE layer_norm decode missing ln_std/ln_mu under SAELens "
-                f"{getattr(__import__('sae_lens'), '__version__', 'unknown')}"
-            )
+        # Keep native layer_norm for Mistral TopK. SAELens encode stores
+        # ln_mu/ln_std on the SAE; saebase.api.features restores them from the
+        # FeatureSnapshot before each independent decode so edit paths stay
+        # source-faithful. Do not silently disable normalize_activations.
         hook_name = resolve_hook_name(sae, profile, layer)
         meta: dict[str, Any] = {
             "sae_key": profile.key,

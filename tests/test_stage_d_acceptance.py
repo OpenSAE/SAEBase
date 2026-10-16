@@ -279,3 +279,201 @@ def test_matrix_dry_run_lists_44(tmp_path):
     assert code == 0
     body = json.loads((tmp_path / "stage_d_targets.json").read_text())
     assert body["n_sites"] == 48
+
+
+def test_resolve_evaluation_host_auto_override_for_transfer():
+    from saebase.sae.stage_d import resolve_evaluation_host
+    host, override = resolve_evaluation_host(
+        catalog_model_key="gemma2_2b_it",
+        sae_key="gemma2_2b_it_matryoshka_l12_32k",
+    )
+    assert host == "gemma2_2b_it"
+    assert override == "gemma2_2b_it"
+
+
+def test_assert_host_rejects_base_labeled_as_it():
+    from saebase.sae.stage_d import assert_host_matches_label
+    with pytest.raises(ValueError, match="IT|instruct|base"):
+        assert_host_matches_label(
+            evaluation_host_model_key="gemma2_2b_it",
+            loaded_model_name="google/gemma-2-2b",
+        )
+
+
+def test_population_corpus_has_64_groups_and_no_overlap():
+    from saebase.sae.stage_d import (
+        DEFAULT_POPULATION_PATH,
+        POPULATION_MIN_EVAL_GROUPS,
+        load_population_corpus,
+    )
+    corpus = load_population_corpus(DEFAULT_POPULATION_PATH)
+    assert corpus["n_evaluation_groups"] >= POPULATION_MIN_EVAL_GROUPS
+    assert corpus["n_selection"] >= 16
+    sel = {r["prompt"] for r in corpus["selection"]}
+    ev = {r["prompt"] for r in corpus["evaluation"]}
+    assert not sel & ev
+
+
+def test_population_flag_rejects_tiny_corpus(tmp_path):
+    from saebase.sae.stage_d import load_population_corpus
+    tiny = tmp_path / "tiny.jsonl"
+    rows = [
+        {"split": "selection", "group_id": "s0", "prompt": "sel A"},
+        {"split": "evaluation", "group_id": "e0", "prompt": "eval A"},
+        {"split": "evaluation", "group_id": "e1", "prompt": "eval B"},
+    ]
+    tiny.write_text("\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="evaluation groups"):
+        load_population_corpus(tiny)
+
+
+def test_resume_fingerprint_mismatch_forces_rerun(tmp_path):
+    payload = {
+        "schema": SCHEMA_ACCEPTANCE,
+        "status": "passed",
+        "model_key": "qwen35_2b",
+        "evaluation_host_model_key": "qwen35_2b",
+        "sae_key": "qwen35_2b_resid_w32k",
+        "layer": 12,
+        "hook_name": "blocks.12.hook_resid_post",
+        "protocol": "stage_d.pair.v2",
+        "model_state_sha256": "a" * 64,
+        "sae_state_sha256": "b" * 64,
+        "d_in": 4,
+        "d_sae": 8,
+        "n_prompts": 1,
+        "identity_patch_max_abs_logit_error": 0.0,
+        "feature_ablation_logit_l2": [1.0],
+        "peak_cuda_allocated_bytes": 0,
+    }
+    payload["artifact_sha256"] = canonical_payload_sha256(payload)
+    write_acceptance(tmp_path, payload)
+    assert should_skip_resume(
+        tmp_path, model_key="qwen35_2b", sae_key="qwen35_2b_resid_w32k",
+        layer=12, resume=True,
+        expected={"hook_name": "blocks.12.hook_resid_post", "protocol": "stage_d.pair.v2"},
+    ) is not None
+    assert should_skip_resume(
+        tmp_path, model_key="qwen35_2b", sae_key="qwen35_2b_resid_w32k",
+        layer=12, resume=True,
+        expected={"hook_name": "blocks.12.hook_resid_pre", "protocol": "stage_d.pair.v2"},
+    ) is None
+
+
+def test_layer_norm_snapshot_restores_and_clears():
+    """Synthetic SAELens-like layer_norm encode/decode with per-input stats."""
+    from saebase.api import ActivationSite, ModelAdapter, capture_features, edit_features
+
+    class LayerNormTopK(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.cfg = SimpleNamespace(d_in=4, d_sae=4, dtype="float32", normalize_activations="layer_norm")
+            self.W_enc = torch.nn.Parameter(torch.eye(4))
+            self.W_dec = torch.nn.Parameter(torch.eye(4))
+            self.b_dec = torch.nn.Parameter(torch.zeros(4))
+            self.k = 2
+
+        def process_sae_in(self, x):
+            mu = x.mean(dim=-1, keepdim=True)
+            xc = x - mu
+            std = xc.std(dim=-1, keepdim=True).clamp_min(1e-5)
+            self.ln_mu = mu
+            self.ln_std = std
+            return xc / std
+
+        def encode(self, x):
+            x = self.process_sae_in(x)
+            z = x @ self.W_enc
+            # TopK
+            vals, idx = torch.topk(z.abs(), k=self.k, dim=-1)
+            mask = torch.zeros_like(z)
+            mask.scatter_(-1, idx, 1.0)
+            return z * mask
+
+        def decode(self, z):
+            out = z @ self.W_dec + self.b_dec
+            out = out * self.ln_std + self.ln_mu
+            del self.ln_mu
+            del self.ln_std
+            return out
+
+    class LNModel(TinyModel):
+        def __init__(self):
+            super().__init__("blocks.0.hook_mlp_out")
+            self.cfg = SimpleNamespace(n_layers=1, device="cpu", d_model=4)
+            self.weight = torch.nn.Parameter(torch.randn(4, 4))
+
+        def _hidden(self, tokens):
+            # Vary activation scale by prompt content for distinct ln stats.
+            base = tokens.float().unsqueeze(-1)
+            scale = 1.0 + (tokens.float().sum() % 7) / 10.0
+            return torch.cat([base, base + 1, base + 2, base * scale], dim=-1)[..., :4]
+
+        def _out(self, h):
+            return h @ self.weight
+
+        def run_with_cache(self, tokens, names_filter=None):
+            return self(tokens), {names_filter: self._hidden(tokens)}
+
+        def run_with_hooks(self, tokens, fwd_hooks):
+            h = self._hidden(tokens)
+            for name, fn in fwd_hooks:
+                if name != self.hook_name:
+                    raise ValueError(name)
+                h = fn(h, None)
+            return self._out(h)
+
+    model = ModelAdapter(LNModel())
+    sae = LayerNormTopK()
+    site = ActivationSite(0, "blocks.0.hook_mlp_out", position=-1)
+    prompts = ["alpha prompt one", "beta prompt two distinctly longer"]
+    snaps = []
+    for prompt in prompts:
+        snap = capture_features(model, sae, site=site, prompt=prompt)
+        assert snap.ln_mu is not None and snap.ln_std is not None
+        assert not hasattr(sae, "ln_mu") and not hasattr(sae, "ln_std")
+        # Reference encode path (manual) must match TopK feature indices.
+        h = snap.activation.to(dtype=torch.float32).unsqueeze(0)
+        z_ref = sae.encode(h)[0]
+        assert torch.equal(
+            torch.topk(snap.codes.abs(), k=2).indices.sort().values,
+            torch.topk(z_ref.abs(), k=2).indices.sort().values,
+        )
+        # Encode leaves ln_* buffers; clear them like an unused decode would.
+        for name in ("ln_mu", "ln_std"):
+            if hasattr(sae, name):
+                delattr(sae, name)
+        _ = edit_features(sae, snap, replacements={int(snap.codes.abs().argmax()): 0.0})
+        assert not hasattr(sae, "ln_mu") and not hasattr(sae, "ln_std")
+        snaps.append(snap)
+    # Distinct prompts must not share LN stats.
+    assert not torch.allclose(snaps[0].ln_mu, snaps[1].ln_mu) or not torch.allclose(
+        snaps[0].ln_std, snaps[1].ln_std
+    )
+
+
+def test_verify_evidence_fails_on_tampered_checksum(tmp_path):
+    from scripts.phase_d_verify_evidence import verify_checksums
+    final = tmp_path / "final"
+    final.mkdir()
+    f = tmp_path / "notes.txt"
+    f.write_text("ok\n", encoding="utf-8")
+    digest = __import__("hashlib").sha256(b"ok\n").hexdigest()
+    manifest = final / "checksums.sha256"
+    manifest.write_text(f"{digest}  notes.txt\n", encoding="utf-8")
+    assert verify_checksums(manifest, tmp_path) == []
+    f.write_text("tampered\n", encoding="utf-8")
+    errs = verify_checksums(manifest, tmp_path)
+    assert errs and "mismatch" in errs[0]
+
+
+def test_rebuild_canonical_status_is_exactly_48(tmp_path):
+    from saebase.sae.stage_d import rebuild_canonical_status
+    records = build_site_records(load_coverage(CATALOG))
+    update_status(tmp_path, "bogus|extra|L0|blocks.0.hook_resid_pre", {"status": "failed_numeric"})
+    update_status(tmp_path, records[0].key.id, {"status": "pair_verified", "pair_verified": True})
+    payload = rebuild_canonical_status(tmp_path, records)
+    assert payload["n_sites"] == 48
+    assert len(payload["sites"]) == 48
+    assert "bogus|extra|L0|blocks.0.hook_resid_pre" not in payload["sites"]
+    assert (tmp_path / "status_archive_extras.json").exists()

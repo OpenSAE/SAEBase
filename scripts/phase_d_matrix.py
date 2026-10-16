@@ -148,6 +148,8 @@ def main(argv=None) -> int:
     print(json.dumps(summary, indent=2))
     if args.dry_run:
         if args.finalize:
+            from saebase.sae.stage_d import rebuild_canonical_status
+            rebuild_canonical_status(args.output, records)
             matrix = build_final_matrix(args.output, records)
             final_dir = args.output / "final"
             final_dir.mkdir(parents=True, exist_ok=True)
@@ -201,16 +203,33 @@ def main(argv=None) -> int:
                 "cuda_reserved_bytes": reserved,
             }), flush=True)
 
-    if args.finalize or True:
+    if args.finalize:
+        from saebase.sae.stage_d import rebuild_canonical_status
+        rebuild_canonical_status(args.output, records)
         matrix = build_final_matrix(args.output, records)
         final_dir = args.output / "final"
         final_dir.mkdir(parents=True, exist_ok=True)
+        if not matrix.get("stage_d_complete"):
+            # Still write a progress matrix, but refuse a "complete" claim.
+            matrix = dict(matrix)
+            matrix["publication"] = "incomplete"
+            matrix["publication_note"] = (
+                "Gates not met: require 48/48 pair_verified and 48/48 population M3/M4. "
+                f"pair={matrix.get('n_pair_verified')} population={matrix.get('n_population_m3m4')}"
+            )
+        else:
+            matrix = dict(matrix)
+            matrix["publication"] = "complete"
         atomic_json(final_dir / "stage_d_final_matrix.json", matrix)
         summary_md = [
             "# Stage D final matrix",
             "",
             f"Updated: {matrix['updated_at_utc']}",
             f"Sites: {matrix['n_sites']}",
+            f"Publication: {matrix.get('publication')}",
+            f"Pair verified: {matrix.get('n_pair_verified')}/48",
+            f"Population M3/M4: {matrix.get('n_population_m3m4')}/48",
+            f"Smoke-only M3/M4 (historical): {matrix.get('n_smoke_only_m3m4')}",
             "",
             "## Counts",
             "",
@@ -218,9 +237,13 @@ def main(argv=None) -> int:
         for key, value in sorted(matrix["counts"].items()):
             summary_md.append(f"- `{key}`: {value}")
         summary_md.append("")
+        if matrix.get("publication_note"):
+            summary_md.extend(["## Note", "", matrix["publication_note"], ""])
         (final_dir / "stage_d_summary.md").write_text(
             "\n".join(summary_md) + "\n", encoding="utf-8",
         )
+        if not matrix.get("stage_d_complete"):
+            return 1 if failures else 2
     return 1 if failures else 0
 
 

@@ -20,7 +20,13 @@ import torch
 import torch.nn.functional as F
 
 from saebase.api import ActivationSite, FeatureSnapshot, ModelAdapter
-from saebase.api.features import _decode, _sae_dimensions, _sae_input
+from saebase.api.features import (
+    _decode,
+    _layer_norm_stats,
+    _sae_dimensions,
+    _sae_input,
+    _sae_uses_layer_norm,
+)
 from saebase.store import ShardedReader, sha256_state_dict
 from .operators import apply_condition
 from .results import ResultWriter
@@ -222,11 +228,21 @@ class BatchEngine:
                 else:
                     h = h_all[i, sample.patch_position].detach().clone()
                     z = self.sae.encode(_sae_input(self.sae, h).unsqueeze(0))[0]
-                reconstruction = _decode(self.sae, z, self.d_in).to(device=h.device, dtype=h.dtype)
+                ln_mu = ln_std = None
+                if _sae_uses_layer_norm(self.sae):
+                    h_in = _sae_input(self.sae, h).unsqueeze(0)
+                    ln_mu, ln_std = _layer_norm_stats(h_in)
+                    ln_mu, ln_std = ln_mu.detach().clone(), ln_std.detach().clone()
+                reconstruction = _decode(
+                    self.sae, z, self.d_in, ln_mu=ln_mu, ln_std=ln_std, activation=h,
+                ).to(device=h.device, dtype=h.dtype)
                 ret.append(FeatureSnapshot(
                     tokens=torch.tensor([sample.tokens], device=padded.device, dtype=torch.long),
                     site=ActivationSite(self.identity.site.layer, self.identity.site.hook_name, sample.patch_position),
-                    activation=h.detach().clone(), codes=z.detach().clone(), reconstruction=reconstruction.detach().clone()))
+                    activation=h.detach().clone(), codes=z.detach().clone(),
+                    reconstruction=reconstruction.detach().clone(),
+                    ln_mu=ln_mu, ln_std=ln_std,
+                ))
                 bs.append(baseline)
             return ret, bs
         # HFHooksModel only supports single-example forward hook capture/patch.
@@ -240,8 +256,19 @@ class BatchEngine:
                      site=ActivationSite(self.identity.site.layer, self.identity.site.hook_name, s.patch_position), tokens=ids)
             else:
                 h, z = cached
-                reconstructed = _decode(self.sae, z, self.d_in).to(device=h.device, dtype=h.dtype)
-                snapshot = FeatureSnapshot(ids, ActivationSite(self.identity.site.layer,self.identity.site.hook_name,s.patch_position),h,z,reconstructed)
+                ln_mu = ln_std = None
+                if _sae_uses_layer_norm(self.sae):
+                    h_in = _sae_input(self.sae, h).unsqueeze(0)
+                    ln_mu, ln_std = _layer_norm_stats(h_in)
+                    ln_mu, ln_std = ln_mu.detach().clone(), ln_std.detach().clone()
+                reconstructed = _decode(
+                    self.sae, z, self.d_in, ln_mu=ln_mu, ln_std=ln_std, activation=h,
+                ).to(device=h.device, dtype=h.dtype)
+                snapshot = FeatureSnapshot(
+                    ids,
+                    ActivationSite(self.identity.site.layer, self.identity.site.hook_name, s.patch_position),
+                    h, z, reconstructed, ln_mu=ln_mu, ln_std=ln_std,
+                )
             ret.append(snapshot)
             bs.append(self.model.forward_logits(tokens=ids, readout_position=s.readout_index))
         return ret, bs
