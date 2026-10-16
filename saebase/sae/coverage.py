@@ -155,3 +155,48 @@ def load_coverage(path: str | Path) -> CoverageCatalog:
         items["cpu_probe_layers"] = tuple(items["cpu_probe_layers"])
         entries.append(CoverageEntry(**items))
     return CoverageCatalog(tuple(entries))
+
+
+def verify_cpu_sae_evidence(catalog: CoverageCatalog, record: dict[str, Any]) -> dict[str, Any]:
+    """Check a run's *claims* against source identity and real weight proof fields.
+
+    This validates the published record, but independent cryptographic trust
+    also requires the GitHub Actions source commit and artifact provenance.
+    """
+    import math
+    import re
+
+    if not isinstance(record, dict):
+        raise ValueError("CPU SAE evidence must be JSON object")
+    if record.get("schema") != "saebase.coverage.cpu_sae_acceptance.v1":
+        raise ValueError("unrecognized CPU SAE evidence schema")
+    sae_key, layer = record.get("sae_key"), record.get("layer")
+    if not isinstance(sae_key, str) or type(layer) is not int:
+        raise ValueError("CPU SAE evidence identity missing")
+    entry = catalog.find(sae_key)
+    if layer not in entry.cpu_probe_layers:
+        raise ValueError("SAE evidence layer was not selected for CPU verification")
+    if record.get("status") != "sae_checkpoint_verified_only":
+        return {"sae_key":sae_key,"layer":layer,"status":"blocked"}
+    source=entry.source(layer)
+    if record.get("model_sae_pair_verified") is not False or record.get("model_loaded") is not False:
+        raise ValueError("SAE-only evidence cannot assert model-pair verification")
+    if (record.get("model_key")!=entry.model_key or
+        record.get("hook_name")!=source["hook_name"] or
+        record.get("source")!=source):
+        raise ValueError("SAE weight evidence source identity mismatch")
+    digest=record.get("sae_state_sha256")
+    if not isinstance(digest,str) or re.fullmatch(r"[0-9a-f]{64}",digest) is None:
+        raise ValueError("successful SAE evidence must contain full checkpoint SHA256")
+    d_in,d_sae=record.get("d_in"),record.get("d_sae")
+    if (type(d_in) is not int or type(d_sae) is not int or
+        not 0<d_in<d_sae or d_sae>500000):
+        raise ValueError("SAE evidence dimensions invalid")
+    values=record.get("synthetic_probe_l0")
+    mse=record.get("synthetic_probe_reconstruction_mse")
+    if (not isinstance(values,list) or len(values)!=2 or
+        any(type(x) is not int or x<0 or x>d_sae for x in values) or
+        type(mse) not in (int,float) or not math.isfinite(mse) or mse<0):
+        raise ValueError("SAE evidence lacks finite encode/decode probe")
+    return {"sae_key":sae_key,"layer":layer,"status":"sae_checkpoint_verified_only",
+            "sae_state_sha256":digest,"d_in":d_in,"d_sae":d_sae}
