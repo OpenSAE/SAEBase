@@ -212,20 +212,34 @@ jobs:
             --repo "$REPO" --verify-tag --latest \
             --title "SAEBase $TAG" \
             --notes-file "docs/releases/$TAG.md"
-          gh release view "$TAG" --repo "$REPO" --json url,tagName,assets > release-remote.json
+          gh api -X GET "repos/$REPO/releases/tags/$TAG" > release-remote.json
           python - <<'PY'
+          import hashlib
           import json
           import os
           from pathlib import Path
 
           remote = json.loads(Path("release-remote.json").read_text())
-          evidence = json.loads(Path("release/release-evidence.json").read_text())
-          expected = set(evidence["distribution_artifacts"]) | {
-              "SHA256SUMS", "release-evidence.json"
-          }
-          assert remote["tagName"] == "v" + os.environ["VERSION"]
-          assert {a["name"] for a in remote["assets"]} == expected
-          print("Verified release assets:", sorted(expected))
+          evidence_path = Path("release/release-evidence.json")
+          checksums_path = Path("release/SHA256SUMS")
+          evidence = json.loads(evidence_path.read_text())
+          expected = dict(evidence["distribution_artifacts"])
+          for name, path in (
+              ("release-evidence.json", evidence_path),
+              ("SHA256SUMS", checksums_path),
+          ):
+              expected[name] = {
+                  "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                  "bytes": path.stat().st_size,
+              }
+          assets = {a["name"]: a for a in remote["assets"]}
+          assert len(assets) == len(remote["assets"]), "duplicate remote assets"
+          assert remote["tag_name"] == "v" + os.environ["VERSION"]
+          assert set(assets) == set(expected), "release assets missing or extra"
+          for name, proof in expected.items():
+              assert assets[name]["size"] == proof["bytes"], name
+              assert assets[name]["digest"] == "sha256:" + proof["sha256"], name
+          print("Verified remotely published asset sizes and SHA256 digests")
           PY
           test "$(git rev-list -n 1 "$TAG")" = "$SOURCE_SHA"
           echo "Published $TAG at immutable commit $SOURCE_SHA"

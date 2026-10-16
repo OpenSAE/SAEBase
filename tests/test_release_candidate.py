@@ -160,6 +160,7 @@ def test_release_workflow_is_manual_explicit_and_privileged_only_when_publish():
     assert "actions/workflows/ci.yml/runs?" in text
     assert "git ls-remote --tags" in text
     assert "release-evidence.json" in text
+    assert 'assets[name]["digest"] == "sha256:" + proof["sha256"]' in text
 
 
 def test_current_repository_version_and_release_notes_are_coherent():
