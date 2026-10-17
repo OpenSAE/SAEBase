@@ -4,6 +4,6 @@ title: "SAEBase: Research Infrastructure for Sparse Autoencoder Evaluation"
 type: software
 authors:
   - name: "OpenSAE contributors"
-version: 0.2.0
+version: 0.3.0
 repository-code: "https://github.com/OpenSAE/SAEBase"
 license: Apache-2.0
