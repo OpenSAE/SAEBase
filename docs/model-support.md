@@ -5,9 +5,9 @@ SAEBase keeps model definitions separate from SAE checkpoint profiles, experimen
 External model/SAE providers may be registered with the [Third-Party Extension API](extensions.md). Registration and limited tensor probes do not confer the real checkpoint verification reported by Stage D.
 
 <!-- BEGIN VERIFIED_MODEL_SUPPORT -->
-## Current main: Stage D
+## Verified checkpoints and layers
 
-As of 2026-10-16, **48/48** selected model-SAE sites passed real pair acceptance, **48/48** completed the 64-group engineering benchmark and **48/48** completed reliability audits across **18** profiles. See the [per-site verified matrix](verified-model-matrix.md).
+As of 2026-10-16, **18** model-SAE configurations spanning 270M-9B cover **48/48** selected model/layer sites with genuine checkpoint compatibility checks. **48/48** completed benchmark evaluation on 64 held-out prompt groups, and **48/48** completed reliability auditing. See the [per-layer verification reports](verified-model-matrix.md).
 <!-- END VERIFIED_MODEL_SUPPORT -->
 
 ## Historical `v0.2.0` release acceptance
