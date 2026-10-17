@@ -6,8 +6,8 @@ SAEBase integrates the original [SAE Input Localization](https://github.com/Open
 
 ```bash
 python -m pip install git+https://github.com/OpenSAE/SAE-Input-Localization.git
-python examples/17_localization_benchmark.py --dry-run
-python examples/17_localization_benchmark.py --output runs
+python examples/research_integrations/localization_benchmark.py --dry-run
+python examples/research_integrations/localization_benchmark.py --output runs
 ```
 
 The example uses a synthetic model and two SAE checkpoint identities. All eight configurations of three controlled factors are captured and cached, and both scope-curve metrics are generated. This is an engineering demonstration, not the paper's learned-SAE experiment.

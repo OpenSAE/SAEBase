@@ -23,7 +23,7 @@ safety and consistency of advanced generation resource management.
    and `rss.py` from the original checkouts; no automatic downloads or copies.
 4. `examples/07_*`, `08_*` — deterministic standalone offline demonstrations
    and explicit opt-in Pythia acceptance mode.
-5. `examples/09_second_model_smoke.py` — registered Pythia-70M layer 3 and
+5. `examples/quickstart/model_checkpoint_probe.py` — registered Pythia-70M layer 3 and
    Gemma-3 270M layer 5 checkpoint acceptance commands. The latter is an
    additional configured pairing, **not yet a successful downloaded run**.
 6. `saebase/generate` — vLLM cache keys include all engine settings; returned

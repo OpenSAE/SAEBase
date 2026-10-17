@@ -5,7 +5,7 @@ SAEBase can prepare a complete binary input experiment, collect its model activa
 ## Offline example
 
 ```bash
-python examples/16_controlled_input_design.py
+python examples/research_integrations/controlled_inputs.py
 ```
 
 The example defines three binary factors, evaluates all eight input states with a small synthetic model, encodes one SAE, and reuses the identical activation/code cache for an XOR state permutation. It writes a checked design manifest alongside the existing activation store.

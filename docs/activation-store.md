@@ -10,7 +10,7 @@ Complete binary input experiments and their checked cache sidecars are described
 
 ```bash
 python -m pip install -e '.[dev]'
-python examples/10_activation_store_offline.py
+python examples/activations/activation_store.py
 python -m pytest -q tests/test_m1_store.py
 ```
 

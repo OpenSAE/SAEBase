@@ -15,9 +15,7 @@ python -m pip check
 saebase-check-env --mode core
 ~~~
 
-The public `v0.2.0` wheel is an older release. Current
-development features such as `saebase.extensions` require installing
-from the repository checkout until a newer version is published.
+The current [v0.3.0 release](https://github.com/OpenSAE/SAEBase/releases/tag/v0.3.0) includes the external-extension API. Install the released source package or use a checkout for examples.
 
 ## Missing optional libraries
 
@@ -40,7 +38,7 @@ you run the example from the checked-out repository root:
 
 ~~~bash
 python -m pip show opensae-saebase
-python examples/19_first_experiment_offline.py --dry-run
+python examples/quickstart/first_experiment.py --dry-run
 ~~~
 
 For an existing editable checkout, reinstall with `python -m pip

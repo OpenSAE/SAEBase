@@ -9,7 +9,7 @@ SAEBase provides common capture, feature-edit and benchmark infrastructure while
 SAEBase captures the relevant model activations and downstream readouts, constructs coalition measurements, and delegates the estimator to the original `sar.py`. The adapter does not redefine SAR or manufacture third-order estimator outputs; the original SAR reference fits first- and second-order approximations.
 
 ```bash
-python examples/07_sar_via_saebase.py --paper-dir /path/to/SAR-repo
+python examples/research_integrations/sar.py --paper-dir /path/to/SAR-repo
 ```
 
 The demo uses deterministic synthetic inputs unless a real checkpoint run is explicitly requested.
@@ -21,7 +21,7 @@ The demo uses deterministic synthetic inputs unless a real checkpoint run is exp
 SAEBase keeps clean, selection and held-out variants separate. Selection and evaluation have distinct identities; the adapter verifies that supplied text matches the declared token IDs and calls the original `rss.py` implementation.
 
 ```bash
-python examples/08_rss_via_saebase.py --paper-dir /path/to/RSS-repo
+python examples/research_integrations/rss.py --paper-dir /path/to/RSS-repo
 ```
 
 Do not interpret a held-out statistic as a selection result or treat repeated variants as independent prompt groups.
@@ -39,8 +39,8 @@ Install the original project separately:
 
 ```bash
 python -m pip install git+https://github.com/OpenSAE/SAE-Input-Localization.git
-python examples/15_input_localization_via_saebase.py
-python examples/16_controlled_input_design.py
+python examples/research_integrations/input_localization.py
+python examples/research_integrations/controlled_inputs.py
 ```
 
 See [Controlled Input Designs](controlled-inputs.md) for enumeration, bijective reindexing, and sidecar provenance. The original estimators also run through [Localize Benchmarking](localization-benchmark.md), with versioned full curves and finite-pair reliability analysis.

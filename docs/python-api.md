@@ -36,7 +36,7 @@ result = evaluate_edit(pair.model, pair.sae, site=pair.site,
 print(result.logit_delta.float().norm())
 ```
 
-This example downloads real checkpoints. Use `python examples/05_public_api_offline.py` first if you only need to inspect the API behavior.
+This example downloads real checkpoints. Use `python examples/quickstart/public_api_offline.py` first if you only need to inspect the API behavior.
 
 Feature editing uses `h' = h + decode(z') - decode(z)` and therefore preserves the original reconstruction residual. Full SAE reconstruction replacement is a separate intervention condition.
 
@@ -100,5 +100,5 @@ The `saebase-audit --m3-root` flag name is unchanged for backward compatibility.
 
 `saebase.data` supplies `BinaryFactor`, `ControlledInputDesign`, `collect_controlled_input_activations` and checked sidecar manifests for complete binary input experiments. Use `saebase.integrations.collect_localization_grid(..., design=...)` or `localization_grid_from_code_store(..., manifest=...)` to hand these inputs to the original Localize estimator.
 
-[Controlled Input Designs](controlled-inputs.md) · [Offline example](../examples/16_controlled_input_design.py)
+[Controlled Input Designs](controlled-inputs.md) · [Offline example](../examples/research_integrations/controlled_inputs.py)
 

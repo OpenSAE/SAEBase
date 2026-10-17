@@ -2,7 +2,7 @@
 
 A passing probe checks one actual checkpoint and hook, not population
 reliability or general checkpoint certification. Float32 matches the
-declared external SAE contract; Stage D uses a separate bfloat16 profile.
+declared external SAE contract; the built-in verification profile uses bfloat16.
 """
 
 from __future__ import annotations

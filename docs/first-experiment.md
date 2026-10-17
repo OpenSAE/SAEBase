@@ -25,7 +25,7 @@ does not require the optional Hugging Face/SAE Lens analysis dependencies.
 First, inspect the bounded experiment plan:
 
 ~~~bash
-python examples/19_first_experiment_offline.py --dry-run
+python examples/quickstart/first_experiment.py --dry-run
 ~~~
 
 This prints its deterministic run ID, two model–SAE evaluations, eight
@@ -35,7 +35,7 @@ It does not write files or download model weights.
 Run the same experiment and keep the results:
 
 ~~~bash
-python examples/19_first_experiment_offline.py --output runs/first-experiment
+python examples/quickstart/first_experiment.py --output runs/first-experiment
 ~~~
 
 The command prints JSON with the exact paths. Open the `report_html`

@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import sys
 import tempfile
 from pathlib import Path
 
 import torch
 
-from _synthetic_common import ResearchToyModel, ResearchToySAE
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ActivationSite
 from saebase.benchmarks import BenchmarkConfig, MetricSpec, build_plan
 from saebase.benchmarks.runner import execute

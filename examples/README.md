@@ -1,102 +1,50 @@
 # SAEBase Examples
 
-This index groups executable examples by **what a researcher wants to do** rather than their file creation order. Numbered filenames are retained for reproducibility and backward compatibility.
-
-## First experiment with saved results
-
-Start with one command that writes a versioned benchmark report, a CSV summary, a reliability audit and reusable activation/intervention caches:
+Runnable examples are organized by **research task**, not implementation order. Start from the repository root with Python 3.11 or 3.12 and a source installation:
 
 ```bash
-python examples/19_first_experiment_offline.py --output runs/first-experiment
+python -m pip install -e .
+python examples/quickstart/first_experiment.py --output runs/first-experiment
 ```
 
-The [first experiment walkthrough](../docs/first-experiment.md) explains the generated files and identity-checked resume. The example uses a deterministic synthetic model and two toy SAE weights, so no checkpoint download or GPU is needed.
+The first experiment writes an HTML report, metric summaries, and a reliability audit without downloading pretrained weights. Examples involving real checkpoints require the optional `.[analysis]` dependencies and the upstream model/SAE weights.
 
-## Learn the public API
+## Choose a task
 
-| Example | What it demonstrates | Requires real weights? |
+| Task | Examples | Start here |
 | --- | --- | --- |
-| [`01_load_model.py`](01_load_model.py) | Registered model loading | Depending on execution |
-| [`02_load_sae.py`](02_load_sae.py) | SAE loading and checkpoint profiles | Depending on execution |
-| [`03_load_prompts.py`](03_load_prompts.py) | Prompt preparation and access | Depends on prepared inputs |
-| [`05_public_api_offline.py`](05_public_api_offline.py) | ModelAdapter, activation capture, feature edits and logit comparison | No |
-| [`06_public_api_pythia.py`](06_public_api_pythia.py) | The same public API with a genuine Pythia checkpoint | Yes |
+| [Quickstart](quickstart/README.md) | Load models, SAEs and prompts; use the API; complete a first experiment | [First experiment](quickstart/first_experiment.py) |
+| [Activations](activations/README.md) | Capture activations, reuse encoded features and inspect activation health | [Activation store](activations/activation_store.py) |
+| [Interventions](interventions/README.md) | Remove or edit SAE features and inspect downstream effects | [Batch interventions](interventions/batch_interventions.py) |
+| [Benchmarking & reliability](benchmarking/README.md) | Inspect workload, bootstrap results and run ground-truth controls | [Benchmark preflight](benchmarking/benchmark_preflight.py) |
+| [Research integrations](research_integrations/README.md) | SAR, RSS, Input Localization and controlled input designs | [Integration index](research_integrations/README.md) |
+| [Third-party extensions](extensions/README.md) | Register external model/SAE/metric providers and probe a real Qwen checkpoint | [Offline external providers](extensions/external_providers.py) |
 
-Start here without downloading weights:
-
-```bash
-python examples/05_public_api_offline.py
-```
-
-## Activation inspection and caching
-
-| Example | What it demonstrates |
-| --- | --- |
-| [`04_run_activation_health.sh`](04_run_activation_health.sh) | Activation-health task |
-| [`10_activation_store_offline.py`](10_activation_store_offline.py) | Verified activation/code shards and resuming previously captured data |
-| [`16_controlled_input_design.py`](16_controlled_input_design.py) | Enumerated binary factor grid, cached activations, bijective state reindexing, and Localize handoff |
+### First, run an offline experiment
 
 ```bash
-python examples/10_activation_store_offline.py
-python examples/16_controlled_input_design.py
+python examples/quickstart/first_experiment.py --dry-run
+python examples/quickstart/first_experiment.py --output runs/first-experiment
 ```
 
-## Interventions and downstream behavior
+See the [first-experiment walkthrough](../docs/first-experiment.md) for the resulting cache, benchmark report, and reliability audit. All numbers in this example come from **synthetic toy weights**, not published research findings.
 
-| Example | What it demonstrates |
-| --- | --- |
-| [`11_batch_interventions_offline.py`](11_batch_interventions_offline.py) | Batch feature conditions, raw measurements and steering reference |
-| [`06_public_api_pythia.py`](06_public_api_pythia.py) | Feature removal and downstream logit differences on actual weights |
+### Then explore individual capabilities
 
 ```bash
-python examples/11_batch_interventions_offline.py
+python examples/quickstart/public_api_offline.py
+python examples/activations/activation_store.py
+python examples/interventions/batch_interventions.py
+python examples/benchmarking/reliability_bootstrap.py
+python examples/benchmarking/ground_truth_controls.py
 ```
 
-## Benchmarks, reliability and synthetic controls
+Run a real checkpoint only after installing `.[analysis]` and reviewing the relevant project's access and hardware requirements.
 
-| Example | What it demonstrates |
-| --- | --- |
-| [`12_benchmark_offline.py`](12_benchmark_offline.py) | Read-only benchmark preflight and compute budget |
-| [`13_reliability_offline.py`](13_reliability_offline.py) | Prompt-group bootstrap and paired SAE comparisons |
-| [`14_ground_truth_offline.py`](14_ground_truth_offline.py) | Known synthetic factors, interaction truth and invariance controls |
-| [`09_second_model_smoke.py`](09_second_model_smoke.py) | Explicit opt-in secondary model/checkpoint loading |
+The shared `_synthetic_common.py` helper is used by multiple offline examples and existing tests. It is not an independent command-line example.
 
-```bash
-python examples/12_benchmark_offline.py
-python examples/13_reliability_offline.py
-python examples/14_ground_truth_offline.py
-```
+## Source releases and compatibility
 
-## Integrate published research
+The original numbered paths remain accessible in the immutable [v0.3.0 GitHub release](https://github.com/OpenSAE/SAEBase/releases/tag/v0.3.0) and its source archive. **The current `main` branch uses the task-based paths above.** Public package APIs, CLIs, verification records and existing release tags are unchanged.
 
-| Example | What it demonstrates |
-| --- | --- |
-| [`07_sar_via_saebase.py`](07_sar_via_saebase.py) | Coalition interventions and the unchanged external SAR estimator |
-| [`08_rss_via_saebase.py`](08_rss_via_saebase.py) | Clean, selection and held-out features with the unchanged RSS estimator |
-| [`15_input_localization_via_saebase.py`](15_input_localization_via_saebase.py) | Complete controlled input grid and original optimal Localize scope curve |
-| [`17_localization_benchmark.py`](17_localization_benchmark.py) | End-to-end Localize Benchmark with full curve artifacts and M4 stability audit |
-
-The SAR/RSS examples need their original research estimator repositories. The Localize example needs the independent `sae-input-localization` package installed from [OpenSAE/SAE-Input-Localization](https://github.com/OpenSAE/SAE-Input-Localization). Their defaults use synthetic demonstration data; real checkpoint runs are opt-in. `17_localization_benchmark.py` additionally needs the installed original Localize package and writes complete M3/M4 reports.
-
-## Use third-party models and benchmarks
-
-| Example | What it demonstrates | Requires real weights? |
-| --- | --- | --- |
-| [`18_external_extensions_offline.py`](18_external_extensions_offline.py) | Opt-in model/SAE providers, source-hashed benchmark and identity patch checks | No |
-| [`19_external_qwen3_1_7b_l7.py`](19_external_qwen3_1_7b_l7.py) | Real Qwen3-1.7B checkpoint interoperability at layer 7, with exact source revisions and feature ablation | Yes |
-| [`19_first_experiment_offline.py`](19_first_experiment_offline.py) | Persistent benchmark, shared caches, reliability and HTML report | No |
-
-The Qwen3 example requires model and SAE weight downloads and checks one specific checkpoint/layer rather than general extension compatibility. See [Third-Party Extensions](../docs/extensions.md) for the provider API and [Verified Model and SAE Coverage](../docs/verified-model-matrix.md) for broader compatibility records.
-
-## A real multi-checkpoint benchmark
-
-For an end-to-end, versioned validation of Pythia-70M and GPT-2 Small with two public SAEs each, use the stable command-line interface rather than an extra ad hoc example:
-
-```bash
-saebase-release-matrix --config conf/release/m5_matrix.json --dry-run
-saebase-release-matrix --config conf/release/m5_matrix.json --real --device cpu
-```
-
-Real weights are downloaded on demand and are not included in the SAEBase package. Small smoke-test results should not be interpreted as a general ranking of SAE quality.
-
-[Documentation Index](../docs/index.md) · [Getting Started](../docs/getting-started.md) · [Python API](../docs/python-api.md)
+[Getting Started](../docs/getting-started.md) · [Documentation](../docs/index.md) · [Python API](../docs/python-api.md)

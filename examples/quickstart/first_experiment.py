@@ -1,7 +1,7 @@
-"""First SAEBase experiment: two toy SAEs, one model, M3 and M4 reports.
+"""First SAEBase experiment: two toy SAEs, one model, benchmark and reliability reports.
 
 Run after installing SAEBase in a checkout:
-    python examples/19_first_experiment_offline.py --output runs/first-experiment
+    python examples/quickstart/first_experiment.py --output runs/first-experiment
 
 All data and checkpoints in this example are synthetic and CPU-only.
 """
@@ -10,12 +10,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 
 import torch
 
-from _synthetic_common import ResearchToyModel, ResearchToySAE
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ActivationSite, ModelAdapter
 from saebase.benchmarks import BenchmarkConfig, build_plan
 from saebase.benchmarks.report import write_report

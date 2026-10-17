@@ -38,13 +38,13 @@ print(result.logit_delta.shape)
 **Offline example (synthetic, runnable without weights):**
 
 ```bash
-python examples/05_public_api_offline.py
+python examples/quickstart/public_api_offline.py
 ```
 
 **Real checkpoint integration smoke (requires model downloads):**
 
 ```bash
-python examples/06_public_api_pythia.py
+python examples/interventions/pythia_feature_edit.py
 ```
 
 ## Core contracts
@@ -156,13 +156,13 @@ Standard check:
 
 ```bash
 python -m pytest -q
-python examples/05_public_api_offline.py
+python examples/quickstart/public_api_offline.py
 ```
 
 Integration check with published weights:
 
 ```bash
-python examples/06_public_api_pythia.py
+python examples/interventions/pythia_feature_edit.py
 bash scripts/phase_a_smoke.sh
 ```
 

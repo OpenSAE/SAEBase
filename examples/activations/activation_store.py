@@ -1,9 +1,9 @@
-"""M1 offline cache demonstration. All values are from a small synthetic model."""
+"""Offline activation-store demonstration. All values are from a small synthetic model."""
 from pathlib import Path
 import tempfile
 import sys
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import numpy as np
 import torch

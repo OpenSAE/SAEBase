@@ -13,7 +13,7 @@ modified here.**
 From a checkout containing the original `sar.py`:
 
 ```bash
-python examples/07_sar_via_saebase.py --paper-dir /path/to/SAR-repo
+python examples/research_integrations/sar.py --paper-dir /path/to/SAR-repo
 ```
 
 This captures one prompt/site, selects the K largest absolute SAE codes,
@@ -35,7 +35,7 @@ coalition experiments will need optimized batching.
 From a checkout containing the original `rss.py`:
 
 ```bash
-python examples/08_rss_via_saebase.py --paper-dir /path/to/RSS-repo
+python examples/research_integrations/rss.py --paper-dir /path/to/RSS-repo
 ```
 
 The bridge captures clean, selection and held-out variants separately.
@@ -63,8 +63,8 @@ Real checkpoint commands (downloads require the requested model and SAE
 sources and any required access approval):
 
 ```bash
-python examples/09_second_model_smoke.py --model pythia70m --device cpu
-python examples/09_second_model_smoke.py --model gemma270m --device cpu
+python examples/quickstart/model_checkpoint_probe.py --model pythia70m --device cpu
+python examples/quickstart/model_checkpoint_probe.py --model gemma270m --device cpu
 ```
 
 The default SAE and layer can be overridden only with a registered and
