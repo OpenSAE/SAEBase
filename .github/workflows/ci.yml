@@ -61,13 +61,13 @@ jobs:
           saebase-check-env --mode core
           python -m saebase.sae.verify_registry --list
       - name: Run offline public API example
-        run: python examples/05_public_api_offline.py
+        run: python examples/quickstart/public_api_offline.py
       - name: Run persistent first experiment and reliability audit
-        run: python examples/19_first_experiment_offline.py --output "$RUNNER_TEMP/saebase-first-experiment"
+        run: python examples/quickstart/first_experiment.py --output "$RUNNER_TEMP/saebase-first-experiment"
       - name: Run external extension demo without model downloads
-        run: python examples/18_external_extensions_offline.py
+        run: python examples/extensions/external_providers.py
       - name: Run controlled input cache example
-        run: python examples/16_controlled_input_design.py
+        run: python examples/research_integrations/controlled_inputs.py
       - name: Validate installed wheel outside checkout
         run: |
           python -m build --wheel
@@ -133,7 +133,7 @@ jobs:
       - name: Run original-estimator benchmark acceptance
         run: python -m pytest -q tests/test_m3_localization.py -k native
       - name: Run full Localize benchmark and reliability demo
-        run: python examples/17_localization_benchmark.py --output "$(mktemp -d)"
+        run: python examples/research_integrations/localization_benchmark.py --output "$(mktemp -d)"
 
   quality:
     runs-on: ubuntu-latest

@@ -11,7 +11,7 @@ The extension API is included in **SAEBase v0.3.0**. Install the published relea
 From the repository checkout, run:
 
 ~~~bash
-python examples/18_external_extensions_offline.py
+python examples/extensions/external_providers.py
 ~~~
 
 This tiny synthetic example registers a model, SAE and external metric,

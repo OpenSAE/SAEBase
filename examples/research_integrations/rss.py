@@ -1,7 +1,7 @@
 """RSS via SAEBase captures + the unchanged original RSS implementation.
 
-Toy: python examples/08_rss_via_saebase.py --paper-dir /path/to/rss-repo
-Real: python examples/08_rss_via_saebase.py --paper-dir /path/to/rss-repo --real
+Toy: python examples/research_integrations/rss.py --paper-dir /path/to/rss-repo
+Real: python examples/research_integrations/rss.py --paper-dir /path/to/rss-repo --real
 
 Selection and held-out variants are distinct. Toy output is synthetic.
 """
@@ -12,7 +12,7 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from saebase.api import ActivationSite, ModelAdapter, load_registered
 from saebase.integrations import collect_rss_features, evaluate_rss, load_paper_module
 

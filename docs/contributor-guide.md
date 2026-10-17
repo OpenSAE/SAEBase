@@ -15,7 +15,7 @@ For a first pull request, good entry points are:
 | Area | Where to start | How to verify |
 | --- | --- | --- |
 | Documentation or tutorial | `docs/`, `examples/README.md` | `python scripts/check_documentation.py --check` |
-| Beginner offline examples | `examples/`, `tests/` | Run the example and its targeted test |
+| Beginner offline examples | `examples/quickstart/`, `tests/` | Run the example and its targeted test |
 | Model/SAE metadata checks | `saebase/sae/` and `saebase/extensions/` | Test hook, dtype, shape and revision mismatch cases |
 | Cache and experiment integrity | `saebase/store/`, `saebase/benchmarks/` | Use synthetic fixtures; assert corrupted identities are rejected |
 
@@ -29,7 +29,7 @@ estimators stay in their respective source repositories.
 git clone https://github.com/OpenSAE/SAEBase.git
 cd SAEBase
 python -m pip install -e ".[dev,quality]"
-python examples/19_first_experiment_offline.py --dry-run
+python examples/quickstart/first_experiment.py --dry-run
 python scripts/check_documentation.py --check
 python -m pytest -q
 ~~~

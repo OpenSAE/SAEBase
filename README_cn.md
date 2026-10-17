@@ -75,7 +75,7 @@ python -m pip install -e ".[analysis]"
 **1. 不下载 checkpoint，先体验公共 API：**
 
 ```bash
-python examples/05_public_api_offline.py
+python examples/quickstart/public_api_offline.py
 ```
 
 示例使用小型合成模型与 SAE，演示激活提取、特征编辑、identity 检查和 logits 对比。示例数值不属于真实研究结果。
@@ -83,7 +83,7 @@ python examples/05_public_api_offline.py
 如果希望一次运行就生成完整的 Benchmark 和 Reliability 报告，可以执行：
 
 ```bash
-python examples/19_first_experiment_offline.py --output runs/first-experiment
+python examples/quickstart/first_experiment.py --output runs/first-experiment
 ```
 
 运行结束后参见[完整入门实验](docs/first-experiment.md)，查看保存的指标、缓存和比较报告。
@@ -123,7 +123,7 @@ saebase-benchmark --config conf/benchmark/p0_small.json --report-only
 在同一个模型和 hook 上提取一次激活，即可在多个 SAE checkpoint 之间共享缓存。每份记录都包含模型与 tokenizer 身份、token 位置、`sample_id`、`prompt_group_id`、数据 split 与激活校验和；SAE 编码以无损 Dense 或 CSR 格式单独保存。
 
 ```bash
-python examples/10_activation_store_offline.py
+python examples/activations/activation_store.py
 ```
 
 Reader 验证 manifest 和分片的完整性，中断后可以从已提交的激活继续，而非重复运行整个模型。缓存复用要求模型、位置和输入身份精确一致，不会只根据文件名猜测。参见[Activation Store](docs/activation-store.md)。
@@ -142,7 +142,7 @@ edited_activation = original_activation + decode(edited_codes) - decode(original
 
 ```bash
 saebase-intervene --config conf/interventions/m2_pythia_example.json --dry-run
-python examples/11_batch_interventions_offline.py
+python examples/interventions/batch_interventions.py
 ```
 
 真实权重执行需要显式提供 `--real`。短文本 Steering 使用完整前缀重新计算作为参考，不宣称已有 KV cache 或 GPU 吞吐加速。参见[特征干预](docs/feature-interventions.md)。
@@ -162,7 +162,7 @@ Benchmark 根据版本化配置规划模型、SAE 与指标，复用精确校验
 
 ```bash
 saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
-python examples/12_benchmark_offline.py
+python examples/benchmarking/benchmark_preflight.py
 ```
 
 SAEBase 的逐 token FVU 不应直接视为与 SAEBench 全局重构协议数值等价。原生 SAEBench 指标从**上游已经生成的 JSON** 导入，Benchmark Importer 不会自动重新运行全部上游评估。参见[基准评估](docs/benchmarking.md)。
@@ -174,8 +174,8 @@ SAEBase 的逐 token FVU 不应直接视为与 SAEBench 全局重构协议数值
 可靠性审计复用已有测量，以完整的 **prompt group** 作为独立重采样单位，保证相同 prompt 的 token 或变体不会被错误视为独立样本。支持 Paired Confidence Intervals、样本量敏感性、合理方向指标的排名稳定性及明确的 undefined/unsupported 结果。
 
 ```bash
-python examples/13_reliability_offline.py
-python examples/14_ground_truth_offline.py
+python examples/benchmarking/reliability_bootstrap.py
+python examples/benchmarking/ground_truth_controls.py
 ```
 
 对已完成的 Benchmark 可执行 `saebase-audit --m3-root runs/<run_id> --config conf/reliability/m4_pythia_smoke.json --run --sae-only`。这里应使用对应的多 prompt Benchmark 结果。其中 `--m3-root` 为保持兼容性保留的 CLI 参数，含义是 Benchmark 结果目录，不代表用户必须理解某个开发阶段。
@@ -190,21 +190,21 @@ SAEBase 提供公共模型操作；各研究项目保留自身的原始指标定
 
 | 项目 | SAEBase 接入方式 | 示例 |
 | :--- | :--- | :--- |
-| 🧩 **[SAR — 行为组合性](https://github.com/OpenSAE/SAE-Behavioral-Compositionality)** | 提取特征贡献、执行 Coalition 编辑、调用未经改写的 SAR 估计器。 | [SAR 示例](examples/07_sar_via_saebase.py) |
-| 🔀 **[RSS — 表征重分布](https://github.com/OpenSAE/Redistribution-Sensitivity-Score)** | 分别提取 Clean、Selection、Held-out 数据，调用未经改写的 RSS 估计器。 | [RSS 示例](examples/08_rss_via_saebase.py) |
-| 🧭 **[Input Localization](https://github.com/OpenSAE/SAE-Input-Localization)** | 在完整受控输入网格上采集或复用 SAE 激活，并调用原始 Localize 算法计算最优 Input Scope Curve。 | [Localize 示例](examples/15_input_localization_via_saebase.py) |
+| 🧩 **[SAR — 行为组合性](https://github.com/OpenSAE/SAE-Behavioral-Compositionality)** | 提取特征贡献、执行 Coalition 编辑、调用未经改写的 SAR 估计器。 | [SAR 示例](examples/research_integrations/sar.py) |
+| 🔀 **[RSS — 表征重分布](https://github.com/OpenSAE/Redistribution-Sensitivity-Score)** | 分别提取 Clean、Selection、Held-out 数据，调用未经改写的 RSS 估计器。 | [RSS 示例](examples/research_integrations/rss.py) |
+| 🧭 **[Input Localization](https://github.com/OpenSAE/SAE-Input-Localization)** | 在完整受控输入网格上采集或复用 SAE 激活，并调用原始 Localize 算法计算最优 Input Scope Curve。 | [Localize 示例](examples/research_integrations/input_localization.py) |
 | 📊 **[SAEBench](https://github.com/adamkarvonen/SAEBench)** | 将选定的原生 Core/Sparse Probing 结果与模型、SAE 身份和上游 commit 对齐后导入。 | [Benchmark 文档](docs/benchmarking.md) |
 
 ```bash
-python examples/07_sar_via_saebase.py --paper-dir /path/to/SAR-repo
-python examples/08_rss_via_saebase.py --paper-dir /path/to/RSS-repo
+python examples/research_integrations/sar.py --paper-dir /path/to/SAR-repo
+python examples/research_integrations/rss.py --paper-dir /path/to/RSS-repo
 ```
 
 两个示例默认采用确定性的合成输入；真实 checkpoint 使用需要明确启用。参见[研究项目集成](docs/research-integrations.md)。
 
 ---
 
-受控输入网格与缓存复用可运行 `python examples/16_controlled_input_design.py`，接口参见[受控输入设计文档](docs/controlled-inputs.md)；Benchmark、Scope Curve 存储和可靠性分析详见 [Localization Benchmark](docs/localization-benchmark.md)。
+受控输入网格与缓存复用可运行 `python examples/research_integrations/controlled_inputs.py`，接口参见[受控输入设计文档](docs/controlled-inputs.md)；Benchmark、Scope Curve 存储和可靠性分析详见 [Localization Benchmark](docs/localization-benchmark.md)。
 
 ---
 
@@ -219,7 +219,7 @@ pair = load_registered(model_key="pythia70m",
                        sae_key="pythia70m_resid_sm", layer=3, device="cpu")
 snapshot = capture_features(pair.model, pair.sae,
                             site=pair.site, prompt="Alice Emma Alice")
-# 完整的特征干预代码参见 examples/06_public_api_pythia.py。
+# 完整的特征干预代码参见 examples/interventions/pythia_feature_edit.py。
 ```
 
 以上代码会下载真实权重；如需无网络启动，请先执行离线示例。参见[Python API 指南](docs/python-api.md)、[API Reference](docs/API.md) 和[Examples 索引](examples/README.md)。

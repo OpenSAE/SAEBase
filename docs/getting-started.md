@@ -17,7 +17,7 @@ This installs the core APIs and CPU-only examples. Use `python -m pip install -e
 Run the [first experiment](first-experiment.md) to create benchmark and reliability results in one directory:
 
 ```bash
-python examples/19_first_experiment_offline.py --output runs/first-experiment
+python examples/quickstart/first_experiment.py --output runs/first-experiment
 ```
 
 The command prints the location of a standalone HTML report, CSV summaries and verified JSON/manifest files. You can rerun it to verify and resume the same experiment. It uses two synthetic SAEs and no downloads.
@@ -25,9 +25,9 @@ The command prints the location of a standalone HTML report, CSV summaries and v
 To explore individual capabilities instead:
 
 ```bash
-python examples/05_public_api_offline.py
+python examples/quickstart/public_api_offline.py
 saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
-python examples/10_activation_store_offline.py
+python examples/activations/activation_store.py
 ```
 
 The first example uses an explicitly synthetic model/SAE to demonstrate capture, editing and logits. The benchmark preflight checks workload and identities without downloading checkpoints. The third example creates and reuses a sharded activation/code store offline.
@@ -44,7 +44,7 @@ The configuration identifies a real Pythia-70M model/SAE pair and a small fixed-
 For a real feature-edit example:
 
 ```bash
-python examples/06_public_api_pythia.py
+python examples/interventions/pythia_feature_edit.py
 ```
 
 ## Prepare your own prompt artifacts

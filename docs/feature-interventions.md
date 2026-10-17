@@ -8,7 +8,7 @@ The intervention engine builds on verified model/SAE adapters and the resumable 
 
 ```bash
 python -m pip install -e '.[dev]'
-python examples/11_batch_interventions_offline.py
+python examples/interventions/batch_interventions.py
 python -m pytest -q tests/test_m2_interventions.py
 ```
 

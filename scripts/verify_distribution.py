@@ -64,7 +64,7 @@ NEEDED_SDIST = NEEDED_WHEEL | {
     "docs/RELEASE_CHECKLIST.md", "docs/PROVENANCE.md", "docs/API.md",
     "tests/test_phase_a.py", "tests/test_phase_d.py",
     "tests/test_m1_store.py", "tests/test_m2_interventions.py", "tests/fixtures/m0_reference_public.json",
-    "docs/M1_ACTIVATION_STORE.md", "examples/10_activation_store_offline.py",
+    "docs/M1_ACTIVATION_STORE.md", "examples/activations/activation_store.py",
     ".github/workflows/real-smoke.yml",
     ".github/workflows/research-regression.yml",
     ".github/workflows/upstream-compatibility.yml",
@@ -72,15 +72,15 @@ NEEDED_SDIST = NEEDED_WHEEL | {
     "scripts/release_candidate.py",
     "docs/release-process.md", "tests/test_release_candidate.py",
     "docs/extensions.md", "tests/test_external_extensions.py",
-    "examples/18_external_extensions_offline.py",
+    "examples/extensions/external_providers.py",
     "docs/first-experiment.md", "docs/troubleshooting.md",
     "docs/contributor-guide.md", "docs/maintainer-workflow.md",
     "scripts/check_documentation.py", "tests/test_developer_experience.py",
-    "examples/19_first_experiment_offline.py",
+    "examples/quickstart/first_experiment.py",
     ".github/ISSUE_TEMPLATE/model_sae_support.yml",
     ".github/ISSUE_TEMPLATE/feature_request.yml",
     "docs/M2_BATCH_INTERVENTIONS.md",
-    "scripts/m2_real_smoke.py", "examples/11_batch_interventions_offline.py",
+    "scripts/m2_real_smoke.py", "examples/interventions/batch_interventions.py",
 }
 BAD_PARTS = {"__pycache__", ".pytest_cache", ".venv", ".git"}
 BAD_TOP_LEVEL = {"experiment", "data", "dist", "build"}

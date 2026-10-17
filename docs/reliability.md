@@ -12,7 +12,7 @@ For example:
 
 ```bash
 python -m pip install -e '.[dev]'
-python examples/13_reliability_offline.py
+python examples/benchmarking/reliability_bootstrap.py
 saebase-benchmark --config conf/benchmark/m4_pythia_three_groups.json --dry-run
 saebase-benchmark --config conf/benchmark/m4_pythia_three_groups.json --real --output runs
 RUNID=$(python -c 'from saebase.benchmarks import load_config;print(load_config("conf/benchmark/m4_pythia_three_groups.json").run_id)')

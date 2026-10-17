@@ -4,9 +4,9 @@ Install first:
     pip install git+https://github.com/OpenSAE/SAE-Input-Localization.git
 
 Run:
-    python examples/17_localization_benchmark.py --output runs
+    python examples/research_integrations/localization_benchmark.py --output runs
 
-No pretrained model download. Outputs a real SAEBase M3 report and M4 audit
+No pretrained model download. Outputs an SAEBase benchmark report and reliability audit
 computed with the original independent Localize estimators.
 """
 from __future__ import annotations
@@ -18,7 +18,7 @@ from pathlib import Path
 from types import SimpleNamespace
 import sys
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import torch
 

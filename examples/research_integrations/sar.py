@@ -1,7 +1,7 @@
 """SAR via SAEBase + the original paper estimator (offline toy or real checkpoint).
 
-Toy:  python examples/07_sar_via_saebase.py --paper-dir /path/to/sar-repo
-Real: python examples/07_sar_via_saebase.py --paper-dir /path/to/sar-repo --real
+Toy:  python examples/research_integrations/sar.py --paper-dir /path/to/sar-repo
+Real: python examples/research_integrations/sar.py --paper-dir /path/to/sar-repo --real
 
 Real run downloads weights. The toy example is synthetic, not a paper result.
 """
@@ -12,7 +12,7 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from saebase.api import ActivationSite, ModelAdapter, load_registered
 from saebase.integrations import evaluate_sar, load_paper_module
 

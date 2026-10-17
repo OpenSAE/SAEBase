@@ -1,7 +1,7 @@
 """Full offline controlled-input workflow with reusable SAEBase caches.
 
-    python examples/16_controlled_input_design.py
-    python examples/16_controlled_input_design.py --evaluate
+    python examples/research_integrations/controlled_inputs.py
+    python examples/research_integrations/controlled_inputs.py --evaluate
 
 The optional --evaluate mode requires the original sae_localize package:
     pip install git+https://github.com/OpenSAE/SAE-Input-Localization.git
@@ -18,7 +18,7 @@ from tempfile import TemporaryDirectory
 
 import torch
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ActivationSite, ModelAdapter

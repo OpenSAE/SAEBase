@@ -1,6 +1,6 @@
 """Real checkpoint Phase B smoke, needs model/SAE dependencies and downloads.
 
-Run: python examples/06_public_api_pythia.py
+Run: python examples/interventions/pythia_feature_edit.py
 On real checkpoints this checks a baseline identity patch, SAE feature removal,
 and prints a reproducible model/SAE record and observed logit-change summary.
 """
@@ -10,7 +10,7 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from saebase.api import capture_features, coalition_replacements, evaluate_edit, load_registered
 

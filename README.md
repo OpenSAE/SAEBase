@@ -75,7 +75,7 @@ For tests and packaging, install `.[dev]`. Optional experimental GPU generation 
 **1. Explore the public API without downloading checkpoints:**
 
 ```bash
-python examples/05_public_api_offline.py
+python examples/quickstart/public_api_offline.py
 ```
 
 This self-contained example uses a small synthetic model and SAE to demonstrate activation capture, feature editing, identity checks, and downstream logit comparisons. Its numerical outputs are not research findings.
@@ -83,7 +83,7 @@ This self-contained example uses a small synthetic model and SAE to demonstrate 
 To generate a complete offline benchmark and reliability report that you can open in a browser:
 
 ```bash
-python examples/19_first_experiment_offline.py --output runs/first-experiment
+python examples/quickstart/first_experiment.py --output runs/first-experiment
 ```
 
 Follow the [first experiment walkthrough](docs/first-experiment.md) to inspect the generated metrics, cache and paired audit.
@@ -123,7 +123,7 @@ The earlier [v0.2.0 release](https://github.com/OpenSAE/SAEBase/releases/tag/v0.
 Capture model activations once and reuse the stored rows when evaluating multiple SAEs at the same hook. The store records the model and tokenizer identity, selected token positions, `sample_id`, `prompt_group_id`, split, and source activation checksums. SAE codes are stored separately in lossless dense or CSR representations.
 
 ```bash
-python examples/10_activation_store_offline.py
+python examples/activations/activation_store.py
 ```
 
 Readers verify manifests and shards, and interrupted runs can resume instead of repeating committed captures. Reuse is conditional on exact model/site/input identities; it is never inferred solely from a file name. See [Activation Store](docs/activation-store.md).
@@ -142,7 +142,7 @@ A **full SAE reconstruction replacement** is a separate experimental control and
 
 ```bash
 saebase-intervene --config conf/interventions/m2_pythia_example.json --dry-run
-python examples/11_batch_interventions_offline.py
+python examples/interventions/batch_interventions.py
 ```
 
 Real checkpoint execution requires `--real`. Short-text steering uses reference full-prefix recomputation; no KV-cache or GPU throughput speedup is implied. See [Feature Interventions](docs/feature-interventions.md).
@@ -162,7 +162,7 @@ The benchmark runner expands model/SAE/metric configurations into a deterministi
 
 ```bash
 saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
-python examples/12_benchmark_offline.py
+python examples/benchmarking/benchmark_preflight.py
 ```
 
 SAEBase's per-token FVU is not automatically numerically interchangeable with SAEBench's global reconstruction protocol. Native SAEBench metrics are **imported from an upstream-generated JSON result**; the benchmark importer does not silently rerun upstream evaluations. See [Benchmarking](docs/benchmarking.md).
@@ -174,8 +174,8 @@ SAEBase's per-token FVU is not automatically numerically interchangeable with SA
 Reliability audits reuse already computed measurements and resample complete **prompt groups**, keeping tokens or prompt variants within the same independent group. They report paired confidence intervals, subsample-size sensitivity, ranking stability for metrics with a meaningful direction, and explicitly undefined or unsupported comparisons.
 
 ```bash
-python examples/13_reliability_offline.py
-python examples/14_ground_truth_offline.py
+python examples/benchmarking/reliability_bootstrap.py
+python examples/benchmarking/ground_truth_controls.py
 ```
 
 To audit a completed benchmark, run `saebase-audit --m3-root runs/<run_id> --config conf/reliability/m4_pythia_smoke.json --run --sae-only`. Use a matching multi-prompt benchmark run for this audit. The legacy `--m3-root` flag is retained for CLI compatibility; it refers to the benchmark's output directory, not a required workflow stage.
@@ -190,17 +190,17 @@ SAEBase supplies shared model operations; original research projects retain thei
 
 | Project | SAEBase integration | Example |
 | :--- | :--- | :--- |
-| 🧩 **[SAR — Behavioral Compositionality](https://github.com/OpenSAE/SAE-Behavioral-Compositionality)** | Capture feature contributions, apply coalition edits, call the unchanged SAR estimator. | [SAR example](examples/07_sar_via_saebase.py) |
-| 🔀 **[RSS — Representation Redistribution](https://github.com/OpenSAE/Redistribution-Sensitivity-Score)** | Capture disjoint clean/selection/held-out observations, call the unchanged RSS estimator. | [RSS example](examples/08_rss_via_saebase.py) |
-| 🧭 **[Input Localization](https://github.com/OpenSAE/SAE-Input-Localization)** | Capture or reuse complete, ordered Boolean input grids of SAE codes; delegate optimal scope curves to the original Localize package. | [Localize example](examples/15_input_localization_via_saebase.py) |
+| 🧩 **[SAR — Behavioral Compositionality](https://github.com/OpenSAE/SAE-Behavioral-Compositionality)** | Capture feature contributions, apply coalition edits, call the unchanged SAR estimator. | [SAR example](examples/research_integrations/sar.py) |
+| 🔀 **[RSS — Representation Redistribution](https://github.com/OpenSAE/Redistribution-Sensitivity-Score)** | Capture disjoint clean/selection/held-out observations, call the unchanged RSS estimator. | [RSS example](examples/research_integrations/rss.py) |
+| 🧭 **[Input Localization](https://github.com/OpenSAE/SAE-Input-Localization)** | Capture or reuse complete, ordered Boolean input grids of SAE codes; delegate optimal scope curves to the original Localize package. | [Localize example](examples/research_integrations/input_localization.py) |
 | 📊 **[SAEBench](https://github.com/adamkarvonen/SAEBench)** | Import and verify selected native Core and Sparse Probing result fields against the original model/SAE identity and upstream commit. | [Benchmark documentation](docs/benchmarking.md) |
 
 ```bash
-python examples/07_sar_via_saebase.py --paper-dir /path/to/SAR-repo
-python examples/08_rss_via_saebase.py --paper-dir /path/to/RSS-repo
+python examples/research_integrations/sar.py --paper-dir /path/to/SAR-repo
+python examples/research_integrations/rss.py --paper-dir /path/to/RSS-repo
 ```
 
-The examples use deterministic synthetic inputs by default; real checkpoint use is opt-in. For Localize, install the independent `sae-input-localization` package first and run `python examples/15_input_localization_via_saebase.py`. Try the cached, reindexed grid via `python examples/16_controlled_input_design.py` (no model downloads). See [Controlled Input Designs](docs/controlled-inputs.md), [Localize Benchmarking](docs/localization-benchmark.md), and [Research Integrations](docs/research-integrations.md).
+The examples use deterministic synthetic inputs by default; real checkpoint use is opt-in. For Localize, install the independent `sae-input-localization` package first and run `python examples/research_integrations/input_localization.py`. Try the cached, reindexed grid via `python examples/research_integrations/controlled_inputs.py` (no model downloads). See [Controlled Input Designs](docs/controlled-inputs.md), [Localize Benchmarking](docs/localization-benchmark.md), and [Research Integrations](docs/research-integrations.md).
 
 ---
 
@@ -215,7 +215,7 @@ pair = load_registered(model_key="pythia70m",
                        sae_key="pythia70m_resid_sm", layer=3, device="cpu")
 snapshot = capture_features(pair.model, pair.sae,
                             site=pair.site, prompt="Alice Emma Alice")
-# See examples/06_public_api_pythia.py for a complete feature-edit example.
+# See examples/interventions/pythia_feature_edit.py for a complete feature-edit example.
 ```
 
 The code above downloads real weights. Prefer the offline example for a no-network start. See the complete [Python API Guide](docs/python-api.md), [API Reference](docs/API.md), and [Examples Index](examples/README.md).

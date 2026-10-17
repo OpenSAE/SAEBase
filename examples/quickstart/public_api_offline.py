@@ -1,6 +1,6 @@
 """Standalone SAEBase API walkthrough; needs only torch and local project code.
 
-Run: python examples/05_public_api_offline.py
+Run: python examples/quickstart/public_api_offline.py
 Shows selection of a particular token/site, SAE editing and output effects.
 Numbers are from an intentionally tiny synthetic model/SAE, not paper results.
 """
@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 import sys
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import torch
 

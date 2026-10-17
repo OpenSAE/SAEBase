@@ -44,7 +44,7 @@ Further checks:
 - Python parsing of all 171 modules succeeded.
 - `python main.py --help` works without vLLM or pretrained weights.
 - `python -m saebase.sae.verify_registry --list` works.
-- `python examples/05_public_api_offline.py` executed and emitted valid JSON;
+- `python examples/quickstart/public_api_offline.py` executed and emitted valid JSON;
   the toy logits differ after editing a selected SAE feature.
 - Default prompt artifacts continue to resolve at `<repo>/data`.
 
@@ -55,7 +55,7 @@ this environment:
 
 ```bash
 python -m pip install -r requirements.txt
-python examples/06_public_api_pythia.py
+python examples/interventions/pythia_feature_edit.py
 bash scripts/phase_a_smoke.sh
 ```
 

@@ -1,7 +1,7 @@
 """Optional two-checkpoint SAEBase public API integration smoke (downloads weights).
 
-python examples/09_second_model_smoke.py --model gemma270m --sae gemma270m_scope_resid --layer 5
-python examples/09_second_model_smoke.py --model pythia70m --sae pythia70m_resid_sm --layer 3
+python examples/quickstart/model_checkpoint_probe.py --model gemma270m --sae gemma270m_scope_resid --layer 5
+python examples/quickstart/model_checkpoint_probe.py --model pythia70m --sae pythia70m_resid_sm --layer 3
 Both choices are configured; real model compatibility must be checked on the
 machine and in the exact environment used by the researcher.
 """
@@ -12,7 +12,7 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from saebase.api import capture_features, evaluate_edit, load_registered
 from saebase.sae.registry import get_profile
 

@@ -1,7 +1,7 @@
-"""M2 deterministic CPU demo: real batch hooks on toy models, no checkpoints.
+"""Deterministic CPU feature-intervention demo: real batch hooks on toy models, no checkpoints.
 
 Run from repository root:
-    python examples/11_batch_interventions_offline.py
+    python examples/interventions/batch_interventions.py
 """
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from pathlib import Path
 import sys
 import tempfile
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ActivationSite, ModelAdapter
