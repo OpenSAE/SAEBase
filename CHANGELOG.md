@@ -17,7 +17,7 @@
 - **Stage D evidence archive:** Checksum-verified compact evidence release, offline verifier, explicit raw-file recovery checks, and a publication workflow gated on successful main-branch CI. Original GPU runs are not reconstructed from summaries.
 
 <!-- BEGIN VERIFIED_MODEL_SUPPORT -->
-- **Stage D support on current main (2026-10-16):** **48/48** real model-SAE pair acceptances, **48/48** 64-group engineering benchmarks and **48/48** reliability audits across **18** profiles. See the [verified layer matrix](docs/verified-model-matrix.md).
+- **Verified model and SAE coverage (2026-10-16):** **48/48** real-checkpoint compatibility tests, **48/48** benchmark evaluations on 64 held-out prompt groups, and **48/48** reliability audits across **18** model-SAE configurations. See the [verified model and SAE matrix](docs/verified-model-matrix.md).
 <!-- END VERIFIED_MODEL_SUPPORT -->
 
 - **Stages B+C acceptance evidence:** 21/21 original CPU SAE weight/encode/decode checks with loaded-parameter hashes, a separately rechecked Gemma Scope 9B L20 source, and three genuine small-model M3/M4 runs (5 metric rows and 3 reliability audits per model). Original artifacts are linked from machine-readable ledgers. These CPU-era findings preceded the subsequently completed Stage D verification summarized above.
