@@ -124,6 +124,7 @@ def load_qwen_resid_topk_sae(
     device: str | None = None,
     k: int = 50,
     filename: str | None = None,
+    revision: str | None = None,
 ) -> tuple[Any, dict, None]:
     """Build a TopKSAE from an official Qwen residual ``layer{L}.sae.pt`` blob."""
     sl = import_sae_lens()
@@ -136,7 +137,7 @@ def load_qwen_resid_topk_sae(
 
     dev = device or require_cuda()
     fname = filename or f"layer{int(layer)}.sae.pt"
-    weights_path = hf_hub_download(repo_id=release, filename=fname)
+    weights_path = hf_hub_download(repo_id=release, filename=fname, revision=revision)
     blob = torch.load(weights_path, map_location="cpu", weights_only=False)
     if not isinstance(blob, dict):
         raise TypeError(f"{release}/{fname}: expected a state dict, got {type(blob)}")
@@ -246,6 +247,7 @@ def load_sae_for_profile(
     sae_key: str,
     layer: int,
     device: str | None = None,
+    revision: str | None = None,
 ) -> tuple[Any, dict[str, Any]]:
     profile = get_profile(sae_key)
     dev = device or require_cuda()
@@ -355,6 +357,7 @@ def load_sae_for_profile(
             model_name=profile.model_name,
             device=dev,
             filename=sae_id,
+            revision=revision,
         )
         meta = {
             "sae_key": profile.key,
