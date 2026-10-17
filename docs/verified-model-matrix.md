@@ -33,7 +33,7 @@ Current `main` Stage D support, distinct from the historical `v0.2.0` release. T
 
 The three earlier CPU-verified pairs have separate historical pair evidence; their later M3/M4 reports are linked above. Model and SAE weight hashes are kept in the [final matrix](../conf/coverage/stage_d_evidence/final/stage_d_final_matrix.json).
 
-The [raw archive index](../conf/coverage/stage_d_evidence/final/raw_run_archive_index.json) lists machine-local paths, **not public download URLs**. The [versioned compact evidence archive](stage-d-evidence-archive.md) is independently SHA256-verifiable; the separate original raw archives remain unavailable until recovered and checked.
+The [raw archive index](../conf/coverage/stage_d_evidence/final/raw_run_archive_index.json) lists the historical machine-local filenames. The original 18 archives and the combined raw bundle are publicly downloadable from [stage-d-original-raw-20261016](https://github.com/OpenSAE/SAEBase/releases/tag/stage-d-original-raw-20261016). The [versioned compact evidence archive](stage-d-evidence-archive.md) remains a separate SHA256-verifiable snapshot and does not itself contain the raw run directories. Native audit of the published raw bundle matched 48/48 compact M3/M4 summaries.
 
 ## Sources and regeneration
 
