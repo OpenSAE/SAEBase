@@ -11,7 +11,6 @@ this model in bfloat16 for Stage D.
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import torch
 from transformers import AutoTokenizer
@@ -25,8 +24,8 @@ from saebase.extensions import (
     load_external_pair,
     register_extension,
 )
-from saebase.sae.loading import load_sae_for_profile
 from models.hf_hooks_backend import load_hf_hooks_model
+from saebase.sae.loading import load_sae_for_profile
 
 MODEL_REPO = "Qwen/Qwen3-1.7B-Base"
 MODEL_REVISION = "ea980cb0a6c2ae4b936e82123acc929f1cec04c1"
@@ -44,13 +43,17 @@ def load_model(device: str):
         family="qwen",
         device=device,
         dtype=torch.float32,
+        revision=MODEL_REVISION,
     )
     return handle.model
 
 
 def load_sae(device: str):
     sae, _meta = load_sae_for_profile(
-        "qwen3_1_7b_base_resid_w32k", LAYER, device=device,
+        "qwen3_1_7b_base_resid_w32k",
+        LAYER,
+        device=device,
+        revision=SAE_REVISION,
     )
     return sae
 
