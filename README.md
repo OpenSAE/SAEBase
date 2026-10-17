@@ -110,7 +110,7 @@ Real runs download the requested weights and produce `metrics.jsonl`, `summary.c
 ## 🧠 Model and SAE Support
 
 <!-- BEGIN VERIFIED_MODEL_SUPPORT -->
-**Current main (Stage D, 2026-10-16).** **48/48** selected model-SAE layer sites passed real pair acceptance; **48/48** completed the 64-group engineering benchmark and **48/48** completed reliability auditing, across **18** profiles (270M-9B). See the [verified layer matrix](docs/verified-model-matrix.md).
+**Verified checkpoints (2026-10-16).** Across **18** model-SAE configurations (270M-9B), **48/48** selected model/layer sites passed real-checkpoint compatibility tests, **48/48** completed benchmark evaluations on 64 held-out prompt groups, and **48/48** completed reliability audits. See the [verified model and SAE matrix](docs/verified-model-matrix.md).
 <!-- END VERIFIED_MODEL_SUPPORT -->
 
 
