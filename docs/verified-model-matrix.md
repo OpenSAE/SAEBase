@@ -3,9 +3,9 @@
 Current `main` Stage D support, distinct from the historical `v0.2.0` release. The table is derived from the committed final matrix and catalog.
 
 <!-- BEGIN VERIFIED_MODEL_SUPPORT -->
-**Current main, Stage D (2026-10-16):** 48/48 real model-SAE pair checks; 48/48 benchmark runs; 48/48 reliability audits; 18 selected model-SAE profiles.
+**Verified model and SAE coverage (2026-10-16):** 18 selected model-SAE configurations across 48 layer sites. Real-checkpoint checks 48/48; benchmark evaluations 48/48; reliability audits 48/48.
 
-| Model key | SAE key | Size | Architecture | Layers (per-site report) | Pair | Benchmark | Reliability |
+| Model ID | SAE checkpoint ID | Parameters | Architecture | Verified layers (per-site results) | Compatibility | Benchmark | Reliability |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `gemma270m` | `gemma270m_scope_resid` | 270M | JumpReLU | [L5](../conf/coverage/stage_d_evidence/reports/gemma270m_gemma270m_scope_resid_L5_m3m4.json), [L9](../conf/coverage/stage_d_evidence/reports/gemma270m_gemma270m_scope_resid_L9_m3m4.json), [L12](../conf/coverage/stage_d_evidence/reports/gemma270m_gemma270m_scope_resid_L12_m3m4.json) | 3/3 | 3/3 | 3/3 |
 | `gemma1b` | `gemma1b_scope_resid` | 1B | JumpReLU | [L7](../conf/coverage/stage_d_evidence/reports/gemma1b_gemma1b_scope_resid_L7_m3m4.json), [L13](../conf/coverage/stage_d_evidence/reports/gemma1b_gemma1b_scope_resid_L13_m3m4.json), [L17](../conf/coverage/stage_d_evidence/reports/gemma1b_gemma1b_scope_resid_L17_m3m4.json) | 3/3 | 3/3 | 3/3 |
