@@ -1,11 +1,11 @@
 # Verified Model and SAE Layer Matrix
 
-Current `main` Stage D support, distinct from the historical `v0.2.0` release. The table is derived from the committed final matrix and catalog.
+Validated model and SAE checkpoints for SAEBase v0.3.0. This table is generated from frozen experiment records; each layer links to its original verification report. The earlier v0.2.0 checks are preserved separately.
 
 <!-- BEGIN VERIFIED_MODEL_SUPPORT -->
-**Current main, Stage D (2026-10-16):** 48/48 real model-SAE pair checks; 48/48 benchmark runs; 48/48 reliability audits; 18 selected model-SAE profiles.
+**Verified model and SAE coverage (2026-10-16):** 18 selected model-SAE configurations across 48 layer sites. Real-checkpoint checks 48/48; benchmark evaluations 48/48; reliability audits 48/48.
 
-| Model key | SAE key | Size | Architecture | Layers (per-site report) | Pair | Benchmark | Reliability |
+| Model ID | SAE checkpoint ID | Parameters | Architecture | Verified layers (per-site results) | Compatibility | Benchmark | Reliability |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `gemma270m` | `gemma270m_scope_resid` | 270M | JumpReLU | [L5](../conf/coverage/stage_d_evidence/reports/gemma270m_gemma270m_scope_resid_L5_m3m4.json), [L9](../conf/coverage/stage_d_evidence/reports/gemma270m_gemma270m_scope_resid_L9_m3m4.json), [L12](../conf/coverage/stage_d_evidence/reports/gemma270m_gemma270m_scope_resid_L12_m3m4.json) | 3/3 | 3/3 | 3/3 |
 | `gemma1b` | `gemma1b_scope_resid` | 1B | JumpReLU | [L7](../conf/coverage/stage_d_evidence/reports/gemma1b_gemma1b_scope_resid_L7_m3m4.json), [L13](../conf/coverage/stage_d_evidence/reports/gemma1b_gemma1b_scope_resid_L13_m3m4.json), [L17](../conf/coverage/stage_d_evidence/reports/gemma1b_gemma1b_scope_resid_L17_m3m4.json) | 3/3 | 3/3 | 3/3 |
@@ -29,14 +29,14 @@ Current `main` Stage D support, distinct from the historical `v0.2.0` release. T
 
 ## What verification means
 
-**Pair acceptance** checks real model/SAE loading, the correct hook, identity replay and nontrivial feature edits. **Benchmark and reliability** indicate the Stage D engineering protocol with 64 independent held-out evaluation groups separated from feature selection. Those groups use repeating prompt templates, so this does not establish general SAE interpretability or comparative scientific quality.
+**Compatibility** means real model and SAE weights loaded at the specified layer and hook, followed by identity replay and nontrivial feature edits. **Benchmark** and **reliability** refer to evaluations using 64 independent held-out prompt groups per site, kept separate from feature selection. The inputs follow controlled templates; the results establish software and evaluation-protocol behavior, not comparative SAE quality or general interpretability.
 
-The three earlier CPU-verified pairs have separate historical pair evidence; their later M3/M4 reports are linked above. Model and SAE weight hashes are kept in the [final matrix](../conf/coverage/stage_d_evidence/final/stage_d_final_matrix.json).
+Three configurations also have separate earlier CPU validation records. The per-layer benchmark and reliability results appear above. Original model and SAE weight hashes are recorded in the [verification ledger](../conf/coverage/stage_d_evidence/final/stage_d_final_matrix.json).
 
-The [raw archive index](../conf/coverage/stage_d_evidence/final/raw_run_archive_index.json) lists the historical machine-local filenames. The original 18 archives and the combined raw bundle are publicly downloadable from [stage-d-original-raw-20261016](https://github.com/OpenSAE/SAEBase/releases/tag/stage-d-original-raw-20261016). The [versioned compact evidence archive](stage-d-evidence-archive.md) remains a separate SHA256-verifiable snapshot and does not itself contain the raw run directories. Native audit of the published raw bundle matched 48/48 compact M3/M4 summaries.
+The [original run archives](https://github.com/OpenSAE/SAEBase/releases/tag/stage-d-original-raw-20261016) and [compact verification records](stage-d-evidence-archive.md) are publicly available as separate, checksummed downloads. The original data were independently redownloaded, and native benchmark and reliability records matched **48/48** saved per-site summaries. Legacy archive filenames remain unchanged for reproducibility.
 
 ## Sources and regeneration
 
-[Stage B+C catalog](../conf/coverage/stage_bc.json) · [Stage D final matrix](../conf/coverage/stage_d_evidence/final/stage_d_final_matrix.json) · [Status ledger](../conf/coverage/stage_d_evidence/status.json) · [SHA256 manifest](../conf/coverage/stage_d_evidence/final/checksums.sha256) · [Historical v0.2.0 release](https://github.com/OpenSAE/SAEBase/releases/tag/v0.2.0)
+[Checkpoint catalog](../conf/coverage/stage_bc.json) · [Verification ledger](../conf/coverage/stage_d_evidence/final/stage_d_final_matrix.json) · [Run status](../conf/coverage/stage_d_evidence/status.json) · [SHA256 manifest](../conf/coverage/stage_d_evidence/final/checksums.sha256) · [v0.3.0 software release](https://github.com/OpenSAE/SAEBase/releases/tag/v0.3.0)
 
 Run `python scripts/generate_model_support.py --write` to regenerate marked sections and `python scripts/generate_model_support.py --check` to verify evidence/doc consistency. CI performs the latter on every PR.

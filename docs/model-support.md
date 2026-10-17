@@ -2,12 +2,12 @@
 
 SAEBase keeps model definitions separate from SAE checkpoint profiles, experimental activation sites, tokenizer identities and source artifacts. **Registered** does not necessarily mean **verified with real checkpoint weights**.
 
-External model/SAE providers may be registered with the [Third-Party Extension API](extensions.md). Registration and limited tensor probes do not confer the real checkpoint verification reported by Stage D.
+External model/SAE providers may be registered with the [Third-Party Extension API](extensions.md). Registration or a limited tensor probe does not establish the checkpoint compatibility and reliability reported in the verified matrix.
 
 <!-- BEGIN VERIFIED_MODEL_SUPPORT -->
-## Current main: Stage D
+## Verified checkpoints and layers
 
-As of 2026-10-16, **48/48** selected model-SAE sites passed real pair acceptance, **48/48** completed the 64-group engineering benchmark and **48/48** completed reliability audits across **18** profiles. See the [per-site verified matrix](verified-model-matrix.md).
+As of 2026-10-16, **18** model-SAE configurations spanning 270M-9B cover **48/48** selected model/layer sites with genuine checkpoint compatibility checks. **48/48** completed benchmark evaluation on 64 held-out prompt groups, and **48/48** completed reliability auditing. See the [per-layer verification reports](verified-model-matrix.md).
 <!-- END VERIFIED_MODEL_SUPPORT -->
 
 ## Historical `v0.2.0` release acceptance
@@ -23,13 +23,13 @@ The first GPT-2 SAE was released by [jbloom](https://huggingface.co/jbloom/GPT2-
 
 The verified release matrix has six distinct prompts per model. It checks compatibility, exact state SHA-256 and downstream measurement integrity, not broad ranking or interpretability quality.
 
-## Phase A 270M–8B expansion
+## Early checkpoint compatibility testing
 
-Six model/SAE pairs are tracked in [Phase A Model Coverage](phase-a-model-coverage.md). **Qwen3.5-2B Base + the original Qwen-Scope 32K SAE has passed genuine CPU model+SAE capture and identity-patch acceptance.** All six original SAE checkpoints independently loaded and encoded/decoded with genuine weights; the other five model+SAE pairs were blocked or untested at the end of Phase A pending gated access or high-memory GPU compute. Details and raw evidence are linked in the Phase A page.
+Early [checkpoint tests](phase-a-model-coverage.md) examined six model and SAE pairs. At that stage, genuine model execution was verified for Qwen3.5-2B Base with the original Qwen-Scope 32K SAE, while all six SAE checkpoints independently passed weight loading and encode/decode tests. Other full-model checks were not yet available at the time. These records are retained as a historical baseline; consult the current [verified matrix](verified-model-matrix.md) for later multi-model results.
 
-## Stages B+C: broader cross-scale and multi-layer coverage
+## Additional CPU checkpoint testing
 
-The [Stage B+C Matrix](stage-bc-model-sae-coverage.md) catalogs 15 model variants spanning 270M–9B and three additional SAE-architecture checks across 48 selected layer checkpoints. New authentic **CPU model–SAE feature-intervention acceptance** has passed for Pythia 410M, Qwen3 1.7B Base and DeepSeek R1 Distill Qwen 1.5B. The stage-C workflow completed **21/21 genuine SAE-only CPU checks** on selected layers; full checkpoint SHA-256 and GitHub Actions provenance are in [the Stage C ledger](../conf/coverage/stage_c_cpu_verified.json). Three real small-model M3/M4 evaluations are indexed in [the Stage B ledger](../conf/coverage/stage_b_cpu_verified.json). Absence of a full LLM run does not imply model-pair verification. GitHub workflow artifacts provide individual weight hashes and numerical probes. At the end of B+C, large-model full runs were deferred; the subsequent Stage D results are recorded in the current matrix above.
+The [earlier CPU verification records](stage-bc-model-sae-coverage.md) cover 15 model variants (270M–9B), three additional SAE architectures, and selected layers later included in the full validation matrix. Real feature-intervention tests passed for Pythia 410M, Qwen3 1.7B Base, and DeepSeek R1 Distill Qwen 1.5B. The original CPU evidence includes **21/21 SAE-weight checks** with [checkpoint hashes](../conf/coverage/stage_c_cpu_verified.json), alongside three small-model benchmark and reliability runs in an [earlier run ledger](../conf/coverage/stage_b_cpu_verified.json). These checks preceded the 48-site evaluation and should not be interpreted as broader validation on their own.
 
 ## Registered configurations and optional models
 
@@ -51,7 +51,7 @@ Real matrix evaluation is opt-in:
 saebase-release-matrix --config conf/release/m5_matrix.json --real --device cpu
 ```
 
-The latest committed evidence can be checked through the [Stage D Evidence Archive](stage-d-evidence-archive.md).
+The latest evidence and original run archives are available through [Verification Evidence and Reproducibility](stage-d-evidence-archive.md).
 
 ## Identity and checkpoint sources
 

@@ -110,18 +110,11 @@ saebase-benchmark --config conf/benchmark/p0_small.json --report-only
 ## 🧠 支持的模型与 SAE
 
 <!-- BEGIN VERIFIED_MODEL_SUPPORT -->
-**当前 main（Stage D，2026-10-16）。** **48/48** 个已选模型-SAE 层位通过真实配对验收，**48/48** 个完成包含 64 个独立评估组的工程 Benchmark，**48/48** 个完成 Reliability 审计，共 **18** 组模型-SAE 配置（270M-9B）。详见[已验证层位矩阵](docs/verified-model-matrix.md)。
+**已验证的模型与 SAE（2026-10-16）。** 覆盖 **18** 组模型与 SAE 配置（270M-9B），**48/48** 个选定层位通过真实权重兼容性检查，**48/48** 个完成基于 64 组独立留出提示的基准评估，**48/48** 个完成统计可靠性审计。详见[模型支持与逐层验证结果](docs/verified-model-matrix.md)。
 <!-- END VERIFIED_MODEL_SUPPORT -->
 
 
-**历史 `v0.2.0` 发行版的验收范围（不同于当前 `main`）：**
-
-| 模型 | 验证的激活位置 | 已执行的真实 SAE checkpoint |
-| :--- | :--- | :--- |
-| **Pythia-70M（去重版）** | `blocks.3.hook_resid_post` | Residual-stream SAE 与另一份独立训练的 Gated SAE |
-| **GPT-2 Small** | `blocks.8.hook_resid_pre` | 原始 Residual SAE 与 Feature-Splitting SAE |
-
-`v0.2.0` 发行版对上述两种模型各验证两个 SAE checkpoint 权重哈希，每个模型使用六组固定 prompts。这只代表历史发行版；当前 Stage D 验证结果请参见上方矩阵。参见[模型与 Checkpoint 支持](docs/model-support.md)。
+早期 [v0.2.0 版本](https://github.com/OpenSAE/SAEBase/releases/tag/v0.2.0)分别在 Pythia-70M 和 GPT-2 Small 上验证了两个 SAE checkpoint。这些较小规模的兼容性测试作为历史记录保留。当前支持的 checkpoint、层位及逐项报告见[模型与 SAE 支持](docs/model-support.md)。
 
 ---
 
@@ -258,13 +251,13 @@ python -m pytest -q
 | 范围 | 已公开验证的内容 |
 | :--- | :--- |
 | 公共 API 与发行包 | Python 3.11/3.12 CI，wheel/sdist 构建和安装检查 |
-| 真实模型与 SAE | Pythia-70M、GPT-2 Small，每个模型两个不同的公开 SAE checkpoint |
+| 真实模型与 SAE | 已验证 18 组模型与 SAE 配置、48 个模型层位（270M-9B），并提供[逐项报告](docs/verified-model-matrix.md) |
 | 存储、干预和报告 | 精确缓存复用、按条件测量、中断恢复与完整性校验 |
 | 原始研究估计器 | SAR/RSS 原版源码测试，以及固定版本的 SAEBench Core/Sparse Probing 验收 |
 | 统计可靠性 | Prompt-group Bootstrap、Paired Comparisons、独立合成真值及负对照 |
 | 实验性后端 | vLLM/NNsight 为可选能力，本发行版不宣称 GPU 吞吐已全面验证 |
 
-公开的多 checkpoint 验收每个模型只采用六组固定 prompts，因此它证明的是**工程兼容性**，而不是 SAE 质量的大样本统计结论。模型权重没有打包进 GitHub Release，第三方 checkpoint 许可证以各自上游为准。参见[验证与证据](docs/validation.md)和[发行说明](docs/releases/v0.2.0.md)。
+这 48 个层位的评估分别使用了 64 组独立留出的提示，但提示来自受控模板，因此结果验证的是既定协议下的运行和可靠性，不等于对 SAE 一般可解释性或质量的保证。模型与 SAE 权重仍由原发布方提供。详见[验证与可复现性](docs/validation.md)和[v0.3.0 发行说明](docs/releases/v0.3.0.md)。
 
 ---
 
@@ -274,7 +267,7 @@ python -m pytest -q
 
 [Activation Store](docs/activation-store.md) · [特征干预](docs/feature-interventions.md) · [Benchmark](docs/benchmarking.md) · [可靠性分析](docs/reliability.md) · [研究项目集成](docs/research-integrations.md) · [第三方扩展](docs/extensions.md)
 
-[验证与证据](docs/validation.md) · [更新记录](CHANGELOG.md) · [发行说明](docs/releases/v0.2.0.md) · [代码来源](docs/PROVENANCE.md) · [参与贡献](CONTRIBUTING.md) · [安全说明](SECURITY.md) · [Apache-2.0 许可证](LICENSE)
+[验证与证据](docs/validation.md) · [更新记录](CHANGELOG.md) · [v0.3.0 发行说明](docs/releases/v0.3.0.md) · [代码来源](docs/PROVENANCE.md) · [参与贡献](CONTRIBUTING.md) · [安全说明](SECURITY.md) · [Apache-2.0 许可证](LICENSE)
 
 <p align="center">
   <b>Open research infrastructure for faithful representation analysis.</b><br>

@@ -133,12 +133,12 @@ def load_support(root: Path = ROOT) -> dict:
 
 def render_table(s: dict) -> str:
     lines = [
-        f"**Current main, Stage D ({s['date']}):** {s['pair']}/{s['total']} real "
-        f"model-SAE pair checks; {s['benchmark']}/{s['total']} benchmark runs; "
-        f"{s['reliability']}/{s['total']} reliability audits; "
-        f"{s['profiles']} selected model-SAE profiles.",
+        f"**Verified model and SAE coverage ({s['date']}):** {s['profiles']} "
+        f"selected model-SAE configurations across {s['total']} layer sites. "
+        f"Real-checkpoint checks {s['pair']}/{s['total']}; benchmark evaluations "
+        f"{s['benchmark']}/{s['total']}; reliability audits {s['reliability']}/{s['total']}.",
         "",
-        "| Model key | SAE key | Size | Architecture | Layers (per-site report) | Pair | Benchmark | Reliability |",
+        "| Model ID | SAE checkpoint ID | Parameters | Architecture | Verified layers (per-site results) | Compatibility | Benchmark | Reliability |",
         "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     tick = chr(96)
@@ -170,36 +170,43 @@ def render_blocks(s: dict) -> dict[str, str]:
     date, profiles = s["date"], s["profiles"]
     return {
         "README.md": (
-            f"**Current main (Stage D, {date}).** **{pair}** selected model-SAE layer "
-            f"sites passed real pair acceptance; **{bench}** completed the 64-group "
-            f"engineering benchmark and **{rel}** completed reliability auditing, "
-            f"across **{profiles}** profiles (270M-9B). See the "
-            "[verified layer matrix](docs/verified-model-matrix.md)."
+            f"**Verified checkpoints ({date}).** Across **{profiles}** model-SAE "
+            f"configurations (270M-9B), **{pair}** selected model/layer sites "
+            f"passed real-checkpoint compatibility tests, **{bench}** completed "
+            "benchmark evaluations on 64 held-out prompt groups, and "
+            f"**{rel}** completed reliability audits. See the "
+            "[verified model and SAE matrix](docs/verified-model-matrix.md)."
         ),
         "README_cn.md": (
-            f"**当前 main（Stage D，{date}）。** **{pair}** 个已选模型-SAE 层位通过真实配对验收，"
-            f"**{bench}** 个完成包含 64 个独立评估组的工程 Benchmark，"
-            f"**{rel}** 个完成 Reliability 审计，共 **{profiles}** 组模型-SAE 配置"
-            "（270M-9B）。详见[已验证层位矩阵](docs/verified-model-matrix.md)。"
+            f"**已验证的模型与 SAE（{date}）。** 覆盖 **{profiles}** 组模型与 SAE 配置"
+            f"（270M-9B），**{pair}** 个选定层位通过真实权重兼容性检查，"
+            f"**{bench}** 个完成基于 64 组独立留出提示的基准评估，"
+            f"**{rel}** 个完成统计可靠性审计。详见"
+            "[模型支持与逐层验证结果](docs/verified-model-matrix.md)。"
         ),
         "docs/model-support.md": (
-            "## Current main: Stage D\n\n"
-            f"As of {date}, **{pair}** selected model-SAE sites passed real pair "
-            f"acceptance, **{bench}** completed the 64-group engineering benchmark "
-            f"and **{rel}** completed reliability audits across **{profiles}** "
-            "profiles. See the [per-site verified matrix](verified-model-matrix.md)."
+            "## Verified checkpoints and layers\n\n"
+            f"As of {date}, **{profiles}** model-SAE configurations spanning "
+            f"270M-9B cover **{pair}** selected model/layer sites with genuine "
+            f"checkpoint compatibility checks. **{bench}** completed benchmark "
+            f"evaluation on 64 held-out prompt groups, and **{rel}** completed "
+            "reliability auditing. See the "
+            "[per-layer verification reports](verified-model-matrix.md)."
         ),
         "docs/validation.md": (
-            "## Current main Stage D evidence\n\n"
-            f"**{pair}** real pair acceptances, **{bench}** 64-group engineering "
-            f"benchmark runs and **{rel}** reliability audits across **{profiles}** "
-            f"profiles ({date}). See the [per-site reports](verified-model-matrix.md)."
+            "## Verified model and SAE evaluations\n\n"
+            f"**{profiles}** selected model-SAE configurations, **{pair}** "
+            f"real-checkpoint compatibility tests, **{bench}** benchmark "
+            f"evaluations on 64 held-out prompt groups, and **{rel}** "
+            f"reliability audits ({date}). See the "
+            "[per-layer reports](verified-model-matrix.md)."
         ),
         "CHANGELOG.md": (
-            f"- **Stage D support on current main ({date}):** **{pair}** real model-SAE "
-            f"pair acceptances, **{bench}** 64-group engineering benchmarks and "
-            f"**{rel}** reliability audits across **{profiles}** profiles. "
-            "See the [verified layer matrix](docs/verified-model-matrix.md)."
+            f"- **Verified model and SAE coverage ({date}):** **{pair}** "
+            f"real-checkpoint compatibility tests, **{bench}** benchmark "
+            f"evaluations on 64 held-out prompt groups, and **{rel}** "
+            f"reliability audits across **{profiles}** model-SAE configurations. "
+            "See the [verified model and SAE matrix](docs/verified-model-matrix.md)."
         ),
         "docs/verified-model-matrix.md": render_table(s),
     }

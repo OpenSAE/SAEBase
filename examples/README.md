@@ -83,9 +83,10 @@ The SAR/RSS examples need their original research estimator repositories. The Lo
 | Example | What it demonstrates | Requires real weights? |
 | --- | --- | --- |
 | [`18_external_extensions_offline.py`](18_external_extensions_offline.py) | Opt-in model/SAE providers, source-hashed benchmark and identity patch checks | No |
+| [`19_external_qwen3_1_7b_l7.py`](19_external_qwen3_1_7b_l7.py) | Real Qwen3-1.7B checkpoint interoperability at layer 7, with exact source revisions and feature ablation | Yes |
 | [`19_first_experiment_offline.py`](19_first_experiment_offline.py) | Persistent benchmark, shared caches, reliability and HTML report | No |
 
-See [Third-Party Extensions](../docs/extensions.md) for registering an installed research adapter.
+The Qwen3 example requires model and SAE weight downloads and checks one specific checkpoint/layer rather than general extension compatibility. See [Third-Party Extensions](../docs/extensions.md) for the provider API and [Verified Model and SAE Coverage](../docs/verified-model-matrix.md) for broader compatibility records.
 
 ## A real multi-checkpoint benchmark
 

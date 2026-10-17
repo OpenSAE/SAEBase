@@ -110,18 +110,11 @@ Real runs download the requested weights and produce `metrics.jsonl`, `summary.c
 ## 🧠 Model and SAE Support
 
 <!-- BEGIN VERIFIED_MODEL_SUPPORT -->
-**Current main (Stage D, 2026-10-16).** **48/48** selected model-SAE layer sites passed real pair acceptance; **48/48** completed the 64-group engineering benchmark and **48/48** completed reliability auditing, across **18** profiles (270M-9B). See the [verified layer matrix](docs/verified-model-matrix.md).
+**Verified checkpoints (2026-10-16).** Across **18** model-SAE configurations (270M-9B), **48/48** selected model/layer sites passed real-checkpoint compatibility tests, **48/48** completed benchmark evaluations on 64 held-out prompt groups, and **48/48** completed reliability audits. See the [verified model and SAE matrix](docs/verified-model-matrix.md).
 <!-- END VERIFIED_MODEL_SUPPORT -->
 
 
-**Historical `v0.2.0` release acceptance (separate from current `main`):**
-
-| Model | Verified activation site | Real SAE checkpoints exercised |
-| :--- | :--- | :--- |
-| **Pythia-70M (deduped)** | `blocks.3.hook_resid_post` | Residual-stream SAE and a separately trained gated SAE |
-| **GPT-2 Small** | `blocks.8.hook_resid_pre` | Original residual SAE and feature-splitting SAE |
-
-The `v0.2.0` release exercised two SAE checkpoint hashes per model with six fixed prompts per model. Its validation scope is historical; see the Stage D matrix above for later `main` evidence. Individual checkpoints may still require access approval and suitable hardware. See [Supported Models and Checkpoints](docs/model-support.md).
+The earlier [v0.2.0 release](https://github.com/OpenSAE/SAEBase/releases/tag/v0.2.0) verified two SAE checkpoints each on Pythia-70M and GPT-2 Small. These smaller compatibility tests are preserved as historical evidence. For current checkpoint identities, evaluated layers, and individual reports, see [Model and SAE Support](docs/model-support.md).
 
 ---
 
@@ -254,13 +247,13 @@ python -m pytest -q
 | Area | Publicly validated scope |
 | :--- | :--- |
 | Core APIs and packaging | Python 3.11/3.12 CI, wheel/sdist construction and installation checks |
-| Real model/SAE interoperability | Pythia-70M and GPT-2 Small, two distinct public SAE checkpoints per model |
+| Real model/SAE interoperability | 18 model-SAE configurations, 48 evaluated model/layer sites (270M-9B), with [per-site reports](docs/verified-model-matrix.md) |
 | Storage, interventions and reports | Identity-aware cache reuse, condition-specific evaluation, resume and integrity checks |
 | Research estimators | Original SAR/RSS estimator tests; Localize delegation contracts and pinned native SAEBench Core/Sparse Probing checks |
 | Reliability | Prompt-group bootstrap, paired comparisons and independently generated analytical controls |
 | Experimental backends | vLLM/NNsight remain optional; this release does not claim GPU throughput validation |
 
-The published multi-checkpoint run uses six fixed prompts per model and is **engineering acceptance**, not large-sample evidence about SAE quality. Checkpoint and dataset licenses remain with their original publishers; model weights are not bundled in the GitHub Release. See [Validation and Evidence](docs/validation.md) and [Release Notes](docs/releases/v0.2.0.md).
+The 48-site evaluation uses 64 held-out prompt groups per site, drawn from controlled templates. It verifies benchmark execution and reliability under this protocol, not general SAE quality or interpretability. The model and SAE weights remain with their original publishers. See [Validation and Reproducibility](docs/validation.md) and the [v0.3.0 release notes](docs/releases/v0.3.0.md).
 
 ---
 
@@ -270,7 +263,7 @@ The published multi-checkpoint run uses six fixed prompts per model and is **eng
 
 [Activation Store](docs/activation-store.md) · [Feature Interventions](docs/feature-interventions.md) · [Benchmarking](docs/benchmarking.md) · [Reliability](docs/reliability.md) · [Research Integrations](docs/research-integrations.md) · [Extensions](docs/extensions.md)
 
-[Validation](docs/validation.md) · [Changelog](CHANGELOG.md) · [Release Notes](docs/releases/v0.2.0.md) · [Provenance](docs/PROVENANCE.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Apache-2.0 License](LICENSE)
+[Validation](docs/validation.md) · [Changelog](CHANGELOG.md) · [v0.3.0 Release Notes](docs/releases/v0.3.0.md) · [Provenance](docs/PROVENANCE.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Apache-2.0 License](LICENSE)
 
 <p align="center">
   <b>Open research infrastructure for faithful representation analysis.</b><br>

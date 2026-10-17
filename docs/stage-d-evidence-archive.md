@@ -1,58 +1,66 @@
-# Stage D Evidence Archive
+# Benchmark Evidence and Reproducibility
 
-The [Stage D compact evidence release](https://github.com/OpenSAE/SAEBase/releases/tag/stage-d-evidence-20261016) provides a versioned snapshot of original **committed evidence records**, distinct from the SAEBase Python package release.
+SAEBase publishes the original verification records for **18 model–SAE configurations** evaluated at **48 model/layer sites**. Each site completed real-checkpoint compatibility tests, benchmark evaluation, and reliability auditing. The evidence is available separately from the SAEBase Python distribution so that the measurements and their sources can be inspected independently.
 
-## Contents
+## Evaluation scope
 
-- The frozen 18-profile, 48-layer Stage D catalog, final matrix and per-layer status ledger.
-- 48 M3/M4 compact summaries, 48 selection and 48 evaluation token ledgers, and the Stage D pair-acceptance JSONs. Three earlier CPU pair acceptances retain their original Stage B ledger rather than fabricated new GPU records.
-- All 200 checked-in Stage D evidence files, including the manifest covering 199 of them (excluding the checksum manifest itself).
-- Original Stage B/C ledgers and the frozen Stage D evaluation corpus.
-- A file-by-file SHA256 bundle manifest, compressed archive checksum, exact Git source revision and a self-contained Python verifier.
+- **Checkpoint compatibility:** real model and SAE weights, exact layers and hooks, identity replay, and nontrivial feature edits.
+- **Benchmark evaluation:** measured reconstruction and downstream intervention effects on **64 independent held-out prompt groups per site**, separated from feature selection.
+- **Reliability:** statistical checks and audit records corresponding to the measured benchmark outputs.
+- **Provenance:** original configurations, model/SAE identities, per-site reports, raw measurements, token ledgers, manifests, and SHA256 checksums.
 
-The reports record 48/48 real model-SAE pair and 48/48 population benchmark/reliability engineering acceptances. The evaluation uses 64 separate groups and recurring controlled prompt templates. These results demonstrate the reported engineering protocol, not general SAE quality or interpretability.
+The input groups use recurring controlled prompt templates. This evidence verifies the supported software workflow under a recorded evaluation protocol; it is not a general ranking of SAE quality or interpretability.
 
-## Scope of the archive
+Browse the [verified models, SAE checkpoints, and per-layer results](verified-model-matrix.md).
 
-**The compact release does not contain original GPU run caches or pretrained weights.** Those original bytes are the separate [original raw release](https://github.com/OpenSAE/SAEBase/releases/tag/stage-d-original-raw-20261016): 18 family archives totaling 725,190 bytes, plus `stage-d-evidence-20261016-original-raw.tar.gz` (`62f5c5b7af719114b999b4b59afb2ddf4798ae337f1a17fd49c11c87c6704958`). A clean redownload of that bundle matched the index and 48/48 native M3/M4 manifests. The [raw-run archive index](../conf/coverage/stage_d_evidence/final/raw_run_archive_index.json) still records the historical machine path; the public download is the release above.
+## Published evidence
 
-The compact evidence is independently hash-verifiable, but it cannot on its own support recomputing all metrics from the unavailable raw M3/M4 run directories. The original `README.json` value of 17 M3/M4 summaries is an earlier in-progress snapshot; the committed final matrix and 48 per-site reports are the final source. These historical records have not been rewritten.
+| Archive | Contents |
+| --- | --- |
+| [Compact verification records](https://github.com/OpenSAE/SAEBase/releases/tag/stage-d-evidence-20261016) | Frozen configuration and result summaries, per-site provenance, token ledgers, and a standalone verifier |
+| [Original run archives](https://github.com/OpenSAE/SAEBase/releases/tag/stage-d-original-raw-20261016) | 18 original family archives, native benchmark/reliability records, and checksum manifests |
+| [Additional exploratory experiments](https://github.com/OpenSAE/SAEBase/releases/tag/stage-d-recovery-03-experiments-20261016) | Independent extension probe and new-prompt experiments, kept separate from the 48-site verified matrix |
+
+The 18 original family archives total **725,190 compressed bytes**. Their combined original-run bundle has SHA256:
+
+`62f5c5b7af719114b999b4b59afb2ddf4798ae337f1a17fd49c11c87c6704958`
+
+A fresh download of the original-run bundle passed checksum and archive verification. The native benchmark and reliability audit matched **48/48** per-site records. The compact snapshot and original runs have separate immutable GitHub release assets.
 
 ## Download and verify
 
-Download all four assets from the [GitHub evidence release](https://github.com/OpenSAE/SAEBase/releases/tag/stage-d-evidence-20261016) or run:
+The compact snapshot can be verified without a model checkpoint or GPU:
 
 ~~~bash
-gh release download stage-d-evidence-20261016 -R OpenSAE/SAEBase --dir stage-d-download
-cd stage-d-download
-sha256sum -c SHA256SUMS
-python verify-stage-d.py --verify-bundle stage-d-evidence-20261016-compact.tar.gz
+gh release download stage-d-evidence-20261016 -R OpenSAE/SAEBase --dir compact-evidence
+(
+  cd compact-evidence
+  sha256sum -c SHA256SUMS
+  python verify-stage-d.py --verify-bundle stage-d-evidence-20261016-compact.tar.gz
+)
 ~~~
 
-The first command checks download integrity; the second safely extracts into a temporary location, checks each file against its SHA256 manifest, then validates the original 199 Stage D hashes, catalog and status ledger and all 48 per-site reports without model weights.
-
-A source checkout can be verified or repackaged entirely offline:
+From an SAEBase source checkout, independently check the original run bundle:
 
 ~~~bash
-python scripts/stage_d_archive.py --check
-python scripts/stage_d_archive.py --build --output-dir dist/stage-d-evidence
-python scripts/stage_d_archive.py --verify-bundle dist/stage-d-evidence/stage-d-evidence-20261016-compact.tar.gz
-(cd dist/stage-d-evidence && sha256sum -c SHA256SUMS)
+gh release download stage-d-original-raw-20261016 -R OpenSAE/SAEBase \
+  -p 'stage-d-evidence-20261016-original-raw.tar.gz*' --dir original-runs
+
+(
+  cd original-runs
+  sha256sum -c stage-d-evidence-20261016-original-raw.tar.gz.sha256
+)
+
+python scripts/stage_d_archive.py \
+  --verify-raw-bundle original-runs/stage-d-evidence-20261016-original-raw.tar.gz
 ~~~
 
-The bundle's source-commit SHA records the packaging revision, distinct from the historical GPU experiment commits contained in the Stage D JSON.
+The downloaded original runs can also be inspected using the native benchmark and reliability readers. File checksums establish integrity; they are not a claim that the original experiments were re-executed.
 
-## Recover original raw M3/M4 archives
+## Provenance and compatibility
 
-Retrieve the **original bytes** from the GPU machine or an existing backup, then run the following against the original archive directory:
+Existing asset filenames, source schema IDs, and archive tags retain their original identifiers for reproducibility. The [original archive index](../conf/coverage/stage_d_evidence/final/raw_run_archive_index.json), [verification ledger](../conf/coverage/stage_d_evidence/final/stage_d_final_matrix.json), and [file checksum manifest](../conf/coverage/stage_d_evidence/final/checksums.sha256) provide the underlying records.
 
-~~~bash
-python scripts/stage_d_archive.py --verify-raw /workspace/stage_d_runs/archives
-python scripts/stage_d_archive.py --build-raw /workspace/stage_d_runs/archives --output-dir dist/stage-d-raw
-python scripts/stage_d_archive.py --verify-raw-bundle dist/stage-d-raw/stage-d-evidence-20261016-original-raw.tar.gz
-(cd dist/stage-d-raw && sha256sum -c stage-d-evidence-20261016-original-raw.tar.gz.sha256)
-~~~
+No third-party pretrained model or SAE weights are included. Access and redistribution terms remain with their original publishers.
 
-Verification refuses absent files, incorrect sizes or SHA256 digests, and unsafe TAR members. The checked originals are published as [stage-d-original-raw-20261016](https://github.com/OpenSAE/SAEBase/releases/tag/stage-d-original-raw-20261016). Restoring their raw run directories and applying `scripts/phase_d_verify_evidence.py` audited 48/48 native M3/M4 manifests against the compact summaries. Hash checking alone is not re-execution or independent numerical verification.
-
-Original model/SAE weights remain subject to upstream access and license restrictions and are not included.
+[v0.3.0 Software Release](https://github.com/OpenSAE/SAEBase/releases/tag/v0.3.0) · [Validation and Reproducibility](validation.md)
