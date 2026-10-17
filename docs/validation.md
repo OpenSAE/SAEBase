@@ -8,7 +8,7 @@ SAEBase distinguishes **what can be configured**, **what has run with real publi
 **18** selected model-SAE configurations, **48/48** real-checkpoint compatibility tests, **48/48** benchmark evaluations on 64 held-out prompt groups, and **48/48** reliability audits (2026-10-16). See the [per-layer reports](verified-model-matrix.md).
 <!-- END VERIFIED_MODEL_SUPPORT -->
 
-## `v0.2.0` release acceptance (historical)
+## Earlier software validation (v0.2.0)
 
 | Validation area | Publicly exercised evidence |
 | --- | --- |
@@ -48,12 +48,12 @@ Benchmark runs and audits use versioned manifests and measured checkpoint SHA-25
 - Different FVU denominators, split definitions, readout units or SAEBench protocols are not interchangeable.
 - Prompt variants are clustered under a common `prompt_group_id` for reliability estimates.
 - Synthetic ground-truth experiments verify the methods' behavior against constructed known effects, not against a real model's ground truth.
-- GPU vLLM/NNsight performance is an optional, separate claim, and has not been established by the CPU real-checkpoint matrix.
+- GPU throughput for optional vLLM/NNsight backends has not been established by checkpoint compatibility testing; it requires separate performance measurements.
 - Some registered models or upstream checkpoints may require authentication or additional hardware.
 - Third-party model/SAE weights are not bundled in SAEBase's distribution.
 
 ## Evidence and releases
 
-The [GitHub Actions runs](https://github.com/OpenSAE/SAEBase/actions) document standard package CI, real checkpoint tests and source-pinned integration acceptance. [v0.2.0 GitHub Release](https://github.com/OpenSAE/SAEBase/releases/tag/v0.2.0) supplies the wheel/sdist, `SHA256SUMS` and `release-evidence.json` for independent artifact checks.
+The [v0.3.0 software release](https://github.com/OpenSAE/SAEBase/releases/tag/v0.3.0) provides the verified Python wheel, source archive, release evidence and checksums. [Checkpoint and layer results](verified-model-matrix.md) are backed by independently downloadable [compact reports and original run archives](stage-d-evidence-archive.md). The [GitHub Actions history](https://github.com/OpenSAE/SAEBase/actions) records software tests and release verification. Earlier [v0.2.0 artifacts](https://github.com/OpenSAE/SAEBase/releases/tag/v0.2.0) remain available for historical reproduction.
 
-[Checkpoint Acceptance Protocol](reference-checkpoint-validation.md) · [Detailed Release Matrix](checkpoint-validation.md) · [Release Notes](releases/v0.2.0.md) · [Provenance](PROVENANCE.md)
+[Checkpoint Acceptance Protocol](reference-checkpoint-validation.md) · [Detailed Release Matrix](checkpoint-validation.md) · [v0.3.0 Release Notes](releases/v0.3.0.md) · [Provenance](PROVENANCE.md)
