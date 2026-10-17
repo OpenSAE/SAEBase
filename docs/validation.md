@@ -3,9 +3,9 @@
 SAEBase distinguishes **what can be configured**, **what has run with real public weights**, and **what its scientific results establish**. A successful registry lookup or a synthetic smoke test is not proof of a real checkpoint evaluation.
 
 <!-- BEGIN VERIFIED_MODEL_SUPPORT -->
-## Current main Stage D evidence
+## Verified model and SAE evaluations
 
-**48/48** real pair acceptances, **48/48** 64-group engineering benchmark runs and **48/48** reliability audits across **18** profiles (2026-10-16). See the [per-site reports](verified-model-matrix.md).
+**18** selected model-SAE configurations, **48/48** real-checkpoint compatibility tests, **48/48** benchmark evaluations on 64 held-out prompt groups, and **48/48** reliability audits (2026-10-16). See the [per-layer reports](verified-model-matrix.md).
 <!-- END VERIFIED_MODEL_SUPPORT -->
 
 ## `v0.2.0` release acceptance (historical)
