@@ -1,13 +1,10 @@
-"""Real-checkpoint external-extension probe for one cached SAE site.
+"""Real-checkpoint external-extension probe for Qwen3-1.7B Base L7.
 
-This uses ``saebase.extensions.load_external_pair`` on Qwen3-1.7B Base L7.
-A passing probe is ``probe_passed_not_checkpoint_certified``: it checks this
-exact checkpoint and hook, not the Stage D 48-site population ledger.
-
-The model factory loads float32 so captured activations match the SAE dtype
-declared to the extension contract. SAEBase's built-in profile still loads
-this model in bfloat16 for Stage D.
+A passing probe checks one actual checkpoint and hook, not population
+reliability or general checkpoint certification. Float32 matches the
+declared external SAE contract; Stage D uses a separate bfloat16 profile.
 """
+
 from __future__ import annotations
 
 import json
@@ -15,6 +12,7 @@ import json
 import torch
 from transformers import AutoTokenizer
 
+from models.hf_hooks_backend import load_hf_hooks_model
 from saebase.api import ActivationSite, capture_features, edit_features
 from saebase.extensions import (
     ExtensionBundle,
@@ -24,7 +22,6 @@ from saebase.extensions import (
     load_external_pair,
     register_extension,
 )
-from models.hf_hooks_backend import load_hf_hooks_model
 from saebase.sae.loading import load_sae_for_profile
 
 MODEL_REPO = "Qwen/Qwen3-1.7B-Base"
@@ -60,35 +57,42 @@ def load_sae(device: str):
 
 def main() -> dict:
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    register_extension(ExtensionBundle(
-        name="ext.opensae.qwen3_1_7b_l7",
-        models=(ExternalModel(
-            key="ext.opensae.qwen3_1_7b_base",
-            source=f"https://huggingface.co/{MODEL_REPO}",
-            revision=MODEL_REVISION,
-            hooks=(HookSpec(SITE, 2048),),
-            factory=load_model,
-            backend="hf_hooks",
-        ),),
-        saes=(ExternalSAE(
-            key="ext.opensae.qwen3_1_7b_base_l7",
-            model_key="ext.opensae.qwen3_1_7b_base",
-            source=f"https://huggingface.co/{SAE_REPO}",
-            revision=SAE_REVISION,
-            site=SITE,
-            d_in=2048,
-            d_sae=32768,
-            architecture="topk",
-            normalization="none",
-            dtype="float32",
-            sae_id="layer7.sae.pt",
-            factory=load_sae,
-        ),),
-    ))
+    register_extension(
+        ExtensionBundle(
+            name="ext.opensae.qwen3_1_7b_l7",
+            models=(
+                ExternalModel(
+                    key="ext.opensae.qwen3_1_7b_base",
+                    source=f"https://huggingface.co/{MODEL_REPO}",
+                    revision=MODEL_REVISION,
+                    hooks=(HookSpec(SITE, 2048),),
+                    factory=load_model,
+                    backend="hf_hooks",
+                ),
+            ),
+            saes=(
+                ExternalSAE(
+                    key="ext.opensae.qwen3_1_7b_base_l7",
+                    model_key="ext.opensae.qwen3_1_7b_base",
+                    source=f"https://huggingface.co/{SAE_REPO}",
+                    revision=SAE_REVISION,
+                    site=SITE,
+                    d_in=2048,
+                    d_sae=32768,
+                    architecture="topk",
+                    normalization="none",
+                    dtype="float32",
+                    sae_id="layer7.sae.pt",
+                    factory=load_sae,
+                ),
+            ),
+        )
+    )
     tokenizer = AutoTokenizer.from_pretrained(MODEL_REPO, revision=MODEL_REVISION)
     tokens = tokenizer(PROMPT, return_tensors="pt").input_ids
     if device == "cuda":
         tokens = tokens.cuda()
+
     pair = load_external_pair(
         model_key="ext.opensae.qwen3_1_7b_base",
         sae_key="ext.opensae.qwen3_1_7b_base_l7",
@@ -99,9 +103,11 @@ def main() -> dict:
     snap = capture_features(pair.model, pair.sae, site=SITE, tokens=tokens)
     selected = int(torch.argmax(snap.codes.abs()).item())
     edited = edit_features(pair.sae, snap, replacements={selected: 0.0})
-    delta = float(torch.linalg.vector_norm(
-        edited.activation.float() - snap.activation.float()
-    ).item())
+    delta = float(
+        torch.linalg.vector_norm(
+            edited.activation.float() - snap.activation.float()
+        ).item()
+    )
     record = {
         "schema": "saebase.stage_d_recovery_03.external_interop.v1",
         "status": pair.verification,
@@ -119,10 +125,16 @@ def main() -> dict:
         "l0": int(torch.count_nonzero(snap.codes).item()),
         "ablated_feature_id": selected,
         "activation_delta_l2": delta,
-        "finite": bool(torch.isfinite(snap.reconstruction).all() and torch.isfinite(edited.activation).all()),
+        "finite": bool(
+            torch.isfinite(snap.reconstruction).all()
+            and torch.isfinite(edited.activation).all()
+        ),
         "nontrivial_ablation": delta > 1e-8,
     }
-    if pair.verification != "probe_passed_not_checkpoint_certified" or not record["nontrivial_ablation"]:
+    if (
+        pair.verification != "probe_passed_not_checkpoint_certified"
+        or not record["nontrivial_ablation"]
+    ):
         raise SystemExit(json.dumps(record, indent=2))
     return record
 
