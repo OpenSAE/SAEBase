@@ -8,10 +8,8 @@ Start with the task you want to perform. The documentation is organized by **cap
 
 - [First Experiment](first-experiment.md) — a single CPU-only command that writes persistent metric, provenance and reliability reports.
 - [Troubleshooting](troubleshooting.md) — installation, checkpoint and benchmark error checks.
-- [Verified Model and SAE Layer Matrix](verified-model-matrix.md) — current `main` Stage D results and per-site evidence.
+- [Verified Models and SAE Checkpoints](verified-model-matrix.md) — 18 configurations, 48 evaluated layer sites, and linked results.
 - [Getting Started](getting-started.md) — installation, offline example, benchmark preflight and a real checkpoint walkthrough.
-- [Phase A Model Coverage](phase-a-model-coverage.md) — six initial 270M–8B models with real checkpoint evidence.
-- [Model and SAE Coverage: Stages B+C](stage-bc-model-sae-coverage.md) — 15 core model variants, 48 layer checkpoints, historical CPU-era evidence before Stage D.
 - [Models and SAEs](model-support.md) — registry versus verified checkpoint coverage, public source links and access constraints.
 - [Examples Index](../examples/README.md) — runnable demonstrations grouped by research task.
 - [Python API](python-api.md) — public research functions, store/benchmark/audit entrypoints and CLI commands.
@@ -34,14 +32,15 @@ Start with the task you want to perform. The documentation is organized by **cap
 - [Contributor Guide](contributor-guide.md) — find a first task, run tests and submit a reproducible pull request.
 - [Maintainer Workflow](maintainer-workflow.md) — ownership, code review and the CI/release process.
 - [CI and Research Validation Lanes](ci-maintenance.md) — pinned regressions, optional real-checkpoint acceptance and release safeguards.
-- [Stage D Evidence Archive](stage-d-evidence-archive.md) — compact data bundle, SHA256 audit, original run recovery.
+- [Benchmark Evidence and Reproducibility](stage-d-evidence-archive.md) — download and audit original experiment measurements and verification reports.
+- [Earlier Checkpoint Studies](phase-a-model-coverage.md) and [CPU Validation Records](stage-bc-model-sae-coverage.md) — historical compatibility tests retained for reproducibility.
 - [Validation and Reproducibility](validation.md) — actual public-checkpoint acceptance versus optional and unverified capabilities.
 - [Checkpoint Acceptance Protocol](reference-checkpoint-validation.md) — detailed reference experiment and checksum requirements.
 - [Public API Validation](public-api-validation.md) — detailed API behavior and compatibility tests.
 - [Research Integration Validation](research-integration-validation.md) — original-source and protocol acceptance notes.
 - [Release and Checkpoint Matrix](checkpoint-validation.md) — versioned multi-checkpoint acceptance, performance and integrity checks.
 - [General Software Release Process](release-process.md) — exact-commit CI gate, candidate checksums and manual version publication.
-- [Release Notes: v0.2.0](releases/v0.2.0.md) — shipped capabilities, bounds and installation.
+- [Release Notes: v0.3.0](releases/v0.3.0.md) — current software capabilities, compatibility, and verified evidence.
 - [Changelog](../CHANGELOG.md), [Provenance](PROVENANCE.md), [Release Checklist](RELEASE_CHECKLIST.md), [Contributing](../CONTRIBUTING.md) and [Security](../SECURITY.md).
 
 ## Terminology and compatibility
