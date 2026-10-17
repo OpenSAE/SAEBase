@@ -104,9 +104,7 @@ def main() -> dict:
     selected = int(torch.argmax(snap.codes.abs()).item())
     edited = edit_features(pair.sae, snap, replacements={selected: 0.0})
     delta = float(
-        torch.linalg.vector_norm(
-            edited.activation.float() - snap.activation.float()
-        ).item()
+        torch.linalg.vector_norm(edited.activation.float() - snap.activation.float()).item()
     )
     record = {
         "schema": "saebase.stage_d_recovery_03.external_interop.v1",
@@ -126,8 +124,7 @@ def main() -> dict:
         "ablated_feature_id": selected,
         "activation_delta_l2": delta,
         "finite": bool(
-            torch.isfinite(snap.reconstruction).all()
-            and torch.isfinite(edited.activation).all()
+            torch.isfinite(snap.reconstruction).all() and torch.isfinite(edited.activation).all()
         ),
         "nontrivial_ablation": delta > 1e-8,
     }
