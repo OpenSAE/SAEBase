@@ -157,7 +157,7 @@ def load_hf_hooks_model(
     if dev == "cuda":
         dev = require_cuda()
 
-    tok = AutoTokenizer.from_pretrained(model_name)
+    tok = AutoTokenizer.from_pretrained(model_name, revision=revision)
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         torch_dtype=dtype,
