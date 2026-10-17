@@ -110,7 +110,7 @@ saebase-benchmark --config conf/benchmark/p0_small.json --report-only
 ## 🧠 支持的模型与 SAE
 
 <!-- BEGIN VERIFIED_MODEL_SUPPORT -->
-**当前 main（Stage D，2026-10-16）。** **48/48** 个已选模型-SAE 层位通过真实配对验收，**48/48** 个完成包含 64 个独立评估组的工程 Benchmark，**48/48** 个完成 Reliability 审计，共 **18** 组模型-SAE 配置（270M-9B）。详见[已验证层位矩阵](docs/verified-model-matrix.md)。
+**已验证的模型与 SAE（2026-10-16）。** 覆盖 **18** 组模型与 SAE 配置（270M-9B），**48/48** 个选定层位通过真实权重兼容性检查，**48/48** 个完成基于 64 组独立留出提示的基准评估，**48/48** 个完成统计可靠性审计。详见[模型支持与逐层验证结果](docs/verified-model-matrix.md)。
 <!-- END VERIFIED_MODEL_SUPPORT -->
 
 
