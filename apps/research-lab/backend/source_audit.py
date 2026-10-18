@@ -8,6 +8,7 @@ text or model data is uploaded automatically.
 The audit is *not* a human license review, a scientifically representative
 sampling proof, or permission to publish third-party text.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -62,13 +63,22 @@ def audit_source(
     exported = acquire(
         dataset_id,
         source_file,
-        max_raw_rows=(35000 if dataset_id == "squad" else 20000 if dataset_id == "wikitext103" else max_raw_rows),
+        max_raw_rows=(
+            35000
+            if dataset_id == "squad"
+            else 20000
+            if dataset_id == "wikitext103"
+            else max_raw_rows
+        ),
         source_revision=pinned_revision,
     )
     release = freeze_dataset(
-        dataset_id, _raw_jsonl(source_file),
+        dataset_id,
+        _raw_jsonl(source_file),
         source_revision=exported["resolved_revision"],
-        output=frozen, license_reviewed=False, human_reviewed=False,
+        output=frozen,
+        license_reviewed=False,
+        human_reviewed=False,
     )
     reviewed = _redacted_records(frozen / "records.jsonl")
     if len(reviewed) != 50 or len({x["prompt_group_id"] for x in reviewed}) != 50:
@@ -188,7 +198,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--source", action="append", help="Repeat to scan selected sources")
     parser.add_argument("--max-raw-rows", type=int, default=2500)
     parser.add_argument("--revisions", type=Path, help="Optional JSON dataset_id -> 40-hex SHA")
-    parser.add_argument("--source-lock", type=Path, help="Use frozen source commits from source_lock_v1.json")
+    parser.add_argument(
+        "--source-lock", type=Path, help="Use frozen source commits from source_lock_v1.json"
+    )
     args = parser.parse_args(argv)
     if args.revisions and args.source_lock:
         parser.error("Use either --source-lock or --revisions, not both")
@@ -210,7 +222,8 @@ def main(argv: list[str] | None = None) -> int:
         "candidate_count": report["candidate_count"],
         "failures": [
             {"source": row["dataset_id"], "error": row.get("error_summary", "")}
-            for row in report["dataset_results"] if row["status"] == "blocked"
+            for row in report["dataset_results"]
+            if row["status"] == "blocked"
         ],
         "reviewed_for_public_release": False,
         "metadata_file": str(args.output),

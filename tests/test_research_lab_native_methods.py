@@ -1,4 +1,5 @@
 """Pinned *original* SAR/RSS parity on CPU-only measured-array interfaces."""
+
 from __future__ import annotations
 
 import importlib.util

@@ -5,6 +5,7 @@ the deterministic source-export digests, 50 rendered-candidate digests per
 source, and the whole redacted 500-row audit fingerprint. It does NOT
 certify rights to republish, scientific quality, or absence of near duplicates.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -83,7 +84,10 @@ def verify_corpus_lock(
             raise ValueError("Missing redacted sample identity rows: " + dataset_id)
         usage = {"discovery": 0, "evaluation": 0}
         for row in rows:
-            if row.get("dataset_id") != dataset_id or row.get("source_revision") != ref["source_revision"]:
+            if (
+                row.get("dataset_id") != dataset_id
+                or row.get("source_revision") != ref["source_revision"]
+            ):
                 raise ValueError("Incorrect row origin: " + dataset_id)
             if "prompt" in row or "text" in row:
                 raise ValueError("Redacted lock unexpectedly contains source prompt text")
@@ -97,8 +101,11 @@ def verify_corpus_lock(
             ):
                 raise ValueError("Malformed redacted candidate identity")
             usage[row["usage_split"]] += 1
-            for seen, key in ((all_sample_ids, "sample_id"), (all_groups, "prompt_group_id"),
-                              (all_text_sha, "text_sha256")):
+            for seen, key in (
+                (all_sample_ids, "sample_id"),
+                (all_groups, "prompt_group_id"),
+                (all_text_sha, "text_sha256"),
+            ):
                 value = row[key]
                 if value in seen:
                     raise ValueError("Repeated source sample, group or exact content hash")

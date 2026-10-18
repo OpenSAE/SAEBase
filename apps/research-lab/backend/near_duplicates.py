@@ -4,6 +4,7 @@ This is a deterministic, deliberately conservative *lexical* screen. It does
 not certify semantic equivalence, model leakage, downstream validity or
 redistribution rights. Only sample identities and overlap scores are emitted.
 """
+
 from __future__ import annotations
 
 import itertools
@@ -37,11 +38,13 @@ def scan_near_duplicates(
         if not path.exists():
             continue
         for row in _raw_jsonl(path):
-            rows.append({
-                "dataset_id": dataset_id,
-                "sample_id": row["sample_id"],
-                "usage_split": row["usage_split"],
-            })
+            rows.append(
+                {
+                    "dataset_id": dataset_id,
+                    "sample_id": row["sample_id"],
+                    "usage_split": row["usage_split"],
+                }
+            )
             shingles.append(_shingles(row["prompt"]))
     posting: dict[tuple[str, ...], list[int]] = defaultdict(list)
     for i, values in enumerate(shingles):
@@ -62,13 +65,15 @@ def scan_near_duplicates(
             continue
         similarity = len(a & b) / union
         if similarity >= threshold:
-            matches.append({
-                "left_id": rows[left]["sample_id"],
-                "right_id": rows[right]["sample_id"],
-                "similarity": round(similarity, 4),
-                "cross_dataset": rows[left]["dataset_id"] != rows[right]["dataset_id"],
-                "cross_usage_split": rows[left]["usage_split"] != rows[right]["usage_split"],
-            })
+            matches.append(
+                {
+                    "left_id": rows[left]["sample_id"],
+                    "right_id": rows[right]["sample_id"],
+                    "similarity": round(similarity, 4),
+                    "cross_dataset": rows[left]["dataset_id"] != rows[right]["dataset_id"],
+                    "cross_usage_split": rows[left]["usage_split"] != rows[right]["usage_split"],
+                }
+            )
     return {
         "algorithm": "casefolded_unicode_word_5gram_jaccard_v1",
         "threshold": threshold,

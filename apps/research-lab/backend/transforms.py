@@ -82,9 +82,7 @@ CONTEXT_SETS = (
 )
 
 
-def _variant_text(
-    base: str, setting: str, operator: int, realization: int, dataset_id: str
-) -> str:
+def _variant_text(base: str, setting: str, operator: int, realization: int, dataset_id: str) -> str:
     """Preserve original task text verbatim, never claim equivalent behavior."""
     if dataset_id in CODE_PREFIX:
         # Python exercise prefixes cannot acquire an arbitrary leading indent
@@ -206,8 +204,10 @@ def build_variants(
         "n_proposals": 45,
         "fully_reviewed": False,
         "transform_family": (
-            "python_comment_and_whitespace" if dataset_id in CODE_PREFIX
-            else "prose_continuation" if dataset_id in PROSE_CONTINUATION
+            "python_comment_and_whitespace"
+            if dataset_id in CODE_PREFIX
+            else "prose_continuation"
+            if dataset_id in PROSE_CONTINUATION
             else "question_wrapper"
         ),
         "interpretation": "proposed expression changes, not certified task equivalence",

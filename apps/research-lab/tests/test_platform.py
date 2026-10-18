@@ -685,7 +685,7 @@ def test_rss_variant_builder_supports_all_ten_sources_as_unreviewed_proposals():
 
     for source in [row["id"] for row in core.dataset_catalog()["sources"]]:
         base = (
-            "def example(x):\n    \"\"\"Describe x.\"\"\"\n"
+            'def example(x):\n    """Describe x."""\n'
             if source == "humaneval"
             else "A standalone original question about a measurable model feature."
         )
@@ -705,16 +705,17 @@ def test_rss_variant_builder_supports_all_ten_sources_as_unreviewed_proposals():
         assert all(v["text"].count(base) == 1 for v in variants["variants"])
         if source == "humaneval":
             assert variants["transform_family"] == "python_comment_and_whitespace"
-            assert all(
-                v["text"].lstrip().startswith(("#", "def"))
-                for v in variants["variants"]
-            )
+            assert all(v["text"].lstrip().startswith(("#", "def")) for v in variants["variants"])
         if source in ("wikitext103", "tinystories"):
             assert variants["transform_family"] == "prose_continuation"
     with pytest.raises(ValueError, match="exactly|once|Anchor"):
         build_variants(
-            "boolq", "boolq:id", "boolq:group", "Answer: Answer:",
-            anchor="Answer:", source_revision="a" * 40,
+            "boolq",
+            "boolq:id",
+            "boolq:group",
+            "Answer: Answer:",
+            anchor="Answer:",
+            source_revision="a" * 40,
         )
 
 
@@ -754,16 +755,35 @@ def test_durable_queue_idempotency_private_reference_and_lease_recovery(tmp_path
         )
     claim = q.claim(worker_id="gpu-worker-1", now=110, lease_seconds=30)
     assert claim["job_id"] == first["job_id"] and claim["attempt"] == 1
-    assert q.heartbeat(job_id=claim["job_id"], worker_id="wrong-worker", attempt=claim["attempt"], now=111) is False
-    assert q.heartbeat(job_id=claim["job_id"], worker_id="gpu-worker-1", attempt=claim["attempt"], now=120, lease_seconds=30)
+    assert (
+        q.heartbeat(
+            job_id=claim["job_id"], worker_id="wrong-worker", attempt=claim["attempt"], now=111
+        )
+        is False
+    )
+    assert q.heartbeat(
+        job_id=claim["job_id"],
+        worker_id="gpu-worker-1",
+        attempt=claim["attempt"],
+        now=120,
+        lease_seconds=30,
+    )
     assert q.reap_expired(now=151) == {"requeued": 1, "failed": 0}
     claim2 = q.claim(worker_id="gpu-worker-2", now=152, lease_seconds=30)
     assert claim2["attempt"] == 2
     assert not q.finish(
-        job_id=claim2["job_id"], worker_id="gpu-worker-1", attempt=claim["attempt"], result_sha256="f" * 64, now=155
+        job_id=claim2["job_id"],
+        worker_id="gpu-worker-1",
+        attempt=claim["attempt"],
+        result_sha256="f" * 64,
+        now=155,
     )
     assert q.finish(
-        job_id=claim2["job_id"], worker_id="gpu-worker-2", attempt=claim2["attempt"], result_sha256="f" * 64, now=155
+        job_id=claim2["job_id"],
+        worker_id="gpu-worker-2",
+        attempt=claim2["attempt"],
+        result_sha256="f" * 64,
+        now=155,
     )
     assert q.status(job_id=first["job_id"], owner="research-user-1")["status"] == "succeeded"
     assert q.cancel(job_id=first["job_id"], owner="research-user-1") is False
@@ -792,12 +812,13 @@ def test_queue_refuses_invalid_specs_and_stale_worker_completion(tmp_path):
     job = q.enqueue(owner="owner-1", client_key="nonce-123456", spec=spec, now=100)
     assert q.claim(worker_id="worker-1", now=101, lease_seconds=30)["attempt"] == 1
     assert (
-        q.finish(job_id=job["job_id"], worker_id="worker-1", attempt=1, error_code="MODEL_ERROR", now=132)
+        q.finish(
+            job_id=job["job_id"], worker_id="worker-1", attempt=1, error_code="MODEL_ERROR", now=132
+        )
         is False
     )
     assert q.reap_expired(now=132, max_attempts=1)["failed"] == 1
     assert q.status(job_id=job["job_id"], owner="owner-1")["status"] == "failed"
-
 
 
 def test_controlled_six_factor_designs_are_complete_and_original_compatible(tmp_path):
@@ -809,9 +830,7 @@ def test_controlled_six_factor_designs_are_complete_and_original_compatible(tmp_
         write_candidate,
     )
 
-    configuration = json.loads(
-        (PROJECT / "data" / "coverage.json").read_text(encoding="utf-8")
-    )
+    configuration = json.loads((PROJECT / "data" / "coverage.json").read_text(encoding="utf-8"))
     assert set(configuration["localize_designs"]) == set(DESIGNS)
     assert len(DESIGNS) == 2
     for name in DESIGNS:
@@ -873,7 +892,6 @@ def test_synthetic_control_is_not_presented_as_real_sae_data():
         synthetic_reference_codes(make_candidate("real_model_six_factor_design"))
 
 
-
 def test_wikitext_raw_lines_preserve_original_article_membership(monkeypatch, tmp_path):
     """Raw-line shuffling before grouping would attach passages to wrong articles."""
     import types
@@ -911,7 +929,10 @@ def test_wikitext_raw_lines_preserve_original_article_membership(monkeypatch, tm
     monkeypatch.setitem(sys.modules, "huggingface_hub", types.SimpleNamespace(HfApi=FakeApi))
     target = tmp_path / "wikitext.jsonl"
     result = acquire(
-        "wikitext103", target, max_raw_rows=100, source_revision="f" * 40,
+        "wikitext103",
+        target,
+        max_raw_rows=100,
+        source_revision="f" * 40,
     )
     entries = [json.loads(line) for line in target.read_text(encoding="utf-8").splitlines()]
     assert len(entries) == 3
@@ -925,25 +946,18 @@ def test_redacted_cpu_audit_never_releases_unreviewed_prompt_text(tmp_path, monk
     import hashlib
     from backend import source_audit
 
-    raw = [
-        {"id": str(i), "text": "Confidential candidate story text " + str(i)}
-        for i in range(65)
-    ]
+    raw = [{"id": str(i), "text": "Confidential candidate story text " + str(i)} for i in range(65)]
 
     def fake_acquire(dataset_id, destination, **kwargs):
         assert dataset_id == "tinystories"
         destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_text(
-            "".join(json.dumps(row) + "\n" for row in raw), encoding="utf-8"
-        )
+        destination.write_text("".join(json.dumps(row) + "\n" for row in raw), encoding="utf-8")
         return {
             "repo": "roneneldan/TinyStories",
             "config": None,
             "split": "validation",
             "resolved_revision": "b" * 40,
-            "source_export_sha256": hashlib.sha256(
-                destination.read_bytes()
-            ).hexdigest(),
+            "source_export_sha256": hashlib.sha256(destination.read_bytes()).hexdigest(),
             "sampling_scope": "test-only source export",
             "max_raw_rows": 2500,
         }
@@ -960,9 +974,13 @@ def test_redacted_cpu_audit_never_releases_unreviewed_prompt_text(tmp_path, monk
     assert report["full_source_text_in_this_artifact"] is False
     data = (tmp_path / "private_manifest.json").read_text(encoding="utf-8")
     assert "Confidential candidate story text" not in data
-    assert all(len(row["text_sha256"]) == 64 for row in report["dataset_results"][0]["candidate_rows_without_text"])
-    assert all("prompt" not in row for row in report["dataset_results"][0]["candidate_rows_without_text"])
-
+    assert all(
+        len(row["text_sha256"]) == 64
+        for row in report["dataset_results"][0]["candidate_rows_without_text"]
+    )
+    assert all(
+        "prompt" not in row for row in report["dataset_results"][0]["candidate_rows_without_text"]
+    )
 
 
 def test_corpus_source_lock_has_ten_exact_pinned_upstream_commits():
@@ -994,8 +1012,8 @@ def test_redacted_corpus_lock_verification_rejects_changed_content():
     frozen = []
     for dataset_id in dataset_ids:
         revision = "b" * 40
-        source_sha = hashlib.sha256((dataset_id+"source").encode()).hexdigest()
-        candidate_sha = hashlib.sha256((dataset_id+"candidate").encode()).hexdigest()
+        source_sha = hashlib.sha256((dataset_id + "source").encode()).hexdigest()
+        candidate_sha = hashlib.sha256((dataset_id + "candidate").encode()).hexdigest()
         group_rows = [
             {
                 "dataset_id": dataset_id,
@@ -1003,31 +1021,41 @@ def test_redacted_corpus_lock_verification_rejects_changed_content():
                 "sample_id": dataset_id + ":sample:" + str(i),
                 "prompt_group_id": dataset_id + ":group:" + str(i),
                 "usage_split": "discovery" if i < 20 else "evaluation",
-                "text_sha256": hashlib.sha256((dataset_id+str(i)).encode()).hexdigest(),
+                "text_sha256": hashlib.sha256((dataset_id + str(i)).encode()).hexdigest(),
             }
             for i in range(50)
         ]
-        frozen.append({
-            "dataset_id": dataset_id, "status": "candidate_frozen_unreviewed",
-            "source_revision": revision,
-            "source_export_sha256": source_sha,
-            "candidate_sha256": candidate_sha,
-            "max_raw_rows": 2500,
-            "n_candidates": 50, "discovery": 20, "evaluation": 30,
-            "license_reviewed": False, "human_reviewed": False,
-            "candidate_rows_without_text": group_rows,
-        })
-        rows.append({
-            "dataset_id": dataset_id,
-            "source_revision": revision,
-            "source_export_sha256": source_sha,
-            "candidate_sha256": candidate_sha,
-            "max_raw_rows": 2500,
-        })
+        frozen.append(
+            {
+                "dataset_id": dataset_id,
+                "status": "candidate_frozen_unreviewed",
+                "source_revision": revision,
+                "source_export_sha256": source_sha,
+                "candidate_sha256": candidate_sha,
+                "max_raw_rows": 2500,
+                "n_candidates": 50,
+                "discovery": 20,
+                "evaluation": 30,
+                "license_reviewed": False,
+                "human_reviewed": False,
+                "candidate_rows_without_text": group_rows,
+            }
+        )
+        rows.append(
+            {
+                "dataset_id": dataset_id,
+                "source_revision": revision,
+                "source_export_sha256": source_sha,
+                "candidate_sha256": candidate_sha,
+                "max_raw_rows": 2500,
+            }
+        )
     report = {
         "schema": "opensae.corpus_cpu_audit.v1",
-        "sources_selected": 10, "candidate_count": 500,
-        "number_sources_target": 10, "gpu_calls": 0,
+        "sources_selected": 10,
+        "candidate_count": 500,
+        "number_sources_target": 10,
+        "gpu_calls": 0,
         "full_source_text_in_this_artifact": False,
         "cross_source_exact_duplicates": [],
         "dataset_results": frozen,
@@ -1035,9 +1063,12 @@ def test_redacted_corpus_lock_verification_rejects_changed_content():
     report["manifest_sha256"] = hashlib.sha256(core.canonical_json(report)).hexdigest()
     lock = {
         "schema": "opensae.corpus_source_lock.v1",
-        "total_sources": 10, "total_base_groups": 500,
-        "discovery_groups": 200, "evaluation_groups": 300,
-        "rights_review": "pending", "human_content_review": "pending",
+        "total_sources": 10,
+        "total_base_groups": 500,
+        "discovery_groups": 200,
+        "evaluation_groups": 300,
+        "rights_review": "pending",
+        "human_content_review": "pending",
         "audit_manifest_sha256": report["manifest_sha256"],
         "sources": rows,
     }
@@ -1045,13 +1076,12 @@ def test_redacted_corpus_lock_verification_rejects_changed_content():
     assert result["status"] == "frozen_candidates_verified_unreviewed"
     assert result["groups"] == 500
     tampered = json.loads(json.dumps(report))
-    tampered["dataset_results"][0]["candidate_rows_without_text"][0]["text_sha256"] = "0"*64
+    tampered["dataset_results"][0]["candidate_rows_without_text"][0]["text_sha256"] = "0" * 64
     with pytest.raises(ValueError, match="fingerprint"):
         verify_corpus_lock(tampered, lock)
     tampered["dataset_results"][0]["candidate_rows_without_text"][0]["prompt"] = "private original"
     with pytest.raises(ValueError, match="prompt text"):
         verify_corpus_lock(tampered, lock, verify_aggregate=False)
-
 
 
 def test_hellaswag_gold_labels_are_balanced_before_model_evaluation():
@@ -1091,19 +1121,14 @@ def test_cpu_near_duplicate_screen_reports_only_sample_ids(tmp_path):
         "usage_split": "evaluation",
         "prompt": base + " in its original context!",
     }
-    (source1 / "records.jsonl").write_text(
-        json.dumps(example_a) + "\n", encoding="utf-8"
-    )
-    (source2 / "records.jsonl").write_text(
-        json.dumps(example_b) + "\n", encoding="utf-8"
-    )
+    (source1 / "records.jsonl").write_text(json.dumps(example_a) + "\n", encoding="utf-8")
+    (source2 / "records.jsonl").write_text(json.dumps(example_b) + "\n", encoding="utf-8")
     report = scan_near_duplicates(tmp_path, ["boolq", "squad"])
     assert report["lexical_near_duplicate_count"] == 1
     assert report["candidates"][0]["cross_dataset"] is True
     assert report["candidates"][0]["cross_usage_split"] is True
     assert base not in json.dumps(report)
     assert report["interpretation"].endswith("human review pending")
-
 
 
 def test_cpu_rss_proposal_audit_does_not_publish_third_party_text(tmp_path):
@@ -1136,7 +1161,6 @@ def test_cpu_rss_proposal_audit_does_not_publish_third_party_text(tmp_path):
     assert rows[0]["prompt"] not in json.dumps(summary)
 
 
-
 def test_worker_attempt_fencing_rejects_stale_identical_worker_identity(tmp_path):
     from backend.jobs import JobQueue
 
@@ -1156,16 +1180,33 @@ def test_worker_attempt_fencing_rejects_stale_identical_worker_identity(tmp_path
     assert queue.reap_expired(now=132)["requeued"] == 1
     second = queue.claim(worker_id="same-gpu-worker", now=133, lease_seconds=30)
     assert second["attempt"] == 2
-    assert queue.heartbeat(
-        job_id=job["job_id"], worker_id="same-gpu-worker",
-        attempt=first["attempt"], now=134,
-    ) is False
-    assert queue.finish(
-        job_id=job["job_id"], worker_id="same-gpu-worker",
-        attempt=first["attempt"], result_sha256="b" * 64, now=135,
-    ) is False
-    assert queue.finish(
-        job_id=job["job_id"], worker_id="same-gpu-worker",
-        attempt=second["attempt"], result_sha256="c" * 64, now=135,
-    ) is True
+    assert (
+        queue.heartbeat(
+            job_id=job["job_id"],
+            worker_id="same-gpu-worker",
+            attempt=first["attempt"],
+            now=134,
+        )
+        is False
+    )
+    assert (
+        queue.finish(
+            job_id=job["job_id"],
+            worker_id="same-gpu-worker",
+            attempt=first["attempt"],
+            result_sha256="b" * 64,
+            now=135,
+        )
+        is False
+    )
+    assert (
+        queue.finish(
+            job_id=job["job_id"],
+            worker_id="same-gpu-worker",
+            attempt=second["attempt"],
+            result_sha256="c" * 64,
+            now=135,
+        )
+        is True
+    )
     assert queue.status(job_id=job["job_id"], owner="owner-retry")["status"] == "succeeded"

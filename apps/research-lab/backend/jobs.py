@@ -236,7 +236,13 @@ class JobQueue:
             }
 
     def heartbeat(
-        self, *, job_id: str, worker_id: str, attempt: int, now: float | None = None, lease_seconds: int = 300
+        self,
+        *,
+        job_id: str,
+        worker_id: str,
+        attempt: int,
+        now: float | None = None,
+        lease_seconds: int = 300,
     ) -> bool:
         if type(attempt) is not int or attempt < 1:
             raise JobError("Invalid worker attempt fencing token")

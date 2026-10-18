@@ -1,4 +1,5 @@
 """Summarize RSS variant identities on CPU without publishing source text."""
+
 from __future__ import annotations
 
 import hashlib

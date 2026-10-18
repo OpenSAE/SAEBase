@@ -34,8 +34,12 @@ def group_wikitext(lines: Iterable[dict]):
 
 
 def acquire(
-    source: str, destination: Path, *, max_raw_rows: int = 20000,
-    seed: int = 20261018, source_revision: str | None = None,
+    source: str,
+    destination: Path,
+    *,
+    max_raw_rows: int = 20000,
+    seed: int = 20261018,
+    source_revision: str | None = None,
 ) -> dict:
     definitions = {r["id"]: r for r in dataset_catalog()["sources"]}
     if source not in definitions:
@@ -53,7 +57,9 @@ def acquire(
         ) from e
     entry = definitions[source]
     if source_revision is not None:
-        if not isinstance(source_revision, str) or not re.fullmatch(r"[0-9a-f]{40}", source_revision):
+        if not isinstance(source_revision, str) or not re.fullmatch(
+            r"[0-9a-f]{40}", source_revision
+        ):
             raise ValueError("Explicit source revision must be a 40-character lowercase Git SHA")
         revision = HfApi().dataset_info(repo_id=entry["repo"], revision=source_revision).sha
         if revision != source_revision:
@@ -124,7 +130,17 @@ def main(argv=None):
     parser.add_argument("--max-raw-rows", type=int, default=20000)
     parser.add_argument("--source-revision", help="Optional exact 40-hex pinned dataset commit")
     args = parser.parse_args(argv)
-    print(json.dumps(acquire(args.source, args.output, max_raw_rows=args.max_raw_rows, source_revision=args.source_revision), indent=2))
+    print(
+        json.dumps(
+            acquire(
+                args.source,
+                args.output,
+                max_raw_rows=args.max_raw_rows,
+                source_revision=args.source_revision,
+            ),
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":

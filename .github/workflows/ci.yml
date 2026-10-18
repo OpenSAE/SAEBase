@@ -206,30 +206,6 @@ jobs:
         run: ruff check saebase/seed.py saebase/data/artifact_layout.py saebase/data/prompt_schema.py saebase/benchmarks/registry.py
       - name: Mypy on adopted modules
         run: mypy --config-file pyproject.toml saebase/seed.py saebase/data/artifact_layout.py saebase/data/prompt_schema.py saebase/benchmarks/registry.py
-      - name: Temporary CPU-05 formatting receipt
-        run: |
-          ruff check --fix apps/research-lab/backend/source_audit.py apps/research-lab/backend/corpus_lock.py apps/research-lab/backend/near_duplicates.py apps/research-lab/backend/variant_audit.py tests/test_research_lab_native_methods.py apps/research-lab/tests/test_platform.py apps/research-lab/backend/acquire.py apps/research-lab/backend/ingest.py apps/research-lab/backend/transforms.py apps/research-lab/backend/jobs.py || true
-          ruff format apps/research-lab/backend/source_audit.py apps/research-lab/backend/corpus_lock.py apps/research-lab/backend/near_duplicates.py apps/research-lab/backend/variant_audit.py tests/test_research_lab_native_methods.py apps/research-lab/tests/test_platform.py apps/research-lab/backend/acquire.py apps/research-lab/backend/ingest.py apps/research-lab/backend/transforms.py apps/research-lab/backend/jobs.py
-          python - <<'PY'
-          import base64
-          from pathlib import Path
-          names = [
-              "apps/research-lab/backend/source_audit.py",
-              "apps/research-lab/backend/corpus_lock.py",
-              "apps/research-lab/backend/near_duplicates.py",
-              "apps/research-lab/backend/variant_audit.py",
-              "tests/test_research_lab_native_methods.py",
-              "apps/research-lab/tests/test_platform.py",
-              "apps/research-lab/backend/acquire.py",
-              "apps/research-lab/backend/ingest.py",
-              "apps/research-lab/backend/transforms.py",
-              "apps/research-lab/backend/jobs.py",
-          ]
-          for name in names:
-              content = base64.b64encode(Path(name).read_bytes()).decode("ascii")
-              for i in range(0, len(content), 3000):
-                  print("@@P@@" + name + "@@" + str(i // 3000) + "@@" + content[i:i+3000])
-          PY
       - name: Enforce lint and formatting on new Python files
         shell: bash
         env:
