@@ -458,6 +458,16 @@ def test_cpu_sar_adapter_calls_only_pinned_trusted_estimator(tmp_path):
     assert result["results"][0]["value"] == 0.5
     assert result["results"][1] == {"metric": "rho2", "value": None, "status": "undefined"}
     assert result["source_sha256"] == trusted_sha
+    from backend.methods import build_analysis_index
+
+    index = build_analysis_index([result], tmp_path / "analyses")
+    assert index["count"] == 1
+    assert index["reviewed_scientific_measurements"] is False
+    assert core.analyses(tmp_path)[0]["kind"] == "sar"
+    with pytest.raises(ValueError, match="Unverified|unverified"):
+        build_analysis_index([{**result, "measurement_input_sha256": "oops"}], tmp_path / "bad_analysis")
+    with pytest.raises(ValueError, match="literal booleans"):
+        run_sar({**input_row, "masks": [[1] * 16 for _ in range(384)]}, original=source, expected_sha=trusted_sha)
     # A mocked trusted function tests dispatch, not scientific parity with
     # the separate, original SAR paper implementation.
     with pytest.raises(ValueError, match="mismatch"):
