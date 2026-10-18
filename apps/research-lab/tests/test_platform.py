@@ -680,27 +680,41 @@ def test_rss_cpu_transformations_keep_parent_and_disjoint_roles():
     assert result["variants"][0]["variant_id"] != changed["variants"][0]["variant_id"]
 
 
-def test_rss_variant_builder_blocks_code_and_continuation_templates():
+def test_rss_variant_builder_supports_all_ten_sources_as_unreviewed_proposals():
     from backend.transforms import build_variants
 
-    for dataset in ("humaneval", "wikitext103", "tinystories"):
-        with pytest.raises(ValueError, match="independently designed"):
-            build_variants(
-                dataset,
-                dataset + ":id",
-                dataset + ":group",
-                "A sample text.",
-                anchor="sample",
-                source_revision="a" * 40,
+    for source in [row["id"] for row in core.dataset_catalog()["sources"]]:
+        base = (
+            "def example(x):\n    \"\"\"Describe x.\"\"\"\n"
+            if source == "humaneval"
+            else "A standalone original question about a measurable model feature."
+        )
+        variants = build_variants(
+            source,
+            source + ":id",
+            source + ":group",
+            base,
+            anchor=base,
+            source_revision="a" * 40,
+        )
+        assert variants["n_proposals"] == 45
+        assert variants["fully_reviewed"] is False
+        assert len({v["variant_id"] for v in variants["variants"]}) == 45
+        assert all(v["semantic_review"] == "required" for v in variants["variants"])
+        assert all(v["tokenizer_alignment"] == "pending" for v in variants["variants"])
+        assert all(v["text"].count(base) == 1 for v in variants["variants"])
+        if source == "humaneval":
+            assert variants["transform_family"] == "python_comment_and_whitespace"
+            assert all(
+                v["text"].lstrip().startswith(("#", "def"))
+                for v in variants["variants"]
             )
+        if source in ("wikitext103", "tinystories"):
+            assert variants["transform_family"] == "prose_continuation"
     with pytest.raises(ValueError, match="exactly|once|Anchor"):
         build_variants(
-            "boolq",
-            "boolq:id",
-            "boolq:group",
-            "Answer: Answer:",
-            anchor="Answer:",
-            source_revision="a" * 40,
+            "boolq", "boolq:id", "boolq:group", "Answer: Answer:",
+            anchor="Answer:", source_revision="a" * 40,
         )
 
 
