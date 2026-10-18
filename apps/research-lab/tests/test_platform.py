@@ -633,3 +633,64 @@ def test_rss_variant_builder_blocks_code_and_continuation_templates():
             "boolq", "boolq:id", "boolq:group", "Answer: Answer:",
             anchor="Answer:", source_revision="a" * 40,
         )
+
+
+
+def test_durable_queue_idempotency_private_reference_and_lease_recovery(tmp_path):
+    from backend.jobs import JobError, JobQueue
+
+    site = next(s for s in core.load_sites() if core.has_complete_identity(s))
+    request = {
+        "site_id": site["site_id"],
+        "operation": "ablate",
+        "feature_ids": [1, 2],
+        "strength": 1.0,
+        "max_new_tokens": 16,
+        "input_ref": "a" * 64,
+    }
+    q = JobQueue(tmp_path / "private" / "queue.sqlite3",max_queued=1,max_per_owner=1)
+    first = q.enqueue(owner="research-user-1",client_key="nonce-1234",spec=request,now=100)
+    assert first["status"] == "queued" and not first["deduplicated"]
+    same = q.enqueue(owner="research-user-1",client_key="nonce-1234",spec=request,now=101)
+    assert same["job_id"] == first["job_id"] and same["deduplicated"]
+    assert q.status(job_id=first["job_id"],owner="unrelated-user") is None
+    with pytest.raises(JobError,match="quota"):
+        q.enqueue(owner="research-user-2",client_key="nonce-5678",spec=request,now=102)
+    with pytest.raises(JobError,match="different inputs"):
+        q.enqueue(owner="research-user-1",client_key="nonce-1234",
+                  spec={**request,"strength":2.0},now=103)
+    with pytest.raises(JobError,match="raw prompt"):
+        q.enqueue(owner="research-user-1",client_key="nonce-9999",
+                  spec={**request,"text":"secret original prompt"},now=104)
+    claim = q.claim(worker_id="gpu-worker-1",now=110,lease_seconds=30)
+    assert claim["job_id"] == first["job_id"] and claim["attempt"] == 1
+    assert q.heartbeat(job_id=claim["job_id"],worker_id="wrong-worker",now=111) is False
+    assert q.heartbeat(job_id=claim["job_id"],worker_id="gpu-worker-1",now=120,lease_seconds=30)
+    assert q.reap_expired(now=151) == {"requeued":1,"failed":0}
+    claim2 = q.claim(worker_id="gpu-worker-2",now=152,lease_seconds=30)
+    assert claim2["attempt"] == 2
+    assert not q.finish(job_id=claim2["job_id"],worker_id="gpu-worker-1",
+                        result_sha256="f"*64,now=155)
+    assert q.finish(job_id=claim2["job_id"],worker_id="gpu-worker-2",
+                    result_sha256="f"*64,now=155)
+    assert q.status(job_id=first["job_id"],owner="research-user-1")["status"] == "succeeded"
+    assert q.cancel(job_id=first["job_id"],owner="research-user-1") is False
+    assert "secret original prompt" not in (tmp_path/"private"/"queue.sqlite3").read_bytes().decode("utf-8",errors="ignore")
+
+
+def test_queue_refuses_invalid_specs_and_stale_worker_completion(tmp_path):
+    from backend.jobs import JobError, JobQueue
+
+    site = next(s for s in core.load_sites() if core.has_complete_identity(s))
+    q=JobQueue(tmp_path/"jobs.sqlite3")
+    spec={"site_id":site["site_id"],"operation":"identity",
+          "feature_ids":[],"strength":1,"max_new_tokens":4,"input_ref":"a"*64}
+    with pytest.raises(JobError,match="64-character|private content hash"):
+        q.enqueue(owner="owner-1",client_key="nonce-123456",spec={**spec,"input_ref":"bad"})
+    with pytest.raises(JobError,match="Identity|feature IDs"):
+        q.enqueue(owner="owner-1",client_key="nonce-123456",spec={**spec,"feature_ids":[1]})
+    job=q.enqueue(owner="owner-1",client_key="nonce-123456",spec=spec,now=100)
+    assert q.claim(worker_id="worker-1",now=101,lease_seconds=30)["attempt"] == 1
+    assert q.finish(job_id=job["job_id"],worker_id="worker-1",error_code="MODEL_ERROR",now=132) is False
+    assert q.reap_expired(now=132,max_attempts=1)["failed"] == 1
+    assert q.status(job_id=job["job_id"],owner="owner-1")["status"] == "failed"
