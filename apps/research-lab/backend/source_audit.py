@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import Any
 
 from .acquire import acquire
-from .core import canonical_json, dataset_catalog, digest
+from .core import canonical_json, dataset_catalog
 from .ingest import _atomic_bytes, _raw_jsonl, freeze_dataset
 
 SCHEMA = "opensae.corpus_cpu_audit.v1"
@@ -183,8 +183,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--max-raw-rows", type=int, default=2500)
     parser.add_argument("--revisions", type=Path, help="Optional JSON dataset_id -> 40-hex SHA")
     args = parser.parse_args(argv)
-    with args.revisions.open("r", encoding="utf-8") if args.revisions else tempfile.TemporaryFile(mode="w+") as fh:
-        versions = json.load(fh) if args.revisions else {}
+    versions = json.loads(args.revisions.read_text(encoding="utf-8")) if args.revisions else {}
     report = audit_sources(
         destination=args.output,
         dataset_ids=args.source,
