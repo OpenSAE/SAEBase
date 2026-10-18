@@ -117,3 +117,28 @@ Do not apply ordinary independent-prompt bootstrap to complete grid states.
 - No third-party model weights or user secrets pushed to this repo.
 - Simulate worker cancel/OOM/restart, database recovery and private
   artifact access control before enabling public POST /api/jobs.
+
+
+## New CPU-stage artifacts prepared in the implementation PR
+
+- apps/research-lab/data/coverage.json fixes six deep sites, three
+  standard SAR sites and the single online candidate to exact historical
+  names. It does not claim all those sites have new prompt measurements.
+- backend/plan.py generates 632 deterministic task specifications, containing
+  only source identity, planned protocol and explicitly blocked prerequisites.
+  Three historical small-model site records lack complete weight hashes; these
+  remain blocked for *new* captures until checked against newly loaded weights.
+- backend/feature_store.py writes an immutable paginated SQLite feature
+  browse index suitable for growth beyond a single 64 MiB JSON file.
+- backend/readouts.py prevents a single next-token score from masquerading
+  as a complete answer likelihood, and validates RSS input anchors.
+- backend/transforms.py proposes exactly 45 transformation instances per
+  supported frozen prompt (selection/held-out roles included), without
+  marking semantic validity as approved. Generic variants for TinyStories,
+  WikiText and HumanEval are deliberately blocked.
+- apps/research-lab/Dockerfile packages the historical read-only site,
+  independent of a GPU worker. CI runs its own Docker smoke for 48 historical
+  site records and checks no new curated corpus has been silently fabricated.
+
+A later operator should start with backend.plan and resolve the listed
+blocking prerequisites, not replace the manifest with optimistic flags.

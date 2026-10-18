@@ -567,7 +567,7 @@ def test_cpu_source_acquisition_is_pinned_and_never_public_without_review(tmp_pa
         assert kwargs["path"] == "roneneldan/TinyStories"
         assert kwargs["split"] == "validation"
         assert kwargs["revision"] == "f" * 40
-        assert kwargs["trust_remote_code"] is False
+        assert "trust_remote_code" not in kwargs
         return FakeStream()
 
     class FakeHfApi:

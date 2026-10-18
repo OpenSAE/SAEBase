@@ -166,3 +166,56 @@ Do not claim arbitrary token editing or GPU streaming throughput.
 - Source methods: OpenSAE SAR, RSS and SAE-Input-Localization repositories
 - This is a local scaffold, NOT a claim that the existing OpenSAE Hugging
   Face Space has been modified or that any live GPU is attached.
+
+
+## Scalable CPU feature store and task plan
+
+For large real activation exports, prefer the paginated SQLite-based index
+over the legacy compact JSON index:
+
+    python -m backend.feature_store --input /path/to/real-observations.jsonl
+
+The SQLite publisher checks every site/checkpoint identity, deduplicates
+prompt-group counts, retains at most eight reviewed examples per feature
+and commits an immutable checksum manifest. It is a **browsing index**, not
+the lossless scientific SAE codes. Report/API queries are paginated.
+
+Before any GPU environment exists, generate the full task inventory:
+
+    python -m backend.plan
+    python -m backend.plan --output /tmp/opensae-compute-plan.json
+
+With no collected new source releases it enumerates exactly 632 plans:
+480 capture tasks across 48 sites and 10 datasets, 60 intervention bundles,
+30 SAR bundles, 60 RSS bundles and two controlled-grid Localize plans.
+They remain marked **blocked/not run**, with explicit missing input and
+checkpoint-hash reasons. When reviewed source releases arrive, eligible
+capture jobs become available for operator preflight without inventing data.
+
+The task-level scoring library in backend/readouts.py validates complete
+teacher-forced candidate log-probability sequences, not single-token proxies.
+It also checks unchanged input anchors and tokenizer offset mappings.
+
+To propose transformation texts for one *already frozen* question, use:
+
+    python -m backend.transforms --input /path/to/frozen-prompt.json \
+      --anchor 'Question: original question text' \
+      --output /tmp/proposed-variants.json
+
+This generates 3 settings × 5 operators × 3 realizations = 45 proposed
+input variants, with exactly 5 selection and 10 held-out per setting.
+Proposals are **not automatically certified meaning-preserving**.
+Code/continuation datasets are intentionally rejected by the generic
+renderer until a separate, valid study protocol exists.
+
+## CPU Docker deployment
+
+From the SAEBase root:
+
+    docker build -f apps/research-lab/Dockerfile -t opensae-lab:cpu .
+    docker run --rm -p 7860:7860 opensae-lab:cpu
+
+The image ships the app and already-published engineering reports, but no
+SAE weights, GPU dependencies, private input data or online worker.
+See docs/research-lab/cpu-deployment.md for HF Docker Space preparation,
+pre-existing Space backup, rollback and acceptance checks.

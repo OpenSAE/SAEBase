@@ -58,7 +58,6 @@ def acquire(
         "split": entry["split"],
         "revision": revision,
         "streaming": True,
-        "trust_remote_code": False,
     }
     if entry["config"]:
         options["name"] = entry["config"]
