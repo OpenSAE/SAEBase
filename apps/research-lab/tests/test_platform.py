@@ -754,16 +754,16 @@ def test_durable_queue_idempotency_private_reference_and_lease_recovery(tmp_path
         )
     claim = q.claim(worker_id="gpu-worker-1", now=110, lease_seconds=30)
     assert claim["job_id"] == first["job_id"] and claim["attempt"] == 1
-    assert q.heartbeat(job_id=claim["job_id"], worker_id="wrong-worker", now=111) is False
-    assert q.heartbeat(job_id=claim["job_id"], worker_id="gpu-worker-1", now=120, lease_seconds=30)
+    assert q.heartbeat(job_id=claim["job_id"], worker_id="wrong-worker", attempt=claim["attempt"], now=111) is False
+    assert q.heartbeat(job_id=claim["job_id"], worker_id="gpu-worker-1", attempt=claim["attempt"], now=120, lease_seconds=30)
     assert q.reap_expired(now=151) == {"requeued": 1, "failed": 0}
     claim2 = q.claim(worker_id="gpu-worker-2", now=152, lease_seconds=30)
     assert claim2["attempt"] == 2
     assert not q.finish(
-        job_id=claim2["job_id"], worker_id="gpu-worker-1", result_sha256="f" * 64, now=155
+        job_id=claim2["job_id"], worker_id="gpu-worker-1", attempt=claim["attempt"], result_sha256="f" * 64, now=155
     )
     assert q.finish(
-        job_id=claim2["job_id"], worker_id="gpu-worker-2", result_sha256="f" * 64, now=155
+        job_id=claim2["job_id"], worker_id="gpu-worker-2", attempt=claim2["attempt"], result_sha256="f" * 64, now=155
     )
     assert q.status(job_id=first["job_id"], owner="research-user-1")["status"] == "succeeded"
     assert q.cancel(job_id=first["job_id"], owner="research-user-1") is False
@@ -792,7 +792,7 @@ def test_queue_refuses_invalid_specs_and_stale_worker_completion(tmp_path):
     job = q.enqueue(owner="owner-1", client_key="nonce-123456", spec=spec, now=100)
     assert q.claim(worker_id="worker-1", now=101, lease_seconds=30)["attempt"] == 1
     assert (
-        q.finish(job_id=job["job_id"], worker_id="worker-1", error_code="MODEL_ERROR", now=132)
+        q.finish(job_id=job["job_id"], worker_id="worker-1", attempt=1, error_code="MODEL_ERROR", now=132)
         is False
     )
     assert q.reap_expired(now=132, max_attempts=1)["failed"] == 1
@@ -1134,3 +1134,38 @@ def test_cpu_rss_proposal_audit_does_not_publish_third_party_text(tmp_path):
     assert summary["input_texts_in_audit"] is False
     assert len(summary["metadata_only_sha256"]) == 64
     assert rows[0]["prompt"] not in json.dumps(summary)
+
+
+
+def test_worker_attempt_fencing_rejects_stale_identical_worker_identity(tmp_path):
+    from backend.jobs import JobQueue
+
+    site = next(s for s in core.load_sites() if core.has_complete_identity(s))
+    queue = JobQueue(tmp_path / "fenced.sqlite3")
+    request = {
+        "site_id": site["site_id"],
+        "operation": "identity",
+        "feature_ids": [],
+        "strength": 1.0,
+        "max_new_tokens": 4,
+        "input_ref": "e" * 64,
+    }
+    job = queue.enqueue(owner="owner-retry", client_key="retry-1234", spec=request, now=100)
+    first = queue.claim(worker_id="same-gpu-worker", now=101, lease_seconds=30)
+    assert first["attempt"] == 1
+    assert queue.reap_expired(now=132)["requeued"] == 1
+    second = queue.claim(worker_id="same-gpu-worker", now=133, lease_seconds=30)
+    assert second["attempt"] == 2
+    assert queue.heartbeat(
+        job_id=job["job_id"], worker_id="same-gpu-worker",
+        attempt=first["attempt"], now=134,
+    ) is False
+    assert queue.finish(
+        job_id=job["job_id"], worker_id="same-gpu-worker",
+        attempt=first["attempt"], result_sha256="b" * 64, now=135,
+    ) is False
+    assert queue.finish(
+        job_id=job["job_id"], worker_id="same-gpu-worker",
+        attempt=second["attempt"], result_sha256="c" * 64, now=135,
+    ) is True
+    assert queue.status(job_id=job["job_id"], owner="owner-retry")["status"] == "succeeded"
