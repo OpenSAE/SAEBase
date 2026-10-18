@@ -1037,3 +1037,55 @@ def test_redacted_corpus_lock_verification_rejects_changed_content():
     tampered["dataset_results"][0]["candidate_rows_without_text"][0]["prompt"] = "private original"
     with pytest.raises(ValueError, match="prompt text"):
         verify_corpus_lock(tampered, lock, verify_aggregate=False)
+
+
+
+def test_hellaswag_gold_labels_are_balanced_before_model_evaluation():
+    candidates = [
+        {
+            "ctx": "An independent example with source number " + str(i),
+            "endings": ["First ending.", "Second ending.", "Third ending.", "Fourth ending."],
+            "label": str(i % 4),
+        }
+        for i in range(160)
+    ]
+    rows = select_records("hellaswag", candidates)
+    assert len(rows) == 50
+    from collections import Counter
+
+    assert Counter(item["task_label"] for item in rows) == Counter(
+        {"A": 13, "B": 13, "C": 12, "D": 12}
+    )
+    assert rows == select_records("hellaswag", list(reversed(candidates)))
+
+
+def test_cpu_near_duplicate_screen_reports_only_sample_ids(tmp_path):
+    from backend.near_duplicates import scan_near_duplicates
+
+    base = "A careful research question asks the same central question about model features"
+    source1 = tmp_path / "boolq"
+    source2 = tmp_path / "squad"
+    source1.mkdir()
+    source2.mkdir()
+    example_a = {
+        "sample_id": "boolq:s1",
+        "usage_split": "discovery",
+        "prompt": base + " in its original context.",
+    }
+    example_b = {
+        "sample_id": "squad:s2",
+        "usage_split": "evaluation",
+        "prompt": base + " in its original context!",
+    }
+    (source1 / "records.jsonl").write_text(
+        json.dumps(example_a) + "\n", encoding="utf-8"
+    )
+    (source2 / "records.jsonl").write_text(
+        json.dumps(example_b) + "\n", encoding="utf-8"
+    )
+    report = scan_near_duplicates(tmp_path, ["boolq", "squad"])
+    assert report["lexical_near_duplicate_count"] == 1
+    assert report["candidates"][0]["cross_dataset"] is True
+    assert report["candidates"][0]["cross_usage_split"] is True
+    assert base not in json.dumps(report)
+    assert report["interpretation"].endswith("human review pending")
