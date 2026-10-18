@@ -586,3 +586,50 @@ def test_cpu_source_acquisition_is_pinned_and_never_public_without_review(tmp_pa
     assert len(path.read_text().strip().splitlines()) == 100
     with pytest.raises(FileExistsError):
         acquire("tinystories", path, max_raw_rows=100)
+
+
+
+def test_rss_cpu_transformations_keep_parent_and_disjoint_roles():
+    from backend.transforms import build_variants
+
+    kwargs = {
+        "dataset_id": "boolq",
+        "sample_id": "boolq:s1",
+        "prompt_group_id": "boolq:g1",
+        "base_prompt": "Passage:\nCats sleep.\nQuestion: Do cats sleep?\nAnswer yes or no:",
+        "anchor": "Question: Do cats sleep?",
+        "source_revision": "d" * 40,
+    }
+    result = build_variants(**kwargs)
+    assert result["n_proposals"] == 45
+    assert result["fully_reviewed"] is False
+    assert result == build_variants(**kwargs)
+    variants = result["variants"]
+    assert len({x["variant_id"] for x in variants}) == 45
+    for setting in ("local_format", "instruction_wrapper", "context_wrapper"):
+        rows = [x for x in variants if x["setting"] == setting]
+        assert len(rows) == 15
+        assert sum(x["variant_role"] == "selection" for x in rows) == 5
+        assert sum(x["variant_role"] == "held_out" for x in rows) == 10
+        assert len({x["operator"] for x in rows}) == 5
+        assert all(x["prompt_group_id"] == "boolq:g1" for x in rows)
+        assert all(x["semantic_review"] == "required" for x in rows)
+        assert all(x["text"].count(kwargs["anchor"]) == 1 for x in rows)
+    changed = build_variants(**{**kwargs, "source_revision": "a" * 40})
+    assert result["variants"][0]["variant_id"] != changed["variants"][0]["variant_id"]
+
+
+def test_rss_variant_builder_blocks_code_and_continuation_templates():
+    from backend.transforms import build_variants
+
+    for dataset in ("humaneval", "wikitext103", "tinystories"):
+        with pytest.raises(ValueError, match="independently designed"):
+            build_variants(
+                dataset, dataset + ":id", dataset + ":group", "A sample text.",
+                anchor="sample", source_revision="a" * 40,
+            )
+    with pytest.raises(ValueError, match="exactly|once|Anchor"):
+        build_variants(
+            "boolq", "boolq:id", "boolq:group", "Answer: Answer:",
+            anchor="Answer:", source_revision="a" * 40,
+        )
