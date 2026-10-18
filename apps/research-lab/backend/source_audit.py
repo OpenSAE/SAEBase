@@ -22,6 +22,7 @@ from .acquire import acquire
 from .core import canonical_json, dataset_catalog
 from .ingest import _atomic_bytes, _raw_jsonl, freeze_dataset
 from .near_duplicates import scan_near_duplicates
+from .variant_audit import summarize_variant_proposals
 
 SCHEMA = "opensae.corpus_cpu_audit.v1"
 
@@ -141,6 +142,7 @@ def audit_sources(
                     }
                 )
         lexical = scan_near_duplicates(scratch / "frozen", chosen)
+        variants = summarize_variant_proposals(scratch / "frozen", chosen)
     complete = [row for row in results if row["status"] == "candidate_frozen_unreviewed"]
     all_rows = [row for entry in complete for row in entry["candidate_rows_without_text"]]
     seen: dict[str, dict[str, Any]] = {}
@@ -167,6 +169,7 @@ def audit_sources(
         "cross_source_exact_duplicates": conflicts,
         "cross_source_near_duplicate_review": "automatic_fivegram_screen_only_human_review_pending",
         "lexical_near_duplicate_screen": lexical,
+        "rss_variant_proposals": variants,
         "human_content_review": "not_completed",
         "rights_review": "not_completed",
         "dataset_results": results,
