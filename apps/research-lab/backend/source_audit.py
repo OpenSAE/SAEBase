@@ -60,7 +60,7 @@ def audit_source(
     exported = acquire(
         dataset_id,
         source_file,
-        max_raw_rows=20000 if dataset_id == "wikitext103" else max_raw_rows,
+        max_raw_rows=(35000 if dataset_id == "squad" else 20000 if dataset_id == "wikitext103" else max_raw_rows),
         source_revision=pinned_revision,
     )
     release = freeze_dataset(

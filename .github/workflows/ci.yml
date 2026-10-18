@@ -251,6 +251,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: opensae-corpus-cpu-preflight
-          path: \${{ runner.temp }}/opensae-corpus-audit.json
+          path: ${{ runner.temp }}/opensae-corpus-audit.json
           if-no-files-found: warn
           retention-days: 30
