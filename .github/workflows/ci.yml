@@ -73,6 +73,12 @@ jobs:
           python -m build --wheel
           python scripts/check_installed_wheel.py dist
 
+      - name: Verify Research Lab CPU APIs and browser scripts
+        run: |
+          python -m pip install -r apps/research-lab/requirements.txt httpx
+          python -m pytest -q apps/research-lab/tests/test_platform.py
+          node --check apps/research-lab/frontend/app.js
+
   analysis-install:
     runs-on: ubuntu-latest
     steps:
@@ -118,6 +124,34 @@ jobs:
           name: saebase-distributions
           path: dist/*
           if-no-files-found: error
+
+      - name: Build and browse Research Lab CPU container
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build -f apps/research-lab/Dockerfile -t opensae-lab:cpu .
+          docker run -d --rm --name opensae-lab-ci -p 127.0.0.1:17860:7860 opensae-lab:cpu
+          trap 'docker rm -f opensae-lab-ci >/dev/null 2>&1 || true' EXIT
+          python - <<'PY'
+          import json
+          import time
+          import urllib.request
+          url = "http://127.0.0.1:17860/api/summary"
+          result = None
+          for attempt in range(30):
+              try:
+                  with urllib.request.urlopen(url, timeout=2) as response:
+                      result = json.load(response)
+                  break
+              except Exception:
+                  time.sleep(0.5)
+          assert result is not None, "CPU container did not start"
+          assert result["sites_verified"] == 48
+          assert result["historical_groups_per_site"] == 64
+          assert result["curated_prompts"] == 0
+          assert result["gpu_online"] is False
+          print("CPU Docker smoke passed with genuine 48-site historical evidence")
+          PY
 
   localization-native:
     runs-on: ubuntu-latest
