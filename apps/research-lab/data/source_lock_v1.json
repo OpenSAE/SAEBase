@@ -1,10 +1,10 @@
 {
   "schema": "opensae.corpus_source_lock.v1",
   "scope": "sampled_500_source_groups__metadata_only__unreviewed_not_published",
-  "audit_commit": "ab82a191ffc2bcdcc1f26a0234c91d9d04e8a52d",
-  "audit_workflow_run": "https://github.com/OpenSAE/SAEBase/actions/runs/39173005702",
-  "audit_artifact_id": 12153760119,
-  "audit_manifest_sha256": "f32e6cf0e00f3ba4bb53ca94ddeb12782501fd4dc4a79d62c262737f7e084d1c",
+  "audit_commit": "9cc2f50d4f31249a4d8e20d9a3b6fb1fcf02a3e9",
+  "audit_workflow_run": "https://github.com/OpenSAE/SAEBase/actions/runs/39174535881",
+  "audit_artifact_id": 12154265086,
+  "audit_manifest_sha256": "3f044cc31c34c0ea7be4c723921323be90f716183d1276a6dfa58c5a605f7a22",
   "total_sources": 10,
   "total_base_groups": 500,
   "discovery_groups": 200,
@@ -13,7 +13,7 @@
   "candidate_rows_in_repository": false,
   "rights_review": "pending",
   "human_content_review": "pending",
-  "near_duplicate_review": "pending",
+  "near_duplicate_review": "automatic_5gram_screen_zero_flags__human_semantic_review_pending",
   "science_status": "input_candidates_only__no_model_or_sae_measured",
   "sources": [
     {
@@ -69,7 +69,7 @@
     {
       "dataset_id": "hellaswag",
       "source_revision": "218ec52e09a7e7462a5400043bb9a69a41d06b76",
-      "candidate_sha256": "8a57bf9738d27a9d6798bb6ff17a792528e1c9a212bf862e6432066c271edba9",
+      "candidate_sha256": "8aa2ffa3060cd2f73fc6f732180fff7e15b8ec685a78e85c757d9485ae191046",
       "source_export_sha256": "83e3942a34d11a20f953762f629c2b0dbf4cbe3c05f60a0d569b3d96c8b7070a",
       "max_raw_rows": 2500,
       "sample_count": 50,
@@ -116,5 +116,11 @@
       "discovery": 20,
       "evaluation": 30
     }
-  ]
+  ],
+  "audit_artifact_file_sha256": "f66f3b9f42936063a1fda7a1a017e3570de8e30f48bd632f322798f2ae32af34",
+  "lexical_near_duplicate_count": 0,
+  "rss_variant_proposals_target": 22500,
+  "rss_selection_proposals": 7500,
+  "rss_held_out_proposals": 15000,
+  "rss_variant_proposals_metadata_sha256": "22fac1b100387ed1a2374dbcb6f8bb593f20a69b4be07d6c63533bc98bbaebf4"
 }
