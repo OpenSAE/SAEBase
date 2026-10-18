@@ -55,6 +55,15 @@ def _validated_site(payload: dict[str, Any], *, repo_root: Path | None = None) -
     return site
 
 
+def _hex64(value: Any) -> bool:
+    return isinstance(value, str) and len(value) == 64 and all(ch in "0123456789abcdef" for ch in value)
+
+
+def _measurement_digest(payload: dict[str, Any]) -> str:
+    """Content identity for measured input; not an independent proof of correctness."""
+    return hashlib.sha256(canonical_json(payload)).hexdigest()
+
+
 def _number_or_undefined(key: str, value: Any) -> dict[str, Any]:
     if value is None:
         return {"metric": key, "value": None, "status": "undefined"}
@@ -76,7 +85,10 @@ def run_sar(
     import numpy as np
 
     module = _original(original, expected_sha, "sar.py")
-    masks = np.asarray(payload["masks"], dtype=bool)
+    original_masks = np.asarray(payload["masks"])
+    if original_masks.dtype != np.dtype(bool):
+        raise ValueError("SAR coalition masks must contain literal booleans")
+    masks = original_masks
     values = np.asarray(payload["g"], dtype=float)
     fit = np.asarray(payload["fit"], dtype=int)
     held = np.asarray(payload["held"], dtype=int)
@@ -100,6 +112,9 @@ def run_sar(
         "dataset_release": payload["dataset_release"],
         "protocol_id": payload["protocol_id"],
         "source_sha256": expected_sha,
+        "measurement_input_sha256": _measurement_digest(payload),
+        "model_sha256": site["model_sha256"],
+        "sae_sha256": site["sae_sha256"],
         "results": rows,
         "status": "completed",
         "description": "Original SAR: coalition interaction residuals and held-out metrics",
@@ -145,6 +160,9 @@ def run_rss(
         "dataset_release": payload["dataset_release"],
         "protocol_id": payload["protocol_id"],
         "source_sha256": expected_sha,
+        "measurement_input_sha256": _measurement_digest(payload),
+        "model_sha256": site["model_sha256"],
+        "sae_sha256": site["sae_sha256"],
         "status": "completed",
         "selection_variant_ids": selected_ids,
         "held_variant_ids": held_ids,
@@ -164,6 +182,12 @@ def run_localize(payload: dict[str, Any], *, repo_root: Path | None = None) -> d
     site = _validated_site(payload, repo_root=repo_root)
     import numpy as np
     from sae_localize import exact_scope_curve  # separately installed original package
+    from sae_localize import exact as localize_exact
+
+    original_file = Path(localize_exact.__file__).resolve()
+    expected = payload.get("original_package_sha256")
+    if not _hex64(expected) or digest(original_file) != expected:
+        raise ValueError("Pinned original Localize exact.py source digest mismatch")
 
     factors = payload.get("factor_names")
     if not isinstance(factors, list) or len(factors) != 6 or len(set(factors)) != 6:
@@ -183,7 +207,10 @@ def run_localize(payload: dict[str, Any], *, repo_root: Path | None = None) -> d
         "prompt_group_id": payload["prompt_group_id"],
         "dataset_release": payload["dataset_release"],
         "protocol_id": payload["protocol_id"],
-        "source_sha256": str(payload.get("original_package_sha256", "")),
+        "source_sha256": expected,
+        "measurement_input_sha256": _measurement_digest(payload),
+        "model_sha256": site["model_sha256"],
+        "sae_sha256": site["sae_sha256"],
         "factor_names": factors,
         "status": "completed",
         "results": [
@@ -196,21 +223,58 @@ def run_localize(payload: dict[str, Any], *, repo_root: Path | None = None) -> d
 
 
 def build_analysis_index(records: list[dict[str, Any]], output: Path) -> dict[str, Any]:
+    """Publish an immutable browse index from validated CPU analysis records.
+
+    A measurement-input checksum proves byte identity only. Scientific
+    correctness additionally depends on original run verification.
+    """
     if (output / "manifest.json").exists():
         raise FileExistsError("Analysis release already published")
-    if any(
-        row.get("schema") != "opensae.analysis_record.v1"
-        or row.get("kind") not in ("sar", "rss", "localization")
-        or row.get("source_type") != "real_checkpoint"
-        or not row.get("source_sha256")
-        for row in records
-    ):
-        raise ValueError("Unverified analysis record")
+    sites = {site["site_id"]: site for site in load_sites()}
+    metric_states = {"completed", "blocked", "unsupported", "failed", "undefined"}
+    for row in records:
+        if (
+            row.get("schema") != "opensae.analysis_record.v1"
+            or row.get("kind") not in ("sar", "rss", "localization")
+            or row.get("source_type") != "real_checkpoint"
+            or row.get("status") != "completed"
+            or not _hex64(row.get("source_sha256"))
+            or not _hex64(row.get("measurement_input_sha256"))
+        ):
+            raise ValueError("Incomplete or unverified analysis record")
+        site = sites.get(row.get("site_id"))
+        if (
+            site is None
+            or not has_complete_identity(site)
+            or row.get("model_sha256") != site["model_sha256"]
+            or row.get("sae_sha256") != site["sae_sha256"]
+        ):
+            raise ValueError("Analysis index checkpoint/site identity mismatch")
+        for field in ("prompt_group_id", "dataset_release", "protocol_id"):
+            if not isinstance(row.get(field), str) or not row[field]:
+                raise ValueError("Missing analysis protocol or data identity")
+        results = row.get("results")
+        if not isinstance(results, list) or not results:
+            raise ValueError("Analysis index requires measured metric rows")
+        for metric in results:
+            if not isinstance(metric, dict) or not isinstance(metric.get("metric"), str):
+                raise ValueError("Malformed analyzed measurement")
+            status, value = metric.get("status"), metric.get("value")
+            if status not in metric_states:
+                raise ValueError("Invalid analyzed metric status")
+            if status != "completed" and value is not None:
+                raise ValueError("Undefined metric cannot carry a number")
+            if status == "completed" and (
+                type(value) not in (int, float) or not math.isfinite(value)
+            ):
+                raise ValueError("Completed metric must be a finite number")
     data = canonical_json(records)
     manifest = {
         "schema": "opensae.analysis_index.v1",
         "files": {"index.json": hashlib.sha256(data).hexdigest()},
         "count": len(records),
+        "reviewed_scientific_measurements": False,
+        "review_note": "Source/content digests checked; upstream run audit remains separate",
     }
     _atomic_bytes(output / "index.json", data)
     _atomic_bytes(output / "manifest.json", canonical_json(manifest))
