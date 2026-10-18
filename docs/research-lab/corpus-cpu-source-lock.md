@@ -16,13 +16,17 @@ the 500-row redacted audit fingerprint. The lock contains **no raw prompt
 text** and indicates `rights_review=pending`,
 `human_content_review=pending`, `near_duplicate_review=pending`.
 
-The first successful 500-row CPU audit was produced by
-[GitHub Actions run 39173005702](https://github.com/OpenSAE/SAEBase/actions/runs/39173005702),
-artifact `opensae-corpus-cpu-preflight`. The source scripts have since
-added strict HellaSwag class quotas and an automatic lexical near-duplicate
-screen; the locked candidate SHA and aggregate fingerprint must be
-updated after a new complete CPU run. Refer to Work Plan 05 for the
-final accepted manifest before generating any real model activations.
+The final metadata-only 500-group and 22,500-variant CPU audit is at
+https://github.com/OpenSAE/SAEBase/actions/runs/39174535881
+Artifact 12154265086, all upstream source SHA values pinned. Zero exact
+duplicates and zero five-word Jaccard >= 0.85 candidate pairs were observed;
+this does not replace a human semantic or rights review.
+
+A complete pinned replay and source-lock verification passed at
+https://github.com/OpenSAE/SAEBase/actions/runs/39175204013.
+The final source lock includes all ten source commits, every source export
+SHA, the full candidate manifest fingerprint, the variant population SHA
+and the lexical screening summary. Do not silently replace the cohort.
 
 ## Reconstruct on an Internet-connected CPU machine
 
@@ -117,7 +121,5 @@ the CPU source audit checks cross-source near-copies using a five-word
 shingle similarity screen. That screen is a conservative lexical warning,
 not a certificate of no semantic duplicates.
 
-The initial source-lock values remain a **historical** fixed sample identity
-until a complete pinned re-audit accepts these revised rules. Work Plan 05
-must record the final candidate manifest and CI run ID before the GPU
-agent starts.
+The source lock now pins the final balanced and task-aware candidate protocol.
+A later change must use a new versioned source lock and independent review.
