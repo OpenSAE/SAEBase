@@ -149,14 +149,14 @@ def test_boolq_gold_label_balance():
 def test_immutable_freeze_and_release_visibility(tmp_path, raw_rows):
     output = tmp_path / "datasets" / "tinystories"
     manifest = freeze_dataset(
-        "tinystories", raw_rows, source_revision="deadbeef0123456789deadbeef0123456789abcdef", output=output
+        "tinystories", raw_rows, source_revision="deadbeefdeadbeefdeadbeefdeadbeefdeadbeef", output=output
     )
     assert manifest["sample_count"] == 50
     assert not manifest["human_reviewed"]
     assert core.imported_counts(tmp_path) == {}
     assert core.digest(output / "records.jsonl") == manifest["records_sha256"]
     with pytest.raises(FileExistsError):
-        freeze_dataset("tinystories", raw_rows, source_revision="deadbeef0123456789deadbeef0123456789abcdef", output=output)
+        freeze_dataset("tinystories", raw_rows, source_revision="deadbeefdeadbeefdeadbeefdeadbeefdeadbeef", output=output)
     reviewed = tmp_path / "datasets" / "boolq"
     inputs = [
         {"passage": "Unique passage " + str(i), "question": "Yes?", "answer": i % 2 == 0}
@@ -165,7 +165,7 @@ def test_immutable_freeze_and_release_visibility(tmp_path, raw_rows):
     freeze_dataset(
         "boolq",
         inputs,
-        source_revision="deadbeef0123456789deadbeef0123456789abcdef",
+        source_revision="deadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
         output=reviewed,
         license_reviewed=True,
         human_reviewed=True,
@@ -354,7 +354,7 @@ def test_sqlite_builder_rejects_unknown_and_synthetic(tmp_path):
 
 def test_published_dataset_rejects_modified_rows_and_fake_metadata(tmp_path, raw_rows):
     folder = tmp_path / "datasets" / "tinystories"
-    pinned = "deadbeef0123456789deadbeef0123456789abcdef"
+    pinned = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
     freeze_dataset(
         "tinystories", raw_rows, source_revision=pinned, output=folder,
         license_reviewed=True, human_reviewed=True
