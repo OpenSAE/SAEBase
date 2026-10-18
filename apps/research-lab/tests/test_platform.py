@@ -11,7 +11,7 @@ import pytest
 PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
 
-from backend import core
+from backend import core  # noqa: E402
 from backend.feature_store import create_feature_store,query_feature_store,feature_store_count  # noqa: E402
 from backend.ingest import build_feature_index, freeze_dataset, normalize, select_records  # noqa: E402
 from backend.publish import publish_report  # noqa: E402
@@ -328,7 +328,7 @@ def test_sqlite_feature_store_indexes_real_records_and_detects_tampering(tmp_pat
     assert len(records["items"][0]["examples"]) == 8
     # SQL wildcards do not alter exact literal searches.
     assert query_feature_store(root=tmp_path,query="%")["total"] == 0
-    assert query_feature_store(root=tmp_path,query="_")["total"] == 0
+    assert query_feature_store(root=tmp_path,query="_____%")["total"] == 0
     with pytest.raises(FileExistsError):
         create_feature_store([sample], tmp_path / "features")
     with (tmp_path / "features" / "features.sqlite3").open("ab") as f:
