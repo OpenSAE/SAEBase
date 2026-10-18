@@ -243,3 +243,9 @@ integration. A SQLite queue alone is not a secure hosted service.
 The Docker build and CI smoke checks can run without any of these GPU
 dependencies. The deployable CPU site is read-only and displays the original
 48-site engineering protocol alongside honest empty states for missing data.
+
+## Controlled six-factor inputs (CPU-only)
+
+Run python -m backend.controlled_designs --output-dir /tmp/opensae-six-factor-v1 to generate two complete 64-state Boolean input grids. Factor zero is the least significant bit and all states belong to one group per design. One grid includes separate **synthetic known-factor values**, never labeled as real model activations.
+
+Documentation: docs/research-lab/controlled-six-factor.md. The original SAEBase ControlledInputDesign remains the model-capture interface.

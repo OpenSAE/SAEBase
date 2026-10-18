@@ -783,3 +783,77 @@ def test_queue_refuses_invalid_specs_and_stale_worker_completion(tmp_path):
     )
     assert q.reap_expired(now=132, max_attempts=1)["failed"] == 1
     assert q.status(job_id=job["job_id"], owner="owner-1")["status"] == "failed"
+
+
+
+def test_controlled_six_factor_designs_are_complete_and_original_compatible(tmp_path):
+    from backend.controlled_designs import (
+        DESIGNS,
+        check_candidate,
+        make_candidate,
+        to_saebase_design,
+        write_candidate,
+    )
+
+    configuration = json.loads(
+        (PROJECT / "data" / "coverage.json").read_text(encoding="utf-8")
+    )
+    assert set(configuration["localize_designs"]) == set(DESIGNS)
+    assert len(DESIGNS) == 2
+    for name in DESIGNS:
+        candidate = make_candidate(name)
+        assert candidate == make_candidate(name)
+        assert check_candidate(candidate) == candidate
+        assert candidate["status"] == "input_only_no_model_execution"
+        assert candidate["n_factors"] == 6
+        assert candidate["n_states"] == 64
+        assert candidate["independent_group_count"] == 1
+        assert [row["mask"] for row in candidate["states"]] == list(range(64))
+        assert len({row["prompt"] for row in candidate["states"]}) == 64
+        assert len({row["sample_id"] for row in candidate["states"]}) == 64
+        assert all(
+            row["bits"] == [(row["mask"] >> bit) & 1 for bit in range(6)]
+            for row in candidate["states"]
+        )
+        assert all(row["token_position"] == -1 for row in candidate["states"])
+        actual = to_saebase_design(candidate)
+        assert actual.n_factors == 6
+        assert actual.n_states == 64
+        assert actual.sample_ids_by_state == {
+            row["mask"]: row["sample_id"] for row in candidate["states"]
+        }
+        assert actual.prompts_by_state == {
+            row["mask"]: row["prompt"] for row in candidate["states"]
+        }
+        output = tmp_path / (name + ".json")
+        result = write_candidate(name, output)
+        assert result["model_inferences"] == 0
+        assert result["n_states"] == 64
+        assert check_candidate(json.loads(output.read_text(encoding="utf-8"))) == candidate
+        with pytest.raises(FileExistsError):
+            write_candidate(name, output)
+
+
+def test_synthetic_control_is_not_presented_as_real_sae_data():
+    from backend.controlled_designs import (
+        check_candidate,
+        make_candidate,
+        synthetic_reference_codes,
+    )
+
+    controlled = make_candidate("synthetic_known_factor_control")
+    synthetic = synthetic_reference_codes(controlled)
+    assert synthetic["source_type"] == "synthetic_logic_not_real_sae"
+    assert synthetic["n_states"] == 64
+    assert synthetic["n_synthetic_features"] == 6
+    assert len(synthetic["feature_values"]) == 64
+    assert all(len(values) == 6 for values in synthetic["feature_values"])
+    assert synthetic["feature_values"][0] == [0.0] * 6
+    assert synthetic["feature_values"][63] == [1.0, 2.0, 1.0, 1.0, 0.0, 2.0]
+    assert synthetic_reference_codes(controlled) == synthetic
+    tampered = json.loads(json.dumps(controlled))
+    tampered["states"][16]["prompt"] = "Not the original controlled input."
+    with pytest.raises(ValueError, match="mismatch"):
+        check_candidate(tampered)
+    with pytest.raises(ValueError, match="Synthetic truth"):
+        synthetic_reference_codes(make_candidate("real_model_six_factor_design"))
