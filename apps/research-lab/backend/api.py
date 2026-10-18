@@ -106,13 +106,11 @@ def prompts(
 ) -> dict[str, Any]:
     if dataset_id not in {d["id"] for d in core.dataset_catalog()["sources"]}:
         raise HTTPException(404, "Unknown source dataset")
-    if dataset_id not in core.imported_counts():
-        return _page([], limit, offset)
-    path = core.data_root() / "datasets" / dataset_id / "records.jsonl"
-    # Only license and human-reviewed releases reach this branch.
-    with path.open("r", encoding="utf-8") as stream:
-        rows = [json.loads(line) for line in stream if line.strip()]
-    return _page(rows, limit, offset)
+    try:
+        rows = core.load_published_dataset(dataset_id)
+    except core.InvalidEvidence as e:
+        _bad_evidence(e)
+    return _page(rows or [], limit, offset)
 
 
 @app.get("/api/sites")

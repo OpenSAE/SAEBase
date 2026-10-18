@@ -70,7 +70,7 @@ def load_sites(repo_root: Path | None = None) -> list[dict[str, Any]]:
     base = (repo_root or REPO_ROOT) / EVIDENCE
     matrix_path = base / "final" / "stage_d_final_matrix.json"
     if not matrix_path.is_file():
-        return []
+        raise InvalidEvidence("Frozen historical 48-site matrix is unavailable")
     matrix = read_json(matrix_path)
     rows = matrix.get("rows", [])
     if not isinstance(rows, list):
@@ -147,26 +147,84 @@ def historical_metrics(sites: list[dict[str, Any]]) -> list[dict[str, Any]]:
     ]
 
 
+def load_published_dataset(dataset_id: str, root: Path | None = None) -> list[dict[str, Any]] | None:
+    """Return exactly the reviewed, checksum-verified 50-row dataset release.
+
+    A missing or unreviewed release is not made public. An incomplete or
+    tampered reviewed release raises rather than returning potentially
+    unapproved text.
+    """
+    catalog = {s["id"]: s for s in dataset_catalog()["sources"]}
+    if dataset_id not in catalog:
+        raise InvalidEvidence("Unknown curated dataset")
+    directory = (root or data_root()) / "datasets" / dataset_id
+    manifest_path = directory / "manifest.json"
+    if not manifest_path.exists():
+        return None
+    meta = read_json(manifest_path)
+    if meta.get("schema") != "opensae.dataset_release.v1":
+        raise InvalidEvidence("Unrecognized dataset release schema")
+    if not (meta.get("license_reviewed") is True and meta.get("human_reviewed") is True):
+        return None
+    definition = catalog[dataset_id]
+    for field, value in (
+        ("dataset_id", dataset_id), ("source_repo", definition["repo"]),
+        ("source_config", definition["config"]), ("source_split", definition["split"]),
+        ("sample_count", 50), ("discovery", 20), ("evaluation", 30),
+    ):
+        if meta.get(field) != value:
+            raise InvalidEvidence("Incorrect reviewed dataset identity: " + field)
+    revision = meta.get("source_revision")
+    if not isinstance(revision, str) or len(revision) != 40 or any(ch not in "0123456789abcdef" for ch in revision):
+        raise InvalidEvidence("Reviewed dataset requires exact 40-character source commit")
+    file_path = directory / "records.jsonl"
+    if not file_path.is_file() or file_path.stat().st_size > 16 * 1024 * 1024:
+        raise InvalidEvidence("Missing or oversized reviewed dataset records")
+    if digest(file_path) != meta.get("records_sha256"):
+        raise InvalidEvidence("Reviewed dataset content differs from checksum")
+    with file_path.open("r", encoding="utf-8") as fh:
+        try:
+            rows = [json.loads(line) for line in fh if line.strip()]
+        except json.JSONDecodeError as e:
+            raise InvalidEvidence("Malformed curated dataset JSONL") from e
+    if len(rows) != 50 or any(not isinstance(row, dict) for row in rows):
+        raise InvalidEvidence("Expected exactly 50 reviewed prompt objects")
+    ids, groups, counts = set(), set(), {"discovery": 0, "evaluation": 0}
+    for row in rows:
+        sample = row.get("sample_id")
+        group = row.get("prompt_group_id")
+        if (
+            not isinstance(sample, str) or not sample.startswith(dataset_id + ":") or sample in ids
+            or not isinstance(group, str) or not group.startswith(dataset_id + ":") or group in groups
+            or row.get("source_revision") != revision
+            or row.get("source_repo") != definition["repo"]
+            or row.get("source_split") != definition["split"]
+            or not isinstance(row.get("prompt"), str) or not row["prompt"].strip()
+            or row.get("usage_split") not in counts
+        ):
+            raise InvalidEvidence("Invalid prompt identity, source, or group in reviewed release")
+        ids.add(sample)
+        groups.add(group)
+        counts[row["usage_split"]] += 1
+    if counts != {"discovery": 20, "evaluation": 30}:
+        raise InvalidEvidence("Unexpected reviewed dataset splits")
+    return rows
+
+
 def imported_counts(root: Path | None = None) -> dict[str, int]:
-    """Count only released, checksum-verified curated prompt rows."""
+    """Count valid published rows, not unchecked booleans in a manifest."""
     base = (root or data_root()) / "datasets"
-    out: dict[str, int] = {}
+    counts: dict[str, int] = {}
     if not base.exists():
-        return out
+        return counts
     for manifest in base.glob("*/manifest.json"):
         try:
-            info = read_json(manifest)
-            records = manifest.parent / "records.jsonl"
-            if info.get("schema") != "opensae.dataset_release.v1" or digest(records) != info.get(
-                "records_sha256"
-            ):
-                continue
-            if not info.get("license_reviewed") or not info.get("human_reviewed"):
-                continue
-            out[manifest.parent.name] = int(info["sample_count"])
-        except (OSError, ValueError, KeyError, TypeError):
+            rows = load_published_dataset(manifest.parent.name, root)
+            if rows is not None:
+                counts[manifest.parent.name] = len(rows)
+        except (OSError, InvalidEvidence, ValueError, TypeError):
             continue
-    return out
+    return counts
 
 
 def _verified_index(folder: Path, key: str, resource: str) -> dict[str, Any] | None:

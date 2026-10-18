@@ -191,7 +191,7 @@ def select_records(
             normal["_rank"] = rank
             picked[group] = normal
     eligible = []
-    for group, value in picked.items():
+    for group, value in sorted(picked.items(), key=lambda item: (_rank(seed, source, item[0]), item[0])):
         fingerprint = hashlib.sha256(value["prompt"].encode()).hexdigest()
         if fingerprint in prompts:
             continue
@@ -243,11 +243,11 @@ def freeze_dataset(
     sources = {d["id"]: d for d in dataset_catalog()["sources"]}
     if source not in sources:
         raise ValueError("Unknown source")
-    if not isinstance(source_revision, str) or len(source_revision) < 7:
-        raise ValueError("Pin exact source revision (not main/latest)")
+    if not isinstance(source_revision, str) or len(source_revision) != 40 or any(ch not in "0123456789abcdef" for ch in source_revision):
+        raise ValueError("Pin exact 40-character lowercase upstream SHA (not main/latest)")
     records = select_records(source, rows, seed=seed)
-    if len({r["prompt_group_id"] for r in records}) != 50:
-        raise ValueError("Source-group leakage")
+    if len({r["prompt_group_id"] for r in records}) != 50 or len({r["sample_id"] for r in records}) != 50:
+        raise ValueError("Source-group or sample identity collision")
     for row in records:
         row["source_revision"] = source_revision
         row["source_repo"] = sources[source]["repo"]

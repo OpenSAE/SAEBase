@@ -149,14 +149,14 @@ def test_boolq_gold_label_balance():
 def test_immutable_freeze_and_release_visibility(tmp_path, raw_rows):
     output = tmp_path / "datasets" / "tinystories"
     manifest = freeze_dataset(
-        "tinystories", raw_rows, source_revision="deadbeef0123456789", output=output
+        "tinystories", raw_rows, source_revision="deadbeef0123456789deadbeef0123456789abcdef", output=output
     )
     assert manifest["sample_count"] == 50
     assert not manifest["human_reviewed"]
     assert core.imported_counts(tmp_path) == {}
     assert core.digest(output / "records.jsonl") == manifest["records_sha256"]
     with pytest.raises(FileExistsError):
-        freeze_dataset("tinystories", raw_rows, source_revision="deadbeef0123456789", output=output)
+        freeze_dataset("tinystories", raw_rows, source_revision="deadbeef0123456789deadbeef0123456789abcdef", output=output)
     reviewed = tmp_path / "datasets" / "boolq"
     inputs = [
         {"passage": "Unique passage " + str(i), "question": "Yes?", "answer": i % 2 == 0}
@@ -165,7 +165,7 @@ def test_immutable_freeze_and_release_visibility(tmp_path, raw_rows):
     freeze_dataset(
         "boolq",
         inputs,
-        source_revision="deadbeef0123456789",
+        source_revision="deadbeef0123456789deadbeef0123456789abcdef",
         output=reviewed,
         license_reviewed=True,
         human_reviewed=True,
@@ -349,3 +349,46 @@ def test_sqlite_builder_rejects_unknown_and_synthetic(tmp_path):
         create_feature_store([row],tmp_path/"one")
     with pytest.raises(ValueError,match="checkpoint"):
         create_feature_store([{**row,"source_type":"real_checkpoint","sae_sha256":""}],tmp_path/"two")
+
+
+
+def test_published_dataset_rejects_modified_rows_and_fake_metadata(tmp_path, raw_rows):
+    folder = tmp_path / "datasets" / "tinystories"
+    pinned = "deadbeef0123456789deadbeef0123456789abcdef"
+    freeze_dataset(
+        "tinystories", raw_rows, source_revision=pinned, output=folder,
+        license_reviewed=True, human_reviewed=True
+    )
+    rows = core.load_published_dataset("tinystories", tmp_path)
+    assert rows is not None and len(rows) == 50
+    assert sum(r["usage_split"] == "evaluation" for r in rows) == 30
+    # An attacker/review mistake cannot silently change the two source populations.
+    report = json.loads((folder / "manifest.json").read_text())
+    report["source_repo"] = "impostor/dataset"
+    (folder / "manifest.json").write_text(json.dumps(report))
+    with pytest.raises(core.InvalidEvidence):
+        core.load_published_dataset("tinystories", tmp_path)
+    assert core.imported_counts(tmp_path) == {}
+
+
+def test_source_group_sampling_ignores_input_record_iteration_order():
+    # Duplicate prompts across distinct articles must be resolved by stable
+    # rank, not whichever article was encountered first.
+    raw = [
+        {"id": "id" + str(i), "article_id": "a" + str(i), "text": "unique-" + str(i)}
+        for i in range(80)
+    ]
+    raw[71]["text"] = raw[12]["text"]
+    raw[73]["text"] = raw[18]["text"]
+    one = select_records("wikitext103", raw)
+    two = select_records("wikitext103", list(reversed(raw)))
+    assert one == two
+    assert len({x["prompt"] for x in one}) == 50
+
+
+def test_exact_source_revision_is_required(raw_rows, tmp_path):
+    with pytest.raises(ValueError, match="40-character"):
+        freeze_dataset(
+            "tinystories", raw_rows, source_revision="main",
+            output=tmp_path / "invalid", human_reviewed=True
+        )
