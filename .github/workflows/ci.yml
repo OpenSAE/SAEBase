@@ -245,6 +245,7 @@ jobs:
         run: |
           PYTHONPATH=apps/research-lab python -m backend.source_audit \
             --max-raw-rows 2500 \
+            --source-lock apps/research-lab/data/source_lock_v1.json \
             --output "$RUNNER_TEMP/opensae-corpus-audit.json"
       - name: Verify all 500 candidates against committed source lock
         run: |
