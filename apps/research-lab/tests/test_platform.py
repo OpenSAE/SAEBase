@@ -1103,3 +1103,34 @@ def test_cpu_near_duplicate_screen_reports_only_sample_ids(tmp_path):
     assert report["candidates"][0]["cross_usage_split"] is True
     assert base not in json.dumps(report)
     assert report["interpretation"].endswith("human review pending")
+
+
+
+def test_cpu_rss_proposal_audit_does_not_publish_third_party_text(tmp_path):
+    from backend.variant_audit import summarize_variant_proposals
+
+    root = tmp_path / "frozen" / "boolq"
+    root.mkdir(parents=True)
+    rows = [
+        {
+            "dataset_id": "boolq",
+            "sample_id": "boolq:sample" + str(i),
+            "prompt_group_id": "boolq:group" + str(i),
+            "source_revision": "a" * 40,
+            "prompt": "A unique original question asks whether a feature is active " + str(i),
+        }
+        for i in range(2)
+    ]
+    (root / "records.jsonl").write_text(
+        "".join(json.dumps(record) + "\n" for record in rows), encoding="utf-8"
+    )
+    summary = summarize_variant_proposals(tmp_path / "frozen", ["boolq"])
+    assert summary == summarize_variant_proposals(tmp_path / "frozen", ["boolq"])
+    assert summary["parent_groups"] == 2
+    assert summary["proposed_variants"] == 90
+    assert summary["selection_proposals"] == 30
+    assert summary["held_out_proposals"] == 60
+    assert summary["semantic_review"] == "pending"
+    assert summary["input_texts_in_audit"] is False
+    assert len(summary["metadata_only_sha256"]) == 64
+    assert rows[0]["prompt"] not in json.dumps(summary)
