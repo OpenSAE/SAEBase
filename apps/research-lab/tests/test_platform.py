@@ -493,3 +493,42 @@ def test_cpu_rss_adapter_respects_held_out_variant_ids(tmp_path):
     assert record["results"][1]["value"] == 0.7
     with pytest.raises(ValueError, match="disjoint"):
         run_rss({**row, "held_variant_ids": row["selection_variant_ids"] + ["x"] * 5}, original=source, expected_sha=trusted_sha)
+
+
+
+def test_cpu_plan_has_exact_632_jobs_without_claiming_execution(tmp_path):
+    from backend.plan import build_compute_plan
+
+    plan = build_compute_plan(root=tmp_path)
+    assert plan["schema"] == "opensae.compute_plan.v1"
+    assert plan["site_count"] == 48
+    assert plan["site_count_with_full_weight_hashes"] == 45
+    assert plan["job_counts"] == {
+        "capture": 480, "intervention": 60, "sar": 30,
+        "rss": 60, "localization": 2
+    }
+    assert len(plan["jobs"]) == 632
+    assert plan["statuses"] == {"blocked": 632}
+    assert plan["estimated_sar_coalition_measurements_if_all_frozen"] == 576000
+    assert len({job["job_id"] for job in plan["jobs"]}) == 632
+    assert all(job["execution"] == "not_run" for job in plan["jobs"])
+    assert all("prompt" not in job["spec"] for job in plan["jobs"])
+
+
+def test_cpu_plan_unblocks_only_pinned_reviewed_data_and_complete_sites(tmp_path, raw_rows):
+    from backend.plan import build_compute_plan
+
+    folder = tmp_path / "datasets" / "tinystories"
+    freeze_dataset(
+        "tinystories", raw_rows,
+        source_revision="deadbeef" * 5, output=folder,
+        license_reviewed=True, human_reviewed=True
+    )
+    plan = build_compute_plan(root=tmp_path)
+    assert plan["statuses"]["ready_for_external_gpu_operator"] == 45
+    assert plan["statuses"]["blocked"] == 587
+    assert len([j for j in plan["jobs"] if j["spec"]["task"] == "capture"
+                and j["spec"]["dataset_id"] == "tinystories"
+                and j["status"] == "blocked"]) == 3
+    assert len([j for j in plan["jobs"] if j["spec"]["task"] == "sar"
+                and j["status"] == "ready_for_external_gpu_operator"]) == 0
