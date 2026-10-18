@@ -165,3 +165,11 @@ deployment must explicitly connect:
    restart. Do not return a success state merely because a worker ran.
 
 No request to the public UI currently creates a persistent queued job.
+
+## Complete six-factor inputs prepared on CPU
+
+The code apps/research-lab/backend/controlled_designs.py generates two 64-state project-authored grids. It provides conversion to the original SAEBase ControlledInputDesign. See docs/research-lab/controlled-six-factor.md.
+
+Run python -m backend.controlled_designs --output-dir /tmp/opensae-six-factor-v1 from apps/research-lab after installing SAEBase.
+
+The real-model design still requires actual SAE activations; the mathematical known-factor control remains explicitly synthetic. Neither belongs in the natural 500-prompt cohort.
