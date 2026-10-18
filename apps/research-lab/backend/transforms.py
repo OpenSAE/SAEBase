@@ -16,7 +16,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .core import canonical_json, data_root, digest
+from .core import canonical_json, dataset_catalog
 from .ingest import _atomic_bytes
 from .readouts import input_anchor
 
@@ -107,10 +107,15 @@ def build_variants(
     base_prompt: str,
     *,
     anchor: str,
+    source_revision: str,
 ) -> dict[str, Any]:
     """Generate reviewed-by-default-FALSE transformations with stable identity."""
+    if dataset_id not in {item["id"] for item in dataset_catalog()["sources"]}:
+        raise ValueError("Unknown source dataset")
     if dataset_id in NOT_AUTOMATED:
         raise ValueError("Dataset requires an independently designed transformation protocol")
+    if not isinstance(source_revision, str) or len(source_revision) != 40 or any(ch not in "0123456789abcdef" for ch in source_revision):
+        raise ValueError("Exact pinned 40-character source revision is required")
     for label, value in (
         ("dataset_id", dataset_id), ("sample_id", sample_id),
         ("prompt_group_id", prompt_group_id), ("base_prompt", base_prompt),
@@ -130,6 +135,8 @@ def build_variants(
                     "dataset_id": dataset_id, "sample_id": sample_id,
                     "setting": setting, "operator": operator,
                     "realization": realization, "protocol": SCHEMA,
+                    "source_revision": source_revision,
+                    "base_sha256": hashlib.sha256(base_prompt.encode("utf-8")).hexdigest(),
                 }
                 variant_id = hashlib.sha256(canonical_json(key)).hexdigest()[:24]
                 variants.append(
@@ -152,6 +159,7 @@ def build_variants(
     return {
         "schema": SCHEMA,
         "dataset_id": dataset_id,
+        "source_revision": source_revision,
         "sample_id": sample_id,
         "prompt_group_id": prompt_group_id,
         "base_prompt_sha256": hashlib.sha256(base_prompt.encode("utf-8")).hexdigest(),
@@ -177,7 +185,7 @@ def main(argv: list[str] | None = None) -> int:
         record = json.load(stream)
     result = build_variants(
         record["dataset_id"], record["sample_id"], record["prompt_group_id"],
-        record["prompt"], anchor=args.anchor,
+        record["prompt"], anchor=args.anchor, source_revision=record["source_revision"],
     )
     _atomic_bytes(args.output, canonical_json(result))
     print(json.dumps({"proposal_count": result["n_proposals"], "output": str(args.output)}, sort_keys=True))
