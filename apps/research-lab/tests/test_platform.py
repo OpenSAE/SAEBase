@@ -542,3 +542,47 @@ def test_cpu_plan_unblocks_only_pinned_reviewed_data_and_complete_sites(tmp_path
                 and j["status"] == "blocked"]) == 3
     assert len([j for j in plan["jobs"] if j["spec"]["task"] == "sar"
                 and j["status"] == "ready_for_external_gpu_operator"]) == 0
+
+
+
+def test_cpu_source_acquisition_is_pinned_and_never_public_without_review(tmp_path, monkeypatch):
+    import types
+    from backend.acquire import acquire
+
+    original_rows = [
+        {"id": str(i), "text": "A unique short story " + str(i)}
+        for i in range(120)
+    ]
+
+    class FakeStream:
+        def shuffle(self, *, seed, buffer_size):
+            assert seed == 20261018
+            assert buffer_size == 2048
+            return self
+
+        def __iter__(self):
+            return iter(original_rows)
+
+    def fake_load_dataset(**kwargs):
+        assert kwargs["path"] == "roneneldan/TinyStories"
+        assert kwargs["split"] == "validation"
+        assert kwargs["revision"] == "f" * 40
+        assert kwargs["trust_remote_code"] is False
+        return FakeStream()
+
+    class FakeHfApi:
+        def dataset_info(self, *, repo_id):
+            assert repo_id == "roneneldan/TinyStories"
+            return types.SimpleNamespace(sha="f" * 40)
+
+    monkeypatch.setitem(sys.modules, "datasets", types.SimpleNamespace(load_dataset=fake_load_dataset))
+    monkeypatch.setitem(sys.modules, "huggingface_hub", types.SimpleNamespace(HfApi=FakeHfApi))
+    path = tmp_path / "source.jsonl"
+    result = acquire("tinystories", path, max_raw_rows=100)
+    assert result["resolved_revision"] == "f" * 40
+    assert result["license_reviewed"] is False
+    assert result["auto_publish"] is False
+    assert core.digest(path) == result["source_export_sha256"]
+    assert len(path.read_text().strip().splitlines()) == 100
+    with pytest.raises(FileExistsError):
+        acquire("tinystories", path, max_raw_rows=100)
