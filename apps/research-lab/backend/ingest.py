@@ -3,6 +3,7 @@
 This module never downloads weights, guesses licensing rights, or invents results.
 Run from apps/research-lab with: python -m backend.ingest --help
 """
+
 from __future__ import annotations
 
 import argparse
@@ -13,7 +14,7 @@ import os
 from pathlib import Path
 from typing import Any, Iterable
 
-from .core import canonical_json, data_root, dataset_catalog, digest, load_sites, has_complete_identity
+from .core import canonical_json, data_root, dataset_catalog, load_sites, has_complete_identity
 
 
 def _text(value: Any, field: str) -> str:
@@ -28,7 +29,12 @@ def _choice_labels(choices: Any) -> tuple[list[str], list[str]]:
     else:
         labels = [str(i) for i in range(len(choices))] if isinstance(choices, list) else None
         texts = choices
-    if not isinstance(labels, list) or not isinstance(texts, list) or len(labels) != len(texts) or not labels:
+    if (
+        not isinstance(labels, list)
+        or not isinstance(texts, list)
+        or len(labels) != len(texts)
+        or not labels
+    ):
         raise ValueError("Invalid candidate choices")
     return [str(x) for x in labels], [_text(x, "choice") for x in texts]
 
@@ -62,11 +68,13 @@ def normalize(source: str, row: dict[str, Any]) -> dict[str, Any]:
             raise ValueError("BoolQ must contain boolean answer")
         label = "yes" if answer else "no"
         candidates = ["yes", "no"]
-        raw_id = raw_id or hashlib.sha256((context+question).encode()).hexdigest()[:20]
+        raw_id = raw_id or hashlib.sha256((context + question).encode()).hexdigest()[:20]
     elif source == "arc_challenge":
         question = _text(row.get("question"), "question")
         labels, texts = _choice_labels(row.get("choices"))
-        prompt = question + "\n" + "\n".join(a + ". " + b for a,b in zip(labels,texts)) + "\nAnswer:"
+        prompt = (
+            question + "\n" + "\n".join(a + ". " + b for a, b in zip(labels, texts)) + "\nAnswer:"
+        )
         group = raw_id or hashlib.sha256(question.encode()).hexdigest()[:20]
         label = str(row.get("answerKey", ""))
         candidates = labels
@@ -74,28 +82,36 @@ def normalize(source: str, row: dict[str, Any]) -> dict[str, Any]:
             raise ValueError("ARC answer does not match choices")
         raw_id = raw_id or group
     elif source == "hellaswag":
-        context = _text(row.get("ctx") or (str(row.get("ctx_a",""))+" "+str(row.get("ctx_b",""))).strip(), "ctx")
+        context = _text(
+            row.get("ctx") or (str(row.get("ctx_a", "")) + " " + str(row.get("ctx_b", ""))).strip(),
+            "ctx",
+        )
         endings = row.get("endings")
         if not isinstance(endings, list) or len(endings) != 4:
             raise ValueError("HellaSwag requires 4 endings")
         candidates = ["A", "B", "C", "D"]
-        prompt = context + "\n" + "\n".join(ch + ". " + _text(t, "ending") for ch,t in zip(candidates,endings)) + "\nAnswer:"
+        prompt = (
+            context
+            + "\n"
+            + "\n".join(ch + ". " + _text(t, "ending") for ch, t in zip(candidates, endings))
+            + "\nAnswer:"
+        )
         raw_id = raw_id or hashlib.sha256(context.encode()).hexdigest()[:20]
         group = raw_id
-        label_index = str(row.get("label",""))
-        if label_index not in ("0","1","2","3"):
+        label_index = str(row.get("label", ""))
+        if label_index not in ("0", "1", "2", "3"):
             raise ValueError("HellaSwag validation label required")
         label = candidates[int(label_index)]
     elif source == "winogrande":
         sentence = _text(row.get("sentence"), "sentence")
         if sentence.count("_") != 1:
             raise ValueError("WinoGrande requires exactly one blank")
-        one,two = _text(row.get("option1"),"option1"),_text(row.get("option2"),"option2")
+        one, two = _text(row.get("option1"), "option1"), _text(row.get("option2"), "option2")
         prompt = sentence + "\n1. " + one + "\n2. " + two + "\nAnswer:"
         raw_id = raw_id or hashlib.sha256(sentence.encode()).hexdigest()[:20]
         group = hashlib.sha256(sentence.encode()).hexdigest()[:20]
         label = str(row.get("answer", ""))
-        if label not in ("1","2"):
+        if label not in ("1", "2"):
             raise ValueError("WinoGrande requires labeled validation set")
         candidates = ["1", "2"]
     elif source == "gsm8k":
@@ -112,12 +128,21 @@ def normalize(source: str, row: dict[str, Any]) -> dict[str, Any]:
         mc = row.get("mc1_targets")
         if not isinstance(mc, dict) or not isinstance(mc.get("choices"), list):
             raise ValueError("TruthfulQA multiple_choice mc1_targets missing")
-        labels = [chr(65+i) for i in range(len(mc["choices"]))]
+        labels = [chr(65 + i) for i in range(len(mc["choices"]))]
         if not (2 <= len(labels) <= 26):
             raise ValueError("Unsupported TruthfulQA choice count")
-        prompt = question + "\n" + "\n".join(ch + ". " + _text(s,"choice") for ch,s in zip(labels,mc["choices"])) + "\nAnswer:"
+        prompt = (
+            question
+            + "\n"
+            + "\n".join(ch + ". " + _text(s, "choice") for ch, s in zip(labels, mc["choices"]))
+            + "\nAnswer:"
+        )
         scores = mc.get("labels")
-        if not isinstance(scores, list) or len(scores) != len(labels) or sum(x == 1 for x in scores) != 1:
+        if (
+            not isinstance(scores, list)
+            or len(scores) != len(labels)
+            or sum(x == 1 for x in scores) != 1
+        ):
             raise ValueError("TruthfulQA MC1 requires exactly one true choice")
         label = labels[scores.index(1)]
         candidates = labels
@@ -130,18 +155,24 @@ def normalize(source: str, row: dict[str, Any]) -> dict[str, Any]:
     if len(prompt) > 30000:
         raise ValueError("Unexpected input length; audit before truncating")
     return {
-        "source_row_id": raw_id, "source_group_id": str(group),
-        "prompt": prompt, "task_label": label, "candidate_labels": candidates,
+        "source_row_id": raw_id,
+        "source_group_id": str(group),
+        "prompt": prompt,
+        "task_label": label,
+        "candidate_labels": candidates,
     }
 
 
 def _rank(seed: int, *parts: str) -> str:
-    return hashlib.sha256((str(seed)+"\x00"+"\x00".join(parts)).encode("utf-8")).hexdigest()
+    return hashlib.sha256((str(seed) + "\x00" + "\x00".join(parts)).encode("utf-8")).hexdigest()
 
 
 def select_records(
-    source: str, rows: Iterable[dict[str, Any]], *,
-    seed: int = 20261018, quota: int = 50,
+    source: str,
+    rows: Iterable[dict[str, Any]],
+    *,
+    seed: int = 20261018,
+    quota: int = 50,
 ) -> list[dict[str, Any]]:
     """Reproducibly sample distinct source groups before model outputs are seen."""
     if quota != 50:
@@ -176,7 +207,7 @@ def select_records(
         no = [r for r in eligible if r["task_label"] == "no"][:25]
         if len(yes) != 25 or len(no) != 25:
             raise ValueError("BoolQ requires 25 true and 25 false")
-        eligible = sorted(yes + no, key=lambda r:r["_group_rank"])
+        eligible = sorted(yes + no, key=lambda r: r["_group_rank"])
     else:
         eligible = eligible[:quota]
     for index, record in enumerate(eligible):
@@ -200,11 +231,16 @@ def _atomic_bytes(path: Path, content: bytes) -> None:
 
 
 def freeze_dataset(
-    source: str, rows: Iterable[dict[str, Any]], *,
-    source_revision: str, output: Path, license_reviewed: bool = False,
-    human_reviewed: bool = False, seed: int = 20261018,
+    source: str,
+    rows: Iterable[dict[str, Any]],
+    *,
+    source_revision: str,
+    output: Path,
+    license_reviewed: bool = False,
+    human_reviewed: bool = False,
+    seed: int = 20261018,
 ) -> dict[str, Any]:
-    sources = {d["id"]:d for d in dataset_catalog()["sources"]}
+    sources = {d["id"]: d for d in dataset_catalog()["sources"]}
     if source not in sources:
         raise ValueError("Unknown source")
     if not isinstance(source_revision, str) or len(source_revision) < 7:
@@ -218,13 +254,20 @@ def freeze_dataset(
         row["source_split"] = sources[source]["split"]
     data = b"".join(canonical_json(r) for r in records)
     meta = {
-        "schema":"opensae.dataset_release.v1", "dataset_id":source,
-        "source_repo":sources[source]["repo"], "source_config":sources[source]["config"],
-        "source_split":sources[source]["split"], "source_revision":source_revision,
-        "seed":seed, "sample_count":len(records), "discovery":20, "evaluation":30,
-        "records_sha256":hashlib.sha256(data).hexdigest(),
-        "license_reviewed":bool(license_reviewed), "human_reviewed":bool(human_reviewed),
-        "interpretation":"curated subset; neither unseen training data nor large-scale benchmark",
+        "schema": "opensae.dataset_release.v1",
+        "dataset_id": source,
+        "source_repo": sources[source]["repo"],
+        "source_config": sources[source]["config"],
+        "source_split": sources[source]["split"],
+        "source_revision": source_revision,
+        "seed": seed,
+        "sample_count": len(records),
+        "discovery": 20,
+        "evaluation": 30,
+        "records_sha256": hashlib.sha256(data).hexdigest(),
+        "license_reviewed": bool(license_reviewed),
+        "human_reviewed": bool(human_reviewed),
+        "interpretation": "curated subset; neither unseen training data nor large-scale benchmark",
     }
     if (output / "manifest.json").exists():
         raise FileExistsError("Immutable dataset release already exists")
@@ -233,101 +276,141 @@ def freeze_dataset(
     return meta
 
 
-def build_feature_index(observations: Iterable[dict[str, Any]], *, output: Path, repo_root: Path | None = None) -> dict[str, Any]:
+def build_feature_index(
+    observations: Iterable[dict[str, Any]], *, output: Path, repo_root: Path | None = None
+) -> dict[str, Any]:
     """Build compact browsing index from REAL activation records only.
 
     Each observation must bind to an exact verified site & model/SAE weights.
     Text is shown only if an explicit rights review permits publication.
     """
-    sites = {s["site_id"]:s for s in load_sites(repo_root)}
+    sites = {s["site_id"]: s for s in load_sites(repo_root)}
     cards: dict[str, dict[str, Any]] = {}
     for row in observations:
         site_id = row.get("site_id")
         site = sites.get(site_id)
-        if site is None or not has_complete_identity(site) or row.get("model_sha256") != site["model_sha256"] or row.get("sae_sha256") != site["sae_sha256"]:
+        if (
+            site is None
+            or not has_complete_identity(site)
+            or row.get("model_sha256") != site["model_sha256"]
+            or row.get("sae_sha256") != site["sae_sha256"]
+        ):
             raise ValueError("Observation does not match a verified model/SAE/site identity")
         if row.get("source_type") != "real_checkpoint":
             raise ValueError("Synthetic or unspecified observations cannot be published as real")
         feature_id = row.get("feature_id")
         position = row.get("token_position")
-        if type(feature_id) is not int or feature_id < 0 or type(position) is not int or position < 0:
+        if (
+            type(feature_id) is not int
+            or feature_id < 0
+            or type(position) is not int
+            or position < 0
+        ):
             raise ValueError("Invalid feature ID or token position")
         strength = row.get("activation")
-        if not isinstance(strength, (int,float)) or not math.isfinite(strength):
+        if not isinstance(strength, (int, float)) or not math.isfinite(strength):
             raise ValueError("Nonfinite activation")
-        group = _text(row.get("prompt_group_id"),"prompt_group_id")
+        group = _text(row.get("prompt_group_id"), "prompt_group_id")
         key = site_id + ":F" + str(feature_id)
-        record = cards.setdefault(key, {
-            "feature_key":key, "site_id":site_id, "model":site["model"],
-            "sae":site["sae"], "layer":site["layer"], "feature_id":feature_id,
-            "observations":0, "max_activation":float("-inf"), "groups":set(), "examples":[],
-            "source_type":"real_checkpoint",
-            "label":None, "label_status":"unlabeled",
-        })
+        record = cards.setdefault(
+            key,
+            {
+                "feature_key": key,
+                "site_id": site_id,
+                "model": site["model"],
+                "sae": site["sae"],
+                "layer": site["layer"],
+                "feature_id": feature_id,
+                "observations": 0,
+                "max_activation": float("-inf"),
+                "groups": set(),
+                "examples": [],
+                "source_type": "real_checkpoint",
+                "label": None,
+                "label_status": "unlabeled",
+            },
+        )
         record["observations"] += 1
         record["groups"].add(group)
         record["max_activation"] = max(record["max_activation"], float(strength))
         if bool(row.get("public_text_reviewed")):
             example = {
-                "prompt_group_id":group, "sample_id":str(row.get("sample_id",group)),
-                "token_position":position, "token_text":str(row.get("token_text",""))[:128],
-                "text_excerpt":str(row.get("text_excerpt",""))[:700],
-                "activation":float(strength),
+                "prompt_group_id": group,
+                "sample_id": str(row.get("sample_id", group)),
+                "token_position": position,
+                "token_text": str(row.get("token_text", ""))[:128],
+                "text_excerpt": str(row.get("text_excerpt", ""))[:700],
+                "activation": float(strength),
             }
             record["examples"].append(example)
-            record["examples"].sort(key=lambda r:-r["activation"])
+            record["examples"].sort(key=lambda r: -r["activation"])
             del record["examples"][8:]
     for item in cards.values():
         item["unique_prompt_groups"] = len(item.pop("groups"))
         if item["max_activation"] == float("-inf"):
             item["max_activation"] = None
-    data = canonical_json(sorted(cards.values(),key=lambda v:(v["model"],v["layer"],v["feature_id"])))
-    if len(data) > 64*1024*1024:
+    data = canonical_json(
+        sorted(cards.values(), key=lambda v: (v["model"], v["layer"], v["feature_id"]))
+    )
+    if len(data) > 64 * 1024 * 1024:
         raise ValueError("Feature index exceeds viewer budget; shard it")
     target = output / "index.json"
     if (output / "manifest.json").exists():
         raise FileExistsError("Feature index is immutable")
-    _atomic_bytes(target,data)
-    manifest = {"schema":"opensae.feature_index.v1","files":{"index.json":hashlib.sha256(data).hexdigest()},"feature_count":len(cards)}
-    _atomic_bytes(output / "manifest.json",canonical_json(manifest))
+    _atomic_bytes(target, data)
+    manifest = {
+        "schema": "opensae.feature_index.v1",
+        "files": {"index.json": hashlib.sha256(data).hexdigest()},
+        "feature_count": len(cards),
+    }
+    _atomic_bytes(output / "manifest.json", canonical_json(manifest))
     return manifest
 
 
 def _raw_jsonl(path: Path) -> Iterable[dict[str, Any]]:
-    with path.open("r",encoding="utf-8") as stream:
-        for number,line in enumerate(stream,1):
+    with path.open("r", encoding="utf-8") as stream:
+        for number, line in enumerate(stream, 1):
             if not line.strip():
                 continue
-            row=json.loads(line)
-            if not isinstance(row,dict):
+            row = json.loads(line)
+            if not isinstance(row, dict):
                 raise ValueError("Expected JSON object at line " + str(number))
             yield row
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    sub = parser.add_subparsers(dest="command",required=True)
-    ds = sub.add_parser("dataset",help="Freeze 50 rows from a locally exported dataset")
-    ds.add_argument("--source",required=True,choices=[s["id"] for s in dataset_catalog()["sources"]])
-    ds.add_argument("--input",type=Path,required=True)
-    ds.add_argument("--source-revision",required=True)
-    ds.add_argument("--output",type=Path,default=None)
-    ds.add_argument("--license-reviewed",action="store_true")
-    ds.add_argument("--human-reviewed",action="store_true")
-    fi = sub.add_parser("features",help="Build a real-only feature index from GPU output")
-    fi.add_argument("--input",type=Path,required=True)
-    fi.add_argument("--output",type=Path,default=None)
-    args=parser.parse_args(argv)
+    sub = parser.add_subparsers(dest="command", required=True)
+    ds = sub.add_parser("dataset", help="Freeze 50 rows from a locally exported dataset")
+    ds.add_argument(
+        "--source", required=True, choices=[s["id"] for s in dataset_catalog()["sources"]]
+    )
+    ds.add_argument("--input", type=Path, required=True)
+    ds.add_argument("--source-revision", required=True)
+    ds.add_argument("--output", type=Path, default=None)
+    ds.add_argument("--license-reviewed", action="store_true")
+    ds.add_argument("--human-reviewed", action="store_true")
+    fi = sub.add_parser("features", help="Build a real-only feature index from GPU output")
+    fi.add_argument("--input", type=Path, required=True)
+    fi.add_argument("--output", type=Path, default=None)
+    args = parser.parse_args(argv)
     if args.command == "dataset":
-        output=args.output or (data_root() / "datasets" / args.source)
-        report=freeze_dataset(args.source,_raw_jsonl(args.input),
-            source_revision=args.source_revision,output=output,
-            license_reviewed=args.license_reviewed,human_reviewed=args.human_reviewed)
+        output = args.output or (data_root() / "datasets" / args.source)
+        report = freeze_dataset(
+            args.source,
+            _raw_jsonl(args.input),
+            source_revision=args.source_revision,
+            output=output,
+            license_reviewed=args.license_reviewed,
+            human_reviewed=args.human_reviewed,
+        )
     else:
-        report=build_feature_index(_raw_jsonl(args.input),output=args.output or data_root()/"features")
-    print(json.dumps(report,indent=2,sort_keys=True))
+        report = build_feature_index(
+            _raw_jsonl(args.input), output=args.output or data_root() / "features"
+        )
+    print(json.dumps(report, indent=2, sort_keys=True))
     return 0
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     raise SystemExit(main())

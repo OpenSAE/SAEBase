@@ -3,6 +3,7 @@
 GPU measurements are never synthesized here.  Historical 64-group engineering
 checks are *not* silently relabeled as the new ten-dataset/500-prompt corpus.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -23,7 +24,9 @@ class InvalidEvidence(ValueError):
 
 
 def data_root() -> Path:
-    return Path(os.environ.get("OPENSAE_LAB_DATA", str(REPO_ROOT / "runs" / "research-lab"))).resolve()
+    return Path(
+        os.environ.get("OPENSAE_LAB_DATA", str(REPO_ROOT / "runs" / "research-lab"))
+    ).resolve()
 
 
 def read_json(path: Path) -> Any:
@@ -32,7 +35,12 @@ def read_json(path: Path) -> Any:
 
 
 def canonical_json(payload: Any) -> bytes:
-    return (json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"), allow_nan=False) + "\n").encode("utf-8")
+    return (
+        json.dumps(
+            payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"), allow_nan=False
+        )
+        + "\n"
+    ).encode("utf-8")
 
 
 def digest(path: Path) -> str:
@@ -81,46 +89,61 @@ def load_sites(repo_root: Path | None = None) -> list[dict[str, Any]]:
                 raise InvalidEvidence("Report/checkpoint mismatch: " + rel + " / " + name)
         if report.get("status") != "passed":
             raise InvalidEvidence("Unverified result: " + rel)
-        if not all(row.get(flag) is True for flag in ("pair_verified", "benchmark_verified", "reliability_verified")):
+        if not all(
+            row.get(flag) is True
+            for flag in ("pair_verified", "benchmark_verified", "reliability_verified")
+        ):
             raise InvalidEvidence("Unverified site in published matrix")
         values = []
         for metric in report.get("metric_results", []):
             if not isinstance(metric, dict) or not isinstance(metric.get("metric_id"), str):
                 raise InvalidEvidence("Malformed metric row")
-            values.append({
-                "id": metric["metric_id"],
-                "value": metric.get("value"),
-                "condition": metric.get("condition"),
-                "n_valid": metric.get("n_valid"),
-            })
-        sites.append({
-            "site_id": f"{row['model_key']}:{row['sae_key']}:L{row['layer']}",
-            "model": row["model_key"],
-            "sae": row["sae_key"],
-            "layer": row["layer"],
-            "hook": row["hook_name"],
-            "model_sha256": row["model_state_sha256"],
-            "sae_sha256": row["sae_state_sha256"],
-            "status": "verified_engineering",
-            "group_count": report.get("n_independent_evaluation_groups"),
-            "protocol": report.get("protocol_id"),
-            "evidence_url": "https://github.com/OpenSAE/SAEBase/blob/main/" + (EVIDENCE / rel).as_posix(),
-            "metrics": values,
-        })
+            values.append(
+                {
+                    "id": metric["metric_id"],
+                    "value": metric.get("value"),
+                    "condition": metric.get("condition"),
+                    "n_valid": metric.get("n_valid"),
+                }
+            )
+        sites.append(
+            {
+                "site_id": f"{row['model_key']}:{row['sae_key']}:L{row['layer']}",
+                "model": row["model_key"],
+                "sae": row["sae_key"],
+                "layer": row["layer"],
+                "hook": row["hook_name"],
+                "model_sha256": row["model_state_sha256"],
+                "sae_sha256": row["sae_state_sha256"],
+                "status": "verified_engineering",
+                "group_count": report.get("n_independent_evaluation_groups"),
+                "protocol": report.get("protocol_id"),
+                "evidence_url": "https://github.com/OpenSAE/SAEBase/blob/main/"
+                + (EVIDENCE / rel).as_posix(),
+                "metrics": values,
+            }
+        )
     return sites
 
 
 def historical_metrics(sites: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         {
-            "site_id": site["site_id"], "model": site["model"], "sae": site["sae"],
-            "layer": site["layer"], "hook": site["hook"],
-            "metric": metric["id"], "value": metric["value"],
-            "condition": metric["condition"], "n_valid": metric["n_valid"],
-            "protocol": site["protocol"], "data_class": "historical_engineering",
+            "site_id": site["site_id"],
+            "model": site["model"],
+            "sae": site["sae"],
+            "layer": site["layer"],
+            "hook": site["hook"],
+            "metric": metric["id"],
+            "value": metric["value"],
+            "condition": metric["condition"],
+            "n_valid": metric["n_valid"],
+            "protocol": site["protocol"],
+            "data_class": "historical_engineering",
             "evidence_url": site["evidence_url"],
         }
-        for site in sites for metric in site["metrics"]
+        for site in sites
+        for metric in site["metrics"]
     ]
 
 
@@ -134,7 +157,9 @@ def imported_counts(root: Path | None = None) -> dict[str, int]:
         try:
             info = read_json(manifest)
             records = manifest.parent / "records.jsonl"
-            if info.get("schema") != "opensae.dataset_release.v1" or digest(records) != info.get("records_sha256"):
+            if info.get("schema") != "opensae.dataset_release.v1" or digest(records) != info.get(
+                "records_sha256"
+            ):
                 continue
             if not info.get("license_reviewed") or not info.get("human_reviewed"):
                 continue
@@ -160,7 +185,9 @@ def _verified_index(folder: Path, key: str, resource: str) -> dict[str, Any] | N
 
 
 def feature_index(root: Path | None = None) -> list[dict[str, Any]]:
-    document = _verified_index((root or data_root()) / "features", "opensae.feature_index.v1", "index.json")
+    document = _verified_index(
+        (root or data_root()) / "features", "opensae.feature_index.v1", "index.json"
+    )
     if document is None:
         return []
     if not isinstance(document, list):
@@ -169,7 +196,9 @@ def feature_index(root: Path | None = None) -> list[dict[str, Any]]:
 
 
 def analyses(root: Path | None = None) -> list[dict[str, Any]]:
-    document = _verified_index((root or data_root()) / "analyses", "opensae.analysis_index.v1", "index.json")
+    document = _verified_index(
+        (root or data_root()) / "analyses", "opensae.analysis_index.v1", "index.json"
+    )
     if document is None:
         return []
     if not isinstance(document, list):
@@ -196,15 +225,17 @@ def published_reports(root: Path | None = None) -> list[dict[str, Any]]:
             report = read_json(report_path)
             if report.get("visibility") != "public" or report.get("report_id") != subfolder.name:
                 continue
-            rows.append({
-                "report_id": report["report_id"],
-                "title": report.get("title", "Untitled experiment"),
-                "kind": report.get("kind", "unknown"),
-                "model": report.get("model"),
-                "source": report.get("source"),
-                "summary": report.get("summary", ""),
-                "url": "/api/reports/" + report["report_id"],
-            })
+            rows.append(
+                {
+                    "report_id": report["report_id"],
+                    "title": report.get("title", "Untitled experiment"),
+                    "kind": report.get("kind", "unknown"),
+                    "model": report.get("model"),
+                    "source": report.get("source"),
+                    "summary": report.get("summary", ""),
+                    "url": "/api/reports/" + report["report_id"],
+                }
+            )
         except (OSError, ValueError, KeyError, TypeError):
             continue
     return rows
@@ -222,7 +253,9 @@ def public_report(report_id: str, root: Path | None = None) -> dict[str, Any] | 
         return None
     manifest = read_json(folder / "manifest.json")
     path = folder / "report.json"
-    if manifest.get("schema") != "opensae.public_report.v1" or digest(path) != manifest.get("report_sha256"):
+    if manifest.get("schema") != "opensae.public_report.v1" or digest(path) != manifest.get(
+        "report_sha256"
+    ):
         raise InvalidEvidence("Report integrity check failed")
     result = read_json(path)
     if result.get("report_id") != report_id or result.get("visibility") != "public":

@@ -3,6 +3,7 @@
 Nothing is published automatically. Source sha, bounded stream settings and
 license-review state are saved for a separate human review.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -31,8 +32,9 @@ def group_wikitext(lines: Iterable[dict]):
         seq += 1
 
 
-def acquire(source: str, destination: Path, *, max_raw_rows: int = 20000,
-            seed: int = 20261018) -> dict:
+def acquire(
+    source: str, destination: Path, *, max_raw_rows: int = 20000, seed: int = 20261018
+) -> dict:
     definitions = {r["id"]: r for r in dataset_catalog()["sources"]}
     if source not in definitions:
         raise ValueError("Unknown public dataset")
@@ -44,14 +46,19 @@ def acquire(source: str, destination: Path, *, max_raw_rows: int = 20000,
         from datasets import load_dataset
         from huggingface_hub import HfApi
     except ImportError as e:
-        raise RuntimeError("Install the optional CPU dependencies datasets and huggingface_hub") from e
+        raise RuntimeError(
+            "Install the optional CPU dependencies datasets and huggingface_hub"
+        ) from e
     entry = definitions[source]
     revision = HfApi().dataset_info(repo_id=entry["repo"]).sha
     if not isinstance(revision, str) or len(revision) != 40:
         raise ValueError("Could not resolve immutable upstream revision")
     options = {
-        "path": entry["repo"], "split": entry["split"], "revision": revision,
-        "streaming": True, "trust_remote_code": False,
+        "path": entry["repo"],
+        "split": entry["split"],
+        "revision": revision,
+        "streaming": True,
+        "trust_remote_code": False,
     }
     if entry["config"]:
         options["name"] = entry["config"]
@@ -71,22 +78,32 @@ def acquire(source: str, destination: Path, *, max_raw_rows: int = 20000,
         raise ValueError("Empty export from pinned upstream data")
     _atomic_bytes(destination, content)
     manifest = {
-        "schema": "opensae.source_export.v1", "dataset_id": source,
-        "repo": entry["repo"], "config": entry["config"], "split": entry["split"],
-        "resolved_revision": revision, "shuffle_seed": seed,
-        "shuffle_buffer_size": 2048, "max_raw_rows": max_raw_rows,
+        "schema": "opensae.source_export.v1",
+        "dataset_id": source,
+        "repo": entry["repo"],
+        "config": entry["config"],
+        "split": entry["split"],
+        "resolved_revision": revision,
+        "shuffle_seed": seed,
+        "shuffle_buffer_size": 2048,
+        "max_raw_rows": max_raw_rows,
         "sampling_scope": "bounded shuffled stream; not uniform across whole source",
         "source_export_sha256": hashlib.sha256(content).hexdigest(),
-        "license_reviewed": False, "human_reviewed": False, "auto_publish": False,
+        "license_reviewed": False,
+        "human_reviewed": False,
+        "auto_publish": False,
     }
-    _atomic_bytes(destination.with_suffix(destination.suffix + ".manifest.json"), canonical_json(manifest))
+    _atomic_bytes(
+        destination.with_suffix(destination.suffix + ".manifest.json"), canonical_json(manifest)
+    )
     return manifest
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source", required=True,
-                        choices=[s["id"] for s in dataset_catalog()["sources"]])
+    parser.add_argument(
+        "--source", required=True, choices=[s["id"] for s in dataset_catalog()["sources"]]
+    )
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--max-raw-rows", type=int, default=20000)
     args = parser.parse_args(argv)
