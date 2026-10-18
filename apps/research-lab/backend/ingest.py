@@ -239,6 +239,18 @@ def select_records(
         if len(yes) != 25 or len(no) != 25:
             raise ValueError("BoolQ requires 25 true and 25 false")
         eligible = sorted(yes + no, key=lambda r: r["_group_rank"])
+    elif source == "hellaswag":
+        # Select from the frozen gold labels, never model correctness.
+        # Fifty samples cannot divide equally into four classes, so use
+        # deterministic counts 13/13/12/12 for A/B/C/D.
+        quotas = {"A": 13, "B": 13, "C": 12, "D": 12}
+        selected = []
+        for label, count in quotas.items():
+            group = [row for row in eligible if row["task_label"] == label][:count]
+            if len(group) != count:
+                raise ValueError("HellaSwag cannot satisfy fixed gold-label quotas")
+            selected.extend(group)
+        eligible = sorted(selected, key=lambda row: row["_group_rank"])
     else:
         eligible = eligible[:quota]
     for index, record in enumerate(eligible):
