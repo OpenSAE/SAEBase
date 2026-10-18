@@ -1,7 +1,7 @@
 # Work Plan 05 — Research Lab CPU 阶段收尾、500 条候选语料锁定与 GPU Agent 执行清单
 
 创建日期：2026-10-18  
-状态：CPU 代码与候选数据锁已准备；最终主分支合并和源锁复验以 PR #42 的检查为准。GPU 实验未启动。  
+状态：CPU 阶段代码、候选数据源锁及 22,500 个 RSS 变体哈希已合并至 main（PR #38、#40、#42）；固定上游版本的 CPU 来源锁复验和正式 CI 通过。原始文本的人工内容/版权审批未完成，GPU 实验未启动。  
 母计划：[04 Research Platform Execution Plan](04_research_platform_execution_plan.md)。  
 归档位置：work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md。
 
