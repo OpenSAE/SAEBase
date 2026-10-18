@@ -948,3 +948,92 @@ def test_redacted_cpu_audit_never_releases_unreviewed_prompt_text(tmp_path, monk
     assert "Confidential candidate story text" not in data
     assert all(len(row["text_sha256"]) == 64 for row in report["dataset_results"][0]["candidate_rows_without_text"])
     assert all("prompt" not in row for row in report["dataset_results"][0]["candidate_rows_without_text"])
+
+
+
+def test_corpus_source_lock_has_ten_exact_pinned_upstream_commits():
+    from backend.corpus_lock import LOCK_PATH, SCHEMA
+
+    source = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+    assert source["schema"] == SCHEMA
+    assert source["total_sources"] == 10
+    assert source["total_base_groups"] == 500
+    assert source["human_content_review"] == "pending"
+    assert source["rights_review"] == "pending"
+    assert source["candidate_rows_in_repository"] is False
+    assert len({row["dataset_id"] for row in source["sources"]}) == 10
+    assert all(
+        len(row["source_revision"]) == 40
+        and len(row["candidate_sha256"]) == 64
+        and len(row["source_export_sha256"]) == 64
+        and row["sample_count"] == 50
+        for row in source["sources"]
+    )
+
+
+def test_redacted_corpus_lock_verification_rejects_changed_content():
+    import hashlib
+    from backend.corpus_lock import verify_corpus_lock
+
+    dataset_ids = [row["id"] for row in core.dataset_catalog()["sources"]]
+    rows = []
+    frozen = []
+    for dataset_id in dataset_ids:
+        revision = "b" * 40
+        source_sha = hashlib.sha256((dataset_id+"source").encode()).hexdigest()
+        candidate_sha = hashlib.sha256((dataset_id+"candidate").encode()).hexdigest()
+        group_rows = [
+            {
+                "dataset_id": dataset_id,
+                "source_revision": revision,
+                "sample_id": dataset_id + ":sample:" + str(i),
+                "prompt_group_id": dataset_id + ":group:" + str(i),
+                "usage_split": "discovery" if i < 20 else "evaluation",
+                "text_sha256": hashlib.sha256((dataset_id+str(i)).encode()).hexdigest(),
+            }
+            for i in range(50)
+        ]
+        frozen.append({
+            "dataset_id": dataset_id, "status": "candidate_frozen_unreviewed",
+            "source_revision": revision,
+            "source_export_sha256": source_sha,
+            "candidate_sha256": candidate_sha,
+            "max_raw_rows": 2500,
+            "n_candidates": 50, "discovery": 20, "evaluation": 30,
+            "license_reviewed": False, "human_reviewed": False,
+            "candidate_rows_without_text": group_rows,
+        })
+        rows.append({
+            "dataset_id": dataset_id,
+            "source_revision": revision,
+            "source_export_sha256": source_sha,
+            "candidate_sha256": candidate_sha,
+            "max_raw_rows": 2500,
+        })
+    report = {
+        "schema": "opensae.corpus_cpu_audit.v1",
+        "sources_selected": 10, "candidate_count": 500,
+        "number_sources_target": 10, "gpu_calls": 0,
+        "full_source_text_in_this_artifact": False,
+        "cross_source_exact_duplicates": [],
+        "dataset_results": frozen,
+    }
+    report["manifest_sha256"] = hashlib.sha256(core.canonical_json(report)).hexdigest()
+    lock = {
+        "schema": "opensae.corpus_source_lock.v1",
+        "total_sources": 10, "total_base_groups": 500,
+        "discovery_groups": 200, "evaluation_groups": 300,
+        "rights_review": "pending", "human_content_review": "pending",
+        "audit_manifest_sha256": report["manifest_sha256"],
+        "sources": rows,
+    }
+    result = verify_corpus_lock(report, lock)
+    assert result["status"] == "frozen_candidates_verified_unreviewed"
+    assert result["groups"] == 500
+    tampered = json.loads(json.dumps(report))
+    tampered["dataset_results"][0]["candidate_rows_without_text"][0]["text_sha256"] = "0"*64
+    with pytest.raises(ValueError, match="fingerprint"):
+        verify_corpus_lock(tampered, lock)
+    tampered["dataset_results"][0]["candidate_rows_without_text"][0]["prompt"] = "private original"
+    with pytest.raises(ValueError, match="prompt text"):
+        verify_corpus_lock(tampered, lock, verify_aggregate=False)
