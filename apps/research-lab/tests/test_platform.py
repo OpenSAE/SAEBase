@@ -857,3 +857,94 @@ def test_synthetic_control_is_not_presented_as_real_sae_data():
         check_candidate(tampered)
     with pytest.raises(ValueError, match="Synthetic truth"):
         synthetic_reference_codes(make_candidate("real_model_six_factor_design"))
+
+
+
+def test_wikitext_raw_lines_preserve_original_article_membership(monkeypatch, tmp_path):
+    """Raw-line shuffling before grouping would attach passages to wrong articles."""
+    import types
+    from backend.acquire import acquire
+
+    lines = [
+        {"text": "= Alpha ="},
+        {"text": "A" * 95},
+        {"text": "= Beta ="},
+        {"text": "B" * 95},
+        {"text": "= Gamma ="},
+        {"text": "C" * 95},
+    ]
+
+    class Stream:
+        def __iter__(self):
+            return iter(lines)
+
+        def shuffle(self, **kwargs):
+            raise AssertionError("Line-level WikiText must not be shuffled")
+
+    class FakeApi:
+        def dataset_info(self, *, repo_id, revision=None):
+            assert repo_id == "Salesforce/wikitext"
+            if revision is not None:
+                assert revision == "f" * 40
+            return types.SimpleNamespace(sha="f" * 40)
+
+    def load_dataset(**kwargs):
+        assert kwargs["revision"] == "f" * 40
+        assert kwargs["name"] == "wikitext-103-raw-v1"
+        return Stream()
+
+    monkeypatch.setitem(sys.modules, "datasets", types.SimpleNamespace(load_dataset=load_dataset))
+    monkeypatch.setitem(sys.modules, "huggingface_hub", types.SimpleNamespace(HfApi=FakeApi))
+    target = tmp_path / "wikitext.jsonl"
+    result = acquire(
+        "wikitext103", target, max_raw_rows=100, source_revision="f" * 40,
+    )
+    entries = [json.loads(line) for line in target.read_text(encoding="utf-8").splitlines()]
+    assert len(entries) == 3
+    assert entries[0]["article_id"] != entries[1]["article_id"]
+    assert entries[1]["article_id"] != entries[2]["article_id"]
+    assert result["shuffle_buffer_size"] == 0
+    assert result["resolved_revision"] == "f" * 40
+
+
+def test_redacted_cpu_audit_never_releases_unreviewed_prompt_text(tmp_path, monkeypatch):
+    import hashlib
+    from backend import source_audit
+
+    raw = [
+        {"id": str(i), "text": "Confidential candidate story text " + str(i)}
+        for i in range(65)
+    ]
+
+    def fake_acquire(dataset_id, destination, **kwargs):
+        assert dataset_id == "tinystories"
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text(
+            "".join(json.dumps(row) + "\n" for row in raw), encoding="utf-8"
+        )
+        return {
+            "repo": "roneneldan/TinyStories",
+            "config": None,
+            "split": "validation",
+            "resolved_revision": "b" * 40,
+            "source_export_sha256": hashlib.sha256(
+                destination.read_bytes()
+            ).hexdigest(),
+            "sampling_scope": "test-only source export",
+            "max_raw_rows": 2500,
+        }
+
+    monkeypatch.setattr(source_audit, "acquire", fake_acquire)
+    report = source_audit.audit_sources(
+        destination=tmp_path / "private_manifest.json",
+        dataset_ids=["tinystories"],
+    )
+    assert report["sources_selected"] == 1
+    assert report["candidate_count"] == 50
+    assert report["gpu_calls"] == 0
+    assert report["rights_review"] == "not_completed"
+    assert report["full_source_text_in_this_artifact"] is False
+    data = (tmp_path / "private_manifest.json").read_text(encoding="utf-8")
+    assert "Confidential candidate story text" not in data
+    assert all(len(row["text_sha256"]) == 64 for row in report["dataset_results"][0]["candidate_rows_without_text"])
+    assert all("prompt" not in row for row in report["dataset_results"][0]["candidate_rows_without_text"])
