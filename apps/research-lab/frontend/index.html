@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Explore sparse autoencoder evidence, features, interventions and reproducible analyses.">
+  <title>OpenSAE — Research Lab</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script defer src="/assets/app.js"></script>
+</head>
+<body>
+  <header class="mast">
+    <div class="page-container mast-inner">
+      <a class="identity" href="#overview" aria-label="OpenSAE Research Lab home">
+        <span class="hex-icon" aria-hidden="true">⬡</span>
+        <span class="brand">OpenSAE <span class="brand-sub">Research Lab</span></span>
+      </a>
+      <nav class="nav" aria-label="Research tools">
+        <a href="#overview" data-nav="overview">Overview</a>
+        <a href="#results" data-nav="results">Results</a>
+        <a href="#explore" data-nav="explore">Features</a>
+        <a href="#intervene" data-nav="intervene">Intervene</a>
+        <a href="#analyze" data-nav="analyze">Analyze</a>
+        <a href="#datasets" data-nav="datasets">Datasets</a>
+        <a href="#reports" data-nav="reports">Reports</a>
+      </nav>
+      <a class="repo-link" target="_blank" rel="noreferrer" href="https://github.com/OpenSAE/SAEBase">GitHub ↗</a>
+    </div>
+  </header>
+  <main class="page-container" id="main">
+    <div class="connection" role="status" aria-live="polite"><span class="status-dot"></span>
+      <span id="connection-text">Connecting to evidence registry…</span></div>
+    <section id="overview" class="view">
+      <div class="hero">
+        <div class="eyebrow">OPEN RESEARCH INFRASTRUCTURE</div>
+        <h1>From learned features<br>to testable explanations.</h1>
+        <p>Explore model internals, compare controlled interventions, and follow every result back to its evidence.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#results">Explore real results <span aria-hidden="true">↗</span></a>
+          <a class="btn secondary" href="#explore">Browse features</a>
+        </div>
+      </div>
+      <div class="metric-grid" aria-label="Research Lab inventory">
+        <div class="metric-tile"><div class="big-number" id="stat-sites">—</div><span>Verified model sites</span></div>
+        <div class="metric-tile"><div class="big-number" id="stat-metrics">—</div><span>Historical metric records</span></div>
+        <div class="metric-tile"><div class="big-number" id="stat-datasets">—</div><span>Planned curated datasets</span></div>
+        <div class="metric-tile"><div class="big-number" id="stat-prompts">—</div><span>Published new prompts</span></div>
+      </div>
+      <div class="section-heading"><div><h2>Explore the research</h2><p>Start with an existing verified result, then move into deeper experiments.</p></div></div>
+      <div class="tool-grid">
+        <a class="tool-card" href="#results"><div class="tool-mark">01</div><h3>Compare results</h3><p>Browse actual SAE measurements across model checkpoints and layers.</p><span>Open Results ↗</span></a>
+        <a class="tool-card" href="#explore"><div class="tool-mark">02</div><h3>Examine features</h3><p>Locate observed features, inspect their activation examples, and review evidence.</p><span>Open Features ↗</span></a>
+        <a class="tool-card" href="#intervene"><div class="tool-mark">03</div><h3>Design an intervention</h3><p>Validate a precise feature edit before running it on model hardware.</p><span>Open Intervene ↗</span></a>
+        <a class="tool-card" href="#analyze"><div class="tool-mark">04</div><h3>Study explanations</h3><p>Explore SAR, RSS, localization, and their published analysis records.</p><span>Open Analyze ↗</span></a>
+      </div>
+      <aside class="scope-note"><strong>About these results.</strong> The 48-site records are historical engineering acceptance on 64 controlled prompt groups per site. The separate 10 × 50 curated corpus has not been collected yet. The site never substitutes synthetic outputs for real measurements.</aside>
+    </section>
+    <section id="results" class="view" hidden>
+      <div class="section-heading"><div><span class="eyebrow">EVIDENCE EXPLORER</span><h1>Measured results</h1><p>Real historical acceptance records, with protocol and original report attached.</p></div></div>
+      <div class="filters">
+        <label>Model <input id="results-model" placeholder="Filter by model" autocomplete="off"></label>
+        <label>Metric <select id="results-metric"><option value="core.l0">L0 · active features</option><option value="core.reconstruction_mse">Reconstruction MSE</option><option value="core.explained_variance">Explained variance</option><option value="intervention.logit_delta_l2">Intervention logit delta L2</option><option value="">All metrics</option></select></label>
+        <button class="btn secondary" id="results-refresh">Apply filters</button>
+      </div>
+      <div class="panel"><div class="panel-title"><h2>Results by model site</h2><span id="results-count" class="subtle">—</span></div>
+        <div class="scroller"><table><thead><tr><th>Model / SAE</th><th>Layer</th><th>Metric</th><th>Condition</th><th>Value</th><th>Source</th></tr></thead><tbody id="results-table"></tbody></table></div>
+        <div class="panel-footer"><span>Values have separate units. This is not an SAE quality leaderboard.</span><button class="btn tiny" id="results-more">Load more</button></div>
+      </div>
+    </section>
+    <section id="explore" class="view" hidden>
+      <div class="section-heading"><div><span class="eyebrow">FEATURE EXPLORER</span><h1>Explore individual features</h1><p>Observed activity, identity, examples and evidence — not guessed explanations.</p></div></div>
+      <div class="filters">
+        <label>Search <input id="feature-query" placeholder="Feature ID, label, or model" autocomplete="off"></label>
+        <label>Model <input id="feature-model" placeholder="All published models" autocomplete="off"></label>
+        <button id="feature-search" class="btn secondary">Search</button>
+      </div>
+      <div id="feature-list" class="feature-grid" aria-live="polite"></div>
+      <div id="feature-detail" class="panel detail-panel" hidden></div>
+    </section>
+    <section id="intervene" class="view" hidden>
+      <div class="section-heading"><div><span class="eyebrow">CONTROLLED INTERVENTIONS</span><h1>Change features. Measure effects.</h1><p>Configure a reproducible experiment. Model execution will be enabled only after GPU and access controls are verified.</p></div></div>
+      <div class="two-cols">
+        <form id="intervention-form" class="panel stacked">
+          <h2>Experiment configuration</h2>
+          <label>Verified model / SAE / layer<select id="intervention-site" required><option value="">Select a verified site</option></select></label>
+          <label>Input text<textarea id="intervention-text" rows="4" maxlength="16000" placeholder="Enter a prompt. Preflight does not store it." required></textarea></label>
+          <div class="form-cols">
+            <label>Operation<select id="intervention-operation"><option value="ablate">Ablate feature</option><option value="scale">Scale activation</option><option value="clamp">Clamp activation</option><option value="add">Add activation</option><option value="coalition">Feature coalition</option><option value="identity">Identity baseline</option><option value="reconstruction">Full SAE reconstruction</option></select></label>
+            <label>Strength<input type="number" id="intervention-strength" value="1" step=".1" min="-10" max="10"></label>
+          </div>
+          <label>Feature IDs (comma-separated)<input id="intervention-features" placeholder="Example: 12, 42"></label>
+          <label>Max output tokens<input type="number" id="intervention-tokens" value="32" min="0" max="64"></label>
+          <button type="submit" class="btn primary">Check experiment setup ↗</button>
+          <div id="preflight-result" role="status" aria-live="polite" class="result-message">Preflight checks the configuration only. No prompt is stored and no model is run.</div>
+        </form>
+        <div class="panel stacked right-context">
+          <div class="panel-label">EXECUTION AVAILABILITY</div><h2>GPU execution not connected</h2>
+          <p>This CPU-first release validates model/SAE identities and experiment settings, but does not simulate a changed answer.</p>
+          <div class="mini-steps"><div><span>01</span> Validate the source site and feature edit</div><div><span>02</span> Connect an authenticated worker and real weights</div><div><span>03</span> Run and publish independently verified evidence</div></div>
+          <a href="https://github.com/OpenSAE/SAEBase/blob/main/work_plan/04_research_platform_execution_plan.md" target="_blank" rel="noreferrer">Read the full execution plan ↗</a>
+        </div>
+      </div>
+    </section>
+    <section id="analyze" class="view" hidden>
+      <div class="section-heading"><div><span class="eyebrow">RESEARCH METHODS</span><h1>Test what features explain.</h1><p>Use purpose-built analyses, with explicit assumptions and source methods.</p></div></div>
+      <div class="method-grid">
+        <div class="method-card"><span class="method-tag">SAR</span><h2>Feature interactions</h2><p>Are combined behavioral effects predictable from individual features, or do feature pairs matter?</p><a target="_blank" rel="noreferrer" href="https://github.com/OpenSAE/SAE-Behavioral-Compositionality">Original method ↗</a></div>
+        <div class="method-card"><span class="method-tag">RSS</span><h2>Input transformations</h2><p>When a prompt changes, which features change consistently, and do directions persist on held-out variants?</p><a target="_blank" rel="noreferrer" href="https://github.com/OpenSAE/Redistribution-Sensitivity-Score">Original method ↗</a></div>
+        <div class="method-card"><span class="method-tag">LOCALIZE</span><h2>Input dependencies</h2><p>How many controlled input factors are needed to explain feature activity? Requires a complete factor grid.</p><a target="_blank" rel="noreferrer" href="https://github.com/OpenSAE/SAE-Input-Localization">Original method ↗</a></div>
+      </div>
+      <div class="panel"><div class="panel-title"><h2>Published analysis records</h2><span id="analysis-count" class="subtle">—</span></div><div id="analysis-list" class="record-list"></div></div>
+    </section>
+    <section id="datasets" class="view" hidden>
+      <div class="section-heading"><div><span class="eyebrow">CURATED INPUTS</span><h1>Ten sources. One shared corpus.</h1><p>Each source targets 50 frozen prompts, with traceable source versions and independently defined splits.</p></div></div>
+      <div id="dataset-list" class="dataset-grid"></div>
+      <div id="dataset-detail" class="panel detail-panel" hidden></div>
+    </section>
+    <section id="reports" class="view" hidden>
+      <div class="section-heading"><div><span class="eyebrow">REPRODUCIBLE RESEARCH</span><h1>Public reports</h1><p>Shareable, immutable experiment summaries with checksummed artifacts.</p></div></div>
+      <div id="reports-list" class="record-list"></div>
+      <div id="report-detail" class="panel detail-panel" hidden></div>
+      <aside class="scope-note">Reports are published only after explicit approval and checksum verification. Custom prompts remain private unless their owners approve publication.</aside>
+    </section>
+  </main>
+  <footer class="footer"><div class="page-container footer-inner"><div>OpenSAE · From learned features to testable explanations.</div><div><a href="https://github.com/OpenSAE/SAEBase" target="_blank" rel="noreferrer">Source code ↗</a><span>Research outputs are not automatically validated interpretations.</span></div></div></footer>
+</body>
+</html>
