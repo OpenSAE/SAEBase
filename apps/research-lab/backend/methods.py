@@ -15,7 +15,7 @@ import math
 from pathlib import Path
 from typing import Any
 
-from .core import canonical_json, data_root, digest, load_sites
+from .core import canonical_json, data_root, digest, load_sites, has_complete_identity
 from .ingest import _atomic_bytes, _raw_jsonl
 
 
@@ -39,6 +39,8 @@ def _validated_site(payload: dict[str, Any], *, repo_root: Path | None = None) -
     site=next((s for s in load_sites(repo_root) if s["site_id"]==payload.get("site_id")),None)
     if site is None:
         raise ValueError("Unregistered model/SAE/site")
+    if not has_complete_identity(site):
+        raise ValueError("Original evidence has no complete weight digests; new observation must be separately verified")
     if payload.get("model_sha256")!=site["model_sha256"] or payload.get("sae_sha256")!=site["sae_sha256"]:
         raise ValueError("Analysis model/SAE weight digest mismatch")
     for field in ("prompt_group_id","dataset_release","protocol_id"):

@@ -201,6 +201,8 @@ def preflight(request: InterventionSpec) -> dict[str, Any]:
         _bad_evidence(e)
     if site is None:
         raise HTTPException(422,"Site not in the verified matrix")
+    if not core.has_complete_identity(site):
+        raise HTTPException(422,"This historical site lacks complete full-weight hashes; reverify before new inference")
     return {
         "valid":True,"submitted":False,"ran_model":False,
         "site_id":site["site_id"],"hook":site["hook"],

@@ -13,7 +13,7 @@ import os
 from pathlib import Path
 from typing import Any, Iterable
 
-from .core import canonical_json, data_root, dataset_catalog, digest, load_sites
+from .core import canonical_json, data_root, dataset_catalog, digest, load_sites, has_complete_identity
 
 
 def _text(value: Any, field: str) -> str:
@@ -244,7 +244,7 @@ def build_feature_index(observations: Iterable[dict[str, Any]], *, output: Path,
     for row in observations:
         site_id = row.get("site_id")
         site = sites.get(site_id)
-        if site is None or row.get("model_sha256") != site["model_sha256"] or row.get("sae_sha256") != site["sae_sha256"]:
+        if site is None or not has_complete_identity(site) or row.get("model_sha256") != site["model_sha256"] or row.get("sae_sha256") != site["sae_sha256"]:
             raise ValueError("Observation does not match a verified model/SAE/site identity")
         if row.get("source_type") != "real_checkpoint":
             raise ValueError("Synthetic or unspecified observations cannot be published as real")

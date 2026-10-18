@@ -43,6 +43,16 @@ def digest(path: Path) -> str:
     return value.hexdigest()
 
 
+def has_complete_identity(site: dict[str, Any]) -> bool:
+    """Historical CPU acceptances may lack weight digests; never treat that as a real ID."""
+    return all(
+        isinstance(site.get(key), str)
+        and len(site[key]) == 64
+        and all(char in "0123456789abcdef" for char in site[key])
+        for key in ("model_sha256", "sae_sha256")
+    )
+
+
 def dataset_catalog() -> dict[str, Any]:
     return read_json(CATALOG)
 

@@ -31,7 +31,10 @@ def test_actual_repository_evidence_is_unchanged_and_joinable():
     assert len(sites)==48
     assert len({s["site_id"] for s in sites})==48
     assert all(s["status"]=="verified_engineering" and s["group_count"]==64 for s in sites)
-    assert all(s["model_sha256"] and s["sae_sha256"] and s["evidence_url"].startswith("https://github.com/OpenSAE/") for s in sites)
+    assert all(s["evidence_url"].startswith("https://github.com/OpenSAE/") for s in sites)
+    # Exactly three older CPU acceptances have no stored full-weight digest.
+    # Historical evidence can still be displayed, but not used to certify a new run.
+    assert sum(core.has_complete_identity(s) for s in sites)==45
     metrics=core.historical_metrics(sites)
     assert len(metrics)>=48*4
     assert all(row["data_class"]=="historical_engineering" and row["n_valid"]==64 for row in metrics)
