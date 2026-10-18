@@ -12,7 +12,7 @@ PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
 
 from backend import core  # noqa: E402
-from backend.feature_store import create_feature_store,query_feature_store,feature_store_count  # noqa: E402
+from backend.feature_store import create_feature_store, query_feature_store, feature_store_count  # noqa: E402
 from backend.ingest import build_feature_index, freeze_dataset, normalize, select_records  # noqa: E402
 from backend.publish import publish_report  # noqa: E402
 from backend.api import app  # noqa: E402
@@ -155,14 +155,22 @@ def test_boolq_gold_label_balance():
 def test_immutable_freeze_and_release_visibility(tmp_path, raw_rows):
     output = tmp_path / "datasets" / "tinystories"
     manifest = freeze_dataset(
-        "tinystories", raw_rows, source_revision="deadbeefdeadbeefdeadbeefdeadbeefdeadbeef", output=output
+        "tinystories",
+        raw_rows,
+        source_revision="deadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+        output=output,
     )
     assert manifest["sample_count"] == 50
     assert not manifest["human_reviewed"]
     assert core.imported_counts(tmp_path) == {}
     assert core.digest(output / "records.jsonl") == manifest["records_sha256"]
     with pytest.raises(FileExistsError):
-        freeze_dataset("tinystories", raw_rows, source_revision="deadbeefdeadbeefdeadbeefdeadbeefdeadbeef", output=output)
+        freeze_dataset(
+            "tinystories",
+            raw_rows,
+            source_revision="deadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+            output=output,
+        )
     reviewed = tmp_path / "datasets" / "boolq"
     inputs = [
         {"passage": "Unique passage " + str(i), "question": "Yes?", "answer": i % 2 == 0}
@@ -300,7 +308,6 @@ def test_preflight_is_not_an_execution_request():
     )
 
 
-
 def test_sqlite_feature_store_indexes_real_records_and_detects_tampering(tmp_path):
     site = next(s for s in core.load_sites() if core.has_complete_identity(s))
     sample = {
@@ -318,52 +325,61 @@ def test_sqlite_feature_store_indexes_real_records_and_detects_tampering(tmp_pat
         "text_excerpt": "A reviewed example about truth.",
     }
     rows = [
-        {**sample, "activation": (n + 1) / 10, "sample_id": "boolq:row" + str(n)}
-        for n in range(17)
+        {**sample, "activation": (n + 1) / 10, "sample_id": "boolq:row" + str(n)} for n in range(17)
     ]
-    rows.extend([{**sample,"feature_id":7,"public_text_reviewed":False,"activation":2}])
+    rows.extend([{**sample, "feature_id": 7, "public_text_reviewed": False, "activation": 2}])
     result = create_feature_store(rows, tmp_path / "features")
     assert result["feature_count"] == 2
     assert result["observation_count"] == 18
     assert result["public_examples_stored"] == 8
     assert feature_store_count(tmp_path) == 2
-    records = query_feature_store(root=tmp_path,query=":F6",limit=5)
+    records = query_feature_store(root=tmp_path, query=":F6", limit=5)
     assert records["total"] == 1
     assert records["items"][0]["observations"] == 17
     assert records["items"][0]["unique_prompt_groups"] == 1
     assert len(records["items"][0]["examples"]) == 8
     # SQL wildcards do not alter exact literal searches.
-    assert query_feature_store(root=tmp_path,query="%")["total"] == 0
-    assert query_feature_store(root=tmp_path,query="_____%")["total"] == 0
+    assert query_feature_store(root=tmp_path, query="%")["total"] == 0
+    assert query_feature_store(root=tmp_path, query="_____%")["total"] == 0
     with pytest.raises(FileExistsError):
         create_feature_store([sample], tmp_path / "features")
     with (tmp_path / "features" / "features.sqlite3").open("ab") as f:
         f.write(b"tampered")
     with pytest.raises(core.InvalidEvidence):
-        query_feature_store(root=tmp_path,limit=1)
+        query_feature_store(root=tmp_path, limit=1)
 
 
 def test_sqlite_builder_rejects_unknown_and_synthetic(tmp_path):
     site = next(s for s in core.load_sites() if core.has_complete_identity(s))
     row = {
-        "site_id": site["site_id"],"model_sha256": site["model_sha256"],
-        "sae_sha256": site["sae_sha256"],"source_type": "synthetic_demo",
-        "feature_id": 1,"token_position":0,"activation":1.0,
-        "sample_id":"p","prompt_group_id":"g",
+        "site_id": site["site_id"],
+        "model_sha256": site["model_sha256"],
+        "sae_sha256": site["sae_sha256"],
+        "source_type": "synthetic_demo",
+        "feature_id": 1,
+        "token_position": 0,
+        "activation": 1.0,
+        "sample_id": "p",
+        "prompt_group_id": "g",
     }
-    with pytest.raises(ValueError,match="Synthetic"):
-        create_feature_store([row],tmp_path/"one")
-    with pytest.raises(ValueError,match="checkpoint"):
-        create_feature_store([{**row,"source_type":"real_checkpoint","sae_sha256":""}],tmp_path/"two")
-
+    with pytest.raises(ValueError, match="Synthetic"):
+        create_feature_store([row], tmp_path / "one")
+    with pytest.raises(ValueError, match="checkpoint"):
+        create_feature_store(
+            [{**row, "source_type": "real_checkpoint", "sae_sha256": ""}], tmp_path / "two"
+        )
 
 
 def test_published_dataset_rejects_modified_rows_and_fake_metadata(tmp_path, raw_rows):
     folder = tmp_path / "datasets" / "tinystories"
     pinned = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
     freeze_dataset(
-        "tinystories", raw_rows, source_revision=pinned, output=folder,
-        license_reviewed=True, human_reviewed=True
+        "tinystories",
+        raw_rows,
+        source_revision=pinned,
+        output=folder,
+        license_reviewed=True,
+        human_reviewed=True,
     )
     rows = core.load_published_dataset("tinystories", tmp_path)
     assert rows is not None and len(rows) == 50
@@ -395,10 +411,12 @@ def test_source_group_sampling_ignores_input_record_iteration_order():
 def test_exact_source_revision_is_required(raw_rows, tmp_path):
     with pytest.raises(ValueError, match="40-character"):
         freeze_dataset(
-            "tinystories", raw_rows, source_revision="main",
-            output=tmp_path / "invalid", human_reviewed=True
+            "tinystories",
+            raw_rows,
+            source_revision="main",
+            output=tmp_path / "invalid",
+            human_reviewed=True,
         )
-
 
 
 def test_full_sequence_readout_and_unambiguous_task_scores():
@@ -449,13 +467,18 @@ def test_cpu_sar_adapter_calls_only_pinned_trusted_estimator(tmp_path):
     )
     trusted_sha = core.digest(source)
     input_row = {
-        "source_type": "real_checkpoint", "site_id": site["site_id"],
-        "model_sha256": site["model_sha256"], "sae_sha256": site["sae_sha256"],
-        "prompt_group_id": "boolq:source1", "dataset_release": "curated-v1",
+        "source_type": "real_checkpoint",
+        "site_id": site["site_id"],
+        "model_sha256": site["model_sha256"],
+        "sae_sha256": site["sae_sha256"],
+        "prompt_group_id": "boolq:source1",
+        "dataset_release": "curated-v1",
         "protocol_id": "sar.original.k16.m384.fit256.v1",
         "masks": [[False] * 16 for _ in range(384)],
         "g": [0.1 * i for i in range(384)],
-        "fit": list(range(256)), "held": list(range(256, 384)), "g_full": 0.0,
+        "fit": list(range(256)),
+        "held": list(range(256, 384)),
+        "g_full": 0.0,
     }
     with pytest.raises(ValueError, match="hash mismatch"):
         run_sar(input_row, original=source, expected_sha="0" * 64)
@@ -471,9 +494,15 @@ def test_cpu_sar_adapter_calls_only_pinned_trusted_estimator(tmp_path):
     assert index["reviewed_scientific_measurements"] is False
     assert core.analyses(tmp_path)[0]["kind"] == "sar"
     with pytest.raises(ValueError, match="Unverified|unverified"):
-        build_analysis_index([{**result, "measurement_input_sha256": "oops"}], tmp_path / "bad_analysis")
+        build_analysis_index(
+            [{**result, "measurement_input_sha256": "oops"}], tmp_path / "bad_analysis"
+        )
     with pytest.raises(ValueError, match="literal booleans"):
-        run_sar({**input_row, "masks": [[1] * 16 for _ in range(384)]}, original=source, expected_sha=trusted_sha)
+        run_sar(
+            {**input_row, "masks": [[1] * 16 for _ in range(384)]},
+            original=source,
+            expected_sha=trusted_sha,
+        )
     # A mocked trusted function tests dispatch, not scientific parity with
     # the separate, original SAR paper implementation.
     with pytest.raises(ValueError, match="mismatch"):
@@ -494,12 +523,15 @@ def test_cpu_rss_adapter_respects_held_out_variant_ids(tmp_path):
     )
     trusted_sha = core.digest(source)
     row = {
-        "source_type": "real_checkpoint", "site_id": site["site_id"],
-        "model_sha256": site["model_sha256"], "sae_sha256": site["sae_sha256"],
-        "prompt_group_id": "boolq:source1", "dataset_release": "curated-v1",
+        "source_type": "real_checkpoint",
+        "site_id": site["site_id"],
+        "model_sha256": site["model_sha256"],
+        "sae_sha256": site["sae_sha256"],
+        "prompt_group_id": "boolq:source1",
+        "dataset_release": "curated-v1",
         "protocol_id": "rss.transform.v1",
         "selection_variant_ids": [str(i) for i in range(5)],
-        "held_variant_ids": [str(i) for i in range(5,15)],
+        "held_variant_ids": [str(i) for i in range(5, 15)],
         "delta_selection": [[0.1, 0.2] for _ in range(5)],
         "delta_held": [[0.1, 0.2] for _ in range(10)],
     }
@@ -508,8 +540,11 @@ def test_cpu_rss_adapter_respects_held_out_variant_ids(tmp_path):
     assert record["results"][0]["value"] == 0.25
     assert record["results"][1]["value"] == 0.7
     with pytest.raises(ValueError, match="disjoint"):
-        run_rss({**row, "held_variant_ids": row["selection_variant_ids"] + ["x"] * 5}, original=source, expected_sha=trusted_sha)
-
+        run_rss(
+            {**row, "held_variant_ids": row["selection_variant_ids"] + ["x"] * 5},
+            original=source,
+            expected_sha=trusted_sha,
+        )
 
 
 def test_cpu_plan_has_exact_632_jobs_without_claiming_execution(tmp_path):
@@ -520,8 +555,11 @@ def test_cpu_plan_has_exact_632_jobs_without_claiming_execution(tmp_path):
     assert plan["site_count"] == 48
     assert plan["site_count_with_full_weight_hashes"] == 45
     assert plan["job_counts"] == {
-        "capture": 480, "intervention": 60, "sar": 30,
-        "rss": 60, "localization": 2
+        "capture": 480,
+        "intervention": 60,
+        "sar": 30,
+        "rss": 60,
+        "localization": 2,
     }
     assert len(plan["jobs"]) == 632
     assert plan["statuses"] == {"blocked": 632}
@@ -536,29 +574,45 @@ def test_cpu_plan_unblocks_only_pinned_reviewed_data_and_complete_sites(tmp_path
 
     folder = tmp_path / "datasets" / "tinystories"
     freeze_dataset(
-        "tinystories", raw_rows,
-        source_revision="deadbeef" * 5, output=folder,
-        license_reviewed=True, human_reviewed=True
+        "tinystories",
+        raw_rows,
+        source_revision="deadbeef" * 5,
+        output=folder,
+        license_reviewed=True,
+        human_reviewed=True,
     )
     plan = build_compute_plan(root=tmp_path)
     assert plan["statuses"]["ready_for_external_gpu_operator"] == 45
     assert plan["statuses"]["blocked"] == 587
-    assert len([j for j in plan["jobs"] if j["spec"]["task"] == "capture"
+    assert (
+        len(
+            [
+                j
+                for j in plan["jobs"]
+                if j["spec"]["task"] == "capture"
                 and j["spec"]["dataset_id"] == "tinystories"
-                and j["status"] == "blocked"]) == 3
-    assert len([j for j in plan["jobs"] if j["spec"]["task"] == "sar"
-                and j["status"] == "ready_for_external_gpu_operator"]) == 0
-
+                and j["status"] == "blocked"
+            ]
+        )
+        == 3
+    )
+    assert (
+        len(
+            [
+                j
+                for j in plan["jobs"]
+                if j["spec"]["task"] == "sar" and j["status"] == "ready_for_external_gpu_operator"
+            ]
+        )
+        == 0
+    )
 
 
 def test_cpu_source_acquisition_is_pinned_and_never_public_without_review(tmp_path, monkeypatch):
     import types
     from backend.acquire import acquire
 
-    original_rows = [
-        {"id": str(i), "text": "A unique short story " + str(i)}
-        for i in range(120)
-    ]
+    original_rows = [{"id": str(i), "text": "A unique short story " + str(i)} for i in range(120)]
 
     class FakeStream:
         def shuffle(self, *, seed, buffer_size):
@@ -581,7 +635,9 @@ def test_cpu_source_acquisition_is_pinned_and_never_public_without_review(tmp_pa
             assert repo_id == "roneneldan/TinyStories"
             return types.SimpleNamespace(sha="f" * 40)
 
-    monkeypatch.setitem(sys.modules, "datasets", types.SimpleNamespace(load_dataset=fake_load_dataset))
+    monkeypatch.setitem(
+        sys.modules, "datasets", types.SimpleNamespace(load_dataset=fake_load_dataset)
+    )
     monkeypatch.setitem(sys.modules, "huggingface_hub", types.SimpleNamespace(HfApi=FakeHfApi))
     path = tmp_path / "source.jsonl"
     result = acquire("tinystories", path, max_raw_rows=100)
@@ -592,7 +648,6 @@ def test_cpu_source_acquisition_is_pinned_and_never_public_without_review(tmp_pa
     assert len(path.read_text().strip().splitlines()) == 100
     with pytest.raises(FileExistsError):
         acquire("tinystories", path, max_raw_rows=100)
-
 
 
 def test_rss_cpu_transformations_keep_parent_and_disjoint_roles():
@@ -631,15 +686,22 @@ def test_rss_variant_builder_blocks_code_and_continuation_templates():
     for dataset in ("humaneval", "wikitext103", "tinystories"):
         with pytest.raises(ValueError, match="independently designed"):
             build_variants(
-                dataset, dataset + ":id", dataset + ":group", "A sample text.",
-                anchor="sample", source_revision="a" * 40,
+                dataset,
+                dataset + ":id",
+                dataset + ":group",
+                "A sample text.",
+                anchor="sample",
+                source_revision="a" * 40,
             )
     with pytest.raises(ValueError, match="exactly|once|Anchor"):
         build_variants(
-            "boolq", "boolq:id", "boolq:group", "Answer: Answer:",
-            anchor="Answer:", source_revision="a" * 40,
+            "boolq",
+            "boolq:id",
+            "boolq:group",
+            "Answer: Answer:",
+            anchor="Answer:",
+            source_revision="a" * 40,
         )
-
 
 
 def test_durable_queue_idempotency_private_reference_and_lease_recovery(tmp_path):
@@ -654,49 +716,70 @@ def test_durable_queue_idempotency_private_reference_and_lease_recovery(tmp_path
         "max_new_tokens": 16,
         "input_ref": "a" * 64,
     }
-    q = JobQueue(tmp_path / "private" / "queue.sqlite3",max_queued=1,max_per_owner=1)
-    first = q.enqueue(owner="research-user-1",client_key="nonce-1234",spec=request,now=100)
+    q = JobQueue(tmp_path / "private" / "queue.sqlite3", max_queued=1, max_per_owner=1)
+    first = q.enqueue(owner="research-user-1", client_key="nonce-1234", spec=request, now=100)
     assert first["status"] == "queued" and not first["deduplicated"]
-    same = q.enqueue(owner="research-user-1",client_key="nonce-1234",spec=request,now=101)
+    same = q.enqueue(owner="research-user-1", client_key="nonce-1234", spec=request, now=101)
     assert same["job_id"] == first["job_id"] and same["deduplicated"]
-    assert q.status(job_id=first["job_id"],owner="unrelated-user") is None
-    with pytest.raises(JobError,match="quota"):
-        q.enqueue(owner="research-user-2",client_key="nonce-5678",spec=request,now=102)
-    with pytest.raises(JobError,match="different inputs"):
-        q.enqueue(owner="research-user-1",client_key="nonce-1234",
-                  spec={**request,"strength":2.0},now=103)
-    with pytest.raises(JobError,match="raw prompt"):
-        q.enqueue(owner="research-user-1",client_key="nonce-9999",
-                  spec={**request,"text":"secret original prompt"},now=104)
-    claim = q.claim(worker_id="gpu-worker-1",now=110,lease_seconds=30)
+    assert q.status(job_id=first["job_id"], owner="unrelated-user") is None
+    with pytest.raises(JobError, match="quota"):
+        q.enqueue(owner="research-user-2", client_key="nonce-5678", spec=request, now=102)
+    with pytest.raises(JobError, match="different inputs"):
+        q.enqueue(
+            owner="research-user-1",
+            client_key="nonce-1234",
+            spec={**request, "strength": 2.0},
+            now=103,
+        )
+    with pytest.raises(JobError, match="raw prompt"):
+        q.enqueue(
+            owner="research-user-1",
+            client_key="nonce-9999",
+            spec={**request, "text": "secret original prompt"},
+            now=104,
+        )
+    claim = q.claim(worker_id="gpu-worker-1", now=110, lease_seconds=30)
     assert claim["job_id"] == first["job_id"] and claim["attempt"] == 1
-    assert q.heartbeat(job_id=claim["job_id"],worker_id="wrong-worker",now=111) is False
-    assert q.heartbeat(job_id=claim["job_id"],worker_id="gpu-worker-1",now=120,lease_seconds=30)
-    assert q.reap_expired(now=151) == {"requeued":1,"failed":0}
-    claim2 = q.claim(worker_id="gpu-worker-2",now=152,lease_seconds=30)
+    assert q.heartbeat(job_id=claim["job_id"], worker_id="wrong-worker", now=111) is False
+    assert q.heartbeat(job_id=claim["job_id"], worker_id="gpu-worker-1", now=120, lease_seconds=30)
+    assert q.reap_expired(now=151) == {"requeued": 1, "failed": 0}
+    claim2 = q.claim(worker_id="gpu-worker-2", now=152, lease_seconds=30)
     assert claim2["attempt"] == 2
-    assert not q.finish(job_id=claim2["job_id"],worker_id="gpu-worker-1",
-                        result_sha256="f"*64,now=155)
-    assert q.finish(job_id=claim2["job_id"],worker_id="gpu-worker-2",
-                    result_sha256="f"*64,now=155)
-    assert q.status(job_id=first["job_id"],owner="research-user-1")["status"] == "succeeded"
-    assert q.cancel(job_id=first["job_id"],owner="research-user-1") is False
-    assert "secret original prompt" not in (tmp_path/"private"/"queue.sqlite3").read_bytes().decode("utf-8",errors="ignore")
+    assert not q.finish(
+        job_id=claim2["job_id"], worker_id="gpu-worker-1", result_sha256="f" * 64, now=155
+    )
+    assert q.finish(
+        job_id=claim2["job_id"], worker_id="gpu-worker-2", result_sha256="f" * 64, now=155
+    )
+    assert q.status(job_id=first["job_id"], owner="research-user-1")["status"] == "succeeded"
+    assert q.cancel(job_id=first["job_id"], owner="research-user-1") is False
+    assert "secret original prompt" not in (
+        tmp_path / "private" / "queue.sqlite3"
+    ).read_bytes().decode("utf-8", errors="ignore")
 
 
 def test_queue_refuses_invalid_specs_and_stale_worker_completion(tmp_path):
     from backend.jobs import JobError, JobQueue
 
     site = next(s for s in core.load_sites() if core.has_complete_identity(s))
-    q=JobQueue(tmp_path/"jobs.sqlite3")
-    spec={"site_id":site["site_id"],"operation":"identity",
-          "feature_ids":[],"strength":1,"max_new_tokens":4,"input_ref":"a"*64}
-    with pytest.raises(JobError,match="64-character|private content hash"):
-        q.enqueue(owner="owner-1",client_key="nonce-123456",spec={**spec,"input_ref":"bad"})
-    with pytest.raises(JobError,match="Identity|feature IDs"):
-        q.enqueue(owner="owner-1",client_key="nonce-123456",spec={**spec,"feature_ids":[1]})
-    job=q.enqueue(owner="owner-1",client_key="nonce-123456",spec=spec,now=100)
-    assert q.claim(worker_id="worker-1",now=101,lease_seconds=30)["attempt"] == 1
-    assert q.finish(job_id=job["job_id"],worker_id="worker-1",error_code="MODEL_ERROR",now=132) is False
-    assert q.reap_expired(now=132,max_attempts=1)["failed"] == 1
-    assert q.status(job_id=job["job_id"],owner="owner-1")["status"] == "failed"
+    q = JobQueue(tmp_path / "jobs.sqlite3")
+    spec = {
+        "site_id": site["site_id"],
+        "operation": "identity",
+        "feature_ids": [],
+        "strength": 1,
+        "max_new_tokens": 4,
+        "input_ref": "a" * 64,
+    }
+    with pytest.raises(JobError, match="64-character|private content hash"):
+        q.enqueue(owner="owner-1", client_key="nonce-123456", spec={**spec, "input_ref": "bad"})
+    with pytest.raises(JobError, match="Identity|feature IDs"):
+        q.enqueue(owner="owner-1", client_key="nonce-123456", spec={**spec, "feature_ids": [1]})
+    job = q.enqueue(owner="owner-1", client_key="nonce-123456", spec=spec, now=100)
+    assert q.claim(worker_id="worker-1", now=101, lease_seconds=30)["attempt"] == 1
+    assert (
+        q.finish(job_id=job["job_id"], worker_id="worker-1", error_code="MODEL_ERROR", now=132)
+        is False
+    )
+    assert q.reap_expired(now=132, max_attempts=1)["failed"] == 1
+    assert q.status(job_id=job["job_id"], owner="owner-1")["status"] == "failed"

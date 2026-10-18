@@ -5,6 +5,7 @@ per-token teacher-forced log probabilities, and must never put gold answers
 inside the *base* activation prompt. This module validates and aggregates
 saved observations without inventing a model score.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -28,7 +29,10 @@ class CandidateEvidence:
             raise ValueError("Each candidate requires a complete nonempty logprob sequence")
         if any(type(value) is not int or value < 0 for value in self.token_ids):
             raise ValueError("Invalid token IDs")
-        if any(type(value) not in (int, float) or not math.isfinite(value) or value > 1e-8 for value in self.token_logprobs):
+        if any(
+            type(value) not in (int, float) or not math.isfinite(value) or value > 1e-8
+            for value in self.token_logprobs
+        ):
             raise ValueError("Per-token log probabilities must be finite and nonpositive")
 
 
@@ -67,7 +71,11 @@ def score_continuations(
             }
         )
     best = max(row["score"] for row in scores)
-    winners = [row["label"] for row in scores if math.isclose(row["score"], best, rel_tol=1e-12, abs_tol=1e-12)]
+    winners = [
+        row["label"]
+        for row in scores
+        if math.isclose(row["score"], best, rel_tol=1e-12, abs_tol=1e-12)
+    ]
     return {
         "schema": "opensae.task_readout.v1",
         "source": "measured_per_token_logprobs",
@@ -76,7 +84,9 @@ def score_continuations(
         "predicted_label": winners[0] if len(winners) == 1 else None,
         "tie": len(winners) > 1,
         "gold_label": gold_label,
-        "correct": (winners[0] == gold_label if len(winners) == 1 else False) if gold_label is not None else None,
+        "correct": (winners[0] == gold_label if len(winners) == 1 else False)
+        if gold_label is not None
+        else None,
         "interpretation": "complete teacher-forced candidate log probabilities; not free-generation accuracy",
     }
 

@@ -6,6 +6,7 @@ never guessed weights, unlicensed prompt text, or synthetic measurements.
 The resulting JSON is a manifest of intended tasks, not evidence that
 the tasks ran or a schedule that pays for GPU instances.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -55,8 +56,11 @@ def _dataset_releases(root: Path | None = None) -> list[dict[str, Any]]:
                 "ready": ready,
                 "count": len(records) if ready else 0,
                 "manifest_sha256": digest(manifest_path) if ready else None,
-                "reason": None if ready else (
-                    "unreviewed_or_invalid_release" if has_manifest
+                "reason": None
+                if ready
+                else (
+                    "unreviewed_or_invalid_release"
+                    if has_manifest
                     else "source_not_collected_or_reviewed"
                 ),
             }
@@ -79,8 +83,11 @@ def build_compute_plan(
     deep = coverage["deep"]
     sar = coverage["sar"]
     if (
-        len(deep) != 6 or len(set(deep)) != 6 or len(sar) != 3
-        or len(set(sar)) != 3 or not set(sar) <= set(deep)
+        len(deep) != 6
+        or len(set(deep)) != 6
+        or len(sar) != 3
+        or len(set(sar)) != 3
+        or not set(sar) <= set(deep)
         or not set(deep) <= set(site_index)
         or coverage["online_candidate"] not in set(deep)
     ):
@@ -124,7 +131,9 @@ def build_compute_plan(
                     "n_base_groups": dataset["count"] if dataset["ready"] else None,
                     "protocol_id": coverage["protocols"][task],
                     "independent_unit": "original_prompt_group",
-                    "max_coalitions_per_group": coverage["coalition_per_prompt"] if task == "sar" else None,
+                    "max_coalitions_per_group": coverage["coalition_per_prompt"]
+                    if task == "sar"
+                    else None,
                     "source_data_class": "curated_10x50_not_historical_stage_d",
                 }
                 jobs.append(
@@ -198,10 +207,15 @@ def main(argv: list[str] | None = None) -> int:
             json.dumps(
                 {
                     key: payload[key]
-                    for key in ("schema", "status", "site_count",
-                                "site_count_with_full_weight_hashes",
-                                "job_counts", "statuses",
-                                "estimated_sar_coalition_measurements_if_all_frozen")
+                    for key in (
+                        "schema",
+                        "status",
+                        "site_count",
+                        "site_count_with_full_weight_hashes",
+                        "job_counts",
+                        "statuses",
+                        "estimated_sar_coalition_measurements_if_all_frozen",
+                    )
                 },
                 indent=2,
                 sort_keys=True,

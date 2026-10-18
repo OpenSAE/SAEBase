@@ -8,6 +8,7 @@ belongs to selection and the other two to held-out. These are separate
 No variant becomes a public validated experiment without semantic review,
 tokenizer-specific anchor checks, source approval and actual SAE activations.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -114,11 +115,17 @@ def build_variants(
         raise ValueError("Unknown source dataset")
     if dataset_id in NOT_AUTOMATED:
         raise ValueError("Dataset requires an independently designed transformation protocol")
-    if not isinstance(source_revision, str) or len(source_revision) != 40 or any(ch not in "0123456789abcdef" for ch in source_revision):
+    if (
+        not isinstance(source_revision, str)
+        or len(source_revision) != 40
+        or any(ch not in "0123456789abcdef" for ch in source_revision)
+    ):
         raise ValueError("Exact pinned 40-character source revision is required")
     for label, value in (
-        ("dataset_id", dataset_id), ("sample_id", sample_id),
-        ("prompt_group_id", prompt_group_id), ("base_prompt", base_prompt),
+        ("dataset_id", dataset_id),
+        ("sample_id", sample_id),
+        ("prompt_group_id", prompt_group_id),
+        ("base_prompt", base_prompt),
         ("anchor", anchor),
     ):
         if not isinstance(value, str) or not value.strip():
@@ -132,9 +139,12 @@ def build_variants(
                 text = _variant_text(base_prompt, setting, operator, realization)
                 alignment = input_anchor(base_prompt, text, anchor=anchor)
                 key = {
-                    "dataset_id": dataset_id, "sample_id": sample_id,
-                    "setting": setting, "operator": operator,
-                    "realization": realization, "protocol": SCHEMA,
+                    "dataset_id": dataset_id,
+                    "sample_id": sample_id,
+                    "setting": setting,
+                    "operator": operator,
+                    "realization": realization,
+                    "protocol": SCHEMA,
                     "source_revision": source_revision,
                     "base_sha256": hashlib.sha256(base_prompt.encode("utf-8")).hexdigest(),
                 }
@@ -175,8 +185,12 @@ def build_variants(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", required=True, type=Path, help="One approved base prompt JSON record")
-    parser.add_argument("--anchor", required=True, help="Unique source anchor, unchanged across variants")
+    parser.add_argument(
+        "--input", required=True, type=Path, help="One approved base prompt JSON record"
+    )
+    parser.add_argument(
+        "--anchor", required=True, help="Unique source anchor, unchanged across variants"
+    )
     parser.add_argument("--output", required=True, type=Path, help="New immutable output")
     args = parser.parse_args(argv)
     if args.output.exists():
@@ -184,11 +198,19 @@ def main(argv: list[str] | None = None) -> int:
     with args.input.open("r", encoding="utf-8") as stream:
         record = json.load(stream)
     result = build_variants(
-        record["dataset_id"], record["sample_id"], record["prompt_group_id"],
-        record["prompt"], anchor=args.anchor, source_revision=record["source_revision"],
+        record["dataset_id"],
+        record["sample_id"],
+        record["prompt_group_id"],
+        record["prompt"],
+        anchor=args.anchor,
+        source_revision=record["source_revision"],
     )
     _atomic_bytes(args.output, canonical_json(result))
-    print(json.dumps({"proposal_count": result["n_proposals"], "output": str(args.output)}, sort_keys=True))
+    print(
+        json.dumps(
+            {"proposal_count": result["n_proposals"], "output": str(args.output)}, sort_keys=True
+        )
+    )
     return 0
 
 

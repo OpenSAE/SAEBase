@@ -176,14 +176,18 @@ def normalize(source: str, row: dict[str, Any]) -> dict[str, Any]:
         "candidate_texts": candidate_texts,
         "reference_answers": reference_answers,
         "render_protocol": (
-            "opensae.render.choice_label.v1" if candidates is not None
-            else "opensae.render.question_answer.v1" if source in ("squad", "gsm8k")
-            else "opensae.render.code_prefix.v1" if source == "humaneval"
+            "opensae.render.choice_label.v1"
+            if candidates is not None
+            else "opensae.render.question_answer.v1"
+            if source in ("squad", "gsm8k")
+            else "opensae.render.code_prefix.v1"
+            if source == "humaneval"
             else "opensae.render.continuation.v1"
         ),
         "evaluation_warning": (
             "HellaSwag multiple-choice label rendering is not the official continuation-likelihood protocol"
-            if source == "hellaswag" else None
+            if source == "hellaswag"
+            else None
         ),
     }
 
@@ -216,7 +220,9 @@ def select_records(
             normal["_rank"] = rank
             picked[group] = normal
     eligible = []
-    for group, value in sorted(picked.items(), key=lambda item: (_rank(seed, source, item[0]), item[0])):
+    for group, value in sorted(
+        picked.items(), key=lambda item: (_rank(seed, source, item[0]), item[0])
+    ):
         fingerprint = hashlib.sha256(value["prompt"].encode()).hexdigest()
         if fingerprint in prompts:
             continue
@@ -268,10 +274,17 @@ def freeze_dataset(
     sources = {d["id"]: d for d in dataset_catalog()["sources"]}
     if source not in sources:
         raise ValueError("Unknown source")
-    if not isinstance(source_revision, str) or len(source_revision) != 40 or any(ch not in "0123456789abcdef" for ch in source_revision):
+    if (
+        not isinstance(source_revision, str)
+        or len(source_revision) != 40
+        or any(ch not in "0123456789abcdef" for ch in source_revision)
+    ):
         raise ValueError("Pin exact 40-character lowercase upstream SHA (not main/latest)")
     records = select_records(source, rows, seed=seed)
-    if len({r["prompt_group_id"] for r in records}) != 50 or len({r["sample_id"] for r in records}) != 50:
+    if (
+        len({r["prompt_group_id"] for r in records}) != 50
+        or len({r["sample_id"] for r in records}) != 50
+    ):
         raise ValueError("Source-group or sample identity collision")
     for row in records:
         row["source_revision"] = source_revision

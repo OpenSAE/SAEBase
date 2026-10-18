@@ -56,7 +56,11 @@ def _validated_site(payload: dict[str, Any], *, repo_root: Path | None = None) -
 
 
 def _hex64(value: Any) -> bool:
-    return isinstance(value, str) and len(value) == 64 and all(ch in "0123456789abcdef" for ch in value)
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(ch in "0123456789abcdef" for ch in value)
+    )
 
 
 def _measurement_digest(payload: dict[str, Any]) -> str:

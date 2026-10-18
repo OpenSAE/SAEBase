@@ -147,7 +147,9 @@ def historical_metrics(sites: list[dict[str, Any]]) -> list[dict[str, Any]]:
     ]
 
 
-def load_published_dataset(dataset_id: str, root: Path | None = None) -> list[dict[str, Any]] | None:
+def load_published_dataset(
+    dataset_id: str, root: Path | None = None
+) -> list[dict[str, Any]] | None:
     """Return exactly the reviewed, checksum-verified 50-row dataset release.
 
     A missing or unreviewed release is not made public. An incomplete or
@@ -168,14 +170,22 @@ def load_published_dataset(dataset_id: str, root: Path | None = None) -> list[di
         return None
     definition = catalog[dataset_id]
     for field, value in (
-        ("dataset_id", dataset_id), ("source_repo", definition["repo"]),
-        ("source_config", definition["config"]), ("source_split", definition["split"]),
-        ("sample_count", 50), ("discovery", 20), ("evaluation", 30),
+        ("dataset_id", dataset_id),
+        ("source_repo", definition["repo"]),
+        ("source_config", definition["config"]),
+        ("source_split", definition["split"]),
+        ("sample_count", 50),
+        ("discovery", 20),
+        ("evaluation", 30),
     ):
         if meta.get(field) != value:
             raise InvalidEvidence("Incorrect reviewed dataset identity: " + field)
     revision = meta.get("source_revision")
-    if not isinstance(revision, str) or len(revision) != 40 or any(ch not in "0123456789abcdef" for ch in revision):
+    if (
+        not isinstance(revision, str)
+        or len(revision) != 40
+        or any(ch not in "0123456789abcdef" for ch in revision)
+    ):
         raise InvalidEvidence("Reviewed dataset requires exact 40-character source commit")
     file_path = directory / "records.jsonl"
     if not file_path.is_file() or file_path.stat().st_size > 16 * 1024 * 1024:
@@ -194,12 +204,17 @@ def load_published_dataset(dataset_id: str, root: Path | None = None) -> list[di
         sample = row.get("sample_id")
         group = row.get("prompt_group_id")
         if (
-            not isinstance(sample, str) or not sample.startswith(dataset_id + ":") or sample in ids
-            or not isinstance(group, str) or not group.startswith(dataset_id + ":") or group in groups
+            not isinstance(sample, str)
+            or not sample.startswith(dataset_id + ":")
+            or sample in ids
+            or not isinstance(group, str)
+            or not group.startswith(dataset_id + ":")
+            or group in groups
             or row.get("source_revision") != revision
             or row.get("source_repo") != definition["repo"]
             or row.get("source_split") != definition["split"]
-            or not isinstance(row.get("prompt"), str) or not row["prompt"].strip()
+            or not isinstance(row.get("prompt"), str)
+            or not row["prompt"].strip()
             or row.get("usage_split") not in counts
         ):
             raise InvalidEvidence("Invalid prompt identity, source, or group in reviewed release")

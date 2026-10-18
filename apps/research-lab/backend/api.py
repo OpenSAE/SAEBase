@@ -6,7 +6,6 @@ Start from apps/research-lab:
 
 from __future__ import annotations
 
-import json
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -17,7 +16,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from . import core
-from .feature_store import feature_store_count, query_feature_store
+from .feature_store import feature_store_count
 
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "frontend"

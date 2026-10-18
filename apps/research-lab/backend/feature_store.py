@@ -8,10 +8,10 @@ The immutable database is written from real, checkpoint-identity-matched
 measurement rows and remains unavailable to readers until the manifest and
 source DB are finalized.
 """
+
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import math
 import os
@@ -75,7 +75,9 @@ def _site_lookup(repo_root: Path | None = None) -> dict[str, dict[str, Any]]:
     return {s["site_id"]: s for s in load_sites(repo_root)}
 
 
-def _validate_observation(row: dict[str, Any], sites: dict[str, dict[str, Any]]) -> tuple[dict[str, Any], str, int, int, float, str, str]:
+def _validate_observation(
+    row: dict[str, Any], sites: dict[str, dict[str, Any]]
+) -> tuple[dict[str, Any], str, int, int, float, str, str]:
     site = sites.get(row.get("site_id"))
     if (
         site is None
@@ -93,7 +95,12 @@ def _validate_observation(row: dict[str, Any], sites: dict[str, dict[str, Any]])
     if type(activation) not in (int, float) or not math.isfinite(activation):
         raise ValueError("Nonfinite or invalid activation")
     group, sample = row.get("prompt_group_id"), row.get("sample_id")
-    if not isinstance(group, str) or not group.strip() or not isinstance(sample, str) or not sample.strip():
+    if (
+        not isinstance(group, str)
+        or not group.strip()
+        or not isinstance(sample, str)
+        or not sample.strip()
+    ):
         raise ValueError("Missing original prompt-group or sample identity")
     key = site["site_id"] + ":F" + str(feature)
     return site, key, feature, position, float(activation), group, sample
@@ -127,12 +134,22 @@ def create_feature_store(
         for row in observations:
             if count >= max_observations:
                 raise ValueError("Observation budget exceeded")
-            site, key, feature_id, position, strength, group, sample = _validate_observation(row, sites)
+            site, key, feature_id, position, strength, group, sample = _validate_observation(
+                row, sites
+            )
             connection.execute(
                 """INSERT OR IGNORE INTO features
                 (feature_key,site_id,model,sae,layer,feature_id,max_activation,source_type)
                 VALUES (?,?,?,?,?,?,?,'real_checkpoint')""",
-                (key, site["site_id"], site["model"], site["sae"], site["layer"], feature_id, strength),
+                (
+                    key,
+                    site["site_id"],
+                    site["model"],
+                    site["sae"],
+                    site["layer"],
+                    feature_id,
+                    strength,
+                ),
             )
             connection.execute(
                 """UPDATE features SET observations=observations+1,
@@ -141,7 +158,7 @@ def create_feature_store(
             )
             if connection.execute(
                 "INSERT OR IGNORE INTO seen_groups(feature_key,prompt_group_id) VALUES (?,?)",
-                (key,group),
+                (key, group),
             ).rowcount:
                 connection.execute(
                     "UPDATE features SET unique_prompt_groups=unique_prompt_groups+1 WHERE feature_key=?",
@@ -157,26 +174,26 @@ def create_feature_store(
                     """INSERT OR REPLACE INTO examples
                     (feature_key,sample_id,token_position,activation,prompt_group_id,token_text,text_excerpt)
                     VALUES (?,?,?,?,?,?,?)""",
-                    (key,sample,position,strength,group,token[:128],excerpt[:700]),
+                    (key, sample, position, strength, group, token[:128], excerpt[:700]),
                 )
                 candidates = connection.execute(
                     """SELECT sample_id,token_position FROM examples
                     WHERE feature_key=? ORDER BY activation DESC,sample_id,token_position
                     LIMIT ?""",
-                    (key,MAX_EXAMPLES),
+                    (key, MAX_EXAMPLES),
                 ).fetchall()
                 if len(candidates) == MAX_EXAMPLES:
                     # The insert may have grown the list to nine. Keep the
                     # strongest entries in a deterministic tie order.
-                    keys = {(a,b) for a,b in candidates}
-                    for a,b in connection.execute(
+                    keys = {(a, b) for a, b in candidates}
+                    for a, b in connection.execute(
                         "SELECT sample_id,token_position FROM examples WHERE feature_key=?",
                         (key,),
                     ).fetchall():
-                        if (a,b) not in keys:
+                        if (a, b) not in keys:
                             connection.execute(
                                 "DELETE FROM examples WHERE feature_key=? AND sample_id=? AND token_position=?",
-                                (key,a,b),
+                                (key, a, b),
                             )
                 public_rows += 1
             count += 1
@@ -241,7 +258,9 @@ def _verified_store(root: Path | None = None) -> Path | None:
             return None
         raise InvalidEvidence("Unknown feature index schema")
     st = db_path.stat()
-    if _cached_digest(str(db_path),st.st_size,st.st_mtime_ns,st.st_ctime_ns) != manifest.get("files", {}).get(DATABASE):
+    if _cached_digest(str(db_path), st.st_size, st.st_mtime_ns, st.st_ctime_ns) != manifest.get(
+        "files", {}
+    ).get(DATABASE):
         raise InvalidEvidence("Feature SQLite checksum mismatch")
     return db_path
 
@@ -279,10 +298,12 @@ def query_feature_store(
         conn.execute("PRAGMA query_only = ON")
         total = conn.execute("SELECT COUNT(*) FROM features" + where, params).fetchone()[0]
         rows = [
-            dict(r) for r in conn.execute(
-                "SELECT * FROM features" + where +
-                " ORDER BY model,layer,feature_id LIMIT ? OFFSET ?",
-                [*params,limit,offset],
+            dict(r)
+            for r in conn.execute(
+                "SELECT * FROM features"
+                + where
+                + " ORDER BY model,layer,feature_id LIMIT ? OFFSET ?",
+                [*params, limit, offset],
             )
         ]
         for row in rows:
@@ -295,7 +316,7 @@ def query_feature_store(
             row["examples"] = [dict(r) for r in examples]
     finally:
         conn.close()
-    return {"items":rows, "total":total, "limit":limit, "offset":offset}
+    return {"items": rows, "total": total, "limit": limit, "offset": offset}
 
 
 def _escape_like(value: str) -> str:
