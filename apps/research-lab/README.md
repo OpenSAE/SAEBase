@@ -219,3 +219,27 @@ The image ships the app and already-published engineering reports, but no
 SAE weights, GPU dependencies, private input data or online worker.
 See docs/research-lab/cpu-deployment.md for HF Docker Space preparation,
 pre-existing Space backup, rollback and acceptance checks.
+
+
+## Durable job lifecycle (CPU state only)
+
+The internal backend/jobs.py module creates a SQLite queue holding **only a
+SHA-256 reference to a separately protected private prompt payload**, never
+the raw input itself. A trusted service supplies an already authenticated
+owner identity; the queue does not implement web login. It supports:
+
+- Idempotency keys and per-user/global queue limits.
+- Atomic one-worker job leases and heartbeats.
+- Bounded attempts after an expired worker lease.
+- Owner-only status inspection and cancellation.
+- Sanitized failure classes and verified result-hash references.
+
+This is **not** an active public GPU job service. The unauthenticated
+POST /api/jobs endpoint still rejects submissions with HTTP 503. Before
+activating, an operator must add authentication, private encrypted object
+storage, per-user budgets, GPU result validation and worker cancellation
+integration. A SQLite queue alone is not a secure hosted service.
+
+The Docker build and CI smoke checks can run without any of these GPU
+dependencies. The deployable CPU site is read-only and displays the original
+48-site engineering protocol alongside honest empty states for missing data.

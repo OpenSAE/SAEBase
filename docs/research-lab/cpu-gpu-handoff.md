@@ -142,3 +142,26 @@ Do not apply ordinary independent-prompt bootstrap to complete grid states.
 
 A later operator should start with backend.plan and resolve the listed
 blocking prerequisites, not replace the manifest with optimistic flags.
+
+
+## Durable queue pre-integration checks (no GPU)
+
+An internal CPU JobQueue now exists. It accepts a strictly validated
+intervention configuration and an opaque SHA-256 private input reference,
+with no raw prompt text in its SQLite metadata. It has fixed owner quotas,
+idempotent client keys, atomic worker leases, lease expiration recovery and
+owner-only status. All of these are unit-testable without a device.
+
+The public HTTP POST /api/jobs route remains deliberately closed. GPU
+deployment must explicitly connect:
+
+1. Authenticated owner verification and per-user compute budgets.
+2. Encrypted private input/result object storage with deletion/TTL policy.
+3. A trusted GPU worker that claims jobs and honors cancellation/lease
+   heartbeats before running any further token predictions.
+4. Actual model/SAE checkpoint digest checks and full result manifest
+   verification before calling JobQueue.finish with a result SHA-256.
+5. Failure injection tests for two workers, stale leases, OOM and process
+   restart. Do not return a success state merely because a worker ran.
+
+No request to the public UI currently creates a persistent queued job.
