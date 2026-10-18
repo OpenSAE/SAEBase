@@ -392,3 +392,104 @@ def test_exact_source_revision_is_required(raw_rows, tmp_path):
             "tinystories", raw_rows, source_revision="main",
             output=tmp_path / "invalid", human_reviewed=True
         )
+
+
+
+def test_full_sequence_readout_and_unambiguous_task_scores():
+    from backend.readouts import CandidateEvidence, score_continuations
+
+    a = CandidateEvidence("A", (10, 11, 12), (-0.1, -0.1, -0.1))
+    b = CandidateEvidence("B", (20,), (-0.2,))
+    summed = score_continuations([a, b], aggregation="sum", gold_label="B")
+    averaged = score_continuations([a, b], aggregation="mean", gold_label="B")
+    assert summed["predicted_label"] == "B" and summed["correct"] is True
+    assert averaged["predicted_label"] == "A" and averaged["correct"] is False
+    assert all(row["n_tokens"] > 0 for row in summed["scores"])
+    with pytest.raises(ValueError, match="nonpositive"):
+        CandidateEvidence("bad", (3,), (0.5,))
+    with pytest.raises(ValueError, match="complete"):
+        CandidateEvidence("bad", (2, 3), (-0.5,))
+    with pytest.raises(ValueError, match="unique"):
+        score_continuations([a, a])
+
+
+def test_input_anchor_prevents_invalid_rss_token_alignment():
+    from backend.readouts import input_anchor
+
+    base = "Question: Is the sky blue?"
+    changed = "Background information.\nQuestion: Is the sky blue?"
+    anchor = "Question: Is the sky blue?"
+    start = len(changed) - len(anchor)
+    mapping = [(0, 0), (0, 11), (11, start), (start, start + 9), (start + 9, len(changed))]
+    # Variant tokenizer offsets describe precisely the unchanged question span.
+    result = input_anchor(base, changed, anchor=anchor, offset_mapping=mapping)
+    assert result["token_positions"] == [3, 4]
+    assert result["variant_anchor_span"][0] == start
+    with pytest.raises(ValueError, match="exactly once"):
+        input_anchor(base, anchor + "\n" + anchor, anchor=anchor)
+    with pytest.raises(ValueError, match="cuts through"):
+        input_anchor(base, changed, anchor=anchor, offset_mapping=[(start - 1, len(changed))])
+
+
+def test_cpu_sar_adapter_calls_only_pinned_trusted_estimator(tmp_path):
+    from backend.methods import run_sar
+
+    site = next(s for s in core.load_sites() if core.has_complete_identity(s))
+    source = tmp_path / "sar.py"
+    source.write_text(
+        "def sar(g, masks, fit, held, g_full=None):\n"
+        "    assert len(g) == 384 and len(fit) == 256 and len(held) == 128\n"
+        "    return {'sar1': 0.5, 'rho2': float('nan')}\n"
+    )
+    trusted_sha = core.digest(source)
+    input_row = {
+        "source_type": "real_checkpoint", "site_id": site["site_id"],
+        "model_sha256": site["model_sha256"], "sae_sha256": site["sae_sha256"],
+        "prompt_group_id": "boolq:source1", "dataset_release": "curated-v1",
+        "protocol_id": "sar.original.k16.m384.fit256.v1",
+        "masks": [[False] * 16 for _ in range(384)],
+        "g": [0.1 * i for i in range(384)],
+        "fit": list(range(256)), "held": list(range(256, 384)), "g_full": 0.0,
+    }
+    with pytest.raises(ValueError, match="hash mismatch"):
+        run_sar(input_row, original=source, expected_sha="0" * 64)
+    result = run_sar(input_row, original=source, expected_sha=trusted_sha)
+    assert result["results"][0]["metric"] == "sar1"
+    assert result["results"][0]["value"] == 0.5
+    assert result["results"][1] == {"metric": "rho2", "value": None, "status": "undefined"}
+    assert result["source_sha256"] == trusted_sha
+    # A mocked trusted function tests dispatch, not scientific parity with
+    # the separate, original SAR paper implementation.
+    with pytest.raises(ValueError, match="mismatch"):
+        run_sar({**input_row, "sae_sha256": "0" * 64}, original=source, expected_sha=trusted_sha)
+
+
+def test_cpu_rss_adapter_respects_held_out_variant_ids(tmp_path):
+    from backend.methods import run_rss
+
+    site = next(s for s in core.load_sites() if core.has_complete_identity(s))
+    source = tmp_path / "rss.py"
+    source.write_text(
+        "import numpy as np\n"
+        "def rss(delta):\n"
+        "    return np.array([1]), np.array([1]), 0.25\n"
+        "def held_out_rate(delta, support, direction):\n"
+        "    return np.array([0.7])\n"
+    )
+    trusted_sha = core.digest(source)
+    row = {
+        "source_type": "real_checkpoint", "site_id": site["site_id"],
+        "model_sha256": site["model_sha256"], "sae_sha256": site["sae_sha256"],
+        "prompt_group_id": "boolq:source1", "dataset_release": "curated-v1",
+        "protocol_id": "rss.transform.v1",
+        "selection_variant_ids": [str(i) for i in range(5)],
+        "held_variant_ids": [str(i) for i in range(5,15)],
+        "delta_selection": [[0.1, 0.2] for _ in range(5)],
+        "delta_held": [[0.1, 0.2] for _ in range(10)],
+    }
+    record = run_rss(row, original=source, expected_sha=trusted_sha)
+    assert record["support_ids"] == [1]
+    assert record["results"][0]["value"] == 0.25
+    assert record["results"][1]["value"] == 0.7
+    with pytest.raises(ValueError, match="disjoint"):
+        run_rss({**row, "held_variant_ids": row["selection_variant_ids"] + ["x"] * 5}, original=source, expected_sha=trusted_sha)
