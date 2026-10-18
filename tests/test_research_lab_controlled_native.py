@@ -4,6 +4,7 @@ This test executes the unchanged upstream estimator when its pinned optional
 package is present. In generic CPU CI the package is optional and this test
 is skipped, while the localization-native lane installs the pinned source.
 """
+
 from __future__ import annotations
 
 import sys
