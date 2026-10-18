@@ -170,6 +170,26 @@ jobs:
         run: python -m pytest -q tests/test_research_lab_controlled_native.py
       - name: Run full Localize benchmark and reliability demo
         run: python examples/research_integrations/localization_benchmark.py --output "$(mktemp -d)"
+      - name: Export both 64-state controlled input designs (CPU)
+        run: |
+          PYTHONPATH=apps/research-lab python -m backend.controlled_designs --output-dir "$RUNNER_TEMP/opensae-six-factor-inputs"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import os
+          folder = Path(os.environ["RUNNER_TEMP"]) / "opensae-six-factor-inputs"
+          files = sorted(folder.glob("*.json"))
+          assert len(files) == 2
+          assert all(len(json.loads(p.read_text())["states"]) == 64 for p in files)
+          print("Exported two full 64-state CPU-only input grids.")
+          PY
+      - name: Archive GPU-ready six-factor input designs
+        uses: actions/upload-artifact@v4
+        with:
+          name: opensae-research-lab-six-factor-inputs
+          path: ${{ runner.temp }}/opensae-six-factor-inputs/*.json
+          if-no-files-found: error
+          retention-days: 30
 
   quality:
     runs-on: ubuntu-latest
