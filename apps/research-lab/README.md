@@ -249,3 +249,18 @@ dependencies. The deployable CPU site is read-only and displays the original
 Run python -m backend.controlled_designs --output-dir /tmp/opensae-six-factor-v1 to generate two complete 64-state Boolean input grids. Factor zero is the least significant bit and all states belong to one group per design. One grid includes separate **synthetic known-factor values**, never labeled as real model activations.
 
 Documentation: docs/research-lab/controlled-six-factor.md. The original SAEBase ControlledInputDesign remains the model-capture interface.
+
+## Work Plan 05 candidate source lock
+
+The platform now has 500 source-version-pinned candidates and hashes for
+22,500 unreviewed RSS proposals. It does not publicly redistribute the
+underlying third-party prompt text and does not claim GPU measurements.
+Dataset cards intentionally remain empty until source-rights and human
+content reviews are completed.
+
+Run backend.source_audit --source-lock and backend.corpus_lock to restore
+and verify the frozen input population. See docs/research-lab/corpus-cpu-source-lock.md
+and Work Plan 05.
+
+The private queue's worker heartbeat and finish require the attempt number
+from claim to fence stale retries; the public inference route stays off.

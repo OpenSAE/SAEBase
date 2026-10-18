@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Iterable
 
@@ -33,7 +34,12 @@ def group_wikitext(lines: Iterable[dict]):
 
 
 def acquire(
-    source: str, destination: Path, *, max_raw_rows: int = 20000, seed: int = 20261018
+    source: str,
+    destination: Path,
+    *,
+    max_raw_rows: int = 20000,
+    seed: int = 20261018,
+    source_revision: str | None = None,
 ) -> dict:
     definitions = {r["id"]: r for r in dataset_catalog()["sources"]}
     if source not in definitions:
@@ -50,8 +56,17 @@ def acquire(
             "Install the optional CPU dependencies datasets and huggingface_hub"
         ) from e
     entry = definitions[source]
-    revision = HfApi().dataset_info(repo_id=entry["repo"]).sha
-    if not isinstance(revision, str) or len(revision) != 40:
+    if source_revision is not None:
+        if not isinstance(source_revision, str) or not re.fullmatch(
+            r"[0-9a-f]{40}", source_revision
+        ):
+            raise ValueError("Explicit source revision must be a 40-character lowercase Git SHA")
+        revision = HfApi().dataset_info(repo_id=entry["repo"], revision=source_revision).sha
+        if revision != source_revision:
+            raise ValueError("Requested revision did not match actual source commit")
+    else:
+        revision = HfApi().dataset_info(repo_id=entry["repo"]).sha
+    if not isinstance(revision, str) or not re.fullmatch(r"[0-9a-f]{40}", revision):
         raise ValueError("Could not resolve immutable upstream revision")
     options = {
         "path": entry["repo"],
@@ -61,7 +76,11 @@ def acquire(
     }
     if entry["config"]:
         options["name"] = entry["config"]
-    stream = load_dataset(**options).shuffle(seed=seed, buffer_size=2048)
+    stream = load_dataset(**options)
+    # WikiText is a LINE-LEVEL corpus. Shuffling raw lines first would detach
+    # passages from article headers and forge source-group identities.
+    if source != "wikitext103":
+        stream = stream.shuffle(seed=seed, buffer_size=2048)
 
     def capped():
         for i, row in enumerate(stream):
@@ -84,9 +103,13 @@ def acquire(
         "split": entry["split"],
         "resolved_revision": revision,
         "shuffle_seed": seed,
-        "shuffle_buffer_size": 2048,
+        "shuffle_buffer_size": 0 if source == "wikitext103" else 2048,
         "max_raw_rows": max_raw_rows,
-        "sampling_scope": "bounded shuffled stream; not uniform across whole source",
+        "sampling_scope": (
+            "bounded original-order article extraction; deterministic group-ranked selection"
+            if source == "wikitext103"
+            else "bounded shuffled stream; not uniform across whole source"
+        ),
         "source_export_sha256": hashlib.sha256(content).hexdigest(),
         "license_reviewed": False,
         "human_reviewed": False,
@@ -105,8 +128,19 @@ def main(argv=None):
     )
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--max-raw-rows", type=int, default=20000)
+    parser.add_argument("--source-revision", help="Optional exact 40-hex pinned dataset commit")
     args = parser.parse_args(argv)
-    print(json.dumps(acquire(args.source, args.output, max_raw_rows=args.max_raw_rows), indent=2))
+    print(
+        json.dumps(
+            acquire(
+                args.source,
+                args.output,
+                max_raw_rows=args.max_raw_rows,
+                source_revision=args.source_revision,
+            ),
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":

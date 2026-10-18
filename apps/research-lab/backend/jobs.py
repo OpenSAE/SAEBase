@@ -236,19 +236,28 @@ class JobQueue:
             }
 
     def heartbeat(
-        self, *, job_id: str, worker_id: str, now: float | None = None, lease_seconds: int = 300
+        self,
+        *,
+        job_id: str,
+        worker_id: str,
+        attempt: int,
+        now: float | None = None,
+        lease_seconds: int = 300,
     ) -> bool:
+        if type(attempt) is not int or attempt < 1:
+            raise JobError("Invalid worker attempt fencing token")
         if not 30 <= lease_seconds <= 3600:
             raise JobError("Invalid lease duration")
         clock = time.time() if now is None else float(now)
         with self._transaction() as con:
             row = con.execute(
-                "SELECT status,worker_id,lease_until FROM jobs WHERE job_id=?", (job_id,)
+                "SELECT status,worker_id,lease_until,attempts FROM jobs WHERE job_id=?", (job_id,)
             ).fetchone()
             if (
                 row is None
                 or row["status"] != "running"
                 or row["worker_id"] != worker_id
+                or row["attempts"] != attempt
                 or row["lease_until"] < clock
             ):
                 return False
@@ -263,11 +272,14 @@ class JobQueue:
         *,
         job_id: str,
         worker_id: str,
+        attempt: int,
         result_sha256: str | None = None,
         error_code: str | None = None,
         now: float | None = None,
     ) -> bool:
         """Worker reports a committed result digest, never arbitrary output text."""
+        if type(attempt) is not int or attempt < 1:
+            raise JobError("Invalid worker attempt fencing token")
         if (result_sha256 is None) == (error_code is None):
             raise JobError("Provide exactly one of result_sha256 or a sanitized error code")
         if result_sha256 is not None and not _sha256(result_sha256):
@@ -277,12 +289,13 @@ class JobQueue:
         clock = time.time() if now is None else float(now)
         with self._transaction() as con:
             row = con.execute(
-                "SELECT status,worker_id,lease_until FROM jobs WHERE job_id=?", (job_id,)
+                "SELECT status,worker_id,lease_until,attempts FROM jobs WHERE job_id=?", (job_id,)
             ).fetchone()
             if (
                 row is None
                 or row["status"] != "running"
                 or row["worker_id"] != worker_id
+                or row["attempts"] != attempt
                 or row["lease_until"] < clock
             ):
                 return False

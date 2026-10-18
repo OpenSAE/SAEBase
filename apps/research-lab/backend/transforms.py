@@ -23,7 +23,8 @@ from .readouts import input_anchor
 
 SCHEMA = "opensae.rss.variant_proposals.v1"
 SETTINGS = ("local_format", "instruction_wrapper", "context_wrapper")
-NOT_AUTOMATED = {"wikitext103", "tinystories", "humaneval"}
+PROSE_CONTINUATION = {"wikitext103", "tinystories"}
+CODE_PREFIX = {"humaneval"}
 
 PREFIX_SETS = (
     (
@@ -81,7 +82,24 @@ CONTEXT_SETS = (
 )
 
 
-def _variant_text(base: str, setting: str, operator: int, realization: int) -> str:
+def _variant_text(base: str, setting: str, operator: int, realization: int, dataset_id: str) -> str:
+    """Preserve original task text verbatim, never claim equivalent behavior."""
+    if dataset_id in CODE_PREFIX:
+        # Python exercise prefixes cannot acquire an arbitrary leading indent
+        # or natural-language header. Prefix metadata stays in comments.
+        if setting == "local_format":
+            pad = realization + 1
+            if operator == 0:
+                return "\n" * pad + base
+            if operator == 1:
+                return "# Python function exercise\n" + "\n" * pad + base
+            if operator == 2:
+                return base + "\n" * pad
+            if operator == 3:
+                return "\n" * pad + base + "\n" * pad
+            return "# " + "-" * (3 + realization) + "\n" + base
+        phrases = PREFIX_SETS if setting == "instruction_wrapper" else CONTEXT_SETS
+        return "# " + phrases[operator][realization].strip() + "\n" + base
     if setting == "local_format":
         pad = realization + 1
         if operator == 0:
@@ -94,6 +112,15 @@ def _variant_text(base: str, setting: str, operator: int, realization: int) -> s
             return "\n" * pad + base + "\n" * pad
         if operator == 4:
             return "-" * (3 + realization) + "\n" + base
+    if dataset_id in PROSE_CONTINUATION:
+        if setting == "instruction_wrapper":
+            return "Continue the unchanged passage below:\n" + (
+                PREFIX_SETS[operator][realization].strip() + "\n" + base
+            )
+        if setting == "context_wrapper":
+            return "This is a sampled text passage, not a verified factual source.\n" + (
+                CONTEXT_SETS[operator][realization].strip() + "\n" + base
+            )
     if setting == "instruction_wrapper":
         return PREFIX_SETS[operator][realization] + "\n" + base
     if setting == "context_wrapper":
@@ -113,8 +140,6 @@ def build_variants(
     """Generate reviewed-by-default-FALSE transformations with stable identity."""
     if dataset_id not in {item["id"] for item in dataset_catalog()["sources"]}:
         raise ValueError("Unknown source dataset")
-    if dataset_id in NOT_AUTOMATED:
-        raise ValueError("Dataset requires an independently designed transformation protocol")
     if (
         not isinstance(source_revision, str)
         or len(source_revision) != 40
@@ -136,7 +161,7 @@ def build_variants(
     for setting in SETTINGS:
         for operator in range(5):
             for realization in range(3):
-                text = _variant_text(base_prompt, setting, operator, realization)
+                text = _variant_text(base_prompt, setting, operator, realization, dataset_id)
                 alignment = input_anchor(base_prompt, text, anchor=anchor)
                 key = {
                     "dataset_id": dataset_id,
@@ -178,6 +203,13 @@ def build_variants(
         "n_operators_per_setting": 5,
         "n_proposals": 45,
         "fully_reviewed": False,
+        "transform_family": (
+            "python_comment_and_whitespace"
+            if dataset_id in CODE_PREFIX
+            else "prose_continuation"
+            if dataset_id in PROSE_CONTINUATION
+            else "question_wrapper"
+        ),
         "interpretation": "proposed expression changes, not certified task equivalence",
         "variants": variants,
     }

@@ -1,0 +1,126 @@
+{
+  "schema": "opensae.corpus_source_lock.v1",
+  "scope": "sampled_500_source_groups__metadata_only__unreviewed_not_published",
+  "audit_commit": "9cc2f50d4f31249a4d8e20d9a3b6fb1fcf02a3e9",
+  "audit_workflow_run": "https://github.com/OpenSAE/SAEBase/actions/runs/39174535881",
+  "audit_artifact_id": 12154265086,
+  "audit_manifest_sha256": "3f044cc31c34c0ea7be4c723921323be90f716183d1276a6dfa58c5a605f7a22",
+  "total_sources": 10,
+  "total_base_groups": 500,
+  "discovery_groups": 200,
+  "evaluation_groups": 300,
+  "selection_seed": 20261018,
+  "candidate_rows_in_repository": false,
+  "rights_review": "pending",
+  "human_content_review": "pending",
+  "near_duplicate_review": "automatic_5gram_screen_zero_flags__human_semantic_review_pending",
+  "science_status": "input_candidates_only__no_model_or_sae_measured",
+  "sources": [
+    {
+      "dataset_id": "wikitext103",
+      "source_revision": "b08601e04326c79dfdd32d625aee71d232d685c3",
+      "candidate_sha256": "5f31b6d5ec18d255886dbbdb9773e4e208b29042e9124c35d135765cb7276d8a",
+      "source_export_sha256": "f97ea04554d7b0e9afb125c3cf10352bc92ef7119ed40ea3d5d9a3cf5cef2dd7",
+      "max_raw_rows": 20000,
+      "sample_count": 50,
+      "discovery": 20,
+      "evaluation": 30
+    },
+    {
+      "dataset_id": "tinystories",
+      "source_revision": "f54c09fd23315a6f9c86f9dc80f725de7d8f9c64",
+      "candidate_sha256": "a4bdaf6432f427e43b7dfea87fd7b29369ee992139dfd835337dba47c08e2f93",
+      "source_export_sha256": "63eb140df46d35badb02a05119717b611f9f0d0f83c92791c114be90c1395072",
+      "max_raw_rows": 2500,
+      "sample_count": 50,
+      "discovery": 20,
+      "evaluation": 30
+    },
+    {
+      "dataset_id": "squad",
+      "source_revision": "7b6d24c440a36b6815f21b70d25016731768db1f",
+      "candidate_sha256": "b421246c20a608eeb7d1fc3684003146c96b70eca10897b08c67d32d9b0db842",
+      "source_export_sha256": "8fdb36d1dd51017de24c1516365c7bc62a62ea4835dc425b2017b7c773e419a0",
+      "max_raw_rows": 35000,
+      "sample_count": 50,
+      "discovery": 20,
+      "evaluation": 30
+    },
+    {
+      "dataset_id": "boolq",
+      "source_revision": "35b264d03638db9f4ce671b711558bf7ff0f80d5",
+      "candidate_sha256": "bfaca730c7bf5ec3b15b18786bcd32015d0489e8ad567a9ec70b523724bba03f",
+      "source_export_sha256": "1147ecf954c1986d718fbbfce40b3cf4c239fe4e2746fce90c1aeb07e53620d3",
+      "max_raw_rows": 2500,
+      "sample_count": 50,
+      "discovery": 20,
+      "evaluation": 30
+    },
+    {
+      "dataset_id": "arc_challenge",
+      "source_revision": "210d026faf9955653af8916fad021475a3f00453",
+      "candidate_sha256": "4b07e7d9e378f47d1ab91a18ed435571bccef82c818cd9a2431171f18684a38b",
+      "source_export_sha256": "b7bd3caa2cf6aebeb48482ed4b7505c9b44aaa233b2c3538ea356c5ee7b49e4d",
+      "max_raw_rows": 2500,
+      "sample_count": 50,
+      "discovery": 20,
+      "evaluation": 30
+    },
+    {
+      "dataset_id": "hellaswag",
+      "source_revision": "218ec52e09a7e7462a5400043bb9a69a41d06b76",
+      "candidate_sha256": "8aa2ffa3060cd2f73fc6f732180fff7e15b8ec685a78e85c757d9485ae191046",
+      "source_export_sha256": "83e3942a34d11a20f953762f629c2b0dbf4cbe3c05f60a0d569b3d96c8b7070a",
+      "max_raw_rows": 2500,
+      "sample_count": 50,
+      "discovery": 20,
+      "evaluation": 30
+    },
+    {
+      "dataset_id": "winogrande",
+      "source_revision": "01e74176c63542e6b0bcb004dcdea22d94fb67b5",
+      "candidate_sha256": "3314ea1aabdf23961ae43463edf63a0ea5fc491ad3076ffe94e7f3e0a1ec2bcb",
+      "source_export_sha256": "2e0a63bc85b1a1394c1d3501fa596645a956531afdbe7c1cd7f8e51b6960e371",
+      "max_raw_rows": 2500,
+      "sample_count": 50,
+      "discovery": 20,
+      "evaluation": 30
+    },
+    {
+      "dataset_id": "gsm8k",
+      "source_revision": "740312add88f781978c0658806c59bc2815b9866",
+      "candidate_sha256": "7efaf3b70e7fb01881838bf9d7bc0063623c097fc8b20a67ca219b1c0ab3a30a",
+      "source_export_sha256": "00b39ebe58867df7fa073b52d42b359385840688a509421626312b71df37fe1b",
+      "max_raw_rows": 2500,
+      "sample_count": 50,
+      "discovery": 20,
+      "evaluation": 30
+    },
+    {
+      "dataset_id": "humaneval",
+      "source_revision": "7dce6050a7d6d172f3cc5c32aa97f52fa1a2e544",
+      "candidate_sha256": "f688ff7bed28a42ba9aea2b38559dc366db49d086795961f4b944de1599998ec",
+      "source_export_sha256": "9c0f66f1bc461e2dd5647030b9ad855dd9ea2b894637d67d87710bea9f087392",
+      "max_raw_rows": 2500,
+      "sample_count": 50,
+      "discovery": 20,
+      "evaluation": 30
+    },
+    {
+      "dataset_id": "truthfulqa",
+      "source_revision": "741b8276f2d1982aa3d5b832d3ee81ed3b896490",
+      "candidate_sha256": "321217b24d3c8ac6a6303af5aab82929f0ccc83a1182f4158c88bfd6c65b8fe4",
+      "source_export_sha256": "2e7616ddc53b6bac81a20769c6ce88def04027a880b0b9c916bdc357cf911d0e",
+      "max_raw_rows": 2500,
+      "sample_count": 50,
+      "discovery": 20,
+      "evaluation": 30
+    }
+  ],
+  "audit_artifact_file_sha256": "f66f3b9f42936063a1fda7a1a017e3570de8e30f48bd632f322798f2ae32af34",
+  "lexical_near_duplicate_count": 0,
+  "rss_variant_proposals_target": 22500,
+  "rss_selection_proposals": 7500,
+  "rss_held_out_proposals": 15000,
+  "rss_variant_proposals_metadata_sha256": "22fac1b100387ed1a2374dbcb6f8bb593f20a69b4be07d6c63533bc98bbaebf4"
+}

@@ -173,3 +173,20 @@ The code apps/research-lab/backend/controlled_designs.py generates two 64-state 
 Run python -m backend.controlled_designs --output-dir /tmp/opensae-six-factor-v1 from apps/research-lab after installing SAEBase.
 
 The real-model design still requires actual SAE activations; the mathematical known-factor control remains explicitly synthetic. Neither belongs in the natural 500-prompt cohort.
+ 
+## Work Plan 05 source lock and worker claim fencing
+
+Read work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md first.
+The ten sources have 500 metadata-locked candidates (200 discovery, 300
+evaluation); raw third-party text remains private until rights and content
+approval. Exact SHA values are in apps/research-lab/data/source_lock_v1.json.
+
+The CPU stage generated 22,500 proposed RSS variants and a lexical
+near-duplicate screen. All variants retain explicit semantic-review and
+tokenizer-alignment requirements before a real GPU run.
+
+JobQueue heartbeat and finish now require the attempt returned by claim.
+The GPU worker must send the current attempt on every heartbeat/commit.
+A stale worker with a reused worker ID must be rejected, including after
+a job timeout and re-lease. Do not open POST /api/jobs to public users
+without authentication, quotas, private storage and worker parity tests.
