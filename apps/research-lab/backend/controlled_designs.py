@@ -7,6 +7,7 @@ or presents synthetic feature activations as genuine checkpoint results.
 The exact state ordering and factor identities are compatible with the
 existing SAEBase ControlledInputDesign and the original Localize estimator.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -95,8 +96,7 @@ def make_candidate(name: str) -> dict[str, Any]:
         "state_order": "integer_bitmask_0_to_63_factor_zero_least_significant",
         "distribution": "uniform_binary_product_when_sampled_as_defined",
         "factors": [
-            {"name": factor_name, "levels": list(levels)}
-            for factor_name, levels in factors
+            {"name": factor_name, "levels": list(levels)} for factor_name, levels in factors
         ],
         "states": states,
         "scientific_scope": (
@@ -127,8 +127,7 @@ def to_saebase_design(document: dict[str, Any]) -> Any:
     from saebase.data import BinaryFactor, ControlledInputDesign
 
     factors = tuple(
-        BinaryFactor(factor["name"], tuple(factor["levels"]))
-        for factor in checked["factors"]
+        BinaryFactor(factor["name"], tuple(factor["levels"])) for factor in checked["factors"]
     )
     design = ControlledInputDesign.from_prompts(
         factors=factors,
@@ -195,20 +194,16 @@ def write_candidate(name: str, output: Path) -> dict[str, Any]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--output-dir", required=True, type=Path,
-        help="Destination for two immutable 64-state input grids"
+        "--output-dir",
+        required=True,
+        type=Path,
+        help="Destination for two immutable 64-state input grids",
     )
     args = parser.parse_args(argv)
-    outputs = [
-        args.output_dir / (name + ".json")
-        for name in DESIGNS
-    ]
+    outputs = [args.output_dir / (name + ".json") for name in DESIGNS]
     if any(path.exists() for path in outputs):
         parser.error("At least one design file already exists; refusing partial overwrite")
-    reports = [
-        write_candidate(name, path)
-        for name, path in zip(DESIGNS, outputs)
-    ]
+    reports = [write_candidate(name, path) for name, path in zip(DESIGNS, outputs)]
     print(json.dumps(reports, indent=2, sort_keys=True))
     return 0
 
