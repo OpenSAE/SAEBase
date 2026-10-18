@@ -185,8 +185,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--source", action="append", help="Repeat to scan selected sources")
     parser.add_argument("--max-raw-rows", type=int, default=2500)
     parser.add_argument("--revisions", type=Path, help="Optional JSON dataset_id -> 40-hex SHA")
+    parser.add_argument("--source-lock", type=Path, help="Use frozen source commits from source_lock_v1.json")
     args = parser.parse_args(argv)
-    versions = json.loads(args.revisions.read_text(encoding="utf-8")) if args.revisions else {}
+    if args.revisions and args.source_lock:
+        parser.error("Use either --source-lock or --revisions, not both")
+    if args.source_lock:
+        locked = json.loads(args.source_lock.read_text(encoding="utf-8"))
+        if locked.get("schema") != "opensae.corpus_source_lock.v1":
+            parser.error("Invalid pinned corpus source lock schema")
+        versions = {row["dataset_id"]: row["source_revision"] for row in locked["sources"]}
+    else:
+        versions = json.loads(args.revisions.read_text(encoding="utf-8")) if args.revisions else {}
     report = audit_sources(
         destination=args.output,
         dataset_ids=args.source,
