@@ -16,8 +16,8 @@ import json
 import math
 import os
 import sqlite3
-import tempfile
 from pathlib import Path
+from functools import lru_cache
 from typing import Any, Iterable
 
 from .core import (
@@ -217,11 +217,21 @@ def create_feature_store(
     return manifest
 
 
+@lru_cache(maxsize=16)
+def _cached_digest(name: str, size: int, modified: int, changed: int) -> str:
+    """Cache complete-file verification only while file metadata stays identical."""
+    return digest(Path(name))
+
+
 def _verified_store(root: Path | None = None) -> Path | None:
     folder = (root or data_root()) / "features"
     manifest_path, db_path = folder / "manifest.json", folder / DATABASE
     if not db_path.exists() and not manifest_path.exists():
         return None
+    if manifest_path.is_file() and not db_path.exists():
+        manifest = read_json(manifest_path)
+        if manifest.get("schema") == "opensae.feature_index.v1":
+            return None
     if not manifest_path.is_file() or not db_path.is_file():
         raise InvalidEvidence("Incomplete feature SQLite release")
     manifest = read_json(manifest_path)
@@ -230,7 +240,8 @@ def _verified_store(root: Path | None = None) -> Path | None:
         if manifest.get("schema") == "opensae.feature_index.v1":
             return None
         raise InvalidEvidence("Unknown feature index schema")
-    if digest(db_path) != manifest.get("files", {}).get(DATABASE):
+    st = db_path.stat()
+    if _cached_digest(str(db_path),st.st_size,st.st_mtime_ns,st.st_ctime_ns) != manifest.get("files", {}).get(DATABASE):
         raise InvalidEvidence("Feature SQLite checksum mismatch")
     return db_path
 

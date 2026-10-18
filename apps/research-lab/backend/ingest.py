@@ -41,7 +41,7 @@ def _choice_labels(choices: Any) -> tuple[list[str], list[str]]:
 
 def normalize(source: str, row: dict[str, Any]) -> dict[str, Any]:
     """Render a base *question/prefix*, never append the withheld gold answer."""
-    raw_id = str(row.get("id") or row.get("idx") or row.get("task_id") or "")
+    raw_id = str(row.get("id") or row.get("idx") or row.get("qID") or row.get("task_id") or "")
     label = None
     candidates = None
     if source == "wikitext103":

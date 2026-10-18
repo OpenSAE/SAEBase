@@ -17,6 +17,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from . import core
+from .feature_store import feature_store_count, query_feature_store
 
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "frontend"
@@ -58,7 +59,8 @@ def health() -> dict[str, Any]:
 def summary() -> dict[str, Any]:
     try:
         sites = site_cache()
-        features = core.feature_index()
+        scalable_features = feature_store_count()
+        features = core.feature_index() if scalable_features is None else None
         analyses = core.analyses()
         dataset_counts = core.imported_counts()
     except core.InvalidEvidence as e:
@@ -72,7 +74,7 @@ def summary() -> dict[str, Any]:
         "candidate_datasets": len(core.dataset_catalog()["sources"]),
         "curated_prompts": sum(dataset_counts.values()),
         "curated_datasets_ready": len(dataset_counts),
-        "feature_cards": len(features),
+        "feature_cards": scalable_features if scalable_features is not None else len(features),
         "analysis_records": len(analyses),
         "reports_published": len(core.published_reports()),
         "cpu_online": True,

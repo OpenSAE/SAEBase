@@ -11,7 +11,8 @@ import pytest
 PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
 
-from backend import core  # noqa: E402
+from backend import core
+from backend.feature_store import create_feature_store,query_feature_store,feature_store_count  # noqa: E402
 from backend.ingest import build_feature_index, freeze_dataset, normalize, select_records  # noqa: E402
 from backend.publish import publish_report  # noqa: E402
 from backend.api import app  # noqa: E402
@@ -291,3 +292,60 @@ def test_preflight_is_not_an_execution_request():
         client.post("/api/jobs/preflight", json={**body, "site_id": "unverified"}).status_code
         == 422
     )
+
+
+
+def test_sqlite_feature_store_indexes_real_records_and_detects_tampering(tmp_path):
+    site = next(s for s in core.load_sites() if core.has_complete_identity(s))
+    sample = {
+        "site_id": site["site_id"],
+        "model_sha256": site["model_sha256"],
+        "sae_sha256": site["sae_sha256"],
+        "source_type": "real_checkpoint",
+        "feature_id": 6,
+        "token_position": 2,
+        "activation": 1.5,
+        "sample_id": "boolq:row1",
+        "prompt_group_id": "boolq:group1",
+        "public_text_reviewed": True,
+        "token_text": "truth",
+        "text_excerpt": "A reviewed example about truth.",
+    }
+    rows = [
+        {**sample, "activation": (n + 1) / 10, "sample_id": "boolq:row" + str(n)}
+        for n in range(17)
+    ]
+    rows.extend([{**sample,"feature_id":7,"public_text_reviewed":False,"activation":2}])
+    result = create_feature_store(rows, tmp_path / "features")
+    assert result["feature_count"] == 2
+    assert result["observation_count"] == 18
+    assert result["public_examples_stored"] == 8
+    assert feature_store_count(tmp_path) == 2
+    records = query_feature_store(root=tmp_path,query=":F6",limit=5)
+    assert records["total"] == 1
+    assert records["items"][0]["observations"] == 17
+    assert records["items"][0]["unique_prompt_groups"] == 1
+    assert len(records["items"][0]["examples"]) == 8
+    # SQL wildcards do not alter exact literal searches.
+    assert query_feature_store(root=tmp_path,query="%")["total"] == 0
+    assert query_feature_store(root=tmp_path,query="_")["total"] == 0
+    with pytest.raises(FileExistsError):
+        create_feature_store([sample], tmp_path / "features")
+    with (tmp_path / "features" / "features.sqlite3").open("ab") as f:
+        f.write(b"tampered")
+    with pytest.raises(core.InvalidEvidence):
+        query_feature_store(root=tmp_path,limit=1)
+
+
+def test_sqlite_builder_rejects_unknown_and_synthetic(tmp_path):
+    site = next(s for s in core.load_sites() if core.has_complete_identity(s))
+    row = {
+        "site_id": site["site_id"],"model_sha256": site["model_sha256"],
+        "sae_sha256": site["sae_sha256"],"source_type": "synthetic_demo",
+        "feature_id": 1,"token_position":0,"activation":1.0,
+        "sample_id":"p","prompt_group_id":"g",
+    }
+    with pytest.raises(ValueError,match="Synthetic"):
+        create_feature_store([row],tmp_path/"one")
+    with pytest.raises(ValueError,match="checkpoint"):
+        create_feature_store([{**row,"source_type":"real_checkpoint","sae_sha256":""}],tmp_path/"two")
