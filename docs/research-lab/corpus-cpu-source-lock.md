@@ -101,3 +101,23 @@ scientific claims need independent collection and design.
 - [Work Plan 05](../../work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md)
 - [Issue #41](https://github.com/OpenSAE/SAEBase/issues/41)
 - [Research Lab CPU-to-GPU handoff](cpu-gpu-handoff.md)
+
+## Revised CPU protocol under review
+
+Work Plan 05 additionally builds task-aware **unapproved** RSS variant
+proposals for all ten source classes, including prose continuation prompts
+and Python-comment-only wrappers for HumanEval. For each base source group
+the proposal stage creates 45 variants (15 selection and 30 held-out across
+the three settings). The proposal manifest exports only SHA-256 identities,
+never the transformed source text. Actual semantic equivalence and
+model-token alignment remain separate review gates.
+
+HellaSwag now requires a frozen 13/13/12/12 balance of answer labels, and
+the CPU source audit checks cross-source near-copies using a five-word
+shingle similarity screen. That screen is a conservative lexical warning,
+not a certificate of no semantic duplicates.
+
+The initial source-lock values remain a **historical** fixed sample identity
+until a complete pinned re-audit accepts these revised rules. Work Plan 05
+must record the final candidate manifest and CI run ID before the GPU
+agent starts.
