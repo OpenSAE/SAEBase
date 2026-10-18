@@ -117,6 +117,12 @@ def test_supported_input_renderers_do_not_leak_gold_answers():
             assert "blue." in output["prompt"]  # gold in provided context is not leakage
         if source == "gsm8k":
             assert "#### 4" not in output["prompt"]
+            assert output["reference_answers"] == ["4"]
+        if source == "hellaswag":
+            assert output["candidate_texts"] == row["endings"]
+            assert "not the official" in output["evaluation_warning"]
+        if source == "arc_challenge":
+            assert output["candidate_texts"] == ["rock", "steam"]
         if source == "humaneval":
             assert "canonical_solution" not in output["prompt"]
         if source == "boolq":

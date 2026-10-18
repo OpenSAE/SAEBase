@@ -44,6 +44,8 @@ def normalize(source: str, row: dict[str, Any]) -> dict[str, Any]:
     raw_id = str(row.get("id") or row.get("idx") or row.get("qID") or row.get("task_id") or "")
     label = None
     candidates = None
+    candidate_texts = None
+    reference_answers = None
     if source == "wikitext103":
         prompt = _text(row.get("text"), "text")
         group = _text(row.get("article_id") or row.get("document_id"), "article_id")
@@ -58,6 +60,9 @@ def normalize(source: str, row: dict[str, Any]) -> dict[str, Any]:
         prompt = "Context:\n" + context + "\nQuestion: " + question + "\nAnswer:"
         group = _text(row.get("title") or row.get("article_id"), "article title")
         raw_id = _text(raw_id, "question id")
+        answers = row.get("answers")
+        if isinstance(answers, dict) and isinstance(answers.get("text"), list):
+            reference_answers = [_text(text, "answer") for text in answers["text"]]
     elif source == "boolq":
         context = _text(row.get("passage"), "passage")
         question = _text(row.get("question"), "question")
@@ -68,6 +73,7 @@ def normalize(source: str, row: dict[str, Any]) -> dict[str, Any]:
             raise ValueError("BoolQ must contain boolean answer")
         label = "yes" if answer else "no"
         candidates = ["yes", "no"]
+        candidate_texts = ["yes", "no"]
         raw_id = raw_id or hashlib.sha256((context + question).encode()).hexdigest()[:20]
     elif source == "arc_challenge":
         question = _text(row.get("question"), "question")
@@ -78,6 +84,7 @@ def normalize(source: str, row: dict[str, Any]) -> dict[str, Any]:
         group = raw_id or hashlib.sha256(question.encode()).hexdigest()[:20]
         label = str(row.get("answerKey", ""))
         candidates = labels
+        candidate_texts = texts
         if label not in candidates:
             raise ValueError("ARC answer does not match choices")
         raw_id = raw_id or group
@@ -90,6 +97,7 @@ def normalize(source: str, row: dict[str, Any]) -> dict[str, Any]:
         if not isinstance(endings, list) or len(endings) != 4:
             raise ValueError("HellaSwag requires 4 endings")
         candidates = ["A", "B", "C", "D"]
+        candidate_texts = [_text(ending, "ending") for ending in endings]
         prompt = (
             context
             + "\n"
@@ -114,11 +122,15 @@ def normalize(source: str, row: dict[str, Any]) -> dict[str, Any]:
         if label not in ("1", "2"):
             raise ValueError("WinoGrande requires labeled validation set")
         candidates = ["1", "2"]
+        candidate_texts = [one, two]
     elif source == "gsm8k":
         question = _text(row.get("question"), "question")
         prompt = "Question: " + question + "\nAnswer:"
         raw_id = raw_id or hashlib.sha256(question.encode()).hexdigest()[:20]
         group = raw_id
+        official = row.get("answer")
+        if isinstance(official, str) and "####" in official:
+            reference_answers = [_text(official.rsplit("####", 1)[-1], "final answer")]
     elif source == "humaneval":
         prompt = _text(row.get("prompt"), "prompt")
         raw_id = _text(row.get("task_id"), "task_id")
@@ -146,6 +158,7 @@ def normalize(source: str, row: dict[str, Any]) -> dict[str, Any]:
             raise ValueError("TruthfulQA MC1 requires exactly one true choice")
         label = labels[scores.index(1)]
         candidates = labels
+        candidate_texts = [_text(text, "choice") for text in mc["choices"]]
         raw_id = raw_id or hashlib.sha256(question.encode()).hexdigest()[:20]
         group = raw_id
     else:
@@ -160,6 +173,18 @@ def normalize(source: str, row: dict[str, Any]) -> dict[str, Any]:
         "prompt": prompt,
         "task_label": label,
         "candidate_labels": candidates,
+        "candidate_texts": candidate_texts,
+        "reference_answers": reference_answers,
+        "render_protocol": (
+            "opensae.render.choice_label.v1" if candidates is not None
+            else "opensae.render.question_answer.v1" if source in ("squad", "gsm8k")
+            else "opensae.render.code_prefix.v1" if source == "humaneval"
+            else "opensae.render.continuation.v1"
+        ),
+        "evaluation_warning": (
+            "HellaSwag multiple-choice label rendering is not the official continuation-likelihood protocol"
+            if source == "hellaswag" else None
+        ),
     }
 
 
