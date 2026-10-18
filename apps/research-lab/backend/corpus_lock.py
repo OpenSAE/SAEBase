@@ -105,6 +105,34 @@ def verify_corpus_lock(
                 seen.add(value)
         if usage != {"discovery": 20, "evaluation": 30}:
             raise ValueError("Incorrect source usage split: " + dataset_id)
+    if anchor.get("rss_variant_proposals_target") is not None:
+        variants = report.get("rss_variant_proposals")
+        if (
+            not isinstance(variants, dict)
+            or variants.get("protocol") != "opensae.rss.variant_proposals.v1"
+            or variants.get("parent_groups") != 500
+            or variants.get("proposed_variants") != anchor["rss_variant_proposals_target"]
+            or variants.get("selection_proposals") != anchor.get("rss_selection_proposals")
+            or variants.get("held_out_proposals") != anchor.get("rss_held_out_proposals")
+            or variants.get("metadata_only_sha256")
+            != anchor.get("rss_variant_proposals_metadata_sha256")
+            or variants.get("input_texts_in_audit") is not False
+            or variants.get("semantic_review") != "pending"
+            or variants.get("tokenizer_alignment") != "pending"
+        ):
+            raise ValueError("RSS variant population not identical to frozen candidate lock")
+    if anchor.get("lexical_near_duplicate_count") is not None:
+        screened = report.get("lexical_near_duplicate_screen")
+        if (
+            not isinstance(screened, dict)
+            or screened.get("candidate_count") != 500
+            or screened.get("lexical_near_duplicate_count")
+            != anchor["lexical_near_duplicate_count"]
+            or screened.get("algorithm") != "casefolded_unicode_word_5gram_jaccard_v1"
+            or screened.get("interpretation")
+            != "automatic lexical screening only; semantic and human review pending"
+        ):
+            raise ValueError("Lexical near-duplicate screen differs from frozen CPU audit")
     if verify_aggregate:
         manifest = report.get("manifest_sha256")
         mutable = {k: v for k, v in report.items() if k != "manifest_sha256"}
@@ -121,6 +149,7 @@ def verify_corpus_lock(
         "public_source_text": False,
         "license_and_human_review": "pending",
         "gpu_measurements": 0,
+        "rss_proposals_unreviewed": anchor.get("rss_variant_proposals_target", 0),
     }
 
 
