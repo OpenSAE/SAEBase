@@ -246,6 +246,10 @@ jobs:
           PYTHONPATH=apps/research-lab python -m backend.source_audit \
             --max-raw-rows 2500 \
             --output "$RUNNER_TEMP/opensae-corpus-audit.json"
+      - name: Verify all 500 candidates against committed source lock
+        run: |
+          PYTHONPATH=apps/research-lab python -m backend.corpus_lock \
+            --audit "$RUNNER_TEMP/opensae-corpus-audit.json"
       - name: Upload metadata-only audit even when sources are blocked
         if: always()
         uses: actions/upload-artifact@v4
