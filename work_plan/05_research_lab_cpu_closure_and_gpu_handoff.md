@@ -1,7 +1,7 @@
 # Work Plan 05 — Research Lab CPU 阶段收尾、500 条候选语料锁定与 GPU Agent 执行清单
 
 创建日期：2026-10-18  
-状态：CPU 阶段代码、候选数据源锁及 22,500 个 RSS 变体哈希已合并至 main（PR #38、#40、#42）；固定上游版本的 CPU 来源锁复验和正式 CI 通过。原始文本的人工内容/版权审批未完成，GPU 实验未启动。  
+状态：CPU 基础已合并 main；2026-10-19 GPU agent 已在独立分支提交真实采集与初步分析记录，成果暂存未归档的 experiments/，尚未进入 main。GPU-02 报告 48/48 站点、GPU-04 六站点样例已完成；GPU-05 SAR 0 组、GPU-06 RSS 为待位置审计的部分结果，GPU-09 公开计算仍关闭。本文件 5.2 节是当日加速执行的最新规则。  
 母计划：[04 Research Platform Execution Plan](04_research_platform_execution_plan.md)。  
 归档位置：work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md。
 
@@ -237,15 +237,91 @@ python -m backend.corpus_lock \
 
 交付：live_service_acceptance.md、production_link、three_user_trials.md、rollback_test.json。
 
-## 5.1 执行修订（2026-10-18 对话）
+## 5.1 原执行修订的适用关系
 
-这一节只改执行节奏，不改第 0、4、5、8 节的估计量、站点、hook、split 和停止条件。
+2026-10-18 的决定仍有效：继续同一份 release，不因为耗时较长就跳过大型计算，不改原始 SAR/RSS 数学估计器、站点身份、hook 或原始 20/30 split。2026-10-19 用户进一步要求**本日完成有实际结果的全链路工作**，因此执行细节由下面 5.2 节覆盖。旧版中“任何计算方法前提不满足时整批阻塞”的理解不再适用；改为**验证问题 → 选择具有明确科学定义的可执行协议 → 运行 → 如实标注协议与适用范围**。
 
-- 继续 release `experiments/research-lab/7fb2be8f29a1-20261019T035727Z`，不新开一轮，不覆盖已经通过的 5×500。
-- 超过一小时不再作为跳过理由。先做不改变估计量的部署加速；对拍失败就退回原文的逐条 full-prefix，仍然跑完。
-- 第 8 节停机条件照旧：source lock 不一致、checkpoint/hash/hook 不匹配、tokenizer 错位、discovery/evaluation 泄漏、SAR/RSS parity 失败、磁盘接近上限、未注明来源的合成结果、未经认证的公开 GPU。`POST /api/jobs` 保持关闭。`human_reviewed` / `license_reviewed` 保持 false。
+不允许为加速而虚构测量、擅自复用错位 tokens、掩盖模型身份或公布未获准公开的原始文本。允许降低数值诊断的过度保守门槛、使用另一种有定义的干预协议、缩小单批次规模、单独标注不同 K 的研究结果，以及先发布内部可用的研究报告。
 
-原文第 0 节继续生效：严禁把旧 48 站点上的 64-group Stage D 工程证据称为新 10×50 语料的测量结果。
+## 5.2 2026-10-19 当日完成修订：避免不必要阻塞，产出真实可复用的实验
+
+**本节为 GPU Agent 最新优先执行条款。先实施并完成当前 release，不新建第二批、不重新采旧 48 站点、不重复已经通过的原始测量。今日交付物为一个可以实际浏览/分析/干预/导出报告的内部 Research Lab release；公开 HF Space 和多用户实时 GPU 只在取得授权及认证后启用，否则作为明确的外部依赖继续关闭。不得将内部完成说成公开上线。**
+
+### A. 当前记录、状态与不能误用的数字
+
+- 固定 release：\`experiments/research-lab/7fb2be8f29a1-20261019T035727Z\`。当前 runner 位于 \`work-plan-05-gpu-handoff\` 分支提交 \`4ef3ba60afa4a87cf3ca4fcc0d59c1e0aaa88a93\`，执行表注明的 \`7fb2be8f...\` 只是 GPU 跑批前的源码身份。**创建一份实际执行源码快照（包含未提交变更），记录 runner SHA 与载入版本；不能只引用旧 main SHA。**
+- GPU-00：500 条来源锁通过，200 discovery、300 evaluation，22,500 条 RSS proposals；审计哈希保留不变。原文 human_reviewed/license_reviewed 均 false，未经审批不能发布或自动关闭这项限制。
+- GPU-01：RTX 5090 20 条 pilot 报告通过；GPU-02：48 站点各 500 条基准 prompt 的 capture 报告通过。这是**本轮真实采集覆盖**，不是与历史权重逐项一致的证明。
+- GPU-03：2,400 个统计卡片（跨 48 站点，各取前 50）属于**无公开文本的 feature 统计索引**，不等于之前六个主站点各 50 张高质量可解释展示卡片；本日进一步准备六主站点精选 300 张，具体证据不足时明确空值。
+- GPU-04：六主站点各已有一个原始 logits 干预对照。这是干预可用性测试，不等于六站点真实文本生成比较完成。
+- GPU-05：**0 个有效 SAR 标准组**；不可写成 SAR 已完成。阻塞点位于 \`saebase/integrations/sar.py::_check_affine_decode\` 对被编辑 activation 的严格可加性前提，原论文统计函数尚未执行完。这是本日第一科学修复优先级。
+- GPU-06：当前显示 **99,200 setting-level 名义输入调用量**，未必等于不同 site–prompt–variant 的去重次数。现有计数器每 setting 计 clean + 15，三 setting 会重复计算 clean；完整逻辑唯一输入的计划上限是 \`6×500×(1+3×15)=138,000\`，而不是每 setting clean 重复的 \`6×500×3×16=144,000\`。**在已存 JSONL 上重新核算有效 unique site/parent/variant，再发布覆盖率**。
+- GPU-07：64 状态真实 Pythia L12 采集已完成；全宽字典的直接精确优化出现 192 GiB 内存申请。现有 55 个实际非零 support 特征及合成零列 parity 提供了**有依据的降内存方案**，不应被前面的大内存异常继续阻塞。
+- GPU-08：特征存储已有 96,673 个不同特征、1,127,055 条记录；**1,500 条重算身份行与 500 条不一致行没有混入旧身份**。保留这份基线，不覆盖。GPU-09 公开认证与 HF 发布仍需授权。
+
+### B. 今日执行原则：让有定义的结果先产出
+
+1. **每个问题最多做一次小规模诊断；诊断只决定具体方法，不得成为无限循环的 stop gate。** 数值疑点在最多两个真实 prompt 上检查，并保留日志。对原数学估计器不做“静默放宽阈值”；不满足某个方法的前提时，切换到独立命名、科学意义明确的新测量协议，并在结果中记录，而不是整批停产。
+2. **先交付小而完整的真实结果，再扩展规模。** 每类功能先形成至少一个可复现真实实例（实际模型/SAE/token/sample、原始 measurements、JSON 报告），随后继续自动批处理全部目标。规模大不再作为跳过理由；按 model/site/shard checkpoint 分批，不因为单批跑不完而扔掉已测有效结果。
+3. **允许 scoped pass，不允许 fake pass。** 一站点只有 1 个编辑案例可标记 \`intervention_demo_passed\`，但不能标 \`500_group_population_passed\`；标准 K16 不满足时若 K8 真运行则标 \`SAR_K8_operational_passed\`，不能标 K16；RSS 变体未审完可以标 \`measured_unreviewed\`，不能标 \`meaning_preserving\`。
+4. **允许新的 checkpoint 身份，不允许硬比较历史哈希。** 三个旧历史空哈希站点及 Gemma-2-2B IT L12 不一致站点均可用新的、实际加载后计算的 model/SAE SHA，写入 \`new_run_identity\` 命名空间继续实验和展示；不纳入历史 checkpoint match 统计，更不因此整批停工。
+5. **立即归档，再继续重任务**。忽略目录不等于结果无效，但 \`experiments/\` 尚未进入 Git；先在受控存储做 snapshot、manifest、SHA-256、执行代码、权重/tokenizer/hash、完整 stdout/stderr、prompt 权限标记，并至少复制到第二个可靠存储位置。没有安全外部上传权限也可先做好可验证的本地 archive，保留原始文件，绝不能为了发包把未经许可的第三方文本公开到 GitHub Release/HF。
+6. **GPU 只能用当前空闲资源**。旧 \`ensure_gpu_idle\` 固定等待五分钟只是工程调度偏好，不是科学前提。先查询 \`nvidia-smi\`，无其他任务、无显存争用即可运行；存在其他人的活动任务则不抢占、不杀进程。不要陷入无意义等待循环。
+
+### C. GPU-05：立即解除 SAR 可加性阻塞，真实执行原始统计估计器
+
+**关键区分**：当前 \`_check_affine_decode\` 验证的是“已选单特征编辑造成的 activation 变化能否线性相加”，而 SAR 最终估计的是所定义干预集合引起的标量下游响应函数 \`g(S)\` 的加性残差。严格线性解码不是“测量任何组合干预响应”的必然前提；但若当前 SAE 是非线性解码/归一化，**不能把它和原来的线性解码 feature-contribution 语义混为一谈**。
+
+**新的执行策略必须按以下先后实现**：
+
+- 对至少 2 个真实 prompt 收集 \`h\`、\`edit_features(single)\`、\`edit_features(pair)\`、\`edit_features(full)\`，打印绝对及相对 residual、dtype、layer_norm 状态、\`identity patch\` 一致性、重复测量稳定性。BF16/FP16 舍入引起的偏差单独记账；不要仅凭 1e-4 的 allclose 失败就得出“理论上解码器非线性”的结论。
+- 新增显式 \`coalition_protocol = decoder_mediated_residual_preserving_v1\`，使用**现有原始 \`edit_features\`** 完成每个 coalition 的实际编辑，再经 \`adapter.patch_logits\` 获取固定 target-token logit 或 logit margin。保留 clean residual；每个 \`g(S)\` 是实际测量，不是从单特征线性预测补出来。验证真实 baseline/identity/replay、finite logits 与至少一个非恒定 coalition。可在本地 runner 中实现单独函数，或给 \`evaluate_sar\` 增加显式 \`require_affine_decode=False\`（默认继续 True）；**不得猴子补丁、吞掉任意异常、修改原 \`paper.sar\` / \`paper.coalitions\` 数学**。
+- 将这种分析命名为 \`SAR (decoder-mediated intervention protocol)\`。它仍可调用原论文相同的 coalition sampler 与 SAR 原始回归/排序估计器，但**解释对象是这个新的组合干预响应函数**；不能声称它直接验证了原来附带严格线性解码前提的实验结论。
+- 对满足至少 K16 个非零/可编辑特征的 prompt，保持原目标 \`K=16, M=384, fit=256, held=128\`。若 prompt 的真实活动 support 小于 16，**允许按实际 support 降级**：K8 配 \`M=128/fit=96/held=32\`；K4 配 \`M=64/fit=48/held=16\`；K2 配 \`M=32/fit=24/held=8\`。每种 K 均须满足各自二阶设计矩阵自由度、实际非零支持与 held-out 非泄漏检验。少于 2 或响应方差为零标 \`undefined\` 并继续下一条，**不得零填充假特征以凑 K16**。
+- 先在一个主站点的一个 prompt 完整实际生成 masks、\`g\` 向量、\`g_full\`、fit/held、所有原始 metric 和 input/model hash；使用固定原始 SAR 实现做同一组 \`g\` 的独立重复计算 parity。测试通过立刻顺序运行三主站点所有有效组，以单 prompt（最多若干 prompt）为一个 durable checkpoint。即使部分组不支持 K16，也要将真正测到的 K8/K4/K2 统计单独输出，不能让 0 个结果持续存在。
+- 输出 \`GPU-05/sar_v2/{site}/{sample_id}.json\`（或等价不可变分片），记录具体 K、M、fit、held、seed、feature IDs、mask、完整响应、期望条件、model/SAE revision、\`decoder_affinity_diagnostic\`、原始 estimator SHA256。K16/K8/K4/K2 各设 cohort 汇总，不在一张无条件平均表里合并。
+- 原 runner 的 \`_rotation_control\` 当前仅将相同 16 个 feature IDs 循环移位，**这是置换而非旋转**，不能作为 matched rotation 证据。先停止给该结果贴 \`rotation\` 标签并移出主要测量的 denominator。今天优先完成真实 SAR；对照可改为预先固定种子、同 K 的随机活跃特征集合（标签 \`matched_random_feature_control_v1\`），或另行实现真正的正交基旋转并验证语义。两类对照都不得伪称 matched rotation。未完成的原计划 57,600 个 rotation 测量单独标为 \`rotation_pending\`，不妨碍本日有科学意义的 SAR 主结果。
+- **通过条件**：至少一个模型有实际 \`g(S)\` + 原始 SAR 估计器输出；随后按 3×500 执行真实可测的 groups 并显示实际 K 分布、失败/undefined 计数。若最终没有任何非恒定 \`g\`，明确诊断 readout 与干预而不是再返回一个笼统的 “decoder not additive” 后结束。
+
+### D. GPU-06：修复 token/BOS 错位及“99,200”重复计数，继续真实 RSS
+
+- 当前 \`_anchor_token\` 使用 tokenizer 的 \`add_special_tokens=False\` offsets；但 \`models/hf_logits_backend.py::to_tokens\` 在存在 BOS 时主动加 BOS。不能直接把 0-based offset index 当作模型实际位置。为 **HF hook** 模型构造实际完整 \`model.to_tokens(text)\` token IDs，把每个 offset 的子串 tokens 与实际 tokens 做对照，确认 BOS/特殊 token 个数后转换。TransformerLens 同样以最终实际输入 token 序列为准，不硬编码全部模型“+1”。
+- 在一个 clean 与一个 wrapper pair 上打印 \`actual tokens\`、\`offsets\`、\`clean_index\`、\`variant_index\`、对应字符区间及 token IDs。输入包裹改变子词分词边界时，允许把严格的同 token span 判定改为**内容锚点末端在真实模型序列中经验证的 readout token**，但必须记录 \`anchor_policy\`、\`position_mapping\` 和端点可能的上下文敏感性；对不可靠的样例只剔除该变体，不整批终止。
+- **已有 99,200 名义调用记录不可丢**。从原 JSONL 按 \`(site_id, sample_id, setting)\` 去重，重算成功的 setting 数以及 \`(site_id, sample_id, variant_id)\` 的去重值。若失败来自 BOS，保留旧 measurement 为 \`position_unverified_legacy\`，单独记录，新正确协议重跑受影响的样例。不能把旧错位值默默改名为正确 RSS。
+- 现有 resume 判断只要某组有**一个 setting** 就视为 done，应改为**逐 \`(site, sample, setting)\` 的 checkpoint**，并区分 \`completed/invalid/failed/unreviewed\`。一个 setting 成功不能阻止其他两个 setting 重跑。写新分片或按唯一键完成幂等合并，保留旧产物，不覆盖原 JSONL。
+- 计划最大 **6×500×46 = 138,000** 个去重的逻辑 site-input 组合；三个 setting 共享一次 clean。已记的 \`99,200\` 数字按旧算法每 setting 计 16，**并不是独立输入数或通过审核的有效测量数**。重新生成 \`rss/coverage_v2.json\`，同时显示 \`n_parent_groups\`、\`settings_complete\`、\`selection_variants\`、\`heldout_variants\`、\`unique_site_input_occurrences\`、\`invalid\`、\`position_recomputed\`。
+- 继续用固定原始 \`rss.py::rss\` 和 \`held_out_rate\`，selection/held-out 切分不变，抽样、feature 支持集和方向不从 held-out 反调参数。每个 completed setting 可报告 MeanRSS、support、held-out 方向持久；\`semantic_review=false\` 的结果应明确叫 \`RSS under proposed transformations (not verified meaning-preserving)\`，可内部展示探索结果，不称任务不变性或安全风险。
+- **通过条件**：至少六主站点各形成一个完成 5+10 变体、位置核验和原始 RSS 计算的案例；随后续跑原先缺失的 setting 及所有可验证样例。对真实不支持的变体给出稳定 reason，不允许人为造数使覆盖率达到 100%。
+
+### E. GPU-07 / 身份 / Feature Explorer：用已有可信结果继续，不再让附加验证阻塞全链路
+
+- Localize 已有完整 64-state real input codes 与 55 列观察到的非零 support。对**这 64 个状态上严格全零**的字典列，去掉它们不会改变该网格的非零方差贡献；已有 synthetic zero-column parity 应与真实输入的零列检查一起保存。用 55 列 support 直接完成可重算 exact scope curve、预算和 assignment，**不再试图分配完整 192 GiB 稠密中间矩阵**。结果命名 \`real_model_scope_on_observed_support\`，不夸大为整个自然语言分布的行为解释。
+- 对 3 个历史无 hash 和 Gemma-2-2B IT L12 历史 hash 不符，用实际加载权重重新登记 \`model_revision + tokenizer_revision + sae_revision + loaded_state_sha256\`，以**新 run 的独立 identity**用于后续分析；历史 identity 对照仍标 \`not_matched\`。不得以四站点不吻合为由删除已成功采集的数据，也不把它们插进旧 hash 的索引。
+- GPU-03 从现有全 48 站点 feature 统计里抽出六个主站点的 300 张卡，填实际 \`sample_id\`、feature ID、激活大小、选中 token IDs/位置、可追踪 private sample reference、clean/edited 关联。文本无对外授权，页面显示 \`text unavailable for public release\`，**内部受控访问**可以展示按权限获得的原文；没有权限就不强行发到 HF。
+- GPU-04 已完成六站点的 logits/feature-operator 干预；本日再使用至少**一个真实可用模型**完成 baseline 和 edited 的文本生成对比（固定 sampling seed、max_new_tokens、输入和 patch timing）。如果单特征 steering 生成接口做不到稳定拼接，先给本地 operator 工作台显示真实 next-token probability/top-k 与实际 rollout，再明确 \`full_steered_generation_pending\`；不能拿两组模拟文本充当真实生成。
+- GPU-08 原有 feature SQLite/JSON store 保持不可变，在新版本/新命名空间纳入拥有**独立、实际哈希**的站点观测（可以同时浏览，不可混作历史 identity）。不重复统计同一 sample/site/token/feature，不把 64 grid states 混入自然文本组。
+
+### F. 当日交付顺序与每项成功定义（必须执行，不要停在文档）
+
+| 优先 | 执行动作 | 最小真实完成标志 | 继续批量的动作 |
+|---|---|---|---|
+| 0 | **冻结当前 GPU 实验原始证据** | 完整当前 release 的私有 archive、manifest、文件 SHA、执行源码 commit/dirty 状态及第二份备份 | 每项实验完成即增量归档 |
+| 1 | **解除 SAR 整批 0 的阻塞** | 1 个真实 \`g(S)\`、K/M/fit/held 与原论文 SAR metric，标明 decoder-mediated protocol | 三主站点逐 prompt 完成；少支持组降 K 后单列 |
+| 2 | **RSS token 对齐与恢复续跑** | 6 主站点各 1 个合法 5/10 setting 的 real result，BOS/offset parity 通过 | 重算错位、补漏 setting，输出 v2 unique 计数 |
+| 3 | **Localize 已有 55 列曲线归档** | 64-state real scope curve 可重算，support/zero-column parity 通过 | 不扩大不必要的全宽内存申请 |
+| 4 | **特征/权重身份与干预页面** | 4 个历史差异站点独立 identity；6 主站点可浏览；至少 1 个真实 edited generation/sample 结果 | 完善 300 张精确证据卡和六站点实例 |
+| 5 | **内部研究发布包** | 可在本地 CPU Research Lab 打开来源清楚的 Results/Features/Intervene/Analyze/Reports；原始 run manifest 与 artifact 校验通过 | 继续覆盖剩余 sites/groups、更新总表 |
+| 6 | **GitHub 交接** | 只提交代码、测试、去敏汇总、Work Plan 05 与安全 manifest；建 PR 并跑 CI | 准备后续 HF/正式在线服务权限 |
+
+**如果单一模型/样例出现非实质阻塞，就记录并继续其他有效样例；如果重计算可能很贵，用 shard、checkpoint、resume，不准以“超过一小时”直接跳过。不得因无法立刻公开 Space 而阻塞已经能运行的本地平台与内部报告。**
+
+### G. 正式停止条件（只用于保护数据真实性、财产和安全）
+
+**必须停止该项或受影响 shard**：来源锁或 sample 内容不一致；模型/SAE 实际加载身份未知；token 对齐已证明错误而不能修正；干预 identity patch 不成立；实验中断导致结果不可区分重试；fit/held-out 数据泄漏；产生 NaN 仍强行写有限值；代码执行来源不可信；超出用户批准 GPU/存储预算；磁盘不足以保证原始结果持久化；公开服务缺认证与隐私保护。
+
+**不需要整批停止**：historical hash 不一致但新 loaded SHA 可确切登记；某些 feature 没有 K16 support 但可做新 K8/K4 方案；某种变体无法对齐但其他变体合法；原非必须的 rotation control 未完成；没有 public HF 写权限但本地和私有研究报告可完成；全字典稠密求解内存过大但零列等价的 support 版本可算。
+
+**最终对外声明**：报告完整说明每个实验的 \`protocol_id\`、真实完成组数、适用范围和局限。当前目标是**让平台今天拿到真实、有用、可复现的研究数据和端到端工作流**，不是保证所有历史最强协议在今天达到虚假的 100% 覆盖率。
 
 ## 6. 交给 GPU Agent 的填报模板
 
@@ -299,6 +375,6 @@ python -m backend.corpus_lock \
 
 执行者先检查本计划和固定 source lock；在有 HF 读取权限的 CPU/宿主环境复放第 3 节审计。**验证成功再租/启动 GPU 计算**。工作单元从 GPU-00 和 GPU-01 开始，先小样本，测实际吞吐后再批准全量。
 
-任何以下情况立即停止新增高成本任务：source lock 不一致、checkpoint/hash/hook 不匹配、tokenizer 导致错位、source-group 泄漏、原始 SAR/RSS 估计量 parity 不一致、磁盘接近上限、超过明确预算、产生未注明来源的合成结果、或面向公开用户的 GPU 端点未经认证。
+后续停止/降级执行规则以第 5.2.G 节为准。已确认的来源锁变化、实际权重身份未知、无法修复的 tokenizer 错位、sample split 泄漏、SAR/RSS 数学估计器 parity 失败、存储/成本超限或未经认证的公开服务，停止对应受影响任务；非必要的线性解码假设、旧历史哈希不一致、部分输入不合法、部分 feature 支持不足等，**选择明示且可验证的替代实验协议继续推进其他合法数据**，不得阻塞整批。
 
 完成标准不是“跑满作业数量”，而是用户可以在 Research Lab 中可靠地**找到特征、查看真实输入、实施受控干预、检验可解释性的限制，并把可追溯的证据分享与复现**。所有结果均须注明模型、数据和实验范围，不能超出科学证据作宣传。
