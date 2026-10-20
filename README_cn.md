@@ -46,6 +46,30 @@ flowchart LR
 
 ---
 
+## 🔬 Research Lab 研究平台
+
+SAEBase 已从单纯的 Python 研究工具扩展到 **可浏览的 SAE 实验平台**，提供结果检索、Feature Explorer、特征干预、SAR/RSS 分析以及可追溯报告。
+
+| 研究模块 | 目前记录的实际进展 |
+| :--- | :--- |
+| 模型覆盖 | 48 个站点针对冻结的 500 个基础 prompt 完成新一轮采集 |
+| Feature Explorer | 六个主站点共 300 张真实激活统计卡片，文本与解释仍需审核 |
+| 特征干预 | 六个站点完成实际 clean/edited logits 对照 |
+| SAR | K16 共 1,485 组，K8 共 14 组，K4 共 1 组；明确区分 decoder-mediated 干预协议 |
+| RSS | 六个站点、500 个父输入，报告 138,000 个不同 site-input 观测；输入变体尚未通过语义等价审核 |
+| Input Localization | 一个真实 64 状态受控输入网格，分析其 55 个有观测支持的特征 |
+
+[**Research Lab 使用指南**](apps/research-lab/README.md) · [结果与方法](docs/research-lab/results-20261020.md) · [v0.4.0 版本说明](docs/releases/v0.4.0.md)
+
+```bash
+docker build -f apps/research-lab/Dockerfile -t opensae-lab:cpu .
+docker run --rm -p 7860:7860 opensae-lab:cpu
+```
+
+浏览器访问 http://127.0.0.1:7860 。这个 CPU 镜像展示历史公开验证结果；新一轮 GPU 原始观测仍保存在私有实验目录，**不会自动出现在公开镜像中**。未经认证的 GPU 在线推理保持关闭。
+
+---
+
 ## ⚙️ 安装
 
 支持 Python 3.11–3.12。首先从源码安装轻量核心，便于直接运行离线教程：

@@ -2,7 +2,7 @@
 
 🌍 Languages: [English](README.md) | [中文](README_cn.md) &nbsp; [![CI](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml)
 
-👉 **TL;DR.** SAEBase is an open-source toolkit for reproducible sparse autoencoder research. Load models and SAEs, capture and reuse activations, intervene on features, benchmark reconstruction and downstream effects, and audit results with verifiable provenance.
+👉 **TL;DR.** SAEBase is an open-source toolkit for reproducible sparse autoencoder research. Load models and SAEs, capture and reuse activations, intervene on features, benchmark reconstruction and downstream effects, and audit results with verifiable provenance. The Research Lab provides a browser workflow for exploring these measurements.
 
 <p align="center">
   <a href="#-quickstart"><b>🚀 Quickstart</b></a> &nbsp; | &nbsp;
@@ -43,6 +43,30 @@ The workflow is **capture once, evaluate multiple SAEs**: a verified activation 
 - 📈 **Reliability analysis.** Prompt-group bootstrap, paired SAE comparisons, confidence intervals, sample-size curves, ranking stability, and analytical ground-truth/negative-control tests.
 - 🧩 **Research integrations.** Original [SAR](https://github.com/OpenSAE/SAE-Behavioral-Compositionality) and [RSS](https://github.com/OpenSAE/Redistribution-Sensitivity-Score) and [Input Localization](https://github.com/OpenSAE/SAE-Input-Localization) estimators plus provenance-checked imports of native SAEBench outputs.
 - ⚙️ **Reproducible experiments.** Compute preflight, exact cache identities, interrupted-run recovery, source/checkpoint hashes, and standalone JSONL/JSON, CSV, and HTML reports.
+
+---
+
+## 🔬 Research Lab
+
+**Explore real SAE measurements in one place.** The Research Lab brings together a browsable results table, a feature explorer, intervention controls, SAR and RSS analyses, and reproducible reports.
+
+| Research Lab evidence | Current recorded scope |
+| :--- | :--- |
+| Model / SAE coverage | 48 selected sites × 500 frozen base prompts captured in the Research Lab GPU run |
+| Feature exploration | 300 curated statistical cards across six deep-dive sites; labels and source text require review |
+| Feature interventions | Six real model/SAE sites with measured clean-versus-edited logits |
+| SAR | 1,485 K16, 14 K8 and 1 K4 measured groups, under a separately named decoder-mediated intervention protocol |
+| RSS | Six sites × 500 parent prompts; 138,000 reported unique clean/variant site-input observations under *proposed* transformations |
+| Input Localization | One real 64-state factor grid, analyzed on 55 features observed on that grid |
+
+[**Explore the Research Lab**](apps/research-lab/README.md) · [Results and methods](docs/research-lab/results-20261020.md) · [Reproduction and release notes](docs/releases/v0.4.0.md)
+
+```bash
+docker build -f apps/research-lab/Dockerfile -t opensae-lab:cpu .
+docker run --rm -p 7860:7860 opensae-lab:cpu
+```
+
+Open http://127.0.0.1:7860 for the public **historical** evidence browser. New Research Lab GPU measurements are stored in a separately maintained private experiment archive, so they are **not automatically available** through this standalone Docker image. Public online inference remains disabled.
 
 ---
 
@@ -253,7 +277,7 @@ python -m pytest -q
 | Reliability | Prompt-group bootstrap, paired comparisons and independently generated analytical controls |
 | Experimental backends | vLLM/NNsight remain optional; this release does not claim GPU throughput validation |
 
-The 48-site evaluation uses 64 held-out prompt groups per site, drawn from controlled templates. It verifies benchmark execution and reliability under this protocol, not general SAE quality or interpretability. The model and SAE weights remain with their original publishers. See [Validation and Reproducibility](docs/validation.md) and the [v0.3.0 release notes](docs/releases/v0.3.0.md).
+The 48-site evaluation uses 64 held-out prompt groups per site, drawn from controlled templates. It verifies benchmark execution and reliability under this protocol, not general SAE quality or interpretability. The model and SAE weights remain with their original publishers. See [Validation and Reproducibility](docs/validation.md), the [Research Lab evidence summary](docs/research-lab/results-20261020.md), and the [v0.4.0 release notes](docs/releases/v0.4.0.md).
 
 ---
 
@@ -263,7 +287,7 @@ The 48-site evaluation uses 64 held-out prompt groups per site, drawn from contr
 
 [Activation Store](docs/activation-store.md) · [Feature Interventions](docs/feature-interventions.md) · [Benchmarking](docs/benchmarking.md) · [Reliability](docs/reliability.md) · [Research Integrations](docs/research-integrations.md) · [Extensions](docs/extensions.md)
 
-[Validation](docs/validation.md) · [Changelog](CHANGELOG.md) · [v0.3.0 Release Notes](docs/releases/v0.3.0.md) · [Provenance](docs/PROVENANCE.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Apache-2.0 License](LICENSE)
+[Validation](docs/validation.md) · [Changelog](CHANGELOG.md) · [v0.4.0 Release Notes](docs/releases/v0.4.0.md) · [Provenance](docs/PROVENANCE.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Apache-2.0 License](LICENSE)
 
 <p align="center">
   <b>Open research infrastructure for faithful representation analysis.</b><br>

@@ -96,6 +96,7 @@ def evaluate_sar(
     readout_position: int = -1,
     verify_replay: bool = True,
     identity: SAEIdentity | None = None,
+    require_affine_decode: bool = True,
 ) -> SARResult:
     """Run real model patches and call the original SAR estimator.
 
@@ -125,7 +126,8 @@ def evaluate_sar(
     if K > snapshot.codes.numel():
         raise ValueError(f"K={K} exceeds SAE feature count {snapshot.codes.numel()}")
     selected = torch.argsort(snapshot.codes.abs(), descending=True, stable=True)[:K].tolist()
-    _check_affine_decode(sae, snapshot, selected)
+    if require_affine_decode:
+        _check_affine_decode(sae, snapshot, selected)
 
     baseline_logits = model.forward_logits(tokens=ids, readout_position=readout_position)
     clean = _scalar(readout(baseline_logits), name="readout")

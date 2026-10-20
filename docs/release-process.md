@@ -120,3 +120,22 @@ The release evidence asserts software distribution integrity and
 successful CI, **not** independent verification of new scientific claims.
 Review [CI lanes](ci-maintenance.md), [provenance](PROVENANCE.md) and
 the [historical v0.2.0 checklist](RELEASE_CHECKLIST.md) as necessary.
+
+## One-time approved Research Lab v0.4.0 publication
+
+The source of the version-specific release request lives at
+[Research Lab v0.4.0 Approved Release Dispatch](../.github/workflows/research-lab-v04-release-dispatch.yml).
+It exists solely for the explicit maintainer-approved Research Lab v0.4.0
+publication after successful *push-to-main* CI of the final source.
+
+That job does **not** publish assets itself or bypass the original manual
+release gates. It dispatches the existing source-bound
+`software-release.yml` using the exact main commit, required confirmation
+`PUBLISH-v0.4.0`, and publish mode. The existing verifier still checks
+all six CI contexts, builds distributions from the same run, verifies their
+SHA-256 and installs them before making an immutable tag. Existing version
+tags must not be overwritten. Future versions still use the normal manual
+process; there is no general automatic software release enabled.
+
+Release assets contain software, release-evidence and checksums only. The
+GPU experiment archive and third-party source texts are excluded.

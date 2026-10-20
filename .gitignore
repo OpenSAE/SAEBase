@@ -34,3 +34,5 @@ coverage.json
 
 # Local first-run benchmarks and saved reports
 runs/
+# Work Plan 05 private corpus, weights, and run artifacts
+experiments/
