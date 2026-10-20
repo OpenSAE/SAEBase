@@ -60,6 +60,8 @@ jobs:
           saebase --list
           saebase-check-env --mode core
           python -m saebase.sae.verify_registry --list
+      - name: Check v0.4.0 Research Lab release manifest and docs
+        run: python -m pytest -q tests/test_research_lab_v04_release.py
       - name: Run offline public API example
         run: python examples/quickstart/public_api_offline.py
       - name: Run persistent first experiment and reliability audit
