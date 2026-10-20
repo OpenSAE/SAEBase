@@ -39,7 +39,9 @@ def _all_records(root: Path) -> list[dict[str, Any]]:
 
     corpus = root / "private" / "corpus"
     rows = []
-    for dataset_dir in sorted(path for path in corpus.iterdir() if (path / "records.jsonl").is_file()):
+    for dataset_dir in sorted(
+        path for path in corpus.iterdir() if (path / "records.jsonl").is_file()
+    ):
         with (dataset_dir / "records.jsonl").open(encoding="utf-8") as stream:
             for line in stream:
                 if line.strip():
@@ -54,7 +56,15 @@ def _public_row(measured: dict, record: dict, site: dict, model_sha: str, sae_sh
     public = {
         key: value
         for key, value in measured.items()
-        if key in {"l0", "reconstruction_mse", "token_position", "capture_seconds", "elapsed_seconds", "peak_vram_bytes"}
+        if key
+        in {
+            "l0",
+            "reconstruction_mse",
+            "token_position",
+            "capture_seconds",
+            "elapsed_seconds",
+            "peak_vram_bytes",
+        }
     }
     public.update(
         {
@@ -68,9 +78,12 @@ def _public_row(measured: dict, record: dict, site: dict, model_sha: str, sae_sh
             "hash_matches_historical": bool(site.get("model_sha256"))
             and model_sha == site.get("model_sha256")
             and sae_sha == site.get("sae_sha256"),
-            "historical_hash_was_empty": site["site_id"] in INCOMPLETE_SITES or not site.get("model_sha256"),
+            "historical_hash_was_empty": site["site_id"] in INCOMPLETE_SITES
+            or not site.get("model_sha256"),
             "text_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
-            "token_ids_sha256": hashlib.sha256(json.dumps(measured["token_ids"]).encode("utf-8")).hexdigest(),
+            "token_ids_sha256": hashlib.sha256(
+                json.dumps(measured["token_ids"]).encode("utf-8")
+            ).hexdigest(),
         }
     )
     return public
@@ -93,13 +106,17 @@ def _measure_capture(adapter, sae, activation_site, tokens) -> dict:
     started = time.perf_counter()
     snapshot = capture_features(adapter, sae, site=activation_site, tokens=tokens)
     nonzero = torch.nonzero(snapshot.codes, as_tuple=False).flatten()
-    mse = float(torch.mean((snapshot.activation.float() - snapshot.reconstruction.float()) ** 2).item())
+    mse = float(
+        torch.mean((snapshot.activation.float() - snapshot.reconstruction.float()) ** 2).item()
+    )
     return {
         "l0": int(nonzero.numel()),
         "reconstruction_mse": mse,
         "token_position": int(tokens.shape[1] - 1),
         "token_ids": [int(token) for token in tokens[0].tolist()],
-        "nonzero_codes": [[int(index), float(snapshot.codes[int(index)].item())] for index in nonzero.tolist()],
+        "nonzero_codes": [
+            [int(index), float(snapshot.codes[int(index)].item())] for index in nonzero.tolist()
+        ],
         "capture_seconds": time.perf_counter() - started,
         "elapsed_seconds": time.perf_counter() - started,
         "peak_vram_bytes": int(torch.cuda.max_memory_allocated()),
@@ -136,7 +153,9 @@ def _codes_from_cached_activation(sae, activation, tokens) -> dict | None:
         "reconstruction_mse": mse,
         "token_position": int(tokens.shape[1] - 1),
         "token_ids": [int(token) for token in tokens[0].tolist()],
-        "nonzero_codes": [[int(index), float(codes[int(index)].item())] for index in nonzero.tolist()],
+        "nonzero_codes": [
+            [int(index), float(codes[int(index)].item())] for index in nonzero.tolist()
+        ],
         "capture_seconds": time.perf_counter() - started,
         "elapsed_seconds": time.perf_counter() - started,
         "peak_vram_bytes": int(torch.cuda.max_memory_allocated()),
@@ -160,12 +179,16 @@ def _multi_hook_parity(model, bundles, tokens) -> dict:
         _logits, cache = model.run_with_cache(tokens, names_filter=lambda name: name in names)
     cached = cache[names[0]][0, -1]
     activation_ok = torch.allclose(cached, reference["snapshot"].activation, rtol=1e-4, atol=1e-4)
-    encoded = _codes_from_cached_activation(bundles[0][1], cached, tokens) if activation_ok else None
+    encoded = (
+        _codes_from_cached_activation(bundles[0][1], cached, tokens) if activation_ok else None
+    )
     codes_ok = False
     if encoded is not None:
         left = {pair[0]: pair[1] for pair in encoded["nonzero_codes"]}
         right = {pair[0]: pair[1] for pair in reference["nonzero_codes"]}
-        codes_ok = left.keys() == right.keys() and all(abs(left[key] - right[key]) <= 1e-4 for key in left)
+        codes_ok = left.keys() == right.keys() and all(
+            abs(left[key] - right[key]) <= 1e-4 for key in left
+        )
     if activation_ok and codes_ok:
         return {"status": "passed", "backend": adapter.backend}
     return {
@@ -200,12 +223,26 @@ def _capture_sequential(root, model, bundle, records, done_ids) -> dict:
         try:
             row = _measure_capture(adapter, sae, activation_site, tokens)
         except Exception as exc:
-            failures.append({"sample_id": record["sample_id"], "error": type(exc).__name__ + ": " + str(exc).splitlines()[0][:240]})
+            failures.append(
+                {
+                    "sample_id": record["sample_id"],
+                    "error": type(exc).__name__ + ": " + str(exc).splitlines()[0][:240],
+                }
+            )
             continue
         public = _public_row(row, record, site, model_sha, sae_sha)
         _append(root, site["site_id"], public, row)
         measured += 1
-    return _summary(site, meta, model_sha, sae_sha, measured, len(done_ids), failures, time.perf_counter() - started)
+    return _summary(
+        site,
+        meta,
+        model_sha,
+        sae_sha,
+        measured,
+        len(done_ids),
+        failures,
+        time.perf_counter() - started,
+    )
 
 
 def _capture_cached(root, model, bundles, records, done_by_site) -> list[dict]:
@@ -221,7 +258,9 @@ def _capture_cached(root, model, bundles, records, done_by_site) -> list[dict]:
     measured = {site["site_id"]: 0 for site, *_rest in identities}
     started = time.perf_counter()
     for record in records:
-        needed = [row for row in identities if record["sample_id"] not in done_by_site[row[0]["site_id"]]]
+        needed = [
+            row for row in identities if record["sample_id"] not in done_by_site[row[0]["site_id"]]
+        ]
         if not needed:
             continue
         tokens, error = _exact_tokens(model, record["prompt"])
@@ -235,7 +274,9 @@ def _capture_cached(root, model, bundles, records, done_by_site) -> list[dict]:
             cached = cache[site["hook"]][0, -1]
             row = _codes_from_cached_activation(sae, cached, tokens)
             if row is None:
-                failures[site["site_id"]].append({"sample_id": record["sample_id"], "error": "cached_encode_unavailable"})
+                failures[site["site_id"]].append(
+                    {"sample_id": record["sample_id"], "error": "cached_encode_unavailable"}
+                )
                 continue
             public = _public_row(row, record, site, model_sha, sae_sha)
             _append(root, site["site_id"], public, row)
@@ -278,7 +319,9 @@ def _summary(site, meta, model_sha, sae_sha, new_rows, skipped, failures, elapse
         "failed_count": len(failures),
         "failed_sample_ids": [row["sample_id"] for row in failures[:20]],
         "elapsed_seconds": elapsed,
-        "peak_vram_bytes": int(torch.cuda.max_memory_allocated()) if torch.cuda.is_available() else None,
+        "peak_vram_bytes": int(torch.cuda.max_memory_allocated())
+        if torch.cuda.is_available()
+        else None,
     }
 
 
@@ -326,7 +369,13 @@ def run_all_sites(root: Path, pilot: dict) -> dict:
     grouped: dict[str, list] = defaultdict(list)
     for site in sites:
         grouped[site["model"]].append(site)
-    ordered = sorted(grouped, key=lambda model: (0 if any(access.get(site["site_id"]) == "open" for site in grouped[model]) else 1, model))
+    ordered = sorted(
+        grouped,
+        key=lambda model: (
+            0 if any(access.get(site["site_id"]) == "open" for site in grouped[model]) else 1,
+            model,
+        ),
+    )
     results = []
     parity_notes = []
     stopped_for_disk = False
@@ -363,7 +412,9 @@ def run_all_sites(root: Path, pilot: dict) -> dict:
         if free_gib(root) < 40:
             stopped_for_disk = True
             for site in pending:
-                results.append(_blocked(site["site_id"], "disk free space below 40 GiB; new downloads stopped"))
+                results.append(
+                    _blocked(site["site_id"], "disk free space below 40 GiB; new downloads stopped")
+                )
             continue
         log(root, f"GPU-02 loading model {model_name} for {len(pending)} sites")
         try:
@@ -380,7 +431,12 @@ def run_all_sites(root: Path, pilot: dict) -> dict:
                 try:
                     sae, meta = load_sae_for_profile(site["sae"], int(site["layer"]), device="cuda")
                 except Exception as exc:
-                    results.append(_blocked(site["site_id"], type(exc).__name__ + ": " + str(exc).splitlines()[0][:300]))
+                    results.append(
+                        _blocked(
+                            site["site_id"],
+                            type(exc).__name__ + ": " + str(exc).splitlines()[0][:300],
+                        )
+                    )
                     continue
                 meta = {**meta, "loaded_model_name": loaded_name}
                 bundles.append((site, sae, meta))
@@ -396,7 +452,10 @@ def run_all_sites(root: Path, pilot: dict) -> dict:
                 try:
                     parity = _multi_hook_parity(model, bundles, probe_tokens)
                 except Exception as exc:
-                    parity = {"status": "fallback_sequential", "reason": type(exc).__name__ + ": " + str(exc).splitlines()[0][:200]}
+                    parity = {
+                        "status": "fallback_sequential",
+                        "reason": type(exc).__name__ + ": " + str(exc).splitlines()[0][:200],
+                    }
             parity_notes.append({"model": model_name, **parity})
             log(root, f"GPU-02 {model_name} hook parity {parity['status']}")
             if parity["status"] == "passed":
@@ -408,7 +467,10 @@ def run_all_sites(root: Path, pilot: dict) -> dict:
                 for bundle in bundles:
                     done = _done_ids(root, bundle[0]["site_id"])
                     results.append(_capture_sequential(root, model, bundle, records, done))
-                    log(root, f"GPU-02 {bundle[0]['site_id']} measured={results[-1].get('measured')} failed={results[-1].get('failed_count')}")
+                    log(
+                        root,
+                        f"GPU-02 {bundle[0]['site_id']} measured={results[-1].get('measured')} failed={results[-1].get('failed_count')}",
+                    )
         finally:
             del model
             for bundle in bundles:
@@ -457,12 +519,25 @@ def _done_ids(root: Path, site_id: str) -> set[str]:
 
 def _write_coverage(root: Path, results: list[dict], access: dict[str, str]) -> None:
     path = root / "GPU-02" / "site_coverage.csv"
-    fields = ["site_id", "access", "status", "measured", "failed_count", "hash_matches_historical", "recomputed_identity", "elapsed_seconds", "reason"]
+    fields = [
+        "site_id",
+        "access",
+        "status",
+        "measured",
+        "failed_count",
+        "hash_matches_historical",
+        "recomputed_identity",
+        "elapsed_seconds",
+        "reason",
+    ]
     with path.open("w", encoding="utf-8", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=fields)
         writer.writeheader()
         for row in results:
-            writer.writerow({key: row.get(key, "") for key in fields} | {"access": access.get(row["site_id"], row.get("access", ""))})
+            writer.writerow(
+                {key: row.get(key, "") for key in fields}
+                | {"access": access.get(row["site_id"], row.get("access", ""))}
+            )
     write_json(
         root / "GPU-02" / "source_digests.json",
         [

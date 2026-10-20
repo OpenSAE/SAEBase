@@ -35,14 +35,20 @@ SEED = 20261018
 
 
 def _coverage_ok() -> None:
-    coverage = json.loads((REPO / "apps/research-lab/data/coverage.json").read_text(encoding="utf-8"))
+    coverage = json.loads(
+        (REPO / "apps/research-lab/data/coverage.json").read_text(encoding="utf-8")
+    )
     if tuple(coverage["deep"]) != DEEP_SITES or tuple(coverage["sar"]) != SAR_SITES:
         raise RuntimeError("coverage.json deep or SAR sites differ from the pinned lists")
 
 
 def _gpu02_passed(root: Path) -> set[str]:
     decision = json.loads((root / "GPU-02" / "decision.json").read_text(encoding="utf-8"))
-    return {row["site_id"] for row in decision.get("site_results", []) if row.get("status") == "passed" and row.get("measured") == 500}
+    return {
+        row["site_id"]
+        for row in decision.get("site_results", [])
+        if row.get("status") == "passed" and row.get("measured") == 500
+    }
 
 
 def _records(root: Path) -> list[dict[str, Any]]:
@@ -97,17 +103,31 @@ def run_gpu04(root: Path) -> dict:
             pairs.append(already[site_id])
             continue
         if site_id not in passed:
-            pairs.append({"site_id": site_id, "status": "not_started", "reason": "site has no 500-group capture"})
+            pairs.append(
+                {
+                    "site_id": site_id,
+                    "status": "not_started",
+                    "reason": "site has no 500-group capture",
+                }
+            )
             continue
         site = _site(site_id)
         if "mlp" not in site["hook"] and site_id.startswith("mistral"):
-            pairs.append({"site_id": site_id, "status": "failed", "reason": "Mistral site lost its MLP hook"})
+            pairs.append(
+                {"site_id": site_id, "status": "failed", "reason": "Mistral site lost its MLP hook"}
+            )
             continue
         log(root, f"GPU-04 {site_id}")
         try:
             model, sae, meta = _load_pair(site)
         except Exception as exc:
-            pairs.append({"site_id": site_id, "status": "blocked", "reason": type(exc).__name__ + ": " + str(exc).splitlines()[0][:240]})
+            pairs.append(
+                {
+                    "site_id": site_id,
+                    "status": "blocked",
+                    "reason": type(exc).__name__ + ": " + str(exc).splitlines()[0][:240],
+                }
+            )
             continue
         try:
             adapter = ModelAdapter(model)
@@ -119,12 +139,22 @@ def run_gpu04(root: Path) -> dict:
                 adapter, sae, ActivationSite(int(site["layer"]), site["hook"], position=-1), tokens
             )
             snapshot = capture_features(
-                adapter, sae, site=ActivationSite(int(site["layer"]), site["hook"], position=-1), tokens=tokens
+                adapter,
+                sae,
+                site=ActivationSite(int(site["layer"]), site["hook"], position=-1),
+                tokens=tokens,
             )
-            active = [int(index) for index in torch.argsort(snapshot.codes.abs(), descending=True)[:2].tolist()]
+            active = [
+                int(index)
+                for index in torch.argsort(snapshot.codes.abs(), descending=True)[:2].tolist()
+            ]
             extra: dict[str, Any] = {}
             if len(active) < 1:
-                extra = {"clamp": "undefined_no_active_feature", "add": "undefined_no_active_feature", "coalition": "undefined_no_active_feature"}
+                extra = {
+                    "clamp": "undefined_no_active_feature",
+                    "add": "undefined_no_active_feature",
+                    "coalition": "undefined_no_active_feature",
+                }
             else:
                 feature = active[0]
                 conditions = [
@@ -132,14 +162,31 @@ def run_gpu04(root: Path) -> dict:
                     ("add", Condition("add", "add", (feature,), 1.0)),
                 ]
                 if len(active) >= 2:
-                    conditions.append(("coalition", Condition("coalition", "coalition", (active[0], active[1]), retained_ids=(active[0],))))
+                    conditions.append(
+                        (
+                            "coalition",
+                            Condition(
+                                "coalition",
+                                "coalition",
+                                (active[0], active[1]),
+                                retained_ids=(active[0],),
+                            ),
+                        )
+                    )
                 else:
                     extra["coalition"] = "undefined_fewer_than_two_active_features"
                 baseline = adapter.forward_logits(tokens=tokens)
                 for name, condition in conditions:
                     patch = apply_condition(sae, snapshot, condition)
-                    edited = adapter.patch_logits(tokens=tokens, site=snapshot.site, activation=patch.activation)
-                    extra[name] = {"feature_ids": list(condition.feature_ids), "logit_l2": float(torch.linalg.vector_norm(edited.float() - baseline.float()).item())}
+                    edited = adapter.patch_logits(
+                        tokens=tokens, site=snapshot.site, activation=patch.activation
+                    )
+                    extra[name] = {
+                        "feature_ids": list(condition.feature_ids),
+                        "logit_l2": float(
+                            torch.linalg.vector_norm(edited.float() - baseline.float()).item()
+                        ),
+                    }
             pairs.append(
                 {
                     "site_id": site_id,
@@ -158,7 +205,13 @@ def run_gpu04(root: Path) -> dict:
                 }
             )
         except Exception as exc:
-            pairs.append({"site_id": site_id, "status": "failed", "reason": type(exc).__name__ + ": " + str(exc).splitlines()[0][:300]})
+            pairs.append(
+                {
+                    "site_id": site_id,
+                    "status": "failed",
+                    "reason": type(exc).__name__ + ": " + str(exc).splitlines()[0][:300],
+                }
+            )
         finally:
             del model, sae
             gc.collect()
@@ -264,9 +317,16 @@ def _sar_one(adapter, sae, site, tokens, paper) -> dict:
         snapshot_codes = snapshot.codes
         active = int(torch.count_nonzero(snapshot.codes).item())
     except Exception as exc:
-        return {"status": "failed", "error": type(exc).__name__ + ": " + str(exc).splitlines()[0][:240]}
+        return {
+            "status": "failed",
+            "error": type(exc).__name__ + ": " + str(exc).splitlines()[0][:240],
+        }
     if active < K:
-        return {"status": "undefined", "actual_k": active, "reason": "fewer than 16 active features; not labeled as K16"}
+        return {
+            "status": "undefined",
+            "actual_k": active,
+            "reason": "fewer than 16 active features; not labeled as K16",
+        }
     readout = _readout_factory(adapter, tokens, site)
     result = evaluate_sar(
         adapter,
@@ -337,7 +397,13 @@ def run_gpu05(root: Path, sources: dict) -> dict:
         out = root / "GPU-05" / "sar" / f"{site_id.replace(':', '_')}.jsonl"
         out.parent.mkdir(parents=True, exist_ok=True)
         if site_id not in passed:
-            site_rows.append({"site_id": site_id, "status": "not_started", "reason": "base capture is absent; pilot numbers were not copied here"})
+            site_rows.append(
+                {
+                    "site_id": site_id,
+                    "status": "not_started",
+                    "reason": "base capture is absent; pilot numbers were not copied here",
+                }
+            )
             continue
         site = _site(site_id)
         done = _finished_ids(out)
@@ -347,7 +413,9 @@ def run_gpu05(root: Path, sources: dict) -> dict:
             site_rows.append(
                 {
                     "site_id": site_id,
-                    "status": "passed" if counts.get("passed") == 500 and counts.get("failed", 0) == 0 else "partial",
+                    "status": "passed"
+                    if counts.get("passed") == 500 and counts.get("failed", 0) == 0
+                    else "partial",
                     "measured_main_groups": counts.get("passed", 0),
                     "undefined_groups": counts.get("undefined", 0),
                     "failed_groups": counts.get("failed", 0),
@@ -360,7 +428,13 @@ def run_gpu05(root: Path, sources: dict) -> dict:
         try:
             model, sae, _meta = _load_pair(site)
         except Exception as exc:
-            site_rows.append({"site_id": site_id, "status": "blocked", "reason": type(exc).__name__ + ": " + str(exc).splitlines()[0][:240]})
+            site_rows.append(
+                {
+                    "site_id": site_id,
+                    "status": "blocked",
+                    "reason": type(exc).__name__ + ": " + str(exc).splitlines()[0][:240],
+                }
+            )
             continue
         adapter = ModelAdapter(model)
         activation_site = ActivationSite(int(site["layer"]), site["hook"], position=-1)
@@ -376,19 +450,46 @@ def run_gpu05(root: Path, sources: dict) -> dict:
                     tokens, error = _exact_tokens(model, record["prompt"])
                     if error or tokens is None:
                         failures += 1
-                        stream.write(json.dumps({"sample_id": record["sample_id"], "status": "failed", "error": error}) + "\n")
+                        stream.write(
+                            json.dumps(
+                                {
+                                    "sample_id": record["sample_id"],
+                                    "status": "failed",
+                                    "error": error,
+                                }
+                            )
+                            + "\n"
+                        )
                         continue
                     try:
                         row = _sar_one(adapter, sae, activation_site, tokens, paper)
                     except Exception as exc:
                         message = type(exc).__name__ + ": " + str(exc).splitlines()[0][:240]
                         if "identity patch" in message.lower() or "Identity patch" in str(exc):
-                            stream.write(json.dumps({"sample_id": record["sample_id"], "status": "failed", "error": message}) + "\n")
+                            stream.write(
+                                json.dumps(
+                                    {
+                                        "sample_id": record["sample_id"],
+                                        "status": "failed",
+                                        "error": message,
+                                    }
+                                )
+                                + "\n"
+                            )
                             failures += 1
                             log(root, f"GPU-05 {site_id} stopped on identity patch")
                             break
                         failures += 1
-                        stream.write(json.dumps({"sample_id": record["sample_id"], "status": "failed", "error": message}) + "\n")
+                        stream.write(
+                            json.dumps(
+                                {
+                                    "sample_id": record["sample_id"],
+                                    "status": "failed",
+                                    "error": message,
+                                }
+                            )
+                            + "\n"
+                        )
                         continue
                     row["sample_id"] = record["sample_id"]
                     row["prompt_group_id"] = record["prompt_group_id"]
@@ -401,20 +502,30 @@ def run_gpu05(root: Path, sources: dict) -> dict:
                         measured += 1
                         total_main += 1
                     if masks is None and row["status"] == "passed":
-                        masks = {"K": K, "M": M, "n_fit": N_FIT, "seed": SEED, "note": "same coalition design for every prompt; per-prompt feature ids differ"}
+                        masks = {
+                            "K": K,
+                            "M": M,
+                            "n_fit": N_FIT,
+                            "seed": SEED,
+                            "note": "same coalition design for every prompt; per-prompt feature ids differ",
+                        }
                     stream.write(json.dumps(row, allow_nan=False) + "\n")
                     if record["sample_id"] in rotation_ids and row["status"] == "passed":
                         shifted = _rotation_control(adapter, sae, activation_site, tokens, paper)
                         shifted["sample_id"] = record["sample_id"]
                         shifted["rotation"] = True
-                        shifted["rotation_definition"] = "same masks and seed; K selected feature ids shifted by one position"
+                        shifted["rotation_definition"] = (
+                            "same masks and seed; K selected feature ids shifted by one position"
+                        )
                         stream.write(json.dumps(shifted, allow_nan=False) + "\n")
                         if shifted.get("status") == "passed":
                             total_rotation += 1
                     if index % 25 == 0:
                         log(root, f"GPU-05 {site_id} index={index} measured={measured}")
             if masks is not None:
-                write_json(root / "GPU-05" / "sar" / f"{site_id.replace(':', '_')}_design.json", masks)
+                write_json(
+                    root / "GPU-05" / "sar" / f"{site_id.replace(':', '_')}_design.json", masks
+                )
         finally:
             del model, sae, adapter
             gc.collect()
@@ -424,7 +535,9 @@ def run_gpu05(root: Path, sources: dict) -> dict:
         site_rows.append(
             {
                 "site_id": site_id,
-                "status": "passed" if counts.get("passed") == 500 and counts.get("failed", 0) == 0 else "partial",
+                "status": "passed"
+                if counts.get("passed") == 500 and counts.get("failed", 0) == 0
+                else "partial",
                 "measured_main_groups": counts.get("passed", 0),
                 "undefined_groups": counts.get("undefined", 0),
                 "failed_groups": counts.get("failed", 0),
@@ -447,7 +560,14 @@ def run_gpu05(root: Path, sources: dict) -> dict:
                 else:
                     total_main += 1
     planned = 3 * 500 * M + 50 * 3 * M
-    decoder_error = next((row.get("error") for row in site_rows if row.get("error") and "not additive" in row["error"]), None)
+    decoder_error = next(
+        (
+            row.get("error")
+            for row in site_rows
+            if row.get("error") and "not additive" in row["error"]
+        ),
+        None,
+    )
     if decoder_error:
         reason = (
             "SAE decoder is not additive, so coalition groups measured stay 0. "
@@ -467,8 +587,14 @@ def run_gpu05(root: Path, sources: dict) -> dict:
         "batch_parity": "sequential evaluate_sar; a batched patch is not substituted unless logit parity passes. This run uses the original sequential patch.",
         "statistical_unit": "base group",
         "reason": reason,
-        "model_sae_site": [row["site_id"] for row in site_rows if row.get("status") != "not_started"],
-        "population": {"main_groups": total_main, "rotation_groups": total_rotation, "planned": planned},
+        "model_sae_site": [
+            row["site_id"] for row in site_rows if row.get("status") != "not_started"
+        ],
+        "population": {
+            "main_groups": total_main,
+            "rotation_groups": total_rotation,
+            "planned": planned,
+        },
         "commands": "python tasks/05_research_lab_cpu_closure_and_gpu_handoff/__main__.py run resume",
         "resources": "sequential full-prefix patch; no quantization",
         "scientific_checks": "original paper.coalitions and paper.sar; K stays 16; short support is undefined rather than relabeled",
@@ -497,7 +623,9 @@ def _rotation_control(adapter, sae, site, tokens, paper) -> dict:
         replacements = {int(fid): 0.0 for fid, keep in zip(rotated, mask) if not keep}
         if replacements:
             patch = edit_features(sae, snapshot, replacements=replacements)
-            logits = adapter.patch_logits(tokens=tokens, site=site, activation=patch.activation, readout_position=-1)
+            logits = adapter.patch_logits(
+                tokens=tokens, site=site, activation=patch.activation, readout_position=-1
+            )
         else:
             logits = baseline
         responses[index] = float(logits[target].item())
@@ -506,7 +634,12 @@ def _rotation_control(adapter, sae, site, tokens, paper) -> dict:
     for key, value in metrics.items():
         value = float(np.asarray(value))
         clean[str(key)] = None if value != value else value
-    return {"status": "passed", "metrics": clean, "feature_ids": [int(item) for item in rotated], "matched_to_seed": SEED}
+    return {
+        "status": "passed",
+        "metrics": clean,
+        "feature_ids": [int(item) for item in rotated],
+        "matched_to_seed": SEED,
+    }
 
 
 def _anchor_token(model, base_text: str, variant_text: str) -> int | None:
@@ -554,7 +687,9 @@ def run_gpu06(root: Path, sources: dict) -> dict:
         invalid_path = root / "GPU-06" / "rss" / f"{site_id.replace(':', '_')}_invalid.jsonl"
         out.parent.mkdir(parents=True, exist_ok=True)
         if site_id not in passed:
-            site_rows.append({"site_id": site_id, "status": "not_started", "reason": "base capture is absent"})
+            site_rows.append(
+                {"site_id": site_id, "status": "not_started", "reason": "base capture is absent"}
+            )
             continue
         site = _site(site_id)
         done = _rss_measured_ids(out)
@@ -573,7 +708,13 @@ def run_gpu06(root: Path, sources: dict) -> dict:
         try:
             model, sae, _meta = _load_pair(site)
         except Exception as exc:
-            site_rows.append({"site_id": site_id, "status": "blocked", "reason": type(exc).__name__ + ": " + str(exc).splitlines()[0][:240]})
+            site_rows.append(
+                {
+                    "site_id": site_id,
+                    "status": "blocked",
+                    "reason": type(exc).__name__ + ": " + str(exc).splitlines()[0][:240],
+                }
+            )
             continue
         adapter = ModelAdapter(model)
         activation_site = ActivationSite(int(site["layer"]), site["hook"], position=-1)
@@ -583,7 +724,10 @@ def run_gpu06(root: Path, sources: dict) -> dict:
         measured = 0
         invalid = 0
         try:
-            with out.open("a", encoding="utf-8") as stream, invalid_path.open("a", encoding="utf-8") as invalid_stream:
+            with (
+                out.open("a", encoding="utf-8") as stream,
+                invalid_path.open("a", encoding="utf-8") as invalid_stream,
+            ):
                 for index, record in enumerate(records):
                     if record["sample_id"] in done:
                         measured += 1
@@ -606,26 +750,52 @@ def run_gpu06(root: Path, sources: dict) -> dict:
                         kept_held = []
                         for variant in variants:
                             position = _anchor_token(model, record["prompt"], variant["text"])
-                            role_ok = (variant["variant_role"] == "selection" and variant["realization"] == 0) or (
-                                variant["variant_role"] == "held_out" and variant["realization"] != 0
+                            role_ok = (
+                                variant["variant_role"] == "selection"
+                                and variant["realization"] == 0
+                            ) or (
+                                variant["variant_role"] == "held_out"
+                                and variant["realization"] != 0
                             )
                             if position is None or not role_ok:
-                                group_invalid.append({"variant_id": variant["variant_id"], "tokenizer_alignment": position is not None, "role_ok": role_ok})
+                                group_invalid.append(
+                                    {
+                                        "variant_id": variant["variant_id"],
+                                        "tokenizer_alignment": position is not None,
+                                        "role_ok": role_ok,
+                                    }
+                                )
                                 continue
-                            bucket = kept_selection if variant["variant_role"] == "selection" else kept_held
+                            bucket = (
+                                kept_selection
+                                if variant["variant_role"] == "selection"
+                                else kept_held
+                            )
                             bucket.append((variant["text"], position))
                         if len(kept_selection) != 5 or len(kept_held) != 10:
-                            group_invalid.append({"setting": setting, "selection": len(kept_selection), "held_out": len(kept_held)})
+                            group_invalid.append(
+                                {
+                                    "setting": setting,
+                                    "selection": len(kept_selection),
+                                    "held_out": len(kept_held),
+                                }
+                            )
                             continue
                         clean_position = _anchor_token(model, record["prompt"], record["prompt"])
                         _tokens, error = _exact_tokens(model, record["prompt"])
                         if error or clean_position is None:
-                            group_invalid.append({"setting": setting, "error": error or "clean_anchor_not_aligned"})
+                            group_invalid.append(
+                                {"setting": setting, "error": error or "clean_anchor_not_aligned"}
+                            )
                             continue
                         features = collect_rss_features(
                             adapter,
                             sae,
-                            site=ActivationSite(activation_site.layer, activation_site.hook_name, position=clean_position),
+                            site=ActivationSite(
+                                activation_site.layer,
+                                activation_site.hook_name,
+                                position=clean_position,
+                            ),
                             clean_prompt=record["prompt"],
                             selection_variants=[item[0] for item in kept_selection],
                             held_out_variants=[item[0] for item in kept_held],
@@ -642,17 +812,24 @@ def run_gpu06(root: Path, sources: dict) -> dict:
                                 "support_status": "undefined" if len(support) == 0 else "measured",
                                 "mean_rss": None if mean != mean else mean,
                                 "held_out_rate_mean": None
-                                if evaluated.held_out_rates.size == 0 or not np.isfinite(evaluated.held_out_rates).all()
+                                if evaluated.held_out_rates.size == 0
+                                or not np.isfinite(evaluated.held_out_rates).all()
                                 else float(np.nanmean(evaluated.held_out_rates)),
                                 "semantic_review": False,
-                                "meaning_preserving": False if record["dataset_id"] in {"wikitext103", "tinystories"} else None,
+                                "meaning_preserving": False
+                                if record["dataset_id"] in {"wikitext103", "tinystories"}
+                                else None,
                             }
                         )
                         occurrences += 1 + 15
                     if group_invalid:
                         invalid += 1
                         invalid_stream.write(
-                            json.dumps({"sample_id": record["sample_id"], "invalid": group_invalid[:8]}, ensure_ascii=False) + "\n"
+                            json.dumps(
+                                {"sample_id": record["sample_id"], "invalid": group_invalid[:8]},
+                                ensure_ascii=False,
+                            )
+                            + "\n"
                         )
                     stream.write(
                         json.dumps(
@@ -676,7 +853,14 @@ def run_gpu06(root: Path, sources: dict) -> dict:
             del model, sae, adapter
             gc.collect()
             torch.cuda.empty_cache()
-        site_rows.append({"site_id": site_id, "status": "partial" if measured else "failed", "groups_with_a_setting": measured, "groups_with_invalid_variant": invalid})
+        site_rows.append(
+            {
+                "site_id": site_id,
+                "status": "partial" if measured else "failed",
+                "groups_with_a_setting": measured,
+                "groups_with_invalid_variant": invalid,
+            }
+        )
     occurrences = _rss_occurrences(root)
     payload = {
         "status": "partial",
@@ -703,15 +887,28 @@ def run_gpu07_support(root: Path) -> dict:
 
     status_path = root / "GPU-07" / "localize_status.json"
     status = json.loads(status_path.read_text(encoding="utf-8")) if status_path.is_file() else {}
-    codes = json.loads((root / "GPU-07" / "synthetic_reference_codes.json").read_text(encoding="utf-8"))
-    synthetic = json.loads((root / "GPU-07" / "synthetic_known_factor_control.json").read_text(encoding="utf-8"))
+    codes = json.loads(
+        (root / "GPU-07" / "synthetic_reference_codes.json").read_text(encoding="utf-8")
+    )
+    synthetic = json.loads(
+        (root / "GPU-07" / "synthetic_known_factor_control.json").read_text(encoding="utf-8")
+    )
     base = np.asarray(codes["feature_values"], dtype=np.float64)
     padded = np.concatenate([base, np.zeros((base.shape[0], 3), dtype=np.float64)], axis=1)
     ids = tuple(row["sample_id"] for row in synthetic["states"])
-    full = evaluate_localization(LocalizationGrid(codes=padded, n_factors=6, state_sample_ids=ids, source="synthetic_logic_not_real_sae"))
+    full = evaluate_localization(
+        LocalizationGrid(
+            codes=padded, n_factors=6, state_sample_ids=ids, source="synthetic_logic_not_real_sae"
+        )
+    )
     support_index = np.nonzero(np.any(padded != 0, axis=0))[0]
     reduced = evaluate_localization(
-        LocalizationGrid(codes=padded[:, support_index], n_factors=6, state_sample_ids=ids, source="synthetic_logic_not_real_sae")
+        LocalizationGrid(
+            codes=padded[:, support_index],
+            n_factors=6,
+            state_sample_ids=ids,
+            source="synthetic_logic_not_real_sae",
+        )
     )
     assignment_ok = np.array_equal(full.assignment[support_index], reduced.assignment)
     budget_ok = int(full.budget) == int(reduced.budget)
@@ -739,7 +936,9 @@ def run_gpu07_support(root: Path) -> dict:
             row = json.loads(line)
             if row.get("dataset_id") == "controlled6":
                 by_id[row["sample_id"]] = row["nonzero_codes"]
-    real = json.loads((root / "GPU-07" / "real_model_six_factor_design.json").read_text(encoding="utf-8"))
+    real = json.loads(
+        (root / "GPU-07" / "real_model_six_factor_design.json").read_text(encoding="utf-8")
+    )
     columns = sorted({int(index) for pairs in by_id.values() for index, _value in pairs})
     ordered = []
     for state in real["states"]:

@@ -13,7 +13,9 @@ from common import REPO, file_sha256, free_gib, write_json
 
 
 def _git(args: list[str]) -> str:
-    return subprocess.check_output(["git", *args], cwd=REPO, text=True, stderr=subprocess.STDOUT).strip()
+    return subprocess.check_output(
+        ["git", *args], cwd=REPO, text=True, stderr=subprocess.STDOUT
+    ).strip()
 
 
 def archive_release(root: Path) -> dict:
@@ -30,7 +32,9 @@ def archive_release(root: Path) -> dict:
             else:
                 shutil.copy2(child, target)
     rows = []
-    for path in sorted(item for item in dest.rglob("*") if item.is_file() and item.name != "manifest.json"):
+    for path in sorted(
+        item for item in dest.rglob("*") if item.is_file() and item.name != "manifest.json"
+    ):
         rows.append(
             {
                 "path": str(path.relative_to(dest)),
@@ -78,8 +82,13 @@ def archive_release(root: Path) -> dict:
     ).hexdigest()
     payload["manifest_sha256"] = digest
     write_json(dest / "manifest.json", payload)
-    write_json(root / "GPU-00" / "archive_manifest.json", {k: v for k, v in payload.items() if k != "files"})
+    write_json(
+        root / "GPU-00" / "archive_manifest.json",
+        {k: v for k, v in payload.items() if k != "files"},
+    )
     pointer = root / "GPU-00" / "archive_file_index.json"
-    write_json(pointer, {"manifest_sha256": digest, "archive_copy": str(dest), "copied_files": len(rows)})
+    write_json(
+        pointer, {"manifest_sha256": digest, "archive_copy": str(dest), "copied_files": len(rows)}
+    )
     os.sync()
     return payload

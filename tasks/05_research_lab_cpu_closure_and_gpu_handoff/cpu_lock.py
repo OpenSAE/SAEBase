@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 
@@ -36,7 +35,9 @@ def _summary(report: dict, verified: dict) -> dict:
         "variant_metadata_sha256": variants["metadata_only_sha256"],
         "gpu_measurements": report["gpu_calls"],
         "cross_source_exact_duplicates": len(report["cross_source_exact_duplicates"]),
-        "lexical_near_duplicate_count": report["lexical_near_duplicate_screen"].get("lexical_near_duplicate_count"),
+        "lexical_near_duplicate_count": report["lexical_near_duplicate_screen"].get(
+            "lexical_near_duplicate_count"
+        ),
         "human_reviewed": False,
         "license_reviewed": False,
         "full_source_text_in_audit": report["full_source_text_in_this_artifact"],
@@ -80,7 +81,9 @@ def run_cpu_lock(root: Path) -> dict:
             ]
         )
         if code != 0:
-            raise RuntimeError("source_audit failed; stopping because the candidate lock may have changed")
+            raise RuntimeError(
+                "source_audit failed; stopping because the candidate lock may have changed"
+            )
     report = read_json(audit_path)
     verified = verify_corpus_lock(report, read_json(LOCK))
     summary = _summary(report, verified)
@@ -113,7 +116,9 @@ def run_cpu_lock(root: Path) -> dict:
                 human_reviewed=False,
             )
         if meta["records_sha256"] != entry["candidate_sha256"]:
-            raise RuntimeError("Private candidate hash does not match the source lock for " + dataset_id)
+            raise RuntimeError(
+                "Private candidate hash does not match the source lock for " + dataset_id
+            )
         if meta["human_reviewed"] or meta["license_reviewed"]:
             raise RuntimeError("Refusing forged review flags for " + dataset_id)
     summary["private_corpus"] = str(corpus)

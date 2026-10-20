@@ -81,7 +81,8 @@ def run_gpu00(root: Path, cpu_summary: dict) -> dict:
                 "historical_model_sha256": site["model_sha256"],
                 "historical_sae_sha256": site["sae_sha256"],
                 "historical_identity_complete": has_complete_identity(site),
-                "new_experiment_allowed": has_complete_identity(site) and site["site_id"] not in INCOMPLETE_SITES,
+                "new_experiment_allowed": has_complete_identity(site)
+                and site["site_id"] not in INCOMPLETE_SITES,
                 "access": access.get(site["site_id"], "unspecified"),
                 "loaded_this_run": False,
             }
@@ -101,7 +102,9 @@ def run_gpu00(root: Path, cpu_summary: dict) -> dict:
         "input_release_sha256": cpu_summary["lock_sha256"],
         "audit_sha256": cpu_summary["audit_sha256"],
         "source_hashes": {
-            "work_plan": file_sha256(REPO / "work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md"),
+            "work_plan": file_sha256(
+                REPO / "work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md"
+            ),
             "operators": file_sha256(REPO / "saebase/interventions/operators.py"),
             "model_api": file_sha256(REPO / "saebase/api/model.py"),
             "coverage": file_sha256(REPO / "apps/research-lab/data/coverage.json"),
@@ -198,7 +201,9 @@ def _finite_l2(edited: torch.Tensor, baseline: torch.Tensor) -> float:
     return value
 
 
-def _measure_one(adapter: ModelAdapter, sae: Any, site: ActivationSite, tokens: torch.Tensor) -> dict[str, Any]:
+def _measure_one(
+    adapter: ModelAdapter, sae: Any, site: ActivationSite, tokens: torch.Tensor
+) -> dict[str, Any]:
     started = time.perf_counter()
     torch.cuda.reset_peak_memory_stats()
     adapter.assert_identity_patch(tokens=tokens, site=site)
@@ -212,7 +217,10 @@ def _measure_one(adapter: ModelAdapter, sae: Any, site: ActivationSite, tokens: 
     active = torch.nonzero(snapshot.codes, as_tuple=False).flatten()
     feature_checks: dict[str, Any]
     if active.numel() == 0:
-        feature_checks = {"ablate": "undefined_no_active_feature", "scale": "undefined_no_active_feature"}
+        feature_checks = {
+            "ablate": "undefined_no_active_feature",
+            "scale": "undefined_no_active_feature",
+        }
     else:
         feature = int(torch.argmax(snapshot.codes.abs()).item())
         feature_checks = {}
@@ -222,7 +230,10 @@ def _measure_one(adapter: ModelAdapter, sae: Any, site: ActivationSite, tokens: 
         ):
             patch = apply_condition(sae, snapshot, condition)
             edited = adapter.patch_logits(
-                tokens=tokens, site=site, activation=patch.activation, readout_position=site.position
+                tokens=tokens,
+                site=site,
+                activation=patch.activation,
+                readout_position=site.position,
             )
             feature_checks[name] = {
                 "feature_id": feature,
@@ -236,7 +247,9 @@ def _measure_one(adapter: ModelAdapter, sae: Any, site: ActivationSite, tokens: 
         activation=reconstruction.activation,
         readout_position=site.position,
     )
-    mse = float(torch.mean((snapshot.activation.float() - snapshot.reconstruction.float()) ** 2).item())
+    mse = float(
+        torch.mean((snapshot.activation.float() - snapshot.reconstruction.float()) ** 2).item()
+    )
     variance = float(torch.var(snapshot.activation.float(), unbiased=False).item())
     explained = None if variance == 0 else 1.0 - mse / variance
     nonzero = torch.nonzero(snapshot.codes, as_tuple=False).flatten()
@@ -268,10 +281,16 @@ def _site_by_id(site_id: str) -> dict[str, Any]:
     raise KeyError(site_id)
 
 
-def _run_site(root: Path, site_id: str, records: list[dict[str, Any]], *, interventions: bool) -> dict[str, Any]:
+def _run_site(
+    root: Path, site_id: str, records: list[dict[str, Any]], *, interventions: bool
+) -> dict[str, Any]:
     site = _site_by_id(site_id)
     if not has_complete_identity(site) or site_id in INCOMPLETE_SITES:
-        return {"site_id": site_id, "status": "blocked", "reason": "historical weight hash incomplete"}
+        return {
+            "site_id": site_id,
+            "status": "blocked",
+            "reason": "historical weight hash incomplete",
+        }
     log(root, f"loading {site_id}")
     try:
         model, sae, meta = load_model_and_sae(site["sae"], int(site["layer"]), device="cuda")
@@ -301,7 +320,11 @@ def _run_site(root: Path, site_id: str, records: list[dict[str, Any]], *, interv
             if record["sample_id"] in done_ids:
                 continue
             prompt = record["prompt"]
-            if record.get("task_label") and record["task_label"] in prompt and record["dataset_id"] == "gsm8k":
+            if (
+                record.get("task_label")
+                and record["task_label"] in prompt
+                and record["dataset_id"] == "gsm8k"
+            ):
                 # GSM8K prompts in this corpus include the question, not a copied final label field.
                 pass
             tokens, error = _exact_tokens(model, prompt)
@@ -325,23 +348,38 @@ def _run_site(root: Path, site_id: str, records: list[dict[str, Any]], *, interv
                     started = time.perf_counter()
                     snapshot = capture_features(adapter, sae, site=activation_site, tokens=tokens)
                     nonzero = torch.nonzero(snapshot.codes, as_tuple=False).flatten()
-                    mse = float(torch.mean((snapshot.activation.float() - snapshot.reconstruction.float()) ** 2).item())
+                    mse = float(
+                        torch.mean(
+                            (snapshot.activation.float() - snapshot.reconstruction.float()) ** 2
+                        ).item()
+                    )
                     measured = {
                         "l0": int(nonzero.numel()),
                         "reconstruction_mse": mse,
                         "token_position": int(tokens.shape[1] - 1),
                         "token_ids": [int(token) for token in tokens[0].tolist()],
-                        "nonzero_codes": [[int(i), float(snapshot.codes[int(i)].item())] for i in nonzero.tolist()],
+                        "nonzero_codes": [
+                            [int(i), float(snapshot.codes[int(i)].item())] for i in nonzero.tolist()
+                        ],
                         "capture_seconds": time.perf_counter() - started,
                         "elapsed_seconds": time.perf_counter() - started,
                         "peak_vram_bytes": int(torch.cuda.max_memory_allocated()),
                     }
             except Exception as exc:
-                failures.append({"sample_id": record["sample_id"], "error": type(exc).__name__ + ": " + str(exc).splitlines()[0][:300]})
+                failures.append(
+                    {
+                        "sample_id": record["sample_id"],
+                        "error": type(exc).__name__ + ": " + str(exc).splitlines()[0][:300],
+                    }
+                )
                 if "identity patch" in str(exc):
                     break
                 continue
-            public = {key: value for key, value in measured.items() if key not in {"token_ids", "nonzero_codes"}}
+            public = {
+                key: value
+                for key, value in measured.items()
+                if key not in {"token_ids", "nonzero_codes"}
+            }
             public.update(
                 {
                     "site_id": site_id,
@@ -351,19 +389,25 @@ def _run_site(root: Path, site_id: str, records: list[dict[str, Any]], *, interv
                     "usage_split": record["usage_split"],
                     "loaded_model_sha256": model_sha,
                     "loaded_sae_sha256": sae_sha,
-                    "hash_matches_historical": model_sha == site["model_sha256"] and sae_sha == site["sae_sha256"],
+                    "hash_matches_historical": model_sha == site["model_sha256"]
+                    and sae_sha == site["sae_sha256"],
                     "text_sha256": __import__("hashlib").sha256(prompt.encode("utf-8")).hexdigest(),
-                    "token_ids_sha256": __import__("hashlib").sha256(
-                        __import__("json").dumps(measured["token_ids"]).encode("utf-8")
-                    ).hexdigest(),
+                    "token_ids_sha256": __import__("hashlib")
+                    .sha256(__import__("json").dumps(measured["token_ids"]).encode("utf-8"))
+                    .hexdigest(),
                 }
             )
             ledger.append(public)
             private_row = dict(public)
             private_row["token_ids"] = measured["token_ids"]
             private_row["nonzero_codes"] = measured["nonzero_codes"]
-            with (root / "private" / f"{site_id.replace(':', '_')}_codes.jsonl").open("a", encoding="utf-8") as stream:
-                stream.write(__import__("json").dumps(private_row, ensure_ascii=False, allow_nan=False) + "\n")
+            with (root / "private" / f"{site_id.replace(':', '_')}_codes.jsonl").open(
+                "a", encoding="utf-8"
+            ) as stream:
+                stream.write(
+                    __import__("json").dumps(private_row, ensure_ascii=False, allow_nan=False)
+                    + "\n"
+                )
     finally:
         del model, sae, adapter
         gc.collect()
@@ -372,7 +416,9 @@ def _run_site(root: Path, site_id: str, records: list[dict[str, Any]], *, interv
     skipped = sum(1 for record in records if record["sample_id"] in done_ids)
     return {
         "site_id": site_id,
-        "status": "passed" if (ledger or skipped) and not any("identity patch" in row["error"] for row in failures) else "failed",
+        "status": "passed"
+        if (ledger or skipped) and not any("identity patch" in row["error"] for row in failures)
+        else "failed",
         "hook": site["hook"],
         "layer": site["layer"],
         "dtype": dtype,
@@ -381,10 +427,13 @@ def _run_site(root: Path, site_id: str, records: list[dict[str, Any]], *, interv
         "loaded_sae_sha256": sae_sha,
         "historical_model_sha256": site["model_sha256"],
         "historical_sae_sha256": site["sae_sha256"],
-        "hash_matches_historical": model_sha == site["model_sha256"] and sae_sha == site["sae_sha256"],
+        "hash_matches_historical": model_sha == site["model_sha256"]
+        and sae_sha == site["sae_sha256"],
         "measured": len(ledger) + skipped,
         "failed": failures,
-        "mean_capture_seconds": (sum(capture_times) / len(capture_times)) if capture_times else None,
+        "mean_capture_seconds": (sum(capture_times) / len(capture_times))
+        if capture_times
+        else None,
         "ledger": ledger,
         "tokenizer_report": tokenizer_report,
     }
@@ -396,14 +445,21 @@ def run_gpu01(root: Path) -> dict:
     results = []
     for site_id in (SMALL_SITE, DEEP_SITE):
         existing_path = package / f"{site_id.replace(':', '_')}.json"
-        existing = json_loads(existing_path.read_text(encoding="utf-8")) if existing_path.is_file() else None
+        existing = (
+            json_loads(existing_path.read_text(encoding="utf-8"))
+            if existing_path.is_file()
+            else None
+        )
         if existing and existing.get("status") == "passed" and existing.get("measured") == 20:
             results.append(existing)
             log(root, f"GPU-01 {site_id} reused passed pilot")
             continue
         results.append(_run_site(root, site_id, records, interventions=True))
         write_json(existing_path, results[-1])
-        log(root, f"GPU-01 {site_id} status={results[-1]['status']} measured={results[-1].get('measured')}")
+        log(
+            root,
+            f"GPU-01 {site_id} status={results[-1]['status']} measured={results[-1].get('measured')}",
+        )
     datasets_ok = set()
     for result in results:
         if result.get("status") != "passed":
@@ -419,7 +475,9 @@ def run_gpu01(root: Path) -> dict:
         "go": go,
         "small_site_passed": small_ok,
         "deep_site_passed": deep_ok,
-        "results": [{key: value for key, value in row.items() if key != "ledger"} for row in results],
+        "results": [
+            {key: value for key, value in row.items() if key != "ledger"} for row in results
+        ],
     }
     write_json(package / "pilot_20" / "manifest.json", manifest)
     write_json(package / "pilot_20" / "ledger.json", results)
@@ -463,7 +521,10 @@ def _synthetic_curve(codes: dict[str, Any], synthetic: dict[str, Any]) -> dict[s
             "not_a_learned_sae_result": True,
         }
     except Exception as exc:
-        return {"status": "blocked", "error": type(exc).__name__ + ": " + str(exc).splitlines()[0][:300]}
+        return {
+            "status": "blocked",
+            "error": type(exc).__name__ + ": " + str(exc).splitlines()[0][:300],
+        }
 
 
 def run_gpu07(root: Path, pilot: dict) -> dict:
@@ -479,7 +540,9 @@ def run_gpu07(root: Path, pilot: dict) -> dict:
     to_saebase_design(synthetic)
     to_saebase_design(real)
     codes = synthetic_reference_codes(synthetic)
-    write_candidate("synthetic_known_factor_control", package / "synthetic_known_factor_control.json")
+    write_candidate(
+        "synthetic_known_factor_control", package / "synthetic_known_factor_control.json"
+    )
     write_candidate("real_model_six_factor_design", package / "real_model_six_factor_design.json")
     write_json(package / "synthetic_reference_codes.json", codes)
     localize_status: dict[str, Any] = {"synthetic_curve": "not_run", "real_model_curve": "not_run"}
@@ -514,7 +577,10 @@ def run_gpu07(root: Path, pilot: dict) -> dict:
         if measured.get("measured") == 64:
             try:
                 import numpy as np
-                from saebase.integrations.localization import LocalizationGrid, evaluate_localization
+                from saebase.integrations.localization import (
+                    LocalizationGrid,
+                    evaluate_localization,
+                )
 
                 private = root / "private" / f"{SMALL_SITE.replace(':', '_')}_codes.jsonl"
                 by_id: dict[str, list] = {}
@@ -529,7 +595,9 @@ def run_gpu07(root: Path, pilot: dict) -> dict:
                         if pairs:
                             width = max(width, max(pair[0] for pair in pairs) + 1)
                 if width < 1 or len(by_id) != 64:
-                    raise RuntimeError("controlled grid codes are incomplete or have no active features")
+                    raise RuntimeError(
+                        "controlled grid codes are incomplete or have no active features"
+                    )
                 ordered = []
                 for state in real["states"]:
                     vector = np.zeros(width, dtype=np.float64)
@@ -557,7 +625,10 @@ def run_gpu07(root: Path, pilot: dict) -> dict:
                     "error": type(exc).__name__ + ": " + str(exc).splitlines()[0][:300],
                 }
     else:
-        localize_status["real_model_capture"] = {"status": "blocked", "reason": "small-site pilot did not pass"}
+        localize_status["real_model_capture"] = {
+            "status": "blocked",
+            "reason": "small-site pilot did not pass",
+        }
     write_json(package / "localize_status.json", localize_status)
     log(root, "GPU-07 controlled grid recorded")
     return localize_status

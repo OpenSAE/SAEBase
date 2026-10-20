@@ -84,7 +84,7 @@ def run_gpu03(root: Path) -> dict:
 
 
 def run_skipped(root: Path, gpu02: dict) -> dict[str, dict]:
-    reason = gpu02.get("reason") or "Full 6-site or 3-site populations were not measured."
+    del gpu02
     payloads = {
         "GPU-04": {
             "status": "partial",
@@ -107,7 +107,10 @@ def run_skipped(root: Path, gpu02: dict) -> dict[str, dict]:
 
 
 def _store_slots(root: Path) -> list[Path]:
-    return [root / "GPU-08" / name for name in ("feature_store", "feature_store_full", "feature_store_v3")]
+    return [
+        root / "GPU-08" / name
+        for name in ("feature_store", "feature_store_full", "feature_store_v3")
+    ]
 
 
 def _store_taken(path: Path) -> bool:
@@ -190,7 +193,10 @@ def run_gpu08(root: Path) -> dict:
                 "error": type(exc).__name__ + ": " + str(exc).splitlines()[0][:300],
                 "rejected_or_unmatched_rows": rejected,
             }
-    write_json(root / "GPU-08" / "recomputed_identity_ledger.json", {"rows": len(recomputed), "not_historical_matches": True})
+    write_json(
+        root / "GPU-08" / "recomputed_identity_ledger.json",
+        {"rows": len(recomputed), "not_historical_matches": True},
+    )
     store_status["recomputed_identity_rows_not_inserted"] = len(recomputed)
     write_json(root / "GPU-08" / "metric_ledger.json", store_status)
     return store_status
@@ -237,7 +243,9 @@ def _extra_negative_checks(root: Path) -> dict[str, Any]:
         "status_hides_script": "<script>" not in json.dumps(status),
         "status_hides_traversal_path": "etc/passwd" not in json.dumps(status),
         "no_file_written_outside_release": not outside.exists(),
-        "ttl_reap_does_not_mark_success": claim is not None and (status or {}).get("status") != "succeeded" and reaped["failed"] + reaped["requeued"] >= 1,
+        "ttl_reap_does_not_mark_success": claim is not None
+        and (status or {}).get("status") != "succeeded"
+        and reaped["failed"] + reaped["requeued"] >= 1,
     }
 
 
@@ -258,7 +266,9 @@ def run_gpu09(root: Path) -> dict:
     checks: dict[str, Any] = {}
     first = queue.enqueue(owner="owner-a-lab", client_key="clientkeyA1", spec=spec, now=1_000.0)
     second = queue.enqueue(owner="owner-a-lab", client_key="clientkeyA1", spec=spec, now=1_001.0)
-    checks["idempotent_enqueue"] = second["deduplicated"] is True and second["job_id"] == first["job_id"]
+    checks["idempotent_enqueue"] = (
+        second["deduplicated"] is True and second["job_id"] == first["job_id"]
+    )
     other = queue.enqueue(
         owner="owner-b-lab",
         client_key="clientkeyB1",
@@ -268,9 +278,7 @@ def run_gpu09(root: Path) -> dict:
     claim_a = queue.claim(worker_id="workerA", now=1_010.0, lease_seconds=30)
     claim_b = queue.claim(worker_id="workerB", now=1_011.0, lease_seconds=30)
     checks["two_workers_receive_distinct_jobs"] = (
-        claim_a is not None
-        and claim_b is not None
-        and claim_a["job_id"] != claim_b["job_id"]
+        claim_a is not None and claim_b is not None and claim_a["job_id"] != claim_b["job_id"]
     )
     checks["stale_attempt_rejected"] = (
         queue.heartbeat(
@@ -281,8 +289,12 @@ def run_gpu09(root: Path) -> dict:
         )
         is False
     )
-    checks["owner_cancel"] = queue.cancel(job_id=claim_a["job_id"], owner="owner-a-lab", now=1_020.0) is True
-    checks["stranger_cannot_read_status"] = queue.status(job_id=other["job_id"], owner="owner-c-lab") is None
+    checks["owner_cancel"] = (
+        queue.cancel(job_id=claim_a["job_id"], owner="owner-a-lab", now=1_020.0) is True
+    )
+    checks["stranger_cannot_read_status"] = (
+        queue.status(job_id=other["job_id"], owner="owner-c-lab") is None
+    )
     expired = queue.reap_expired(now=1_100.0, max_attempts=3)
     checks["expired_lease_not_marked_success"] = expired["failed"] + expired["requeued"] >= 0
     try:

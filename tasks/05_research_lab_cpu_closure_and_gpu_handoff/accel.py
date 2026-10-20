@@ -61,7 +61,9 @@ def probe_vllm(root: Path) -> dict:
     text = (probe.stdout or "") + "\n" + (probe.stderr or "")
     mentions_torch_removal = "uninstall" in text.lower() and "torch" in text.lower()
     confirmed_same_torch = (not mentions_torch_removal) and any(
-        torch_version in line and "torch" in line.lower() and ("install" in line.lower() or line.strip().startswith("+"))
+        torch_version in line
+        and "torch" in line.lower()
+        and ("install" in line.lower() or line.strip().startswith("+"))
         for line in text.splitlines()
     )
     payload = {
@@ -74,7 +76,9 @@ def probe_vllm(root: Path) -> dict:
     if installed:
         payload["decision"] = "already_present_generation_only"
     elif probe.returncode == 0 and confirmed_same_torch:
-        install = subprocess.run(["uv", "pip", "install", "vllm"], capture_output=True, text=True, timeout=1800)
+        install = subprocess.run(
+            ["uv", "pip", "install", "vllm"], capture_output=True, text=True, timeout=1800
+        )
         payload["install_returncode"] = install.returncode
         if install.returncode == 0 and importlib.metadata.version("torch") == torch_version:
             payload["decision"] = "installed_same_torch"

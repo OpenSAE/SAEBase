@@ -13,7 +13,18 @@ from typing import Any
 REPO = Path(__file__).resolve().parents[2]
 LAB = REPO / "apps" / "research-lab"
 POINTER = REPO / "experiments" / "research-lab" / "active_release.txt"
-PACKAGES = ("GPU-00", "GPU-01", "GPU-02", "GPU-03", "GPU-04", "GPU-05", "GPU-06", "GPU-07", "GPU-08", "GPU-09")
+PACKAGES = (
+    "GPU-00",
+    "GPU-01",
+    "GPU-02",
+    "GPU-03",
+    "GPU-04",
+    "GPU-05",
+    "GPU-06",
+    "GPU-07",
+    "GPU-08",
+    "GPU-09",
+)
 INCOMPLETE_SITES = {
     "pythia410m:pythia410m_mlp_topk:L4",
     "qwen3_1_7b_base:qwen3_1_7b_base_resid_w32k:L7",
@@ -47,7 +58,7 @@ def release_root() -> Path:
 def free_gib(path: Path) -> float:
     import shutil
 
-    return shutil.disk_usage(path).free / (1024 ** 3)
+    return shutil.disk_usage(path).free / (1024**3)
 
 
 def apply_env(root: Path) -> None:

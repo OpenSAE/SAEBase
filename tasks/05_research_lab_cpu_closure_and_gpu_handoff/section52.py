@@ -82,7 +82,9 @@ def _residual(name: str, actual: torch.Tensor, reference: torch.Tensor) -> dict[
     }
 
 
-def _diagnostic(sae: Any, snapshot: Any, indices: list[int], adapter: Any, tokens: torch.Tensor, site: Any) -> dict:
+def _diagnostic(
+    sae: Any, snapshot: Any, indices: list[int], adapter: Any, tokens: torch.Tensor, site: Any
+) -> dict:
     from saebase.api.features import edit_features
 
     hidden = snapshot.activation
@@ -97,7 +99,11 @@ def _diagnostic(sae: Any, snapshot: Any, indices: list[int], adapter: Any, token
         pair = indices[:2]
         actual = edit_features(sae, snapshot, replacements={i: 0.0 for i in pair}).activation
         additive = hidden + singles[0] + singles[1]
-        rounded = hidden.to(torch.bfloat16) + singles[0].to(torch.bfloat16) + singles[1].to(torch.bfloat16)
+        rounded = (
+            hidden.to(torch.bfloat16)
+            + singles[0].to(torch.bfloat16)
+            + singles[1].to(torch.bfloat16)
+        )
         rows.append(_residual("pair", actual, additive))
         rows.append(_residual("pair_bf16_reference", actual, rounded.float()))
         full = edit_features(sae, snapshot, replacements={i: 0.0 for i in indices}).activation
@@ -111,7 +117,9 @@ def _diagnostic(sae: Any, snapshot: Any, indices: list[int], adapter: Any, token
         rows.append(_residual("all_selected", full, additive_full))
     baseline = adapter.forward_logits(tokens=tokens, readout_position=-1)
     replay = adapter.patch_logits(tokens=tokens, site=site, activation=hidden, readout_position=-1)
-    replay_again = adapter.patch_logits(tokens=tokens, site=site, activation=hidden, readout_position=-1)
+    replay_again = adapter.patch_logits(
+        tokens=tokens, site=site, activation=hidden, readout_position=-1
+    )
     identity_gap = float((baseline.float() - replay.float()).abs().max().item())
     repeat_gap = float((replay.float() - replay_again.float()).abs().max().item())
     return {
@@ -131,7 +139,9 @@ def _position(length: int, position: int) -> int:
     return position
 
 
-def _batch_scalars(adapter: Any, tokens: torch.Tensor, site: Any, activations: list[torch.Tensor], target: int) -> list[float]:
+def _batch_scalars(
+    adapter: Any, tokens: torch.Tensor, site: Any, activations: list[torch.Tensor], target: int
+) -> list[float]:
     model = adapter.model
     if not callable(getattr(model, "run_with_hooks", None)):
         raise RuntimeError("batch path requires run_with_hooks")
@@ -146,7 +156,9 @@ def _batch_scalars(adapter: Any, tokens: torch.Tensor, site: Any, activations: l
         if hidden.ndim != 3 or hidden.shape[0] != batch or hidden.shape[1] != ids.shape[1]:
             raise RuntimeError("batched hook activation does not match the repeated tokens")
         patched = hidden.clone()
-        patched[torch.arange(batch, device=hidden.device), position] = stacked.to(device=hidden.device, dtype=hidden.dtype)
+        patched[torch.arange(batch, device=hidden.device), position] = stacked.to(
+            device=hidden.device, dtype=hidden.dtype
+        )
         return patched
 
     output = model.run_with_hooks(ids, fwd_hooks=[(site.hook_name, replace)])
@@ -172,7 +184,9 @@ def _responses(
 
     activations = []
     for mask in masks:
-        replacements = {int(feature): 0.0 for feature, keep in zip(selected, mask.tolist()) if not keep}
+        replacements = {
+            int(feature): 0.0 for feature, keep in zip(selected, mask.tolist()) if not keep
+        }
         if replacements:
             activations.append(edit_features(sae, snapshot, replacements=replacements).activation)
         else:
@@ -180,7 +194,9 @@ def _responses(
     sequential = []
     check = min(4, len(activations))
     for activation in activations[:check]:
-        logits = adapter.patch_logits(tokens=tokens, site=site, activation=activation, readout_position=-1)
+        logits = adapter.patch_logits(
+            tokens=tokens, site=site, activation=activation, readout_position=-1
+        )
         sequential.append(float(logits[target].item()))
     note = {"mode": "sequential_full_prefix", "kv_cache": False, "parity": "not_used"}
     use_batch = False
@@ -212,10 +228,14 @@ def _responses(
         while cursor < len(activations):
             chunk = activations[cursor : cursor + 4]
             try:
-                values[cursor : cursor + len(chunk)] = _batch_scalars(adapter, tokens, site, chunk, target)
+                values[cursor : cursor + len(chunk)] = _batch_scalars(
+                    adapter, tokens, site, chunk, target
+                )
             except RuntimeError:
                 for offset, activation in enumerate(chunk):
-                    logits = adapter.patch_logits(tokens=tokens, site=site, activation=activation, readout_position=-1)
+                    logits = adapter.patch_logits(
+                        tokens=tokens, site=site, activation=activation, readout_position=-1
+                    )
                     values[cursor + offset] = float(logits[target].item())
                 note["mode"] = "sequential_full_prefix"
                 note["parity"] = "batch_runtime_fallback"
@@ -223,7 +243,9 @@ def _responses(
     else:
         values[:check] = sequential
         for index, activation in enumerate(activations[check:], start=check):
-            logits = adapter.patch_logits(tokens=tokens, site=site, activation=activation, readout_position=-1)
+            logits = adapter.patch_logits(
+                tokens=tokens, site=site, activation=activation, readout_position=-1
+            )
             values[index] = float(logits[target].item())
     return values, note
 
@@ -239,7 +261,11 @@ def _sar_summary(root: Path, rows: list[dict]) -> None:
             failed += 1
         key = f"{row.get('status')}:K{row.get('k')}"
         counts[key] = counts.get(key, 0) + 1
-    status = "passed" if files >= 1500 and failed == 0 and any(key.startswith("passed:") for key in counts) else "partial"
+    status = (
+        "passed"
+        if files >= 1500 and failed == 0 and any(key.startswith("passed:") for key in counts)
+        else "partial"
+    )
     payload = {
         "status": status,
         "protocol": PROTOCOL,
@@ -283,9 +309,15 @@ def run_sar_v2(root: Path, sources: dict) -> dict:
         folder = root / "GPU-05" / "sar_v2" / _safe(site_id)
         folder.mkdir(parents=True, exist_ok=True)
         if site_id not in passed:
-            site_rows.append({"site_id": site_id, "status": "blocked", "reason": "base capture is absent"})
+            site_rows.append(
+                {"site_id": site_id, "status": "blocked", "reason": "base capture is absent"}
+            )
             continue
-        pending = [record for record in records if not (folder / f"{_safe(record['sample_id'])}.json").is_file()]
+        pending = [
+            record
+            for record in records
+            if not (folder / f"{_safe(record['sample_id'])}.json").is_file()
+        ]
         existing = len(records) - len(pending)
         if not pending:
             site_rows.append({"site_id": site_id, "status": "measured", "files": existing})
@@ -304,7 +336,14 @@ def run_sar_v2(root: Path, sources: dict) -> dict:
                 tokens, error = _exact_tokens(model, record["prompt"])
                 destination = folder / f"{_safe(record['sample_id'])}.json"
                 if error or tokens is None:
-                    _atomic(destination, {"sample_id": record["sample_id"], "status": "failed", "error": error or "tokens"})
+                    _atomic(
+                        destination,
+                        {
+                            "sample_id": record["sample_id"],
+                            "status": "failed",
+                            "error": error or "tokens",
+                        },
+                    )
                     continue
                 snapshot = capture_features(adapter, sae, site=activation, tokens=tokens)
                 active = int(torch.count_nonzero(snapshot.codes).item())
@@ -319,35 +358,64 @@ def run_sar_v2(root: Path, sources: dict) -> dict:
                     "active_features": active,
                 }
                 if chosen is None:
-                    _atomic(destination, {**base, "status": "undefined", "reason": "fewer than 2 editable features"})
+                    _atomic(
+                        destination,
+                        {**base, "status": "undefined", "reason": "fewer than 2 editable features"},
+                    )
                     continue
                 k, m_count, n_fit, _held = chosen
-                selected = torch.argsort(snapshot.codes.abs(), descending=True, stable=True)[:k].tolist()
+                selected = torch.argsort(snapshot.codes.abs(), descending=True, stable=True)[
+                    :k
+                ].tolist()
                 if not diagnostic_done:
                     diag = _diagnostic(sae, snapshot, selected, adapter, tokens, activation)
                     diag["sample_id"] = record["sample_id"]
                     diag["site_id"] = site_id
-                    write_json(root / "GPU-05" / "sar_v2" / "diagnostic.json", {"prompts": [diag], "protocol": PROTOCOL})
+                    write_json(
+                        root / "GPU-05" / "sar_v2" / "diagnostic.json",
+                        {"prompts": [diag], "protocol": PROTOCOL},
+                    )
                     diagnostic_done = True
                 elif (root / "GPU-05" / "sar_v2" / "diagnostic.json").is_file():
                     current = _load(root / "GPU-05" / "sar_v2" / "diagnostic.json")
-                    if len(current.get("prompts", [])) < 2 and current.get("prompts", [{}])[0].get("sample_id") != record["sample_id"]:
+                    if (
+                        len(current.get("prompts", [])) < 2
+                        and current.get("prompts", [{}])[0].get("sample_id") != record["sample_id"]
+                    ):
                         diag = _diagnostic(sae, snapshot, selected, adapter, tokens, activation)
                         diag["sample_id"] = record["sample_id"]
                         diag["site_id"] = site_id
                         current.setdefault("prompts", []).append(diag)
                         write_json(root / "GPU-05" / "sar_v2" / "diagnostic.json", current)
                 baseline = adapter.forward_logits(tokens=tokens, readout_position=-1)
-                replay = adapter.patch_logits(tokens=tokens, site=activation, activation=snapshot.activation, readout_position=-1)
+                replay = adapter.patch_logits(
+                    tokens=tokens,
+                    site=activation,
+                    activation=snapshot.activation,
+                    readout_position=-1,
+                )
                 if not torch.allclose(baseline.float(), replay.float(), rtol=1e-4, atol=1e-4):
                     gap = float((baseline.float() - replay.float()).abs().max().item())
-                    _atomic(destination, {**base, "status": "failed", "error": f"identity_patch_abs_max={gap}"})
+                    _atomic(
+                        destination,
+                        {**base, "status": "failed", "error": f"identity_patch_abs_max={gap}"},
+                    )
                     continue
                 target = int(torch.argmax(baseline).item())
-                masks, fit, held = paper.coalitions(K=k, M=m_count, p=0.5, n_fit=n_fit, seed=20261018)
+                masks, fit, held = paper.coalitions(
+                    K=k, M=m_count, p=0.5, n_fit=n_fit, seed=20261018
+                )
                 masks = np.asarray(masks, dtype=bool)
                 responses, accel = _responses(
-                    adapter, sae, snapshot, activation, tokens, selected, masks, target, allow_batch=batch_ok.get(site_id, True)
+                    adapter,
+                    sae,
+                    snapshot,
+                    activation,
+                    tokens,
+                    selected,
+                    masks,
+                    target,
+                    allow_batch=batch_ok.get(site_id, True),
                 )
                 batch_ok[site_id] = accel.get("mode") == "batched_hook"
                 if float(np.nanstd(responses)) == 0.0:
@@ -363,7 +431,13 @@ def run_sar_v2(root: Path, sources: dict) -> dict:
                         },
                     )
                     continue
-                metrics = paper.sar(responses, masks, np.asarray(fit), np.asarray(held), g_full=float(baseline[target].item()))
+                metrics = paper.sar(
+                    responses,
+                    masks,
+                    np.asarray(fit),
+                    np.asarray(held),
+                    g_full=float(baseline[target].item()),
+                )
                 digest = _atomic(
                     destination,
                     {
@@ -386,12 +460,17 @@ def run_sar_v2(root: Path, sources: dict) -> dict:
                 if finished % 10 == 0:
                     rate = (time.time() - started) / finished
                     remaining = rate * (len(pending) - finished)
-                    log(root, f"SAR v2 {site_id} done={existing + finished} sha256={digest[:12]} eta_s={remaining:.0f}")
+                    log(
+                        root,
+                        f"SAR v2 {site_id} done={existing + finished} sha256={digest[:12]} eta_s={remaining:.0f}",
+                    )
         finally:
             del model, sae, adapter
             gc.collect()
             torch.cuda.empty_cache()
-        site_rows.append({"site_id": site_id, "status": "measured", "files": len(list(folder.glob('*.json')))})
+        site_rows.append(
+            {"site_id": site_id, "status": "measured", "files": len(list(folder.glob("*.json")))}
+        )
         _sar_summary(root, site_rows)
     _sar_summary(root, site_rows)
     return {"sites": site_rows}
@@ -439,7 +518,12 @@ def _aligned(model: Any, base_text: str, variant_text: str) -> dict[str, Any]:
         policy = "exact_token_span_v1"
         boundary_sensitive = False
         try:
-            located = input_anchor(base_text, variant_text, anchor=base_text, offset_mapping=[tuple(item) for item in offsets])
+            located = input_anchor(
+                base_text,
+                variant_text,
+                anchor=base_text,
+                offset_mapping=[tuple(item) for item in offsets],
+            )
             positions = located.get("token_positions") or []
             anchor = int(positions[-1]) if positions else None
             reason = None if anchor is not None else "anchor_not_located"
@@ -463,8 +547,12 @@ def _aligned(model: Any, base_text: str, variant_text: str) -> dict[str, Any]:
             model_index = None
             reason = "model_index_outside_sequence"
         return {
-            "offset_token_ids_sha256": hashlib.sha256(json.dumps(plain).encode("utf-8")).hexdigest(),
-            "model_token_ids_sha256": hashlib.sha256(json.dumps(actual).encode("utf-8")).hexdigest(),
+            "offset_token_ids_sha256": hashlib.sha256(
+                json.dumps(plain).encode("utf-8")
+            ).hexdigest(),
+            "model_token_ids_sha256": hashlib.sha256(
+                json.dumps(actual).encode("utf-8")
+            ).hexdigest(),
             "offset_len": len(plain),
             "model_len": len(actual),
             "offsets": offsets,
@@ -499,7 +587,15 @@ def _legacy_rss(root: Path) -> dict[str, int]:
 def run_rss_v2(root: Path, sources: dict) -> dict:
     import gc
 
-    from analyses import DEEP_SITES, _coverage_ok, _gpu02_passed, _load_pair, _paper, _records, _site
+    from analyses import (
+        DEEP_SITES,
+        _coverage_ok,
+        _gpu02_passed,
+        _load_pair,
+        _paper,
+        _records,
+        _site,
+    )
     from backend.core import read_json
     from backend.transforms import build_variants
     from saebase.api import ActivationSite, ModelAdapter
@@ -521,11 +617,22 @@ def run_rss_v2(root: Path, sources: dict) -> dict:
             site_rows.append({"site_id": site_id, "status": "blocked"})
             continue
         if not any(
-            _setting_open(name, (_load(folder / f"{_safe(record['sample_id'])}.json").get("settings") or {}).get(name))
+            _setting_open(
+                name,
+                (_load(folder / f"{_safe(record['sample_id'])}.json").get("settings") or {}).get(
+                    name
+                ),
+            )
             for record in records
             for name in ("local_format", "instruction_wrapper", "context_wrapper")
         ):
-            site_rows.append({"site_id": site_id, "files": len(list(folder.glob("*.json"))), "status": "complete"})
+            site_rows.append(
+                {
+                    "site_id": site_id,
+                    "files": len(list(folder.glob("*.json"))),
+                    "status": "complete",
+                }
+            )
             continue
         site = _site(site_id)
         model, sae, _meta = _load_pair(site)
@@ -537,7 +644,11 @@ def run_rss_v2(root: Path, sources: dict) -> dict:
                 destination = folder / f"{_safe(record['sample_id'])}.json"
                 current = _load(destination)
                 settings = current.get("settings") or {}
-                missing = [name for name in ("local_format", "instruction_wrapper", "context_wrapper") if _setting_open(name, settings.get(name))]
+                missing = [
+                    name
+                    for name in ("local_format", "instruction_wrapper", "context_wrapper")
+                    if _setting_open(name, settings.get(name))
+                ]
                 if not missing:
                     done += 1
                     continue
@@ -551,7 +662,9 @@ def run_rss_v2(root: Path, sources: dict) -> dict:
                 )
                 clean_align = _aligned(model, record["prompt"], record["prompt"])
                 if not probe_path.is_file():
-                    variant = next(row for row in built["variants"] if row["setting"] == "local_format")
+                    variant = next(
+                        row for row in built["variants"] if row["setting"] == "local_format"
+                    )
                     wrapped = _aligned(model, record["prompt"], variant["text"])
                     write_json(
                         probe_path,
@@ -568,21 +681,37 @@ def run_rss_v2(root: Path, sources: dict) -> dict:
                     for name in missing:
                         settings[name] = {"status": "invalid", "reason": "clean_anchor"}
                 else:
-                    clean_site = ActivationSite(int(site["layer"]), site["hook"], position=int(clean_align["model_index"]))
+                    clean_site = ActivationSite(
+                        int(site["layer"]), site["hook"], position=int(clean_align["model_index"])
+                    )
                     clean_ids = adapter.tokens(prompt=record["prompt"])
-                    clean_codes = capture_features(adapter, sae, tokens=clean_ids, site=clean_site).codes.detach().cpu().numpy()
+                    clean_codes = (
+                        capture_features(adapter, sae, tokens=clean_ids, site=clean_site)
+                        .codes.detach()
+                        .cpu()
+                        .numpy()
+                    )
                     for name in missing:
                         variants = [row for row in built["variants"] if row["setting"] == name]
                         selection = []
                         held = []
                         invalid = []
                         for variant in variants:
-                            role_ok = (variant["variant_role"] == "selection" and variant["realization"] == 0) or (
-                                variant["variant_role"] == "held_out" and variant["realization"] != 0
+                            role_ok = (
+                                variant["variant_role"] == "selection"
+                                and variant["realization"] == 0
+                            ) or (
+                                variant["variant_role"] == "held_out"
+                                and variant["realization"] != 0
                             )
                             aligned = _aligned(model, record["prompt"], variant["text"])
                             if not role_ok or aligned["model_index"] is None:
-                                invalid.append({"variant_id": variant["variant_id"], "reason": aligned.get("reason") or "role_rejected"})
+                                invalid.append(
+                                    {
+                                        "variant_id": variant["variant_id"],
+                                        "reason": aligned.get("reason") or "role_rejected",
+                                    }
+                                )
                                 continue
                             bucket = selection if variant["variant_role"] == "selection" else held
                             bucket.append((variant, aligned))
@@ -601,19 +730,41 @@ def run_rss_v2(root: Path, sources: dict) -> dict:
                         held_codes = []
                         for variant, aligned in selection:
                             ids = adapter.tokens(prompt=variant["text"])
-                            chosen = ActivationSite(clean_site.layer, clean_site.hook_name, position=int(aligned["model_index"]))
-                            selection_codes.append(capture_features(adapter, sae, tokens=ids, site=chosen).codes.detach().cpu().numpy())
+                            chosen = ActivationSite(
+                                clean_site.layer,
+                                clean_site.hook_name,
+                                position=int(aligned["model_index"]),
+                            )
+                            selection_codes.append(
+                                capture_features(adapter, sae, tokens=ids, site=chosen)
+                                .codes.detach()
+                                .cpu()
+                                .numpy()
+                            )
                         for variant, aligned in held:
                             ids = adapter.tokens(prompt=variant["text"])
-                            chosen = ActivationSite(clean_site.layer, clean_site.hook_name, position=int(aligned["model_index"]))
-                            held_codes.append(capture_features(adapter, sae, tokens=ids, site=chosen).codes.detach().cpu().numpy())
+                            chosen = ActivationSite(
+                                clean_site.layer,
+                                clean_site.hook_name,
+                                position=int(aligned["model_index"]),
+                            )
+                            held_codes.append(
+                                capture_features(adapter, sae, tokens=ids, site=chosen)
+                                .codes.detach()
+                                .cpu()
+                                .numpy()
+                            )
                         features = RSSFeatures(
                             clean_codes=clean_codes.astype(np.float64, copy=True),
                             selection_codes=np.stack(selection_codes).astype(np.float64),
                             held_out_codes=np.stack(held_codes).astype(np.float64),
-                            selection_changes=np.stack(selection_codes).astype(np.float64) - clean_codes.astype(np.float64),
-                            held_out_changes=np.stack(held_codes).astype(np.float64) - clean_codes.astype(np.float64),
-                            selection_positions=tuple(int(item[1]["model_index"]) for item in selection),
+                            selection_changes=np.stack(selection_codes).astype(np.float64)
+                            - clean_codes.astype(np.float64),
+                            held_out_changes=np.stack(held_codes).astype(np.float64)
+                            - clean_codes.astype(np.float64),
+                            selection_positions=tuple(
+                                int(item[1]["model_index"]) for item in selection
+                            ),
                             held_out_positions=tuple(int(item[1]["model_index"]) for item in held),
                             clean_position=int(clean_align["model_index"]),
                             site=clean_site,
@@ -626,7 +777,8 @@ def run_rss_v2(root: Path, sources: dict) -> dict:
                             "support": support,
                             "mean_rss": None if mean != mean else float(mean),
                             "held_out_rate_mean": None
-                            if evaluated.held_out_rates.size == 0 or not np.isfinite(evaluated.held_out_rates).all()
+                            if evaluated.held_out_rates.size == 0
+                            or not np.isfinite(evaluated.held_out_rates).all()
                             else float(np.nanmean(evaluated.held_out_rates)),
                             "selection_variant_ids": [item[0]["variant_id"] for item in selection],
                             "held_out_variant_ids": [item[0]["variant_id"] for item in held],
@@ -650,12 +802,15 @@ def run_rss_v2(root: Path, sources: dict) -> dict:
                 done += 1
                 if done % 10 == 0:
                     rate = max((time.time() - started) / max(done, 1), 0.001)
-                    log(root, f"RSS v2 {site_id} done={done} sha256={digest[:12]} eta_s={rate * (len(records) - done):.0f}")
+                    log(
+                        root,
+                        f"RSS v2 {site_id} done={done} sha256={digest[:12]} eta_s={rate * (len(records) - done):.0f}",
+                    )
         finally:
             del model, sae, adapter
             gc.collect()
             torch.cuda.empty_cache()
-        site_rows.append({"site_id": site_id, "files": len(list(folder.glob('*.json')))})
+        site_rows.append({"site_id": site_id, "files": len(list(folder.glob("*.json")))})
     coverage = _coverage(root, site_rows)
     write_json(root / "GPU-06" / "coverage_v2.json", coverage)
     write_json(
@@ -688,7 +843,10 @@ def _coverage(root: Path, site_rows: list[dict]) -> dict[str, Any]:
         row = _load(path)
         groups += 1
         settings = row.get("settings") or {}
-        if all(settings.get(name, {}).get("status") in {"measured", "undefined"} for name in ("local_format", "instruction_wrapper", "context_wrapper")):
+        if all(
+            settings.get(name, {}).get("status") in {"measured", "undefined"}
+            for name in ("local_format", "instruction_wrapper", "context_wrapper")
+        ):
             complete += 1
         unique.add((path.parent.name, row.get("sample_id"), "clean"))
         for name, setting in settings.items():
@@ -746,7 +904,10 @@ def _identities(root: Path) -> None:
                     "measured": row.get("measured"),
                 }
             )
-    write_json(root / "GPU-02" / "new_run_identity.json", {"rows": rows, "inserted_into_old_hash_index": False})
+    write_json(
+        root / "GPU-02" / "new_run_identity.json",
+        {"rows": rows, "inserted_into_old_hash_index": False},
+    )
 
 
 def _cards(root: Path) -> dict:
@@ -778,7 +939,13 @@ def _cards(root: Path) -> dict:
                 counts[feature] += 1
                 previous = peak.get(feature)
                 if previous is None or abs(float(value)) > previous[0]:
-                    peak[feature] = (abs(float(value)), row["sample_id"], position, selected, row.get("token_ids_sha256"))
+                    peak[feature] = (
+                        abs(float(value)),
+                        row["sample_id"],
+                        position,
+                        selected,
+                        row.get("token_ids_sha256"),
+                    )
         for feature, count in counts.most_common(50):
             activation, sample_id, position, selected, token_sha = peak[feature]
             cards.append(
@@ -795,7 +962,13 @@ def _cards(root: Path) -> dict:
                     "text": PUBLIC_TEXT,
                 }
             )
-    payload = {"card_count": len(cards), "target": 300, "sites": sorted(by_site), "cards": cards, "text": PUBLIC_TEXT}
+    payload = {
+        "card_count": len(cards),
+        "target": 300,
+        "sites": sorted(by_site),
+        "cards": cards,
+        "text": PUBLIC_TEXT,
+    }
     write_json(root / "GPU-03" / "deep_site_cards.json", payload)
     return payload
 
@@ -827,7 +1000,9 @@ def _generation(root: Path) -> dict:
         snapshot = capture_features(adapter, sae, tokens=tokens, site=activation)
         feature = int(torch.argmax(snapshot.codes.abs()).item())
         edited = edit_features(sae, snapshot, replacements={feature: 0.0})
-        patched = adapter.patch_logits(tokens=tokens, site=activation, activation=edited.activation, readout_position=-1)
+        patched = adapter.patch_logits(
+            tokens=tokens, site=activation, activation=edited.activation, readout_position=-1
+        )
         payload = {
             "status": "full_steered_generation_pending",
             "site_id": site_id,
@@ -848,7 +1023,11 @@ def _generation(root: Path) -> dict:
     write_json(root / "GPU-04" / "generation_v2.json", payload)
     write_json(
         root / "GPU-08" / "new_observations.json",
-        {"store": None, "reason": "no new feature rows; feature_store_v3 was not overwritten", "v3_preserved": True},
+        {
+            "store": None,
+            "reason": "no new feature rows; feature_store_v3 was not overwritten",
+            "v3_preserved": True,
+        },
     )
     return payload
 
@@ -890,14 +1069,26 @@ def _lab(root: Path) -> dict:
     report_dir.mkdir(parents=True, exist_ok=True)
     report_path = report_dir / "report.json"
     report_path.write_text(json.dumps(report, sort_keys=True) + "\n", encoding="utf-8")
-    write_json(report_dir / "manifest.json", {"schema": "opensae.public_report.v1", "report_sha256": file_sha256(report_path)})
+    write_json(
+        report_dir / "manifest.json",
+        {"schema": "opensae.public_report.v1", "report_sha256": file_sha256(report_path)},
+    )
     env = os.environ.copy()
     env["OPENSAE_LAB_DATA"] = str(index)
     err_path = root / "GPU-09" / "local_lab_stderr.log"
     err_path.parent.mkdir(parents=True, exist_ok=True)
     err_stream = err_path.open("w", encoding="utf-8")
     proc = subprocess.Popen(
-        ["/venv/main/bin/python", "-m", "uvicorn", "backend.api:app", "--host", "127.0.0.1", "--port", "8765"],
+        [
+            "/venv/main/bin/python",
+            "-m",
+            "uvicorn",
+            "backend.api:app",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            "8765",
+        ],
         cwd=str(REPO / "apps" / "research-lab"),
         env=env,
         stdout=err_stream,
@@ -917,7 +1108,10 @@ def _lab(root: Path) -> dict:
                 time.sleep(0.5)
         if not ready:
             err_stream.flush()
-            raise RuntimeError("Research Lab did not accept connections: " + err_path.read_text(encoding="utf-8")[-500:])
+            raise RuntimeError(
+                "Research Lab did not accept connections: "
+                + err_path.read_text(encoding="utf-8")[-500:]
+            )
         for path in ("/api/results", "/api/features", "/api/analyses", "/api/reports"):
             with urllib.request.urlopen("http://127.0.0.1:8765" + path, timeout=10) as response:
                 checks[path] = response.status
@@ -945,7 +1139,9 @@ def _publish(folder: Path, schema: str, rows: list) -> None:
     folder.mkdir(parents=True, exist_ok=True)
     path = folder / "index.json"
     path.write_text(json.dumps(rows, sort_keys=True) + "\n", encoding="utf-8")
-    write_json(folder / "manifest.json", {"schema": schema, "files": {"index.json": file_sha256(path)}})
+    write_json(
+        folder / "manifest.json", {"schema": schema, "files": {"index.json": file_sha256(path)}}
+    )
 
 
 def run_section_52(root: Path) -> None:

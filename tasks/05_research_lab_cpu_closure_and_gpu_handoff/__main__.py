@@ -29,7 +29,10 @@ def _tokenizer_report(root: Path) -> None:
     rows = json.loads(ledger.read_text(encoding="utf-8"))
     write_json(
         root / "GPU-00" / "tokenizer_and_position_report.json",
-        [{"site_id": row.get("site_id"), "tokenizer_report": row.get("tokenizer_report")} for row in rows],
+        [
+            {"site_id": row.get("site_id"), "tokenizer_report": row.get("tokenizer_report")}
+            for row in rows
+        ],
     )
 
 
@@ -75,7 +78,9 @@ def run_all() -> int:
         cpu = run_cpu_lock(root)
     except Exception as exc:
         log(root, "CPU lock failed: " + str(exc).splitlines()[0][:400])
-        write_json(root / "GPU-00" / "cpu_lock_error.json", {"error": str(exc).splitlines()[0][:500]})
+        write_json(
+            root / "GPU-00" / "cpu_lock_error.json", {"error": str(exc).splitlines()[0][:500]}
+        )
         write_work_plan(collect(root))
         return 1
     run_gpu00(root, cpu)
