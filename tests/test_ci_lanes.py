@@ -40,7 +40,7 @@ def workflow(name: str) -> dict:
 
 def test_only_essential_ci_and_pinned_research_run_on_pull_requests():
     paths = sorted(WORKFLOWS.glob("*.yml"))
-    assert len(paths) == 18
+    assert len(paths) == 19
     auto = {path.name for path in paths if "pull_request" in workflow(path.name)["on"]}
     assert auto == {"ci.yml", "research-regression.yml"}
     for name in MANUAL:
@@ -95,3 +95,22 @@ def test_immutable_historical_release_guards_are_preserved():
     assert set(workflow("m5-matrix.yml")["on"]) == {"workflow_dispatch"}
     stage_d = workflow("stage-d-evidence-release.yml")["jobs"]["archive"]["if"]
     assert "head_repository.full_name == github.repository" in stage_d
+
+
+def test_one_time_research_lab_release_preserves_main_ci_guard():
+    flow = workflow("research-lab-v04-release-dispatch.yml")
+    assert set(flow["on"]) == {"workflow_run"}
+    assert flow["on"]["workflow_run"]["workflows"] == ["CI"]
+    gate = flow["jobs"]["release"]["if"]
+    for clause in (
+        "workflow_run.conclusion == 'success'",
+        "workflow_run.event == 'push'",
+        "workflow_run.head_branch == 'main'",
+        "head_repository.full_name == github.repository",
+    ):
+        assert clause in gate
+    source = (WORKFLOWS / "research-lab-v04-release-dispatch.yml").read_text()
+    assert 'VERSION: "0.4.0"' in source
+    assert 'TAG: "v0.4.0"' in source
+    assert "gh workflow run software-release.yml" in source
+    assert "PUBLISH-$TAG" in source
