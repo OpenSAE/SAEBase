@@ -1,4 +1,5 @@
 """Release integrity and scope of v0.4.0, not GPU scientific replay."""
+
 from __future__ import annotations
 
 import ast
@@ -28,9 +29,7 @@ def test_release_version_and_notes_are_consistent():
 
 
 def test_research_lab_report_distinguishes_experiment_scope_from_software():
-    report = json.loads(
-        (BASE / "docs/research-lab/release-evidence-v0.4.0.json").read_text()
-    )
+    report = json.loads((BASE / "docs/research-lab/release-evidence-v0.4.0.json").read_text())
     assert report["software_version"] == "0.4.0"
     assert report["historical_reference"]["prompt_groups_per_site"] == 64
     assert report["new_cohort"]["parent_groups"] == 500
@@ -41,15 +40,23 @@ def test_research_lab_report_distinguishes_experiment_scope_from_software():
     assert sar["groups_K16"] + sar["groups_K8"] + sar["groups_K4"] == 1500
     assert sar["groups_K2"] == 0
     assert sar["protocol"] == "decoder_mediated_residual_preserving_v1"
-    assert gpu["rss"]["clean_site_inputs"] + gpu["rss"]["selection_site_variants"] + gpu["rss"]["held_out_site_variants"] == 138000
+    assert (
+        gpu["rss"]["clean_site_inputs"]
+        + gpu["rss"]["selection_site_variants"]
+        + gpu["rss"]["held_out_site_variants"]
+        == 138000
+    )
     assert gpu["rss"]["semantic_review"] is False
     assert gpu["full_steered_text_generation"] == "pending"
     assert gpu["raw_experiment_archive"] == "private_not_in_git"
     assert report["verification"]["full_gpu_raw_independent_verification"] == "not_completed"
-    assert not any((BASE / name).exists() for name in (
-        "experiments/research-lab/7fb2be8f29a1-20261019T035727Z/private",
-        "apps/research-lab/data/raw_prompts.jsonl",
-    ))
+    assert not any(
+        (BASE / name).exists()
+        for name in (
+            "experiments/research-lab/7fb2be8f29a1-20261019T035727Z/private",
+            "apps/research-lab/data/raw_prompts.jsonl",
+        )
+    )
 
 
 def test_readmes_and_workplan_refer_to_actual_preview():
