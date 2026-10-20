@@ -27,9 +27,12 @@ def collect(root: Path) -> list[dict[str, str]]:
     cost = _load(root / "GPU-01" / "cost_and_capacity.json") or {}
     gpu02 = _load(root / "GPU-02" / "decision.json") or {}
     gpu03 = _load(root / "GPU-03" / "feature_cards.json") or {}
+    deep_cards = _load(root / "GPU-03" / "deep_site_cards.json") or {}
     gpu04 = _load(root / "GPU-04" / "decision.json") or {}
-    gpu05 = _load(root / "GPU-05" / "decision.json") or {}
-    gpu06 = _load(root / "GPU-06" / "decision.json") or {}
+    generation = _load(root / "GPU-04" / "generation_v2.json") or {}
+    gpu05 = _load(root / "GPU-05" / "decision_v2.json") or _load(root / "GPU-05" / "decision.json") or {}
+    gpu06 = _load(root / "GPU-06" / "decision_v2.json") or _load(root / "GPU-06" / "decision.json") or {}
+    coverage = _load(root / "GPU-06" / "coverage_v2.json") or {}
     gpu07 = _load(root / "GPU-07" / "localize_status.json") or {}
     gpu08 = _load(root / "GPU-08" / "metric_ledger.json") or {}
     gpu09 = _load(root / "GPU-09" / "live_service_acceptance.json") or {}
@@ -80,12 +83,12 @@ def collect(root: Path) -> list[dict[str, str]]:
             "commit": commit,
             "model_sae_site": _cell(gpu03.get("sites_with_real_codes")),
             "input_release": lock,
-            "population": f"cards={gpu03.get('card_count')} target=300",
+            "population": f"historical_cards={gpu03.get('card_count')} deep_site_cards={deep_cards.get('card_count')} deep_target=300",
             "commands": "included in run all",
             "resources": "CPU index over saved codes",
             "outputs": str(root / "GPU-03" / "feature_cards.json"),
             "scientific_checks": "no invented explanations or dead-feature labels; text hidden until review",
-            "decisions": _cell(f"cards={gpu03.get('card_count')} from sites with real codes; text hidden; unobserved features are not called dead"),
+            "decisions": _cell(f"historical cards={gpu03.get('card_count')} across captured sites; deep-site cards={deep_cards.get('card_count')} with public text unavailable for public release; unobserved features are not called dead"),
         },
         {
             "task_id": "GPU-04",
@@ -97,7 +100,7 @@ def collect(root: Path) -> list[dict[str, str]]:
             "commands": gpu04.get("commands", "not started as a full package"),
             "resources": _cell(gpu04.get("resources", "n/a")),
             "outputs": str(root / "GPU-04"),
-            "scientific_checks": gpu04.get("scientific_checks", "POST /api/jobs remains 503"),
+            "scientific_checks": _cell({"pairs": gpu04.get("scientific_checks"), "generation": generation.get("status", "not_started"), "kv_cache": generation.get("kv_cache")}),
             "decisions": _cell(gpu04.get("reason")),
         },
         {
@@ -119,7 +122,7 @@ def collect(root: Path) -> list[dict[str, str]]:
             "commit": commit,
             "model_sae_site": _cell(gpu06.get("model_sae_site", "six deep sites")),
             "input_release": lock,
-            "population": _cell(gpu06.get("population", "22500 proposals")),
+            "population": _cell(coverage or gpu06.get("population") or gpu06.get("coverage") or "22500 proposals"),
             "commands": gpu06.get("commands", "not started"),
             "resources": _cell(gpu06.get("resources", "n/a")),
             "outputs": str(root / "GPU-06"),
@@ -128,7 +131,7 @@ def collect(root: Path) -> list[dict[str, str]]:
         },
         {
             "task_id": "GPU-07",
-            "status": "partial",
+            "status": "partial" if gpu07.get("real_model_scope_on_observed_support", {}).get("status") != "blocked" else "partial",
             "commit": commit,
             "model_sae_site": "synthetic control plus pythia410m L12 when the pilot passed",
             "input_release": "controlled six-factor grids, not the 500 natural prompts",
@@ -136,8 +139,8 @@ def collect(root: Path) -> list[dict[str, str]]:
             "commands": "included in run all",
             "resources": "64 short authored prompts on the small site",
             "outputs": str(root / "GPU-07"),
-            "scientific_checks": _cell(gpu07),
-            "decisions": "synthetic curve is not a learned SAE result",
+            "scientific_checks": _cell(gpu07.get("real_model_scope_on_observed_support") or gpu07.get("real_model_curve_support")),
+            "decisions": "synthetic curve remains synthetic_logic_not_real_sae; the 55-column curve is real_model_scope_on_observed_support",
         },
         {
             "task_id": "GPU-08",

@@ -47,6 +47,9 @@ def _finish(root, pilot) -> None:
     run_gpu09(root)
     write_work_plan(collect(root))
     log(root, "section 6 filled")
+    from section52 import run_section_52
+
+    run_section_52(root)
 
 
 def json_sources(root):
