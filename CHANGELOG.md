@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 0.4.0 — Research Lab Preview and 500-Prompt GPU Cohort
+
+- **Research Lab browser and APIs:** responsive Results, Feature Explorer, Intervene, Analyze, Datasets and Reports workflows; read-only FastAPI and CPU Docker deployment with original verified Stage D historical results.
+- **New natural-prompt cohort:** ten pinned public sources, 50 base prompt groups each (200 discovery and 300 evaluation), provenance/digest locks, conservative lexical duplication checks and private-text review gates. Source text is not redistributed in this software release.
+- **Real checkpoint runs, as recorded by the GPU executor:** 48 × 500 source-group capture sites; six-site edited-logit comparisons; 300 featured deep-site statistical cards.
+- **SAR integration:** 1,485 K16, 14 K8 and one K4 observed groups using the separately declared decoder-mediated residual-preserving coalition protocol and the original SAR estimator. The classic affine-decoder gate remains the default; genuine orthogonal-rotation control is pending.
+- **RSS integration:** site-aware tokenizer positioning and resumable settings; executor reports 138,000 unique site-input occurrences across six sites and 500 parent groups. Meaning-preservation review of the transformation proposals is not yet complete.
+- **Input Localization:** two six-factor controlled input designs with pinned synthetic parity checks, plus a real 64-state grid evaluated over its 55 observed-support feature columns.
+- **Scientific and engineering provenance:** original-source pinned SAR/RSS regression, SHA-bound data manifests, identity-separated incomplete/mismatched historical sites, CPU job leasing, and an explicit privacy/authorization boundary for online GPU work.
+- **Distribution boundary:** software and sanitized summaries only. Full raw GPU experiment artifacts are not present in the repository or automatically included in the versioned software packages; their independent off-machine verification and public data rights are separate release gates.
+
+
 ## 0.3.0 — Expanded Model Coverage and Extensible SAE Research
 
 - **Developer onboarding and community:** add a persistent CPU-only first benchmark with saved metrics and reliability reports, short first-experiment/contributor/troubleshooting guides, local documentation link checks and a CI smoke test. Restore CODEOWNERS and GitHub feature/model-SAE contribution forms.

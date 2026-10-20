@@ -378,3 +378,15 @@ python -m backend.corpus_lock \
 后续停止/降级执行规则以第 5.2.G 节为准。已确认的来源锁变化、实际权重身份未知、无法修复的 tokenizer 错位、sample split 泄漏、SAR/RSS 数学估计器 parity 失败、存储/成本超限或未经认证的公开服务，停止对应受影响任务；非必要的线性解码假设、旧历史哈希不一致、部分输入不合法、部分 feature 支持不足等，**选择明示且可验证的替代实验协议继续推进其他合法数据**，不得阻塞整批。
 
 完成标准不是“跑满作业数量”，而是用户可以在 Research Lab 中可靠地**找到特征、查看真实输入、实施受控干预、检验可解释性的限制，并把可追溯的证据分享与复现**。所有结果均须注明模型、数据和实验范围，不能超出科学证据作宣传。
+
+## 9. 软件发布与研究阶段性完结（2026-10-20）
+
+本轮 Research Lab 的**研究执行阶段**已达到可冻结成果的规模：48 个站点 × 500 基础 prompt 的采集、六个站点的编辑 logits 样例、六主站点 300 张激活统计卡，K16=1485/K8=14/K4=1 的 decoder-mediated SAR，六站点 RSS 变体的已记录测量，以及完整 64 态真实输入 Localize support 曲线。具体计数来自同一 GPU agent 的执行记录，尚未完成独立离线复核所有原始测量字节。原始 source lock、协议、K 分组、身份差异、未审核输入的状态保持不变。
+
+发布目标是 **SAEBase v0.4.0 Research Lab Preview**。Release 公开内容包括源码、wheel/sdist、source-bound CI/校验摘要、中文/英文 README、Research Lab 使用指南、版本说明、去敏实验计数及对比报告。GitHub 代码库不包含私有 500 条原始文本、私有 GPU 输出、权重或未经版权审核的数据包。对应外部数据公开 release 必须另做审核及独立下载哈希验证。
+
+[Results and scientific scope](../docs/research-lab/results-20261020.md) · [Release acceptance](../docs/research-lab/release-acceptance.md) · [v0.4.0 notes](../docs/releases/v0.4.0.md)。
+
+这一轮不再增加主要 GPU 实验数量；保留的独立项目包括真正的 steering rollout 文本生成、完整正交旋转对照、全量原始 GPU archive 的异机独立复核、原始内容许可/审核、以及 Hugging Face 官方在线部署和私有认证队列。它们**不是本软件预览版完成的先决条件**，但也不能说成已完成。
+
+任何新论文结论需在发表前单独完成未公开原始数据的独立审计，特别是已记录的 RSS position parity、SAR decoder-mediated 协议区别和 Localize 仅限有限 64 状态网格的解释范围。

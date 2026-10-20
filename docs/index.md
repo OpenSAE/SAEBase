@@ -16,6 +16,13 @@ Start with the task you want to perform. The documentation is organized by **cap
 - [Packaging and Compatibility](packaging.md) — installable namespaces, original CLI compatibility and distribution boundaries.
 - [API Reference](API.md) — quick lookup of major public interfaces.
 
+## Research Lab
+
+- [Research Lab: run locally](../apps/research-lab/README.md) — browse real historical evidence, discover feature indexes, validate intervention configurations and inspect report APIs.
+- [Research Lab: measured progress and limitations](research-lab/results-20261020.md) — the 500-prompt capture cohort, SAR/RSS/Localize analysis and actual public/private artifact boundaries.
+- [Research Lab: release/verification checklist](research-lab/release-acceptance.md) — what a source release proves, what stays private and what must be checked before public dataset or hosted inference releases.
+- [Work Plan 05](../work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md) — implementation milestones and GPU execution record.
+
 ## Research capabilities
 
 - [Controlled Input Designs](controlled-inputs.md) — complete binary factor grids, state mapping, cache identity and Localize handoff.
@@ -40,7 +47,8 @@ Start with the task you want to perform. The documentation is organized by **cap
 - [Research Integration Validation](research-integration-validation.md) — original-source and protocol acceptance notes.
 - [Release and Checkpoint Matrix](checkpoint-validation.md) — versioned multi-checkpoint acceptance, performance and integrity checks.
 - [General Software Release Process](release-process.md) — exact-commit CI gate, candidate checksums and manual version publication.
-- [Release Notes: v0.3.0](releases/v0.3.0.md) — current software capabilities, compatibility, and verified evidence.
+- [Release Notes: v0.4.0](releases/v0.4.0.md) — Research Lab software preview, compatibility and experiment-evidence boundaries.
+- [Earlier Release: v0.3.0](releases/v0.3.0.md) — historical verified SAE compatibility and package release.
 - [Changelog](../CHANGELOG.md), [Provenance](PROVENANCE.md), [Release Checklist](RELEASE_CHECKLIST.md), [Contributing](../CONTRIBUTING.md) and [Security](../SECURITY.md).
 
 ## Terminology and compatibility
