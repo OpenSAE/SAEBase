@@ -358,8 +358,7 @@ def main() -> None:
                 median = sorted_times[len(sorted_times) // 2]
                 total = len(token_ids or ())
                 ttfts = sorted(
-                    float(x["ttft_seconds"]) for x in series
-                    if x["ttft_seconds"] is not None
+                    float(x["ttft_seconds"]) for x in series if x["ttft_seconds"] is not None
                 )
                 report["results"].append(
                     {
@@ -369,9 +368,7 @@ def main() -> None:
                         "max_new_tokens": length,
                         "protocol": trace["protocol"],
                         "median_seconds": median,
-                        "median_ttft_seconds": (
-                            ttfts[len(ttfts) // 2] if ttfts else None
-                        ),
+                        "median_ttft_seconds": (ttfts[len(ttfts) // 2] if ttfts else None),
                         "new_tokens_per_second": total / median if median else None,
                         "repetitions": series,
                         "new_token_ids_private": token_ids,
