@@ -117,12 +117,70 @@ def test_hf_batch_forward_matches_individual():
         )
 
 
+def test_identity_replay_oom_keeps_reduced_microbatch(tmp_path):
+    adapter, sae, ident = context()
+    samples = records()
+    conditions = [Condition("identity", "identity"), Condition("ablate", "ablate", (0,))]
+    engine = BatchEngine(adapter, sae, ident, pad_token_id=0)
+    widths: list[int] = []
+    original = engine._patched_logits
+    state = {"large": False}
+
+    def patched(jobs):
+        widths.append(len(jobs))
+        if len(jobs) > 2 and not state["large"]:
+            state["large"] = True
+            raise torch.cuda.OutOfMemoryError("injected out of memory")
+        return original(jobs)
+
+    engine._patched_logits = patched
+    with ResultWriter(tmp_path, ident) as writer:
+        stats = engine.run(samples, conditions, writer, sample_batch=3, microbatch=8)
+    assert stats.measured == len(samples) * len(conditions)
+    assert stats.microbatch_retries >= 1
+    assert widths[0] > 2
+    assert all(width <= 2 for width in widths[1:])
+
+
+def test_baseline_oom_splits_without_dropping_samples(tmp_path):
+    adapter, sae, ident = context()
+    samples = records()
+    conditions = [Condition("identity", "identity")]
+    engine = BatchEngine(adapter, sae, ident, pad_token_id=0)
+    original = engine._baselines
+    state = {"full": False}
+
+    def baselines(active):
+        if len(active) > 1 and not state["full"]:
+            state["full"] = True
+            raise torch.cuda.OutOfMemoryError("injected out of memory")
+        return original(active)
+
+    engine._baselines = baselines
+    with ResultWriter(tmp_path, ident) as writer:
+        stats = engine.run(samples, conditions, writer, sample_batch=3, microbatch=4)
+    assert stats.measured == len(samples)
+    assert stats.microbatch_retries >= 1
+
+
+def test_hf_masked_batch_defaults_to_single_prompt(tmp_path):
+    adapter, sae, ident = context()
+    samples = records()
+    conditions = [Condition("identity", "identity")]
+    with ResultWriter(tmp_path, ident) as writer:
+        stats = BatchEngine(adapter, sae, ident, pad_token_id=0).run(
+            samples, conditions, writer, sample_batch=3, microbatch=4
+        )
+    assert stats.measured == len(samples)
+    assert stats.baseline_batches == len(samples)
+
+
 def test_batch_engine_hf_uses_one_forward_per_chunk(tmp_path):
     adapter, sae, ident = context()
     samples = records()
     conditions = [Condition("identity", "identity"), Condition("ablate", "ablate", (0,))]
     with ResultWriter(tmp_path, ident) as writer:
-        stats = BatchEngine(adapter, sae, ident, pad_token_id=0).run(
+        stats = BatchEngine(adapter, sae, ident, pad_token_id=0, enable_hf_masked_batch=True).run(
             samples, conditions, writer, sample_batch=3, microbatch=4
         )
     assert stats.measured == len(samples) * len(conditions)

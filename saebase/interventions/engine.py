@@ -94,6 +94,11 @@ def _padded_tokens(samples: Sequence[MeasurementSample], *, device: torch.device
     return tokens
 
 
+def _is_oom(exc: BaseException) -> bool:
+    """True for CUDA OOM and for runtimes that surface the same failure as text."""
+    return isinstance(exc, torch.cuda.OutOfMemoryError) or "out of memory" in str(exc).lower()
+
+
 def _metrics(baseline: torch.Tensor, patched: torch.Tensor, sample: MeasurementSample,
              delta_h: float) -> dict[str, Any]:
     if baseline.shape != patched.shape or baseline.ndim != 1:
@@ -137,10 +142,16 @@ class BatchEngine:
     def __init__(self, model: ModelAdapter, sae: Any, identity: ExperimentIdentity, *,
                  activation_reader: ShardedReader | None = None,
                  code_reader: ShardedReader | None = None,
-                 pad_token_id: int | None = None) -> None:
+                 pad_token_id: int | None = None,
+                 enable_hf_masked_batch: bool = False) -> None:
         self.model, self.sae, self.identity = model, sae, identity
         self.activation_reader, self.code_reader = activation_reader, code_reader
         self.pad_token_id = pad_token_id
+        # Off by default: on bf16 Qwen the masked batch matches shapes but can
+        # move TopK feature identities across the frozen parity tolerance.
+        if not isinstance(enable_hf_masked_batch, bool):
+            raise TypeError("enable_hf_masked_batch must be a bool")
+        self.enable_hf_masked_batch = enable_hf_masked_batch
         model.capabilities.require("forward")
         model.capabilities.require("patch")
         if model.backend != identity.backend:
@@ -196,10 +207,14 @@ class BatchEngine:
                              device=_sae_input(self.sae, h).device)
         return h, z
 
+    def _hf_batch_enabled(self) -> bool:
+        return bool(self.enable_hf_masked_batch and self.model.backend == "hf_hooks"
+                    and callable(getattr(self.model.model, "run_batch", None)))
+
     def _hf_batch(self, samples: Sequence[MeasurementSample],
                   patches: torch.Tensor | None = None
                   ) -> tuple[torch.Tensor, torch.Tensor]:
-        """Execute a masked batch only on the explicit HF batch-capable wrapper."""
+        """Execute a masked batch only when the caller explicitly opts in."""
         if self.pad_token_id is None and len({s.valid_length for s in samples}) > 1:
             raise ValueError("mixed token lengths require explicit pad_token_id")
         device = self.model.tokens(
@@ -266,7 +281,7 @@ class BatchEngine:
                 bs.append(baseline)
             return ret, bs
         if (self.model.backend == "hf_hooks"
-                and callable(getattr(self.model.model, "run_batch", None))):
+                and self._hf_batch_enabled()):
             activations, logits = self._hf_batch(samples)
             snapshots: list[FeatureSnapshot] = []
             baselines: list[torch.Tensor] = []
@@ -324,7 +339,7 @@ class BatchEngine:
     @torch.no_grad()
     def _patched_logits(self, jobs: Sequence[tuple[MeasurementSample, torch.Tensor]]) -> list[torch.Tensor]:
         if (self.model.backend == "hf_hooks"
-                and callable(getattr(self.model.model, "run_batch", None))):
+                and self._hf_batch_enabled()):
             samples = [sample for sample, _ in jobs]
             patches = torch.stack([h for _, h in jobs])
             _, logits = self._hf_batch(samples, patches=patches)
@@ -350,6 +365,21 @@ class BatchEngine:
         if not isinstance(logits, torch.Tensor) or logits.ndim != 3 or logits.shape[:2] != padded.shape:
             raise RuntimeError("batched patch logits shape mismatch")
         return [logits[i, s.readout_index].detach().clone() for i,s in enumerate(samples)]
+
+    def _baselines_split(self, active: Sequence[MeasurementSample]
+                         ) -> tuple[tuple[list[FeatureSnapshot], list[torch.Tensor]], int]:
+        """Split a baseline/capture batch after OOM. One-example failure still raises."""
+        try:
+            return self._baselines(active), 0
+        except (torch.cuda.OutOfMemoryError, RuntimeError) as exc:
+            if not _is_oom(exc) or len(active) == 1:
+                raise
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            middle = len(active) // 2
+            left, left_retries = self._baselines_split(active[:middle])
+            right, right_retries = self._baselines_split(active[middle:])
+            return (left[0] + right[0], left[1] + right[1]), left_retries + right_retries + 1
 
     @torch.no_grad()
     def run(self, samples: Sequence[MeasurementSample], conditions: Sequence[Condition],
@@ -385,20 +415,41 @@ class BatchEngine:
             # These baseline examples include diverse lengths. The TL backend
             # runs one batch forward and one batch capture where needed.
             active = [x[0] for x in group]
-            snapshots, ref_logits = self._baselines(active)
-            baselines += 1 if self.model.backend == "transformer_lens" or callable(getattr(self.model.model, "run_batch", None)) else len(active)
+            (snapshots, ref_logits), baseline_retries = self._baselines_split(active)
+            retries += baseline_retries
+            if baseline_retries:
+                safe_microbatch = min(safe_microbatch, max(1, len(active) // 2))
+            baselines += 1 if self.model.backend == "transformer_lens" or self._hf_batch_enabled() else len(active)
             if verify_identity:
                 # Bound temporary batch memory even when sample_batch exceeds
                 # microbatch. A cached activation may be quantized and is
-                # checked against the configured numerical tolerance.
-                for start in range(0, len(active), microbatch):
-                    subset = list(zip(active, snapshots))[start:start + microbatch]
-                    replay = self._patched_logits([(s, snap.activation) for s, snap in subset])
-                    patches += 1 if self.model.backend == "transformer_lens" or callable(getattr(self.model.model, "run_batch", None)) else len(subset)
-                    for expected, actual in zip(ref_logits[start:start + microbatch], replay):
+                # checked against the configured numerical tolerance. OOM here
+                # keeps the reduced width for later chunks, same as the edit loop.
+                pairs = list(zip(active, snapshots))
+                cursor = 0
+                while cursor < len(pairs):
+                    width = min(safe_microbatch, len(pairs) - cursor)
+                    while True:
+                        subset = pairs[cursor:cursor + width]
+                        try:
+                            replay = self._patched_logits([(s, snap.activation) for s, snap in subset])
+                            patches += 1 if self.model.backend == "transformer_lens" or self._hf_batch_enabled() else len(subset)
+                            break
+                        except (torch.cuda.OutOfMemoryError, RuntimeError) as exc:
+                            if not _is_oom(exc):
+                                raise
+                            if width == 1:
+                                raise
+                            width = max(1, width // 2)
+                            retries += 1
+                            safe_microbatch = min(safe_microbatch, width)
+                            if torch.cuda.is_available():
+                                torch.cuda.empty_cache()
+                    for expected, actual in zip(ref_logits[cursor:cursor + width], replay):
                         if not torch.allclose(expected.float(), actual.float(), rtol=1e-5, atol=tolerance):
                             error = float((expected.float() - actual.float()).abs().max().item())
                             raise RuntimeError(f"identity patch mismatch; max logits error {error}")
+                    cursor += width
             all_jobs: list[tuple[MeasurementSample, Condition, str, FeatureSnapshot, torch.Tensor, torch.Tensor]] = []
             for (sample, jobs), snapshot, baseline in zip(group, snapshots, ref_logits):
                 for condition, mid in jobs:
@@ -414,10 +465,10 @@ class BatchEngine:
                     chunk = all_jobs[i:i+width]
                     try:
                         updated = self._patched_logits([(job[0], job[5]) for job in chunk])
-                        patches += 1 if self.model.backend == "transformer_lens" or callable(getattr(self.model.model, "run_batch", None)) else len(chunk)
+                        patches += 1 if self.model.backend == "transformer_lens" or self._hf_batch_enabled() else len(chunk)
                         break
                     except (torch.cuda.OutOfMemoryError, RuntimeError) as exc:
-                        if not isinstance(exc, torch.cuda.OutOfMemoryError) and "out of memory" not in str(exc).lower():
+                        if not _is_oom(exc):
                             raise
                         if width == 1:
                             raise
