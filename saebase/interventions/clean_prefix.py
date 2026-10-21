@@ -51,6 +51,10 @@ def edited_logits_clean_prefix(
         edited = hidden.clone()
         edited[0, -1] = patch.activation.to(device=edited.device, dtype=edited.dtype)
         return backend(tokens, site.layer, edited, readout_offset=0).detach().clone()
-    return model.patch_logits(
-        tokens=tokens, site=current, activation=patch.activation, readout_position=-1
-    ).detach().clone()
+    return (
+        model.patch_logits(
+            tokens=tokens, site=current, activation=patch.activation, readout_position=-1
+        )
+        .detach()
+        .clone()
+    )
