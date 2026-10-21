@@ -38,19 +38,22 @@ tolerances pass on each targeted real model and checkpoint.
 
 ## Not yet verified or shipped
 
-- Exact GPU speedups as a new default. Work Plan 11 measured an opt-in
-  block-suffix replay at 1.260x median on Qwen3-1.7B Base layer 7
-  (8 prompts, 7 edits, RTX 5070, max abs error 0). It stays off unless
-  `BatchEngine(..., enable_suffix_replay=True)` is set. Untested model
-  families keep the original hook. See
-  [workplan11_results.md](performance/workplan11_results.md).
+- Exact GPU speedups as a new default. The opt-in block-suffix replay
+  stays off unless `BatchEngine(..., enable_suffix_replay=True)` is set.
+  On the full Qwen3-1.7B Base layer-7 workload (25 rows, 7 edits, identity
+  replay included) the RTX 5070 median is 1.888 s versus 2.409 s for the
+  original hooks, 1.276x, metric max abs 0. Untested families keep the
+  original hook. See [workplan11_results.md](performance/workplan11_results.md).
 - 48-site live-model parity and cross-backend equivalence.
-- KV-cached steering: the reference implementation recomputes a clean prefix
-  at each generation step. Incremental clean KV is blocked on the current
-  Qwen cache, and a persistent edited KV cache would change the intervention
-  protocol. Neither is a drop-in acceleration.
-- `interp-engine` integration or vLLM static-point/CUDA-graph execution:
-  these need backend-specific GPU tests and an isolated dependency environment.
+- Generated-token steering is a separate protocol matrix, measured at 8, 32,
+  and 128 tokens on this GPU. Live HF SAE KV and fixed decoder-direction
+  vLLM/static generation both ran; they are not the 25×7 suffix result and
+  not the default. The legacy clean-history prototype still misses the
+  frozen bar on the first new token (layer 7 activation max abs 0.25).
+  See [workplan11_final_results.md](performance/workplan11_final_results.md).
+- interp-engine one-prompt SAE capture still does not match HF residuals,
+  logits, or TopK support. That single-prompt edit is not continuous
+  generated-token ablation.
 - Multi-GPU scheduling, dynamic model residency and production hosted GPU
   serving; Research Lab's public endpoint remains read-only.
 

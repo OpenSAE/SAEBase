@@ -161,7 +161,7 @@ saebase-intervene --config conf/interventions/m2_pythia_example.json --dry-run
 python examples/interventions/batch_interventions.py
 ```
 
-Real checkpoint execution requires `--real`. Short-text steering uses reference full-prefix recomputation; no KV-cache or GPU throughput speedup is implied. See [Feature Interventions](docs/feature-interventions.md).
+Real checkpoint execution requires `--real`. Optional GPU acceleration delivered **1.28×** faster Qwen3-1.7B feature-intervention evaluation (unchanged metrics), plus KV-cached generation with live SAE edits (**89 tokens/s**) or vLLM SAE decoder-direction steering (**158 tokens/s**) on an RTX 5070 at 128 tokens. The generation modes use distinct intervention protocols; the original full-prefix reference remains available. [GPU results](docs/performance/workplan11_final_results.md) · [Feature Interventions](docs/feature-interventions.md).
 
 ---
 

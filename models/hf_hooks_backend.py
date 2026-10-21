@@ -3,12 +3,25 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from threading import RLock
 from typing import Any, Iterator
 
 import torch
 
 from models.hf_logits_backend import HFLogitsModel, _reject_quantized
 from models.hooked_lm_common import HookedLMHandle, require_cuda
+
+
+def _hold_forward(method):
+    """Serialize forwards that share a module whose block methods may be replaced."""
+
+    def wrapped(self, *args, **kwargs):
+        with self._forward_lock:
+            return method(self, *args, **kwargs)
+
+    wrapped.__name__ = getattr(method, "__name__", "forward")
+    wrapped.__doc__ = method.__doc__
+    return wrapped
 
 
 def _offset_to_index(seq_len: int, offset: int) -> int:
@@ -44,6 +57,9 @@ class HFHooksModel(HFLogitsModel):
         device: str,
     ) -> None:
         super().__init__(model, tokenizer, model_name=model_name, device=device)
+        # Suffix replay replaces block forwards. Every entry that runs the
+        # module takes this lock so a second caller cannot observe the stubs.
+        self._forward_lock = RLock()
         self.cfg = HFHooksModelCfg(
             device=str(device),
             n_layers=int(self.cfg.n_layers),
@@ -53,6 +69,10 @@ class HFHooksModel(HFLogitsModel):
     @property
     def n_layers(self) -> int:
         return int(self.cfg.n_layers)
+
+    def __call__(self, input_ids: torch.Tensor) -> torch.Tensor:
+        with self._forward_lock:
+            return super().__call__(input_ids)
 
     def _layer_module(self, layer: int) -> Any:
         n = int(layer)
@@ -66,6 +86,7 @@ class HFHooksModel(HFLogitsModel):
                 return layers[n]
         raise ValueError(f"Cannot resolve HF layer module for layer={layer}")
 
+    @_hold_forward
     @torch.no_grad()
     def get_resid(
         self,
@@ -101,6 +122,7 @@ class HFHooksModel(HFLogitsModel):
             rows.append(resid[pos].clone())
         return torch.stack(rows, dim=0)
 
+    @_hold_forward
     @torch.no_grad()
     def capture_with_logits(
         self,
@@ -136,6 +158,7 @@ class HFHooksModel(HFLogitsModel):
         logits = output.logits[0, _offset_to_index(seq_len, int(readout_offset))].clone()
         return torch.stack(rows, dim=0), logits
 
+    @_hold_forward
     @torch.no_grad()
     def run_with_patch(
         self,
@@ -221,13 +244,18 @@ class HFHooksModel(HFLogitsModel):
             for module, original in saved:
                 module.forward = original  # type: ignore[method-assign]
 
+    @_hold_forward
     @torch.no_grad()
     def cache_site_with_logits(
         self, input_ids: torch.Tensor, layer: int
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """One full forward: site hidden ``[1, seq, d]`` and logits ``[1, seq, vocab]``."""
         self._decoder_layers()
-        if not isinstance(input_ids, torch.Tensor) or input_ids.ndim != 2 or input_ids.shape[0] != 1:
+        if (
+            not isinstance(input_ids, torch.Tensor)
+            or input_ids.ndim != 2
+            or input_ids.shape[0] != 1
+        ):
             raise ValueError("suffix replay expects one unpadded prompt with shape [1, seq]")
         dev = self.cfg.device
         if input_ids.device.type != dev.split(":")[0]:
@@ -256,6 +284,7 @@ class HFHooksModel(HFLogitsModel):
         hidden, _logits = self.cache_site_with_logits(input_ids, layer)
         return hidden
 
+    @_hold_forward
     @torch.no_grad()
     def logits_from_site_hidden(
         self,
@@ -266,7 +295,11 @@ class HFHooksModel(HFLogitsModel):
         readout_offset: int = 0,
     ) -> torch.Tensor:
         """Logits after replacing the cached block output and running only later blocks."""
-        if not isinstance(input_ids, torch.Tensor) or input_ids.ndim != 2 or input_ids.shape[0] != 1:
+        if (
+            not isinstance(input_ids, torch.Tensor)
+            or input_ids.ndim != 2
+            or input_ids.shape[0] != 1
+        ):
             raise ValueError("suffix replay expects one unpadded prompt with shape [1, seq]")
         dev = self.cfg.device
         if input_ids.device.type != dev.split(":")[0]:
@@ -288,6 +321,7 @@ class HFHooksModel(HFLogitsModel):
             raise RuntimeError("suffix replay injector ended before the forward") from None
         return out.logits[0, _offset_to_index(seq_len, int(readout_offset))]
 
+    @_hold_forward
     @torch.no_grad()
     def run_batch(
         self,
