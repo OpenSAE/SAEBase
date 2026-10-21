@@ -11,6 +11,8 @@
   <a href="#-documentation"><b>📚 Documentation</b></a>
 </p>
 
+🧪 **Hugging Face:** [SAEBase Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [SAEBase Evaluation Dataset](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation)
+
 ---
 
 ## 🧭 Overview
@@ -59,7 +61,7 @@ The workflow is **capture once, evaluate multiple SAEs**: a verified activation 
 | RSS | Six sites × 500 parent prompts; 138,000 reported unique clean/variant site-input observations under *proposed* transformations |
 | Input Localization | One real 64-state factor grid, analyzed on 55 features observed on that grid |
 
-[**Explore the Research Lab**](apps/research-lab/README.md) · [Results and methods](docs/research-lab/results-20261020.md) · [Reproduction and release notes](docs/releases/v0.4.0.md)
+[**Open the Research Lab on Hugging Face**](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Evaluation Dataset](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation) · [Local setup](apps/research-lab/README.md) · [Results and methods](docs/research-lab/results-20261020.md) · [Reproduction and release notes](docs/releases/v0.4.0.md)
 
 ```bash
 docker build -f apps/research-lab/Dockerfile -t opensae-lab:cpu .
