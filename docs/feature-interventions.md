@@ -19,15 +19,15 @@ Its outputs are engineering examples, not scientific findings.
 
 ```bash
 # Validate IDs, operators, measurements and budgets, without loading weights.
-saebase-intervene --config conf/interventions/m2_pythia_example.json --dry-run
+saebase-intervene --config conf/interventions/pythia_feature_edits.json --dry-run
 
 # Explicitly authorize public Pythia/SAE checkpoint download or loading.
-saebase-intervene --config conf/interventions/m2_pythia_example.json \
-  --output experiment/m2-pythia --real
+saebase-intervene --config conf/interventions/pythia_feature_edits.json \
+  --output runs/pythia-feature-edits --real
 
 # Re-running reuses completed measurements. Refuse reusing an existing run:
-saebase-intervene --config conf/interventions/m2_pythia_example.json \
-  --output experiment/new-run --real --no-resume
+saebase-intervene --config conf/interventions/pythia_feature_edits.json \
+  --output runs/new-feature-experiment --real --no-resume
 ```
 
 The provided real-model configuration includes one frozen reference validation example token
@@ -161,8 +161,9 @@ steered continuation. A separate unmodified continuation supplies a baseline.
   separate, independent RNG state for the two continuations.
 - EOS stops and max new-token limits are recorded. `max_context_tokens` can
   prevent an unsupported generation length.
-- KV-cache optimization is intentionally **not** claimed; cached decoding
-  changes intervention semantics if old prefix states are stale.
+- The reference implementation uses full-prefix recomputation. Optional KV-cached
+  generated-token SAE edits and decoder-direction steering are measured under
+  separate execution protocols; see the [GPU performance report](performance/workplan11_final_results.md).
 - Both baseline and steered token ID sequences, stopping reasons and exact
   generation specs are written to the result store for reproducibility.
 

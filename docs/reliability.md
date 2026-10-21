@@ -13,12 +13,12 @@ For example:
 ```bash
 python -m pip install -e '.[dev]'
 python examples/benchmarking/reliability_bootstrap.py
-saebase-benchmark --config conf/benchmark/m4_pythia_three_groups.json --dry-run
-saebase-benchmark --config conf/benchmark/m4_pythia_three_groups.json --real --output runs
-RUNID=$(python -c 'from saebase.benchmarks import load_config;print(load_config("conf/benchmark/m4_pythia_three_groups.json").run_id)')
-saebase-audit --m3-root "runs/$RUNID" --config conf/reliability/m4_pythia_smoke.json --dry-run
-saebase-audit --m3-root "runs/$RUNID" --config conf/reliability/m4_pythia_smoke.json --run --sae-only
-saebase-audit --m3-root "runs/$RUNID" --config conf/reliability/m4_pythia_smoke.json --report-only
+saebase-benchmark --config conf/benchmark/pythia_grouped_benchmark.json --dry-run
+saebase-benchmark --config conf/benchmark/pythia_grouped_benchmark.json --real --output runs
+RUNID=$(python -c 'from saebase.benchmarks import load_config;print(load_config("conf/benchmark/pythia_grouped_benchmark.json").run_id)')
+saebase-audit --results-dir "runs/$RUNID" --config conf/reliability/pythia_reliability_audit.json --dry-run
+saebase-audit --results-dir "runs/$RUNID" --config conf/reliability/pythia_reliability_audit.json --run --sae-only
+saebase-audit --results-dir "runs/$RUNID" --config conf/reliability/pythia_reliability_audit.json --report-only
 ```
 
 `--real` belongs to the benchmark model execution stage. The reliability audit stage does not run additional language-model forwards. The optional `--sae-only`
@@ -105,7 +105,7 @@ RSS input rejection and the precise scaling rule for MeanRSS.
 For a complete benchmark-attached audit with the original paper estimators:
 
 ```bash
-saebase-audit --m3-root "runs/$RUNID" \
+saebase-audit --results-dir "runs/$RUNID" \
   --config conf/reliability/m4_ground_truth.json --run --ground-truth \
   --sar-source /path/to/SAR/sar.py --rss-source /path/to/RSS/rss.py
 ```

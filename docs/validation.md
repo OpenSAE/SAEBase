@@ -48,7 +48,7 @@ Benchmark runs and audits use versioned manifests and measured checkpoint SHA-25
 - Different FVU denominators, split definitions, readout units or SAEBench protocols are not interchangeable.
 - Prompt variants are clustered under a common `prompt_group_id` for reliability estimates.
 - Synthetic ground-truth experiments verify the methods' behavior against constructed known effects, not against a real model's ground truth.
-- GPU throughput for optional vLLM/NNsight backends has not been established by checkpoint compatibility testing; it requires separate performance measurements.
+- Qwen3-1.7B live SAE KV and vLLM decoder-direction steering have separately recorded GPU throughput at 8/32/128 generated tokens. These are distinct execution protocols; results cannot be substituted for the reference full-prefix SAE ablation. See [measured performance](performance/workplan11_final_results.md).
 - Some registered models or upstream checkpoints may require authentication or additional hardware.
 - Third-party model/SAE weights are not bundled in SAEBase's distribution.
 

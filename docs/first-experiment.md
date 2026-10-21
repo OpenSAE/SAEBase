@@ -78,9 +78,7 @@ runs/first-experiment/
     reliability_manifest.json
     reliability_summary.csv
     reliability.html
-  _cache/
-    m1/
-    m2/
+  _cache/      (SAEBase-managed activation and intervention stores)
 ~~~
 
 Use `summary.csv` to compare metric rows. Metrics retain their

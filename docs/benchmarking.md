@@ -19,7 +19,7 @@ Numerical acceptance is independently exercised in CI by executing native upstre
 
 ```bash
 python -m pip install -e '.[dev]'
-saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
+saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --dry-run
 python -m pytest -q tests/test_m3_plan.py tests/test_m3_execution.py
 ```
 
@@ -31,9 +31,9 @@ time and GPU memory appear as null.
 For real weights (network access and adequate RAM required):
 
 ```bash
-saebase-benchmark --config conf/benchmark/p0_small.json --real
-saebase-benchmark --config conf/benchmark/p0_small.json --real --resume
-saebase-benchmark --config conf/benchmark/p0_small.json --report-only
+saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --real
+saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --real --resume
+saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --report-only
 ```
 
 The smoke fixture token IDs originate from a frozen reference and should not be

@@ -301,7 +301,7 @@ def test_refuse_relabelled_code_cache_source(tmp_path):
 def test_configurable_cli_dry_run_requires_no_remote_weights(tmp_path):
     import subprocess,sys
     from pathlib import Path
-    conf=Path(__file__).resolve().parents[1]/'conf/interventions/m2_pythia_example.json'
+    conf=Path(__file__).resolve().parents[1]/'conf/interventions/pythia_feature_edits.json'
     repo=Path(__file__).resolve().parents[1]
     r=subprocess.run([sys.executable,'scripts/m2_batch.py','--config',str(conf),'--dry-run'],
                      cwd=repo,capture_output=True,text=True,timeout=20)

@@ -25,16 +25,16 @@ jobs:
           TOKENIZERS_PARALLELISM: 'false'
         run: |
           set -euo pipefail
-          saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
-          saebase-benchmark --config conf/benchmark/p0_small.json --real --output "$RUNNER_TEMP/m3"
-          saebase-benchmark --config conf/benchmark/p0_small.json --real --resume --output "$RUNNER_TEMP/m3"
-          saebase-benchmark --config conf/benchmark/p0_small.json --report-only --output "$RUNNER_TEMP/m3"
+          saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --dry-run
+          saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --real --output "$RUNNER_TEMP/m3"
+          saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --real --resume --output "$RUNNER_TEMP/m3"
+          saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --report-only --output "$RUNNER_TEMP/m3"
           python - <<'PY'
           from pathlib import Path
           from saebase.benchmarks import load_config
           from saebase.benchmarks.results import read_metrics
           import os
-          cfg=load_config('conf/benchmark/p0_small.json')
+          cfg=load_config('conf/benchmark/pythia_benchmark_smoke.json')
           root=Path(os.environ['RUNNER_TEMP'])/'m3'/cfg.run_id
           rows=read_metrics(root,cfg.run_id)
           assert len(rows)==7, len(rows)
