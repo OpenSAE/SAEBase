@@ -5,8 +5,10 @@ one-token decode and an independent edited one-token decode against the SAME
 clean history. This is an independent implementation to verify against the
 existing full-prefix reference, not a parity-verified backend by default.
 
-The cache fork currently uses deepcopy for correctness and bounded tests; it
-may not accelerate long prefixes until a non-mutating cache fork is validated.
+The cache fork currently uses deepcopy for correctness and bounded tests.
+On Qwen3-1.7B bf16 the cached prefix matches a full forward, and the first
+incremental token does not: layer 7 activation max abs 0.25 against the
+frozen 1e-2 bar. Leave this path off.
 """
 
 from __future__ import annotations

@@ -330,28 +330,55 @@ def hf_reference() -> None:
 
 
 def vllm(backend: str) -> None:
+    for extra in os.environ.get("SAEBASE_EXTRA_SITE", "").split(os.pathsep):
+        if extra and extra not in sys.path:
+            # Later entries fill missing pure-Python deps. Torch and vLLM
+            # stay first because this process already imported them.
+            sys.path.append(extra)
     from saebase.sae.loading import load_sae_for_profile
     from saebase.interventions.specs import Condition
     from saebase.vllm_backend.sae_interventions import InterpVLLMSAE
 
     reference = torch.load(OUT / "hf_reference_private.pt", map_location="cpu", weights_only=True)
     sae, _ = load_sae_for_profile(SAE_KEY, LAYER, device="cuda")
-    engine = InterpVLLMSAE.load(
-        MODEL_NAME,
-        sae,
-        layer=LAYER,
-        backend=backend,
-        gpu_memory_utilization=0.50,
-        max_model_len=512,
-    )
     try:
-        outcome = engine.measure(
-            reference["ids"].flatten().tolist(),
-            Condition("ablate", "ablate", (int(reference["feature_id"]),)),
-            patch_position=-1,
-            atol=1e-2,
-            rtol=1e-2,
+        # Static graphs need a few megabytes past the weight pool. 0.50 left
+        # a zero-byte static budget on this 12 GiB card.
+        utilization = 0.70 if backend == "vllm-static" else 0.50
+        engine = InterpVLLMSAE.load(
+            MODEL_NAME,
+            sae,
+            layer=LAYER,
+            backend=backend,
+            gpu_memory_utilization=utilization,
+            max_model_len=512,
         )
+    except Exception as exc:
+        persist(
+            f"vllm_{backend}.json",
+            {"backend": backend, "status": "FAIL", "error": f"{type(exc).__name__}: {exc}"},
+        )
+        raise
+    try:
+        try:
+            outcome = engine.measure(
+                reference["ids"].flatten().tolist(),
+                Condition("ablate", "ablate", (int(reference["feature_id"]),)),
+                patch_position=-1,
+                atol=1e-2,
+                rtol=1e-2,
+            )
+        except RuntimeError as exc:
+            persist(
+                f"vllm_{backend}.json",
+                {
+                    "backend": backend,
+                    "status": "FAIL",
+                    "error": f"{type(exc).__name__}: {exc}",
+                    "reference_equivalence": "FAIL_SCIENTIFIC_REFERENCE_PARITY",
+                },
+            )
+            raise
         clean_err = float((outcome.clean_residual.float() - reference["resid"]).abs().max().item())
         edited_err = float(
             (outcome.edited_residual.float() - reference["patched"]).abs().max().item()
