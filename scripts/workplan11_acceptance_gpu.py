@@ -178,6 +178,16 @@ def kv(steps: int) -> None:
     raw, sae, _ = load_pair()
     adapter = ModelAdapter(raw)
     ids = raw.to_tokens(PROMPT, prepend_bos=False)
+    # Select a genuinely active feature on THIS exact tokenization, not a
+    # hard-coded coordinate from a different run or with different BOS rules.
+    from saebase.api import ActivationSite, capture_features
+
+    initial_site = ActivationSite(LAYER, f"blocks.{LAYER}.hook_resid_post", -1)
+    initial = capture_features(adapter, sae, site=initial_site, tokens=ids)
+    selected = torch.nonzero(initial.codes != 0).flatten().tolist()
+    if not selected:
+        raise RuntimeError("no nonzero SAE feature for clean-KV steering test")
+    feature_id = int(selected[0])
     decoder = CleanPrefixKVDecoder(
         raw, sae, layer=LAYER, hook_name=f"blocks.{LAYER}.hook_resid_post"
     )
@@ -190,7 +200,7 @@ def kv(steps: int) -> None:
                 decoder,
                 adapter,
                 sae,
-                Condition("ablate", "ablate", (185,)),
+                Condition("ablate", "ablate", (feature_id,)),
                 atol=1e-2,
                 rtol=1e-2,
             )
@@ -218,7 +228,7 @@ def kv(steps: int) -> None:
     from saebase.interventions.operators import apply_condition
     from saebase.interventions.specs import Condition
 
-    condition = Condition("ablate", "ablate", (185,))
+    condition = Condition("ablate", "ablate", (feature_id,))
     token = int(ids[0, -1])
     full_times = []
     kv_times = []
