@@ -8,7 +8,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from dataclasses import dataclass
 import sys
-from types import ModuleType, SimpleNamespace
+from types import ModuleType
 
 import pytest
 import torch
