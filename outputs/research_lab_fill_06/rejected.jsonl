@@ -1,0 +1,12 @@
+{"path": "GPU-06/rss/gemma1b_gemma1b_scope_resid_L13.jsonl", "position_recomputed": {"None": 1050}, "reason": "legacy_or_unverified_rss_jsonl_not_pooled", "rows": 500}
+{"path": "GPU-06/rss/gemma1b_gemma1b_scope_resid_L13_invalid.jsonl", "reason": "invalid_rss_jsonl_not_measured"}
+{"path": "GPU-06/rss/gemma3_4b_it_gemma3_4b_it_scope_resid_L22.jsonl", "position_recomputed": {"None": 1050}, "reason": "legacy_or_unverified_rss_jsonl_not_pooled", "rows": 500}
+{"path": "GPU-06/rss/gemma3_4b_it_gemma3_4b_it_scope_resid_L22_invalid.jsonl", "reason": "invalid_rss_jsonl_not_measured"}
+{"path": "GPU-06/rss/gemma3_4b_pt_gemma3_4b_pt_scope_resid_L22.jsonl", "position_recomputed": {"None": 1050}, "reason": "legacy_or_unverified_rss_jsonl_not_pooled", "rows": 500}
+{"path": "GPU-06/rss/gemma3_4b_pt_gemma3_4b_pt_scope_resid_L22_invalid.jsonl", "reason": "invalid_rss_jsonl_not_measured"}
+{"path": "GPU-06/rss/llama31_8b_llama31_8b_lxr_8x_L21.jsonl", "position_recomputed": {"None": 1000}, "reason": "legacy_or_unverified_rss_jsonl_not_pooled", "rows": 500}
+{"path": "GPU-06/rss/llama31_8b_llama31_8b_lxr_8x_L21_invalid.jsonl", "reason": "invalid_rss_jsonl_not_measured"}
+{"path": "GPU-06/rss/mistral7b_instruct_mistral7b_instruct_tc_l16_131k_L16.jsonl", "position_recomputed": {"None": 1050}, "reason": "legacy_or_unverified_rss_jsonl_not_pooled", "rows": 500}
+{"path": "GPU-06/rss/mistral7b_instruct_mistral7b_instruct_tc_l16_131k_L16_invalid.jsonl", "reason": "invalid_rss_jsonl_not_measured"}
+{"path": "GPU-06/rss/qwen3_1_7b_base_qwen3_1_7b_base_resid_w32k_L14.jsonl", "position_recomputed": {"None": 1000}, "reason": "legacy_or_unverified_rss_jsonl_not_pooled", "rows": 500}
+{"path": "GPU-06/rss/qwen3_1_7b_base_qwen3_1_7b_base_resid_w32k_L14_invalid.jsonl", "reason": "invalid_rss_jsonl_not_measured"}
