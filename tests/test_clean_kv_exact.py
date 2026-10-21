@@ -16,7 +16,6 @@ from models.hf_hooks_backend import HFHooksModel
 from saebase.api import ModelAdapter
 from saebase.interventions.kv_cache_exact import (
     CleanPrefixKVDecoder,
-    KVParityError,
     compare_cached_step_with_reference,
 )
 from saebase.interventions.specs import Condition
