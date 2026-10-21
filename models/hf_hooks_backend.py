@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Iterator
 
 import torch
 
@@ -175,6 +175,118 @@ class HFHooksModel(HFLogitsModel):
             handle.remove()
         logits = out.logits[0, _offset_to_index(seq_len, int(readout_offset))]
         return logits
+
+    def supports_suffix_replay(self) -> bool:
+        """True when early blocks can be skipped without changing later-block inputs.
+
+        Only ``model.model.layers`` stacks whose parent forward calls each block
+        in order are supported. Other layouts are refused instead of approximated.
+        """
+        layers = getattr(getattr(self._model, "model", None), "layers", None)
+        return layers is not None and len(layers) == self.n_layers and self.n_layers > 0
+
+    def _decoder_layers(self) -> Any:
+        if not self.supports_suffix_replay():
+            raise ValueError(
+                "suffix replay is unsupported for this architecture; use the original hook forward"
+            )
+        return self._model.model.layers
+
+    def _inject_site_hidden(self, layer: int, hidden: torch.Tensor) -> Iterator[None]:
+        """Yield while layers ``0..layer`` return ``hidden`` instead of recomputing."""
+        layers = self._decoder_layers()
+        n = int(layer)
+        if not 0 <= n < len(layers):
+            raise ValueError(f"layer {layer} outside suffix-replay stack")
+        if hidden.ndim != 3 or hidden.shape[0] != 1:
+            raise ValueError("site hidden must have shape [1, seq, d_model]")
+        saved: list[tuple[Any, Any]] = []
+
+        def emit(_hidden_states: Any, *args: Any, **kwargs: Any) -> torch.Tensor:
+            del args, kwargs
+            return hidden.clone()
+
+        def passthrough(hidden_states: Any, *args: Any, **kwargs: Any) -> Any:
+            del args, kwargs
+            return hidden_states
+
+        try:
+            for index, module in enumerate(layers):
+                if index > n:
+                    break
+                saved.append((module, module.forward))
+                module.forward = emit if index == 0 else passthrough  # type: ignore[method-assign]
+            yield
+        finally:
+            for module, original in saved:
+                module.forward = original  # type: ignore[method-assign]
+
+    @torch.no_grad()
+    def cache_site_with_logits(
+        self, input_ids: torch.Tensor, layer: int
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """One full forward: site hidden ``[1, seq, d]`` and logits ``[1, seq, vocab]``."""
+        self._decoder_layers()
+        if not isinstance(input_ids, torch.Tensor) or input_ids.ndim != 2 or input_ids.shape[0] != 1:
+            raise ValueError("suffix replay expects one unpadded prompt with shape [1, seq]")
+        dev = self.cfg.device
+        if input_ids.device.type != dev.split(":")[0]:
+            input_ids = input_ids.to(dev)
+        captured: dict[str, torch.Tensor] = {}
+
+        def hook_fn(_module: Any, _inp: Any, out: Any) -> Any:
+            hs = out[0] if isinstance(out, tuple) else out
+            captured["resid"] = hs.detach()
+            return out
+
+        handle = self._layer_module(layer).register_forward_hook(hook_fn)
+        try:
+            output = self._model(input_ids=input_ids)
+        finally:
+            handle.remove()
+        if "resid" not in captured or captured["resid"].shape[0] != 1:
+            raise RuntimeError(f"suffix replay failed to cache layer={layer}")
+        if output.logits.ndim != 3 or output.logits.shape[1] != input_ids.shape[1]:
+            raise RuntimeError("suffix replay logits do not match the prompt length")
+        return captured["resid"].clone(), output.logits.detach().clone()
+
+    @torch.no_grad()
+    def cache_site_hidden(self, input_ids: torch.Tensor, layer: int) -> torch.Tensor:
+        """Full-sequence block output at ``layer``, shape ``[1, seq, d_model]``."""
+        hidden, _logits = self.cache_site_with_logits(input_ids, layer)
+        return hidden
+
+    @torch.no_grad()
+    def logits_from_site_hidden(
+        self,
+        input_ids: torch.Tensor,
+        layer: int,
+        hidden: torch.Tensor,
+        *,
+        readout_offset: int = 0,
+    ) -> torch.Tensor:
+        """Logits after replacing the cached block output and running only later blocks."""
+        if not isinstance(input_ids, torch.Tensor) or input_ids.ndim != 2 or input_ids.shape[0] != 1:
+            raise ValueError("suffix replay expects one unpadded prompt with shape [1, seq]")
+        dev = self.cfg.device
+        if input_ids.device.type != dev.split(":")[0]:
+            input_ids = input_ids.to(dev)
+        site = hidden.to(device=input_ids.device)
+        if site.shape[1] != input_ids.shape[1]:
+            raise ValueError("cached site sequence length does not match the prompt")
+        if not bool(torch.isfinite(site).all()):
+            raise ValueError("cached site hidden contains non-finite values")
+        seq_len = int(input_ids.shape[1])
+        try:
+            injector = self._inject_site_hidden(layer, site)
+            next(injector)
+            try:
+                out = self._model(input_ids=input_ids)
+            finally:
+                injector.close()
+        except StopIteration:
+            raise RuntimeError("suffix replay injector ended before the forward") from None
+        return out.logits[0, _offset_to_index(seq_len, int(readout_offset))]
 
     @torch.no_grad()
     def run_batch(

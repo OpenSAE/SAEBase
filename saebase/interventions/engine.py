@@ -168,6 +168,7 @@ class BatchEngine:
                  code_reader: ShardedReader | None = None,
                  pad_token_id: int | None = None,
                  enable_hf_masked_batch: bool = False,
+                 enable_suffix_replay: bool = False,
                  identity_lease: VerifiedCheckpointSession | None = None,
                  release_content_check: bool | None = None) -> None:
         self.model, self.sae, self.identity = model, sae, identity
@@ -185,13 +186,25 @@ class BatchEngine:
             "separate_baseline_forwards": 0,
             "sae_encodes": 0,
             "patch_forwards": 0,
+            "suffix_prefix_forwards": 0,
+            "suffix_replay_forwards": 0,
         }
         # Off by default. Opt-in run_batch uses the single-example kernel.
         # A fused padded GEMM changes Qwen3 bf16 TopK ids, so it is not used.
         # Leave this off until a fused path meets the frozen tolerance and 1.15x.
         if not isinstance(enable_hf_masked_batch, bool):
             raise TypeError("enable_hf_masked_batch must be a bool")
+        if not isinstance(enable_suffix_replay, bool):
+            raise TypeError("enable_suffix_replay must be a bool")
+        if enable_suffix_replay and enable_hf_masked_batch:
+            raise ValueError("suffix replay and the masked HF batch cannot be combined")
         self.enable_hf_masked_batch = enable_hf_masked_batch
+        # Off by default until a real workload shows at least 1.15x and exact parity.
+        self.enable_suffix_replay = enable_suffix_replay
+        if enable_suffix_replay:
+            probe = getattr(model.model, "supports_suffix_replay", None)
+            if model.backend != "hf_hooks" or not callable(probe) or not probe():
+                raise ValueError("suffix replay was requested but this model does not support it")
         model.capabilities.require("forward")
         model.capabilities.require("patch")
         if model.backend != identity.backend:
@@ -252,6 +265,11 @@ class BatchEngine:
         return bool(self.enable_hf_masked_batch and self.model.backend == "hf_hooks"
                     and callable(getattr(self.model.model, "run_batch", None)))
 
+    def _suffix_replay_enabled(self) -> bool:
+        probe = getattr(self.model.model, "supports_suffix_replay", None)
+        return bool(self.enable_suffix_replay and self.model.backend == "hf_hooks"
+                    and callable(probe) and probe())
+
     def _hf_batch(self, samples: Sequence[MeasurementSample],
                   patches: torch.Tensor | None = None
                   ) -> tuple[torch.Tensor, torch.Tensor]:
@@ -273,7 +291,39 @@ class BatchEngine:
             attention_mask=mask, patches=patches)
 
     @torch.no_grad()
+    def _suffix_baselines(
+        self, samples: Sequence[MeasurementSample]
+    ) -> tuple[list[FeatureSnapshot], list[torch.Tensor]]:
+        """Cache each prompt's block output once and read both the site row and logits."""
+        from saebase.api.features import snapshot_from_activation
+
+        snapshots: list[FeatureSnapshot] = []
+        baselines: list[torch.Tensor] = []
+        self._suffix_hidden = {}
+        layer = self.identity.site.layer
+        for sample in samples:
+            ids = self.model.tokens(tokens=torch.tensor([sample.tokens], dtype=torch.long))
+            hidden, logits = self.model.model.cache_site_with_logits(ids, layer)
+            self._suffix_hidden[tuple(sample.tokens)] = hidden
+            self.counters["suffix_prefix_forwards"] += 1
+            self.counters["model_forwards"] += 1
+            self.counters["combined_capture_forwards"] += 1
+            site = ActivationSite(
+                layer, self.identity.site.hook_name, sample.patch_position
+            )
+            activation = hidden[0, sample.patch_position]
+            snapshot = snapshot_from_activation(
+                self.sae, tokens=ids, site=site, activation=activation
+            )
+            self.counters["sae_encodes"] += 1
+            snapshots.append(snapshot)
+            baselines.append(logits[0, sample.readout_index].detach().clone())
+        return snapshots, baselines
+
+    @torch.no_grad()
     def _baselines(self, samples: Sequence[MeasurementSample]) -> tuple[list[FeatureSnapshot], list[torch.Tensor]]:
+        if self._suffix_replay_enabled():
+            return self._suffix_baselines(samples)
         # Padding token never read; right-pad positions must be strictly later
         # than each prompt's readout/patch. For TL this is one forward per group.
         if self.model.backend == "transformer_lens":
@@ -393,7 +443,54 @@ class BatchEngine:
         return ret, bs
 
     @torch.no_grad()
+    def _suffix_patched_logits(
+        self, jobs: Sequence[tuple[MeasurementSample, torch.Tensor]]
+    ) -> list[torch.Tensor]:
+        """Reuse one clean block output per prompt, then run only the later blocks."""
+        grouped: dict[tuple[int, ...], list[int]] = {}
+        order: list[tuple[int, ...]] = []
+        for index, (sample, _activation) in enumerate(jobs):
+            key = tuple(sample.tokens)
+            if key not in grouped:
+                order.append(key)
+                grouped[key] = []
+            grouped[key].append(index)
+        produced: list[torch.Tensor | None] = [None] * len(jobs)
+        layer = self.identity.site.layer
+        cached = getattr(self, "_suffix_hidden", {})
+        for key in order:
+            ids = self.model.tokens(tokens=torch.tensor([key], dtype=torch.long))
+            hidden = cached.get(key)
+            if hidden is None:
+                hidden = self.model.model.cache_site_hidden(ids, layer)
+                cached[key] = hidden
+                self.counters["suffix_prefix_forwards"] += 1
+                self.counters["model_forwards"] += 1
+            self._suffix_hidden = cached
+            for index in grouped[key]:
+                sample, activation = jobs[index]
+                if activation.ndim != 1 or activation.shape[0] != hidden.shape[-1]:
+                    raise ValueError("suffix replay activation width does not match the cached site")
+                patched = hidden.clone()
+                patched[0, sample.patch_position] = activation.to(
+                    device=patched.device, dtype=patched.dtype
+                )
+                read_offset = int(ids.shape[1] - 1 - sample.readout_index)
+                logits = self.model.model.logits_from_site_hidden(
+                    ids, layer, patched, readout_offset=read_offset
+                )
+                self.counters["suffix_replay_forwards"] += 1
+                self.counters["patch_forwards"] += 1
+                self.counters["model_forwards"] += 1
+                produced[index] = logits.detach().clone()
+        if any(item is None for item in produced):
+            raise RuntimeError("suffix replay did not return one logit vector per edit")
+        return produced  # type: ignore[return-value]
+
+    @torch.no_grad()
     def _patched_logits(self, jobs: Sequence[tuple[MeasurementSample, torch.Tensor]]) -> list[torch.Tensor]:
+        if self._suffix_replay_enabled():
+            return self._suffix_patched_logits(jobs)
         if (self.model.backend == "hf_hooks"
                 and self._hf_batch_enabled()):
             samples = [sample for sample, _ in jobs]

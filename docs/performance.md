@@ -38,10 +38,17 @@ tolerances pass on each targeted real model and checkpoint.
 
 ## Not yet verified or shipped
 
-- Exact GPU speedups, 48-site live-model parity and cross-backend equivalence.
+- Exact GPU speedups as a new default. Work Plan 11 measured an opt-in
+  block-suffix replay at 1.260x median on Qwen3-1.7B Base layer 7
+  (8 prompts, 7 edits, RTX 5070, max abs error 0). It stays off unless
+  `BatchEngine(..., enable_suffix_replay=True)` is set. Untested model
+  families keep the original hook. See
+  [workplan11_results.md](performance/workplan11_results.md).
+- 48-site live-model parity and cross-backend equivalence.
 - KV-cached steering: the reference implementation recomputes a clean prefix
-  at each generation step. A persistent edited KV cache would change its
-  intervention protocol and is not an acceptable drop-in replacement.
+  at each generation step. Incremental clean KV is blocked on the current
+  Qwen cache, and a persistent edited KV cache would change the intervention
+  protocol. Neither is a drop-in acceleration.
 - `interp-engine` integration or vLLM static-point/CUDA-graph execution:
   these need backend-specific GPU tests and an isolated dependency environment.
 - Multi-GPU scheduling, dynamic model residency and production hosted GPU
