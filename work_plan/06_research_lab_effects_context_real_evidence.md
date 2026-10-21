@@ -188,6 +188,98 @@ Required interface:
 
 The saved six-site clean/edited logit evidence is enough to deliver a working Effects browsing experience even WITHOUT a new GPU job. Capture all existing operations per site from the original records and make the first real case automatic.
 
+## 5.1 Immediate UX correction — explain the result, not the experiment ledger (2026-10-20)
+
+This section supersedes any earlier instruction that causes the second Lab to open on a purely technical `Compare edits` display. The current deployed example shows `ablate`, `scale`, `add`, `clamp`, `coalition`, `Logit L2 6.19`, `Feature IDs 74449`, `Recorded prompts 1`, an opaque `arc_challenge:TIMSS...` identifier, GPU protocol IDs, SHA-256 strings and a technical explanation. Those observations may be genuine, but their public presentation is NOT acceptable. A person with no SAE or ML background should be able to say what changed, on which example, and why the graph is interesting after one glance. "There are real numbers" is not the acceptance criterion.
+
+### A. New information hierarchy — content must be instantly understandable
+
+Use this progressive disclosure order and keep the public text in clear, consistent English:
+
+1. **Title:** `What happens when we change a model feature?` (or `Change a feature. See what changes.`). Not `Compare edits` as the only page explanation.
+2. **One-line premise:** `A feature is a learned internal signal. We can change it and measure how the model's next-word predictions respond.`
+3. **Named, human-readable example:** show an approved short source prompt verbatim, or a new measured project-authored prompt. Show the actual task category if available. Never display an opaque source ID such as `arc_challenge:TIMSS_2003_8_pg85` as the primary input, and never lead with `The prompt text is not in the public record`. If third-party text cannot be shown, select another public-safe measured case; do not invent the hidden prompt's wording or semantics. The raw identifier belongs inside `Experiment details` only.
+4. **Main result — preferred:** if actual recorded/recomputed baseline and edited readouts exist, present a side-by-side `Before / After` comparison of real top next-token predictions with readable token labels, normalized probabilities from COMPLETE logits, and highlighted biggest rises/falls. If a recorded full rollout is available, show the real response texts. Never reconstruct text, probabilities or top-k ranks from the L2 scalar.
+5. **When only operator L2 is measured:** provide a useful, HONEST, simple bar chart titled `How much did each change affect the model's predictions?`. The visual is a relative numerical comparison for ONE exact model/site, prompt and readout; it does not show WHAT words changed. Place next to it a prominent explanation: `Longer bars mean the model's next-word scores moved more. They do not tell us which word was chosen or whether the answer improved.` The paragraph under the chart should be based on actual within-case rankings, for example `For this example, the paired edit changed the scores more than removing a single feature.` Only claim this if the paired edit and single-feature edit genuinely use comparable readouts/conditions. Do not assign fabricated low/medium/high thresholds or pretend `6.19` has everyday units.
+6. **A single result-led sentence:** generated deterministically from observed values, such as `Removing this feature changed the model's next-word scores. Changing the pair caused the largest shift among the measured edits on this example.` This is a statement about measured magnitude only; do not claim a changed answer or semantic effect without actual tokens/generation.
+7. **Simple interactions:** `Remove this feature`, `Reduce its activity`, `Increase its activity`, `Set its activity`, `Change a pair`, `Another real example`. Include only methods actually present in the case. Use an explicit neutral `Original` comparison when available. Internal operation keys remain machine-readable only. For `scale` use the actual factor (e.g. 0.5) rather than assuming reduction. For `add` or `clamp`, describe exactly the recorded transformation without claiming it always increases/sets an interpretable concept. For `coalition`, verify retained/removed IDs and the baseline before describing it as jointly editing two features.
+8. **Quiet research metadata:** put raw feature IDs, dataset sample IDs, run IDs, protocol IDs, logit-L2 exact value, all hashes, prompts-count and evidence URLs in one CLOSED `Experiment details` disclosure at the bottom. The main page must never show a wall of numeric metadata, fingerprints or `gpu04...` strings. Preserve the exact provenance accessible on demand. Do NOT delete it from the data asset.
+
+The main screen should not need a user to know the terms `ablate`, `logit`, `L2`, `coalition`, `readout`, `protocol` or `hash`. If a rigorous metric name is needed, explain it only in the expandable research details. Do not remove scientific evidence or imply a model improvement.
+
+### B. Concrete visual specification for the agent
+
+Above the fold, create one coherent experiment card, not many disconnected boxes.
+
+```text
+What happens when we change a model feature?
+Change a learned internal signal and see what the model does differently.
+
+EXAMPLE [visible, source-approved short input, or authored and measured]
+"..."                                       [Try another example]
+
+[Original]                   [Remove this feature]
+top prediction  ...          top prediction  ...        <- only with real paired logits
+other candidates ...         other candidates ...      <- measured, aligned output
+
+OR, with existing L2-only measurements:
+
+How much did the model's predictions shift?
+Remove feature       ██████
+Reduce activity      █████
+Increase activity    ████
+Set activity         ████
+Change a pair        ███████████████
+Longer bars = larger change in next-word scores on this SAME example.
+This does not tell us whether the final answer improved.
+
+What we learned
+[one grounded, plain-English comparison of measured operations]
+
+[Experiment details ▾]         <- closed by default
+```
+
+The real case is measured, not a made-up illustration. The blocks above are structure instructions only. Display actual human-approved prompt content where permitted; never use `...` as a production example. Use ONE appropriate primary chart for the available evidence instead of redundant bars + cards + bold totals. Remove the `Selected logit L2 6.1908` KPI box, `Feature IDs` KPI box and `Recorded prompts 1` KPI box from the primary flow.
+
+Select a real measured default that is interpretable and visually interesting. Do not default to a technically valid but opaque third-party prompt with no public preview. Case order should prioritize (a) actual approved input context, (b) paired token-level evidence, (c) genuinely differing interventions, (d) model identity. Do not cherry-pick to imply a general scientific conclusion; give access to the rest in the case gallery after the selected examples.
+
+### C. Make "what changed" a genuinely better experiment, not an explanation of L2
+
+A page that only renames `Logit L2` as `Prediction shift` still does not satisfy the product goal: most visitors want to see a concrete change in the model's output.
+
+**First, inspect existing archives and caches** for actual baseline/edited logits, top tokens or generation. Reuse without any GPU when found. Confirm exact alignment (model, SAE, layer, original prompt, readout position, tokenization, edit strength and condition).
+
+If only L2 was saved, keep the real per-operation bar chart as an honest supporting view, but enrich the TOP of the module with a few short, concrete paired predictions using the already-authorized **optional micro-study from Section 7**. Prefer **project-authored, meaningfully different, publicly safe short prompts**, one or two lightweight verified sites, and ONLY the minimal number of edits needed for 3–6 genuinely compelling before/after cases. The entire follow-up remains capped at 12 prompt-site pairs across two sites, as before; if it is expensive or model weights are not ready, do not run. Save measured complete logits for meaningful candidate probabilities and actual token IDs, not just aggregate differences. Real full generation is optional and must never be staged as measured unless performed. Keep the historic six-site operator results intact and separate; the micro-study has its own run and protocol identity.
+
+"Prompt without public text" plus unexplained L2 must not be the FIRST experience. If no public-safe meaningful paired output can be obtained without violating compute/rights restrictions, the release fails this upgraded UX target rather than being presented as complete. The agent must truthfully flag this blocker, not invent a narrative.
+
+### D. Exact content-writing rules
+
+- Titles and annotations are short, accessible and explanatory. The first sentence tells the visitor what action is being tested; the second states what the result shows.
+- Avoid internal vocabulary and defensive explanations in the public main viewport. Separate `What happened?` and `What this does NOT prove` when necessary, with one sentence each.
+- No raw technical operation names or logs as main-page typography. Technical values remain accessible through the closed `Experiment details` panel.
+- Do not interpret a larger L2 as a better answer, greater feature importance across models, guaranteed semantic change, or higher probability.
+- Do not label an SAE feature with an invented concept. Use reviewed feature descriptions from Feature Atlas only when model/site/feature identities match; otherwise say `a learned internal feature` rather than show the raw ID at the top.
+- Every bar has a visible label and its simple interpretation; comparable operators share a baseline and consistent axis. If conditions are not comparable, do not combine them.
+- No empty demo cards, `Not available` status tiles, fake prediction lists or dead interactions. Hide unsupported actions. Keep source evidence links in details.
+- Consistency with the first Lab and OpenSAE product tone: simple nouns, examples, plain language, real experiments first. The site should resemble an interactive explanation, not a benchmark debugging dashboard.
+
+### E. Additional mandatory UX acceptance and screenshots
+
+Extend Section 9 with these acceptance gates:
+
+1. Desktop/mobile screenshots of the Effects landing state show the title, actual sample context and a **legibly explained** primary plot, without jargon-heavy debug fields visible by default.
+2. None of the following occurs in the visible main content: `Selected logit L2`, `Feature IDs`, `Recorded prompts 1`, `gpu04.paired_operator_logit_l2.v1`, raw SHA-256 text, or `The prompt text is not in the public record`.
+3. An independent newcomer can answer in 10 seconds: `What was changed?`, `What does the bar or before/after plot mean?`, `Does a bigger bar mean a better answer?`. The correct answers are visible within the interface itself.
+4. Changing the edit type genuinely changes the measured state/visualization; each new selected example has source-backed values and meaningful public context. `Another example` never lands on a blank placeholder.
+5. The selected example is accompanied by a simple source-backed finding. Text is calculated from comparable recorded data and is not a fabricated feature explanation or guessed change in generated answer.
+6. The optional detailed evidence panel remains complete, accessible and copyable; disabling its default visibility does not compromise reproducibility.
+7. If new token-level examples are added, demonstrate exact logit/probability reconstruction, tokenizer decoding and before/after alignment in numerical tests.
+8. Retest Feature Atlas and Context Lab for regressions; the latter's already-usable controlled-input experience should not be altered by this UX fix.
+9. Publish and verify the *actual live* HF Space URL, not just localhost. Include before/after screenshots and list what was **reused** and what (if anything) was **newly measured**.
+
+**Updated completion definition:** Effects is done only when a nontechnical visitor can understand a concrete intervention and the honest meaning of its outcome. A graph with five unexplained L2 numbers and a provenance ledger is a FAILED release, even when all five measurements are real.
+
 ## 6. Work unit D: Context Lab as two functioning experimental modes
 
 ### 6.1 Controlled Inputs — default
