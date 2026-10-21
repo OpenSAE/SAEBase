@@ -186,6 +186,7 @@ def main() -> None:
             "repeats": args.repeats,
             "site": f"{MODEL}:L{LAYER}:{SAE_KEY}",
             "results": [],
+            "generation_controls": [],
             "comparability": (
                 "old clean-prefix scientific protocol"
                 if args.mode == "hf-reference"
@@ -206,6 +207,36 @@ def main() -> None:
                     selected = select_feature_id(raw, sae, ids)
                 else:
                     raise RuntimeError("provide an explicit, source-verified SAE feature ID")
+            if raw is None:
+                # A real baseline -> steered -> baseline request sequence. The
+                # worker owns steering per request, and no test may infer a
+                # working hook solely from the presence of generated text.
+                from saebase.vllm_backend.fast_steering import generate_decoder_direction_cached
+
+                probe = generate_decoder_direction_cached(
+                    engine.model,
+                    sae,
+                    tuple(int(x) for x in ids[0].tolist()),
+                    layer=LAYER,
+                    feature_id=selected,
+                    strength=args.strength,
+                    max_new_tokens=min(8, max(lengths)),
+                    temperature=0.0,
+                    seed=0,
+                    compare_unsteered=True,
+                    stop_at_eos=False,
+                )
+                before = tuple(probe.baseline_token_ids or ())
+                after = tuple(probe.generated_token_ids)
+                report["generation_controls"].append(
+                    {
+                        "prompt_index": prompt_index,
+                        "unsteered_token_ids_private": list(before),
+                        "steered_token_ids_private": list(after),
+                        "token_disagreement": sum(a != b for a, b in zip(before, after)),
+                        "note": "Token agreement alone does not establish that taps were bypassed",
+                    }
+                )
             for length in lengths:
                 series = []
                 token_ids = None
