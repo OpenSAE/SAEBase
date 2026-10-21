@@ -48,7 +48,10 @@ class Facade:
             for i in range(len(ids)):
                 if i not in masked:
                     h[i] += torch.as_tensor(delta, dtype=h.dtype)
-        return {points[0]: h}
+        return {point: h.clone() for point in points}
+
+    def decode_residuals(self, residuals, *, detach=True):
+        return residuals[:, :3].clone()
 
     def generate_text(self, ids, **kwargs):
         return "EDITED" if self.engine.active is not None else "CLEAN"
