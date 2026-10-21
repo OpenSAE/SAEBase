@@ -14,6 +14,7 @@
 .field select,select{min-width:0;max-width:100%}
 .table-wrap{display:block;overflow-x:auto}
 .record-meta,.panel-label,.token-label{overflow-wrap:anywhere}
+.feature-block{margin:8px 0 22px}.feature-block h2{font-size:22px;margin:18px 0 8px}.feature-name{font-size:28px;font-weight:760;letter-spacing:-.04em;margin:0}.feature-note,.model-line{color:#51657e;font-size:16px;margin:6px 0}.feature-switch{display:inline-flex;background:#eef2fa;border-radius:12px;padding:4px;gap:4px;margin-top:8px}.feature-switch button{min-height:44px;min-width:72px;border:0;border-radius:9px;background:transparent;font-weight:740;color:#64758d}.feature-switch button[aria-pressed="true"]{background:#fff;color:#2f4fcc;box-shadow:0 2px 9px #233a6622}.before-after .predict-col h3,.predict-col h3{text-transform:none;letter-spacing:-.02em;font-size:16px;color:#192535}
 .example-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
 .example-head > div{min-width:0;flex:1}
 @media(max-width:750px){.example-head{display:block}.example-head .secondary-action{margin-top:12px}}

@@ -6,7 +6,7 @@
   'use strict';
   const TYPES = ['sites', 'metrics', 'effects', 'contexts', 'rss', 'coalitions'];
   const MAX_UPLOAD = 25 * 1024 * 1024;
-  const state = { pack: null, route: 'effects', effectId: '', effectTarget: 'ablate', edit: 'ablate', removed: true, prediction: '', revealed: false,
+  const state = { pack: null, route: 'effects', effectId: '', effectTarget: 'ablate', edit: 'ablate', removed: false, prediction: '', revealed: false,
     contextMode: 'grid', contextId: '', mask: 0, prevMask: null, contextBit: 0, rssId: '', rssSetting: 'local_format', variantId: '', coalitionId: '', coalitionMask: 0,
     modelProtocol: '', modelX: '', modelY: '', modelFilter: '', modelSelected: '' };
   const SETTING_COPY = {
@@ -109,38 +109,40 @@
     const operators=(c.operators||[]).filter(op=>Array.isArray(op.edited_top_tokens)&&op.edited_top_tokens.length);
     const selected=operators.find(op=>op.operation===state.edit)||operators.find(op=>op.operation==='ablate')||operators[0];
     const before=c.original_top_tokens;
-    const after=state.removed?selected.edited_top_tokens:before;
-    const rows=alignedRows(before, after);
-    const probs=rows.flatMap(row=>[row.base?.probability, row.edited?.probability]).filter(value=>typeof value==='number');
+    const edited=selected.edited_top_tokens;
+    const after=state.removed?edited:before;
+    const rows=alignedRows(before, state.removed?edited:before);
+    const probs=rows.flatMap(row=>[row.base?.probability, state.removed?row.edited?.probability:null]).filter(value=>typeof value==='number');
     const peak=Math.max(...probs, 0.001);
     const marks=new Map();
-    const shared=rows.filter(row=>row.base&&row.edited).map(row=>({token:row.token, delta:row.edited.probability-row.base.probability}));
-    if(state.removed && shared.length){const rise=shared.reduce((best,row)=>row.delta>best.delta?row:best,shared[0]);const fall=shared.reduce((best,row)=>row.delta<best.delta?row:best,shared[0]);if(rise.delta>=0.02)marks.set(rise.token,'rise');if(fall.delta<=-0.02)marks.set(fall.token,'fall');}
+    const shared=state.removed?rows.filter(row=>row.base&&row.edited).map(row=>({token:row.token, delta:row.edited.probability-row.base.probability})):[];
+    if(shared.length){const rise=shared.reduce((best,row)=>row.delta>best.delta?row:best,shared[0]);const fall=shared.reduce((best,row)=>row.delta<best.delta?row:best,shared[0]);if(rise.delta>=0.02)marks.set(rise.token,'rise');if(fall.delta<=-0.02)marks.set(fall.token,'fall');}
     const cell=(row,side)=>{const mark=marks.get(row.token)||'';const value=side==='base'?row.base:row.edited;if(!value)return `<div class="word-row"><span class="token-label">${esc(piece(row.base||row.edited))}</span><span class="bar-track"></span><span class="bar-number">not in the recorded top 5</span></div>`;
       return `<div class="word-row ${mark}"><span class="token-label">${esc(piece(value))}</span><span class="bar-track"><span class="bar-fill ${side==='edited'&&mark==='rise'?'edit-fill':'base-fill'}" style="width:${Math.max(value.probability/peak*100, value.probability>0?2:0)}%"></span></span><span class="bar-number">${percent(value.probability)}</span></div>`;};
-    const rightTitle=state.removed?(selected.operation==='ablate'?'Feature removed':selected.label):'Original';
-    const topBefore=before[0];const topAfter=after[0];
-    $('effect-case-name').textContent=item.name;
+    const topBefore=before[0];const topEdited=edited[0];
     $('effect-prompt').textContent=c.prompt;
-    $('effect-meta').textContent=`${c.model} · next-token forecast · one selected example, not a sample of every feature.`;
-    $('effects-chart').innerHTML=`<div class="before-after"><div class="predict-col"><h3>Original</h3><p class="top-line">Top prediction: ${esc(quoted(topBefore))} (${percent(topBefore.probability)})</p>${rows.map(row=>cell(row,'base')).join('')}</div><div class="predict-col"><h3>${esc(rightTitle)}</h3><p class="top-line">Top prediction: ${esc(quoted(topAfter))} (${percent(topAfter.probability)})</p>${rows.map(row=>cell(row,'edited')).join('')}</div></div><p class="chart-note">Bars share one scale. The printed chances are a full-vocabulary softmax, not a top-5 total of 100%. A next token is not a finished answer.</p>`;
-    const shownBefore=Math.round(topBefore.probability*1000)/10, shownAfter=Math.round(topAfter.probability*1000)/10;
+    $('effect-meta').textContent=c.model;
+    $('effect-feature').textContent=`Feature #${c.feature_id}`;
+    $('effect-active').textContent='This feature was the strongest nonzero coordinate measured on this input.';
+    const onColumn=`<div class="predict-col"><h3>Feature on (normal)</h3><p class="top-line">Top prediction: ${esc(quoted(topBefore))} (${percent(topBefore.probability)})</p>${rows.map(row=>cell(row,'base')).join('')}</div>`;
+    const offColumn=`<div class="predict-col"><h3>Feature #${esc(c.feature_id)} off</h3><p class="top-line">Top prediction: ${esc(quoted(topEdited))} (${percent(topEdited.probability)})</p>${rows.map(row=>cell(row,'edited')).join('')}</div>`;
+    $('effects-chart').innerHTML=state.removed?`<div class="before-after">${onColumn}${offColumn}</div>`:onColumn;
+    const shownBefore=Math.round(topBefore.probability*1000)/10, shownAfter=Math.round(topEdited.probability*1000)/10;
     const dpp=Math.round((shownAfter-shownBefore)*10)/10;
-    const same=topBefore.token===topAfter.token;
-    const moved=Math.abs(dpp)<0.05?'changed':dpp<0?'dropped':'rose';
-    let finding;
-    if(!state.removed) finding='Original restored. Both sides show the measured prediction before any edit.';
-    else if(selected.operation==='ablate' && !same) finding=`Removing this feature changed the most likely next piece of text from ${quoted(topBefore)} to ${quoted(topAfter)} for this input. The top prediction changed. This does not mean the answer got better, and it does not say what the feature represents.`;
-    else if(selected.operation==='ablate' && Math.abs(dpp)<1) finding=`For this particular prompt, the change was small. The model still favored the same continuation; its confidence ${moved} by ${Math.abs(dpp).toFixed(1)} percentage points. It does not establish what the feature represents.`;
-    else if(selected.operation==='ablate') finding=`The top prediction stayed the same, but its probability ${moved} by ${Math.abs(dpp).toFixed(1)} percentage points. The model still favored the same continuation. This does not mean the answer got better, and it does not say what the feature represents.`;
-    else finding=`${selected.label} ${same?`kept ${quoted(topBefore)} first. Its chance ${moved} by ${Math.abs(dpp).toFixed(1)} percentage points.`:`changed the most likely next piece from ${quoted(topBefore)} to ${quoted(topAfter)}.`} This is a different measured edit, not the removal.`;
-    $('effect-footnote').textContent=finding;
-    $('effect-remove').setAttribute('aria-pressed', state.removed && selected.operation==='ablate' ? 'true' : 'false');
-    $('effect-remove').classList.toggle('is-on', state.removed && selected.operation==='ablate');
-    const others=operators.filter(op=>op.operation!=='ablate');
-    $('effect-other').innerHTML=others.map(op=>{const value=op.operation_parameters&&op.operation_parameters.value;const exact=value===undefined?'':` Exact recorded value: ${esc(value)}.`;return `<button type="button" class="other-edit ${state.removed&&state.edit===op.operation?'is-on':''}" data-edit="${esc(op.operation)}">${esc(op.label)}.${exact}</button>`;}).join('') || '<p>No other edit was measured for this example.</p>';
-    document.querySelectorAll('[data-edit]').forEach(btn=>btn.addEventListener('click',()=>{state.edit=btn.dataset.edit;state.removed=true;renderEffects();}));
-    const legacyLabels={ablate:'Remove this feature',scale:'Cut its activity in half',add:'Add 1 to its activity',clamp:'Set its activity to 1',coalition:'Turn off the second active feature'};
+    const same=topBefore.token===topEdited.token;
+    const limit=' This shows a change for one input, not what the feature means in general.';
+    const verb=dpp<0?'fell':'rose';
+    const finding=!same
+      ? `Turning off feature #${c.feature_id} changed the model's top next-token prediction from ${quoted(topBefore)} to ${quoted(topEdited)} on this input.${limit}`
+      : Math.abs(dpp)<1
+        ? `Turning off this feature had little effect on the recorded next-token predictions for this input.${limit}`
+        : `The top prediction stayed ${quoted(topBefore)}, but its probability ${verb} from ${percent(topBefore.probability)} to ${percent(topEdited.probability)}.${limit}`;
+    $('effect-learned-title').hidden=!state.removed;
+    $('effect-footnote').hidden=!state.removed;
+    $('effect-footnote').textContent=state.removed?finding:'';
+    $('effect-on').setAttribute('aria-pressed', state.removed?'false':'true');
+    $('effect-off').setAttribute('aria-pressed', state.removed?'true':'false');
+    const legacyLabels={ablate:'Set activity to zero',scale:'Multiply activity by 0.5',add:'Add 1 to its activity',clamp:'Set its activity to 1',coalition:'Turn off the second active feature'};
     const legacy=cases('effects').filter(row=>!row.prompt);
     const othersPublic=publicEffects().filter(row=>!CURATED.some(item=>item.id===row.id));
     const otherLines=othersPublic.map(row=>{const op=(row.operators||[]).find(item=>item.operation==='ablate');const next=op?.edited_top_tokens?.[0];const first=row.original_top_tokens[0];return `<li>${esc(row.model)} · ${esc(row.prompt)} · ${esc(piece(first))} ${percent(first.probability)} → ${next?esc(piece(next))+' '+percent(next.probability):'recorded'}</li>`;}).join('');
@@ -266,7 +268,7 @@
     const url=location.origin+location.pathname+'?'+q.toString()+'#'+state.route;const done=()=>status('View URL copied. Imported local evidence must also be shared separately to reproduce measurements.');
     if(navigator.clipboard?.writeText)navigator.clipboard.writeText(url).then(done,()=>status(url));else status(url);}
   async function init(){for(const [id,fn] of [
-      ['effect-case',()=>{state.effectId=$('effect-case').value;state.edit='ablate';state.removed=true;clearPrediction();renderEffects();}],
+      ['effect-case',()=>{state.effectId=$('effect-case').value;state.edit='ablate';state.removed=false;clearPrediction();renderEffects();}],
       ['context-case',()=>{state.contextId=$('context-case').value;state.prevMask=null;state.mask=bestMask(find('contexts',state.contextId));renderGrid();}],
       ['rss-case',()=>{const [site,dataset]=$('rss-case').value.split('|');const match=cases('rss').find(row=>row.site_id===site&&row.dataset_id===dataset&&row.setting===state.rssSetting)||cases('rss').find(row=>row.site_id===site&&row.dataset_id===dataset);state.rssId=match?.id||'';state.variantId='';renderRSS();}],
       ['rss-variant',()=>{state.variantId=$('rss-variant').value;renderRSS();}],
@@ -276,9 +278,9 @@
       ['model-y',()=>{state.modelY=$('model-y').value;renderModels();}],
       ['model-name',()=>{state.modelFilter=$('model-name').value==='all'?'':$('model-name').value;renderModels();}]
     ])$(id).addEventListener('change',fn);
-    $('effect-next').addEventListener('click',()=>{const list=curatedEffects();if(!list.length)return;const index=Math.max(0,list.findIndex(item=>item.id===state.effectId));state.effectId=list[(index+1)%list.length].id;state.edit='ablate';state.removed=true;clearPrediction();renderEffects();});
-    $('effect-remove').addEventListener('click',()=>{state.edit='ablate';state.removed=true;renderEffects();});
-    $('effect-restore').addEventListener('click',()=>{state.removed=false;renderEffects();});
+    $('effect-next').addEventListener('click',()=>{const list=curatedEffects();if(!list.length)return;const index=Math.max(0,list.findIndex(item=>item.id===state.effectId));state.effectId=list[(index+1)%list.length].id;state.edit='ablate';state.removed=false;clearPrediction();renderEffects();});
+    $('effect-on').addEventListener('click',()=>{state.edit='ablate';state.removed=false;renderEffects();});
+    $('effect-off').addEventListener('click',()=>{state.edit='ablate';state.removed=true;renderEffects();});
     $('context-surprise').addEventListener('click',()=>{const list=cases('contexts');if(!list.length)return;const pick=list[Math.floor(Math.random()*list.length)];state.contextId=pick.id;state.prevMask=null;state.mask=Math.floor(Math.random()*64);renderGrid();});
     $('context-recipe').addEventListener('click',()=>recipe('context'));
     $('coalition-recipe').addEventListener('click',()=>recipe('interactions'));

@@ -30,30 +30,30 @@
       <div id="flash" class="flash" role="status" aria-live="polite" hidden></div>
       <section class="page" id="page-effects" aria-labelledby="title-effects">
         <div class="hero">
-          <div class="eyebrow">FEATURE EFFECTS</div>
-          <h1 id="title-effects">What changes when we remove a model feature?</h1>
-          <p>Pick a real example, then compare the model's prediction before and after one internal signal is removed. <span class="feature-tip" tabindex="0" title="A feature is a pattern detected inside the model.">What is a feature?</span></p>
+          <h1 id="title-effects">What happens when we turn off one feature?</h1>
         </div>
         <article class="card experiment-card">
           <div class="example-head">
             <div>
-              <div class="eyebrow">A REAL INPUT</div>
-              <p id="effect-case-name" class="case-name"></p>
               <p id="effect-prompt" class="example-quote"></p>
-              <p id="effect-meta" class="record-meta"></p>
+              <p id="effect-meta" class="model-line"></p>
             </div>
             <button id="effect-next" class="secondary-action" type="button">Another example</button>
           </div>
           <select id="effect-case" hidden></select>
-          <div class="action-row">
-            <button id="effect-remove" class="primary-action" type="button" aria-pressed="true">Remove this feature</button>
-            <button id="effect-restore" class="secondary-action" type="button">Restore original</button>
+          <div class="feature-block">
+            <h2>Inside the model</h2>
+            <p id="effect-feature" class="feature-name"></p>
+            <p id="effect-active" class="feature-note"></p>
+            <p id="effect-mechanism">We set this feature's activity to zero for this prediction. The input and model weights stay the same.</p>
+            <div class="feature-switch" role="group" aria-labelledby="effect-feature">
+              <button id="effect-on" type="button" aria-pressed="true">On</button>
+              <button id="effect-off" type="button" aria-pressed="false">Off</button>
+            </div>
           </div>
           <div id="effects-chart" aria-live="polite"></div>
-          <h2 id="effect-learned-title">What changed?</h2>
-          <p id="effect-footnote"></p>
-          <p id="effect-limit">These are selected examples, not a survey of every feature. A larger change does not mean a better answer.</p>
-          <details class="evidence-fold" id="other-changes"><summary>Explore other changes</summary><div id="effect-other" class="other-actions"></div></details>
+          <h2 id="effect-learned-title" hidden>What changed?</h2>
+          <p id="effect-footnote" hidden></p>
           <details class="evidence-fold"><summary>Experiment details</summary><div id="effect-evidence" class="record-meta"></div><div id="effect-measures"></div></details>
         </article>
       </section>
