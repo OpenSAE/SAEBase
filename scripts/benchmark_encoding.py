@@ -3,6 +3,7 @@
 Run: python scripts/benchmark_encoding.py --rows 8192 --width 1024 --repeat 5
 Compare batch=1 against larger batches using the same fixed tensors.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -15,8 +16,9 @@ import torch
 class FixedSAE(torch.nn.Module):
     def __init__(self, width: int, features: int):
         super().__init__()
-        self.weight = torch.nn.Parameter(torch.randn(width, features) / width ** .5,
-                                         requires_grad=False)
+        self.weight = torch.nn.Parameter(
+            torch.randn(width, features) / width**0.5, requires_grad=False
+        )
 
     def encode(self, x: torch.Tensor) -> torch.Tensor:
         return torch.relu(x @ self.weight)
@@ -36,9 +38,12 @@ def measure(model: FixedSAE, rows: torch.Tensor, chunk: int, repeat: int) -> dic
             torch.cuda.synchronize()
         times.append(perf_counter() - started)
     times.sort()
-    median = times[len(times)//2]
-    return {"batch_rows": chunk, "median_seconds": median,
-            "rows_per_second": round(len(rows) / median, 2)}
+    median = times[len(times) // 2]
+    return {
+        "batch_rows": chunk,
+        "median_seconds": median,
+        "rows_per_second": round(len(rows) / median, 2),
+    }
 
 
 def main() -> None:
@@ -61,9 +66,14 @@ def main() -> None:
     sizes = [int(x) for x in args.batch_sizes.split(",")]
     if any(x < 1 for x in sizes):
         parser.error("batch sizes must be positive")
-    result = {"device": args.device, "rows": args.rows, "width": args.width,
-              "features": args.features, "torch": torch.__version__,
-              "measurements": [measure(model, x, n, args.repeat) for n in sizes]}
+    result = {
+        "device": args.device,
+        "rows": args.rows,
+        "width": args.width,
+        "features": args.features,
+        "torch": torch.__version__,
+        "measurements": [measure(model, x, n, args.repeat) for n in sizes],
+    }
     print(json.dumps(result, indent=2))
 
 
