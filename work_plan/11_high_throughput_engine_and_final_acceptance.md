@@ -152,8 +152,9 @@ Minimum commands from root (adapt only after inspecting repository state):
 ~~~bash
 git fetch origin
 git status --short
-# Branch from merged WP10 or the exact approved PR #45 commit, without resetting local work.
-git switch -c perf/wp11-final origin/main
+# If WP10 PR #45 is merged, branch from origin/main.
+# Otherwise branch from the approved, exact WP10 PR SHA on a separate worktree.
+git switch -c perf/wp11-final origin/main  # only after WP10 is merged
 python -m pip install -e ".[dev,quality]"
 python -m pytest -q
 python -m ruff check saebase/ models/ scripts/
