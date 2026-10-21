@@ -8,12 +8,11 @@ model. Left padding or noncausal models require a different adapter.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import Path
 from dataclasses import replace
 import hashlib
 import numpy as np
 from time import perf_counter
-from typing import Any, Iterable, Sequence
+from typing import Any, Sequence
 import math
 
 import torch
@@ -27,7 +26,7 @@ from saebase.api.features import (
     _sae_input,
     _sae_uses_layer_norm,
 )
-from saebase.store import ShardedReader, sha256_state_dict
+from saebase.store import ShardedReader, VerifiedCheckpointSession, sha256_state_dict
 from .operators import apply_condition
 from .results import ResultWriter
 from .specs import Condition, ExperimentIdentity, MeasurementSample, measurement_id
@@ -103,33 +102,58 @@ def _metrics(baseline: torch.Tensor, patched: torch.Tensor, sample: MeasurementS
              delta_h: float) -> dict[str, Any]:
     if baseline.shape != patched.shape or baseline.ndim != 1:
         raise ValueError("baseline/edited logits must have equal [vocab] shapes")
-    if not bool(torch.isfinite(patched).all()) or not bool(torch.isfinite(baseline).all()):
-        raise ValueError("non-finite model output")
     b, p = baseline.float(), patched.float()
+    finite = torch.isfinite(b).all() & torch.isfinite(p).all()
+    diff = p - b
+    # One host transfer for the reductions. KL stays the sum of
+    # softmax(baseline) * (log softmax(baseline) - log softmax(edited)),
+    # clamped at 0 because a float32 reduction of an identity can be -1e-8.
+    pieces = [
+        torch.linalg.vector_norm(diff),
+        diff.abs().max(),
+        F.kl_div(F.log_softmax(p, -1), F.softmax(b, -1), reduction="sum"),
+        finite.to(dtype=b.dtype),
+    ]
+    target = sample.target_token_id
+    reference = sample.reference_token_id
+    if target is not None:
+        if isinstance(target, bool) or not isinstance(target, int) or target >= b.numel() or target < 0:
+            raise IndexError("target token ID exceeds vocabulary")
+        if reference is not None and (
+            isinstance(reference, bool) or not isinstance(reference, int)
+            or reference >= b.numel() or reference < 0
+        ):
+            raise IndexError("reference token ID exceeds vocabulary")
+        top_b = torch.argmax(b)
+        top_p = torch.argmax(p)
+        pieces.extend([b[target], p[target], diff[target], (top_b == target).to(b.dtype), (top_p == target).to(b.dtype)])
+        if reference is not None:
+            pieces.extend([b[target] - b[reference], p[target] - p[reference]])
+    values = torch.stack(pieces).detach().cpu().tolist()
+    if values[3] == 0.0:
+        raise ValueError("non-finite model output")
     out: dict[str, Any] = {
-        "logit_delta_l2": float(torch.linalg.vector_norm(p - b).item()),
-        "logit_delta_max_abs": float((p - b).abs().max().item()),
-        # The analytic KL is >=0; float32 reductions can give -1e-8 for
-        # identity operations. Avoid displaying negative KL as a metric.
-        "kl_baseline_to_edited": max(0., float(F.kl_div(F.log_softmax(p, -1), F.softmax(b, -1), reduction="sum").item())),
+        "logit_delta_l2": float(values[0]),
+        "logit_delta_max_abs": float(values[1]),
+        "kl_baseline_to_edited": max(0.0, float(values[2])),
         "activation_delta_l2": delta_h,
     }
-    if sample.target_token_id is not None:
-        t = sample.target_token_id
-        if t >= b.numel():
-            raise IndexError("target token ID exceeds vocabulary")
-        r = sample.reference_token_id
-        if r is not None and r >= b.numel():
-            raise IndexError("reference token ID exceeds vocabulary")
-        out["baseline_target_logit"] = float(b[t].item())
-        out["edited_target_logit"] = float(p[t].item())
-        out["target_logit_delta"] = float((p[t] - b[t]).item())
-        out["baseline_target_top1"] = int(torch.argmax(b).item() == t)
-        out["edited_target_top1"] = int(torch.argmax(p).item() == t)
-        if r is not None:
-            out["baseline_logit_difference"] = float((b[t]-b[r]).item())
-            out["edited_logit_difference"] = float((p[t]-p[r]).item())
+    if target is not None:
+        out["baseline_target_logit"] = float(values[4])
+        out["edited_target_logit"] = float(values[5])
+        out["target_logit_delta"] = float(values[6])
+        out["baseline_target_top1"] = int(values[7] == 1.0)
+        out["edited_target_top1"] = int(values[8] == 1.0)
+        if reference is not None:
+            out["baseline_logit_difference"] = float(values[9])
+            out["edited_logit_difference"] = float(values[10])
     return out
+
+
+def _boundary_digests_for(model: Any, sae: Any, lease: VerifiedCheckpointSession | None) -> tuple[str, str]:
+    if lease is None:
+        return sha256_state_dict(model), sha256_state_dict(sae)
+    return lease.leased_sha256(model), lease.leased_sha256(sae)
 
 
 class BatchEngine:
@@ -143,10 +167,25 @@ class BatchEngine:
                  activation_reader: ShardedReader | None = None,
                  code_reader: ShardedReader | None = None,
                  pad_token_id: int | None = None,
-                 enable_hf_masked_batch: bool = False) -> None:
+                 enable_hf_masked_batch: bool = False,
+                 identity_lease: VerifiedCheckpointSession | None = None,
+                 release_content_check: bool | None = None) -> None:
         self.model, self.sae, self.identity = model, sae, identity
         self.activation_reader, self.code_reader = activation_reader, code_reader
         self.pad_token_id = pad_token_id
+        self.identity_lease = identity_lease
+        if release_content_check is None:
+            release_content_check = identity_lease is not None
+        if not isinstance(release_content_check, bool):
+            raise TypeError("release_content_check must be a bool")
+        self.release_content_check = release_content_check
+        self.counters = {
+            "model_forwards": 0,
+            "combined_capture_forwards": 0,
+            "separate_baseline_forwards": 0,
+            "sae_encodes": 0,
+            "patch_forwards": 0,
+        }
         # Off by default. Opt-in run_batch uses the single-example kernel.
         # A fused padded GEMM changes Qwen3 bf16 TopK ids, so it is not used.
         # Leave this off until a fused path meets the frozen tolerance and 1.15x.
@@ -157,9 +196,10 @@ class BatchEngine:
         model.capabilities.require("patch")
         if model.backend != identity.backend:
             raise ValueError("model backend differs from experiment identity")
-        if sha256_state_dict(model.model) != identity.model_state_sha256:
+        model_sha, sae_sha = _boundary_digests_for(model.model, sae, identity_lease)
+        if model_sha != identity.model_state_sha256:
             raise ValueError("model state differs from experiment identity")
-        if sha256_state_dict(sae) != identity.sae_state_sha256:
+        if sae_sha != identity.sae_state_sha256:
             raise ValueError("SAE state differs from experiment identity")
         self.d_in, self.d_sae = _sae_dimensions(sae)
         if activation_reader is not None:
@@ -309,15 +349,29 @@ class BatchEngine:
                 ))
                 baselines.append(logits[i])
             return snapshots, baselines
-        # HFHooksModel only supports single-example forward hook capture/patch.
-        from saebase.api import capture_features
+        # One unpadded forward can return the site activation and the baseline
+        # logits. Models without that primitive keep capture plus forward_logits.
+        from saebase.api.features import capture_features, snapshot_from_activation
         ret, bs = [], []
+        combined = callable(getattr(self.model, "capture_with_logits", None))
         for s in samples:
             ids = self.model.tokens(tokens=torch.tensor([s.tokens], dtype=torch.long))
+            site = ActivationSite(self.identity.site.layer, self.identity.site.hook_name, s.patch_position)
             cached = self._read_cache(s) if self.activation_reader is not None else None
-            if cached is None:
-                snapshot = capture_features(self.model, self.sae,
-                     site=ActivationSite(self.identity.site.layer, self.identity.site.hook_name, s.patch_position), tokens=ids)
+            baseline = None
+            if cached is None and combined:
+                activation, baseline = self.model.capture_with_logits(
+                    tokens=ids, site=site, readout_position=s.readout_index
+                )
+                snapshot = snapshot_from_activation(self.sae, tokens=ids, site=site, activation=activation)
+                self.counters["combined_capture_forwards"] += 1
+                self.counters["model_forwards"] += 1
+                self.counters["sae_encodes"] += 1
+            elif cached is None:
+                snapshot = capture_features(self.model, self.sae, site=site, tokens=ids)
+                self.counters["separate_baseline_forwards"] += 1
+                self.counters["model_forwards"] += 1
+                self.counters["sae_encodes"] += 1
             else:
                 h, z = cached
                 ln_mu = ln_std = None
@@ -329,12 +383,13 @@ class BatchEngine:
                     self.sae, z, self.d_in, ln_mu=ln_mu, ln_std=ln_std, activation=h,
                 ).to(device=h.device, dtype=h.dtype)
                 snapshot = FeatureSnapshot(
-                    ids,
-                    ActivationSite(self.identity.site.layer, self.identity.site.hook_name, s.patch_position),
-                    h, z, reconstructed, ln_mu=ln_mu, ln_std=ln_std,
+                    ids, site, h, z, reconstructed, ln_mu=ln_mu, ln_std=ln_std,
                 )
+            if baseline is None:
+                baseline = self.model.forward_logits(tokens=ids, readout_position=s.readout_index)
+                self.counters["model_forwards"] += 1
             ret.append(snapshot)
-            bs.append(self.model.forward_logits(tokens=ids, readout_position=s.readout_index))
+            bs.append(baseline)
         return ret, bs
 
     @torch.no_grad()
@@ -346,9 +401,12 @@ class BatchEngine:
             _, logits = self._hf_batch(samples, patches=patches)
             return [logits[i] for i in range(len(jobs))]
         if self.model.backend != "transformer_lens":
-            return [self.model.patch_logits(tokens=self.model.tokens(tokens=torch.tensor([s.tokens])),
+            logits = [self.model.patch_logits(tokens=self.model.tokens(tokens=torch.tensor([s.tokens])),
                         site=ActivationSite(self.identity.site.layer, self.identity.site.hook_name, s.patch_position),
                         activation=h, readout_position=s.readout_index) for s,h in jobs]
+            self.counters["patch_forwards"] += len(logits)
+            self.counters["model_forwards"] += len(logits)
+            return logits
         samples = [s for s,_ in jobs]
         device = self.model.tokens(tokens=torch.tensor([samples[0].tokens])).device
         padded = _padded_tokens(samples, device=device, pad_token_id=self.pad_token_id or 0)
@@ -387,7 +445,16 @@ class BatchEngine:
             writer: ResultWriter, *, sample_batch: int = 8, microbatch: int = 16,
             budget: RunBudget | None = None, verify_identity: bool = True,
             tolerance: float = 1e-4) -> ExecutionStats:
-        plan = dry_run(samples, conditions, microbatch=microbatch, budget=budget)
+        dry_run(samples, conditions, microbatch=microbatch, budget=budget)
+        if self.release_content_check:
+            if self.identity_lease is not None:
+                self.identity_lease.strict_recheck()
+            else:
+                model_sha = sha256_state_dict(self.model.model)
+                sae_sha = sha256_state_dict(self.sae)
+                if (model_sha != self.identity.model_state_sha256
+                        or sae_sha != self.identity.sae_state_sha256):
+                    raise RuntimeError("content checksum differs from the experiment identity")
         if writer.identity.key != self.identity.key:
             raise ValueError("result store experiment identity mismatch")
         if type(sample_batch) is not int or sample_batch < 1:

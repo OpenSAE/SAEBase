@@ -97,9 +97,7 @@ def _clone_ln_stat(value: Any) -> torch.Tensor | None:
 
 
 def _capture_ln_stats(sae: Any) -> tuple[torch.Tensor | None, torch.Tensor | None]:
-    return _clone_ln_stat(getattr(sae, "ln_mu", None)), _clone_ln_stat(
-        getattr(sae, "ln_std", None)
-    )
+    return _clone_ln_stat(getattr(sae, "ln_mu", None)), _clone_ln_stat(getattr(sae, "ln_std", None))
 
 
 def _clear_ln_stats(sae: Any) -> None:
@@ -125,7 +123,9 @@ def _restore_ln_stats(
         _clear_ln_stats(sae)
 
 
-def _layer_norm_stats(activation: torch.Tensor, eps: float = 1e-5) -> tuple[torch.Tensor, torch.Tensor]:
+def _layer_norm_stats(
+    activation: torch.Tensor, eps: float = 1e-5
+) -> tuple[torch.Tensor, torch.Tensor]:
     """Match SAELens ``normalize_activations='layer_norm'`` affine stats."""
     mu = activation.mean(dim=-1, keepdim=True)
     centered = activation - mu
@@ -172,14 +172,11 @@ def _decode(
 
 
 @torch.no_grad()
-def capture_features(
-    model: ModelAdapter, sae: Any, *, site: ActivationSite,
-    prompt: str | None = None, tokens: torch.Tensor | None = None
+def snapshot_from_activation(
+    sae: Any, *, tokens: torch.Tensor, site: ActivationSite, activation: torch.Tensor
 ) -> FeatureSnapshot:
-    """Capture activation and SAE encode/decode at a specific token position."""
+    """Encode and decode one already-captured activation. Does not run the model."""
     d_in, d_sae = _sae_dimensions(sae)
-    ids = model.tokens(prompt=prompt, tokens=tokens)
-    activation = model.capture(tokens=ids, site=site)
     _check_vector("activation", activation, size=d_in)
     h_for_sae = _sae_input(sae, activation)
     z = sae.encode(h_for_sae.unsqueeze(0))
@@ -194,11 +191,29 @@ def capture_features(
     if hasattr(sae, "ln_mu") or hasattr(sae, "ln_std"):
         raise RuntimeError("SAE layer_norm buffers leaked after capture decode")
     return FeatureSnapshot(
-        tokens=ids.detach().clone(), site=site,
-        activation=activation, codes=z.detach().clone(),
+        tokens=tokens.detach().clone(),
+        site=site,
+        activation=activation.detach().clone(),
+        codes=z.detach().clone(),
         reconstruction=reconstruction.detach().clone(),
-        ln_mu=ln_mu, ln_std=ln_std,
+        ln_mu=ln_mu,
+        ln_std=ln_std,
     )
+
+
+@torch.no_grad()
+def capture_features(
+    model: ModelAdapter,
+    sae: Any,
+    *,
+    site: ActivationSite,
+    prompt: str | None = None,
+    tokens: torch.Tensor | None = None,
+) -> FeatureSnapshot:
+    """Capture activation and SAE encode/decode at a specific token position."""
+    ids = model.tokens(prompt=prompt, tokens=tokens)
+    activation = model.capture(tokens=ids, site=site)
+    return snapshot_from_activation(sae, tokens=ids, site=site, activation=activation)
 
 
 @torch.no_grad()
@@ -223,17 +238,30 @@ def edit_features(
         if val.ndim != 0 or not bool(torch.isfinite(val)):
             raise ValueError(f"replacement value for feature {key} must be a finite scalar")
         z_new[key] = val
+    if not replacements:
+        return FeaturePatch(
+            codes=z_new.detach().clone(), activation=snapshot.activation.detach().clone()
+        )
+    # Decode both code vectors. Qwen bf16 stores reconstruction in the
+    # activation dtype, and subtracting that rounded tensor misses the
+    # frozen logit bar, so the stored reconstruction is not reused here.
     before = _decode(
-        sae, snapshot.codes, d_in, ln_mu=snapshot.ln_mu, ln_std=snapshot.ln_std,
+        sae,
+        snapshot.codes,
+        d_in,
+        ln_mu=snapshot.ln_mu,
+        ln_std=snapshot.ln_std,
     )
     after = _decode(
-        sae, z_new, d_in, ln_mu=snapshot.ln_mu, ln_std=snapshot.ln_std,
+        sae,
+        z_new,
+        d_in,
+        ln_mu=snapshot.ln_mu,
+        ln_std=snapshot.ln_std,
     )
     if hasattr(sae, "ln_mu") or hasattr(sae, "ln_std"):
         raise RuntimeError("SAE layer_norm buffers leaked after edit decode")
-    delta = (after - before).to(
-        device=snapshot.activation.device, dtype=snapshot.activation.dtype
-    )
+    delta = (after - before).to(device=snapshot.activation.device, dtype=snapshot.activation.dtype)
     edited_activation = snapshot.activation + delta
     _check_vector("edited activation", edited_activation, size=d_in)
     return FeaturePatch(codes=z_new.detach().clone(), activation=edited_activation.detach().clone())
@@ -249,15 +277,19 @@ def coalition_replacements(
     """
     if not isinstance(codes, torch.Tensor) or codes.ndim != 1:
         raise ValueError("codes must be a 1-D tensor")
+
     def validate(indices: Sequence[int], name: str) -> set[int]:
         if not isinstance(indices, (list, tuple, set, frozenset)):
             raise TypeError(f"{name} must be a sequence of integer feature IDs")
         ids = list(indices)
-        if any(isinstance(k, bool) or not isinstance(k, int) or not 0 <= k < len(codes) for k in ids):
+        if any(
+            isinstance(k, bool) or not isinstance(k, int) or not 0 <= k < len(codes) for k in ids
+        ):
             raise IndexError(f"{name} contains invalid feature ID")
         if len(ids) != len(set(ids)):
             raise ValueError(f"{name} contains duplicate features")
         return set(ids)
+
     selected = validate(selected_indices, "selected_indices")
     retained = validate(retained_indices, "retained_indices")
     if not retained.issubset(selected):
@@ -267,10 +299,15 @@ def coalition_replacements(
 
 @torch.no_grad()
 def evaluate_edit(
-    model: ModelAdapter, sae: Any, *, site: ActivationSite,
+    model: ModelAdapter,
+    sae: Any,
+    *,
+    site: ActivationSite,
     replacements: Mapping[int, float | torch.Tensor],
-    prompt: str | None = None, tokens: torch.Tensor | None = None,
-    readout_position: int = -1, verify_identity: bool = True,
+    prompt: str | None = None,
+    tokens: torch.Tensor | None = None,
+    readout_position: int = -1,
+    verify_identity: bool = True,
 ) -> InterventionResult:
     """Capture, edit, replay, and report baseline/edited logit vectors.
 
@@ -283,12 +320,16 @@ def evaluate_edit(
     patch = edit_features(sae, snapshot, replacements=replacements)
     baseline = model.forward_logits(tokens=snapshot.tokens, readout_position=readout_position)
     edited = model.patch_logits(
-        tokens=snapshot.tokens, site=site, activation=patch.activation,
+        tokens=snapshot.tokens,
+        site=site,
+        activation=patch.activation,
         readout_position=readout_position,
     )
     if baseline.shape != edited.shape or not bool(torch.isfinite(edited).all()):
         raise RuntimeError("edited logits must be finite and match baseline shape")
     return InterventionResult(
-        snapshot=snapshot, patch=patch,
-        baseline_logits=baseline, edited_logits=edited,
+        snapshot=snapshot,
+        patch=patch,
+        baseline_logits=baseline,
+        edited_logits=edited,
     )
