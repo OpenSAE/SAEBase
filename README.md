@@ -64,7 +64,7 @@ python examples/quickstart/public_api_offline.py
 python examples/quickstart/first_experiment.py --output runs/first-experiment
 ```
 
-The first command demonstrates activation capture and a feature edit. The second evaluates two small synthetic SAEs and writes `report.html`, `summary.csv` and a reliability report. It prints the exact output paths so you can open the HTML report in a browser.
+The first Python example demonstrates activation capture and a feature edit. The second example evaluates two small synthetic SAEs and writes `report.html`, `summary.csv` and a reliability report. It prints the exact output paths so you can open the HTML report in a browser.
 
 ### 2. Try a real model and SAE
 
@@ -120,7 +120,7 @@ Full SAE reconstruction is a separate experimental control. Reliability estimate
 
 ### ⚡ Measured acceleration
 
-On one RTX 5070 with Qwen3-1.7B Base, opt-in block-suffix replay accelerated the **complete 25-sample × 7-condition intervention workload by 1.28×**, with unchanged reported metrics. For 128-token generation, live SAE editing with a KV cache achieved **89 tokens/s**, and vLLM SAE decoder-direction steering achieved **158 tokens/s**. The generation paths implement distinct steering protocols; they are not interchangeable scientific experiments.
+On one RTX 5070 with Qwen3-1.7B Base, opt-in block-suffix replay accelerated the **complete 25-sample × 7-condition intervention workload by 1.28×**, with unchanged reported metrics. For 128-token generation, live SAE editing with a KV cache achieved **89 tokens/s**, and vLLM SAE decoder-direction steering achieved **158 tokens/s**. The generation paths use distinct steering protocols.
 
 [Full GPU results](docs/performance/workplan11_final_results.md) · [Execution details](docs/performance.md)
 
