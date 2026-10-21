@@ -169,7 +169,7 @@ saebase-intervene --config conf/interventions/m2_pythia_example.json --dry-run
 python examples/interventions/batch_interventions.py
 ```
 
-真实权重执行需要显式提供 `--real`。短文本 Steering 使用完整前缀重新计算作为参考，不宣称已有 KV cache 或 GPU 吞吐加速。参见[特征干预](docs/feature-interventions.md)。
+真实权重执行需要显式提供 `--real`。可选 GPU 加速使 Qwen3-1.7B 特征干预评测达到 **1.28×**（指标不变）；在 RTX 5070 上，128-token KV-cached 生成中的逐 token SAE 编辑约 **89 tokens/s**，vLLM SAE decoder-direction steering 约 **158 tokens/s**。两种生成方式有独立的干预协议，原始完整前缀参考实现仍可使用。[GPU 实测结果](docs/performance/workplan11_final_results.md) · [特征干预](docs/feature-interventions.md)。
 
 ---
 
