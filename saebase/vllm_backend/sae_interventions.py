@@ -32,6 +32,8 @@ class VLLMSAEOutcome:
     expected_residual: torch.Tensor
     clean_next_text: str | None
     edited_next_text: str | None
+    clean_logits: torch.Tensor
+    edited_logits: torch.Tensor
     protocol: str = "single_prompt_position_edit_v1"
     scientific_parity: str = "UNVERIFIED_VS_HF"
 
@@ -90,8 +92,12 @@ class InterpVLLMSAE:
             "max_model_len": max_model_len,
         }
         if backend == "vllm-static":
+            from transformers import AutoConfig
+
+            n_layers = int(AutoConfig.from_pretrained(model_name).num_hidden_layers)
             point = f"resid_post.{layer}"
-            kwargs["static_points"] = [point]
+            final = f"resid_post.{n_layers - 1}"
+            kwargs["static_points"] = list(dict.fromkeys((point, final)))
             kwargs["static_writes"] = [point]
         model = load_model(model_name, **kwargs)
         return InterpVLLMSAE(model, sae, layer=layer, backend=backend)
@@ -125,7 +131,9 @@ class InterpVLLMSAE:
             raise ValueError("invalid token position")
         point = Address("resid_post", self.layer)
         sync = sync_model(self.model)
-        clean_cache = sync.capture(ids, [point])
+        final_point = Address("resid_post", int(self.model.n_layers) - 1)
+        points = list(dict.fromkeys((point, final_point)))
+        clean_cache = sync.capture(ids, points)
         clean_tensor = clean_cache[point]
         if (
             not isinstance(clean_tensor, torch.Tensor)
@@ -152,7 +160,7 @@ class InterpVLLMSAE:
         # Position mask lists EXCLUDED token IDs, not the edited one.
         masked = [i for i in range(len(ids)) if i != idx]
         with steer(self.model, ops, prompt_token_ids=ids, position_mask=masked, generated=False):
-            edited_cache = sync.capture(ids, [point])
+            edited_cache = sync.capture(ids, points)
         edited_tensor = edited_cache[point]
         if edited_tensor.shape != clean_tensor.shape:
             raise RuntimeError("edited vLLM capture returned mismatched token geometry")
@@ -172,6 +180,22 @@ class InterpVLLMSAE:
             rtol=rtol,
         ):
             raise RuntimeError("steer changed excluded prompt positions")
+        # Read the final residual from the SAME worker forward, then apply
+        # the backend's genuine final norm and unembedding. The resulting
+        # vectors are checked against independent HF reference logits below.
+        def final_logits(cache: dict) -> torch.Tensor:
+            resid = cache[final_point]
+            if not isinstance(resid, torch.Tensor) or resid.ndim != 2:
+                raise RuntimeError("missing [tokens, width] final residual for logits")
+            vector = sync.decode_residuals(resid[-1:].contiguous())
+            if not isinstance(vector, torch.Tensor):
+                raise RuntimeError("interp-engine residual unembedding failed")
+            return vector.detach().float().reshape(-1).cpu()
+
+        clean_logits = final_logits(clean_cache)
+        edited_logits = final_logits(edited_cache)
+        if clean_logits.shape != edited_logits.shape or clean_logits.numel() < 2:
+            raise RuntimeError("vLLM readout logits mismatched")
         clean_text = edited_text = None
         if next_token_probe:
             clean_text = sync.generate_text(ids, max_tokens=1, temperature=0.0, seed=0)
@@ -194,4 +218,6 @@ class InterpVLLMSAE:
             expected_residual=expected.cpu(),
             clean_next_text=clean_text,
             edited_next_text=edited_text,
+            clean_logits=clean_logits,
+            edited_logits=edited_logits,
         )
