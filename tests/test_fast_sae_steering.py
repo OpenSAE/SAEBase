@@ -191,6 +191,7 @@ def test_generation_only_backend_refused(monkeypatch):
     with pytest.raises(RuntimeError, match="generation-only"):
         generate_decoder_direction_cached(candidate, sae, [1], layer=2, feature_id=0, strength=1.0)
 
+
 def test_cached_identity_agrees_with_complete_clean_sequence():
     """No-op SAE hook must yield the same five greedy tokens as full-prefix decoding."""
     model, _adapter, sae = build()
@@ -203,9 +204,7 @@ def test_cached_identity_agrees_with_complete_clean_sequence():
             logits = raw(input_ids=current, use_cache=False).logits[0, -1]
             nxt = int(torch.argmax(logits.float()).item())
             expected.append(nxt)
-            current = torch.cat(
-                (current, torch.tensor([[nxt]], dtype=torch.long)), dim=1
-            )
+            current = torch.cat((current, torch.tensor([[nxt]], dtype=torch.long)), dim=1)
     result = generate_live_sae_cached(
         model,
         sae,
