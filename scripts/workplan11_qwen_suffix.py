@@ -64,7 +64,9 @@ def main() -> None:
         row_error = float((hidden[0, -1].float() - reference[0][0].float()).abs().max())
         logit_error = float((logits[0, -1].float() - reference[1].float()).abs().max())
         max_abs = max(max_abs, row_error, logit_error)
-        token_rows.append({"prompt_tokens": int(ids.shape[1]), "row_abs": row_error, "logit_abs": logit_error})
+        token_rows.append(
+            {"prompt_tokens": int(ids.shape[1]), "row_abs": row_error, "logit_abs": logit_error}
+        )
         site = ActivationSite(LAYER, SITE, int(ids.shape[1]) - 1)
         snapshot = capture_features(adapter, sae, site=site, tokens=ids)
         cached_codes = sae.encode(hidden[0, -1].unsqueeze(0))[0]
@@ -73,9 +75,15 @@ def main() -> None:
             feature_flips += 1
         edits = {
             "identity": hidden[0, -1],
-            "ablate": apply_condition(sae, snapshot, Condition("ablate", "ablate", (0,))).activation,
-            "scale": apply_condition(sae, snapshot, Condition("scale", "scale", (0,), 2.0)).activation,
-            "clamp": apply_condition(sae, snapshot, Condition("clamp", "clamp", (0,), 1.0)).activation,
+            "ablate": apply_condition(
+                sae, snapshot, Condition("ablate", "ablate", (0,))
+            ).activation,
+            "scale": apply_condition(
+                sae, snapshot, Condition("scale", "scale", (0,), 2.0)
+            ).activation,
+            "clamp": apply_condition(
+                sae, snapshot, Condition("clamp", "clamp", (0,), 1.0)
+            ).activation,
             "add": apply_condition(sae, snapshot, Condition("add", "add", (0,), 1.0)).activation,
             "coalition": apply_condition(
                 sae, snapshot, Condition("coalition", "coalition", (0, 1), retained_ids=(0,))
@@ -92,8 +100,12 @@ def main() -> None:
             patched = hidden.clone()
             patched[0, position] = vector.to(device=patched.device, dtype=patched.dtype)
             offset = int(ids.shape[1]) - 1 - position
-            actual = model.logits_from_site_hidden(ids, LAYER, patched, readout_offset=readout_offset)
-            expected = model.run_with_patch(ids, LAYER, {offset: patched[0, position]}, readout_offset=readout_offset)
+            actual = model.logits_from_site_hidden(
+                ids, LAYER, patched, readout_offset=readout_offset
+            )
+            expected = model.run_with_patch(
+                ids, LAYER, {offset: patched[0, position]}, readout_offset=readout_offset
+            )
             error = float((actual.float() - expected.float()).abs().max())
             max_abs = max(max_abs, error)
             rows.append({"prompt_tokens": int(ids.shape[1]), "edit": name, "max_abs": error})
@@ -149,10 +161,21 @@ def main() -> None:
         "gate_1_15": speedup >= 1.15 and feature_flips == 0 and max_abs <= 1e-2,
     }
     (OUT / "qwen_l7.json").write_text(json.dumps(payload, indent=2) + "\n")
-    print(json.dumps({k: payload[k] for k in (
-        "feature_support_flips", "max_abs_logits_or_activation",
-        "median_speedup_full_over_suffix", "gate_1_15", "full_seconds", "suffix_seconds",
-    )}))
+    print(
+        json.dumps(
+            {
+                k: payload[k]
+                for k in (
+                    "feature_support_flips",
+                    "max_abs_logits_or_activation",
+                    "median_speedup_full_over_suffix",
+                    "gate_1_15",
+                    "full_seconds",
+                    "suffix_seconds",
+                )
+            }
+        )
+    )
 
 
 if __name__ == "__main__":
