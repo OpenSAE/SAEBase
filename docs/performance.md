@@ -45,13 +45,15 @@ tolerances pass on each targeted real model and checkpoint.
   original hooks, 1.276x, metric max abs 0. Untested families keep the
   original hook. See [workplan11_results.md](performance/workplan11_results.md).
 - 48-site live-model parity and cross-backend equivalence.
-- KV-cached steering. The reference still recomputes a clean prefix at each
-  step. An incremental clean-history prototype matches the prefix itself,
-  then leaves the frozen bf16 bar on the first new token (layer 7 activation
-  max abs 0.25). It is not enabled.
-- interp-engine 1.14.0 / vLLM 0.28 SAE capture. The write tap applies, and
-  the residual, logits, and TopK support do not match HF. Dynamic and static
-  taps stay off the scientific default.
+- Generated-token steering is a separate protocol matrix, measured at 8, 32,
+  and 128 tokens on this GPU. Live HF SAE KV and fixed decoder-direction
+  vLLM/static generation both ran; they are not the 25×7 suffix result and
+  not the default. The legacy clean-history prototype still misses the
+  frozen bar on the first new token (layer 7 activation max abs 0.25).
+  See [workplan11_final_results.md](performance/workplan11_final_results.md).
+- interp-engine one-prompt SAE capture still does not match HF residuals,
+  logits, or TopK support. That single-prompt edit is not continuous
+  generated-token ablation.
 - Multi-GPU scheduling, dynamic model residency and production hosted GPU
   serving; Research Lab's public endpoint remains read-only.
 

@@ -1,4 +1,8 @@
-# Work Plan 11 — RTX 5070 final measurements
+# Work Plan 11 — RTX 5070 BatchEngine measurements
+
+Generated-token HF KV and vLLM steering are a different protocol matrix.
+Those 8/32/128 timings live in [workplan11_final_results.md](workplan11_final_results.md).
+The 1.276× number below is only the 25×7 suffix-replay workload.
 
 Base is Work Plan 10 `bc9b1fb`, stacked through the suffix-replay branch and the clean-KV / vLLM branch. Measurements below were taken on one RTX 5070, 12227 MiB, compute capability 12.0. HF path: torch 2.14.1+cu130, transformers 5.20.2. vLLM path: torch 2.13.0+cu130, vLLM 0.28.0, interp-engine 1.14.0, in a separate environment. Tolerances stayed frozen: bf16 atol 1e-2 rtol 1e-2. Prompt text and token ids are not in this file. CPU suite on the parent commit: 341 passed, 13 skipped.
 

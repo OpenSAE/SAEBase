@@ -18,9 +18,17 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import time
 
 import torch
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+for extra in os.environ.get("SAEBASE_EXTRA_SITE", "").split(os.pathsep):
+    if extra and extra not in sys.path:
+        sys.path.append(extra)
 
 MODEL = "Qwen/Qwen3-1.7B-Base"
 SAE_KEY = "qwen3_1_7b_base_resid_w32k"
@@ -135,6 +143,37 @@ def raw_hf_cached_greedy(model, prompt_ids: torch.Tensor, max_tokens: int) -> tu
                 (ids, torch.tensor([[token]], dtype=torch.long, device=ids.device)), dim=1
             )
     return tuple(result_ids)
+
+
+def activation_edit_probe(model, ids, layer, vector, strength):
+    """Capture the steered prompt residual and report the applied delta."""
+    from interp_engine import Address
+    from interp_engine.steer import steer
+    from interp_engine.steer_specs import AddSpec, LayerSteeringSpec, SteeringSpec
+    from interp_engine.sync import sync_model
+
+    point = Address("resid_post", layer)
+    sync = sync_model(model)
+    clean = sync.capture(ids, [point])[point]
+    spec = SteeringSpec(
+        layers={
+            layer: LayerSteeringSpec(
+                operations=[AddSpec(vector=vector, scale=float(strength), normalize=False)]
+            )
+        },
+        point="resid_post",
+    )
+    excluded = list(range(len(ids) - 1))
+    with steer(model, spec, prompt_token_ids=ids, position_mask=excluded, generated=False):
+        edited = sync.capture(ids, [point])[point]
+    if edited.shape != clean.shape:
+        raise RuntimeError("steered capture changed residual geometry")
+    last = float((edited[-1].float() - clean[-1].float()).abs().max().item())
+    leak = 0.0
+    if excluded:
+        kept = torch.tensor(excluded, dtype=torch.long)
+        leak = float((edited[kept].float() - clean[kept].float()).abs().max().item())
+    return last, leak
 
 
 def vllm_generator(model, sae, ids, max_tokens, feature_id, strength, direction):
@@ -312,12 +351,18 @@ def main() -> None:
                 )
                 before = tuple(probe.baseline_token_ids or ())
                 after = tuple(probe.generated_token_ids)
+                prompt_ids = tuple(int(x) for x in ids[0].tolist())
+                edit_abs, excluded_abs = activation_edit_probe(
+                    engine.model, prompt_ids, LAYER, cached_direction, args.strength
+                )
                 report["generation_controls"].append(
                     {
                         "prompt_index": prompt_index,
                         "unsteered_token_ids_private": list(before),
                         "steered_token_ids_private": list(after),
                         "token_disagreement": sum(a != b for a, b in zip(before, after)),
+                        "activation_edit_max_abs": edit_abs,
+                        "excluded_position_max_abs": excluded_abs,
                         "note": "Token agreement alone does not establish that taps were bypassed",
                     }
                 )
