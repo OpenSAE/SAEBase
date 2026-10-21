@@ -12,6 +12,7 @@ Examples:
  python scripts/workplan11_acceptance_gpu.py vllm --backend vllm
  python scripts/workplan11_acceptance_gpu.py vllm --backend vllm-static
 """
+
 from __future__ import annotations
 
 import argparse
@@ -46,6 +47,7 @@ def synchronize() -> None:
 
 def load_pair():
     from saebase.sae.loading import load_model_and_sae
+
     return load_model_and_sae(SAE_KEY, LAYER, device="cuda")
 
 
@@ -63,24 +65,28 @@ def e2e() -> None:
     first = samples[0]
     site = ActivationSite(LAYER, get_profile(SAE_KEY).hook_name(LAYER), first.patch_position)
     snap = capture_features(
-        adapter, sae, site=site,
+        adapter,
+        sae,
+        site=site,
         tokens=adapter.tokens(tokens=torch.tensor([first.tokens], dtype=torch.long)),
     )
     active = torch.nonzero(snap.codes != 0).flatten().tolist()
     conditions = pilot._conditions_for(active, int(sae.cfg.d_sae))
     model_sha, sae_sha = sha256_state_dict(raw), sha256_state_dict(sae)
-    identity = pilot._experiment(
-        adapter, sae, pilot.SITES[1], model_sha, sae_sha, "b" * 64
-    )
+    identity = pilot._experiment(adapter, sae, pilot.SITES[1], model_sha, sae_sha, "b" * 64)
     session = VerifiedCheckpointSession.mint(raw, sae)
     if not callable(getattr(raw, "supports_suffix_replay", None)):
         raise RuntimeError("candidate lacks suffix replay")
     if not raw.supports_suffix_replay():
         raise RuntimeError("registered Qwen backend cannot replay its suffix")
-    report = {"workload": "25 real selected site rows x 7 edits",
-              "samples": len(samples), "conditions": len(conditions),
-              "model_sha256": model_sha, "sae_sha256": sae_sha,
-              "runs": {"original": [], "suffix": []}}
+    report = {
+        "workload": "25 real selected site rows x 7 edits",
+        "samples": len(samples),
+        "conditions": len(conditions),
+        "model_sha256": model_sha,
+        "sae_sha256": sae_sha,
+        "runs": {"original": [], "suffix": []},
+    }
     by_mode = {}
     with tempfile.TemporaryDirectory(prefix="wp11e2e-") as root:
         for mode in ("original", "suffix"):
@@ -90,29 +96,40 @@ def e2e() -> None:
                 torch.cuda.reset_peak_memory_stats()
                 t0 = time.perf_counter()
                 engine = BatchEngine(
-                    adapter, sae, identity, pad_token_id=pad,
-                    identity_lease=session, release_content_check=False,
+                    adapter,
+                    sae,
+                    identity,
+                    pad_token_id=pad,
+                    identity_lease=session,
+                    release_content_check=False,
                     enable_suffix_replay=(mode == "suffix"),
                 )
                 with ResultWriter(folder, identity) as writer:
                     stats = engine.run(
-                        samples, conditions, writer, sample_batch=8,
-                        microbatch=4, verify_identity=True, tolerance=1e-2
+                        samples,
+                        conditions,
+                        writer,
+                        sample_batch=8,
+                        microbatch=4,
+                        verify_identity=True,
+                        tolerance=1e-2,
                     )
                 synchronize()
                 elapsed = time.perf_counter() - t0
                 if rep == 1:
                     by_mode[mode] = {
-                        item["measurement_id"]: item for item in
-                        read_results(folder, identity)
+                        item["measurement_id"]: item for item in read_results(folder, identity)
                     }
                 if rep:
-                    report["runs"][mode].append({
-                        "elapsed_seconds": elapsed,
-                        "allocated_bytes": torch.cuda.max_memory_allocated(),
-                        "reserved_bytes": torch.cuda.max_memory_reserved(),
-                        "measured": stats.measured, "counters": engine.counters,
-                    })
+                    report["runs"][mode].append(
+                        {
+                            "elapsed_seconds": elapsed,
+                            "allocated_bytes": torch.cuda.max_memory_allocated(),
+                            "reserved_bytes": torch.cuda.max_memory_reserved(),
+                            "measured": stats.measured,
+                            "counters": engine.counters,
+                        }
+                    )
     before = by_mode["original"]
     after = by_mode["suffix"]
     if before.keys() != after.keys():
@@ -152,9 +169,12 @@ def e2e() -> None:
 def kv(steps: int) -> None:
     from saebase.api import ModelAdapter
     from saebase.interventions.kv_cache_exact import (
-        CleanPrefixKVDecoder, compare_cached_step_with_reference, KVParityError,
+        CleanPrefixKVDecoder,
+        compare_cached_step_with_reference,
+        KVParityError,
     )
     from saebase.interventions.specs import Condition
+
     raw, sae, _ = load_pair()
     adapter = ModelAdapter(raw)
     ids = raw.to_tokens(PROMPT, prepend_bos=False)
@@ -167,19 +187,27 @@ def kv(steps: int) -> None:
     try:
         for index in range(steps):
             row = compare_cached_step_with_reference(
-                decoder, adapter, sae,
+                decoder,
+                adapter,
+                sae,
                 Condition("ablate", "ablate", (185,)),
-                atol=1e-2, rtol=1e-2,
+                atol=1e-2,
+                rtol=1e-2,
             )
             row["step"] = index
             entries.append(row)
             # Fixed deterministic continuation independent of candidate output.
             decoder.append(int(ids[0, -1]))
     except (KVParityError, RuntimeError, ValueError) as exc:
-        persist("clean_kv_parity.json", {
-            "status": "FAIL", "steps_completed": len(entries),
-            "error": f"{type(exc).__name__}: {exc}", "rows": entries,
-        })
+        persist(
+            "clean_kv_parity.json",
+            {
+                "status": "FAIL",
+                "steps_completed": len(entries),
+                "error": f"{type(exc).__name__}: {exc}",
+                "rows": entries,
+            },
+        )
         raise
     finally:
         decoder.close()
@@ -189,6 +217,7 @@ def kv(steps: int) -> None:
     from saebase.api import ActivationSite, capture_features
     from saebase.interventions.operators import apply_condition
     from saebase.interventions.specs import Condition
+
     condition = Condition("ablate", "ablate", (185,))
     token = int(ids[0, -1])
     full_times = []
@@ -199,8 +228,7 @@ def kv(steps: int) -> None:
             instance = None
             if mode == "clean-kv":
                 instance = CleanPrefixKVDecoder(
-                    raw, sae, layer=LAYER,
-                    hook_name=f"blocks.{LAYER}.hook_resid_post"
+                    raw, sae, layer=LAYER, hook_name=f"blocks.{LAYER}.hook_resid_post"
                 )
                 instance.start(current)
             synchronize()
@@ -208,14 +236,11 @@ def kv(steps: int) -> None:
             for _ in range(steps):
                 if mode == "full-prefix":
                     site = ActivationSite(
-                        LAYER, f"blocks.{LAYER}.hook_resid_post",
-                        current.shape[1] - 1
+                        LAYER, f"blocks.{LAYER}.hook_resid_post", current.shape[1] - 1
                     )
                     snap = capture_features(adapter, sae, site=site, tokens=current)
                     patch = apply_condition(sae, snap, condition)
-                    adapter.patch_logits(
-                        tokens=current, site=site, activation=patch.activation
-                    )
+                    adapter.patch_logits(tokens=current, site=site, activation=patch.activation)
                 else:
                     instance.step(condition)
                 if mode == "clean-kv":
@@ -232,17 +257,22 @@ def kv(steps: int) -> None:
                 instance.close()
     full_median = sorted(full_times)[len(full_times) // 2]
     kv_median = sorted(kv_times)[len(kv_times) // 2]
-    persist("clean_kv_parity.json", {
-        "status": "PARITY_PASS",
-        "steps": entries, "elapsed_with_reference_seconds": parity_time,
-        "reference_seconds": full_times, "cached_seconds": kv_times,
-        "reference_median_seconds": full_median,
-        "cached_median_seconds": kv_median,
-        "full_prefix_over_cached": full_median / kv_median,
-        "speed_gate_pass": full_median / kv_median >= 1.15,
-        "peak_allocated_bytes": torch.cuda.max_memory_allocated(),
-        "note": "KV fork deep-copies the clean past before edited calls; promote only after measured gain.",
-    })
+    persist(
+        "clean_kv_parity.json",
+        {
+            "status": "PARITY_PASS",
+            "steps": entries,
+            "elapsed_with_reference_seconds": parity_time,
+            "reference_seconds": full_times,
+            "cached_seconds": kv_times,
+            "reference_median_seconds": full_median,
+            "cached_median_seconds": kv_median,
+            "full_prefix_over_cached": full_median / kv_median,
+            "speed_gate_pass": full_median / kv_median >= 1.15,
+            "peak_allocated_bytes": torch.cuda.max_memory_allocated(),
+            "note": "KV fork deep-copies the clean past before edited calls; promote only after measured gain.",
+        },
+    )
 
 
 def hf_reference() -> None:
@@ -263,19 +293,29 @@ def hf_reference() -> None:
     edited = adapter.patch_logits(tokens=ids, site=site, activation=patch.activation)
     OUT.mkdir(parents=True, exist_ok=True)
     # Private file: the token IDs and activation vector must NOT go to GitHub.
-    torch.save({
-        "ids": ids.cpu(), "resid": snapshot.activation.float().cpu(),
-        "patched": patch.activation.float().cpu(),
-        "feature_id": feature,
-        "clean_logits": clean.float().cpu(),
-        "edited_logits": edited.float().cpu(),
-        "model_sha": sha256_state_dict(raw), "sae_sha": sha256_state_dict(sae),
-    }, OUT / "hf_reference_private.pt")
-    persist("hf_reference_status.json", {
-        "status": "PASS", "model": MODEL_NAME, "layer": LAYER,
-        "n_tokens": int(ids.shape[1]),
-        "note": "raw reference tensors saved privately, not published",
-    })
+    torch.save(
+        {
+            "ids": ids.cpu(),
+            "resid": snapshot.activation.float().cpu(),
+            "patched": patch.activation.float().cpu(),
+            "feature_id": feature,
+            "clean_logits": clean.float().cpu(),
+            "edited_logits": edited.float().cpu(),
+            "model_sha": sha256_state_dict(raw),
+            "sae_sha": sha256_state_dict(sae),
+        },
+        OUT / "hf_reference_private.pt",
+    )
+    persist(
+        "hf_reference_status.json",
+        {
+            "status": "PASS",
+            "model": MODEL_NAME,
+            "layer": LAYER,
+            "n_tokens": int(ids.shape[1]),
+            "note": "raw reference tensors saved privately, not published",
+        },
+    )
 
 
 def vllm(backend: str) -> None:
@@ -283,25 +323,31 @@ def vllm(backend: str) -> None:
     from saebase.interventions.specs import Condition
     from saebase.vllm_backend.sae_interventions import InterpVLLMSAE
 
-    reference = torch.load(OUT / "hf_reference_private.pt", map_location="cpu",
-                           weights_only=True)
+    reference = torch.load(OUT / "hf_reference_private.pt", map_location="cpu", weights_only=True)
     sae, _ = load_sae_for_profile(SAE_KEY, LAYER, device="cuda")
     engine = InterpVLLMSAE.load(
-        MODEL_NAME, sae, layer=LAYER, backend=backend,
-        gpu_memory_utilization=0.50, max_model_len=512,
+        MODEL_NAME,
+        sae,
+        layer=LAYER,
+        backend=backend,
+        gpu_memory_utilization=0.50,
+        max_model_len=512,
     )
     try:
         outcome = engine.measure(
             reference["ids"].flatten().tolist(),
             Condition("ablate", "ablate", (int(reference["feature_id"]),)),
-            patch_position=-1, atol=1e-2, rtol=1e-2,
+            patch_position=-1,
+            atol=1e-2,
+            rtol=1e-2,
         )
-        clean_err = float((outcome.clean_residual.float() -
-                           reference["resid"]).abs().max().item())
-        edited_err = float((outcome.edited_residual.float() -
-                            reference["patched"]).abs().max().item())
+        clean_err = float((outcome.clean_residual.float() - reference["resid"]).abs().max().item())
+        edited_err = float(
+            (outcome.edited_residual.float() - reference["patched"]).abs().max().item()
+        )
         data = {
-            "backend": backend, "status": "BACKEND_NATIVE_VERIFIED",
+            "backend": backend,
+            "status": "BACKEND_NATIVE_VERIFIED",
             "input_length": outcome.input_length,
             "position": outcome.patch_position,
             "vllm_internal_edit_max_abs": outcome.activation_error,
