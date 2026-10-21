@@ -4,6 +4,7 @@ Model weights/tokenizer/preprocessing are part of activation identity. SAE
 checkpoint/inference metadata is *only* part of the separately keyed code cache.
 The SHA-256 hashes are deterministic identifiers, not an authenticity guarantee.
 """
+
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
@@ -16,21 +17,42 @@ from typing import Any, Mapping
 import torch
 
 _SHA = re.compile(r"^[0-9a-f]{64}$")
-# Repeated fingerprints of one loaded module skip the full byte hash when the
-# storage address, layout, and in-place version of every tensor are unchanged.
-_STATE_SHA_CACHE: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
 
 
 def stable_json(value: Any) -> str:
-    return json.dumps(value, sort_keys=True, ensure_ascii=False, allow_nan=False,
-                      separators=(",", ":"))
+    return json.dumps(
+        value, sort_keys=True, ensure_ascii=False, allow_nan=False, separators=(",", ":")
+    )
 
 
 def fingerprint(value: Any) -> str:
     return hashlib.sha256(stable_json(value).encode("utf-8")).hexdigest()
 
 
+class CheckpointLeaseError(RuntimeError):
+    """A checkpoint lease is missing, stale, or cannot be treated as a content proof."""
+
+
+def _state_items(module: Any) -> list[tuple[str, torch.Tensor]]:
+    if not callable(getattr(module, "state_dict", None)):
+        raise TypeError("module must expose state_dict() for checkpoint verification")
+    state = module.state_dict()
+    if not state:
+        raise ValueError("cannot fingerprint an empty state_dict")
+    items: list[tuple[str, torch.Tensor]] = []
+    for name, value in sorted(state.items()):
+        if not isinstance(value, torch.Tensor):
+            raise TypeError(f"non-tensor state_dict value: {name!r}")
+        items.append((name, value))
+    return items
+
+
 def _state_signature(items: list[tuple[str, torch.Tensor]]) -> tuple:
+    """Fast storage heuristic. This is not a byte hash.
+
+    ``Tensor._version`` does not move for writes through ``.data``. Callers that
+    need a content checksum must use :func:`sha256_state_dict`.
+    """
     return tuple(
         (
             name,
@@ -45,42 +67,102 @@ def _state_signature(items: list[tuple[str, torch.Tensor]]) -> tuple:
     )
 
 
-def sha256_state_dict(module: Any) -> str:
-    """Hash the complete sorted loaded state, identical to M0's reference format.
-
-    The digest is cached on the module object. A later call returns that digest
-    only when every tensor still has the same storage, layout, and in-place
-    version, so an in-place weight edit is hashed again.
-    """
-    if not callable(getattr(module, "state_dict", None)):
-        raise TypeError("module must expose state_dict() for checkpoint verification")
-    state = module.state_dict()
-    if not state:
-        raise ValueError("cannot fingerprint an empty state_dict")
-    items: list[tuple[str, torch.Tensor]] = []
-    for name, value in sorted(state.items()):
-        if not isinstance(value, torch.Tensor):
-            raise TypeError(f"non-tensor state_dict value: {name!r}")
-        items.append((name, value))
-    signature = _state_signature(items)
-    try:
-        cached = _STATE_SHA_CACHE.get(module)
-    except TypeError:
-        cached = None
-    if isinstance(cached, tuple) and cached[0] == signature:
-        return cached[1]
+def _hash_items(items: list[tuple[str, torch.Tensor]]) -> str:
     digest = hashlib.sha256()
     for name, value in items:
         tensor = value.detach().contiguous().cpu()
-        digest.update(json.dumps([name, str(tensor.dtype), list(tensor.shape)],
-                                 separators=(",", ":")).encode())
+        digest.update(
+            json.dumps(
+                [name, str(tensor.dtype), list(tensor.shape)], separators=(",", ":")
+            ).encode()
+        )
         digest.update(tensor.reshape(-1).view(torch.uint8).numpy().tobytes())
-    result = digest.hexdigest()
-    try:
-        _STATE_SHA_CACHE[module] = (signature, result)
-    except TypeError:
-        pass
-    return result
+    return digest.hexdigest()
+
+
+def sha256_state_dict(module: Any) -> str:
+    """Hash the complete sorted loaded state, identical to M0's reference format.
+
+    Every call reads the current tensor bytes. Nothing is cached. A matching
+    storage address or ``_version`` is not a content checksum.
+    """
+    return _hash_items(_state_items(module))
+
+
+class VerifiedCheckpointSession:
+    """In-process lease minted only after a strict byte hash.
+
+    ``leased_sha256`` repeats that digest when the storage heuristic still
+    matches. It is not a fresh content checksum and cannot be pickled or sent
+    to another process. ``strict_recheck`` reads the bytes again and refuses
+    the lease if they differ from the digest minted at the start.
+    """
+
+    def __init__(self) -> None:
+        self._pins: list[tuple[weakref.ref, tuple, str]] = []
+        self._open = True
+
+    @classmethod
+    def mint(cls, *modules: Any) -> "VerifiedCheckpointSession":
+        if not modules:
+            raise ValueError("a checkpoint session needs at least one module")
+        session = cls()
+        for module in modules:
+            if any(pin() is module for pin, _signature, _digest in session._pins):
+                raise ValueError("duplicate module in one checkpoint session")
+            items = _state_items(module)
+            digest = _hash_items(items)
+            try:
+                pin = weakref.ref(module)
+            except TypeError as exc:
+                raise TypeError("checkpoint session modules must support weak references") from exc
+            session._pins.append((pin, _state_signature(items), digest))
+        return session
+
+    def __getstate__(self) -> None:
+        raise CheckpointLeaseError("a checkpoint lease cannot leave this process")
+
+    def _require_open(self) -> None:
+        if not self._open:
+            raise CheckpointLeaseError("checkpoint lease is closed")
+
+    def _pin(self, module: Any) -> tuple[tuple, str]:
+        self._require_open()
+        for pin, signature, digest in self._pins:
+            if pin() is module:
+                return signature, digest
+        raise CheckpointLeaseError("module is not pinned by this checkpoint lease")
+
+    def leased_sha256(self, module: Any) -> str:
+        """Return the minted digest when the storage heuristic still matches.
+
+        This does not read tensor bytes. A ``.data`` write can leave the
+        heuristic unchanged; use :meth:`strict_recheck` before publication.
+        """
+        signature, digest = self._pin(module)
+        current = _state_signature(_state_items(module))
+        if current != signature:
+            raise CheckpointLeaseError(
+                "pinned module no longer matches the leased storage signature"
+            )
+        return digest
+
+    def strict_recheck(self) -> None:
+        """Byte-hash every pinned module and close the lease on mismatch."""
+        self._require_open()
+        for pin, _signature, digest in self._pins:
+            module = pin()
+            if module is None:
+                self._open = False
+                raise CheckpointLeaseError("pinned module was collected")
+            actual = sha256_state_dict(module)
+            if actual != digest:
+                self._open = False
+                raise CheckpointLeaseError("checkpoint bytes differ from the leased digest")
+
+    @property
+    def open(self) -> bool:
+        return self._open
 
 
 def _sha(value: str, label: str) -> None:
@@ -158,10 +240,17 @@ class CodeIdentity:
         if not isinstance(self.sae_key, str) or not self.sae_key.strip():
             raise ValueError("sae_key must not be empty")
         _sha(self.sae_state_sha256, "sae_state_sha256")
-        if type(self.d_in) is not int or self.d_in < 1 or type(self.d_sae) is not int or self.d_sae < 1:
+        if (
+            type(self.d_in) is not int
+            or self.d_in < 1
+            or type(self.d_sae) is not int
+            or self.d_sae < 1
+        ):
             raise ValueError("SAE dimensions must be positive integers")
         if self.inference_mode not in {"per_token", "fixed_threshold"}:
-            raise ValueError("code caching needs deterministic per-token or fixed-threshold inference")
+            raise ValueError(
+                "code caching needs deterministic per-token or fixed-threshold inference"
+            )
         _json_mapping(self.normalization, "normalization")
 
     def to_dict(self) -> dict[str, Any]:
@@ -191,21 +280,30 @@ class TokenSelection:
         elif self.indices:
             raise ValueError("indices are supported only in indices mode")
         if self.mode == "span":
-            if (not isinstance(self.char_span, tuple) or len(self.char_span) != 2
-                    or any(type(x) is not int for x in self.char_span)
-                    or not 0 <= self.char_span[0] < self.char_span[1]):
+            if (
+                not isinstance(self.char_span, tuple)
+                or len(self.char_span) != 2
+                or any(type(x) is not int for x in self.char_span)
+                or not 0 <= self.char_span[0] < self.char_span[1]
+            ):
                 raise ValueError("char_span must contain [start, end) offsets")
         elif self.char_span is not None:
             raise ValueError("char_span is supported only in span mode")
 
     def to_dict(self) -> dict[str, Any]:
-        return {"mode": self.mode, "indices": list(self.indices),
-                "char_span": list(self.char_span) if self.char_span else None}
+        return {
+            "mode": self.mode,
+            "indices": list(self.indices),
+            "char_span": list(self.char_span) if self.char_span else None,
+        }
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "TokenSelection":
-        return cls(mode=data["mode"], indices=tuple(data.get("indices") or ()),
-                   char_span=tuple(data["char_span"]) if data.get("char_span") else None)
+        return cls(
+            mode=data["mode"],
+            indices=tuple(data.get("indices") or ()),
+            char_span=tuple(data["char_span"]) if data.get("char_span") else None,
+        )
 
 
 @dataclass(frozen=True)
@@ -229,12 +327,18 @@ class SampleRecord:
             raise TypeError("selection must be TokenSelection")
         if not self.token_ids or any(type(v) is not int or v < 0 for v in self.token_ids):
             raise ValueError("token_ids must be nonempty nonnegative integers")
-        if self.attention_mask is not None and (len(self.attention_mask) != len(self.token_ids)
-                or any(type(v) is not int or v not in (0, 1) for v in self.attention_mask)):
+        if self.attention_mask is not None and (
+            len(self.attention_mask) != len(self.token_ids)
+            or any(type(v) is not int or v not in (0, 1) for v in self.attention_mask)
+        ):
             raise ValueError("attention_mask must contain 0/1 for each token")
-        if self.token_offsets is not None and (len(self.token_offsets) != len(self.token_ids)
-                or any(len(p) != 2 or any(type(x) is not int for x in p)
-                       or p[0] < 0 or p[1] < p[0] for p in self.token_offsets)):
+        if self.token_offsets is not None and (
+            len(self.token_offsets) != len(self.token_ids)
+            or any(
+                len(p) != 2 or any(type(x) is not int for x in p) or p[0] < 0 or p[1] < p[0]
+                for p in self.token_offsets
+            )
+        ):
             raise ValueError("token_offsets must contain nonnegative [start, end) pairs per token")
         if not isinstance(self.split, str) or not self.split.strip():
             raise ValueError("split must not be empty")
@@ -247,23 +351,39 @@ class SampleRecord:
         resolve_positions(self)
 
     def to_dict(self) -> dict[str, Any]:
-        return {"sample_id": self.sample_id, "token_ids": list(self.token_ids),
-                "selection": self.selection.to_dict(),
-                "attention_mask": list(self.attention_mask) if self.attention_mask is not None else None,
-                "prompt_group_id": self.prompt_group_id, "split": self.split,
-                "variant_role": self.variant_role,
-                "token_offsets": [list(p) for p in self.token_offsets] if self.token_offsets is not None else None,
-                "source_activation_sha256": self.source_activation_sha256}
+        return {
+            "sample_id": self.sample_id,
+            "token_ids": list(self.token_ids),
+            "selection": self.selection.to_dict(),
+            "attention_mask": list(self.attention_mask)
+            if self.attention_mask is not None
+            else None,
+            "prompt_group_id": self.prompt_group_id,
+            "split": self.split,
+            "variant_role": self.variant_role,
+            "token_offsets": [list(p) for p in self.token_offsets]
+            if self.token_offsets is not None
+            else None,
+            "source_activation_sha256": self.source_activation_sha256,
+        }
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "SampleRecord":
-        return cls(sample_id=data["sample_id"], token_ids=tuple(data["token_ids"]),
-                   selection=TokenSelection.from_dict(data["selection"]),
-                   attention_mask=tuple(data["attention_mask"]) if data.get("attention_mask") is not None else None,
-                   prompt_group_id=data.get("prompt_group_id"), split=data.get("split", "unspecified"),
-                   variant_role=data.get("variant_role", "clean"),
-                   token_offsets=tuple(map(tuple, data["token_offsets"])) if data.get("token_offsets") is not None else None,
-                   source_activation_sha256=data.get("source_activation_sha256"))
+        return cls(
+            sample_id=data["sample_id"],
+            token_ids=tuple(data["token_ids"]),
+            selection=TokenSelection.from_dict(data["selection"]),
+            attention_mask=tuple(data["attention_mask"])
+            if data.get("attention_mask") is not None
+            else None,
+            prompt_group_id=data.get("prompt_group_id"),
+            split=data.get("split", "unspecified"),
+            variant_role=data.get("variant_role", "clean"),
+            token_offsets=tuple(map(tuple, data["token_offsets"]))
+            if data.get("token_offsets") is not None
+            else None,
+            source_activation_sha256=data.get("source_activation_sha256"),
+        )
 
     @property
     def key(self) -> str:
@@ -288,8 +408,11 @@ def resolve_positions(record: SampleRecord) -> tuple[int, ...]:
     if record.token_offsets is None:
         raise ValueError("span token alignment requires token_offsets or explicit indices")
     start, end = policy.char_span  # type: ignore[misc]
-    chosen = tuple(i for i, (a, b) in enumerate(record.token_offsets)
-                   if mask[i] and a < end and b > start and a < b)
+    chosen = tuple(
+        i
+        for i, (a, b) in enumerate(record.token_offsets)
+        if mask[i] and a < end and b > start and a < b
+    )
     if not chosen:
         raise ValueError("requested char span has no matching valid tokens")
     return chosen
