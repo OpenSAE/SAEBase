@@ -6,6 +6,53 @@ Execution owner: local GPU agent. Reviewer: OpenSAE / SAEBase.
 Source branch: perf/wp11-complete-kv-vllm-20261021, stacked on PR #46 and PR #45. Protect existing local GPU assets and noncommitted work.
 Hardware: one RTX 5070, nominal 12 GiB; inspect physical and free memory. No mandatory 48-site sweep or public GPU server.
 
+## Latest code completion and first GPU commands
+
+**Code has already been written and pushed** to PR #47; the agent must debug/test it on the RTX 5070 instead of rewriting the core acceleration algorithms.
+
+The implemented source includes:
+- HF persistent live SAE editing with real past_key_values in `saebase/interventions/hf_cached_steering.py`; one Qwen prompt prefill followed by one cached decode forward per generated token, freshly encoding and editing SAE codes each step, with separate TTFT/throughput counters.
+- Neuronpedia interp-engine persistent fixed SAE decoder-direction generation in `saebase/vllm_backend/fast_steering.py`; upstream `steer(..., generated=True)` and `generate_stream(...)` perform actual vLLM KV-cached decode, not a simulated generation result. Includes real first-token latency and explicit `stop_at_eos=False` for length-matched timing.
+- `scripts/workplan11_fast_steering_gpu.py` measures **8, 32, 128** generated tokens over 3 public prompts, five repeats per condition, full elapsed and TTFT, actual tokens/sec, peak allocated/reserved VRAM, source SHA, token IDs kept in a PRIVATE artifact. Its HF live mode independently runs a no-hook raw KV oracle against identity SAE steering. Its vLLM mode performs a separate unsteered/steered control request. A file cannot claim a PASS solely from token agreement.
+- `tests/test_fast_sae_steering.py` includes synthetic multiple-token identity equivalence, actual SAE editing effects, hook cleanup and a scoped vLLM stream mock. CPU tests are not substitutes for the real Qwen GPU run.
+
+**Mandatory validation order (in separate supported environments):**
+
+~~~bash
+git fetch origin
+git worktree add -b perf/wp11-gpu-evidence ../SAEBase-wp11-gpu origin/perf/wp11-complete-kv-vllm-20261021
+cd ../SAEBase-wp11-gpu
+python -m ruff check saebase/interventions/hf_cached_steering.py saebase/vllm_backend/fast_steering.py scripts/workplan11_fast_steering_gpu.py tests/test_fast_sae_steering.py
+python -m ruff format --check saebase/interventions/hf_cached_steering.py saebase/vllm_backend/fast_steering.py scripts/workplan11_fast_steering_gpu.py tests/test_fast_sae_steering.py
+python -m pytest -q tests/test_fast_sae_steering.py tests/test_clean_kv_exact.py tests/test_interp_vllm_sae_contract.py tests/test_suffix_replay.py
+python -m pytest -q
+nvidia-smi
+export WP11_RUN=/workspace/experiments/performance/workplan11/final_5070
+# HF environment, same Qwen and registered SAE:
+python scripts/workplan11_fast_steering_gpu.py --mode hf-live --lengths 8,32,128
+python scripts/workplan11_fast_steering_gpu.py --mode hf-reference --lengths 8,32,128
+# Existing previously validated Qwen feature-intervention throughput:
+python scripts/workplan11_acceptance_gpu.py e2e
+~~~
+
+Before vLLM tests choose a **source-verified registered SAE feature ID**, for example from the private `hf_reference_private.pt` produced by `python scripts/workplan11_acceptance_gpu.py hf-reference`; verify the value is present in the SAE and, for claimed prompt activation, its TopK support. Do NOT let scripts silently substitute 185 or some default. Export it as `FEATURE_ID`:
+
+~~~bash
+# In the isolated interp-engine/vLLM installation:
+FEATURE_ID=<verified-SAE-feature-ID>
+python scripts/workplan11_fast_steering_gpu.py --mode vllm --lengths 8,32,128 --feature-id "$FEATURE_ID" --strength 2
+# New worker process, sufficient VRAM to allocate declared static taps:
+python scripts/workplan11_fast_steering_gpu.py --mode vllm-static --lengths 8,32,128 --feature-id "$FEATURE_ID" --strength 2 --utilization 0.70
+~~~
+
+No source code in this branch has yet proven **new** HF-live/vLLM-stream 8/32/128-token performance on the target GPU. Preserve prior Work Plan 11 Qwen W2 **1.276x** as a SEPARATE completed benchmark; do not recycle that number. For these new protocols, aim first for a working streamed decode that is materially faster than the old full-prefix baseline; then analyze numerical behavior and scientific comparability separately.
+
+**Acceptance definition:** GPU startup, 8/32/128 actual generated tokens, no cache/hook/request leakage, real intervention effect, stable output and finite metrics, bounded RTX5070 memory, source-locked 5-repeat latency/TTFT/tokens-per-second tables, CPU+CI green. An accelerated but scientifically DIFFERENT mode may be retained under its explicit new protocol ID; old clean-prefix experimental results are reproduced only by the original reference path.
+
+**Important note on CLI:** `--feature-id` is REQUIRED for vLLM modes, and fixed-length benchmark runs now use `stop_at_eos=False`; the HF modes select an active feature from each exact prompt unless the user explicitly supplies one. Do not alter original SAE feature operators or research metrics.
+
+---
+
 ## Mission
 
 The upstream Neuronpedia / decoderesearch interp-engine ALREADY implements tokenwise KV-cached vLLM generation with per-request steering and optional static CUDA graph taps. SAEBase now has two NEW source implementations, in addition to the historical clean-prefix reference.
