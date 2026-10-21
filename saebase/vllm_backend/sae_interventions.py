@@ -48,7 +48,15 @@ class InterpVLLMSAE:
     def __init__(self, model: Any, sae: Any, *, layer: int, backend: str) -> None:
         if backend not in ("vllm", "vllm-static", "eager"):
             raise ValueError("vllm-generate has no SAE activation hooks")
-        if not bool(getattr(model, "hooks_available", False)):
+        if backend == "vllm-static":
+            from interp_engine import Address
+
+            point = Address("resid_post", layer)
+            reads = getattr(model, "static_points", ())
+            writes = getattr(model, "static_writes", ())
+            if point not in reads or point not in writes:
+                raise RuntimeError("static backend did not declare both read and write taps")
+        elif not bool(getattr(model, "hooks_available", False)):
             raise RuntimeError("selected interp-engine backend has no capture/steering hooks")
         if layer < 0 or layer >= int(model.n_layers):
             raise ValueError("requested SAE site not present")
@@ -121,12 +129,11 @@ class InterpVLLMSAE:
         clean_tensor = clean_cache[point]
         if (
             not isinstance(clean_tensor, torch.Tensor)
-            or clean_tensor.ndim != 3
-            or clean_tensor.shape[0] != 1
-            or clean_tensor.shape[1] != len(ids)
+            or clean_tensor.ndim != 2
+            or clean_tensor.shape[0] != len(ids)
         ):
-            raise RuntimeError("vLLM capture failed to return the exact requested token rows")
-        original = clean_tensor[0, idx].detach().clone()
+            raise RuntimeError("interp-engine capture must return [tokens, hidden_dim]")
+        original = clean_tensor[idx].detach().clone()
         site = ActivationSite(self.layer, f"blocks.{self.layer}.hook_resid_post", idx)
         tokens = torch.tensor([ids], device=original.device, dtype=torch.long)
         snapshot = snapshot_from_activation(self.sae, tokens=tokens, site=site, activation=original)
@@ -149,7 +156,7 @@ class InterpVLLMSAE:
         edited_tensor = edited_cache[point]
         if edited_tensor.shape != clean_tensor.shape:
             raise RuntimeError("edited vLLM capture returned mismatched token geometry")
-        actual = edited_tensor[0, idx].detach().clone()
+        actual = edited_tensor[idx].detach().clone()
         expected = original + delta.to(device=original.device, dtype=original.dtype)
         err = float((actual.float() - expected.float()).abs().max().item())
         if not torch.allclose(actual.float(), expected.float(), atol=atol, rtol=rtol):
