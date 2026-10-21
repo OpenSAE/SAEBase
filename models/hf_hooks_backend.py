@@ -153,12 +153,13 @@ class HFHooksModel(HFLogitsModel):
         attention_mask: torch.Tensor,
         patches: torch.Tensor | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor]:
-        """One masked HF forward for a right-padded batch.
+        """Row-wise HF forward matching get_resid and run_with_patch.
 
         Positions are absolute, zero-based token positions for each sample.
-        Returns original site activations [batch, d_model] and final logits
-        [batch, vocab]. When patches are supplied, capture precedes editing.
-        This is separate from the established one-prompt hook API.
+        Returns original site activations [batch, d_model] and readout logits
+        [batch, vocab]. When patches are supplied, each row is edited with
+        run_with_patch. A fused padded GEMM is not used: on Qwen3 bf16 the
+        reduction depends on the row count and changes TopK feature ids.
         """
         if not isinstance(input_ids, torch.Tensor) or input_ids.ndim != 2:
             raise ValueError("input_ids must have shape [batch, seq]")
@@ -178,43 +179,34 @@ class HFHooksModel(HFLogitsModel):
                        for i, (p, r) in enumerate(zip(positions, readout_positions)))):
             raise ValueError("right padding with valid patch/readout positions required")
         ids = input_ids.to(self.cfg.device)
-        rows = torch.arange(batch, device=ids.device)
-        patch_index = torch.tensor(positions, device=ids.device)
-        readout_index = torch.tensor(readout_positions, device=ids.device)
         if patches is not None:
             if (not isinstance(patches, torch.Tensor) or patches.ndim != 2
                     or patches.shape[0] != batch or not bool(torch.isfinite(patches).all())):
                 raise ValueError("patches must be finite [batch, d_model]")
-        captured: dict[str, torch.Tensor] = {}
-
-        def hook_fn(_module: Any, _inp: Any, out: Any) -> Any:
-            hs = out[0] if isinstance(out, tuple) else out
-            if (not isinstance(hs, torch.Tensor) or hs.ndim != 3
-                    or tuple(hs.shape[:2]) != tuple(ids.shape)):
-                raise RuntimeError("batch hook shape mismatch")
-            captured["resid"] = hs[rows, patch_index].detach().clone()
+        # A fused bf16 GEMM uses a different K-reduction tile once the row count
+        # changes. On Qwen3-1.7B that 1-ulp gap in block 0 grows into TopK
+        # feature substitutions by the readout layer. Each row therefore uses
+        # the same unpadded forward as get_resid / run_with_patch.
+        activations: list[torch.Tensor] = []
+        logits: list[torch.Tensor] = []
+        for i in range(batch):
+            length = int(mask[i].sum().item())
+            row = ids[i:i + 1, :length]
+            pos = positions[i]
+            read = readout_positions[i]
+            if pos >= length or read >= length:
+                raise ValueError("patch/readout position is outside the unpadded row")
+            offset = length - 1 - pos
+            read_offset = length - 1 - read
+            activations.append(self.get_resid(row, layer, [offset])[0])
             if patches is None:
-                return out
-            if hs.shape[-1] != patches.shape[-1]:
-                raise ValueError("patch width differs from model residual width")
-            changed = hs.clone()
-            changed[rows, patch_index] = patches.to(device=hs.device, dtype=hs.dtype)
-            return (changed, *out[1:]) if isinstance(out, tuple) else changed
-
-        handle = self._layer_module(layer).register_forward_hook(hook_fn)
-        try:
-            result = self._model(
-                input_ids=ids, attention_mask=mask, use_cache=False
-            )
-        finally:
-            handle.remove()
-        if "resid" not in captured:
-            raise RuntimeError("batch hook did not execute")
-        logits = result.logits
-        if (not isinstance(logits, torch.Tensor) or logits.ndim != 3
-                or logits.shape[:2] != ids.shape):
-            raise RuntimeError("batch logits shape mismatch")
-        return captured["resid"], logits[rows, readout_index].detach().clone()
+                row_logits = self(row)
+                logits.append(row_logits[0, read].detach().clone())
+            else:
+                logits.append(self.run_with_patch(
+                    row, layer, {offset: patches[i]}, readout_offset=read_offset,
+                ).detach().clone())
+        return torch.stack(activations, dim=0), torch.stack(logits, dim=0)
 
 
 def load_hf_hooks_model(
