@@ -26,7 +26,7 @@ Preserve existing local changes and previous experiments. Before checkout: recor
 
 ## 1. Target environment and resource preflight — G0
 
-Expected GPU: **one NVIDIA GeForce RTX 5070 (nominal 12 GB VRAM)**, not an RTX 5090. Inspect the *actual* GPU, driver, free/total VRAM, host CPU/RAM and free disk; do not assume the earlier 5090 host's CPU, RAM or storage capacities still apply. Run one model and its required SAE at a time, use short prompts and small microbatches, and verify the true free VRAM before loading any checkpoint. Never attempt the full 48-site sweep in this work plan.
+Expected GPU: **one NVIDIA GeForce RTX 5070 (nominal 12 GB VRAM)**. Inspect the *actual* GPU, driver, free/total VRAM, host CPU/RAM and free disk; do not assume the previous machine's CPU, RAM or storage capacities still apply. Run one model and its required SAE at a time, use short prompts and small microbatches, and verify the true free VRAM before loading any checkpoint. Never attempt the full 48-site sweep in this work plan.
 
 Record:
 
@@ -107,7 +107,7 @@ Do not call the included `scripts/benchmark_encoding.py` an end-to-end benchmark
 
 1. Inspect CI for PR #44 at the exact candidate SHA; no unreviewed failing code/format/package gate can be ignored.
 2. Record worktrees, clean dependencies and registered model/SAE sites.
-3. Perform Tier A preflight and a tiny no-network cached experiment before downloading weights.
+3. Perform the focused representative-site preflight and a tiny no-network cached experiment before downloading weights.
 4. Write private `run_manifest.json`, `environment.json`, `site_plan.json`; choose bounded resource limits.
 
 **Output:** environment report, immutable base/candidate identity and a fixed experiment matrix. **Stop gate:** no safe runnable target or missing exact checkpoint identity.
@@ -145,7 +145,7 @@ Do not call the included `scripts/benchmark_encoding.py` an end-to-end benchmark
 
 ### GPU-04 — Measured acceleration, regression identification and tuning
 
-1. Execute base and candidate on exactly the frozen small RTX 5070 pilot workloads with warmup and repeated timing. Do not add a 48-site/Tier B sweep.
+1. Execute base and candidate on exactly the frozen small RTX 5070 pilot workloads with warmup and repeated timing. Do not add a 48-site expansion.
 2. Sweep batch sizes, token lengths, number of feature edit conditions, and SAE width. Record observed best **safe** size, not just the largest batch.
 3. Measure time spent in tokenizer/model forward, activation capture, SAE encoding, patch forwards, D2H transfers, metric reduction, I/O, checkpoint hashing and model load where instrumentable.
 4. Prefer interventions/s and encoded rows/s over nominal batch size. Report old/new forward counts and effects of reusing cached activations.
@@ -155,7 +155,7 @@ Do not call the included `scripts/benchmark_encoding.py` an end-to-end benchmark
 
 ### GPU-06 — REQUIRED real GPU tests of accelerated backends and steering
 
-**GPU-06 is mandatory, not optional, and replaces GPU-05 in the execution sequence.** Run its actual experiments on the RTX 5070 after recording the GPU-00 environment and completing the targeted GPU-01 through GPU-04 baseline work. If an earlier candidate regression is unresolved, isolate GPU-06 using the verified reference environment instead of skipping it. The current PR does **not** yet contain an interp-engine adapter or KV-cached steering implementation: the agent must build and test the smallest safe compatibility prototype where feasible, not claim one exists.
+**GPU-06 is mandatory and follows GPU-04 directly; GPU-05 is not executed.** Run its actual experiments on the RTX 5070 after recording the GPU-00 environment and completing the targeted GPU-01 through GPU-04 baseline work. If an earlier candidate regression is unresolved, isolate GPU-06 using the verified reference environment instead of skipping it. The current PR does **not** yet contain an interp-engine adapter or KV-cached steering implementation: the agent must build and test the smallest safe compatibility prototype where feasible, not claim one exists.
 
 **GPU-06A — Dependency and memory feasibility.**
 
@@ -233,7 +233,7 @@ The last `report.md` must answer all questions plainly:
 | --- | --- |
 | G0 Environment | Frozen inputs/commits, real GPU and declared budgets |
 | G1 CI | Python 3.11/3.12 offline, lint/format, package and regression checks green for final candidate SHA |
-| G2 Numerical parity | All mandatory real Tier A sites pass identity, capture, code, edit and logit checks |
+| G2 Numerical parity | All required representative real sites pass identity, capture, code, edit and logit checks |
 | G3 Recovery | No silent row loss/duplicate; safe OOM fallback, resume and cache-integrity failure behavior |
 | G4 Performance | Full per-run records and speed/memory comparisons; meaningful improvement labeled only where demonstrated |
 | G5 Mandatory GPU-06 | Real RTX 5070 accelerated-backend execution and reference parity, steering reference/prototype comparison, GPU-06 output files; unsupported paths explicitly BLOCKED |
