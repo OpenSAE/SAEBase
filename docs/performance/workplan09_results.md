@@ -2,56 +2,62 @@
 
 Public summary of the private run `rtx5070-20261021`. Prompt text, token ids, and weights are not included. This is not a 48-site result and not a Research Lab corpus result. GPU-05 was not run.
 
-Base `339fbb603bc6d999fd126a91ea8709fee1c599c2`. The first GPU rows were measured on candidate `db8e652d818ea2ec6995ebe87b9a001d623db2bb` and recorded in `c93cb5ca846eabdbe90d81496845c56112802ca4` and `1ae89ff7e1a30b1e57886335fc8b6e7dbed4a594`. CI for `db8e652`: https://github.com/OpenSAE/SAEBase/actions/runs/39546669785. CI for `c93cb5c`: https://github.com/OpenSAE/SAEBase/actions/runs/39550371815. CI for `1ae89ff`: https://github.com/OpenSAE/SAEBase/actions/runs/39550761574. The follow-up below was measured on the working tree after `1ae89ff`.
+Base `339fbb603bc6d999fd126a91ea8709fee1c599c2`. The first GPU rows were measured on candidate `db8e652d818ea2ec6995ebe87b9a001d623db2bb` and recorded in `c93cb5ca846eabdbe90d81496845c56112802ca4` and `1ae89ff7e1a30b1e57886335fc8b6e7dbed4a594`. CI for `db8e652`: https://github.com/OpenSAE/SAEBase/actions/runs/39546669785. CI for `c93cb5c`: https://github.com/OpenSAE/SAEBase/actions/runs/39550371815. CI for `1ae89ff`: https://github.com/OpenSAE/SAEBase/actions/runs/39550761574. Row-wise Qwen parity and the same-width identity gate are `09bbe9c`. The hash-cache timings below were measured on the working tree after that commit.
 
-Machine: one RTX 5070, compute capability 12.0, 12227 MiB. Pilot torch 2.14.1+cu130. Tolerances stayed frozen: fp32 atol 1e-5 rtol 1e-4; bf16 atol 1e-2 rtol 1e-2. Speed bar: 1.15x median warmed throughput over 5 repetitions.
+Machine: one RTX 5070, compute capability 12.0, 12227 MiB. Pilot torch 2.14.1+cu130. vLLM comparisons use torch 2.13.0+cu130 in a separate environment. Tolerances stayed frozen: fp32 atol 1e-5 rtol 1e-4; bf16 atol 1e-2 rtol 1e-2. Speed bar: 1.15x median warmed throughput over 5 repetitions, against the archived base medians from this same machine.
 
-## Sites
+## Final benchmark
 
-| Site | Backend | Result |
-| --- | --- | --- |
-| Pythia-410M TopK MLP, layer 4, `blocks.4.hook_mlp_out`, fp32 | TransformerLens | Tensor parity PASS (0 feature flips). Throughput ratio 0.987. |
-| Qwen3-1.7B-Base residual TopK, layer 7, `blocks.7.hook_resid_post`, bf16 | HF hooks, serial default | PASS. 0 feature flips. Identity PASS both sides. Ratio 1.009. Peak allocated about 4.03 GB both sides. |
-| Same Qwen site, fused masked batch | HF hooks | FAIL. Ratio 1.418, 5 feature-id flips, candidate identity max logit error 0.375. That kernel is no longer what `run_batch` executes. |
-| Gemma-3-270M Scope residual, layer 5, fp32 | TransformerLens | Activations, codes, baselines, and 182 matched intervention metrics agree exactly. Ratio 1.027. See Gemma note. |
-| R1-distill Qwen-1.5B residual, layer 20, registered substitute | TransformerLens | Tensor parity PASS. Ratio 1.295. This does not replace the Gemma JumpReLU cell. |
+| Site | Numerical | Median seconds (candidate / archived base) | Ratio | Peak allocated | Status |
+| --- | --- | --- | --- | --- | --- |
+| Pythia-410M TopK MLP, layer 4, fp32 | Prior tensor parity PASS, 0 feature flips | 0.920 / 2.363 | 2.569 | 2.43 GB | PASS |
+| Qwen3-1.7B residual TopK, layer 7, bf16, serial default | PASS, 0 feature flips, identity PASS | 2.363 / 5.587 | 2.364 | 4.02 GB | PASS |
+| Same Qwen site, fused masked batch | FAIL, 5 feature-id flips, identity max logit error 0.375 | 3.940 / 5.587 | 1.418 | 4.05 GB | FAIL, disabled |
+| Gemma-3-270M Scope residual, layer 5, fp32 | Activations, codes, baselines, and 182 matched metrics max abs 0 | 1.198 / 2.898 | 2.418 | 3.00 GB | PASS on matched metrics. Automatic patch-index compare remains an index artifact |
+| R1-distill Qwen-1.5B residual, layer 20, fp32 substitute | Prior tensor parity PASS, 0 feature flips | 3.450 / 10.021 | 2.905 | 9.01 GB | PASS. Does not replace Gemma |
+| Eager interp-engine, SDPA, same torch as SAEBase | All 28 `resid_post` layers max abs 0 | not a throughput path | — | — | PASS |
+| vLLM 0.28, eager, bf16 | Layer 7 residual outside the frozen bar | not benchmarked | — | — | FAIL |
 
-Checkpoint SHA-256 values are in the private `summary.csv`. Direct encode of the cached rows matched serial feature ids at batch sizes 1, 8, 32, 128, and 256 on every site measured before Gemma. A second `encode_from_store` reused all 25 rows. Gemma encode reports also matched feature ids at those batch sizes.
+The warmed Qwen repetitions were 2.346, 2.328, 2.376, 2.363, and 2.384 s. Pythia peak was 2,429,628,928 bytes, Qwen 4,024,979,456, Gemma 3,004,868,608, R1 9,011,744,256. Those peaks match the archived runs within a few hundred kilobytes.
 
-The synthetic encode microbenchmark (2048 by 1024, 32768 features) reached 4658, 33877, 128815, 244052, and 239361 rows/s at those batch sizes. That is not end-to-end evidence.
+## Where the time went
 
-## Qwen batching
+One serial Qwen engine pass, before the cache, spent 2.057 s in 225 model forwards and 0.013 s in 25 SAE encodes. Decode, metrics, and the result writer were 0.14 s, 0.08 s, and 0.006 s. The other ~3.1 s was `sha256_state_dict` copying the full model and SAE to the host on every `BatchEngine` construction. A direct measurement of that copy is 2.728 s for the Qwen model and 0.447 s for its SAE. The second call, on the same unchanged tensors, is 0.0015 s and 0.000058 s.
 
-The five feature-id substitutions came from the fused bf16 forward, not from a wrong token position. Equal-length rows with no padding already diverge from the single-example forward: activation max abs 0.125, logits max abs 0.5, 3/3 TopK flips. A repeated identical row at batch 4 had activation max abs 0.25 and 0 flips. Masked and unmasked equal-length batches matched each other. Mixed lengths were measured separately. Layer-0 inputs matched; the gap opens inside block 0 and is large by layer 7.
+The digest bytes are unchanged. The cache key is storage address, shape, stride, offset, and the tensor in-place version. An in-place edit misses the cache and is hashed again. CPU check: 75 passed, including that repeat-and-invalidate test (`test_performance_hf_batch.py`, `test_m1_store.py`, `test_m2_interventions.py`, `test_m3_execution.py`).
 
-Grouped GEMM, deterministic cuBLAS, SDPA backend selection, CUDA graphs, and a second replica on another stream did not produce a fused forward that matches the single-example kernel and is faster. `run_batch` now runs each unpadded row through `get_resid` and `run_with_patch`. After that change, equal-length, mixed-length, and repeated-row groups have activation and logit max abs 0 and 0 feature-id flips at the frozen bf16 bar. The engine opt-in path matches the serial default at max abs 0, with identity PASS, on both an equal-length group and a mixed-length group.
+After the cache, the dominant remaining cost on serial Qwen is those 225 model forwards: one capture, one logit readout, and one forward per condition. Fusing the capture and the logit readout would remove 25 of them, about 0.23 s. That is smaller than the hash that the profile actually identified, so it was not the change made here. A fused padded GEMM is still not used.
 
-`enable_hf_masked_batch` stays false. The opt-in path is the single-example kernel, so it does not meet the 1.15x bar. The fused kernel remains outside the tolerance and is not re-enabled.
+`enable_hf_masked_batch` stays false. `run_batch` walks each unpadded row through the single-example kernel. That matches serial Qwen at max abs 0. It is not a batching speedup, and it is not what produced the ratios above.
 
-## Identity replay
+Coalesced cache encoding is unchanged: direct encode of the cached rows matched serial feature ids at batch sizes 1, 8, 32, 128, and 256, and a second `encode_from_store` reused all 25 rows. Injected OOM retained the reduced microbatch (8/8). A corrupted shard was rejected with `CacheIntegrityError`.
 
-This is separate from candidate-versus-base tensor parity. The pilot baseline uses `sample_batch=8` and the old gate replayed identity at `microbatch=4`. Same-width write-back is bitwise on Pythia and R1 for both the base commit and the candidate (max abs 0). Cross-width replay fails the 1e-5 gate. The base commit still raises the archived errors 3.325e-4 (Pythia) and 2.289e-5 (R1). TF32 was off. The gap is the batch shape used by the reference protocol, not a hook that writes the wrong residual.
+## Qwen batching and identity
 
-The candidate gate now replays at the baseline width. On an 8-row mixed-length group it PASSes for Pythia and R1. If that replay runs out of memory, each half is rebaselined before it is compared. Edit chunks that are narrower than the baseline group are not treated as identity failures. Saved edit microbatch widths are unchanged.
+The five feature-id substitutions came from the fused bf16 forward. Equal-length rows with no padding already diverge from the single-example forward: activation max abs 0.125, logits max abs 0.5, 3/3 TopK flips. Layer-0 inputs matched; the gap opens inside block 0. Grouped GEMM, deterministic cuBLAS, SDPA backend selection, CUDA graphs, and a second stream replica did not produce a fused forward that matches the single-example kernel and is faster.
 
-## Gemma
+The Pythia and R1 identity misses on the archived summaries are a separate protocol error. The pilot baseline uses `sample_batch=8` and the old gate replayed identity at `microbatch=4`. Same-width write-back is bitwise on both the base commit and the candidate. The candidate gate replays at the baseline width. Qwen's full serial workload was re-run with that gate after the hash cache: PASS.
 
-`google/gemma-3-270m` and `google/gemma-scope-2-270m-pt` loaded with the instance token. Layer 5 residual, fp32, TransformerLens. Candidate median 2.821 s, base median 2.898 s, ratio 1.027, peak about 3.00 GB. Encode feature ids matched. Activations, codes, and baselines differ by max abs 0. All 182 intervention rows matched on logit and activation metrics (max abs 0) when keyed by sample and condition. 0 feature-id flips.
+Gemma's automatic comparer can still report failed patch tensors because patch logs are keyed by batch index and the identity-width change altered how many patch batches were recorded. Matched sample-and-condition metrics are the cross-version result.
 
-The automatic comparer reported 20 failed patch tensors and worst max abs 18.9. Those keys are batch-index logs. The candidate records 91 patch batches and the base records 65, because the identity replay width changed, so a shared index is not the same edit. The matched metrics above are the cross-version result. Candidate identity gate PASS. Base identity gate FAIL at max logit error 2.575e-5, the same width-mismatch protocol. Speed gate not met.
+## vLLM numerical mismatch
 
-## GPU-06
+SAEBase, eager interp-engine, and vLLM were compared on the same token ids, the same bf16 checkpoint, and `resid_post`. Eager interp on the pilot torch with SDPA matches SAEBase at every layer, including the layer-0 input: max abs 0. The earlier 0.25 gap was eager attention against SAEBase SDPA.
 
-Eager interp-engine 1.14.0 on the pilot torch, with SDPA attention, matches SAEBase at layer 7 `resid_post`: residual, clean logits, identity patch, and SAE-ablation logits max abs 0. Ablation residual max abs 4.88e-4, inside the bf16 bar. Four-token greedy generation matches. The earlier max abs 0.25 was interp's default eager attention against SAEBase SDPA. Hook name, token positions, and bf16 dtype already agreed.
+vLLM 0.28 completes a forward with `CUDA_HOME` pointed at the cu13 nvcc, `VLLM_USE_FLASHINFER_SAMPLER=0`, `enforce_eager=True`, and prefix caching off. The layer-0 residual input matches SAEBase at max abs 0, so the capture is not reading a doubled residual and the embeddings match. The first difference is inside block 0.
 
-vLLM 0.28.0 completes a forward when `CUDA_HOME` points at the cu13 nvcc (13.4), `VLLM_USE_FLASHINFER_SAMPLER=0`, `enforce_eager=True`, and prefix caching is off. FlashInfer autotune starts and finishes. Triton attention and FlashAttention both capture. Each misses the frozen bf16 residual bar at max abs 0.0625. An identity add of zeros is bitwise on the vLLM capture. The SAE ablation residual has the same 0.0625 gap. Greedy and stepwise token decisions match SAEBase. CUDA graphs stayed off. No vLLM benchmark, because the residual bar fails.
+| vLLM config | Layer 0 attention | Layer 0 MLP | Layer 0 residual | Layer 7 residual | Worst residual |
+| --- | --- | --- | --- | --- | --- |
+| Triton attention, vLLM RMSNorm | 0.0078125 | 0.03125 | 0.0625 | 0.0625, outside the bar | layer 24, 8.0 |
+| Triton attention, native RMSNorm first | 0.0078125 | 0.0078125 | 0.015625 | 0.25, outside the bar | layer 26, 8.0 |
+| FlashAttention, native RMSNorm first | 0.0078125 | 0.0078125 | 0.015625 | 0.25, outside the bar | layer 25, 8.0 |
 
-## Other checks
+Native RMSNorm reduces the layer-0 MLP gap and does not bring layer 7 inside the frozen bar. Triton and FlashAttention agree with each other once the norm implementation is the same, and both differ from HF SDPA. This vLLM build has no decoder SDPA backend. The error is an attention-kernel and norm difference that accumulates through the residual stream. It is not fixed by changing the hook, the token position, or the dtype. CUDA graphs stayed off. No vLLM throughput number is reported.
 
-Injected OOM retained the reduced microbatch (8/8 kept). A corrupted activation shard was rejected with `CacheIntegrityError`. Coalesced cache encoding is unchanged. CPU: 74 passed across `test_performance_hf_batch.py`, `test_m1_store.py`, `test_m2_interventions.py`, and `test_m3_execution.py`.
+## Decision for PR #44
 
-## Decision
+Merge the verified core. Do not treat vLLM as part of that release.
 
-Serial Qwen parity PASS. Opt-in `run_batch` parity PASS and not faster, so masked batching stays off. Fused Qwen batching FAIL and is not the implementation. Pythia and R1 cross-version tensors PASS. Their old identity-replay miss is the batch-width protocol; same-width replay passes, including on the candidate gate. Gemma activations and matched intervention metrics PASS; the automatic patch-index compare does not, for the reason above; the speed bar is not met. Eager GPU-06 with SDPA PASS. vLLM forward PASS and vLLM residual equivalence FAIL at max abs 0.0625.
+The core is serial HF execution as the default, row-wise `run_batch` kept only as a same-kernel opt-in, the same-width identity replay, coalesced SAE encoding, OOM microbatch retention, and the state-hash cache. Those paths keep the frozen tolerances. The cache is the change that clears 1.15x on the four timed sites. High-speed fused HF batching stays disabled. vLLM stays experimental and disabled: every configuration measured here fails the bf16 residual bar, so it is not a GPU-06 pass and it gets no speed claim.
 
-PR #44 stays a draft. The vLLM residual is still outside the frozen tolerance, and the HF batch flag is not a 1.15x acceleration.
+CPU tests: 75 passed. GPU-05 and the 48-site sweep were not run.
