@@ -52,6 +52,8 @@ def reference_stepper(model, sae, token_ids, max_tokens: int, feature_id: int):
     condition = Condition("ablate", "ablate", (feature_id,))
     current = token_ids.detach().clone()
     result = []
+    started = time.perf_counter()
+    time_to_first_token = None
     for _step in range(max_tokens):
         site = ActivationSite(LAYER, f"blocks.{LAYER}.hook_resid_post", int(current.shape[1]) - 1)
         snapshot = capture_features(adapter, sae, site=site, tokens=current)
@@ -60,6 +62,8 @@ def reference_stepper(model, sae, token_ids, max_tokens: int, feature_id: int):
             tokens=current, site=site, activation=patch.activation, readout_position=-1
         )
         nxt = int(torch.argmax(logits.float()).item())
+        if time_to_first_token is None:
+            time_to_first_token = time.perf_counter() - started
         result.append(nxt)
         current = torch.cat(
             (current, torch.tensor([[nxt]], dtype=torch.long, device=current.device)), dim=1
@@ -67,6 +71,7 @@ def reference_stepper(model, sae, token_ids, max_tokens: int, feature_id: int):
     return {
         "ids": tuple(result),
         "forwards": 2 * max_tokens,
+        "ttft": time_to_first_token,
         "protocol": "reference_clean_prefix_stepwise_v1",
     }
 
@@ -95,6 +100,7 @@ def hf_generator(mode, model, sae, ids, max_tokens, feature_id):
     return {
         "ids": trace.generated_token_ids,
         "forwards": trace.model_forwards,
+        "ttft": trace.time_to_first_token_seconds,
         "protocol": trace.protocol,
     }
 
@@ -144,7 +150,12 @@ def vllm_generator(model, sae, ids, max_tokens, feature_id, strength):
         seed=0,
         stop_at_eos=False,
     )
-    return {"ids": trace.generated_token_ids, "forwards": None, "protocol": trace.protocol}
+    return {
+        "ids": trace.generated_token_ids,
+        "forwards": None,
+        "ttft": trace.time_to_first_token_seconds,
+        "protocol": trace.protocol,
+    }
 
 
 def select_feature_id(model, sae, ids):
@@ -321,6 +332,7 @@ def main() -> None:
                         series.append(
                             {
                                 "seconds": elapsed,
+                                "ttft_seconds": trace["ttft"],
                                 "tokens": len(trace["ids"]),
                                 "forwards": trace["forwards"],
                                 "allocated_bytes": int(torch.cuda.max_memory_allocated()),
@@ -331,6 +343,10 @@ def main() -> None:
                 sorted_times = sorted(x["seconds"] for x in series)
                 median = sorted_times[len(sorted_times) // 2]
                 total = len(token_ids or ())
+                ttfts = sorted(
+                    float(x["ttft_seconds"]) for x in series
+                    if x["ttft_seconds"] is not None
+                )
                 report["results"].append(
                     {
                         "prompt_index": prompt_index,
@@ -339,6 +355,9 @@ def main() -> None:
                         "max_new_tokens": length,
                         "protocol": trace["protocol"],
                         "median_seconds": median,
+                        "median_ttft_seconds": (
+                            ttfts[len(ttfts) // 2] if ttfts else None
+                        ),
                         "new_tokens_per_second": total / median if median else None,
                         "repetitions": series,
                         "new_token_ids_private": token_ids,
@@ -356,6 +375,7 @@ def main() -> None:
                             "prompt_index": row["prompt_index"],
                             "tokens": row["max_new_tokens"],
                             "median_seconds": row["median_seconds"],
+                            "median_ttft_seconds": row["median_ttft_seconds"],
                             "tokens_per_second": row["new_tokens_per_second"],
                         }
                         for row in report["results"]
