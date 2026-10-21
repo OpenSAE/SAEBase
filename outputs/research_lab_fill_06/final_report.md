@@ -1,10 +1,10 @@
 # Feature Effects and Context Lab
 
-Both live workspaces open on preserved measurements. No new GPU run was started.
+Both live workspaces open on preserved measurements. Feature Effects now opens on a new, separate next-word measurement. The older six score-only pairs stay in the closed details.
 
 ## What is published
 
-Feature Effects has six cases, one recorded prompt group on each deep site. Every case has the five stored operators `ablate`, `scale`, `add`, `clamp`, and `coalition`. The chart is logit L2 for those operators on that same prompt. The pairs do not contain token probabilities or a generated sentence, so the page does not draw either. `GPU-04/generation_v2.json` has five token ids for a different sample and was not joined.
+The archived six pairs and `GPU-04/generation_v2.json` still have no aligned token probabilities. A bounded follow-up used weights already on disk: Pythia 410M at layer 12 and Gemma 1B at layer 13, four project-authored prompts each (8 prompt-site pairs). Each prompt records the original next-word list and three edits of the strongest active feature: remove it, cut its activity in half, and add 1. Chances are a full-vocabulary softmax. The landing example is Gemma 1B on “The capital of France is”: removing the feature changes the top guess from “a” (23.0%) to “Paris” (35.9%). Cutting the activity in half leaves “a” first. This run id is `effects-authored-20261021`, separate from the six saved pairs.
 
 Context Lab opens on the project-authored six-factor grid. All 64 states match sparse codes for `pythia410m:pythia410m_mlp_topk:L12`. The observed support is 55 dictionary feature ids. Marginal effects are the mean of the 32 paired on-minus-off differences.
 
@@ -25,17 +25,15 @@ Feature Atlas content is unchanged (`features.json` `f3bc09f9e9ee6528`). The int
 
 ## Checks
 
-`apps/research-lab/tests/test_export_real_cases.py`: 2 passed, including a byte-identical rebuild from the run directory. Chromium on desktop and a 390px viewport opened Effects, the 64-cell grid, and Input Transformations with no console errors and no failed asset requests. Keyboard activation of a factor changed the authored prompt. Switching the operator changed the displayed logit L2 (`184.2337` to `100.0485` on the first case).
-
-The same checks passed on the live host.
+`apps/research-lab/tests/test_export_real_cases.py`: 3 passed. The new test rebuilds each displayed probability from the token logit and the full-vocabulary log-sum-exp. Chromium on desktop and a 390px viewport opened Effects on the France example, switched the edit, and still found 64 context cells. The live host showed the same page with no console errors and no failed assets. Context Lab’s controlled grid was not redesigned.
 
 ## Commits and URLs
 
-- Repository commit: `8672ff05aa3ea4d1bb961558bc1307540df9b871` on `work-plan-06-real-evidence`
-- Space commit: `ce09617cf3c5c0209cebd156a628ca627a2c21cc`
-- Feature Effects: https://opensae-saebase.static.hf.space/lab-experiments/index.html?v=wp06#effects
-- Context Lab: https://opensae-saebase.static.hf.space/lab-experiments/index.html?v=wp06#context
-- Feature Atlas: https://opensae-saebase.static.hf.space/index.html?v=wp06#play
+- Repository commit: `7378ccc350f6b2e2bacc7f8b01e610190e630565` on `work-plan-06-real-evidence`
+- Space commit: `179bc506602e5d82c7121a2922d8c84c8c409d19`
+- Feature Effects: https://opensae-saebase.static.hf.space/lab-experiments/index.html?v=wp06b#effects
+- Context Lab: https://opensae-saebase.static.hf.space/lab-experiments/index.html?v=wp06b#context
+- Feature Atlas: https://opensae-saebase.static.hf.space/index.html?v=wp06b#play
 - Space page: https://huggingface.co/spaces/OpenSAE/SAEBase
 
-Optional GPU follow-up was not run. The within-prompt operator chart is the recorded result.
+Reused: the six score-only pairs, the 64-state grid, and the position-corrected RSS aggregates. Newly measured: eight authored prompt-site pairs and their next-word lists.
