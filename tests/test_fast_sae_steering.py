@@ -175,12 +175,23 @@ def test_fixed_decoder_direction_and_true_generated_steering(monkeypatch):
         strength=1.5,
         max_new_tokens=4,
         compare_unsteered=True,
+        precomputed_direction=direction,
     )
     assert result.generated_token_ids == (10, 11, 12, 13)
     assert result.baseline_token_ids == (20, 21, 22, 23)
     assert result.protocol == "persistent_decoder_direction_kv_v1"
     assert model.calls == [("generate", False), ("steer", 1.5), ("generate", True)]
     assert not model.active
+    with pytest.raises(ValueError, match="precomputed SAE direction"):
+        generate_decoder_direction_cached(
+            model,
+            sae,
+            [1, 2, 3],
+            layer=2,
+            feature_id=0,
+            strength=1.0,
+            precomputed_direction=torch.zeros(1),
+        )
 
 
 def test_generation_only_backend_refused(monkeypatch):
