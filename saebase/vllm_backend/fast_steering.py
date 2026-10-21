@@ -5,6 +5,7 @@ per-request vLLM steering and static CUDA-graph taps where available. Fixed
 decoder-direction addition is NOT dynamic tokenwise SAE ablation: use the
 separate HF live-SAE cached implementation when the current z_t is needed.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -68,8 +69,9 @@ def decoder_feature_direction(sae: Any, feature_id: int) -> torch.Tensor:
     delta = (active - base)[0].detach().float().cpu()
     # The fixed-vector route is only justified for an affine SAE decode. A
     # nonaffine decoder needs actual current z_t, not this approximation.
-    if not torch.allclose((middle - base).float(), (active - base).float() * 0.5,
-                          rtol=1e-3, atol=2e-3):
+    if not torch.allclose(
+        (middle - base).float(), (active - base).float() * 0.5, rtol=1e-3, atol=2e-3
+    ):
         raise ValueError("nonaffine SAE decoder; use live cached feature edits")
     if not delta.any():
         raise ValueError("selected SAE feature has a zero decoder direction")
@@ -127,7 +129,9 @@ def generate_decoder_direction_cached(
 
     ids = _validate_token_ids(token_ids)
     backend = _require_steer_site(model, layer)
-    if not isinstance(strength, (float, int)) or not bool(torch.isfinite(torch.tensor(float(strength)))):
+    if not isinstance(strength, (float, int)) or not bool(
+        torch.isfinite(torch.tensor(float(strength)))
+    ):
         raise ValueError("strength must be finite")
     if type(max_new_tokens) is not int or not 1 <= max_new_tokens <= 4096:
         raise ValueError("max_new_tokens outside supported budget")
@@ -138,9 +142,11 @@ def generate_decoder_direction_cached(
 
     vector = decoder_feature_direction(sae, feature_id)
     spec = SteeringSpec(
-        layers={layer: LayerSteeringSpec(
-            operations=[AddSpec(vector=vector, scale=float(strength), normalize=False)]
-        )},
+        layers={
+            layer: LayerSteeringSpec(
+                operations=[AddSpec(vector=vector, scale=float(strength), normalize=False)]
+            )
+        },
         point="resid_post",
     )
     excluded = list(range(len(ids) - 1)) if steer_last_prompt_token else list(range(len(ids)))
@@ -150,27 +156,41 @@ def generate_decoder_direction_cached(
         original = tuple(
             int(step.token_id)
             for step in generate_stream(
-                model, ids, max_tokens=max_new_tokens, temperature=float(temperature),
-                seed=seed, stop_at_eos=True,
+                model,
+                ids,
+                max_tokens=max_new_tokens,
+                temperature=float(temperature),
+                seed=seed,
+                stop_at_eos=True,
             )
         )
     start = perf_counter()
     with steer(
-        model, spec, prompt_token_ids=ids,
-        position_mask=excluded, generated=True,
+        model,
+        spec,
+        prompt_token_ids=ids,
+        position_mask=excluded,
+        generated=True,
     ):
         generated = tuple(
             int(step.token_id)
             for step in generate_stream(
-                model, ids, max_tokens=max_new_tokens, temperature=float(temperature),
-                seed=seed, stop_at_eos=True,
+                model,
+                ids,
+                max_tokens=max_new_tokens,
+                temperature=float(temperature),
+                seed=seed,
+                stop_at_eos=True,
             )
         )
     if torch.cuda.is_available() and torch.as_tensor(vector).is_cuda:
         torch.cuda.synchronize()
     elapsed = perf_counter() - start
     return FastSteeringResult(
-        backend=backend, generated_token_ids=generated,
-        elapsed_seconds=elapsed, feature_id=feature_id,
-        strength=float(strength), baseline_token_ids=original,
+        backend=backend,
+        generated_token_ids=generated,
+        elapsed_seconds=elapsed,
+        feature_id=feature_id,
+        strength=float(strength),
+        baseline_token_ids=original,
     )
