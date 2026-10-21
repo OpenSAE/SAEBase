@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1290" height="630" viewBox="0 0 1290 630" role="img" aria-labelledby="title desc">
+  <title id="title">SAEBase research workflow</title>
+  <desc id="desc">Models and SAEs plus versioned inputs lead to activation capture, an activation store and SAE encoding. Reconstruction and feature interventions are evaluated with benchmarks and reliability checks, followed by provenance and reports.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="9.5" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 10 6 L 1 11 Z" fill="#000"/>
+    </marker>
+  </defs>
+  <rect width="1290" height="630" fill="#fff"/>
+  <g fill="none" stroke="#000" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M290 116 H315 V180 H350" marker-end="url(#arrow)"/>
+    <path d="M290 240 H315 V180" />
+    <path d="M610 180 H675" marker-end="url(#arrow)"/>
+    <path d="M920 180 H990" marker-end="url(#arrow)"/>
+    <path d="M1120 226 V306 H365 V334" marker-end="url(#arrow)"/>
+    <path d="M895 306 V334" marker-end="url(#arrow)"/>
+    <path d="M365 428 V470 H625 V508" marker-end="url(#arrow)"/>
+    <path d="M895 428 V470 H625" />
+    <path d="M850 554 H930" marker-end="url(#arrow)"/>
+  </g>
+  <g stroke="#000" stroke-width="3.6">
+    <rect x="40" y="71" width="250" height="90" rx="14" fill="#fff"/>
+    <rect x="40" y="195" width="250" height="90" rx="14" fill="#fff"/>
+    <rect x="350" y="135" width="260" height="90" rx="14" fill="#000"/>
+    <rect x="675" y="135" width="245" height="90" rx="14" fill="#fff"/>
+    <rect x="990" y="135" width="260" height="90" rx="14" fill="#000"/>
+    <rect x="195" y="338" width="340" height="90" rx="14" fill="#fff"/>
+    <rect x="700" y="338" width="390" height="90" rx="14" fill="#fff"/>
+    <rect x="400" y="510" width="450" height="86" rx="14" fill="#fff"/>
+    <rect x="930" y="510" width="300" height="86" rx="14" fill="#fff"/>
+  </g>
+  <g font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" text-anchor="middle" dominant-baseline="middle">
+    <text x="165" y="117" fill="#000">Models &amp; SAEs</text>
+    <text x="165" y="241" fill="#000">Versioned inputs</text>
+    <text x="480" y="181" fill="#fff">Load &amp; capture</text>
+    <text x="797.5" y="181" fill="#000">Activation store</text>
+    <text x="1120" y="181" fill="#fff" font-size="25">SAE encode / decode</text>
+    <text x="365" y="384" fill="#000">Reconstruction</text>
+    <text x="895" y="384" fill="#000">Feature interventions</text>
+    <text x="625" y="555" fill="#000">Benchmark &amp; reliability</text>
+    <text x="1080" y="555" fill="#000" font-size="25">Provenance &amp; reports</text>
+  </g>
+</svg>
