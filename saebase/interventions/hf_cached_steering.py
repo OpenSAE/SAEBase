@@ -35,6 +35,7 @@ class CachedSAEGeneration:
     elapsed_seconds: float
     model_forwards: int
     steps: tuple[CachedSAEStep, ...]
+    time_to_first_token_seconds: float | None = None
     protocol: str = "persistent_live_sae_kv_v1"
 
     @property
@@ -137,6 +138,7 @@ def generate_live_sae_cached(
         return (changed, *output[1:]) if isinstance(output, tuple) else changed
 
     start = perf_counter()
+    first_token_time: float | None = None
     with lock:
         hook = module.register_forward_hook(live_edit)
         try:
@@ -164,6 +166,8 @@ def generate_live_sae_cached(
                 if logits.ndim != 3 or logits.shape[:2] != (1, forward_ids.shape[1]):
                     raise RuntimeError("invalid cached decode logits")
                 new_id = int(torch.argmax(logits[0, -1].float()).item())
+                if first_token_time is None:
+                    first_token_time = perf_counter() - start
                 if record_steps:
                     trace.append(
                         CachedSAEStep(
@@ -191,4 +195,5 @@ def generate_live_sae_cached(
         elapsed_seconds=elapsed,
         model_forwards=forwards,
         steps=tuple(trace),
+        time_to_first_token_seconds=first_token_time,
     )
