@@ -115,8 +115,10 @@ def raw_hf_cached_greedy(model, prompt_ids: torch.Tensor, max_tokens: int) -> tu
     for _step in range(max_tokens):
         total = int(ids.shape[1])
         current = ids if past is None else ids[:, -1:]
-        positions = torch.arange(total, device=ids.device) if past is None else torch.tensor(
-            [total - 1], dtype=torch.long, device=ids.device
+        positions = (
+            torch.arange(total, device=ids.device)
+            if past is None
+            else torch.tensor([total - 1], dtype=torch.long, device=ids.device)
         )
         output = raw(
             input_ids=current,
