@@ -6,6 +6,7 @@ propagates the edited activation through the remaining model. Past KV from
 the edited execution is retained. This is the distinct protocol
 persistent_live_sae_kv_v1, NOT the old clean-full-prefix reference.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -73,8 +74,10 @@ def generate_live_sae_cached(
     if not isinstance(condition, Condition):
         raise TypeError("condition must be a SAEBase Condition")
     if (
-        not isinstance(prompt_ids, torch.Tensor) or prompt_ids.ndim != 2
-        or prompt_ids.shape[0] != 1 or prompt_ids.shape[1] < 1
+        not isinstance(prompt_ids, torch.Tensor)
+        or prompt_ids.ndim != 2
+        or prompt_ids.shape[0] != 1
+        or prompt_ids.shape[1] < 1
         or prompt_ids.dtype not in (torch.int32, torch.int64)
     ):
         raise ValueError("prompt_ids must be nonempty integer [1, seq] tensor")
@@ -115,7 +118,9 @@ def generate_live_sae_cached(
         position = total - 1
         vector = hidden[0, -1].detach().clone()
         snapshot = snapshot_from_activation(
-            sae, tokens=ids, site=ActivationSite(layer, site_name, position),
+            sae,
+            tokens=ids,
+            site=ActivationSite(layer, site_name, position),
             activation=vector,
         )
         patch = apply_condition(sae, snapshot, condition)
