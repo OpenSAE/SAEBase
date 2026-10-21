@@ -190,3 +190,56 @@ def test_generation_only_backend_refused(monkeypatch):
     candidate.hooks_available = False
     with pytest.raises(RuntimeError, match="generation-only"):
         generate_decoder_direction_cached(candidate, sae, [1], layer=2, feature_id=0, strength=1.0)
+
+def test_cached_identity_agrees_with_complete_clean_sequence():
+    """No-op SAE hook must yield the same five greedy tokens as full-prefix decoding."""
+    model, _adapter, sae = build()
+    raw = model._model
+    ids = torch.tensor([[1, 2, 3]], dtype=torch.long)
+    current = ids.clone()
+    expected = []
+    with torch.no_grad():
+        for _ in range(5):
+            logits = raw(input_ids=current, use_cache=False).logits[0, -1]
+            nxt = int(torch.argmax(logits.float()).item())
+            expected.append(nxt)
+            current = torch.cat(
+                (current, torch.tensor([[nxt]], dtype=torch.long)), dim=1
+            )
+    result = generate_live_sae_cached(
+        model,
+        sae,
+        ids,
+        layer=0,
+        condition=Condition("identity", "identity"),
+        max_new_tokens=5,
+    )
+    assert result.generated_token_ids == tuple(expected)
+    assert result.model_forwards == 5
+    assert len(raw.model.layers[0]._forward_hooks) == 0
+
+
+def test_live_sae_kv_edit_changes_actual_greedy_token():
+    """A large genuine SAE edit must reach the logits, not just modify a cache."""
+    model, _adapter, sae = build()
+    ids = torch.tensor([[1, 2, 3]], dtype=torch.long)
+    original = generate_live_sae_cached(
+        model,
+        sae,
+        ids,
+        layer=0,
+        condition=Condition("identity", "identity"),
+        max_new_tokens=3,
+    )
+    modified = generate_live_sae_cached(
+        model,
+        sae,
+        ids,
+        layer=0,
+        condition=Condition("add", "add", (0,), 10.0),
+        max_new_tokens=3,
+        record_steps=True,
+    )
+    assert modified.generated_token_ids[0] != original.generated_token_ids[0]
+    assert modified.steps[0].edit_l2 > 0
+    assert len(model._model.model.layers[0]._forward_hooks) == 0
