@@ -1,4 +1,5 @@
 """CPU tests for real tokenwise SAE edits and fixed feature-direction KV steering."""
+
 from __future__ import annotations
 
 from contextlib import contextmanager
@@ -24,8 +25,13 @@ def test_live_sae_kv_uses_one_forward_per_token_and_cleans_hook():
     original = raw(input_ids=ids, use_cache=True).logits[0, -1]
     before = raw.calls
     result = generate_live_sae_cached(
-        model, sae, ids, layer=0, condition=Condition("id", "identity"),
-        max_new_tokens=4, record_steps=True,
+        model,
+        sae,
+        ids,
+        layer=0,
+        condition=Condition("id", "identity"),
+        max_new_tokens=4,
+        record_steps=True,
     )
     assert result.model_forwards == 4
     assert raw.calls - before == 4
@@ -40,15 +46,23 @@ def test_live_sae_ablation_and_exception_restore_hook():
     model, _adapter, sae = build()
     ids = torch.tensor([[1, 2, 3]], dtype=torch.long)
     result = generate_live_sae_cached(
-        model, sae, ids, layer=0, condition=Condition("a", "ablate", (0,)),
-        max_new_tokens=3, record_steps=True,
+        model,
+        sae,
+        ids,
+        layer=0,
+        condition=Condition("a", "ablate", (0,)),
+        max_new_tokens=3,
+        record_steps=True,
     )
     assert result.model_forwards == 3
     assert all(x.edited_feature_ids for x in result.steps)
     assert all(x.edit_l2 >= 0 for x in result.steps)
     with pytest.raises(IndexError):
         generate_live_sae_cached(
-            model, sae, ids, layer=0,
+            model,
+            sae,
+            ids,
+            layer=0,
             condition=Condition("bad", "ablate", (100000,)),
             max_new_tokens=1,
         )
@@ -60,13 +74,22 @@ def test_live_sae_validates_budget_and_model():
     ids = torch.tensor([[1, 2, 3]], dtype=torch.long)
     with pytest.raises(ValueError, match="context"):
         generate_live_sae_cached(
-            model, sae, ids, layer=0, condition=Condition("i", "identity"),
-            max_new_tokens=4, max_context_tokens=5,
+            model,
+            sae,
+            ids,
+            layer=0,
+            condition=Condition("i", "identity"),
+            max_new_tokens=4,
+            max_context_tokens=5,
         )
     model._model.config.model_type = "other"
     with pytest.raises(ValueError, match="Qwen3"):
         generate_live_sae_cached(
-            model, sae, ids, layer=0, condition=Condition("i", "identity"),
+            model,
+            sae,
+            ids,
+            layer=0,
+            condition=Condition("i", "identity"),
         )
 
 
@@ -130,7 +153,8 @@ def install_interp(monkeypatch):
     specs.LayerSteeringSpec = LayerSteeringSpec
     specs.SteeringSpec = SteeringSpec
     for name, module in (
-        ("interp_engine", root), ("interp_engine.steer", steering),
+        ("interp_engine", root),
+        ("interp_engine.steer", steering),
         ("interp_engine.steer_specs", specs),
     ):
         monkeypatch.setitem(sys.modules, name, module)
@@ -143,15 +167,19 @@ def test_fixed_decoder_direction_and_true_generated_steering(monkeypatch):
     assert direction.ndim == 1 and direction.numel() == sae.cfg.d_in
     model = FakeInterp()
     result = generate_decoder_direction_cached(
-        model, sae, [1, 2, 3], layer=2, feature_id=0,
-        strength=1.5, max_new_tokens=4, compare_unsteered=True,
+        model,
+        sae,
+        [1, 2, 3],
+        layer=2,
+        feature_id=0,
+        strength=1.5,
+        max_new_tokens=4,
+        compare_unsteered=True,
     )
     assert result.generated_token_ids == (10, 11, 12, 13)
     assert result.baseline_token_ids == (20, 21, 22, 23)
     assert result.protocol == "persistent_decoder_direction_kv_v1"
-    assert model.calls == [
-        ("generate", False), ("steer", 1.5), ("generate", True)
-    ]
+    assert model.calls == [("generate", False), ("steer", 1.5), ("generate", True)]
     assert not model.active
 
 
@@ -161,6 +189,4 @@ def test_generation_only_backend_refused(monkeypatch):
     candidate = FakeInterp()
     candidate.hooks_available = False
     with pytest.raises(RuntimeError, match="generation-only"):
-        generate_decoder_direction_cached(
-            candidate, sae, [1], layer=2, feature_id=0, strength=1.0
-        )
+        generate_decoder_direction_cached(candidate, sae, [1], layer=2, feature_id=0, strength=1.0)
