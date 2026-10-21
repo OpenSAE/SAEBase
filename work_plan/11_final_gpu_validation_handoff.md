@@ -5,6 +5,60 @@ Status: engineering code present; GPU acceptance and final release NOT completed
 Executor: local agent with one RTX 5070 (nominal 12 GiB) and the exact original Qwen model + SAE.
 This is an **implementation, debugging, measurement, and completion task**, NOT another planning task.
 
+## Critical correction after inspecting Neuronpedia / interp-engine source (2026-10-21)
+
+**Supersedes every instruction below that equates "not bitwise/numerically identical to HF" with "vLLM is broken" or treats "cached steering not byte-identical to full-prefix HF" as proof it cannot be shipped.** HF is a frozen historical reference, not a privileged mathematical ground truth. Different BF16 kernels and batch shapes may produce different but valid floating-point traces. The scientific question is whether it changes SAE feature identities/effects for the workload, and whether a new backend is clearly declared and independently validated.
+
+### Read these upstream sources BEFORE another GPU tuning loop
+
+- Engine implementation, supported capture/writes and backend choices: https://github.com/decoderesearch/interp-engine
+- Real steering semantics, position_mask (EXCLUDED positions), and generated=True/False: https://github.com/decoderesearch/interp-engine/blob/main/interp_engine/steer.py
+- Read/write graph taps, prefix-cache isolation, CUDA graph and vLLM-static design: https://github.com/decoderesearch/interp-engine/blob/main/docs/PERFORMANCE.md
+- Accurate numerical comparison process and cases (do not invent thresholds): https://github.com/decoderesearch/interp-engine/tree/main/validator
+- Neuronpedia inference and SAE feature/direction endpoints: https://github.com/hijohnnylin/neuronpedia/blob/main/apps/inference/README.md
+- Actual capture+steering+generate timing suite, including prompt length and GPU specification: https://github.com/decoderesearch/interp-engine/blob/main/benchmarks/results-latest.md
+
+Neuronpedia ALREADY has production vLLM dynamic hooks, a static-tap CUDA graph backend that can read/write declared residual sites, and KV-cached streaming generation. Do not reimplement that engine or dismiss its design based only on cross-library BF16 differences. Its published B200/Qwen3-4B results are evidence of architectural feasibility, NOT a speed claim for Qwen3-1.7B on RTX5070.
+
+### P0: Explicitly separate THREE scientific protocols
+
+**A. reference_clean_prefix_stepwise_v1 (historical reproducibility).** For each generated token, SAEBase recomputes the entire CLEAN prefix (of that steered trajectory's own actual token history), computes the live SAE feature and its residual-preserving edit ONLY on the current token, then computes edited next-token logits. A new incremental clean-cache implementation may speed it up, but old paper/benchmark outputs must remain pinned to their HF/TL execution protocol. For equivalence to those old results retain old dtype, attention kernel, exact activation site, tokenization and feature-id support; a divergent backend is NOT interchangeable in the same experiment identity.
+
+**B. fast_persistent_steering_v1 (high-throughput Neuronpedia-style generation).** A per-token or fixed steering intervention runs during cached generation; **edited historical KV can persist**. This is a valid research/interactive generation protocol with different causal history. Implement using upstream `interp-engine` native `steer(model, SteeringSpec(...), generated=True)` and its real `generate_steps`/streaming API, using the declared `resid_post` site and tested vLLM/static taps. Do NOT demand byte equality with protocol A as an acceptance condition; do demand backend-local no-edit identity, finite activations, correct per-request isolation, actual steering effect and stable reproduction. Never report B's outputs under A's experiment identity.
+
+**C. fixed_decoder_direction_steering_v1 versus live_feature_ablation_v1.** They are NOT the same operation. Neuronpedia's simple decoder-vector additive steering can add a fixed direction at each token, needing no SAE encode during decode. SAEBase's live ablate/scale/coalition computes z=encode(h_t) per current token and may require different deltas each step: h'_t = h_t + decode(z'_t) - decode(z_t). That requires a dynamic in-worker per-token capture/SAE callback or a verified segmented step-loop. The currently implemented `InterpVLLMSAE.measure` computes ONE prompt-specific delta and reuses it for that request; it does NOT prove dynamic SAE ablation across generated tokens. Do not mislabel fixed-vector steering as that capability. Implement and benchmark them as separate operations.
+
+### P1: Fix the evaluation criterion rather than merely raising tolerances
+
+For two different backends in BF16, report:
+- same checkpoint/tokenizer/layer semantics/position; correct clean forward and no-edit/identity invariants within each backend;
+- actual residual normalized relative L2, max abs with activation scale, cosine, and per-position logit differences;
+- SAE TopK support overlap and **which** features flipped, TopK k-versus-k+1 margin at the boundary, ranks, actual z_i and patch vector effects;
+- intervention outcomes on matched prompt variants, paired behavioral/metric changes (with uncertainty across prompts);
+- reproducibility under each backend, exact backend/build/kernel/protocol in the experiment identity.
+
+Small BF16 errors can cross a near-tied TopK boundary. That does not automatically make vLLM incorrect. However changed feature support means B must not silently reuse old A codes/caches/results. For strict reproduction of an existing result, keep the reference exact path; for a NEW high-throughput study, publish backend-native data and validate its scientific conclusions independently. Do not relabel `BACKEND_NATIVE` as `REFERENCE_EXACT` without stronger evidence.
+
+### P2: KV engineering strategy
+
+**First ship a real upstream-based fast steering baseline**: interp-engine vLLM with `generated=True`, per-request steering, prefix-cache isolation and, when VRAM permits, vLLM-static predeclared read/write taps. Benchmark 8, 32, 128 tokens with one/2/4 concurrent requests and capture+steering, on RTX5070. Verify actual public upstream API in the installed version. Do not confuse vLLM-generate with capture-capable backends.
+
+**Then separately accelerate A**: maintain CLEAN history KV for tokens in the steered sequence, fork/snapshot it for the current-step edited suffix, discard edited KV, and advance ONLY clean history. The existing `CleanPrefixKVDecoder` attempts that. If incremental and full-prefix BF16 computations disagree, first test exact tokenization/cache mask, position ids, full-prefix versus one-token kernel/batch shape and fp32 diagnostic; record whether topk support or actual intervention metrics change. Crucially, incrementally computed KV need not have identical BF16 tensors to a full-sequence GEMM. Preserve A's old full-prefix reference for strict legacy comparisons; do not conclude KV caching is mathematically impossible. If clean-cache semantics hold but legacy HF tolerances fail, this becomes a separately identified cached numerical protocol, not a drop-in replacement for old experimental results.
+
+For either mode, account for possible hook skipping when vLLM prefix cache hits. Neuronpedia's engine uses per-request cache_salt to isolate intervention requests; adopt the supported upstream policy rather than globally disabling prefix caching or inheriting stale steered KV. Never transplant historical KV between independent baseline and steered continuations.
+
+### P3: Objective finish and report
+
+1. Complete PR #45 and #46 independently after CI/parity; PR #46 already has Qwen full W2 25×7 median 2.409 s to 1.888 s, a measured 1.276x; don't withhold that benefit.
+2. In PR #47 execute **two** fast-steering benchmarks: B using upstream engine native cached generation (this is a required actual capability target), then A's clean-cache reimplementation if needed for exact historical reuse. Do NOT replace B with mere single-prompt feature edits.
+3. Demonstrate real SAE decoder-direction steering from feature ids on generated tokens; test live SAE activation-dependent edits separately and label unsupported if current upstream hook protocol lacks a dynamic worker callback.
+4. Treat legacy HF difference as a *comparability finding* rather than wholesale vLLM failure; classify capabilities by per-protocol validation.
+5. Publish a small capability matrix with columns: protocol, backend, prompt capture, generation steering, persistent KV, live SAE re-encode, numerical reference identity, RTX5070 throughput, peak VRAM and status. No "all accelerated" claim without measurements.
+
+Agent must inspect the linked upstream code BEFORE modifying its own worker. No new generic engine or another unfocused vLLM numerical-tolerance sweep. Source-driven, measured reuse is the priority.
+
+---
+
 ## 0. Starting facts — read and reconcile with live GitHub
 
 Repository: OpenSAE/SAEBase.
