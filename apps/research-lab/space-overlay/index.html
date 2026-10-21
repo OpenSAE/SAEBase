@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f6f8fc">
+  <meta name="description" content="Explore real SAE feature ablations and controlled inputs, interactively.">
+  <title>SAEBase Research Lab · OpenSAE</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/feature-atlas.css">
+  <link rel="stylesheet" href="assets/prompt-gallery.css">
+  <script defer src="assets/lab-data.js"></script>
+  <script defer src="assets/app.js"></script>
+  <script defer src="assets/feature-atlas.js"></script>
+  <script defer src="assets/prompt-gallery.js"></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="rail" aria-label="Main navigation">
+      <a class="identity" href="https://huggingface.co/OpenSAE" target="_blank" rel="noopener noreferrer"><span class="logo" aria-hidden="true">✳</span><span>OpenSAE</span></a>
+      <div class="rail-caption">RESEARCH LAB</div>
+      <nav class="rail-nav" aria-label="Choose playground">
+        <button class="tab active" data-tab="features" type="button"><span class="rail-icon">◈</span><span>Feature Atlas</span></button>
+        <a class="tab" href="lab-experiments/index.html#effects"><span class="rail-icon">⟐</span><span>Feature Effects</span></a>
+        <a class="tab" href="lab-experiments/index.html#context"><span class="rail-icon">▦</span><span>Context Lab</span></a>
+        <a class="tab" href="lab-experiments/index.html#models"><span class="rail-icon">◫</span><span>Compare models</span></a>
+        <a class="tab" href="lab-experiments/index.html#interactions"><span class="rail-icon">⌘</span><span>Research</span></a>
+      </nav>
+      <div class="rail-links"><span class="rail-caption">DISCOVER MORE</span><a href="https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation" target="_blank" rel="noopener noreferrer">Dataset <span>↗</span></a><a href="https://github.com/OpenSAE/SAEBase" target="_blank" rel="noopener noreferrer">Code & experiments <span>↗</span></a></div>
+      <div class="rail-foot"><span class="online-dot"></span> SAEBase 0.4.0 <span class="rail-foot-sub">Recorded experiments</span></div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar"><span>OpenSAE <b class="slash">/</b> <strong id="crumb">Feature Atlas</strong></span><div class="head-side"><a href="https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation" target="_blank" rel="noopener noreferrer">Explore the dataset ↗</a><span class="version">Research Lab · v0.4</span></div></header>
+      <div class="body">
+
+        <section class="view active" id="view-features" aria-labelledby="title-features">
+          <div class="hero feature-hero"><div class="eyebrow"><span class="status-dot"></span> 21 REAL FEATURE ABLATION EXAMPLES</div><h1 id="title-features">Pick a feature.<br><em>See real evidence.</em></h1><p>Choose a prompt, explore its meaning, and see real model evidence where available.</p></div>
+
+          <section class="prompt-gallery card" aria-labelledby="promptGalleryTitle">
+            <div class="prompt-gallery-head"><div><div class="atlas-overline">PICK A REAL EXAMPLE</div><h2 id="promptGalleryTitle">Explore 10 prompts</h2><p>Different inputs. Different questions. Choose one to see the exact text and what the experiment actually measured.</p></div><span class="prompt-gallery-count" id="promptGalleryCount">10 examples</span></div>
+            <div class="prompt-gallery-tabs" id="promptGalleryFilters" role="group" aria-label="Filter example types"><button type="button" data-filter="all" aria-pressed="true" class="active">All 10</button><button type="button" data-filter="measured" aria-pressed="false">Feature effects · 3</button><button type="button" data-filter="controlled" aria-pressed="false">Change the input · 7</button></div>
+            <div class="prompt-gallery-list" id="promptGalleryList" role="group" aria-label="Choose an example"></div>
+            <div class="prompt-gallery-preview">
+              <div class="prompt-gallery-preview-head"><div><span class="prompt-gallery-mode" id="promptGalleryMode">Recorded feature effect</span><h3 id="promptGalleryName">France</h3></div><button id="promptGalleryCopy" class="secondary-action" type="button">Copy prompt ↗</button></div>
+              <p id="promptGalleryMeaning" class="prompt-gallery-meaning"></p>
+              <pre id="promptGalleryText" class="prompt-gallery-text"></pre>
+              <div id="promptGalleryEvidence" class="prompt-gallery-evidence" aria-live="polite"></div>
+              <div class="atlas-buttons"><button type="button" class="atlas-primary" id="promptGalleryAction">Explore measured feature →</button><a id="promptGalleryOriginal" href="#" target="_blank" rel="noopener noreferrer">Source ↗</a><span id="promptGalleryFeedback" class="prompt-gallery-feedback" role="status"></span></div>
+            </div>
+          </section>
+
+          <div class="atlas-layout">
+            <aside class="atlas-sidebar card">
+              <div class="atlas-heading"><h2>Feature library</h2><span id="atlasCount">14 features</span></div>
+              <input type="search" id="atlasSearch" placeholder="Search model, feature, or topic…" aria-label="Search features and prompt topics" autocomplete="off" />
+              <div id="atlasList" class="atlas-list" role="list" aria-label="Features with recorded examples"></div>
+            </aside>
+            <article class="atlas-detail">
+              <div class="atlas-head card" id="atlasDetailSpotlight">
+                <div class="atlas-model" id="atlasModel">Qwen3 1.7B · Layer 14</div>
+                <div class="atlas-headline"><div><h2 id="atlasFeatureTitle">Feature #20227</h2><span class="atlas-candidate-tag">Interpretation · under review</span></div><button id="atlasShare" class="secondary-action" type="button">Share feature ↗</button></div>
+                <h3 id="atlasHypothesis">What does this feature represent?</h3>
+                <p id="atlasExplanation" class="atlas-explanation"></p>
+                <div class="atlas-evidence-meta" id="atlasEvidenceMeta"></div>
+              </div>
+              <div class="atlas-examples card">
+                <div class="atlas-section-heading"><div><div class="atlas-overline">REAL INPUTS</div><h2>Where was it observed?</h2></div><span class="atlas-meter">Original model run</span></div>
+                <div class="atlas-contexts" id="atlasExamples" role="list"></div>
+                <p class="atlas-note">Blue marks the final written word for orientation. The actual readout was at the final model token; the records do not include a token-by-token activation map.</p>
+              </div>
+              <div class="atlas-effect card">
+                <div class="atlas-section-heading"><div><div class="atlas-overline">WHAT CHANGED</div><h2>Remove this feature</h2></div><span class="atlas-meter">Measured logits</span></div>
+                <div class="atlas-effects-top"><span>Output-score difference after removal</span><strong id="atlasMainEffect">144.30 <small>L2</small></strong></div>
+                <div id="atlasEffectBars" class="atlas-effect-bars"></div>
+                <div class="atlas-buttons"><button type="button" id="atlasTryEdit" class="atlas-primary">Explore this intervention →</button><a id="atlasSource" href="#" target="_blank" rel="noopener noreferrer">Original measurement ↗</a></div>
+              </div>
+              <div class="atlas-notes card">
+                <div class="atlas-section-heading"><div><div class="atlas-overline">INTERPRET THE FEATURE</div><h2>What might it mean?</h2></div><span class="atlas-meter">Your draft</span></div>
+                <p class="atlas-note">Look at the sentences and their effects, then write a testable hypothesis. Notes stay on your device and are not published as verified explanations.</p>
+                <textarea id="atlasDraft" rows="3" placeholder="e.g. This feature might respond to … when …"></textarea>
+                <div class="atlas-buttons"><button id="atlasSave" class="atlas-primary" type="button">Save my hypothesis</button><button id="atlasCopy" class="secondary-action" type="button">Copy evidence</button><span id="atlasSavedMsg" role="status"></span></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="view-effects" aria-labelledby="title-play">
+          <div class="hero"><div class="eyebrow"><span class="status-dot"></span> RECORDED ABLATIONS · REAL MODEL RESULTS</div><h1 id="title-play">Inspect a recorded edit.<br><em>See the output effect.</em></h1><p>Choose an actual model, pick an observed example, and switch a recorded SAE feature off.</p></div>
+          <div class="playground">
+            <div class="control-card">
+              <div class="card-head"><span class="step">01</span><h2>Choose a model</h2></div>
+              <div class="model-pills" id="modelPresets" role="group" aria-label="Featured models"></div>
+              <label class="select-label" for="probeModel">MODEL · LAYER</label>
+              <div class="select-wrap"><select id="probeModel"></select><span class="select-arrow">⌄</span></div>
+              <div class="control-divider"></div>
+              <div class="card-head"><span class="step">02</span><h2>Pick an input</h2></div>
+              <div id="probePrompt" class="probe-prompt-display"></div>
+              <div class="sample-grid" id="sampleButtons" role="group" aria-label="Recorded inputs"></div>
+              <div class="choice-summary" id="recordedFeature">Feature —</div>
+              <div class="control-divider"></div>
+              <div class="card-head"><span class="step">03</span><h2>Try the intervention</h2></div>
+              <div class="mode-switch" role="group" aria-label="Toggle feature"><button type="button" id="conditionOriginal" class="switch-btn active" aria-pressed="true">Original</button><button type="button" id="conditionAblated" class="switch-btn" aria-pressed="false">Remove feature <span>↗</span></button></div>
+              <div class="hint">This compares recorded output scores, not generated text. Choose a different model or input to explore another actual run.</div>
+            </div>
+            <div class="output-card">
+              <div class="output-head"><div><span class="eyebrow">WHAT CHANGED?</span><h2>Output response</h2></div><span class="verified"><span class="checkmark">✓</span> Measured</span></div>
+              <div class="response-hero"><span class="response-caption" id="response-caption">Change in output scores</span><div class="response-number" id="response-number">0.00<span> L2</span></div><div class="response-desc" id="response-desc">Original output · no feature removed</div></div>
+              <div class="chart-wrap"><div class="chart-topline"><strong>Three recorded inputs</strong><span>Choose a bar</span></div><div id="probeChart" class="probe-chart" role="group" aria-label="Recorded ablation responses"></div><div class="chart-axis">Changes in output scores after the recorded feature removal</div></div>
+              <div class="result-footer"><div id="observationMeta">SAE feature — · — active features</div><a id="originalEvidenceLink" href="#" target="_blank" rel="noopener noreferrer">View measured evidence ↗</a></div>
+            </div>
+          </div>
+          <div class="below-play"><div class="mini-heading">TRY SOMETHING ELSE <span>↘</span></div><div class="quick-links"><button data-go="factors"><span class="quick-icon violet">▦</span><strong>Change the input</strong><small>Flip six factors across 64 real input designs.</small><b>→</b></button><button data-go="models"><span class="quick-icon coral">◫</span><strong>Explore the layers</strong><small>Compare recorded SAE behavior across models.</small><b>→</b></button><button data-go="research"><span class="quick-icon blue">⌘</span><strong>Explore interactions</strong><small>Inspect the measured SAR and RSS experiments.</small><b>→</b></button></div></div>
+        </section>
+
+        <section class="view" id="view-factors" aria-labelledby="title-factors">
+          <div class="hero small"><div class="eyebrow"><span class="status-dot"></span> 64 REAL INPUT STATES</div><h1 id="title-factors">Change one thing.<br><em>See the new input.</em></h1><p>Explore the actual six-factor study inputs. Toggle a factor, pick any state, and inspect the exact text used in the experiment.</p></div>
+          <div class="factor-layout"><div class="card factor-card"><div class="card-head"><span class="step">01</span><h2>Choose the factors</h2></div><div id="factorControls" class="factor-controls"></div><div class="factor-footer"><button id="randomState" type="button" class="secondary-action">Surprise me ↗</button><span id="maskLabel">State 00 / 63</span></div></div><div class="card preview-card"><div class="card-head between"><div><span class="step">02</span><h2>Observe the input</h2></div><button id="copyPrompt" class="secondary-action" type="button">Copy ↗</button></div><div class="side-by-side"><div class="preview-label">Selected input</div><pre id="livePrompt" class="input-pre"></pre><div class="input-meta" id="inputMeta"></div></div></div></div>
+          <div class="state-block"><div class="state-block-head"><h2>All 64 combinations</h2><span>Click any square</span></div><div class="state-grid" id="stateGrid" aria-label="All 64 real input states"></div></div>
+          <div class="small-after">These are real authored experimental inputs. This explorer changes the input text; it does not invent model activations for unseen configurations. <a href="https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation" target="_blank" rel="noopener noreferrer">Open full dataset ↗</a></div>
+        </section>
+
+        <section class="view" id="view-models" aria-labelledby="title-models">
+          <div class="hero small"><div class="eyebrow"><span class="status-dot"></span> 48 VERIFIED SITES</div><h1 id="title-models">Explore every layer.<br><em>Compare real measurements.</em></h1><p>Choose a model and a measurement. Tap any layer to inspect its recorded results.</p></div>
+          <div class="compare-card card"><div class="compare-toolbar"><label><span>MODEL</span><select id="compareModel"></select></label><label><span>MEASUREMENT</span><select id="metricSelect"><option value="ev">Explained variance</option><option value="l0">Active features (L0)</option><option value="ablation_delta">Output change after ablation</option><option value="mse">Reconstruction error</option></select></label></div><div class="compare-main"><div><div class="comparison-caption" id="metricCaption">Explained variance across layers</div><div class="layer-chart" id="layerChart"></div></div><div class="selected-layer"><span class="eyebrow">SELECTED LAYER</span><div class="layer-heading" id="layerName">Layer 14</div><div class="metric-stack" id="metricStack"></div><a id="layerSource" target="_blank" rel="noopener noreferrer">Original evaluation ↗</a></div></div></div><div class="small-after">These are historical evaluations over 64 controlled input groups per site. For fair comparisons, start with layers of the same model and SAE. <a href="https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation" target="_blank" rel="noopener noreferrer">Download all results ↗</a></div>
+        </section>
+
+        <section class="view" id="view-research" aria-labelledby="title-research">
+          <div class="hero small"><div class="eyebrow"><span class="status-dot"></span> RECORDED RESEARCH</div><h1 id="title-research">Beyond single features.<br><em>Explore the evidence.</em></h1><p>Two questions: how do features work together, and what happens to features when the input changes?</p></div>
+          <div class="research-grid"><article class="research-panel card"><div class="research-tag">FEATURE INTERACTIONS · SAR</div><h2>Can single-feature effects explain combinations?</h2><div class="mini-copy">Select a study size to explore recorded coalition experiments.</div><div class="k-buttons" id="kButtons" role="group" aria-label="SAR K value"></div><div class="research-number" id="sarTotal">1,485 <span>groups</span></div><div class="sar-viz" id="sarViz"></div><div class="research-bottom" id="sarReadout"></div><a href="https://github.com/OpenSAE/SAEBase/blob/v0.4.0/docs/research-lab/results-20261020.md" target="_blank" rel="noopener noreferrer">Explore SAR results ↗</a></article><article class="research-panel card"><div class="research-tag">INPUT TRANSFORMATIONS · RSS</div><h2>How does the representation respond to context?</h2><div class="mini-copy">Explore the real selection and held-out population.</div><div class="rss-stack" id="rssStack"></div><div class="research-number" id="rssTotal">138,000 <span>observations</span></div><div class="research-bottom">Six model sites · 500 base prompts each. Variants are proposed transformations, not independently certified to preserve meaning.</div><a href="https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation" target="_blank" rel="noopener noreferrer">Browse the research dataset ↗</a></article></div><div class="method-link-row"><button data-go="effects" class="secondary-action">Try a measured ablation ←</button><button data-go="factors" class="secondary-action">Explore the six-factor grid →</button></div>
+        </section>
+      </div>
+      <footer class="footer"><span>OpenSAE · From learned features to testable explanations.</span><span>Feature explanations are hypotheses unless independently reviewed.</span></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

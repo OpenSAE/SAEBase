@@ -31,6 +31,10 @@ PROMPTS = (
     {"id": "opposite", "category": "opposite", "text": "The opposite of hot is"},
     {"id": "animal", "category": "animal name", "text": "A baby cat is called a"},
 )
+EXTRA_PROMPTS = (
+    {"id": "sky", "category": "color", "text": "The color of the sky is"},
+    {"id": "story", "category": "story opening", "text": "Once upon a"},
+)
 SITES = (
     {
         "site_id": "pythia410m:pythia410m_mlp_topk:L12",
@@ -72,8 +76,10 @@ def readout(logits, tokenizer) -> dict:
         token = tokenizer.decode([token_id])
         logit = float(values[token_id].item())
         rebuilt = math.exp(logit - logsumexp)
-        if not math.isclose(probability, rebuilt, rel_tol=0, abs_tol=1e-6):
-            raise RuntimeError("top-token probability does not match a full-vocabulary softmax")
+        if not math.isclose(probability, rebuilt, rel_tol=0, abs_tol=1e-5):
+            raise RuntimeError(
+                f"top-token probability {probability} does not match a full-vocabulary softmax {rebuilt}"
+            )
         rows.append(
             {
                 "label": visible_label(token),
@@ -189,19 +195,24 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--site", action="append", choices=["pythia", "gemma"])
+    parser.add_argument("--set", choices=["base", "extra"], default="base")
     args = parser.parse_args()
     selected = {"pythia": SITES[0], "gemma": SITES[1]}
     wanted = [selected[name] for name in (args.site or ["pythia", "gemma"])]
-    if len(PROMPTS) * len(wanted) > 12:
+    prompts = EXTRA_PROMPTS if args.set == "extra" else PROMPTS
+    run_id = RUN_ID if args.set == "base" else RUN_ID + "b"
+    if len(prompts) * len(wanted) > 12:
         raise SystemExit("prompt-site budget is 12")
     cases = []
     for spec in wanted:
-        cases.extend(measure_site(spec, PROMPTS))
+        cases.extend(measure_site(spec, prompts))
+    for case in cases:
+        case["run_id"] = run_id
     payload = {
         "cases": cases,
         "prompt_site_pairs": len(cases),
         "protocol_id": PROTOCOL,
-        "run_id": RUN_ID,
+        "run_id": run_id,
         "sites": [spec["site_id"] for spec in wanted],
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)

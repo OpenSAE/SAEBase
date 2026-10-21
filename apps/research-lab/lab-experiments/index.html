@@ -3,62 +3,76 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b1320">
-  <meta name="description" content="Real measured SAE interventions, context dependence, model comparisons, and feature interactions.">
-  <title>Experiments · OpenSAE Research Lab</title>
+  <meta name="theme-color" content="#f6f8fc">
+  <meta name="description" content="Explore a real feature removal, a controlled input, and recorded model comparisons.">
+  <title>SAEBase Research Lab · OpenSAE</title>
   <link rel="stylesheet" href="assets/lab.css">
   <script defer src="assets/lab.js"></script>
 </head>
 <body>
-<div class="shell">
-  <header class="topbar">
-    <a class="brand" href="../index.html" aria-label="OpenSAE Research Lab home"><span class="mark">✳</span><span>OpenSAE <span class="brand-muted">Research Lab</span></span></a>
-    <nav class="toplinks" aria-label="Project links"><a href="../index.html">← Original Lab</a><a target="_blank" rel="noopener noreferrer" href="https://github.com/OpenSAE/SAEBase">Source ↗</a></nav>
-  </header>
+<div class="app">
+  <aside class="rail" aria-label="Main navigation">
+    <a class="identity" href="../index.html#features"><span class="logo" aria-hidden="true">✳</span><span>OpenSAE</span></a>
+    <div class="rail-caption">RESEARCH LAB</div>
+    <nav class="rail-nav" aria-label="Choose a lab">
+      <a class="tab" href="../index.html#features"><span class="rail-icon">◈</span><span>Feature Atlas</span></a>
+      <a class="tab" href="#effects" data-route="effects"><span class="rail-icon">⟐</span><span>Feature Effects</span></a>
+      <a class="tab" href="#context" data-route="context"><span class="rail-icon">▦</span><span>Context Lab</span></a>
+      <a class="tab" href="#models" data-route="models"><span class="rail-icon">◫</span><span>Compare models</span></a>
+      <a class="tab" href="#interactions" data-route="interactions"><span class="rail-icon">⌘</span><span>Research</span></a>
+    </nav>
+    <div class="rail-links"><span class="rail-caption">DISCOVER MORE</span><a href="https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation" target="_blank" rel="noopener noreferrer">Dataset <span>↗</span></a><a href="https://github.com/OpenSAE/SAEBase" target="_blank" rel="noopener noreferrer">Code & experiments <span>↗</span></a></div>
+    <div class="rail-foot"><span class="online-dot"></span> SAEBase 0.4.0 <span class="rail-foot-sub">Recorded experiments</span></div>
+  </aside>
   <main class="main">
-    <aside class="sidebar">
-      <div class="overline">EXPLORE</div>
-      <a class="nav-atlas" href="../index.html#play"> <span class="nav-num">01</span><span>Feature Atlas<small>Original experience</small></span><span class="arrow">↗</span></a>
-      <div class="nav-buttons" role="navigation" aria-label="Experiment sections">
-        <a href="#effects" data-route="effects"><span class="nav-num">02</span><span>Feature Effects<small>Remove and measure</small></span></a>
-        <a href="#context" data-route="context"><span class="nav-num">03</span><span>Context Lab<small>Control the input</small></span></a>
-        <a href="#models" data-route="models"><span class="nav-num">04</span><span>Model Explorer<small>Compare SAEs</small></span></a>
-        <a href="#interactions" data-route="interactions"><span class="nav-num">05</span><span>Feature Interactions<small>Test additivity</small></span></a>
-      </div>
-      <div class="aside-note"><span class="live-dot"></span><strong>Evidence-first</strong><p>Every number on these pages is a preserved measurement for a named model, SAE, and protocol.</p></div>
-    </aside>
-    <div class="content">
-      <div class="statusline"><div class="status-left"><span class="eyebrow">INTERACTIVE RESEARCH WORKSPACE</span><span class="status-divider"></span><span id="evidence-status">Reading evidence…</span></div><div class="status-actions"><label class="import-button" for="import-json">Import evidence <span>↑</span></label><input id="import-json" type="file" accept="application/json,.json" hidden><button id="share" class="ghost-btn" type="button">Share view ↗</button></div></div>
+    <header class="topbar"><span>OpenSAE <b class="slash">/</b> <strong id="crumb">Feature Effects</strong></span><div class="head-side"><a class="dataset-link" href="https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation" target="_blank" rel="noopener noreferrer">Explore the dataset ↗</a><label class="secondary-action import-button" for="import-json">Import evidence</label><input id="import-json" type="file" accept="application/json,.json" hidden><button id="share" class="secondary-action" type="button">Share view</button><span class="version">Research Lab</span></div></header>
+    <div class="body">
       <div id="flash" class="flash" role="status" aria-live="polite" hidden></div>
       <section class="page" id="page-effects" aria-labelledby="title-effects">
-        <header class="page-header"><span class="kicker">02 / FEATURE EFFECTS</span><h1 id="title-effects">What happens when we change a model feature?</h1><p>A feature is a learned internal signal. We can change it and measure how the model's next-word predictions respond.</p></header>
-        <div class="experiment-card">
-          <div class="example-head"><div><div class="panel-label">EXAMPLE</div><p id="effect-prompt" class="example-quote"></p><p id="effect-meta" class="record-meta"></p></div><button id="effect-next" class="ghost-btn" type="button">Another real example</button></div>
-          <select id="effect-case" hidden></select>
-          <label class="field"><span id="effect-target-label">What we change</span> <select id="effect-target"></select></label>
-          <div id="effects-chart" aria-live="polite"></div>
-          <h2 id="effect-learned-title">What we learned</h2>
-          <p id="effect-footnote"></p>
-          <p id="effect-limit">A larger change does not mean a better answer, and it does not tell us what the feature means.</p>
-          <details class="evidence-fold"><summary>Experiment details</summary><div id="effect-evidence" class="record-meta"></div><div id="effect-measures"></div></details>
+        <div class="hero">
+          <div class="eyebrow">FEATURE EFFECTS</div>
+          <h1 id="title-effects">What changes when we remove a model feature?</h1>
+          <p>Pick a real example, then compare the model's prediction before and after one internal signal is removed. <span class="feature-tip" tabindex="0" title="A feature is a pattern detected inside the model.">What is a feature?</span></p>
         </div>
+        <article class="card experiment-card">
+          <div class="example-head">
+            <div>
+              <div class="eyebrow">A REAL INPUT</div>
+              <p id="effect-case-name" class="case-name"></p>
+              <p id="effect-prompt" class="example-quote"></p>
+              <p id="effect-meta" class="record-meta"></p>
+            </div>
+            <button id="effect-next" class="secondary-action" type="button">Another example</button>
+          </div>
+          <select id="effect-case" hidden></select>
+          <div class="action-row">
+            <button id="effect-remove" class="primary-action" type="button" aria-pressed="true">Remove this feature</button>
+            <button id="effect-restore" class="secondary-action" type="button">Restore original</button>
+          </div>
+          <div id="effects-chart" aria-live="polite"></div>
+          <h2 id="effect-learned-title">What changed?</h2>
+          <p id="effect-footnote"></p>
+          <p id="effect-limit">These are selected examples, not a survey of every feature. A larger change does not mean a better answer.</p>
+          <details class="evidence-fold" id="other-changes"><summary>Explore other changes</summary><div id="effect-other" class="other-actions"></div></details>
+          <details class="evidence-fold"><summary>Experiment details</summary><div id="effect-evidence" class="record-meta"></div><div id="effect-measures"></div></details>
+        </article>
       </section>
       <section class="page" id="page-context" aria-labelledby="title-context" hidden>
-        <header class="page-header"><span class="kicker">03 / CONTEXT LAB</span><h1 id="title-context">Feature activation</h1><p>Change six authored factors on one 64-state grid, or browse recorded input transformations.</p></header>
-        <div class="mode-tabs" role="tablist" aria-label="Context experiment mode"><button id="context-grid-tab" class="tab active" role="tab" aria-selected="true" type="button">Controlled Inputs</button><button id="context-rss-tab" class="tab" role="tab" aria-selected="false" type="button">Input Transformations</button></div>
-        <div id="context-grid-view"><div class="two-col"><div class="panel controls"><div class="panel-label">CONTROLLED INPUTS</div><label class="field">Most responsive features <select id="context-case"></select></label><div id="context-factor-grid" class="factor-grid"></div><div class="selected-state"><span>Selected configuration</span><strong id="mask-id">00 / 63</strong></div><div id="context-text" class="prompt-card" aria-live="polite"></div><div class="bottom-actions"><button id="context-surprise" class="text-button" type="button">Surprise me →</button><button id="context-recipe" class="text-button" type="button">Export selected state ↧</button></div></div><div class="panel graph-panel"><div class="panel-heading"><h2>Feature activation</h2><span class="chip" id="grid-count">0 / 64 measurements</span></div><div id="state-legend" class="legend-line"></div><div id="context-heatmap" class="heat-grid" aria-label="64 recorded configurations"></div><div id="context-current" class="callout" aria-live="polite"></div><div class="section-label space-top">32 paired differences for the selected factor</div><div id="context-pairs" class="pair-strip"></div><div class="section-label space-top">Mean on-minus-off difference for each factor</div><div id="context-marginals" class="marginals"></div><details class="evidence-fold"><summary>Evidence</summary><div id="context-evidence" class="record-meta"></div></details></div></div></div>
-        <div id="context-rss-view" hidden><div class="two-col"><div class="panel controls"><div class="panel-label">INPUT TRANSFORMATIONS</div><label class="field">Site and dataset <select id="rss-case"></select></label><div class="seg" id="rss-settings" role="tablist" aria-label="Transformation"></div><label class="field">Recorded parent group <select id="rss-variant"></select></label><div id="rss-meta" class="record-meta"></div><div class="note">These are proposed transformations. A wrapper change does not establish that meaning stayed the same.</div></div><div class="panel graph-panel"><div class="panel-heading"><h2>Recorded redistribution</h2><span id="rss-chip" class="chip">Proposed transformation</span></div><div class="section-label">SOURCE CATEGORY</div><div id="rss-clean" class="prompt-card"></div><div class="section-label space-top">TRANSFORMATION</div><div id="rss-changed" class="prompt-card"></div><div class="section-label space-top">Measured summaries</div><div id="rss-shifts"></div><details class="evidence-fold"><summary>Evidence</summary><div id="rss-evidence" class="record-meta"></div></details></div></div></div>
+        <div class="hero small"><div class="eyebrow">CONTEXT LAB</div><h1 id="title-context">What happens when the input changes?</h1><p>Change six authored factors on one 64-state grid, or browse recorded input transformations.</p></div>
+        <div class="mode-tabs" role="tablist" aria-label="Context experiment mode"><button id="context-grid-tab" class="mode-tab active" role="tab" aria-selected="true" type="button">Controlled Inputs</button><button id="context-rss-tab" class="mode-tab" role="tab" aria-selected="false" type="button">Input Transformations</button></div>
+        <div id="context-grid-view"><div class="two-col"><div class="panel controls"><div class="panel-label">CONTROLLED INPUTS</div><label class="field">Most responsive features <select id="context-case"></select></label><div id="context-factor-grid" class="factor-grid"></div><div class="selected-state"><span>Selected configuration</span><strong id="mask-id">00 / 63</strong></div><div id="context-text" class="prompt-card" aria-live="polite"></div><div class="bottom-actions"><button id="context-surprise" class="text-button" type="button">Surprise me →</button><button id="context-recipe" class="text-button" type="button">Export selected state ↧</button></div></div><div class="panel graph-panel"><div class="panel-heading"><h2>Feature activation</h2><span class="chip" id="grid-count">0 / 64 measurements</span></div><div id="state-legend" class="legend-line"></div><div id="context-heatmap" class="heat-grid" aria-label="64 recorded configurations"></div><div id="context-current" class="callout" aria-live="polite"></div><div class="section-label space-top">32 paired differences for the selected factor</div><div id="context-pairs" class="pair-strip"></div><div class="section-label space-top">Mean on-minus-off difference for each factor</div><div id="context-marginals" class="marginals"></div><details class="evidence-fold"><summary>Experiment details</summary><div id="context-evidence" class="record-meta"></div></details></div></div></div>
+        <div id="context-rss-view" hidden><div class="two-col"><div class="panel controls"><div class="panel-label">INPUT TRANSFORMATIONS</div><label class="field">Site and dataset <select id="rss-case"></select></label><div class="seg" id="rss-settings" role="tablist" aria-label="Transformation"></div><label class="field">Recorded parent group <select id="rss-variant"></select></label><div id="rss-meta" class="record-meta"></div><div class="note">These are proposed transformations. A wrapper change does not establish that meaning stayed the same.</div></div><div class="panel graph-panel"><div class="panel-heading"><h2>Recorded redistribution</h2><span id="rss-chip" class="chip">Proposed transformation</span></div><div class="section-label">SOURCE CATEGORY</div><div id="rss-clean" class="prompt-card"></div><div class="section-label space-top">TRANSFORMATION</div><div id="rss-changed" class="prompt-card"></div><div class="section-label space-top">Measured summaries</div><div id="rss-shifts"></div><details class="evidence-fold"><summary>Experiment details</summary><div id="rss-evidence" class="record-meta"></div></details></div></div></div>
       </section>
       <section class="page" id="page-models" aria-labelledby="title-models" hidden>
-        <header class="page-header"><span class="kicker">04 / SAE BENCHMARKING</span><h1 id="title-models">Where do sparse autoencoders differ?</h1><p>Explore the tradeoffs between active features, reconstruction, and downstream measurements. Compare matched protocols before interpreting differences.</p></header>
+        <div class="hero small"><div class="eyebrow">COMPARE MODELS</div><h1 id="title-models">Where do the recorded sites differ?</h1><p>Explore the tradeoffs between active features, reconstruction, and downstream measurements. Compare matched protocols before interpreting differences. There is no single ranking.</p></div>
         <div class="panel main-compare"><div class="compare-filters"><label class="field">Protocol <select id="model-protocol"></select></label><label class="field">Horizontal axis <select id="model-x"></select></label><label class="field">Vertical axis <select id="model-y"></select></label><label class="field">Model filter <select id="model-name"></select></label></div><div class="divider"></div><div class="panel-heading"><h2 id="compare-title">Quality tradeoffs</h2><span id="model-count" class="chip">No measurements</span></div><div id="compare-chart" class="scatter-wrap"></div><div id="compare-selected" class="record-meta"></div><div id="compare-table" class="table-wrap"></div><p class="footnote">A point appears only when both axes have real measurements for the same site and selected protocol. Different units and metrics are not collapsed into one score.</p></div>
       </section>
       <section class="page" id="page-interactions" aria-labelledby="title-interactions" hidden>
-        <header class="page-header"><span class="kicker">05 / BEHAVIORAL COMPOSITIONALITY</span><h1 id="title-interactions">Do feature effects add up?</h1><p>Construct a measured coalition. Compare the sum of individual effects with the actual combined response on the same downstream quantity.</p></header>
+        <div class="hero small"><div class="eyebrow">RESEARCH</div><h1 id="title-interactions">Do feature effects add up?</h1><p>Construct a measured coalition. Compare the sum of individual effects with the actual combined response on the same downstream quantity.</p></div>
         <div class="two-col"><div class="panel controls"><div class="panel-label">MEASURED COALITION GROUP</div><label class="field">Experiment <select id="coalition-case"></select></label><div id="coalition-meta" class="record-meta"></div><div class="section-label space-top">SELECT FEATURES TO INCLUDE</div><div id="coalition-features" class="coalition-features"></div><div class="selected-state"><span>Coalition</span><strong id="coalition-mask">∅</strong></div><button id="coalition-recipe" class="text-button" type="button">Export coalition recipe ↧</button></div><div class="panel graph-panel"><div class="panel-heading"><h2>Predicted vs measured</h2><span class="chip" id="coalition-chip">Recorded responses</span></div><div class="triple-metrics"><div><span>Additive prediction</span><strong id="coalition-predicted">—</strong></div><div><span>Actual measurement</span><strong id="coalition-observed">—</strong></div><div><span>Interaction residual</span><strong id="coalition-gap">—</strong></div></div><div id="coalition-comparison" class="compare-bars"></div><div class="section-label space-top">Subset measurements</div><div id="coalition-table" class="table-wrap"></div><div id="coalition-footnote" class="footnote"></div></div></div>
       </section>
-      <footer class="footer">OpenSAE · From learned features to testable explanations. <span>Research data are not automatically validated interpretations.</span></footer>
     </div>
+    <footer class="footer"><span>OpenSAE · From learned features to testable explanations.</span><span id="evidence-status">Reading evidence…</span></footer>
   </main>
 </div>
 </body>

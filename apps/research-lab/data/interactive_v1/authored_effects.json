@@ -1,1 +1,3080 @@
-{"cases":[{"condition":"ablate","edited_top_tokens":[{"label":" Paris","logit":18.325897216796875,"probability":0.3587510585784912,"token":" Paris","token_id":9079},{"label":" a","logit":17.55063819885254,"probability":0.16523516178131104,"token":" a","token_id":496},{"label":" the","logit":17.200834274291992,"probability":0.11646208167076111,"token":" the","token_id":506},{"label":" one","logit":16.166080474853516,"probability":0.04138059541583061,"token":" one","token_id":886},{"label":" is","logit":15.958934783935547,"probability":0.03363833203911781,"token":" is","token_id":563}],"evidence_url":"https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py","feature_id":203,"id":"authored:gemma1b:gemma1b_scope_resid:L13:capital","identity_patch_passed":true,"layer":13,"measured_delta_l2":660.2359619140625,"measured_fields":["top_tokens","logit_l2"],"model":"Gemma 1B","model_key":"gemma1b","model_sha256":"7aec27428b6d4425bab5e9ea7f1f855c1f2d9d0b6c65be97dfb386d4bb594ba4","note":"Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.","operators":[{"edited_logsumexp":19.351024627685547,"edited_top_tokens":[{"label":" Paris","logit":18.325897216796875,"probability":0.3587510585784912,"token":" Paris","token_id":9079},{"label":" a","logit":17.55063819885254,"probability":0.16523516178131104,"token":" a","token_id":496},{"label":" the","logit":17.200834274291992,"probability":0.11646208167076111,"token":" the","token_id":506},{"label":" one","logit":16.166080474853516,"probability":0.04138059541583061,"token":" one","token_id":886},{"label":" is","logit":15.958934783935547,"probability":0.03363833203911781,"token":" is","token_id":563}],"feature_ids":[203],"label":"Remove this feature","logit_l2":660.2359619140625,"operation":"ablate","operation_parameters":{},"sentence":"Removing this feature"},{"edited_logsumexp":20.332191467285156,"edited_top_tokens":[{"label":" a","logit":18.776580810546875,"probability":0.2110605686903,"token":" a","token_id":496},{"label":" Paris","logit":18.559589385986328,"probability":0.1698904186487198,"token":" Paris","token_id":9079},{"label":" the","logit":18.380634307861328,"probability":0.1420527696609497,"token":" the","token_id":506},{"label":" one","logit":17.678266525268555,"probability":0.0703744888305664,"token":" one","token_id":886},{"label":" home","logit":16.93643569946289,"probability":0.03351523354649544,"token":" home","token_id":2033}],"feature_ids":[203],"label":"Cut its activity in half","logit_l2":198.657470703125,"operation":"scale","operation_parameters":{"value":0.5},"sentence":"Cutting this feature's activity in half"},{"edited_logsumexp":20.900909423828125,"edited_top_tokens":[{"label":" a","logit":19.429298400878906,"probability":0.22955524921417236,"token":" a","token_id":496},{"label":" the","logit":18.94261932373047,"probability":0.14109942317008972,"token":" the","token_id":506},{"label":" Paris","logit":18.439525604248047,"probability":0.08531676232814789,"token":" Paris","token_id":9079},{"label":" one","logit":18.2748966217041,"probability":0.0723663941025734,"token":" one","token_id":886},{"label":" home","logit":17.641555786132812,"probability":0.03841319680213928,"token":" home","token_id":2033}],"feature_ids":[203],"label":"Add 1 to its activity","logit_l2":0.4365513324737549,"operation":"add","operation_parameters":{"value":1.0},"sentence":"Adding 1 to this feature's activity"}],"original_logsumexp":20.899656295776367,"original_top_tokens":[{"label":" a","logit":19.427860260009766,"probability":0.22951281070709229,"token":" a","token_id":496},{"label":" the","logit":18.94146728515625,"probability":0.14111369848251343,"token":" the","token_id":506},{"label":" Paris","logit":18.440059661865234,"probability":0.08546938747167587,"token":" Paris","token_id":9079},{"label":" one","logit":18.273725509643555,"probability":0.07237233221530914,"token":" one","token_id":886},{"label":" home","logit":17.639991760253906,"probability":0.03840126469731331,"token":" home","token_id":2033}],"prompt":"The capital of France is","protocol_id":"authored_prompt.paired_topk.v1","public_text_reviewed":true,"rights_reviewed":false,"run_id":"effects-authored-20261021","sae":"gemma1b_scope_resid","sae_sha256":"97e478af2ba7c150c2cc144602bed081003067451c604879ab2533dca62c1468","sample_count":1,"site_id":"gemma1b:gemma1b_scope_resid:L13","source_category":"place name","source_relative_path":"scripts/research_lab/measure_authored_effects.py","source_sha256":"4d812f4b5e30239543a87fedf6a6cfe1070c5c065fa6469325d2065f0808b2a1","source_type":"real_checkpoint","text_stored":true,"title":"Gemma 1B · place name"},{"condition":"ablate","edited_top_tokens":[{"label":" one","logit":14.888466835021973,"probability":0.15338987112045288,"token":" one","token_id":581},{"label":" two","logit":14.86661148071289,"probability":0.1500738561153412,"token":" two","token_id":767},{"label":" three","logit":14.859519004821777,"probability":0.1490132212638855,"token":" three","token_id":1264},{"label":" four","logit":14.21353530883789,"probability":0.07810478657484055,"token":" four","token_id":1740},{"label":" zero","logit":13.38893985748291,"probability":0.03424210101366043,"token":" zero","token_id":5058}],"evidence_url":"https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py","feature_id":52025,"id":"authored:pythia410m:pythia410m_mlp_topk:L12:sum","identity_patch_passed":true,"layer":12,"measured_delta_l2":4.868540287017822,"measured_fields":["top_tokens","logit_l2"],"model":"Pythia 410M","model_key":"pythia410m","model_sha256":"f7127cb94a25b63c030d2dd6b2b26c8dd7814eae34ddda2269b068066da22244","note":"Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.","operators":[{"edited_logsumexp":16.76323890686035,"edited_top_tokens":[{"label":" one","logit":14.888466835021973,"probability":0.15338987112045288,"token":" one","token_id":581},{"label":" two","logit":14.86661148071289,"probability":0.1500738561153412,"token":" two","token_id":767},{"label":" three","logit":14.859519004821777,"probability":0.1490132212638855,"token":" three","token_id":1264},{"label":" four","logit":14.21353530883789,"probability":0.07810478657484055,"token":" four","token_id":1740},{"label":" zero","logit":13.38893985748291,"probability":0.03424210101366043,"token":" zero","token_id":5058}],"feature_ids":[52025],"label":"Remove this feature","logit_l2":4.868540287017822,"operation":"ablate","operation_parameters":{},"sentence":"Removing this feature"},{"edited_logsumexp":16.768917083740234,"edited_top_tokens":[{"label":" one","logit":14.885000228881836,"probability":0.15199360251426697,"token":" one","token_id":581},{"label":" three","logit":14.872157096862793,"probability":0.15005400776863098,"token":" three","token_id":1264},{"label":" two","logit":14.871105194091797,"probability":0.14989624917507172,"token":" two","token_id":767},{"label":" four","logit":14.233797073364258,"probability":0.0792522132396698,"token":" four","token_id":1740},{"label":" zero","logit":13.401214599609375,"probability":0.03446873649954796,"token":" zero","token_id":5058}],"feature_ids":[52025],"label":"Cut its activity in half","logit_l2":2.4290969371795654,"operation":"scale","operation_parameters":{"value":0.5},"sentence":"Cutting this feature's activity in half"},{"edited_logsumexp":16.800092697143555,"edited_top_tokens":[{"label":" three","logit":14.941619873046875,"probability":0.15591053664684296,"token":" three","token_id":1264},{"label":" two","logit":14.890592575073242,"probability":0.14815440773963928,"token":" two","token_id":767},{"label":" one","logit":14.86270523071289,"probability":0.14407986402511597,"token":" one","token_id":581},{"label":" four","logit":14.345458030700684,"probability":0.08589456230401993,"token":" four","token_id":1740},{"label":" zero","logit":13.473316192626953,"probability":0.035908669233322144,"token":" zero","token_id":5058}],"feature_ids":[52025],"label":"Add 1 to its activity","logit_l2":11.51213550567627,"operation":"add","operation_parameters":{"value":1.0},"sentence":"Adding 1 to this feature's activity"}],"original_logsumexp":16.774511337280273,"original_top_tokens":[{"label":" three","logit":14.884611129760742,"probability":0.15108701586723328,"token":" three","token_id":1264},{"label":" one","logit":14.881428718566895,"probability":0.15060697495937347,"token":" one","token_id":581},{"label":" two","logit":14.875221252441406,"probability":0.14967496693134308,"token":" two","token_id":767},{"label":" four","logit":14.25385570526123,"probability":0.08040694147348404,"token":" four","token_id":1740},{"label":" zero","logit":13.413426399230957,"probability":0.03469762206077576,"token":" zero","token_id":5058}],"prompt":"Two plus two equals","protocol_id":"authored_prompt.paired_topk.v1","public_text_reviewed":true,"rights_reviewed":false,"run_id":"effects-authored-20261021","sae":"pythia410m_mlp_topk","sae_sha256":"0792d98e4129cadcd2481ccd3c11109d9ecde46cde2e7f0da597ea2cc4b0f6a8","sample_count":1,"site_id":"pythia410m:pythia410m_mlp_topk:L12","source_category":"arithmetic","source_relative_path":"scripts/research_lab/measure_authored_effects.py","source_sha256":"4d812f4b5e30239543a87fedf6a6cfe1070c5c065fa6469325d2065f0808b2a1","source_type":"real_checkpoint","text_stored":true,"title":"Pythia 410M · arithmetic"},{"condition":"ablate","edited_top_tokens":[{"label":" kitten","logit":19.562162399291992,"probability":0.8223137259483337,"token":" kitten","token_id":55095},{"label":" kit","logit":16.24825096130371,"probability":0.029910529032349586,"token":" kit","token_id":5689},{"label":" “","logit":15.645054817199707,"probability":0.016362864524126053,"token":" “","token_id":999},{"label":" \"","logit":15.6087007522583,"probability":0.015778690576553345,"token":" \"","token_id":623},{"label":" cub","logit":15.396683692932129,"probability":0.012764185667037964,"token":" cub","token_id":11351}],"evidence_url":"https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py","feature_id":238,"id":"authored:gemma1b:gemma1b_scope_resid:L13:animal","identity_patch_passed":true,"layer":13,"measured_delta_l2":172.30191040039062,"measured_fields":["top_tokens","logit_l2"],"model":"Gemma 1B","model_key":"gemma1b","model_sha256":"7aec27428b6d4425bab5e9ea7f1f855c1f2d9d0b6c65be97dfb386d4bb594ba4","note":"Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.","operators":[{"edited_logsumexp":19.757795333862305,"edited_top_tokens":[{"label":" kitten","logit":19.562162399291992,"probability":0.8223137259483337,"token":" kitten","token_id":55095},{"label":" kit","logit":16.24825096130371,"probability":0.029910529032349586,"token":" kit","token_id":5689},{"label":" “","logit":15.645054817199707,"probability":0.016362864524126053,"token":" “","token_id":999},{"label":" \"","logit":15.6087007522583,"probability":0.015778690576553345,"token":" \"","token_id":623},{"label":" cub","logit":15.396683692932129,"probability":0.012764185667037964,"token":" cub","token_id":11351}],"feature_ids":[238],"label":"Remove this feature","logit_l2":172.30191040039062,"operation":"ablate","operation_parameters":{},"sentence":"Removing this feature"},{"edited_logsumexp":19.780391693115234,"edited_top_tokens":[{"label":" kitten","logit":19.5718994140625,"probability":0.8118072152137756,"token":" kitten","token_id":55095},{"label":" kit","logit":16.29043197631836,"probability":0.03050209954380989,"token":" kit","token_id":5689},{"label":" “","logit":15.78193473815918,"probability":0.01834392175078392,"token":" “","token_id":999},{"label":" \"","logit":15.745920181274414,"probability":0.017695028334856033,"token":" \"","token_id":623},{"label":" cub","logit":15.481719017028809,"probability":0.013586578890681267,"token":" cub","token_id":11351}],"feature_ids":[238],"label":"Cut its activity in half","logit_l2":78.30413818359375,"operation":"scale","operation_parameters":{"value":0.5},"sentence":"Cutting this feature's activity in half"},{"edited_logsumexp":19.771631240844727,"edited_top_tokens":[{"label":" kitten","logit":19.552398681640625,"probability":0.8031352758407593,"token":" kitten","token_id":55095},{"label":" kit","logit":16.248098373413086,"probability":0.029495060443878174,"token":" kit","token_id":5689},{"label":" “","logit":15.871837615966797,"probability":0.020246097818017006,"token":" “","token_id":999},{"label":" \"","logit":15.837681770324707,"probability":0.0195662509649992,"token":" \"","token_id":623},{"label":" cub","logit":15.484384536743164,"probability":0.013742716051638126,"token":" cub","token_id":11351}],"feature_ids":[238],"label":"Add 1 to its activity","logit_l2":0.33352071046829224,"operation":"add","operation_parameters":{"value":1.0},"sentence":"Adding 1 to this feature's activity"}],"original_logsumexp":19.77173614501953,"original_top_tokens":[{"label":" kitten","logit":19.552549362182617,"probability":0.8031714558601379,"token":" kitten","token_id":55095},{"label":" kit","logit":16.248458862304688,"probability":0.02950257807970047,"token":" kit","token_id":5689},{"label":" “","logit":15.871526718139648,"probability":0.020237667486071587,"token":" “","token_id":999},{"label":" \"","logit":15.837359428405762,"probability":0.019557880237698555,"token":" \"","token_id":623},{"label":" cub","logit":15.484529495239258,"probability":0.013743258081376553,"token":" cub","token_id":11351}],"prompt":"A baby cat is called a","protocol_id":"authored_prompt.paired_topk.v1","public_text_reviewed":true,"rights_reviewed":false,"run_id":"effects-authored-20261021","sae":"gemma1b_scope_resid","sae_sha256":"97e478af2ba7c150c2cc144602bed081003067451c604879ab2533dca62c1468","sample_count":1,"site_id":"gemma1b:gemma1b_scope_resid:L13","source_category":"animal name","source_relative_path":"scripts/research_lab/measure_authored_effects.py","source_sha256":"4d812f4b5e30239543a87fedf6a6cfe1070c5c065fa6469325d2065f0808b2a1","source_type":"real_checkpoint","text_stored":true,"title":"Gemma 1B · animal name"},{"condition":"ablate","edited_top_tokens":[{"label":" cold","logit":18.4152774810791,"probability":0.7633107900619507,"token":" cold","token_id":7445},{"label":" cool","logit":15.59116268157959,"probability":0.045311033725738525,"token":" cool","token_id":5427},{"label":"space","logit":14.956786155700684,"probability":0.02402690052986145,"token":" ","token_id":236743},{"label":" ice","logit":14.48172378540039,"probability":0.014941038563847542,"token":" ice","token_id":8205},{"label":":","logit":14.372102737426758,"probability":0.013389764353632927,"token":":","token_id":236787}],"evidence_url":"https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py","feature_id":203,"id":"authored:gemma1b:gemma1b_scope_resid:L13:opposite","identity_patch_passed":true,"layer":13,"measured_delta_l2":176.7088165283203,"measured_fields":["top_tokens","logit_l2"],"model":"Gemma 1B","model_key":"gemma1b","model_sha256":"7aec27428b6d4425bab5e9ea7f1f855c1f2d9d0b6c65be97dfb386d4bb594ba4","note":"Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.","operators":[{"edited_logsumexp":18.685367584228516,"edited_top_tokens":[{"label":" cold","logit":18.4152774810791,"probability":0.7633107900619507,"token":" cold","token_id":7445},{"label":" cool","logit":15.59116268157959,"probability":0.045311033725738525,"token":" cool","token_id":5427},{"label":"space","logit":14.956786155700684,"probability":0.02402690052986145,"token":" ","token_id":236743},{"label":" ice","logit":14.48172378540039,"probability":0.014941038563847542,"token":" ice","token_id":8205},{"label":":","logit":14.372102737426758,"probability":0.013389764353632927,"token":":","token_id":236787}],"feature_ids":[203],"label":"Remove this feature","logit_l2":176.7088165283203,"operation":"ablate","operation_parameters":{},"sentence":"Removing this feature"},{"edited_logsumexp":18.83262825012207,"edited_top_tokens":[{"label":" cold","logit":18.555194854736328,"probability":0.7577259540557861,"token":" cold","token_id":7445},{"label":" cool","logit":15.8230619430542,"probability":0.049313053488731384,"token":" cool","token_id":5427},{"label":"space","logit":15.098244667053223,"probability":0.023887889459729195,"token":" ","token_id":236743},{"label":" ice","logit":14.66235065460205,"probability":0.015447968617081642,"token":" ice","token_id":8205},{"label":":","logit":14.35987377166748,"probability":0.011415827088057995,"token":":","token_id":236787}],"feature_ids":[203],"label":"Cut its activity in half","logit_l2":88.45610046386719,"operation":"scale","operation_parameters":{"value":0.5},"sentence":"Cutting this feature's activity in half"},{"edited_logsumexp":18.961776733398438,"edited_top_tokens":[{"label":" cold","logit":18.67171287536621,"probability":0.7482166290283203,"token":" cold","token_id":7445},{"label":" cool","logit":16.010583877563477,"probability":0.05227736756205559,"token":" cool","token_id":5427},{"label":"space","logit":15.208597183227539,"probability":0.02344311587512493,"token":" ","token_id":236743},{"label":" ice","logit":14.811264991760254,"probability":0.01575636863708496,"token":" ice","token_id":8205},{"label":"...","logit":14.492761611938477,"probability":0.011458608321845531,"token":"...","token_id":1390}],"feature_ids":[203],"label":"Add 1 to its activity","logit_l2":0.42606857419013977,"operation":"add","operation_parameters":{"value":1.0},"sentence":"Adding 1 to this feature's activity"}],"original_logsumexp":18.961185455322266,"original_top_tokens":[{"label":" cold","logit":18.671201705932617,"probability":0.7482764720916748,"token":" cold","token_id":7445},{"label":" cool","logit":16.009784698486328,"probability":0.05226648971438408,"token":" cool","token_id":5427},{"label":"space","logit":15.208117485046387,"probability":0.023445729166269302,"token":" ","token_id":236743},{"label":" ice","logit":14.810600280761719,"probability":0.01575521007180214,"token":" ice","token_id":8205},{"label":"...","logit":14.492164611816406,"probability":0.01145854126662016,"token":"...","token_id":1390}],"prompt":"The opposite of hot is","protocol_id":"authored_prompt.paired_topk.v1","public_text_reviewed":true,"rights_reviewed":false,"run_id":"effects-authored-20261021","sae":"gemma1b_scope_resid","sae_sha256":"97e478af2ba7c150c2cc144602bed081003067451c604879ab2533dca62c1468","sample_count":1,"site_id":"gemma1b:gemma1b_scope_resid:L13","source_category":"opposite","source_relative_path":"scripts/research_lab/measure_authored_effects.py","source_sha256":"4d812f4b5e30239543a87fedf6a6cfe1070c5c065fa6469325d2065f0808b2a1","source_type":"real_checkpoint","text_stored":true,"title":"Gemma 1B · opposite"},{"condition":"ablate","edited_top_tokens":[{"label":" four","logit":18.17037582397461,"probability":0.4382784366607666,"token":" four","token_id":2390},{"label":" five","logit":17.710355758666992,"probability":0.27667245268821716,"token":" five","token_id":3493},{"label":" six","logit":16.221378326416016,"probability":0.06241820007562637,"token":" six","token_id":3962},{"label":"space","logit":16.008464813232422,"probability":0.050448011606931686,"token":" ","token_id":236743},{"label":" eight","logit":15.405982971191406,"probability":0.02761783078312874,"token":" eight","token_id":6589}],"evidence_url":"https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py","feature_id":98,"id":"authored:gemma1b:gemma1b_scope_resid:L13:sum","identity_patch_passed":true,"layer":13,"measured_delta_l2":178.93592834472656,"measured_fields":["top_tokens","logit_l2"],"model":"Gemma 1B","model_key":"gemma1b","model_sha256":"7aec27428b6d4425bab5e9ea7f1f855c1f2d9d0b6c65be97dfb386d4bb594ba4","note":"Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.","operators":[{"edited_logsumexp":18.995277404785156,"edited_top_tokens":[{"label":" four","logit":18.17037582397461,"probability":0.4382784366607666,"token":" four","token_id":2390},{"label":" five","logit":17.710355758666992,"probability":0.27667245268821716,"token":" five","token_id":3493},{"label":" six","logit":16.221378326416016,"probability":0.06241820007562637,"token":" six","token_id":3962},{"label":"space","logit":16.008464813232422,"probability":0.050448011606931686,"token":" ","token_id":236743},{"label":" eight","logit":15.405982971191406,"probability":0.02761783078312874,"token":" eight","token_id":6589}],"feature_ids":[98],"label":"Remove this feature","logit_l2":178.93592834472656,"operation":"ablate","operation_parameters":{},"sentence":"Removing this feature"},{"edited_logsumexp":18.924604415893555,"edited_top_tokens":[{"label":" four","logit":18.11227035522461,"probability":0.4438215494155884,"token":" four","token_id":2390},{"label":" five","logit":17.584537506103516,"probability":0.2618284821510315,"token":" five","token_id":3493},{"label":" six","logit":16.082794189453125,"probability":0.05832007899880409,"token":" six","token_id":3962},{"label":"space","logit":15.919507026672363,"probability":0.049533993005752563,"token":" ","token_id":236743},{"label":" eight","logit":15.297780990600586,"probability":0.026600586250424385,"token":" eight","token_id":6589}],"feature_ids":[98],"label":"Cut its activity in half","logit_l2":88.59415435791016,"operation":"scale","operation_parameters":{"value":0.5},"sentence":"Cutting this feature's activity in half"},{"edited_logsumexp":18.86213493347168,"edited_top_tokens":[{"label":" four","logit":18.06084632873535,"probability":0.4487503468990326,"token":" four","token_id":2390},{"label":" five","logit":17.451610565185547,"probability":0.24401533603668213,"token":" five","token_id":3493},{"label":" six","logit":15.960075378417969,"probability":0.05491001531481743,"token":" six","token_id":3962},{"label":"space","logit":15.856170654296875,"probability":0.04949101060628891,"token":" ","token_id":236743},{"label":" eight","logit":15.195625305175781,"probability":0.025565549731254578,"token":" eight","token_id":6589}],"feature_ids":[98],"label":"Add 1 to its activity","logit_l2":0.47288671135902405,"operation":"add","operation_parameters":{"value":1.0},"sentence":"Adding 1 to this feature's activity"}],"original_logsumexp":18.862445831298828,"original_top_tokens":[{"label":" four","logit":18.061113357543945,"probability":0.4487307071685791,"token":" four","token_id":2390},{"label":" five","logit":17.452322006225586,"probability":0.24411310255527496,"token":" five","token_id":3493},{"label":" six","logit":15.960688591003418,"probability":0.05492662265896797,"token":" six","token_id":3962},{"label":"space","logit":15.856430053710938,"probability":0.04948846623301506,"token":" ","token_id":236743},{"label":" eight","logit":15.196158409118652,"probability":0.02557123452425003,"token":" eight","token_id":6589}],"prompt":"Two plus two equals","protocol_id":"authored_prompt.paired_topk.v1","public_text_reviewed":true,"rights_reviewed":false,"run_id":"effects-authored-20261021","sae":"gemma1b_scope_resid","sae_sha256":"97e478af2ba7c150c2cc144602bed081003067451c604879ab2533dca62c1468","sample_count":1,"site_id":"gemma1b:gemma1b_scope_resid:L13","source_category":"arithmetic","source_relative_path":"scripts/research_lab/measure_authored_effects.py","source_sha256":"4d812f4b5e30239543a87fedf6a6cfe1070c5c065fa6469325d2065f0808b2a1","source_type":"real_checkpoint","text_stored":true,"title":"Gemma 1B · arithmetic"},{"condition":"ablate","edited_top_tokens":[{"label":" cold","logit":18.054256439208984,"probability":0.7915324568748474,"token":" cold","token_id":5412},{"label":" not","logit":15.612879753112793,"probability":0.06889572739601135,"token":" not","token_id":417},{"label":" cool","logit":14.089235305786133,"probability":0.015013499185442924,"token":" cool","token_id":4484},{"label":" very","logit":12.794766426086426,"probability":0.004114349838346243,"token":" very","token_id":1077},{"label":" also","logit":12.652801513671875,"probability":0.0035698229912668467,"token":" also","token_id":671}],"evidence_url":"https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py","feature_id":14109,"id":"authored:pythia410m:pythia410m_mlp_topk:L12:opposite","identity_patch_passed":true,"layer":12,"measured_delta_l2":10.435279846191406,"measured_fields":["top_tokens","logit_l2"],"model":"Pythia 410M","model_key":"pythia410m","model_sha256":"f7127cb94a25b63c030d2dd6b2b26c8dd7814eae34ddda2269b068066da22244","note":"Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.","operators":[{"edited_logsumexp":18.288040161132812,"edited_top_tokens":[{"label":" cold","logit":18.054256439208984,"probability":0.7915324568748474,"token":" cold","token_id":5412},{"label":" not","logit":15.612879753112793,"probability":0.06889572739601135,"token":" not","token_id":417},{"label":" cool","logit":14.089235305786133,"probability":0.015013499185442924,"token":" cool","token_id":4484},{"label":" very","logit":12.794766426086426,"probability":0.004114349838346243,"token":" very","token_id":1077},{"label":" also","logit":12.652801513671875,"probability":0.0035698229912668467,"token":" also","token_id":671}],"feature_ids":[14109],"label":"Remove this feature","logit_l2":10.435279846191406,"operation":"ablate","operation_parameters":{},"sentence":"Removing this feature"},{"edited_logsumexp":18.290964126586914,"edited_top_tokens":[{"label":" cold","logit":18.058094024658203,"probability":0.7922571301460266,"token":" cold","token_id":5412},{"label":" not","logit":15.621723175048828,"probability":0.06930487602949142,"token":" not","token_id":417},{"label":" cool","logit":14.074239730834961,"probability":0.014746882021427155,"token":" cool","token_id":4484},{"label":" very","logit":12.804891586303711,"probability":0.004144091624766588,"token":" very","token_id":1077},{"label":" also","logit":12.659719467163086,"probability":0.0035841146018356085,"token":" also","token_id":671}],"feature_ids":[14109],"label":"Cut its activity in half","logit_l2":5.223907947540283,"operation":"scale","operation_parameters":{"value":0.5},"sentence":"Cutting this feature's activity in half"},{"edited_logsumexp":18.28569793701172,"edited_top_tokens":[{"label":" cold","logit":18.05429458618164,"probability":0.7934186458587646,"token":" cold","token_id":5412},{"label":" not","logit":15.641644477844238,"probability":0.0710725337266922,"token":" not","token_id":417},{"label":" cool","logit":14.00709056854248,"probability":0.013861940242350101,"token":" cool","token_id":4484},{"label":" very","logit":12.819357872009277,"probability":0.004226669203490019,"token":" very","token_id":1077},{"label":" the","logit":12.710838317871094,"probability":0.003792004194110632,"token":" the","token_id":253}],"feature_ids":[14109],"label":"Add 1 to its activity","logit_l2":14.158798217773438,"operation":"add","operation_parameters":{"value":1.0},"sentence":"Adding 1 to this feature's activity"}],"original_logsumexp":18.292362213134766,"original_top_tokens":[{"label":" cold","logit":18.060260772705078,"probability":0.7928658127784729,"token":" cold","token_id":5412},{"label":" not","logit":15.629169464111328,"probability":0.06972526013851166,"token":" not","token_id":417},{"label":" cool","logit":14.05789566040039,"probability":0.014487538486719131,"token":" cool","token_id":4484},{"label":" very","logit":12.812265396118164,"probability":0.004168926738202572,"token":" very","token_id":1077},{"label":" the","logit":12.673973083496094,"probability":0.0036304849199950695,"token":" the","token_id":253}],"prompt":"The opposite of hot is","protocol_id":"authored_prompt.paired_topk.v1","public_text_reviewed":true,"rights_reviewed":false,"run_id":"effects-authored-20261021","sae":"pythia410m_mlp_topk","sae_sha256":"0792d98e4129cadcd2481ccd3c11109d9ecde46cde2e7f0da597ea2cc4b0f6a8","sample_count":1,"site_id":"pythia410m:pythia410m_mlp_topk:L12","source_category":"opposite","source_relative_path":"scripts/research_lab/measure_authored_effects.py","source_sha256":"4d812f4b5e30239543a87fedf6a6cfe1070c5c065fa6469325d2065f0808b2a1","source_type":"real_checkpoint","text_stored":true,"title":"Pythia 410M · opposite"},{"condition":"ablate","edited_top_tokens":[{"label":" the","logit":14.030407905578613,"probability":0.08855893462896347,"token":" the","token_id":253},{"label":" a","logit":13.78176498413086,"probability":0.06906342506408691,"token":" a","token_id":247},{"label":" also","logit":13.45506763458252,"probability":0.0498155914247036,"token":" also","token_id":671},{"label":" located","logit":13.055927276611328,"probability":0.0334211029112339,"token":" located","token_id":4441},{"label":" in","logit":13.037212371826172,"probability":0.03280144929885864,"token":" in","token_id":275}],"evidence_url":"https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py","feature_id":50616,"id":"authored:pythia410m:pythia410m_mlp_topk:L12:capital","identity_patch_passed":true,"layer":12,"measured_delta_l2":4.493411064147949,"measured_fields":["top_tokens","logit_l2"],"model":"Pythia 410M","model_key":"pythia410m","model_sha256":"f7127cb94a25b63c030d2dd6b2b26c8dd7814eae34ddda2269b068066da22244","note":"Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.","operators":[{"edited_logsumexp":16.45449447631836,"edited_top_tokens":[{"label":" the","logit":14.030407905578613,"probability":0.08855893462896347,"token":" the","token_id":253},{"label":" a","logit":13.78176498413086,"probability":0.06906342506408691,"token":" a","token_id":247},{"label":" also","logit":13.45506763458252,"probability":0.0498155914247036,"token":" also","token_id":671},{"label":" located","logit":13.055927276611328,"probability":0.0334211029112339,"token":" located","token_id":4441},{"label":" in","logit":13.037212371826172,"probability":0.03280144929885864,"token":" in","token_id":275}],"feature_ids":[50616],"label":"Remove this feature","logit_l2":4.493411064147949,"operation":"ablate","operation_parameters":{},"sentence":"Removing this feature"},{"edited_logsumexp":16.45630645751953,"edited_top_tokens":[{"label":" the","logit":14.038619995117188,"probability":0.08912751078605652,"token":" the","token_id":253},{"label":" a","logit":13.778165817260742,"probability":0.0686907023191452,"token":" a","token_id":247},{"label":" also","logit":13.4434814453125,"probability":0.049152594059705734,"token":" also","token_id":671},{"label":" located","logit":13.043850898742676,"probability":0.03296013921499252,"token":" located","token_id":4441},{"label":" in","logit":13.031229972839355,"probability":0.032546769827604294,"token":" in","token_id":275}],"feature_ids":[50616],"label":"Cut its activity in half","logit_l2":2.2444944381713867,"operation":"scale","operation_parameters":{"value":0.5},"sentence":"Cutting this feature's activity in half"},{"edited_logsumexp":16.47062110900879,"edited_top_tokens":[{"label":" the","logit":14.090752601623535,"probability":0.09256281703710556,"token":" the","token_id":253},{"label":" a","logit":13.756302833557129,"probability":0.06625015288591385,"token":" a","token_id":247},{"label":" also","logit":13.376730918884277,"probability":0.04532532021403313,"token":" also","token_id":671},{"label":" in","logit":13.004315376281738,"probability":0.03123222291469574,"token":" in","token_id":275},{"label":" located","logit":12.980083465576172,"probability":0.030484501272439957,"token":" located","token_id":4441}],"feature_ids":[50616],"label":"Add 1 to its activity","logit_l2":10.418188095092773,"operation":"add","operation_parameters":{"value":1.0},"sentence":"Adding 1 to this feature's activity"}],"original_logsumexp":16.458383560180664,"original_top_tokens":[{"label":" the","logit":14.047170639038086,"probability":0.0897064208984375,"token":" the","token_id":253},{"label":" a","logit":13.774544715881348,"probability":0.06830044835805893,"token":" a","token_id":247},{"label":" also","logit":13.432001113891602,"probability":0.0484907403588295,"token":" also","token_id":671},{"label":" located","logit":13.032064437866211,"probability":0.03250637277960777,"token":" located","token_id":4441},{"label":" in","logit":13.025716781616211,"probability":0.032300688326358795,"token":" in","token_id":275}],"prompt":"The capital of France is","protocol_id":"authored_prompt.paired_topk.v1","public_text_reviewed":true,"rights_reviewed":false,"run_id":"effects-authored-20261021","sae":"pythia410m_mlp_topk","sae_sha256":"0792d98e4129cadcd2481ccd3c11109d9ecde46cde2e7f0da597ea2cc4b0f6a8","sample_count":1,"site_id":"pythia410m:pythia410m_mlp_topk:L12","source_category":"place name","source_relative_path":"scripts/research_lab/measure_authored_effects.py","source_sha256":"4d812f4b5e30239543a87fedf6a6cfe1070c5c065fa6469325d2065f0808b2a1","source_type":"real_checkpoint","text_stored":true,"title":"Pythia 410M · place name"},{"condition":"ablate","edited_top_tokens":[{"label":" \"","logit":13.675004959106445,"probability":0.10191324353218079,"token":" \"","token_id":346},{"label":" cat","logit":13.386409759521484,"probability":0.076365165412426,"token":" cat","token_id":5798},{"label":" “","logit":13.296860694885254,"probability":0.06982399523258209,"token":" “","token_id":773},{"label":" k","logit":13.068771362304688,"probability":0.05558360740542412,"token":" k","token_id":465},{"label":" '","logit":12.357992172241211,"probability":0.027306070551276207,"token":" '","token_id":686}],"evidence_url":"https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py","feature_id":8039,"id":"authored:pythia410m:pythia410m_mlp_topk:L12:animal","identity_patch_passed":true,"layer":12,"measured_delta_l2":6.860777854919434,"measured_fields":["top_tokens","logit_l2"],"model":"Pythia 410M","model_key":"pythia410m","model_sha256":"f7127cb94a25b63c030d2dd6b2b26c8dd7814eae34ddda2269b068066da22244","note":"Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.","operators":[{"edited_logsumexp":15.958638191223145,"edited_top_tokens":[{"label":" \"","logit":13.675004959106445,"probability":0.10191324353218079,"token":" \"","token_id":346},{"label":" cat","logit":13.386409759521484,"probability":0.076365165412426,"token":" cat","token_id":5798},{"label":" “","logit":13.296860694885254,"probability":0.06982399523258209,"token":" “","token_id":773},{"label":" k","logit":13.068771362304688,"probability":0.05558360740542412,"token":" k","token_id":465},{"label":" '","logit":12.357992172241211,"probability":0.027306070551276207,"token":" '","token_id":686}],"feature_ids":[8039],"label":"Remove this feature","logit_l2":6.860777854919434,"operation":"ablate","operation_parameters":{},"sentence":"Removing this feature"},{"edited_logsumexp":15.944440841674805,"edited_top_tokens":[{"label":" \"","logit":13.666635513305664,"probability":0.10250888764858246,"token":" \"","token_id":346},{"label":" cat","logit":13.375388145446777,"probability":0.07660804688930511,"token":" cat","token_id":5798},{"label":" “","logit":13.279892921447754,"probability":0.06963079422712326,"token":" “","token_id":773},{"label":" k","logit":13.049429893493652,"probability":0.05529839172959328,"token":" k","token_id":465},{"label":" '","logit":12.351130485534668,"probability":0.027507107704877853,"token":" '","token_id":686}],"feature_ids":[8039],"label":"Cut its activity in half","logit_l2":3.417825222015381,"operation":"scale","operation_parameters":{"value":0.5},"sentence":"Cutting this feature's activity in half"},{"edited_logsumexp":15.88403034210205,"edited_top_tokens":[{"label":" \"","logit":13.612590789794922,"probability":0.10316357016563416,"token":" \"","token_id":346},{"label":" cat","logit":13.33621597290039,"probability":0.07825251668691635,"token":" cat","token_id":5798},{"label":" “","logit":13.206056594848633,"probability":0.06870222091674805,"token":" “","token_id":773},{"label":" k","logit":12.962199211120605,"probability":0.05383502319455147,"token":" k","token_id":465},{"label":" '","logit":12.308736801147461,"probability":0.028007205575704575,"token":" '","token_id":686}],"feature_ids":[8039],"label":"Add 1 to its activity","logit_l2":10.987921714782715,"operation":"add","operation_parameters":{"value":1.0},"sentence":"Adding 1 to this feature's activity"}],"original_logsumexp":15.930148124694824,"original_top_tokens":[{"label":" \"","logit":13.656423568725586,"probability":0.10292810946702957,"token":" \"","token_id":346},{"label":" cat","logit":13.364481925964355,"probability":0.0768679678440094,"token":" cat","token_id":5798},{"label":" “","logit":13.262776374816895,"probability":0.06943447887897491,"token":" “","token_id":773},{"label":" k","logit":13.029589653015137,"probability":0.054992496967315674,"token":" k","token_id":465},{"label":" '","logit":12.342663764953613,"probability":0.027667848393321037,"token":" '","token_id":686}],"prompt":"A baby cat is called a","protocol_id":"authored_prompt.paired_topk.v1","public_text_reviewed":true,"rights_reviewed":false,"run_id":"effects-authored-20261021","sae":"pythia410m_mlp_topk","sae_sha256":"0792d98e4129cadcd2481ccd3c11109d9ecde46cde2e7f0da597ea2cc4b0f6a8","sample_count":1,"site_id":"pythia410m:pythia410m_mlp_topk:L12","source_category":"animal name","source_relative_path":"scripts/research_lab/measure_authored_effects.py","source_sha256":"4d812f4b5e30239543a87fedf6a6cfe1070c5c065fa6469325d2065f0808b2a1","source_type":"real_checkpoint","text_stored":true,"title":"Pythia 410M · animal name"}],"protocol_id":"authored_prompt.paired_topk.v1","run_id":"effects-authored-20261021","separate_from":"GPU-04 paired logit L2 records"}
+{
+  "cases": [
+    {
+      "condition": "ablate",
+      "edited_top_tokens": [
+        {
+          "label": " Paris",
+          "logit": 18.325897216796875,
+          "probability": 0.3587510585784912,
+          "token": " Paris",
+          "token_id": 9079
+        },
+        {
+          "label": " a",
+          "logit": 17.55063819885254,
+          "probability": 0.16523516178131104,
+          "token": " a",
+          "token_id": 496
+        },
+        {
+          "label": " the",
+          "logit": 17.200834274291992,
+          "probability": 0.11646208167076111,
+          "token": " the",
+          "token_id": 506
+        },
+        {
+          "label": " one",
+          "logit": 16.166080474853516,
+          "probability": 0.04138059541583061,
+          "token": " one",
+          "token_id": 886
+        },
+        {
+          "label": " is",
+          "logit": 15.958934783935547,
+          "probability": 0.03363833203911781,
+          "token": " is",
+          "token_id": 563
+        }
+      ],
+      "evidence_url": "https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py",
+      "feature_id": 203,
+      "id": "authored:gemma1b:gemma1b_scope_resid:L13:capital",
+      "identity_patch_passed": true,
+      "layer": 13,
+      "measured_delta_l2": 660.2359619140625,
+      "measured_fields": [
+        "top_tokens",
+        "logit_l2"
+      ],
+      "model": "Gemma 1B",
+      "model_key": "gemma1b",
+      "model_sha256": "7aec27428b6d4425bab5e9ea7f1f855c1f2d9d0b6c65be97dfb386d4bb594ba4",
+      "note": "Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.",
+      "operators": [
+        {
+          "edited_logsumexp": 19.351024627685547,
+          "edited_top_tokens": [
+            {
+              "label": " Paris",
+              "logit": 18.325897216796875,
+              "probability": 0.3587510585784912,
+              "token": " Paris",
+              "token_id": 9079
+            },
+            {
+              "label": " a",
+              "logit": 17.55063819885254,
+              "probability": 0.16523516178131104,
+              "token": " a",
+              "token_id": 496
+            },
+            {
+              "label": " the",
+              "logit": 17.200834274291992,
+              "probability": 0.11646208167076111,
+              "token": " the",
+              "token_id": 506
+            },
+            {
+              "label": " one",
+              "logit": 16.166080474853516,
+              "probability": 0.04138059541583061,
+              "token": " one",
+              "token_id": 886
+            },
+            {
+              "label": " is",
+              "logit": 15.958934783935547,
+              "probability": 0.03363833203911781,
+              "token": " is",
+              "token_id": 563
+            }
+          ],
+          "feature_ids": [
+            203
+          ],
+          "label": "Remove this feature",
+          "logit_l2": 660.2359619140625,
+          "operation": "ablate",
+          "operation_parameters": {},
+          "sentence": "Removing this feature"
+        },
+        {
+          "edited_logsumexp": 20.332191467285156,
+          "edited_top_tokens": [
+            {
+              "label": " a",
+              "logit": 18.776580810546875,
+              "probability": 0.2110605686903,
+              "token": " a",
+              "token_id": 496
+            },
+            {
+              "label": " Paris",
+              "logit": 18.559589385986328,
+              "probability": 0.1698904186487198,
+              "token": " Paris",
+              "token_id": 9079
+            },
+            {
+              "label": " the",
+              "logit": 18.380634307861328,
+              "probability": 0.1420527696609497,
+              "token": " the",
+              "token_id": 506
+            },
+            {
+              "label": " one",
+              "logit": 17.678266525268555,
+              "probability": 0.0703744888305664,
+              "token": " one",
+              "token_id": 886
+            },
+            {
+              "label": " home",
+              "logit": 16.93643569946289,
+              "probability": 0.03351523354649544,
+              "token": " home",
+              "token_id": 2033
+            }
+          ],
+          "feature_ids": [
+            203
+          ],
+          "label": "Cut its activity in half",
+          "logit_l2": 198.657470703125,
+          "operation": "scale",
+          "operation_parameters": {
+            "value": 0.5
+          },
+          "sentence": "Cutting this feature's activity in half"
+        },
+        {
+          "edited_logsumexp": 20.900909423828125,
+          "edited_top_tokens": [
+            {
+              "label": " a",
+              "logit": 19.429298400878906,
+              "probability": 0.22955524921417236,
+              "token": " a",
+              "token_id": 496
+            },
+            {
+              "label": " the",
+              "logit": 18.94261932373047,
+              "probability": 0.14109942317008972,
+              "token": " the",
+              "token_id": 506
+            },
+            {
+              "label": " Paris",
+              "logit": 18.439525604248047,
+              "probability": 0.08531676232814789,
+              "token": " Paris",
+              "token_id": 9079
+            },
+            {
+              "label": " one",
+              "logit": 18.2748966217041,
+              "probability": 0.0723663941025734,
+              "token": " one",
+              "token_id": 886
+            },
+            {
+              "label": " home",
+              "logit": 17.641555786132812,
+              "probability": 0.03841319680213928,
+              "token": " home",
+              "token_id": 2033
+            }
+          ],
+          "feature_ids": [
+            203
+          ],
+          "label": "Add 1 to its activity",
+          "logit_l2": 0.4365513324737549,
+          "operation": "add",
+          "operation_parameters": {
+            "value": 1.0
+          },
+          "sentence": "Adding 1 to this feature's activity"
+        }
+      ],
+      "original_logsumexp": 20.899656295776367,
+      "original_top_tokens": [
+        {
+          "label": " a",
+          "logit": 19.427860260009766,
+          "probability": 0.22951281070709229,
+          "token": " a",
+          "token_id": 496
+        },
+        {
+          "label": " the",
+          "logit": 18.94146728515625,
+          "probability": 0.14111369848251343,
+          "token": " the",
+          "token_id": 506
+        },
+        {
+          "label": " Paris",
+          "logit": 18.440059661865234,
+          "probability": 0.08546938747167587,
+          "token": " Paris",
+          "token_id": 9079
+        },
+        {
+          "label": " one",
+          "logit": 18.273725509643555,
+          "probability": 0.07237233221530914,
+          "token": " one",
+          "token_id": 886
+        },
+        {
+          "label": " home",
+          "logit": 17.639991760253906,
+          "probability": 0.03840126469731331,
+          "token": " home",
+          "token_id": 2033
+        }
+      ],
+      "prompt": "The capital of France is",
+      "protocol_id": "authored_prompt.paired_topk.v1",
+      "public_text_reviewed": true,
+      "rights_reviewed": false,
+      "run_id": "effects-authored-20261021",
+      "sae": "gemma1b_scope_resid",
+      "sae_sha256": "97e478af2ba7c150c2cc144602bed081003067451c604879ab2533dca62c1468",
+      "sample_count": 1,
+      "site_id": "gemma1b:gemma1b_scope_resid:L13",
+      "source_category": "place name",
+      "source_relative_path": "scripts/research_lab/measure_authored_effects.py",
+      "source_sha256": "4d812f4b5e30239543a87fedf6a6cfe1070c5c065fa6469325d2065f0808b2a1",
+      "source_type": "real_checkpoint",
+      "text_stored": true,
+      "title": "Gemma 1B · place name"
+    },
+    {
+      "condition": "ablate",
+      "edited_top_tokens": [
+        {
+          "label": " one",
+          "logit": 14.888466835021973,
+          "probability": 0.15338987112045288,
+          "token": " one",
+          "token_id": 581
+        },
+        {
+          "label": " two",
+          "logit": 14.86661148071289,
+          "probability": 0.1500738561153412,
+          "token": " two",
+          "token_id": 767
+        },
+        {
+          "label": " three",
+          "logit": 14.859519004821777,
+          "probability": 0.1490132212638855,
+          "token": " three",
+          "token_id": 1264
+        },
+        {
+          "label": " four",
+          "logit": 14.21353530883789,
+          "probability": 0.07810478657484055,
+          "token": " four",
+          "token_id": 1740
+        },
+        {
+          "label": " zero",
+          "logit": 13.38893985748291,
+          "probability": 0.03424210101366043,
+          "token": " zero",
+          "token_id": 5058
+        }
+      ],
+      "evidence_url": "https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py",
+      "feature_id": 52025,
+      "id": "authored:pythia410m:pythia410m_mlp_topk:L12:sum",
+      "identity_patch_passed": true,
+      "layer": 12,
+      "measured_delta_l2": 4.868540287017822,
+      "measured_fields": [
+        "top_tokens",
+        "logit_l2"
+      ],
+      "model": "Pythia 410M",
+      "model_key": "pythia410m",
+      "model_sha256": "f7127cb94a25b63c030d2dd6b2b26c8dd7814eae34ddda2269b068066da22244",
+      "note": "Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.",
+      "operators": [
+        {
+          "edited_logsumexp": 16.76323890686035,
+          "edited_top_tokens": [
+            {
+              "label": " one",
+              "logit": 14.888466835021973,
+              "probability": 0.15338987112045288,
+              "token": " one",
+              "token_id": 581
+            },
+            {
+              "label": " two",
+              "logit": 14.86661148071289,
+              "probability": 0.1500738561153412,
+              "token": " two",
+              "token_id": 767
+            },
+            {
+              "label": " three",
+              "logit": 14.859519004821777,
+              "probability": 0.1490132212638855,
+              "token": " three",
+              "token_id": 1264
+            },
+            {
+              "label": " four",
+              "logit": 14.21353530883789,
+              "probability": 0.07810478657484055,
+              "token": " four",
+              "token_id": 1740
+            },
+            {
+              "label": " zero",
+              "logit": 13.38893985748291,
+              "probability": 0.03424210101366043,
+              "token": " zero",
+              "token_id": 5058
+            }
+          ],
+          "feature_ids": [
+            52025
+          ],
+          "label": "Remove this feature",
+          "logit_l2": 4.868540287017822,
+          "operation": "ablate",
+          "operation_parameters": {},
+          "sentence": "Removing this feature"
+        },
+        {
+          "edited_logsumexp": 16.768917083740234,
+          "edited_top_tokens": [
+            {
+              "label": " one",
+              "logit": 14.885000228881836,
+              "probability": 0.15199360251426697,
+              "token": " one",
+              "token_id": 581
+            },
+            {
+              "label": " three",
+              "logit": 14.872157096862793,
+              "probability": 0.15005400776863098,
+              "token": " three",
+              "token_id": 1264
+            },
+            {
+              "label": " two",
+              "logit": 14.871105194091797,
+              "probability": 0.14989624917507172,
+              "token": " two",
+              "token_id": 767
+            },
+            {
+              "label": " four",
+              "logit": 14.233797073364258,
+              "probability": 0.0792522132396698,
+              "token": " four",
+              "token_id": 1740
+            },
+            {
+              "label": " zero",
+              "logit": 13.401214599609375,
+              "probability": 0.03446873649954796,
+              "token": " zero",
+              "token_id": 5058
+            }
+          ],
+          "feature_ids": [
+            52025
+          ],
+          "label": "Cut its activity in half",
+          "logit_l2": 2.4290969371795654,
+          "operation": "scale",
+          "operation_parameters": {
+            "value": 0.5
+          },
+          "sentence": "Cutting this feature's activity in half"
+        },
+        {
+          "edited_logsumexp": 16.800092697143555,
+          "edited_top_tokens": [
+            {
+              "label": " three",
+              "logit": 14.941619873046875,
+              "probability": 0.15591053664684296,
+              "token": " three",
+              "token_id": 1264
+            },
+            {
+              "label": " two",
+              "logit": 14.890592575073242,
+              "probability": 0.14815440773963928,
+              "token": " two",
+              "token_id": 767
+            },
+            {
+              "label": " one",
+              "logit": 14.86270523071289,
+              "probability": 0.14407986402511597,
+              "token": " one",
+              "token_id": 581
+            },
+            {
+              "label": " four",
+              "logit": 14.345458030700684,
+              "probability": 0.08589456230401993,
+              "token": " four",
+              "token_id": 1740
+            },
+            {
+              "label": " zero",
+              "logit": 13.473316192626953,
+              "probability": 0.035908669233322144,
+              "token": " zero",
+              "token_id": 5058
+            }
+          ],
+          "feature_ids": [
+            52025
+          ],
+          "label": "Add 1 to its activity",
+          "logit_l2": 11.51213550567627,
+          "operation": "add",
+          "operation_parameters": {
+            "value": 1.0
+          },
+          "sentence": "Adding 1 to this feature's activity"
+        }
+      ],
+      "original_logsumexp": 16.774511337280273,
+      "original_top_tokens": [
+        {
+          "label": " three",
+          "logit": 14.884611129760742,
+          "probability": 0.15108701586723328,
+          "token": " three",
+          "token_id": 1264
+        },
+        {
+          "label": " one",
+          "logit": 14.881428718566895,
+          "probability": 0.15060697495937347,
+          "token": " one",
+          "token_id": 581
+        },
+        {
+          "label": " two",
+          "logit": 14.875221252441406,
+          "probability": 0.14967496693134308,
+          "token": " two",
+          "token_id": 767
+        },
+        {
+          "label": " four",
+          "logit": 14.25385570526123,
+          "probability": 0.08040694147348404,
+          "token": " four",
+          "token_id": 1740
+        },
+        {
+          "label": " zero",
+          "logit": 13.413426399230957,
+          "probability": 0.03469762206077576,
+          "token": " zero",
+          "token_id": 5058
+        }
+      ],
+      "prompt": "Two plus two equals",
+      "protocol_id": "authored_prompt.paired_topk.v1",
+      "public_text_reviewed": true,
+      "rights_reviewed": false,
+      "run_id": "effects-authored-20261021",
+      "sae": "pythia410m_mlp_topk",
+      "sae_sha256": "0792d98e4129cadcd2481ccd3c11109d9ecde46cde2e7f0da597ea2cc4b0f6a8",
+      "sample_count": 1,
+      "site_id": "pythia410m:pythia410m_mlp_topk:L12",
+      "source_category": "arithmetic",
+      "source_relative_path": "scripts/research_lab/measure_authored_effects.py",
+      "source_sha256": "4d812f4b5e30239543a87fedf6a6cfe1070c5c065fa6469325d2065f0808b2a1",
+      "source_type": "real_checkpoint",
+      "text_stored": true,
+      "title": "Pythia 410M · arithmetic"
+    },
+    {
+      "condition": "ablate",
+      "edited_top_tokens": [
+        {
+          "label": " kitten",
+          "logit": 19.562162399291992,
+          "probability": 0.8223137259483337,
+          "token": " kitten",
+          "token_id": 55095
+        },
+        {
+          "label": " kit",
+          "logit": 16.24825096130371,
+          "probability": 0.029910529032349586,
+          "token": " kit",
+          "token_id": 5689
+        },
+        {
+          "label": " “",
+          "logit": 15.645054817199707,
+          "probability": 0.016362864524126053,
+          "token": " “",
+          "token_id": 999
+        },
+        {
+          "label": " \"",
+          "logit": 15.6087007522583,
+          "probability": 0.015778690576553345,
+          "token": " \"",
+          "token_id": 623
+        },
+        {
+          "label": " cub",
+          "logit": 15.396683692932129,
+          "probability": 0.012764185667037964,
+          "token": " cub",
+          "token_id": 11351
+        }
+      ],
+      "evidence_url": "https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py",
+      "feature_id": 238,
+      "id": "authored:gemma1b:gemma1b_scope_resid:L13:animal",
+      "identity_patch_passed": true,
+      "layer": 13,
+      "measured_delta_l2": 172.30191040039062,
+      "measured_fields": [
+        "top_tokens",
+        "logit_l2"
+      ],
+      "model": "Gemma 1B",
+      "model_key": "gemma1b",
+      "model_sha256": "7aec27428b6d4425bab5e9ea7f1f855c1f2d9d0b6c65be97dfb386d4bb594ba4",
+      "note": "Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.",
+      "operators": [
+        {
+          "edited_logsumexp": 19.757795333862305,
+          "edited_top_tokens": [
+            {
+              "label": " kitten",
+              "logit": 19.562162399291992,
+              "probability": 0.8223137259483337,
+              "token": " kitten",
+              "token_id": 55095
+            },
+            {
+              "label": " kit",
+              "logit": 16.24825096130371,
+              "probability": 0.029910529032349586,
+              "token": " kit",
+              "token_id": 5689
+            },
+            {
+              "label": " “",
+              "logit": 15.645054817199707,
+              "probability": 0.016362864524126053,
+              "token": " “",
+              "token_id": 999
+            },
+            {
+              "label": " \"",
+              "logit": 15.6087007522583,
+              "probability": 0.015778690576553345,
+              "token": " \"",
+              "token_id": 623
+            },
+            {
+              "label": " cub",
+              "logit": 15.396683692932129,
+              "probability": 0.012764185667037964,
+              "token": " cub",
+              "token_id": 11351
+            }
+          ],
+          "feature_ids": [
+            238
+          ],
+          "label": "Remove this feature",
+          "logit_l2": 172.30191040039062,
+          "operation": "ablate",
+          "operation_parameters": {},
+          "sentence": "Removing this feature"
+        },
+        {
+          "edited_logsumexp": 19.780391693115234,
+          "edited_top_tokens": [
+            {
+              "label": " kitten",
+              "logit": 19.5718994140625,
+              "probability": 0.8118072152137756,
+              "token": " kitten",
+              "token_id": 55095
+            },
+            {
+              "label": " kit",
+              "logit": 16.29043197631836,
+              "probability": 0.03050209954380989,
+              "token": " kit",
+              "token_id": 5689
+            },
+            {
+              "label": " “",
+              "logit": 15.78193473815918,
+              "probability": 0.01834392175078392,
+              "token": " “",
+              "token_id": 999
+            },
+            {
+              "label": " \"",
+              "logit": 15.745920181274414,
+              "probability": 0.017695028334856033,
+              "token": " \"",
+              "token_id": 623
+            },
+            {
+              "label": " cub",
+              "logit": 15.481719017028809,
+              "probability": 0.013586578890681267,
+              "token": " cub",
+              "token_id": 11351
+            }
+          ],
+          "feature_ids": [
+            238
+          ],
+          "label": "Cut its activity in half",
+          "logit_l2": 78.30413818359375,
+          "operation": "scale",
+          "operation_parameters": {
+            "value": 0.5
+          },
+          "sentence": "Cutting this feature's activity in half"
+        },
+        {
+          "edited_logsumexp": 19.771631240844727,
+          "edited_top_tokens": [
+            {
+              "label": " kitten",
+              "logit": 19.552398681640625,
+              "probability": 0.8031352758407593,
+              "token": " kitten",
+              "token_id": 55095
+            },
+            {
+              "label": " kit",
+              "logit": 16.248098373413086,
+              "probability": 0.029495060443878174,
+              "token": " kit",
+              "token_id": 5689
+            },
+            {
+              "label": " “",
+              "logit": 15.871837615966797,
+              "probability": 0.020246097818017006,
+              "token": " “",
+              "token_id": 999
+            },
+            {
+              "label": " \"",
+              "logit": 15.837681770324707,
+              "probability": 0.0195662509649992,
+              "token": " \"",
+              "token_id": 623
+            },
+            {
+              "label": " cub",
+              "logit": 15.484384536743164,
+              "probability": 0.013742716051638126,
+              "token": " cub",
+              "token_id": 11351
+            }
+          ],
+          "feature_ids": [
+            238
+          ],
+          "label": "Add 1 to its activity",
+          "logit_l2": 0.33352071046829224,
+          "operation": "add",
+          "operation_parameters": {
+            "value": 1.0
+          },
+          "sentence": "Adding 1 to this feature's activity"
+        }
+      ],
+      "original_logsumexp": 19.77173614501953,
+      "original_top_tokens": [
+        {
+          "label": " kitten",
+          "logit": 19.552549362182617,
+          "probability": 0.8031714558601379,
+          "token": " kitten",
+          "token_id": 55095
+        },
+        {
+          "label": " kit",
+          "logit": 16.248458862304688,
+          "probability": 0.02950257807970047,
+          "token": " kit",
+          "token_id": 5689
+        },
+        {
+          "label": " “",
+          "logit": 15.871526718139648,
+          "probability": 0.020237667486071587,
+          "token": " “",
+          "token_id": 999
+        },
+        {
+          "label": " \"",
+          "logit": 15.837359428405762,
+          "probability": 0.019557880237698555,
+          "token": " \"",
+          "token_id": 623
+        },
+        {
+          "label": " cub",
+          "logit": 15.484529495239258,
+          "probability": 0.013743258081376553,
+          "token": " cub",
+          "token_id": 11351
+        }
+      ],
+      "prompt": "A baby cat is called a",
+      "protocol_id": "authored_prompt.paired_topk.v1",
+      "public_text_reviewed": true,
+      "rights_reviewed": false,
+      "run_id": "effects-authored-20261021",
+      "sae": "gemma1b_scope_resid",
+      "sae_sha256": "97e478af2ba7c150c2cc144602bed081003067451c604879ab2533dca62c1468",
+      "sample_count": 1,
+      "site_id": "gemma1b:gemma1b_scope_resid:L13",
+      "source_category": "animal name",
+      "source_relative_path": "scripts/research_lab/measure_authored_effects.py",
+      "source_sha256": "4d812f4b5e30239543a87fedf6a6cfe1070c5c065fa6469325d2065f0808b2a1",
+      "source_type": "real_checkpoint",
+      "text_stored": true,
+      "title": "Gemma 1B · animal name"
+    },
+    {
+      "condition": "ablate",
+      "edited_top_tokens": [
+        {
+          "label": " cold",
+          "logit": 18.4152774810791,
+          "probability": 0.7633107900619507,
+          "token": " cold",
+          "token_id": 7445
+        },
+        {
+          "label": " cool",
+          "logit": 15.59116268157959,
+          "probability": 0.045311033725738525,
+          "token": " cool",
+          "token_id": 5427
+        },
+        {
+          "label": "space",
+          "logit": 14.956786155700684,
+          "probability": 0.02402690052986145,
+          "token": " ",
+          "token_id": 236743
+        },
+        {
+          "label": " ice",
+          "logit": 14.48172378540039,
+          "probability": 0.014941038563847542,
+          "token": " ice",
+          "token_id": 8205
+        },
+        {
+          "label": ":",
+          "logit": 14.372102737426758,
+          "probability": 0.013389764353632927,
+          "token": ":",
+          "token_id": 236787
+        }
+      ],
+      "evidence_url": "https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py",
+      "feature_id": 203,
+      "id": "authored:gemma1b:gemma1b_scope_resid:L13:opposite",
+      "identity_patch_passed": true,
+      "layer": 13,
+      "measured_delta_l2": 176.7088165283203,
+      "measured_fields": [
+        "top_tokens",
+        "logit_l2"
+      ],
+      "model": "Gemma 1B",
+      "model_key": "gemma1b",
+      "model_sha256": "7aec27428b6d4425bab5e9ea7f1f855c1f2d9d0b6c65be97dfb386d4bb594ba4",
+      "note": "Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.",
+      "operators": [
+        {
+          "edited_logsumexp": 18.685367584228516,
+          "edited_top_tokens": [
+            {
+              "label": " cold",
+              "logit": 18.4152774810791,
+              "probability": 0.7633107900619507,
+              "token": " cold",
+              "token_id": 7445
+            },
+            {
+              "label": " cool",
+              "logit": 15.59116268157959,
+              "probability": 0.045311033725738525,
+              "token": " cool",
+              "token_id": 5427
+            },
+            {
+              "label": "space",
+              "logit": 14.956786155700684,
+              "probability": 0.02402690052986145,
+              "token": " ",
+              "token_id": 236743
+            },
+            {
+              "label": " ice",
+              "logit": 14.48172378540039,
+              "probability": 0.014941038563847542,
+              "token": " ice",
+              "token_id": 8205
+            },
+            {
+              "label": ":",
+              "logit": 14.372102737426758,
+              "probability": 0.013389764353632927,
+              "token": ":",
+              "token_id": 236787
+            }
+          ],
+          "feature_ids": [
+            203
+          ],
+          "label": "Remove this feature",
+          "logit_l2": 176.7088165283203,
+          "operation": "ablate",
+          "operation_parameters": {},
+          "sentence": "Removing this feature"
+        },
+        {
+          "edited_logsumexp": 18.83262825012207,
+          "edited_top_tokens": [
+            {
+              "label": " cold",
+              "logit": 18.555194854736328,
+              "probability": 0.7577259540557861,
+              "token": " cold",
+              "token_id": 7445
+            },
+            {
+              "label": " cool",
+              "logit": 15.8230619430542,
+              "probability": 0.049313053488731384,
+              "token": " cool",
+              "token_id": 5427
+            },
+            {
+              "label": "space",
+              "logit": 15.098244667053223,
+              "probability": 0.023887889459729195,
+              "token": " ",
+              "token_id": 236743
+            },
+            {
+              "label": " ice",
+              "logit": 14.66235065460205,
+              "probability": 0.015447968617081642,
+              "token": " ice",
+              "token_id": 8205
+            },
+            {
+              "label": ":",
+              "logit": 14.35987377166748,
+              "probability": 0.011415827088057995,
+              "token": ":",
+              "token_id": 236787
+            }
+          ],
+          "feature_ids": [
+            203
+          ],
+          "label": "Cut its activity in half",
+          "logit_l2": 88.45610046386719,
+          "operation": "scale",
+          "operation_parameters": {
+            "value": 0.5
+          },
+          "sentence": "Cutting this feature's activity in half"
+        },
+        {
+          "edited_logsumexp": 18.961776733398438,
+          "edited_top_tokens": [
+            {
+              "label": " cold",
+              "logit": 18.67171287536621,
+              "probability": 0.7482166290283203,
+              "token": " cold",
+              "token_id": 7445
+            },
+            {
+              "label": " cool",
+              "logit": 16.010583877563477,
+              "probability": 0.05227736756205559,
+              "token": " cool",
+              "token_id": 5427
+            },
+            {
+              "label": "space",
+              "logit": 15.208597183227539,
+              "probability": 0.02344311587512493,
+              "token": " ",
+              "token_id": 236743
+            },
+            {
+              "label": " ice",
+              "logit": 14.811264991760254,
+              "probability": 0.01575636863708496,
+              "token": " ice",
+              "token_id": 8205
+            },
+            {
+              "label": "...",
+              "logit": 14.492761611938477,
+              "probability": 0.011458608321845531,
+              "token": "...",
+              "token_id": 1390
+            }
+          ],
+          "feature_ids": [
+            203
+          ],
+          "label": "Add 1 to its activity",
+          "logit_l2": 0.42606857419013977,
+          "operation": "add",
+          "operation_parameters": {
+            "value": 1.0
+          },
+          "sentence": "Adding 1 to this feature's activity"
+        }
+      ],
+      "original_logsumexp": 18.961185455322266,
+      "original_top_tokens": [
+        {
+          "label": " cold",
+          "logit": 18.671201705932617,
+          "probability": 0.7482764720916748,
+          "token": " cold",
+          "token_id": 7445
+        },
+        {
+          "label": " cool",
+          "logit": 16.009784698486328,
+          "probability": 0.05226648971438408,
+          "token": " cool",
+          "token_id": 5427
+        },
+        {
+          "label": "space",
+          "logit": 15.208117485046387,
+          "probability": 0.023445729166269302,
+          "token": " ",
+          "token_id": 236743
+        },
+        {
+          "label": " ice",
+          "logit": 14.810600280761719,
+          "probability": 0.01575521007180214,
+          "token": " ice",
+          "token_id": 8205
+        },
+        {
+          "label": "...",
+          "logit": 14.492164611816406,
+          "probability": 0.01145854126662016,
+          "token": "...",
+          "token_id": 1390
+        }
+      ],
+      "prompt": "The opposite of hot is",
+      "protocol_id": "authored_prompt.paired_topk.v1",
+      "public_text_reviewed": true,
+      "rights_reviewed": false,
+      "run_id": "effects-authored-20261021",
+      "sae": "gemma1b_scope_resid",
+      "sae_sha256": "97e478af2ba7c150c2cc144602bed081003067451c604879ab2533dca62c1468",
+      "sample_count": 1,
+      "site_id": "gemma1b:gemma1b_scope_resid:L13",
+      "source_category": "opposite",
+      "source_relative_path": "scripts/research_lab/measure_authored_effects.py",
+      "source_sha256": "4d812f4b5e30239543a87fedf6a6cfe1070c5c065fa6469325d2065f0808b2a1",
+      "source_type": "real_checkpoint",
+      "text_stored": true,
+      "title": "Gemma 1B · opposite"
+    },
+    {
+      "condition": "ablate",
+      "edited_top_tokens": [
+        {
+          "label": " four",
+          "logit": 18.17037582397461,
+          "probability": 0.4382784366607666,
+          "token": " four",
+          "token_id": 2390
+        },
+        {
+          "label": " five",
+          "logit": 17.710355758666992,
+          "probability": 0.27667245268821716,
+          "token": " five",
+          "token_id": 3493
+        },
+        {
+          "label": " six",
+          "logit": 16.221378326416016,
+          "probability": 0.06241820007562637,
+          "token": " six",
+          "token_id": 3962
+        },
+        {
+          "label": "space",
+          "logit": 16.008464813232422,
+          "probability": 0.050448011606931686,
+          "token": " ",
+          "token_id": 236743
+        },
+        {
+          "label": " eight",
+          "logit": 15.405982971191406,
+          "probability": 0.02761783078312874,
+          "token": " eight",
+          "token_id": 6589
+        }
+      ],
+      "evidence_url": "https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py",
+      "feature_id": 98,
+      "id": "authored:gemma1b:gemma1b_scope_resid:L13:sum",
+      "identity_patch_passed": true,
+      "layer": 13,
+      "measured_delta_l2": 178.93592834472656,
+      "measured_fields": [
+        "top_tokens",
+        "logit_l2"
+      ],
+      "model": "Gemma 1B",
+      "model_key": "gemma1b",
+      "model_sha256": "7aec27428b6d4425bab5e9ea7f1f855c1f2d9d0b6c65be97dfb386d4bb594ba4",
+      "note": "Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.",
+      "operators": [
+        {
+          "edited_logsumexp": 18.995277404785156,
+          "edited_top_tokens": [
+            {
+              "label": " four",
+              "logit": 18.17037582397461,
+              "probability": 0.4382784366607666,
+              "token": " four",
+              "token_id": 2390
+            },
+            {
+              "label": " five",
+              "logit": 17.710355758666992,
+              "probability": 0.27667245268821716,
+              "token": " five",
+              "token_id": 3493
+            },
+            {
+              "label": " six",
+              "logit": 16.221378326416016,
+              "probability": 0.06241820007562637,
+              "token": " six",
+              "token_id": 3962
+            },
+            {
+              "label": "space",
+              "logit": 16.008464813232422,
+              "probability": 0.050448011606931686,
+              "token": " ",
+              "token_id": 236743
+            },
+            {
+              "label": " eight",
+              "logit": 15.405982971191406,
+              "probability": 0.02761783078312874,
+              "token": " eight",
+              "token_id": 6589
+            }
+          ],
+          "feature_ids": [
+            98
+          ],
+          "label": "Remove this feature",
+          "logit_l2": 178.93592834472656,
+          "operation": "ablate",
+          "operation_parameters": {},
+          "sentence": "Removing this feature"
+        },
+        {
+          "edited_logsumexp": 18.924604415893555,
+          "edited_top_tokens": [
+            {
+              "label": " four",
+              "logit": 18.11227035522461,
+              "probability": 0.4438215494155884,
+              "token": " four",
+              "token_id": 2390
+            },
+            {
+              "label": " five",
+              "logit": 17.584537506103516,
+              "probability": 0.2618284821510315,
+              "token": " five",
+              "token_id": 3493
+            },
+            {
+              "label": " six",
+              "logit": 16.082794189453125,
+              "probability": 0.05832007899880409,
+              "token": " six",
+              "token_id": 3962
+            },
+            {
+              "label": "space",
+              "logit": 15.919507026672363,
+              "probability": 0.049533993005752563,
+              "token": " ",
+              "token_id": 236743
+            },
+            {
+              "label": " eight",
+              "logit": 15.297780990600586,
+              "probability": 0.026600586250424385,
+              "token": " eight",
+              "token_id": 6589
+            }
+          ],
+          "feature_ids": [
+            98
+          ],
+          "label": "Cut its activity in half",
+          "logit_l2": 88.59415435791016,
+          "operation": "scale",
+          "operation_parameters": {
+            "value": 0.5
+          },
+          "sentence": "Cutting this feature's activity in half"
+        },
+        {
+          "edited_logsumexp": 18.86213493347168,
+          "edited_top_tokens": [
+            {
+              "label": " four",
+              "logit": 18.06084632873535,
+              "probability": 0.4487503468990326,
+              "token": " four",
+              "token_id": 2390
+            },
+            {
+              "label": " five",
+              "logit": 17.451610565185547,
+              "probability": 0.24401533603668213,
+              "token": " five",
+              "token_id": 3493
+            },
+            {
+              "label": " six",
+              "logit": 15.960075378417969,
+              "probability": 0.05491001531481743,
+              "token": " six",
+              "token_id": 3962
+            },
+            {
+              "label": "space",
+              "logit": 15.856170654296875,
+              "probability": 0.04949101060628891,
+              "token": " ",
+              "token_id": 236743
+            },
+            {
+              "label": " eight",
+              "logit": 15.195625305175781,
+              "probability": 0.025565549731254578,
+              "token": " eight",
+              "token_id": 6589
+            }
+          ],
+          "feature_ids": [
+            98
+          ],
+          "label": "Add 1 to its activity",
+          "logit_l2": 0.47288671135902405,
+          "operation": "add",
+          "operation_parameters": {
+            "value": 1.0
+          },
+          "sentence": "Adding 1 to this feature's activity"
+        }
+      ],
+      "original_logsumexp": 18.862445831298828,
+      "original_top_tokens": [
+        {
+          "label": " four",
+          "logit": 18.061113357543945,
+          "probability": 0.4487307071685791,
+          "token": " four",
+          "token_id": 2390
+        },
+        {
+          "label": " five",
+          "logit": 17.452322006225586,
+          "probability": 0.24411310255527496,
+          "token": " five",
+          "token_id": 3493
+        },
+        {
+          "label": " six",
+          "logit": 15.960688591003418,
+          "probability": 0.05492662265896797,
+          "token": " six",
+          "token_id": 3962
+        },
+        {
+          "label": "space",
+          "logit": 15.856430053710938,
+          "probability": 0.04948846623301506,
+          "token": " ",
+          "token_id": 236743
+        },
+        {
+          "label": " eight",
+          "logit": 15.196158409118652,
+          "probability": 0.02557123452425003,
+          "token": " eight",
+          "token_id": 6589
+        }
+      ],
+      "prompt": "Two plus two equals",
+      "protocol_id": "authored_prompt.paired_topk.v1",
+      "public_text_reviewed": true,
+      "rights_reviewed": false,
+      "run_id": "effects-authored-20261021",
+      "sae": "gemma1b_scope_resid",
+      "sae_sha256": "97e478af2ba7c150c2cc144602bed081003067451c604879ab2533dca62c1468",
+      "sample_count": 1,
+      "site_id": "gemma1b:gemma1b_scope_resid:L13",
+      "source_category": "arithmetic",
+      "source_relative_path": "scripts/research_lab/measure_authored_effects.py",
+      "source_sha256": "4d812f4b5e30239543a87fedf6a6cfe1070c5c065fa6469325d2065f0808b2a1",
+      "source_type": "real_checkpoint",
+      "text_stored": true,
+      "title": "Gemma 1B · arithmetic"
+    },
+    {
+      "condition": "ablate",
+      "edited_top_tokens": [
+        {
+          "label": " cold",
+          "logit": 18.054256439208984,
+          "probability": 0.7915324568748474,
+          "token": " cold",
+          "token_id": 5412
+        },
+        {
+          "label": " not",
+          "logit": 15.612879753112793,
+          "probability": 0.06889572739601135,
+          "token": " not",
+          "token_id": 417
+        },
+        {
+          "label": " cool",
+          "logit": 14.089235305786133,
+          "probability": 0.015013499185442924,
+          "token": " cool",
+          "token_id": 4484
+        },
+        {
+          "label": " very",
+          "logit": 12.794766426086426,
+          "probability": 0.004114349838346243,
+          "token": " very",
+          "token_id": 1077
+        },
+        {
+          "label": " also",
+          "logit": 12.652801513671875,
+          "probability": 0.0035698229912668467,
+          "token": " also",
+          "token_id": 671
+        }
+      ],
+      "evidence_url": "https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py",
+      "feature_id": 14109,
+      "id": "authored:pythia410m:pythia410m_mlp_topk:L12:opposite",
+      "identity_patch_passed": true,
+      "layer": 12,
+      "measured_delta_l2": 10.435279846191406,
+      "measured_fields": [
+        "top_tokens",
+        "logit_l2"
+      ],
+      "model": "Pythia 410M",
+      "model_key": "pythia410m",
+      "model_sha256": "f7127cb94a25b63c030d2dd6b2b26c8dd7814eae34ddda2269b068066da22244",
+      "note": "Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.",
+      "operators": [
+        {
+          "edited_logsumexp": 18.288040161132812,
+          "edited_top_tokens": [
+            {
+              "label": " cold",
+              "logit": 18.054256439208984,
+              "probability": 0.7915324568748474,
+              "token": " cold",
+              "token_id": 5412
+            },
+            {
+              "label": " not",
+              "logit": 15.612879753112793,
+              "probability": 0.06889572739601135,
+              "token": " not",
+              "token_id": 417
+            },
+            {
+              "label": " cool",
+              "logit": 14.089235305786133,
+              "probability": 0.015013499185442924,
+              "token": " cool",
+              "token_id": 4484
+            },
+            {
+              "label": " very",
+              "logit": 12.794766426086426,
+              "probability": 0.004114349838346243,
+              "token": " very",
+              "token_id": 1077
+            },
+            {
+              "label": " also",
+              "logit": 12.652801513671875,
+              "probability": 0.0035698229912668467,
+              "token": " also",
+              "token_id": 671
+            }
+          ],
+          "feature_ids": [
+            14109
+          ],
+          "label": "Remove this feature",
+          "logit_l2": 10.435279846191406,
+          "operation": "ablate",
+          "operation_parameters": {},
+          "sentence": "Removing this feature"
+        },
+        {
+          "edited_logsumexp": 18.290964126586914,
+          "edited_top_tokens": [
+            {
+              "label": " cold",
+              "logit": 18.058094024658203,
+              "probability": 0.7922571301460266,
+              "token": " cold",
+              "token_id": 5412
+            },
+            {
+              "label": " not",
+              "logit": 15.621723175048828,
+              "probability": 0.06930487602949142,
+              "token": " not",
+              "token_id": 417
+            },
+            {
+              "label": " cool",
+              "logit": 14.074239730834961,
+              "probability": 0.014746882021427155,
+              "token": " cool",
+              "token_id": 4484
+            },
+            {
+              "label": " very",
+              "logit": 12.804891586303711,
+              "probability": 0.004144091624766588,
+              "token": " very",
+              "token_id": 1077
+            },
+            {
+              "label": " also",
+              "logit": 12.659719467163086,
+              "probability": 0.0035841146018356085,
+              "token": " also",
+              "token_id": 671
+            }
+          ],
+          "feature_ids": [
+            14109
+          ],
+          "label": "Cut its activity in half",
+          "logit_l2": 5.223907947540283,
+          "operation": "scale",
+          "operation_parameters": {
+            "value": 0.5
+          },
+          "sentence": "Cutting this feature's activity in half"
+        },
+        {
+          "edited_logsumexp": 18.28569793701172,
+          "edited_top_tokens": [
+            {
+              "label": " cold",
+              "logit": 18.05429458618164,
+              "probability": 0.7934186458587646,
+              "token": " cold",
+              "token_id": 5412
+            },
+            {
+              "label": " not",
+              "logit": 15.641644477844238,
+              "probability": 0.0710725337266922,
+              "token": " not",
+              "token_id": 417
+            },
+            {
+              "label": " cool",
+              "logit": 14.00709056854248,
+              "probability": 0.013861940242350101,
+              "token": " cool",
+              "token_id": 4484
+            },
+            {
+              "label": " very",
+              "logit": 12.819357872009277,
+              "probability": 0.004226669203490019,
+              "token": " very",
+              "token_id": 1077
+            },
+            {
+              "label": " the",
+              "logit": 12.710838317871094,
+              "probability": 0.003792004194110632,
+              "token": " the",
+              "token_id": 253
+            }
+          ],
+          "feature_ids": [
+            14109
+          ],
+          "label": "Add 1 to its activity",
+          "logit_l2": 14.158798217773438,
+          "operation": "add",
+          "operation_parameters": {
+            "value": 1.0
+          },
+          "sentence": "Adding 1 to this feature's activity"
+        }
+      ],
+      "original_logsumexp": 18.292362213134766,
+      "original_top_tokens": [
+        {
+          "label": " cold",
+          "logit": 18.060260772705078,
+          "probability": 0.7928658127784729,
+          "token": " cold",
+          "token_id": 5412
+        },
+        {
+          "label": " not",
+          "logit": 15.629169464111328,
+          "probability": 0.06972526013851166,
+          "token": " not",
+          "token_id": 417
+        },
+        {
+          "label": " cool",
+          "logit": 14.05789566040039,
+          "probability": 0.014487538486719131,
+          "token": " cool",
+          "token_id": 4484
+        },
+        {
+          "label": " very",
+          "logit": 12.812265396118164,
+          "probability": 0.004168926738202572,
+          "token": " very",
+          "token_id": 1077
+        },
+        {
+          "label": " the",
+          "logit": 12.673973083496094,
+          "probability": 0.0036304849199950695,
+          "token": " the",
+          "token_id": 253
+        }
+      ],
+      "prompt": "The opposite of hot is",
+      "protocol_id": "authored_prompt.paired_topk.v1",
+      "public_text_reviewed": true,
+      "rights_reviewed": false,
+      "run_id": "effects-authored-20261021",
+      "sae": "pythia410m_mlp_topk",
+      "sae_sha256": "0792d98e4129cadcd2481ccd3c11109d9ecde46cde2e7f0da597ea2cc4b0f6a8",
+      "sample_count": 1,
+      "site_id": "pythia410m:pythia410m_mlp_topk:L12",
+      "source_category": "opposite",
+      "source_relative_path": "scripts/research_lab/measure_authored_effects.py",
+      "source_sha256": "4d812f4b5e30239543a87fedf6a6cfe1070c5c065fa6469325d2065f0808b2a1",
+      "source_type": "real_checkpoint",
+      "text_stored": true,
+      "title": "Pythia 410M · opposite"
+    },
+    {
+      "condition": "ablate",
+      "edited_top_tokens": [
+        {
+          "label": " the",
+          "logit": 14.030407905578613,
+          "probability": 0.08855893462896347,
+          "token": " the",
+          "token_id": 253
+        },
+        {
+          "label": " a",
+          "logit": 13.78176498413086,
+          "probability": 0.06906342506408691,
+          "token": " a",
+          "token_id": 247
+        },
+        {
+          "label": " also",
+          "logit": 13.45506763458252,
+          "probability": 0.0498155914247036,
+          "token": " also",
+          "token_id": 671
+        },
+        {
+          "label": " located",
+          "logit": 13.055927276611328,
+          "probability": 0.0334211029112339,
+          "token": " located",
+          "token_id": 4441
+        },
+        {
+          "label": " in",
+          "logit": 13.037212371826172,
+          "probability": 0.03280144929885864,
+          "token": " in",
+          "token_id": 275
+        }
+      ],
+      "evidence_url": "https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py",
+      "feature_id": 50616,
+      "id": "authored:pythia410m:pythia410m_mlp_topk:L12:capital",
+      "identity_patch_passed": true,
+      "layer": 12,
+      "measured_delta_l2": 4.493411064147949,
+      "measured_fields": [
+        "top_tokens",
+        "logit_l2"
+      ],
+      "model": "Pythia 410M",
+      "model_key": "pythia410m",
+      "model_sha256": "f7127cb94a25b63c030d2dd6b2b26c8dd7814eae34ddda2269b068066da22244",
+      "note": "Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.",
+      "operators": [
+        {
+          "edited_logsumexp": 16.45449447631836,
+          "edited_top_tokens": [
+            {
+              "label": " the",
+              "logit": 14.030407905578613,
+              "probability": 0.08855893462896347,
+              "token": " the",
+              "token_id": 253
+            },
+            {
+              "label": " a",
+              "logit": 13.78176498413086,
+              "probability": 0.06906342506408691,
+              "token": " a",
+              "token_id": 247
+            },
+            {
+              "label": " also",
+              "logit": 13.45506763458252,
+              "probability": 0.0498155914247036,
+              "token": " also",
+              "token_id": 671
+            },
+            {
+              "label": " located",
+              "logit": 13.055927276611328,
+              "probability": 0.0334211029112339,
+              "token": " located",
+              "token_id": 4441
+            },
+            {
+              "label": " in",
+              "logit": 13.037212371826172,
+              "probability": 0.03280144929885864,
+              "token": " in",
+              "token_id": 275
+            }
+          ],
+          "feature_ids": [
+            50616
+          ],
+          "label": "Remove this feature",
+          "logit_l2": 4.493411064147949,
+          "operation": "ablate",
+          "operation_parameters": {},
+          "sentence": "Removing this feature"
+        },
+        {
+          "edited_logsumexp": 16.45630645751953,
+          "edited_top_tokens": [
+            {
+              "label": " the",
+              "logit": 14.038619995117188,
+              "probability": 0.08912751078605652,
+              "token": " the",
+              "token_id": 253
+            },
+            {
+              "label": " a",
+              "logit": 13.778165817260742,
+              "probability": 0.0686907023191452,
+              "token": " a",
+              "token_id": 247
+            },
+            {
+              "label": " also",
+              "logit": 13.4434814453125,
+              "probability": 0.049152594059705734,
+              "token": " also",
+              "token_id": 671
+            },
+            {
+              "label": " located",
+              "logit": 13.043850898742676,
+              "probability": 0.03296013921499252,
+              "token": " located",
+              "token_id": 4441
+            },
+            {
+              "label": " in",
+              "logit": 13.031229972839355,
+              "probability": 0.032546769827604294,
+              "token": " in",
+              "token_id": 275
+            }
+          ],
+          "feature_ids": [
+            50616
+          ],
+          "label": "Cut its activity in half",
+          "logit_l2": 2.2444944381713867,
+          "operation": "scale",
+          "operation_parameters": {
+            "value": 0.5
+          },
+          "sentence": "Cutting this feature's activity in half"
+        },
+        {
+          "edited_logsumexp": 16.47062110900879,
+          "edited_top_tokens": [
+            {
+              "label": " the",
+              "logit": 14.090752601623535,
+              "probability": 0.09256281703710556,
+              "token": " the",
+              "token_id": 253
+            },
+            {
+              "label": " a",
+              "logit": 13.756302833557129,
+              "probability": 0.06625015288591385,
+              "token": " a",
+              "token_id": 247
+            },
+            {
+              "label": " also",
+              "logit": 13.376730918884277,
+              "probability": 0.04532532021403313,
+              "token": " also",
+              "token_id": 671
+            },
+            {
+              "label": " in",
+              "logit": 13.004315376281738,
+              "probability": 0.03123222291469574,
+              "token": " in",
+              "token_id": 275
+            },
+            {
+              "label": " located",
+              "logit": 12.980083465576172,
+              "probability": 0.030484501272439957,
+              "token": " located",
+              "token_id": 4441
+            }
+          ],
+          "feature_ids": [
+            50616
+          ],
+          "label": "Add 1 to its activity",
+          "logit_l2": 10.418188095092773,
+          "operation": "add",
+          "operation_parameters": {
+            "value": 1.0
+          },
+          "sentence": "Adding 1 to this feature's activity"
+        }
+      ],
+      "original_logsumexp": 16.458383560180664,
+      "original_top_tokens": [
+        {
+          "label": " the",
+          "logit": 14.047170639038086,
+          "probability": 0.0897064208984375,
+          "token": " the",
+          "token_id": 253
+        },
+        {
+          "label": " a",
+          "logit": 13.774544715881348,
+          "probability": 0.06830044835805893,
+          "token": " a",
+          "token_id": 247
+        },
+        {
+          "label": " also",
+          "logit": 13.432001113891602,
+          "probability": 0.0484907403588295,
+          "token": " also",
+          "token_id": 671
+        },
+        {
+          "label": " located",
+          "logit": 13.032064437866211,
+          "probability": 0.03250637277960777,
+          "token": " located",
+          "token_id": 4441
+        },
+        {
+          "label": " in",
+          "logit": 13.025716781616211,
+          "probability": 0.032300688326358795,
+          "token": " in",
+          "token_id": 275
+        }
+      ],
+      "prompt": "The capital of France is",
+      "protocol_id": "authored_prompt.paired_topk.v1",
+      "public_text_reviewed": true,
+      "rights_reviewed": false,
+      "run_id": "effects-authored-20261021",
+      "sae": "pythia410m_mlp_topk",
+      "sae_sha256": "0792d98e4129cadcd2481ccd3c11109d9ecde46cde2e7f0da597ea2cc4b0f6a8",
+      "sample_count": 1,
+      "site_id": "pythia410m:pythia410m_mlp_topk:L12",
+      "source_category": "place name",
+      "source_relative_path": "scripts/research_lab/measure_authored_effects.py",
+      "source_sha256": "4d812f4b5e30239543a87fedf6a6cfe1070c5c065fa6469325d2065f0808b2a1",
+      "source_type": "real_checkpoint",
+      "text_stored": true,
+      "title": "Pythia 410M · place name"
+    },
+    {
+      "condition": "ablate",
+      "edited_top_tokens": [
+        {
+          "label": " \"",
+          "logit": 13.675004959106445,
+          "probability": 0.10191324353218079,
+          "token": " \"",
+          "token_id": 346
+        },
+        {
+          "label": " cat",
+          "logit": 13.386409759521484,
+          "probability": 0.076365165412426,
+          "token": " cat",
+          "token_id": 5798
+        },
+        {
+          "label": " “",
+          "logit": 13.296860694885254,
+          "probability": 0.06982399523258209,
+          "token": " “",
+          "token_id": 773
+        },
+        {
+          "label": " k",
+          "logit": 13.068771362304688,
+          "probability": 0.05558360740542412,
+          "token": " k",
+          "token_id": 465
+        },
+        {
+          "label": " '",
+          "logit": 12.357992172241211,
+          "probability": 0.027306070551276207,
+          "token": " '",
+          "token_id": 686
+        }
+      ],
+      "evidence_url": "https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py",
+      "feature_id": 8039,
+      "id": "authored:pythia410m:pythia410m_mlp_topk:L12:animal",
+      "identity_patch_passed": true,
+      "layer": 12,
+      "measured_delta_l2": 6.860777854919434,
+      "measured_fields": [
+        "top_tokens",
+        "logit_l2"
+      ],
+      "model": "Pythia 410M",
+      "model_key": "pythia410m",
+      "model_sha256": "f7127cb94a25b63c030d2dd6b2b26c8dd7814eae34ddda2269b068066da22244",
+      "note": "Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.",
+      "operators": [
+        {
+          "edited_logsumexp": 15.958638191223145,
+          "edited_top_tokens": [
+            {
+              "label": " \"",
+              "logit": 13.675004959106445,
+              "probability": 0.10191324353218079,
+              "token": " \"",
+              "token_id": 346
+            },
+            {
+              "label": " cat",
+              "logit": 13.386409759521484,
+              "probability": 0.076365165412426,
+              "token": " cat",
+              "token_id": 5798
+            },
+            {
+              "label": " “",
+              "logit": 13.296860694885254,
+              "probability": 0.06982399523258209,
+              "token": " “",
+              "token_id": 773
+            },
+            {
+              "label": " k",
+              "logit": 13.068771362304688,
+              "probability": 0.05558360740542412,
+              "token": " k",
+              "token_id": 465
+            },
+            {
+              "label": " '",
+              "logit": 12.357992172241211,
+              "probability": 0.027306070551276207,
+              "token": " '",
+              "token_id": 686
+            }
+          ],
+          "feature_ids": [
+            8039
+          ],
+          "label": "Remove this feature",
+          "logit_l2": 6.860777854919434,
+          "operation": "ablate",
+          "operation_parameters": {},
+          "sentence": "Removing this feature"
+        },
+        {
+          "edited_logsumexp": 15.944440841674805,
+          "edited_top_tokens": [
+            {
+              "label": " \"",
+              "logit": 13.666635513305664,
+              "probability": 0.10250888764858246,
+              "token": " \"",
+              "token_id": 346
+            },
+            {
+              "label": " cat",
+              "logit": 13.375388145446777,
+              "probability": 0.07660804688930511,
+              "token": " cat",
+              "token_id": 5798
+            },
+            {
+              "label": " “",
+              "logit": 13.279892921447754,
+              "probability": 0.06963079422712326,
+              "token": " “",
+              "token_id": 773
+            },
+            {
+              "label": " k",
+              "logit": 13.049429893493652,
+              "probability": 0.05529839172959328,
+              "token": " k",
+              "token_id": 465
+            },
+            {
+              "label": " '",
+              "logit": 12.351130485534668,
+              "probability": 0.027507107704877853,
+              "token": " '",
+              "token_id": 686
+            }
+          ],
+          "feature_ids": [
+            8039
+          ],
+          "label": "Cut its activity in half",
+          "logit_l2": 3.417825222015381,
+          "operation": "scale",
+          "operation_parameters": {
+            "value": 0.5
+          },
+          "sentence": "Cutting this feature's activity in half"
+        },
+        {
+          "edited_logsumexp": 15.88403034210205,
+          "edited_top_tokens": [
+            {
+              "label": " \"",
+              "logit": 13.612590789794922,
+              "probability": 0.10316357016563416,
+              "token": " \"",
+              "token_id": 346
+            },
+            {
+              "label": " cat",
+              "logit": 13.33621597290039,
+              "probability": 0.07825251668691635,
+              "token": " cat",
+              "token_id": 5798
+            },
+            {
+              "label": " “",
+              "logit": 13.206056594848633,
+              "probability": 0.06870222091674805,
+              "token": " “",
+              "token_id": 773
+            },
+            {
+              "label": " k",
+              "logit": 12.962199211120605,
+              "probability": 0.05383502319455147,
+              "token": " k",
+              "token_id": 465
+            },
+            {
+              "label": " '",
+              "logit": 12.308736801147461,
+              "probability": 0.028007205575704575,
+              "token": " '",
+              "token_id": 686
+            }
+          ],
+          "feature_ids": [
+            8039
+          ],
+          "label": "Add 1 to its activity",
+          "logit_l2": 10.987921714782715,
+          "operation": "add",
+          "operation_parameters": {
+            "value": 1.0
+          },
+          "sentence": "Adding 1 to this feature's activity"
+        }
+      ],
+      "original_logsumexp": 15.930148124694824,
+      "original_top_tokens": [
+        {
+          "label": " \"",
+          "logit": 13.656423568725586,
+          "probability": 0.10292810946702957,
+          "token": " \"",
+          "token_id": 346
+        },
+        {
+          "label": " cat",
+          "logit": 13.364481925964355,
+          "probability": 0.0768679678440094,
+          "token": " cat",
+          "token_id": 5798
+        },
+        {
+          "label": " “",
+          "logit": 13.262776374816895,
+          "probability": 0.06943447887897491,
+          "token": " “",
+          "token_id": 773
+        },
+        {
+          "label": " k",
+          "logit": 13.029589653015137,
+          "probability": 0.054992496967315674,
+          "token": " k",
+          "token_id": 465
+        },
+        {
+          "label": " '",
+          "logit": 12.342663764953613,
+          "probability": 0.027667848393321037,
+          "token": " '",
+          "token_id": 686
+        }
+      ],
+      "prompt": "A baby cat is called a",
+      "protocol_id": "authored_prompt.paired_topk.v1",
+      "public_text_reviewed": true,
+      "rights_reviewed": false,
+      "run_id": "effects-authored-20261021",
+      "sae": "pythia410m_mlp_topk",
+      "sae_sha256": "0792d98e4129cadcd2481ccd3c11109d9ecde46cde2e7f0da597ea2cc4b0f6a8",
+      "sample_count": 1,
+      "site_id": "pythia410m:pythia410m_mlp_topk:L12",
+      "source_category": "animal name",
+      "source_relative_path": "scripts/research_lab/measure_authored_effects.py",
+      "source_sha256": "4d812f4b5e30239543a87fedf6a6cfe1070c5c065fa6469325d2065f0808b2a1",
+      "source_type": "real_checkpoint",
+      "text_stored": true,
+      "title": "Pythia 410M · animal name"
+    },
+    {
+      "condition": "ablate",
+      "evidence_url": "https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py",
+      "feature_id": 3748,
+      "id": "authored:pythia410m:pythia410m_mlp_topk:L12:sky",
+      "identity_patch_passed": true,
+      "layer": 12,
+      "measured_delta_l2": 4.398275375366211,
+      "measured_fields": [
+        "top_tokens",
+        "logit_l2"
+      ],
+      "model": "Pythia 410M",
+      "model_key": "pythia410m",
+      "model_sha256": "f7127cb94a25b63c030d2dd6b2b26c8dd7814eae34ddda2269b068066da22244",
+      "note": "Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.",
+      "operators": [
+        {
+          "edited_top_tokens": [
+            {
+              "label": " the",
+              "logit": 13.848278045654297,
+              "probability": 0.05711526796221733,
+              "token": " the",
+              "token_id": 253
+            },
+            {
+              "label": " a",
+              "logit": 13.759641647338867,
+              "probability": 0.05227065458893776,
+              "token": " a",
+              "token_id": 247
+            },
+            {
+              "label": " not",
+              "logit": 13.748208045959473,
+              "probability": 0.05167641490697861,
+              "token": " not",
+              "token_id": 417
+            },
+            {
+              "label": " changing",
+              "logit": 13.445358276367188,
+              "probability": 0.03817388787865639,
+              "token": " changing",
+              "token_id": 6890
+            },
+            {
+              "label": " blue",
+              "logit": 13.28681755065918,
+              "probability": 0.03257714584469795,
+              "token": " blue",
+              "token_id": 4797
+            }
+          ],
+          "edited_logsumexp": 16.710962295532227,
+          "feature_ids": [
+            3748
+          ],
+          "label": "Remove this feature",
+          "logit_l2": 4.398275375366211,
+          "operation": "ablate",
+          "operation_parameters": {}
+        },
+        {
+          "edited_top_tokens": [
+            {
+              "label": " the",
+              "logit": 13.8406400680542,
+              "probability": 0.05704212933778763,
+              "token": " the",
+              "token_id": 253
+            },
+            {
+              "label": " a",
+              "logit": 13.753437995910645,
+              "probability": 0.05227864906191826,
+              "token": " a",
+              "token_id": 247
+            },
+            {
+              "label": " not",
+              "logit": 13.728687286376953,
+              "probability": 0.05100059509277344,
+              "token": " not",
+              "token_id": 417
+            },
+            {
+              "label": " changing",
+              "logit": 13.421874046325684,
+              "probability": 0.03752562403678894,
+              "token": " changing",
+              "token_id": 6890
+            },
+            {
+              "label": " blue",
+              "logit": 13.295821189880371,
+              "probability": 0.03308140113949776,
+              "token": " blue",
+              "token_id": 4797
+            }
+          ],
+          "edited_logsumexp": 16.704605102539062,
+          "feature_ids": [
+            3748
+          ],
+          "label": "Cut its activity in half",
+          "logit_l2": 2.1992056369781494,
+          "operation": "scale",
+          "operation_parameters": {
+            "value": 0.5
+          }
+        },
+        {
+          "edited_top_tokens": [
+            {
+              "label": " the",
+              "logit": 13.795310974121094,
+              "probability": 0.056367434561252594,
+              "token": " the",
+              "token_id": 253
+            },
+            {
+              "label": " a",
+              "logit": 13.72008228302002,
+              "probability": 0.05228256434202194,
+              "token": " a",
+              "token_id": 247
+            },
+            {
+              "label": " not",
+              "logit": 13.607784271240234,
+              "probability": 0.04672899842262268,
+              "token": " not",
+              "token_id": 417
+            },
+            {
+              "label": " blue",
+              "logit": 13.362580299377441,
+              "probability": 0.03656753897666931,
+              "token": " blue",
+              "token_id": 4797
+            },
+            {
+              "label": " changing",
+              "logit": 13.278711318969727,
+              "probability": 0.03362574428319931,
+              "token": " changing",
+              "token_id": 6890
+            }
+          ],
+          "edited_logsumexp": 16.671175003051758,
+          "feature_ids": [
+            3748
+          ],
+          "label": "Add 1 to its activity",
+          "logit_l2": 12.185722351074219,
+          "operation": "add",
+          "operation_parameters": {
+            "value": 1.0
+          }
+        }
+      ],
+      "original_logsumexp": 16.69839096069336,
+      "original_top_tokens": [
+        {
+          "label": " the",
+          "logit": 13.832921981811523,
+          "probability": 0.05695643275976181,
+          "token": " the",
+          "token_id": 253
+        },
+        {
+          "label": " a",
+          "logit": 13.747384071350098,
+          "probability": 0.05228705331683159,
+          "token": " a",
+          "token_id": 247
+        },
+        {
+          "label": " not",
+          "logit": 13.709308624267578,
+          "probability": 0.050333622843027115,
+          "token": " not",
+          "token_id": 417
+        },
+        {
+          "label": " changing",
+          "logit": 13.398465156555176,
+          "probability": 0.03688591718673706,
+          "token": " changing",
+          "token_id": 6890
+        },
+        {
+          "label": " blue",
+          "logit": 13.30483627319336,
+          "probability": 0.03358907625079155,
+          "token": " blue",
+          "token_id": 4797
+        }
+      ],
+      "edited_top_tokens": [
+        {
+          "label": " the",
+          "logit": 13.848278045654297,
+          "probability": 0.05711526796221733,
+          "token": " the",
+          "token_id": 253
+        },
+        {
+          "label": " a",
+          "logit": 13.759641647338867,
+          "probability": 0.05227065458893776,
+          "token": " a",
+          "token_id": 247
+        },
+        {
+          "label": " not",
+          "logit": 13.748208045959473,
+          "probability": 0.05167641490697861,
+          "token": " not",
+          "token_id": 417
+        },
+        {
+          "label": " changing",
+          "logit": 13.445358276367188,
+          "probability": 0.03817388787865639,
+          "token": " changing",
+          "token_id": 6890
+        },
+        {
+          "label": " blue",
+          "logit": 13.28681755065918,
+          "probability": 0.03257714584469795,
+          "token": " blue",
+          "token_id": 4797
+        }
+      ],
+      "prompt": "The color of the sky is",
+      "protocol_id": "authored_prompt.paired_topk.v1",
+      "public_text_reviewed": true,
+      "rights_reviewed": false,
+      "run_id": "effects-authored-20261021b",
+      "sae": "pythia410m_mlp_topk",
+      "sae_sha256": "0792d98e4129cadcd2481ccd3c11109d9ecde46cde2e7f0da597ea2cc4b0f6a8",
+      "sample_count": 1,
+      "site_id": "pythia410m:pythia410m_mlp_topk:L12",
+      "source_category": "color",
+      "source_relative_path": "scripts/research_lab/measure_authored_effects.py",
+      "source_sha256": "88924b50b213077a8501199113fb92b60a47595f74e8a2f0ad5fd6aeeda12fad",
+      "source_type": "real_checkpoint",
+      "text_stored": true,
+      "title": "Pythia 410M · color"
+    },
+    {
+      "condition": "ablate",
+      "evidence_url": "https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py",
+      "feature_id": 65119,
+      "id": "authored:pythia410m:pythia410m_mlp_topk:L12:story",
+      "identity_patch_passed": true,
+      "layer": 12,
+      "measured_delta_l2": 12.847159385681152,
+      "measured_fields": [
+        "top_tokens",
+        "logit_l2"
+      ],
+      "model": "Pythia 410M",
+      "model_key": "pythia410m",
+      "model_sha256": "f7127cb94a25b63c030d2dd6b2b26c8dd7814eae34ddda2269b068066da22244",
+      "note": "Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.",
+      "operators": [
+        {
+          "edited_top_tokens": [
+            {
+              "label": " time",
+              "logit": 21.505069732666016,
+              "probability": 0.9900160431861877,
+              "token": " time",
+              "token_id": 673
+            },
+            {
+              "label": " Time",
+              "logit": 14.560927391052246,
+              "probability": 0.0009546397486701608,
+              "token": " Time",
+              "token_id": 6865
+            },
+            {
+              "label": " certain",
+              "logit": 13.985770225524902,
+              "probability": 0.000537096057087183,
+              "token": " certain",
+              "token_id": 2176
+            },
+            {
+              "label": "new line",
+              "logit": 13.945987701416016,
+              "probability": 0.0005161484587006271,
+              "token": "\n",
+              "token_id": 187
+            },
+            {
+              "label": " midnight",
+              "logit": 13.727690696716309,
+              "probability": 0.00041492481250315905,
+              "token": " midnight",
+              "token_id": 21811
+            }
+          ],
+          "edited_logsumexp": 21.515104293823242,
+          "feature_ids": [
+            65119
+          ],
+          "label": "Remove this feature",
+          "logit_l2": 12.847159385681152,
+          "operation": "ablate",
+          "operation_parameters": {}
+        },
+        {
+          "edited_top_tokens": [
+            {
+              "label": " time",
+              "logit": 21.507474899291992,
+              "probability": 0.9901337027549744,
+              "token": " time",
+              "token_id": 673
+            },
+            {
+              "label": " Time",
+              "logit": 14.553705215454102,
+              "probability": 0.0009456056286580861,
+              "token": " Time",
+              "token_id": 6865
+            },
+            {
+              "label": " certain",
+              "logit": 13.95064926147461,
+              "probability": 0.0005173758254386485,
+              "token": " certain",
+              "token_id": 2176
+            },
+            {
+              "label": "new line",
+              "logit": 13.931140899658203,
+              "probability": 0.0005073805223219097,
+              "token": "\n",
+              "token_id": 187
+            },
+            {
+              "label": " midnight",
+              "logit": 13.73944091796875,
+              "probability": 0.0004188703023828566,
+              "token": " midnight",
+              "token_id": 21811
+            }
+          ],
+          "edited_logsumexp": 21.517391204833984,
+          "feature_ids": [
+            65119
+          ],
+          "label": "Cut its activity in half",
+          "logit_l2": 6.444403171539307,
+          "operation": "scale",
+          "operation_parameters": {
+            "value": 0.5
+          }
+        },
+        {
+          "edited_top_tokens": [
+            {
+              "label": " time",
+              "logit": 21.483259201049805,
+              "probability": 0.9904649257659912,
+              "token": " time",
+              "token_id": 673
+            },
+            {
+              "label": " Time",
+              "logit": 14.47040843963623,
+              "probability": 0.0008916546939872205,
+              "token": " Time",
+              "token_id": 6865
+            },
+            {
+              "label": "new line",
+              "logit": 13.823518753051758,
+              "probability": 0.00046693466720171273,
+              "token": "\n",
+              "token_id": 187
+            },
+            {
+              "label": " midnight",
+              "logit": 13.775798797607422,
+              "probability": 0.00044517579954117537,
+              "token": " midnight",
+              "token_id": 21811
+            },
+            {
+              "label": " date",
+              "logit": 13.770859718322754,
+              "probability": 0.0004429825348779559,
+              "token": " date",
+              "token_id": 3522
+            }
+          ],
+          "edited_logsumexp": 21.492839813232422,
+          "feature_ids": [
+            65119
+          ],
+          "label": "Add 1 to its activity",
+          "logit_l2": 26.820375442504883,
+          "operation": "add",
+          "operation_parameters": {
+            "value": 1.0
+          }
+        }
+      ],
+      "original_logsumexp": 21.517335891723633,
+      "original_top_tokens": [
+        {
+          "label": " time",
+          "logit": 21.507522583007812,
+          "probability": 0.9902341365814209,
+          "token": " time",
+          "token_id": 673
+        },
+        {
+          "label": " Time",
+          "logit": 14.54352855682373,
+          "probability": 0.0009360815747641027,
+          "token": " Time",
+          "token_id": 6865
+        },
+        {
+          "label": "new line",
+          "logit": 13.914398193359375,
+          "probability": 0.0004989831941202283,
+          "token": "\n",
+          "token_id": 187
+        },
+        {
+          "label": " certain",
+          "logit": 13.913458824157715,
+          "probability": 0.0004985146224498749,
+          "token": " certain",
+          "token_id": 2176
+        },
+        {
+          "label": " midnight",
+          "logit": 13.749458312988281,
+          "probability": 0.0004231101192999631,
+          "token": " midnight",
+          "token_id": 21811
+        }
+      ],
+      "edited_top_tokens": [
+        {
+          "label": " time",
+          "logit": 21.505069732666016,
+          "probability": 0.9900160431861877,
+          "token": " time",
+          "token_id": 673
+        },
+        {
+          "label": " Time",
+          "logit": 14.560927391052246,
+          "probability": 0.0009546397486701608,
+          "token": " Time",
+          "token_id": 6865
+        },
+        {
+          "label": " certain",
+          "logit": 13.985770225524902,
+          "probability": 0.000537096057087183,
+          "token": " certain",
+          "token_id": 2176
+        },
+        {
+          "label": "new line",
+          "logit": 13.945987701416016,
+          "probability": 0.0005161484587006271,
+          "token": "\n",
+          "token_id": 187
+        },
+        {
+          "label": " midnight",
+          "logit": 13.727690696716309,
+          "probability": 0.00041492481250315905,
+          "token": " midnight",
+          "token_id": 21811
+        }
+      ],
+      "prompt": "Once upon a",
+      "protocol_id": "authored_prompt.paired_topk.v1",
+      "public_text_reviewed": true,
+      "rights_reviewed": false,
+      "run_id": "effects-authored-20261021b",
+      "sae": "pythia410m_mlp_topk",
+      "sae_sha256": "0792d98e4129cadcd2481ccd3c11109d9ecde46cde2e7f0da597ea2cc4b0f6a8",
+      "sample_count": 1,
+      "site_id": "pythia410m:pythia410m_mlp_topk:L12",
+      "source_category": "story opening",
+      "source_relative_path": "scripts/research_lab/measure_authored_effects.py",
+      "source_sha256": "88924b50b213077a8501199113fb92b60a47595f74e8a2f0ad5fd6aeeda12fad",
+      "source_type": "real_checkpoint",
+      "text_stored": true,
+      "title": "Pythia 410M · story opening"
+    },
+    {
+      "condition": "ablate",
+      "evidence_url": "https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py",
+      "feature_id": 203,
+      "id": "authored:gemma1b:gemma1b_scope_resid:L13:sky",
+      "identity_patch_passed": true,
+      "layer": 13,
+      "measured_delta_l2": 762.7740478515625,
+      "measured_fields": [
+        "top_tokens",
+        "logit_l2"
+      ],
+      "model": "Gemma 1B",
+      "model_key": "gemma1b",
+      "model_sha256": "7aec27428b6d4425bab5e9ea7f1f855c1f2d9d0b6c65be97dfb386d4bb594ba4",
+      "note": "Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.",
+      "operators": [
+        {
+          "edited_top_tokens": [
+            {
+              "label": " blue",
+              "logit": 15.756978034973145,
+              "probability": 0.13090753555297852,
+              "token": " blue",
+              "token_id": 3730
+            },
+            {
+              "label": " the",
+              "logit": 15.443142890930176,
+              "probability": 0.0956462100148201,
+              "token": " the",
+              "token_id": 506
+            },
+            {
+              "label": " a",
+              "logit": 15.061936378479004,
+              "probability": 0.0653298869729042,
+              "token": " a",
+              "token_id": 496
+            },
+            {
+              "label": " different",
+              "logit": 14.455266952514648,
+              "probability": 0.035615473985672,
+              "token": " different",
+              "token_id": 1607
+            },
+            {
+              "label": "<start_of_image>",
+              "logit": 14.354450225830078,
+              "probability": 0.03219990059733391,
+              "token": "<start_of_image>",
+              "token_id": 255999
+            }
+          ],
+          "edited_logsumexp": 17.79024314880371,
+          "feature_ids": [
+            203
+          ],
+          "label": "Remove this feature",
+          "logit_l2": 762.7740478515625,
+          "operation": "ablate",
+          "operation_parameters": {}
+        },
+        {
+          "edited_top_tokens": [
+            {
+              "label": " blue",
+              "logit": 17.3645076751709,
+              "probability": 0.13413821160793304,
+              "token": " blue",
+              "token_id": 3730
+            },
+            {
+              "label": " the",
+              "logit": 17.083398818969727,
+              "probability": 0.10126712918281555,
+              "token": " the",
+              "token_id": 506
+            },
+            {
+              "label": " a",
+              "logit": 17.042743682861328,
+              "probability": 0.09723266214132309,
+              "token": " a",
+              "token_id": 496
+            },
+            {
+              "label": " changing",
+              "logit": 16.487548828125,
+              "probability": 0.055807698518037796,
+              "token": " changing",
+              "token_id": 9199
+            },
+            {
+              "label": " not",
+              "logit": 16.19700813293457,
+              "probability": 0.04173629358410835,
+              "token": " not",
+              "token_id": 711
+            }
+          ],
+          "edited_logsumexp": 19.37339210510254,
+          "feature_ids": [
+            203
+          ],
+          "label": "Cut its activity in half",
+          "logit_l2": 238.59608459472656,
+          "operation": "scale",
+          "operation_parameters": {
+            "value": 0.5
+          }
+        },
+        {
+          "edited_top_tokens": [
+            {
+              "label": " blue",
+              "logit": 17.935523986816406,
+              "probability": 0.11615730077028275,
+              "token": " blue",
+              "token_id": 3730
+            },
+            {
+              "label": " a",
+              "logit": 17.776525497436523,
+              "probability": 0.09908190369606018,
+              "token": " a",
+              "token_id": 496
+            },
+            {
+              "label": " the",
+              "logit": 17.701446533203125,
+              "probability": 0.09191533178091049,
+              "token": " the",
+              "token_id": 506
+            },
+            {
+              "label": " changing",
+              "logit": 17.36573028564453,
+              "probability": 0.06570345163345337,
+              "token": " changing",
+              "token_id": 9199
+            },
+            {
+              "label": " not",
+              "logit": 17.116573333740234,
+              "probability": 0.051213063299655914,
+              "token": " not",
+              "token_id": 711
+            }
+          ],
+          "edited_logsumexp": 20.088335037231445,
+          "feature_ids": [
+            203
+          ],
+          "label": "Add 1 to its activity",
+          "logit_l2": 0.39148375391960144,
+          "operation": "add",
+          "operation_parameters": {
+            "value": 1.0
+          }
+        }
+      ],
+      "original_logsumexp": 20.087371826171875,
+      "original_top_tokens": [
+        {
+          "label": " blue",
+          "logit": 17.934829711914062,
+          "probability": 0.11618854105472565,
+          "token": " blue",
+          "token_id": 3730
+        },
+        {
+          "label": " a",
+          "logit": 17.775611877441406,
+          "probability": 0.09908681362867355,
+          "token": " a",
+          "token_id": 496
+        },
+        {
+          "label": " the",
+          "logit": 17.700712203979492,
+          "probability": 0.0919363722205162,
+          "token": " the",
+          "token_id": 506
+        },
+        {
+          "label": " changing",
+          "logit": 17.36459732055664,
+          "probability": 0.06569229811429977,
+          "token": " changing",
+          "token_id": 9199
+        },
+        {
+          "label": " not",
+          "logit": 17.115318298339844,
+          "probability": 0.051198117434978485,
+          "token": " not",
+          "token_id": 711
+        }
+      ],
+      "edited_top_tokens": [
+        {
+          "label": " blue",
+          "logit": 15.756978034973145,
+          "probability": 0.13090753555297852,
+          "token": " blue",
+          "token_id": 3730
+        },
+        {
+          "label": " the",
+          "logit": 15.443142890930176,
+          "probability": 0.0956462100148201,
+          "token": " the",
+          "token_id": 506
+        },
+        {
+          "label": " a",
+          "logit": 15.061936378479004,
+          "probability": 0.0653298869729042,
+          "token": " a",
+          "token_id": 496
+        },
+        {
+          "label": " different",
+          "logit": 14.455266952514648,
+          "probability": 0.035615473985672,
+          "token": " different",
+          "token_id": 1607
+        },
+        {
+          "label": "<start_of_image>",
+          "logit": 14.354450225830078,
+          "probability": 0.03219990059733391,
+          "token": "<start_of_image>",
+          "token_id": 255999
+        }
+      ],
+      "prompt": "The color of the sky is",
+      "protocol_id": "authored_prompt.paired_topk.v1",
+      "public_text_reviewed": true,
+      "rights_reviewed": false,
+      "run_id": "effects-authored-20261021b",
+      "sae": "gemma1b_scope_resid",
+      "sae_sha256": "97e478af2ba7c150c2cc144602bed081003067451c604879ab2533dca62c1468",
+      "sample_count": 1,
+      "site_id": "gemma1b:gemma1b_scope_resid:L13",
+      "source_category": "color",
+      "source_relative_path": "scripts/research_lab/measure_authored_effects.py",
+      "source_sha256": "88924b50b213077a8501199113fb92b60a47595f74e8a2f0ad5fd6aeeda12fad",
+      "source_type": "real_checkpoint",
+      "text_stored": true,
+      "title": "Gemma 1B · color"
+    },
+    {
+      "condition": "ablate",
+      "evidence_url": "https://github.com/OpenSAE/SAEBase/blob/work-plan-06-real-evidence/scripts/research_lab/measure_authored_effects.py",
+      "feature_id": 358,
+      "id": "authored:gemma1b:gemma1b_scope_resid:L13:story",
+      "identity_patch_passed": true,
+      "layer": 13,
+      "measured_delta_l2": 362.5037841796875,
+      "measured_fields": [
+        "top_tokens",
+        "logit_l2"
+      ],
+      "model": "Gemma 1B",
+      "model_key": "gemma1b",
+      "model_sha256": "7aec27428b6d4425bab5e9ea7f1f855c1f2d9d0b6c65be97dfb386d4bb594ba4",
+      "note": "Next-word chances come from a full-vocabulary softmax at the last token. A larger score shift does not mean a better answer.",
+      "operators": [
+        {
+          "edited_top_tokens": [
+            {
+              "label": " time",
+              "logit": 21.85265350341797,
+              "probability": 0.9837338924407959,
+              "token": " time",
+              "token_id": 990
+            },
+            {
+              "label": " midnight",
+              "logit": 15.498252868652344,
+              "probability": 0.0017107892781496048,
+              "token": " midnight",
+              "token_id": 38735
+            },
+            {
+              "label": " year",
+              "logit": 15.021623611450195,
+              "probability": 0.001062182243913412,
+              "token": " year",
+              "token_id": 1051
+            },
+            {
+              "label": " night",
+              "logit": 15.000908851623535,
+              "probability": 0.0010404058266431093,
+              "token": " night",
+              "token_id": 3446
+            },
+            {
+              "label": " Christmas",
+              "logit": 14.62350845336914,
+              "probability": 0.0007133453618735075,
+              "token": " Christmas",
+              "token_id": 8226
+            }
+          ],
+          "edited_logsumexp": 21.86905288696289,
+          "feature_ids": [
+            358
+          ],
+          "label": "Remove this feature",
+          "logit_l2": 362.5037841796875,
+          "operation": "ablate",
+          "operation_parameters": {}
+        },
+        {
+          "edited_top_tokens": [
+            {
+              "label": " time",
+              "logit": 22.301786422729492,
+              "probability": 0.9862862229347229,
+              "token": " time",
+              "token_id": 990
+            },
+            {
+              "label": " midnight",
+              "logit": 15.790290832519531,
+              "probability": 0.0014658730942755938,
+              "token": " midnight",
+              "token_id": 38735
+            },
+            {
+              "label": " night",
+              "logit": 15.135991096496582,
+              "probability": 0.0007619695388711989,
+              "token": " night",
+              "token_id": 3446
+            },
+            {
+              "label": " long",
+              "logit": 14.8054780960083,
+              "probability": 0.000547517032828182,
+              "token": " long",
+              "token_id": 1440
+            },
+            {
+              "label": " year",
+              "logit": 14.781208038330078,
+              "probability": 0.0005343887023627758,
+              "token": " year",
+              "token_id": 1051
+            }
+          ],
+          "edited_logsumexp": 22.315595626831055,
+          "feature_ids": [
+            358
+          ],
+          "label": "Cut its activity in half",
+          "logit_l2": 152.11383056640625,
+          "operation": "scale",
+          "operation_parameters": {
+            "value": 0.5
+          }
+        },
+        {
+          "edited_top_tokens": [
+            {
+              "label": " time",
+              "logit": 22.62386703491211,
+              "probability": 0.9882366061210632,
+              "token": " time",
+              "token_id": 990
+            },
+            {
+              "label": " midnight",
+              "logit": 15.778844833374023,
+              "probability": 0.0010522175580263138,
+              "token": " midnight",
+              "token_id": 38735
+            },
+            {
+              "label": " night",
+              "logit": 15.154115676879883,
+              "probability": 0.0005633640685118735,
+              "token": " night",
+              "token_id": 3446
+            },
+            {
+              "label": " long",
+              "logit": 15.066011428833008,
+              "probability": 0.0005158529966138303,
+              "token": " long",
+              "token_id": 1440
+            },
+            {
+              "label": " winter",
+              "logit": 14.919401168823242,
+              "probability": 0.0004455063899513334,
+              "token": " winter",
+              "token_id": 7208
+            }
+          ],
+          "edited_logsumexp": 22.635700225830078,
+          "feature_ids": [
+            358
+          ],
+          "label": "Add 1 to its activity",
+          "logit_l2": 0.5060277581214905,
+          "operation": "add",
+          "operation_parameters": {
+            "value": 1.0
+          }
+        }
+      ],
+      "original_logsumexp": 22.634567260742188,
+      "original_top_tokens": [
+        {
+          "label": " time",
+          "logit": 22.622726440429688,
+          "probability": 0.9882297515869141,
+          "token": " time",
+          "token_id": 990
+        },
+        {
+          "label": " midnight",
+          "logit": 15.779151916503906,
+          "probability": 0.0010537346825003624,
+          "token": " midnight",
+          "token_id": 38735
+        },
+        {
+          "label": " night",
+          "logit": 15.153964042663574,
+          "probability": 0.0005639175651594996,
+          "token": " night",
+          "token_id": 3446
+        },
+        {
+          "label": " long",
+          "logit": 15.065234184265137,
+          "probability": 0.000516036874614656,
+          "token": " long",
+          "token_id": 1440
+        },
+        {
+          "label": " winter",
+          "logit": 14.918563842773438,
+          "probability": 0.00044563840492628515,
+          "token": " winter",
+          "token_id": 7208
+        }
+      ],
+      "edited_top_tokens": [
+        {
+          "label": " time",
+          "logit": 21.85265350341797,
+          "probability": 0.9837338924407959,
+          "token": " time",
+          "token_id": 990
+        },
+        {
+          "label": " midnight",
+          "logit": 15.498252868652344,
+          "probability": 0.0017107892781496048,
+          "token": " midnight",
+          "token_id": 38735
+        },
+        {
+          "label": " year",
+          "logit": 15.021623611450195,
+          "probability": 0.001062182243913412,
+          "token": " year",
+          "token_id": 1051
+        },
+        {
+          "label": " night",
+          "logit": 15.000908851623535,
+          "probability": 0.0010404058266431093,
+          "token": " night",
+          "token_id": 3446
+        },
+        {
+          "label": " Christmas",
+          "logit": 14.62350845336914,
+          "probability": 0.0007133453618735075,
+          "token": " Christmas",
+          "token_id": 8226
+        }
+      ],
+      "prompt": "Once upon a",
+      "protocol_id": "authored_prompt.paired_topk.v1",
+      "public_text_reviewed": true,
+      "rights_reviewed": false,
+      "run_id": "effects-authored-20261021b",
+      "sae": "gemma1b_scope_resid",
+      "sae_sha256": "97e478af2ba7c150c2cc144602bed081003067451c604879ab2533dca62c1468",
+      "sample_count": 1,
+      "site_id": "gemma1b:gemma1b_scope_resid:L13",
+      "source_category": "story opening",
+      "source_relative_path": "scripts/research_lab/measure_authored_effects.py",
+      "source_sha256": "88924b50b213077a8501199113fb92b60a47595f74e8a2f0ad5fd6aeeda12fad",
+      "source_type": "real_checkpoint",
+      "text_stored": true,
+      "title": "Gemma 1B · story opening"
+    }
+  ],
+  "protocol_id": "authored_prompt.paired_topk.v1",
+  "run_id": "effects-authored-20261021",
+  "separate_from": "GPU-04 paired logit L2 records",
+  "prompt_site_pairs": 12
+}

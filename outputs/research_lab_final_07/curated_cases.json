@@ -1,0 +1,10 @@
+{
+  "note": "Selected examples for the first screen. Not a sample of every feature.",
+  "cases": [
+    {"id": "authored:gemma1b:gemma1b_scope_resid:L13:capital", "name": "A factual question", "prompt": "The capital of France is", "why": "Removing the strongest feature changes the top next token from \" a\" to \" Paris\"."},
+    {"id": "authored:gemma1b:gemma1b_scope_resid:L13:sky", "name": "A color question", "prompt": "The color of the sky is", "why": "Top token stays \" blue\" and its chance rises by about 1.5 percentage points."},
+    {"id": "authored:gemma1b:gemma1b_scope_resid:L13:sum", "name": "An arithmetic question", "prompt": "Two plus two equals", "why": "Top token stays \" four\". Kept as the small-change example, not the landing case."},
+    {"id": "authored:gemma1b:gemma1b_scope_resid:L13:animal", "name": "Name the animal", "prompt": "A baby cat is called a", "why": "Top token stays \" kitten\"."},
+    {"id": "authored:pythia410m:pythia410m_mlp_topk:L12:story", "name": "A story opening", "prompt": "Once upon a", "why": "Second model. Top token stays \" time\" and the change is under one percentage point."}
+  ]
+}

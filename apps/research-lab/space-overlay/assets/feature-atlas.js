@@ -52,6 +52,8 @@
   function updateSelectedExample(){
     if(!active)return;
     const ex=active.examples[activeExample];
+    const linked=(window.OPENSAEEffectLinks||[]).some(row=>row.site_id===ex.site_id && Number(row.feature_id)===Number(active.feature_id) && row.prompt_sha256===ex.prompt_sha256);
+    $('atlasTryEdit').textContent=linked?'Explore this intervention →':'Browse measured effects →';
     $('atlasMainEffect').replaceChildren();$('atlasMainEffect').append(document.createTextNode(fmt(ex.delta_logit_l2)),el('small',null,' L2'));
     document.querySelectorAll('.atlas-prompt-card').forEach((n,i)=>n.classList.toggle('active',i===activeExample));
     const bars=$('atlasEffectBars');bars.replaceChildren();

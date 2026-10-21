@@ -97,7 +97,8 @@ def test_bundle_contracts():
     lab_js = (LAB / "assets" / "lab.js").read_text(encoding="utf-8")
     page = (LAB / "index.html").read_text(encoding="utf-8")
     assert "unavailable" not in lab_js
-    assert "What happens when we change a model feature?" in page
+    assert "What changes when we remove a model feature?" in page
+    assert "Remove this feature" in page
     for banned in ("Selected logit L2", "Feature IDs", "Recorded prompts 1", "gpu04.paired_operator_logit_l2.v1", "The prompt text is not in the public record"):
         assert banned not in page
         assert banned not in lab_js
