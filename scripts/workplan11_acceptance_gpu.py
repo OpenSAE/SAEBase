@@ -184,11 +184,64 @@ def kv(steps: int) -> None:
     finally:
         decoder.close()
     synchronize()
+    parity_time = time.perf_counter() - start
+
+    from saebase.api import ActivationSite, capture_features
+    from saebase.interventions.operators import apply_condition
+    from saebase.interventions.specs import Condition
+    condition = Condition("ablate", "ablate", (185,))
+    token = int(ids[0, -1])
+    full_times = []
+    kv_times = []
+    for mode in ("full-prefix", "clean-kv"):
+        for rep in range(6):
+            current = ids.detach().clone()
+            instance = None
+            if mode == "clean-kv":
+                instance = CleanPrefixKVDecoder(
+                    raw, sae, layer=LAYER,
+                    hook_name=f"blocks.{LAYER}.hook_resid_post"
+                )
+                instance.start(current)
+            synchronize()
+            t0 = time.perf_counter()
+            for _ in range(steps):
+                if mode == "full-prefix":
+                    site = ActivationSite(
+                        LAYER, f"blocks.{LAYER}.hook_resid_post",
+                        current.shape[1] - 1
+                    )
+                    snap = capture_features(adapter, sae, site=site, tokens=current)
+                    patch = apply_condition(sae, snap, condition)
+                    adapter.patch_logits(
+                        tokens=current, site=site, activation=patch.activation
+                    )
+                else:
+                    instance.step(condition)
+                if mode == "clean-kv":
+                    instance.append(token)
+                else:
+                    current = torch.cat(
+                        (current, torch.tensor([[token]], device=current.device)), dim=1
+                    )
+            synchronize()
+            elapsed = time.perf_counter() - t0
+            if rep:
+                (full_times if mode == "full-prefix" else kv_times).append(elapsed)
+            if instance is not None:
+                instance.close()
+    full_median = sorted(full_times)[len(full_times) // 2]
+    kv_median = sorted(kv_times)[len(kv_times) // 2]
     persist("clean_kv_parity.json", {
-        "status": "PARITY_PASS_NOT_SPEED_PROOF", "steps": entries,
-        "elapsed_with_reference_seconds": time.perf_counter() - start,
+        "status": "PARITY_PASS",
+        "steps": entries, "elapsed_with_reference_seconds": parity_time,
+        "reference_seconds": full_times, "cached_seconds": kv_times,
+        "reference_median_seconds": full_median,
+        "cached_median_seconds": kv_median,
+        "full_prefix_over_cached": full_median / kv_median,
+        "speed_gate_pass": full_median / kv_median >= 1.15,
         "peak_allocated_bytes": torch.cuda.max_memory_allocated(),
-        "note": "Deep-copied cache fork is correctness-first, not optimized.",
+        "note": "KV fork deep-copies the clean past before edited calls; promote only after measured gain.",
     })
 
 
