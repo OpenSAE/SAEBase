@@ -239,7 +239,7 @@ Use scoped module CSS, shared typography/design tokens and predictable box sizin
 
 Current rendered string: `What we changeRemove this featureCut its activity in halfAdd 1 to its activity`.
 
-This is a failed layout. Primary flow only needs ONE large, labeled `Remove this feature` action. Optional advanced controls must be in a distinct secondary section, each button with visible spacing, hit area >= 44px, actual numeric edit value, selected state and responsive wrapping; no labels may concatenate. Add snapshot tests for long text, narrow devices and zoom.
+This is a failed layout. Primary flow needs ONE feature-attached, explicitly explained ON/OFF switch, with a clear identity and state as specified in the revised Section 2. Optional advanced controls belong in a collapsed secondary section, each with visible spacing, touch area >= 44px, actual numeric edit value, selected state and responsive wrapping; no labels may concatenate. Add snapshot tests for long text, narrow devices and zoom.
 
 ### 4.4 Shared visual language with existing Atlas
 
@@ -254,7 +254,7 @@ This is a failed layout. Primary flow only needs ONE large, labeled `Remove this
 ## 5. Information architecture: the five Labs should make sense together
 
 1. **Feature Atlas — Find a feature.** Keep existing approved experience.
-2. **Feature Effects — Change it and observe the model.** Redesigned single primary action with concrete Before/After.
+2. **Feature Effects — Identify a measured internal feature, turn its activity off, and observe the model.** One named feature, one explained ON/OFF switch, a real prediction comparison.
 3. **Context Lab — Change the input and observe the feature.** Preserve actual 64-state activation study and RSS as secondary mode.
 4. **Compare Models — Observe representation tradeoffs across layers.** Preserve true historical measurements, no universal ranking.
 5. **Research — Study interaction and redistribution.** Preserve SAR/RSS method identities.
@@ -281,7 +281,7 @@ A. **Snapshot/inventory** (Section 1) and select source of truth for current fro
 
 B. **Evidence-backed curated cases** (Sections 2–3). Produce an auditable data manifest, 3–6 quality verified first-screen cases and several real optional comparison examples. No GPU unless proven necessary.
 
-C. **Implement the simple Effects experience**. Replace clutter with one meaningful before/after, one action and a clearly described change. Hide advanced edit types and research metadata by default. Keep a consistent baseline and numeric validation.
+C. **Implement the simple Effects experience**. Replace clutter with one named and evidenced feature, an explanation of setting its local activation to zero, one attached ON/OFF switch, and one measured prediction comparison. Hide advanced edit types and research metadata by default. Keep a consistent baseline and numeric validation.
 
 D. **Unify ALL Lab modules visually** (Section 4). Extract the Atlas tokens, replace conflicting wrappers and styles, align every route and navigation state. Fix broken concatenated controls and all responsive layouts.
 
@@ -325,7 +325,7 @@ G. **Produce final report** with actual counts, visual screenshots, checksums, c
 ### 8.4 Real deployment
 
 21. Verify the deployed HF Space source revision and actual static asset fingerprint against the pushed commit; confirm not an old cached version.
-22. Open live `#effects`, `#context` and Atlas on desktop/mobile; manually execute at least three different curated cases, use restore/replay, and test every five-module navigation transition.
+22. Open live `#effects`, `#context` and Atlas on desktop/mobile; manually execute at least three curated real cases, verify the feature identity and zero-activation explanation, toggle the same feature ON/OFF in both directions, and test every five-module navigation transition.
 23. Compare measured screenshot evidence to the pre-change captured Atlas baseline. Inspect both global design coherence and the specific "concatenated controls" issue.
 24. Save final artifacts under `outputs/research_lab_final_07/`, with test report, three viewport screenshots per module, per-case source/provenance manifest, deployment revision and original/updated screenshot map.
 
@@ -339,8 +339,8 @@ If ANY gate fails, fix and rerun the test before declaring completion. Do not as
 - No private data leakage, fake behavior, or new broad GPU job.
 - `outputs/research_lab_final_07/final_report.md` containing: screenshots for 5 modules x 3 viewports, exact case counts/which were newly measured, any blocked source rights, provenance checksum report, tests, Space build fingerprint, commit SHA(s), and 24 acceptance gate PASS/FAIL lines.
 
-**The success metric is visitor understanding, not the number of plotted values or the number of interface buttons.** A code-accurate screen of "44.9% to 43.8%" with no meaningful user action and no unified layout is NOT finished.
+**The success metric is visitor understanding, not the number of plotted values or the number of interface buttons.** A code-accurate screen of "44.9% to 43.8%" with no named, evidenced feature, clear local zero-activation intervention, meaningful user action and unified layout is NOT finished.
 
 ## 10. Agent's first instruction
 
-Read this entire Work Plan 07 and execute it from Section 1 to Section 9 without splitting into further planning documents. The user's existing Feature Atlas is the design reference. Reuse recorded data first. Rebuild Feature Effects as a concrete before/after with one main action. Unify the shared shell for all Labs. Run actual browser tests, deploy, verify the public page, and leave a factual final report. No invented evidence, no broad model reruns, and no "done" until all acceptance gates pass.
+Read this entire Work Plan 07, including the REVISED Section 2, and execute it from Section 1 to Section 9 without splitting into further planning documents. The existing Feature Atlas is the design reference. Reuse recorded data first. In Feature Effects identify the exact observed SAE feature before the user can intervene, explain that its activation is set to zero for one prediction, then show one ON/OFF control and matched real before/after predictions. Delete unnecessary microcopy and labels. Unify the shared shell for all Labs. Run real browser tests, deploy, verify the public page, and leave a factual final report. No invented evidence, no broad model reruns, and no "done" until all acceptance gates pass.
