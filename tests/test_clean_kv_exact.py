@@ -3,6 +3,7 @@
 No pretrained model or external GPU package is required. Real Qwen on RTX 5070
 is the mandatory later validation, since attention kernels may alter TopK.
 """
+
 from __future__ import annotations
 
 from types import SimpleNamespace
@@ -14,7 +15,9 @@ from examples._synthetic_common import ResearchToySAE
 from models.hf_hooks_backend import HFHooksModel
 from saebase.api import ModelAdapter
 from saebase.interventions.kv_cache_exact import (
-    CleanPrefixKVDecoder, KVParityError, compare_cached_step_with_reference,
+    CleanPrefixKVDecoder,
+    KVParityError,
+    compare_cached_step_with_reference,
 )
 from saebase.interventions.specs import Condition
 
@@ -41,27 +44,28 @@ class ToyQwen3(torch.nn.Module):
         self.scale = torch.nn.Parameter(torch.tensor(1.0))
         self.calls = 0
 
-    def forward(self, input_ids: torch.Tensor, *,
-                past_key_values=None, use_cache=False,
-                cache_position=None, attention_mask=None):
+    def forward(
+        self,
+        input_ids: torch.Tensor,
+        *,
+        past_key_values=None,
+        use_cache=False,
+        cache_position=None,
+        attention_mask=None,
+    ):
         self.calls += 1
-        prior = (past_key_values.token_ids if past_key_values is not None
-                 else input_ids[:, :0])
+        prior = past_key_values.token_ids if past_key_values is not None else input_ids[:, :0]
         ids = torch.cat((prior, input_ids), dim=1)
         if cache_position is not None:
-            assert torch.equal(
-                cache_position.cpu(), torch.arange(prior.shape[1], ids.shape[1])
-            )
+            assert torch.equal(cache_position.cpu(), torch.arange(prior.shape[1], ids.shape[1]))
         if attention_mask is not None:
             assert attention_mask.shape[1] == ids.shape[1]
-        sums = ids.float().cumsum(dim=1)[:, -input_ids.shape[1]:]
+        sums = ids.float().cumsum(dim=1)[:, -input_ids.shape[1] :]
         h = sums.unsqueeze(-1).expand(-1, -1, 4).contiguous() * self.scale / 10
         for layer in self.model.layers:
             h = layer(h)
         y = torch.stack((h[..., 0], -h[..., 1], h[..., 2] + h[..., 3]), dim=-1)
-        return SimpleNamespace(
-            logits=y, past_key_values=ToyCache(ids) if use_cache else None
-        )
+        return SimpleNamespace(logits=y, past_key_values=ToyCache(ids) if use_cache else None)
 
 
 def build():
@@ -73,14 +77,16 @@ def build():
 
 def test_incremental_clean_kv_matches_full_prefix_stepwise():
     hf, adapter, sae = build()
-    decoder = CleanPrefixKVDecoder(
-        hf, sae, layer=0, hook_name="blocks.0.hook_resid_post"
-    )
+    decoder = CleanPrefixKVDecoder(hf, sae, layer=0, hook_name="blocks.0.hook_resid_post")
     decoder.start(torch.tensor([[1, 2, 3]], dtype=torch.long))
     for next_id in (4, 5, 6, 7):
         row = compare_cached_step_with_reference(
-            decoder, adapter, sae, Condition("ablate", "ablate", (0,)),
-            atol=1e-5, rtol=1e-4,
+            decoder,
+            adapter,
+            sae,
+            Condition("ablate", "ablate", (0,)),
+            atol=1e-5,
+            rtol=1e-4,
         )
         assert row["pass"] and row["feature_flips"] == 0
         decoder.append(next_id)
@@ -89,9 +95,7 @@ def test_incremental_clean_kv_matches_full_prefix_stepwise():
 
 def test_incremental_identity_and_scale_stay_exact():
     hf, adapter, sae = build()
-    decoder = CleanPrefixKVDecoder(
-        hf, sae, layer=0, hook_name="blocks.0.hook_resid_post"
-    )
+    decoder = CleanPrefixKVDecoder(hf, sae, layer=0, hook_name="blocks.0.hook_resid_post")
     decoder.start(torch.tensor([[3]], dtype=torch.long))
     for condition, token in (
         (Condition("i", "identity"), 4),
@@ -111,9 +115,7 @@ def test_kv_refuses_unsupported_model_and_bad_sequence():
     with pytest.raises(ValueError, match="Qwen3"):
         CleanPrefixKVDecoder(hf, sae, layer=0, hook_name="blocks.0.hook_resid_post")
     hf._model.config.model_type = "qwen3"
-    decoder = CleanPrefixKVDecoder(
-        hf, sae, layer=0, hook_name="blocks.0.hook_resid_post"
-    )
+    decoder = CleanPrefixKVDecoder(hf, sae, layer=0, hook_name="blocks.0.hook_resid_post")
     with pytest.raises(RuntimeError, match="started"):
         decoder.step(Condition("i", "identity"))
     with pytest.raises(ValueError):
