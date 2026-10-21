@@ -23,6 +23,7 @@ class FastSteeringResult:
     feature_id: int
     strength: float
     baseline_token_ids: tuple[int, ...] | None = None
+    time_to_first_token_seconds: float | None = None
     protocol: str = "persistent_decoder_direction_kv_v1"
 
     @property
@@ -168,6 +169,8 @@ def generate_decoder_direction_cached(
             )
         )
     start = perf_counter()
+    first_token_time: float | None = None
+    emitted: list[int] = []
     with steer(
         model,
         spec,
@@ -175,17 +178,18 @@ def generate_decoder_direction_cached(
         position_mask=excluded,
         generated=True,
     ):
-        generated = tuple(
-            int(step.token_id)
-            for step in generate_stream(
-                model,
-                ids,
-                max_tokens=max_new_tokens,
-                temperature=float(temperature),
-                seed=seed,
-                stop_at_eos=stop_at_eos,
-            )
-        )
+        for step in generate_stream(
+            model,
+            ids,
+            max_tokens=max_new_tokens,
+            temperature=float(temperature),
+            seed=seed,
+            stop_at_eos=stop_at_eos,
+        ):
+            if first_token_time is None:
+                first_token_time = perf_counter() - start
+            emitted.append(int(step.token_id))
+    generated = tuple(emitted)
     if torch.cuda.is_available() and torch.as_tensor(vector).is_cuda:
         torch.cuda.synchronize()
     elapsed = perf_counter() - start
@@ -196,4 +200,5 @@ def generate_decoder_direction_cached(
         feature_id=feature_id,
         strength=float(strength),
         baseline_token_ids=original,
+        time_to_first_token_seconds=first_token_time,
     )
