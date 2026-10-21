@@ -7,6 +7,16 @@ Base: Work Plan 10 PR #45 (perf/wp10-execution-reuse, bc9b1fb4638a01be19756d508d
 Hardware: one RTX 5070 with approximately 12 GiB VRAM. Inspect free capacity.
 Work Plan 09 PR #44 is merged. Work Plan 10 PR #45 has 87 focused CPU tests, real GPU pilot and a green CI run at the noted SHA.
 
+## Current execution handoff — use this instead of the older broad scope
+
+The concrete Work Plan 11 implementation is now split across stacked PRs #45 -> #46 -> #47. **The current executable RTX 5070 handoff is:**
+
+https://github.com/OpenSAE/SAEBase/blob/perf/wp11-complete-kv-vllm-20261021/work_plan/11_final_gpu_validation_handoff.md
+
+It supersedes older "skip vLLM/KV" or "mark BLOCKED without implementation" suggestions. Local agent MUST implement/debug and actually execute (1) final CI lint+CPU tests, (2) 25-row × 7-condition real BatchEngine end-to-end parity and performance, (3) Qwen clean-prefix KV 8/32-step full-prefix oracle and speed, and (4) real interp-engine vLLM SAE capture, position-scoped edit and complete downstream logit/reference parity. Keep incompatible experimental backends disabled; report actual failures instead of invented speedups.
+
+At time of handoff the PR #47 Python 3.11/3.12 offline, package and analysis installation tests passed for commit 4bd66e45, while Ruff formatting failed on two edited Python files. Agent must check the latest CI rather than assume the old result persists. None of the new KV/vLLM GPU paths is yet certified. Do not alter public GPU endpoints or expand to 48 sites.
+
 ## 0. Decision: only implement performance work with real payoff
 
 The user wants SAEBase fast, correct, simple to adopt and easy to maintain. This is an implementation plan, not a proposal to build a new inference framework or a new cloud product. Code and run experiments; repair failures; return measured results. The finish condition is a well-characterized efficient implementation on **defined workloads**, not the impossible promise that nobody can optimize it further.
