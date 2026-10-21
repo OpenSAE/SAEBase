@@ -33,13 +33,14 @@ python scripts/workplan11_fast_steering_gpu.py --mode hf-live --lengths 8,32,128
 python scripts/workplan11_fast_steering_gpu.py --mode hf-reference --lengths 8,32,128
 # Existing previously validated Qwen feature-intervention throughput:
 python scripts/workplan11_acceptance_gpu.py e2e
+python scripts/workplan11_acceptance_gpu.py hf-reference
 ~~~
 
 Before vLLM tests choose a **source-verified registered SAE feature ID**, for example from the private `hf_reference_private.pt` produced by `python scripts/workplan11_acceptance_gpu.py hf-reference`; verify the value is present in the SAE and, for claimed prompt activation, its TopK support. Do NOT let scripts silently substitute 185 or some default. Export it as `FEATURE_ID`:
 
 ~~~bash
 # In the isolated interp-engine/vLLM installation:
-FEATURE_ID=<verified-SAE-feature-ID>
+FEATURE_ID="$(python -c 'import os,torch; from pathlib import Path; p=Path(os.environ["WP11_RUN"])/"hf_reference_private.pt"; print(int(torch.load(p,map_location="cpu",weights_only=True)["feature_id"]))')"
 python scripts/workplan11_fast_steering_gpu.py --mode vllm --lengths 8,32,128 --feature-id "$FEATURE_ID" --strength 2
 # New worker process, sufficient VRAM to allocate declared static taps:
 python scripts/workplan11_fast_steering_gpu.py --mode vllm-static --lengths 8,32,128 --feature-id "$FEATURE_ID" --strength 2 --utilization 0.70
