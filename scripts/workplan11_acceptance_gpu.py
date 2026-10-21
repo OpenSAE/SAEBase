@@ -210,7 +210,7 @@ def kv(steps: int) -> None:
             decoder.append(int(ids[0, -1]))
     except (KVParityError, RuntimeError, ValueError) as exc:
         persist(
-            "clean_kv_parity.json",
+            f"clean_kv_parity_{steps}.json",
             {
                 "status": "FAIL",
                 "steps_completed": len(entries),
@@ -268,7 +268,7 @@ def kv(steps: int) -> None:
     full_median = sorted(full_times)[len(full_times) // 2]
     kv_median = sorted(kv_times)[len(kv_times) // 2]
     persist(
-        "clean_kv_parity.json",
+        f"clean_kv_parity_{steps}.json",
         {
             "status": "PARITY_PASS",
             "steps": entries,
@@ -357,37 +357,37 @@ def vllm(backend: str) -> None:
             (outcome.edited_residual.float() - reference["patched"]).abs().max().item()
         )
         clean_logit_err = float(
-            (outcome.clean_logits.float() - reference["clean_logits"].float())
-            .abs()
-            .max()
-            .item()
+            (outcome.clean_logits.float() - reference["clean_logits"].float()).abs().max().item()
         )
         edited_logit_err = float(
-            (outcome.edited_logits.float() - reference["edited_logits"].float())
-            .abs()
-            .max()
-            .item()
+            (outcome.edited_logits.float() - reference["edited_logits"].float()).abs().max().item()
         )
-        feature_support_match = (
-            tuple(reference["feature_ids"]) == outcome.feature_ids_before
-        )
+        feature_support_match = tuple(reference["feature_ids"]) == outcome.feature_ids_before
         numeric_pass = (
             feature_support_match
             and torch.allclose(
-                outcome.clean_residual.float(), reference["resid"].float(),
-                atol=1e-2, rtol=1e-2,
+                outcome.clean_residual.float(),
+                reference["resid"].float(),
+                atol=1e-2,
+                rtol=1e-2,
             )
             and torch.allclose(
-                outcome.edited_residual.float(), reference["patched"].float(),
-                atol=1e-2, rtol=1e-2,
+                outcome.edited_residual.float(),
+                reference["patched"].float(),
+                atol=1e-2,
+                rtol=1e-2,
             )
             and torch.allclose(
-                outcome.clean_logits.float(), reference["clean_logits"].float(),
-                atol=1e-2, rtol=1e-2,
+                outcome.clean_logits.float(),
+                reference["clean_logits"].float(),
+                atol=1e-2,
+                rtol=1e-2,
             )
             and torch.allclose(
-                outcome.edited_logits.float(), reference["edited_logits"].float(),
-                atol=1e-2, rtol=1e-2,
+                outcome.edited_logits.float(),
+                reference["edited_logits"].float(),
+                atol=1e-2,
+                rtol=1e-2,
             )
         )
         data = {
@@ -404,7 +404,8 @@ def vllm(backend: str) -> None:
             "feature_support": len(outcome.feature_ids_before),
             "reference_equivalence": (
                 "FULL_CAPTURE_SAE_EDIT_AND_LOGIT_PASS"
-                if numeric_pass else "FAIL_SCIENTIFIC_REFERENCE_PARITY"
+                if numeric_pass
+                else "FAIL_SCIENTIFIC_REFERENCE_PARITY"
             ),
             "clean_next_text": outcome.clean_next_text,
             "edited_next_text": outcome.edited_next_text,

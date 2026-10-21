@@ -171,15 +171,18 @@ class InterpVLLMSAE:
             raise RuntimeError(
                 f"vLLM SAE edit was not applied at the requested tap (max abs {err})"
             )
-        # Verify that OTHER prompt positions were not steered.
-        mask = torch.tensor(masked, dtype=torch.long, device=edited_tensor.device)
-        if len(masked) and not torch.allclose(
-            edited_tensor[0, mask].float(),
-            clean_tensor[0, mask].float(),
-            atol=atol,
-            rtol=rtol,
-        ):
-            raise RuntimeError("steer changed excluded prompt positions")
+        # Capture is [tokens, hidden]. Compare the excluded token rows, not
+        # a slice of the first token's hidden units.
+        if masked:
+            kept = torch.tensor(masked, dtype=torch.long)
+            if not torch.allclose(
+                edited_tensor[kept].float(),
+                clean_tensor[kept].float(),
+                atol=atol,
+                rtol=rtol,
+            ):
+                raise RuntimeError("steer changed excluded prompt positions")
+
         # Read the final residual from the SAME worker forward, then apply
         # the backend's genuine final norm and unembedding. The resulting
         # vectors are checked against independent HF reference logits below.

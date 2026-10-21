@@ -123,6 +123,30 @@ def test_real_capture_contract_and_scoped_feature_edit(monkeypatch, backend):
     assert result.patch_position == 1
     torch.testing.assert_close(result.edited_residual, result.expected_residual)
     assert result.activation_error < 1e-5
+    saved_capture = Facade.capture
+
+    def leak(self, ids, points):
+        tensors = saved_capture(self, ids, points)
+        if self.engine.active is not None:
+            _spec, masked = self.engine.active
+            for point, tensor in list(tensors.items()):
+                changed = tensor.clone()
+                for index in masked:
+                    changed[index, 0] = changed[index, 0] + 1
+                tensors[point] = changed
+        return tensors
+
+    Facade.capture = leak
+    try:
+        with pytest.raises(RuntimeError, match="excluded prompt positions"):
+            adapter.measure(
+                [1, 2, 3],
+                Condition("ablate", "ablate", (0,)),
+                patch_position=1,
+                next_token_probe=False,
+            )
+    finally:
+        Facade.capture = saved_capture
     assert result.clean_next_text == "CLEAN"
     assert result.edited_next_text == "EDITED"
     assert model.active is None
