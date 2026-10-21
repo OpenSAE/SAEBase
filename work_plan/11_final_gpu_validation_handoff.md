@@ -1,194 +1,140 @@
-# Work Plan 11 — Final GPU Execution, Debugging, and Release Acceptance
+# Work Plan 11 — Final Implementation and RTX 5070 GPU Acceptance
 
-Updated: 2026-10-21. This document REPLACES the previous short handoff in the same file.
-Status: engineering code present; GPU acceptance and final release NOT completed.
-Executor: local agent with one RTX 5070 (nominal 12 GiB) and the exact original Qwen model + SAE.
-This is an **implementation, debugging, measurement, and completion task**, NOT another planning task.
+Updated: 2026-10-21. THIS IS THE CURRENT HANDOFF; it supersedes earlier instructions to stop after a KV/vLLM BF16 mismatch.
 
-## Critical correction after inspecting Neuronpedia / interp-engine source (2026-10-21)
+Execution owner: local GPU agent. Reviewer: OpenSAE / SAEBase.
+Source branch: perf/wp11-complete-kv-vllm-20261021, stacked on PR #46 and PR #45. Protect existing local GPU assets and noncommitted work.
+Hardware: one RTX 5070, nominal 12 GiB; inspect physical and free memory. No mandatory 48-site sweep or public GPU server.
 
-**Supersedes every instruction below that equates "not bitwise/numerically identical to HF" with "vLLM is broken" or treats "cached steering not byte-identical to full-prefix HF" as proof it cannot be shipped.** HF is a frozen historical reference, not a privileged mathematical ground truth. Different BF16 kernels and batch shapes may produce different but valid floating-point traces. The scientific question is whether it changes SAE feature identities/effects for the workload, and whether a new backend is clearly declared and independently validated.
+## Mission
 
-### Read these upstream sources BEFORE another GPU tuning loop
+The upstream Neuronpedia / decoderesearch interp-engine ALREADY implements tokenwise KV-cached vLLM generation with per-request steering and optional static CUDA graph taps. SAEBase now has two NEW source implementations, in addition to the historical clean-prefix reference.
 
-- Engine implementation, supported capture/writes and backend choices: https://github.com/decoderesearch/interp-engine
-- Real steering semantics, position_mask (EXCLUDED positions), and generated=True/False: https://github.com/decoderesearch/interp-engine/blob/main/interp_engine/steer.py
-- Read/write graph taps, prefix-cache isolation, CUDA graph and vLLM-static design: https://github.com/decoderesearch/interp-engine/blob/main/docs/PERFORMANCE.md
-- Accurate numerical comparison process and cases (do not invent thresholds): https://github.com/decoderesearch/interp-engine/tree/main/validator
-- Neuronpedia inference and SAE feature/direction endpoints: https://github.com/hijohnnylin/neuronpedia/blob/main/apps/inference/README.md
-- Actual capture+steering+generate timing suite, including prompt length and GPU specification: https://github.com/decoderesearch/interp-engine/blob/main/benchmarks/results-latest.md
+**GPU agent must run and improve actual accelerated implementations first**, then perform numerical, scientific, memory and release verification. Do NOT count a numerical mismatch with a different backend as proof that KV/vLLM cannot work. Do not sacrifice the existing reference scientific protocol or silently substitute a different one.
 
-Neuronpedia ALREADY has production vLLM dynamic hooks, a static-tap CUDA graph backend that can read/write declared residual sites, and KV-cached streaming generation. Do not reimplement that engine or dismiss its design based only on cross-library BF16 differences. Its published B200/Qwen3-4B results are evidence of architectural feasibility, NOT a speed claim for Qwen3-1.7B on RTX5070.
+Current stacked source and interfaces:
 
-### P0: Explicitly separate THREE scientific protocols
+- saebase/interventions/hf_cached_steering.py : generate_live_sae_cached. Real Qwen3 HF KV; one prefill + one forward per generated token, fresh SAE encode and SAEBase residual-preserving edit on every token, persistent edited KV. Public protocol: persistent_live_sae_kv_v1.
+- saebase/vllm_backend/fast_steering.py : decoder_feature_direction and generate_decoder_direction_cached. True interp-engine steer() + generate_stream() with generated=True and cached vLLM; uses actual SAE decoder difference and static/dynamic vLLM taps; protocol: persistent_decoder_direction_kv_v1.
+- saebase/interventions/kv_cache_exact.py : historical reference-compatible clean-history KV experiment. It forks a clean cache for edits and discards edited past; on earlier Qwen BF16 test incremental/full-prefix numerical differences persisted. This is an INDEPENDENT research protocol, not the only possible accelerated generation.
+- saebase/vllm_backend/sae_interventions.py : real per-request prompt-position live SAE capture + one-shot feature edit in interp-engine. Distinct from generated-token continuous dynamic ablation.
+- scripts/workplan11_fast_steering_gpu.py : NEW 8/32/128 token end-to-end generation timing for the old clean-prefix reference, HF live KV, and interp-engine vLLM/static fixed SAE direction.
+- scripts/workplan11_acceptance_gpu.py : existing complete BatchEngine E2E suffix replay and HF reference / vLLM SAE capture / historical clean-KV numerical gate.
+- tests/test_fast_sae_steering.py : NEW CPU test contracts for live HF KV and vLLM streaming scopes.
+- tests/test_clean_kv_exact.py, tests/test_interp_vllm_sae_contract.py, tests/test_suffix_replay.py : previous scientific and safety regressions.
 
-**A. reference_clean_prefix_stepwise_v1 (historical reproducibility).** For each generated token, SAEBase recomputes the entire CLEAN prefix (of that steered trajectory's own actual token history), computes the live SAE feature and its residual-preserving edit ONLY on the current token, then computes edited next-token logits. A new incremental clean-cache implementation may speed it up, but old paper/benchmark outputs must remain pinned to their HF/TL execution protocol. For equivalence to those old results retain old dtype, attention kernel, exact activation site, tokenization and feature-id support; a divergent backend is NOT interchangeable in the same experiment identity.
+## 0. First ten minutes: source, environment and CI (P0)
 
-**B. fast_persistent_steering_v1 (high-throughput Neuronpedia-style generation).** A per-token or fixed steering intervention runs during cached generation; **edited historical KV can persist**. This is a valid research/interactive generation protocol with different causal history. Implement using upstream `interp-engine` native `steer(model, SteeringSpec(...), generated=True)` and its real `generate_steps`/streaming API, using the declared `resid_post` site and tested vLLM/static taps. Do NOT demand byte equality with protocol A as an acceptance condition; do demand backend-local no-edit identity, finite activations, correct per-request isolation, actual steering effect and stable reproduction. Never report B's outputs under A's experiment identity.
-
-**C. fixed_decoder_direction_steering_v1 versus live_feature_ablation_v1.** They are NOT the same operation. Neuronpedia's simple decoder-vector additive steering can add a fixed direction at each token, needing no SAE encode during decode. SAEBase's live ablate/scale/coalition computes z=encode(h_t) per current token and may require different deltas each step: h'_t = h_t + decode(z'_t) - decode(z_t). That requires a dynamic in-worker per-token capture/SAE callback or a verified segmented step-loop. The currently implemented `InterpVLLMSAE.measure` computes ONE prompt-specific delta and reuses it for that request; it does NOT prove dynamic SAE ablation across generated tokens. Do not mislabel fixed-vector steering as that capability. Implement and benchmark them as separate operations.
-
-### P1: Fix the evaluation criterion rather than merely raising tolerances
-
-For two different backends in BF16, report:
-- same checkpoint/tokenizer/layer semantics/position; correct clean forward and no-edit/identity invariants within each backend;
-- actual residual normalized relative L2, max abs with activation scale, cosine, and per-position logit differences;
-- SAE TopK support overlap and **which** features flipped, TopK k-versus-k+1 margin at the boundary, ranks, actual z_i and patch vector effects;
-- intervention outcomes on matched prompt variants, paired behavioral/metric changes (with uncertainty across prompts);
-- reproducibility under each backend, exact backend/build/kernel/protocol in the experiment identity.
-
-Small BF16 errors can cross a near-tied TopK boundary. That does not automatically make vLLM incorrect. However changed feature support means B must not silently reuse old A codes/caches/results. For strict reproduction of an existing result, keep the reference exact path; for a NEW high-throughput study, publish backend-native data and validate its scientific conclusions independently. Do not relabel `BACKEND_NATIVE` as `REFERENCE_EXACT` without stronger evidence.
-
-### P2: KV engineering strategy
-
-**First ship a real upstream-based fast steering baseline**: interp-engine vLLM with `generated=True`, per-request steering, prefix-cache isolation and, when VRAM permits, vLLM-static predeclared read/write taps. Benchmark 8, 32, 128 tokens with one/2/4 concurrent requests and capture+steering, on RTX5070. Verify actual public upstream API in the installed version. Do not confuse vLLM-generate with capture-capable backends.
-
-**Then separately accelerate A**: maintain CLEAN history KV for tokens in the steered sequence, fork/snapshot it for the current-step edited suffix, discard edited KV, and advance ONLY clean history. The existing `CleanPrefixKVDecoder` attempts that. If incremental and full-prefix BF16 computations disagree, first test exact tokenization/cache mask, position ids, full-prefix versus one-token kernel/batch shape and fp32 diagnostic; record whether topk support or actual intervention metrics change. Crucially, incrementally computed KV need not have identical BF16 tensors to a full-sequence GEMM. Preserve A's old full-prefix reference for strict legacy comparisons; do not conclude KV caching is mathematically impossible. If clean-cache semantics hold but legacy HF tolerances fail, this becomes a separately identified cached numerical protocol, not a drop-in replacement for old experimental results.
-
-For either mode, account for possible hook skipping when vLLM prefix cache hits. Neuronpedia's engine uses per-request cache_salt to isolate intervention requests; adopt the supported upstream policy rather than globally disabling prefix caching or inheriting stale steered KV. Never transplant historical KV between independent baseline and steered continuations.
-
-### P3: Objective finish and report
-
-1. Complete PR #45 and #46 independently after CI/parity; PR #46 already has Qwen full W2 25×7 median 2.409 s to 1.888 s, a measured 1.276x; don't withhold that benefit.
-2. In PR #47 execute **two** fast-steering benchmarks: B using upstream engine native cached generation (this is a required actual capability target), then A's clean-cache reimplementation if needed for exact historical reuse. Do NOT replace B with mere single-prompt feature edits.
-3. Demonstrate real SAE decoder-direction steering from feature ids on generated tokens; test live SAE activation-dependent edits separately and label unsupported if current upstream hook protocol lacks a dynamic worker callback.
-4. Treat legacy HF difference as a *comparability finding* rather than wholesale vLLM failure; classify capabilities by per-protocol validation.
-5. Publish a small capability matrix with columns: protocol, backend, prompt capture, generation steering, persistent KV, live SAE re-encode, numerical reference identity, RTX5070 throughput, peak VRAM and status. No "all accelerated" claim without measurements.
-
-Agent must inspect the linked upstream code BEFORE modifying its own worker. No new generic engine or another unfocused vLLM numerical-tolerance sweep. Source-driven, measured reuse is the priority.
-
----
-
-## 0. Starting facts — read and reconcile with live GitHub
-
-Repository: OpenSAE/SAEBase.
-
-The three stacked PRs are:
-- #45 https://github.com/OpenSAE/SAEBase/pull/45 — Work Plan 10, strict full-weight hashes, VerifiedCheckpointSession, HF single-forward capture/logits. Its CI has passed; NOT merged at the time of this edit.
-- #46 https://github.com/OpenSAE/SAEBase/pull/46 — opt-in block-suffix replay, Qwen L7 **edited-forward ONLY** benchmark median 0.47774 s -> 0.37909 s (1.260x). Latest #46 SHA 2d36c2a... has passed CI. NOT merged.
-- #47 https://github.com/OpenSAE/SAEBase/pull/47 — optional experimental clean-history KV decoder, interp-engine hooked-vLLM SAE intervention adapter, end-to-end RTX 5070 test harness and CPU contract tests. It is a **stacked PR against #46**, NOT against main. Current source head when this revision was written was 4bd66e45; confirm current SHA before work.
-
-At that specific #47 commit, GitHub Actions https://github.com/OpenSAE/SAEBase/actions/runs/39662842992 reported **all required offline Python 3.11, 3.12, package, analysis installation and localization jobs succeeded; only the quality job failed on Ruff formatting**:
-- saebase/vllm_backend/sae_interventions.py
-- scripts/workplan11_acceptance_gpu.py
-
-Do not repeat already successful GPU results or assert the CI is still failing without checking the NEW head. Existing offline CPU tests do NOT establish real GPU parity. The #47 test for interp-engine is a **mock API contract**; in particular, the newly used `decode_residuals`, `static_points`, `static_writes`, `sync.capture`, `SteeringSpec` and `position_mask` behavior MUST be verified in the installed upstream version. Do not trust a mock as confirmation that the vLLM worker supports an operation.
-
-No need to revisit GPU-05 / 48-site matrix, Research Lab UI, marketing, new job servers, or unrelated cleanup.
-
-## 1. Preserve the working tree, repair CI and resolve PR layering (P0)
-
-1. Capture current `git status --porcelain`, branch and HEAD, worktrees, exact dependency pins, available model/SAE checkpoints, and already executed private GPU output; never reset/overwrite raw data.
-2. Use separate worktree from `origin/perf/wp11-complete-kv-vllm-20261021`. The #47 parent at initial creation was an earlier #46 head. Sync the final #46 fixes carefully so the stacked PR contains the verified current parent without throwing away the new KV/vLLM work. Do not force-push.
-3. Fix the **two known Ruff files** using `ruff format`, then run the full touched-file lint/format; report the changed-file list. Do not modify unrelated scientific logic merely to placate formatting.
-4. Run the focused tests and complete local CPU suite. When a failure occurs, find the FIRST real stack trace, add a minimal reproducer, repair code, rerun.
-5. Push. Verify GREEN CI on the ACTUAL LAST commit (not an earlier passing SHA).
-
-Commands (adapt only if an existing protected worktree has the same path):
+1. Record Git worktrees/status/HEAD, code commit, GPU/driver, PyTorch/Transformers/SAE Lens, interp-engine and vLLM package versions. Save original private experimental results. Do not reset/force-push.
+2. Check GitHub Actions on the LATEST source SHA, not an older green SHA. Run Ruff check, Ruff format, and complete CPU tests. Fix any failure and push. Never declare the code complete merely because it imports.
+3. Prepare a dedicated HF environment AND separate interp-engine[vllm] environment. Do not break the verified Torch/CUDA installation. The upstream engine may require nvcc 13.x and FlashInfer fixes on Blackwell; use supported pinned dependency combinations in an isolated env.
+4. Review the exact upstream implementation:
+   - https://github.com/decoderesearch/interp-engine
+   - https://github.com/decoderesearch/interp-engine/blob/main/interp_engine/steer.py
+   - https://github.com/decoderesearch/interp-engine/blob/main/docs/PERFORMANCE.md
+   - https://github.com/decoderesearch/interp-engine/blob/main/docs/USAGE.md
+   - https://github.com/decoderesearch/interp-engine/blob/main/tests/test_vllm_kv_isolation.py
+   - https://huggingface.co/docs/transformers/main/kv_cache
+   Verify actual installed public APIs, CUDA kernel flags, static read/write declarations and the per-request cache-salt policy. Prefer existing upstream code to bespoke vLLM extensions.
 
 ~~~bash
 git fetch origin
 git status --short
-git worktree add ../SAEBase-wp11-gpu origin/perf/wp11-complete-kv-vllm-20261021
+# Use a fresh safe worktree or the existing protected checkout.
+git worktree add -b perf/wp11-gpu-final ../SAEBase-wp11-gpu origin/perf/wp11-complete-kv-vllm-20261021
 cd ../SAEBase-wp11-gpu
 python -m pip install -e '.[analysis,dev,quality]'
-python -m ruff format saebase/vllm_backend/sae_interventions.py scripts/workplan11_acceptance_gpu.py
-python -m ruff check saebase/interventions/kv_cache_exact.py saebase/vllm_backend/sae_interventions.py scripts/workplan11_acceptance_gpu.py tests/test_clean_kv_exact.py tests/test_interp_vllm_sae_contract.py
-python -m ruff format --check saebase/interventions/kv_cache_exact.py saebase/vllm_backend/sae_interventions.py scripts/workplan11_acceptance_gpu.py tests/test_clean_kv_exact.py tests/test_interp_vllm_sae_contract.py
-python -m pytest -q tests/test_clean_kv_exact.py tests/test_interp_vllm_sae_contract.py tests/test_suffix_replay.py tests/test_performance_hf_batch.py tests/test_weight_identity_modes.py tests/test_m2_interventions.py
+python -m ruff check saebase/interventions/hf_cached_steering.py saebase/vllm_backend/fast_steering.py scripts/workplan11_fast_steering_gpu.py tests/test_fast_sae_steering.py
+python -m ruff format --check saebase/interventions/hf_cached_steering.py saebase/vllm_backend/fast_steering.py scripts/workplan11_fast_steering_gpu.py tests/test_fast_sae_steering.py
+python -m pytest -q tests/test_fast_sae_steering.py tests/test_clean_kv_exact.py tests/test_interp_vllm_sae_contract.py tests/test_suffix_replay.py tests/test_weight_identity_modes.py tests/test_m2_interventions.py
 python -m pytest -q
 nvidia-smi
 ~~~
 
-**Exit G1:** exact head CI all required checks success and no feature/provenance contract regression.
+## 1. Mandatory HF live SAE KV generation (P0)
 
-## 2. Full end-to-end SAEBase benchmark, not a kernel microbenchmark (P0)
+This is NEW substantive work. It must not be stopped because older clean-prefix output differs numerically.
 
-Already implemented: `scripts/workplan11_acceptance_gpu.py e2e`.
-Run against Qwen3-1.7B Base, original registered residual TopK SAE, layer 7, the same real frozen 25 selected input samples and **all seven** conditions. Compare `BatchEngine(enable_suffix_replay=False)` vs `True` under the exact same prompt IDs, SAE/weights, position, readout and dtype. Use one warmup + five synchronized repeats for each mode; alternate order or check for order bias, record per-run elapsed, output count, peak allocated/reserved GPU memory and model-forward counts. The existing 1.260x is a smaller edited-forward timing and must not be advertised as E2E.
-
-Requirements:
-- By `measurement_id`, same cardinality, operations and sample IDs, no dropped conditions, metrics within precommitted bf16 atol/rtol 1e-2, no nonfinite metrics, independent feature support/ID checks, identity replay PASS.
-- Validate **real patch tensors and downstream logits** on a representative per-condition sample, not merely aggregate L2 metrics; a key-matched scalar result can conceal unintended feature changes.
-- Confirm suffix cache key `tuple(sample.tokens)` cannot reuse stale hidden when site/dtype/model/attention changes; it is scoped to one model/experiment, cleared appropriately, and works under mixed lengths/duplicates and OOM splits.
-- Caution: suffix path temporarily overrides block `module.forward`. Do not run the same model concurrently. Implement an explicit exclusive-execution guard or otherwise enforce single-owner worker access across ALL forward entrypoints before enabling beyond controlled tests. Restoration must occur in `finally`.
-- If end-to-end speedup <1.15x, keep opt-in, report truthfully. If parity fails, keep the original path as default.
+Test the new generated-token SAE logic on actual Qwen3-1.7B Base, layer 7, registered residual TopK SAE, at 8, 32 and 128 tokens:
 
 ~~~bash
-# Run inside the HF/Torch + SAE Lens environment, from the PR47 worktree.
 export WP11_RUN=/workspace/experiments/performance/workplan11/final_5070
-python scripts/workplan11_acceptance_gpu.py e2e
+python scripts/workplan11_fast_steering_gpu.py --mode hf-live --lengths 8,32,128
+python scripts/workplan11_fast_steering_gpu.py --mode hf-reference --lengths 8,32,128
 ~~~
 
-**Exit G2:** `end_to_end.json` with actual five-run timings, exact output parity and VRAM. Speed gate is reported, not assumed.
+Expected internal contract: ONE full prompt prefill, then ONE one-token KV forward per new token; freshly compute actual SAE z for each emitted token and use SAEBase apply_condition() to edit h. Edited downstream history is retained, so this is Neuronpedia-style persistent steering, not the old clean-prefix science. Require 1 warmup + >=5 timed repetitions, max allocated/reserved VRAM, forward counters, token IDs (PRIVATE), actual feature IDs from at least one traced run, no NaN/OOM/invalid position, hook cleanup and no state leakage between requests. Test zero-strength or identity alongside ablate/scale to ensure actual causal effects. Test two prompts and repeated runs for state isolation.
 
-## 3. True clean-prefix KV-cached SAE steering (P0)
+If BF16 differs from historical full-prefix results, record the difference and keep the distinct protocol identity; **do not disable a working and correct cached-generation path merely because the old full-prefix numerical protocol differs**. Fix within-backend bugs, wrong feature indices, old KV contamination and memory leaks.
 
-Already implemented: `saebase/interventions/kv_cache_exact.py`, `CleanPrefixKVDecoder`, with **clean prior KV separated from an edited copy**. The next step consumes the clean history for the steered sequence, not a persistent edited history. This is the right scientific protocol but implementation is not yet confirmed on real Qwen.
+Implementation restrictions: model.eval(), torch.no_grad/inference mode, exclusive HF worker lock, one loaded model + SAE per GPU, bounded max context, no unsupported training/gradient callbacks. The result must not be silently used as prior Stage D science.
 
-Do not simply mark `CLEAN_KV_STATUS = BLOCKED` and stop; that older constant describes a pre-implementation state. Test and repair the new candidate.
+## 2. Mandatory genuine interp-engine vLLM/static generated-token steering (P0)
 
-Execution / numerical acceptance:
-1. CPU toy oracle tests must pass for full-prefix vs incremental cache across multiple steps. Inspect `transformers` Qwen3's actual `DynamicCache`, `get_seq_length`, `cache_position`, `past_key_values` and attention-mask contract for the pinned Transformers version.
-2. Run **8 then 32 steps on real Qwen** with *forced identical continuation tokens* first. At EVERY step compare original site activation, complete SAE support set, clean logits and SAE-edited logits against `capture_features` + `apply_condition` + `patch_logits` on a freshly recomputed clean full prefix. Zero support flips required; bf16 `atol=rtol=1e-2`; record MAX errors and earliest divergent step.
-3. Use an actually active SAE feature selected from the exact prompt's code rather than hardcoded coordinate 185. Include identity and ablation/scale, two distinct prompts, and a non-final hook position if the protocol supports it (otherwise declare unsupported). Then compare independent baseline and steered continuations with frozen greedy / sampled RNG and EOS.
-4. If parity fails, inspect which layer/step diverges and whether the prior cache was mutated, the fork was shallow, the attention mask offset was wrong, or a clean step accidentally used edited KV. Fix and rerun; never "solve" it by relaxing tolerance or reusing edited history.
-5. The current fork uses `copy.deepcopy(past)` for safety. This may scale linearly with sequence length and can erase the benefit of KV caching. Record clone time, peak allocated/reserved GPU VRAM and forward time independently; after parity passes, optimize with a read-only/forkable clean cache when real Qwen supports it. Do not design a new generic inference framework.
-6. Compare real full-prefix reference vs incremental clean-KV steering with 1 warmup + >=5 runs for **8 and 32 steps**. Benchmark stepwise compute *without* including the expensive correctness oracle inside the timed path. Report TTFT, tokens/sec, memory and 1.15x median gate.
+The code in fast_steering.py already constructs an SAE decoder direction from original SAE.decode(onehot)-SAE.decode(zeros), then applies it with upstream AddSpec at resid_post. It sets generated=True and masks all earlier prompt token positions, leaving the last prompt token and every subsequent generated token steered. This must run on the vLLM worker, not be simulated with text replacement.
+
+Run in SEPARATE clean vLLM+interp-engine environment/process; pin CUDA, torch, interp-engine, vLLM and dependencies. Static mode on 5070 had previously needed gpu_memory_utilization >=0.70 to obtain an actual tap buffer; do not mix different backends in the same process.
+
+~~~bash
+python scripts/workplan11_fast_steering_gpu.py --mode vllm --lengths 8,32,128 --feature-id 185 --strength 2
+# Restart in a new process after dynamic worker exits.
+python scripts/workplan11_fast_steering_gpu.py --mode vllm-static --lengths 8,32,128 --feature-id 185 --strength 2 --utilization 0.70
+~~~
+
+NOTE: fixed decoder-vector addition is a real SAE feature-direction steering method, but NOT identical to live tokenwise feature ablation/scale. Explicitly label it. If user feature 185 is not a meaningful registered feature for the chosen SAE checkpoint, pick an active feature from the HF reference capture with a documented stable ID; don't fabricate labels or strengths.
+
+Required checks:
+- Open upstream steer context reaches actual vLLM generation request via per-request steering_spec, generated=True applies after prefill, masks earlier prompt rows.
+- A control unsteered run vs edited run with same seed and tokenization; prove an actual activation edit even if greedy output token sequence happens to stay unchanged.
+- No cross-request leakage: unsteered -> steered -> unsteered and two independent prompts; prefix-cache cache_salt isolation and static tap declaration verified by actual worker.
+- Independent time-to-first-token, total decode time, tokens/s and memory, warmup + 5 repeats, 8/32/128 output lengths. Compare same-backend steered vs unsteered cost, and clearly label cross-protocol HF speed.
+- If static graph cannot fit 5070 due to verified buffer budget, report exact bytes and try smaller max_model_len/static tap set rather than silently making up times.
+
+Do not require bitwise equality with Hugging Face as a prerequisite for measuring or implementing fast steering. If SAE TopK code support differs between backends, pin execution protocol and report which features; never reuse incompatible historical cache identities.
+
+## 3. Retain and verify exact original experimental evaluation (P0)
+
+PR #45 strict source hashes; PR #46 opt-in block-suffix replay measured on real Qwen: complete 25 samples x 7 edits, median 2.409 -> 1.888 s (1.276x), max metric difference zero. Keep this independently publishable.
+
+~~~bash
+python scripts/workplan11_acceptance_gpu.py e2e
+python scripts/workplan11_acceptance_gpu.py hf-reference
+~~~
+
+Validate original and optimized sample/condition identities, exact SAE support and measured metrics, no stale prefix cache, OOM and exception cleanup, source provenance. For changed source changes since prior benchmark, rerun warmup + 5 repeats. Stable defaults remain old hook path unless real deployment is tested; opt-in suffix replay can ship with gates.
+
+## 4. Historical clean-prefix KV attempt (P1, after real fast generation)
+
+Only AFTER sections 1 and 2 are genuinely running, investigate the source of the Qwen incremental-vs-full-prefix BF16 difference seen before. Keep original full-prefix implementation for exact historical comparisons.
 
 ~~~bash
 python scripts/workplan11_acceptance_gpu.py kv --steps 8
 python scripts/workplan11_acceptance_gpu.py kv --steps 32
 ~~~
 
-**Exit G3:** full forced-token per-step numeric PASS, or a reproducible concrete failure after an actual RTX 5070 run (not unsupported-by-assumption); performance must be measured separately. No default KV enablement without parity.
+First check tokenization/BOS, RoPE positions, attention mask, cache ownership, and per-layer K/V vs full prefix; test fp32 diagnostic and batch-invariant or stable attention kernels if available. Report per-layer relative errors and **whether different support alters the actual experiment**, not just a global max abs. If cached numerical trajectory cannot reproduce historical full-prefix, expose it only as a distinct execution identity. Do NOT declare caching impossible.
 
-## 4. A real vLLM hooked SAE backend, not generation-only (P0)
+## 5. Mandatory final report and decision
 
-Already implemented experimentally:
-- `saebase/vllm_backend/sae_interventions.py`, `InterpVLLMSAE`: capture a real `resid_post` site, encode with the registered SAE, calculate exact residual-preserving edit, apply only the requested prompt token using interp-engine steering, capture output and read out real model logits.
-- `scripts/workplan11_acceptance_gpu.py hf-reference` writes a PRIVATE reference file, then `vllm --backend vllm` and `vllm-static` run in SEPARATE processes/environments.
-- `tests/test_interp_vllm_sae_contract.py` mocks the upstream structure; mock success does not prove worker-API compatibility.
+Under the gitignored private WP11_RUN directory save separate:
+- fast_steering_hf_live.json and fast_steering_hf_reference.json with 8/32/128 series and source hashes
+- fast_steering_vllm.json and fast_steering_vllm_static.json from actual GPU workers, or precise failure logs
+- end_to_end.json and hf_reference_private.pt, full BatchEngine parity
+- clean_kv_parity_8.json and clean_kv_parity_32.json
+- final_report.md with real command transcript, frozen model/SAE/tokenizer checkpoint identities, environment and GPU memory, numeric and feature effects, all five repeats and p50/p95 where estimable.
 
-DO NOT assume `sync.decode_residuals` actually exists or returns calibrated next-token logits in the installed interp-engine. On the REAL pinned version, first inspect the exact signatures and underlying worker implementations for `Address`, `sync_model.capture`, readout/unembedding, `steer`, `AddSpec`, static tap declarations and the meaning of `position_mask`. Replace invented/incompatible calls with documented supported real API **before** running expensive GPU tests. For a legitimate final-logit comparison, read logits from the same edited model execution, applying the correct final norm and lm_head; a raw residual is not itself logits. Do not infer logits from one generated token.
+Produce docs/performance/workplan11_final_results.md as public redacted summary. Its capability matrix MUST distinguish:
+1. reference_clean_prefix_stepwise_v1 (slow but reference-frozen)
+2. persistent_live_sae_kv_v1 (HF dynamic SAE encode/edit every generated token)
+3. persistent_decoder_direction_kv_v1 (interp-engine vLLM/static fixed SAE decoder-vector generation)
+4. block_suffix_replay_v1 (exact 25x7 intervention forward reuse)
+5. legacy clean-history KV prototype (independent work, not mandatory fast path)
+6. interp-engine one-prompt live SAE feature edit (already implemented, not continuous generated-token ablation)
 
-1. Create a separate compatible interp-engine/vLLM/Torch/CUDA environment (never clobber the trusted HF benchmark). Record `pip freeze`, exact package versions, compiler, compute capability and model/SAE hashes. Keep one model + SAE resident and conservative KV/graph memory on 12 GiB.
-2. Run Qwen clean capture and compare original residual at layer 7 vs SAEBase HF (including EXACT tokenization, BOS, positions). Verify physical per-request additive write at ONE target token and that excluded token rows remain unchanged.
-3. From the same capture/edit execution, read out clean and edited logits (ideally all-vocab comparison). Compare HF original/edit logits and SAE support and per-feature IDs at frozen BF16 bar; include identity, ablate and scale.
-4. Run dynamic hooked `vllm`, then `vllm-static` only if it fits VRAM and its static read/write site list is declared before graph capture. If static CUDA graphs or the compatible backend fail with a reproducible OOM/kernel incompatibility, do NOT silently call generation-only PASS.
-5. Diagnose first layer of divergence. The previous vLLM attempt had Qwen residual mismatches starting inside block 0 despite matched input; no tolerance relaxation, no hidden quantization, no scientific equivalent claim if it persists. If the backend is numerically different but internally consistent, label it `BACKEND_NATIVE`, not `REFERENCE_EXACT`. Preserve the HF default; a separate backend-native protocol must not reuse its scientific cache identity.
-6. If scientific parity passes, repeat five real inference/capture/patch benchmarks, report throughput, p50/p95/TTFT/peak VRAM and compare identical workload. Otherwise report the exact blocker and the minimal feasible remedy, not a vague "not supported".
+Mark each as CODE_READY, CPU_TESTED, GPU_RUNNING, GPU_PARITY_PASS, GPU_SPEED_PASS, EXPERIMENTAL or BLOCKED with actual evidence; do not equate green CPU CI with real GPU. A legitimate measured faster NEW scientific protocol can ship opt-in even if not numerically identical to the old protocol, provided semantics, source identity, output validity, and absence of hidden cache leakage are verified.
 
-~~~bash
-python scripts/workplan11_acceptance_gpu.py hf-reference
-# New separate vLLM process/env (only after verifying actual interp-engine API).
-python scripts/workplan11_acceptance_gpu.py vllm --backend vllm
-# Again a distinct worker process, conditional on VRAM and declared static points.
-python scripts/workplan11_acceptance_gpu.py vllm --backend vllm-static
-~~~
+When GPU evidence is obtained, land PR #45 -> PR #46 -> PR #47 in dependency order after full CI, retain high-speed generation behind an explicit protocol/capability gate, no public server deployment. Do not create Work Plan 12. If a real performance blocker remains, fix code directly, rerun the **same** tests, report residual engineering limitation rather than returning another strategy memo.
 
-**Exit G4:** a real worker capture + SAE edit demonstrated; reference-equivalence claimed ONLY on full logit and feature parity. Plain vLLM generation does not satisfy this task.
+## First instruction to the GPU agent
 
-## 5. Release decision and files (P0)
-
-Expected private outputs inside `$WP11_RUN`:
-- `end_to_end.json` — complete reference vs suffix, five repeats and metric agreement.
-- `clean_kv_parity.json` — stepwise oracle and 8/32-step timing and memory. Save separate files or runs so the 32-step test cannot silently overwrite the 8-step evidence.
-- `hf_reference_private.pt` — original tokens/activations/logits/weights provenance, NEVER publish.
-- `hf_reference_status.json`.
-- `vllm_vllm.json`, `vllm_vllm-static.json` — measured backend-native and HF parity, per-operation evidence or reproducible errors.
-- `final_report.md` — actual executed commands, SHAs, CI run links, repeated timings, VRAM, true speedups, parity matrices and blockers.
-
-**Important implementation corrections to test harness:** do not overwrite the 8-step KV artifact when running 32 steps; preserve every repetition. Do not report a speed gain based on a microbenchmark that omits capture, snapshot edits, writer or identity checks while calling it end-to-end. The current GPU script has no real CI GPU coverage. Add only the minimum helpers needed to make it reproducible.
-
-Do not merge experimental code before final CI and data. After G1/G2/G3/G4 have honest outcomes:
-- Merge PR #45 to main first only if its verified strict-hash and HF tests remain good.
-- Rebase/update #46 onto latest main, verify CI and Qwen E2E; merge if safe (suffix remains opt-in if further coverage is absent).
-- Rebase/update #47 onto #46 or merged main, rerun tests and CI, merge only validated experimental paths behind OFF-by-default capability gates.
-- Public GPU API remains disabled. Do not modify original Stage D/SAR/RSS records.
-
-A credible FINALIZED result explicitly says what is enabled, what runs faster, what remains non-equivalent, and what specific work would be required for previously blocked acceleration. No indefinite tuning loops, but NEVER call a path COMPLETE without a real measured result.
-
-## 6. Agent first instruction
-
-Read PR #47 and this handoff. Protect existing local changes and GPU evidence. **Fix exact Ruff CI failures first**, then run CPU oracle and full Qwen BatchEngine E2E. Run clean-prefix KV 8/32 steps with exact full-prefix comparison, fix Qwen cache/position bugs, and profile clone overhead. Inspect installed interp-engine's REAL API before replacing any incompatible capture/readout/static tap calls, then run dynamic and static vLLM SAE edits in isolated GPU workers. Produce a factual final_report.md, push fixes, get final CI green, and close the PR chain in correct order only for scientifically validated code. Do the work; do not return a new work plan.
+Use the latest PR #47 source. Finish CI and CPU tests; launch hf-live generation 8/32/128; launch real interp-engine vLLM+static generation 8/32/128 in isolated environment; benchmark the original full-prefix reference and the previous Qwen BatchEngine E2E; fix actual kernel/cache/SAE bugs, rerun; then publish only validated measured speedups and the final implementation/PR decisions. No alternative planning and no early BLOCKED unless a reproducible run proves the cause.
