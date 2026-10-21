@@ -133,7 +133,9 @@ def test_engine_suffix_matches_hook_and_is_opt_in(tmp_path):
         # The baseline caches each prompt once. Identity verification and both
         # conditions then replay only the blocks after the site.
         assert engine.counters["suffix_prefix_forwards"] == len(samples)
-        assert engine.counters["suffix_replay_forwards"] == len(samples) + len(samples) * len(conditions)
+        assert engine.counters["suffix_replay_forwards"] == len(samples) + len(samples) * len(
+            conditions
+        )
     with pytest.raises(ValueError, match="cannot be combined"):
         BatchEngine(adapter, sae, ident, enable_suffix_replay=True, enable_hf_masked_batch=True)
 
