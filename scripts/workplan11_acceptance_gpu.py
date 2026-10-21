@@ -309,6 +309,7 @@ def hf_reference() -> None:
             "resid": snapshot.activation.float().cpu(),
             "patched": patch.activation.float().cpu(),
             "feature_id": feature,
+            "feature_ids": torch.nonzero(snapshot.codes != 0).flatten().cpu().tolist(),
             "clean_logits": clean.float().cpu(),
             "edited_logits": edited.float().cpu(),
             "model_sha": sha256_state_dict(raw),
@@ -355,19 +356,55 @@ def vllm(backend: str) -> None:
         edited_err = float(
             (outcome.edited_residual.float() - reference["patched"]).abs().max().item()
         )
+        clean_logit_err = float(
+            (outcome.clean_logits.float() - reference["clean_logits"].float())
+            .abs()
+            .max()
+            .item()
+        )
+        edited_logit_err = float(
+            (outcome.edited_logits.float() - reference["edited_logits"].float())
+            .abs()
+            .max()
+            .item()
+        )
+        feature_support_match = (
+            tuple(reference["feature_ids"]) == outcome.feature_ids_before
+        )
+        numeric_pass = (
+            feature_support_match
+            and torch.allclose(
+                outcome.clean_residual.float(), reference["resid"].float(),
+                atol=1e-2, rtol=1e-2,
+            )
+            and torch.allclose(
+                outcome.edited_residual.float(), reference["patched"].float(),
+                atol=1e-2, rtol=1e-2,
+            )
+            and torch.allclose(
+                outcome.clean_logits.float(), reference["clean_logits"].float(),
+                atol=1e-2, rtol=1e-2,
+            )
+            and torch.allclose(
+                outcome.edited_logits.float(), reference["edited_logits"].float(),
+                atol=1e-2, rtol=1e-2,
+            )
+        )
         data = {
             "backend": backend,
-            "status": "BACKEND_NATIVE_VERIFIED",
+            "status": "REFERENCE_PARITY_PASS" if numeric_pass else "BACKEND_NATIVE_ONLY",
             "input_length": outcome.input_length,
             "position": outcome.patch_position,
             "vllm_internal_edit_max_abs": outcome.activation_error,
             "hf_capture_max_abs": clean_err,
             "hf_edited_activation_max_abs": edited_err,
+            "hf_clean_logit_max_abs": clean_logit_err,
+            "hf_edited_logit_max_abs": edited_logit_err,
+            "feature_support_match": feature_support_match,
             "feature_support": len(outcome.feature_ids_before),
             "reference_equivalence": (
-                "CAPTURE_AND_EDIT_PARITY_PASS_LOGITS_UNVERIFIED"
-                if clean_err <= 1e-2 and edited_err <= 1e-2
-                else "FAIL_HF_RESIDUAL_PARITY"
+                "FULL_CAPTURE_SAE_EDIT_AND_LOGIT_PASS"
+                if numeric_pass else "FAIL_SCIENTIFIC_REFERENCE_PARITY"
             ),
             "clean_next_text": outcome.clean_next_text,
             "edited_next_text": outcome.edited_next_text,
