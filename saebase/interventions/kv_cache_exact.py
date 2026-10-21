@@ -8,6 +8,7 @@ existing full-prefix reference, not a parity-verified backend by default.
 The cache fork currently uses deepcopy for correctness and bounded tests; it
 may not accelerate long prefixes until a non-mutating cache fork is validated.
 """
+
 from __future__ import annotations
 
 import copy
@@ -77,7 +78,8 @@ class CleanPrefixKVDecoder:
             length = ids.shape[1] - 1
             prefix = ids[:, :length]
             output = self.raw(
-                input_ids=prefix, use_cache=True,
+                input_ids=prefix,
+                use_cache=True,
                 attention_mask=torch.ones_like(prefix),
                 cache_position=torch.arange(length, device=ids.device),
             )
@@ -169,8 +171,13 @@ class CleanPrefixKVDecoder:
 
 @torch.no_grad()
 def compare_cached_step_with_reference(
-    decoder: CleanPrefixKVDecoder, adapter: Any, sae: Any, condition: Condition,
-    *, atol: float, rtol: float,
+    decoder: CleanPrefixKVDecoder,
+    adapter: Any,
+    sae: Any,
+    condition: Condition,
+    *,
+    atol: float,
+    rtol: float,
 ) -> dict[str, Any]:
     """Fail closed on mismatched features or logits before accepting a cached step."""
     from saebase.api import capture_features
@@ -182,30 +189,40 @@ def compare_cached_step_with_reference(
     reference_snapshot = capture_features(adapter, sae, site=site, tokens=ids)
     reference_patch = apply_condition(sae, reference_snapshot, condition)
     baseline = adapter.forward_logits(tokens=ids)
-    edited = adapter.patch_logits(
-        tokens=ids, site=site, activation=reference_patch.activation
-    )
+    edited = adapter.patch_logits(tokens=ids, site=site, activation=reference_patch.activation)
     candidate = decoder.step(condition)
     ref_support = reference_snapshot.codes != 0
     new_support = candidate.snapshot.codes != 0
     flip_count = int((ref_support != new_support).sum().item())
     errors = {
-        "activation": float((reference_snapshot.activation.float() -
-                              candidate.snapshot.activation.float()).abs().max().item()),
-        "clean_logits": float((baseline.float() - candidate.clean_logits.float()).abs().max().item()),
-        "edited_logits": float((edited.float() - candidate.edited_logits.float()).abs().max().item()),
+        "activation": float(
+            (reference_snapshot.activation.float() - candidate.snapshot.activation.float())
+            .abs()
+            .max()
+            .item()
+        ),
+        "clean_logits": float(
+            (baseline.float() - candidate.clean_logits.float()).abs().max().item()
+        ),
+        "edited_logits": float(
+            (edited.float() - candidate.edited_logits.float()).abs().max().item()
+        ),
     }
     passed = (
         flip_count == 0
-        and torch.allclose(reference_snapshot.activation.float(),
-                           candidate.snapshot.activation.float(), atol=atol, rtol=rtol)
-        and torch.allclose(baseline.float(), candidate.clean_logits.float(),
-                           atol=atol, rtol=rtol)
-        and torch.allclose(edited.float(), candidate.edited_logits.float(),
-                           atol=atol, rtol=rtol)
+        and torch.allclose(
+            reference_snapshot.activation.float(),
+            candidate.snapshot.activation.float(),
+            atol=atol,
+            rtol=rtol,
+        )
+        and torch.allclose(baseline.float(), candidate.clean_logits.float(), atol=atol, rtol=rtol)
+        and torch.allclose(edited.float(), candidate.edited_logits.float(), atol=atol, rtol=rtol)
     )
     result = {
-        "pass": bool(passed), "feature_flips": flip_count, "max_abs": errors,
+        "pass": bool(passed),
+        "feature_flips": flip_count,
+        "max_abs": errors,
         "prefix_length": candidate.prefix_length,
     }
     if not passed:
