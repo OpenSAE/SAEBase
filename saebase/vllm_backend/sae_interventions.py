@@ -5,6 +5,7 @@ residual-preserving delta are computed with SAEBase's original operator.
 This is an opt-in backend-native experiment, never a silent replacement for
 HF/SAEBase. vLLM numerical equivalence must be measured separately.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -58,8 +59,13 @@ class InterpVLLMSAE:
 
     @staticmethod
     def load(
-        model_name: str, sae: Any, *, layer: int, backend: str = "vllm",
-        gpu_memory_utilization: float = 0.55, max_model_len: int = 1024,
+        model_name: str,
+        sae: Any,
+        *,
+        layer: int,
+        backend: str = "vllm",
+        gpu_memory_utilization: float = 0.55,
+        max_model_len: int = 1024,
     ) -> "InterpVLLMSAE":
         if backend not in ("vllm", "vllm-static"):
             raise ValueError("load() requires a capture-capable vLLM backend")
@@ -69,7 +75,9 @@ class InterpVLLMSAE:
         from interp_engine import load_model
 
         kwargs: dict[str, Any] = {
-            "backend": backend, "dtype": "bfloat16", "num_gpus": 1,
+            "backend": backend,
+            "dtype": "bfloat16",
+            "num_gpus": 1,
             "gpu_memory_utilization": gpu_memory_utilization,
             "max_model_len": max_model_len,
         }
@@ -87,9 +95,14 @@ class InterpVLLMSAE:
 
     @torch.no_grad()
     def measure(
-        self, token_ids: Sequence[int], condition: Condition, *,
-        patch_position: int = -1, next_token_probe: bool = True,
-        atol: float = 0.01, rtol: float = 0.01,
+        self,
+        token_ids: Sequence[int],
+        condition: Condition,
+        *,
+        patch_position: int = -1,
+        next_token_probe: bool = True,
+        atol: float = 0.01,
+        rtol: float = 0.01,
     ) -> VLLMSAEOutcome:
         from interp_engine import Address
         from interp_engine.steer import steer
@@ -106,31 +119,32 @@ class InterpVLLMSAE:
         sync = sync_model(self.model)
         clean_cache = sync.capture(ids, [point])
         clean_tensor = clean_cache[point]
-        if (not isinstance(clean_tensor, torch.Tensor)
-                or clean_tensor.ndim != 3
-                or clean_tensor.shape[0] != 1
-                or clean_tensor.shape[1] != len(ids)):
+        if (
+            not isinstance(clean_tensor, torch.Tensor)
+            or clean_tensor.ndim != 3
+            or clean_tensor.shape[0] != 1
+            or clean_tensor.shape[1] != len(ids)
+        ):
             raise RuntimeError("vLLM capture failed to return the exact requested token rows")
         original = clean_tensor[0, idx].detach().clone()
         site = ActivationSite(self.layer, f"blocks.{self.layer}.hook_resid_post", idx)
         tokens = torch.tensor([ids], device=original.device, dtype=torch.long)
-        snapshot = snapshot_from_activation(
-            self.sae, tokens=tokens, site=site, activation=original
-        )
+        snapshot = snapshot_from_activation(self.sae, tokens=tokens, site=site, activation=original)
         patch = apply_condition(self.sae, snapshot, condition)
         delta = (patch.activation.to(original.device, original.dtype) - original).detach()
         if not bool(torch.isfinite(delta).all()):
             raise RuntimeError("nonfinite SAE edit delta")
         ops = SteeringSpec(
-            layers={self.layer: LayerSteeringSpec(
-                operations=[AddSpec(vector=delta.float().cpu(), scale=1.0)]
-            )},
+            layers={
+                self.layer: LayerSteeringSpec(
+                    operations=[AddSpec(vector=delta.float().cpu(), scale=1.0)]
+                )
+            },
             point="resid_post",
         )
         # Position mask lists EXCLUDED token IDs, not the edited one.
         masked = [i for i in range(len(ids)) if i != idx]
-        with steer(self.model, ops, prompt_token_ids=ids,
-                   position_mask=masked, generated=False):
+        with steer(self.model, ops, prompt_token_ids=ids, position_mask=masked, generated=False):
             edited_cache = sync.capture(ids, [point])
         edited_tensor = edited_cache[point]
         if edited_tensor.shape != clean_tensor.shape:
@@ -145,26 +159,32 @@ class InterpVLLMSAE:
         # Verify that OTHER prompt positions were not steered.
         mask = torch.tensor(masked, dtype=torch.long, device=edited_tensor.device)
         if len(masked) and not torch.allclose(
-            edited_tensor[0, mask].float(), clean_tensor[0, mask].float(),
-            atol=atol, rtol=rtol,
+            edited_tensor[0, mask].float(),
+            clean_tensor[0, mask].float(),
+            atol=atol,
+            rtol=rtol,
         ):
             raise RuntimeError("steer changed excluded prompt positions")
         clean_text = edited_text = None
         if next_token_probe:
             clean_text = sync.generate_text(ids, max_tokens=1, temperature=0.0, seed=0)
-            with steer(self.model, ops, prompt_token_ids=ids,
-                       position_mask=masked, generated=False):
-                edited_text = sync.generate_text(
-                    ids, max_tokens=1, temperature=0.0, seed=0
-                )
+            with steer(
+                self.model, ops, prompt_token_ids=ids, position_mask=masked, generated=False
+            ):
+                edited_text = sync.generate_text(ids, max_tokens=1, temperature=0.0, seed=0)
         support = tuple(
-            torch.nonzero(snapshot.codes != 0, as_tuple=False)
-            .reshape(-1).cpu().tolist()
+            torch.nonzero(snapshot.codes != 0, as_tuple=False).reshape(-1).cpu().tolist()
         )
         return VLLMSAEOutcome(
-            backend=self.backend, input_length=len(ids), layer=self.layer,
-            patch_position=idx, feature_ids_before=support, activation_error=err,
-            clean_residual=original.cpu(), edited_residual=actual.cpu(),
-            expected_residual=expected.cpu(), clean_next_text=clean_text,
+            backend=self.backend,
+            input_length=len(ids),
+            layer=self.layer,
+            patch_position=idx,
+            feature_ids_before=support,
+            activation_error=err,
+            clean_residual=original.cpu(),
+            edited_residual=actual.cpu(),
+            expected_residual=expected.cpu(),
+            clean_next_text=clean_text,
             edited_next_text=edited_text,
         )
