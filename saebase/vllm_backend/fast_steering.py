@@ -118,6 +118,7 @@ def generate_decoder_direction_cached(
     compare_unsteered: bool = False,
     steer_last_prompt_token: bool = True,
     stop_at_eos: bool = True,
+    precomputed_direction: torch.Tensor | None = None,
 ) -> FastSteeringResult:
     """Real cached generation with an SAE feature direction on every decode token.
 
@@ -144,7 +145,20 @@ def generate_decoder_direction_cached(
     if type(seed) is not int or seed < 0:
         raise ValueError("seed must be nonnegative")
 
-    vector = decoder_feature_direction(sae, feature_id)
+    if precomputed_direction is None:
+        vector = decoder_feature_direction(sae, feature_id)
+    else:
+        if (
+            not isinstance(precomputed_direction, torch.Tensor)
+            or precomputed_direction.ndim != 1
+            or precomputed_direction.numel() != int(sae.cfg.d_in)
+            or not bool(torch.isfinite(precomputed_direction).all())
+            or not bool(precomputed_direction.any())
+        ):
+            raise ValueError("precomputed SAE direction must be finite nonzero [d_in]")
+        # Only reuse this in a pinned, read-only model+SAE worker whose
+        # feature_id has been verified. Avoid decoding onehots each request.
+        vector = precomputed_direction.detach().float().cpu().clone()
     spec = SteeringSpec(
         layers={
             layer: LayerSteeringSpec(
