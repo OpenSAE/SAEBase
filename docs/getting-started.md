@@ -1,78 +1,52 @@
 # Getting Started
 
-SAEBase provides a lightweight offline interface, and optional analysis dependencies for real pretrained language models and SAEs. Python 3.11–3.12 is supported.
+SAEBase supports Python 3.11 and 3.12. The core package and its first examples work without downloading any pretrained model.
 
-## Install
+## Install and explore SAE features
 
 ```bash
 git clone https://github.com/OpenSAE/SAEBase.git
 cd SAEBase
 python -m pip install -e .
+
+python examples/quickstart/public_api_offline.py
 ```
 
-This installs the core APIs and CPU-only examples. Use `python -m pip install -e ".[dev]"` for tests and `python -m pip install -e ".[analysis]"` when you want to load pretrained checkpoints. GitHub [Releases](https://github.com/OpenSAE/SAEBase/releases) also contain archived versions; the current development APIs are available from this source checkout.
+This example creates a small local model and SAE, captures a selected token's activation, edits features and compares logits.
 
-## Start without model downloads
-
-Run the [first experiment](first-experiment.md) to create benchmark and reliability results in one directory:
+## Run a full experiment on CPU
 
 ```bash
+python examples/quickstart/first_experiment.py --dry-run
 python examples/quickstart/first_experiment.py --output runs/first-experiment
 ```
 
-The command prints the location of a standalone HTML report, CSV summaries and verified JSON/manifest files. You can rerun it to verify and resume the same experiment. It uses two synthetic SAEs and no downloads.
+This evaluates two synthetic SAEs, reuses cached activations, measures feature interventions and produces a reliability audit. The command prints the exact paths of the HTML report, CSV summary and JSON results. Run it again to inspect the persisted results without repeating valid completed measurements.
 
-To explore individual capabilities instead:
+See [Your First SAEBase Experiment](first-experiment.md) for an explanation of the outputs.
 
-```bash
-python examples/quickstart/public_api_offline.py
-saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --dry-run
-python examples/activations/activation_store.py
-```
+## Load a real public model and SAE
 
-The first example uses an explicitly synthetic model/SAE to demonstrate capture, editing and logits. The benchmark preflight checks workload and identities without downloading checkpoints. The third example creates and reuses a sharded activation/code store offline.
-
-## Run a real SAE benchmark
+Install the optional analysis dependencies and run a small Pythia example:
 
 ```bash
-saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --real
-saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --report-only
-```
-
-The configuration identifies a real Pythia-70M model/SAE pair and a small fixed-token validation sample. Real execution downloads checkpoints and needs an appropriate CPU or GPU environment. Results are written under `runs/<run_id>/` with separate metrics, source provenance, a CSV summary and standalone HTML. This example validates engineering behavior, not a representative language dataset.
-
-For a real feature-edit example:
-
-```bash
+python -m pip install -e ".[analysis]"
 python examples/interventions/pythia_feature_edit.py
 ```
 
-## Prepare your own prompt artifacts
-
-SAEBase also supports versioned prompt datasets with explicit behavior, split and seed metadata.
+For a reproducible checkpoint benchmark, inspect its bounded plan before downloading weights:
 
 ```bash
-saebase-prepare-prompts \
-  --model-key pythia70m --behavior SimpleCopying \
-  --device cpu --n-generate 300 --min-kept 20 --seed 0 \
-  --data-dir ./data
+saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --dry-run
+saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --real
 ```
 
-This creates `data/SimpleCopying/pythia70m/v1/prompts.jsonl` and
-`manifest.json`. The original activation-health CLI can evaluate these prompts:
+The benchmark uses one frozen example token sequence to verify the software pipeline; it is not a language-model evaluation dataset. The HTML report and source/metric manifests are saved under `runs/<run_id>/`.
 
-```bash
-saebase \
-  --task sae --model pythia70m --sae pythia70m_resid_sm \
-  --prompt-source SimpleCopying --layer 3 --n-prompts 5 \
-  --data-dir ./data --device cpu \
-  --run-dir ./experiment/pythia70m-smoke
-```
+## Continue with your own research
 
-The output includes `sae_activation_summary.json` and a resolved Hydra configuration. Model/SAE checkpoint downloads are required for these two commands.
+Use [Model and SAE Support](model-support.md) to choose checkpoints, [Activation Store](activation-store.md) to reuse captured activations, [Feature Interventions](feature-interventions.md) to edit codes, [Benchmarking](benchmarking.md) to configure metrics and [Reliability](reliability.md) to assess grouped uncertainty.
 
-## Choose what to do next
+For external SAR, RSS, Input Localization and SAEBench measurements, see [Research Integrations](research-integrations.md). To prepare your own prompts and source manifests, consult the [Data and Python API Guide](python-api.md).
 
-If you want to evaluate two SAE dictionaries over shared model activations, see [Activation Store](activation-store.md) and [SAE Benchmarking](benchmarking.md). If you want to edit features and measure output changes, see [Feature Interventions](feature-interventions.md). For paired statistical comparisons and known-truth controls, see [Reliability Analysis](reliability.md).
-
-[Examples](../examples/README.md) · [Python API](python-api.md) · [Model Support](model-support.md) · [Troubleshooting](troubleshooting.md)
+[Examples](../examples/README.md) · [Documentation](index.md) · [Troubleshooting](troubleshooting.md)

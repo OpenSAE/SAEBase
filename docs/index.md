@@ -1,58 +1,45 @@
 # SAEBase Documentation
 
-SAEBase is an open-source toolkit for evaluating sparse autoencoders, intervening on learned features, reusing model activations and auditing experimental reliability.
-
-Start with the task you want to perform. The documentation is organized by **capability**, not by the order in which the project was developed.
+Start with a working example, then choose the research task you want to perform. Guides are organized by capability rather than development stage.
 
 ## Getting started
 
-- [First Experiment](first-experiment.md) — a single CPU-only command that writes persistent metric, provenance and reliability reports.
-- [Troubleshooting](troubleshooting.md) — installation, checkpoint and benchmark error checks.
-- [Verified Models and SAE Checkpoints](verified-model-matrix.md) — 18 configurations, 48 evaluated layer sites, and linked results.
-- [Getting Started](getting-started.md) — installation, offline example, benchmark preflight and a real checkpoint walkthrough.
-- [Models and SAEs](model-support.md) — registry versus verified checkpoint coverage, public source links and access constraints.
-- [Examples Index](../examples/README.md) — runnable demonstrations grouped by research task.
-- [Python API](python-api.md) — public research functions, store/benchmark/audit entrypoints and CLI commands.
-- [Packaging and Compatibility](packaging.md) — installable namespaces, original CLI compatibility and distribution boundaries.
-- [API Reference](API.md) — quick lookup of major public interfaces.
+- [**Quick Start**](../README.md#-quick-start) — install SAEBase, run an offline example and try a real model/SAE in Python.
+- [First Experiment](first-experiment.md) — create an HTML report, CSV metrics, source records and a reliability audit without model downloads.
+- [Getting Started](getting-started.md) — installation, preflight and real-checkpoint commands.
+- [Python API](python-api.md) · [API Reference](API.md) — model adapters, SAE features, stores and evaluation.
+- [Runnable Examples](../examples/README.md) · [Troubleshooting](troubleshooting.md).
+
+## Research workflows
+
+| Task | Guide |
+| --- | --- |
+| Capture and reuse model activations | [Activation Store](activation-store.md) |
+| Edit SAE features and inspect downstream effects | [Feature Interventions](feature-interventions.md) |
+| Measure reconstruction, sparsity and behavior | [SAE Benchmarking](benchmarking.md) |
+| Bootstrap, paired comparisons and known-truth controls | [Reliability](reliability.md) |
+| Study full input-factor grids | [Controlled Inputs](controlled-inputs.md) · [Input Localization](localization-benchmark.md) |
+| Use original SAR, RSS and native SAEBench methods | [Research Integrations](research-integrations.md) |
+| Load a custom model, SAE or estimator | [Third-Party Extensions](extensions.md) |
 
 ## Research Lab
 
-- [Research Lab: run locally](../apps/research-lab/README.md) — browse real historical evidence, discover feature indexes, validate intervention configurations and inspect report APIs.
-- [Research Lab: measured progress and limitations](research-lab/results-20261020.md) — the 500-prompt capture cohort, SAR/RSS/Localize analysis and actual public/private artifact boundaries.
-- [Research Lab: release/verification checklist](research-lab/release-acceptance.md) — what a source release proves, what stays private and what must be checked before public dataset or hosted inference releases.
-- [Work Plan 05](../work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md) — implementation milestones and GPU execution record.
+- [Explore the Research Lab](../apps/research-lab/README.md) — recorded measurements, feature explorer and reports.
+- [Measured results](research-lab/results-20261020.md) — model/SAE coverage and recorded SAR, RSS and feature-intervention evidence.
+- [Release acceptance](research-lab/release-acceptance.md) — artifact checks, public data and deployment boundaries.
 
-## Research capabilities
+## Validated results
 
-- [Controlled Input Designs](controlled-inputs.md) — complete binary factor grids, state mapping, cache identity and Localize handoff.
-- [Activation Capture and Storage](activation-store.md) — reusable, integrity-checked activation and SAE code caches.
-- [Feature Interventions and Steering](feature-interventions.md) — residual-preserving edits, conditions and downstream measurements.
-- [SAE Benchmarking](benchmarking.md) — metrics, versioned configurations, experiment planning, reports and external native results.
-- [Reliability Analysis](reliability.md) — prompt-group bootstrap, paired comparisons and scientific ground-truth controls.
-- [Input Localization Benchmarking](localization-benchmark.md) — exact curves, metric artifacts, native paired-estimator stability and matched SAE comparisons.
-- [Research Integrations](research-integrations.md) — using original SAR/RSS/Localize estimators and native SAEBench results.
-- [Third-Party Extensions](extensions.md) — external model, SAE and original benchmark providers.
+- [Verified Model and SAE Matrix](verified-model-matrix.md) · [Model Support](model-support.md)
+- [GPU Performance Measurements](performance/workplan11_final_results.md) · [Performance Guide](performance.md)
+- [Validation and Reproducibility](validation.md) · [Checkpoint Evidence](stage-d-evidence-archive.md)
+- [Software Release v0.4.0](releases/v0.4.0.md) · [Previous Release v0.3.0](releases/v0.3.0.md)
 
-## Evidence and maintenance
+## Repository and maintenance
 
-- [Contributor Guide](contributor-guide.md) — find a first task, run tests and submit a reproducible pull request.
-- [Maintainer Workflow](maintainer-workflow.md) — ownership, code review and the CI/release process.
-- [CI and Research Validation Lanes](ci-maintenance.md) — pinned regressions, optional real-checkpoint acceptance and release safeguards.
-- [Benchmark Evidence and Reproducibility](stage-d-evidence-archive.md) — download and audit original experiment measurements and verification reports.
-- [Earlier Checkpoint Studies](phase-a-model-coverage.md) and [CPU Validation Records](stage-bc-model-sae-coverage.md) — historical compatibility tests retained for reproducibility.
-- [Validation and Reproducibility](validation.md) — actual public-checkpoint acceptance versus optional and unverified capabilities.
-- [Checkpoint Acceptance Protocol](reference-checkpoint-validation.md) — detailed reference experiment and checksum requirements.
-- [Public API Validation](public-api-validation.md) — detailed API behavior and compatibility tests.
-- [Research Integration Validation](research-integration-validation.md) — original-source and protocol acceptance notes.
-- [Release and Checkpoint Matrix](checkpoint-validation.md) — versioned multi-checkpoint acceptance, performance and integrity checks.
-- [General Software Release Process](release-process.md) — exact-commit CI gate, candidate checksums and manual version publication.
-- [Release Notes: v0.4.0](releases/v0.4.0.md) — Research Lab software preview, compatibility and experiment-evidence boundaries.
-- [Earlier Release: v0.3.0](releases/v0.3.0.md) — historical verified SAE compatibility and package release.
-- [Changelog](../CHANGELOG.md), [Provenance](PROVENANCE.md), [Release Checklist](RELEASE_CHECKLIST.md), [Contributing](../CONTRIBUTING.md) and [Security](../SECURITY.md).
+- [**Repository Guide**](repository-guide.md) — where examples, configuration, research code, assets and evidence live.
+- [Contributing](../CONTRIBUTING.md) · [Maintainer Workflow](maintainer-workflow.md) · [CI Checks](ci-maintenance.md)
+- [Packaging](packaging.md) · [Software Release Process](release-process.md) · [Security](../SECURITY.md)
+- [Historical Research and Engineering Notes](history.md) — older implementation, compatibility and checkpoint records.
 
-## Terminology and compatibility
-
-The `saebase` Python package has stable public modules for API access, storage, interventions, benchmarks, reliability and integrations. Persisted schemas such as `saebase.m2.measurement.v1` and existing CLI flags such as `--m3-root` are preserved for compatibility. These are **machine-facing identifiers**, not names that users must learn to understand the research workflow.
-
-The project publishes source and executable tools; it does not redistribute third-party model or SAE weights. A registered model or SAE is not automatically an experimentally validated model/SAE pair.
+Versioned source identities and older command aliases remain usable for reproducibility. They are not required to follow the current Quick Start.

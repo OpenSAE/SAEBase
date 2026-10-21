@@ -11,8 +11,8 @@ from saebase.reliability.report import write_audit,read_audit
 
 def main(argv=None)->int:
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--m3-root",type=Path,required=True,
-                   help="runs/<run_id> containing verified benchmark metrics and source caches")
+    p.add_argument("--results-dir","--m3-root",dest="m3_root",type=Path,required=True,
+                   help="completed benchmark directory with metrics and source caches")
     p.add_argument("--config",type=Path,required=True)
     action=p.add_mutually_exclusive_group(required=True)
     action.add_argument("--dry-run",action="store_true")

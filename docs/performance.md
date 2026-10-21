@@ -36,9 +36,9 @@ after identity patches, per-position logits, exact feature code provenance,
 sample grouping, original SAR/RSS estimators, and appropriate numerical
 tolerances pass on each targeted real model and checkpoint.
 
-## Not yet verified or shipped
+## Measured acceleration and remaining limits
 
-- Exact GPU speedups as a new default. The opt-in block-suffix replay
+- Opt-in GPU acceleration. The block-suffix replay
   stays off unless `BatchEngine(..., enable_suffix_replay=True)` is set.
   On the full Qwen3-1.7B Base layer-7 workload (25 rows, 7 edits, identity
   replay included) the RTX 5070 median is 1.888 s versus 2.409 s for the
