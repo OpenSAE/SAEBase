@@ -142,6 +142,73 @@ class HFHooksModel(HFLogitsModel):
         return logits
 
 
+    @torch.no_grad()
+    def run_batch(
+        self,
+        input_ids: torch.Tensor,
+        *,
+        layer: int,
+        positions: list[int],
+        readout_positions: list[int],
+        attention_mask: torch.Tensor,
+        patches: torch.Tensor | None = None,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """Row-wise HF forward matching get_resid and run_with_patch.
+
+        Positions are absolute, zero-based token positions for each sample.
+        Returns original site activations [batch, d_model] and readout logits
+        [batch, vocab]. When patches are supplied, each row is edited with
+        run_with_patch. A fused padded GEMM is not used: on Qwen3 bf16 the
+        reduction depends on the row count and changes TopK feature ids.
+        """
+        if not isinstance(input_ids, torch.Tensor) or input_ids.ndim != 2:
+            raise ValueError("input_ids must have shape [batch, seq]")
+        batch, length = input_ids.shape
+        if batch == 0 or length == 0:
+            raise ValueError("empty token batch")
+        if (len(positions) != batch or len(readout_positions) != batch
+                or any(type(p) is not int or p < 0 or p >= length
+                       for p in positions + readout_positions)):
+            raise ValueError("one valid absolute patch/readout position per sample required")
+        if not isinstance(attention_mask, torch.Tensor) or attention_mask.shape != input_ids.shape:
+            raise ValueError("attention_mask must match input_ids shape")
+        mask = attention_mask.to(dtype=torch.long, device=self.cfg.device)
+        if (not bool(((mask == 0) | (mask == 1)).all())
+                or not bool((mask[:, 1:] <= mask[:, :-1]).all())
+                or any(int(mask[i, p]) != 1 or int(mask[i, r]) != 1
+                       for i, (p, r) in enumerate(zip(positions, readout_positions)))):
+            raise ValueError("right padding with valid patch/readout positions required")
+        ids = input_ids.to(self.cfg.device)
+        if patches is not None:
+            if (not isinstance(patches, torch.Tensor) or patches.ndim != 2
+                    or patches.shape[0] != batch or not bool(torch.isfinite(patches).all())):
+                raise ValueError("patches must be finite [batch, d_model]")
+        # A fused bf16 GEMM uses a different K-reduction tile once the row count
+        # changes. On Qwen3-1.7B that 1-ulp gap in block 0 grows into TopK
+        # feature substitutions by the readout layer. Each row therefore uses
+        # the same unpadded forward as get_resid / run_with_patch.
+        activations: list[torch.Tensor] = []
+        logits: list[torch.Tensor] = []
+        for i in range(batch):
+            length = int(mask[i].sum().item())
+            row = ids[i:i + 1, :length]
+            pos = positions[i]
+            read = readout_positions[i]
+            if pos >= length or read >= length:
+                raise ValueError("patch/readout position is outside the unpadded row")
+            offset = length - 1 - pos
+            read_offset = length - 1 - read
+            activations.append(self.get_resid(row, layer, [offset])[0])
+            if patches is None:
+                row_logits = self(row)
+                logits.append(row_logits[0, read].detach().clone())
+            else:
+                logits.append(self.run_with_patch(
+                    row, layer, {offset: patches[i]}, readout_offset=read_offset,
+                ).detach().clone())
+        return torch.stack(activations, dim=0), torch.stack(logits, dim=0)
+
+
 def load_hf_hooks_model(
     model_name: str,
     *,

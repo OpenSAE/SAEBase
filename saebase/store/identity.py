@@ -10,11 +10,15 @@ from dataclasses import asdict, dataclass, field
 import hashlib
 import json
 import re
+import weakref
 from typing import Any, Mapping
 
 import torch
 
 _SHA = re.compile(r"^[0-9a-f]{64}$")
+# Repeated fingerprints of one loaded module skip the full byte hash when the
+# storage address, layout, and in-place version of every tensor are unchanged.
+_STATE_SHA_CACHE: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
 
 
 def stable_json(value: Any) -> str:
@@ -26,22 +30,57 @@ def fingerprint(value: Any) -> str:
     return hashlib.sha256(stable_json(value).encode("utf-8")).hexdigest()
 
 
+def _state_signature(items: list[tuple[str, torch.Tensor]]) -> tuple:
+    return tuple(
+        (
+            name,
+            str(value.dtype),
+            tuple(value.shape),
+            tuple(value.stride()),
+            int(value.data_ptr()),
+            int(value.storage_offset()),
+            int(getattr(value, "_version", 0)),
+        )
+        for name, value in items
+    )
+
+
 def sha256_state_dict(module: Any) -> str:
-    """Hash the complete sorted loaded state, identical to M0's reference format."""
+    """Hash the complete sorted loaded state, identical to M0's reference format.
+
+    The digest is cached on the module object. A later call returns that digest
+    only when every tensor still has the same storage, layout, and in-place
+    version, so an in-place weight edit is hashed again.
+    """
     if not callable(getattr(module, "state_dict", None)):
         raise TypeError("module must expose state_dict() for checkpoint verification")
     state = module.state_dict()
     if not state:
         raise ValueError("cannot fingerprint an empty state_dict")
-    digest = hashlib.sha256()
+    items: list[tuple[str, torch.Tensor]] = []
     for name, value in sorted(state.items()):
         if not isinstance(value, torch.Tensor):
             raise TypeError(f"non-tensor state_dict value: {name!r}")
+        items.append((name, value))
+    signature = _state_signature(items)
+    try:
+        cached = _STATE_SHA_CACHE.get(module)
+    except TypeError:
+        cached = None
+    if isinstance(cached, tuple) and cached[0] == signature:
+        return cached[1]
+    digest = hashlib.sha256()
+    for name, value in items:
         tensor = value.detach().contiguous().cpu()
         digest.update(json.dumps([name, str(tensor.dtype), list(tensor.shape)],
                                  separators=(",", ":")).encode())
         digest.update(tensor.reshape(-1).view(torch.uint8).numpy().tobytes())
-    return digest.hexdigest()
+    result = digest.hexdigest()
+    try:
+        _STATE_SHA_CACHE[module] = (signature, result)
+    except TypeError:
+        pass
+    return result
 
 
 def _sha(value: str, label: str) -> None:

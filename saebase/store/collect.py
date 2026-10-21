@@ -121,11 +121,14 @@ def encode_from_store(activation_path: str | Path, sae: Any,
     written = reused = rows = 0
     with CodeWriter(activation_path, identity, layout=layout, shard_target_bytes=shard_target_bytes,
                     repair_corruption=repair_corruption) as writer:
-        # iter_batches caps intermediate encoded tensor allocations for a group.
+        # Encode all uncached rows from each bounded read batch together.
+        # CodeIdentity restricts this path to per-token or fixed-threshold
+        # inference, so combining unrelated prompt rows is semantically safe.
         for batch in reader.iter_batches(max_rows=max_rows):
+            pending: list[tuple[Any, SampleRecord, int]] = []
+            inputs: list[np.ndarray] = []
             for sample in batch:
-                # The code cache must reject stale rows after a repaired or
-                # recaptured activation shard, even if sample_id is unchanged.
+                # The code cache rejects stale rows even when sample IDs match.
                 source_values = np.asarray(sample.values, dtype=np.float32)
                 source_sha = hashlib.sha256(source_values.tobytes(order="C")).hexdigest()
                 code_record = replace(sample.record, source_activation_sha256=source_sha)
@@ -133,18 +136,30 @@ def encode_from_store(activation_path: str | Path, sae: Any,
                     reused += 1
                     continue
                 matrix = np.array(source_values, dtype=np.float32, copy=True)
-                inputs = torch.as_tensor(matrix, dtype=dtype, device=device)
-                encoded = sae.encode(inputs)
-                # layer_norm SAEs stash ln_mu/ln_std on encode; clear so later
-                # independent decodes cannot reuse a stale prompt's stats.
-                for _ln_name in ("ln_mu", "ln_std"):
-                    if hasattr(sae, _ln_name):
-                        delattr(sae, _ln_name)
-                if (not isinstance(encoded, torch.Tensor) or encoded.shape != (len(sample.positions), identity.d_sae)
-                        or not bool(torch.isfinite(encoded).all())):
-                    raise RuntimeError("sae.encode must return finite [selected_positions, d_sae]")
-                if writer.append(code_record, encoded):
+                pending.append((sample, code_record, len(sample.positions)))
+                inputs.append(matrix)
+            if not pending:
+                continue
+            matrix = np.concatenate(inputs, axis=0)
+            tensor = torch.as_tensor(matrix, dtype=dtype, device=device)
+            encoded = sae.encode(tensor)
+            # Layer-norm SAEs can store transient statistics on encode. Clear
+            # them so later independent decode calls cannot reuse stale data.
+            for _ln_name in ("ln_mu", "ln_std"):
+                if hasattr(sae, _ln_name):
+                    delattr(sae, _ln_name)
+            if (not isinstance(encoded, torch.Tensor)
+                    or encoded.shape != (len(matrix), identity.d_sae)
+                    or not bool(torch.isfinite(encoded).all())):
+                raise RuntimeError("sae.encode must return finite [n_positions, d_sae]")
+            start_row = 0
+            for sample, code_record, n_rows in pending:
+                values = encoded[start_row:start_row + n_rows]
+                start_row += n_rows
+                if writer.append(code_record, values):
                     written += 1
-                    rows += len(sample.positions)
+                    rows += n_rows
+            if start_row != encoded.shape[0]:
+                raise RuntimeError("encoded row count differs from source rows")
         path = writer.path
     return path, CollectionStats(written, reused, rows)

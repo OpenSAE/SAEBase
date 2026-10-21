@@ -415,6 +415,21 @@ def test_m0_and_m1_state_hashes_agree_for_model_and_sae():
     assert sha256_state_dict(sae) == _sha_weights(sae)
 
 
+def test_state_hash_cache_repeats_and_sees_inplace_edits():
+    from saebase.store.identity import _STATE_SHA_CACHE
+
+    model = ResearchToyModel()
+    first = sha256_state_dict(model)
+    assert model in _STATE_SHA_CACHE
+    assert sha256_state_dict(model) == first
+    with torch.no_grad():
+        parameter = next(model.parameters())
+        parameter.add_(1)
+    changed = sha256_state_dict(model)
+    assert changed != first
+    assert sha256_state_dict(model) == changed
+
+
 def test_many_shards_use_incremental_metadata_index(tmp_path, monkeypatch):
     import saebase.store.shards as mod
     original = mod.ShardedReader
