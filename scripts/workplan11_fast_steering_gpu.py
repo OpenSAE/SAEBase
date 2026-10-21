@@ -10,6 +10,7 @@ These are DIFFERENT scientific protocols. Compare speeds, but never claim that
 fixed decoder direction or persistent edited KV reproduces old SAEBase logits.
 Save raw token IDs only under the private WP11_RUN directory.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -38,9 +39,7 @@ def sync() -> None:
 
 
 def git_sha() -> str | None:
-    p = subprocess.run(
-        ["git", "rev-parse", "HEAD"], text=True, capture_output=True, check=False
-    )
+    p = subprocess.run(["git", "rev-parse", "HEAD"], text=True, capture_output=True, check=False)
     return p.stdout.strip() if p.returncode == 0 else None
 
 
@@ -65,8 +64,11 @@ def reference_stepper(model, sae, token_ids, max_tokens: int, feature_id: int):
         current = torch.cat(
             (current, torch.tensor([[nxt]], dtype=torch.long, device=current.device)), dim=1
         )
-    return {"ids": tuple(result), "forwards": 2 * max_tokens,
-            "protocol": "reference_clean_prefix_stepwise_v1"}
+    return {
+        "ids": tuple(result),
+        "forwards": 2 * max_tokens,
+        "protocol": "reference_clean_prefix_stepwise_v1",
+    }
 
 
 def load_hf_pair():
@@ -82,24 +84,36 @@ def hf_generator(mode, model, sae, ids, max_tokens, feature_id):
     from saebase.interventions.specs import Condition
 
     trace = generate_live_sae_cached(
-        model, sae, ids, layer=LAYER,
+        model,
+        sae,
+        ids,
+        layer=LAYER,
         condition=Condition("ablate", "ablate", (feature_id,)),
-        max_new_tokens=max_tokens, max_context_tokens=1024,
+        max_new_tokens=max_tokens,
+        max_context_tokens=1024,
     )
-    return {"ids": trace.generated_token_ids, "forwards": trace.model_forwards,
-            "protocol": trace.protocol}
+    return {
+        "ids": trace.generated_token_ids,
+        "forwards": trace.model_forwards,
+        "protocol": trace.protocol,
+    }
 
 
 def vllm_generator(model, sae, ids, max_tokens, feature_id, strength):
     from saebase.vllm_backend.fast_steering import generate_decoder_direction_cached
 
     trace = generate_decoder_direction_cached(
-        model, sae, ids, layer=LAYER,
-        feature_id=feature_id, strength=strength,
-        max_new_tokens=max_tokens, temperature=0.0, seed=0,
+        model,
+        sae,
+        ids,
+        layer=LAYER,
+        feature_id=feature_id,
+        strength=strength,
+        max_new_tokens=max_tokens,
+        temperature=0.0,
+        seed=0,
     )
-    return {"ids": trace.generated_token_ids, "forwards": None,
-            "protocol": trace.protocol}
+    return {"ids": trace.generated_token_ids, "forwards": None, "protocol": trace.protocol}
 
 
 def select_feature_id(model, sae, ids):
@@ -107,8 +121,7 @@ def select_feature_id(model, sae, ids):
 
     adapter = ModelAdapter(model)
     snap = capture_features(
-        adapter, sae,
-        site=ActivationSite(LAYER, f"blocks.{LAYER}.hook_resid_post", -1), tokens=ids
+        adapter, sae, site=ActivationSite(LAYER, f"blocks.{LAYER}.hook_resid_post", -1), tokens=ids
     )
     active = torch.nonzero(snap.codes != 0).flatten().tolist()
     if not active:
@@ -119,7 +132,8 @@ def select_feature_id(model, sae, ids):
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--mode", required=True,
+        "--mode",
+        required=True,
         choices=("hf-reference", "hf-live", "vllm", "vllm-static"),
     )
     parser.add_argument("--lengths", default="8,32,128")
@@ -147,23 +161,33 @@ def main() -> None:
         from saebase.vllm_backend.sae_interventions import InterpVLLMSAE
 
         sae, _ = load_sae_for_profile(SAE_KEY, LAYER, device="cuda")
-        utilization = max(0.70, args.utilization) if args.mode == "vllm-static" else args.utilization
+        utilization = (
+            max(0.70, args.utilization) if args.mode == "vllm-static" else args.utilization
+        )
         engine = InterpVLLMSAE.load(
-            MODEL, sae, layer=LAYER,
-            backend=args.mode, gpu_memory_utilization=utilization,
+            MODEL,
+            sae,
+            layer=LAYER,
+            backend=args.mode,
+            gpu_memory_utilization=utilization,
             max_model_len=1024,
         )
         tokenizer = engine.model
 
     try:
         report = {
-            "git_sha": git_sha(), "mode": args.mode,
-            "gpu": torch.cuda.get_device_name(), "torch": torch.__version__,
-            "repeats": args.repeats, "site": f"{MODEL}:L{LAYER}:{SAE_KEY}",
+            "git_sha": git_sha(),
+            "mode": args.mode,
+            "gpu": torch.cuda.get_device_name(),
+            "torch": torch.__version__,
+            "repeats": args.repeats,
+            "site": f"{MODEL}:L{LAYER}:{SAE_KEY}",
             "results": [],
             "comparability": (
-                "old clean-prefix scientific protocol" if args.mode == "hf-reference"
-                else "persistent live SAE edit KV" if args.mode == "hf-live"
+                "old clean-prefix scientific protocol"
+                if args.mode == "hf-reference"
+                else "persistent live SAE edit KV"
+                if args.mode == "hf-live"
                 else "persistent fixed SAE decoder-direction, not live ablation"
             ),
         }
@@ -192,47 +216,65 @@ def main() -> None:
                         trace = hf_generator(args.mode, raw, sae, ids, length, selected)
                     else:
                         trace = vllm_generator(
-                            engine.model, sae, tuple(int(x) for x in ids[0].tolist()),
-                            length, selected, args.strength,
+                            engine.model,
+                            sae,
+                            tuple(int(x) for x in ids[0].tolist()),
+                            length,
+                            selected,
+                            args.strength,
                         )
                     sync()
                     elapsed = time.perf_counter() - start
                     if rep:
-                        series.append({
-                            "seconds": elapsed,
-                            "tokens": len(trace["ids"]),
-                            "forwards": trace["forwards"],
-                            "allocated_bytes": int(torch.cuda.max_memory_allocated()),
-                            "reserved_bytes": int(torch.cuda.max_memory_reserved()),
-                        })
+                        series.append(
+                            {
+                                "seconds": elapsed,
+                                "tokens": len(trace["ids"]),
+                                "forwards": trace["forwards"],
+                                "allocated_bytes": int(torch.cuda.max_memory_allocated()),
+                                "reserved_bytes": int(torch.cuda.max_memory_reserved()),
+                            }
+                        )
                         token_ids = list(trace["ids"])
                 sorted_times = sorted(x["seconds"] for x in series)
                 median = sorted_times[len(sorted_times) // 2]
                 total = len(token_ids or ())
-                report["results"].append({
-                    "prompt_index": prompt_index,
-                    "original_token_count": int(ids.shape[1]),
-                    "feature_id": selected,
-                    "max_new_tokens": length,
-                    "protocol": trace["protocol"],
-                    "median_seconds": median,
-                    "new_tokens_per_second": total / median if median else None,
-                    "repetitions": series,
-                    "new_token_ids_private": token_ids,
-                })
+                report["results"].append(
+                    {
+                        "prompt_index": prompt_index,
+                        "original_token_count": int(ids.shape[1]),
+                        "feature_id": selected,
+                        "max_new_tokens": length,
+                        "protocol": trace["protocol"],
+                        "median_seconds": median,
+                        "new_tokens_per_second": total / median if median else None,
+                        "repetitions": series,
+                        "new_token_ids_private": token_ids,
+                    }
+                )
                 name = f"fast_steering_{args.mode.replace('-', '_')}.json"
                 (OUT / name).write_text(json.dumps(report, indent=2) + "\n")
-        print(json.dumps({
-            "mode": args.mode, "site": report["site"],
-            "summary": [
-                {"prompt_index": row["prompt_index"],
-                 "tokens": row["max_new_tokens"],
-                 "median_seconds": row["median_seconds"],
-                 "tokens_per_second": row["new_tokens_per_second"]}
-                for row in report["results"]
-            ],
-            "private_report": str(OUT / f"fast_steering_{args.mode.replace('-', '_')}.json"),
-        }, indent=2))
+        print(
+            json.dumps(
+                {
+                    "mode": args.mode,
+                    "site": report["site"],
+                    "summary": [
+                        {
+                            "prompt_index": row["prompt_index"],
+                            "tokens": row["max_new_tokens"],
+                            "median_seconds": row["median_seconds"],
+                            "tokens_per_second": row["new_tokens_per_second"],
+                        }
+                        for row in report["results"]
+                    ],
+                    "private_report": str(
+                        OUT / f"fast_steering_{args.mode.replace('-', '_')}.json"
+                    ),
+                },
+                indent=2,
+            )
+        )
     finally:
         if engine is not None:
             engine.close()
