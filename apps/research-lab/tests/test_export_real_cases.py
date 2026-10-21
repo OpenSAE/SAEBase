@@ -95,12 +95,34 @@ def test_bundle_contracts():
         if len(text) > 180 and not text.startswith("https://"):
             raise AssertionError("unexpected long public string")
     lab_js = (LAB / "assets" / "lab.js").read_text(encoding="utf-8")
+    page = (LAB / "index.html").read_text(encoding="utf-8")
     assert "unavailable" not in lab_js
-    assert "Compare edits" in (LAB / "index.html").read_text(encoding="utf-8")
+    assert "What happens when we change a model feature?" in page
+    for banned in ("Selected logit L2", "Feature IDs", "Recorded prompts 1", "gpu04.paired_operator_logit_l2.v1", "The prompt text is not in the public record"):
+        assert banned not in page
+        assert banned not in lab_js
     pack = json.loads((LAB / "data" / "evidence.json").read_text(encoding="utf-8"))
     assert pack["effects"][0]["operators"]
     assert len(pack["contexts"]) == len(context["features"])
     assert len(pack["contexts"][0]["states"]) == 64
+
+
+def test_authored_probabilities_match_full_softmax():
+    import math
+
+    payload = json.loads((DATA / "authored_effects.json").read_text(encoding="utf-8"))
+    assert 3 <= len(payload["cases"]) <= 12
+    assert payload["run_id"] != "7fb2be8f29a1-20261019T035727Z"
+    for case in payload["cases"]:
+        assert case["prompt"]
+        assert case["public_text_reviewed"] is True
+        groups = [(case["original_top_tokens"], case["original_logsumexp"])]
+        groups.extend((item["edited_top_tokens"], item["edited_logsumexp"]) for item in case["operators"])
+        for rows, logsumexp in groups:
+            for row in rows:
+                rebuilt = math.exp(row["logit"] - logsumexp)
+                assert math.isclose(row["probability"], rebuilt, rel_tol=0, abs_tol=1e-5)
+                assert 0 <= row["probability"] <= 1
 
 
 def test_export_matches_sources_when_archive_present():

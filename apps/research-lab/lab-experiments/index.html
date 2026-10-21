@@ -31,10 +31,16 @@
       <div class="statusline"><div class="status-left"><span class="eyebrow">INTERACTIVE RESEARCH WORKSPACE</span><span class="status-divider"></span><span id="evidence-status">Reading evidence…</span></div><div class="status-actions"><label class="import-button" for="import-json">Import evidence <span>↑</span></label><input id="import-json" type="file" accept="application/json,.json" hidden><button id="share" class="ghost-btn" type="button">Share view ↗</button></div></div>
       <div id="flash" class="flash" role="status" aria-live="polite" hidden></div>
       <section class="page" id="page-effects" aria-labelledby="title-effects">
-        <header class="page-header"><span class="kicker">02 / FEATURE EFFECTS</span><h1 id="title-effects">What changed?</h1><p>Each case is one recorded prompt on one model. Compare the edits that were actually saved for that prompt.</p></header>
-        <div class="two-col">
-          <div class="panel controls"><div class="panel-label">RECORDED CASE</div><label class="field">Model and feature <select id="effect-case"></select></label><div id="effect-meta" class="record-meta"></div><div class="divider"></div><div class="section-label">Same prompt, different edit</div><label class="field"><span id="effect-target-label">Operator</span> <select id="effect-target"></select></label><div class="predict-box" id="effect-predict"><span class="section-label">TOKEN PROBABILITIES</span><p id="effect-predict-copy">Will the selected token become more or less likely?</p><div class="seg" role="group" aria-label="Prediction"><button id="predict-up" class="seg-btn" type="button">↑ More likely</button><button id="predict-down" class="seg-btn" type="button">↓ Less likely</button></div><button class="action primary" type="button" id="effect-reveal">Reveal measured effect →</button><div class="feedback" id="effect-feedback" aria-live="polite"></div></div><div class="bottom-actions"><button id="effect-next" class="text-button" type="button">Try another example →</button><button id="effect-recipe" class="text-button" type="button">Export experiment recipe ↧</button></div></div>
-          <div class="panel graph-panel"><div class="panel-heading"><h2>Compare edits</h2><span id="effect-chip" class="chip">No case selected</span></div><div id="effect-prompt" class="prompt-card"></div><div id="effects-chart" class="bars-area" aria-live="polite"></div><div id="effect-measures" class="measure-list"></div><details class="evidence-fold"><summary>Evidence</summary><div id="effect-evidence" class="record-meta"></div></details><div id="effect-footnote" class="footnote"></div></div>
+        <header class="page-header"><span class="kicker">02 / FEATURE EFFECTS</span><h1 id="title-effects">What happens when we change a model feature?</h1><p>A feature is a learned internal signal. We can change it and measure how the model's next-word predictions respond.</p></header>
+        <div class="experiment-card">
+          <div class="example-head"><div><div class="panel-label">EXAMPLE</div><p id="effect-prompt" class="example-quote"></p><p id="effect-meta" class="record-meta"></p></div><button id="effect-next" class="ghost-btn" type="button">Another real example</button></div>
+          <select id="effect-case" hidden></select>
+          <label class="field"><span id="effect-target-label">What we change</span> <select id="effect-target"></select></label>
+          <div id="effects-chart" aria-live="polite"></div>
+          <h2 id="effect-learned-title">What we learned</h2>
+          <p id="effect-footnote"></p>
+          <p id="effect-limit">A larger change does not mean a better answer, and it does not tell us what the feature means.</p>
+          <details class="evidence-fold"><summary>Experiment details</summary><div id="effect-evidence" class="record-meta"></div><div id="effect-measures"></div></details>
         </div>
       </section>
       <section class="page" id="page-context" aria-labelledby="title-context" hidden>

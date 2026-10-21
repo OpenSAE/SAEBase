@@ -38,7 +38,7 @@
   }
   function metadata(c) { return provenance(c); }
   const standardSite = (c) => c?.model ? c.model + (c.sae ? ' / '+c.sae : '') + (c.layer!=null ? ' / L'+c.layer : '') : c?.site_id || 'Measured site';
-  function clearPrediction(){state.prediction='';state.revealed=false;$('predict-up').classList.remove('active');$('predict-down').classList.remove('active');$('effect-feedback').textContent='';}
+  function clearPrediction(){state.prediction='';state.revealed=false;}
   function validate(p) {
     if(!p || p.schema !== 'opensae.lab.evidence.v1')throw new Error('Unsupported evidence schema. Expected opensae.lab.evidence.v1');
     if(!p.meta || typeof p.meta !== 'object')throw new Error('Pack is missing metadata');
@@ -82,32 +82,33 @@
     if(state.route==='effects')renderEffects();if(state.route==='context')renderContext();if(state.route==='models')renderModels();if(state.route==='interactions')renderCoalitions();}
   function effectTokens(c){const base=new Map((c?.original_top_tokens||[]).map(t=>[t.token,t.probability]));const edited=new Map((c?.edited_top_tokens||[]).map(t=>[t.token,t.probability]));
     const all=[...new Set([...base.keys(),...edited.keys()])];return all.map(token=>({token,base:base.has(token)?base.get(token):null,edited:edited.has(token)?edited.get(token):null}));}
-  function operatorChoices(c){return (c?.operators||[]).filter(op=>typeof op.logit_l2==='number'&&Number.isFinite(op.logit_l2));}
-  function renderEffects(){state.effectId=options($('effect-case'),cases('effects').map(c=>{const primary=(c.operators||[]).find(op=>op.operation===c.condition)||c.operators?.[0];const magnitude=primary?` · L2 ${fmt(primary.logit_l2,1)}`:'';return {value:c.id,label:`${c.model||c.site_id} L${c.layer} · ${c.source_category||'recorded'} · feature ${c.feature_id}${magnitude}`};}),state.effectId);
-    const c=find('effects',state.effectId);$('effect-meta').innerHTML=metadata(c);
-    const tokens=effectTokens(c).filter(t=>t.base!==null&&t.edited!==null);
-    const operators=operatorChoices(c);
-    const label=$('effect-target-label');
-    if(tokens.length){label.textContent='Target token';state.effectTarget=options($('effect-target'),tokens.map(t=>({value:t.token,label:t.token})),state.effectTarget);}
-    else {label.textContent='Operator';state.effectTarget=options($('effect-target'),operators.map(op=>({value:op.operation,label:`${op.operation} · features ${op.feature_ids.join(', ')}`})),state.effectTarget||c?.condition||'');}
-    const selectedOp=operators.find(op=>op.operation===state.effectTarget)||operators.find(op=>op.operation===c?.condition)||operators[0];
-    $('effect-chip').textContent=selectedOp?selectedOp.operation:(c?.condition||'Recorded case');
-    $('effect-prompt').textContent=c?.prompt || (c?`Recorded prompt group ${c.prompt_group_id||c.id}. The prompt text is not in the public record.`:'');
-    $('effect-predict').hidden=!tokens.length;
-    $('effect-reveal').disabled=!tokens.length;$('predict-up').disabled=!tokens.length;$('predict-down').disabled=!tokens.length;
-    if(!c){$('effects-chart').innerHTML='';}
-    else if(tokens.length){$('effects-chart').innerHTML=`<div class="legend"><span><i class="original"></i>Original model</span><span><i class="edited"></i>Feature edited</span></div>`+
-       tokens.slice(0,12).map(t=>`<div class="bar-row"><span class="token-label">${esc(t.token)}</span><div class="bar-pair"><div class="bar-track"><div class="bar-fill base-fill" style="width:${t.base*100}%"></div></div><div class="bar-track"><div class="bar-fill edit-fill" style="width:${t.edited*100}%"></div></div></div><span class="bar-number">${fmt(t.base*100,2)}% → ${fmt(t.edited*100,2)}%</span></div>`).join('');}
-    else {const peak=Math.max(...operators.map(op=>op.logit_l2),1e-9);
-      $('effects-chart').innerHTML=`<div class="legend"><span>Logit L2 on this prompt</span></div>`+operators.map(op=>`<div class="bar-row ${op===selectedOp?'row-focus':''}"><span class="token-label">${esc(op.operation)}</span><div class="bar-track"><div class="bar-fill edit-fill" style="width:${op.logit_l2/peak*100}%"></div></div><span class="bar-number">${fmt(op.logit_l2,2)}</span></div>`).join('');}
-    const measures=[];
-    if(selectedOp)measures.push(['Selected logit L2',fmt(selectedOp.logit_l2)]);
-    if(selectedOp?.feature_ids?.length)measures.push(['Feature IDs',selectedOp.feature_ids.join(', ')]);
-    if(c?.sample_count!==undefined)measures.push(['Recorded prompts',fmt(c.sample_count,0)]);
-    $('effect-measures').innerHTML=measures.map(([a,b])=>`<div class="measure"><span>${esc(a)}</span><strong>${esc(b)}</strong></div>`).join('');
-    $('effect-evidence').innerHTML=c?`<div>${esc(c.protocol_id)} · ${esc(c.run_id||'')}</div><div>Model ${esc(c.model_sha256||'')} · SAE ${esc(c.sae_sha256||'')}</div><div>Source ${esc(c.source_relative_path||'')} · ${esc((c.source_sha256||'').slice(0,16))}</div><div>${link('Open source evidence',src(c))}</div>`:'';
-    $('effect-footnote').textContent=c?'Logit L2 is the distance between next-token logit vectors before and after this edit. It is not a token probability and not a generated sentence. Bars compare operators saved for this same prompt, not different models.':'';
-    if(!state.revealed)$('effect-feedback').textContent='';else revealEffect();}
+  function publicEffects(){return cases('effects').filter(c=>c.prompt && Array.isArray(c.original_top_tokens) && c.original_top_tokens.length);}
+  function wordOf(row){const raw=String(row?.label||row?.token||'');return raw.startsWith(' ')&&raw.trim()?raw.slice(1):raw;}
+  function percent(value){return `${(Number(value)*100).toFixed(1)}%`;}
+  function tokenColumn(title, rows, marks){const peak=Math.max(...rows.map(row=>row.probability),0.001);return `<div class="predict-col"><h3>${esc(title)}</h3>`+rows.map(row=>{const name=wordOf(row);const mark=marks.get(row.token)||'';return `<div class="word-row ${mark}"><span class="token-label">${esc(name)}</span><span class="bar-track"><span class="bar-fill ${mark==='rise'?'edit-fill':'base-fill'}" style="width:${Math.max(8,row.probability/peak*100)}%"></span></span><span class="bar-number">${percent(row.probability)}</span></div>`;}).join('')+'</div>';}
+  function renderEffects(){const shown=publicEffects();state.effectId=options($('effect-case'),shown.map(c=>({value:c.id,label:`${c.model} · ${c.prompt}`})),state.effectId);
+    const c=find('effects',state.effectId);if(!c){$('effects-chart').innerHTML='';return;}
+    const operators=(c.operators||[]).filter(op=>Array.isArray(op.edited_top_tokens)&&op.edited_top_tokens.length);
+    state.effectTarget=options($('effect-target'),operators.map(op=>({value:op.operation,label:op.label||op.operation})),state.effectTarget||c.condition);
+    const selected=operators.find(op=>op.operation===state.effectTarget)||operators[0];
+    const before=c.original_top_tokens;const after=selected.edited_top_tokens;
+    const beforeMap=new Map(before.map(row=>[row.token,row.probability]));const afterMap=new Map(after.map(row=>[row.token,row.probability]));
+    const shared=[...beforeMap.keys()].filter(token=>afterMap.has(token)).map(token=>({token,delta:afterMap.get(token)-beforeMap.get(token)}));
+    const marks=new Map();
+    if(shared.length){const rise=shared.reduce((best,row)=>row.delta>best.delta?row:best,shared[0]);const fall=shared.reduce((best,row)=>row.delta<best.delta?row:best,shared[0]);if(rise.delta>=0.02)marks.set(rise.token,'rise');if(fall.delta<=-0.02)marks.set(fall.token,'fall');}
+    $('effect-prompt').textContent=`“${c.prompt}”`;
+    $('effect-meta').textContent=`${c.model} · ${c.source_category||'short example'} · a learned internal feature. The lists are the model's most likely next words.`;
+    $('effects-chart').innerHTML=`<div class="before-after">${tokenColumn('Original', before, marks)}${tokenColumn(selected.label||'After the change', after, marks)}</div>`;
+    const firstBefore=before[0], firstAfter=after[0];
+    const action=selected.sentence||selected.label||'This change';
+    $('effect-footnote').textContent=wordOf(firstBefore)===wordOf(firstAfter)
+      ? `${action} kept “${wordOf(firstBefore)}” as the top next-word guess. Its chance moved from ${percent(firstBefore.probability)} to ${percent(firstAfter.probability)}.`
+      : `${action} changed the top next-word guess from “${wordOf(firstBefore)}” to “${wordOf(firstAfter)}”.`;
+    const legacyLabels={ablate:'Remove this feature',scale:'Cut its activity in half',add:'Add 1 to its activity',clamp:'Set its activity to 1',coalition:'Turn off the second active feature'};
+    const legacy=cases('effects').filter(row=>!row.prompt);
+    const legacyTable=legacy.length?`<h3>Older score-only records</h3><p>These six saved studies record how far the next-word scores moved. Their prompt wording was not stored, so they are not the main examples. Scale used a factor of one half, add used plus one, and clamp set the activity to 1.</p><table><tbody>${legacy.map(row=>`<tr><td>${esc(row.model||row.site_id)} layer ${esc(row.layer)}</td><td>${(row.operators||[]).map(op=>`${esc(legacyLabels[op.operation]||op.operation)} ${fmt(op.logit_l2,2)}`).join(' · ')}</td></tr>`).join('')}</tbody></table>`:'';
+    $('effect-evidence').innerHTML=`<p>${esc(c.protocol_id)} · run ${esc(c.run_id)} · site ${esc(c.site_id)} · feature ${esc(c.feature_id)}</p><p>Score shift for this edit: ${fmt(selected.logit_l2,4)}. Chances are a full-vocabulary softmax at the last token.</p><p>Model fingerprint ${esc(c.model_sha256||'')} · SAE fingerprint ${esc(c.sae_sha256||'')}</p><p>${link('Measurement script', src(c))}</p>${legacyTable}`;
+    $('effect-measures').textContent='';}
   function revealEffect(){const c=find('effects',state.effectId),t=effectTokens(c).find(t=>t.token===state.effectTarget&&t.base!==null&&t.edited!==null);
     if(!t){$('effect-feedback').textContent='Select an observed token with measured probabilities.';return;}
     const diff=t.edited-t.base;const direction=diff>0?'up':diff<0?'down':'unchanged';
@@ -238,11 +239,9 @@
       ['model-y',()=>{state.modelY=$('model-y').value;renderModels();}],
       ['model-name',()=>{state.modelFilter=$('model-name').value==='all'?'':$('model-name').value;renderModels();}]
     ])$(id).addEventListener('change',fn);
-    for(const [id,dir] of [['predict-up','up'],['predict-down','down']])$(id).addEventListener('click',()=>{state.prediction=dir;state.revealed=false;$('effect-feedback').textContent='';$('predict-up').classList.toggle('active',dir==='up');$('predict-down').classList.toggle('active',dir==='down');});
-    $('effect-reveal').addEventListener('click',()=>{state.revealed=true;revealEffect();});
-    $('effect-next').addEventListener('click',()=>{const list=cases('effects');if(!list.length)return;const index=Math.max(0,list.findIndex(item=>item.id===state.effectId));state.effectId=list[(index+1)%list.length].id;state.effectTarget='';clearPrediction();renderEffects();});
+    $('effect-next').addEventListener('click',()=>{const list=publicEffects();if(!list.length)return;const index=Math.max(0,list.findIndex(item=>item.id===state.effectId));state.effectId=list[(index+1)%list.length].id;state.effectTarget='';clearPrediction();renderEffects();});
     $('context-surprise').addEventListener('click',()=>{const list=cases('contexts');if(!list.length)return;const pick=list[Math.floor(Math.random()*list.length)];state.contextId=pick.id;state.prevMask=null;state.mask=Math.floor(Math.random()*64);renderGrid();});
-    $('effect-recipe').addEventListener('click',()=>recipe('effects'));$('context-recipe').addEventListener('click',()=>recipe('context'));
+    $('context-recipe').addEventListener('click',()=>recipe('context'));
     $('coalition-recipe').addEventListener('click',()=>recipe('interactions'));
     $('context-grid-tab').addEventListener('click',()=>{state.contextMode='grid';renderContext();});$('context-rss-tab').addEventListener('click',()=>{state.contextMode='rss';renderContext();});
     $('share').addEventListener('click',share);

@@ -27,7 +27,7 @@ The API documentation is at `/api/docs`.
 
 The public site also has two measured workspaces beside Feature Atlas:
 
-- **Feature Effects** opens on a recorded prompt and compares the edits saved for that prompt. The chart is logit L2, the distance between next-token logit vectors. A case link looks like `lab-experiments/index.html?effect=<case>#effects`.
+- **Feature Effects** opens on a short authored sentence and shows the model's most likely next words before and after a change to one learned feature. A case link looks like `lab-experiments/index.html?effect=<case>#effects`.
 - **Context Lab** opens on a 64-state authored input grid for one SAE feature. The six switches are setting, season, event, venue, voice, and format. **Input Transformations** shows Mean RSS, held-out rate, and support feature IDs for proposed prompt transformations. Prompt text from external datasets is not shown.
 
 Rebuild the static JSON from a local run directory with `scripts/research_lab/export_real_cases.py`.
