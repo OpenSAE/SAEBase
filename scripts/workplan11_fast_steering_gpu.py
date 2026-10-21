@@ -112,6 +112,7 @@ def vllm_generator(model, sae, ids, max_tokens, feature_id, strength):
         max_new_tokens=max_tokens,
         temperature=0.0,
         seed=0,
+        stop_at_eos=False,
     )
     return {"ids": trace.generated_token_ids, "forwards": None, "protocol": trace.protocol}
 
@@ -147,6 +148,8 @@ def main() -> None:
         parser.error("lengths must contain integers from 1 through 256")
     if args.repeats < 5:
         parser.error("at least 5 timed repetitions required")
+    if args.mode in ("vllm", "vllm-static") and args.feature_id is None:
+        parser.error("vLLM runs require --feature-id from a verified SAE capture")
     if not torch.cuda.is_available():
         parser.error("RTX CUDA GPU required")
     OUT.mkdir(parents=True, exist_ok=True)
@@ -202,9 +205,7 @@ def main() -> None:
                 if raw is not None:
                     selected = select_feature_id(raw, sae, ids)
                 else:
-                    # Fixed direction does not require active z_t, but user should
-                    # choose a feature from a prior HF capture for interpretation.
-                    selected = 185
+                    raise RuntimeError("provide an explicit, source-verified SAE feature ID")
             for length in lengths:
                 series = []
                 token_ids = None
