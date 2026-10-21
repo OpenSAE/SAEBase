@@ -99,6 +99,36 @@ def hf_generator(mode, model, sae, ids, max_tokens, feature_id):
     }
 
 
+@torch.no_grad()
+def raw_hf_cached_greedy(model, prompt_ids: torch.Tensor, max_tokens: int) -> tuple[int, ...]:
+    """Independent no-hook Qwen KV generation oracle, one prefill and token decode."""
+    raw = model._model
+    ids = prompt_ids.detach().clone()
+    past = None
+    result_ids: list[int] = []
+    for _step in range(max_tokens):
+        total = int(ids.shape[1])
+        current = ids if past is None else ids[:, -1:]
+        positions = torch.arange(total, device=ids.device) if past is None else torch.tensor(
+            [total - 1], dtype=torch.long, device=ids.device
+        )
+        output = raw(
+            input_ids=current,
+            past_key_values=past,
+            use_cache=True,
+            cache_position=positions,
+            attention_mask=torch.ones((1, total), dtype=torch.long, device=ids.device),
+        )
+        past = output.past_key_values
+        token = int(torch.argmax(output.logits[0, -1].float()).item())
+        result_ids.append(token)
+        if _step + 1 < max_tokens:
+            ids = torch.cat(
+                (ids, torch.tensor([[token]], dtype=torch.long, device=ids.device)), dim=1
+            )
+    return tuple(result_ids)
+
+
 def vllm_generator(model, sae, ids, max_tokens, feature_id, strength):
     from saebase.vllm_backend.fast_steering import generate_decoder_direction_cached
 
@@ -187,6 +217,7 @@ def main() -> None:
             "site": f"{MODEL}:L{LAYER}:{SAE_KEY}",
             "results": [],
             "generation_controls": [],
+            "identity_controls": [],
             "comparability": (
                 "old clean-prefix scientific protocol"
                 if args.mode == "hf-reference"
@@ -207,6 +238,35 @@ def main() -> None:
                     selected = select_feature_id(raw, sae, ids)
                 else:
                     raise RuntimeError("provide an explicit, source-verified SAE feature ID")
+            if args.mode == "hf-live":
+                from saebase.interventions.hf_cached_steering import generate_live_sae_cached
+                from saebase.interventions.specs import Condition
+
+                count = min(8, max(lengths))
+                expected_ids = raw_hf_cached_greedy(raw, ids, count)
+                identity = generate_live_sae_cached(
+                    raw,
+                    sae,
+                    ids,
+                    layer=LAYER,
+                    condition=Condition("identity", "identity"),
+                    max_new_tokens=count,
+                    max_context_tokens=1024,
+                )
+                identical = expected_ids == identity.generated_token_ids
+                report["identity_controls"].append(
+                    {
+                        "prompt_index": prompt_index,
+                        "tokens": count,
+                        "passed": identical,
+                        "no_hook_ids_private": list(expected_ids),
+                        "identity_hook_ids_private": list(identity.generated_token_ids),
+                    }
+                )
+                if not identical:
+                    raise RuntimeError(
+                        "live HF KV identity changed token sequence; benchmark not valid"
+                    )
             if raw is None:
                 # A real baseline -> steered -> baseline request sequence. The
                 # worker owns steering per request, and no test may infer a
