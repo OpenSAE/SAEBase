@@ -1,4 +1,5 @@
 """Feature-space operations with explicit reconstruction-residual semantics."""
+
 from __future__ import annotations
 
 import torch
@@ -18,17 +19,19 @@ def apply_condition(sae: object, snapshot: FeatureSnapshot, condition: Condition
         return edit_features(sae, snapshot, replacements={})
     if condition.operation == "reconstruction":
         # Deliberately *not* the residual-preserving edit: used for loss recovered.
-        return FeaturePatch(codes=codes.detach().clone(), activation=snapshot.reconstruction.detach().clone())
+        return FeaturePatch(
+            codes=codes.detach().clone(), activation=snapshot.reconstruction.detach().clone()
+        )
     if condition.operation == "coalition":
-        values = {i: 0. for i in condition.feature_ids if i not in condition.retained_ids}
+        values = {i: 0.0 for i in condition.feature_ids if i not in condition.retained_ids}
     elif condition.operation == "ablate":
-        values = {i: 0. for i in condition.feature_ids}
+        values = {i: 0.0 for i in condition.feature_ids}
     elif condition.operation == "scale":
-        values = {i: float(codes[i].item()) * condition.value for i in condition.feature_ids}
+        values = {i: codes[i] * condition.value for i in condition.feature_ids}
     elif condition.operation == "clamp":
         values = {i: condition.value for i in condition.feature_ids}
     elif condition.operation == "add":
-        values = {i: float(codes[i].item()) + condition.value for i in condition.feature_ids}
+        values = {i: codes[i] + condition.value for i in condition.feature_ids}
     else:
         raise RuntimeError("unreachable intervention operation")
     return edit_features(sae, snapshot, replacements=values)

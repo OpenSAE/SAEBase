@@ -42,8 +42,7 @@ class ActivationSite:
         if len(pieces) >= 3 and pieces[0] == "blocks" and pieces[1].isdigit():
             if int(pieces[1]) != self.layer:
                 raise ValueError(
-                    f"hook {self.hook_name!r} belongs to layer {pieces[1]}, "
-                    f"not layer {self.layer}"
+                    f"hook {self.hook_name!r} belongs to layer {pieces[1]}, not layer {self.layer}"
                 )
 
 
@@ -78,7 +77,9 @@ def _as_logits(output: Any, *, token_index: int, length: int) -> torch.Tensor:
     if not isinstance(tensor, torch.Tensor) or tensor.ndim != 3:
         raise ValueError("model forward must return logits with shape [batch, seq, vocab]")
     if tensor.shape[0] != 1 or tensor.shape[1] != length:
-        raise ValueError(f"logits shape {tuple(tensor.shape)} incompatible with [1, {length}, vocab]")
+        raise ValueError(
+            f"logits shape {tuple(tensor.shape)} incompatible with [1, {length}, vocab]"
+        )
     return tensor[0, token_index].detach().clone()
 
 
@@ -109,8 +110,12 @@ class ModelAdapter:
                 backend = "logits_only"
         if backend not in {"transformer_lens", "hf_hooks", "logits_only"}:
             raise ValueError(f"Unknown backend: {backend}")
-        capture_method = {"transformer_lens": "run_with_cache", "hf_hooks": "get_resid"}.get(backend)
-        patch_method = {"transformer_lens": "run_with_hooks", "hf_hooks": "run_with_patch"}.get(backend)
+        capture_method = {"transformer_lens": "run_with_cache", "hf_hooks": "get_resid"}.get(
+            backend
+        )
+        patch_method = {"transformer_lens": "run_with_hooks", "hf_hooks": "run_with_patch"}.get(
+            backend
+        )
         can_capture = bool(capture_method and callable(getattr(model, capture_method, None)))
         can_patch = bool(patch_method and callable(getattr(model, patch_method, None)))
         if backend != "logits_only" and not (can_capture or can_patch):
@@ -148,7 +153,9 @@ class ModelAdapter:
             device = getattr(cfg, "device", tokens.device)
         return tokens.to(device)
 
-    def tokens(self, *, prompt: str | None = None, tokens: torch.Tensor | None = None) -> torch.Tensor:
+    def tokens(
+        self, *, prompt: str | None = None, tokens: torch.Tensor | None = None
+    ) -> torch.Tensor:
         return self._tokens(prompt=prompt, tokens=tokens)
 
     def _assert_site(self, site: ActivationSite, tokens: torch.Tensor) -> int:
@@ -198,10 +205,58 @@ class ModelAdapter:
             raise RuntimeError("captured activation must be finite and one-dimensional")
         return out.detach().clone()
 
+    def supports_capture_with_logits(self) -> bool:
+        """True when one forward can return the site activation and readout logits."""
+        return callable(getattr(self.model, "capture_with_logits", None))
+
+    @torch.no_grad()
+    def capture_with_logits(
+        self, *, tokens: torch.Tensor, site: ActivationSite, readout_position: int = -1
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """Activation at the site and baseline logits from a single forward when supported."""
+        if not self.supports_capture_with_logits():
+            return (
+                self.capture(tokens=tokens, site=site),
+                self.forward_logits(tokens=tokens, readout_position=readout_position),
+            )
+        self.capabilities.require("capture")
+        self.capabilities.require("forward")
+        ids = self._tokens(prompt=None, tokens=tokens)
+        pos = self._assert_site(site, ids)
+        read = _index(ids.shape[1], readout_position)
+        if self.backend != "hf_hooks":
+            return (
+                self.capture(tokens=ids, site=site),
+                self.forward_logits(tokens=ids, readout_position=readout_position),
+            )
+        offset = int(ids.shape[1] - 1 - pos)
+        read_offset = int(ids.shape[1] - 1 - read)
+        captured = self.model.capture_with_logits(
+            ids, site.layer, [offset], readout_offset=read_offset
+        )
+        if not isinstance(captured, tuple) or len(captured) != 2:
+            raise RuntimeError("capture_with_logits must return (activation, logits)")
+        activation, logits = captured
+        if (
+            not isinstance(activation, torch.Tensor)
+            or activation.ndim != 2
+            or activation.shape[0] != 1
+        ):
+            raise RuntimeError("capture_with_logits activation must have shape [1, d_model]")
+        if not isinstance(logits, torch.Tensor) or logits.ndim != 1:
+            raise RuntimeError("capture_with_logits logits must have shape [vocab]")
+        if not bool(torch.isfinite(activation).all()) or not bool(torch.isfinite(logits).all()):
+            raise RuntimeError("capture_with_logits returned a non-finite tensor")
+        return activation[0].detach().clone(), logits.detach().clone()
+
     @torch.no_grad()
     def patch_logits(
-        self, *, tokens: torch.Tensor, site: ActivationSite,
-        activation: torch.Tensor, readout_position: int = -1
+        self,
+        *,
+        tokens: torch.Tensor,
+        site: ActivationSite,
+        activation: torch.Tensor,
+        readout_position: int = -1,
     ) -> torch.Tensor:
         self.capabilities.require("patch")
         ids = self._tokens(prompt=None, tokens=tokens)
@@ -214,7 +269,9 @@ class ModelAdapter:
         if self.backend == "hf_hooks":
             offset = ids.shape[1] - 1 - pos
             result = self.model.run_with_patch(
-                ids, site.layer, {offset: activation},
+                ids,
+                site.layer,
+                {offset: activation},
                 readout_offset=ids.shape[1] - 1 - readout,
             )
             if not isinstance(result, torch.Tensor) or result.ndim != 1:
@@ -236,8 +293,7 @@ class ModelAdapter:
 
     @torch.no_grad()
     def assert_identity_patch(
-        self, *, tokens: torch.Tensor, site: ActivationSite,
-        rtol: float = 1e-4, atol: float = 1e-4
+        self, *, tokens: torch.Tensor, site: ActivationSite, rtol: float = 1e-4, atol: float = 1e-4
     ) -> None:
         """Original activation patch must reproduce the unmodified forward logits."""
         original = self.capture(tokens=tokens, site=site)
