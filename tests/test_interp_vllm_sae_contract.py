@@ -3,6 +3,7 @@
 No vLLM dependency or GPU required; real worker correctness is a separate
 mandatory RTX 5070 acceptance gate.
 """
+
 from __future__ import annotations
 
 from contextlib import contextmanager
@@ -109,8 +110,12 @@ def test_real_capture_contract_and_scoped_feature_edit(monkeypatch, backend):
     model = Engine(static=backend == "vllm-static")
     adapter = InterpVLLMSAE(model, ResearchToySAE().eval(), layer=0, backend=backend)
     result = adapter.measure(
-        [1, 2, 3], Condition("ablate", "ablate", (0,)),
-        patch_position=1, next_token_probe=True, atol=1e-5, rtol=1e-4
+        [1, 2, 3],
+        Condition("ablate", "ablate", (0,)),
+        patch_position=1,
+        next_token_probe=True,
+        atol=1e-5,
+        rtol=1e-4,
     )
     assert result.patch_position == 1
     torch.testing.assert_close(result.edited_residual, result.expected_residual)
