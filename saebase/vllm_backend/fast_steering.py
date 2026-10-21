@@ -116,6 +116,7 @@ def generate_decoder_direction_cached(
     seed: int = 0,
     compare_unsteered: bool = False,
     steer_last_prompt_token: bool = True,
+    stop_at_eos: bool = True,
 ) -> FastSteeringResult:
     """Real cached generation with an SAE feature direction on every decode token.
 
@@ -137,6 +138,8 @@ def generate_decoder_direction_cached(
         raise ValueError("max_new_tokens outside supported budget")
     if not isinstance(temperature, (float, int)) or not 0 <= temperature <= 10:
         raise ValueError("temperature outside supported bounds")
+    if not isinstance(stop_at_eos, bool):
+        raise TypeError("stop_at_eos must be bool")
     if type(seed) is not int or seed < 0:
         raise ValueError("seed must be nonnegative")
 
@@ -161,7 +164,7 @@ def generate_decoder_direction_cached(
                 max_tokens=max_new_tokens,
                 temperature=float(temperature),
                 seed=seed,
-                stop_at_eos=True,
+                stop_at_eos=stop_at_eos,
             )
         )
     start = perf_counter()
@@ -180,7 +183,7 @@ def generate_decoder_direction_cached(
                 max_tokens=max_new_tokens,
                 temperature=float(temperature),
                 seed=seed,
-                stop_at_eos=True,
+                stop_at_eos=stop_at_eos,
             )
         )
     if torch.cuda.is_available() and torch.as_tensor(vector).is_cuda:
