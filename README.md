@@ -11,7 +11,7 @@
   <a href="#-documentation"><b>📚 Documentation</b></a>
 </p>
 
-🧪 **Hugging Face:** [SAEBase Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [SAEBase Evaluation Dataset](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation)
+🤗 **Hugging Face:** [SAEBase Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [SAEBase Evaluation Dataset](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation)
 
 ---
 
@@ -19,19 +19,9 @@
 
 SAEBase provides a common research workflow for evaluating sparse autoencoders (SAEs) beyond reconstruction alone. It connects pretrained models, SAE dictionaries, versioned input samples, activation-level measurements, controlled feature edits, and statistical reliability checks without conflating their results.
 
-```mermaid
-flowchart LR
-    A["Model & SAE registries"] --> C["Load & validate"]
-    B["Versioned prompts"] --> C
-    C --> D["Capture activations"]
-    D --> E["Shared activation store"]
-    E --> F["SAE encode / decode"]
-    F --> G["Reconstruction diagnostics"]
-    F --> H["Feature interventions"]
-    G --> I["Benchmark & reliability"]
-    H --> I
-    I --> J["Provenance & reports"]
-```
+<p align="center">
+  <img src="assets/figures/saebase_workflow.svg" alt="SAEBase workflow: models and versioned inputs, activation capture and reuse, SAE encoding, reconstruction and feature interventions, benchmarking, reliability and reports" width="1080"/>
+</p>
 
 The workflow is **capture once, evaluate multiple SAEs**: a verified activation cache can be reused by different SAE checkpoints at the same model site. Feature edits can then be measured against original model outputs, and independently interpretable metrics are reported without producing a single composite SAE score.
 
