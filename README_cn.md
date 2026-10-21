@@ -120,7 +120,7 @@ edited_activation = original_activation + decode(edited_codes) - decode(original
 
 ### ⚡ 实测加速
 
-在单张 RTX 5070 上，Qwen3-1.7B Base 的 25 个样本、7 种条件的完整干预评测通过可选 suffix replay 加速 **1.28×**，报告的指标保持一致。128-token 生成时，逐 token SAE 编辑与 KV 缓存达到 **89 tokens/s**，vLLM SAE decoder-direction steering 达到 **158 tokens/s**。两种生成方式使用不同的干预协议，不能当作相同实验直接比较其科学输出。
+在单张 RTX 5070 上，Qwen3-1.7B Base 的 25 个样本、7 种条件的完整干预评测通过可选 suffix replay 加速 **1.28×**，报告的指标保持一致。128-token 生成时，逐 token SAE 编辑与 KV 缓存达到 **89 tokens/s**，vLLM SAE decoder-direction steering 达到 **158 tokens/s**。两种生成方式采用不同的干预协议。
 
 [完整 GPU 结果](docs/performance/workplan11_final_results.md) · [性能实现说明](docs/performance.md)
 
