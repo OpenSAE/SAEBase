@@ -26,7 +26,7 @@ To explore individual capabilities instead:
 
 ```bash
 python examples/quickstart/public_api_offline.py
-saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
+saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --dry-run
 python examples/activations/activation_store.py
 ```
 
@@ -35,8 +35,8 @@ The first example uses an explicitly synthetic model/SAE to demonstrate capture,
 ## Run a real SAE benchmark
 
 ```bash
-saebase-benchmark --config conf/benchmark/p0_small.json --real
-saebase-benchmark --config conf/benchmark/p0_small.json --report-only
+saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --real
+saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --report-only
 ```
 
 The configuration identifies a real Pythia-70M model/SAE pair and a small fixed-token validation sample. Real execution downloads checkpoints and needs an appropriate CPU or GPU environment. Results are written under `runs/<run_id>/` with separate metrics, source provenance, a CSV summary and standalone HTML. This example validates engineering behavior, not a representative language dataset.

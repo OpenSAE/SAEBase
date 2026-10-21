@@ -36,7 +36,7 @@ NEEDED_WHEEL = {
     "saebase/interventions/__init__.py", "saebase/interventions/engine.py",
     "saebase/interventions/specs.py", "saebase/interventions/operators.py",
     "saebase/interventions/results.py", "saebase/interventions/steering.py",
-    "scripts/m2_batch.py", "conf/interventions/m2_pythia_example.json",
+    "scripts/m2_batch.py", "conf/interventions/pythia_feature_edits.json",
     "saebase/store/__init__.py", "saebase/store/identity.py",
     "saebase/store/shards.py", "saebase/store/collect.py",
     "saebase/integrations/sar.py",

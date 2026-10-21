@@ -115,7 +115,7 @@ python examples/quickstart/first_experiment.py --output runs/first-experiment
 **2. 预检可复现的 SAE Benchmark：**
 
 ```bash
-saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
+saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --dry-run
 ```
 
 这一步会验证配置、干预测量数量和任务依赖，不加载模型权重。
@@ -123,8 +123,8 @@ saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
 **3. 使用公开 checkpoint 执行相同评估：**
 
 ```bash
-saebase-benchmark --config conf/benchmark/p0_small.json --real
-saebase-benchmark --config conf/benchmark/p0_small.json --report-only
+saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --real
+saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --report-only
 ```
 
 真实运行会下载指定权重，在 `runs/<run_id>/` 输出 `metrics.jsonl`、`summary.csv`、`report.html`、配置与来源信息。这个固定 token 的小示例仅用于工程验证，并非正式研究数据集。Prompt Preparation 与原有 Activation Health 使用方法参见[入门指南](docs/getting-started.md)。
@@ -165,7 +165,7 @@ edited_activation = original_activation + decode(edited_codes) - decode(original
 **完整 SAE 重构替换**是不同的实验对照，不能与保留残差的特征编辑混为一谈。指标按条件分别记录下游 logits、KL divergence、可定义的目标 token 变化及激活差异。
 
 ```bash
-saebase-intervene --config conf/interventions/m2_pythia_example.json --dry-run
+saebase-intervene --config conf/interventions/pythia_feature_edits.json --dry-run
 python examples/interventions/batch_interventions.py
 ```
 
@@ -185,7 +185,7 @@ Benchmark 根据版本化配置规划模型、SAE 与指标，复用精确校验
 | **外部研究指标** | SAR、RSS、SAEBench Core / Sparse Probing | 保留原始估计器或原生生成结果的协议与来源校验 |
 
 ```bash
-saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
+saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --dry-run
 python examples/benchmarking/benchmark_preflight.py
 ```
 
@@ -202,7 +202,7 @@ python examples/benchmarking/reliability_bootstrap.py
 python examples/benchmarking/ground_truth_controls.py
 ```
 
-对已完成的 Benchmark 可执行 `saebase-audit --m3-root runs/<run_id> --config conf/reliability/m4_pythia_smoke.json --run --sae-only`。这里应使用对应的多 prompt Benchmark 结果。其中 `--m3-root` 为保持兼容性保留的 CLI 参数，含义是 Benchmark 结果目录，不代表用户必须理解某个开发阶段。
+对已完成的 Benchmark 可执行 `saebase-audit --m3-root runs/<run_id> --config conf/reliability/pythia_reliability_audit.json --run --sae-only`。这里应使用对应的多 prompt Benchmark 结果。其中 `--m3-root` 为保持兼容性保留的 CLI 参数，含义是 Benchmark 结果目录，不代表用户必须理解某个开发阶段。
 
 独立的合成真值实验覆盖已知因子字典、Coalition 交互阶数、RSS 支持集及方向、可控退化和负对照。这些测试**不等于证明真实 SAE 的特征具有可解释性**。如需从原始缓存计算重构指标置信区间，可选 `--sae-only`，仅加载 SAE Decoder，不重新运行语言模型。参见[可靠性分析](docs/reliability.md)。
 

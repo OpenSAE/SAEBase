@@ -19,14 +19,14 @@ Its outputs are engineering examples, not scientific findings.
 
 ```bash
 # Validate IDs, operators, measurements and budgets, without loading weights.
-saebase-intervene --config conf/interventions/m2_pythia_example.json --dry-run
+saebase-intervene --config conf/interventions/pythia_feature_edits.json --dry-run
 
 # Explicitly authorize public Pythia/SAE checkpoint download or loading.
-saebase-intervene --config conf/interventions/m2_pythia_example.json \
+saebase-intervene --config conf/interventions/pythia_feature_edits.json \
   --output experiment/m2-pythia --real
 
 # Re-running reuses completed measurements. Refuse reusing an existing run:
-saebase-intervene --config conf/interventions/m2_pythia_example.json \
+saebase-intervene --config conf/interventions/pythia_feature_edits.json \
   --output experiment/new-run --real --no-resume
 ```
 

@@ -107,7 +107,7 @@ Follow the [first experiment walkthrough](docs/first-experiment.md) to inspect t
 **2. Inspect a benchmark before committing compute:**
 
 ```bash
-saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
+saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --dry-run
 ```
 
 This validates the experiment, its measurement count, and the execution dependencies without loading model weights.
@@ -115,8 +115,8 @@ This validates the experiment, its measurement count, and the execution dependen
 **3. Run the same configuration using public checkpoints:**
 
 ```bash
-saebase-benchmark --config conf/benchmark/p0_small.json --real
-saebase-benchmark --config conf/benchmark/p0_small.json --report-only
+saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --real
+saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --report-only
 ```
 
 Real runs download the requested weights and produce `metrics.jsonl`, `summary.csv`, `report.html`, configuration, and provenance under `runs/<run_id>/`. This tiny fixed-token example is an engineering smoke test, not a study dataset. For prompt preparation and the original activation-health command, see [Getting Started](docs/getting-started.md).
@@ -157,7 +157,7 @@ edited_activation = original_activation + decode(edited_codes) - decode(original
 A **full SAE reconstruction replacement** is a separate experimental control and must not be confused with residual-preserving feature edits. Results distinguish interventions by condition and include downstream logits, KL divergence, target-token effects (when defined), and activation changes.
 
 ```bash
-saebase-intervene --config conf/interventions/m2_pythia_example.json --dry-run
+saebase-intervene --config conf/interventions/pythia_feature_edits.json --dry-run
 python examples/interventions/batch_interventions.py
 ```
 
@@ -177,7 +177,7 @@ The benchmark runner expands model/SAE/metric configurations into a deterministi
 | **External research metrics** | SAR, RSS, native SAEBench Core and Sparse Probing | Original estimators or original externally generated results, with source and protocol checks |
 
 ```bash
-saebase-benchmark --config conf/benchmark/p0_small.json --dry-run
+saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --dry-run
 python examples/benchmarking/benchmark_preflight.py
 ```
 
@@ -194,7 +194,7 @@ python examples/benchmarking/reliability_bootstrap.py
 python examples/benchmarking/ground_truth_controls.py
 ```
 
-To audit a completed benchmark, run `saebase-audit --m3-root runs/<run_id> --config conf/reliability/m4_pythia_smoke.json --run --sae-only`. Use a matching multi-prompt benchmark run for this audit. The legacy `--m3-root` flag is retained for CLI compatibility; it refers to the benchmark's output directory, not a required workflow stage.
+To audit a completed benchmark, run `saebase-audit --m3-root runs/<run_id> --config conf/reliability/pythia_reliability_audit.json --run --sae-only`. Use a matching multi-prompt benchmark run for this audit. The legacy `--m3-root` flag is retained for CLI compatibility; it refers to the benchmark's output directory, not a required workflow stage.
 
 Analytical controls include known factor dictionaries, coalition interaction orders, RSS support/direction persistence, controllable degradation, and negative controls. These synthetic tests **do not certify the interpretability of a real SAE**. For reconstruction uncertainty, `--sae-only` can decode verified cached codes without re-running the language model. See [Reliability Analysis](docs/reliability.md).
 
