@@ -36,64 +36,125 @@ This instruction is about the agent's procedure, not a promised duration.
 
 Output this brief inventory locally at `outputs/research_lab_final_07/inventory.md`. No private prompts or credentials in public logs.
 
-## 2. Product concept: one strong experiment, one obvious interaction
+## 2. Final interaction design — identify the feature BEFORE asking users to edit it (revised 2026-10-20)
 
-New Effects first view MUST have just four visible areas:
+This section **replaces the earlier Effects UX proposal**. The latest deployed view still has redundant microcopy such as `A REAL INPUT`, the unexplained buttons `Remove this feature` / `Restore original`, and an isolated `Original` heading. This is not understandable. **Do not add another introductory paragraph or tooltip to an otherwise unchanged interface. Change the information architecture itself.**
 
-### A. One compelling, public-safe example
+### 2.1 The actual research question
 
-Heading: `What changes when we remove a model feature?`
-Subheading: `Pick a real example, then compare the model's prediction before and after one internal signal is removed.`
+What a visitor must understand, in precisely this order:
 
-Start with the **exact human-readable prompt** from a rights-approved source or short project-authored prompt that has actually been measured. Do not show an opaque `arc_challenge:TIMSS...` ID or "prompt not in public record" as the first impression. If a source is not approved for public text, that case can appear only in advanced anonymized research browsing, not the introductory carousel.
+1. **Input** — What did the user write, and which model read it?
+2. **Selected feature** — Which exact learned SAE coordinate is the experiment changing, and why was THIS coordinate chosen? A feature is not a prompt word, class label, weight, neuron or permanently deleted component.
+3. **Intervention** — What does the control do physically? It sets this selected coordinate's activation to zero at the recorded intervention site and token, while keeping the input and model parameters unchanged. In SAEBase's actual residual-preserving patch, the change is propagated through the remaining model layers. Avoid calling this "removing a neuron" or "deleting knowledge".
+4. **Outcome** — What did that ONE edit change in the measured next-token distribution, not what we hope it means?
+5. **Limit** — One example shows a local model response. It does not by itself identify the feature's general semantic function or prove answer quality improved.
 
-Display small familiar case names (e.g. `A factual question`, `Complete the sentence`, `Reading comprehension`, `Code completion`) derived from actual task, not invented feature meaning. `Gemma 1B` is model identity; "arithmetic" may describe the question but must NOT be called the feature's semantic label. Show a compact `Try another example` control and 3–6 *actually measured* curated examples initially. Keep the full measurement browser one click deeper; no need to expose all raw recordings at the top.
+The screen is not a research dashboard. The natural flow is **input → one named, observed internal feature → switch its activation off → compare predictions**.
 
-### B. One primary user action
+### 2.2 Exact visual hierarchy and copy
 
-Use ONE obvious action: `Remove this feature`. The action changes the right comparison from the baseline to the **measured** intervention state. A two-state segmented control `Original / Feature removed` can be used to compare, but baseline is not a scientific edit. Preferred: keep a persistent baseline on the left and reveal the edited result on the right by clicking `Remove this feature`; allow `Restore original` / `Replay`.
+Use a short, clean top heading:
 
-Do NOT make novices choose among `ablate`, `scale`, `clamp`, `add`, `coalition` or arbitrary strength fields before seeing a result. Put actual other measured edit methods in an optional `Explore other changes` subsection below the primary takeaway. When opened, give human descriptions and exact measured parameter values; never interpolate a continuous slider across unmeasured strengths.
+`What happens when we turn off one feature?`
 
-Changing the selected case resets the interaction consistently, updates BOTH sides, and preserves accessible keyboard operation.
+Do NOT display a lead paragraph that repeats the heading. Do NOT print a generic all-caps `EXAMPLE` / `A REAL INPUT` / `WHAT WE CHANGE` / `MEASURED OUTPUT` / `LIVE EXPERIMENT` / `REAL DATA` / `ACTIVE EVIDENCE`. No rows of small explanatory text, badges, unnecessary provenance warnings, decorative icons or repeated footers inside modules.
 
-### C. Clear observable result
-
-Prioritize actual complete continuation text if independently recorded with identical comparison protocol. Otherwise use actual next-token predictions and probability percentages calculated from correctly aligned complete-vocabulary logits. A next-token prediction is not necessarily a whole English word; decode and display tokenizer fragments honestly, including leading whitespace. Do not claim a sequence-level answer changed from a single next-token prediction. If labels are complete multi-token answers, score full continuations with the original experimental protocol rather than first-token proxies.
-
-Show readable, aligned before/after results with **the same candidates and consistent scale**:
+One source-backed curated card contains the following (illustrative layout only, NEVER use made-up values in production):
 
 ```text
-A REAL INPUT                         [Another example]
-<exact, approved prompt>
+What happens when we turn off one feature?
 
-[Remove this feature]                [Restore original]
+"Two plus two equals"                          [Another example]
+Gemma 1B
 
-          ORIGINAL                      FEATURE REMOVED
-Top prediction: "..." (..%)         Top prediction: "..." (..%)
-<shared candidate> [bar] ..%        <same candidate> [bar] ..%
-<shared candidate> [bar] ..%        <same candidate> [bar] ..%
+Inside the model
+Feature #74449       [small observed-activation visual]
+This feature activated while the model processed this input.
+[Only if evidence exists: "Also observed on ..." with actual reviewed examples]
 
-WHAT CHANGED?
-<one short sentence based on the REAL measured result>
-<one concise sentence about whether this actually changed the top prediction>
-[Explore other changes ▾]   [Experiment details ▾]
+We set this feature's activity to zero for this prediction.
+The input and model weights do not change.
+
+Feature #74449           [ ON   |   OFF ]   < one switch with clear active state >
+
+WHEN ON                                WHEN OFF  < shown after user toggles off >
+four               44.9%              four                  43.8%
+five               24.4%              five                  27.7%
+...                                   ...
+<identical vocabulary candidates on identical scale>
+
+What changed?
+The top prediction stayed "four", but its probability decreased by
+1.1 percentage points for this particular input.
+
+[Another example]                     [Experiment details ▾]
 ```
 
-Emphasize the largest **percentage-point** changes, not raw logit L2. Use the union of candidates from both distributions rather than two differently ordered top-5 lists that cannot be visually compared. Never normalize only the top-5 probabilities to 100%. If the top candidate changes, point it out clearly. If it does not, say `The model still favored the same continuation; its confidence changed by X percentage points.`
+**Critical:** The quoted text and the above numbers are ONLY a structural illustration based on a previously shown measurement; that weak case is NOT an acceptable default. The actual chosen case MUST be one of the strongest PUBLIC-SAFE, measured and comprehensible cases selected under Section 3. Numbers and words must be read from its raw evidence. The site must not ship the above static mock content.
 
-Do NOT use sample counts, model hashes, feature IDs, raw L2, tokenizer IDs or protocol strings as hero KPIs. Avoid "prediction means better answer". A gold label supports task correctness only if a matched fully evaluated task readout was actually measured.
+### 2.3 Make the feature a real visible object, not a mysterious pronoun
 
-### D. One meaningful takeaway, not a grand claim
+- The selected feature is identified ON SCREEN as `Feature #<real ID>`, associated with a human-readable model name, and matched to exactly one SAE checkpoint/site. This identifier is essential to answer "**which** feature?" — it is NOT the old meaningless KPI card labeled `Feature IDs`.
+- Next to that identity, show a minimal actual activity indicator for the current input. Use `Active on this input` only if a nonzero activation is actually measured for the SAME source prompt, same site and same token. Optionally show `measured activity → zero` if the precise saved activation value is matched and finite. Do not fabricate a percentage activation meter or a universal feature activation scale.
+- If the approved Atlas contains reviewed descriptions or activation examples for this exact model/site/feature, use a concise description like `This feature also activates on these recorded examples` and show 1–2 real, rights-cleared snippets on an optional expanded card. A reviewed Atlas description is a hypothesis, NOT a proved single-concept identity.
+- If there are no reviewed semantic examples, DO NOT label it `arithmetic feature`, `fact feature` or `truthfulness feature`. An exact ID + measured activation + mechanistic intervention explanation is honest. For the introductory gallery, strongly prefer measured features with approved contextual examples so a visitor learns why the feature was selected, not just its index.
+- If the selected feature is not observed active for this same input, do not say it "activated" or choose it as the beginner default. Check the original codes and intervention semantics; do not pretend setting an already-zero coordinate off caused a visible effect.
+- The feature is a *single SAE coordinate*; the model is not selecting the "most important" feature or proving it corresponds to a linguistic concept. Avoid the phrase `we remove this feature` unless it is immediately clear that **only its local activation is zeroed**.
 
-Text is determined entirely by recorded facts. Example wording:
-- `Removing this feature changed the most likely next piece of text from "A" to "B" for this input.` Only when truly supported by aligned logits.
-- `The top prediction stayed the same, but its probability dropped by X percentage points.` For measured smaller effects.
-- `For this particular prompt, the change was small. It does not establish what the feature represents.` For near-null examples.
+### 2.4 One understandable switch, no competing buttons
 
-Never label a feature as `arithmetic`, `truthfulness`, `language`, or another generalizable concept based on a single convenient prompt. A semantics claim requires separate multi-prompt contrastive evidence. The Atlas may have interpretation hypotheses; retain their uncertainty when linked.
+**DELETE the unexplained pair `Remove this feature` / `Restore original`.** Replace with a single **stateful** ON/OFF control attached directly to the visible feature card: `Feature #74449 [On | Off]`, whose selected state is visually unmistakable. Use `Turn off` as the action hint if needed, not another separate button. `On` denotes the normal, unedited model computation; `Off` denotes the measured zero-activation intervention at the pinned site.
 
-**Remove this public sentence:** `A feature is a learned internal signal...` from the main title area if it crowds the example. If needed use a one-line tooltip `A feature is a pattern detected inside the model.`
+- Default state: ON, normal output shown. When the visitor switches OFF, reveal/animate the actual edited prediction side by side with the fixed normal prediction. When switched ON again, restore the original presentation. Never imply the permanent model weights changed.
+- This is comparison of two previously measured states, NOT live GPU computation. Avoid `Run inference`, `AI is thinking`, spinners that suggest online model generation, and fake intermediate states.
+- Switching to a different example changes the prompt, model, feature identity, matching activation, measured outputs and state together. Reset the switch to ON to prevent stale outputs.
+- **Do not put other edits on this introductory screen.** If needed, a collapsed secondary `Try other measured changes` view may provide detailed factor/mode controls after the primary interaction is understood; omit it entirely when it creates clutter. Never show generic `Add 1`, `Cut its activity in half`, `clamp` or `coalition` controls disconnected from a named and measured feature.
+- The phrase `Original` as a stand-alone section heading is prohibited. The prediction labels must answer which state: `Feature ON (normal)` versus `Feature OFF`, or `Normal prediction` versus `With feature #74449 off`.
+- Real readouts must use candidate alignment and same probability axis as required by Section 6. A token may be a token fragment; do not masquerade next-token predictions as complete answers.
+
+### 2.5 The correct explanation is built into the action, not packed into footnotes
+
+The ONLY mandatory explanation, placed immediately adjacent to the feature switch, is concise ordinary-size text:
+
+`We set this feature's activity to zero for this prediction. The input and model weights stay the same.`
+
+This answers "**how**" before user interaction. If feature activation and token position are actually known, the Evidence drawer can describe the exact residual-preserving activation edit and selected token. Never leave `remove` unexplained.
+
+Place one clear result sentence after the plot:
+
+- Changed top candidate: `Turning off feature #N changed the model's top next-token prediction from “A” to “B” on this input.`
+- Unchanged top candidate: `The top prediction stayed “A”, but its probability fell from X% to Y%.`
+- Similar distributions: `Turning off this feature had little effect on the recorded next-token predictions for this input.`
+
+Use real matched numerical evidence and avoid ungrounded adjectives. If data are only L2 aggregate, this probability flow cannot be shown; do not invent before/after words. Such cases belong in secondary measurement browsing, not the introductory experiment.
+
+The only appropriate limitation in the main flow, IF necessary to prevent misunderstanding, is one normal-size sentence: `This shows a change for one input, not what the feature means in general.` Do not repeat it in small print, badges, captions, nav, and footer.
+
+### 2.6 Visual design: remove microcopy, preserve meaning
+
+1. Short main heading, one actual prompt, one named feature with real activation evidence, one switch, one prediction comparison, one result. That is the **entire default reading path**.
+2. Normal body text for any sentence required to understand the action; no 10–12px disclaimers or dense explanatory notes. The existing Feature Atlas sets the typography, cards, spacing and palette.
+3. Delete headings and labels that do not add meaning, especially `A REAL INPUT`, `EXAMPLE`, `What we change`, `Original` standing alone, `Recorded prompts`, `Selected logit L2` and meaningless accuracy/quality badges.
+4. Model identity and feature identity remain visible because they ARE meaningful. Keep raw feature/checkpoint hashes, protocol, site hook name, exact layer, raw activation value (if visually cluttered), and source links inside CLOSED `Experiment details`.
+5. The switch must sit INSIDE the selected feature card, not above the prompt or on a disconnected action toolbar. All controls get adequate spacing, keyboard focus, responsive wrap and mobile touch size.
+6. No image-generation assets, decorative stock images, tiny legends, pictograms or made-up colorful data graphics. Use text, spacing, and measured compact bars to convey the actual observation.
+7. Do not make every line a card. Prefer one integrated experiment panel with a light visual flow and one chart.
+
+### 2.7 Immediate acceptance tests (add these to the existing 24 gates)
+
+- T01 **Identity first:** before the user sees any editing control, they can point to the selected `Feature #N`, name the model, and state that this was an actually observed signal for the selected input.
+- T02 **Mechanism before action:** without opening advanced settings they can read that the feature's activity is set to zero *for this prediction*; the prompt and model weights do not change.
+- T03 **One switch:** `Remove this feature` and `Restore original` are gone. One feature-attached ON/OFF switch can be toggled both ways; no vague standalone `Original` heading remains.
+- T04 **Real examples:** all introductory examples have an input the visitor can actually read, matched nonzero feature evidence and genuine paired predictions; case selection updates all three and returns the switch to ON.
+- T05 **No hallucinated meaning:** arithmetic prompt ≠ `arithmetic feature`; no feature label based only on a single input. Atlas reviewed interpretations retain their uncertainty.
+- T06 **Honest presentation:** raw logit-L2-only records never masquerade as probability bars. If same-input activation is absent, no fake activation visual or unsupported `Active` claim appears.
+- T07 **Compact screen:** desktop and mobile first viewport have no all-caps `A REAL INPUT`, `EXAMPLE`, extra tiny legend, repeated interpretation disclaimers, raw hashes, separate restore button or redundant metadata boxes.
+- T08 **What changed:** aligned normal/off candidate displays and plain-language result explain exactly which prediction changed or stayed the same, with real percentage-point arithmetic.
+- T09 **Unified styling:** match the CURRENT Feature Atlas title hierarchy, card proportions, content width, nav and footer across all five modules; no Effects-specific CSS resets that modify Atlas.
+- T10 **Release proof:** screen recordings or browser interaction evidence verify the full sequence: change case → identify signal → switch OFF → observe changed comparison → switch ON. Verify at 1440px, 768px and 390px and publish the tested HF Space revision.
+
+Any violation is a FAILED Section 2 redesign even if unit tests pass. An appealing but incomprehensible "turn off this feature" button is not complete.
 
 ## 3. Curate examples from saved REAL evidence, rather than choose the first row
 
@@ -178,7 +239,7 @@ Use scoped module CSS, shared typography/design tokens and predictable box sizin
 
 Current rendered string: `What we changeRemove this featureCut its activity in halfAdd 1 to its activity`.
 
-This is a failed layout. Primary flow only needs ONE large, labeled `Remove this feature` action. Optional advanced controls must be in a distinct secondary section, each button with visible spacing, hit area >= 44px, actual numeric edit value, selected state and responsive wrapping; no labels may concatenate. Add snapshot tests for long text, narrow devices and zoom.
+This is a failed layout. Primary flow needs ONE feature-attached, explicitly explained ON/OFF switch, with a clear identity and state as specified in the revised Section 2. Optional advanced controls belong in a collapsed secondary section, each with visible spacing, touch area >= 44px, actual numeric edit value, selected state and responsive wrapping; no labels may concatenate. Add snapshot tests for long text, narrow devices and zoom.
 
 ### 4.4 Shared visual language with existing Atlas
 
@@ -193,7 +254,7 @@ This is a failed layout. Primary flow only needs ONE large, labeled `Remove this
 ## 5. Information architecture: the five Labs should make sense together
 
 1. **Feature Atlas — Find a feature.** Keep existing approved experience.
-2. **Feature Effects — Change it and observe the model.** Redesigned single primary action with concrete Before/After.
+2. **Feature Effects — Identify a measured internal feature, turn its activity off, and observe the model.** One named feature, one explained ON/OFF switch, a real prediction comparison.
 3. **Context Lab — Change the input and observe the feature.** Preserve actual 64-state activation study and RSS as secondary mode.
 4. **Compare Models — Observe representation tradeoffs across layers.** Preserve true historical measurements, no universal ranking.
 5. **Research — Study interaction and redistribution.** Preserve SAR/RSS method identities.
@@ -220,7 +281,7 @@ A. **Snapshot/inventory** (Section 1) and select source of truth for current fro
 
 B. **Evidence-backed curated cases** (Sections 2–3). Produce an auditable data manifest, 3–6 quality verified first-screen cases and several real optional comparison examples. No GPU unless proven necessary.
 
-C. **Implement the simple Effects experience**. Replace clutter with one meaningful before/after, one action and a clearly described change. Hide advanced edit types and research metadata by default. Keep a consistent baseline and numeric validation.
+C. **Implement the simple Effects experience**. Replace clutter with one named and evidenced feature, an explanation of setting its local activation to zero, one attached ON/OFF switch, and one measured prediction comparison. Hide advanced edit types and research metadata by default. Keep a consistent baseline and numeric validation.
 
 D. **Unify ALL Lab modules visually** (Section 4). Extract the Atlas tokens, replace conflicting wrappers and styles, align every route and navigation state. Fix broken concatenated controls and all responsive layouts.
 
@@ -264,7 +325,7 @@ G. **Produce final report** with actual counts, visual screenshots, checksums, c
 ### 8.4 Real deployment
 
 21. Verify the deployed HF Space source revision and actual static asset fingerprint against the pushed commit; confirm not an old cached version.
-22. Open live `#effects`, `#context` and Atlas on desktop/mobile; manually execute at least three different curated cases, use restore/replay, and test every five-module navigation transition.
+22. Open live `#effects`, `#context` and Atlas on desktop/mobile; manually execute at least three curated real cases, verify the feature identity and zero-activation explanation, toggle the same feature ON/OFF in both directions, and test every five-module navigation transition.
 23. Compare measured screenshot evidence to the pre-change captured Atlas baseline. Inspect both global design coherence and the specific "concatenated controls" issue.
 24. Save final artifacts under `outputs/research_lab_final_07/`, with test report, three viewport screenshots per module, per-case source/provenance manifest, deployment revision and original/updated screenshot map.
 
@@ -278,8 +339,8 @@ If ANY gate fails, fix and rerun the test before declaring completion. Do not as
 - No private data leakage, fake behavior, or new broad GPU job.
 - `outputs/research_lab_final_07/final_report.md` containing: screenshots for 5 modules x 3 viewports, exact case counts/which were newly measured, any blocked source rights, provenance checksum report, tests, Space build fingerprint, commit SHA(s), and 24 acceptance gate PASS/FAIL lines.
 
-**The success metric is visitor understanding, not the number of plotted values or the number of interface buttons.** A code-accurate screen of "44.9% to 43.8%" with no meaningful user action and no unified layout is NOT finished.
+**The success metric is visitor understanding, not the number of plotted values or the number of interface buttons.** A code-accurate screen of "44.9% to 43.8%" with no named, evidenced feature, clear local zero-activation intervention, meaningful user action and unified layout is NOT finished.
 
 ## 10. Agent's first instruction
 
-Read this entire Work Plan 07 and execute it from Section 1 to Section 9 without splitting into further planning documents. The user's existing Feature Atlas is the design reference. Reuse recorded data first. Rebuild Feature Effects as a concrete before/after with one main action. Unify the shared shell for all Labs. Run actual browser tests, deploy, verify the public page, and leave a factual final report. No invented evidence, no broad model reruns, and no "done" until all acceptance gates pass.
+Read this entire Work Plan 07, including the REVISED Section 2, and execute it from Section 1 to Section 9 without splitting into further planning documents. The existing Feature Atlas is the design reference. Reuse recorded data first. In Feature Effects identify the exact observed SAE feature before the user can intervene, explain that its activation is set to zero for one prediction, then show one ON/OFF control and matched real before/after predictions. Delete unnecessary microcopy and labels. Unify the shared shell for all Labs. Run real browser tests, deploy, verify the public page, and leave a factual final report. No invented evidence, no broad model reruns, and no "done" until all acceptance gates pass.
