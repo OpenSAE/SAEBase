@@ -137,7 +137,7 @@ def raw_hf_cached_greedy(model, prompt_ids: torch.Tensor, max_tokens: int) -> tu
     return tuple(result_ids)
 
 
-def vllm_generator(model, sae, ids, max_tokens, feature_id, strength):
+def vllm_generator(model, sae, ids, max_tokens, feature_id, strength, direction):
     from saebase.vllm_backend.fast_steering import generate_decoder_direction_cached
 
     trace = generate_decoder_direction_cached(
@@ -151,6 +151,7 @@ def vllm_generator(model, sae, ids, max_tokens, feature_id, strength):
         temperature=0.0,
         seed=0,
         stop_at_eos=False,
+        precomputed_direction=direction,
     )
     return {
         "ids": trace.generated_token_ids,
@@ -221,6 +222,15 @@ def main() -> None:
         tokenizer = engine.model
 
     try:
+        # The selected fixed feature's decoder vector is invariant across
+        # requests. Precompute ONCE per verified model+SAE worker to measure
+        # actual cached generation throughput rather than setup overhead.
+        cached_direction = None
+        if engine is not None:
+            from saebase.vllm_backend.fast_steering import decoder_feature_direction
+
+            cached_direction = decoder_feature_direction(sae, args.feature_id)
+
         report = {
             "git_sha": git_sha(),
             "mode": args.mode,
@@ -298,6 +308,7 @@ def main() -> None:
                     seed=0,
                     compare_unsteered=True,
                     stop_at_eos=False,
+                    precomputed_direction=cached_direction,
                 )
                 before = tuple(probe.baseline_token_ids or ())
                 after = tuple(probe.generated_token_ids)
@@ -327,6 +338,7 @@ def main() -> None:
                             length,
                             selected,
                             args.strength,
+                            cached_direction,
                         )
                     sync()
                     elapsed = time.perf_counter() - start
