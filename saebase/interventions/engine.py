@@ -196,6 +196,26 @@ class BatchEngine:
                              device=_sae_input(self.sae, h).device)
         return h, z
 
+    def _hf_batch(self, samples: Sequence[MeasurementSample],
+                  patches: torch.Tensor | None = None
+                  ) -> tuple[torch.Tensor, torch.Tensor]:
+        """Execute a masked batch only on the explicit HF batch-capable wrapper."""
+        if self.pad_token_id is None and len({s.valid_length for s in samples}) > 1:
+            raise ValueError("mixed token lengths require explicit pad_token_id")
+        device = self.model.tokens(
+            tokens=torch.tensor([samples[0].tokens], dtype=torch.long)).device
+        ids = _padded_tokens(
+            samples, device=device,
+            pad_token_id=self.pad_token_id if self.pad_token_id is not None else 0)
+        mask = torch.zeros_like(ids)
+        for i, sample in enumerate(samples):
+            mask[i, :sample.valid_length] = 1
+        return self.model.model.run_batch(
+            ids, layer=self.identity.site.layer,
+            positions=[s.patch_position for s in samples],
+            readout_positions=[s.readout_index for s in samples],
+            attention_mask=mask, patches=patches)
+
     @torch.no_grad()
     def _baselines(self, samples: Sequence[MeasurementSample]) -> tuple[list[FeatureSnapshot], list[torch.Tensor]]:
         # Padding token never read; right-pad positions must be strictly later
@@ -245,6 +265,34 @@ class BatchEngine:
                 ))
                 bs.append(baseline)
             return ret, bs
+        if (self.model.backend == "hf_hooks"
+                and callable(getattr(self.model.model, "run_batch", None))):
+            activations, logits = self._hf_batch(samples)
+            snapshots: list[FeatureSnapshot] = []
+            baselines: list[torch.Tensor] = []
+            for i, sample in enumerate(samples):
+                cached = self._read_cache(sample) if self.activation_reader is not None else None
+                if cached is None:
+                    h = activations[i]
+                    z = self.sae.encode(_sae_input(self.sae, h).unsqueeze(0))[0]
+                else:
+                    h, z = cached
+                ln_mu = ln_std = None
+                if _sae_uses_layer_norm(self.sae):
+                    ln_mu, ln_std = _layer_norm_stats(_sae_input(self.sae, h).unsqueeze(0))
+                    ln_mu, ln_std = ln_mu.detach().clone(), ln_std.detach().clone()
+                reconstruction = _decode(
+                    self.sae, z, self.d_in, ln_mu=ln_mu, ln_std=ln_std, activation=h,
+                ).to(device=h.device, dtype=h.dtype)
+                snapshots.append(FeatureSnapshot(
+                    tokens=torch.tensor([sample.tokens], device=h.device, dtype=torch.long),
+                    site=ActivationSite(self.identity.site.layer, self.identity.site.hook_name,
+                                        sample.patch_position),
+                    activation=h.detach().clone(), codes=z.detach().clone(),
+                    reconstruction=reconstruction.detach().clone(), ln_mu=ln_mu, ln_std=ln_std,
+                ))
+                baselines.append(logits[i])
+            return snapshots, baselines
         # HFHooksModel only supports single-example forward hook capture/patch.
         from saebase.api import capture_features
         ret, bs = [], []
@@ -275,6 +323,12 @@ class BatchEngine:
 
     @torch.no_grad()
     def _patched_logits(self, jobs: Sequence[tuple[MeasurementSample, torch.Tensor]]) -> list[torch.Tensor]:
+        if (self.model.backend == "hf_hooks"
+                and callable(getattr(self.model.model, "run_batch", None))):
+            samples = [sample for sample, _ in jobs]
+            patches = torch.stack([h for _, h in jobs])
+            _, logits = self._hf_batch(samples, patches=patches)
+            return [logits[i] for i in range(len(jobs))]
         if self.model.backend != "transformer_lens":
             return [self.model.patch_logits(tokens=self.model.tokens(tokens=torch.tensor([s.tokens])),
                         site=ActivationSite(self.identity.site.layer, self.identity.site.hook_name, s.patch_position),
@@ -311,6 +365,7 @@ class BatchEngine:
             raise ValueError("tolerance must be finite and nonnegative")
         started = perf_counter()
         done, reused, baselines, patches, retries, peak = 0, 0, 0, 0, 0, 0
+        safe_microbatch = microbatch
         for offset in range(0, len(samples), sample_batch):
             group = []
             for sample in samples[offset:offset+sample_batch]:
@@ -331,7 +386,7 @@ class BatchEngine:
             # runs one batch forward and one batch capture where needed.
             active = [x[0] for x in group]
             snapshots, ref_logits = self._baselines(active)
-            baselines += 1 if self.model.backend == "transformer_lens" else len(active)
+            baselines += 1 if self.model.backend == "transformer_lens" or callable(getattr(self.model.model, "run_batch", None)) else len(active)
             if verify_identity:
                 # Bound temporary batch memory even when sample_batch exceeds
                 # microbatch. A cached activation may be quantized and is
@@ -339,7 +394,7 @@ class BatchEngine:
                 for start in range(0, len(active), microbatch):
                     subset = list(zip(active, snapshots))[start:start + microbatch]
                     replay = self._patched_logits([(s, snap.activation) for s, snap in subset])
-                    patches += 1 if self.model.backend == "transformer_lens" else len(subset)
+                    patches += 1 if self.model.backend == "transformer_lens" or callable(getattr(self.model.model, "run_batch", None)) else len(subset)
                     for expected, actual in zip(ref_logits[start:start + microbatch], replay):
                         if not torch.allclose(expected.float(), actual.float(), rtol=1e-5, atol=tolerance):
                             error = float((expected.float() - actual.float()).abs().max().item())
@@ -354,12 +409,12 @@ class BatchEngine:
                         raise RuntimeError("identity SAE edit does not preserve activation")
             i = 0
             while i < len(all_jobs):
-                width = min(microbatch, len(all_jobs) - i)
+                width = min(safe_microbatch, len(all_jobs) - i)
                 while True:
                     chunk = all_jobs[i:i+width]
                     try:
                         updated = self._patched_logits([(job[0], job[5]) for job in chunk])
-                        patches += 1 if self.model.backend == "transformer_lens" else len(chunk)
+                        patches += 1 if self.model.backend == "transformer_lens" or callable(getattr(self.model.model, "run_batch", None)) else len(chunk)
                         break
                     except (torch.cuda.OutOfMemoryError, RuntimeError) as exc:
                         if not isinstance(exc, torch.cuda.OutOfMemoryError) and "out of memory" not in str(exc).lower():
@@ -368,6 +423,7 @@ class BatchEngine:
                             raise
                         width = max(1, width // 2)
                         retries += 1
+                        safe_microbatch = min(safe_microbatch, width)
                         if torch.cuda.is_available():
                             torch.cuda.empty_cache()
                 peak = max(peak, len(chunk))
