@@ -158,6 +158,96 @@ def parse_typed_graph(raw: dict[str, Any], *, provenance: dict[str, str]) -> Gra
     return record
 
 
+def import_native_graph_file(
+    source: Path,
+    *,
+    model_sha256: str,
+    transcoder_sha256: str,
+    original_tool_commit: str,
+) -> GraphRecord:
+    """Convert exact circuit-tracer frontend v1 JSON without loading raw .pt.
+
+    Native selected feature IDs live in node_id; the native "feature" field
+    is Cantor-encoded and must not be mistaken for the SAE feature index.
+    """
+    if not source.is_file() or source.stat().st_size > 32 * 1024 * 1024:
+        raise ValueError("Original native graph JSON missing or oversized")
+    content = source.read_bytes()
+    obj = json.loads(content)
+    if not isinstance(obj, dict) or not {"metadata", "nodes", "links"}.issubset(obj):
+        raise ValueError("Original circuit-tracer graph schema required")
+    meta = obj["metadata"]
+    if (
+        not isinstance(meta, dict)
+        or meta.get("schema_version", 1) != 1
+        or not isinstance(meta.get("scan"), str)
+        or not meta["scan"]
+        or not isinstance(meta.get("prompt_tokens"), list)
+    ):
+        raise ValueError("Unknown native graph version or source identity")
+    native_nodes, native_edges = obj["nodes"], obj["links"]
+    if (
+        not isinstance(native_nodes, list)
+        or not isinstance(native_edges, list)
+        or len(native_nodes) > 3000
+        or len(native_edges) > 15000
+    ):
+        raise ValueError("Unbounded native graph")
+    nodes = []
+    for original in native_nodes:
+        if not isinstance(original, dict) or not isinstance(original.get("node_id"), str):
+            raise ValueError("Missing native node identity")
+        node_id = original["node_id"]
+        family = original.get("feature_type")
+        pos = original.get("ctx_idx")
+        if type(pos) is not int or pos < 0:
+            raise ValueError("Invalid original node context index")
+        layer, feature = None, None
+        if family == "cross layer transcoder":
+            match = re.fullmatch(r"(\d+)_(\d+)_(\d+)", node_id)
+            if match is None or int(match.group(3)) != pos:
+                raise ValueError("Transcoder feature node identity mismatch")
+            layer, feature = int(match.group(1)), int(match.group(2))
+            if original.get("layer") != str(layer):
+                raise ValueError("Native transcoder layer identity mismatch")
+            kind = "feature"
+            label = f"Layer {layer} feature {feature}, token {pos}"
+        elif family == "mlp reconstruction error":
+            match = re.fullmatch(r"(\d+)_-1_(\d+)", node_id)
+            if match is None or int(match.group(2)) != pos:
+                raise ValueError("Native reconstruction-error node mismatch")
+            layer = int(match.group(1))
+            if original.get("layer") != str(layer):
+                raise ValueError("Native error layer mismatch")
+            kind, label = "error", f"Layer {layer} reconstruction error, token {pos}"
+        elif family == "embedding":
+            match = re.fullmatch(r"E_(\d+)_(\d+)", node_id)
+            if match is None or int(match.group(2)) != pos:
+                raise ValueError("Native embedding identity mismatch")
+            kind = "token"
+            labels = meta["prompt_tokens"]
+            label = str(labels[pos])[:256] if pos < len(labels) else f"Input token {pos}"
+        elif family == "logit":
+            match = re.fullmatch(r"(\d+)_(\d+)_(\d+)", node_id)
+            if match is None or int(match.group(3)) != pos:
+                raise ValueError("Native logit identity mismatch")
+            kind, label = "logit", str(original.get("clerp") or node_id)[:256]
+        else:
+            raise ValueError(f"Unsupported circuit-tracer node family: {family!r}")
+        nodes.append(GraphNode(node_id, kind, layer, feature, pos, label))
+    record = GraphRecord(
+        nodes=tuple(nodes),
+        edges=tuple(GraphEdge(**edge) for edge in native_edges),
+        source_sha256=hashlib.sha256(content).hexdigest(),
+        model_sha256=model_sha256,
+        transcoder_sha256=transcoder_sha256,
+        original_tool_commit=original_tool_commit,
+        source_format="circuit-tracer-frontend-v1",
+    )
+    record.validate()
+    return record
+
+
 def prune(record: GraphRecord, *, min_abs_weight: float) -> GraphRecord:
     """Return bounded view without deleting raw graph; retain all error/target nodes."""
     record.validate()
