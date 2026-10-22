@@ -16,10 +16,10 @@ HuggingFace packed decode 只有调用方显式 `SAE_GENERATE_BACKEND=hf` 时，
 
 ## 安装
 
-标准 SAE 分析依赖在根目录 `requirements.txt`。GPU 生成和 NNsight 是独立的可选环境，依赖位于 `requirements-generation.txt`：
+标准 SAE 分析依赖在根目录 `requirements.txt`。GPU 生成和 NNsight 通过项目的可选依赖 `generation` 安装：
 
 ```bash
-python -m pip install -r requirements-generation.txt
+python -m pip install -e '.[generation]'
 ```
 
 具体的 CUDA、PyTorch 与 vLLM 版本必须在目标机器上验证。`apply_process_env()` 设置项目默认环境变量，可由调用者覆盖。

@@ -38,7 +38,7 @@ def generate_vllm(
     except ImportError as exc:
         raise RuntimeError(
             "vLLM is not installed in this interpreter. "
-            "Install them using requirements-generation.txt in this interpreter."
+            "Install them using pip install -e '.[generation]' in this interpreter."
         ) from exc
 
     if llm is None and not model:

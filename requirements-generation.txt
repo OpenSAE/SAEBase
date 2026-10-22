@@ -1,2 +1,0 @@
-# Optional experimental GPU generation backend; compatible CUDA/PyTorch required.
--e ".[generation]"

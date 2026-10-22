@@ -123,7 +123,7 @@ def test_generate_vllm_import_error_is_explicit():
             generate_vllm(["hello"], max_new_tokens=8, temperature=0.6, top_p=0.95, model="x")
         except RuntimeError as exc:
             assert "vLLM is not installed" in str(exc)
-            assert "requirements-generation.txt" in str(exc)
+            assert ".[generation]" in str(exc)
         else:
             raise AssertionError("expected RuntimeError without vLLM")
     else:

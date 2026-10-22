@@ -11,7 +11,7 @@ This page preserves detailed technical contracts and verification context. For c
   logit-difference filtering, artifact manifest, configurable directory and CPU/CUDA selection.
 - Routed `paths.data_dir` consistently through preflight, prompt loading and evaluation.
 - Added an optional `--run-dir` that resolves against the caller's directory, then passes to Hydra.
-- Made vLLM/NNsight dependencies optional through `requirements-generation.txt` (one Python interpreter).
+- Made vLLM/NNsight dependencies optional through `pip install -e '.[generation]'` (one Python interpreter).
 - Removed the missing protocol-04 import from the legacy generation wrapper. Its sampling parameters are explicit.
 - The absent BatchTopK research loader is called out clearly; checkpoint inference is not approximated.
 - Replaced the internal protocol-heavy README with a standalone README. The supplied

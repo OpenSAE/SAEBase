@@ -168,5 +168,5 @@ def generate(
     raise RuntimeError(
         "vLLM is not in this interpreter and no server is listening at "
         f"{server_base_url()}. Install the optional stack via "
-        "requirements-generation.txt or explicitly configure a vLLM HTTP server."
+        "pip install -e '.[generation]' or explicitly configure a vLLM HTTP server."
     )
