@@ -177,6 +177,7 @@ def test_nnsight_requires_a_real_trace_wrapper():
     with pytest.raises(TypeError):
         NNsightLocal(object())
     assert TraceLocation("model.layers[1].mlp", output_index=0).output_index == 0
+    assert TraceLocation("[0]").path == "[0]"
 
 
 def test_scope_catalog_lists_real_registered_profiles():
