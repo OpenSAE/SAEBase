@@ -14,7 +14,7 @@ from typing import Any, Sequence
 import torch
 
 
-_SEGMENT = re.compile(r"^([A-Za-z][A-Za-z0-9_]*)(?:\[([0-9]+)\])?$")
+_SEGMENT = re.compile(r"^([A-Za-z][A-Za-z0-9_]*)?(?:\[([0-9]+)\])?$")
 
 
 @dataclass(frozen=True)
@@ -29,7 +29,7 @@ class TraceLocation:
             raise ValueError("NNsight module path cannot be empty")
         for piece in self.path.split("."):
             match = _SEGMENT.fullmatch(piece)
-            if match is None or piece.startswith("_") or "__" in piece:
+            if match is None or not piece or piece.startswith("_") or "__" in piece:
                 raise ValueError(f"invalid NNsight module segment: {piece!r}")
         if self.output_index is not None and (
             type(self.output_index) is not int or self.output_index < 0
@@ -44,7 +44,8 @@ def _resolve(model: Any, location: TraceLocation) -> Any:
         assert match is not None  # validated at TraceLocation construction
         name, index = match.groups()
         try:
-            module = getattr(module, name)
+            if name is not None:
+                module = getattr(module, name)
             if index is not None:
                 module = module[int(index)]
         except (AttributeError, KeyError, IndexError, TypeError) as exc:
