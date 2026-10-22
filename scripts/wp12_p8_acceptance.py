@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 """P8 independent acceptance report from actual 50-item evidence and raw archive."""
+
 from __future__ import annotations
 
 import argparse
 import json
 from pathlib import Path
-import sys
 
 from saebase.wp12.acceptance import audit_ledger, inspect_archive, render_progress
 
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--ledger", type=Path, default=Path("work_plan/12_capability_acceptance_matrix.csv"))
+    p.add_argument(
+        "--ledger", type=Path, default=Path("work_plan/12_capability_acceptance_matrix.csv")
+    )
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--archive", type=Path, default=None)
     p.add_argument("--archive-sha256", type=str, default=None)
@@ -30,12 +32,17 @@ def main(argv: list[str] | None = None) -> int:
         json.dumps(report, sort_keys=True, indent=2) + "\n", encoding="utf-8"
     )
     (args.output / "progress.md").write_text(render_progress(report), encoding="utf-8")
-    print(json.dumps({
-        "release_ready": report["release_ready"],
-        "capabilities": report["capabilities"],
-        "missing_acceptance": len(report["missing"]),
-        "output": str(args.output),
-    }, sort_keys=True))
+    print(
+        json.dumps(
+            {
+                "release_ready": report["release_ready"],
+                "capabilities": report["capabilities"],
+                "missing_acceptance": len(report["missing"]),
+                "output": str(args.output),
+            },
+            sort_keys=True,
+        )
+    )
     return 1 if args.require_release and not report["release_ready"] else 0
 
 

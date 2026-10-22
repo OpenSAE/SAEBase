@@ -1,4 +1,5 @@
 """Fast CPU public/private WP12 integration and privacy checks."""
+
 from __future__ import annotations
 
 import sys
@@ -30,8 +31,7 @@ def graph_record() -> dict:
             {"source": "f", "target": "logit", "weight": 0.4},
             {"source": "error", "target": "logit", "weight": 0.02},
         ],
-        "provenance": {"source_sha256": "a" * 64,
-                       "original_tool_commit": "b" * 40},
+        "provenance": {"source_sha256": "a" * 64, "original_tool_commit": "b" * 40},
     }
 
 
@@ -40,11 +40,16 @@ def test_only_reviewed_native_records_become_browsable(monkeypatch, tmp_path):
     assert client.get("/api/wp12/circuits").json()["total"] == 0
     with pytest.raises(PermissionError):
         published_wp12.publish_record(
-            "circuits", graph_record(), root=tmp_path,
+            "circuits",
+            graph_record(),
+            root=tmp_path,
         )
     record = published_wp12.publish_record(
-        "circuits", graph_record(), root=tmp_path,
-        public_consent=True, rights_reviewed=True,
+        "circuits",
+        graph_record(),
+        root=tmp_path,
+        public_consent=True,
+        rights_reviewed=True,
     )
     sha = record["record_sha256"]
     response = client.get("/api/wp12/circuits")
@@ -74,7 +79,10 @@ def test_private_operator_worker_roles_and_durable_queue(monkeypatch, tmp_path):
     monkeypatch.setenv("OPENSAE_PRIVATE_WORKER_TOKEN", "b" * 40)
     op = {"Authorization": "Bearer " + "a" * 40}
     worker = {"Authorization": "Bearer " + "b" * 40}
-    assert client.post("/api/private/inputs", json={"text": "Hidden"}, headers=worker).status_code == 401
+    assert (
+        client.post("/api/private/inputs", json={"text": "Hidden"}, headers=worker).status_code
+        == 401
+    )
     r = client.post("/api/private/inputs", json={"text": "Hidden"}, headers=op)
     assert r.status_code == 200
     ref = r.json()["input_ref"]
@@ -98,10 +106,16 @@ def test_private_operator_worker_roles_and_durable_queue(monkeypatch, tmp_path):
     assert claimed.status_code == 200
     job = claimed.json()["job"]
     assert "Hidden" not in str(job)
-    finished = client.post("/api/private/workers/finish", headers=worker, json={
-        "job_id": job_id, "worker_id": "opensaebase-worker",
-        "attempt": job["attempt"], "result_sha256": "c" * 64,
-    })
+    finished = client.post(
+        "/api/private/workers/finish",
+        headers=worker,
+        json={
+            "job_id": job_id,
+            "worker_id": "opensaebase-worker",
+            "attempt": job["attempt"],
+            "result_sha256": "c" * 64,
+        },
+    )
     assert finished.status_code == 200 and finished.json()["accepted"]
     status = client.get("/api/private/jobs/" + job_id, headers=op)
     assert status.json()["status"] == "succeeded"
