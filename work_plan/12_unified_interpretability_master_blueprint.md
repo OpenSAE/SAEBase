@@ -166,7 +166,7 @@ No timeline is a promise: estimate calendar only after P0 inventory, upstream en
 
 **Scale:** **C1 smoke mandatory. C2 2–3 verified sites conditional. C3 broad site sweep forbidden.** Import pretrained official asset metadata CPU-only; download weights lazily and verify checksums; do not mirror model families.
 
-**Gate P1:** all 13 capabilities each have at least one real validated supported route, unsupported combinations fail clearly, legacy/new TL behavior is explicitly versioned, and clean/corrupt intervention results are faithful to the declared protocol.
+**P1 development checkpoint:** implement scoped API routes for its 13 capabilities, keep the legacy backend intact, run lightweight unit tests and one short real-weight sanity test where available. Do not block P2–P7 development on independent review of all P1 numerical arrays. Unsupported combinations must fail clearly. Full source-bound parity, cross-version matrix and 13-capability certification remain explicit P8 release criteria. Progress details: [P1 implementation](12_p1_model_backend_implementation.md).
 
 ### P2 — Neuronpedia-style Explore + SAE-Vis-style interactive evidence
 
@@ -426,7 +426,7 @@ runs/wp12/<phase>/<run_id>/
 
 Do not check large raw artifacts, model weights, secrets or private prompts into Git. Stable public summaries are published only through approved report paths.
 
-**Merge rules:** P0 must pass before P1; failures stay visible; no “success” because the run was skipped; no performance claim without matched protocol; unreviewed scientific estimator changes are excluded from infrastructure PRs. Any blocking library/API changes receive a compatibility decision documented in the ledger.
+**Merge and development rules:** the P0 source audit and bounded legacy GPU sanity check permit P1–P7 development to proceed while open independent evidence checks remain tracked for P8. Basic tests and correct fail-closed behavior are required before merging a changed runtime path. Failures stay visible; no “success” because a run was skipped; no performance claim without matched protocol; unreviewed scientific estimator changes are excluded from infrastructure PRs. Any blocking library/API changes receive a compatibility decision documented in the ledger.
 
 ## 9. Recommended first actual execution queue
 

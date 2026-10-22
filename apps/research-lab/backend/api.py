@@ -265,6 +265,15 @@ def preflight(request: InterventionSpec) -> dict[str, Any]:
     }
 
 
+@app.get("/api/sae-assets")
+def sae_assets(model_key: str = "") -> dict[str, Any]:
+    """Browse registered Gemma Scope 2 metadata; never download model weights."""
+    from saebase.sae.catalog import registered_catalog_json
+
+    items = registered_catalog_json(model_key=model_key or None)
+    return {"total": len(items), "items": items, "mode": "registered_metadata_only"}
+
+
 @app.post("/api/jobs")
 def submit_jobs() -> None:
     """Deliberately disabled until authenticated durable GPU service passes QA."""

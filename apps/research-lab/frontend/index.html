@@ -69,6 +69,15 @@
     </section>
     <section id="explore" class="view" hidden>
       <div class="section-heading"><div><span class="eyebrow">FEATURE EXPLORER</span><h1>Explore individual features</h1><p>Observed activity, identity, examples and evidence — not guessed explanations.</p></div></div>
+      <div class="panel asset-panel">
+        <div class="panel-title"><h2>Registered SAE resources</h2><span class="subtle">Official asset metadata · no model run</span></div>
+        <div class="filters asset-controls">
+          <label>Model <select id="asset-model"><option value="">All registered Gemma Scope models</option></select></label>
+          <button id="asset-refresh" class="btn secondary">View resources</button>
+        </div>
+        <div class="scroller"><table><thead><tr><th>Model</th><th>Layer / Hook</th><th>SAE identifier</th><th>Width</th><th>L0</th><th>Source</th></tr></thead><tbody id="asset-table"></tbody></table></div>
+        <div class="panel-footer"><span id="asset-count">Registered checkpoints are not automatically live GPU models.</span></div>
+      </div>
       <div class="filters">
         <label>Search <input id="feature-query" placeholder="Feature ID, label, or model" autocomplete="off"></label>
         <label>Model <input id="feature-model" placeholder="All published models" autocomplete="off"></label>
