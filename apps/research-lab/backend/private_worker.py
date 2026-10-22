@@ -77,9 +77,7 @@ def execute_one(*, root: Path, device: str = "cuda") -> dict:
             plan = EditPlan(site["sae"], site["layer"], -1, (edit,))
             response = compare_sae_edits(pair, pair.model.tokens(prompt=prompt), plan)
             result = {
-                k: v
-                for k, v in response.items()
-                if k not in {"baseline_logits", "edited_logits"}
+                k: v for k, v in response.items() if k not in {"baseline_logits", "edited_logits"}
             }
             result["baseline_logits"] = response["baseline_logits"].tolist()
             result["edited_logits"] = response["edited_logits"].tolist()

@@ -4,6 +4,7 @@ Uses the official config.json and safetensors at an immutable Hugging Face
 revision. Does not guess the type, skip connection or hook coordinates, and
 does not load unsafe pickle. Large checkpoints are opt-in.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -21,9 +22,16 @@ _REPO = re.compile(r"^google/gemma-scope-2-(270m|1b|4b|12b|27b)-(pt|it)$")
 _SHA = re.compile(r"^[a-f0-9]{40}$")
 _DIR = re.compile(r"^[a-z0-9_]+/[a-zA-Z0-9_]+$")
 _ALLOWED = {
-    "resid_post", "resid_post_all", "attn_out", "attn_out_all",
-    "mlp_out", "mlp_out_all", "transcoder", "transcoder_all",
-    "crosscoder", "clt",
+    "resid_post",
+    "resid_post_all",
+    "attn_out",
+    "attn_out_all",
+    "mlp_out",
+    "mlp_out_all",
+    "transcoder",
+    "transcoder_all",
+    "crosscoder",
+    "clt",
 }
 
 
@@ -53,7 +61,9 @@ class JumpReLURepresentation(nn.Module):
     """
 
     def __init__(
-        self, params: Mapping[str, torch.Tensor], *,
+        self,
+        params: Mapping[str, torch.Tensor],
+        *,
         config: Mapping[str, Any],
     ):
         super().__init__()
@@ -152,7 +162,11 @@ def _validate_source(repo_id: str, revision: str, directory: str) -> str:
 
 
 def load_official_scope2(
-    *, repo_id: str, revision: str, directory: str, device: str = "cpu",
+    *,
+    repo_id: str,
+    revision: str,
+    directory: str,
+    device: str = "cpu",
     max_checkpoint_bytes: int = 1_000_000_000,
 ) -> tuple[JumpReLURepresentation, ScopeIdentity]:
     """Download two named official files and load safetensors only, with fail-closed identity.
@@ -166,12 +180,14 @@ def load_official_scope2(
     from huggingface_hub import hf_hub_download
     from safetensors.torch import load_file
 
-    config_path = Path(hf_hub_download(
-        repo_id=repo_id, filename=f"{directory}/config.json", revision=revision
-    ))
-    weights_path = Path(hf_hub_download(
-        repo_id=repo_id, filename=f"{directory}/params.safetensors", revision=revision
-    ))
+    config_path = Path(
+        hf_hub_download(repo_id=repo_id, filename=f"{directory}/config.json", revision=revision)
+    )
+    weights_path = Path(
+        hf_hub_download(
+            repo_id=repo_id, filename=f"{directory}/params.safetensors", revision=revision
+        )
+    )
     if config_path.stat().st_size > 16_384 or weights_path.stat().st_size > max_checkpoint_bytes:
         raise ValueError("Official checkpoint exceeds declared memory/storage budget")
     config = json.loads(config_path.read_text(encoding="utf-8"))
@@ -207,10 +223,18 @@ def load_official_scope2(
                 source_hash.update(buf)
     output_dim = int(net.b_dec.shape[-1])
     info = ScopeIdentity(
-        repo_id=repo_id, revision=revision, asset_directory=directory,
-        family=family, kind=kind, input_hook=incoming, output_hook=outgoing,
-        source_sha256=source_hash.hexdigest(), width=net.num_features,
-        input_dim=net.input_dim, output_dim=output_dim, affine_skip=net.affine,
+        repo_id=repo_id,
+        revision=revision,
+        asset_directory=directory,
+        family=family,
+        kind=kind,
+        input_hook=incoming,
+        output_hook=outgoing,
+        source_sha256=source_hash.hexdigest(),
+        width=net.num_features,
+        input_dim=net.input_dim,
+        output_dim=output_dim,
+        affine_skip=net.affine,
         source_model=str(config.get("model_name", "")),
     )
     return net, info

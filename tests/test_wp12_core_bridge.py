@@ -1,4 +1,5 @@
 """Source-level native-pyvene bridge and private prompt inspection contract."""
+
 from __future__ import annotations
 
 import sys
@@ -7,8 +8,12 @@ from types import ModuleType, SimpleNamespace
 import pytest
 
 from saebase.wp12.pyvene import (
-    PyvenePlan, PyveneRepresentation, build_native_pyvene,
-    execute_native_pyvene, load_native_pyvene, save_native_pyvene,
+    PyvenePlan,
+    PyveneRepresentation,
+    build_native_pyvene,
+    execute_native_pyvene,
+    load_native_pyvene,
+    save_native_pyvene,
 )
 
 
@@ -47,16 +52,21 @@ def test_pyvene_roundtrip_parallel_serial_and_provenance(monkeypatch, tmp_path):
     fake.ZeroIntervention = type("ZeroIntervention", (), {})
     monkeypatch.setitem(sys.modules, "pyvene", fake)
 
-    p = PyvenePlan((
-        PyveneRepresentation(0, "block_output"),
-        PyveneRepresentation(1, "mlp_output", intervention="zero"),
-    ), mode="serial")
+    p = PyvenePlan(
+        (
+            PyveneRepresentation(0, "block_output"),
+            PyveneRepresentation(1, "mlp_output", intervention="zero"),
+        ),
+        mode="serial",
+    )
     assert PyvenePlan.parse(p.json()) == p
     wrapped = build_native_pyvene("source-model", p)
     assert wrapped.config.mode == "serial"
     assert len(wrapped.config.representations) == 2
     before, after = execute_native_pyvene(
-        wrapped, base={"input_ids": [1]}, sources=[{"input_ids": [2]}],
+        wrapped,
+        base={"input_ids": [1]},
+        sources=[{"input_ids": [2]}],
         unit_locations={"source_0->base": ([[0]], [[0]])},
     )
     assert before == {"input_ids": [1]}
@@ -66,16 +76,20 @@ def test_pyvene_roundtrip_parallel_serial_and_provenance(monkeypatch, tmp_path):
     with pytest.raises(PermissionError):
         load_native_pyvene(model="source", directory=folder)
     loaded = load_native_pyvene(
-        model="source", directory=folder, trusted_local_source=True,
+        model="source",
+        directory=folder,
+        trusted_local_source=True,
     )
     assert isinstance(loaded, Native)
     with pytest.raises(FileExistsError):
         save_native_pyvene(wrapped, folder)
     with pytest.raises(ValueError, match="Duplicate"):
-        PyvenePlan((
-            PyveneRepresentation(0, "block_output"),
-            PyveneRepresentation(0, "block_output"),
-        ))
+        PyvenePlan(
+            (
+                PyveneRepresentation(0, "block_output"),
+                PyveneRepresentation(0, "block_output"),
+            )
+        )
 
 
 def test_private_inspection_is_a_true_job_mode_with_no_steering():

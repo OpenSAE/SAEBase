@@ -3,6 +3,7 @@
 Construction, execution and source intervention hooks are handled by the
 upstream pyvene IntervenableModel. No SAEs are silently passed off as pyvene.
 """
+
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
@@ -23,7 +24,10 @@ class PyveneRepresentation:
         if type(self.layer) is not int or self.layer < 0:
             raise ValueError("pyvene layer must be nonnegative")
         if self.component not in {
-            "block_output", "block_input", "mlp_output", "attention_output",
+            "block_output",
+            "block_input",
+            "mlp_output",
+            "attention_output",
         }:
             raise ValueError("Choose a declared supported pyvene component")
         if self.unit not in {"pos", "h", "h.pos"}:
@@ -69,8 +73,11 @@ class PyvenePlan:
         allowed = {"layer", "component", "unit", "maximum_units", "intervention"}
         if any(not isinstance(v, dict) or set(v) != allowed for v in values):
             raise ValueError("pyvene representation has unknown fields")
-        return cls(tuple(PyveneRepresentation(**v) for v in values),
-                   mode=record["mode"], schema=record["schema"])
+        return cls(
+            tuple(PyveneRepresentation(**v) for v in values),
+            mode=record["mode"],
+            schema=record["schema"],
+        )
 
 
 def build_native_pyvene(model: Any, plan: PyvenePlan) -> Any:
@@ -109,9 +116,7 @@ def execute_native_pyvene(
         raise TypeError("Require original native pyvene IntervenableModel")
     if not isinstance(unit_locations, dict) or not unit_locations:
         raise ValueError("Actual native pyvene intervention positions required")
-    original, counterfactual = intervenable(
-        base, sources=sources, unit_locations=unit_locations
-    )
+    original, counterfactual = intervenable(base, sources=sources, unit_locations=unit_locations)
     if counterfactual is None:
         raise RuntimeError("Original pyvene returned no intervention output")
     return original, counterfactual

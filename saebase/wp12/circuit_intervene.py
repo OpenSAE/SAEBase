@@ -4,6 +4,7 @@ The original output is changed by decode(z_new) - decode(z), preserving
 everything outside the chosen transcoder feature. This is not a proof that
 a traced circuit is unique. Requires a real PyTorch forward and exact hooks.
 """
+
 from __future__ import annotations
 
 from typing import Any
@@ -19,7 +20,7 @@ from .circuits import GraphRecord
 def _module_name(hook: str) -> str:
     if not hook.endswith(".output"):
         raise ValueError("Only original output-module hooks are supported")
-    return hook[:-len(".output")]
+    return hook[: -len(".output")]
 
 
 def _logits(output: Any, position: int) -> torch.Tensor:
@@ -108,9 +109,8 @@ def execute_transcoder_node(
         # The affine/skip term cancels in the edit delta by construction.
         measured_delta = transcoder.decode(z_new) - transcoder.decode(z)
         changed = result.clone()
-        changed[:, position, :] = (
-            changed[:, position, :]
-            + measured_delta.to(device=changed.device, dtype=changed.dtype)
+        changed[:, position, :] = changed[:, position, :] + measured_delta.to(
+            device=changed.device, dtype=changed.dtype
         )
         return changed
 
