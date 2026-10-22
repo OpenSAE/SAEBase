@@ -1,5 +1,8 @@
 # Work Plan 14 — Ship a Useful SAEBase Research Lab
 
+> **Superseded for current execution by [WP15](15_complete_six_workflows_and_release.md).** This WP14 file records an earlier ship-or-cut strategy. G1–G6 are now mandatory engineering-completion targets; do not follow its HIDE/DEFER directives for the current release.
+
+
 Updated 2026-10-22. Release-first decision by the project owner.
 
 **This is the active release plan.** It supersedes WP12's all-50-capability goal, formal P8 signoff, and WP13's broad LIVE-00–10 completion sequence **as launch requirements**. Older plans, experiments and the 50-item ledger remain historical engineering records; do not delete or rewrite their evidence. Read the [short GPU Agent assignment](14_gpu_agent_release_handoff.md) and [release scope sheet](14_release_scope.csv) with this plan.
