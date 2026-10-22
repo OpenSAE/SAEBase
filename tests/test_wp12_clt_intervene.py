@@ -109,10 +109,11 @@ def test_clt_edit_changes_later_layers_only():
             model, inputs, record, "source-feature", clt,
             CLTIdentity(**{**identity.__dict__, "source_sha256": "f" * 64}),
         )
+    unhooked = TinyCLTModel()
+    unhooked.named_modules = lambda: iter(())
     with pytest.raises(ValueError, match="hook mapping"):
         execute_clt_feature(
-            nn.Sequential(nn.Identity()), inputs, record, "source-feature",
-            clt, identity,
+            unhooked, inputs, record, "source-feature", clt, identity,
         )
 
 
