@@ -149,7 +149,9 @@
       append(tr, "td", "", asset.width || "Unspecified");
       append(tr, "td", "", asset.l0_variant || "Unspecified");
       const cell = append(tr, "td");
-      if (/^google\\/gemma-scope-2-[a-z0-9-]+$/.test(asset.repo_id)) {
+      if (typeof asset.repo_id === "string" &&
+          asset.repo_id.startsWith("google/gemma-scope-2-") &&
+          /^[a-z0-9-]+$/.test(asset.repo_id.slice("google/gemma-scope-2-".length))) {
         const link = append(cell, "a", "", "Official manifest ↗");
         link.href = "https://huggingface.co/" + asset.repo_id;
         link.target = "_blank";
