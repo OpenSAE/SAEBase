@@ -15,7 +15,8 @@ from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import core
+from . import core, published_wp12
+from .private_api import router as private_router
 from .feature_store import feature_store_count
 from . import explore
 
@@ -23,6 +24,9 @@ ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "frontend"
 app = FastAPI(title="OpenSAE Research Lab", version="0.1.0", docs_url="/api/docs", redoc_url=None)
 app.mount("/assets", StaticFiles(directory=str(FRONTEND)), name="assets")
+# The private router responds 503 until explicitly configured with distinct
+# operator/worker tokens and durable storage. Public Research Lab stays read-only.
+app.include_router(private_router)
 
 
 @lru_cache(maxsize=1)
@@ -362,6 +366,40 @@ def preflight(request: InterventionSpec) -> dict[str, Any]:
         "max_new_tokens": request.max_new_tokens,
         "status": "blocked_until_gpu_worker_and_auth_are_configured",
         "note": "Preflight checks syntax/registered site only; it does not validate model behavior or run inference.",
+    }
+
+
+@app.get("/api/wp12/{category}")
+def wp12_catalog(category: str) -> dict[str, Any]:
+    """Only source-reviewed, immutable native result summaries."""
+    try:
+        return published_wp12.list_records(category)
+    except core.InvalidEvidence as exc:
+        _bad_evidence(exc)
+    except ValueError as exc:
+        raise HTTPException(404, str(exc)) from exc
+
+
+@app.get("/api/wp12/{category}/{record_id}")
+def wp12_record(category: str, record_id: str) -> dict[str, Any]:
+    try:
+        record = published_wp12.load_record(category, record_id)
+    except core.InvalidEvidence as exc:
+        _bad_evidence(exc)
+    if record is None:
+        raise HTTPException(404, "No approved real result with this identity")
+    return record
+
+
+@app.get("/api/wp12-compute")
+def wp12_compute() -> dict[str, Any]:
+    """No inference is falsely advertised in the CPU Research Lab."""
+    return {
+        "public_cpu_browse": True,
+        "online_new_inference": False,
+        "private_worker": "disabled_by_default",
+        "ndif_remote": "explicit_credentials_and_approval_required",
+        "multi_gpu_training": "real_2plus_gpu_allocation_required",
     }
 
 
