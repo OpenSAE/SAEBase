@@ -2,6 +2,7 @@
 
 No model or GPU execution here. Historical full-vocab arrays are never needed.
 """
+
 from __future__ import annotations
 
 import json
@@ -35,17 +36,12 @@ def test_live03_real_summary_maps_to_two_source_bound_records():
     assert all(r["measured"] is True for r in source)
     assert all(r["readouts"]["feature_position"]["noop"]["logit_delta_l2"] == 0 for r in source)
     assert all(
-        r["readouts"]["feature_position"]["ablation"]["argmax_changed"] is True
-        for r in source
+        r["readouts"]["feature_position"]["ablation"]["argmax_changed"] is True for r in source
     )
     assert all(
-        r["readouts"]["final_position"]["ablation"]["argmax_changed"] is False
-        for r in source
+        r["readouts"]["final_position"]["ablation"]["argmax_changed"] is False for r in source
     )
-    assert all(
-        r["readouts"]["final_position"]["ablation"]["logit_delta_l2"] > 0
-        for r in source
-    )
+    assert all(r["readouts"]["final_position"]["ablation"]["logit_delta_l2"] > 0 for r in source)
     assert all("prompt_text" not in r for r in source)
 
 
@@ -54,10 +50,20 @@ def test_live03_staging_requires_explicit_approval_and_hashes(tmp_path, monkeypa
     with pytest.raises(SystemExit):
         main(["--source", str(SOURCE), "--publish-reviewed"])
     release = tmp_path / "approved-records"
-    assert main([
-        "--source", str(SOURCE), "--publish-reviewed",
-        "--release-root", str(release), "--reviewer", "Real test reviewer",
-    ]) == 0
+    assert (
+        main(
+            [
+                "--source",
+                str(SOURCE),
+                "--publish-reviewed",
+                "--release-root",
+                str(release),
+                "--reviewer",
+                "Real test reviewer",
+            ]
+        )
+        == 0
+    )
     monkeypatch.setenv("OPENSAE_LAB_DATA", str(release))
     catalog = client.get("/api/wp12/interventions")
     assert catalog.status_code == 200
@@ -68,17 +74,27 @@ def test_live03_staging_requires_explicit_approval_and_hashes(tmp_path, monkeypa
         assert detail.json()["measured"] is True
         assert detail.json()["generated_text"] is False
     with pytest.raises(FileExistsError):
-        main([
-            "--source", str(SOURCE), "--publish-reviewed",
-            "--release-root", str(release), "--reviewer", "Real test reviewer",
-        ])
+        main(
+            [
+                "--source",
+                str(SOURCE),
+                "--publish-reviewed",
+                "--release-root",
+                str(release),
+                "--reviewer",
+                "Real test reviewer",
+            ]
+        )
 
 
-@pytest.mark.parametrize("field,value,error", [
-    ("generated_text", True, "unexecuted"),
-    ("logit_kind", "generated_text", "unexecuted"),
-    ("status", "not_measured", "unexecuted"),
-])
+@pytest.mark.parametrize(
+    "field,value,error",
+    [
+        ("generated_text", True, "unexecuted"),
+        ("logit_kind", "generated_text", "unexecuted"),
+        ("status", "not_measured", "unexecuted"),
+    ],
+)
 def test_live03_refuses_mislabeled_computation(tmp_path, field, value, error):
     source = json.loads(SOURCE.read_text(encoding="utf-8"))
     source[field] = value

@@ -4,6 +4,7 @@
 No GPU is run. By default this validates and prints a *private* count; it
 does not publish. Source results and model/SAE SHA are never manufactured.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -31,8 +32,13 @@ def _sha(value: Any, size: int) -> bool:
 def _measure(measure: Any, *, original: int, no_op: bool = False) -> dict[str, Any]:
     if not isinstance(measure, dict):
         raise ValueError("Expected actual original-logit metrics")
-    needed = {"max_abs_logit_delta", "logit_delta_l2", "baseline_argmax_token_id",
-              "edited_argmax_token_id", "argmax_changed"}
+    needed = {
+        "max_abs_logit_delta",
+        "logit_delta_l2",
+        "baseline_argmax_token_id",
+        "edited_argmax_token_id",
+        "argmax_changed",
+    }
     if set(measure) != needed:
         raise ValueError("Unknown or missing teacher-forced metric fields")
     max_delta, l2 = measure["max_abs_logit_delta"], measure["logit_delta_l2"]
@@ -61,8 +67,13 @@ def _measure(measure: Any, *, original: int, no_op: bool = False) -> dict[str, A
 
 def _readout(value: Any, *, expected_position: int, seq_length: int) -> dict:
     if not isinstance(value, dict) or set(value) != {
-        "readout_position", "logit_kind", "generated_text",
-        "baseline_argmax_token_id", "noop", "ablation", "scale"
+        "readout_position",
+        "logit_kind",
+        "generated_text",
+        "baseline_argmax_token_id",
+        "noop",
+        "ablation",
+        "scale",
     }:
         raise ValueError("Unexpected readout shape")
     if (
@@ -114,7 +125,8 @@ def translate_summary(source: Path) -> list[dict[str, Any]]:
         name = measured.get("site_id")
         site = sites.get(name)
         if (
-            not site or not core.has_complete_identity(site)
+            not site
+            or not core.has_complete_identity(site)
             or name in seen
             or measured.get("model_sha256") != site["model_sha256"]
             or measured.get("sae_sha256") != site["sae_sha256"]
@@ -123,8 +135,9 @@ def translate_summary(source: Path) -> list[dict[str, Any]]:
             raise ValueError("The reported real checkpoint/site is not in the verified registry")
         seen.add(name)
         feature_id, pos, token_id = (
-            measured.get("feature_id"), measured.get("token_position"),
-            measured.get("token_id")
+            measured.get("feature_id"),
+            measured.get("token_position"),
+            measured.get("token_id"),
         )
         total = measured.get("sequence_length")
         if (
@@ -144,46 +157,53 @@ def translate_summary(source: Path) -> list[dict[str, Any]]:
                 raise ValueError("Invalid measured native SAE activation")
         if (
             measured.get("scale_factor") != report["scale_factor"]
-            or abs(measured["scale_replacement_value"] -
-                   measured["live_activation"] * measured["scale_factor"]) > 0.001
+            or abs(
+                measured["scale_replacement_value"]
+                - measured["live_activation"] * measured["scale_factor"]
+            )
+            > 0.001
         ):
             raise ValueError("Reported scale does not correspond to measured live code")
         readouts = {
             "feature_position": _readout(
                 measured.get("readout_at_feature_position"),
-                expected_position=pos, seq_length=total,
+                expected_position=pos,
+                seq_length=total,
             ),
             "final_position": _readout(
                 measured.get("readout_at_final_token"),
-                expected_position=total - 1, seq_length=total,
+                expected_position=total - 1,
+                seq_length=total,
             ),
         }
-        imported.append({
-            "schema": PUBLIC_SCHEMA,
-            "site": name,
-            "sample_id": measured["sample_id"],
-            "prompt_sha256": measured["prompt_sha256"],
-            "model_sha256": measured["model_sha256"],
-            "sae_sha256": measured["sae_sha256"],
-            "hook_name": site["hook"],
-            "feature_id": feature_id,
-            "token_id": token_id,
-            "token_position": pos,
-            "sequence_length": total,
-            "measured_activation": float(measured["live_activation"]),
-            "scale_factor": float(report["scale_factor"]),
-            "measurement": "teacher_forced_full_vocab_logits_only",
-            "generated_text": False,
-            "measured": True,
-            "original_agent_run": "LIVE-03",
-            "original_source_code_sha": report["code_sha"],
-            "source_report_sha256": hashlib.sha256(original_bytes).hexdigest(),
-            "readouts": readouts,
-            "interpretation": (
-                "Source-recorded real checkpoint intervention; at each readout, "
-                "a changed argmax is not equivalent to generated text."
-            ),
-        })
+        imported.append(
+            {
+                "schema": PUBLIC_SCHEMA,
+                "site": name,
+                "sample_id": measured["sample_id"],
+                "prompt_sha256": measured["prompt_sha256"],
+                "model_sha256": measured["model_sha256"],
+                "sae_sha256": measured["sae_sha256"],
+                "hook_name": site["hook"],
+                "feature_id": feature_id,
+                "token_id": token_id,
+                "token_position": pos,
+                "sequence_length": total,
+                "measured_activation": float(measured["live_activation"]),
+                "scale_factor": float(report["scale_factor"]),
+                "measurement": "teacher_forced_full_vocab_logits_only",
+                "generated_text": False,
+                "measured": True,
+                "original_agent_run": "LIVE-03",
+                "original_source_code_sha": report["code_sha"],
+                "source_report_sha256": hashlib.sha256(original_bytes).hexdigest(),
+                "readouts": readouts,
+                "interpretation": (
+                    "Source-recorded real checkpoint intervention; at each readout, "
+                    "a changed argmax is not equivalent to generated text."
+                ),
+            }
+        )
     return imported
 
 
@@ -196,31 +216,39 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     records = translate_summary(args.source)
     if not args.publish_reviewed:
-        print(json.dumps({
-            "status": "real_measurement_validated_not_publicly_released",
-            "site_count": len(records),
-            "source_report_sha256": records[0]["source_report_sha256"],
-        }))
+        print(
+            json.dumps(
+                {
+                    "status": "real_measurement_validated_not_publicly_released",
+                    "site_count": len(records),
+                    "source_report_sha256": records[0]["source_report_sha256"],
+                }
+            )
+        )
         return 0
-    if (
-        args.release_root is None or not args.reviewer
-        or not args.reviewer.strip()
-    ):
+    if args.release_root is None or not args.reviewer or not args.reviewer.strip():
         parser.error("Public staging requires --release-root and a named source reviewer")
     # This local command stages operator-approved records only. It does not
     # deploy to HF and cannot substitute for public storage approval.
     published = []
     for record in records:
         receipt = published_wp12.publish_record(
-            "interventions", {**record, "reviewed_by": args.reviewer},
-            root=args.release_root, public_consent=True, rights_reviewed=True,
+            "interventions",
+            {**record, "reviewed_by": args.reviewer},
+            root=args.release_root,
+            public_consent=True,
+            rights_reviewed=True,
         )
         published.append(receipt["record_sha256"])
-    print(json.dumps({
-        "status": "approved_records_locally_staged_not_deployed",
-        "record_ids": published,
-        "release_root": str(args.release_root),
-    }))
+    print(
+        json.dumps(
+            {
+                "status": "approved_records_locally_staged_not_deployed",
+                "record_ids": published,
+                "release_root": str(args.release_root),
+            }
+        )
+    )
     return 0
 
 
