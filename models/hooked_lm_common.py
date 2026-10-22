@@ -1,4 +1,4 @@
-"""Shared HookedTransformer loading helpers for SAE / SAR models."""
+"""Version-aware TransformerLens loading helpers for SAE / SAR models."""
 
 from __future__ import annotations
 
@@ -99,9 +99,8 @@ def load_hooked_model(
     tokenizer: Any | None = None,
     architecture_name: str | None = None,
 ) -> Any:
-    from models.hf_compat import import_transformer_lens
+    from models.transformerlens_backend import boot_transformerlens
 
-    HookedTransformer = import_transformer_lens().HookedTransformer
     dev = device or require_cuda()
     defaults = _default_load_kwargs(architecture_name or model_name)
     use_no_processing = (
@@ -110,25 +109,13 @@ def load_hooked_model(
         else bool(no_processing)
     )
     use_dtype = defaults.get("dtype") if dtype is None else dtype
-    loader = (
-        HookedTransformer.from_pretrained_no_processing
-        if use_no_processing
-        else HookedTransformer.from_pretrained
-    )
-    kwargs: dict[str, Any] = {"device": dev}
-    if use_dtype is not None:
-        kwargs["dtype"] = use_dtype
-    if hf_model is not None:
-        kwargs["hf_model"] = hf_model
-    if tokenizer is not None:
-        kwargs["tokenizer"] = tokenizer
-    # Architecture name must be a TransformerLens-recognized official id;
-    # weight_repo may differ (e.g. unsloth mirror of google/gemma-3-1b-it).
+    # Architecture name must be recognized by the selected TL model system;
+    # hf_model/tokenizer may refer to the weights of a separate source mirror.
     load_name = architecture_name or model_name
-    model = loader(load_name, **kwargs)
-    model.eval()
-    for p in model.parameters():
-        p.requires_grad_(False)
+    model, _ = boot_transformerlens(
+        load_name, device=dev, dtype=use_dtype,
+        no_processing=use_no_processing, hf_model=hf_model, tokenizer=tokenizer,
+    )
     return model
 
 
