@@ -23,9 +23,10 @@ def boot_transformerlens(
 ) -> tuple[Any, str]:
     """Load a local model; never fall back to another weight-processing mode.
 
-    A bridge without compatibility mode uses raw HF weights and different hook
-    names. Enabling compatibility with no_processing=True registers historical
-    hook aliases but deliberately keeps raw HF parameters unchanged.
+    TL4 raw mode uses boot_transformers alone, while the historical
+    processed-weight route explicitly enables its compatibility mode.
+    Legacy hook aliases are available in both modes; processing is not
+    silently changed to make an incompatible SAE appear to work.
     """
     from models.hf_compat import import_transformer_lens
 
@@ -54,12 +55,13 @@ def boot_transformerlens(
         if tokenizer is not None:
             bridge_kwargs["tokenizer"] = tokenizer
         model = TransformerBridge.boot_transformers(model_name, **bridge_kwargs)
-        compatibility = getattr(model, "enable_compatibility_mode", None)
-        if not callable(compatibility):
-            raise RuntimeError("TransformerBridge lacks legacy hook compatibility mode")
-        # This registers old hook aliases in BOTH modes, but only folds/centers
-        # weights if the original SAEBase profile called from_pretrained.
-        compatibility(no_processing=no_processing)
+        if not no_processing:
+            compatibility = getattr(model, "enable_compatibility_mode", None)
+            if not callable(compatibility):
+                raise RuntimeError("TransformerBridge lacks weight compatibility mode")
+            # Full processed weights must be explicitly requested; historical
+            # hook aliases are exposed even by a raw TransformerBridge.
+            compatibility(no_processing=False)
         engine = "transformer_bridge_local"
 
     model.eval()
