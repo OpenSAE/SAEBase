@@ -5,6 +5,7 @@ By default this only indexes source-bound private trace metadata. It never
 publishes prompt texts or activation arrays. An optional explicit reviewed
 release builds actual SQLite/trace artifacts IN PLACE on the source host.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -18,7 +19,7 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "apps" / "research-lab"))
 
-from backend import core, explore  # noqa: E402
+from backend import explore  # noqa: E402
 from backend.feature_store import create_feature_store, feature_store_count  # noqa: E402
 
 
@@ -45,8 +46,13 @@ def _read_traces(folder: Path) -> list[tuple[Path, str, dict[str, Any]]]:
         if path.stat().st_size > MAX_JSON_BYTES:
             raise ValueError("Oversized raw trace; refuse silent truncation")
         record = json.loads(path.read_text(encoding="utf-8"))
-        if not isinstance(record, dict) or not {"site_id", "sample_id", "tokens",
-                                                "model_sha256", "sae_sha256"}.issubset(record):
+        if not isinstance(record, dict) or not {
+            "site_id",
+            "sample_id",
+            "tokens",
+            "model_sha256",
+            "sae_sha256",
+        }.issubset(record):
             continue
         digest = _sha(path)
         # Validate all scientific identity/token/code claims locally WITHOUT
@@ -206,9 +212,7 @@ def main(argv: list[str] | None = None) -> int:
         if not approved:
             p.error("No source/rights-approved trace was selected")
         args.release_root.mkdir(mode=0o700, parents=True)
-        feature_meta = create_feature_store(
-            _observations(approved), args.release_root / "features"
-        )
+        feature_meta = create_feature_store(_observations(approved), args.release_root / "features")
         trace_meta = explore.publish_exploration(
             approved, [], output=args.release_root / "explore", public_consent=True
         )
@@ -231,13 +235,17 @@ def main(argv: list[str] | None = None) -> int:
             raise RuntimeError("Staging bundle cannot open reviewed token traces")
         print(json.dumps({"built": True, "publicly_deployed": False, **manifest}))
     else:
-        print(json.dumps({
-            "built": False,
-            "publicly_deployed": False,
-            "count": summary["trace_count"],
-            "reviewed_excerpt_count": summary["reviewed_excerpt_count"],
-            "small_report": str(args.small_report),
-        }))
+        print(
+            json.dumps(
+                {
+                    "built": False,
+                    "publicly_deployed": False,
+                    "count": summary["trace_count"],
+                    "reviewed_excerpt_count": summary["reviewed_excerpt_count"],
+                    "small_report": str(args.small_report),
+                }
+            )
+        )
     return 0
 
 
