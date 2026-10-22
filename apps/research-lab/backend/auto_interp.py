@@ -5,6 +5,7 @@ service. The researcher supplies a generator and, optionally, a predictor;
 the output is a provenance-bearing hypothesis requiring human publication
 approval and further scientific validation.
 """
+
 from __future__ import annotations
 
 from collections.abc import Callable, Sequence
@@ -48,12 +49,11 @@ def propose_interpretation(
         raise PermissionError("Explicit sufficient generation budget required before a call")
     if not discovery or not heldout or len(discovery) > 100 or len(heldout) > 100:
         raise ValueError("Separate bounded discovery and evaluation records required")
+
     def check(rows: Sequence[dict[str, Any]]) -> list[str]:
         ids = []
         for row in rows:
-            group, text, value = (
-                row.get("group_id"), row.get("text"), row.get("activation")
-            )
+            group, text, value = (row.get("group_id"), row.get("text"), row.get("activation"))
             if not isinstance(group, str) or not group:
                 raise ValueError("Missing independent prompt group")
             if not isinstance(text, str) or not text or len(text) > 6000:
@@ -64,6 +64,7 @@ def propose_interpretation(
         if len(set(ids)) != len(ids):
             raise ValueError("Each split requires distinct prompt groups")
         return ids
+
     discovery_ids, heldout_ids = check(discovery), check(heldout)
     if set(discovery_ids) & set(heldout_ids):
         raise ValueError("Discovery and held-out groups overlap")
@@ -102,15 +103,21 @@ def propose_interpretation(
         raise ValueError("Balanced accuracy requires activating and inactive held-out groups")
     tpr = sum(predicted[i] for i in positives) / len(positives)
     tnr = sum(not predicted[i] for i in negatives) / len(negatives)
-    result.update({
-        "status": "heldout_tested",
-        "heldout_score": float((tpr + tnr) / 2),
-        "heldout_n_positive": len(positives),
-        "heldout_n_negative": len(negatives),
-        "heldout_errors": [
-            {"group_id": heldout[i]["group_id"], "observed_active": labels[i],
-             "predicted_active": predicted[i]}
-            for i in range(len(heldout)) if predicted[i] != labels[i]
-        ],
-    })
+    result.update(
+        {
+            "status": "heldout_tested",
+            "heldout_score": float((tpr + tnr) / 2),
+            "heldout_n_positive": len(positives),
+            "heldout_n_negative": len(negatives),
+            "heldout_errors": [
+                {
+                    "group_id": heldout[i]["group_id"],
+                    "observed_active": labels[i],
+                    "predicted_active": predicted[i],
+                }
+                for i in range(len(heldout))
+                if predicted[i] != labels[i]
+            ],
+        }
+    )
     return result
