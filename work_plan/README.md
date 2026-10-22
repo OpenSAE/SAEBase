@@ -7,3 +7,13 @@ This folder holds plans and execution records used while building SAEBase. Start
 - Final measured performance, including Qwen3-1.7B intervention and generated-token results, is reported in [Work Plan 11 results](../docs/performance/workplan11_final_results.md).
 
 The two Work Plan 11 files reflect an original broad plan and the later GPU execution handoff; they are historical records, not competing user-facing installation instructions. Existing paths remain intact so external references and experimental records do not break.
+
+## Work Plan 12 — Unified OpenSAE research infrastructure
+
+The new long-term master blueprint integrates the **50 functional capabilities of 10 established interpretability projects** through a single SAEBase API and Research Lab, retaining all historical plans and experimental evidence.
+
+- [**12 — Master blueprint**](12_unified_interpretability_master_blueprint.md). Nine phases P0–P8, upstream feature-to-UI mapping, API architecture, 50 exact acceptance tests, local/GPU split, C0–C3 compute tiers, scientific boundaries and release policy.
+- [**12 — GPU agent handoff**](12_gpu_agent_handoff_protocol.md). Exact phased GPU/CPU responsibilities, preflight, run artifacts, rate measurement, stop rules and independent signoff.
+- [**12 — 50-capability ledger**](12_capability_acceptance_matrix.csv). One row per feature, with phase, computational tier, accountable execution route, and empty evidence fields deliberately marked `TO_AUDIT` pending verification.
+
+Work Plan 12 is a *planned expansion*, not a claim that all capabilities have been implemented, publicly deployed or tested on GPU. Follow older WP04–WP11 experimental protocols and accepted findings when implementing the new work.
