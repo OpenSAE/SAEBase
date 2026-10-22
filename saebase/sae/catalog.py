@@ -4,6 +4,7 @@ Listing an asset never downloads model weights, and a registered SAE profile
 is not proof of a successfully loaded checkpoint. Upstream manifest discovery
 is opt-in and records the exact returned Hugging Face model revision.
 """
+
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
@@ -55,18 +56,30 @@ def registered_scope_assets(*, model_key: str | None = None) -> list[ScopeAsset]
             parsed_layer, width, l0 = _parts(sae_id)
             if parsed_layer is not None and parsed_layer != layer:
                 raise ValueError(f"SAE profile {profile.key} has inconsistent layer")
-            output.append(ScopeAsset(
-                model_key=profile.model_key, repo_id=repo, revision=None,
-                source="registered_profile", sae_id=sae_id, layer=layer,
-                hook=profile.hook_name(layer), width=width, l0_variant=l0,
-                loader=profile.loader, registered_profile=profile.key,
-                status="registered_not_live_verified",
-            ))
+            output.append(
+                ScopeAsset(
+                    model_key=profile.model_key,
+                    repo_id=repo,
+                    revision=None,
+                    source="registered_profile",
+                    sae_id=sae_id,
+                    layer=layer,
+                    hook=profile.hook_name(layer),
+                    width=width,
+                    l0_variant=l0,
+                    loader=profile.loader,
+                    registered_profile=profile.key,
+                    status="registered_not_live_verified",
+                )
+            )
     return sorted(output, key=lambda e: (e.model_key, e.layer, e.repo_id, e.sae_id))
 
 
 def discover_official_scope_assets(
-    repo_id: str, *, revision: str | None = None, info: Any | None = None,
+    repo_id: str,
+    *,
+    revision: str | None = None,
+    info: Any | None = None,
 ) -> list[ScopeAsset]:
     """List real width/L0 variants from an official HF repo's file manifest.
 
@@ -109,15 +122,20 @@ def discover_official_scope_assets(
             if key in by_key:
                 continue
             exemplar = match[0]
-            sae_id = "/".join(filename.split("/")[:filename.split("/").index(part)+1])
+            sae_id = "/".join(filename.split("/")[: filename.split("/").index(part) + 1])
             by_key[key] = ScopeAsset(
-                model_key=exemplar.model_key, repo_id=repo_id, revision=sha,
-                source="official_file_manifest", sae_id=sae_id, layer=layer,
-                hook=exemplar.hook, width=width, l0_variant=l0,
+                model_key=exemplar.model_key,
+                repo_id=repo_id,
+                revision=sha,
+                source="official_file_manifest",
+                sae_id=sae_id,
+                layer=layer,
+                hook=exemplar.hook,
+                width=width,
+                l0_variant=l0,
                 loader=exemplar.loader,
                 registered_profile=next(
-                    (a.registered_profile for a in match if
-                     a.sae_id == sae_id), None
+                    (a.registered_profile for a in match if a.sae_id == sae_id), None
                 ),
                 status="official_manifest_unloaded",
             )
