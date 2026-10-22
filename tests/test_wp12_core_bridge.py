@@ -38,6 +38,7 @@ def test_pyvene_roundtrip_parallel_serial_and_provenance(monkeypatch, tmp_path):
             assert kwargs == {"from_huggingface_hub": False, "include_model": False}
             return Native(SimpleNamespace(), model)
 
+    PyveneModel.__module__ = "pyvene.models.intervenable_base"
     fake = ModuleType("pyvene")
     fake.RepresentationConfig = make_config
     fake.IntervenableConfig = make_config
@@ -95,7 +96,7 @@ def test_private_inspection_is_a_true_job_mode_with_no_steering():
         "input_ref": "a" * 64,
     }
     assert JobQueue._validated_spec(spec) == spec
-    with pytest.raises(JobError, match="no feature edits"):
+    with pytest.raises(JobError, match="select no feature IDs"):
         JobQueue._validated_spec({**spec, "feature_ids": [1]})
     with pytest.raises(JobError, match="no feature edits"):
         JobQueue._validated_spec({**spec, "strength": 1.0})
