@@ -4,11 +4,11 @@ CPU-only, no remote inference. The published trace collection is small and
 checksummed; the independently maintained feature SQLite index handles large
 dictionaries. Missing observations are unknown, never assumed to be zero.
 """
+
 from __future__ import annotations
 
 import hashlib
 import html
-import json
 import math
 from pathlib import Path
 from typing import Any, Iterable
@@ -27,8 +27,10 @@ MAX_LABELS = 1024
 
 
 def _sha(value: str, *, length: int = 64) -> bool:
-    return isinstance(value, str) and len(value) == length and all(
-        char in "0123456789abcdef" for char in value
+    return (
+        isinstance(value, str)
+        and len(value) == length
+        and all(char in "0123456789abcdef" for char in value)
     )
 
 
@@ -134,17 +136,21 @@ def _valid_explanation(row: dict[str, Any], sites: dict[str, dict[str, Any]]) ->
     discovery = row.get("discovery_group_ids", [])
     evaluation = row.get("evaluation_group_ids", [])
     if (
-        not isinstance(discovery, list) or not isinstance(evaluation, list)
+        not isinstance(discovery, list)
+        or not isinstance(evaluation, list)
         or any(not isinstance(x, str) or not x for x in discovery + evaluation)
-        or len(set(discovery)) != len(discovery) or len(set(evaluation)) != len(evaluation)
+        or len(set(discovery)) != len(discovery)
+        or len(set(evaluation)) != len(evaluation)
         or set(discovery) & set(evaluation)
     ):
         raise ValueError("Discovery/evaluation groups must be distinct")
     score = row.get("heldout_score")
     if row["status"] == "heldout_tested":
         if (
-            not discovery or not evaluation
-            or type(score) not in (int, float) or not math.isfinite(score)
+            not discovery
+            or not evaluation
+            or type(score) not in (int, float)
+            or not math.isfinite(score)
             or not 0 <= score <= 1
         ):
             raise ValueError("Held-out score requires exact disjoint groups and finite value")
@@ -248,10 +254,12 @@ def published_exploration(root: Path | None = None) -> dict[str, Any]:
         raise core.InvalidEvidence("Exploration schema mismatch")
     traces, labels = body.get("traces"), body.get("explanations")
     if (
-        not isinstance(traces, list) or not isinstance(labels, list)
+        not isinstance(traces, list)
+        or not isinstance(labels, list)
         or len(traces) != meta.get("trace_count")
         or len(labels) != meta.get("explanation_count")
-        or len(traces) > MAX_TRACES or len(labels) > MAX_LABELS
+        or len(traces) > MAX_TRACES
+        or len(labels) > MAX_LABELS
     ):
         raise core.InvalidEvidence("Exploration counts invalid")
     sites = _sites()
@@ -266,8 +274,13 @@ def published_exploration(root: Path | None = None) -> dict[str, Any]:
 
 
 def feature_search(
-    *, query: str = "", model: str = "", site_id: str = "",
-    mode: str = "feature", limit: int = 36, offset: int = 0,
+    *,
+    query: str = "",
+    model: str = "",
+    site_id: str = "",
+    mode: str = "feature",
+    limit: int = 36,
+    offset: int = 0,
     root: Path | None = None,
 ) -> dict[str, Any]:
     """Search either recorded IDs or published explanation text, not live inference."""
@@ -278,48 +291,65 @@ def feature_search(
     if mode == "explanation":
         labels = published_exploration(root)["explanations"]
         query_fold = query.casefold()
-        hits = [x for x in labels if query_fold in x["description"].casefold()
-                and (not site_id or x["site_id"] == site_id)]
+        hits = [
+            x
+            for x in labels
+            if query_fold in x["description"].casefold()
+            and (not site_id or x["site_id"] == site_id)
+        ]
         sites = _sites()
         if model:
             hits = [x for x in hits if model.casefold() in sites[x["site_id"]]["model"].casefold()]
         by_key = {x["feature_key"]: x for x in hits}
         keys = sorted(by_key)
         return {
-            "total": len(keys), "items": [
+            "total": len(keys),
+            "items": [
                 {**by_key[key], "site": sites[by_key[key]["site_id"]]}
                 for key in keys[offset : offset + limit]
-            ], "mode": "explanation", "source": "approved_descriptions",
+            ],
+            "mode": "explanation",
+            "source": "approved_descriptions",
         }
     indexed = query_feature_store(
-        root=root, query=query, model=model, site_id=site_id,
-        limit=limit, offset=offset,
+        root=root,
+        query=query,
+        model=model,
+        site_id=site_id,
+        limit=limit,
+        offset=offset,
     )
     if indexed is not None:
         return {**indexed, "mode": "feature", "source": "verified_sqlite"}
     rows = core.feature_index(root)
     lookup = query.casefold()
     rows = [
-        x for x in rows if (not model or model.casefold() in x["model"].casefold())
+        x
+        for x in rows
+        if (not model or model.casefold() in x["model"].casefold())
         and (not site_id or x["site_id"] == site_id)
-        and (
-            not query or lookup in (
-                x["feature_key"] + " " + str(x.get("label") or "")
-            ).casefold()
-        )
+        and (not query or lookup in (x["feature_key"] + " " + str(x.get("label") or "")).casefold())
     ]
     rows.sort(key=lambda x: (x["model"], x["layer"], x["feature_id"]))
-    return {"total": len(rows), "limit": limit, "offset": offset,
-            "items": rows[offset:offset + limit], "mode": "feature",
-            "source": "verified_compact_index"}
+    return {
+        "total": len(rows),
+        "limit": limit,
+        "offset": offset,
+        "items": rows[offset : offset + limit],
+        "mode": "feature",
+        "source": "verified_compact_index",
+    }
 
 
-def feature_details(site_id: str, feature_id: int, *, root: Path | None = None) -> dict[str, Any] | None:
+def feature_details(
+    site_id: str, feature_id: int, *, root: Path | None = None
+) -> dict[str, Any] | None:
     if type(feature_id) is not int or feature_id < 0:
         return None
     if site_id not in _sites():
         return None
     from .feature_store import feature_by_id, feature_store_count
+
     has_sqlite = feature_store_count(root) is not None
     result = feature_by_id(site_id, feature_id, root=root) if has_sqlite else None
     if result is None and not has_sqlite:
@@ -332,33 +362,47 @@ def feature_details(site_id: str, feature_id: int, *, root: Path | None = None) 
             if row.get("feature_id") == feature_id:
                 result = {
                     **row,
-                    "previous_feature_id": (
-                        candidates[index - 1]["feature_id"] if index else None
-                    ),
+                    "previous_feature_id": (candidates[index - 1]["feature_id"] if index else None),
                     "next_feature_id": (
-                        candidates[index + 1]["feature_id"]
-                        if index + 1 < len(candidates) else None
+                        candidates[index + 1]["feature_id"] if index + 1 < len(candidates) else None
                     ),
                 }
                 break
     if result is None:
         return None
     site = _sites()[site_id]
-    labels = [x for x in published_exploration(root)["explanations"]
-              if x["site_id"] == site_id and x["feature_id"] == feature_id]
+    labels = [
+        x
+        for x in published_exploration(root)["explanations"]
+        if x["site_id"] == site_id and x["feature_id"] == feature_id
+    ]
     examples = result.get("examples") or []
     # Distribution is explicitly *reviewed examples only*, not density across
     # the source corpus; sparse index has no all-token denominator.
     positives = [float(x["activation"]) for x in examples if x["activation"] > 0]
     negative = [float(x["activation"]) for x in examples if x["activation"] < 0]
     return {
-        **result, "site": {k: site[k] for k in ("site_id", "model", "sae", "layer",
-                                               "hook", "model_sha256", "sae_sha256",
-                                               "evidence_url")},
+        **result,
+        "site": {
+            k: site[k]
+            for k in (
+                "site_id",
+                "model",
+                "sae",
+                "layer",
+                "hook",
+                "model_sha256",
+                "sae_sha256",
+                "evidence_url",
+            )
+        },
         "explanations": labels,
-        "distribution": {"scope": "top_reviewed_examples_only",
-                         "positive_activations": positives, "negative_activations": negative,
-                         "population_density": None},
+        "distribution": {
+            "scope": "top_reviewed_examples_only",
+            "positive_activations": positives,
+            "negative_activations": negative,
+            "population_density": None,
+        },
         "canonical_url_fragment": "explore?site=" + site_id + "&feature=" + str(feature_id),
         "supported": {"logit_attribution": False, "live_inference": False},
     }
@@ -366,10 +410,15 @@ def feature_details(site_id: str, feature_id: int, *, root: Path | None = None) 
 
 def recorded_traces(*, site_id: str = "", root: Path | None = None) -> list[dict[str, Any]]:
     return [
-        {"trace_id": x["trace_id"], "site_id": x["site_id"],
-         "sample_id": x["sample_id"], "prompt_group_id": x["prompt_group_id"],
-         "token_count": len(x["tokens"]), "split": x["split"],
-         "prompt_text": x["prompt_text"]}
+        {
+            "trace_id": x["trace_id"],
+            "site_id": x["site_id"],
+            "sample_id": x["sample_id"],
+            "prompt_group_id": x["prompt_group_id"],
+            "token_count": len(x["tokens"]),
+            "split": x["split"],
+            "prompt_text": x["prompt_text"],
+        }
         for x in published_exploration(root)["traces"]
         if not site_id or x["site_id"] == site_id
     ]
@@ -384,22 +433,28 @@ def recorded_trace(trace_id: str, *, root: Path | None = None) -> dict[str, Any]
     )
 
 
-def recorded_inference(prompt: str, *, site_id: str = "", root: Path | None = None
-                       ) -> list[dict[str, Any]]:
+def recorded_inference(
+    prompt: str, *, site_id: str = "", root: Path | None = None
+) -> list[dict[str, Any]]:
     """Retrieve matching frozen actual input, never imply fresh GPU inference."""
     if not isinstance(prompt, str) or not prompt or len(prompt) > 16000:
         raise ValueError("Input text required")
     digest = hashlib.sha256(prompt.encode()).hexdigest()
     return [
-        {"trace_id": t["trace_id"], "site_id": t["site_id"],
-         "max_features": strongest_features(t), "mode": "recorded_only"}
+        {
+            "trace_id": t["trace_id"],
+            "site_id": t["site_id"],
+            "max_features": strongest_features(t),
+            "mode": "recorded_only",
+        }
         for t in published_exploration(root)["traces"]
         if t["prompt_sha256"] == digest and (not site_id or t["site_id"] == site_id)
     ]
 
 
-def strongest_features(trace: dict[str, Any], *, token_position: int | None = None,
-                       top_k: int = 20) -> list[dict[str, Any]]:
+def strongest_features(
+    trace: dict[str, Any], *, token_position: int | None = None, top_k: int = 20
+) -> list[dict[str, Any]]:
     """Max activation per feature on selected token(s) of one COMPLETE trace."""
     if not 1 <= top_k <= 100:
         raise ValueError("Invalid top-k request")
@@ -414,15 +469,19 @@ def strongest_features(trace: dict[str, Any], *, token_position: int | None = No
             if fid not in best or abs(value) > abs(best[fid][0]):
                 best[fid] = (float(value), token["position"])
     return [
-        {"feature_id": fid, "activation": value, "position": pos,
-         "feature_key": trace["site_id"] + ":F" + str(fid)}
-        for fid, (value, pos) in sorted(best.items(),
-            key=lambda x: (-abs(x[1][0]), x[0]))[:top_k]
+        {
+            "feature_id": fid,
+            "activation": value,
+            "position": pos,
+            "feature_key": trace["site_id"] + ":F" + str(fid),
+        }
+        for fid, (value, pos) in sorted(best.items(), key=lambda x: (-abs(x[1][0]), x[0]))[:top_k]
     ]
 
 
-def correlations(site_id: str, feature_id: int, *, root: Path | None = None,
-                 limit: int = 10) -> dict[str, Any]:
+def correlations(
+    site_id: str, feature_id: int, *, root: Path | None = None, limit: int = 10
+) -> dict[str, Any]:
     """Pearson correlation of per-group maximum SAE codes, complete sources only.
 
     Empty or unobserved groups are zeros ONLY when the trace explicitly covers
@@ -441,9 +500,13 @@ def correlations(site_id: str, feature_id: int, *, root: Path | None = None,
                 if fid not in by_id or abs(v) > abs(by_id[fid]):
                     by_id[fid] = v
     if len(groups) < 3:
-        return {"items": [], "n_groups": len(groups),
-                "note": "Need >=3 independent published prompt groups"}
+        return {
+            "items": [],
+            "n_groups": len(groups),
+            "note": "Need >=3 independent published prompt groups",
+        }
     import numpy as np
+
     array = list(groups.values())
     v = np.asarray([g.get(feature_id, 0.0) for g in array], dtype=float)
     if float(np.std(v)) == 0:
@@ -458,23 +521,38 @@ def correlations(site_id: str, feature_id: int, *, root: Path | None = None,
         if math.isfinite(rho):
             found.append({"feature_id": fid, "pearson_r": rho})
     found.sort(key=lambda x: (-abs(x["pearson_r"]), x["feature_id"]))
-    return {"items": found[:limit], "n_groups": len(groups),
-            "scope": "complete_sparse_codes_per_independent_prompt_group",
-            "note": "Correlation is not causal identity; small-group estimates are unstable"}
+    return {
+        "items": found[:limit],
+        "n_groups": len(groups),
+        "scope": "complete_sparse_codes_per_independent_prompt_group",
+        "note": "Correlation is not causal identity; small-group estimates are unstable",
+    }
 
 
 def feature_html(card: dict[str, Any]) -> str:
     """Self-contained printable HTML; only reviewed public content is inserted."""
-    esc = lambda value: html.escape(str(value), quote=True)
+    def esc(value: Any) -> str:
+        return html.escape(str(value), quote=True)
     examples = "".join(
-        "<li><strong>" + esc(e["token_text"]) + "</strong> · " +
-        esc(e["activation"]) + "<p>" + esc(e["text_excerpt"]) + "</p></li>"
+        "<li><strong>"
+        + esc(e["token_text"])
+        + "</strong> · "
+        + esc(e["activation"])
+        + "<p>"
+        + esc(e["text_excerpt"])
+        + "</p></li>"
         for e in card.get("examples", [])
     )
     labels = "".join(
-        "<li>" + esc(item["description"]) + " <small>(" +
-        esc(item["origin"]) + "; " + esc(item["status"]) +
-        "; " + esc(item["author_or_model"]) + ")</small></li>"
+        "<li>"
+        + esc(item["description"])
+        + " <small>("
+        + esc(item["origin"])
+        + "; "
+        + esc(item["status"])
+        + "; "
+        + esc(item["author_or_model"])
+        + ")</small></li>"
         for item in card.get("explanations", [])
     )
     return (
@@ -484,13 +562,22 @@ def feature_html(card: dict[str, Any]) -> str:
         "<style>body{font:16px system-ui;max-width:800px;margin:3rem auto;padding:1rem}"
         "li{margin:1rem 0}small{color:#666}p{white-space:pre-wrap}</style>"
         "<h1>Feature " + esc(card["feature_id"]) + "</h1>"
-        "<p>Model " + esc(card["site"]["model"]) + " · SAE " +
-        esc(card["site"]["sae"]) + " · " + esc(card["site"]["hook"]) + "</p>"
-        "<p>Recorded activity: " + esc(card["observations"]) +
-        " occurrences from " + esc(card["unique_prompt_groups"]) + " groups.</p>"
+        "<p>Model "
+        + esc(card["site"]["model"])
+        + " · SAE "
+        + esc(card["site"]["sae"])
+        + " · "
+        + esc(card["site"]["hook"])
+        + "</p>"
+        "<p>Recorded activity: "
+        + esc(card["observations"])
+        + " occurrences from "
+        + esc(card["unique_prompt_groups"])
+        + " groups.</p>"
         "<p>These are recorded observations, not live inference or an explanation guarantee.</p>"
         "<h2>Published interpretations</h2><ul>" + labels + "</ul>"
         "<h2>Reviewed activation examples</h2><ul>" + examples + "</ul>"
-        "<footer>OpenSAE SAEBase · verified-site evidence reference: " +
-        esc(card["site"]["evidence_url"]) + "</footer></html>"
+        "<footer>OpenSAE SAEBase · verified-site evidence reference: "
+        + esc(card["site"]["evidence_url"])
+        + "</footer></html>"
     )
