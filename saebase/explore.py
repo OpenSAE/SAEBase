@@ -28,6 +28,7 @@ def capture_prompt_trace(
     split: str = "discovery",
     max_tokens: int = 128,
     max_active_per_token: int = 256,
+    pair: Any | None = None,
 ) -> dict[str, Any]:
     """Capture one real prompt from a registered TransformerLens/SAE pair.
 
@@ -40,7 +41,10 @@ def capture_prompt_trace(
         raise ValueError("Explicit sample/group/split identity required")
     if not 1 <= max_tokens <= 128 or not 1 <= max_active_per_token <= 256:
         raise ValueError("P2 small-capture budget exceeded")
-    pair = load_registered(sae_key=sae_key, layer=layer, device=device)
+    if pair is None:
+        pair = load_registered(sae_key=sae_key, layer=layer, device=device)
+    elif pair.identity.sae_key != sae_key or pair.identity.layer != layer:
+        raise ValueError("Selected loaded model/SAE does not match requested prompt site")
     model, sae, site = pair.model, pair.sae, pair.site
     if model.backend != "transformer_lens":
         raise RuntimeError("Full token trace requires a supported cached TL hook backend")

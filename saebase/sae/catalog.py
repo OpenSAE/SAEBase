@@ -14,7 +14,15 @@ from typing import Any
 from saebase.sae.registry import list_profiles
 
 
-_VARIANT = re.compile(r"^layer_(\d+)_width_([A-Za-z0-9]+)_l0_([A-Za-z0-9]+)$")
+_VARIANT = re.compile(
+    r"^layer_([0-9_]+)_width_([A-Za-z0-9]+)_l0_([A-Za-z0-9]+)(?:_(affine))?$"
+)
+_MULTILAYER = re.compile(r"^width_([A-Za-z0-9]+)_l0_([A-Za-z0-9]+)(?:_(affine))?$")
+_SCOPE_FAMILIES = {
+    "resid_post", "attn_out", "mlp_out", "transcoder",
+    "resid_post_all", "attn_out_all", "mlp_out_all", "transcoder_all",
+    "crosscoder", "clt",
+}
 
 
 @dataclass(frozen=True)
@@ -32,14 +40,17 @@ class ScopeAsset:
     registered_profile: str | None
     status: str
     activation_family: str = "resid_post"
+    layers: tuple[int, ...] = ()
+    affine_skip: bool = False
 
 
 def _parts(sae_id: str) -> tuple[int | None, str | None, str | None]:
     for segment in sae_id.split("/"):
         match = _VARIANT.fullmatch(segment)
         if match is not None:
-            layer, width, l0 = match.groups()
-            return int(layer), width, l0
+            layer, width, l0, _affine = match.groups()
+            pieces = tuple(int(value) for value in layer.strip("_").split("_"))
+            return (pieces[0] if len(pieces) == 1 else None), width, l0
     return None, None, None
 
 
@@ -104,57 +115,75 @@ def discover_official_scope_assets(
     siblings = getattr(info, "siblings", None)
     if siblings is None:
         raise ValueError("HF asset listing has no file manifest")
-    # Scope 2 publishes several hook families. P1 enumerates SAE families
-    # only; transcoders, crosscoders and CLTs need typed P6 loaders.
-    sae_families = {"resid_post", "attn_out", "mlp_out"}
-    by_key: dict[tuple[int, str, str, str], ScopeAsset] = {}
+    by_key: dict[tuple[str, str], ScopeAsset] = {}
     for sibling in siblings:
         filename = getattr(sibling, "rfilename", None)
-        if not isinstance(filename, str):
+        if not isinstance(filename, str) or "/" not in filename:
             continue
-        path_parts = filename.split("/")
-        kind = path_parts[0]
-        family = kind.removesuffix("_all")
-        if family not in sae_families:
+        segments = filename.split("/")
+        family = segments[0]
+        if family not in _SCOPE_FAMILIES or len(segments) < 3:
             continue
-        for idx, part in enumerate(path_parts):
-            layer, width, l0 = _parts(part)
-            if layer is None or width is None or l0 is None:
-                continue
-            key = (layer, width, l0, kind)
-            if key in by_key:
-                continue
-            # The entry came from an actual published path; do not generate
-            # combinations absent from the manifest, even at new layers.
-            identifier = "/".join(path_parts[: idx + 1])
-            match = [
-                a
-                for a in valid
-                if a.layer == layer and a.sae_id in {part, identifier} and family == "resid_post"
-            ]
-            exemplar = valid[0]
-            # The official attention/MLP extraction location differs from
-            # the residual hook, so those sites require an explicit mapping.
-            hook = (
-                f"blocks.{layer}.hook_resid_post"
-                if family == "resid_post"
-                else "requires_native_site_mapping"
-            )
-            by_key[key] = ScopeAsset(
-                model_key=exemplar.model_key,
-                repo_id=repo_id,
-                revision=sha,
-                source="official_file_manifest",
-                sae_id=identifier,
-                layer=layer,
-                hook=hook,
-                width=width,
-                l0_variant=l0,
-                loader=exemplar.loader,
-                registered_profile=match[0].registered_profile if match else None,
-                status="official_manifest_unloaded" if match else "official_manifest_unmapped",
-                activation_family=family,
-            )
+        directory = segments[1]
+        match = _VARIANT.fullmatch(directory)
+        special = _MULTILAYER.fullmatch(directory) if family == "clt" else None
+        if match is not None:
+            raw_layers, width, l0, affine = match.groups()
+            layers = tuple(int(x) for x in raw_layers.strip("_").split("_"))
+        elif special is not None:
+            width, l0, affine = special.groups()
+            layers = ()
+        else:
+            continue
+        if len(layers) > 1 and family != "crosscoder":
+            continue
+        if family == "crosscoder" and len(layers) < 2:
+            continue
+        if family != "clt" and not layers:
+            continue
+        key = (family, directory)
+        if key in by_key:
+            continue
+        exemplar = valid[0]
+        index_layer = layers[0] if len(layers) == 1 else -1
+        original = next(
+            (
+                asset for asset in valid
+                if asset.layer == index_layer
+                and asset.sae_id in {directory, f"{family}/{directory}"}
+                and family in {"resid_post", "resid_post_all"}
+            ),
+            None,
+        )
+        # Raw HF hook coordinates must be loaded from the checkpoint's
+        # config.json; do not substitute a TransformerLens residual hook
+        # for native attention/MLP or cross-layer contracts.
+        hook = (
+            f"blocks.{index_layer}.hook_resid_post"
+            if original is not None
+            else "requires_official_config_hook_mapping"
+        )
+        by_key[key] = ScopeAsset(
+            model_key=exemplar.model_key,
+            repo_id=repo_id,
+            revision=sha,
+            source="official_file_manifest",
+            sae_id=f"{family}/{directory}",
+            layer=index_layer,
+            hook=hook,
+            width=width,
+            l0_variant=l0,
+            loader="scope2_native" if original is None else original.loader,
+            registered_profile=original.registered_profile if original else None,
+            status=(
+                "official_manifest_unloaded"
+                if original is not None
+                else "official_manifest_loadable_unverified"
+            ),
+            activation_family=family,
+            layers=layers,
+            affine_skip=bool(affine),
+        )
     return sorted(by_key.values(), key=lambda a: (a.layer, a.width or "", a.l0_variant or ""))
 
 

@@ -23,6 +23,10 @@
         <a href="#analyze" data-nav="analyze">Analyze</a>
         <a href="#datasets" data-nav="datasets">Datasets</a>
         <a href="#reports" data-nav="reports">Reports</a>
+        <a href="#benchmarks" data-nav="benchmarks">Benchmarks</a>
+        <a href="#training" data-nav="training">Training</a>
+        <a href="#circuits" data-nav="circuits">Circuits</a>
+        <a href="#jobs" data-nav="jobs">Jobs</a>
       </nav>
       <a class="repo-link" target="_blank" rel="noreferrer" href="https://github.com/OpenSAE/SAEBase">GitHub ↗</a>
     </div>
@@ -160,6 +164,88 @@
       <div id="reports-list" class="record-list"></div>
       <div id="report-detail" class="panel detail-panel" hidden></div>
       <aside class="scope-note">Reports are published only after explicit approval and checksum verification. Custom prompts remain private unless their owners approve publication.</aside>
+    </section>
+
+    <section id="benchmarks" class="view" hidden>
+      <div class="section-heading"><div><span class="eyebrow">NATIVE SAE EVALUATION</span>
+        <h1>Benchmark comparisons</h1><p>Compare genuinely run SAEBench results under matched model, dataset, site and upstream protocol.</p></div></div>
+      <div class="panel"><div class="panel-title"><h2>Reviewed native comparisons</h2>
+        <span id="benchmark-count" class="subtle">No data loaded</span></div>
+        <div id="benchmark-list" class="record-list"></div>
+      </div>
+      <div id="benchmark-detail" class="panel detail-panel" hidden></div>
+      <aside class="scope-note">Core and Sparse Probing are executed with the original SAEBench evaluator in an opt-in worker. A JSON importer alone is not a native benchmark. Results appear after original source and publication review.</aside>
+    </section>
+    <section id="training" class="view" hidden>
+      <div class="section-heading"><div><span class="eyebrow">NATIVE SAE TRAINERS</span>
+        <h1>Train a representation</h1><p>Prepare an exact local training configuration, and inspect source-verified native checkpoints.</p></div></div>
+      <div class="two-cols">
+        <form id="training-form" class="panel stacked">
+          <h2>Local training plan</h2>
+          <label>Original trainer<select id="training-backend"><option value="sparsify">Sparsify</option><option value="saelens">SAELens</option></select></label>
+          <label>Model snapshot folder<input id="training-model" placeholder="/private/models/pinned-commit" required></label>
+          <label>Dataset snapshot folder<input id="training-dataset" placeholder="/private/datasets/pinned-commit" required></label>
+          <label>Model revision (40-character git SHA)<input id="training-model-revision" minlength="40" maxlength="40" placeholder="exact revision" required></label>
+          <label>Dataset revision (40-character git SHA)<input id="training-dataset-revision" minlength="40" maxlength="40" placeholder="exact revision" required></label>
+          <label>Hookpoint<input id="training-hook" placeholder="transformer.h.0" required></label>
+          <div class="form-cols">
+            <label>Input width<input id="training-width" type="number" min="1" value="768"></label>
+            <label>SAE width<input id="training-latents" type="number" min="1" value="6144"></label>
+          </div>
+          <div class="form-cols">
+            <label>TopK<input id="training-k" type="number" min="1" value="32"></label>
+            <label>Steps<input id="training-steps" type="number" min="1" max="200" value="50"></label>
+          </div>
+          <button type="submit" class="btn secondary">Export local config JSON</button>
+          <p class="quiet">Only exports a plan. No model is trained or downloaded in this public CPU page.</p>
+        </form>
+        <div class="panel stacked">
+          <h2>Released training records</h2>
+          <div id="training-list" class="record-list"></div>
+          <p class="quiet">Native checkpoints and optimizer states stay on the private worker. Only approved source hashes and summaries can be published here.</p>
+        </div>
+      </div>
+    </section>
+    <section id="circuits" class="view" hidden>
+      <div class="section-heading"><div><span class="eyebrow">ATTRIBUTION GRAPH EXPLORER</span>
+        <h1>Trace a circuit</h1><p>Inspect signed attribution edges, input tokens, learned features, error contributions and target logits.</p></div></div>
+      <div class="panel stacked">
+        <div class="filters">
+          <label>Reviewed circuit<select id="circuit-select"><option value="">Choose a published graph</option></select></label>
+          <label>Or inspect your own normalized graph<input id="circuit-upload" type="file" accept=".json,application/json"></label>
+          <button id="circuit-open" type="button" class="btn secondary">Open circuit</button>
+        </div>
+        <div class="filters">
+          <label>Minimum absolute attribution<input id="circuit-threshold" type="number" min="0" step=".01" value="0"></label>
+          <button id="circuit-zoom-in" type="button" class="btn tiny">Zoom in</button>
+          <button id="circuit-zoom-out" type="button" class="btn tiny">Zoom out</button>
+          <button id="circuit-export" type="button" class="btn tiny">Export annotated JSON</button>
+        </div>
+        <p id="circuit-status" class="quiet">Only original source-checked graph files can be published. Local uploads stay in your browser.</p>
+        <div class="graph-layout">
+          <svg id="circuit-graph" viewBox="0 0 900 520" role="img" aria-label="Interactive attribution graph"></svg>
+          <div id="circuit-inspector" class="graph-inspector">
+            <strong>Select a graph node</strong>
+            <p class="quiet">Inspect original feature and attribution details.</p>
+            <label>Annotation<textarea id="circuit-note" rows="4" maxlength="500" placeholder="Your local note"></textarea></label>
+            <button type="button" id="circuit-save-note" class="btn tiny">Save local note</button>
+            <button type="button" id="circuit-pin" class="btn tiny">Pin or unpin node</button>
+            <button type="button" id="circuit-group" class="btn tiny">Group pinned nodes</button>
+            <div id="circuit-node-list" class="graph-node-list"></div>
+          </div>
+        </div>
+      </div>
+      <aside class="scope-note">Rendering, grouping and annotating a saved graph do not reproduce its underlying gradient attribution. Actual graph creation runs through the original circuit-tracer backend on a compatible model.</aside>
+    </section>
+    <section id="jobs" class="view" hidden>
+      <div class="section-heading"><div><span class="eyebrow">PRIVATE EXECUTION</span>
+        <h1>Local workers and NDIF</h1><p>Job status, resource limits and access are separated from public read-only exploration.</p></div></div>
+      <div class="panel stacked">
+        <h2>Available execution routes</h2>
+        <div id="compute-routes" class="record-list"></div>
+        <p>Existing local workers can run actual SAEBase edits with authenticated, hash-bound private inputs. NDIF requires a model deployed on that service, a valid key and explicit authorization.</p>
+        <a href="https://github.com/OpenSAE/SAEBase/tree/main/work_plan" target="_blank" rel="noopener noreferrer">Source protocols and final acceptance criteria ↗</a>
+      </div>
     </section>
   </main>
   <footer class="footer"><div class="page-container footer-inner"><div>OpenSAE · From learned features to testable explanations.</div><div><a href="https://github.com/OpenSAE/SAEBase" target="_blank" rel="noreferrer">Source code ↗</a><span>Research outputs are not automatically validated interpretations.</span></div></div></footer>

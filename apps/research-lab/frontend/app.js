@@ -4,7 +4,8 @@
 */
 "use strict";
 (function () {
-  const state = { sites: [], datasets: [], assets: [], assetsLoaded: false, tracesLoaded: false, activeTrace: null, searchMode: "explanation", current: "overview", resultOffset: 0, resultTotal: 0 };
+  const state = { sites: [], datasets: [], assets: [], assetsLoaded: false, tracesLoaded: false, activeTrace: null, searchMode: "explanation", current: "overview", resultOffset: 0, resultTotal: 0,
+    circuitsLoaded: false, circuitData: null, circuitSelected: null, circuitPins: new Set(), circuitNotes: {}, circuitGroups: [], graphScale: 1 };
   const byId = function (id) { return document.getElementById(id); };
   const create = function (tag, cls, text) {
     const element = document.createElement(tag);
@@ -76,6 +77,10 @@
     if (view === "analyze") loadAnalyses();
     if (view === "datasets") loadDatasets();
     if (view === "reports") loadReports();
+    if (view === "benchmarks") loadBenchmarks();
+    if (view === "training") loadTraining();
+    if (view === "circuits") loadCircuitCatalog();
+    if (view === "jobs") loadComputeRoutes();
     window.scrollTo({ top: 0, behavior: "instant" });
   }
   async function bootstrap() {
@@ -150,7 +155,8 @@
     items.forEach(function (asset) {
       const tr = append(target, "tr");
       append(tr, "td", "", asset.model_key);
-      append(tr, "td", "", "L" + asset.layer + " · " + asset.hook);
+      append(tr, "td", "", (asset.layers && asset.layers.length > 1 ? "L" + asset.layers.join(",") :
+        asset.layer < 0 ? "Cross-layer" : "L" + asset.layer) + " · " + asset.hook);
       append(tr, "td", "", asset.sae_id);
       append(tr, "td", "", asset.width || "Unspecified");
       append(tr, "td", "", asset.l0_variant || "Unspecified");
@@ -366,6 +372,17 @@
       const nav = append(panel, "div", "feature-navigation");
       if (data.previous_feature_id != null) featureLink(nav, "← Previous", siteId, data.previous_feature_id);
       if (data.next_feature_id != null) featureLink(nav, "Next →", siteId, data.next_feature_id);
+      const intervene = append(nav, "button", "btn tiny", "Design an intervention ↗");
+      intervene.type = "button";
+      intervene.addEventListener("click", function () {
+        const selector = byId("intervention-site");
+        if ([...selector.options].some(function (option) { return option.value === siteId; })) {
+          selector.value = siteId;
+        }
+        byId("intervention-features").value = String(featureId);
+        byId("intervention-operation").value = "ablate";
+        window.location.hash = "#intervene";
+      });
       const download = append(nav, "a", "", "Export offline HTML ↗");
       download.href = "/api/explore/features/" + encodeURIComponent(siteId) + "/" +
         featureId + "/export.html";
@@ -548,6 +565,332 @@
       result.className="result-message ok";
     } catch (error) { result.textContent=error.message; result.className="result-message error"; }
   }
+  function downloadJson(filename, data) {
+    const bytes = new Blob([JSON.stringify(data, null, 2) + "\n"], { type: "application/json" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(bytes);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(link.href);
+  }
+
+  async function loadBenchmarks() {
+    const target = byId("benchmark-list");
+    empty(target, "Loading native comparisons…", "");
+    try {
+      const res = await get("/api/wp12/benchmarks");
+      byId("benchmark-count").textContent = res.total + " reviewed native comparisons";
+      clear(target);
+      if (!res.total) { empty(target, "No native benchmark comparisons published",
+        "Run native SAEBench in an approved worker; no benchmark result is fabricated here."); return; }
+      res.items.forEach(function (item) {
+        const row = append(target, "div", "record");
+        append(row, "strong", "", item.metric || "Native metric");
+        append(row, "p", "quiet", item.points + " matched SAE points · exact source review");
+        const button = append(row, "button", "btn tiny", "View comparison");
+        button.type = "button";
+        button.addEventListener("click", function () { showBenchmark(item.id); });
+      });
+    } catch (error) { errorMessage(target, error); }
+  }
+  async function showBenchmark(id) {
+    const panel = byId("benchmark-detail");
+    panel.hidden = false;
+    empty(panel, "Loading source results…", "");
+    try {
+      const record = await get("/api/wp12/benchmarks/" + id);
+      if (record.comparable !== true || !Array.isArray(record.points) || record.points.length < 2) {
+        throw new Error("Source comparison is not independently matched");
+      }
+      clear(panel);
+      append(panel, "h2", "", record.metric);
+      append(panel, "p", "quiet", "Matched source: " + record.scope.hook +
+        " · dataset SHA256 " + record.scope.dataset_sha256.slice(0, 16) + "…");
+      const table = append(panel, "table");
+      const head = append(table, "thead");
+      const tr = append(head, "tr");
+      ["SAE", "L0", "Measured metric"].forEach(function (name) { append(tr, "th", "", name); });
+      const tbody = append(table, "tbody");
+      record.points.forEach(function (p) {
+        const row = append(tbody, "tr");
+        append(row, "td", "", p.sae);
+        append(row, "td", "", safeNumber(p.l0));
+        append(row, "td", "", safeNumber(p.metric_value));
+      });
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", "0 0 640 280");
+      svg.setAttribute("role", "img");
+      svg.setAttribute("aria-label", "Native SAE measurement by original L0 sparsity");
+      svg.classList.add("native-metric-chart");
+      panel.appendChild(svg);
+      const xs = record.points.map(function (p) { return p.l0; });
+      const ys = record.points.map(function (p) { return p.metric_value; });
+      const xmin = Math.min(...xs), xmax = Math.max(...xs);
+      const ymin = Math.min(...ys), ymax = Math.max(...ys);
+      const posX = function (v) { return 45 + (v - xmin) / (xmax - xmin || 1) * 535; };
+      const posY = function (v) { return 220 - (v - ymin) / (ymax - ymin || 1) * 180; };
+      function el(kind, attrs, title) {
+        const node = document.createElementNS("http://www.w3.org/2000/svg", kind);
+        Object.keys(attrs).forEach(function (key) { node.setAttribute(key, String(attrs[key])); });
+        if (title) {
+          const t = document.createElementNS("http://www.w3.org/2000/svg", "title");
+          t.textContent = title;
+          node.appendChild(t);
+        }
+        svg.appendChild(node);
+      }
+      el("path", {d:"M45 32V220H580", stroke:"#7d8ba0",fill:"none"});
+      record.points.forEach(function (p) {
+        el("circle", {cx:posX(p.l0),cy:posY(p.metric_value),r:6,
+          fill:"#2563aa"}, p.sae + ": L0 " + p.l0 + ", " + p.metric_value);
+      });
+      append(panel, "p", "quiet", record.uncertainty ||
+        "Uncertainty cannot be inferred without source-level independent samples.");
+    } catch (error) { errorMessage(panel, error); }
+  }
+
+  async function loadTraining() {
+    const target = byId("training-list");
+    empty(target, "Loading training records…", "");
+    try {
+      const res = await get("/api/wp12/training");
+      if (!res.total) {
+        empty(target, "No native training runs released",
+          "SAELens and Sparsify workers can train privately; checkpoint and source approval come before publication.");
+        return;
+      }
+      clear(target);
+      res.items.forEach(function (item) {
+        const row = append(target, "div", "record");
+        append(row, "strong", "", item.backend || "Native trainer");
+        append(row, "p", "quiet", item.id.slice(0, 20) + "… · approved checkpoint source");
+      });
+    } catch (error) { errorMessage(target, error); }
+  }
+  function onTrainingExport(event) {
+    event.preventDefault();
+    const revision = /^[0-9a-f]{40}$/;
+    if (!revision.test(value("training-model-revision")) ||
+        !revision.test(value("training-dataset-revision"))) {
+      return window.alert("Both source revisions must be exact 40-character lowercase SHAs.");
+    }
+    const steps = Number(value("training-steps"));
+    const width = Number(value("training-width"));
+    const latents = Number(value("training-latents"));
+    const k = Number(value("training-k"));
+    if (!Number.isInteger(steps) || steps < 1 || steps > 200 ||
+        !Number.isInteger(width) || width < 1 ||
+        !Number.isInteger(latents) || latents < 1 ||
+        !Number.isInteger(k) || k < 1 || k > latents) {
+      return window.alert("Invalid width, sparsity or C1 training budget.");
+    }
+    const manifest = {
+      schema: "opensae.wp12.p5.training_plan_draft.v1",
+      status: "user_config_only_not_executed",
+      backend: value("training-backend"),
+      model_path: value("training-model"),
+      dataset_path: value("training-dataset"),
+      model_revision: value("training-model-revision"),
+      dataset_revision: value("training-dataset-revision"),
+      hookpoint: value("training-hook"),
+      d_in: width, d_sae: latents, k: k, steps: steps,
+      architecture: "topk",
+      max_examples: Math.min(10000, steps * 16),
+      batch_size: 16, ctx_len: 128,
+      run_name: "wp12-local-pilot", device: "cuda",
+      distributed_gpus: 1, resume_checkpoint: null
+    };
+    if (!manifest.model_path || !manifest.dataset_path || !manifest.hookpoint) {
+      return window.alert("Model, dataset and hookpoint are required.");
+    }
+    downloadJson("opensae-wp12-training-plan.json", manifest);
+  }
+
+  function svgNode(tag, attrs) {
+    const node = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    Object.entries(attrs || {}).forEach(function (entry) {
+      node.setAttribute(entry[0], String(entry[1]));
+    });
+    return node;
+  }
+  function checkGraph(graph) {
+    if (!graph || graph.schema !== "opensae.wp12.p6.graph.v1" ||
+        !Array.isArray(graph.nodes) || !Array.isArray(graph.edges) ||
+        !graph.nodes.length || graph.nodes.length > 250 || graph.edges.length > 750 ||
+        !graph.provenance || !/^[a-f0-9]{64}$/.test(graph.provenance.source_sha256)) {
+      throw new Error("Expected a bounded, source-identified attribution graph");
+    }
+    const ids = new Set();
+    graph.nodes.forEach(function (n) {
+      if (typeof n.id !== "string" || !["feature", "error", "token", "logit"].includes(n.kind) ||
+          n.id.length > 120 || ids.has(n.id)) throw new Error("Invalid or duplicate graph node");
+      ids.add(n.id);
+    });
+    if (!graph.nodes.some(function (n) {return n.kind === "error";}) ||
+        !graph.nodes.some(function (n) {return n.kind === "logit";})) {
+      throw new Error("Native error and logit nodes required");
+    }
+    graph.edges.forEach(function (e) {
+      if (!ids.has(e.source) || !ids.has(e.target) ||
+          typeof e.weight !== "number" || !Number.isFinite(e.weight)) {
+        throw new Error("Graph edge identity or attribution is invalid");
+      }
+    });
+    return graph;
+  }
+  async function loadCircuitCatalog() {
+    if (state.circuitsLoaded) return;
+    try {
+      const res = await get("/api/wp12/circuits");
+      const selector = byId("circuit-select");
+      res.items.forEach(function (item) {
+        const option = append(selector, "option", "",
+          item.nodes + " nodes · " + item.edges + " edges · " + item.id.slice(0, 8));
+        option.value = item.id;
+      });
+      state.circuitsLoaded = true;
+      byId("circuit-status").textContent = res.total ?
+        res.total + " reviewed native graphs available" :
+        "No native graphs approved for publication. You can inspect a typed local JSON file.";
+    } catch (error) { byId("circuit-status").textContent = error.message; }
+  }
+  async function openCircuit() {
+    const file = byId("circuit-upload").files[0];
+    try {
+      const graph = file ?
+        JSON.parse(await file.text()) :
+        await get("/api/wp12/circuits/" + encodeURIComponent(value("circuit-select")));
+      state.circuitData = checkGraph(graph);
+      state.circuitNotes = graph.annotations && typeof graph.annotations === "object" ?
+        graph.annotations.notes || {} : {};
+      state.circuitPins = new Set(graph.annotations?.pinned || []);
+      state.circuitGroups = graph.annotations?.groups || [];
+      state.circuitSelected = null;
+      state.graphScale = 1;
+      byId("circuit-status").textContent = graph.nodes.length + " actual source nodes · " +
+        graph.edges.length + " signed edges · " + graph.provenance.source_sha256.slice(0, 14) +
+        "… · annotations are local only";
+      renderCircuit();
+    } catch (error) { byId("circuit-status").textContent = "Cannot open circuit: " + error.message; }
+  }
+  function renderCircuit() {
+    const graph = state.circuitData, svg = byId("circuit-graph");
+    svg.replaceChildren();
+    if (!graph) return;
+    const layers = [...new Set(graph.nodes.map(function (n) {
+      return n.kind === "token" ? "input" : n.kind === "logit" ? "output" :
+        "layer" + (n.layer == null ? "?" : n.layer);
+    }))].sort(function (a,b) {
+      if (a === "input") return -1; if (b === "input") return 1;
+      if (a === "output") return 1; if (b === "output") return -1;
+      return Number(a.slice(5)) - Number(b.slice(5));
+    });
+    const groups = new Map(layers.map(function (l) { return [l, []]; }));
+    graph.nodes.forEach(function (n) {
+      const layer = n.kind === "token" ? "input" :
+        n.kind === "logit" ? "output" : "layer" + (n.layer == null ? "?" : n.layer);
+      groups.get(layer).push(n);
+    });
+    const xy = new Map();
+    layers.forEach(function (l, col) {
+      const members = groups.get(l);
+      members.forEach(function (n, index) {
+        xy.set(n.id, {x:52 + col * 780 / Math.max(1, layers.length-1),
+          y:42 + (index + 1) * 440 / (members.length + 1)});
+      });
+    });
+    const threshold = Number(value("circuit-threshold")) || 0;
+    graph.edges.forEach(function (edge) {
+      if (Math.abs(edge.weight) < threshold) return;
+      const a = xy.get(edge.source), b = xy.get(edge.target);
+      const line = svgNode("line", {x1:a.x,y1:a.y,x2:b.x,y2:b.y,
+        stroke:edge.weight >= 0 ? "#4c7eb0" : "#c26b62",
+        "stroke-width":Math.min(4,1 + Math.log1p(Math.abs(edge.weight))),
+        opacity:0.55});
+      const label = svgNode("title");
+      label.textContent = edge.source + " → " + edge.target + " · " + edge.weight;
+      line.appendChild(label); svg.appendChild(line);
+    });
+    graph.nodes.forEach(function (node) {
+      const loc = xy.get(node.id);
+      const circle = svgNode("circle", {cx:loc.x,cy:loc.y,
+        r:node.id === state.circuitSelected ? 11 : 7,
+        fill:node.kind === "error" ? "#cf9a4b" :
+          node.kind === "logit" ? "#4a9d78" :
+          node.kind === "token" ? "#8e9dad" : "#427cbe",
+        stroke:state.circuitPins.has(node.id) ? "#17263d" : "white",
+        "stroke-width":state.circuitPins.has(node.id) ? 3 : 1,
+        tabindex:0, role:"button"});
+      const title = svgNode("title");
+      title.textContent = node.id + " · " + node.kind + " · " + (node.label || "");
+      circle.appendChild(title);
+      circle.addEventListener("click", function () { selectGraphNode(node.id); });
+      circle.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") selectGraphNode(node.id);
+      });
+      svg.appendChild(circle);
+    });
+    svg.setAttribute("viewBox", "0 0 " + (900 / state.graphScale) +
+      " " + (520 / state.graphScale));
+  }
+  function selectGraphNode(id) {
+    const node = state.circuitData?.nodes.find(function (n) { return n.id === id; });
+    if (!node) return;
+    state.circuitSelected = id;
+    const target = byId("circuit-inspector");
+    const old = target.querySelector(".graph-selected");
+    if (old) old.remove();
+    const part = create("div", "graph-selected");
+    append(part, "strong", "", node.label || node.id);
+    append(part, "p", "quiet", "ID " + node.id + " · " + node.kind +
+      " · layer " + (node.layer == null ? "N/A" : node.layer));
+    target.prepend(part);
+    byId("circuit-note").value = state.circuitNotes[id] || "";
+    renderCircuit();
+  }
+  function updateGraphNotes() {
+    if (!state.circuitSelected) return;
+    state.circuitNotes[state.circuitSelected] = value("circuit-note").slice(0, 500);
+    byId("circuit-status").textContent = "Annotation saved locally; export JSON to keep it.";
+  }
+  function toggleGraphPin() {
+    if (!state.circuitSelected) return;
+    if (state.circuitPins.has(state.circuitSelected)) state.circuitPins.delete(state.circuitSelected);
+    else state.circuitPins.add(state.circuitSelected);
+    renderCircuit();
+  }
+  function groupGraphPins() {
+    const pins = [...state.circuitPins];
+    if (pins.length < 2) {
+      byId("circuit-status").textContent = "Pin at least two nodes to make an annotation group.";
+      return;
+    }
+    state.circuitGroups.push({name:"Group " + (state.circuitGroups.length+1),members:pins});
+    byId("circuit-status").textContent = pins.length + " original graph nodes grouped for annotation.";
+  }
+  function exportCircuit() {
+    if (!state.circuitData) return;
+    downloadJson("opensaebase-annotated-circuit.json", {
+      ...state.circuitData, annotations:{
+        notes:state.circuitNotes, pinned:[...state.circuitPins], groups:state.circuitGroups
+      }
+    });
+  }
+  async function loadComputeRoutes() {
+    try {
+      const status = await get("/api/wp12-compute");
+      const target = byId("compute-routes");
+      clear(target);
+      Object.keys(status).forEach(function (key) {
+        const row = append(target, "div", "record");
+        append(row, "strong", "", key.replaceAll("_", " "));
+        append(row, "p", "quiet", String(status[key]));
+      });
+    } catch (error) { errorMessage(byId("compute-routes"), error); }
+  }
+
   byId("results-refresh").addEventListener("click",function(){loadResults(true);});
   byId("results-more").addEventListener("click",function(){loadResults(false);});
   byId("results-model").addEventListener("keydown",function(e){if(e.key==="Enter")loadResults(true);});
@@ -562,6 +905,19 @@
   byId("explanation-query").addEventListener("keydown",function(e){if(e.key==="Enter")searchExplanations();});
   byId("inference-search").addEventListener("click",searchRecordedInference);
   byId("trace-select").addEventListener("change",selectRecordedTrace);
+  byId("training-form").addEventListener("submit",onTrainingExport);
+  byId("circuit-open").addEventListener("click",openCircuit);
+  byId("circuit-threshold").addEventListener("change",renderCircuit);
+  byId("circuit-zoom-in").addEventListener("click",function(){
+    state.graphScale=Math.min(3,state.graphScale*1.2);renderCircuit();
+  });
+  byId("circuit-zoom-out").addEventListener("click",function(){
+    state.graphScale=Math.max(.6,state.graphScale/1.2);renderCircuit();
+  });
+  byId("circuit-export").addEventListener("click",exportCircuit);
+  byId("circuit-save-note").addEventListener("click",updateGraphNotes);
+  byId("circuit-pin").addEventListener("click",toggleGraphPin);
+  byId("circuit-group").addEventListener("click",groupGraphPins);
   byId("intervention-form").addEventListener("submit",onPreflight);
   window.addEventListener("hashchange",activate);
   bootstrap();
