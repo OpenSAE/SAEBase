@@ -97,10 +97,12 @@ not a claim that its native trainer directly supports a `--steps` flag.
 
 **P6 Circuit Tracer:** only the official
 `circuit-tracer attribute --prompt ... --transcoder_set ... --slug ...`
-command executes attribution. A normalized graph used by the UI must be
-created using a **source-specific, independently checked native converter**;
-do not load arbitrary original `.pt` files into the public web process or
-invent feature node/error weights.
+command executes attribution. The local `import_native_graph_file()` now converts the original upstream
+circuit-tracer frontend v1 `{metadata,nodes,links}` JSON into a typed OpenSAE
+GraphRecord with exact native node IDs, signed weights and retained error nodes.
+The converter reads no `.pt` pickle and reconstructs true feature indices
+from `node_id`, not the upstream Cantor-encoded auxiliary `feature` column.
+Actual native output parity on a real graph is still a P8 task.
 
 **P7 private self-hosted worker** is disabled by default:
 
@@ -145,8 +147,9 @@ No 50/50 RELEASED claim is valid from source checks alone.
 
 - **F20 NDIF:** actual remote deployment and user credentials absent.
 - **F50 distributed training:** no authorized real two-GPU execution.
-- **Circuit source conversion:** real upstream graph file to verified typed
-  UI graph converter remains schema/commit specific.
+- **Circuit source conversion:** original frontend v1 JSON is now supported
+  via `import_native_graph_file()`. Other source schema versions remain
+  explicitly unsupported until individually mapped and real graph-tested.
 - **Public live prompt/steering:** no permission to deploy a continuously
   running GPU or publish unreviewed prompt text.
 - **SAEBench full suite, native pyvene, SAELens/Sparsify checkpoints:**
