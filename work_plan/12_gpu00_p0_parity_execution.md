@@ -1,12 +1,15 @@
 # WP12 GPU-00 — P0 Real-Weight Parity Test Handoff
 
 Date: 2026-10-21
-Status: **READY FOR AGENT PREFLIGHT; NOT YET EXECUTED OR ACCEPTED**
+Status: **GPU AGENT REPORTS 4/4 LEGACY FP32 SITE PASSES; INDEPENDENT VERIFICATION AND P0 ACCEPTANCE PENDING**
 Branch: feat/wp12-p0-foundation (PR #50, not merged into main)
 Parent: [WP12 master blueprint](12_unified_interpretability_master_blueprint.md)
 Protocol: [WP12 GPU agent handoff](12_gpu_agent_handoff_protocol.md)
 Source audit: [WP12-00 inventory](12_p0_source_inventory_20261021.md)
 Frozen authored inputs: [eight prompt pairs](12_gpu00_prompt_pairs.json)
+Agent-reported execution and next independent checks: [GPU-00 report](12_gpu00_agent_report_20261022.md)
+
+> Execution update: on source SHA `490b18c`, the GPU agent reports Pythia-70M L3/L5 and Gemma-3-270M L5/L9 all PASS using legacy TransformerLens 3.9 / SAELens 6.54 (fp32), with 85 CPU tests passed, 283 matrix forward equivalents and no relaxed tolerances. The raw run directory is not accessible to the independent reviewer, so this does **not** close GPU-00. TL4 was not tested. See the linked report for preserved failure and negative-control details.
 
 ## 0. Authority, boundary and result we need
 
