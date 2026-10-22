@@ -147,9 +147,12 @@ No 50/50 RELEASED claim is valid from source checks alone.
 
 - **F20 NDIF:** actual remote deployment and user credentials absent.
 - **F50 distributed training:** no authorized real two-GPU execution.
-- **Circuit source conversion:** original frontend v1 JSON is now supported
-  via `import_native_graph_file()`. Other source schema versions remain
-  explicitly unsupported until individually mapped and real graph-tested.
+- **Circuit source conversion:** original frontend v1 JSON is supported
+  via `import_native_graph_file()`. A separate
+  `saebase/wp12/circuit_intervene.py` performs an actual single-layer
+  transcoder feature edit with state/SHA checks, original-vs-edited logits,
+  and preserved non-selected decoder content. Other source graph schemas
+  and full native CLT interventions remain unsupported.
 - **Public live prompt/steering:** no permission to deploy a continuously
   running GPU or publish unreviewed prompt text.
 - **SAEBench full suite, native pyvene, SAELens/Sparsify checkpoints:**
@@ -157,5 +160,9 @@ No 50/50 RELEASED claim is valid from source checks alone.
 - **Externally validated release:** ten authentic features and three external
   researcher sessions remain final acceptance work, not fake demo records.
 
-All other development routes appear in the source ledger as `PARTIAL` until
-the authentic native and user evidence exists. This is intentional.
+Core implementation is now classified separately from P8 release evidence. The
+[core function assessment](12_core_function_assessment.md) records 44 PASS,
+4 PARTIAL (F03/F10/F19/F44), and 2 BLOCKED (F20/F50), with explicit core
+tests, execution scope, remaining gaps and all P8 signoffs PENDING. PASS
+means a concrete executable core route exists. It is not scientific or
+public hosted-service certification.
