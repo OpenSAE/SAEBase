@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import sys
 from pathlib import Path
 
@@ -106,6 +108,13 @@ def test_private_operator_worker_roles_and_durable_queue(monkeypatch, tmp_path):
     assert claimed.status_code == 200
     job = claimed.json()["job"]
     assert "Hidden" not in str(job)
+    payload = {"job_id": job_id, "schema": "opensae.wp12.private_test_fixture.v1",
+               "logit_delta_l2": 0.25}
+    data = json.dumps(payload, sort_keys=True).encode()
+    path = tmp_path / "results" / (job_id + ".json")
+    path.parent.mkdir()
+    path.write_bytes(data)
+    sha = hashlib.sha256(data).hexdigest()
     finished = client.post(
         "/api/private/workers/finish",
         headers=worker,
@@ -113,10 +122,16 @@ def test_private_operator_worker_roles_and_durable_queue(monkeypatch, tmp_path):
             "job_id": job_id,
             "worker_id": "opensaebase-worker",
             "attempt": job["attempt"],
-            "result_sha256": "c" * 64,
+            "result_sha256": sha,
         },
     )
     assert finished.status_code == 200 and finished.json()["accepted"]
     status = client.get("/api/private/jobs/" + job_id, headers=op)
     assert status.json()["status"] == "succeeded"
     assert "Hidden" not in status.text
+    assert client.get("/api/private/jobs/" + job_id + "/result", headers=worker).status_code == 401
+    checked = client.get("/api/private/jobs/" + job_id + "/result", headers=op)
+    assert checked.status_code == 200
+    assert checked.json()["logit_delta_l2"] == 0.25
+    path.write_bytes(b'{"job_id":"modified"}')
+    assert client.get("/api/private/jobs/" + job_id + "/result", headers=op).status_code == 503
