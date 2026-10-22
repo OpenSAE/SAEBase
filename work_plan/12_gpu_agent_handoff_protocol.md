@@ -2,7 +2,7 @@
 
 This file is an executable **handoff protocol**, not authorization to run expensive jobs. Read [master blueprint](12_unified_interpretability_master_blueprint.md) and [50-feature ledger](12_capability_acceptance_matrix.csv). Begin at P0; preserve historical Work Plans 01–11 and existing evidence.
 
-**Current first GPU task (GPU-00):** follow the [bounded P0 real-weight parity runbook](12_gpu00_p0_parity_execution.md) and its [eight fixed prompt pairs](12_gpu00_prompt_pairs.json). It uses two small models and two sites per model, with original native references, the preflight lock and raw output checks. Only C0 preflight and a bounded C1 smoke are authorized by this handoff; do not treat legacy backend parity as TL4 parity. The [P0 source audit](12_p0_source_inventory_20261021.md) still has unmet CPU/deployment gates.
+**GPU-00 execution update:** [Agent-reported outcome and independent review queue](12_gpu00_agent_report_20261022.md). The agent reports 4/4 real-site legacy TransformerLens 3.9 / SAELens 6.54 fp32 passes following the [bounded P0 real-weight parity runbook](12_gpu00_p0_parity_execution.md) with [eight fixed prompt pairs](12_gpu00_prompt_pairs.json). **The raw evidence has not yet been transferred or independently reviewed. Do not repeat C1, promote capability statuses, claim TL4 compatibility, or automatically launch GPU-01.** The [P0 source audit](12_p0_source_inventory_20261021.md) still has unmet CPU/deployment gates.
 
 ## Assignment boundaries
 
