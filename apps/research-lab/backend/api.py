@@ -367,11 +367,52 @@ def preflight(request: InterventionSpec) -> dict[str, Any]:
 
 @app.get("/api/sae-assets")
 def sae_assets(model_key: str = "") -> dict[str, Any]:
-    """Browse registered Gemma Scope 2 metadata; never download model weights."""
-    from saebase.sae.catalog import registered_catalog_json
+    """Browse actual SAE registry locally, historical sites in CPU-only Docker.
 
+    The public CPU image intentionally does NOT install torch/SAELens. Thus a
+    fallback is derived only from real frozen verified site records. Unknown
+    width/L0 values stay null; no checkpoint weight is loaded or invented.
+    """
+    try:
+        from saebase.sae.catalog import registered_catalog_json
+    except (ImportError, ModuleNotFoundError):
+        known_sources = {
+            "gemma270m": "google/gemma-scope-2-270m-pt",
+            "gemma1b": "google/gemma-scope-2-1b-pt",
+            "gemma3_4b_pt": "google/gemma-scope-2-4b-pt",
+            "gemma3_4b_it": "google/gemma-scope-2-4b-it",
+        }
+        try:
+            sites = site_cache()
+        except core.InvalidEvidence as exc:
+            _bad_evidence(exc)
+        items = [
+            {
+                "model_key": site["model"],
+                "repo_id": known_sources[site["model"]],
+                "revision": None,
+                "source": "historical_verified_sites",
+                "sae_id": site["sae"] + ":L" + str(site["layer"]),
+                "layer": site["layer"],
+                "hook": site["hook"],
+                "width": None,
+                "l0_variant": None,
+                "loader": "sae_lens",
+                "registered_profile": site["sae"],
+                "status": "registered_not_live_verified",
+            }
+            for site in sites
+            if site["model"] in known_sources
+            and "scope" in site["sae"]
+            and (not model_key or site["model"] == model_key)
+        ]
+        return {
+            "total": len(items), "items": items,
+            "mode": "registered_metadata_only", "source": "historical_verified_sites",
+        }
     items = registered_catalog_json(model_key=model_key or None)
-    return {"total": len(items), "items": items, "mode": "registered_metadata_only"}
+    return {"total": len(items), "items": items, "mode": "registered_metadata_only",
+            "source": "saebase_python_registry"}
 
 
 @app.post("/api/jobs")
