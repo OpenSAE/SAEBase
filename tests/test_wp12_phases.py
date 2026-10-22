@@ -27,6 +27,7 @@ from saebase.wp12.circuits import (
     prune,
     save_graph,
     graph_feature_intervention_request,
+    import_native_graph_file,
 )
 from saebase.wp12.acceptance import audit_ledger, inspect_archive
 from saebase.wp12.ndif import remote_ndif_capture
@@ -211,6 +212,66 @@ def test_p6_graph_preserves_signed_edges_and_error_nodes(tmp_path):
     assert request["executed"] is False
     with pytest.raises(ValueError, match="feature node"):
         graph_feature_intervention_request(original, "error-1", asset, value=0)
+
+
+def test_p6_real_upstream_v1_json_converter_is_not_a_fake_graph(tmp_path):
+    import json
+
+    native = {
+        "metadata": {
+            "slug": "frozen-small-graph",
+            "scan": "verified-native-transcoder",
+            "prompt_tokens": ["The"],
+            "prompt": "The",
+            "schema_version": 1,
+        },
+        "qParams": {"pinnedIds": [], "supernodes": []},
+        "nodes": [
+            {
+                "node_id": "E_40_0", "feature_type": "embedding",
+                "layer": "E", "ctx_idx": 0, "feature": 0
+            },
+            {
+                "node_id": "2_17_0", "feature_type": "cross layer transcoder",
+                "layer": "2", "ctx_idx": 0, "feature": 207
+            },
+            {
+                "node_id": "2_-1_0", "feature_type": "mlp reconstruction error",
+                "layer": "2", "ctx_idx": 0, "feature": -1
+            },
+            {
+                "node_id": "13_4_0", "feature_type": "logit",
+                "layer": "13", "ctx_idx": 0, "feature": 4,
+                "clerp": "Output The"
+            },
+        ],
+        "links": [
+            {"source": "E_40_0", "target": "2_17_0", "weight": 0.5},
+            {"source": "2_-1_0", "target": "13_4_0", "weight": -0.1},
+            {"source": "2_17_0", "target": "13_4_0", "weight": 0.6},
+        ],
+    }
+    file = tmp_path / "source.json"
+    file.write_text(json.dumps(native), encoding="utf-8")
+    result = import_native_graph_file(
+        file,
+        model_sha256="a" * 64,
+        transcoder_sha256="b" * 64,
+        original_tool_commit="c" * 40,
+    )
+    assert len(result.nodes) == 4
+    feature = next(n for n in result.nodes if n.kind == "feature")
+    assert feature.feature_id == 17  # NOT native Cantor index 207
+    assert result.source_sha256 == hashlib.sha256(file.read_bytes()).hexdigest()
+    assert any(e.weight < 0 for e in result.edges)
+    native["nodes"][1]["node_id"] = "2_18_0"
+    native["nodes"][1]["ctx_idx"] = 1
+    file.write_text(json.dumps(native), encoding="utf-8")
+    with pytest.raises(ValueError, match="node identity mismatch"):
+        import_native_graph_file(
+            file, model_sha256="a" * 64, transcoder_sha256="b" * 64,
+            original_tool_commit="c" * 40,
+        )
 
 
 def test_p7_ndif_does_not_run_without_explicit_permission():
