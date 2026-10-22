@@ -7,6 +7,7 @@ source-identified SAE activations, not synthetic published feature labels.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
@@ -96,7 +97,7 @@ class LocalAutoInterpreter:
         if not 1 <= max_new_tokens <= 100 or len(text) > 18000:
             raise ValueError("Interpretation prompt exceeds its local budget")
         encoded = self.tokenizer(text, return_tensors="pt", truncation=False)
-        if not isinstance(encoded, dict) or "input_ids" not in encoded:
+        if not isinstance(encoded, Mapping) or "input_ids" not in encoded:
             raise TypeError("Original tokenizer did not return input_ids")
         ids = encoded["input_ids"]
         if not isinstance(ids, torch.Tensor) or ids.ndim != 2 or ids.shape[0] != 1:
