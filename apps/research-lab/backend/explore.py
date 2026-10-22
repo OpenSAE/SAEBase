@@ -186,6 +186,29 @@ def publish_exploration(
         raise ValueError("Repeated trace")
     if len({(row["site_id"], row["sample_id"]) for row in records}) != len(records):
         raise ValueError("Duplicate site/sample token trace")
+    # Labels are hypotheses about *observed* SAE features, not arbitrary
+    # invented semantic IDs. Accept an exact reviewed source index or a full
+    # verified, approved per-token trace containing that feature.
+    observed = {
+        (trace["site_id"], code["feature_id"])
+        for trace in records for token in trace["tokens"] for code in token["features"]
+    }
+    from .feature_store import feature_by_id, feature_store_count
+    has_sqlite = feature_store_count(output.parent) is not None
+    indexed = None if has_sqlite else core.feature_index(output.parent)
+    for label in labels:
+        key = (label["site_id"], label["feature_id"])
+        if key in observed:
+            continue
+        if has_sqlite:
+            exists = feature_by_id(*key, root=output.parent) is not None
+        else:
+            exists = any(
+                item.get("site_id") == key[0] and item.get("feature_id") == key[1]
+                for item in indexed
+            )
+        if not exists:
+            raise ValueError("Cannot publish an explanation for an unobserved feature")
     document = {
         "schema": SCHEMA,
         "traces": sorted(records, key=lambda item: (item["site_id"], item["sample_id"])),
