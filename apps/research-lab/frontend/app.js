@@ -279,6 +279,8 @@
       response.items.forEach(function (record) {
         const part = append(target, "div", "record");
         append(part, "h3", "", record.site_id + " · recorded computation");
+        append(part, "p", "quiet",
+          "Ranked across content tokens only. Special tokens such as <bos> remain visible when selecting an individual recorded token.");
         showRankedFeatures(part, record.max_features, record.site_id);
       });
     } catch (error) { errorMessage(target, error); }
