@@ -10,8 +10,9 @@ is deferred to P8. No bulk Stage D or prior scientific experiments are rerun.
 - **TransformerLens version-aware boot**: `models/transformerlens_backend.py` uses
   `HookedTransformer` when available (legacy 3.x) and falls back to
   `TransformerBridge.boot_transformers` on TL4. Compatibility mode registers
-  old hook aliases. `no_processing=True` preserves raw Hugging Face weights;
-  otherwise the requested legacy weight-processing mode is explicitly applied.
+  old hook aliases when needed. `no_processing=True` keeps TL4's raw
+  `boot_transformers` path untouched; the processed-weight route explicitly
+  enters compatibility mode. These are distinct coordinate systems.
   The loaded model records `_saebase_transformerlens_engine` and
   `_saebase_weight_processing`. Existing plugin model keys and SAE profiles
   remain unchanged.
