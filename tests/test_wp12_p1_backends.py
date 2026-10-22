@@ -92,7 +92,7 @@ def test_tl4_bridge_uses_explict_legacy_alias_mode(monkeypatch, raw):
     )
     assert calls == [("gpt2", {"device": "cpu", "dtype": torch.float32})]
     assert engine == "transformer_bridge_local"
-    assert model.compatibility is raw
+    assert model.compatibility is (None if raw else False)
     assert model._saebase_weight_processing == ("raw_hf" if raw else "legacy_compatible")
 
 
