@@ -102,7 +102,9 @@ def execute_transcoder_node(
         x = captured["input"].to(device=transcoder.w_enc.device, dtype=transcoder.w_enc.dtype)
         z = transcoder.encode(x)
         z_new = z.detach().clone()
-        z_new[node.feature_id] = new_code
+        # z has [batch, features]. Index the FEATURE axis, not batch 0:
+        # z_new[0] would incorrectly erase every feature in one batch row.
+        z_new[..., node.feature_id] = new_code
         # The affine/skip term cancels in the edit delta by construction.
         measured_delta = transcoder.decode(z_new) - transcoder.decode(z)
         changed = result.clone()
