@@ -16,8 +16,8 @@ def test_core_pass_matrix_is_specific_and_not_release_certification():
     file = ROOT / "work_plan" / "12_capability_acceptance_matrix.csv"
     report = audit_ledger(file)
     assert report["capabilities"] == 50
-    assert report["status_counts"]["PASS"] == 44
-    assert report["status_counts"]["PARTIAL"] == 4
+    assert report["status_counts"]["PASS"] == 48
+    assert report["status_counts"]["PARTIAL"] == 0
     assert report["status_counts"]["BLOCKED"] == 2
     assert report["p8_pending_count"] == 50
     assert report["release_ready"] is False
@@ -29,8 +29,12 @@ def test_core_pass_matrix_is_specific_and_not_release_certification():
     assert "circuit_intervene.py" in rows["30"]["core_test"]
     assert rows["43"]["current_status"] == "PASS"
     assert rows["43"]["core_grade"] == "3/3"
-    assert rows["44"]["current_status"] == "PARTIAL"
-    assert "CLT" in rows["44"]["remaining_core_work"]
+    assert rows["44"]["current_status"] == "PASS"
+    assert "clt_intervene.py" in rows["44"]["core_test"]
+    for feature in ("03", "10", "19", "44"):
+        assert rows[feature]["current_status"] == "PASS"
+        assert rows[feature]["core_grade"] == "3/3"
+        assert rows[feature]["p8_status"] == "PENDING"
     assert rows["20"]["current_status"] == "BLOCKED"
     assert rows["50"]["current_status"] == "BLOCKED"
     assert not any(row["p8_status"] == "VERIFIED" for row in rows.values())

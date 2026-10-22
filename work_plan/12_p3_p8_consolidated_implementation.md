@@ -161,8 +161,17 @@ No 50/50 RELEASED claim is valid from source checks alone.
   researcher sessions remain final acceptance work, not fake demo records.
 
 Core implementation is now classified separately from P8 release evidence. The
-[core function assessment](12_core_function_assessment.md) records 44 PASS,
-4 PARTIAL (F03/F10/F19/F44), and 2 BLOCKED (F20/F50), with explicit core
+[core function assessment](12_core_function_assessment.md) records 48 PASS,
+0 PARTIAL, and 2 BLOCKED (F20/F50), with explicit core
 tests, execution scope, remaining gaps and all P8 signoffs PENDING. PASS
 means a concrete executable core route exists. It is not scientific or
 public hosted-service certification.
+
+## Subsequent F03/F10/F19/F44 executable core additions
+
+- F03: A real local-only language model produces an SAE feature hypothesis and predicts activation on disjoint held-out positive/negative contexts. `apps/research-lab/backend/auto_interp_local.py` and `scripts/wp12_autointerpret.py`.
+- F10: Projection vectors for individual TransformerLens attention heads and MLP neurons reconstitute measured original component outputs. `saebase/api/fine_components.py`.
+- F19: Native NNsight v0.8 `tracer.iter` selects generation forward occurrences and compares actual baseline and intervened output token IDs. `saebase/api/nnsight_local.py`.
+- F44: Gemma Scope 2 original typed CLT shards implement triangular source-to-target feature decoding, with `execute_clt_feature` editing actual downstream layer output hooks. `saebase/sae/scope2_clt.py`, `saebase/wp12/clt_intervene.py`.
+
+All four are core implementation PASS within their explicit source scopes, not independently accepted real-checkpoint P8 release claims.
