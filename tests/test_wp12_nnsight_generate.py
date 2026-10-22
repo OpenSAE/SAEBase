@@ -1,4 +1,5 @@
 """Native NNsight 0.8 generation-step API contract without GPU downloads."""
+
 from __future__ import annotations
 
 import pytest
@@ -91,6 +92,8 @@ def test_nnsight_generation_does_not_fake_an_unsupported_backend():
     model.generate = None
     with pytest.raises(RuntimeError, match="cannot trace generation"):
         NNsightLocal(model).generate_edit(
-            "Example prompt", TraceLocation("layer"),
-            steps=[0], operation="zero",
+            "Example prompt",
+            TraceLocation("layer"),
+            steps=[0],
+            operation="zero",
         )

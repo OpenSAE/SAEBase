@@ -4,9 +4,9 @@ No external model provider or paid API is invoked. The operator selects an
 already-downloaded instruct checkpoint. All examples come from real
 source-identified SAE activations, not synthetic published feature labels.
 """
+
 from __future__ import annotations
 
-import hashlib
 from pathlib import Path
 from typing import Any
 
@@ -32,8 +32,10 @@ class LocalAutoInterpreter:
             raise TypeError("A real locally loaded causal LM with generate() is required")
         if not callable(tokenizer) or not callable(getattr(tokenizer, "decode", None)):
             raise TypeError("A matching source tokenizer is required")
-        if not model_name or len(model_sha256) != 64 or any(
-            x not in "0123456789abcdef" for x in model_sha256
+        if (
+            not model_name
+            or len(model_sha256) != 64
+            or any(x not in "0123456789abcdef" for x in model_sha256)
         ):
             raise ValueError("Local generation must have full model source identity")
         if not 64 <= max_input_tokens <= 4096:
@@ -64,17 +66,29 @@ class LocalAutoInterpreter:
         from saebase.store import sha256_state_dict
 
         tokenizer = AutoTokenizer.from_pretrained(
-            str(path), local_files_only=True, trust_remote_code=False,
+            str(path),
+            local_files_only=True,
+            trust_remote_code=False,
         )
-        model = AutoModelForCausalLM.from_pretrained(
-            str(path), local_files_only=True, trust_remote_code=False,
-            use_safetensors=True, torch_dtype=torch.float32,
-        ).to(device).eval()
+        model = (
+            AutoModelForCausalLM.from_pretrained(
+                str(path),
+                local_files_only=True,
+                trust_remote_code=False,
+                use_safetensors=True,
+                torch_dtype=torch.float32,
+            )
+            .to(device)
+            .eval()
+        )
         digest = sha256_state_dict(model)
         return cls(
-            model, tokenizer,
-            model_name=str(path.resolve()), model_sha256=digest,
-            device=device, max_input_tokens=max_input_tokens,
+            model,
+            tokenizer,
+            model_name=str(path.resolve()),
+            model_sha256=digest,
+            device=device,
+            max_input_tokens=max_input_tokens,
         )
 
     @torch.no_grad()
@@ -91,27 +105,27 @@ class LocalAutoInterpreter:
             raise ValueError("Interpretation prompt exceeds max_input_tokens")
         inputs = {
             key: tensor.to(self.device)
-            for key, tensor in encoded.items() if isinstance(tensor, torch.Tensor)
+            for key, tensor in encoded.items()
+            if isinstance(tensor, torch.Tensor)
         }
         eos = getattr(self.tokenizer, "eos_token_id", None)
         output = self.model.generate(
-            **inputs, max_new_tokens=max_new_tokens, do_sample=False,
-            num_beams=1, pad_token_id=eos,
+            **inputs,
+            max_new_tokens=max_new_tokens,
+            do_sample=False,
+            num_beams=1,
+            pad_token_id=eos,
         )
         if not isinstance(output, torch.Tensor) or output.ndim != 2 or output.shape[0] != 1:
             raise RuntimeError("Original local generator did not return token IDs")
         if output.shape[1] <= ids.shape[1]:
             raise RuntimeError("Local language model generated no response")
-        return self.tokenizer.decode(
-            output[0, ids.shape[1]:], skip_special_tokens=True
-        ).strip()
+        return self.tokenizer.decode(output[0, ids.shape[1] :], skip_special_tokens=True).strip()
 
     def _candidate(self, contexts: list[str]) -> str:
         if not 1 <= len(contexts) <= 32:
             raise ValueError("Need 1–32 genuine activating contexts")
-        content = "\n".join(
-            f"{i + 1}. {value[:1200]}" for i, value in enumerate(contexts)
-        )
+        content = "\n".join(f"{i + 1}. {value[:1200]}" for i, value in enumerate(contexts))
         question = (
             "You are interpreting the observed activity of one sparse autoencoder "
             "feature. The following real text contexts activate that feature. "
@@ -128,8 +142,7 @@ class LocalAutoInterpreter:
         question = (
             "Does this text clearly exhibit the described pattern? "
             "Return exactly YES or NO, and nothing else.\n"
-            "Pattern: " + description[:900] +
-            "\nText: " + context[:1400] + "\nAnswer:"
+            "Pattern: " + description[:900] + "\nText: " + context[:1400] + "\nAnswer:"
         )
         response = self._ask(question, max_new_tokens=6)
         label = response.upper().strip().rstrip(".")
@@ -138,18 +151,24 @@ class LocalAutoInterpreter:
         return label == "YES"
 
     def interpret(
-        self, *, site_id: str, feature_id: int,
+        self,
+        *,
+        site_id: str,
+        feature_id: int,
         discovery: list[dict[str, Any]],
         heldout: list[dict[str, Any]],
     ) -> dict[str, Any]:
         """Real candidate + held-out balanced accuracy, but never auto-approve."""
         result = propose_interpretation(
-            site_id=site_id, feature_id=feature_id,
-            discovery=discovery, heldout=heldout,
+            site_id=site_id,
+            feature_id=feature_id,
+            discovery=discovery,
+            heldout=heldout,
             generator=self._candidate,
             generator_model=self.model_name,
             generator_method="local_greedy_context_pattern_v1",
-            authorized_budget_usd=0.0, estimated_cost_usd=0.0,
+            authorized_budget_usd=0.0,
+            estimated_cost_usd=0.0,
             predictor=self._predictor,
         )
         result["generator_state_sha256"] = self.model_sha256

@@ -4,10 +4,10 @@ Unlike block-level residual differences, these are independently computed
 projection vectors for each attention head and post-nonlinearity MLP neuron.
 Biases are returned separately. Unsupported architectures fail closed.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
 
 import torch
 
@@ -52,9 +52,7 @@ def capture_projected_components(
     """
     if model.backend != "transformer_lens":
         raise UnsupportedCapability("Component projection requires actual TransformerLens hooks")
-    if type(layer) is not int or layer < 0 or component not in {
-        "attention_heads", "mlp_neurons"
-    }:
+    if type(layer) is not int or layer < 0 or component not in {"attention_heads", "mlp_neurons"}:
         raise ValueError("Supported layer and component type required")
     blocks = getattr(model.model, "blocks", None)
     if blocks is None or layer >= len(blocks):
@@ -91,7 +89,8 @@ def capture_projected_components(
         not isinstance(activation, torch.Tensor)
         or not isinstance(measured, torch.Tensor)
         or activation.shape[0] != 1
-        or measured.ndim != 3 or measured.shape[0] != 1
+        or measured.ndim != 3
+        or measured.shape[0] != 1
         or measured.shape[1] != length
     ):
         raise RuntimeError("Component activation and output tensor shapes are invalid")
@@ -120,11 +119,11 @@ def capture_projected_components(
     diff = (contributions.sum(0) + projected_bias - out).abs()
     if not torch.allclose(
         contributions.sum(0) + projected_bias,
-        out, atol=atol, rtol=rtol,
+        out,
+        atol=atol,
+        rtol=rtol,
     ):
-        raise RuntimeError(
-            "Native component projections do not reconstitute the measured output"
-        )
+        raise RuntimeError("Native component projections do not reconstitute the measured output")
     return ComponentContributions(
         layer=layer,
         token_position=pos,

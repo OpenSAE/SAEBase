@@ -221,8 +221,10 @@ def test_scope2_pinned_native_loader_reads_real_source_contract(monkeypatch, tmp
     def read_safe(_path, *, device):
         assert device == "cpu"
         return {
-            "w_enc": torch.eye(2), "w_dec": torch.eye(2),
-            "b_enc": torch.zeros(2), "b_dec": torch.zeros(2),
+            "w_enc": torch.eye(2),
+            "w_dec": torch.eye(2),
+            "b_enc": torch.zeros(2),
+            "b_dec": torch.zeros(2),
             "threshold": torch.zeros(2),
         }
 
@@ -262,9 +264,7 @@ def test_scope2_manifest_indexes_published_transcoder_crosscoder_clt():
         sha="a" * 40,
         siblings=[SimpleNamespace(rfilename=name) for name in names],
     )
-    assets = discover_official_scope_assets(
-        "google/gemma-scope-2-270m-pt", info=info
-    )
+    assets = discover_official_scope_assets("google/gemma-scope-2-270m-pt", info=info)
     assert len(assets) == 3
     by_type = {asset.activation_family: asset for asset in assets}
     assert by_type["transcoder"].affine_skip

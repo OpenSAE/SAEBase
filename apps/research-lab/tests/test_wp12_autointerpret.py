@@ -1,4 +1,5 @@
 """End-to-end local candidate and held-out scoring, no external providers."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -41,7 +42,13 @@ class ToyModel:
         self.generate_calls = 0
 
     def generate(
-        self, *, input_ids, max_new_tokens, do_sample, num_beams, pad_token_id,
+        self,
+        *,
+        input_ids,
+        max_new_tokens,
+        do_sample,
+        num_beams,
+        pad_token_id,
     ):
         assert do_sample is False and num_beams == 1 and pad_token_id == 0
         assert 1 <= max_new_tokens <= 100
@@ -84,6 +91,9 @@ def test_local_interpreter_rejects_missing_checkpoint_and_invalid_source(tmp_pat
         LocalAutoInterpreter.from_local_snapshot(tmp_path / "missing")
     with pytest.raises(ValueError, match="source identity"):
         LocalAutoInterpreter(
-            ToyModel(), ToyTokenizer(),
-            model_name="unknown", model_sha256="bad", device="cpu",
+            ToyModel(),
+            ToyTokenizer(),
+            model_name="unknown",
+            model_sha256="bad",
+            device="cpu",
         )

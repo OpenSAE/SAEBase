@@ -4,6 +4,7 @@
 No Hugging Face model download, external API request, public upload or
 automatic approval. Outputs a private hypothesis with held-out diagnostics.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -26,7 +27,10 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("A bounded local reviewed source examples JSON is required")
     data = json.loads(args.examples.read_text(encoding="utf-8"))
     if not isinstance(data, dict) or set(data) != {
-        "site_id", "feature_id", "discovery", "heldout",
+        "site_id",
+        "feature_id",
+        "discovery",
+        "heldout",
     }:
         parser.error("Require exact source site, feature, discovery and heldout fields")
     sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "apps" / "research-lab"))
@@ -34,20 +38,28 @@ def main(argv: list[str] | None = None) -> int:
 
     worker = LocalAutoInterpreter.from_local_snapshot(args.local_model, device=args.device)
     result = worker.interpret(
-        site_id=data["site_id"], feature_id=data["feature_id"],
-        discovery=data["discovery"], heldout=data["heldout"],
+        site_id=data["site_id"],
+        feature_id=data["feature_id"],
+        discovery=data["discovery"],
+        heldout=data["heldout"],
     )
     args.output.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     with args.output.open("x", encoding="utf-8") as stream:
         json.dump(result, stream, sort_keys=True, indent=2, allow_nan=False)
         stream.write("\n")
     os.chmod(args.output, 0o600)
-    print(json.dumps({
-        "status": result["status"], "approved": False,
-        "heldout_score": result.get("heldout_score"),
-        "generator_state_sha256": result["generator_state_sha256"],
-        "output": str(args.output),
-    }, sort_keys=True))
+    print(
+        json.dumps(
+            {
+                "status": result["status"],
+                "approved": False,
+                "heldout_score": result.get("heldout_score"),
+                "generator_state_sha256": result["generator_state_sha256"],
+                "output": str(args.output),
+            },
+            sort_keys=True,
+        )
+    )
     return 0
 
 
