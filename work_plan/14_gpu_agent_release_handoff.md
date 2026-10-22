@@ -1,5 +1,8 @@
 # Work Plan 14 — GPU Agent Release Handoff
 
+> **Superseded by [WP15 GPU Agent runbook](15_gpu_agent_completion_runbook.md).** The old TRY_ONCE / HIDE / DEFER strategy is historical; install missing upstream dependencies, prepare real assets and complete G1–G6.
+
+
 Date: 2026-10-22. Source branch: `docs/wp13-real-world-integration` (WP12 P0/P1/P2/P3–P8 stacked below it). Read [release plan](14_ship_first_release_plan.md). **Goal: working release features, not independent 50-feature certification.**
 
 ## Working constraints
