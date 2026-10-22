@@ -4,6 +4,7 @@ Legacy HookedTransformer 3.x remains an explicit supported route. TL 4.x
 replaces that class with TransformerBridge. Both expose the hook/cache API,
 but their model coordinate systems must be recorded separately.
 """
+
 from __future__ import annotations
 
 from typing import Any
@@ -31,10 +32,7 @@ def boot_transformerlens(
     tl = import_transformer_lens()
     legacy = getattr(tl, "HookedTransformer", None)
     if legacy is not None:
-        loader = (
-            legacy.from_pretrained_no_processing
-            if no_processing else legacy.from_pretrained
-        )
+        loader = legacy.from_pretrained_no_processing if no_processing else legacy.from_pretrained
         kwargs: dict[str, Any] = {"device": device}
         if dtype is not None:
             kwargs["dtype"] = dtype
@@ -68,7 +66,5 @@ def boot_transformerlens(
     for parameter in model.parameters():
         parameter.requires_grad_(False)
     model._saebase_transformerlens_engine = engine
-    model._saebase_weight_processing = (
-        "raw_hf" if no_processing else "legacy_compatible"
-    )
+    model._saebase_weight_processing = "raw_hf" if no_processing else "legacy_compatible"
     return model, engine
