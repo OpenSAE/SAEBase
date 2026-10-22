@@ -227,6 +227,9 @@ def test_official_scope_manifest_is_not_a_fabricated_cartesian_product():
     assert residual.width == "65k"
     assert residual.revision == "a" * 40
     assert residual.status == "official_manifest_unloaded"
-    assert all(a.status == "official_manifest_unmapped" for a in assets if a is not residual)
+    assert all(
+        a.status == "official_manifest_loadable_unverified"
+        for a in assets if a is not residual
+    )
     with pytest.raises(ValueError, match="unregistered"):
         discover_official_scope_assets("some/other-model", info=info)
