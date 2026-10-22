@@ -4,7 +4,7 @@
 */
 "use strict";
 (function () {
-  const state = { sites: [], datasets: [], current: "overview", resultOffset: 0, resultTotal: 0 };
+  const state = { sites: [], datasets: [], assets: [], assetsLoaded: false, current: "overview", resultOffset: 0, resultTotal: 0 };
   const byId = function (id) { return document.getElementById(id); };
   const create = function (tag, cls, text) {
     const element = document.createElement(tag);
@@ -66,7 +66,7 @@
     });
     document.title = (view === "overview" ? "OpenSAE" : view[0].toUpperCase() + view.slice(1) + " · OpenSAE") + " Research Lab";
     if (view === "results") loadResults(true);
-    if (view === "explore") loadFeatures();
+    if (view === "explore") { loadAssets(); loadFeatures(); }
     if (view === "analyze") loadAnalyses();
     if (view === "datasets") loadDatasets();
     if (view === "reports") loadReports();
@@ -132,6 +132,60 @@
       const tr = append(target, "tr");
       append(tr, "td", "", "Source unavailable: " + error.message).colSpan = 6;
       byId("results-count").textContent = "Evidence unavailable";
+    }
+  }
+  function renderAssets() {
+    const target = byId("asset-table");
+    clear(target);
+    const selected = value("asset-model");
+    const items = state.assets.filter(function (item) {
+      return !selected || item.model_key === selected;
+    });
+    items.forEach(function (asset) {
+      const tr = append(target, "tr");
+      append(tr, "td", "", asset.model_key);
+      append(tr, "td", "", "L" + asset.layer + " · " + asset.hook);
+      append(tr, "td", "", asset.sae_id);
+      append(tr, "td", "", asset.width || "Unspecified");
+      append(tr, "td", "", asset.l0_variant || "Unspecified");
+      const cell = append(tr, "td");
+      if (/^google\\/gemma-scope-2-[a-z0-9-]+$/.test(asset.repo_id)) {
+        const link = append(cell, "a", "", "Official manifest ↗");
+        link.href = "https://huggingface.co/" + asset.repo_id;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+      } else {
+        append(cell, "span", "", "Source unavailable");
+      }
+    });
+    if (!items.length) {
+      const tr = append(target, "tr");
+      append(tr, "td", "", "No registered assets for this selection.").colSpan = 6;
+    }
+    byId("asset-count").textContent = items.length +
+      " registered resource sites · weights are not loaded by this page";
+  }
+  async function loadAssets() {
+    if (state.assetsLoaded) { renderAssets(); return; }
+    const target = byId("asset-table");
+    try {
+      const response = await get("/api/sae-assets");
+      if (response.mode !== "registered_metadata_only" || !Array.isArray(response.items)) {
+        throw new Error("Unexpected asset registry response");
+      }
+      state.assets = response.items;
+      state.assetsLoaded = true;
+      const modelNames = Array.from(new Set(state.assets.map(function (a) { return a.model_key; }))).sort();
+      const selector = byId("asset-model");
+      modelNames.forEach(function (key) {
+        const option = append(selector, "option", "", key);
+        option.value = key;
+      });
+      renderAssets();
+    } catch (error) {
+      clear(target);
+      const tr = append(target, "tr");
+      append(tr, "td", "", "Asset registry unavailable: " + error.message).colSpan = 6;
     }
   }
   async function loadFeatures() {
@@ -315,6 +369,8 @@
   byId("results-more").addEventListener("click",function(){loadResults(false);});
   byId("results-model").addEventListener("keydown",function(e){if(e.key==="Enter")loadResults(true);});
   byId("feature-search").addEventListener("click",loadFeatures);
+  byId("asset-refresh").addEventListener("click",renderAssets);
+  byId("asset-model").addEventListener("change",renderAssets);
   byId("feature-query").addEventListener("keydown",function(e){if(e.key==="Enter")loadFeatures();});
   byId("intervention-form").addEventListener("submit",onPreflight);
   window.addEventListener("hashchange",activate);
