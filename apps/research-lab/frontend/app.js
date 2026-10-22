@@ -371,6 +371,17 @@
       const nav = append(panel, "div", "feature-navigation");
       if (data.previous_feature_id != null) featureLink(nav, "← Previous", siteId, data.previous_feature_id);
       if (data.next_feature_id != null) featureLink(nav, "Next →", siteId, data.next_feature_id);
+      const intervene = append(nav, "button", "btn tiny", "Design an intervention ↗");
+      intervene.type = "button";
+      intervene.addEventListener("click", function () {
+        const selector = byId("intervention-site");
+        if ([...selector.options].some(function (option) { return option.value === siteId; })) {
+          selector.value = siteId;
+        }
+        byId("intervention-features").value = String(featureId);
+        byId("intervention-operation").value = "ablate";
+        window.location.hash = "#intervene";
+      });
       const download = append(nav, "a", "", "Export offline HTML ↗");
       download.href = "/api/explore/features/" + encodeURIComponent(siteId) + "/" +
         featureId + "/export.html";
