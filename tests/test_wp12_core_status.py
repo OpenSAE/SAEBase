@@ -1,4 +1,5 @@
 """Core functionality and independent release are distinct pass/fail axes."""
+
 from __future__ import annotations
 
 import csv

@@ -92,8 +92,7 @@ def audit_ledger(path: Path) -> dict[str, Any]:
             missing.append({"id": row["id"], "reason": "not_finally_verified", "status": status})
     released = counts["RELEASED"]
     complete = (
-        released == 50 and not missing
-        and all(row["p8_status"] == "VERIFIED" for row in rows)
+        released == 50 and not missing and all(row["p8_status"] == "VERIFIED" for row in rows)
     )
     return {
         "schema": "opensae.wp12.p8.acceptance.v1",
@@ -104,9 +103,9 @@ def audit_ledger(path: Path) -> dict[str, Any]:
         "core_partial_count": counts["PARTIAL"],
         "core_blocked_count": counts["BLOCKED"],
         "core_gaps": [
-            {"id": row["id"], "grade": row["core_grade"],
-             "missing": row["remaining_core_work"]}
-            for row in rows if row["current_status"] in {"PARTIAL", "BLOCKED"}
+            {"id": row["id"], "grade": row["core_grade"], "missing": row["remaining_core_work"]}
+            for row in rows
+            if row["current_status"] in {"PARTIAL", "BLOCKED"}
         ],
         "p8_pending_count": sum(row["p8_status"] == "PENDING" for row in rows),
         "release_ready": complete,
