@@ -1,9 +1,9 @@
 # SAEBase performance and reliability
 
-SAEBase optimizes its evaluation execution while keeping scientific identities,
-SAE estimators, feature operations and results unchanged.
+SAEBase reduces repeated computation during feature evaluation and supports
+generation with KV caching.
 
-## Implemented in this branch
+## Execution optimizations
 
 - Cached activation encoding now coalesces uncached records within a bounded
   reader batch into one SAE invocation, splitting codes back by their exact

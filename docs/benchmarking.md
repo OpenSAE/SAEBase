@@ -12,7 +12,7 @@ Engineering implementation is distinct from numerical validation. The offline
 example proves only the synthetic execution contract. SAEBench JSON import tests
 prove that an already-generated native result is faithfully transcribed, **not**
 that a SAEBench evaluation ran or that its dataset/protocol matches SAEBase.
-Numerical acceptance is independently exercised in CI by executing native upstream Core and Sparse Probing evaluations with pinned model, SAE checkpoint, dataset, preprocessing and protocol, and checking imported values. Unsupported or not-yet-executed paths are marked
+A separate GitHub Actions workflow runs the original SAEBench Core and Sparse Probing evaluations with fixed models, SAE checkpoints, data, and settings, then checks the imported values. This workflow is triggered manually. Unsupported or not-yet-executed paths are marked
 `blocked` in reports rather than assigned zero or called validated.
 
 ## Install / preflight

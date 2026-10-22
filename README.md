@@ -36,7 +36,7 @@ SAEBase connects pretrained models, SAE dictionaries, activation measurements, c
 
 ## 🧪 Research Lab
 
-Explore real model/SAE measurements, feature statistics, controlled interventions and reports in the [interactive Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase).
+The [Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) displays public SAE measurements and reports. The table also includes results recorded in separate GPU experiments.
 
 | Research area | Recorded evidence |
 | --- | --- |
@@ -44,7 +44,7 @@ Explore real model/SAE measurements, feature statistics, controlled intervention
 | Feature exploration | 300 statistical feature cards across six deep-dive sites |
 | Interventions | Six real model/SAE sites with clean and edited logits |
 | SAR | 1,485 measured K16 groups, 14 K8 groups and one K4 group |
-| RSS | Six sites and 138,000 recorded clean/variant site-input observations |
+| RSS | 138,000 records of clean inputs and proposed variants across six sites |
 | Input Localization | One 64-state input grid and 55 observed features |
 
 [**Open the Research Lab**](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Dataset](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation) · [Recorded results](docs/research-lab/results-20261020.md) · [Software release notes](docs/releases/v0.4.0.md)

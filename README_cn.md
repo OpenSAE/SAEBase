@@ -36,7 +36,7 @@ SAEBase 将预训练模型、SAE 字典、激活测量、受控特征干预、�
 
 ## 🧪 Research Lab
 
-在 [Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) 中查看真实模型测量、特征统计、干预结果和实验报告。
+[Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) 展示已公开的 SAE 测量与报告。下表还包括单独记录的 GPU 实验结果。
 
 | 研究内容 | 已记录的实验结果 |
 | --- | --- |
@@ -44,7 +44,7 @@ SAEBase 将预训练模型、SAE 字典、激活测量、受控特征干预、�
 | Feature Explorer | 六个主要层位的 300 张特征统计卡片 |
 | 特征干预 | 六个真实模型/SAE 层位的 clean 与 edited logits |
 | SAR | 1,485 组 K16、14 组 K8 与一组 K4 测量 |
-| RSS | 六个层位、138,000 个 clean/variant site-input 观测 |
+| RSS | 六个层位，共 138,000 条原始输入和候选变体记录 |
 | Input Localization | 一个 64 状态的输入网格、55 个有观测支持的特征 |
 
 [**打开 Research Lab**](https://huggingface.co/spaces/OpenSAE/SAEBase) · [数据集](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation) · [实验结果](docs/research-lab/results-20261020.md) · [软件版本说明](docs/releases/v0.4.0.md)

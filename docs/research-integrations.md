@@ -30,7 +30,7 @@ Do not interpret a held-out statistic as a selection result or treat repeated va
 
 [Input Localization](https://github.com/OpenSAE/SAE-Input-Localization) measures which controlled binary inputs are needed to explain frozen SAE feature activations. SAEBase provides two input routes without copying the original mathematical estimator.
 
-- `ControlledInputDesign.from_renderer(...)` enumerates independent binary factors, and `collect_controlled_input_activations(...)` caches their complete, token-aligned grids with a checked state-to-sample manifest.
+- `ControlledInputDesign.from_renderer(...)` enumerates the binary factors defined for the experiment, and `collect_controlled_input_activations(...)` caches their complete, token-aligned grids with a checked state-to-sample manifest.
 - `collect_localization_grid(..., design=...)` uses the public capture API to encode each input configuration in explicit Boolean bitmask order.
 - `localization_grid_from_code_store(..., manifest=...)` reconstructs the same grid from identity-checked SAEBase code caches and verifies their associated activation checksums.
 - `evaluate_localization(...)` calls the original `sae_localize.exact_scope_curve`; optionally it also calls the original paired plug-in estimator. It returns the optimal curve, total variance, budget and feature scope assignment.
