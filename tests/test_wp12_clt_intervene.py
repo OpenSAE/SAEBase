@@ -1,4 +1,5 @@
 """CPU numerical check: a CLT feature actually edits downstream outputs."""
+
 from __future__ import annotations
 
 import pytest
@@ -22,9 +23,7 @@ class TinyCLTModel(nn.Module):
             block.post = nn.Identity()
             self.model.layers.append(block)
         self.readout = nn.Linear(2, 3, bias=False)
-        self.readout.weight.data.copy_(
-            torch.tensor([[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]])
-        )
+        self.readout.weight.data.copy_(torch.tensor([[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]))
 
     def forward(self, inputs):
         x = inputs
@@ -41,13 +40,15 @@ def test_clt_edit_changes_later_layers_only():
         if source == 1:
             dec[0, 1, 0] = 1
             dec[0, 2, 0] = 1
-        weights.append({
-            "w_enc": torch.eye(2),
-            "w_dec": dec,
-            "b_enc": torch.zeros(2),
-            "b_dec": torch.zeros(2),
-            "threshold": torch.zeros(2),
-        })
+        weights.append(
+            {
+                "w_enc": torch.eye(2),
+                "w_dec": dec,
+                "b_enc": torch.zeros(2),
+                "b_dec": torch.zeros(2),
+                "threshold": torch.zeros(2),
+            }
+        )
     clt = Scope2CLT(
         weights,
         config={
@@ -92,7 +93,13 @@ def test_clt_edit_changes_later_layers_only():
     inputs = torch.tensor([[[0.5, 0.1], [2.0, 3.0], [1.0, 1.0]]])
     before = model(inputs).clone()
     result = execute_clt_feature(
-        model, inputs, record, "source-feature", clt, identity, new_code=0.0,
+        model,
+        inputs,
+        record,
+        "source-feature",
+        clt,
+        identity,
+        new_code=0.0,
     )
     assert result["executed"] is True
     assert result["target_layers"] == [1, 2]

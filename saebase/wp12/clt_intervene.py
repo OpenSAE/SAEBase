@@ -4,6 +4,7 @@ This changes live PyTorch module outputs, not just a saved graph JSON or
 cross-layer decoder tensor. Requires exact input/output site mappings and
 the original model/transcoder identity. No arbitrary pickles are loaded.
 """
+
 from __future__ import annotations
 
 import math
@@ -69,10 +70,7 @@ def execute_clt_feature(
     actual_model_sha = sha256_state_dict(model)
     if actual_model_sha != graph.model_sha256:
         raise ValueError("Circuit references a different model state")
-    if (
-        type(new_code) not in (int, float)
-        or not math.isfinite(new_code)
-    ):
+    if type(new_code) not in (int, float) or not math.isfinite(new_code):
         raise ValueError("New feature code must be finite")
     if (
         not isinstance(inputs, torch.Tensor)
@@ -100,8 +98,7 @@ def execute_clt_feature(
         raise ValueError("Native target readout token position out of range")
     src_name = _module_name(identity.input_hook_template, layer)
     targets = {
-        j: _module_name(identity.output_hook_template, j)
-        for j in range(layer, clt.n_layers)
+        j: _module_name(identity.output_hook_template, j) for j in range(layer, clt.n_layers)
     }
     if src_name in targets.values():
         raise ValueError("CLT source activation and target MLP output sites must be distinct")
@@ -152,19 +149,16 @@ def execute_clt_feature(
             if state["targets"][target_layer] != 1:
                 raise RuntimeError("CLT output target fired multiple times")
             result = output.clone()
-            delta = state["delta"][:, target_layer, :].to(
-                device=result.device, dtype=result.dtype
-            )
+            delta = state["delta"][:, target_layer, :].to(device=result.device, dtype=result.dtype)
             result[:, token, :] = result[:, token, :] + delta
             return result
+
         return patch
 
     try:
         handles.append(modules[src_name].register_forward_hook(capture))
         for target_layer, target_name in targets.items():
-            handles.append(
-                modules[target_name].register_forward_hook(make_patch(target_layer))
-            )
+            handles.append(modules[target_name].register_forward_hook(make_patch(target_layer)))
         edited = _model_logits(model(inputs), out_pos)
     finally:
         for handle in handles:
