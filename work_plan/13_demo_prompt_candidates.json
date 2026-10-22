@@ -1,0 +1,129 @@
+{
+  "schema": "opensae.wp13.demo_prompt_candidates.v1",
+  "purpose": "Candidate original engineering prompts for real model/SAE capture, before human rights review and publication approval.",
+  "status": "CANDIDATE_UNREVIEWED_NOT_PUBLIC",
+  "model_preference": {
+    "model_key": "gemma270m",
+    "sae_key": "gemma270m_scope_resid",
+    "layers": [
+      5,
+      9
+    ],
+    "fallback": "Use one authentic supported site if the exact source identifiers cannot be matched; document the reason."
+  },
+  "exact_source_identifiers": "FILL_AT_GPU_PREFLIGHT; never infer or invent model/SAE SHA or tokenizer revision",
+  "max_tokens_per_prompt": 128,
+  "examples": [
+    {
+      "id": "WP13-DEMO-01",
+      "group_id": "WP13-DEMO-01",
+      "split": "discovery",
+      "topic": "numbers",
+      "text": "The sensor reading rose from seven to twelve after calibration.",
+      "rights_reviewed": false,
+      "public_text_reviewed": false,
+      "token_ids": null,
+      "model_computed": false
+    },
+    {
+      "id": "WP13-DEMO-02",
+      "group_id": "WP13-DEMO-02",
+      "split": "discovery",
+      "topic": "numbers",
+      "text": "A box contains four blue markers and six red markers.",
+      "rights_reviewed": false,
+      "public_text_reviewed": false,
+      "token_ids": null,
+      "model_computed": false
+    },
+    {
+      "id": "WP13-DEMO-03",
+      "group_id": "WP13-DEMO-03",
+      "split": "discovery",
+      "topic": "geography",
+      "text": "Paris is the capital of France, while Marseille is on the coast.",
+      "rights_reviewed": false,
+      "public_text_reviewed": false,
+      "token_ids": null,
+      "model_computed": false
+    },
+    {
+      "id": "WP13-DEMO-04",
+      "group_id": "WP13-DEMO-04",
+      "split": "discovery",
+      "topic": "negation",
+      "text": "The reviewer did not accept the first explanation.",
+      "rights_reviewed": false,
+      "public_text_reviewed": false,
+      "token_ids": null,
+      "model_computed": false
+    },
+    {
+      "id": "WP13-DEMO-05",
+      "group_id": "WP13-DEMO-05",
+      "split": "discovery",
+      "topic": "science",
+      "text": "The scientist compared observations from the control and treatment groups.",
+      "rights_reviewed": false,
+      "public_text_reviewed": false,
+      "token_ids": null,
+      "model_computed": false
+    },
+    {
+      "id": "WP13-DEMO-06",
+      "group_id": "WP13-DEMO-06",
+      "split": "discovery",
+      "topic": "temporal",
+      "text": "The train arrived before the rain started that evening.",
+      "rights_reviewed": false,
+      "public_text_reviewed": false,
+      "token_ids": null,
+      "model_computed": false
+    },
+    {
+      "id": "WP13-DEMO-07",
+      "group_id": "WP13-DEMO-07",
+      "split": "evaluation",
+      "topic": "programming",
+      "text": "A Python function returns the square of a positive integer.",
+      "rights_reviewed": false,
+      "public_text_reviewed": false,
+      "token_ids": null,
+      "model_computed": false
+    },
+    {
+      "id": "WP13-DEMO-08",
+      "group_id": "WP13-DEMO-08",
+      "split": "evaluation",
+      "topic": "reasoning",
+      "text": "If every lamp is off, then the room remains dark.",
+      "rights_reviewed": false,
+      "public_text_reviewed": false,
+      "token_ids": null,
+      "model_computed": false
+    },
+    {
+      "id": "WP13-DEMO-09",
+      "group_id": "WP13-DEMO-09",
+      "split": "evaluation",
+      "topic": "question",
+      "text": "Question: Which number comes after eight? Answer:",
+      "rights_reviewed": false,
+      "public_text_reviewed": false,
+      "token_ids": null,
+      "model_computed": false
+    },
+    {
+      "id": "WP13-DEMO-10",
+      "group_id": "WP13-DEMO-10",
+      "split": "evaluation",
+      "topic": "contrast",
+      "text": "Although the experiment failed twice, the third attempt succeeded.",
+      "rights_reviewed": false,
+      "public_text_reviewed": false,
+      "token_ids": null,
+      "model_computed": false
+    }
+  ],
+  "caution": "No precomputed SAE activations, feature IDs, explanations, benchmark scores or inference claims are contained here. The evaluation split is not guaranteed to contain both activating and inactive contexts for any selected feature. Repartition only with documented new immutable manifest before interpretation, never after viewing held-out labels."
+}
