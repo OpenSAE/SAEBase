@@ -168,7 +168,7 @@ Recommended first routes (only if sources actually resolve on the host):
 ### R2 — Build the first authentic 10-prompt experience
 
 **GPU Agent:**
-- Use ten short prompts authored specifically for the demo or otherwise rights-cleared, varied enough to show distinct feature behavior (numbers, geography, negation, syntactic structure, code, etc.). No invented guarantee that one specific feature matches a semantic pattern.
+- Start from the [10 unreviewed original candidate prompts](13_demo_prompt_candidates.json), grouped by numbers, geography, negation, science, programming, logic, time and contrast. These are **candidate inputs, not approved public data or precomputed feature activations**. Human-review text rights before release, preserve exact bytes and source IDs. No invented guarantee that any specific feature matches a semantic pattern.
 - Record exact prompt bytes and token IDs, 1–2 **compatible** registered sites; record discovery vs evaluation groups separately for candidate explanations. Reuse a loaded model across prompts for efficient capture; build a batching driver if the existing CLI reloads weights on every call.
 - Generate `backend.feature_store`-compatible rows, `backend.explore`-compatible *complete* sparse token traces and optionally honest candidate interpretations. The existing `scripts/wp12_p2_capture.py` is a **one-prompt** CLI; a 10-prompt run controller is an integration task, not an implicit feature.
 - Return a small rights-reviewed candidate bundle and source coverage report; no 500-group rerun, no third-party mass-text export.
