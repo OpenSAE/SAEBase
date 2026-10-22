@@ -2,6 +2,7 @@
 
 The fixtures are artificial, never presented as real user-facing SAE measurements.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -45,11 +46,15 @@ def _trace(site: dict, index: int) -> dict:
         "rights_reviewed": False,
         "tokens": [
             {
-                "position": 0, "token_id": 2, "text": "<bos>",
+                "position": 0,
+                "token_id": 2,
+                "text": "<bos>",
                 "features": [{"feature_id": 923, "activation": 3405.25}],
             },
             {
-                "position": 1, "token_id": 505, "text": "Paris",
+                "position": 1,
+                "token_id": 505,
+                "text": "Paris",
                 "features": [{"feature_id": 506, "activation": float(index) * 3}],
             },
         ],
@@ -71,11 +76,19 @@ def test_metadata_only_handoff_never_exposes_prompt_or_feature_values(tmp_path):
     source = _files(tmp_path)
     report = tmp_path / "summary.json"
     checklist = tmp_path / "review-template.json"
-    assert main([
-        "--private-raw", str(source),
-        "--small-report", str(report),
-        "--review-template", str(checklist),
-    ]) == 0
+    assert (
+        main(
+            [
+                "--private-raw",
+                str(source),
+                "--small-report",
+                str(report),
+                "--review-template",
+                str(checklist),
+            ]
+        )
+        == 0
+    )
     output = json.loads(report.read_text())
     assert output["trace_count"] == 2
     assert output["observed_nonzero_codes"] == 4
@@ -126,11 +139,22 @@ def test_approved_release_builds_actual_lab_index_and_explore_in_place(tmp_path)
     approval = tmp_path / "review.json"
     approval.write_text(json.dumps(checklist), encoding="utf-8")
     bundle = tmp_path / "public-bundle"
-    assert main([
-        "--private-raw", str(source), "--small-report", str(tmp_path / "release-preflight.json"),
-        "--review-file", str(approval), "--publish-reviewed",
-        "--release-root", str(bundle),
-    ]) == 0
+    assert (
+        main(
+            [
+                "--private-raw",
+                str(source),
+                "--small-report",
+                str(tmp_path / "release-preflight.json"),
+                "--review-file",
+                str(approval),
+                "--publish-reviewed",
+                "--release-root",
+                str(bundle),
+            ]
+        )
+        == 0
+    )
     assert (bundle / "features" / "features.sqlite3").is_file()
     assert feature_store_count(bundle) == 2
     assert (bundle / "explore" / "manifest.json").is_file()
@@ -140,7 +164,16 @@ def test_approved_release_builds_actual_lab_index_and_explore_in_place(tmp_path)
     assert all(t["rights_reviewed"] for t in released["traces"])
     assert (bundle / "release-manifest.json").is_file()
     with pytest.raises(SystemExit):
-        main([
-            "--private-raw", str(source), "--small-report", str(tmp_path / "other.json"),
-            "--review-file", str(approval), "--publish-reviewed", "--release-root", str(bundle),
-        ])
+        main(
+            [
+                "--private-raw",
+                str(source),
+                "--small-report",
+                str(tmp_path / "other.json"),
+                "--review-file",
+                str(approval),
+                "--publish-reviewed",
+                "--release-root",
+                str(bundle),
+            ]
+        )
