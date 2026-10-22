@@ -1,4 +1,5 @@
 """Offline P1 backend contracts; no upstream weights or GPU downloads."""
+
 from __future__ import annotations
 
 from types import ModuleType, SimpleNamespace
@@ -10,12 +11,16 @@ from torch import nn
 
 from models.transformerlens_backend import boot_transformerlens
 from saebase.api import (
-    ActivationSite, ModelAdapter, NNsightLocal, TraceLocation,
+    ActivationSite,
+    ModelAdapter,
+    NNsightLocal,
+    TraceLocation,
     capture_block_components,
 )
 from saebase.api.model import UnsupportedCapability
 from saebase.sae.catalog import (
-    discover_official_scope_assets, registered_scope_assets,
+    discover_official_scope_assets,
+    registered_scope_assets,
 )
 
 
@@ -48,7 +53,9 @@ def test_legacy_loader_keeps_old_processing(monkeypatch):
         lambda: SimpleNamespace(HookedTransformer=Legacy),
     )
     model, engine = boot_transformerlens(
-        "pythia-70m-deduped", device="cpu", dtype=torch.float32,
+        "pythia-70m-deduped",
+        device="cpu",
+        dtype=torch.float32,
         no_processing=True,
     )
     assert engine == "hooked_transformer_legacy"
@@ -78,14 +85,15 @@ def test_tl4_bridge_uses_explict_legacy_alias_mode(monkeypatch, raw):
         lambda: SimpleNamespace(),
     )
     model, engine = boot_transformerlens(
-        "gpt2", device="cpu", dtype=None, no_processing=raw,
+        "gpt2",
+        device="cpu",
+        dtype=None,
+        no_processing=raw,
     )
     assert calls == [("gpt2", {"device": "cpu", "dtype": torch.float32})]
     assert engine == "transformer_bridge_local"
     assert model.compatibility is raw
-    assert model._saebase_weight_processing == (
-        "raw_hf" if raw else "legacy_compatible"
-    )
+    assert model._saebase_weight_processing == ("raw_hf" if raw else "legacy_compatible")
 
 
 class HookToy(nn.Module):
@@ -95,9 +103,7 @@ class HookToy(nn.Module):
         super().__init__()
         self.weight = nn.Parameter(torch.ones(1))
         self.cfg = SimpleNamespace(n_layers=1)
-        self.hook_dict = {
-            f"blocks.0.hook_resid_{s}": object() for s in ("pre", "mid", "post")
-        }
+        self.hook_dict = {f"blocks.0.hook_resid_{s}": object() for s in ("pre", "mid", "post")}
         self.actually_fire = actually_fire
 
     def get_hook_point(self, name):
@@ -139,7 +145,8 @@ def test_hook_patch_requires_real_execution():
         adapter.capture(tokens=ids, site=ActivationSite(0, "blocks.0.hook_wrong"))
     with pytest.raises(UnsupportedCapability, match="no fireable hook"):
         adapter.patch_logits(
-            tokens=ids, site=ActivationSite(0, "blocks.0.hook_wrong"),
+            tokens=ids,
+            site=ActivationSite(0, "blocks.0.hook_wrong"),
             activation=activation,
         )
 
@@ -149,7 +156,8 @@ def test_silent_patch_is_rejected():
     ids = torch.tensor([[1, 2, 3]])
     with pytest.raises(UnsupportedCapability, match="fired 0 times"):
         adapter.patch_logits(
-            tokens=ids, site=ActivationSite(0, "blocks.0.hook_resid_post"),
+            tokens=ids,
+            site=ActivationSite(0, "blocks.0.hook_resid_post"),
             activation=torch.zeros(4),
         )
 
@@ -157,17 +165,26 @@ def test_silent_patch_is_rejected():
 def test_block_components_are_real_differences():
     adapter = ModelAdapter(HookToy())
     components = capture_block_components(
-        adapter, tokens=torch.tensor([[1, 2, 3]]), layer=0,
+        adapter,
+        tokens=torch.tensor([[1, 2, 3]]),
+        layer=0,
     )
     assert torch.allclose(components.attention_delta, torch.ones(4))
     assert torch.allclose(components.mlp_delta, torch.full((4,), 2.0))
     components.check()
 
 
-@pytest.mark.parametrize("path", [
-    "", "_hidden.layer", "model.__class__", "model.layers[-1]",
-    "model.layers[x]", "model.layers[0].__dict__",
-])
+@pytest.mark.parametrize(
+    "path",
+    [
+        "",
+        "_hidden.layer",
+        "model.__class__",
+        "model.layers[-1]",
+        "model.layers[x]",
+        "model.layers[0].__dict__",
+    ],
+)
 def test_nnsight_location_rejects_ambiguous_paths(path):
     with pytest.raises(ValueError):
         TraceLocation(path)
