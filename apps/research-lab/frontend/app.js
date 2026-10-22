@@ -155,7 +155,8 @@
     items.forEach(function (asset) {
       const tr = append(target, "tr");
       append(tr, "td", "", asset.model_key);
-      append(tr, "td", "", "L" + asset.layer + " · " + asset.hook);
+      append(tr, "td", "", (asset.layers && asset.layers.length > 1 ? "L" + asset.layers.join(",") :
+        asset.layer < 0 ? "Cross-layer" : "L" + asset.layer) + " · " + asset.hook);
       append(tr, "td", "", asset.sae_id);
       append(tr, "td", "", asset.width || "Unspecified");
       append(tr, "td", "", asset.l0_variant || "Unspecified");
