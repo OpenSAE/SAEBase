@@ -132,6 +132,34 @@ def status(job_id: str, authorization: str | None = Header(default=None)) -> dic
     return result
 
 
+@router.get("/jobs/{job_id}/result")
+def private_result(
+    job_id: str, authorization: str | None = Header(default=None)
+) -> dict[str, Any]:
+    """Return only the authenticated operator's hash-verified native output."""
+    root = authorize("operator", authorization)
+    status = get_queue(root).status(job_id=job_id, owner="single-operator")
+    if status is None:
+        raise HTTPException(404, "Unknown private job")
+    if status["status"] != "succeeded":
+        raise HTTPException(409, "Private job has not produced a committed result")
+    if len(job_id) != 40 or any(ch not in "0123456789abcdef" for ch in job_id):
+        raise HTTPException(404, "Invalid private job identity")
+    file = root / "results" / (job_id + ".json")
+    if not file.is_file() or file.is_symlink() or file.stat().st_size > 10 * 1024 * 1024:
+        raise HTTPException(503, "Private result file is missing or oversized")
+    payload = file.read_bytes()
+    if hashlib.sha256(payload).hexdigest() != status["result_sha"]:
+        raise HTTPException(503, "Private result checksum mismatch")
+    try:
+        record = json.loads(payload)
+    except (ValueError, UnicodeDecodeError) as exc:
+        raise HTTPException(503, "Private result is not valid JSON") from exc
+    if not isinstance(record, dict) or record.get("job_id") != job_id:
+        raise HTTPException(503, "Private result belongs to a different job")
+    return record
+
+
 @router.post("/jobs/{job_id}/cancel")
 def cancel(job_id: str, authorization: str | None = Header(default=None)) -> dict[str, Any]:
     root = authorize("operator", authorization)
