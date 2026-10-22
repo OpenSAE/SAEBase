@@ -3,10 +3,10 @@
 Only owner-approved nonsecret artifacts are served. Private original prompts,
 training weights, job errors and credential-bearing logs are never exposed.
 """
+
 from __future__ import annotations
 
 import hashlib
-import json
 import os
 from pathlib import Path
 from typing import Any
@@ -29,8 +29,8 @@ def _root(root: Path | None = None) -> Path:
 
 
 def _id(value: str) -> bool:
-    return isinstance(value, str) and len(value) == 64 and all(
-        c in "0123456789abcdef" for c in value
+    return (
+        isinstance(value, str) and len(value) == 64 and all(c in "0123456789abcdef" for c in value)
     )
 
 
@@ -49,8 +49,11 @@ def _validate(category: str, record: dict[str, Any]) -> None:
             raise ValueError("Browser graph needs a source-bound bounded subgraph")
         node_ids = set()
         for node in nodes:
-            if (not isinstance(node, dict) or not isinstance(node.get("id"), str)
-                    or node.get("kind") not in {"feature", "token", "error", "logit"}):
+            if (
+                not isinstance(node, dict)
+                or not isinstance(node.get("id"), str)
+                or node.get("kind") not in {"feature", "token", "error", "logit"}
+            ):
                 raise ValueError("Invalid public circuit node")
             node_ids.add(node["id"])
         if len(node_ids) != len(nodes) or any(
@@ -79,8 +82,12 @@ def _validate(category: str, record: dict[str, Any]) -> None:
 
 
 def publish_record(
-    category: str, record: dict[str, Any], *, root: Path | None = None,
-    public_consent: bool = False, rights_reviewed: bool = False,
+    category: str,
+    record: dict[str, Any],
+    *,
+    root: Path | None = None,
+    public_consent: bool = False,
+    rights_reviewed: bool = False,
 ) -> dict[str, Any]:
     if not public_consent or not rights_reviewed:
         raise PermissionError("Explicit reviewed permission required for public publication")
@@ -97,16 +104,22 @@ def publish_record(
     file.write_bytes(payload)
     os.chmod(file, 0o600)
     meta = {
-        "schema": "opensae.wp12.published.v1", "category": category,
-        "record_sha256": sha, "source_reviewed": True,
-        "public_consent": True, "rights_reviewed": True,
+        "schema": "opensae.wp12.published.v1",
+        "category": category,
+        "record_sha256": sha,
+        "source_reviewed": True,
+        "public_consent": True,
+        "rights_reviewed": True,
     }
     (folder / "manifest.json").write_bytes(core.canonical_json(meta))
     return meta
 
 
 def load_record(
-    category: str, record_id: str, *, root: Path | None = None,
+    category: str,
+    record_id: str,
+    *,
+    root: Path | None = None,
 ) -> dict[str, Any] | None:
     if category not in CATEGORIES or not _id(record_id):
         return None
@@ -116,7 +129,8 @@ def load_record(
     record_path = folder / "record.json"
     manifest_path = folder / "manifest.json"
     if (
-        not record_path.is_file() or record_path.stat().st_size > MAX_BYTES
+        not record_path.is_file()
+        or record_path.stat().st_size > MAX_BYTES
         or not manifest_path.is_file()
     ):
         raise core.InvalidEvidence("Missing or oversized public WP12 record")
@@ -139,7 +153,9 @@ def load_record(
 
 
 def list_records(
-    category: str, *, root: Path | None = None,
+    category: str,
+    *,
+    root: Path | None = None,
 ) -> dict[str, Any]:
     if category not in CATEGORIES:
         raise ValueError("Invalid research collection")
@@ -152,7 +168,9 @@ def list_records(
         record = load_record(category, name, root=root)
         if record is not None:
             info = {
-                "id": name, "schema": record["schema"], "category": category,
+                "id": name,
+                "schema": record["schema"],
+                "category": category,
                 "source": "owner_approved_real_record",
             }
             if category == "circuits":
@@ -166,5 +184,4 @@ def list_records(
             else:
                 info["site"] = record.get("site")
             items.append(info)
-    return {"category": category, "items": items, "total": len(items),
-            "mode": "published_only"}
+    return {"category": category, "items": items, "total": len(items), "mode": "published_only"}

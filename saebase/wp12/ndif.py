@@ -3,11 +3,11 @@
 Never turns a local simulation or self-hosted worker into an NDIF success.
 The user supplies an authorized NNsight model instance deployed on NDIF.
 """
+
 from __future__ import annotations
 
 import hashlib
 import os
-import re
 from typing import Any
 
 import torch
@@ -16,8 +16,13 @@ from saebase.api.nnsight_local import TraceLocation, _target
 
 
 def remote_ndif_capture(
-    model: Any, prompt: str, location: TraceLocation, *, model_id: str,
-    approved: bool = False, rights_reviewed: bool = False,
+    model: Any,
+    prompt: str,
+    location: TraceLocation,
+    *,
+    model_id: str,
+    approved: bool = False,
+    rights_reviewed: bool = False,
     deployment_allowlist: frozenset[str] = frozenset(),
     max_output_elements: int = 2048,
 ) -> dict[str, Any]:

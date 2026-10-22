@@ -3,6 +3,7 @@
 Disabled on the public Research Lab. Uses separate operator/worker bearer
 secrets and a durable private data directory. No user text enters the queue.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -27,14 +28,19 @@ def authorize(role: str, bearer: str | None) -> Path:
     operator = os.environ.get("OPENSAE_PRIVATE_OPERATOR_TOKEN")
     worker = os.environ.get("OPENSAE_PRIVATE_WORKER_TOKEN")
     if (
-        not root or not Path(root).is_absolute()
-        or not operator or len(operator) < 32
-        or not worker or len(worker) < 32 or operator == worker
+        not root
+        or not Path(root).is_absolute()
+        or not operator
+        or len(operator) < 32
+        or not worker
+        or len(worker) < 32
+        or operator == worker
     ):
         raise HTTPException(503, "Durable storage and distinct strong secrets required")
     expected = operator if role == "operator" else worker
     if (
-        not isinstance(bearer, str) or not bearer.startswith("Bearer ")
+        not isinstance(bearer, str)
+        or not bearer.startswith("Bearer ")
         or not secrets.compare_digest(bearer[7:], expected)
     ):
         raise HTTPException(401, "Unauthorized")
@@ -87,7 +93,9 @@ class Completion(BaseModel):
 
 
 @router.post("/inputs")
-def store_input(body: PrivateInput, authorization: str | None = Header(default=None)) -> dict[str, Any]:
+def store_input(
+    body: PrivateInput, authorization: str | None = Header(default=None)
+) -> dict[str, Any]:
     root = authorize("operator", authorization)
     digest = hashlib.sha256(body.text.encode()).hexdigest()
     file = input_path(root, digest)
@@ -107,7 +115,8 @@ def enqueue(body: PrivateJob, authorization: str | None = Header(default=None)) 
     try:
         load_input(root, body.input_ref)
         return get_queue(root).enqueue(
-            owner="single-operator", client_key=body.client_key,
+            owner="single-operator",
+            client_key=body.client_key,
             spec=body.model_dump(exclude={"client_key"}),
         )
     except (JobError, ValueError, FileNotFoundError) as exc:

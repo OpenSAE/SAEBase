@@ -3,6 +3,7 @@
 Reuses original upstream Core/Sparse-Probing code; native JSON import is
 not a substitute for running the upstream evaluators on real checkpoints.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -40,7 +41,8 @@ class NativePilot:
             raise ValueError("Pinned native runner requires repo_root/upstream checkout")
         commit = subprocess.check_output(
             ["git", "-C", str(self.upstream), "rev-parse", "HEAD"],
-            text=True, timeout=20,
+            text=True,
+            timeout=20,
         ).strip()
         if commit != self.upstream_commit:
             raise ValueError("Native upstream checkout does not match frozen commit")
@@ -60,8 +62,12 @@ def native_pilot(job: NativePilot) -> dict[str, Any]:
     }
     proc = subprocess.run(
         [sys.executable, "scripts/m3_native_saebench_smoke.py"],
-        cwd=job.repo_root, env=env, capture_output=True, text=True,
-        timeout=job.timeout_seconds, check=False,
+        cwd=job.repo_root,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=job.timeout_seconds,
+        check=False,
     )
     (job.output / "stdout.log").write_text(proc.stdout)
     (job.output / "stderr.log").write_text(proc.stderr)
@@ -74,9 +80,11 @@ def native_pilot(job: NativePilot) -> dict[str, Any]:
     if (
         record.get("status") != "passed"
         or record.get("upstream_commit") != job.upstream_commit
-        or set(record.get("native_metrics", {})) != {
-            "saebench.core.l0", "saebench.core.mse",
-            "saebench.sparse_probing.sae_top_1_test_accuracy"
+        or set(record.get("native_metrics", {}))
+        != {
+            "saebench.core.l0",
+            "saebench.core.mse",
+            "saebench.sparse_probing.sae_top_1_test_accuracy",
         }
     ):
         raise RuntimeError("Upstream native results or source identity are invalid")
@@ -113,8 +121,13 @@ class ComparisonPoint:
             raise ValueError("Native upstream commit must be pinned")
         if not self.hook or not self.metric_id or not self.sae_name:
             raise ValueError("Complete site, metric and SAE identities required")
-        if any(type(v) not in (int, float) or not math.isfinite(v)
-               for v in (self.metric_value, self.l0)) or self.l0 < 0:
+        if (
+            any(
+                type(v) not in (int, float) or not math.isfinite(v)
+                for v in (self.metric_value, self.l0)
+            )
+            or self.l0 < 0
+        ):
             raise ValueError("Metrics and L0 must be finite")
 
 
@@ -125,24 +138,35 @@ def compare_sae_points(points: list[ComparisonPoint]) -> dict[str, Any]:
     ref = points[0]
     for p in points[1:]:
         mismatches = [
-            name for name in ("model_sha256", "hook", "dataset_sha256",
-                              "native_commit", "metric_id")
+            name
+            for name in ("model_sha256", "hook", "dataset_sha256", "native_commit", "metric_id")
             if getattr(p, name) != getattr(ref, name)
         ]
         if mismatches:
-            return {"comparable": False, "mismatches": mismatches, "points": [],
-                    "reason": "Source/checkpoint/site/protocol are not matched"}
+            return {
+                "comparable": False,
+                "mismatches": mismatches,
+                "points": [],
+                "reason": "Source/checkpoint/site/protocol are not matched",
+            }
     if len({p.sae_sha256 for p in points}) < 2:
         raise ValueError("Two distinct SAE checkpoints are required")
     return {
         "comparable": True,
         "metric": ref.metric_id,
-        "scope": {"model_sha256": ref.model_sha256, "hook": ref.hook,
-                  "dataset_sha256": ref.dataset_sha256,
-                  "native_commit": ref.native_commit},
+        "scope": {
+            "model_sha256": ref.model_sha256,
+            "hook": ref.hook,
+            "dataset_sha256": ref.dataset_sha256,
+            "native_commit": ref.native_commit,
+        },
         "points": [
-            {"sae": p.sae_name, "sae_sha256": p.sae_sha256,
-             "l0": p.l0, "metric_value": p.metric_value}
+            {
+                "sae": p.sae_name,
+                "sae_sha256": p.sae_sha256,
+                "l0": p.l0,
+                "metric_value": p.metric_value,
+            }
             for p in sorted(points, key=lambda q: (q.l0, q.sae_name))
         ],
         "uncertainty": "not_computed_without_independent_sample_values",

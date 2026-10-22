@@ -4,6 +4,7 @@ The two modes are deliberately distinct: SAE code changes preserve the
 reconstruction residual; PyTorch hooks operate on native module tensors.
 A native pyvene execution can be supplied via its original implementation.
 """
+
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
@@ -13,7 +14,7 @@ from typing import Any, Literal, Sequence
 
 import torch
 
-from saebase.api import ActivationSite, ModelAdapter, capture_features, edit_features
+from saebase.api import ActivationSite, capture_features, edit_features
 from saebase.api.features import snapshot_from_activation
 from saebase.interventions.specs import Condition
 from saebase.interventions.operators import apply_condition
@@ -27,9 +28,13 @@ class Edit:
     retained_ids: tuple[int, ...] = ()
 
     def condition(self) -> Condition:
-        return Condition(name=self.operation, operation=self.operation,
-                         feature_ids=self.feature_ids, value=self.value,
-                         retained_ids=self.retained_ids)
+        return Condition(
+            name=self.operation,
+            operation=self.operation,
+            feature_ids=self.feature_ids,
+            value=self.value,
+            retained_ids=self.retained_ids,
+        )
 
 
 @dataclass(frozen=True)
@@ -70,7 +75,12 @@ class EditPlan:
     def parse(cls, raw: str) -> "EditPlan":
         value = json.loads(raw)
         if not isinstance(value, dict) or set(value) != {
-            "schema", "sae_key", "layer", "token_position", "steps", "compose"
+            "schema",
+            "sae_key",
+            "layer",
+            "token_position",
+            "steps",
+            "compose",
         }:
             raise ValueError("Edit config has unknown or missing fields")
         if not isinstance(value["steps"], list):
@@ -78,20 +88,38 @@ class EditPlan:
         steps = []
         for item in value["steps"]:
             if not isinstance(item, dict) or set(item) != {
-                "operation", "feature_ids", "value", "retained_ids"
+                "operation",
+                "feature_ids",
+                "value",
+                "retained_ids",
             }:
                 raise ValueError("Unexpected step fields")
-            if not isinstance(item["feature_ids"], list) or not isinstance(item["retained_ids"], list):
+            if not isinstance(item["feature_ids"], list) or not isinstance(
+                item["retained_ids"], list
+            ):
                 raise ValueError("Feature IDs must be lists")
-            steps.append(Edit(item["operation"], tuple(item["feature_ids"]),
-                              item["value"], tuple(item["retained_ids"])))
-        return cls(value["sae_key"], value["layer"], value["token_position"],
-                   tuple(steps), value["compose"], value["schema"])
+            steps.append(
+                Edit(
+                    item["operation"],
+                    tuple(item["feature_ids"]),
+                    item["value"],
+                    tuple(item["retained_ids"]),
+                )
+            )
+        return cls(
+            value["sae_key"],
+            value["layer"],
+            value["token_position"],
+            tuple(steps),
+            value["compose"],
+            value["schema"],
+        )
 
 
 @torch.no_grad()
-def compare_sae_edits(bundle: Any, tokens: torch.Tensor, plan: EditPlan,
-                      *, readout_position: int = -1) -> dict[str, Any]:
+def compare_sae_edits(
+    bundle: Any, tokens: torch.Tensor, plan: EditPlan, *, readout_position: int = -1
+) -> dict[str, Any]:
     """Real baseline vs edited teacher-forced logits, no invented generation.
 
     The supplied bundle is an already loaded SAEBase LoadedResearchPair, so
@@ -136,8 +164,9 @@ def compare_sae_edits(bundle: Any, tokens: torch.Tensor, plan: EditPlan,
                 sae, tokens=ids, site=site, activation=patched.activation
             )
         assert patched is not None
-    changed = model.patch_logits(tokens=ids, site=site, activation=patched.activation,
-                                 readout_position=readout_position)
+    changed = model.patch_logits(
+        tokens=ids, site=site, activation=patched.activation, readout_position=readout_position
+    )
     if changed.shape != baseline.shape or not bool(torch.isfinite(changed).all()):
         raise RuntimeError("Invalid edited logits")
     return {
@@ -149,11 +178,14 @@ def compare_sae_edits(bundle: Any, tokens: torch.Tensor, plan: EditPlan,
         "token_position": site.position,
         "readout_position": readout_position,
         "compose": plan.compose,
-        "residual_semantics": "preserving" if all(x.operation != "reconstruction" for x in plan.steps)
-                              else "full_reconstruction",
+        "residual_semantics": "preserving"
+        if all(x.operation != "reconstruction" for x in plan.steps)
+        else "full_reconstruction",
         "baseline_logits": baseline.detach().cpu(),
         "edited_logits": changed.detach().cpu(),
-        "logit_delta_l2": float(torch.linalg.vector_norm(changed.float() - baseline.float()).item()),
+        "logit_delta_l2": float(
+            torch.linalg.vector_norm(changed.float() - baseline.float()).item()
+        ),
         "plan": json.loads(plan.json()),
         "model_engine": getattr(model.model, "_saebase_transformerlens_engine", None),
     }
@@ -169,19 +201,24 @@ class ModuleEdit:
     value: float = 0.0
 
     def __post_init__(self) -> None:
-        if not self.module_name or any(part.startswith("_") or not part for part in self.module_name.split(".")):
+        if not self.module_name or any(
+            part.startswith("_") or not part for part in self.module_name.split(".")
+        ):
             raise ValueError("Choose a named public model module")
         if self.operation not in {"zero", "scale", "replace"}:
             raise ValueError("Unknown module edit")
-        if any(type(x) is not int or x < 0 for x in self.positions) or len(set(self.positions)) != len(self.positions):
+        if any(type(x) is not int or x < 0 for x in self.positions) or len(
+            set(self.positions)
+        ) != len(self.positions):
             raise ValueError("Positions must be unique nonnegative indices")
         if type(self.value) not in (int, float) or not math.isfinite(self.value):
             raise ValueError("Invalid module edit value")
 
 
 @torch.no_grad()
-def compare_module_edits(model: torch.nn.Module, inputs: Any,
-                         edits: Sequence[ModuleEdit]) -> dict[str, Any]:
+def compare_module_edits(
+    model: torch.nn.Module, inputs: Any, edits: Sequence[ModuleEdit]
+) -> dict[str, Any]:
     """Genuine forward hooks on arbitrary PyTorch modules including CNNs.
 
     Caller retains responsibility for user-selected output semantics. The
@@ -201,6 +238,7 @@ def compare_module_edits(model: torch.nn.Module, inputs: Any,
         raise TypeError("This local adapter requires Tensor output")
     counts = {edit.module_name: 0 for edit in edits}
     handles = []
+
     def make_hook(edit: ModuleEdit):
         def hook(module: torch.nn.Module, args: Any, output: Any) -> Any:
             if not isinstance(output, torch.Tensor):
@@ -211,15 +249,21 @@ def compare_module_edits(model: torch.nn.Module, inputs: Any,
             if positions and (data.ndim < 2 or any(p >= data.shape[-1] for p in positions)):
                 raise ValueError("Neuron index outside output last dimension")
             target = data[..., list(positions)] if positions else data
-            value = (target * 0 if edit.operation == "zero" else
-                     target * edit.value if edit.operation == "scale" else
-                     torch.full_like(target, edit.value))
+            value = (
+                target * 0
+                if edit.operation == "zero"
+                else target * edit.value
+                if edit.operation == "scale"
+                else torch.full_like(target, edit.value)
+            )
             if positions:
                 data[..., list(positions)] = value
             else:
                 data = value
             return data
+
         return hook
+
     try:
         for edit in edits:
             handles.append(modules[edit.module_name].register_forward_hook(make_hook(edit)))
@@ -232,15 +276,23 @@ def compare_module_edits(model: torch.nn.Module, inputs: Any,
     if not isinstance(edited, torch.Tensor) or edited.shape != baseline.shape:
         raise RuntimeError("Native edited output shape changed")
     return {
-        "baseline": baseline.detach().clone(), "edited": edited.detach().clone(),
-        "delta_l2": float((edited.float()-baseline.float()).norm().item()),
-        "fired": counts, "backend": "pytorch_forward_hooks",
+        "baseline": baseline.detach().clone(),
+        "edited": edited.detach().clone(),
+        "delta_l2": float((edited.float() - baseline.float()).norm().item()),
+        "fired": counts,
+        "backend": "pytorch_forward_hooks",
         "semantics": "module_tensor_not_sae_feature",
     }
 
 
-def run_native_pyvene(intervenable: Any, *, base: Any, sources: Any,
-                      unit_locations: dict[str, Any], **upstream_kwargs: Any) -> Any:
+def run_native_pyvene(
+    intervenable: Any,
+    *,
+    base: Any,
+    sources: Any,
+    unit_locations: dict[str, Any],
+    **upstream_kwargs: Any,
+) -> Any:
     """Invoke an already constructed ORIGINAL pyvene IntervenableModel.
 
     The caller supplies its official IntervenableConfig, registrations and

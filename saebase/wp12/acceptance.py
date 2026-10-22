@@ -3,26 +3,42 @@
 No feature is promoted because a file was committed or a GPU agent said PASS.
 P8 checks source-bound evidence, independent reviewer and requested scope.
 """
+
 from __future__ import annotations
 
 import csv
 import hashlib
 import io
-import json
 from pathlib import Path, PurePosixPath
 from typing import Any
 import zipfile
 
 REQUIRED_IDS = {f"{i:02d}" for i in range(1, 51)}
 VALID_STATES = {
-    "TO_AUDIT", "NOT_STARTED", "PARTIAL", "BLOCKED",
-    "CPU_VERIFIED", "GPU_VERIFIED", "RELEASED",
+    "TO_AUDIT",
+    "NOT_STARTED",
+    "PARTIAL",
+    "BLOCKED",
+    "CPU_VERIFIED",
+    "GPU_VERIFIED",
+    "RELEASED",
 }
 FIELDS = {
-    "id", "reference_project", "capability", "phase", "compute_tier",
-    "execution_owner", "current_status", "verified_scope",
-    "upstream_reference", "open_sae_entrypoint", "native_parity_evidence",
-    "cpu_evidence", "gpu_evidence", "artifact_link", "reviewer",
+    "id",
+    "reference_project",
+    "capability",
+    "phase",
+    "compute_tier",
+    "execution_owner",
+    "current_status",
+    "verified_scope",
+    "upstream_reference",
+    "open_sae_entrypoint",
+    "native_parity_evidence",
+    "cpu_evidence",
+    "gpu_evidence",
+    "artifact_link",
+    "reviewer",
     "blocking_reason",
 }
 
@@ -48,11 +64,11 @@ def audit_ledger(path: Path) -> dict[str, Any]:
                 needs += ["gpu_evidence", "native_parity_evidence"]
             absent = [name for name in needs if not row[name].strip()]
             if absent:
-                missing.append({"id": row["id"], "reason": "verified_without_evidence",
-                                "fields": absent})
+                missing.append(
+                    {"id": row["id"], "reason": "verified_without_evidence", "fields": absent}
+                )
         if status not in {"CPU_VERIFIED", "GPU_VERIFIED", "RELEASED"}:
-            missing.append({"id": row["id"], "reason": "not_finally_verified",
-                            "status": status})
+            missing.append({"id": row["id"], "reason": "not_finally_verified", "status": status})
     released = counts["RELEASED"]
     complete = released == 50 and not missing
     return {
@@ -64,8 +80,8 @@ def audit_ledger(path: Path) -> dict[str, Any]:
         "missing": missing,
         "external_user_tests": "not_inferred_from_ledger",
         "two_gpu_acceptance": (
-            "independent_evidence_required" if
-            next(r for r in rows if r["id"] == "50")["current_status"] != "RELEASED"
+            "independent_evidence_required"
+            if next(r for r in rows if r["id"] == "50")["current_status"] != "RELEASED"
             else "ledger_reports_released_verify_raw_signoff"
         ),
     }
@@ -73,13 +89,17 @@ def audit_ledger(path: Path) -> dict[str, Any]:
 
 def _safe_zip_name(name: str) -> bool:
     path = PurePosixPath(name)
-    return bool(name) and not path.is_absolute() and not any(
-        part in {".", "..", ""} for part in path.parts
-    ) and "\\" not in name
+    return (
+        bool(name)
+        and not path.is_absolute()
+        and not any(part in {".", "..", ""} for part in path.parts)
+        and "\\" not in name
+    )
 
 
-def inspect_archive(path: Path, *, expected_sha256: str,
-                    max_unpacked_bytes: int = 4_000_000_000) -> dict[str, Any]:
+def inspect_archive(
+    path: Path, *, expected_sha256: str, max_unpacked_bytes: int = 4_000_000_000
+) -> dict[str, Any]:
     """Hash the real archive bytes; inspect without executing archived code.
 
     ZIP CRC, internal SHA256 entries and raw tensor counts are different
@@ -102,9 +122,9 @@ def inspect_archive(path: Path, *, expected_sha256: str,
             raise ValueError("Archive expands beyond reviewed evidence budget")
         # No third-party weight binaries or obvious private environment files.
         forbidden = [
-            name for name in names
-            if name.endswith((".env", ".safetensors", ".ckpt"))
-            or "/.env" in name
+            name
+            for name in names
+            if name.endswith((".env", ".safetensors", ".ckpt")) or "/.env" in name
         ]
         if forbidden:
             raise ValueError("Archive contains checkpoint/environment paths")
@@ -159,9 +179,12 @@ def render_progress(report: dict[str, Any]) -> str:
         "| --- | ---: |",
     ]
     lines.extend(f"| {key} | {value} |" for key, value in counts.items())
-    lines.extend(["", "## Outstanding",
-                  f"{len(report['missing'])} capability gates have not passed final acceptance."])
     lines.extend(
-        f"- F{row['id']} {row['reason']}" for row in report["missing"]
+        [
+            "",
+            "## Outstanding",
+            f"{len(report['missing'])} capability gates have not passed final acceptance.",
+        ]
     )
+    lines.extend(f"- F{row['id']} {row['reason']}" for row in report["missing"])
     return "\n".join(lines) + "\n"

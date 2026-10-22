@@ -3,6 +3,7 @@
 Never substitutes a home-built trainer for SAELens/Sparsify. Local snapshot
 paths and permission must be supplied to keep dataset/model identity stable.
 """
+
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
@@ -55,13 +56,16 @@ class TrainPlan:
             raise ValueError("Explicit concrete hookpoint required")
         if not re.fullmatch(r"[A-Za-z0-9_-]{3,64}", self.run_name):
             raise ValueError("Safe 3-64 character experiment name required")
-        if not (0 < self.k <= self.d_sae and
-                0 < self.d_in <= 16384 and 0 < self.d_sae <= 1_048_576):
+        if not (
+            0 < self.k <= self.d_sae and 0 < self.d_in <= 16384 and 0 < self.d_sae <= 1_048_576
+        ):
             raise ValueError("Invalid native model/SAE width/sparsity")
         if not (1 <= self.batch_size <= 256 and 16 <= self.ctx_len <= 4096):
             raise ValueError("Invalid batch/context budget")
-        if not (1 <= self.steps <= (200000 if allow_large else 200) and
-                1 <= self.max_examples <= (100_000_000 if allow_large else 10000)):
+        if not (
+            1 <= self.steps <= (200000 if allow_large else 200)
+            and 1 <= self.max_examples <= (100_000_000 if allow_large else 10000)
+        ):
             raise PermissionError("Large C2/C3 training needs separate authorization")
         if self.distributed_gpus < 1 or self.distributed_gpus > 16:
             raise ValueError("GPU world size outside supported bounds")
@@ -84,6 +88,7 @@ def _saelens_train(plan: TrainPlan, checkpoint_dir: Path) -> None:
         JumpReLUTrainingSAEConfig,
         GatedTrainingSAEConfig,
     )
+
     implementations = {
         "standard": StandardTrainingSAEConfig,
         "topk": TopKTrainingSAEConfig,
@@ -116,13 +121,25 @@ def _saelens_train(plan: TrainPlan, checkpoint_dir: Path) -> None:
 
 
 def _sparsify_command(plan: TrainPlan) -> list[str]:
-    cmd = [sys.executable, "-m", "sparsify", plan.model_path, plan.dataset_path,
-           "--run_name", plan.run_name,
-           "--hookpoints", plan.hookpoint,
-           "--ctx_len", str(plan.ctx_len),
-           "--max_examples", str(plan.max_examples),
-           "--batch_size", str(plan.batch_size),
-           "--k", str(plan.k)]
+    cmd = [
+        sys.executable,
+        "-m",
+        "sparsify",
+        plan.model_path,
+        plan.dataset_path,
+        "--run_name",
+        plan.run_name,
+        "--hookpoints",
+        plan.hookpoint,
+        "--ctx_len",
+        str(plan.ctx_len),
+        "--max_examples",
+        str(plan.max_examples),
+        "--batch_size",
+        str(plan.batch_size),
+        "--k",
+        str(plan.k),
+    ]
     if plan.architecture == "transcoder":
         cmd.append("--transcode")
     if plan.resume_checkpoint is not None:
@@ -130,13 +147,26 @@ def _sparsify_command(plan: TrainPlan) -> list[str]:
         # NOT a claim to restore optimizer+data iterator state.
         cmd += ["--finetune", plan.resume_checkpoint]
     if plan.distributed_gpus > 1:
-        cmd = ["torchrun", "--standalone", "--nproc_per_node",
-               str(plan.distributed_gpus), "-m", "sparsify", *cmd[3:]]
+        cmd = [
+            "torchrun",
+            "--standalone",
+            "--nproc_per_node",
+            str(plan.distributed_gpus),
+            "-m",
+            "sparsify",
+            *cmd[3:],
+        ]
     return cmd
 
 
-def run_training(plan: TrainPlan, *, output: Path, approved: bool = False,
-                 allow_large: bool = False, timeout_seconds: int = 1800) -> dict:
+def run_training(
+    plan: TrainPlan,
+    *,
+    output: Path,
+    approved: bool = False,
+    allow_large: bool = False,
+    timeout_seconds: int = 1800,
+) -> dict:
     """Real native execution only on explicit approval and actual local snapshots."""
     plan.validate(allow_large=allow_large)
     if not approved:
@@ -157,16 +187,23 @@ def run_training(plan: TrainPlan, *, output: Path, approved: bool = False,
     start = time.monotonic()
     if plan.backend == "saelens":
         _saelens_train(plan, output / "checkpoint")
-        return {"status": "native_training_returned", "backend": plan.backend,
-                "elapsed_seconds": time.monotonic() - start,
-                "checkpoints_need_registration": True}
+        return {
+            "status": "native_training_returned",
+            "backend": plan.backend,
+            "elapsed_seconds": time.monotonic() - start,
+            "checkpoints_need_registration": True,
+        }
     command = _sparsify_command(plan)
     # Source returns paths and progress according to the installed native CLI;
     # stdout/logs cannot certify which specific weights were saved.
     try:
         result = subprocess.run(
-            command, cwd=output, capture_output=True, text=True,
-            timeout=timeout_seconds, check=False,
+            command,
+            cwd=output,
+            capture_output=True,
+            text=True,
+            timeout=timeout_seconds,
+            check=False,
             env={**os.environ, "WANDB_MODE": "disabled"},
         )
     except subprocess.TimeoutExpired:
@@ -176,10 +213,13 @@ def run_training(plan: TrainPlan, *, output: Path, approved: bool = False,
     (output / "native.stderr.log").write_text(result.stderr)
     if result.returncode:
         raise RuntimeError(f"Native Sparsify exited {result.returncode}; inspect private logs")
-    return {"status": "native_training_returned", "backend": plan.backend,
-            "elapsed_seconds": time.monotonic() - start,
-            "checkpoints_need_registration": True,
-            "distributed_gpus_requested": plan.distributed_gpus}
+    return {
+        "status": "native_training_returned",
+        "backend": plan.backend,
+        "elapsed_seconds": time.monotonic() - start,
+        "checkpoints_need_registration": True,
+        "distributed_gpus_requested": plan.distributed_gpus,
+    }
 
 
 def register_checkpoint(native_directory: Path, output: Path, *, source: dict) -> dict:
@@ -188,7 +228,8 @@ def register_checkpoint(native_directory: Path, output: Path, *, source: dict) -
         raise FileExistsError("Immutable checkpoint registry entry already exists")
     native_directory = native_directory.resolve()
     candidates = sorted(
-        p for p in native_directory.rglob("*")
+        p
+        for p in native_directory.rglob("*")
         if p.is_file() and p.suffix in {".safetensors", ".pt", ".pth", ".bin"}
     )
     if not candidates or len(candidates) > 1000:
