@@ -140,6 +140,8 @@ edited_activation = original_activation + decode(edited_codes) - decode(original
 
 [参与贡献](CONTRIBUTING.md) · [更新记录](CHANGELOG.md) · [引用信息](CITATION.cff) · [Apache-2.0 许可证](LICENSE) · [安全说明](SECURITY.md)
 
+---
+
 <p align="center">
   <b>From learned features to testable explanations.</b><br>
   <a href="https://github.com/OpenSAE">OpenSAE</a> · <a href="https://github.com/OpenSAE/SAEBase/issues">Issues</a>
