@@ -188,3 +188,87 @@ def test_p6_native_transcoder_circuit_intervention_changes_real_logits():
             native,
             ScopeIdentity(**{**info.__dict__, "source_sha256": "0" * 64}),
         )
+
+
+def test_scope2_pinned_native_loader_reads_real_source_contract(monkeypatch, tmp_path):
+    import json
+    import sys
+    from types import ModuleType
+
+    from saebase.sae.scope2_native import load_official_scope2
+
+    cfg = {
+        "hf_hook_point_in": "model.layers.12.pre_feedforward_layernorm.output",
+        "hf_hook_point_out": "model.layers.12.post_feedforward_layernorm.output",
+        "width": 2,
+        "model_name": "google/gemma-3-270m-pt",
+        "architecture": "jump_relu",
+        "l0": 30,
+        "affine_connection": False,
+        "type": "transcoder",
+    }
+    config = tmp_path / "config.json"
+    config.write_text(json.dumps(cfg))
+    tensor_file = tmp_path / "params.safetensors"
+    tensor_file.write_bytes(b"synthetic-only-test-stub")
+
+    def download(*, repo_id, filename, revision):
+        assert repo_id == "google/gemma-scope-2-270m-pt"
+        assert revision == "a" * 40
+        assert filename.startswith("transcoder/layer_12_width_2_l0_medium/")
+        return str(config if filename.endswith("config.json") else tensor_file)
+
+    def read_safe(_path, *, device):
+        assert device == "cpu"
+        return {
+            "w_enc": torch.eye(2), "w_dec": torch.eye(2),
+            "b_enc": torch.zeros(2), "b_dec": torch.zeros(2),
+            "threshold": torch.zeros(2),
+        }
+
+    hub = ModuleType("huggingface_hub")
+    hub.hf_hub_download = download
+    safe = ModuleType("safetensors")
+    safe.__path__ = []
+    backend = ModuleType("safetensors.torch")
+    backend.load_file = read_safe
+    monkeypatch.setitem(sys.modules, "huggingface_hub", hub)
+    monkeypatch.setitem(sys.modules, "safetensors", safe)
+    monkeypatch.setitem(sys.modules, "safetensors.torch", backend)
+
+    model, identity = load_official_scope2(
+        repo_id="google/gemma-scope-2-270m-pt",
+        revision="a" * 40,
+        directory="transcoder/layer_12_width_2_l0_medium",
+    )
+    assert identity.kind == "transcoder"
+    assert identity.input_hook != identity.output_hook
+    assert identity.width == 2
+    assert len(identity.source_sha256) == 64
+    assert torch.equal(model(torch.ones(1, 2)), torch.ones(1, 2))
+
+
+def test_scope2_manifest_indexes_published_transcoder_crosscoder_clt():
+    from types import SimpleNamespace
+
+    from saebase.sae.catalog import discover_official_scope_assets
+
+    names = [
+        "transcoder/layer_12_width_65k_l0_medium_affine/params.safetensors",
+        "crosscoder/layer_5_9_12_15_width_65k_l0_medium/params.safetensors",
+        "clt/width_262k_l0_medium_affine/params.safetensors",
+    ]
+    info = SimpleNamespace(
+        sha="a" * 40,
+        siblings=[SimpleNamespace(rfilename=name) for name in names],
+    )
+    assets = discover_official_scope_assets(
+        "google/gemma-scope-2-270m-pt", info=info
+    )
+    assert len(assets) == 3
+    by_type = {asset.activation_family: asset for asset in assets}
+    assert by_type["transcoder"].affine_skip
+    assert by_type["transcoder"].layer == 12
+    assert by_type["crosscoder"].layers == (5, 9, 12, 15)
+    assert by_type["clt"].layer == -1
+    assert by_type["clt"].affine_skip
