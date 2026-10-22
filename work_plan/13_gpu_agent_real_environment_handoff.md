@@ -109,7 +109,7 @@ python scripts/wp12_p2_capture.py \
   --output /workspace/wp13/private/runs/LIVE-02-demo-01-L5.json
 ```
 
-Then add a small batch controller that loads a model/SAE/site once and loops through up to 10 approved short prompts. The existing CLI currently loads weights for every invocation, so repeating it 20 times is *not* the desired final implementation. Use `saebase.explore.capture_prompt_trace(pair=loaded_pair, ...)` and preserve exact prompt bytes and tokenizer SHA.
+Use the [10 original candidate prompt groups](13_demo_prompt_candidates.json) as the default fixed source text after a human reviews public-text rights; preserve its discovery/evaluation split and exact bytes. A selected feature is not guaranteed to have positive/negative held-out examples, so do not invent activation labels. Then add a small batch controller that loads a model/SAE/site once and loops through up to 10 approved short prompts. The existing CLI currently loads weights for every invocation, so repeating it 20 times is *not* the desired final implementation. Use `saebase.explore.capture_prompt_trace(pair=loaded_pair, ...)` and preserve exact prompt bytes and tokenizer SHA.
 
 Target: first 1 good trace and feature page, then 10 approved short texts × L5/L9 = **up to 20 traces**, within existing 32-trace limit. 6 distinct prompt groups for discovery, 4 for held-out or another predeclared disjoint arrangement. Content semantics must be observed, not invented. No random synthetic sparse activations in a public bundle.
 
