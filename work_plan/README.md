@@ -18,5 +18,6 @@ The new long-term master blueprint integrates the **50 functional capabilities o
 - [**12 — P0 source audit**](12_p0_source_inventory_20261021.md). Current code, Research Lab, CI/release and compatibility inventory; P0 gate remains open.
 - [**12 — GPU-00 runbook**](12_gpu00_p0_parity_execution.md). First bounded C1 real-model numerical parity test with environment preflight, exact model/SAE/site choices, operation definitions, tolerances, resource stop rules and immutable handoff outputs.
 - [**12 — GPU-00 frozen input pairs**](12_gpu00_prompt_pairs.json). Eight small original paired prompts, site list and tokenization acceptance policy.
+- [**12 — GPU-00 agent report and independent review**](12_gpu00_agent_report_20261022.md). Reports four passing legacy fp32 model/SAE sites, preserved failures and resource counts, while explicitly leaving raw-artifact verification, TL4 compatibility and overall P0 acceptance open.
 
 Work Plan 12 is a *planned expansion*, not a claim that all capabilities have been implemented, publicly deployed or tested on GPU. Follow older WP04–WP11 experimental protocols and accepted findings when implementing the new work.
