@@ -1,5 +1,14 @@
 # Engineering Plan Archive
 
+### Current execution directive: WP15
+
+**WP15 is the authoritative release-completion plan.** G1–G6 are mandatory working product workflows; do not defer G2–G6 merely because packages, upstream checkouts or local checkpoints are missing. GPU Agent must prepare compatible inputs and execute the real original tools; Integration Agent must show real recorded results in a usable Research Lab. WP14 SHIP/HIDE/DEFER was a historical receipt review, not the current completion mandate.
+
+- [**WP15 — Complete all six workflows and release**](15_complete_six_workflows_and_release.md). Concrete engineering decisions, native integrations, user journeys and practical acceptance.
+- [**WP15 — GPU Agent command handoff**](15_gpu_agent_completion_runbook.md). Version setup, repair routes, commands, genuine artifacts and frontend integration.
+- [**WP15 — Completion matrix**](15_release_completion_matrix.csv). One row per mandatory feature and the release candidate; missing dependency is not a terminal status.
+
+
 ## Work Plan 14 — Active release-first plan (takes precedence for launch)
 
 **Current priority: ship useful, working SAEBase features.** This supersedes WP12's full 50-feature certification and WP13's eleven-job completion list as **launch requirements**. Existing work plans and data remain historical references, not prerequisites. Optional missing capabilities should be hidden/deferred rather than block a usable release.
