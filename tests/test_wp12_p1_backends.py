@@ -219,7 +219,9 @@ def test_official_scope_manifest_is_not_a_fabricated_cartesian_product():
     assets = discover_official_scope_assets(repo, info=info)
     assert len(assets) == 3
     assert {(a.activation_family, a.layer) for a in assets} == {
-        ("resid_post", 5), ("mlp_out", 2), ("attn_out", 9)
+        ("resid_post", 5),
+        ("mlp_out", 2),
+        ("attn_out", 9),
     }
     residual = next(a for a in assets if a.activation_family == "resid_post")
     assert residual.width == "65k"
