@@ -7,7 +7,8 @@ Scope: Integrate, expose, validate, and maintain **all 50 named capabilities** d
 Execution companion: [GPU-agent handoff](12_gpu_agent_handoff_protocol.md)  
 Machine-readable ledger: [50-capability acceptance matrix](12_capability_acceptance_matrix.csv)  
 First step source audit: [WP12-00](12_p0_source_inventory_20261021.md)  
-First GPU test specification: [GPU-00 P0 parity](12_gpu00_p0_parity_execution.md) · [frozen prompt pairs](12_gpu00_prompt_pairs.json)
+First GPU test specification: [GPU-00 P0 parity](12_gpu00_p0_parity_execution.md) · [frozen prompt pairs](12_gpu00_prompt_pairs.json)  
+GPU agent's legacy-run outcome, **pending independent verification**: [GPU-00 reported results](12_gpu00_agent_report_20261022.md)
 
 > **Final outcome.** A researcher can bring a model, an existing or newly trained representation, and a prompt; explore features; perform genuine interventions; compare SAEs; trace candidate circuits; analyze SAR/RSS/Input Localization; and publish a provenance-linked, independently reproducible experiment. A visitor without a GPU can explore the same real saved evidence. **All 50 features stay in scope; we phase their implementation, not their existence.**
 
@@ -35,7 +36,7 @@ The current repository README documents model/SAE registration, cached activatio
 * Existing loader code [models/hooked_lm_common.py](../models/hooked_lm_common.py) calls legacy TransformerLens \`HookedTransformer\`, and current unconstrained dependencies in [pyproject.toml](../pyproject.toml) allow major-version drift. **TransformerLens 4.0 removed legacy \`Hooked*\` classes on 2026-09-21.** Audit and repair version compatibility first. For an exact frozen legacy environment, use a pinned supported prior version; provide a tested bridge adapter for the current interface. Do not silently switch weight-processing conventions.
 * Work Plan 11 describes execution on an RTX 5070 (~12 GiB). The user has also mentioned access to an RTX 5090 (32 GiB) for another workload. **Do not assume these are the same host or that either is available**. GPU agent must record the hardware actually allocated to each run.
 
-Everything in this plan marked “target” is **not** claimed to be implemented. WP12-00 has now completed an initial **source-only** inventory on branch `feat/wp12-p0-foundation`: 24 PARTIAL, 24 NOT_STARTED and 2 BLOCKED, pending independent review. No fresh CPU test, GPU parity or live deployment verification was done in that inventory, so the P0 gate is still **open**. The [GPU-00 runbook](12_gpu00_p0_parity_execution.md) gives the GPU agent a fixed C1 handoff without changing scientific results. New verified statuses require source-linked execution evidence and separate reviewer signoff.
+Everything in this plan marked “target” is **not** claimed to be implemented. WP12-00 has now completed an initial **source-only** inventory on branch `feat/wp12-p0-foundation`: 24 PARTIAL, 24 NOT_STARTED and 2 BLOCKED, pending independent review. No fresh CPU test, GPU parity or live deployment verification was done in that inventory, so the P0 gate is still **open**. The [GPU-00 runbook](12_gpu00_p0_parity_execution.md) gives the GPU agent a fixed C1 handoff without changing scientific results. New verified statuses require source-linked execution evidence and separate reviewer signoff. **Update after GPU-00:** an agent reports 4/4 site-level parity PASS for legacy TransformerLens 3.9 / SAELens 6.54 fp32 on Pythia-70M L3/L5 and Gemma-3-270M L5/L9. The raw evidence is not yet accessible to the independent reviewer, TransformerLens 4 was not tested, and P0 remains open. See [the dated report](12_gpu00_agent_report_20261022.md).
 
 ## 1. Upstream product study: match useful behavior, not branding
 
