@@ -2,6 +2,8 @@
 
 This file is an executable **handoff protocol**, not authorization to run expensive jobs. Read [master blueprint](12_unified_interpretability_master_blueprint.md) and [50-feature ledger](12_capability_acceptance_matrix.csv). Begin at P0; preserve historical Work Plans 01–11 and existing evidence.
 
+**Current first GPU task (GPU-00):** follow the [bounded P0 real-weight parity runbook](12_gpu00_p0_parity_execution.md) and its [eight fixed prompt pairs](12_gpu00_prompt_pairs.json). It uses two small models and two sites per model, with original native references, the preflight lock and raw output checks. Only C0 preflight and a bounded C1 smoke are authorized by this handoff; do not treat legacy backend parity as TL4 parity. The [P0 source audit](12_p0_source_inventory_20261021.md) still has unmet CPU/deployment gates.
+
 ## Assignment boundaries
 
 **Local strategy/CPU agent**
@@ -33,7 +35,7 @@ If only a single GPU is available, F50 real distributed training remains blocked
 
 | Job ID | Phase | Local CPU preparation | GPU run required | Stop / success |
 |---|---|---|---|---|
-| GPU-00 | P0 | Freeze dependency, registry, exact sites, token IDs, cache keys and C1 manifest | Two small-model sites × 8–16 prompts, baseline/no-op/patch/encode numerical smoke | Mismatch stops expansion. Required manifest and reference numbers |
+| GPU-00 | P0 | Follow [GPU-00 runbook](12_gpu00_p0_parity_execution.md): exact packages, registered A1/A2/B1/B2 sites, eight clean/corrupt groups, frozen per-model token IDs and C1 preflight | Four selected sites across two small models, 8 groups / 16 variants per model; genuine native-vs-SAEBase baseline/no-op/patch/encode/edit/cache measurements | Exact identity + source parity; mismatch stops expansion; preserve raw evidence and all failures |
 | GPU-01 | P1 | Implement validated TL4 bridge, NNsight adapter, Gemma Scope asset registration | Official small SAE load/encode/decode, native comparisons, patch clean/corrupt | No adapter promotion without exact hash/shape/tolerance check |
 | GPU-02 | P2 | Create real feature cards/search over existing archive | 8–32 custom prompts, target features/activations; limited interpretation evaluation | Search results match token-level sources; generated explanations have provenance |
 | GPU-03 | P3 | Typed InterventionSpec; visual before/after workflow | No-op, ablate, scale, compose, generation-step edit; compare full-prefix baseline | No unsupported equivalent silently substituted |
