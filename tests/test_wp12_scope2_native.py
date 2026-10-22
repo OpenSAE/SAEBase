@@ -90,3 +90,78 @@ def test_only_official_pinned_sources_allowed():
         _validate_source("google/gemma-scope-2-270m-pt", "main", "transcoder/foo")
     with pytest.raises(ValueError):
         _validate_source("google/gemma-scope-2-270m-pt", "a" * 40, "../../private")
+
+
+def test_p6_native_transcoder_circuit_intervention_changes_real_logits():
+    from torch import nn
+
+    from saebase.sae.scope2_native import ScopeIdentity
+    from saebase.store import sha256_state_dict
+    from saebase.wp12.circuit_intervene import execute_transcoder_node
+    from saebase.wp12.circuits import GraphNode, GraphEdge, GraphRecord
+
+    class TinyForward(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.in_layer = nn.Linear(2, 2, bias=False)
+            self.out_layer = nn.Linear(2, 2, bias=False)
+            self.readout = nn.Linear(2, 3, bias=False)
+            for layer in (self.in_layer, self.out_layer):
+                layer.weight.data.copy_(torch.eye(2))
+            self.readout.weight.data.copy_(torch.tensor([[1., 0.], [0., 1.], [1., 1.]]))
+
+        def forward(self, batch):
+            return self.readout(self.out_layer(self.in_layer(batch)))
+
+    model = TinyForward()
+    params = {
+        "w_enc": torch.eye(2),
+        "w_dec": torch.eye(2),
+        "b_enc": torch.zeros(2),
+        "b_dec": torch.zeros(2),
+        "threshold": torch.zeros(2),
+    }
+    native = JumpReLURepresentation(
+        params, config={"width": 2, "architecture": "jump_relu",
+                        "affine_connection": False}
+    )
+    source_sha = "b" * 64
+    info = ScopeIdentity(
+        repo_id="google/gemma-scope-2-270m-pt", revision="a" * 40,
+        asset_directory="transcoder/layer_0_width_2_l0_medium",
+        family="transcoder", kind="transcoder",
+        input_hook="in_layer.output", output_hook="out_layer.output",
+        source_sha256=source_sha, width=2, input_dim=2, output_dim=2,
+        affine_skip=False, source_model="synthetic-cpu-only",
+    )
+    graph = GraphRecord(
+        nodes=(
+            GraphNode("f0", "feature", 0, 0, 1, "feature 0"),
+            GraphNode("err", "error", 0, None, 1, "original error"),
+            GraphNode("logit", "logit", None, None, 1, "target"),
+        ),
+        edges=(
+            GraphEdge("f0", "logit", 0.7),
+            GraphEdge("err", "logit", -0.1),
+        ),
+        source_sha256="c" * 64, model_sha256=sha256_state_dict(model),
+        transcoder_sha256=source_sha, original_tool_commit="d" * 40,
+        source_format="synthetic-numerical-fixture",
+    )
+    prompt = torch.tensor([[[0.5, 0.0], [2.0, 3.0], [1.0, 1.0]]])
+    baseline = model(prompt).detach().clone()
+    outcome = execute_transcoder_node(
+        model, prompt, graph, "f0", native, info, new_code=0
+    )
+    assert outcome["executed"] is True
+    assert outcome["activation_delta_l2"] > 0
+    assert outcome["logit_delta_l2"] > 0
+    assert outcome["fired"] == {"input": 1, "output": 1}
+    assert torch.equal(model(prompt), baseline)
+    assert torch.allclose(outcome["edited_logits"] - outcome["baseline_logits"],
+                          torch.tensor([-2., 0., -2.]))
+    with pytest.raises(ValueError, match="checkpoint disagree"):
+        execute_transcoder_node(
+            model, prompt, graph, "f0", native,
+            ScopeIdentity(**{**info.__dict__, "source_sha256": "0" * 64})
+        )
