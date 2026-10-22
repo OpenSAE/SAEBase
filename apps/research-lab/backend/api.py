@@ -15,7 +15,7 @@ from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import core, published_wp12
+from . import core, published_wp12, wp15_records
 from .private_api import router as private_router
 from .feature_store import feature_store_count
 from . import explore
@@ -389,6 +389,15 @@ def wp12_record(category: str, record_id: str) -> dict[str, Any]:
     if record is None:
         raise HTTPException(404, "No approved real result with this identity")
     return record
+
+
+@app.get("/api/wp15/{name}")
+def wp15_record(name: str) -> dict[str, Any]:
+    """Recorded local measurements. Prompt text and explanations are not included."""
+    try:
+        return wp15_records.load_record(name)
+    except ValueError as exc:
+        raise HTTPException(404, str(exc)) from exc
 
 
 @app.get("/api/wp12-compute")

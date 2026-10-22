@@ -1,0 +1,20 @@
+{
+  "schema": "opensae.wp15.native_benchmark.v1",
+  "kind": "single_native_run",
+  "comparable": false,
+  "reason": "One original SAE was evaluated. This is not a matched multi-SAE comparison.",
+  "upstream_commit": "8042bb3828c6340da8d12062324e92b2077c571c",
+  "evidence_sha256": "de79361b70f61cb331d669b1afbcebe4b9acfdef66f9f4d57ddf0901d3d4896e",
+  "model_name": "pythia-70m-deduped",
+  "sae_release": "sae_bench_pythia70m_sweep_gated_ctx128_0730",
+  "sae_id": "blocks.3.hook_resid_post__trainer_5",
+  "dataset": "fancyzhx/ag_news",
+  "device": "cpu",
+  "metrics": {
+    "saebench.core.l0": 376.0,
+    "saebench.core.mse": 0.02498825453221798,
+    "saebench.sparse_probing.sae_top_1_test_accuracy": 0.59375
+  },
+  "public_prompt": false,
+  "rights_reviewed": false
+}

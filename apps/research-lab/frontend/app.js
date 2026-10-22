@@ -68,13 +68,13 @@
     document.title = (view === "overview" ? "OpenSAE" : view[0].toUpperCase() + view.slice(1) + " · OpenSAE") + " Research Lab";
     if (view === "results") loadResults(true);
     if (view === "explore") {
-      loadAssets(); loadFeatures(); loadRecordedTraces();
+      loadAssets(); loadFeatures(); loadRecordedTraces(); loadWp15Explanation();
       const params = new URLSearchParams(window.location.hash.split("?")[1] || "");
       const site = params.get("site");
       const index = params.get("feature");
       if (site && index && /^\\d+$/.test(index)) loadFeature(site, Number(index));
     }
-    if (view === "intervene") loadMeasuredInterventions();
+    if (view === "intervene") { loadMeasuredInterventions(); loadWp15Generation(); }
     if (view === "analyze") loadAnalyses();
     if (view === "datasets") loadDatasets();
     if (view === "reports") loadReports();
@@ -658,10 +658,91 @@
     URL.revokeObjectURL(link.href);
   }
 
+  async function loadWp15Benchmark() {
+    const panel = byId("wp15-benchmark");
+    if (!panel) return;
+    empty(panel, "Loading the recorded SAEBench run…", "");
+    try {
+      const record = await get("/api/wp15/benchmark");
+      clear(panel);
+      append(panel, "h2", "", "Recorded native SAEBench run");
+      append(panel, "p", "quiet", record.sae_release + " / " + record.sae_id +
+        " · " + record.dataset + " · evaluator " + record.upstream_commit.slice(0, 12) +
+        " · one SAE, so this is not a comparison");
+      const table = append(panel, "table");
+      const body = append(table, "tbody");
+      Object.keys(record.metrics).forEach(function (name) {
+        const row = append(body, "tr");
+        append(row, "td", "", name);
+        append(row, "td", "number", safeNumber(record.metrics[name]));
+      });
+    } catch (error) { errorMessage(panel, error); }
+  }
+  async function loadWp15Training() {
+    const panel = byId("wp15-training");
+    if (!panel) return;
+    empty(panel, "Loading the recorded training run…", "");
+    try {
+      const record = await get("/api/wp15/training");
+      clear(panel);
+      const row = append(panel, "div", "record");
+      append(row, "strong", "", record.backend + " · " + record.hookpoint + " · " + record.steps + " steps");
+      append(row, "p", "quiet", "Checkpoint " + record.checkpoint_sha256.slice(0, 16) +
+        "… · reloaded encode MSE " + safeNumber(record.reconstruction_mse) +
+        " · " + record.nonzero_codes + " nonzero codes · weights stay private");
+    } catch (error) { errorMessage(panel, error); }
+  }
+  async function loadWp15Generation() {
+    const panel = byId("wp15-generation");
+    if (!panel) return;
+    empty(panel, "Loading recorded generation effects…", "");
+    try {
+      const record = await get("/api/wp15/generation");
+      clear(panel);
+      append(panel, "p", "quiet", record.note);
+      record.samples.forEach(function (sample) {
+        const box = append(panel, "div", "record");
+        append(box, "strong", "", sample.sample_id + " · feature " + sample.feature_id +
+          " at position " + sample.feature_position);
+        append(box, "p", "quiet", "Prompt SHA256 " + sample.prompt_sha256.slice(0, 16) +
+          "… · activation " + safeNumber(sample.feature_activation));
+        const table = append(box, "table");
+        const head = append(append(table, "thead"), "tr");
+        ["Edit", "Same greedy text", "Step-0 max |Δ logit|", "P(clean argmax)", "Rank of clean argmax"].forEach(function (name) {
+          append(head, "th", "", name);
+        });
+        const body = append(table, "tbody");
+        sample.conditions.forEach(function (condition) {
+          const row = append(body, "tr");
+          append(row, "td", "", condition.name);
+          append(row, "td", "", condition.same_continuation ? "yes" : "no");
+          append(row, "td", "number", safeNumber(condition.step0_max_abs_logit_delta));
+          append(row, "td", "number", safeNumber(condition.edited_probability_of_clean_argmax));
+          append(row, "td", "", String(condition.clean_argmax_rank_after_edit));
+        });
+      });
+    } catch (error) { errorMessage(panel, error); }
+  }
+  async function loadWp15Explanation() {
+    const panel = byId("wp15-explanation");
+    if (!panel) return;
+    empty(panel, "Loading the unreviewed explanation diagnostic…", "");
+    try {
+      const record = await get("/api/wp15/explanation");
+      clear(panel);
+      const box = append(panel, "div", "record");
+      append(box, "strong", "", "Unreviewed local candidate · feature " + record.feature_id);
+      append(box, "p", "", "Held-out activation score " + safeNumber(record.heldout_score) +
+        " on " + record.heldout_n_positive + " active and " + record.heldout_n_negative +
+        " inactive examples. Approved: no. The written hypothesis is not shown.");
+      append(box, "p", "quiet", record.note);
+    } catch (error) { errorMessage(panel, error); }
+  }
   async function loadBenchmarks() {
     const target = byId("benchmark-list");
     empty(target, "Loading native comparisons…", "");
     try {
+      loadWp15Benchmark();
       const res = await get("/api/wp12/benchmarks");
       byId("benchmark-count").textContent = res.total + " reviewed native comparisons";
       clear(target);
@@ -737,6 +818,7 @@
     const target = byId("training-list");
     empty(target, "Loading training records…", "");
     try {
+      loadWp15Training();
       const res = await get("/api/wp12/training");
       if (!res.total) {
         empty(target, "No native training runs released",
@@ -753,10 +835,11 @@
   }
   function onTrainingExport(event) {
     event.preventDefault();
-    const revision = /^[0-9a-f]{40}$/;
-    if (!revision.test(value("training-model-revision")) ||
-        !revision.test(value("training-dataset-revision"))) {
-      return window.alert("Both source revisions must be exact 40-character lowercase SHAs.");
+    const modelRevision = /^[0-9a-f]{40}$/;
+    const datasetRevision = /^[0-9a-f]{40}([0-9a-f]{24})?$/;
+    if (!modelRevision.test(value("training-model-revision")) ||
+        !datasetRevision.test(value("training-dataset-revision"))) {
+      return window.alert("Model revision must be a 40-character git SHA. Dataset revision must be a 40-character git SHA or a 64-character data hash.");
     }
     const steps = Number(value("training-steps"));
     const width = Number(value("training-width"));
@@ -827,23 +910,33 @@
     try {
       const res = await get("/api/wp12/circuits");
       const selector = byId("circuit-select");
+      try {
+        const recorded = await get("/api/wp15/circuit");
+        const option = append(selector, "option", "",
+          "Gemma-2-2B recorded graph · " + recorded.graph.nodes.length + " nodes · " +
+          recorded.graph.edges.length + " edges");
+        option.value = "wp15-recorded";
+      } catch (error) { /* The recorded graph is optional until import finishes. */ }
       res.items.forEach(function (item) {
         const option = append(selector, "option", "",
           item.nodes + " nodes · " + item.edges + " edges · " + item.id.slice(0, 8));
         option.value = item.id;
       });
       state.circuitsLoaded = true;
-      byId("circuit-status").textContent = res.total ?
-        res.total + " reviewed native graphs available" :
+      byId("circuit-status").textContent = selector.options.length > 1 ?
+        "Recorded and reviewed graphs can be opened below." :
         "No native graphs approved for publication. You can inspect a typed local JSON file.";
     } catch (error) { byId("circuit-status").textContent = error.message; }
   }
   async function openCircuit() {
     const file = byId("circuit-upload").files[0];
     try {
+      const selected = value("circuit-select");
       const graph = file ?
         JSON.parse(await file.text()) :
-        await get("/api/wp12/circuits/" + encodeURIComponent(value("circuit-select")));
+        selected === "wp15-recorded" ?
+          (await get("/api/wp15/circuit")).graph :
+          await get("/api/wp12/circuits/" + encodeURIComponent(selected));
       state.circuitData = checkGraph(graph);
       state.circuitNotes = graph.annotations && typeof graph.annotations === "object" ?
         graph.annotations.notes || {} : {};

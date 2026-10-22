@@ -1,5 +1,6 @@
 # Local datasets, experiment runs, and model caches
 data/
+/upstream/
 experiment/
 *.safetensors
 *.pt

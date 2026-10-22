@@ -332,6 +332,11 @@ def run_native_circuit_tracer(
     slug: str,
     approved: bool = False,
     timeout_seconds: int = 1800,
+    offload: str | None = None,
+    dtype: str | None = None,
+    max_feature_nodes: int | None = None,
+    batch_size: int | None = None,
+    lazy_encoder: bool = False,
 ) -> dict:
     """Use original circuit-tracer CLI, without starting its web server."""
     if not approved:
@@ -370,6 +375,24 @@ def run_native_circuit_tracer(
         "--graph_output_path",
         str(raw),
     ]
+    if offload is not None:
+        if offload not in {"cpu", "disk"}:
+            raise ValueError("Official circuit-tracer offload is cpu or disk")
+        cmd.extend(["--offload", offload])
+    if dtype is not None:
+        if dtype not in {"float32", "bfloat16", "float16", "fp32", "bf16", "fp16"}:
+            raise ValueError("Official circuit-tracer dtype required")
+        cmd.extend(["--dtype", dtype])
+    if max_feature_nodes is not None:
+        if type(max_feature_nodes) is not int or not 1 <= max_feature_nodes <= 7500:
+            raise ValueError("Feature-node cap must stay inside the official limit")
+        cmd.extend(["--max_feature_nodes", str(max_feature_nodes)])
+    if batch_size is not None:
+        if type(batch_size) is not int or not 1 <= batch_size <= 256:
+            raise ValueError("Backward batch size must stay inside the official default range")
+        cmd.extend(["--batch_size", str(batch_size)])
+    if lazy_encoder:
+        cmd.append("--lazy-encoder")
     proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout_seconds, check=False)
     (output / "native.stdout.log").write_text(proc.stdout)
     (output / "native.stderr.log").write_text(proc.stderr)
