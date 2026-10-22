@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Bounded P1 real-checkpoint smoke, opt-in only; no benchmark expansion."""
+
 from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
 import json
 from pathlib import Path
-import sys
 
 import torch
 
@@ -41,18 +41,24 @@ def smoke(*, sae_key: str, layer: int, device: str) -> dict:
         if float(snapshot.codes[selected].abs().item()) <= 0:
             raise ValueError("no active SAE feature for this prompt")
         edited = evaluate_edit(
-            model, sae, site=site, tokens=tokens,
-            replacements={selected: 0.0}, verify_identity=True,
+            model,
+            sae,
+            site=site,
+            tokens=tokens,
+            replacements={selected: 0.0},
+            verify_identity=True,
         )
-        results.append({
-            "text_token_count": int(tokens.shape[1]),
-            "selected_feature": selected,
-            "code_nonzeros": int(torch.count_nonzero(snapshot.codes).item()),
-            "reconstruction_mse": float(
-                ((snapshot.activation.float() - snapshot.reconstruction.float()) ** 2).mean()
-            ),
-            "edited_logit_delta_l2": float(edited.logit_delta.float().norm().item()),
-        })
+        results.append(
+            {
+                "text_token_count": int(tokens.shape[1]),
+                "selected_feature": selected,
+                "code_nonzeros": int(torch.count_nonzero(snapshot.codes).item()),
+                "reconstruction_mse": float(
+                    ((snapshot.activation.float() - snapshot.reconstruction.float()) ** 2).mean()
+                ),
+                "edited_logit_delta_l2": float(edited.logit_delta.float().norm().item()),
+            }
+        )
     return {
         "schema": "opensae.wp12.p1.smoke.v1",
         "status": "small_real_smoke_pass",
@@ -84,10 +90,16 @@ def main(argv=None) -> int:
     result = smoke(sae_key=args.sae_key, layer=args.layer, device=args.device)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
-    print(json.dumps({
-        "status": result["status"], "engine": result["engine"],
-        "site": result["site"], "output": str(args.output),
-    }))
+    print(
+        json.dumps(
+            {
+                "status": result["status"],
+                "engine": result["engine"],
+                "site": result["site"],
+                "output": str(args.output),
+            }
+        )
+    )
     return 0
 
 
