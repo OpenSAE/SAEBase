@@ -16,6 +16,7 @@ from saebase.wp12.training import (
     TrainPlan,
     _sparsify_command,
     register_checkpoint,
+    resume_sparsify_training,
 )
 from saebase.wp12.circuits import (
     GraphNode,
@@ -106,7 +107,11 @@ def plan(tmp_path: Path, *, distributed: int = 1) -> TrainPlan:
 def test_p5_native_training_validation_checkpoint_without_gpu(tmp_path):
     p = plan(tmp_path)
     p.validate()
-    assert _sparsify_command(p)[:3] == [__import__("sys").executable, "-m", "sparsify"]
+    command = _sparsify_command(p)
+    assert command[:3] == [__import__("sys").executable, "-m", "sparsify"]
+    assert command[command.index("--num_latents") + 1] == str(p.d_sae)
+    assert command[command.index("--revision") + 1] == p.model_revision
+    assert "--resume" not in command
     with pytest.raises(PermissionError):
         plan(tmp_path, distributed=2).validate()
     plan(tmp_path, distributed=2).validate(allow_large=True)
@@ -123,6 +128,29 @@ def test_p5_native_training_validation_checkpoint_without_gpu(tmp_path):
     assert len(record["tensor_file_sha256"]) == 1
     with pytest.raises(FileExistsError):
         register_checkpoint(folder, output, source={"upstream_commit": "a" * 40})
+
+
+def test_p5_resume_is_not_confused_with_weight_finetuning(tmp_path):
+    from dataclasses import replace
+
+    basic = plan(tmp_path)
+    with pytest.raises(ValueError, match="steps × batch_size"):
+        replace(basic, max_examples=21).validate()
+    checkpoint = tmp_path / "run" / "checkpoints" / basic.run_name
+    checkpoint.mkdir(parents=True)
+    (checkpoint / "state.pt").write_bytes(b"synthetic metadata fixture")
+    resumed = replace(basic, resume_checkpoint=str(checkpoint))
+    resumed.validate()
+    command = _sparsify_command(resumed)
+    assert "--resume" in command and "--finetune" not in command
+    with pytest.raises(PermissionError):
+        resume_sparsify_training(resumed, output=tmp_path / "run", approved=False)
+    with pytest.raises(ValueError, match="new output cannot resume"):
+        # The normal native training route must not silently start a new
+        # optimizer from a published checkpoint when resume was requested.
+        from saebase.wp12.training import run_training
+
+        run_training(resumed, output=tmp_path / "fresh", approved=True)
 
 
 def graph() -> GraphRecord:
