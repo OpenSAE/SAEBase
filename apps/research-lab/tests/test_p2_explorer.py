@@ -3,6 +3,7 @@
 No fixture is shipped as a published feature, and no pretrained weight or
 network request is used in these regression tests.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -86,31 +87,43 @@ def test_exploration_rejects_unreviewed_and_misidentified_input(tmp_path, site):
     with pytest.raises(PermissionError):
         explore.publish_exploration(
             [{**item, "public_text_reviewed": False}],
-            [], output=tmp_path / "explore", public_consent=True,
+            [],
+            output=tmp_path / "explore",
+            public_consent=True,
         )
     with pytest.raises(ValueError, match="source site"):
         explore.publish_exploration(
             [{**item, "sae_sha256": "0" * 64}],
-            [], output=tmp_path / "explore", public_consent=True,
+            [],
+            output=tmp_path / "explore",
+            public_consent=True,
         )
     with pytest.raises(ValueError, match="complete nonzero"):
         explore.publish_exploration(
             [{**item, "complete_sparse_codes": False}],
-            [], output=tmp_path / "explore", public_consent=True,
+            [],
+            output=tmp_path / "explore",
+            public_consent=True,
         )
 
 
 def test_exploration_immutable_artifact_and_checksum(tmp_path, site):
     traces = [make_trace(site, i) for i in range(1, 5)]
     meta = explore.publish_exploration(
-        traces, [make_label(site)], output=tmp_path / "explore", public_consent=True,
+        traces,
+        [make_label(site)],
+        output=tmp_path / "explore",
+        public_consent=True,
     )
     assert meta["trace_count"] == 4
     assert meta["explanation_count"] == 1
     assert len(explore.published_exploration(tmp_path)["traces"]) == 4
     with pytest.raises(FileExistsError):
         explore.publish_exploration(
-            traces, [], output=tmp_path / "explore", public_consent=True,
+            traces,
+            [],
+            output=tmp_path / "explore",
+            public_consent=True,
         )
     file_path = tmp_path / "explore" / "records.json"
     file_path.write_text(file_path.read_text(encoding="utf-8") + " ")
@@ -123,29 +136,40 @@ def test_three_search_modes_and_independent_group_correlation(tmp_path, monkeypa
     obs = []
     for fid in (10, 11):
         for n in range(1, 5):
-            obs.append({
-                "site_id": site["site_id"], "model_sha256": site["model_sha256"],
-                "sae_sha256": site["sae_sha256"], "source_type": "real_checkpoint",
-                "feature_id": fid, "token_position": 1, "activation": float(n),
-                "sample_id": f"engineering:sample-{n}",
-                "prompt_group_id": f"engineering:group-{n}",
-                "token_text": "<script>danger</script>" if fid == 10 else "token",
-                "text_excerpt": "Safe example is visibly escaped <script>alert(1)</script>",
-                "public_text_reviewed": True,
-            })
+            obs.append(
+                {
+                    "site_id": site["site_id"],
+                    "model_sha256": site["model_sha256"],
+                    "sae_sha256": site["sae_sha256"],
+                    "source_type": "real_checkpoint",
+                    "feature_id": fid,
+                    "token_position": 1,
+                    "activation": float(n),
+                    "sample_id": f"engineering:sample-{n}",
+                    "prompt_group_id": f"engineering:group-{n}",
+                    "token_text": "<script>danger</script>" if fid == 10 else "token",
+                    "text_excerpt": "Safe example is visibly escaped <script>alert(1)</script>",
+                    "public_text_reviewed": True,
+                }
+            )
     create_feature_store(obs, root / "features")
     explore.publish_exploration(
         [make_trace(site, n) for n in range(1, 5)],
         [make_label(site)],
-        output=root / "explore", public_consent=True,
+        output=root / "explore",
+        public_consent=True,
     )
     monkeypatch.setenv("OPENSAE_LAB_DATA", str(root))
     listed = client.get("/api/features?q=:F10")
     assert listed.status_code == 200 and listed.json()["total"] == 1
     assert listed.json()["source"] == "verified_sqlite"
-    searched = client.post("/api/explore/search", json={
-        "mode": "explanation", "query": "numerical",
-    })
+    searched = client.post(
+        "/api/explore/search",
+        json={
+            "mode": "explanation",
+            "query": "numerical",
+        },
+    )
     assert searched.status_code == 200
     assert searched.json()["total"] == 1
     assert searched.json()["items"][0]["feature_id"] == 10
@@ -165,15 +189,24 @@ def test_three_search_modes_and_independent_group_correlation(tmp_path, monkeypa
     tid = summaries.json()["items"][0]["trace_id"]
     saved = client.get("/api/explore/traces/" + tid)
     assert saved.status_code == 200 and saved.json()["trace_id"] == tid
-    by_input = client.post("/api/explore/search", json={
-        "mode": "inference", "query": make_trace(site, 1)["prompt_text"],
-    })
+    by_input = client.post(
+        "/api/explore/search",
+        json={
+            "mode": "inference",
+            "query": make_trace(site, 1)["prompt_text"],
+        },
+    )
     assert by_input.status_code == 200
     assert by_input.json()["mode"] == "recorded_only"
     assert by_input.json()["items"][0]["max_features"][0]["feature_id"] == 11
-    by_token = client.post("/api/explore/search", json={
-        "mode": "token", "trace_id": tid, "position": 1,
-    })
+    by_token = client.post(
+        "/api/explore/search",
+        json={
+            "mode": "token",
+            "trace_id": tid,
+            "position": 1,
+        },
+    )
     assert by_token.status_code == 200
     assert len(by_token.json()["items"]) == 2
     assert by_token.json()["items"][0]["position"] == 1
@@ -182,42 +215,68 @@ def test_three_search_modes_and_independent_group_correlation(tmp_path, monkeypa
     assert rho.json()["n_groups"] == 4
     assert rho.json()["items"][0]["feature_id"] == 11
     assert rho.json()["items"][0]["pearson_r"] == pytest.approx(-1.0)
-    unseen = client.post("/api/explore/search", json={
-        "mode": "inference", "query": "A prompt never sent through a model.",
-    })
+    unseen = client.post(
+        "/api/explore/search",
+        json={
+            "mode": "inference",
+            "query": "A prompt never sent through a model.",
+        },
+    )
     assert unseen.status_code == 503
     assert client.get("/api/explore/traces/" + "0" * 64).status_code == 404
-    assert client.post("/api/explore/search", json={
-        "mode": "token", "trace_id": tid, "position": 10,
-    }).status_code == 422
+    assert (
+        client.post(
+            "/api/explore/search",
+            json={
+                "mode": "token",
+                "trace_id": tid,
+                "position": 10,
+            },
+        ).status_code
+        == 422
+    )
 
 
 def test_interpretation_budget_splits_and_provenance():
     calls = []
-    discovery = [{"group_id": "d", "text": "Positive discovery context",
-                  "activation": 3.5}]
+    discovery = [{"group_id": "d", "text": "Positive discovery context", "activation": 3.5}]
     heldout = [
         {"group_id": "e1", "text": "Positive heldout", "activation": 2},
         {"group_id": "e2", "text": "Negative heldout", "activation": 0},
     ]
+
     def generate(examples):
         calls.append(list(examples))
         return "A candidate about positive text"
+
     def predict(_description, text):
         return "Positive" in text
+
     with pytest.raises(PermissionError):
         propose_interpretation(
-            site_id="actual-site", feature_id=10, discovery=discovery,
-            heldout=heldout, generator=generate,
-            generator_model="external-opt-in", generator_method="example-conditioned",
-            authorized_budget_usd=0, estimated_cost_usd=1, predictor=predict,
+            site_id="actual-site",
+            feature_id=10,
+            discovery=discovery,
+            heldout=heldout,
+            generator=generate,
+            generator_model="external-opt-in",
+            generator_method="example-conditioned",
+            authorized_budget_usd=0,
+            estimated_cost_usd=1,
+            predictor=predict,
         )
     assert calls == []
     result = propose_interpretation(
-        site_id="actual-site", feature_id=10, discovery=discovery,
-        heldout=heldout, generator=generate, generator_model="external-opt-in",
-        generator_method="example-conditioned", authorized_budget_usd=1,
-        estimated_cost_usd=0.25, predictor=predict,
+        site_id="actual-site",
+        feature_id=10,
+        discovery=discovery,
+        heldout=heldout,
+        generator=generate,
+        generator_model="external-opt-in",
+        generator_method="example-conditioned",
+        authorized_budget_usd=1,
+        estimated_cost_usd=0.25,
+        predictor=predict,
     )
     assert len(calls) == 1
     assert result["status"] == "heldout_tested"
@@ -226,9 +285,13 @@ def test_interpretation_budget_splits_and_provenance():
     assert result["evaluation_kind"].endswith("_not_semantic_truth")
     with pytest.raises(ValueError, match="overlap"):
         propose_interpretation(
-            site_id="actual-site", feature_id=10, discovery=discovery,
+            site_id="actual-site",
+            feature_id=10,
+            discovery=discovery,
             heldout=[{**heldout[0], "group_id": "d"}],
-            generator=generate, generator_model="test",
-            generator_method="method", authorized_budget_usd=1,
+            generator=generate,
+            generator_model="test",
+            generator_method="method",
+            authorized_budget_usd=1,
             estimated_cost_usd=0,
         )
