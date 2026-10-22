@@ -78,6 +78,37 @@
         <div class="scroller"><table><thead><tr><th>Model</th><th>Layer / Hook</th><th>SAE identifier</th><th>Width</th><th>L0</th><th>Source</th></tr></thead><tbody id="asset-table"></tbody></table></div>
         <div class="panel-footer"><span id="asset-count">Registered checkpoints are not automatically live GPU models.</span></div>
       </div>
+      <div class="panel explore-tools">
+        <div class="panel-title">
+          <h2>Find features</h2>
+          <span class="subtle">Real observations · explicit computation status</span>
+        </div>
+        <div class="explore-tabs" role="group" aria-label="Feature search methods">
+          <button class="explore-tab selected" type="button" data-explore-mode="explanation" aria-pressed="true">Search explanations</button>
+          <button class="explore-tab" type="button" data-explore-mode="inference" aria-pressed="false">Search by prompt</button>
+          <button class="explore-tab" type="button" data-explore-mode="token" aria-pressed="false">Top features by token</button>
+        </div>
+        <div class="explore-mode-panel" id="explore-mode-explanation">
+          <div class="filters">
+            <label>Concept or phrase <input id="explanation-query" placeholder="Search approved feature interpretations" autocomplete="off"></label>
+            <button type="button" class="btn secondary" id="explanation-search">Find explanations</button>
+          </div>
+          <p class="quiet">Explanations are hypotheses. Results appear only when reviewed descriptions have been published.</p>
+        </div>
+        <div class="explore-mode-panel" id="explore-mode-inference" hidden>
+          <label class="prompt-label">Prompt text<textarea id="inference-prompt" rows="3" maxlength="16000" placeholder="Enter text from a previously published trace; new GPU inference is offline"></textarea></label>
+          <button type="button" class="btn secondary" id="inference-search">Find existing calculation</button>
+          <p class="quiet">This public CPU Lab only retrieves an exact saved prompt. To compute a new prompt, use the bounded local Python capture workflow.</p>
+        </div>
+        <div class="explore-mode-panel" id="explore-mode-token" hidden>
+          <div class="filters">
+            <label>Recorded prompt <select id="trace-select"><option value="">Choose a reviewed, published trace</option></select></label>
+          </div>
+          <div id="token-strip" class="token-strip" aria-label="Recorded tokens"></div>
+          <p class="quiet">Click a real recorded token to inspect its highest-activation SAE features.</p>
+        </div>
+        <div id="explore-search-results" class="explore-search-results" aria-live="polite"></div>
+      </div>
       <div class="filters">
         <label>Search <input id="feature-query" placeholder="Feature ID, label, or model" autocomplete="off"></label>
         <label>Model <input id="feature-model" placeholder="All published models" autocomplete="off"></label>

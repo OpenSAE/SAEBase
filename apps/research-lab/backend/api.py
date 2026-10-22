@@ -11,12 +11,13 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from . import core
 from .feature_store import feature_store_count
+from . import explore
 
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "frontend"
@@ -161,29 +162,128 @@ def features(
     limit: int = Query(36, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ) -> dict[str, Any]:
+    """Search the immutable SQLite feature store, or the legacy compact index."""
     try:
-        rows = core.feature_index()
-    except core.InvalidEvidence as e:
-        _bad_evidence(e)
-    lookup = q.casefold()
-    rows = [
-        r
-        for r in rows
-        if (not model or model.casefold() in r.get("model", "").casefold())
-        and (not site_id or r.get("site_id") == site_id)
-        and (
-            not lookup
-            or lookup
-            in (
-                str(r.get("feature_id", ""))
-                + " "
-                + str(r.get("label", ""))
-                + " "
-                + r.get("site_id", "")
-            ).casefold()
+        return explore.feature_search(
+            query=q, model=model, site_id=site_id, limit=limit, offset=offset,
         )
-    ]
-    return _page(rows, limit, offset)
+    except core.InvalidEvidence as exc:
+        _bad_evidence(exc)
+
+
+@app.get("/api/explore/features/{site_id}/{feature_id}")
+def feature_details(site_id: str, feature_id: int) -> dict[str, Any]:
+    try:
+        card = explore.feature_details(site_id, feature_id)
+    except core.InvalidEvidence as exc:
+        _bad_evidence(exc)
+    if card is None:
+        raise HTTPException(404, "No published feature for this exact SAE/site/index")
+    return card
+
+
+@app.get("/api/explore/features/{site_id}/{feature_id}/export.html")
+def feature_export(site_id: str, feature_id: int) -> HTMLResponse:
+    try:
+        card = explore.feature_details(site_id, feature_id)
+    except core.InvalidEvidence as exc:
+        _bad_evidence(exc)
+    if card is None:
+        raise HTTPException(404, "No published feature to export")
+    return HTMLResponse(
+        explore.feature_html(card),
+        headers={
+            "Content-Disposition": f'attachment; filename="opensae-feature-{feature_id}.html"',
+            "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'",
+        },
+    )
+
+
+@app.get("/api/explore/features/{site_id}/{feature_id}/correlations")
+def feature_correlations(
+    site_id: str, feature_id: int, limit: int = Query(10, ge=1, le=40)
+) -> dict[str, Any]:
+    try:
+        if site_id not in {s["site_id"] for s in site_cache()} or feature_id < 0:
+            raise HTTPException(404, "Unknown exact feature site")
+        return explore.correlations(site_id, feature_id, limit=limit)
+    except core.InvalidEvidence as exc:
+        _bad_evidence(exc)
+
+
+@app.get("/api/explore/traces")
+def explore_traces(site_id: str = "") -> dict[str, Any]:
+    try:
+        traces = explore.recorded_traces(site_id=site_id)
+    except core.InvalidEvidence as exc:
+        _bad_evidence(exc)
+    return {"total": len(traces), "items": traces, "mode": "recorded_only"}
+
+
+@app.get("/api/explore/traces/{trace_id}")
+def explore_trace(trace_id: str) -> dict[str, Any]:
+    try:
+        trace = explore.recorded_trace(trace_id)
+    except core.InvalidEvidence as exc:
+        _bad_evidence(exc)
+    if trace is None:
+        raise HTTPException(404, "No publicly reviewed trace with that identity")
+    return trace
+
+
+class ExploreSearch(BaseModel):
+    mode: str
+    query: str = Field(default="", max_length=16000)
+    site_id: str = Field(default="", max_length=280)
+    trace_id: str = Field(default="", max_length=64)
+    position: int | None = Field(default=None, ge=0, le=127)
+    limit: int = Field(default=20, ge=1, le=100)
+
+
+@app.post("/api/explore/search")
+def explore_search(request: ExploreSearch) -> dict[str, Any]:
+    """Separate explanation search, recorded input lookup and per-token TopK.
+
+    An arbitrary new prompt is NEVER run on a CPU-only public HF Space.
+    Put text in the JSON body, not a browser URL or access log.
+    """
+    try:
+        if request.mode == "explanation":
+            if not request.query.strip():
+                raise HTTPException(422, "Enter an explanation search term")
+            return explore.feature_search(
+                mode="explanation", query=request.query[:200],
+                site_id=request.site_id, limit=request.limit,
+            )
+        if request.mode == "inference":
+            matches = explore.recorded_inference(
+                request.query, site_id=request.site_id,
+            )
+            if not matches:
+                raise HTTPException(
+                    503, "No exact reviewed recorded prompt matches this input. "
+                    "Live inference requires an authorized local/GPU worker.",
+                )
+            return {"mode": "recorded_only", "total": len(matches),
+                    "items": matches[:request.limit]}
+        if request.mode == "token":
+            trace = explore.recorded_trace(request.trace_id)
+            if trace is None:
+                raise HTTPException(404, "Select a published recorded prompt")
+            if request.position is None:
+                raise HTTPException(422, "A token position is required")
+            return {
+                "mode": "recorded_token_topk", "trace_id": trace["trace_id"],
+                "site_id": trace["site_id"], "position": request.position,
+                "items": explore.strongest_features(
+                    trace, token_position=request.position, top_k=request.limit,
+                ),
+            }
+        raise HTTPException(422, "Unknown search mode")
+    except core.InvalidEvidence as exc:
+        _bad_evidence(exc)
+    except (ValueError, IndexError) as exc:
+        raise HTTPException(422, str(exc)) from exc
 
 
 @app.get("/api/analyses")
@@ -267,11 +367,52 @@ def preflight(request: InterventionSpec) -> dict[str, Any]:
 
 @app.get("/api/sae-assets")
 def sae_assets(model_key: str = "") -> dict[str, Any]:
-    """Browse registered Gemma Scope 2 metadata; never download model weights."""
-    from saebase.sae.catalog import registered_catalog_json
+    """Browse actual SAE registry locally, historical sites in CPU-only Docker.
 
+    The public CPU image intentionally does NOT install torch/SAELens. Thus a
+    fallback is derived only from real frozen verified site records. Unknown
+    width/L0 values stay null; no checkpoint weight is loaded or invented.
+    """
+    try:
+        from saebase.sae.catalog import registered_catalog_json
+    except (ImportError, ModuleNotFoundError):
+        known_sources = {
+            "gemma270m": "google/gemma-scope-2-270m-pt",
+            "gemma1b": "google/gemma-scope-2-1b-pt",
+            "gemma3_4b_pt": "google/gemma-scope-2-4b-pt",
+            "gemma3_4b_it": "google/gemma-scope-2-4b-it",
+        }
+        try:
+            sites = site_cache()
+        except core.InvalidEvidence as exc:
+            _bad_evidence(exc)
+        items = [
+            {
+                "model_key": site["model"],
+                "repo_id": known_sources[site["model"]],
+                "revision": None,
+                "source": "historical_verified_sites",
+                "sae_id": site["sae"] + ":L" + str(site["layer"]),
+                "layer": site["layer"],
+                "hook": site["hook"],
+                "width": None,
+                "l0_variant": None,
+                "loader": "sae_lens",
+                "registered_profile": site["sae"],
+                "status": "registered_not_live_verified",
+            }
+            for site in sites
+            if site["model"] in known_sources
+            and "scope" in site["sae"]
+            and (not model_key or site["model"] == model_key)
+        ]
+        return {
+            "total": len(items), "items": items,
+            "mode": "registered_metadata_only", "source": "historical_verified_sites",
+        }
     items = registered_catalog_json(model_key=model_key or None)
-    return {"total": len(items), "items": items, "mode": "registered_metadata_only"}
+    return {"total": len(items), "items": items, "mode": "registered_metadata_only",
+            "source": "saebase_python_registry"}
 
 
 @app.post("/api/jobs")

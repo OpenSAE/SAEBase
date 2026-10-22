@@ -182,7 +182,7 @@ No timeline is a promise: estimate calendar only after P0 inventory, upstream en
 
 **Scale:** **C0 for most features; C1 for live prompt lookup; C2 only to fill audited gaps.** Avoid computing dense all-feature × all-token displays. Store sparse top indices and paginated feature records; never assume absent from sample means globally dead.
 
-**Gate P2:** ten authentic demonstrations; user finds a feature via all three routes; tokens and scores match exact raw artifacts; exports open offline; explanations can be traced to generating model/data and are visibly hypotheses; feature index remains responsive on large dictionaries.
+**P2 development checkpoint:** ship source-bound feature detail/search, per-token recorded prompt exploration, explanation hypotheses with disjoint held-out scoring, backed feature index and standalone export with routine offline tests. The [P2 implementation](12_p2_feature_explorer.md) supplies these source routes. Do not block P3–P7 on obtaining ten public GPU feature examples. Ten authentic user examples, real new-prompt inference, large-dictionary scalability, exact native metric comparisons and independent final evidence remain P8 gates.
 
 ### P3 — real interventions, generation and composability
 

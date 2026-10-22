@@ -4,7 +4,7 @@
 */
 "use strict";
 (function () {
-  const state = { sites: [], datasets: [], assets: [], assetsLoaded: false, current: "overview", resultOffset: 0, resultTotal: 0 };
+  const state = { sites: [], datasets: [], assets: [], assetsLoaded: false, tracesLoaded: false, activeTrace: null, searchMode: "explanation", current: "overview", resultOffset: 0, resultTotal: 0 };
   const byId = function (id) { return document.getElementById(id); };
   const create = function (tag, cls, text) {
     const element = document.createElement(tag);
@@ -66,7 +66,13 @@
     });
     document.title = (view === "overview" ? "OpenSAE" : view[0].toUpperCase() + view.slice(1) + " · OpenSAE") + " Research Lab";
     if (view === "results") loadResults(true);
-    if (view === "explore") { loadAssets(); loadFeatures(); }
+    if (view === "explore") {
+      loadAssets(); loadFeatures(); loadRecordedTraces();
+      const params = new URLSearchParams(window.location.hash.split("?")[1] || "");
+      const site = params.get("site");
+      const index = params.get("feature");
+      if (site && index && /^\\d+$/.test(index)) loadFeature(site, Number(index));
+    }
     if (view === "analyze") loadAnalyses();
     if (view === "datasets") loadDatasets();
     if (view === "reports") loadReports();
@@ -190,9 +196,142 @@
       append(tr, "td", "", "Asset registry unavailable: " + error.message).colSpan = 6;
     }
   }
+  async function postExplore(request) {
+    const response = await fetch("/api/explore/search", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      cache: "no-store", body: JSON.stringify(request)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(typeof data.detail === "string" ? data.detail : "Search failed");
+    return data;
+  }
+  function setSearchMode(mode) {
+    state.searchMode = mode;
+    document.querySelectorAll("[data-explore-mode]").forEach(function (tab) {
+      const selected = tab.dataset.exploreMode === mode;
+      tab.classList.toggle("selected", selected);
+      tab.setAttribute("aria-pressed", String(selected));
+    });
+    ["explanation", "inference", "token"].forEach(function (key) {
+      byId("explore-mode-" + key).hidden = key !== mode;
+    });
+    clear(byId("explore-search-results"));
+  }
+  function featureLink(parent, title, siteId, featureId) {
+    const link = append(parent, "a", "", title);
+    link.href = "#explore?site=" + encodeURIComponent(siteId) + "&feature=" + featureId;
+    link.addEventListener("click", function () {
+      if (window.location.hash === link.getAttribute("href")) loadFeature(siteId, featureId);
+    });
+    return link;
+  }
+  function showRankedFeatures(parent, items, siteId) {
+    if (!items.length) {
+      empty(parent, "No observed active features", "This recorded token has no nonzero SAE codes.");
+      return;
+    }
+    const list = append(parent, "div", "ranked-features");
+    items.forEach(function (row, rank) {
+      const card = append(list, "div", "ranked-row");
+      append(card, "span", "token-rank", String(rank + 1));
+      featureLink(card, "Feature " + row.feature_id, siteId, row.feature_id);
+      append(card, "span", "number", safeNumber(row.activation));
+      append(card, "span", "quiet", "Token " + row.position);
+    });
+  }
+  async function searchExplanations() {
+    const target = byId("explore-search-results");
+    empty(target, "Searching published explanations…", "");
+    try {
+      const response = await postExplore({
+        mode: "explanation", query: value("explanation-query"), limit: 40
+      });
+      clear(target);
+      if (!response.total) {
+        empty(target, "No reviewed explanations match", "There are no published descriptions for this query.");
+        return;
+      }
+      const list = append(target, "div", "explanation-results");
+      response.items.forEach(function (entry) {
+        const item = append(list, "div", "record");
+        featureLink(item, entry.site_id + " · Feature " + entry.feature_id, entry.site_id, entry.feature_id);
+        append(item, "p", "", entry.description);
+        append(item, "span", "quiet", entry.origin + " · " + entry.status +
+          " · " + entry.author_or_model + (entry.heldout_score == null ?
+            "" : " · Held-out score " + safeNumber(entry.heldout_score)));
+      });
+    } catch (error) { errorMessage(target, error); }
+  }
+  async function searchRecordedInference() {
+    const target = byId("explore-search-results");
+    empty(target, "Looking for an exact recorded input…", "");
+    try {
+      const response = await postExplore({
+        mode: "inference", query: value("inference-prompt"), limit: 10
+      });
+      clear(target);
+      response.items.forEach(function (record) {
+        const part = append(target, "div", "record");
+        append(part, "h3", "", record.site_id + " · recorded computation");
+        showRankedFeatures(part, record.max_features, record.site_id);
+      });
+    } catch (error) { errorMessage(target, error); }
+  }
+  async function loadRecordedTraces() {
+    if (state.tracesLoaded) return;
+    const strip = byId("token-strip");
+    empty(strip, "Checking saved prompts…", "");
+    try {
+      const collection = await get("/api/explore/traces");
+      const selector = byId("trace-select");
+      collection.items.forEach(function (trace) {
+        const option = append(selector, "option", "",
+          trace.site_id + " · " + trace.sample_id + " · " + trace.token_count + " tokens");
+        option.value = trace.trace_id;
+      });
+      state.tracesLoaded = true;
+      if (!collection.items.length) {
+        empty(strip, "No public recorded token traces", "A local GPU or CPU worker can export real traces for review before publication.");
+      } else clear(strip);
+    } catch (error) { errorMessage(strip, error); }
+  }
+  async function selectRecordedTrace() {
+    const id = value("trace-select");
+    const strip = byId("token-strip");
+    if (!id) { empty(strip, "Select a recorded prompt", "No computation is started."); return; }
+    try {
+      const trace = await get("/api/explore/traces/" + encodeURIComponent(id));
+      state.activeTrace = trace;
+      clear(strip);
+      trace.tokens.forEach(function (token) {
+        const button = append(strip, "button", "token-button", token.text || "(empty token)");
+        button.type = "button";
+        button.title = "Token " + token.position + " · id " + token.token_id;
+        button.addEventListener("click", function () { showTokenFeatures(trace, token.position); });
+      });
+      showTokenFeatures(trace, trace.tokens.length - 1);
+    } catch (error) { errorMessage(strip, error); }
+  }
+  async function showTokenFeatures(trace, position) {
+    const target = byId("explore-search-results");
+    clear(target);
+    try {
+      const response = await postExplore({
+        mode: "token", trace_id: trace.trace_id, position: position, limit: 30
+      });
+      const token = trace.tokens[position];
+      append(target, "h3", "", "Token " + position + " · " + (token.text || "(empty token)"));
+      append(target, "p", "quiet", "Recorded nonzero SAE codes · " + trace.site_id +
+        " · " + trace.prompt_group_id + " · not live inference");
+      showRankedFeatures(target, response.items, response.site_id);
+      byId("token-strip").querySelectorAll("button").forEach(function (button, i) {
+        button.classList.toggle("selected", i === position);
+      });
+    } catch (error) { errorMessage(target, error); }
+  }
   async function loadFeatures() {
     const target = byId("feature-list");
-    empty(target, "Loading observations…", "");
+    empty(target, "Loading published feature cards…", "");
     const query = new URLSearchParams({
       q: value("feature-query"), model: value("feature-model"), limit: "48"
     });
@@ -200,39 +339,81 @@
       const data = await get("/api/features?" + query.toString());
       clear(target);
       if (!data.total) {
-        empty(target, "Feature measurements not yet released",
-          "The index builder is ready for genuine checkpoint activations. No invented feature cards are shown before collection.");
-        byId("feature-detail").hidden = true;
+        empty(target, "Feature measurements not yet published",
+          "The SQLite/index pipeline accepts real verified observations. No synthetic card is displayed as a measurement.");
         return;
       }
       data.items.forEach(function (feature) {
-        const button = append(target, "button", "feature-card");
-        button.type = "button";
-        append(button, "span", "kicker", feature.model + " · L" + feature.layer);
-        append(button, "h3", "", "Feature " + feature.feature_id);
-        append(button, "p", "", feature.label || "No verified natural-language explanation");
-        append(button, "span", "count", feature.unique_prompt_groups + " observed prompt groups");
-        button.addEventListener("click", function () { showFeature(feature); });
+        const card = append(target, "div", "feature-card");
+        append(card, "span", "kicker", feature.model + " · L" + feature.layer);
+        const title = append(card, "h3");
+        featureLink(title, "Feature " + feature.feature_id, feature.site_id, feature.feature_id);
+        append(card, "p", "", feature.label || "No approved explanation");
+        append(card, "span", "count", feature.unique_prompt_groups + " recorded prompt groups");
       });
     } catch (error) { errorMessage(target, error); }
   }
-  function showFeature(feature) {
+  async function loadFeature(siteId, featureId) {
     const panel = byId("feature-detail");
     panel.hidden = false;
     clear(panel);
-    append(panel, "span", "kicker", feature.site_id);
-    append(panel, "h2", "", "Feature " + feature.feature_id);
-    append(panel, "p", "quiet", "Exact model and SAE identities are recorded in the verified site matrix.");
-    append(panel, "p", "", "Observed groups: " + feature.unique_prompt_groups + " · Nonzero observations: " + feature.observations + " · Maximum recorded activation: " + safeNumber(feature.max_activation));
-    append(panel, "h3", "", "Source-approved activation examples");
-    if (!feature.examples || !feature.examples.length) {
-      append(panel, "p", "", "No examples have been approved for public text display.");
-    } else feature.examples.forEach(function (example) {
-      const sample = append(panel, "div", "example");
-      append(sample, "strong", "", "Token " + example.token_position + " · " + example.token_text + " · activation " + safeNumber(example.activation));
-      append(sample, "p", "longtext", example.text_excerpt || "Text not included in public record.");
-    });
-    panel.scrollIntoView({ behavior:"smooth",block:"nearest" });
+    append(panel, "p", "quiet", "Loading source-bound feature…");
+    try {
+      const data = await get("/api/explore/features/" + encodeURIComponent(siteId) + "/" + featureId);
+      clear(panel);
+      append(panel, "span", "kicker", data.site.model + " · L" + data.site.layer + " · " + data.site.sae);
+      append(panel, "h2", "", "Feature " + data.feature_id);
+      const nav = append(panel, "div", "feature-navigation");
+      if (data.previous_feature_id != null) featureLink(nav, "← Previous", siteId, data.previous_feature_id);
+      if (data.next_feature_id != null) featureLink(nav, "Next →", siteId, data.next_feature_id);
+      const download = append(nav, "a", "", "Export offline HTML ↗");
+      download.href = "/api/explore/features/" + encodeURIComponent(siteId) + "/" +
+        featureId + "/export.html";
+      download.setAttribute("download", "opensae-feature-" + featureId + ".html");
+      append(panel, "p", "quiet", "Exact site " + data.site.site_id +
+        " · " + data.site.hook + " · evidence is recorded, not live");
+      append(panel, "p", "", "Observed feature occurrences: " + data.observations +
+        " · independent prompt groups: " + data.unique_prompt_groups +
+        " · highest recorded activation: " + safeNumber(data.max_activation));
+      const labels = append(panel, "div", "feature-explanations");
+      append(labels, "h3", "", "Published interpretations");
+      if (!(data.explanations || []).length) {
+        append(labels, "p", "quiet", "No approved explanation. Feature activations are observations, not semantic labels.");
+      } else (data.explanations || []).forEach(function (entry) {
+        const item = append(labels, "div", "example");
+        append(item, "p", "", entry.description);
+        append(item, "span", "quiet", entry.origin + " · " + entry.method +
+          " · " + entry.status + " · " + entry.author_or_model);
+        if (entry.heldout_score != null)
+          append(item, "p", "quiet", "Held-out activation prediction score " +
+            safeNumber(entry.heldout_score) + " · not ground-truth semantic accuracy");
+      });
+      append(panel, "h3", "", "Highest reviewed activation contexts");
+      const examples = data.examples || [];
+      if (!examples.length) append(panel, "p", "quiet", "No text approved for public display.");
+      examples.forEach(function (ex) {
+        const item = append(panel, "div", "example");
+        append(item, "strong", "", ex.token_text + " · activation " + safeNumber(ex.activation));
+        append(item, "p", "longtext", ex.text_excerpt || "Original context not publicly available.");
+      });
+      if (examples.length) append(panel, "p", "quiet",
+        "The displayed values are selected reviewed examples, not a corpus-wide activation histogram or density estimate.");
+      const corr = append(panel, "div", "feature-correlations");
+      append(corr, "h3", "", "Correlations across recorded prompt groups");
+      append(corr, "p", "quiet", "Loading the actual complete-code group comparison…");
+      try {
+        const scores = await get("/api/explore/features/" + encodeURIComponent(siteId) +
+          "/" + featureId + "/correlations");
+        clear(corr);
+        append(corr, "h3", "", "Correlations across recorded prompt groups");
+        append(corr, "p", "quiet", scores.note || "Complete sparse-code source");
+        (scores.items || []).forEach(function (value) {
+          const row = append(corr, "div", "correlation-row");
+          featureLink(row, "Feature " + value.feature_id, siteId, value.feature_id);
+          append(row, "span", "number", "Pearson r = " + safeNumber(value.pearson_r));
+        });
+      } catch (error) { append(corr, "p", "quiet", "Correlation unavailable: " + error.message); }
+    } catch (error) { errorMessage(panel, error); }
   }
   async function loadDatasets() {
     const target = byId("dataset-list");
@@ -374,6 +555,13 @@
   byId("asset-refresh").addEventListener("click",renderAssets);
   byId("asset-model").addEventListener("change",renderAssets);
   byId("feature-query").addEventListener("keydown",function(e){if(e.key==="Enter")loadFeatures();});
+  document.querySelectorAll("[data-explore-mode]").forEach(function (button) {
+    button.addEventListener("click", function () { setSearchMode(button.dataset.exploreMode); });
+  });
+  byId("explanation-search").addEventListener("click",searchExplanations);
+  byId("explanation-query").addEventListener("keydown",function(e){if(e.key==="Enter")searchExplanations();});
+  byId("inference-search").addEventListener("click",searchRecordedInference);
+  byId("trace-select").addEventListener("change",selectRecordedTrace);
   byId("intervention-form").addEventListener("submit",onPreflight);
   window.addEventListener("hashchange",activate);
   bootstrap();
