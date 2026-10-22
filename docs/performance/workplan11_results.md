@@ -41,6 +41,6 @@ Dynamic `vllm` at `gpu_memory_utilization=0.50` applies the requested residual d
 
 Static taps at 0.50 fail before a forward: the static buffer budget is 0 bytes after weights, graphs, and KV (8 MiB requested). At 0.70 the static forward runs. Its own edit max abs is 0.03125, and the HF gaps match the dynamic run, including the support mismatch. Neither backend is a scientific default.
 
-## Stop rule for this hardware and these workloads
+## Outcome of this experiment
 
-The edit-forward reuse that clears 1.15x on the defined Qwen intervention workload is implemented, parity-checked, and opt-in. Clean-prefix KV and vLLM SAE capture were run on the real checkpoint and rejected for the frozen bar. No remaining untried change on this machine has a measured Amdahl bound above 1.15x that is still scientifically equivalent: the leftover time is the model forward itself, and the two ways of skipping it change the numbers. No new stable release is cut here.
+Suffix replay passed the 1.15× speed threshold with unchanged metrics for this Qwen workload. The clean-prefix KV and vLLM capture tests did not meet the numerical threshold used here. Later measurements of KV-cached generation are reported in [the follow-up results](workplan11_final_results.md).

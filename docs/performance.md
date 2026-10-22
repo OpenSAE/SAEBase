@@ -1,9 +1,9 @@
 # SAEBase performance and reliability
 
-SAEBase optimizes its evaluation execution while keeping scientific identities,
-SAE estimators, feature operations and results unchanged.
+SAEBase reduces repeated computation during feature evaluation and supports
+generation with KV caching.
 
-## Implemented in this branch
+## Execution optimizations
 
 - Cached activation encoding now coalesces uncached records within a bounded
   reader batch into one SAE invocation, splitting codes back by their exact
@@ -12,8 +12,7 @@ SAE estimators, feature operations and results unchanged.
   capable of capturing original residual activations and applying per-row
   patches. Only right-padded causal inputs with valid patch/readout positions
   are accepted.
-- The intervention engine uses this new optional batch API when present,
-  while preserving the legacy single-sample fallback for other adapters.
+- Hugging Face batch execution is optional; single-sample forwards remain the default.
 - OOM microbatch reduction is retained for subsequent patch chunks instead
   of retrying the original unsafe size repeatedly.
 - A deterministic offline encoding microbenchmark and CPU batch-parity tests
