@@ -18,6 +18,7 @@ VALID_STATES = {
     "TO_AUDIT",
     "NOT_STARTED",
     "PARTIAL",
+    "PASS",
     "BLOCKED",
     "CPU_VERIFIED",
     "GPU_VERIFIED",
@@ -40,6 +41,11 @@ FIELDS = {
     "artifact_link",
     "reviewer",
     "blocking_reason",
+    "core_grade",
+    "core_criterion",
+    "core_test",
+    "remaining_core_work",
+    "p8_status",
 }
 
 
@@ -58,6 +64,21 @@ def audit_ledger(path: Path) -> dict[str, Any]:
         if status not in VALID_STATES:
             raise ValueError(f"Invalid state for F{row['id']}")
         counts[status] += 1
+        grade = row["core_grade"]
+        if not row["core_criterion"].strip() or not row["core_test"].strip():
+            raise ValueError(f"F{row['id']} missing core acceptance criterion/test")
+        if status == "PASS" and (grade != "3/3" or row["remaining_core_work"].strip()):
+            raise ValueError(f"F{row['id']} cannot be core PASS with incomplete work")
+        if status == "PARTIAL" and (
+            grade not in {"0/3", "1/3", "2/3"} or not row["remaining_core_work"].strip()
+        ):
+            raise ValueError(f"F{row['id']} needs a graded specific core gap")
+        if status == "BLOCKED" and not row["remaining_core_work"].strip():
+            raise ValueError(f"F{row['id']} needs an exact external dependency")
+        if row["p8_status"] not in {"PENDING", "VERIFIED"}:
+            raise ValueError(f"F{row['id']} invalid independent P8 status")
+        if row["p8_status"] == "VERIFIED" and status != "RELEASED":
+            raise ValueError("P8 VERIFIED requires distinct final RELEASED state")
         if status in {"CPU_VERIFIED", "GPU_VERIFIED", "RELEASED"}:
             needs = ["verified_scope", "cpu_evidence", "reviewer", "artifact_link"]
             if status in {"GPU_VERIFIED", "RELEASED"} and "C0" not in row["compute_tier"]:
@@ -70,12 +91,24 @@ def audit_ledger(path: Path) -> dict[str, Any]:
         if status not in {"CPU_VERIFIED", "GPU_VERIFIED", "RELEASED"}:
             missing.append({"id": row["id"], "reason": "not_finally_verified", "status": status})
     released = counts["RELEASED"]
-    complete = released == 50 and not missing
+    complete = (
+        released == 50 and not missing
+        and all(row["p8_status"] == "VERIFIED" for row in rows)
+    )
     return {
         "schema": "opensae.wp12.p8.acceptance.v1",
         "ledger_sha256": hashlib.sha256(content).hexdigest(),
         "capabilities": len(rows),
         "status_counts": counts,
+        "core_pass_count": counts["PASS"] + counts["RELEASED"],
+        "core_partial_count": counts["PARTIAL"],
+        "core_blocked_count": counts["BLOCKED"],
+        "core_gaps": [
+            {"id": row["id"], "grade": row["core_grade"],
+             "missing": row["remaining_core_work"]}
+            for row in rows if row["current_status"] in {"PARTIAL", "BLOCKED"}
+        ],
+        "p8_pending_count": sum(row["p8_status"] == "PENDING" for row in rows),
         "release_ready": complete,
         "missing": missing,
         "external_user_tests": "not_inferred_from_ledger",
@@ -174,6 +207,8 @@ def render_progress(report: dict[str, Any]) -> str:
         "",
         f"Ledger SHA256: \`{report['ledger_sha256']}\`",
         f"Release ready: **{'YES' if report['release_ready'] else 'NO'}**",
+        f"Core behavior implemented: **{report['core_pass_count']}/50**",
+        f"P8 independent signoff pending: **{report['p8_pending_count']}/50**",
         "",
         "| Status | Count |",
         "| --- | ---: |",
