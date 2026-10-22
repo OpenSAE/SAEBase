@@ -140,6 +140,8 @@ The repository is organized by use: `saebase/` for the research API and engines,
 
 [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md) · [Citation](CITATION.cff) · [Apache-2.0 License](LICENSE) · [Security](SECURITY.md)
 
+---
+
 <p align="center">
   <b>From learned features to testable explanations.</b><br>
   <a href="https://github.com/OpenSAE">OpenSAE</a> · <a href="https://github.com/OpenSAE/SAEBase/issues">Issues</a>
