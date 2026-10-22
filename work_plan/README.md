@@ -1,5 +1,14 @@
 # Engineering Plan Archive
 
+## Work Plan 14 — Active release-first plan (takes precedence for launch)
+
+**Current priority: ship useful, working SAEBase features.** This supersedes WP12's full 50-feature certification and WP13's eleven-job completion list as **launch requirements**. Existing work plans and data remain historical references, not prerequisites. Optional missing capabilities should be hidden/deferred rather than block a usable release.
+
+- [**14 — Ship-first release plan**](14_ship_first_release_plan.md). Required real Feature Explorer → Prompt/Token → Feature → measured Intervention, working Python quick start, polished public CPU Lab, staged deploy/restart, GO/GO_WITH_CUT criteria.
+- [**14 — GPU Agent release handoff**](14_gpu_agent_release_handoff.md). Bounded G1–G6 genuine smoke runs, exact feature-specific SHIP/FIX_ONCE/HIDE/DEFER reports, existing GPU asset reuse and no raw archive transfers.
+- [**14 — Release scope**](14_release_scope.csv). Launch-required, optional and explicitly cut features with a user-visible minimum demo and owner.
+
+
 This folder holds plans and execution records used while building SAEBase. Start with the [project README](../README.md) and [documentation](../docs/index.md) for current installation and research tasks.
 
 - Early plans: model/SAE acceptance, GPU coverage and Research Lab rollout.
