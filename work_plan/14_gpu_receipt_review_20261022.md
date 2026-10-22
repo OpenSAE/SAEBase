@@ -1,5 +1,8 @@
 # WP14 GPU Receipt Review — Product Decision
 
+> **Historical receipt review only. Current release instruction is [WP15](15_complete_six_workflows_and_release.md).** The observed GPU numbers remain valid as reported, but the previous product decision to hide/defer G2–G6 has been replaced by a directive to complete them.
+
+
 Date: 2026-10-22  
 Original execution source: `5aa054dd491d7c1c63204aa2ee7e5292cdd5ac38`  
 GPU: RTX 5070  
