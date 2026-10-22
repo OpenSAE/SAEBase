@@ -1,4 +1,4 @@
-"""P4 native SAEBench custom SAE worker; uses original upstream run_evals.
+"""P4 bounded custom-SAE evaluations using original SAEBench Core/Sparse Probing.
 
 Supports actually loaded registered SAE objects, not hand-made metric
 emulation. A bounded subprocess is mandatory before any native suite.
@@ -44,8 +44,10 @@ def native_worker(
     sys.path.insert(0, str(upstream.resolve()))
     from sae_bench.custom_saes.run_all_evals_custom_saes import (  # type: ignore[import-not-found]
         MODEL_CONFIGS,
-        run_evals,
     )
+    import sae_bench.evals.core.main as native_core
+    import sae_bench.evals.sparse_probing.main as native_sparse
+    from sae_bench.evals.sparse_probing.eval_config import SparseProbingEvalConfig
 
     if model_name not in MODEL_CONFIGS:
         raise ValueError("Original native custom SAE runner does not support this model")
@@ -68,19 +70,52 @@ def native_worker(
         raise ValueError("Native custom SAE must expose W_dec")
     source_sha = sha256_state_dict(sae)
     selected = [(f"opensae_custom_{sae_key}_L{layer}", sae)]
-    # run_evals is from the ORIGINAL pinned SAEBench source, not copied math.
-    run_evals(
-        model_name=model_name,
-        selected_saes=selected,
-        llm_batch_size=MODEL_CONFIGS[model_name]["batch_size"],
-        llm_dtype=llm_dtype,
-        device=device,
-        eval_types=[eval_type],
-        api_key=None,
-        force_rerun=True,
-        save_activations=False,
-    )
-    paths = sorted(Path("eval_results").rglob("*.json"))
+    # Invoke original published evaluators directly with predeclared C1
+    # micro-budgets. The generic upstream run_evals() defaults to hundreds or
+    # thousands of batches and must NOT be mistaken for a bounded pilot.
+    result_root = Path("eval_results") / eval_type
+    result_root.mkdir(parents=True, exist_ok=False)
+    if eval_type == "core":
+        native_core.multiple_evals(
+            selected_saes=selected,
+            n_eval_reconstruction_batches=1,
+            n_eval_sparsity_variance_batches=1,
+            eval_batch_size_prompts=2,
+            compute_featurewise_density_statistics=True,
+            compute_featurewise_weight_based_metrics=True,
+            exclude_special_tokens_from_reconstruction=False,
+            dataset="fancyzhx/ag_news",
+            context_size=32,
+            output_folder=str(result_root),
+            device=device,
+            dtype=llm_dtype,
+            force_rerun=True,
+        )
+    else:
+        sparse_cfg = SparseProbingEvalConfig(
+            model_name=model_name,
+            dataset_names=["fancyzhx/ag_news"],
+            random_seed=44,
+            probe_train_set_size=64,
+            probe_test_set_size=32,
+            context_length=32,
+            sae_batch_size=64,
+            llm_batch_size=4,
+            llm_dtype=llm_dtype,
+            k_values=[1],
+            lower_vram_usage=True,
+        )
+        native_sparse.run_eval(
+            sparse_cfg,
+            selected,
+            device,
+            str(result_root),
+            force_rerun=True,
+            clean_up_activations=True,
+            save_activations=False,
+            artifacts_path=str(Path("temporary")),
+        )
+    paths = sorted(result_root.rglob("*.json"))
     if not paths or len(paths) > 100:
         raise RuntimeError("Native runner returned without actual result JSON files")
     return {
@@ -89,6 +124,9 @@ def native_worker(
         "source_sae": sae_key,
         "sae_state_sha256": source_sha,
         "eval_type": eval_type,
+        "protocol_scope": "C1_pilot_not_full_native_default",
+        "frozen_dataset": "fancyzhx/ag_news",
+        "context_size": 32,
         "source_hook": meta["hook_name"],
         "native_output_files": [
             {"path": str(x), "sha256": hashlib.sha256(x.read_bytes()).hexdigest()} for x in paths
