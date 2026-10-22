@@ -75,11 +75,11 @@ from saebase.api import NNsightLocal, TraceLocation
 
 module = torch.nn.Sequential(torch.nn.Linear(3, 4), torch.nn.ReLU())
 trace = NNsightLocal.from_torch(module)
-result = trace.capture(torch.zeros(1, 3), TraceLocation("model[0]"))
+result = trace.capture(torch.zeros(1, 3), TraceLocation("[0]"))
 print(result.shape)
 ```
 
-The exact module path for NNsight depends on the wrapper's module tree and
+NNsight paths are relative to the wrapped root (so `[0]` denotes the first module of a Sequential model). The exact module path depends on the wrapper's tree and
 model class. Pick it from the native model (do not guess architecture names).
 For gradients, choose the loss output at a module reached later in the forward
 pass. Native NNsight enforces trace order. `TraceLocation` does not accept
