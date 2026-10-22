@@ -31,6 +31,7 @@ class ScopeAsset:
     loader: str
     registered_profile: str | None
     status: str
+    activation_family: str = "resid_post"
 
 
 def _parts(sae_id: str) -> tuple[int | None, str | None, str | None]:
@@ -103,41 +104,57 @@ def discover_official_scope_assets(
     siblings = getattr(info, "siblings", None)
     if siblings is None:
         raise ValueError("HF asset listing has no file manifest")
+    # Scope 2 publishes several hook families. P1 enumerates SAE families
+    # only; transcoders, crosscoders and CLTs need typed P6 loaders.
+    sae_families = {"resid_post", "attn_out", "mlp_out"}
     by_key: dict[tuple[int, str, str, str], ScopeAsset] = {}
     for sibling in siblings:
         filename = getattr(sibling, "rfilename", None)
         if not isinstance(filename, str):
             continue
-        for part in filename.split("/"):
+        path_parts = filename.split("/")
+        kind = path_parts[0]
+        family = kind.removesuffix("_all")
+        if family not in sae_families:
+            continue
+        for idx, part in enumerate(path_parts):
             layer, width, l0 = _parts(part)
             if layer is None or width is None or l0 is None:
-                continue
-            # The file's path must identify the feature family. Only actual
-            # published directories are listed; no cross-product is invented.
-            kind = filename.split("/")[0] if "/" in filename else "unspecified"
-            match = [a for a in valid if a.layer == layer]
-            if not match:
                 continue
             key = (layer, width, l0, kind)
             if key in by_key:
                 continue
-            exemplar = match[0]
-            sae_id = "/".join(filename.split("/")[: filename.split("/").index(part) + 1])
+            # The entry came from an actual published path; do not generate
+            # combinations absent from the manifest, even at new layers.
+            identifier = "/".join(path_parts[: idx + 1])
+            match = [
+                a
+                for a in valid
+                if a.layer == layer and a.sae_id in {part, identifier}
+                and family == "resid_post"
+            ]
+            exemplar = valid[0]
+            # The official attention/MLP extraction location differs from
+            # the residual hook, so those sites require an explicit mapping.
+            hook = (
+                f"blocks.{layer}.hook_resid_post"
+                if family == "resid_post"
+                else "requires_native_site_mapping"
+            )
             by_key[key] = ScopeAsset(
                 model_key=exemplar.model_key,
                 repo_id=repo_id,
                 revision=sha,
                 source="official_file_manifest",
-                sae_id=sae_id,
+                sae_id=identifier,
                 layer=layer,
-                hook=exemplar.hook,
+                hook=hook,
                 width=width,
                 l0_variant=l0,
                 loader=exemplar.loader,
-                registered_profile=next(
-                    (a.registered_profile for a in match if a.sae_id == sae_id), None
-                ),
-                status="official_manifest_unloaded",
+                registered_profile=match[0].registered_profile if match else None,
+                status="official_manifest_unloaded" if match else "official_manifest_unmapped",
+                activation_family=family,
             )
     return sorted(by_key.values(), key=lambda a: (a.layer, a.width or "", a.l0_variant or ""))
 
