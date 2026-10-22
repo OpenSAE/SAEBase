@@ -23,7 +23,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.output.exists():
         parser.error("Refusing to overwrite an existing capture")
-    prompt = args.prompt_file.read_text(encoding="utf-8").strip()
+    prompt = args.prompt_file.read_text(encoding="utf-8")
+    if not prompt.strip():
+        parser.error("Prompt file contains no non-whitespace text")
     row = capture_prompt_trace(
         sae_key=args.sae_key,
         layer=args.layer,
