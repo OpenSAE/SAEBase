@@ -3,6 +3,8 @@
 Date: 2026-10-22
 Read first: [WP13 operating plan](13_real_environment_integration_and_deployment.md).
 Machine-readable queue: [13_live_execution_matrix.csv](13_live_execution_matrix.csv).
+
+**2026-10-22 actual GPU Agent progress:** LIVE-00/01/02 have reported PASS_WORKING on an RTX 5070, code SHA `903d837`; LIVE-02 computed 20 complete Gemma L5/L9 traces and locally indexed 5,804 features with zero approved excerpts. **Do not rerun these GPU tasks.** Start with the [tiny metadata-only handoff and local publish instructions](13_live02_small_handoff_and_publication.md), then LIVE-03 based on a measured content-token feature. Public release is a separate operator approval. Existing raw traces stay on the GPU host.
 Inherited implementation: [WP12 core assessment](12_core_function_assessment.md) and [PR #53](https://github.com/OpenSAE/SAEBase/pull/53).
 
 **One instruction:** execute the specified original model/backend operation and make the **result actually usable in OpenSAE**. The objective is not a second GPU-00 audit, a 48-site benchmark, or 50 standalone folders stamped “PASS”. Start with LIVE-00 and the first functioning Prompt→SAE Feature→Intervention user journey. Do not run all rows blindly.
