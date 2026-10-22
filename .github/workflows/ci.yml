@@ -78,7 +78,10 @@ jobs:
       - name: Verify Research Lab CPU APIs and browser scripts
         run: |
           python -m pip install -r apps/research-lab/requirements.txt httpx
-          python -m pytest -q apps/research-lab/tests/test_platform.py
+          python -m pytest -q \
+            apps/research-lab/tests/test_platform.py \
+            apps/research-lab/tests/test_p2_explorer.py \
+            apps/research-lab/tests/test_wp13_bundle.py
           node --check apps/research-lab/frontend/app.js
 
   analysis-install:
