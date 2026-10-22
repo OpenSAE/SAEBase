@@ -319,6 +319,49 @@ def query_feature_store(
     return {"items": rows, "total": total, "limit": limit, "offset": offset}
 
 
+
+def feature_by_id(site_id: str, feature_id: int, *, root: Path | None = None) -> dict[str, Any] | None:
+    """Exact feature lookup, linked previous/next, and public examples from SQLite.
+
+    None is also returned if SQLite is not installed; callers may then fall
+    back to the compact index. No query materializes the entire dictionary.
+    """
+    path = _verified_store(root)
+    if path is None:
+        return None
+    if not isinstance(site_id, str) or type(feature_id) is not int or feature_id < 0:
+        return None
+    connection = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+    connection.row_factory = sqlite3.Row
+    try:
+        connection.execute("PRAGMA query_only = ON")
+        found = connection.execute(
+            "SELECT * FROM features WHERE site_id=? AND feature_id=?",
+            (site_id, feature_id),
+        ).fetchone()
+        if found is None:
+            return None
+        row = dict(found)
+        row["examples"] = [
+            dict(item) for item in connection.execute(
+                """SELECT sample_id,token_position,activation,prompt_group_id,
+                token_text,text_excerpt FROM examples WHERE feature_key=?
+                ORDER BY activation DESC,sample_id,token_position LIMIT ?""",
+                (row["feature_key"], MAX_EXAMPLES),
+            )
+        ]
+        row["previous_feature_id"] = connection.execute(
+            "SELECT MAX(feature_id) FROM features WHERE site_id=? AND feature_id<?",
+            (site_id, feature_id),
+        ).fetchone()[0]
+        row["next_feature_id"] = connection.execute(
+            "SELECT MIN(feature_id) FROM features WHERE site_id=? AND feature_id>?",
+            (site_id, feature_id),
+        ).fetchone()[0]
+        return row
+    finally:
+        connection.close()
+
 def _escape_like(value: str) -> str:
     return value.replace("!", "!!").replace("%", "!%").replace("_", "!_")
 
