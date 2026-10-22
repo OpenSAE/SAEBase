@@ -1,0 +1,220 @@
+{
+  "observed_nonzero_codes": 16788,
+  "privacy": "No prompt text, raw codes or model weights included.",
+  "public_release": false,
+  "reviewed_excerpt_count": 0,
+  "schema": "opensae.wp13.small_gpu_handoff.v1",
+  "sites": {
+    "gemma270m:gemma270m_scope_resid:L5": 10,
+    "gemma270m:gemma270m_scope_resid:L9": 10
+  },
+  "source": "real_local_sae_traces_not_independently_certified",
+  "split_counts": {
+    "discovery": 12,
+    "evaluation": 8
+  },
+  "token_count": 240,
+  "trace_count": 20,
+  "traces": [
+    {
+      "nonzero_codes": 779,
+      "private_file_sha256": "8cc47f641e1225a06e14606f77c284521e9b9b7eb5f8f8810ed5cefe5272fbe4",
+      "prompt_group_id": "WP13-DEMO-01",
+      "prompt_sha256": "8034d10b659c951e60f5abc774a8d44b7d777c1f27fa4b44a35c0d9ef4f29ef2",
+      "sample_id": "WP13-DEMO-01",
+      "site_id": "gemma270m:gemma270m_scope_resid:L5",
+      "split": "discovery",
+      "token_count": 12
+    },
+    {
+      "nonzero_codes": 890,
+      "private_file_sha256": "4ab68b65ae17769e0bb02eafcde50a803d959c476f5c96d350d46791be2260ba",
+      "prompt_group_id": "WP13-DEMO-01",
+      "prompt_sha256": "8034d10b659c951e60f5abc774a8d44b7d777c1f27fa4b44a35c0d9ef4f29ef2",
+      "sample_id": "WP13-DEMO-01",
+      "site_id": "gemma270m:gemma270m_scope_resid:L9",
+      "split": "discovery",
+      "token_count": 12
+    },
+    {
+      "nonzero_codes": 779,
+      "private_file_sha256": "0bdeedd6d4bd49f938f4f2ddf18c28918172796d74ce3bfe5f76f2dddd0868f8",
+      "prompt_group_id": "WP13-DEMO-02",
+      "prompt_sha256": "aeb42a41a57a226e61fd3cdb18461ad8fe5c1d4b33a2c3ee6d88a1e17b3fad7c",
+      "sample_id": "WP13-DEMO-02",
+      "site_id": "gemma270m:gemma270m_scope_resid:L5",
+      "split": "discovery",
+      "token_count": 12
+    },
+    {
+      "nonzero_codes": 1002,
+      "private_file_sha256": "813f4073509469e3b2409ebd4d22b147c9c0ad8f983fc596be44fc158593a19f",
+      "prompt_group_id": "WP13-DEMO-02",
+      "prompt_sha256": "aeb42a41a57a226e61fd3cdb18461ad8fe5c1d4b33a2c3ee6d88a1e17b3fad7c",
+      "sample_id": "WP13-DEMO-02",
+      "site_id": "gemma270m:gemma270m_scope_resid:L9",
+      "split": "discovery",
+      "token_count": 12
+    },
+    {
+      "nonzero_codes": 931,
+      "private_file_sha256": "eab65cc61b1a376dd80e9b801f919f022817a2d11443d9ed5f390f971831b1f3",
+      "prompt_group_id": "WP13-DEMO-03",
+      "prompt_sha256": "d830ebdaf0340f9e6372843e1910c4b655b4d6f9c142c84ef27b2e4b30eff48f",
+      "sample_id": "WP13-DEMO-03",
+      "site_id": "gemma270m:gemma270m_scope_resid:L5",
+      "split": "discovery",
+      "token_count": 15
+    },
+    {
+      "nonzero_codes": 1098,
+      "private_file_sha256": "47371737caff64fe0989afd56b1783365e6810af7578a2c03aadc21133bb32b6",
+      "prompt_group_id": "WP13-DEMO-03",
+      "prompt_sha256": "d830ebdaf0340f9e6372843e1910c4b655b4d6f9c142c84ef27b2e4b30eff48f",
+      "sample_id": "WP13-DEMO-03",
+      "site_id": "gemma270m:gemma270m_scope_resid:L9",
+      "split": "discovery",
+      "token_count": 15
+    },
+    {
+      "nonzero_codes": 673,
+      "private_file_sha256": "31da9976983106c7594398aa4838d3f679693fc3ff6160a1dcae43bc356c1f9d",
+      "prompt_group_id": "WP13-DEMO-04",
+      "prompt_sha256": "ee82a8f72bad31024446959633ec3aca3d8abddb841326e8642a5f963ebd3f5f",
+      "sample_id": "WP13-DEMO-04",
+      "site_id": "gemma270m:gemma270m_scope_resid:L5",
+      "split": "discovery",
+      "token_count": 10
+    },
+    {
+      "nonzero_codes": 677,
+      "private_file_sha256": "72e13e00f95f47e80e6debe06629b4886ba41288b338ed955fbc69822d50e55b",
+      "prompt_group_id": "WP13-DEMO-04",
+      "prompt_sha256": "ee82a8f72bad31024446959633ec3aca3d8abddb841326e8642a5f963ebd3f5f",
+      "sample_id": "WP13-DEMO-04",
+      "site_id": "gemma270m:gemma270m_scope_resid:L9",
+      "split": "discovery",
+      "token_count": 10
+    },
+    {
+      "nonzero_codes": 771,
+      "private_file_sha256": "37e9be41fc54de1c2b22bf2c117f600efbdd527f07309ae99b0a903313537444",
+      "prompt_group_id": "WP13-DEMO-05",
+      "prompt_sha256": "565a4e1aa6d6411211419976c712e4fef45e9c2b3f5c87bd3e71a8ed9256fbd6",
+      "sample_id": "WP13-DEMO-05",
+      "site_id": "gemma270m:gemma270m_scope_resid:L5",
+      "split": "discovery",
+      "token_count": 12
+    },
+    {
+      "nonzero_codes": 902,
+      "private_file_sha256": "789dcec733c8d69fbe48b82533550295360c3c42fce1ed3f4f4a8cc0bef262e0",
+      "prompt_group_id": "WP13-DEMO-05",
+      "prompt_sha256": "565a4e1aa6d6411211419976c712e4fef45e9c2b3f5c87bd3e71a8ed9256fbd6",
+      "sample_id": "WP13-DEMO-05",
+      "site_id": "gemma270m:gemma270m_scope_resid:L9",
+      "split": "discovery",
+      "token_count": 12
+    },
+    {
+      "nonzero_codes": 740,
+      "private_file_sha256": "683a28c78d8a8a2ba178ea9b7e92a2b8d58e6886d446c5a90b5c5ba81930513c",
+      "prompt_group_id": "WP13-DEMO-06",
+      "prompt_sha256": "1bff97af5e98dece4ed18511ce2682052eba455ab29464ef31414817977649b2",
+      "sample_id": "WP13-DEMO-06",
+      "site_id": "gemma270m:gemma270m_scope_resid:L5",
+      "split": "discovery",
+      "token_count": 11
+    },
+    {
+      "nonzero_codes": 793,
+      "private_file_sha256": "3745a02a09d19ac24d9360e513e29f56c7b39b955b219894c89c3d7a092a0168",
+      "prompt_group_id": "WP13-DEMO-06",
+      "prompt_sha256": "1bff97af5e98dece4ed18511ce2682052eba455ab29464ef31414817977649b2",
+      "sample_id": "WP13-DEMO-06",
+      "site_id": "gemma270m:gemma270m_scope_resid:L9",
+      "split": "discovery",
+      "token_count": 11
+    },
+    {
+      "nonzero_codes": 845,
+      "private_file_sha256": "d754e7822e7b7e099dd88abb8b8f6b12463971e6486c51431798ef518a46914e",
+      "prompt_group_id": "WP13-DEMO-07",
+      "prompt_sha256": "3e32360b0514144c72c2eedecd7154674c2f841d7c3fe71758f6ee116f382e7e",
+      "sample_id": "WP13-DEMO-07",
+      "site_id": "gemma270m:gemma270m_scope_resid:L5",
+      "split": "evaluation",
+      "token_count": 12
+    },
+    {
+      "nonzero_codes": 891,
+      "private_file_sha256": "ef98c2e5ea8f10003524b54102fdffd9a57e1cac8a1b7188d0c57c59ba308fbd",
+      "prompt_group_id": "WP13-DEMO-07",
+      "prompt_sha256": "3e32360b0514144c72c2eedecd7154674c2f841d7c3fe71758f6ee116f382e7e",
+      "sample_id": "WP13-DEMO-07",
+      "site_id": "gemma270m:gemma270m_scope_resid:L9",
+      "split": "evaluation",
+      "token_count": 12
+    },
+    {
+      "nonzero_codes": 815,
+      "private_file_sha256": "99ffe2dca3abd7670551759c989aabafa3506c6c4707a4e71afda3db819ecd1b",
+      "prompt_group_id": "WP13-DEMO-08",
+      "prompt_sha256": "da4b4de9f6ddc8718523d109b2896128b6366c53ba6b2a900a0081d5adcda333",
+      "sample_id": "WP13-DEMO-08",
+      "site_id": "gemma270m:gemma270m_scope_resid:L5",
+      "split": "evaluation",
+      "token_count": 13
+    },
+    {
+      "nonzero_codes": 977,
+      "private_file_sha256": "ee6d08c346123c2b3d48dea3c0853f83db55f7b9c61565b4a5367021494d0888",
+      "prompt_group_id": "WP13-DEMO-08",
+      "prompt_sha256": "da4b4de9f6ddc8718523d109b2896128b6366c53ba6b2a900a0081d5adcda333",
+      "sample_id": "WP13-DEMO-08",
+      "site_id": "gemma270m:gemma270m_scope_resid:L9",
+      "split": "evaluation",
+      "token_count": 13
+    },
+    {
+      "nonzero_codes": 716,
+      "private_file_sha256": "ad7ee8b6bae5de5b650c56dbbe1b0045bee0e9c4f229b484b8e26c6bf15036b0",
+      "prompt_group_id": "WP13-DEMO-09",
+      "prompt_sha256": "ef973b0436ef027a5eaf13c397c51254d6f7f26d11a7eab434294fb88ee737b4",
+      "sample_id": "WP13-DEMO-09",
+      "site_id": "gemma270m:gemma270m_scope_resid:L5",
+      "split": "evaluation",
+      "token_count": 11
+    },
+    {
+      "nonzero_codes": 871,
+      "private_file_sha256": "248152921e7d7441bf7b57038511f109cb223863cd91324b9efbe0f57421705d",
+      "prompt_group_id": "WP13-DEMO-09",
+      "prompt_sha256": "ef973b0436ef027a5eaf13c397c51254d6f7f26d11a7eab434294fb88ee737b4",
+      "sample_id": "WP13-DEMO-09",
+      "site_id": "gemma270m:gemma270m_scope_resid:L9",
+      "split": "evaluation",
+      "token_count": 11
+    },
+    {
+      "nonzero_codes": 772,
+      "private_file_sha256": "a0d628468b2789ae1468cf1bea83811805f0455f4706d2f4dd2f108cd66857f2",
+      "prompt_group_id": "WP13-DEMO-10",
+      "prompt_sha256": "2401c7df3ba9bddbccfc0801e742d56636a309ce3d3b0b53cdf63d4b144a1720",
+      "sample_id": "WP13-DEMO-10",
+      "site_id": "gemma270m:gemma270m_scope_resid:L5",
+      "split": "evaluation",
+      "token_count": 12
+    },
+    {
+      "nonzero_codes": 866,
+      "private_file_sha256": "7aa7a1083ecfeb2dcbc8f0fea3c89b161003fe301e302dce0269239ed20ee221",
+      "prompt_group_id": "WP13-DEMO-10",
+      "prompt_sha256": "2401c7df3ba9bddbccfc0801e742d56636a309ce3d3b0b53cdf63d4b144a1720",
+      "sample_id": "WP13-DEMO-10",
+      "site_id": "gemma270m:gemma270m_scope_resid:L9",
+      "split": "evaluation",
+      "token_count": 12
+    }
+  ]
+}
