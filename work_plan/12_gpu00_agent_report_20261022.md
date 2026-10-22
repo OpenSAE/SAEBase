@@ -9,6 +9,27 @@ Agent-reported summary: `summary.md` inside that run directory.
 
 This document records an **unreviewed claim**, not accepted experimental evidence. The external GPU machine's `/workspace` directory is not mounted in the independent reviewer environment; the reported `summary.md`, `parity.json`, raw arrays, harness, failure records and checksums were **not available for inspection at the time of this update**. Do not confuse a filesystem path supplied in conversation with a publicly accessible artifact URL.
 
+## Evidence archive reported as prepared (not yet received by reviewer)
+
+The user relayed a **second GPU-agent report** that the *existing* run was packaged **without rerunning GPU computation**.
+
+| Field | GPU-agent reported value |
+| --- | --- |
+| ZIP on external GPU machine | `/workspace/wp12_gpu00_runs/wp12-gpu00-20261022T031830Z-490b18c-evidence.zip` |
+| ZIP size | `147631684` bytes |
+| ZIP SHA256 | `470d5136d51f58e8ca4278670cd172e4eff9484600e138edbe048c95a500a41b` |
+| Raw tensors | `576` unrounded `.pt` files beneath `native_reference/` and `opensaebase_results/` |
+| Inner checksums | Agent claims `checksums.sha256` validates all `652` evidence files |
+| Original failure | Agent says first A1 `TypeError` remains in `failures.json`, timestamp `2026-10-22T03:21:58Z` |
+| Privacy inventory | Agent says no model weights, `.env` or access tokens were included |
+| Computation | Packaging only; no new GPU execution |
+
+**Important:** the external `/workspace` location is **not mounted in the independent reviewer's environment**, and no actual ZIP bytes or authorized download URL have been supplied. The reviewer has **not computed this outer SHA256**, enumerated the ZIP members, validated its internal checksums, opened the 576 tensors, searched the archive for secrets, or inspected the first A1 traceback. These are reported package assertions, not verified observations.
+
+**Next handoff:** transfer the *exact* ZIP bytes privately to the independent reviewer (e.g. upload as a conversation attachment or provide access to the same file through a connected authorized storage service). Match the received archive size and outer SHA256 **before** opening any inner files. Then audit the 652 checksum entries and member inventory, source/harness lineage, full fp32 tensor parity, all four site/group denominators and logged failures. Load `.pt` files using safe PyTorch `weights_only=True` where compatible; never execute arbitrary archived code or load untrusted pickles. Independently inspect rights/privacy before redistribution. The absence of leaked secrets cannot be proven by filename checks alone.
+
+**Status remains** `GPU_AGENT_REPORTED_PASS_PENDING_INDEPENDENT_REVIEW`. Keep `artifact_link`, `native_parity_evidence` and `reviewer` empty in the capability ledger until the actual bytes and numerical computations have been checked. No GPU-01 authorization is implied.
+
 ## 1. Reported numerical outcome
 
 | Site | Real checkpoint route | GPU agent's result | Independent reviewer |
