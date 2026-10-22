@@ -144,6 +144,89 @@ class NNsightLocal:
             changed = _saved(_target(self.model, readout))
         return _tensor(changed)
 
+    def generate_edit(
+        self,
+        inputs: Any,
+        location: TraceLocation,
+        *,
+        steps: Sequence[int],
+        operation: str,
+        max_new_tokens: int = 8,
+        value: float = 0.0,
+        replacement: torch.Tensor | None = None,
+    ) -> dict[str, Any]:
+        """Two real native NNsight greedy generations with per-step interventions.
+
+        Uses NNsight 0.8's documented `model.generate` and `tracer.iter`
+        occurrence syntax, not archived SAEBase task-only generation.
+        Each requested step is a forward occurrence (step 0 is prefill), not
+        simply a generated text-token index. The operation changes the
+        original native module output, not an SAE feature code.
+        """
+        if not callable(getattr(self.model, "generate", None)):
+            raise RuntimeError("This local NNsight wrapper cannot trace generation")
+        if isinstance(inputs, str) and (not inputs or len(inputs) > 5000):
+            raise ValueError("Bounded nonempty generation prompt required")
+        if type(max_new_tokens) is not int or not 1 <= max_new_tokens <= 64:
+            raise ValueError("Generation budget must be one to 64 new tokens")
+        selected = list(steps)
+        if (
+            not selected
+            or len(selected) > 16
+            or any(type(step) is not int or step < 0 or step >= max_new_tokens
+                   for step in selected)
+            or selected != sorted(set(selected))
+        ):
+            raise ValueError("Choose up to 16 ordered distinct reachable generation steps")
+        if operation not in {"zero", "scale", "replace"}:
+            raise ValueError("Unknown native generation-time edit")
+        if operation == "replace":
+            if (
+                not isinstance(replacement, torch.Tensor)
+                or not bool(torch.isfinite(replacement).all())
+            ):
+                raise ValueError("Replacement must be a finite native tensor")
+        elif replacement is not None:
+            raise ValueError("Replacement applies only to native replace operation")
+        if operation == "scale" and (
+            type(value) not in (int, float) or not bool(torch.isfinite(torch.tensor(value)))
+        ):
+            raise ValueError("Scale must be finite")
+
+        with self.model.generate(inputs, max_new_tokens=max_new_tokens, do_sample=False) as baseline:
+            baseline_ref = _saved(baseline.result)
+        with self.model.generate(inputs, max_new_tokens=max_new_tokens, do_sample=False) as edited:
+            for step in edited.iter[selected]:
+                output = _target(self.model, location)
+                if operation == "zero":
+                    output[:] = 0
+                elif operation == "scale":
+                    output[:] = output * value
+                else:
+                    output[:] = replacement
+            edited_ref = _saved(edited.result)
+        before = _tensor(baseline_ref)
+        after = _tensor(edited_ref)
+        if before.ndim != 2 or after.ndim != 2 or before.shape[0] != 1 or after.shape[0] != 1:
+            raise RuntimeError("Native NNsight generation must return [1, sequence] token IDs")
+        if before.dtype not in (torch.int32, torch.int64) or after.dtype not in (
+            torch.int32, torch.int64
+        ):
+            raise TypeError("Original NNsight generation did not return token IDs")
+        return {
+            "schema": "opensae.wp12.nnsight_generation_edit.v1",
+            "backend": "nnsight_local",
+            "site": location.path,
+            "step_interpretation": "forward_occurrences_0_is_prefill",
+            "selected_steps": selected,
+            "max_new_tokens": max_new_tokens,
+            "operation": operation,
+            "baseline_token_ids": before.cpu(),
+            "edited_token_ids": after.cpu(),
+            "same_continuation": torch.equal(before, after),
+            "executed": True,
+        }
+
     def gradient(
         self,
         inputs: Any,
