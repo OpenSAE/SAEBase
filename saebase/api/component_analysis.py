@@ -4,6 +4,7 @@ These are residual-state differences, not direct logit attribution or
 independent causal effects. The calculation explicitly requires all three
 hook points to be available in the selected execution backend.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -26,14 +27,19 @@ class BlockComponents:
         if not torch.allclose(
             self.residual_before + self.attention_delta + self.mlp_delta,
             self.residual_after,
-            atol=atol, rtol=rtol,
+            atol=atol,
+            rtol=rtol,
         ):
             raise RuntimeError("block residual components do not reconstitute the output")
 
 
 @torch.no_grad()
 def capture_block_components(
-    model: ModelAdapter, *, tokens: torch.Tensor, layer: int, position: int = -1,
+    model: ModelAdapter,
+    *,
+    tokens: torch.Tensor,
+    layer: int,
+    position: int = -1,
 ) -> BlockComponents:
     """Capture before/mid/after at a single token and return additive deltas.
 
@@ -54,8 +60,11 @@ def capture_block_components(
     if before.shape != middle.shape or middle.shape != after.shape:
         raise ValueError("block hooks disagree on residual shape")
     result = BlockComponents(
-        layer=layer, position=position, residual_before=before,
-        attention_delta=middle - before, mlp_delta=after - middle,
+        layer=layer,
+        position=position,
+        residual_before=before,
+        attention_delta=middle - before,
+        mlp_delta=after - middle,
         residual_after=after,
     )
     result.check()
