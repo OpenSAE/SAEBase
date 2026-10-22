@@ -113,7 +113,11 @@ def test_clt_edit_changes_later_layers_only():
     )
     with pytest.raises(ValueError, match="checkpoint digest"):
         execute_clt_feature(
-            model, inputs, record, "source-feature", clt,
+            model,
+            inputs,
+            record,
+            "source-feature",
+            clt,
             CLTIdentity(**{**identity.__dict__, "source_sha256": "f" * 64}),
         )
     incorrect_hooks = CLTIdentity(
@@ -123,9 +127,7 @@ def test_clt_edit_changes_later_layers_only():
         }
     )
     with pytest.raises(ValueError, match="hook mapping"):
-        execute_clt_feature(
-            model, inputs, record, "source-feature", clt, incorrect_hooks
-        )
+        execute_clt_feature(model, inputs, record, "source-feature", clt, incorrect_hooks)
 
 
 def test_clt_rejects_graph_nonfeature_target():
