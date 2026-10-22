@@ -530,21 +530,25 @@ def correlations(
             "n_groups": len(groups),
             "note": "Need >=3 independent published prompt groups",
         }
-    import numpy as np
-
     array = list(groups.values())
-    v = np.asarray([g.get(feature_id, 0.0) for g in array], dtype=float)
-    if float(np.std(v)) == 0:
+    v = [g.get(feature_id, 0.0) for g in array]
+    mean_v = sum(v) / len(v)
+    centered_v = [x - mean_v for x in v]
+    norm_v = math.sqrt(sum(x * x for x in centered_v))
+    if norm_v == 0:
         return {"items": [], "n_groups": len(groups), "note": "Selected feature has zero variance"}
     ids = sorted({fid for g in array for fid in g} - {feature_id})
     found = []
     for fid in ids:
-        w = np.asarray([g.get(fid, 0.0) for g in array], dtype=float)
-        if np.std(w) == 0:
+        w = [g.get(fid, 0.0) for g in array]
+        mean_w = sum(w) / len(w)
+        centered_w = [x - mean_w for x in w]
+        norm_w = math.sqrt(sum(x * x for x in centered_w))
+        if norm_w == 0:
             continue
-        rho = float(np.corrcoef(v, w)[0, 1])
+        rho = sum(x * y for x, y in zip(centered_v, centered_w)) / (norm_v * norm_w)
         if math.isfinite(rho):
-            found.append({"feature_id": fid, "pearson_r": rho})
+            found.append({"feature_id": fid, "pearson_r": max(-1.0, min(1.0, rho))})
     found.sort(key=lambda x: (-abs(x["pearson_r"]), x["feature_id"]))
     return {
         "items": found[:limit],
