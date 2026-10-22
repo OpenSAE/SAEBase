@@ -1210,3 +1210,14 @@ def test_worker_attempt_fencing_rejects_stale_identical_worker_identity(tmp_path
         is True
     )
     assert queue.status(job_id=job["job_id"], owner="owner-retry")["status"] == "succeeded"
+
+
+def test_registered_scope_assets_endpoint_is_metadata_only():
+    response = client.get("/api/sae-assets?model_key=gemma270m")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["mode"] == "registered_metadata_only"
+    assert data["total"] >= 3
+    assert all(item["model_key"] == "gemma270m" for item in data["items"])
+    assert all(item["status"] == "registered_not_live_verified" for item in data["items"])
+    assert all(item["repo_id"].startswith("google/gemma-scope-2-") for item in data["items"])
