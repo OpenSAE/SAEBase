@@ -584,7 +584,7 @@
         " · intervention position " + record.token_position +
         " · measured activation " + safeNumber(record.measured_activation));
       append(target, "p", "quiet",
-        "Full-vocabulary teacher-forced logits; **no** text generation was performed. " +
+        "Full-vocabulary teacher-forced logits; no text generation was performed. " +
         "A changed argmax at one token does not mean the completed model answer changed.");
       const views = [
         ["feature_position", "Readout at edited token"],
