@@ -43,18 +43,46 @@ def execute_one(*, root: Path, device: str = "cuda") -> dict:
         ):
             raise ValueError("Original model or SAE checkpoint identity has changed")
         op = spec["operation"]
-        edit = Edit(
-            op,
-            tuple(spec["feature_ids"]),
-            spec["strength"] if op in {"scale", "clamp", "add"} else 0.0,
-        )
-        plan = EditPlan(site["sae"], site["layer"], -1, (edit,))
-        response = compare_sae_edits(pair, pair.model.tokens(prompt=prompt), plan)
-        result = {
-            k: v for k, v in response.items() if k not in {"baseline_logits", "edited_logits"}
-        }
-        result["baseline_logits"] = response["baseline_logits"].tolist()
-        result["edited_logits"] = response["edited_logits"].tolist()
+        if op == "inspect":
+            from saebase.explore import capture_prompt_trace
+
+            trace = capture_prompt_trace(
+                sae_key=site["sae"],
+                layer=site["layer"],
+                prompt=prompt,
+                device=device,
+                sample_id=jid,
+                prompt_group_id=jid,
+                max_tokens=128,
+                pair=pair,
+            )
+            result = {
+                "schema": "opensae.wp12.private_prompt_inspection.v1",
+                "operation": "inspect",
+                "status": "real_local_inference",
+                "model_sha256": trace["model_sha256"],
+                "sae_sha256": trace["sae_sha256"],
+                "tokenizer_sha256": trace["tokenizer_sha256"],
+                "prompt_sha256": trace["prompt_sha256"],
+                "site_id": site["site_id"],
+                "tokens": trace["tokens"],
+                "public_release": False,
+            }
+        else:
+            edit = Edit(
+                op,
+                tuple(spec["feature_ids"]),
+                spec["strength"] if op in {"scale", "clamp", "add"} else 0.0,
+            )
+            plan = EditPlan(site["sae"], site["layer"], -1, (edit,))
+            response = compare_sae_edits(pair, pair.model.tokens(prompt=prompt), plan)
+            result = {
+                k: v
+                for k, v in response.items()
+                if k not in {"baseline_logits", "edited_logits"}
+            }
+            result["baseline_logits"] = response["baseline_logits"].tolist()
+            result["edited_logits"] = response["edited_logits"].tolist()
         result["job_id"] = jid
         output = root / "results" / (jid + ".json")
         output.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
