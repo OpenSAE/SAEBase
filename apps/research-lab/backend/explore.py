@@ -90,11 +90,27 @@ def _valid_trace(row: dict[str, Any], sites: dict[str, dict[str, Any]]) -> dict[
             if type(strength) not in (int, float) or not math.isfinite(strength) or strength == 0:
                 raise ValueError("Sparse feature activation must be nonzero and finite")
             seen.add(fid)
-    copy = {**row}
+    # Publish an allowlisted record only. Source-worker diagnostics, raw text
+    # fields or accidental tokens must not silently leak via **row.
+    allowed = (
+        "site_id", "model_sha256", "sae_sha256", "source_type", "sample_id",
+        "prompt_group_id", "split", "prompt_text", "prompt_sha256",
+        "tokenizer_sha256", "model_processing", "complete_sparse_codes",
+        "public_text_reviewed", "rights_reviewed",
+    )
+    copy = {key: row[key] for key in allowed}
+    copy["tokens"] = [
+        {
+            "position": token["position"], "token_id": token["token_id"],
+            "text": token["text"], "features": [
+                {"feature_id": feature["feature_id"], "activation": float(feature["activation"])}
+                for feature in token["features"]
+            ],
+        }
+        for token in tokens
+    ]
     copy["site"] = {key: site[key] for key in ("model", "sae", "layer", "hook")}
-    copy["trace_id"] = hashlib.sha256(
-        core.canonical_json({key: value for key, value in copy.items() if key != "trace_id"})
-    ).hexdigest()
+    copy["trace_id"] = hashlib.sha256(core.canonical_json(copy)).hexdigest()
     return copy
 
 
@@ -134,7 +150,18 @@ def _valid_explanation(row: dict[str, Any], sites: dict[str, dict[str, Any]]) ->
             raise ValueError("Held-out score requires exact disjoint groups and finite value")
     elif score is not None:
         raise ValueError("Untested interpretation cannot have a numerical score")
-    return {**row, "feature_key": f"{row['site_id']}:F{fid}"}
+    allowed = (
+        "site_id", "model_sha256", "sae_sha256", "source_type",
+        "feature_id", "origin", "description", "author_or_model", "method",
+        "status", "approved", "discovery_group_ids", "evaluation_group_ids",
+        "heldout_score",
+    )
+    result = {key: row[key] for key in allowed if key in row}
+    result["discovery_group_ids"] = discovery
+    result["evaluation_group_ids"] = evaluation
+    result["heldout_score"] = score
+    result["feature_key"] = f"{row['site_id']}:F{fid}"
+    return result
 
 
 def publish_exploration(
