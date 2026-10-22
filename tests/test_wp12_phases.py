@@ -228,21 +228,33 @@ def test_p6_real_upstream_v1_json_converter_is_not_a_fake_graph(tmp_path):
         "qParams": {"pinnedIds": [], "supernodes": []},
         "nodes": [
             {
-                "node_id": "E_40_0", "feature_type": "embedding",
-                "layer": "E", "ctx_idx": 0, "feature": 0
+                "node_id": "E_40_0",
+                "feature_type": "embedding",
+                "layer": "E",
+                "ctx_idx": 0,
+                "feature": 0,
             },
             {
-                "node_id": "2_17_0", "feature_type": "cross layer transcoder",
-                "layer": "2", "ctx_idx": 0, "feature": 207
+                "node_id": "2_17_0",
+                "feature_type": "cross layer transcoder",
+                "layer": "2",
+                "ctx_idx": 0,
+                "feature": 207,
             },
             {
-                "node_id": "2_-1_0", "feature_type": "mlp reconstruction error",
-                "layer": "2", "ctx_idx": 0, "feature": -1
+                "node_id": "2_-1_0",
+                "feature_type": "mlp reconstruction error",
+                "layer": "2",
+                "ctx_idx": 0,
+                "feature": -1,
             },
             {
-                "node_id": "13_4_0", "feature_type": "logit",
-                "layer": "13", "ctx_idx": 0, "feature": 4,
-                "clerp": "Output The"
+                "node_id": "13_4_0",
+                "feature_type": "logit",
+                "layer": "13",
+                "ctx_idx": 0,
+                "feature": 4,
+                "clerp": "Output The",
             },
         ],
         "links": [
@@ -269,7 +281,9 @@ def test_p6_real_upstream_v1_json_converter_is_not_a_fake_graph(tmp_path):
     file.write_text(json.dumps(native), encoding="utf-8")
     with pytest.raises(ValueError, match="node identity mismatch"):
         import_native_graph_file(
-            file, model_sha256="a" * 64, transcoder_sha256="b" * 64,
+            file,
+            model_sha256="a" * 64,
+            transcoder_sha256="b" * 64,
             original_tool_commit="c" * 40,
         )
 
