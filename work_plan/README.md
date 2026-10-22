@@ -14,7 +14,7 @@ The new long-term master blueprint integrates the **50 functional capabilities o
 
 - [**12 — Master blueprint**](12_unified_interpretability_master_blueprint.md). Nine phases P0–P8, upstream feature-to-UI mapping, API architecture, 50 exact acceptance tests, local/GPU split, C0–C3 compute tiers, scientific boundaries and release policy.
 - [**12 — GPU agent handoff**](12_gpu_agent_handoff_protocol.md). Exact phased GPU/CPU responsibilities, preflight, run artifacts, rate measurement, stop rules and independent signoff.
-- [**12 — 50-capability ledger**](12_capability_acceptance_matrix.csv). One row per feature. WP12-00 source audit currently classifies 24 PARTIAL, 24 NOT_STARTED and 2 BLOCKED; independent CPU/native/GPU evidence fields remain empty until independently verified.
+- [**12 — 50-capability ledger**](12_capability_acceptance_matrix.csv). Core implementation and final release are tracked separately: 48 source-level PASS, 0 core PARTIAL, 2 external BLOCKED, with all independent P8 verification pending. The historical WP12-00 audit remains a dated baseline.
 - [**12 — P0 source audit**](12_p0_source_inventory_20261021.md). Current code, Research Lab, CI/release and compatibility inventory; P0 gate remains open.
 - [**12 — GPU-00 runbook**](12_gpu00_p0_parity_execution.md). First bounded C1 real-model numerical parity test with environment preflight, exact model/SAE/site choices, operation definitions, tolerances, resource stop rules and immutable handoff outputs.
 - [**12 — GPU-00 frozen input pairs**](12_gpu00_prompt_pairs.json). Eight small original paired prompts, site list and tokenization acceptance policy.
@@ -24,4 +24,14 @@ The new long-term master blueprint integrates the **50 functional capabilities o
 - [**12 — P3–P8 consolidated implementation**](12_p3_p8_consolidated_implementation.md). Typed interventions, bounded original SAEBench, native training/restart, Circuit Tracer graph conversion/UI, private worker and independent release checks. Scientific and public release acceptance still remains open.
 - [**12 — Core functionality verdicts**](12_core_function_assessment.md). A strict 50-item implementation assessment: **48 core PASS, 0 PARTIAL, 2 BLOCKED**, with per-item executable criteria, source/test references and specific remaining gaps. Independent P8 scientific validation is separate.
 
-Work Plan 12 is a *planned expansion*, not a claim that all capabilities have been implemented, publicly deployed or tested on GPU. Follow older WP04–WP11 experimental protocols and accepted findings when implementing the new work.
+Work Plan 12 now has developed core source routes but is **not** a claim that all functions have been executed with real official checkpoints or deployed. Follow older WP04–WP11 experimental protocols and accepted findings.
+
+## Work Plan 13 — Real-environment integration and deployment
+
+Turn WP12's source-level implementations into actual runnable research workflows and a useful deployed Research Lab, prioritizing genuine model/prompt experience over repeated formal numerical certification.
+
+- [**13 — Real-environment integration and deployment**](13_real_environment_integration_and_deployment.md). Architecture, 10-prompt real-feature browser, genuine interventions, native training/benchmarks/circuits, private local GPU queue, source-reviewed dataset publication, HF staging/rollout, usability and recovery.
+- [**13 — Local GPU Agent execution handoff**](13_gpu_agent_real_environment_handoff.md). Exact LIVE-00 → LIVE-10 task sequence, commands, isolated library environments, bounds, return artifacts and Integration/GPU agent repair ownership.
+- [**13 — Machine-readable LIVE task queue**](13_live_execution_matrix.csv). Eleven execution tasks with dependent prerequisites, resource caps, measured success definitions, minimal handoffs and honest external blockers.
+
+WP13 changes **operational readiness and deployment**, not the untouched WP12 P8 scientific release verdicts. Start with one complete real Prompt → Feature → Intervention workflow, publish a useful reviewed CPU Lab, then extend to native training and circuits.
