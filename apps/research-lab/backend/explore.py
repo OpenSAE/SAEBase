@@ -95,16 +95,28 @@ def _valid_trace(row: dict[str, Any], sites: dict[str, dict[str, Any]]) -> dict[
     # Publish an allowlisted record only. Source-worker diagnostics, raw text
     # fields or accidental tokens must not silently leak via **row.
     allowed = (
-        "site_id", "model_sha256", "sae_sha256", "source_type", "sample_id",
-        "prompt_group_id", "split", "prompt_text", "prompt_sha256",
-        "tokenizer_sha256", "model_processing", "complete_sparse_codes",
-        "public_text_reviewed", "rights_reviewed",
+        "site_id",
+        "model_sha256",
+        "sae_sha256",
+        "source_type",
+        "sample_id",
+        "prompt_group_id",
+        "split",
+        "prompt_text",
+        "prompt_sha256",
+        "tokenizer_sha256",
+        "model_processing",
+        "complete_sparse_codes",
+        "public_text_reviewed",
+        "rights_reviewed",
     )
     copy = {key: row[key] for key in allowed}
     copy["tokens"] = [
         {
-            "position": token["position"], "token_id": token["token_id"],
-            "text": token["text"], "features": [
+            "position": token["position"],
+            "token_id": token["token_id"],
+            "text": token["text"],
+            "features": [
                 {"feature_id": feature["feature_id"], "activation": float(feature["activation"])}
                 for feature in token["features"]
             ],
@@ -157,9 +169,19 @@ def _valid_explanation(row: dict[str, Any], sites: dict[str, dict[str, Any]]) ->
     elif score is not None:
         raise ValueError("Untested interpretation cannot have a numerical score")
     allowed = (
-        "site_id", "model_sha256", "sae_sha256", "source_type",
-        "feature_id", "origin", "description", "author_or_model", "method",
-        "status", "approved", "discovery_group_ids", "evaluation_group_ids",
+        "site_id",
+        "model_sha256",
+        "sae_sha256",
+        "source_type",
+        "feature_id",
+        "origin",
+        "description",
+        "author_or_model",
+        "method",
+        "status",
+        "approved",
+        "discovery_group_ids",
+        "evaluation_group_ids",
         "heldout_score",
     )
     result = {key: row[key] for key in allowed if key in row}
@@ -197,9 +219,12 @@ def publish_exploration(
     # verified, approved per-token trace containing that feature.
     observed = {
         (trace["site_id"], code["feature_id"])
-        for trace in records for token in trace["tokens"] for code in token["features"]
+        for trace in records
+        for token in trace["tokens"]
+        for code in token["features"]
     }
     from .feature_store import feature_by_id, feature_store_count
+
     has_sqlite = feature_store_count(output.parent) is not None
     indexed = None if has_sqlite else core.feature_index(output.parent)
     for label in labels:
@@ -531,8 +556,10 @@ def correlations(
 
 def feature_html(card: dict[str, Any]) -> str:
     """Self-contained printable HTML; only reviewed public content is inserted."""
+
     def esc(value: Any) -> str:
         return html.escape(str(value), quote=True)
+
     examples = "".join(
         "<li><strong>"
         + esc(e["token_text"])
