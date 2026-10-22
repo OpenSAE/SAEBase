@@ -130,8 +130,7 @@ def discover_official_scope_assets(
             match = [
                 a
                 for a in valid
-                if a.layer == layer and a.sae_id in {part, identifier}
-                and family == "resid_post"
+                if a.layer == layer and a.sae_id in {part, identifier} and family == "resid_post"
             ]
             exemplar = valid[0]
             # The official attention/MLP extraction location differs from
