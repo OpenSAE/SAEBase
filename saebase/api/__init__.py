@@ -18,6 +18,8 @@ from .features import (
     edit_features,
     evaluate_edit,
 )
+from .component_analysis import BlockComponents, capture_block_components
+from .nnsight_local import NNsightLocal, TraceLocation
 from .metadata import SAEIdentity
 from .model import ActivationSite, ModelAdapter, ModelCapabilities, UnsupportedCapability
 
@@ -70,6 +72,7 @@ def load_registered(
 __all__ = [
     "ActivationSite", "ModelAdapter", "ModelCapabilities", "UnsupportedCapability",
     "SAEIdentity", "LoadedResearchPair", "load_registered",
+    "BlockComponents", "capture_block_components", "NNsightLocal", "TraceLocation",
     "FeatureSnapshot", "FeaturePatch", "InterventionResult",
     "capture_features", "edit_features", "coalition_replacements", "evaluate_edit",
 ]
