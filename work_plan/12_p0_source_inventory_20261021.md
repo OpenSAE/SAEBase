@@ -4,6 +4,8 @@ Date: 2026-10-21
 Source baseline: `main` at `f9c1f4e07f14bda4ab4724ae399138249cc7b3ba`
 Status: **CPU source inventory complete. P0 gate NOT PASSED.** No fresh CPU test, GPU run, or public deployment acceptance is claimed.
 
+**GPU-00 execution handoff now available:** [bounded P0 parity runbook](12_gpu00_p0_parity_execution.md) with [frozen prompt pairs](12_gpu00_prompt_pairs.json). This is a *test specification*, not an executed run. The GPU agent must perform the runbook's C0 preflight before any C1 numerical work, and a separate CPU reviewer must validate returned evidence.
+
 ## Scope and method
 
 This audit reviewed the repository tree, selected current Python API, registry, experiment-store, intervention, native-result importer, Research Lab backend/frontend, test code, release notes, Work Plans, GitHub CI/PR/release metadata, and the 50-feature roadmap. The existing records remain immutable. It does **not** certify functional parity against ten upstream tools or change scientific estimators. The acceptance matrix now contains a conservative state for each feature plus an entrypoint and missing evidence.
