@@ -469,7 +469,8 @@ def recorded_inference(
         {
             "trace_id": t["trace_id"],
             "site_id": t["site_id"],
-            "max_features": strongest_features(t),
+            "max_features": strongest_features(t, exclude_special_tokens=True),
+            "ranking_scope": "content_tokens_only_special_tokens_excluded",
             "mode": "recorded_only",
         }
         for t in published_exploration(root)["traces"]
@@ -478,15 +479,27 @@ def recorded_inference(
 
 
 def strongest_features(
-    trace: dict[str, Any], *, token_position: int | None = None, top_k: int = 20
+    trace: dict[str, Any], *, token_position: int | None = None, top_k: int = 20,
+    exclude_special_tokens: bool = False,
 ) -> list[dict[str, Any]]:
-    """Max activation per feature on selected token(s) of one COMPLETE trace."""
+    """Rank actual sparse codes, optionally excluding tokenizer control tokens.
+
+    The complete underlying trace is never altered. A selected BOS token still
+    displays its real activation; it simply cannot dominate a whole-prompt
+    content-token summary when exclude_special_tokens=True.
+    """
     if not 1 <= top_k <= 100:
         raise ValueError("Invalid top-k request")
     tokens = trace["tokens"]
     if token_position is not None and not 0 <= token_position < len(tokens):
         raise IndexError("Token position out of range")
     collection = tokens if token_position is None else [tokens[token_position]]
+    if exclude_special_tokens and token_position is None:
+        known_special = {
+            "<bos>", "<eos>", "<pad>", "<s>", "</s>",
+            "<|begin_of_text|>", "<|end_of_text|>", "<|eot_id|>",
+        }
+        collection = [t for t in collection if t["text"] not in known_special]
     best: dict[int, tuple[float, int]] = {}
     for token in collection:
         for feature in token["features"]:

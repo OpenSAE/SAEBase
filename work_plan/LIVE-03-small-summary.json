@@ -1,0 +1,153 @@
+{
+  "schema": "opensae.wp13.live03_teacher_forced_summary.v1",
+  "job_id": "LIVE-03",
+  "status": "PASS_WORKING",
+  "code_sha": "c49513494fdf10161ecd85d9633bc0e1001b8c14",
+  "logit_kind": "teacher_forced_full_vocab",
+  "generated_text": false,
+  "scale_factor": 2.0,
+  "wall_seconds": 10.252,
+  "peak_vram_bytes": 2904854016,
+  "sites": [
+    {
+      "site_id": "gemma270m:gemma270m_scope_resid:L5",
+      "hook_name": "blocks.5.hook_resid_post",
+      "model_sha256": "1e1d3500f913a1c406f73c62bf8902d9e8aa0b4a255b45d36cadbfbdafca5ea4",
+      "sae_sha256": "c8d81c4a60f18e4dc7a97efdf2988dd22ea428931a94ff49326b541360e9df88",
+      "prompt_sha256": "d830ebdaf0340f9e6372843e1910c4b655b4d6f9c142c84ef27b2e4b30eff48f",
+      "sample_id": "WP13-DEMO-03",
+      "feature_id": 506,
+      "token_position": 1,
+      "token_id": 50429,
+      "saved_activation": 225.42555236816406,
+      "live_activation": 225.4255828857422,
+      "scale_factor": 2.0,
+      "scale_replacement_value": 450.8511657714844,
+      "sequence_length": 15,
+      "readout_at_feature_position": {
+        "readout_position": 1,
+        "logit_kind": "teacher_forced_full_vocab",
+        "generated_text": false,
+        "baseline_argmax_token_id": 236764,
+        "noop": {
+          "max_abs_logit_delta": 0.0,
+          "logit_delta_l2": 0.0,
+          "baseline_argmax_token_id": 236764,
+          "edited_argmax_token_id": 236764,
+          "argmax_changed": false
+        },
+        "ablation": {
+          "max_abs_logit_delta": 6.118146896362305,
+          "logit_delta_l2": 596.1752319335938,
+          "baseline_argmax_token_id": 236764,
+          "edited_argmax_token_id": 14148,
+          "argmax_changed": true
+        },
+        "scale": {
+          "max_abs_logit_delta": 2.8989524841308594,
+          "logit_delta_l2": 319.08099365234375,
+          "baseline_argmax_token_id": 236764,
+          "edited_argmax_token_id": 236764,
+          "argmax_changed": false
+        }
+      },
+      "readout_at_final_token": {
+        "readout_position": 14,
+        "logit_kind": "teacher_forced_full_vocab",
+        "generated_text": false,
+        "baseline_argmax_token_id": 10508,
+        "noop": {
+          "max_abs_logit_delta": 0.0,
+          "logit_delta_l2": 0.0,
+          "baseline_argmax_token_id": 10508,
+          "edited_argmax_token_id": 10508,
+          "argmax_changed": false
+        },
+        "ablation": {
+          "max_abs_logit_delta": 0.8522114753723145,
+          "logit_delta_l2": 77.25747680664062,
+          "baseline_argmax_token_id": 10508,
+          "edited_argmax_token_id": 10508,
+          "argmax_changed": false
+        },
+        "scale": {
+          "max_abs_logit_delta": 0.6260557174682617,
+          "logit_delta_l2": 54.78569793701172,
+          "baseline_argmax_token_id": 10508,
+          "edited_argmax_token_id": 10508,
+          "argmax_changed": false
+        }
+      }
+    },
+    {
+      "site_id": "gemma270m:gemma270m_scope_resid:L9",
+      "hook_name": "blocks.9.hook_resid_post",
+      "model_sha256": "1e1d3500f913a1c406f73c62bf8902d9e8aa0b4a255b45d36cadbfbdafca5ea4",
+      "sae_sha256": "d913cf42760518b59bc07e88d97012a1ac8e9532afbc56b81016b21e473501d0",
+      "prompt_sha256": "d830ebdaf0340f9e6372843e1910c4b655b4d6f9c142c84ef27b2e4b30eff48f",
+      "sample_id": "WP13-DEMO-03",
+      "feature_id": 95,
+      "token_position": 1,
+      "token_id": 50429,
+      "saved_activation": 396.42486572265625,
+      "live_activation": 396.4249267578125,
+      "scale_factor": 2.0,
+      "scale_replacement_value": 792.849853515625,
+      "sequence_length": 15,
+      "readout_at_feature_position": {
+        "readout_position": 1,
+        "logit_kind": "teacher_forced_full_vocab",
+        "generated_text": false,
+        "baseline_argmax_token_id": 236764,
+        "noop": {
+          "max_abs_logit_delta": 0.0,
+          "logit_delta_l2": 0.0,
+          "baseline_argmax_token_id": 236764,
+          "edited_argmax_token_id": 236764,
+          "argmax_changed": false
+        },
+        "ablation": {
+          "max_abs_logit_delta": 2.5850186347961426,
+          "logit_delta_l2": 263.5510559082031,
+          "baseline_argmax_token_id": 236764,
+          "edited_argmax_token_id": 14148,
+          "argmax_changed": true
+        },
+        "scale": {
+          "max_abs_logit_delta": 2.2171554565429688,
+          "logit_delta_l2": 240.92474365234375,
+          "baseline_argmax_token_id": 236764,
+          "edited_argmax_token_id": 236764,
+          "argmax_changed": false
+        }
+      },
+      "readout_at_final_token": {
+        "readout_position": 14,
+        "logit_kind": "teacher_forced_full_vocab",
+        "generated_text": false,
+        "baseline_argmax_token_id": 10508,
+        "noop": {
+          "max_abs_logit_delta": 0.0,
+          "logit_delta_l2": 0.0,
+          "baseline_argmax_token_id": 10508,
+          "edited_argmax_token_id": 10508,
+          "argmax_changed": false
+        },
+        "ablation": {
+          "max_abs_logit_delta": 0.3602895736694336,
+          "logit_delta_l2": 33.19508361816406,
+          "baseline_argmax_token_id": 10508,
+          "edited_argmax_token_id": 10508,
+          "argmax_changed": false
+        },
+        "scale": {
+          "max_abs_logit_delta": 0.31251561641693115,
+          "logit_delta_l2": 29.577383041381836,
+          "baseline_argmax_token_id": 10508,
+          "edited_argmax_token_id": 10508,
+          "argmax_changed": false
+        }
+      }
+    }
+  ]
+}

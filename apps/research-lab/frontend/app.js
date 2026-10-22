@@ -74,6 +74,7 @@
       const index = params.get("feature");
       if (site && index && /^\\d+$/.test(index)) loadFeature(site, Number(index));
     }
+    if (view === "intervene") loadMeasuredInterventions();
     if (view === "analyze") loadAnalyses();
     if (view === "datasets") loadDatasets();
     if (view === "reports") loadReports();
@@ -279,6 +280,8 @@
       response.items.forEach(function (record) {
         const part = append(target, "div", "record");
         append(part, "h3", "", record.site_id + " · recorded computation");
+        append(part, "p", "quiet",
+          "Ranked across content tokens only. Special tokens such as <bos> remain visible when selecting an individual recorded token.");
         showRankedFeatures(part, record.max_features, record.site_id);
       });
     } catch (error) { errorMessage(target, error); }
@@ -537,6 +540,85 @@
     } catch (error) { append(panel,"p","",error.message); }
     panel.scrollIntoView({behavior:"smooth",block:"nearest"});
   }
+  async function loadMeasuredInterventions() {
+    const target = byId("intervention-record-list");
+    empty(target, "Loading reviewed real intervention records…", "");
+    byId("intervention-record-detail").hidden = true;
+    try {
+      const records = await get("/api/wp12/interventions");
+      clear(target);
+      if (!records.total) {
+        empty(target, "No public measured interventions yet",
+          "Local LIVE-03 ran and its small numeric summary exists in WP13, but the Research Lab publishes only reviewed and explicitly approved records. This is not an online GPU service.");
+        return;
+      }
+      records.items.forEach(function (item) {
+        const box = append(target, "div", "record");
+        append(box, "strong", "", item.site || "Exact measured model site");
+        append(box, "p", "quiet", "Native source record " + item.id.slice(0, 16) + "…");
+        const button = append(box, "button", "btn tiny", "View measured logits");
+        button.type = "button";
+        button.addEventListener("click", function () { showMeasuredIntervention(item.id); });
+      });
+    } catch (error) { errorMessage(target, error); }
+  }
+
+  async function showMeasuredIntervention(recordId) {
+    const target = byId("intervention-record-detail");
+    target.hidden = false;
+    empty(target, "Loading actual saved logits comparison…", "");
+    try {
+      const record = await get("/api/wp12/interventions/" + encodeURIComponent(recordId));
+      if (record.schema !== "opensae.wp12.p3.public_result.v1" ||
+          record.measured !== true ||
+          record.generated_text !== false ||
+          record.measurement !== "teacher_forced_full_vocab_logits_only" ||
+          typeof record.readouts !== "object" ||
+          !record.readouts.feature_position || !record.readouts.final_position) {
+        throw new Error("This is not a supported reviewed teacher-forced measurement");
+      }
+      clear(target);
+      append(target, "h3", "", record.site + " · Feature " + record.feature_id);
+      append(target, "p", "quiet",
+        "Prompt " + record.sample_id + " · token ID " + record.token_id +
+        " · intervention position " + record.token_position +
+        " · measured activation " + safeNumber(record.measured_activation));
+      append(target, "p", "quiet",
+        "Full-vocabulary teacher-forced logits; no text generation was performed. " +
+        "A changed argmax at one token does not mean the completed model answer changed.");
+      const views = [
+        ["feature_position", "Readout at edited token"],
+        ["final_position", "Readout at final prompt token"]
+      ];
+      views.forEach(function (choice) {
+        const position = record.readouts[choice[0]];
+        append(target, "h3", "", choice[1] + " · position " + position.position);
+        const table = append(target, "table");
+        const head = append(table, "thead");
+        const row = append(head, "tr");
+        ["Operation", "Maximum |Δ logit|", "Logit L2", "Argmax token ID", "Argmax changed"].forEach(function (name) {
+          append(row, "th", "", name);
+        });
+        const body = append(table, "tbody");
+        [["noop", "No-op"], ["ablation", "Ablation"], ["scale", record.scale_factor + "× scale"]].forEach(function (spec) {
+          const measurement = position[spec[0]];
+          const r = append(body, "tr");
+          append(r, "td", "", spec[1]);
+          append(r, "td", "number", safeNumber(measurement.max_abs_logit_delta));
+          append(r, "td", "number", safeNumber(measurement.logit_delta_l2));
+          append(r, "td", "", String(measurement.edited_argmax_token_id));
+          append(r, "td", "", measurement.argmax_changed ? "Yes" : "No");
+        });
+        append(target, "p", "quiet",
+          "Source baseline argmax token ID " + position.baseline_argmax_token_id +
+          ". Nonzero logit changes may occur even without an argmax change.");
+      });
+      append(target, "p", "quiet",
+        "Original source commit " + record.original_source_code_sha.slice(0, 12) +
+        "… · source summary SHA256 " + record.source_report_sha256.slice(0, 16) + "…");
+    } catch (error) { errorMessage(target, error); }
+  }
+
   async function onPreflight(event) {
     event.preventDefault();
     const result = byId("preflight-result");

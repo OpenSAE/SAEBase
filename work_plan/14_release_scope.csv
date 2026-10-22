@@ -1,0 +1,17 @@
+feature,priority,release_surface,decision,minimum_real_demo,primary_owner,release_blocker
+Feature explorer,P0,Public Lab,COMMIT,Approved recorded prompt to token to real feature detail,CPU Integration,yes
+Measured feature intervention,P0,Public Lab,COMMIT,Recorded real no-op and edit with correct token-position readout,CPU Integration,yes
+Local SAE loading capture and API,P0,Local Python CLI,COMMIT,Fresh prompt real SAE codes and reproducible command,GPU Agent,yes
+Public Research Lab deployment,P0,Hugging Face CPU Space,COMMIT,Populated real browser page survives restart,CPU Integration,yes
+Private fresh-input queue,P1,Authenticated local GPU,TRY_ONCE,Two owner jobs real inspect/edit and result access,GPU Agent,no
+Generation steering,P1,Local Python CLI,TRY_ONCE,One actual baseline vs edited continuation,GPU Agent,no
+Native SAEBench,P1,Local Python + recorded Lab,TRY_ONCE,One real original upstream evaluated metric and UI readout,GPU Agent,no
+Circuit exploration,P1,Public Lab + optional local CLI,TRY_ONCE,One real graph openable and navigable,CPU Integration + GPU Agent,no
+SAE training and checkpoint import,P2,Local Python,TRY_ONCE,One tiny genuine trained SAE reload and encode,GPU Agent,no
+Local auto interpretation,P2,Local Python + approved result,TRY_ONCE,One source-linked heldout-scored candidate,GPU Agent,no
+NDIF remote execution,C,Not advertised,CUT,Out of current preview scope,None,no
+Distributed multi GPU SAE training,C,Not advertised,CUT,Out of current preview scope,None,no
+Full 50-feature P8 signoff,C,Not advertised,CUT,Out of current preview scope,None,no
+500-group new public corpus,C,Not advertised,CUT,Out of current preview scope,None,no
+Public hosted arbitrary prompt GPU,C,Not advertised,CUT,Out of current preview scope,None,no
+Gradio ZeroGPU MCP migration,C,Not advertised,CUT,Out of current preview scope,None,no

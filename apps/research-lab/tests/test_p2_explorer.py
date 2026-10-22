@@ -237,6 +237,22 @@ def test_three_search_modes_and_independent_group_correlation(tmp_path, monkeypa
     )
 
 
+def test_prompt_ranking_keeps_bos_real_but_excludes_it_from_content_summary(site):
+    from backend.explore import strongest_features
+
+    trace = make_trace(site, 1)
+    trace["tokens"][0]["features"] = [{"feature_id": 923, "activation": 3405.25}]
+    trace["tokens"][1]["features"] = [{"feature_id": 506, "activation": 225.42555236816406}]
+    all_positions = strongest_features(trace)
+    content_only = strongest_features(trace, exclude_special_tokens=True)
+    explicit_bos = strongest_features(trace, token_position=0)
+    assert all_positions[0]["feature_id"] == 923
+    assert content_only[0]["feature_id"] == 506
+    assert all(x["position"] > 0 for x in content_only)
+    assert explicit_bos[0]["feature_id"] == 923
+    assert trace["tokens"][0]["features"][0]["activation"] == 3405.25
+
+
 def test_interpretation_budget_splits_and_provenance():
     calls = []
     discovery = [{"group_id": "d", "text": "Positive discovery context", "activation": 3.5}]
