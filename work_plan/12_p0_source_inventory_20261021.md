@@ -4,7 +4,7 @@ Date: 2026-10-21
 Source baseline: `main` at `f9c1f4e07f14bda4ab4724ae399138249cc7b3ba`
 Status: **CPU source inventory complete. P0 gate NOT PASSED.** No fresh CPU test, GPU run, or public deployment acceptance is claimed.
 
-**GPU-00 execution handoff now available:** [bounded P0 parity runbook](12_gpu00_p0_parity_execution.md) with [frozen prompt pairs](12_gpu00_prompt_pairs.json). This is a *test specification*, not an executed run. The GPU agent must perform the runbook's C0 preflight before any C1 numerical work, and a separate CPU reviewer must validate returned evidence.
+**Subsequent GPU-00 update:** [GPU Agent reported four legacy-site passes on 2026-10-22 UTC](12_gpu00_agent_report_20261022.md) under fp32 TL3.9/SAELens6.54; original run material has not been transferred to the independent reviewer. See the original [test runbook](12_gpu00_p0_parity_execution.md) and [frozen prompts](12_gpu00_prompt_pairs.json). This initial source audit predated the GPU Agent's reported execution. The overall P0 gate is still **NOT PASSED**.
 
 ## Scope and method
 
@@ -78,7 +78,7 @@ The matrix `cpu_evidence`, `gpu_evidence`, `native_parity_evidence`, `artifact_l
 | Frozen 10 upstream UI journeys, licenses and source commits | NOT STARTED | WP12-01 dependency and rights freeze |
 | Frozen v1 model/SAE/input/intervention/schema contracts | NOT STARTED | WP12-01 |
 | Exact TransformerLens 4 and SAELens/NNsight worker compatibility | NOT VERIFIED | WP12-01, followed by native parity |
-| New two-model/two-site real GPU smoke | NOT RUN | GPU-00 only after CPU preflight passes |
+| New two-model/two-site real GPU smoke | AGENT REPORTED 4/4 PASS, independent raw review OPEN | Verify GPU-00 original run bundle and 85-test CPU preflight; no TL4 evidence |
 | **Overall P0 gate** | **NOT PASSED** | Complete open checks before P1 |
 
 ## First handoff order
