@@ -12,8 +12,7 @@ generation with KV caching.
   capable of capturing original residual activations and applying per-row
   patches. Only right-padded causal inputs with valid patch/readout positions
   are accepted.
-- The intervention engine uses this new optional batch API when present,
-  while preserving the legacy single-sample fallback for other adapters.
+- Hugging Face batch execution is optional; single-sample forwards remain the default.
 - OOM microbatch reduction is retained for subsequent patch chunks instead
   of retrying the original unsafe size repeatedly.
 - A deterministic offline encoding microbenchmark and CPU batch-parity tests
