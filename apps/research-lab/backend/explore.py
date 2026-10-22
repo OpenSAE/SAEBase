@@ -269,12 +269,28 @@ def feature_details(site_id: str, feature_id: int, *, root: Path | None = None) 
         return None
     if site_id not in _sites():
         return None
-    from .feature_store import feature_by_id
-    result = feature_by_id(site_id, feature_id, root=root)
-    if result is None:
+    from .feature_store import feature_by_id, feature_store_count
+    has_sqlite = feature_store_count(root) is not None
+    result = feature_by_id(site_id, feature_id, root=root) if has_sqlite else None
+    if result is None and not has_sqlite:
         results = core.feature_index(root)
-        result = next((x for x in results if x.get("site_id") == site_id
-                       and x.get("feature_id") == feature_id), None)
+        candidates = sorted(
+            (row for row in results if row.get("site_id") == site_id),
+            key=lambda row: row["feature_id"],
+        )
+        for index, row in enumerate(candidates):
+            if row.get("feature_id") == feature_id:
+                result = {
+                    **row,
+                    "previous_feature_id": (
+                        candidates[index - 1]["feature_id"] if index else None
+                    ),
+                    "next_feature_id": (
+                        candidates[index + 1]["feature_id"]
+                        if index + 1 < len(candidates) else None
+                    ),
+                }
+                break
     if result is None:
         return None
     site = _sites()[site_id]
