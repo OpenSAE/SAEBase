@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import UserDict
 from pathlib import Path
 import sys
 
@@ -26,7 +27,8 @@ class ToyTokenizer:
             index = 2
         else:
             index = 3
-        return {"input_ids": torch.tensor([[index]])}
+        # HF Transformers returns a BatchEncoding/UserDict, not a plain dict.
+        return UserDict({"input_ids": torch.tensor([[index]])})
 
     def decode(self, tokens, *, skip_special_tokens):
         assert skip_special_tokens
