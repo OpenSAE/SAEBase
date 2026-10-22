@@ -208,13 +208,23 @@ def test_official_scope_manifest_is_not_a_fabricated_cartesian_product():
     sibling = SimpleNamespace(rfilename="resid_post/layer_5_width_65k_l0_medium/params.npz")
     info = SimpleNamespace(
         sha="a" * 40,
-        siblings=[sibling, sibling, SimpleNamespace(rfilename="LICENSE")],
+        siblings=[
+            sibling,
+            sibling,
+            SimpleNamespace(rfilename="mlp_out/layer_2_width_16k_l0_small/params.safetensors"),
+            SimpleNamespace(rfilename="attn_out/layer_9_width_65k_l0_big/params.safetensors"),
+            SimpleNamespace(rfilename="LICENSE"),
+        ],
     )
     assets = discover_official_scope_assets(repo, info=info)
-    assert len(assets) == 1
-    assert assets[0].layer == 5
-    assert assets[0].width == "65k"
-    assert assets[0].revision == "a" * 40
-    assert assets[0].status == "official_manifest_unloaded"
+    assert len(assets) == 3
+    assert {(a.activation_family, a.layer) for a in assets} == {
+        ("resid_post", 5), ("mlp_out", 2), ("attn_out", 9)
+    }
+    residual = next(a for a in assets if a.activation_family == "resid_post")
+    assert residual.width == "65k"
+    assert residual.revision == "a" * 40
+    assert residual.status == "official_manifest_unloaded"
+    assert all(a.status == "official_manifest_unmapped" for a in assets if a is not residual)
     with pytest.raises(ValueError, match="unregistered"):
         discover_official_scope_assets("some/other-model", info=info)
