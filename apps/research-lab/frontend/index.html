@@ -144,6 +144,15 @@
           <a href="https://github.com/OpenSAE/SAEBase/blob/main/work_plan/04_research_platform_execution_plan.md" target="_blank" rel="noreferrer">Read the full execution plan ↗</a>
         </div>
       </div>
+      <div class="panel stacked recorded-interventions">
+        <div class="panel-title">
+          <h2>Measured interventions</h2>
+          <span class="subtle">Reviewed source data only · not live GPU output</span>
+        </div>
+        <p class="quiet">Browse real baseline, no-op, feature ablation and scaling measurements. Teacher-forced token predictions are not generated continuations. Original logits remain on the research machine.</p>
+        <div id="intervention-record-list" class="record-list" aria-live="polite"></div>
+        <div id="intervention-record-detail" class="record-list" hidden></div>
+      </div>
     </section>
     <section id="analyze" class="view" hidden>
       <div class="section-heading"><div><span class="eyebrow">RESEARCH METHODS</span><h1>Test what features explain.</h1><p>Use purpose-built analyses, with explicit assumptions and source methods.</p></div></div>
