@@ -4,6 +4,7 @@ This opt-in Python API records the complete nonzero codes at each token.
 It is distinct from model generation, feature steering and a public inference
 service. The returned record is private until reviewed for redistribution.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -53,15 +54,18 @@ def capture_prompt_trace(
         raise RuntimeError("Selected SAE hook did not fire")
     activation = cache[site.hook_name]
     if (
-        not isinstance(activation, torch.Tensor) or activation.ndim != 3
-        or activation.shape[0] != 1 or activation.shape[1] != n_tokens
+        not isinstance(activation, torch.Tensor)
+        or activation.ndim != 3
+        or activation.shape[0] != 1
+        or activation.shape[1] != n_tokens
         or activation.shape[2] != pair.identity.d_in
     ):
         raise ValueError("Exact token/SAE input dimensions mismatch")
     activation = activation[0]
     codes = sae.encode(activation)
     if (
-        not isinstance(codes, torch.Tensor) or codes.ndim != 2
+        not isinstance(codes, torch.Tensor)
+        or codes.ndim != 2
         or tuple(codes.shape) != (n_tokens, pair.identity.d_sae)
         or not bool(torch.isfinite(codes).all())
     ):
@@ -91,12 +95,16 @@ def capture_prompt_trace(
             {"feature_id": int(fid), "activation": float(codes[position, fid].float().item())}
             for fid in active.tolist()
         ]
-        tokens.append({
-            "position": position,
-            "token_id": int(token_id),
-            "text": str(token_text),
-            "features": sorted(features, key=lambda v: (-abs(v["activation"]), v["feature_id"])),
-        })
+        tokens.append(
+            {
+                "position": position,
+                "token_id": int(token_id),
+                "text": str(token_text),
+                "features": sorted(
+                    features, key=lambda v: (-abs(v["activation"]), v["feature_id"])
+                ),
+            }
+        )
     return {
         "site_id": f"{pair.identity.model_key}:{pair.identity.sae_key}:L{layer}",
         "model_sha256": sha256_state_dict(raw_model),
