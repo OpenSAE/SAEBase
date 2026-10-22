@@ -67,6 +67,11 @@ class TrainPlan:
             and 1 <= self.max_examples <= (100_000_000 if allow_large else 10000)
         ):
             raise PermissionError("Large C2/C3 training needs separate authorization")
+        if self.backend == "sparsify" and self.max_examples > self.steps * self.batch_size:
+            raise ValueError(
+                "Sparsify trains on dataset examples, not a step limit; max_examples "
+                "must fit within the predeclared steps × batch_size budget"
+            )
         if self.distributed_gpus < 1 or self.distributed_gpus > 16:
             raise ValueError("GPU world size outside supported bounds")
         if self.distributed_gpus > 1 and not allow_large:
@@ -104,6 +109,8 @@ def _saelens_train(plan: TrainPlan, checkpoint_dir: Path) -> None:
         model_name=plan.model_path,
         hook_name=plan.hookpoint,
         dataset_path=plan.dataset_path,
+        dataset_trust_remote_code=False,
+        streaming=False,
         sae=sae,
         train_batch_size_tokens=plan.batch_size,
         training_tokens=plan.steps * plan.batch_size,
@@ -113,11 +120,12 @@ def _saelens_train(plan: TrainPlan, checkpoint_dir: Path) -> None:
         dtype="float32",
         n_checkpoints=1,
         checkpoint_path=str(checkpoint_dir),
+        save_final_checkpoint=True,
+        output_path=str(checkpoint_dir / "inference"),
         resume_from_checkpoint=plan.resume_checkpoint,
         logger=LoggingConfig(log_to_wandb=False),
     )
-    trained = LanguageModelSAETrainingRunner(runner).run()
-    trained.save_inference_model(str(checkpoint_dir / "inference"))
+    LanguageModelSAETrainingRunner(runner).run()
 
 
 def _sparsify_command(plan: TrainPlan) -> list[str]:
@@ -139,13 +147,17 @@ def _sparsify_command(plan: TrainPlan) -> list[str]:
         str(plan.batch_size),
         "--k",
         str(plan.k),
+        "--num_latents",
+        str(plan.d_sae),
+        "--revision",
+        plan.model_revision,
     ]
     if plan.architecture == "transcoder":
         cmd.append("--transcode")
     if plan.resume_checkpoint is not None:
-        # Sparsify's --finetune is a new training run initialized from weights,
-        # NOT a claim to restore optimizer+data iterator state.
-        cmd += ["--finetune", plan.resume_checkpoint]
+        # Native Sparsify restores optimizer, scheduler and trainer state with
+        # --resume from checkpoints/{run_name}. --finetune only loads weights.
+        cmd.append("--resume")
     if plan.distributed_gpus > 1:
         cmd = [
             "torchrun",
@@ -173,6 +185,13 @@ def run_training(
         raise PermissionError("Training must be explicitly authorized")
     if output.exists():
         raise FileExistsError("Training output and historical state are immutable")
+    if plan.backend == "sparsify" and plan.resume_checkpoint is not None:
+        raise ValueError(
+            "Use resume_sparsify_training on the existing native run directory; "
+            "a new output cannot resume its old optimizer/data state"
+        )
+    if plan.backend == "sparsify" and plan.device != "cuda":
+        raise RuntimeError("Native Sparsify training requires an actual CUDA device")
     if not 30 <= timeout_seconds <= (86400 if allow_large else 3600):
         raise ValueError("Training timeout outside approved tier")
     import torch
@@ -221,6 +240,73 @@ def run_training(
         "distributed_gpus_requested": plan.distributed_gpus,
     }
 
+
+
+def resume_sparsify_training(
+    plan: TrainPlan, *, output: Path, approved: bool = False,
+    allow_large: bool = False, timeout_seconds: int = 1800,
+) -> dict:
+    """Resume real optimizer/trainer state only in its original run directory.
+
+    Sparsify's upstream CLI resolves checkpoints/{run_name} relative to the
+    current directory. The owner must approve resuming that *same* run; a
+    fine-tuned new model is not equivalent to a resumed training trajectory.
+    Logs are never overwritten, and failed attempts remain inspectable.
+    """
+    if plan.backend != "sparsify" or plan.resume_checkpoint is None:
+        raise ValueError("Only genuine native Sparsify resume plans are supported")
+    plan.validate(allow_large=allow_large)
+    if not approved:
+        raise PermissionError("Explicit checkpoint-resume permission required")
+    if not 30 <= timeout_seconds <= (86400 if allow_large else 3600):
+        raise ValueError("Resume timeout outside approved budget")
+    import torch
+
+    if not torch.cuda.is_available():
+        raise RuntimeError("Sparsify resume requires actual CUDA hardware")
+    if plan.distributed_gpus > torch.cuda.device_count():
+        raise RuntimeError("Cannot simulate missing distributed CUDA ranks")
+    output = output.resolve()
+    expected = (output / "checkpoints" / plan.run_name).resolve()
+    if Path(plan.resume_checkpoint).resolve() != expected:
+        raise ValueError("Resume checkpoint must be native checkpoints/{run_name}")
+    if not (expected / "state.pt").is_file():
+        raise FileNotFoundError("Native optimizer/trainer state.pt is missing")
+    original = output / "plan.json"
+    if not original.is_file():
+        raise FileNotFoundError("Original frozen native training plan is missing")
+    prior = json.loads(original.read_text(encoding="utf-8"))
+    current = asdict(plan)
+    for record in (prior, current):
+        record.pop("resume_checkpoint", None)
+    if prior != current:
+        raise ValueError("Full native resume requires the original immutable training plan")
+    attempts = output / "resume_attempts"
+    attempts.mkdir(exist_ok=True, mode=0o700)
+    attempt = attempts / str(time.time_ns())
+    attempt.mkdir(mode=0o700)
+    proc = subprocess.run(
+        _sparsify_command(plan),
+        cwd=output,
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=timeout_seconds,
+        env={**os.environ, "WANDB_MODE": "disabled"},
+    )
+    (attempt / "native.stdout.log").write_text(proc.stdout)
+    (attempt / "native.stderr.log").write_text(proc.stderr)
+    (attempt / "exit.json").write_text(
+        json.dumps({"returncode": proc.returncode}, sort_keys=True) + "\n"
+    )
+    if proc.returncode:
+        raise RuntimeError("Original Sparsify checkpoint resume failed; inspect attempt logs")
+    return {
+        "status": "native_resume_returned_not_numerically_certified",
+        "attempt_directory": str(attempt),
+        "real_gpus_used": plan.distributed_gpus,
+        "resume_equivalence_verified": False,
+    }
 
 def register_checkpoint(native_directory: Path, output: Path, *, source: dict) -> dict:
     """Hash an actual saved native checkpoint without copying third-party weights."""
