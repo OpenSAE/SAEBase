@@ -35,6 +35,7 @@ Turn WP12's source-level implementations into actual runnable research workflows
 - [**13 — Machine-readable LIVE task queue**](13_live_execution_matrix.csv). Eleven execution tasks with dependent prerequisites, resource caps, measured success definitions, minimal handoffs and honest external blockers.
 - [**13 — Ten candidate demo prompts**](13_demo_prompt_candidates.json). Original engineering text candidates with fixed IDs and 6/4 discovery/evaluation split, all explicitly unreviewed; real model activations and release approval must be added separately.
 - [**13 — LIVE-00/01/02 agent report**](13_live_00_02_report_20261022.json). Trusted reported runtime results and exact GPU/database identities, kept separate from source verification and public approval.
-- [**13 — Small LIVE-02 handoff and staging publication**](13_live02_small_handoff_and_publication.md). Metadata-only GPU report, source-hash-bound local review, compact Research Lab staging bundle and next LIVE-03 task; no huge ZIP transfers.
+- [**13 — Small LIVE-02 handoff and staging publication**](13_live02_small_handoff_and_publication.md). Metadata-only GPU report, source-hash-bound local review, compact Research Lab staging bundle; no huge ZIP transfers.
+- [**13 — LIVE-03 measured intervention integration**](13_live03_review_and_gallery.md). PR #55/#56 merged; L5 F506 and L9 F95 no-op/ablation/scale with separate edited-token and final-token logits, optional approved CPU gallery and remaining private job work.
 
 WP13 changes **operational readiness and deployment**, not the untouched WP12 P8 scientific release verdicts. Start with one complete real Prompt → Feature → Intervention workflow, publish a useful reviewed CPU Lab, then extend to native training and circuits.
