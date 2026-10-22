@@ -5,6 +5,7 @@ One iteration only. Does not launch a public service, download datasets
 implicitly, or simulate an inference result. Configure OPENSAE_PRIVATE_DATA
 and OPENSAE_ENABLE_PRIVATE_JOBS=1 before invoking.
 """
+
 from __future__ import annotations
 
 import argparse

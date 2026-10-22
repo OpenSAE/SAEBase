@@ -133,9 +133,7 @@ def status(job_id: str, authorization: str | None = Header(default=None)) -> dic
 
 
 @router.get("/jobs/{job_id}/result")
-def private_result(
-    job_id: str, authorization: str | None = Header(default=None)
-) -> dict[str, Any]:
+def private_result(job_id: str, authorization: str | None = Header(default=None)) -> dict[str, Any]:
     """Return only the authenticated operator's hash-verified native output."""
     root = authorize("operator", authorization)
     status = get_queue(root).status(job_id=job_id, owner="single-operator")

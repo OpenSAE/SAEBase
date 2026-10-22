@@ -108,8 +108,11 @@ def test_private_operator_worker_roles_and_durable_queue(monkeypatch, tmp_path):
     assert claimed.status_code == 200
     job = claimed.json()["job"]
     assert "Hidden" not in str(job)
-    payload = {"job_id": job_id, "schema": "opensae.wp12.private_test_fixture.v1",
-               "logit_delta_l2": 0.25}
+    payload = {
+        "job_id": job_id,
+        "schema": "opensae.wp12.private_test_fixture.v1",
+        "logit_delta_l2": 0.25,
+    }
     data = json.dumps(payload, sort_keys=True).encode()
     path = tmp_path / "results" / (job_id + ".json")
     path.parent.mkdir()

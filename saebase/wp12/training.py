@@ -241,10 +241,13 @@ def run_training(
     }
 
 
-
 def resume_sparsify_training(
-    plan: TrainPlan, *, output: Path, approved: bool = False,
-    allow_large: bool = False, timeout_seconds: int = 1800,
+    plan: TrainPlan,
+    *,
+    output: Path,
+    approved: bool = False,
+    allow_large: bool = False,
+    timeout_seconds: int = 1800,
 ) -> dict:
     """Resume real optimizer/trainer state only in its original run directory.
 
@@ -307,6 +310,7 @@ def resume_sparsify_training(
         "real_gpus_used": plan.distributed_gpus,
         "resume_equivalence_verified": False,
     }
+
 
 def register_checkpoint(native_directory: Path, output: Path, *, source: dict) -> dict:
     """Hash an actual saved native checkpoint without copying third-party weights."""
