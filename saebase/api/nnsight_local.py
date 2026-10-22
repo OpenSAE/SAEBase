@@ -5,6 +5,7 @@ device selection is performed here. Use an existing NNsight wrapper or call
 `from_torch` explicitly. Module locations are exact user-selected paths and
 the wrapper rejects ambiguous or unsafe attribute names.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -105,7 +106,9 @@ class NNsightLocal:
         return _tensor(result)
 
     def capture_many(
-        self, inputs: Sequence[Any], location: TraceLocation,
+        self,
+        inputs: Sequence[Any],
+        location: TraceLocation,
     ) -> tuple[torch.Tensor, ...]:
         """Use native NNsight invokers, preserving per-invocation order."""
         if not inputs:
@@ -120,8 +123,12 @@ class NNsightLocal:
         return tuple(_tensor(ref) for ref in refs)
 
     def edit(
-        self, inputs: Any, location: TraceLocation, replacement: torch.Tensor,
-        *, readout: TraceLocation,
+        self,
+        inputs: Any,
+        location: TraceLocation,
+        replacement: torch.Tensor,
+        *,
+        readout: TraceLocation,
     ) -> torch.Tensor:
         """Assign a real trace activation, then capture downstream readout.
 
@@ -138,7 +145,11 @@ class NNsightLocal:
         return _tensor(changed)
 
     def gradient(
-        self, inputs: Any, location: TraceLocation, *, loss_location: TraceLocation,
+        self,
+        inputs: Any,
+        location: TraceLocation,
+        *,
+        loss_location: TraceLocation,
     ) -> torch.Tensor:
         """Gradient of the sum of a downstream Tensor, via native NNsight.
 
