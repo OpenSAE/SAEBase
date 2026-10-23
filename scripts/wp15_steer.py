@@ -36,7 +36,9 @@ def _sample(model, prompt: str, sample_id: str) -> tuple[MeasurementSample, list
     return MeasurementSample(record=record), [str(text) for text in texts]
 
 
-def _active_feature(model, sae, site_hook: str, layer: int, sample: MeasurementSample, texts: list[str]) -> tuple[int, int, float]:
+def _active_feature(
+    model, sae, site_hook: str, layer: int, sample: MeasurementSample, texts: list[str]
+) -> tuple[int, int, float]:
     ids = torch.tensor([sample.tokens], dtype=torch.long)
     for position in range(len(sample.tokens) - 1, -1, -1):
         if texts[position] in SPECIAL:
@@ -79,9 +81,15 @@ def _run_one(pair, prompt: str, sample_id: str, max_new_tokens: int, scale: floa
                 "first_different_generated_index": result["first_different_generated_index"],
                 "baseline_generated_token_ids": result["baseline_generated_token_ids"],
                 "edited_generated_token_ids": result["steered_generated_token_ids"],
-                "baseline_continuation": decode(result["baseline_generated_token_ids"], skip_special_tokens=False),
-                "edited_continuation": decode(result["steered_generated_token_ids"], skip_special_tokens=False),
-                "noop_equal_baseline": result["same_continuation"] if condition.operation == "identity" else None,
+                "baseline_continuation": decode(
+                    result["baseline_generated_token_ids"], skip_special_tokens=False
+                ),
+                "edited_continuation": decode(
+                    result["steered_generated_token_ids"], skip_special_tokens=False
+                ),
+                "noop_equal_baseline": result["same_continuation"]
+                if condition.operation == "identity"
+                else None,
                 "steps": result.get("steered_steps", []),
             }
         )
@@ -122,7 +130,9 @@ def main(argv: list[str] | None = None) -> int:
         prompt = path.read_text(encoding="utf-8")
         if not prompt.strip():
             parser.error("Prompt file is empty: " + str(path))
-        rows.append(_run_one(pair, prompt, f"WP15-G2-{index + 1:02d}", args.max_new_tokens, args.scale))
+        rows.append(
+            _run_one(pair, prompt, f"WP15-G2-{index + 1:02d}", args.max_new_tokens, args.scale)
+        )
     document = {
         "schema": "opensae.wp15.generation_steering.v1",
         "sae_key": args.sae_key,
@@ -132,25 +142,33 @@ def main(argv: list[str] | None = None) -> int:
         "prompts": rows,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(document, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(json.dumps({
-        "output": str(args.output),
-        "prompts": [
+    args.output.write_text(
+        json.dumps(document, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
+    print(
+        json.dumps(
             {
-                "sample_id": row["sample_id"],
-                "feature_id": row["feature_id"],
-                "conditions": [
+                "output": str(args.output),
+                "prompts": [
                     {
-                        "name": run["condition"]["name"],
-                        "same_continuation": run["same_continuation"],
-                        "max_abs_logit_delta": max(step["max_abs_logit_delta"] for step in run["steps"]),
+                        "sample_id": row["sample_id"],
+                        "feature_id": row["feature_id"],
+                        "conditions": [
+                            {
+                                "name": run["condition"]["name"],
+                                "same_continuation": run["same_continuation"],
+                                "max_abs_logit_delta": max(
+                                    step["max_abs_logit_delta"] for step in run["steps"]
+                                ),
+                            }
+                            for run in row["runs"]
+                        ],
                     }
-                    for run in row["runs"]
+                    for row in rows
                 ],
             }
-            for row in rows
-        ],
-    }))
+        )
+    )
     return 0
 
 
