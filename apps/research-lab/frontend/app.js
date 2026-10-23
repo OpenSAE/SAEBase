@@ -706,6 +706,14 @@
           " at position " + sample.feature_position);
         append(box, "p", "quiet", "Prompt SHA256 " + sample.prompt_sha256.slice(0, 16) +
           "… · activation " + safeNumber(sample.feature_activation));
+        if (sample.public_example) {
+          append(box, "p", "quiet", "Reviewed author-approved example · local GPU output");
+          append(box, "p", "", "Input: " + sample.public_example.prompt_text);
+          append(box, "p", "", "Baseline continuation: " +
+            sample.public_example.baseline_continuation);
+          append(box, "p", "", "Edited continuation: " +
+            sample.public_example.edited_continuation);
+        }
         const table = append(box, "table");
         const head = append(append(table, "thead"), "tr");
         ["Edit", "Same greedy text", "Step-0 max |Δ logit|", "P(clean token, baseline)", "P(clean token, edited)", "Clean token rank after edit"].forEach(function (name) {
