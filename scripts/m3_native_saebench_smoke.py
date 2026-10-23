@@ -12,6 +12,12 @@ from pathlib import Path
 import random
 import os
 
+# Newer jaxtyping memos symbolic sizes process-wide. The pinned SAEBench
+# probe annotates train and test tensors with different lengths under one
+# name, so the second class crashes after a real probe has already trained.
+# Disabling the checker keeps the original sklearn estimator unchanged.
+os.environ["JAXTYPING_DISABLE"] = "1"
+
 import numpy as np
 import torch
 

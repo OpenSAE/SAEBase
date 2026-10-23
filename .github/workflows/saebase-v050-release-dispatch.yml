@@ -1,0 +1,73 @@
+name: SAEBase v0.5.0 Approved Release Dispatch
+
+# One-time version-specific dispatch after the exact source's successful
+# push-to-main CI. The normal, fail-closed software-release workflow still
+# verifies six jobs and asset hashes and performs the actual publication.
+# Publishing was explicitly requested by the repository maintainer.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: saebase-v0.5.0-once
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: >-
+      ${{ github.repository == 'OpenSAE/SAEBase' &&
+          github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'push' &&
+          github.event.workflow_run.head_branch == 'main' &&
+          github.event.workflow_run.head_repository.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+      VERSION: "0.5.0"
+      TAG: "v0.5.0"
+    steps:
+      - name: Authorize only the exact public software Beta
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$(gh api "repos/$REPO/branches/main" --jq '.commit.sha')" = "$SOURCE_SHA"
+          echo "Require original CI run ID: ${{ github.event.workflow_run.id }}"
+          if gh api "repos/$REPO/git/ref/tags/$TAG" >/dev/null 2>&1; then
+            echo "Version tag already exists; release must never be republished."
+            exit 0
+          fi
+          gh api "repos/$REPO/contents/pyproject.toml?ref=$SOURCE_SHA" \
+            --jq '.content' | base64 -d | grep -q 'version = "0.5.0"'
+          gh api "repos/$REPO/contents/docs/releases/v0.5.0.md?ref=$SOURCE_SHA" \
+            --jq '.sha' | grep -Eq '^[a-f0-9]{40}$'
+          gh api "repos/$REPO/contents/work_plan/17_seven_playgrounds_agent_handoff.md?ref=$SOURCE_SHA" \
+            --jq '.sha' | grep -Eq '^[a-f0-9]{40}$'
+      - name: Dispatch existing source-bound release verifier and publisher
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            echo "Existing v0.5.0 GitHub Release; no dispatch."
+            exit 0
+          fi
+          # Existing v0.5.0 tag without release requires manual investigation.
+          if gh api "repos/$REPO/git/ref/tags/$TAG" >/dev/null 2>&1; then
+            echo "Existing version tag, refusing to dispatch."
+            exit 1
+          fi
+          gh workflow run software-release.yml --repo "$REPO" --ref main \
+            -f source_sha="$SOURCE_SHA" \
+            -f version="$VERSION" \
+            -f mode=publish \
+            -f confirmation="PUBLISH-$TAG"
+          echo "Requested standard source-bound six-context software publishing."
+          echo "No GPU raw experiments or third-party text are among the software assets."

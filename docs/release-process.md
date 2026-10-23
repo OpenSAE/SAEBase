@@ -139,3 +139,19 @@ process; there is no general automatic software release enabled.
 
 Release assets contain software, release-evidence and checksums only. The
 GPU experiment archive and third-party source texts are excluded.
+
+## One-time maintainer-authorized SAEBase v0.5.0 publication
+
+The maintainer explicitly requested the v0.5.0 release. A version-specific
+[one-time CI dispatch](../.github/workflows/saebase-v050-release-dispatch.yml)
+reacts **only** to a completed, successful push-to-main CI for the exact
+current head, confirms `pyproject.toml` is version 0.5.0 and the release
+notes exist, and invokes the existing checked `software-release.yml`
+workflow with `mode=publish` and `PUBLISH-v0.5.0`.
+The software release gate independently rechecks all six CI contexts,
+wheel and sdist hashes, installed import, source identity and tag
+immutability before publication. It does not upload PyPI packages,
+publish private GPU artifacts, or provision a public inference service.
+
+This is deliberately scoped to **v0.5.0 only** and cannot publish
+future versions. Prior v0.4.0 and all historical tags stay immutable.

@@ -4,7 +4,8 @@
 */
 "use strict";
 (function () {
-  const state = { sites: [], datasets: [], current: "overview", resultOffset: 0, resultTotal: 0 };
+  const state = { sites: [], datasets: [], assets: [], assetsLoaded: false, tracesLoaded: false, activeTrace: null, searchMode: "explanation", current: "overview", resultOffset: 0, resultTotal: 0,
+    circuitsLoaded: false, circuitData: null, circuitSelected: null, circuitPins: new Set(), circuitNotes: {}, circuitGroups: [], graphScale: 1 };
   const byId = function (id) { return document.getElementById(id); };
   const create = function (tag, cls, text) {
     const element = document.createElement(tag);
@@ -66,10 +67,21 @@
     });
     document.title = (view === "overview" ? "OpenSAE" : view[0].toUpperCase() + view.slice(1) + " · OpenSAE") + " Research Lab";
     if (view === "results") loadResults(true);
-    if (view === "explore") loadFeatures();
+    if (view === "explore") {
+      loadAssets(); loadFeatures(); loadRecordedTraces(); loadWp15Explanation();
+      const params = new URLSearchParams(window.location.hash.split("?")[1] || "");
+      const site = params.get("site");
+      const index = params.get("feature");
+      if (site && index && /^\\d+$/.test(index)) loadFeature(site, Number(index));
+    }
+    if (view === "intervene") { loadMeasuredInterventions(); loadWp15Generation(); }
     if (view === "analyze") loadAnalyses();
     if (view === "datasets") loadDatasets();
     if (view === "reports") loadReports();
+    if (view === "benchmarks") loadBenchmarks();
+    if (view === "training") loadTraining();
+    if (view === "circuits") loadCircuitCatalog();
+    if (view === "jobs") loadComputeRoutes();
     window.scrollTo({ top: 0, behavior: "instant" });
   }
   async function bootstrap() {
@@ -134,9 +146,201 @@
       byId("results-count").textContent = "Evidence unavailable";
     }
   }
+  function renderAssets() {
+    const target = byId("asset-table");
+    clear(target);
+    const selected = value("asset-model");
+    const items = state.assets.filter(function (item) {
+      return !selected || item.model_key === selected;
+    });
+    items.forEach(function (asset) {
+      const tr = append(target, "tr");
+      append(tr, "td", "", asset.model_key);
+      append(tr, "td", "", (asset.layers && asset.layers.length > 1 ? "L" + asset.layers.join(",") :
+        asset.layer < 0 ? "Cross-layer" : "L" + asset.layer) + " · " + asset.hook);
+      append(tr, "td", "", asset.sae_id);
+      append(tr, "td", "", asset.width || "Unspecified");
+      append(tr, "td", "", asset.l0_variant || "Unspecified");
+      const cell = append(tr, "td");
+      if (typeof asset.repo_id === "string" &&
+          asset.repo_id.startsWith("google/gemma-scope-2-") &&
+          /^[a-z0-9-]+$/.test(asset.repo_id.slice("google/gemma-scope-2-".length))) {
+        const link = append(cell, "a", "", "Official manifest ↗");
+        link.href = "https://huggingface.co/" + asset.repo_id;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+      } else {
+        append(cell, "span", "", "Source unavailable");
+      }
+    });
+    if (!items.length) {
+      const tr = append(target, "tr");
+      append(tr, "td", "", "No registered assets for this selection.").colSpan = 6;
+    }
+    byId("asset-count").textContent = items.length +
+      " registered resource sites · weights are not loaded by this page";
+  }
+  async function loadAssets() {
+    if (state.assetsLoaded) { renderAssets(); return; }
+    const target = byId("asset-table");
+    try {
+      const response = await get("/api/sae-assets");
+      if (response.mode !== "registered_metadata_only" || !Array.isArray(response.items)) {
+        throw new Error("Unexpected asset registry response");
+      }
+      state.assets = response.items;
+      state.assetsLoaded = true;
+      const modelNames = Array.from(new Set(state.assets.map(function (a) { return a.model_key; }))).sort();
+      const selector = byId("asset-model");
+      modelNames.forEach(function (key) {
+        const option = append(selector, "option", "", key);
+        option.value = key;
+      });
+      renderAssets();
+    } catch (error) {
+      clear(target);
+      const tr = append(target, "tr");
+      append(tr, "td", "", "Asset registry unavailable: " + error.message).colSpan = 6;
+    }
+  }
+  async function postExplore(request) {
+    const response = await fetch("/api/explore/search", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      cache: "no-store", body: JSON.stringify(request)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(typeof data.detail === "string" ? data.detail : "Search failed");
+    return data;
+  }
+  function setSearchMode(mode) {
+    state.searchMode = mode;
+    document.querySelectorAll("[data-explore-mode]").forEach(function (tab) {
+      const selected = tab.dataset.exploreMode === mode;
+      tab.classList.toggle("selected", selected);
+      tab.setAttribute("aria-pressed", String(selected));
+    });
+    ["explanation", "inference", "token"].forEach(function (key) {
+      byId("explore-mode-" + key).hidden = key !== mode;
+    });
+    clear(byId("explore-search-results"));
+  }
+  function featureLink(parent, title, siteId, featureId) {
+    const link = append(parent, "a", "", title);
+    link.href = "#explore?site=" + encodeURIComponent(siteId) + "&feature=" + featureId;
+    link.addEventListener("click", function () {
+      if (window.location.hash === link.getAttribute("href")) loadFeature(siteId, featureId);
+    });
+    return link;
+  }
+  function showRankedFeatures(parent, items, siteId) {
+    if (!items.length) {
+      empty(parent, "No observed active features", "This recorded token has no nonzero SAE codes.");
+      return;
+    }
+    const list = append(parent, "div", "ranked-features");
+    items.forEach(function (row, rank) {
+      const card = append(list, "div", "ranked-row");
+      append(card, "span", "token-rank", String(rank + 1));
+      featureLink(card, "Feature " + row.feature_id, siteId, row.feature_id);
+      append(card, "span", "number", safeNumber(row.activation));
+      append(card, "span", "quiet", "Token " + row.position);
+    });
+  }
+  async function searchExplanations() {
+    const target = byId("explore-search-results");
+    empty(target, "Searching published explanations…", "");
+    try {
+      const response = await postExplore({
+        mode: "explanation", query: value("explanation-query"), limit: 40
+      });
+      clear(target);
+      if (!response.total) {
+        empty(target, "No reviewed explanations match", "There are no published descriptions for this query.");
+        return;
+      }
+      const list = append(target, "div", "explanation-results");
+      response.items.forEach(function (entry) {
+        const item = append(list, "div", "record");
+        featureLink(item, entry.site_id + " · Feature " + entry.feature_id, entry.site_id, entry.feature_id);
+        append(item, "p", "", entry.description);
+        append(item, "span", "quiet", entry.origin + " · " + entry.status +
+          " · " + entry.author_or_model + (entry.heldout_score == null ?
+            "" : " · Held-out score " + safeNumber(entry.heldout_score)));
+      });
+    } catch (error) { errorMessage(target, error); }
+  }
+  async function searchRecordedInference() {
+    const target = byId("explore-search-results");
+    empty(target, "Looking for an exact recorded input…", "");
+    try {
+      const response = await postExplore({
+        mode: "inference", query: value("inference-prompt"), limit: 10
+      });
+      clear(target);
+      response.items.forEach(function (record) {
+        const part = append(target, "div", "record");
+        append(part, "h3", "", record.site_id + " · recorded computation");
+        append(part, "p", "quiet",
+          "Ranked across content tokens only. Special tokens such as <bos> remain visible when selecting an individual recorded token.");
+        showRankedFeatures(part, record.max_features, record.site_id);
+      });
+    } catch (error) { errorMessage(target, error); }
+  }
+  async function loadRecordedTraces() {
+    if (state.tracesLoaded) return;
+    const strip = byId("token-strip");
+    empty(strip, "Checking saved prompts…", "");
+    try {
+      const collection = await get("/api/explore/traces");
+      const selector = byId("trace-select");
+      collection.items.forEach(function (trace) {
+        const option = append(selector, "option", "",
+          trace.site_id + " · " + trace.sample_id + " · " + trace.token_count + " tokens");
+        option.value = trace.trace_id;
+      });
+      state.tracesLoaded = true;
+      if (!collection.items.length) {
+        empty(strip, "No public recorded token traces", "A local GPU or CPU worker can export real traces for review before publication.");
+      } else clear(strip);
+    } catch (error) { errorMessage(strip, error); }
+  }
+  async function selectRecordedTrace() {
+    const id = value("trace-select");
+    const strip = byId("token-strip");
+    if (!id) { empty(strip, "Select a recorded prompt", "No computation is started."); return; }
+    try {
+      const trace = await get("/api/explore/traces/" + encodeURIComponent(id));
+      state.activeTrace = trace;
+      clear(strip);
+      trace.tokens.forEach(function (token) {
+        const button = append(strip, "button", "token-button", token.text || "(empty token)");
+        button.type = "button";
+        button.title = "Token " + token.position + " · id " + token.token_id;
+        button.addEventListener("click", function () { showTokenFeatures(trace, token.position); });
+      });
+      showTokenFeatures(trace, trace.tokens.length - 1);
+    } catch (error) { errorMessage(strip, error); }
+  }
+  async function showTokenFeatures(trace, position) {
+    const target = byId("explore-search-results");
+    clear(target);
+    try {
+      const response = await postExplore({
+        mode: "token", trace_id: trace.trace_id, position: position, limit: 30
+      });
+      const token = trace.tokens[position];
+      append(target, "h3", "", "Token " + position + " · " + (token.text || "(empty token)"));
+      append(target, "p", "quiet", "Recorded nonzero SAE codes · " + trace.site_id +
+        " · " + trace.prompt_group_id + " · not live inference");
+      showRankedFeatures(target, response.items, response.site_id);
+      byId("token-strip").querySelectorAll("button").forEach(function (button, i) {
+        button.classList.toggle("selected", i === position);
+      });
+    } catch (error) { errorMessage(target, error); }
+  }
   async function loadFeatures() {
     const target = byId("feature-list");
-    empty(target, "Loading observations…", "");
+    empty(target, "Loading published feature cards…", "");
     const query = new URLSearchParams({
       q: value("feature-query"), model: value("feature-model"), limit: "48"
     });
@@ -144,39 +348,92 @@
       const data = await get("/api/features?" + query.toString());
       clear(target);
       if (!data.total) {
-        empty(target, "Feature measurements not yet released",
-          "The index builder is ready for genuine checkpoint activations. No invented feature cards are shown before collection.");
-        byId("feature-detail").hidden = true;
+        empty(target, "Feature measurements not yet published",
+          "The SQLite/index pipeline accepts real verified observations. No synthetic card is displayed as a measurement.");
         return;
       }
       data.items.forEach(function (feature) {
-        const button = append(target, "button", "feature-card");
-        button.type = "button";
-        append(button, "span", "kicker", feature.model + " · L" + feature.layer);
-        append(button, "h3", "", "Feature " + feature.feature_id);
-        append(button, "p", "", feature.label || "No verified natural-language explanation");
-        append(button, "span", "count", feature.unique_prompt_groups + " observed prompt groups");
-        button.addEventListener("click", function () { showFeature(feature); });
+        const card = append(target, "div", "feature-card");
+        append(card, "span", "kicker", feature.model + " · L" + feature.layer);
+        const title = append(card, "h3");
+        featureLink(title, "Feature " + feature.feature_id, feature.site_id, feature.feature_id);
+        append(card, "p", "", feature.label || "No approved explanation");
+        append(card, "span", "count", feature.unique_prompt_groups + " recorded prompt groups");
       });
     } catch (error) { errorMessage(target, error); }
   }
-  function showFeature(feature) {
+  async function loadFeature(siteId, featureId) {
     const panel = byId("feature-detail");
     panel.hidden = false;
     clear(panel);
-    append(panel, "span", "kicker", feature.site_id);
-    append(panel, "h2", "", "Feature " + feature.feature_id);
-    append(panel, "p", "quiet", "Exact model and SAE identities are recorded in the verified site matrix.");
-    append(panel, "p", "", "Observed groups: " + feature.unique_prompt_groups + " · Nonzero observations: " + feature.observations + " · Maximum recorded activation: " + safeNumber(feature.max_activation));
-    append(panel, "h3", "", "Source-approved activation examples");
-    if (!feature.examples || !feature.examples.length) {
-      append(panel, "p", "", "No examples have been approved for public text display.");
-    } else feature.examples.forEach(function (example) {
-      const sample = append(panel, "div", "example");
-      append(sample, "strong", "", "Token " + example.token_position + " · " + example.token_text + " · activation " + safeNumber(example.activation));
-      append(sample, "p", "longtext", example.text_excerpt || "Text not included in public record.");
-    });
-    panel.scrollIntoView({ behavior:"smooth",block:"nearest" });
+    append(panel, "p", "quiet", "Loading source-bound feature…");
+    try {
+      const data = await get("/api/explore/features/" + encodeURIComponent(siteId) + "/" + featureId);
+      clear(panel);
+      append(panel, "span", "kicker", data.site.model + " · L" + data.site.layer + " · " + data.site.sae);
+      append(panel, "h2", "", "Feature " + data.feature_id);
+      const nav = append(panel, "div", "feature-navigation");
+      if (data.previous_feature_id != null) featureLink(nav, "← Previous", siteId, data.previous_feature_id);
+      if (data.next_feature_id != null) featureLink(nav, "Next →", siteId, data.next_feature_id);
+      const intervene = append(nav, "button", "btn tiny", "Design an intervention ↗");
+      intervene.type = "button";
+      intervene.addEventListener("click", function () {
+        const selector = byId("intervention-site");
+        if ([...selector.options].some(function (option) { return option.value === siteId; })) {
+          selector.value = siteId;
+        }
+        byId("intervention-features").value = String(featureId);
+        byId("intervention-operation").value = "ablate";
+        window.location.hash = "#intervene";
+      });
+      const download = append(nav, "a", "", "Export offline HTML ↗");
+      download.href = "/api/explore/features/" + encodeURIComponent(siteId) + "/" +
+        featureId + "/export.html";
+      download.setAttribute("download", "opensae-feature-" + featureId + ".html");
+      append(panel, "p", "quiet", "Exact site " + data.site.site_id +
+        " · " + data.site.hook + " · evidence is recorded, not live");
+      append(panel, "p", "", "Observed feature occurrences: " + data.observations +
+        " · independent prompt groups: " + data.unique_prompt_groups +
+        " · highest recorded activation: " + safeNumber(data.max_activation));
+      const labels = append(panel, "div", "feature-explanations");
+      append(labels, "h3", "", "Published interpretations");
+      if (!(data.explanations || []).length) {
+        append(labels, "p", "quiet", "No approved explanation. Feature activations are observations, not semantic labels.");
+      } else (data.explanations || []).forEach(function (entry) {
+        const item = append(labels, "div", "example");
+        append(item, "p", "", entry.description);
+        append(item, "span", "quiet", entry.origin + " · " + entry.method +
+          " · " + entry.status + " · " + entry.author_or_model);
+        if (entry.heldout_score != null)
+          append(item, "p", "quiet", "Held-out activation prediction score " +
+            safeNumber(entry.heldout_score) + " · not ground-truth semantic accuracy");
+      });
+      append(panel, "h3", "", "Highest reviewed activation contexts");
+      const examples = data.examples || [];
+      if (!examples.length) append(panel, "p", "quiet", "No text approved for public display.");
+      examples.forEach(function (ex) {
+        const item = append(panel, "div", "example");
+        append(item, "strong", "", ex.token_text + " · activation " + safeNumber(ex.activation));
+        append(item, "p", "longtext", ex.text_excerpt || "Original context not publicly available.");
+      });
+      if (examples.length) append(panel, "p", "quiet",
+        "The displayed values are selected reviewed examples, not a corpus-wide activation histogram or density estimate.");
+      const corr = append(panel, "div", "feature-correlations");
+      append(corr, "h3", "", "Correlations across recorded prompt groups");
+      append(corr, "p", "quiet", "Loading the actual complete-code group comparison…");
+      try {
+        const scores = await get("/api/explore/features/" + encodeURIComponent(siteId) +
+          "/" + featureId + "/correlations");
+        clear(corr);
+        append(corr, "h3", "", "Correlations across recorded prompt groups");
+        append(corr, "p", "quiet", scores.note || "Complete sparse-code source");
+        (scores.items || []).forEach(function (value) {
+          const row = append(corr, "div", "correlation-row");
+          featureLink(row, "Feature " + value.feature_id, siteId, value.feature_id);
+          append(row, "span", "number", "Pearson r = " + safeNumber(value.pearson_r));
+        });
+      } catch (error) { append(corr, "p", "quiet", "Correlation unavailable: " + error.message); }
+    } catch (error) { errorMessage(panel, error); }
   }
   async function loadDatasets() {
     const target = byId("dataset-list");
@@ -283,6 +540,85 @@
     } catch (error) { append(panel,"p","",error.message); }
     panel.scrollIntoView({behavior:"smooth",block:"nearest"});
   }
+  async function loadMeasuredInterventions() {
+    const target = byId("intervention-record-list");
+    empty(target, "Loading reviewed real intervention records…", "");
+    byId("intervention-record-detail").hidden = true;
+    try {
+      const records = await get("/api/wp12/interventions");
+      clear(target);
+      if (!records.total) {
+        empty(target, "No public measured interventions yet",
+          "Local LIVE-03 ran and its small numeric summary exists in WP13, but the Research Lab publishes only reviewed and explicitly approved records. This is not an online GPU service.");
+        return;
+      }
+      records.items.forEach(function (item) {
+        const box = append(target, "div", "record");
+        append(box, "strong", "", item.site || "Exact measured model site");
+        append(box, "p", "quiet", "Native source record " + item.id.slice(0, 16) + "…");
+        const button = append(box, "button", "btn tiny", "View measured logits");
+        button.type = "button";
+        button.addEventListener("click", function () { showMeasuredIntervention(item.id); });
+      });
+    } catch (error) { errorMessage(target, error); }
+  }
+
+  async function showMeasuredIntervention(recordId) {
+    const target = byId("intervention-record-detail");
+    target.hidden = false;
+    empty(target, "Loading actual saved logits comparison…", "");
+    try {
+      const record = await get("/api/wp12/interventions/" + encodeURIComponent(recordId));
+      if (record.schema !== "opensae.wp12.p3.public_result.v1" ||
+          record.measured !== true ||
+          record.generated_text !== false ||
+          record.measurement !== "teacher_forced_full_vocab_logits_only" ||
+          typeof record.readouts !== "object" ||
+          !record.readouts.feature_position || !record.readouts.final_position) {
+        throw new Error("This is not a supported reviewed teacher-forced measurement");
+      }
+      clear(target);
+      append(target, "h3", "", record.site + " · Feature " + record.feature_id);
+      append(target, "p", "quiet",
+        "Prompt " + record.sample_id + " · token ID " + record.token_id +
+        " · intervention position " + record.token_position +
+        " · measured activation " + safeNumber(record.measured_activation));
+      append(target, "p", "quiet",
+        "Full-vocabulary teacher-forced logits; no text generation was performed. " +
+        "A changed argmax at one token does not mean the completed model answer changed.");
+      const views = [
+        ["feature_position", "Readout at edited token"],
+        ["final_position", "Readout at final prompt token"]
+      ];
+      views.forEach(function (choice) {
+        const position = record.readouts[choice[0]];
+        append(target, "h3", "", choice[1] + " · position " + position.position);
+        const table = append(target, "table");
+        const head = append(table, "thead");
+        const row = append(head, "tr");
+        ["Operation", "Maximum |Δ logit|", "Logit L2", "Argmax token ID", "Argmax changed"].forEach(function (name) {
+          append(row, "th", "", name);
+        });
+        const body = append(table, "tbody");
+        [["noop", "No-op"], ["ablation", "Ablation"], ["scale", record.scale_factor + "× scale"]].forEach(function (spec) {
+          const measurement = position[spec[0]];
+          const r = append(body, "tr");
+          append(r, "td", "", spec[1]);
+          append(r, "td", "number", safeNumber(measurement.max_abs_logit_delta));
+          append(r, "td", "number", safeNumber(measurement.logit_delta_l2));
+          append(r, "td", "", String(measurement.edited_argmax_token_id));
+          append(r, "td", "", measurement.argmax_changed ? "Yes" : "No");
+        });
+        append(target, "p", "quiet",
+          "Source baseline argmax token ID " + position.baseline_argmax_token_id +
+          ". Nonzero logit changes may occur even without an argmax change.");
+      });
+      append(target, "p", "quiet",
+        "Original source commit " + record.original_source_code_sha.slice(0, 12) +
+        "… · source summary SHA256 " + record.source_report_sha256.slice(0, 16) + "…");
+    } catch (error) { errorMessage(target, error); }
+  }
+
   async function onPreflight(event) {
     event.preventDefault();
     const result = byId("preflight-result");
@@ -311,11 +647,483 @@
       result.className="result-message ok";
     } catch (error) { result.textContent=error.message; result.className="result-message error"; }
   }
+  function downloadJson(filename, data) {
+    const bytes = new Blob([JSON.stringify(data, null, 2) + "\n"], { type: "application/json" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(bytes);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(link.href);
+  }
+
+  async function loadWp15Benchmark() {
+    const panel = byId("wp15-benchmark");
+    if (!panel) return;
+    empty(panel, "Loading the recorded SAEBench run…", "");
+    try {
+      const record = await get("/api/wp15/benchmark");
+      clear(panel);
+      append(panel, "h2", "", "Recorded native SAEBench run");
+      append(panel, "p", "quiet", record.sae_release + " / " + record.sae_id +
+        " · " + record.dataset + " · evaluator " + record.upstream_commit.slice(0, 12) +
+        " · one SAE, so this is not a comparison");
+      const table = append(panel, "table");
+      const body = append(table, "tbody");
+      Object.keys(record.metrics).forEach(function (name) {
+        const row = append(body, "tr");
+        append(row, "td", "", name);
+        append(row, "td", "number", safeNumber(record.metrics[name]));
+      });
+    } catch (error) { errorMessage(panel, error); }
+  }
+  async function loadWp15Training() {
+    const panel = byId("wp15-training");
+    if (!panel) return;
+    empty(panel, "Loading the recorded training run…", "");
+    try {
+      const record = await get("/api/wp15/training");
+      clear(panel);
+      const row = append(panel, "div", "record");
+      append(row, "strong", "", record.backend + " · " + record.hookpoint + " · " + record.steps + " steps");
+      append(row, "p", "quiet", "Checkpoint " + record.checkpoint_sha256.slice(0, 16) +
+        "… · reloaded encode MSE " + safeNumber(record.reconstruction_mse) +
+        " · " + record.nonzero_codes + " nonzero codes · weights stay private");
+    } catch (error) { errorMessage(panel, error); }
+  }
+  async function loadWp15Generation() {
+    const panel = byId("wp15-generation");
+    if (!panel) return;
+    empty(panel, "Loading recorded generation effects…", "");
+    try {
+      const record = await get("/api/wp15/generation");
+      clear(panel);
+      append(panel, "p", "quiet", record.note);
+      record.samples.forEach(function (sample) {
+        const box = append(panel, "div", "record");
+        append(box, "strong", "", sample.sample_id + " · feature " + sample.feature_id +
+          " at position " + sample.feature_position);
+        append(box, "p", "quiet", "Prompt SHA256 " + sample.prompt_sha256.slice(0, 16) +
+          "… · activation " + safeNumber(sample.feature_activation));
+        if (sample.public_example) {
+          append(box, "p", "quiet", "Reviewed author-approved example · local GPU output");
+          append(box, "p", "", "Input: " + sample.public_example.prompt_text);
+          append(box, "p", "", "Baseline continuation: " +
+            sample.public_example.baseline_continuation);
+          append(box, "p", "", "Edited continuation: " +
+            sample.public_example.edited_continuation);
+        }
+        const table = append(box, "table");
+        const head = append(append(table, "thead"), "tr");
+        ["Edit", "Same greedy text", "Step-0 max |Δ logit|", "P(clean token, baseline)", "P(clean token, edited)", "Clean token rank after edit"].forEach(function (name) {
+          append(head, "th", "", name);
+        });
+        const body = append(table, "tbody");
+        sample.conditions.forEach(function (condition) {
+          const row = append(body, "tr");
+          append(row, "td", "", condition.name);
+          append(row, "td", "", condition.same_continuation ? "yes" : "no");
+          append(row, "td", "number", safeNumber(condition.step0_max_abs_logit_delta));
+          append(row, "td", "number", safeNumber(condition.clean_argmax_probability));
+          append(row, "td", "number", safeNumber(condition.edited_probability_of_clean_argmax));
+          append(row, "td", "", String(condition.clean_argmax_rank_after_edit));
+        });
+        const edited = sample.conditions.find(function (condition) {
+          return condition.name === "ablate";
+        });
+        if (edited && edited.argmax_changed) {
+          append(box, "p", "", "Observed: ablation changed the first generated token. " +
+            "This is actual autoregressive generation, not the teacher-forced LIVE-03 record.");
+        } else {
+          append(box, "p", "quiet", "The generated token sequence may be unchanged even " +
+            "when the measured next-token distribution changes.");
+        }
+      });
+    } catch (error) { errorMessage(panel, error); }
+  }
+  async function loadWp15Explanation() {
+    const panel = byId("wp15-explanation");
+    if (!panel) return;
+    empty(panel, "Loading the unreviewed explanation diagnostic…", "");
+    try {
+      const record = await get("/api/wp15/explanation");
+      clear(panel);
+      const box = append(panel, "div", "record");
+      const reviewed = record.approved === true && record.human_reviewed === true &&
+        record.rights_reviewed === true && record.description_published === true;
+      append(box, "strong", "", (reviewed ? "Reviewed feature hypothesis" :
+        "Unreviewed local candidate") + " · feature " + record.feature_id);
+      if (reviewed) {
+        append(box, "p", "", record.description);
+      } else {
+        append(box, "p", "quiet", "The written hypothesis has not been approved for publication.");
+      }
+      append(box, "p", "", "Held-out activation-prediction score " +
+        safeNumber(record.heldout_score) + " on " + record.heldout_n_positive +
+        " active and " + record.heldout_n_negative + " inactive examples.");
+      if (record.heldout_score <= 0.5) {
+        append(box, "p", "quiet", "This diagnostic is not strong evidence of a useful " +
+          "feature explanation. More independent positive and negative examples are needed.");
+      }
+      append(box, "p", "quiet", record.note);
+    } catch (error) { errorMessage(panel, error); }
+  }
+  async function loadBenchmarks() {
+    const target = byId("benchmark-list");
+    empty(target, "Loading native comparisons…", "");
+    try {
+      loadWp15Benchmark();
+      const res = await get("/api/wp12/benchmarks");
+      byId("benchmark-count").textContent = res.total + " reviewed native comparisons";
+      clear(target);
+      if (!res.total) { empty(target, "No native benchmark comparisons published",
+        "Run native SAEBench in an approved worker; no benchmark result is fabricated here."); return; }
+      res.items.forEach(function (item) {
+        const row = append(target, "div", "record");
+        append(row, "strong", "", item.metric || "Native metric");
+        append(row, "p", "quiet", item.points + " matched SAE points · exact source review");
+        const button = append(row, "button", "btn tiny", "View comparison");
+        button.type = "button";
+        button.addEventListener("click", function () { showBenchmark(item.id); });
+      });
+    } catch (error) { errorMessage(target, error); }
+  }
+  async function showBenchmark(id) {
+    const panel = byId("benchmark-detail");
+    panel.hidden = false;
+    empty(panel, "Loading source results…", "");
+    try {
+      const record = await get("/api/wp12/benchmarks/" + id);
+      if (record.comparable !== true || !Array.isArray(record.points) || record.points.length < 2) {
+        throw new Error("Source comparison is not independently matched");
+      }
+      clear(panel);
+      append(panel, "h2", "", record.metric);
+      append(panel, "p", "quiet", "Matched source: " + record.scope.hook +
+        " · dataset SHA256 " + record.scope.dataset_sha256.slice(0, 16) + "…");
+      const table = append(panel, "table");
+      const head = append(table, "thead");
+      const tr = append(head, "tr");
+      ["SAE", "L0", "Measured metric"].forEach(function (name) { append(tr, "th", "", name); });
+      const tbody = append(table, "tbody");
+      record.points.forEach(function (p) {
+        const row = append(tbody, "tr");
+        append(row, "td", "", p.sae);
+        append(row, "td", "", safeNumber(p.l0));
+        append(row, "td", "", safeNumber(p.metric_value));
+      });
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", "0 0 640 280");
+      svg.setAttribute("role", "img");
+      svg.setAttribute("aria-label", "Native SAE measurement by original L0 sparsity");
+      svg.classList.add("native-metric-chart");
+      panel.appendChild(svg);
+      const xs = record.points.map(function (p) { return p.l0; });
+      const ys = record.points.map(function (p) { return p.metric_value; });
+      const xmin = Math.min(...xs), xmax = Math.max(...xs);
+      const ymin = Math.min(...ys), ymax = Math.max(...ys);
+      const posX = function (v) { return 45 + (v - xmin) / (xmax - xmin || 1) * 535; };
+      const posY = function (v) { return 220 - (v - ymin) / (ymax - ymin || 1) * 180; };
+      function el(kind, attrs, title) {
+        const node = document.createElementNS("http://www.w3.org/2000/svg", kind);
+        Object.keys(attrs).forEach(function (key) { node.setAttribute(key, String(attrs[key])); });
+        if (title) {
+          const t = document.createElementNS("http://www.w3.org/2000/svg", "title");
+          t.textContent = title;
+          node.appendChild(t);
+        }
+        svg.appendChild(node);
+      }
+      el("path", {d:"M45 32V220H580", stroke:"#7d8ba0",fill:"none"});
+      record.points.forEach(function (p) {
+        el("circle", {cx:posX(p.l0),cy:posY(p.metric_value),r:6,
+          fill:"#2563aa"}, p.sae + ": L0 " + p.l0 + ", " + p.metric_value);
+      });
+      append(panel, "p", "quiet", record.uncertainty ||
+        "Uncertainty cannot be inferred without source-level independent samples.");
+    } catch (error) { errorMessage(panel, error); }
+  }
+
+  async function loadTraining() {
+    const target = byId("training-list");
+    empty(target, "Loading training records…", "");
+    try {
+      loadWp15Training();
+      const res = await get("/api/wp12/training");
+      if (!res.total) {
+        empty(target, "No native training runs released",
+          "SAELens and Sparsify workers can train privately; checkpoint and source approval come before publication.");
+        return;
+      }
+      clear(target);
+      res.items.forEach(function (item) {
+        const row = append(target, "div", "record");
+        append(row, "strong", "", item.backend || "Native trainer");
+        append(row, "p", "quiet", item.id.slice(0, 20) + "… · approved checkpoint source");
+      });
+    } catch (error) { errorMessage(target, error); }
+  }
+  function onTrainingExport(event) {
+    event.preventDefault();
+    const modelRevision = /^[0-9a-f]{40}$/;
+    const datasetRevision = /^[0-9a-f]{40}([0-9a-f]{24})?$/;
+    if (!modelRevision.test(value("training-model-revision")) ||
+        !datasetRevision.test(value("training-dataset-revision"))) {
+      return window.alert("Model revision must be a 40-character git SHA. Dataset revision must be a 40-character git SHA or a 64-character data hash.");
+    }
+    const steps = Number(value("training-steps"));
+    const width = Number(value("training-width"));
+    const latents = Number(value("training-latents"));
+    const k = Number(value("training-k"));
+    if (!Number.isInteger(steps) || steps < 1 || steps > 200 ||
+        !Number.isInteger(width) || width < 1 ||
+        !Number.isInteger(latents) || latents < 1 ||
+        !Number.isInteger(k) || k < 1 || k > latents) {
+      return window.alert("Invalid width, sparsity or C1 training budget.");
+    }
+    const manifest = {
+      schema: "opensae.wp12.p5.training_plan_draft.v1",
+      status: "user_config_only_not_executed",
+      backend: value("training-backend"),
+      model_path: value("training-model"),
+      dataset_path: value("training-dataset"),
+      model_revision: value("training-model-revision"),
+      dataset_revision: value("training-dataset-revision"),
+      hookpoint: value("training-hook"),
+      d_in: width, d_sae: latents, k: k, steps: steps,
+      architecture: "topk",
+      max_examples: Math.min(10000, steps * 16),
+      batch_size: 16, ctx_len: 128,
+      run_name: "wp12-local-pilot", device: "cuda",
+      distributed_gpus: 1, resume_checkpoint: null
+    };
+    if (!manifest.model_path || !manifest.dataset_path || !manifest.hookpoint) {
+      return window.alert("Model, dataset and hookpoint are required.");
+    }
+    downloadJson("opensae-wp12-training-plan.json", manifest);
+  }
+
+  function svgNode(tag, attrs) {
+    const node = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    Object.entries(attrs || {}).forEach(function (entry) {
+      node.setAttribute(entry[0], String(entry[1]));
+    });
+    return node;
+  }
+  function checkGraph(graph) {
+    if (!graph || graph.schema !== "opensae.wp12.p6.graph.v1" ||
+        !Array.isArray(graph.nodes) || !Array.isArray(graph.edges) ||
+        !graph.nodes.length || graph.nodes.length > 250 || graph.edges.length > 750 ||
+        !graph.provenance || !/^[a-f0-9]{64}$/.test(graph.provenance.source_sha256)) {
+      throw new Error("Expected a bounded, source-identified attribution graph");
+    }
+    const ids = new Set();
+    graph.nodes.forEach(function (n) {
+      if (typeof n.id !== "string" || !["feature", "error", "token", "logit"].includes(n.kind) ||
+          n.id.length > 120 || ids.has(n.id)) throw new Error("Invalid or duplicate graph node");
+      ids.add(n.id);
+    });
+    if (!graph.nodes.some(function (n) {return n.kind === "error";}) ||
+        !graph.nodes.some(function (n) {return n.kind === "logit";})) {
+      throw new Error("Native error and logit nodes required");
+    }
+    graph.edges.forEach(function (e) {
+      if (!ids.has(e.source) || !ids.has(e.target) ||
+          typeof e.weight !== "number" || !Number.isFinite(e.weight)) {
+        throw new Error("Graph edge identity or attribution is invalid");
+      }
+    });
+    return graph;
+  }
+  async function loadCircuitCatalog() {
+    if (state.circuitsLoaded) return;
+    try {
+      const res = await get("/api/wp12/circuits");
+      const selector = byId("circuit-select");
+      try {
+        const recorded = await get("/api/wp15/circuit");
+        const option = append(selector, "option", "",
+          "Gemma-2-2B recorded graph · " + recorded.graph.nodes.length + " nodes · " +
+          recorded.graph.edges.length + " edges");
+        option.value = "wp15-recorded";
+      } catch (error) { /* The recorded graph is optional until import finishes. */ }
+      res.items.forEach(function (item) {
+        const option = append(selector, "option", "",
+          item.nodes + " nodes · " + item.edges + " edges · " + item.id.slice(0, 8));
+        option.value = item.id;
+      });
+      state.circuitsLoaded = true;
+      byId("circuit-status").textContent = selector.options.length > 1 ?
+        "Recorded source graphs can be inspected; WP15 publication review is still pending." :
+        "No native graphs approved for publication. You can inspect a typed local JSON file.";
+    } catch (error) { byId("circuit-status").textContent = error.message; }
+  }
+  async function openCircuit() {
+    const file = byId("circuit-upload").files[0];
+    try {
+      const selected = value("circuit-select");
+      const graph = file ?
+        JSON.parse(await file.text()) :
+        selected === "wp15-recorded" ?
+          (await get("/api/wp15/circuit")).graph :
+          await get("/api/wp12/circuits/" + encodeURIComponent(selected));
+      state.circuitData = checkGraph(graph);
+      state.circuitNotes = graph.annotations && typeof graph.annotations === "object" ?
+        graph.annotations.notes || {} : {};
+      state.circuitPins = new Set(graph.annotations?.pinned || []);
+      state.circuitGroups = graph.annotations?.groups || [];
+      state.circuitSelected = null;
+      state.graphScale = 1;
+      byId("circuit-status").textContent = graph.nodes.length + " actual source nodes · " +
+        graph.edges.length + " signed edges · " + graph.provenance.source_sha256.slice(0, 14) +
+        "… · annotations are local only";
+      renderCircuit();
+    } catch (error) { byId("circuit-status").textContent = "Cannot open circuit: " + error.message; }
+  }
+  function renderCircuit() {
+    const graph = state.circuitData, svg = byId("circuit-graph");
+    svg.replaceChildren();
+    if (!graph) return;
+    const layers = [...new Set(graph.nodes.map(function (n) {
+      return n.kind === "token" ? "input" : n.kind === "logit" ? "output" :
+        "layer" + (n.layer == null ? "?" : n.layer);
+    }))].sort(function (a,b) {
+      if (a === "input") return -1; if (b === "input") return 1;
+      if (a === "output") return 1; if (b === "output") return -1;
+      return Number(a.slice(5)) - Number(b.slice(5));
+    });
+    const groups = new Map(layers.map(function (l) { return [l, []]; }));
+    graph.nodes.forEach(function (n) {
+      const layer = n.kind === "token" ? "input" :
+        n.kind === "logit" ? "output" : "layer" + (n.layer == null ? "?" : n.layer);
+      groups.get(layer).push(n);
+    });
+    const xy = new Map();
+    layers.forEach(function (l, col) {
+      const members = groups.get(l);
+      members.forEach(function (n, index) {
+        xy.set(n.id, {x:52 + col * 780 / Math.max(1, layers.length-1),
+          y:42 + (index + 1) * 440 / (members.length + 1)});
+      });
+    });
+    const threshold = Number(value("circuit-threshold")) || 0;
+    graph.edges.forEach(function (edge) {
+      if (Math.abs(edge.weight) < threshold) return;
+      const a = xy.get(edge.source), b = xy.get(edge.target);
+      const line = svgNode("line", {x1:a.x,y1:a.y,x2:b.x,y2:b.y,
+        stroke:edge.weight >= 0 ? "#4c7eb0" : "#c26b62",
+        "stroke-width":Math.min(4,1 + Math.log1p(Math.abs(edge.weight))),
+        opacity:0.55});
+      const label = svgNode("title");
+      label.textContent = edge.source + " → " + edge.target + " · " + edge.weight;
+      line.appendChild(label); svg.appendChild(line);
+    });
+    graph.nodes.forEach(function (node) {
+      const loc = xy.get(node.id);
+      const circle = svgNode("circle", {cx:loc.x,cy:loc.y,
+        r:node.id === state.circuitSelected ? 11 : 7,
+        fill:node.kind === "error" ? "#cf9a4b" :
+          node.kind === "logit" ? "#4a9d78" :
+          node.kind === "token" ? "#8e9dad" : "#427cbe",
+        stroke:state.circuitPins.has(node.id) ? "#17263d" : "white",
+        "stroke-width":state.circuitPins.has(node.id) ? 3 : 1,
+        tabindex:0, role:"button"});
+      const title = svgNode("title");
+      title.textContent = node.id + " · " + node.kind + " · " + (node.label || "");
+      circle.appendChild(title);
+      circle.addEventListener("click", function () { selectGraphNode(node.id); });
+      circle.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") selectGraphNode(node.id);
+      });
+      svg.appendChild(circle);
+    });
+    svg.setAttribute("viewBox", "0 0 " + (900 / state.graphScale) +
+      " " + (520 / state.graphScale));
+  }
+  function selectGraphNode(id) {
+    const node = state.circuitData?.nodes.find(function (n) { return n.id === id; });
+    if (!node) return;
+    state.circuitSelected = id;
+    const target = byId("circuit-inspector");
+    const old = target.querySelector(".graph-selected");
+    if (old) old.remove();
+    const part = create("div", "graph-selected");
+    append(part, "strong", "", node.label || node.id);
+    append(part, "p", "quiet", "ID " + node.id + " · " + node.kind +
+      " · layer " + (node.layer == null ? "N/A" : node.layer));
+    target.prepend(part);
+    byId("circuit-note").value = state.circuitNotes[id] || "";
+    renderCircuit();
+  }
+  function updateGraphNotes() {
+    if (!state.circuitSelected) return;
+    state.circuitNotes[state.circuitSelected] = value("circuit-note").slice(0, 500);
+    byId("circuit-status").textContent = "Annotation saved locally; export JSON to keep it.";
+  }
+  function toggleGraphPin() {
+    if (!state.circuitSelected) return;
+    if (state.circuitPins.has(state.circuitSelected)) state.circuitPins.delete(state.circuitSelected);
+    else state.circuitPins.add(state.circuitSelected);
+    renderCircuit();
+  }
+  function groupGraphPins() {
+    const pins = [...state.circuitPins];
+    if (pins.length < 2) {
+      byId("circuit-status").textContent = "Pin at least two nodes to make an annotation group.";
+      return;
+    }
+    state.circuitGroups.push({name:"Group " + (state.circuitGroups.length+1),members:pins});
+    byId("circuit-status").textContent = pins.length + " original graph nodes grouped for annotation.";
+  }
+  function exportCircuit() {
+    if (!state.circuitData) return;
+    downloadJson("opensaebase-annotated-circuit.json", {
+      ...state.circuitData, annotations:{
+        notes:state.circuitNotes, pinned:[...state.circuitPins], groups:state.circuitGroups
+      }
+    });
+  }
+  async function loadComputeRoutes() {
+    try {
+      const status = await get("/api/wp12-compute");
+      const target = byId("compute-routes");
+      clear(target);
+      Object.keys(status).forEach(function (key) {
+        const row = append(target, "div", "record");
+        append(row, "strong", "", key.replaceAll("_", " "));
+        append(row, "p", "quiet", String(status[key]));
+      });
+    } catch (error) { errorMessage(byId("compute-routes"), error); }
+  }
+
   byId("results-refresh").addEventListener("click",function(){loadResults(true);});
   byId("results-more").addEventListener("click",function(){loadResults(false);});
   byId("results-model").addEventListener("keydown",function(e){if(e.key==="Enter")loadResults(true);});
   byId("feature-search").addEventListener("click",loadFeatures);
+  byId("asset-refresh").addEventListener("click",renderAssets);
+  byId("asset-model").addEventListener("change",renderAssets);
   byId("feature-query").addEventListener("keydown",function(e){if(e.key==="Enter")loadFeatures();});
+  document.querySelectorAll("[data-explore-mode]").forEach(function (button) {
+    button.addEventListener("click", function () { setSearchMode(button.dataset.exploreMode); });
+  });
+  byId("explanation-search").addEventListener("click",searchExplanations);
+  byId("explanation-query").addEventListener("keydown",function(e){if(e.key==="Enter")searchExplanations();});
+  byId("inference-search").addEventListener("click",searchRecordedInference);
+  byId("trace-select").addEventListener("change",selectRecordedTrace);
+  byId("training-form").addEventListener("submit",onTrainingExport);
+  byId("circuit-open").addEventListener("click",openCircuit);
+  byId("circuit-threshold").addEventListener("change",renderCircuit);
+  byId("circuit-zoom-in").addEventListener("click",function(){
+    state.graphScale=Math.min(3,state.graphScale*1.2);renderCircuit();
+  });
+  byId("circuit-zoom-out").addEventListener("click",function(){
+    state.graphScale=Math.max(.6,state.graphScale/1.2);renderCircuit();
+  });
+  byId("circuit-export").addEventListener("click",exportCircuit);
+  byId("circuit-save-note").addEventListener("click",updateGraphNotes);
+  byId("circuit-pin").addEventListener("click",toggleGraphPin);
+  byId("circuit-group").addEventListener("click",groupGraphPins);
   byId("intervention-form").addEventListener("submit",onPreflight);
   window.addEventListener("hashchange",activate);
   bootstrap();

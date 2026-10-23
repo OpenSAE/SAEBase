@@ -1,0 +1,90 @@
+{
+  "schema": "opensae.wp12.gpu00.prompt_pairs.v1",
+  "title": "GPU-00 C1 identity and patching smoke test",
+  "status": "frozen_candidate_pending_tokenizer_preflight",
+  "data_origin": "Original minimal synthetic text prompts authored for engineering validation; no private or redistributed corpus.",
+  "license": "CC0-1.0",
+  "seed": 17,
+  "pair_count": 8,
+  "expected_sites": [
+    {
+      "model_key": "pythia70m",
+      "sae_key": "pythia70m_resid_sm",
+      "layer": 3,
+      "hook": "blocks.3.hook_resid_post",
+      "role": "Pythia anchor; M0 historical precedent"
+    },
+    {
+      "model_key": "pythia70m",
+      "sae_key": "pythia70m_resid_sm",
+      "layer": 5,
+      "hook": "blocks.5.hook_resid_post",
+      "role": "Second registered Pythia site; WP12 parity not yet verified"
+    },
+    {
+      "model_key": "gemma270m",
+      "sae_key": "gemma270m_scope_resid",
+      "layer": 5,
+      "hook": "blocks.5.hook_resid_post",
+      "role": "Gemma Scope 2 previously recorded acceptance"
+    },
+    {
+      "model_key": "gemma270m",
+      "sae_key": "gemma270m_scope_resid",
+      "layer": 9,
+      "hook": "blocks.9.hook_resid_post",
+      "role": "Second Gemma Scope 2 previously recorded acceptance"
+    }
+  ],
+  "selection": {
+    "activation_token_position": "last_non_padding_token",
+    "logit_readout_position": "last_non_padding_token",
+    "clean_corrupt_policy": "Exact tokenizer token counts must match within each pair for a given model; preserve exact token IDs and reject mismatched pairs.",
+    "min_valid_pairs_per_model": 8,
+    "max_tokens_per_input": 128
+  },
+  "pairs": [
+    {
+      "id": "pair01",
+      "clean": "The counter shows 3.",
+      "corrupt": "The counter shows 4."
+    },
+    {
+      "id": "pair02",
+      "clean": "The test batch contains 7 items.",
+      "corrupt": "The test batch contains 8 items."
+    },
+    {
+      "id": "pair03",
+      "clean": "At noon the sign read 1.",
+      "corrupt": "At noon the sign read 2."
+    },
+    {
+      "id": "pair04",
+      "clean": "The printed code ends with 5.",
+      "corrupt": "The printed code ends with 6."
+    },
+    {
+      "id": "pair05",
+      "clean": "A report recorded 2 samples.",
+      "corrupt": "A report recorded 3 samples."
+    },
+    {
+      "id": "pair06",
+      "clean": "The robot visited room 4.",
+      "corrupt": "The robot visited room 5."
+    },
+    {
+      "id": "pair07",
+      "clean": "On Tuesday the meter read 6.",
+      "corrupt": "On Tuesday the meter read 7."
+    },
+    {
+      "id": "pair08",
+      "clean": "The box is marked number 8.",
+      "corrupt": "The box is marked number 9."
+    }
+  ],
+  "meaning": "Clean/corrupt labels identify paired inputs only. They do not imply any behavior, preference, ground-truth circuit, or causal claim.",
+  "protocol": "tokenize once in CPU preflight with actual pinned per-model tokenizer; freeze token IDs, BOS/chat template, lengths, source SHA256 and split IDs before any GPU measurement; do not silently modify the input texts"
+}

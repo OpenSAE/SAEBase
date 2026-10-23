@@ -5,7 +5,15 @@ Status: **Strategic master blueprint. Not an implementation or GPU-completion cl
 Repository: https://github.com/OpenSAE/SAEBase  
 Scope: Integrate, expose, validate, and maintain **all 50 named capabilities** drawn from 10 established SAE / mechanistic-interpretability projects.  
 Execution companion: [GPU-agent handoff](12_gpu_agent_handoff_protocol.md)  
-Machine-readable ledger: [50-capability acceptance matrix](12_capability_acceptance_matrix.csv)
+Machine-readable ledger: [50-capability acceptance matrix](12_capability_acceptance_matrix.csv)  
+First step source audit: [WP12-00](12_p0_source_inventory_20261021.md)  
+First GPU test specification: [GPU-00 P0 parity](12_gpu00_p0_parity_execution.md) · [frozen prompt pairs](12_gpu00_prompt_pairs.json)  
+GPU agent's legacy-run outcome, **pending independent verification**: [GPU-00 reported results](12_gpu00_agent_report_20261022.md)
+Consolidated P3–P8 source implementation: [P3–P8 execution summary](12_p3_p8_consolidated_implementation.md) · [PR #53](https://github.com/OpenSAE/SAEBase/pull/53)  
+Core functionality audited separately: [48 PASS / 0 PARTIAL / 2 BLOCKED](12_core_function_assessment.md)  
+**Next operational phase:** [Work Plan 13 real-environment integration and deployment](13_real_environment_integration_and_deployment.md) · [GPU Agent LIVE task handoff](13_gpu_agent_real_environment_handoff.md) · [11-job queue](13_live_execution_matrix.csv) · [10 unreviewed demo prompt candidates](13_demo_prompt_candidates.json). WP13 is for installed native backends, useful public real data and staged deployment; formal independent P8 verification remains distinct.
+
+> **Implementation update, 2026-10-22.** The staged development branches now expose source-level routes for all 50 planned capabilities. The revised core-operation audit now records **48 PASS, 0 PARTIAL and 2 BLOCKED**, with independent P8 acceptance still PENDING for all 50. See [Core Functionality Assessment](12_core_function_assessment.md). PASS is an implemented executable core route, not a claim of broad numerical or external release acceptance. This is the code-completion baseline, not native numerical or public deployment acceptance. CPU CI runs after each commit; real NDIF, distributed training, graph attribution, full benchmark evidence and external researcher validation remain later gates. Do not repeat earlier GPU-00 or historical 48-site tests by default.
 
 > **Final outcome.** A researcher can bring a model, an existing or newly trained representation, and a prompt; explore features; perform genuine interventions; compare SAEs; trace candidate circuits; analyze SAR/RSS/Input Localization; and publish a provenance-linked, independently reproducible experiment. A visitor without a GPU can explore the same real saved evidence. **All 50 features stay in scope; we phase their implementation, not their existence.**
 
@@ -33,7 +41,7 @@ The current repository README documents model/SAE registration, cached activatio
 * Existing loader code [models/hooked_lm_common.py](../models/hooked_lm_common.py) calls legacy TransformerLens \`HookedTransformer\`, and current unconstrained dependencies in [pyproject.toml](../pyproject.toml) allow major-version drift. **TransformerLens 4.0 removed legacy \`Hooked*\` classes on 2026-09-21.** Audit and repair version compatibility first. For an exact frozen legacy environment, use a pinned supported prior version; provide a tested bridge adapter for the current interface. Do not silently switch weight-processing conventions.
 * Work Plan 11 describes execution on an RTX 5070 (~12 GiB). The user has also mentioned access to an RTX 5090 (32 GiB) for another workload. **Do not assume these are the same host or that either is available**. GPU agent must record the hardware actually allocated to each run.
 
-Everything in this plan marked “target” is **not** claimed to be implemented. Phase P0 must populate the machine-readable ledger with real evidence statuses before any feature is marked complete.
+Everything in this plan marked “target” is **not** claimed to be implemented. WP12-00 has now completed an initial **source-only** inventory on branch `feat/wp12-p0-foundation`: 24 PARTIAL, 24 NOT_STARTED and 2 BLOCKED, pending independent review. No fresh CPU test, GPU parity or live deployment verification was done in that inventory, so the P0 gate is still **open**. The [GPU-00 runbook](12_gpu00_p0_parity_execution.md) gives the GPU agent a fixed C1 handoff without changing scientific results. New verified statuses require source-linked execution evidence and separate reviewer signoff. **Update after GPU-00:** an agent reports 4/4 site-level parity PASS for legacy TransformerLens 3.9 / SAELens 6.54 fp32 on Pythia-70M L3/L5 and Gemma-3-270M L5/L9. The raw evidence is not yet accessible to the independent reviewer, TransformerLens 4 was not tested, and P0 remains open. See [the dated report](12_gpu00_agent_report_20261022.md).
 
 ## 1. Upstream product study: match useful behavior, not branding
 
@@ -145,7 +153,7 @@ No timeline is a promise: estimate calendar only after P0 inventory, upstream en
 5. Define immutable v1 identities/JSON schema, version migration, capability registration, report artifact paths and comparison eligibility. Integrate with existing registries rather than inventing a parallel data system.
 6. Verify rights and hashes for the existing 500-group cohort and feature cards; if raw files are unavailable, mark \`REQUIRES_AUTHORIZED_ARCHIVE\` and use legitimate smaller datasets—not made-up data.
 
-**GPU agent:** only perform a 2-model × 2-site × 8–16 prompts parity smoke after local contracts pass. Pin model/SAE exact hashes; compare logits, codes, patch identity and report provenance between old and new backends where supported. Record runtime/VRAM on actual machine.
+**GPU agent:** first follow [GPU-00](12_gpu00_p0_parity_execution.md): two small model families (Pythia-70M and Gemma-3-270M), two registered SAE sites each, eight original clean/corrupt prompt groups. Run its C0 host/environment/tokenization preflight and exact native-versus-SAEBase C1 checks before requesting broader compute. Pin actual model/SAE hashes, logits, code and patch evidence, and record wall time/VRAM. This initial run measures the supported legacy backend: do **not** claim TransformerLens 4 bridge parity without separately executing a tested new bridge.
 
 **Gate P0:** clean CPU install+CI; exact dependency lock; baseline registry of 50 with evidence links and honest states; one simple real-model capture/edit result; no silent compatibility changes. **Do not queue a large run yet.**
 
@@ -163,7 +171,7 @@ No timeline is a promise: estimate calendar only after P0 inventory, upstream en
 
 **Scale:** **C1 smoke mandatory. C2 2–3 verified sites conditional. C3 broad site sweep forbidden.** Import pretrained official asset metadata CPU-only; download weights lazily and verify checksums; do not mirror model families.
 
-**Gate P1:** all 13 capabilities each have at least one real validated supported route, unsupported combinations fail clearly, legacy/new TL behavior is explicitly versioned, and clean/corrupt intervention results are faithful to the declared protocol.
+**P1 development checkpoint:** implement scoped API routes for its 13 capabilities, keep the legacy backend intact, run lightweight unit tests and one short real-weight sanity test where available. Do not block P2–P7 development on independent review of all P1 numerical arrays. Unsupported combinations must fail clearly. Full source-bound parity, cross-version matrix and 13-capability certification remain explicit P8 release criteria. Progress details: [P1 implementation](12_p1_model_backend_implementation.md).
 
 ### P2 — Neuronpedia-style Explore + SAE-Vis-style interactive evidence
 
@@ -179,7 +187,7 @@ No timeline is a promise: estimate calendar only after P0 inventory, upstream en
 
 **Scale:** **C0 for most features; C1 for live prompt lookup; C2 only to fill audited gaps.** Avoid computing dense all-feature × all-token displays. Store sparse top indices and paginated feature records; never assume absent from sample means globally dead.
 
-**Gate P2:** ten authentic demonstrations; user finds a feature via all three routes; tokens and scores match exact raw artifacts; exports open offline; explanations can be traced to generating model/data and are visibly hypotheses; feature index remains responsive on large dictionaries.
+**P2 development checkpoint:** ship source-bound feature detail/search, per-token recorded prompt exploration, explanation hypotheses with disjoint held-out scoring, backed feature index and standalone export with routine offline tests. The [P2 implementation](12_p2_feature_explorer.md) supplies these source routes. Do not block P3–P7 on obtaining ten public GPU feature examples. Ten authentic user examples, real new-prompt inference, large-dictionary scalability, exact native metric comparisons and independent final evidence remain P8 gates.
 
 ### P3 — real interventions, generation and composability
 
@@ -423,7 +431,7 @@ runs/wp12/<phase>/<run_id>/
 
 Do not check large raw artifacts, model weights, secrets or private prompts into Git. Stable public summaries are published only through approved report paths.
 
-**Merge rules:** P0 must pass before P1; failures stay visible; no “success” because the run was skipped; no performance claim without matched protocol; unreviewed scientific estimator changes are excluded from infrastructure PRs. Any blocking library/API changes receive a compatibility decision documented in the ledger.
+**Merge and development rules:** the P0 source audit and bounded legacy GPU sanity check permit P1–P7 development to proceed while open independent evidence checks remain tracked for P8. Basic tests and correct fail-closed behavior are required before merging a changed runtime path. Failures stay visible; no “success” because a run was skipped; no performance claim without matched protocol; unreviewed scientific estimator changes are excluded from infrastructure PRs. Any blocking library/API changes receive a compatibility decision documented in the ledger.
 
 ## 9. Recommended first actual execution queue
 
@@ -431,7 +439,7 @@ Run these in order (subsequent agents may parallelize independent CPU documentat
 
 1. **WP12-00 (CPU):** inventory 50 features and preserve existing Work Plans / PR statuses; inspect actual Research Lab; commit the ledger with honest statuses.
 2. **WP12-01 (CPU):** freeze upstream APIs, package versions, representation identities, operation capability matrix, native-vs-imported definitions and minimal dependencies.
-3. **WP12-02 (GPU-C1):** one real Pythia/Gemma small-model cross-backend capture / encode / no-op / patch parity, with complete manifest.
+3. **WP12-02 (GPU-C1 / GPU-00):** execute the [fixed GPU-00 P0 parity protocol](12_gpu00_p0_parity_execution.md) using its [eight prompt pairs](12_gpu00_prompt_pairs.json), after C0 environment and tokenization preflight. Preserve exact native-vs-SAEBase evidence, status per model/site and failures. A legacy-only pass does not certify TransformerLens 4.
 4. **WP12-03 (CPU):** build a feature detail + three search modes on existing authentic public measurements and exact identity links.
 5. **WP12-04 (GPU-C1):** add real custom-prompt inference and feature steering for one supported model/SAE/site; preserve clean vs edited text and logits.
 6. **WP12-05 (CPU):** integrate SAR/RSS/Localization evidence links, correct reporting, export and comparison baseline; share one complete report.

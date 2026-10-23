@@ -8,20 +8,44 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+import os
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from . import core
+from . import core, published_wp12, wp15_records
+from .private_api import router as private_router
 from .feature_store import feature_store_count
+from . import explore
 
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "frontend"
 app = FastAPI(title="OpenSAE Research Lab", version="0.1.0", docs_url="/api/docs", redoc_url=None)
+# CORS is an origin allowlist, not authentication. It only authorizes browser access.
+# The private worker remains disabled unless strong operator/worker secrets are configured.
+WEB_ORIGINS = [
+    origin.strip().rstrip("/")
+    for origin in os.environ.get("OPENSAE_CORS_ORIGINS", "https://atheavenma.github.io").split(",")
+    if origin.strip()
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=WEB_ORIGINS,
+    allow_credentials=False,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Authorization", "Content-Type"],
+    # GitHub Pages is a public origin. Chrome blocks its calls to a local
+    # operator API unless this preflight answer is present.
+    allow_private_network=True,
+)
 app.mount("/assets", StaticFiles(directory=str(FRONTEND)), name="assets")
+# The private router responds 503 until explicitly configured with distinct
+# operator/worker tokens and durable storage. Public Research Lab stays read-only.
+app.include_router(private_router)
 
 
 @lru_cache(maxsize=1)
@@ -161,29 +185,128 @@ def features(
     limit: int = Query(36, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ) -> dict[str, Any]:
+    """Search the immutable SQLite feature store, or the legacy compact index."""
     try:
-        rows = core.feature_index()
-    except core.InvalidEvidence as e:
-        _bad_evidence(e)
-    lookup = q.casefold()
-    rows = [
-        r
-        for r in rows
-        if (not model or model.casefold() in r.get("model", "").casefold())
-        and (not site_id or r.get("site_id") == site_id)
-        and (
-            not lookup
-            or lookup
-            in (
-                str(r.get("feature_id", ""))
-                + " "
-                + str(r.get("label", ""))
-                + " "
-                + r.get("site_id", "")
-            ).casefold()
+        return explore.feature_search(
+            query=q, model=model, site_id=site_id, limit=limit, offset=offset,
         )
-    ]
-    return _page(rows, limit, offset)
+    except core.InvalidEvidence as exc:
+        _bad_evidence(exc)
+
+
+@app.get("/api/explore/features/{site_id}/{feature_id}")
+def feature_details(site_id: str, feature_id: int) -> dict[str, Any]:
+    try:
+        card = explore.feature_details(site_id, feature_id)
+    except core.InvalidEvidence as exc:
+        _bad_evidence(exc)
+    if card is None:
+        raise HTTPException(404, "No published feature for this exact SAE/site/index")
+    return card
+
+
+@app.get("/api/explore/features/{site_id}/{feature_id}/export.html")
+def feature_export(site_id: str, feature_id: int) -> HTMLResponse:
+    try:
+        card = explore.feature_details(site_id, feature_id)
+    except core.InvalidEvidence as exc:
+        _bad_evidence(exc)
+    if card is None:
+        raise HTTPException(404, "No published feature to export")
+    return HTMLResponse(
+        explore.feature_html(card),
+        headers={
+            "Content-Disposition": f'attachment; filename="opensae-feature-{feature_id}.html"',
+            "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'",
+        },
+    )
+
+
+@app.get("/api/explore/features/{site_id}/{feature_id}/correlations")
+def feature_correlations(
+    site_id: str, feature_id: int, limit: int = Query(10, ge=1, le=40)
+) -> dict[str, Any]:
+    try:
+        if site_id not in {s["site_id"] for s in site_cache()} or feature_id < 0:
+            raise HTTPException(404, "Unknown exact feature site")
+        return explore.correlations(site_id, feature_id, limit=limit)
+    except core.InvalidEvidence as exc:
+        _bad_evidence(exc)
+
+
+@app.get("/api/explore/traces")
+def explore_traces(site_id: str = "") -> dict[str, Any]:
+    try:
+        traces = explore.recorded_traces(site_id=site_id)
+    except core.InvalidEvidence as exc:
+        _bad_evidence(exc)
+    return {"total": len(traces), "items": traces, "mode": "recorded_only"}
+
+
+@app.get("/api/explore/traces/{trace_id}")
+def explore_trace(trace_id: str) -> dict[str, Any]:
+    try:
+        trace = explore.recorded_trace(trace_id)
+    except core.InvalidEvidence as exc:
+        _bad_evidence(exc)
+    if trace is None:
+        raise HTTPException(404, "No publicly reviewed trace with that identity")
+    return trace
+
+
+class ExploreSearch(BaseModel):
+    mode: str
+    query: str = Field(default="", max_length=16000)
+    site_id: str = Field(default="", max_length=280)
+    trace_id: str = Field(default="", max_length=64)
+    position: int | None = Field(default=None, ge=0, le=127)
+    limit: int = Field(default=20, ge=1, le=100)
+
+
+@app.post("/api/explore/search")
+def explore_search(request: ExploreSearch) -> dict[str, Any]:
+    """Separate explanation search, recorded input lookup and per-token TopK.
+
+    An arbitrary new prompt is NEVER run on a CPU-only public HF Space.
+    Put text in the JSON body, not a browser URL or access log.
+    """
+    try:
+        if request.mode == "explanation":
+            if not request.query.strip():
+                raise HTTPException(422, "Enter an explanation search term")
+            return explore.feature_search(
+                mode="explanation", query=request.query[:200],
+                site_id=request.site_id, limit=request.limit,
+            )
+        if request.mode == "inference":
+            matches = explore.recorded_inference(
+                request.query, site_id=request.site_id,
+            )
+            if not matches:
+                raise HTTPException(
+                    503, "No exact reviewed recorded prompt matches this input. "
+                    "Live inference requires an authorized local/GPU worker.",
+                )
+            return {"mode": "recorded_only", "total": len(matches),
+                    "items": matches[:request.limit]}
+        if request.mode == "token":
+            trace = explore.recorded_trace(request.trace_id)
+            if trace is None:
+                raise HTTPException(404, "Select a published recorded prompt")
+            if request.position is None:
+                raise HTTPException(422, "A token position is required")
+            return {
+                "mode": "recorded_token_topk", "trace_id": trace["trace_id"],
+                "site_id": trace["site_id"], "position": request.position,
+                "items": explore.strongest_features(
+                    trace, token_position=request.position, top_k=request.limit,
+                ),
+            }
+        raise HTTPException(422, "Unknown search mode")
+    except core.InvalidEvidence as exc:
+        _bad_evidence(exc)
+    except (ValueError, IndexError) as exc:
+        raise HTTPException(422, str(exc)) from exc
 
 
 @app.get("/api/analyses")
@@ -225,13 +348,34 @@ class InterventionSpec(BaseModel):
 @app.post("/api/jobs/preflight")
 def preflight(request: InterventionSpec) -> dict[str, Any]:
     """Validate only. Never enqueue, store input, or claim GPU execution."""
-    permitted = {"identity", "ablate", "scale", "clamp", "add", "coalition", "reconstruction"}
+    permitted = {
+        "identity",
+        "ablate",
+        "scale",
+        "clamp",
+        "add",
+        "coalition",
+        "reconstruction",
+        "inspect",
+    }
     if request.operation not in permitted:
         raise HTTPException(422, "Unknown intervention operation")
-    if request.operation not in ("identity", "reconstruction") and not request.feature_ids:
+    if request.operation == "inspect" and (
+        request.feature_ids or request.max_new_tokens or request.strength
+    ):
+        raise HTTPException(422, "Inspection selects no feature edit or generation")
+    if request.operation not in ("identity", "reconstruction", "inspect") and not (
+        request.feature_ids
+    ):
         raise HTTPException(422, "At least one feature ID is required")
     if request.operation in ("identity", "reconstruction") and request.feature_ids:
         raise HTTPException(422, "This condition does not select individual features")
+    if request.max_new_tokens and not (
+        request.operation in {"identity", "ablate", "scale"} and 16 <= request.max_new_tokens <= 32
+    ):
+        raise HTTPException(
+            422, "Generation jobs use 16–32 new tokens with identity, ablate, or scale"
+        )
     if any(v < 0 for v in request.feature_ids) or len(set(request.feature_ids)) != len(
         request.feature_ids
     ):
@@ -263,6 +407,99 @@ def preflight(request: InterventionSpec) -> dict[str, Any]:
         "status": "blocked_until_gpu_worker_and_auth_are_configured",
         "note": "Preflight checks syntax/registered site only; it does not validate model behavior or run inference.",
     }
+
+
+@app.get("/api/wp12/{category}")
+def wp12_catalog(category: str) -> dict[str, Any]:
+    """Only source-reviewed, immutable native result summaries."""
+    try:
+        return published_wp12.list_records(category)
+    except core.InvalidEvidence as exc:
+        _bad_evidence(exc)
+    except ValueError as exc:
+        raise HTTPException(404, str(exc)) from exc
+
+
+@app.get("/api/wp12/{category}/{record_id}")
+def wp12_record(category: str, record_id: str) -> dict[str, Any]:
+    try:
+        record = published_wp12.load_record(category, record_id)
+    except core.InvalidEvidence as exc:
+        _bad_evidence(exc)
+    if record is None:
+        raise HTTPException(404, "No approved real result with this identity")
+    return record
+
+
+@app.get("/api/wp15/{name}")
+def wp15_record(name: str) -> dict[str, Any]:
+    """Recorded local measurements. Prompt text and explanations are not included."""
+    try:
+        return wp15_records.load_record(name)
+    except ValueError as exc:
+        raise HTTPException(404, str(exc)) from exc
+
+
+@app.get("/api/wp12-compute")
+def wp12_compute() -> dict[str, Any]:
+    """No inference is falsely advertised in the CPU Research Lab."""
+    return {
+        "public_cpu_browse": True,
+        "online_new_inference": False,
+        "private_worker": "disabled_by_default",
+        "ndif_remote": "explicit_credentials_and_approval_required",
+        "multi_gpu_training": "real_2plus_gpu_allocation_required",
+    }
+
+
+@app.get("/api/sae-assets")
+def sae_assets(model_key: str = "") -> dict[str, Any]:
+    """Browse actual SAE registry locally, historical sites in CPU-only Docker.
+
+    The public CPU image intentionally does NOT install torch/SAELens. Thus a
+    fallback is derived only from real frozen verified site records. Unknown
+    width/L0 values stay null; no checkpoint weight is loaded or invented.
+    """
+    try:
+        from saebase.sae.catalog import registered_catalog_json
+    except (ImportError, ModuleNotFoundError):
+        known_sources = {
+            "gemma270m": "google/gemma-scope-2-270m-pt",
+            "gemma1b": "google/gemma-scope-2-1b-pt",
+            "gemma3_4b_pt": "google/gemma-scope-2-4b-pt",
+            "gemma3_4b_it": "google/gemma-scope-2-4b-it",
+        }
+        try:
+            sites = site_cache()
+        except core.InvalidEvidence as exc:
+            _bad_evidence(exc)
+        items = [
+            {
+                "model_key": site["model"],
+                "repo_id": known_sources[site["model"]],
+                "revision": None,
+                "source": "historical_verified_sites",
+                "sae_id": site["sae"] + ":L" + str(site["layer"]),
+                "layer": site["layer"],
+                "hook": site["hook"],
+                "width": None,
+                "l0_variant": None,
+                "loader": "sae_lens",
+                "registered_profile": site["sae"],
+                "status": "registered_not_live_verified",
+            }
+            for site in sites
+            if site["model"] in known_sources
+            and "scope" in site["sae"]
+            and (not model_key or site["model"] == model_key)
+        ]
+        return {
+            "total": len(items), "items": items,
+            "mode": "registered_metadata_only", "source": "historical_verified_sites",
+        }
+    items = registered_catalog_json(model_key=model_key or None)
+    return {"total": len(items), "items": items, "mode": "registered_metadata_only",
+            "source": "saebase_python_registry"}
 
 
 @app.post("/api/jobs")

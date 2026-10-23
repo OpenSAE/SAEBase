@@ -2,7 +2,7 @@
 
 Capture/patch are deliberately scoped to an explicit model site and a single
 prompt. This contract prevents ambiguity about batch and token alignment.
-Supported adapters: TransformerLens HookedTransformer, HFHooksModel and
+Supported adapters: local TransformerLens HookedTransformer/TransformerBridge, HFHooksModel and
 compatible implementations of their documented methods.
 """
 
@@ -129,6 +129,30 @@ class ModelAdapter:
             backend=backend,
         )
 
+    def available_hooks(self, *, layer: int | None = None) -> tuple[str, ...]:
+        """List actual hook names without running the model.
+
+        Alias and driver coverage depend on the loaded backend. Empty output
+        means hook enumeration is unsupported, not that every name is valid.
+        """
+        if self.backend != "transformer_lens":
+            return ()
+        registry = getattr(self.model, "hook_dict", None)
+        if registry is None:
+            registry = getattr(self.model, "hook_points", None)
+        if isinstance(registry, dict):
+            names = tuple(str(name) for name in registry)
+        elif isinstance(registry, (tuple, list, set)):
+            names = tuple(str(name) for name in registry)
+        else:
+            return ()
+        if layer is not None:
+            if isinstance(layer, bool) or not isinstance(layer, int) or layer < 0:
+                raise ValueError("layer must be a nonnegative integer")
+            prefix = f"blocks.{layer}."
+            names = tuple(name for name in names if name.startswith(prefix))
+        return tuple(sorted(set(names)))
+
     def _tokens(self, *, prompt: str | None, tokens: torch.Tensor | None) -> torch.Tensor:
         if (prompt is None) == (tokens is None):
             raise ValueError("provide exactly one of prompt or tokens")
@@ -171,6 +195,14 @@ class ModelAdapter:
         layers = getattr(cfg, "n_layers", None)
         if layers is not None and not (0 <= site.layer < int(layers)):
             raise ValueError(f"layer {site.layer} outside model's {layers} layers")
+        if self.backend == "transformer_lens":
+            # A names_filter that matches no hooks is not an error in
+            # TransformerLens. Reject unknown names *before* patch execution.
+            get_point = getattr(self.model, "get_hook_point", None)
+            if callable(get_point) and get_point(site.hook_name) is None:
+                raise UnsupportedCapability(
+                    f"model has no fireable hook {site.hook_name!r}"
+                )
         return pos
 
     @torch.no_grad()
@@ -278,8 +310,14 @@ class ModelAdapter:
                 raise RuntimeError("HFHooksModel patch must return logits of shape [vocab]")
             return result.detach().clone()
 
-        # Tensor clone is essential: multiple hooks may consume the same data.
-        def replace(h: torch.Tensor, hook: Any) -> torch.Tensor:
+        # TransformerLens 4 may pass the hook by keyword; earlier versions
+        # pass it positionally. The fired counter rejects a silent no-op when
+        # an in-range hook alias exists but is not actually invoked.
+        fired = 0
+
+        def replace(h: torch.Tensor, hook: Any = None, **kwargs: Any) -> torch.Tensor:
+            nonlocal fired
+            fired += 1
             if not isinstance(h, torch.Tensor) or h.ndim != 3 or h.shape[:2] != ids.shape:
                 raise RuntimeError("patch hook must receive shape [1, seq, d_model]")
             if h.shape[-1] != activation.numel():
@@ -289,6 +327,10 @@ class ModelAdapter:
             return patched
 
         output = self.model.run_with_hooks(ids, fwd_hooks=[(site.hook_name, replace)])
+        if fired != 1:
+            raise UnsupportedCapability(
+                f"hook {site.hook_name!r} fired {fired} times; expected exactly once"
+            )
         return _as_logits(output, token_index=readout, length=ids.shape[1])
 
     @torch.no_grad()

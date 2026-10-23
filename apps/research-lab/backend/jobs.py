@@ -123,6 +123,7 @@ class JobQueue:
             "add",
             "coalition",
             "reconstruction",
+            "inspect",
         }:
             raise JobError("Unknown feature intervention")
         features = spec["feature_ids"]
@@ -133,7 +134,7 @@ class JobQueue:
             or len(features) != len(set(features))
         ):
             raise JobError("Invalid feature selection")
-        if spec["operation"] in ("identity", "reconstruction"):
+        if spec["operation"] in ("identity", "reconstruction", "inspect"):
             if features:
                 raise JobError("Identity/reconstruction conditions select no feature IDs")
         elif not features:
@@ -148,6 +149,12 @@ class JobQueue:
         tokens = spec["max_new_tokens"]
         if type(tokens) is not int or not 0 <= tokens <= 64:
             raise JobError("Invalid token budget")
+        if spec["operation"] == "inspect" and (features or tokens != 0 or strength != 0):
+            raise JobError("Recorded prompt inspection has no feature edits or generation")
+        if tokens and not (
+            spec["operation"] in {"identity", "ablate", "scale"} and 16 <= tokens <= 32
+        ):
+            raise JobError("Generation jobs use 16–32 new tokens with identity, ablate, or scale")
         return spec
 
     def enqueue(

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "opensae-saebase"
-version = "0.4.0"
+version = "0.5.0"
 description = "Research infrastructure for sparse autoencoder evaluation and interventions"
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
@@ -52,6 +52,14 @@ generation = [
     "vllm==0.27.1",
     "nnsight[vllm]==0.8.0rc1",
 ]
+# Separate optional workers. Do not co-install every research backend by default.
+tl4 = [
+    "transformer-lens>=4.0,<5",
+    "sae-lens>=6.0,<7",
+    "transformers>=4.40",
+    "huggingface-hub>=0.23",
+]
+nnsight-local = ["nnsight>=0.8,<0.9"]
 dev = ["pytest>=7", "build>=1.2", "twine>=5", "PyYAML>=6", "pytest-cov>=5,<8"]
 quality = ["ruff>=0.12,<0.16", "mypy>=1.15,<2", "pre-commit>=4,<5"]
 
