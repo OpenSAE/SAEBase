@@ -2,6 +2,8 @@
 
 🌍 Languages: [English](README.md) | [中文](README_cn.md) &nbsp; [![CI](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml)
 
+**Latest software release:** [v0.5.0 Public Research Beta](docs/releases/v0.5.0.md) · [OpenSAE Playground](https://atheavenma.github.io/opensae/workspace.html) · [Python API](docs/python-api.md)
+
 👉 **TL;DR.** SAEBase helps researchers understand, test, and modify sparse autoencoder (SAE) features in language models. Capture activations, evaluate reconstructions, edit features, measure downstream effects, and reproduce results with checkpoint-aware caches.
 
 <p align="center">
