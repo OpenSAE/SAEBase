@@ -2,6 +2,8 @@
 
 🌍 语言：[English](README.md) | [中文](README_cn.md) &nbsp; [![CI](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml)
 
+**最新软件版本：** [v0.5.0 Public Research Beta](docs/releases/v0.5.0.md) · [OpenSAE Playground](https://atheavenma.github.io/opensae/workspace.html) · [Python API](docs/python-api.md)
+
 👉 **简介。** SAEBase 用于理解、测试和修改语言模型中的稀疏自编码器（SAE）特征。它提供激活提取与复用、重构分析、特征干预、下游行为评测以及可追溯的实验结果。
 
 <p align="center">
