@@ -8,11 +8,13 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+import os
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from . import core, published_wp12, wp15_records
@@ -23,6 +25,20 @@ from . import explore
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "frontend"
 app = FastAPI(title="OpenSAE Research Lab", version="0.1.0", docs_url="/api/docs", redoc_url=None)
+# CORS is an origin allowlist, not authentication. It only authorizes browser access.
+# The private worker remains disabled unless strong operator/worker secrets are configured.
+WEB_ORIGINS = [
+    origin.strip().rstrip("/")
+    for origin in os.environ.get("OPENSAE_CORS_ORIGINS", "https://atheavenma.github.io").split(",")
+    if origin.strip()
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=WEB_ORIGINS,
+    allow_credentials=False,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Authorization", "Content-Type"],
+)
 app.mount("/assets", StaticFiles(directory=str(FRONTEND)), name="assets")
 # The private router responds 503 until explicitly configured with distinct
 # operator/worker tokens and durable storage. Public Research Lab stays read-only.
