@@ -87,7 +87,8 @@ def load_record(name: str) -> dict[str, Any]:
             **record,
             "samples": [
                 {key: value for key, value in sample.items() if key != "public_example"}
-                if isinstance(sample, dict) else sample
+                if isinstance(sample, dict)
+                else sample
                 for sample in record["samples"]
             ],
         }
@@ -153,9 +154,7 @@ def load_record(name: str) -> dict[str, Any]:
             elif example is not None:
                 raise ValueError("Unreviewed generation must not contain public text")
     elif name == "explanation":
-        if type(record.get("feature_id")) is not int or not _finite(
-            record.get("heldout_score")
-        ):
+        if type(record.get("feature_id")) is not int or not _finite(record.get("heldout_score")):
             raise ValueError("Explanation card has no measured feature or held-out result")
         if reviewed_description:
             description = record.get("description")
