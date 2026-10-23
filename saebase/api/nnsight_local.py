@@ -173,17 +173,15 @@ class NNsightLocal:
         if (
             not selected
             or len(selected) > 16
-            or any(type(step) is not int or step < 0 or step >= max_new_tokens
-                   for step in selected)
+            or any(type(step) is not int or step < 0 or step >= max_new_tokens for step in selected)
             or selected != sorted(set(selected))
         ):
             raise ValueError("Choose up to 16 ordered distinct reachable generation steps")
         if operation not in {"zero", "scale", "replace"}:
             raise ValueError("Unknown native generation-time edit")
         if operation == "replace":
-            if (
-                not isinstance(replacement, torch.Tensor)
-                or not bool(torch.isfinite(replacement).all())
+            if not isinstance(replacement, torch.Tensor) or not bool(
+                torch.isfinite(replacement).all()
             ):
                 raise ValueError("Replacement must be a finite native tensor")
         elif replacement is not None:
@@ -193,7 +191,9 @@ class NNsightLocal:
         ):
             raise ValueError("Scale must be finite")
 
-        with self.model.generate(inputs, max_new_tokens=max_new_tokens, do_sample=False) as baseline:
+        with self.model.generate(
+            inputs, max_new_tokens=max_new_tokens, do_sample=False
+        ) as baseline:
             baseline_ref = _saved(baseline.result)
         with self.model.generate(inputs, max_new_tokens=max_new_tokens, do_sample=False) as edited:
             for step in edited.iter[selected]:
@@ -210,7 +210,8 @@ class NNsightLocal:
         if before.ndim != 2 or after.ndim != 2 or before.shape[0] != 1 or after.shape[0] != 1:
             raise RuntimeError("Native NNsight generation must return [1, sequence] token IDs")
         if before.dtype not in (torch.int32, torch.int64) or after.dtype not in (
-            torch.int32, torch.int64
+            torch.int32,
+            torch.int64,
         ):
             raise TypeError("Original NNsight generation did not return token IDs")
         return {
