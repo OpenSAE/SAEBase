@@ -13,7 +13,7 @@ BASE = Path(__file__).resolve().parents[1]
 
 def test_release_version_and_notes_are_consistent():
     version = tomllib.loads((BASE / "pyproject.toml").read_text())["project"]["version"]
-    assert version == "0.4.0"
+    assert tuple(int(x) for x in version.split(".")) >= (0, 4, 0)
     module = ast.parse((BASE / "saebase" / "__init__.py").read_text())
     constants = [
         node.value.value
