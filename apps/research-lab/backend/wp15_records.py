@@ -70,7 +70,8 @@ def load_record(name: str) -> dict[str, Any]:
             or record.get("upstream_commit") != "8042bb3828c6340da8d12062324e92b2077c571c"
             or not _sha(record.get("evidence_sha256"))
             or not isinstance(metrics, dict)
-            or set(metrics) != {
+            or set(metrics)
+            != {
                 "saebench.core.l0",
                 "saebench.core.mse",
                 "saebench.sparse_probing.sae_top_1_test_accuracy",
@@ -92,7 +93,11 @@ def load_record(name: str) -> dict[str, Any]:
             raise ValueError("Training card is missing a real reloaded checkpoint")
     elif name == "generation":
         samples = record.get("samples")
-        if record.get("public_prompt") is not False or not isinstance(samples, list) or len(samples) != 2:
+        if (
+            record.get("public_prompt") is not False
+            or not isinstance(samples, list)
+            or len(samples) != 2
+        ):
             raise ValueError("Generation card must keep both prompts private")
         for sample in samples:
             if not _sha(sample.get("prompt_sha256")) or type(sample.get("feature_id")) is not int:
