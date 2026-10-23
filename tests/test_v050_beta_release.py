@@ -2,6 +2,7 @@
 
 This test does not mistake a successful package build for independent GPU validation.
 """
+
 from pathlib import Path
 import ast
 import tomllib
@@ -15,7 +16,8 @@ def test_v050_package_version_and_release_notes():
     assert project["version"] == "0.5.0"
     src = ast.parse((ROOT / "saebase" / "__init__.py").read_text())
     found = [
-        node.value.value for node in src.body
+        node.value.value
+        for node in src.body
         if isinstance(node, ast.Assign)
         and any(isinstance(t, ast.Name) and t.id == "__version__" for t in node.targets)
         and isinstance(node.value, ast.Constant)
