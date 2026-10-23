@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+import json
+import shutil
 import sys
+
+import pytest
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -41,3 +45,54 @@ def test_recorded_cards_match_the_real_runs_and_hide_text():
 
 def test_unknown_wp15_card_is_not_invented():
     assert client.get("/api/wp15/weights").status_code == 404
+
+
+def test_reviewed_staging_bundle_requires_human_approval(tmp_path, monkeypatch):
+    """A reviewed description can be staged without making unreviewed text public."""
+    from backend import wp15_records
+
+    source = wp15_records._root()
+    staged = tmp_path / "wp15"
+    shutil.copytree(source, staged)
+    monkeypatch.setenv("OPENSAE_LAB_DATA", str(tmp_path))
+
+    record_path = staged / "explanation.json"
+    candidate = json.loads(record_path.read_text())
+    candidate.update(
+        {
+            "approved": True,
+            "human_reviewed": True,
+            "rights_reviewed": True,
+            "private_unpublished": False,
+            "description_published": True,
+            "description": "Test-only approved explanation for a simulated review flow.",
+        }
+    )
+    record_path.write_text(json.dumps(candidate))
+    returned = wp15_records.load_record("explanation")
+    assert returned["description_published"] is True
+    assert returned["description"] == candidate["description"]
+
+    candidate["human_reviewed"] = False
+    record_path.write_text(json.dumps(candidate))
+    with pytest.raises(ValueError):
+        wp15_records.load_record("explanation")
+
+    candidate["human_reviewed"] = True
+    candidate["prompt_text"] = "Private material must never appear."
+    record_path.write_text(json.dumps(candidate))
+    with pytest.raises(ValueError):
+        wp15_records.load_record("explanation")
+
+
+def test_staged_bundle_overrides_preview_only_when_present(tmp_path, monkeypatch):
+    from backend import wp15_records
+
+    source = wp15_records._root()
+    staged = tmp_path / "wp15"
+    shutil.copytree(source, staged)
+    monkeypatch.setenv("OPENSAE_LAB_DATA", str(tmp_path))
+    benchmark = json.loads((staged / "benchmark.json").read_text())
+    benchmark["metrics"]["saebench.core.l0"] = 375.0
+    (staged / "benchmark.json").write_text(json.dumps(benchmark))
+    assert wp15_records.load_record("benchmark")["metrics"]["saebench.core.l0"] == 375.0
