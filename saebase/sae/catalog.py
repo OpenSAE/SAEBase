@@ -14,14 +14,19 @@ from typing import Any
 from saebase.sae.registry import list_profiles
 
 
-_VARIANT = re.compile(
-    r"^layer_([0-9_]+)_width_([A-Za-z0-9]+)_l0_([A-Za-z0-9]+)(?:_(affine))?$"
-)
+_VARIANT = re.compile(r"^layer_([0-9_]+)_width_([A-Za-z0-9]+)_l0_([A-Za-z0-9]+)(?:_(affine))?$")
 _MULTILAYER = re.compile(r"^width_([A-Za-z0-9]+)_l0_([A-Za-z0-9]+)(?:_(affine))?$")
 _SCOPE_FAMILIES = {
-    "resid_post", "attn_out", "mlp_out", "transcoder",
-    "resid_post_all", "attn_out_all", "mlp_out_all", "transcoder_all",
-    "crosscoder", "clt",
+    "resid_post",
+    "attn_out",
+    "mlp_out",
+    "transcoder",
+    "resid_post_all",
+    "attn_out_all",
+    "mlp_out_all",
+    "transcoder_all",
+    "crosscoder",
+    "clt",
 }
 
 
@@ -148,7 +153,8 @@ def discover_official_scope_assets(
         index_layer = layers[0] if len(layers) == 1 else -1
         original = next(
             (
-                asset for asset in valid
+                asset
+                for asset in valid
                 if asset.layer == index_layer
                 and asset.sae_id in {directory, f"{family}/{directory}"}
                 and family in {"resid_post", "resid_post_all"}
