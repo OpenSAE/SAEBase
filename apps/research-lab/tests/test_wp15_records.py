@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
 import sys
@@ -96,3 +97,38 @@ def test_staged_bundle_overrides_preview_only_when_present(tmp_path, monkeypatch
     benchmark["metrics"]["saebench.core.l0"] = 375.0
     (staged / "benchmark.json").write_text(json.dumps(benchmark))
     assert wp15_records.load_record("benchmark")["metrics"]["saebench.core.l0"] == 375.0
+
+
+def test_generation_can_publish_only_source_matched_reviewed_examples(tmp_path, monkeypatch):
+    from backend import wp15_records
+
+    source = wp15_records._root()
+    staged = tmp_path / "wp15"
+    shutil.copytree(source, staged)
+    monkeypatch.setenv("OPENSAE_LAB_DATA", str(tmp_path))
+    path = staged / "generation.json"
+    record = json.loads(path.read_text())
+    record["rights_reviewed"] = True
+    record["public_prompt"] = True
+    record["public_continuations_reviewed"] = True
+    for idx, sample in enumerate(record["samples"]):
+        prompt = "Original demo prompt " + str(idx)
+        sample["prompt_sha256"] = hashlib.sha256(prompt.encode()).hexdigest()
+        sample["public_example"] = {
+            "prompt_text": prompt,
+            "baseline_continuation": " Baseline",
+            "edited_continuation": " Edited",
+        }
+    path.write_text(json.dumps(record))
+    accepted = wp15_records.load_record("generation")
+    assert accepted["samples"][0]["public_example"]["prompt_text"].startswith("Original")
+
+    record["samples"][0]["public_example"]["prompt_text"] = "Source text modified"
+    path.write_text(json.dumps(record))
+    with pytest.raises(ValueError, match="match original GPU source"):
+        wp15_records.load_record("generation")
+
+    record["public_prompt"] = False
+    path.write_text(json.dumps(record))
+    with pytest.raises(ValueError):
+        wp15_records.load_record("generation")
