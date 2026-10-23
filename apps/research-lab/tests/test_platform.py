@@ -1221,3 +1221,35 @@ def test_registered_scope_assets_endpoint_is_metadata_only():
     assert all(item["model_key"] == "gemma270m" for item in data["items"])
     assert all(item["status"] == "registered_not_live_verified" for item in data["items"])
     assert all(item["repo_id"].startswith("google/gemma-scope-2-") for item in data["items"])
+
+
+def test_opensae_workspace_cors_is_allowlisted():
+    """Browser API access is enabled only for the explicitly configured site."""
+    allowed = "https://atheavenma.github.io"
+    response = client.options(
+        "/api/sites?limit=5",
+        headers={
+            "Origin": allowed,
+            "Access-Control-Request-Method": "GET",
+        },
+    )
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == allowed
+    response = client.options(
+        "/api/private/jobs",
+        headers={
+            "Origin": allowed,
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "authorization,content-type",
+        },
+    )
+    assert response.status_code == 200
+    assert "authorization" in response.headers["access-control-allow-headers"].lower()
+    rejected = client.options(
+        "/api/sites",
+        headers={
+            "Origin": "https://untrusted.example",
+            "Access-Control-Request-Method": "GET",
+        },
+    )
+    assert "access-control-allow-origin" not in rejected.headers
