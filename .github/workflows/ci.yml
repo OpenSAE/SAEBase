@@ -264,6 +264,10 @@ jobs:
         run: python -m pip install -e ".[dev,quality]"
       - name: Ruff on adopted modules
         run: ruff check saebase/seed.py saebase/data/artifact_layout.py saebase/data/prompt_schema.py saebase/benchmarks/registry.py
+      - name: Check WP15 release adapter formatting
+        run: |
+          ruff check scripts/wp15_steer.py scripts/wp15_import_gemma_graph.py apps/research-lab/backend/wp15_records.py apps/research-lab/tests/test_wp15_records.py
+          ruff format --check scripts/wp15_steer.py scripts/wp15_import_gemma_graph.py apps/research-lab/backend/wp15_records.py apps/research-lab/tests/test_wp15_records.py
       - name: Mypy on adopted modules
         run: mypy --config-file pyproject.toml saebase/seed.py saebase/data/artifact_layout.py saebase/data/prompt_schema.py saebase/benchmarks/registry.py
       - name: Enforce lint and formatting on new Python files
