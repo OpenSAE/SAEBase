@@ -156,7 +156,61 @@ jobs:
           assert result["historical_groups_per_site"] == 64
           assert result["curated_prompts"] == 0
           assert result["gpu_online"] is False
-          print("CPU Docker smoke passed with genuine 48-site historical evidence")
+          # Exercise all five recorded WP15 cards inside the *actual* CPU image,
+          # not only API mocks or a localhost FastAPI test client.
+          def fetch(path):
+              with urllib.request.urlopen("http://127.0.0.1:17860" + path, timeout=5) as response:
+                  return json.load(response)
+          benchmark = fetch("/api/wp15/benchmark")
+          training = fetch("/api/wp15/training")
+          generation = fetch("/api/wp15/generation")
+          explanation = fetch("/api/wp15/explanation")
+          circuit = fetch("/api/wp15/circuit")
+          assert benchmark["metrics"]["saebench.core.l0"] == 376.0
+          assert training["reloaded"] is True and training["global_step"] == 50
+          assert any(
+              c["argmax_changed"]
+              for sample in generation["samples"]
+              for c in sample["conditions"]
+              if c["name"] == "ablate"
+          )
+          assert explanation["approved"] is False and explanation["description_published"] is False
+          assert len(circuit["graph"]["nodes"]) == 155
+          assert len(circuit["graph"]["edges"]) == 748
+          for name, card in (
+              ("benchmark", benchmark),
+              ("training", training),
+              ("generation", generation),
+              ("explanation", explanation),
+              ("circuit", circuit),
+          ):
+              content = json.dumps(card).lower()
+              assert '"prompt_text"' not in content, name
+              assert '"baseline_continuation"' not in content, name
+              assert '"edited_continuation"' not in content, name
+          try:
+              fetch("/api/wp15/not-a-real-record")
+              raise AssertionError("Unknown record was returned as a success")
+          except urllib.error.HTTPError as exc:
+              assert exc.code == 404
+          print("WP15 recorded cards passed in real CPU Docker, with private text omitted")
+          PY
+          docker restart opensae-lab-ci >/dev/null
+          python - <<'PY'
+          import json, time, urllib.request
+          url = "http://127.0.0.1:17860/api/wp15/circuit"
+          for _ in range(40):
+              try:
+                  with urllib.request.urlopen(url, timeout=3) as response:
+                      graph = json.load(response)
+                  assert len(graph["graph"]["nodes"]) == 155
+                  assert len(graph["graph"]["edges"]) == 748
+                  print("WP15 real recorded circuit survives CPU Docker restart")
+                  break
+              except Exception:
+                  time.sleep(0.5)
+          else:
+              raise AssertionError("Research Lab did not recover after Docker restart")
           PY
 
   localization-native:
