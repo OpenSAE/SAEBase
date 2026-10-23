@@ -742,10 +742,18 @@
       const record = await get("/api/wp15/explanation");
       clear(panel);
       const box = append(panel, "div", "record");
-      append(box, "strong", "", "Unreviewed local candidate · feature " + record.feature_id);
-      append(box, "p", "", "Held-out activation score " + safeNumber(record.heldout_score) +
-        " on " + record.heldout_n_positive + " active and " + record.heldout_n_negative +
-        " inactive examples. Approved: no. The written hypothesis is not shown.");
+      const reviewed = record.approved === true && record.human_reviewed === true &&
+        record.rights_reviewed === true && record.description_published === true;
+      append(box, "strong", "", (reviewed ? "Reviewed feature hypothesis" :
+        "Unreviewed local candidate") + " · feature " + record.feature_id);
+      if (reviewed) {
+        append(box, "p", "", record.description);
+      } else {
+        append(box, "p", "quiet", "The written hypothesis has not been approved for publication.");
+      }
+      append(box, "p", "", "Held-out activation-prediction score " +
+        safeNumber(record.heldout_score) + " on " + record.heldout_n_positive +
+        " active and " + record.heldout_n_negative + " inactive examples.");
       if (record.heldout_score <= 0.5) {
         append(box, "p", "quiet", "This diagnostic is not strong evidence of a useful " +
           "feature explanation. More independent positive and negative examples are needed.");
