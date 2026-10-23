@@ -3,6 +3,13 @@
 These commands run on a machine with the recorded weights. The public Research Lab pages show the measured cards and do not execute the models.
 
 ```bash
+# G1 — capture genuine SAE codes for a new local prompt (never auto-publishes)
+python scripts/wp12_p2_capture.py \
+  --prompt-file /path/to/authored-prompt.txt \
+  --sae-key gemma270m_scope_resid --layer 5 --device cuda \
+  --sample-id local-example-001 --group-id local-group-001 \
+  --output /tmp/local-feature-trace.json
+
 # G2 — 16-token greedy steering. Prompt files stay local.
 python scripts/wp15_steer.py \
   --prompt-file /path/to/prompt-a.txt \
