@@ -479,7 +479,10 @@ def recorded_inference(
 
 
 def strongest_features(
-    trace: dict[str, Any], *, token_position: int | None = None, top_k: int = 20,
+    trace: dict[str, Any],
+    *,
+    token_position: int | None = None,
+    top_k: int = 20,
     exclude_special_tokens: bool = False,
 ) -> list[dict[str, Any]]:
     """Rank actual sparse codes, optionally excluding tokenizer control tokens.
@@ -496,8 +499,14 @@ def strongest_features(
     collection = tokens if token_position is None else [tokens[token_position]]
     if exclude_special_tokens and token_position is None:
         known_special = {
-            "<bos>", "<eos>", "<pad>", "<s>", "</s>",
-            "<|begin_of_text|>", "<|end_of_text|>", "<|eot_id|>",
+            "<bos>",
+            "<eos>",
+            "<pad>",
+            "<s>",
+            "</s>",
+            "<|begin_of_text|>",
+            "<|end_of_text|>",
+            "<|eot_id|>",
         }
         collection = [t for t in collection if t["text"] not in known_special]
     best: dict[int, tuple[float, int]] = {}
