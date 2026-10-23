@@ -76,11 +76,17 @@ def execute_one(*, root: Path, device: str = "cuda") -> dict:
             )
             plan = EditPlan(site["sae"], site["layer"], -1, (edit,))
             response = compare_sae_edits(pair, pair.model.tokens(prompt=prompt), plan)
+            baseline = response["baseline_logits"].detach().float().cpu()
+            edited = response["edited_logits"].detach().float().cpu()
+            if baseline.ndim != 1 or baseline.shape != edited.shape:
+                raise RuntimeError("Teacher-forced readout logits have an unexpected shape")
             result = {
                 k: v for k, v in response.items() if k not in {"baseline_logits", "edited_logits"}
             }
-            result["baseline_logits"] = response["baseline_logits"].tolist()
-            result["edited_logits"] = response["edited_logits"].tolist()
+            result["max_abs_logit_delta"] = float((edited - baseline).abs().max())
+            result["baseline_argmax_token_id"] = int(baseline.argmax())
+            result["edited_argmax_token_id"] = int(edited.argmax())
+            result["logits_retained"] = False
         result["job_id"] = jid
         output = root / "results" / (jid + ".json")
         output.parent.mkdir(parents=True, exist_ok=True, mode=0o700)

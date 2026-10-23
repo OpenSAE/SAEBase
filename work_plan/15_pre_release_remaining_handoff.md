@@ -1,6 +1,8 @@
 # WP15 — Final Release Candidate Handoff (after CPU/CI integration)
 
-Date: 2026-10-22. **This is the current remaining-work handoff, not another GPU research plan.**  
+Date: 2026-10-22. **This is the current remaining-work handoff, not another GPU research plan.**
+
+GPU follow-up A–E is recorded in [15_gpu_asset_review.md](15_gpu_asset_review.md). That note is for human review. It does not update production `main` or the Hugging Face Space. The raw trace database stays on the GPU host.  
 Current release-candidate branch: `feat/wp15-six-workflows` ([PR #57](https://github.com/OpenSAE/SAEBase/pull/57)), with the pre-release integration ([PR #58](https://github.com/OpenSAE/SAEBase/pull/58)) already merged as commit `ae655959506f072b765ccb386372a7aacb2312a0`. PR #57 targets the WP13 development branch.  
 Production GitHub `main` and Hugging Face `OpenSAE/SAEBase` Space **must remain unchanged until the actual owner-authorized release**.
 
