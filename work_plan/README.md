@@ -1,3 +1,11 @@
+## Current product execution — WP17
+
+[**WP17 — Seven playground compute handoff**](17_seven_playgrounds_agent_handoff.md): the active, single GPU Agent task list. All seven example-first browser modules are implemented; reuse WP13–WP15 assets and replace only marked Demo results with real compute.
+
+## Current website execution — WP16
+
+[**WP16: OpenSAE Vision + real SAEBase API Workspace**](16_web_vision_api_single_execution.md) is the **single active web integration and GPU Agent handoff**. The V5 static website and API-aware Workspace are on the live website repository; existing WP13–WP15 model results and APIs must be reused. No new plan or repeated GPU sweep.
+
 # Engineering Plan Archive
 
 ### Current execution directive: WP15
@@ -7,6 +15,8 @@
 - [**WP15 — Complete all six workflows and release**](15_complete_six_workflows_and_release.md). Concrete engineering decisions, native integrations, user journeys and practical acceptance.
 - [**WP15 — GPU Agent command handoff**](15_gpu_agent_completion_runbook.md). Version setup, repair routes, commands, genuine artifacts and frontend integration.
 - [**WP15 — Completion matrix**](15_release_completion_matrix.csv). One row per mandatory feature and the release candidate; missing dependency is not a terminal status.
+- [**WP15 — Pre-release remaining handoff**](15_pre_release_remaining_handoff.md). Actual CI/CPU integration fixes completed; operator/GPU Agent follow-up is limited to approved real prompt assets, one private edit queue smoke, G2 decoded demos, G6 meaningful interpretation and remote staging proof.
+- [**WP15 — GPU asset review**](15_gpu_asset_review.md). One approved trace, two reviewed generation examples, and one private edit whose logits actually changed. Not a production release.
 
 
 ## Work Plan 14 — Active release-first plan (takes precedence for launch)

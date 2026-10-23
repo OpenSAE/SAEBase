@@ -50,6 +50,33 @@ class GenerationSpec:
                 "eos_token_ids": list(self.eos_token_ids), "max_context_tokens": self.max_context_tokens}
 
 
+def _distribution_shift(
+    clean: torch.Tensor, edited: torch.Tensor, *, feature_id: int | None, activation: float | None
+) -> dict[str, Any]:
+    """Teacher-forced next-token shift at one generated prefix. Not a continuation."""
+    clean_f = clean.detach().float().cpu()
+    edited_f = edited.detach().float().cpu()
+    if clean_f.ndim != 1 or edited_f.shape != clean_f.shape:
+        raise RuntimeError("generation logits must be one shared vocabulary vector")
+    clean_prob = torch.softmax(clean_f, -1)
+    edited_prob = torch.softmax(edited_f, -1)
+    clean_top = int(clean_f.argmax().item())
+    edited_top = int(edited_f.argmax().item())
+    rank = int((torch.argsort(edited_f, descending=True) == clean_top).nonzero()[0].item())
+    return {
+        "feature_id": feature_id,
+        "feature_activation": activation,
+        "clean_argmax_token_id": clean_top,
+        "edited_argmax_token_id": edited_top,
+        "clean_argmax_probability": float(clean_prob[clean_top].item()),
+        "edited_probability_of_clean_argmax": float(edited_prob[clean_top].item()),
+        "edited_argmax_probability": float(edited_prob[edited_top].item()),
+        "clean_argmax_rank_after_edit": rank,
+        "max_abs_logit_delta": float((edited_f - clean_f).abs().max().item()),
+        "logit_kind": "teacher_forced_next_token_at_generation_step",
+    }
+
+
 def _sample(logits: torch.Tensor, spec: GenerationSpec, *, rng: torch.Generator) -> int:
     vector = logits.float().detach().cpu()
     if not bool(torch.isfinite(vector).all()):
@@ -88,6 +115,7 @@ def compare_steered_generation(model: ModelAdapter, sae: Any, *,
         rng = torch.Generator(device="cpu").manual_seed(int.from_bytes(seed_material[:8], "little") % (2**63-1))
         current = list(original)
         generated: list[int] = []
+        steps: list[dict[str, Any]] = []
         for step in range(spec.max_new_tokens):
             input_ids = model.tokens(tokens=torch.tensor([current], dtype=torch.long))
             if steered:
@@ -97,6 +125,17 @@ def compare_steered_generation(model: ModelAdapter, sae: Any, *,
                 patch = apply_condition(sae, snapshot, condition)
                 logits = model.patch_logits(tokens=input_ids, site=current_site,
                                            activation=patch.activation, readout_position=-1)
+                clean = model.forward_logits(tokens=input_ids, readout_position=-1)
+                feature_id = condition.feature_ids[0] if condition.feature_ids else None
+                activation = None
+                if feature_id is not None:
+                    activation = float(snapshot.codes[feature_id].detach().float().item())
+                effect = _distribution_shift(
+                    clean, logits, feature_id=feature_id, activation=activation
+                )
+                effect["step"] = step
+                effect["position"] = position
+                steps.append(effect)
             else:
                 logits = model.forward_logits(tokens=input_ids, readout_position=-1)
             tok = _sample(logits, spec, rng=rng)
@@ -106,6 +145,8 @@ def compare_steered_generation(model: ModelAdapter, sae: Any, *,
                 break
         result[label + "_generated_token_ids"] = generated
         result[label + "_stop_reason"] = "eos" if generated and generated[-1] in eos else "max_new_tokens"
+        if steered:
+            result["steered_steps"] = steps
     result["same_continuation"] = result["baseline_generated_token_ids"] == result["steered_generated_token_ids"]
     result["shared_prefix_tokens"] = len(original)
     result["first_different_generated_index"] = next((i for i, (a,b) in enumerate(zip(

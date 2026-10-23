@@ -110,8 +110,12 @@ def store_input(
 @router.post("/jobs")
 def enqueue(body: PrivateJob, authorization: str | None = Header(default=None)) -> dict[str, Any]:
     root = authorize("operator", authorization)
-    if body.max_new_tokens:
-        raise HTTPException(422, "Teacher-forced private worker does not generate text")
+    if body.max_new_tokens and not (
+        body.operation in {"identity", "ablate", "scale"} and 16 <= body.max_new_tokens <= 32
+    ):
+        raise HTTPException(
+            422, "Generation jobs use 16–32 new tokens with identity, ablate, or scale"
+        )
     try:
         load_input(root, body.input_ref)
         return get_queue(root).enqueue(

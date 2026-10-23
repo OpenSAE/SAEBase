@@ -8,14 +8,16 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+import os
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from . import core, published_wp12
+from . import core, published_wp12, wp15_records
 from .private_api import router as private_router
 from .feature_store import feature_store_count
 from . import explore
@@ -23,6 +25,23 @@ from . import explore
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "frontend"
 app = FastAPI(title="OpenSAE Research Lab", version="0.1.0", docs_url="/api/docs", redoc_url=None)
+# CORS is an origin allowlist, not authentication. It only authorizes browser access.
+# The private worker remains disabled unless strong operator/worker secrets are configured.
+WEB_ORIGINS = [
+    origin.strip().rstrip("/")
+    for origin in os.environ.get("OPENSAE_CORS_ORIGINS", "https://atheavenma.github.io").split(",")
+    if origin.strip()
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=WEB_ORIGINS,
+    allow_credentials=False,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Authorization", "Content-Type"],
+    # GitHub Pages is a public origin. Chrome blocks its calls to a local
+    # operator API unless this preflight answer is present.
+    allow_private_network=True,
+)
 app.mount("/assets", StaticFiles(directory=str(FRONTEND)), name="assets")
 # The private router responds 503 until explicitly configured with distinct
 # operator/worker tokens and durable storage. Public Research Lab stays read-only.
@@ -329,13 +348,34 @@ class InterventionSpec(BaseModel):
 @app.post("/api/jobs/preflight")
 def preflight(request: InterventionSpec) -> dict[str, Any]:
     """Validate only. Never enqueue, store input, or claim GPU execution."""
-    permitted = {"identity", "ablate", "scale", "clamp", "add", "coalition", "reconstruction"}
+    permitted = {
+        "identity",
+        "ablate",
+        "scale",
+        "clamp",
+        "add",
+        "coalition",
+        "reconstruction",
+        "inspect",
+    }
     if request.operation not in permitted:
         raise HTTPException(422, "Unknown intervention operation")
-    if request.operation not in ("identity", "reconstruction") and not request.feature_ids:
+    if request.operation == "inspect" and (
+        request.feature_ids or request.max_new_tokens or request.strength
+    ):
+        raise HTTPException(422, "Inspection selects no feature edit or generation")
+    if request.operation not in ("identity", "reconstruction", "inspect") and not (
+        request.feature_ids
+    ):
         raise HTTPException(422, "At least one feature ID is required")
     if request.operation in ("identity", "reconstruction") and request.feature_ids:
         raise HTTPException(422, "This condition does not select individual features")
+    if request.max_new_tokens and not (
+        request.operation in {"identity", "ablate", "scale"} and 16 <= request.max_new_tokens <= 32
+    ):
+        raise HTTPException(
+            422, "Generation jobs use 16–32 new tokens with identity, ablate, or scale"
+        )
     if any(v < 0 for v in request.feature_ids) or len(set(request.feature_ids)) != len(
         request.feature_ids
     ):
@@ -389,6 +429,15 @@ def wp12_record(category: str, record_id: str) -> dict[str, Any]:
     if record is None:
         raise HTTPException(404, "No approved real result with this identity")
     return record
+
+
+@app.get("/api/wp15/{name}")
+def wp15_record(name: str) -> dict[str, Any]:
+    """Recorded local measurements. Prompt text and explanations are not included."""
+    try:
+        return wp15_records.load_record(name)
+    except ValueError as exc:
+        raise HTTPException(404, str(exc)) from exc
 
 
 @app.get("/api/wp12-compute")

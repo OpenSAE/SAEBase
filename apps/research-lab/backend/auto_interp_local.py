@@ -96,7 +96,20 @@ class LocalAutoInterpreter:
     def _ask(self, text: str, *, max_new_tokens: int) -> str:
         if not 1 <= max_new_tokens <= 100 or len(text) > 18000:
             raise ValueError("Interpretation prompt exceeds its local budget")
-        encoded = self.tokenizer(text, return_tensors="pt", truncation=False)
+        chat = getattr(self.tokenizer, "apply_chat_template", None)
+        encoded = None
+        if callable(chat):
+            templated = chat(
+                [{"role": "user", "content": text}],
+                add_generation_prompt=True,
+                return_tensors="pt",
+            )
+            if isinstance(templated, torch.Tensor):
+                encoded = {"input_ids": templated}
+            elif isinstance(templated, Mapping) and "input_ids" in templated:
+                encoded = templated
+        if encoded is None:
+            encoded = self.tokenizer(text, return_tensors="pt", truncation=False)
         if not isinstance(encoded, Mapping) or "input_ids" not in encoded:
             raise TypeError("Original tokenizer did not return input_ids")
         ids = encoded["input_ids"]
@@ -146,9 +159,10 @@ class LocalAutoInterpreter:
             "Pattern: " + description[:900] + "\nText: " + context[:1400] + "\nAnswer:"
         )
         response = self._ask(question, max_new_tokens=6)
-        label = response.upper().strip().rstrip(".")
+        word = "".join(ch for ch in response.upper() if ch.isalpha() or ch.isspace()).split()
+        label = word[0] if word else ""
         if label not in {"YES", "NO"}:
-            raise ValueError("Held-out predictor returned neither YES nor NO")
+            raise ValueError("Held-out predictor returned neither YES nor NO: " + response[:80])
         return label == "YES"
 
     def interpret(

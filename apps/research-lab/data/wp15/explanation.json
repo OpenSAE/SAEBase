@@ -1,0 +1,17 @@
+{
+  "schema": "opensae.wp15.explanation_record.v1",
+  "site_id": "gemma270m:gemma270m_scope_resid:L5",
+  "feature_id": 1680,
+  "approved": false,
+  "approval_required": true,
+  "private_unpublished": true,
+  "description_published": false,
+  "heldout_score": 0.5,
+  "heldout_n_positive": 3,
+  "heldout_n_negative": 1,
+  "evaluation_kind": "SAE_binary_activation_prediction_not_semantic_truth",
+  "generator_state_sha256": "f1877a0f35674b31e1903b8e9ed2300f3cd484e5d126b95ec9e0f73807efbc7e",
+  "method": "local_greedy_context_pattern_v1",
+  "rights_reviewed": false,
+  "note": "The model wrote a hypothesis and the held-out score is a diagnostic. The sentence is unpublished and is not a feature label."
+}

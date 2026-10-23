@@ -17,7 +17,7 @@ import sys
 import time
 from typing import Literal
 
-SHA = re.compile(r"^[0-9a-f]{40}$")
+SHA = re.compile(r"^[0-9a-f]{40}([0-9a-f]{24})?$")
 
 
 @dataclass(frozen=True)

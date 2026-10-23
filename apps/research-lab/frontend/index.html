@@ -98,6 +98,7 @@
             <button type="button" class="btn secondary" id="explanation-search">Find explanations</button>
           </div>
           <p class="quiet">Explanations are hypotheses. Results appear only when reviewed descriptions have been published.</p>
+          <div id="wp15-explanation" class="record-list"></div>
         </div>
         <div class="explore-mode-panel" id="explore-mode-inference" hidden>
           <label class="prompt-label">Prompt text<textarea id="inference-prompt" rows="3" maxlength="16000" placeholder="Enter text from a previously published trace; new GPU inference is offline"></textarea></label>
@@ -153,6 +154,11 @@
         <div id="intervention-record-list" class="record-list" aria-live="polite"></div>
         <div id="intervention-record-detail" class="record-list" hidden></div>
       </div>
+      <div class="panel stacked">
+        <h2>Recorded generation steering</h2>
+        <p class="quiet">Sixteen new greedy tokens on the local Gemma worker. The card shows whether the continuation changed and how the first-step distribution moved. Prompt text stays private.</p>
+        <div id="wp15-generation" class="record-list"></div>
+      </div>
     </section>
     <section id="analyze" class="view" hidden>
       <div class="section-heading"><div><span class="eyebrow">RESEARCH METHODS</span><h1>Test what features explain.</h1><p>Use purpose-built analyses, with explicit assumptions and source methods.</p></div></div>
@@ -177,7 +183,8 @@
 
     <section id="benchmarks" class="view" hidden>
       <div class="section-heading"><div><span class="eyebrow">NATIVE SAE EVALUATION</span>
-        <h1>Benchmark comparisons</h1><p>Compare genuinely run SAEBench results under matched model, dataset, site and upstream protocol.</p></div></div>
+        <h1>SAE benchmarks</h1><p>Inspect actual native SAEBench results. Cross-SAE comparisons appear only when compatible runs exist.</p></div></div>
+      <div id="wp15-benchmark" class="panel"></div>
       <div class="panel"><div class="panel-title"><h2>Reviewed native comparisons</h2>
         <span id="benchmark-count" class="subtle">No data loaded</span></div>
         <div id="benchmark-list" class="record-list"></div>
@@ -195,7 +202,7 @@
           <label>Model snapshot folder<input id="training-model" placeholder="/private/models/pinned-commit" required></label>
           <label>Dataset snapshot folder<input id="training-dataset" placeholder="/private/datasets/pinned-commit" required></label>
           <label>Model revision (40-character git SHA)<input id="training-model-revision" minlength="40" maxlength="40" placeholder="exact revision" required></label>
-          <label>Dataset revision (40-character git SHA)<input id="training-dataset-revision" minlength="40" maxlength="40" placeholder="exact revision" required></label>
+          <label>Dataset revision (40-character git SHA or 64-character data hash)<input id="training-dataset-revision" minlength="40" maxlength="64" placeholder="exact revision" required></label>
           <label>Hookpoint<input id="training-hook" placeholder="transformer.h.0" required></label>
           <div class="form-cols">
             <label>Input width<input id="training-width" type="number" min="1" value="768"></label>
@@ -211,6 +218,7 @@
         <div class="panel stacked">
           <h2>Released training records</h2>
           <div id="training-list" class="record-list"></div>
+          <div id="wp15-training" class="record-list"></div>
           <p class="quiet">Native checkpoints and optimizer states stay on the private worker. Only approved source hashes and summaries can be published here.</p>
         </div>
       </div>

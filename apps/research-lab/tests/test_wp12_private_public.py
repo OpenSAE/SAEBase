@@ -138,3 +138,53 @@ def test_private_operator_worker_roles_and_durable_queue(monkeypatch, tmp_path):
     assert checked.json()["logit_delta_l2"] == 0.25
     path.write_bytes(b'{"job_id":"modified"}')
     assert client.get("/api/private/jobs/" + job_id + "/result", headers=op).status_code == 503
+
+
+def test_private_generation_is_bounded_and_keeps_the_prompt_out_of_the_queue(monkeypatch, tmp_path):
+    monkeypatch.setenv("OPENSAE_ENABLE_PRIVATE_JOBS", "1")
+    monkeypatch.setenv("OPENSAE_PRIVATE_DATA", str(tmp_path))
+    monkeypatch.setenv("OPENSAE_PRIVATE_OPERATOR_TOKEN", "c" * 40)
+    monkeypatch.setenv("OPENSAE_PRIVATE_WORKER_TOKEN", "d" * 40)
+    op = {"Authorization": "Bearer " + "c" * 40}
+    prompt = "A private generation sentence that must stay off the queue."
+    stored = client.post("/api/private/inputs", json={"text": prompt}, headers=op)
+    assert stored.status_code == 200
+    ref = stored.json()["input_ref"]
+    site = next(s for s in core.load_sites() if core.has_complete_identity(s))
+    base = {
+        "client_key": "wp17-generate-01",
+        "site_id": site["site_id"],
+        "operation": "ablate",
+        "feature_ids": [1819],
+        "strength": 0.0,
+        "input_ref": ref,
+    }
+    rejected = client.post("/api/private/jobs", json={**base, "max_new_tokens": 8}, headers=op)
+    assert rejected.status_code == 422
+    assert prompt not in rejected.text
+    accepted = client.post("/api/private/jobs", json={**base, "max_new_tokens": 16}, headers=op)
+    assert accepted.status_code == 200
+    assert prompt not in accepted.text
+    inspect_job = {
+        "client_key": "wp17-inspect-01",
+        "site_id": site["site_id"],
+        "operation": "inspect",
+        "feature_ids": [],
+        "strength": 0.0,
+        "max_new_tokens": 0,
+        "input_ref": ref,
+    }
+    assert client.post("/api/private/jobs", json=inspect_job, headers=op).status_code == 200
+    preflight = client.post(
+        "/api/jobs/preflight",
+        json={
+            "site_id": site["site_id"],
+            "text": prompt,
+            "operation": "inspect",
+            "feature_ids": [],
+            "strength": 0,
+            "max_new_tokens": 0,
+        },
+    )
+    assert preflight.status_code == 200
+    assert prompt not in preflight.text

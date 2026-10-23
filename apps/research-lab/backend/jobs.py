@@ -147,10 +147,14 @@ class JobQueue:
         ):
             raise JobError("Invalid edit strength")
         tokens = spec["max_new_tokens"]
-        if spec["operation"] == "inspect" and (features or tokens != 0 or strength != 0):
-            raise JobError("Recorded prompt inspection has no feature edits or generation")
         if type(tokens) is not int or not 0 <= tokens <= 64:
             raise JobError("Invalid token budget")
+        if spec["operation"] == "inspect" and (features or tokens != 0 or strength != 0):
+            raise JobError("Recorded prompt inspection has no feature edits or generation")
+        if tokens and not (
+            spec["operation"] in {"identity", "ablate", "scale"} and 16 <= tokens <= 32
+        ):
+            raise JobError("Generation jobs use 16–32 new tokens with identity, ablate, or scale")
         return spec
 
     def enqueue(
