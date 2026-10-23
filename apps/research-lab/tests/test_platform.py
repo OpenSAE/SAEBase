@@ -802,7 +802,7 @@ def test_queue_refuses_invalid_specs_and_stale_worker_completion(tmp_path):
         "operation": "identity",
         "feature_ids": [],
         "strength": 1,
-        "max_new_tokens": 4,
+        "max_new_tokens": 16,
         "input_ref": "a" * 64,
     }
     with pytest.raises(JobError, match="64-character|private content hash"):
@@ -1171,7 +1171,7 @@ def test_worker_attempt_fencing_rejects_stale_identical_worker_identity(tmp_path
         "operation": "identity",
         "feature_ids": [],
         "strength": 1.0,
-        "max_new_tokens": 4,
+        "max_new_tokens": 16,
         "input_ref": "e" * 64,
     }
     job = queue.enqueue(owner="owner-retry", client_key="retry-1234", spec=request, now=100)
