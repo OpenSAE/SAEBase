@@ -27,6 +27,8 @@ Existing compute code: `OpenSAE/SAEBase` branch `feat/wp15-six-workflows`, PR #5
 
 ### 1. Explore — real prompt → tokens → activated features
 
+**REAL RECORDED** for the approved sensor prompt (`WP13-DEMO-01`, 639 features, 779 nonzero codes) in playground PR #6. **REAL LIVE** for one new operator prompt: inspect returned HTTP 200 and 14 tokens; the last token's strongest feature was 973 at activation 555.75. Prompt SHA256 `4bdd718eacdb26ae986b252c474334d89851e8f731db25724626667d4f00dc2d`. Other prompts without a connected worker stay **DEMO ONLY**.
+
 Current browser `runExplore` uses a seeded illustrative feature map for any prompt. Replace this only when the real backend is reachable.
 
 Reuse `saebase.explore.capture_prompt_trace` (Gemma-3-270M / `gemma270m_scope_resid` / L5) or already approved `WP13-DEMO-01` (`/workspace/wp15/staging/rc1`, 639 nonzero rows). On preset example, return the matching token rows, feature IDs and measured activations; for a new prompt, enqueue an authenticated fresh-input inspect job. Preserve token-to-feature selection and reusing selected Feature in Intervene.
@@ -35,11 +37,15 @@ Example existing `scripts/wp12_p2_capture.py`; private worker `apps/research-lab
 
 ### 2. Intervene — real edit from an active feature
 
+**REAL RECORDED** for the boats prompt, feature 1819, ablation. **REAL LIVE** for feature 973 on the new prompt: `logit_delta_l2` 591.45, maximum logit change 5.53, argmax token stayed 818, wrong token HTTP 401. Feature 0 was inactive at the last token; the result says so and its logit change is 0. Other combinations without a worker stay **DEMO ONLY**.
+
 Current `runIntervene` uses the recorded Gemma F1819 ablation max logit change ~9.802836 for the exact boats prompt; other parameter combinations are `Demo`.
 
 Connect selection, operation (ablate / scale / clamp / add), and strength to the real native `compare_sae_edits` via existing `private_api.py` and `private_worker.py`. Return source/model/site, measured baseline/edited next-token IDs, logit delta and user-visible error. Existing **private** WP15 edit proved HTTP 401 for bad tokens and nonzero logit changes: reuse that worker. For a target feature inactive at the selected position, show a meaningful message rather than a fabricated edit.
 
 ### 3. Generate — actual autoregressive feature edit
+
+**REAL RECORDED** for the two approved 16-token prompts. **REAL LIVE** for a 16-token ablation of feature 973 on the new prompt: decoded baseline and edited text were returned, greedy text matched, and the first-step maximum logit change was 5.53. The prompt and continuations were not committed. Full logits were not stored.
 
 Current `runGenerate` shows existing **measured** original WP15 continuations for exact approved G2 prompts; other prompts use clearly marked demos.
 
@@ -47,19 +53,27 @@ Current private queue disallows `max_new_tokens>0` and only has teacher-forced e
 
 ### 4. Circuits — real graph browsing and optional source-consistent tracing
 
+**REAL RECORDED.** The existing Gemma-2-2B graph remains the viewer. No new circuit trace was run.
+
 Current browser loads the original recorded, sanitized native G4 Gemma-2-2B graph (155 nodes, 748 browser edges). Working graph filter, zoom via browser, click/keyboard node selection already exists.
 
 Keep the first working capability as **open and inspect a real graph**. If there is compatible native circuit-tracer execution already available, add a bounded operator job calling `run_native_circuit_tracer` and `import_native_graph_file` with matching original transcoder; otherwise **do not block the working graph viewer** or invent a circuit from the G1 Gemma-3 SAE.
 
 ### 5. Evaluate — real native benchmark results and optional new evaluation
 
+**REAL RECORDED.** The existing SAEBench L0, reconstruction MSE, and sparse-probing numbers remain the page. No new evaluation was run.
+
 Current browser metric selector reads original G3 native SAEBench results. Do not rerun this for a demo. For a user-authored evaluation, reuse `saebase.wp12.benchmarks.native_pilot` and original fixed SAEBench upstream `8042bb3828c6340da8d12062324e92b2077c571c`; make one authenticated queued operation with compatible model/SAE/dataset config and source-linked report. Otherwise the existing measured metric exploration **already constitutes one useful playable page**.
 
 ### 6. Train — real existing checkpoint plus optional short new run
 
+**REAL RECORDED** for the TopK, K=32, 50-step preset. Other parameter combinations stay **DEMO ONLY**. No new training run was started.
+
 The exact preset TopK / K32 / 50-step option uses the original WP15 Sparsify run; alternative `steps`, `K` and architecture currently generate an explicitly **simulated** response. Use `saebase.wp12.training.TrainPlan` and `run_training` for an operator-authenticated, bounded original native run, with nonblocking job progress, checkpoint registration and **actual** checkpoint reload + encoding test. The existing native 50-step checkpoint is proof of integration, not proof of high SAE quality. Do not train a big SAE solely for site UX.
 
 ### 7. Interpret — real candidate and separately evaluated evidence
+
+**REAL RECORDED** for feature 1680: held-out score 0.50, three positive and one negative example, no approved explanation. Other feature hypotheses stay **DEMO ONLY**. No new explanation text was published.
 
 The exact F1680 preset displays original diagnostic score **0.50** on 3 positive and 1 negative held-out prompts and correctly says no approved explanation. Other feature hypotheses and scores in the browser are **Demo**.
 
@@ -72,6 +86,10 @@ Reuse original local Qwen2.5-0.5B-Instruct and `scripts/wp12_autointerpret.py`, 
 - Small portable result schema for each completed operation: `{status, model, site_id, feature_id, operation, input_sha256, result, runtime_seconds, source_commit}` plus operation-specific token features or generated outputs, or a job ID with progress. Reuse existing Pydantic records and small JSON adapters, don't invent parallel backend schemas.
 - Real processed input and results must be displayed where the current Demo result appears. On no compatible backend, the public sample play mode still works and stays marked Demo. Network/remote failures get explicit error messages, not a counterfeit measured result.
 - Work in one feature branch on top of current WP15 development, commit source/tests, and give the specific existing website PR or follow-up patch required to replace demo computations. No new branding/visualization work.
+
+## Operator result, 2026-10-23
+
+The private API was started only for this check at `http://127.0.0.1:18083` and then stopped. It is not a public 24/7 GPU service. Playground follow-up: https://github.com/AtheavenMa/AtheavenMa.github.io/pull/6. Backend changes are on `feat/wp15-six-workflows`. Production `main` and the Hugging Face Space were not changed. No browser screenshot was taken on this host.
 
 ## Acceptance for GPU Agent
 

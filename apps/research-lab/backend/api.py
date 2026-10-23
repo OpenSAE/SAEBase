@@ -345,13 +345,34 @@ class InterventionSpec(BaseModel):
 @app.post("/api/jobs/preflight")
 def preflight(request: InterventionSpec) -> dict[str, Any]:
     """Validate only. Never enqueue, store input, or claim GPU execution."""
-    permitted = {"identity", "ablate", "scale", "clamp", "add", "coalition", "reconstruction"}
+    permitted = {
+        "identity",
+        "ablate",
+        "scale",
+        "clamp",
+        "add",
+        "coalition",
+        "reconstruction",
+        "inspect",
+    }
     if request.operation not in permitted:
         raise HTTPException(422, "Unknown intervention operation")
-    if request.operation not in ("identity", "reconstruction") and not request.feature_ids:
+    if request.operation == "inspect" and (
+        request.feature_ids or request.max_new_tokens or request.strength
+    ):
+        raise HTTPException(422, "Inspection selects no feature edit or generation")
+    if request.operation not in ("identity", "reconstruction", "inspect") and not (
+        request.feature_ids
+    ):
         raise HTTPException(422, "At least one feature ID is required")
     if request.operation in ("identity", "reconstruction") and request.feature_ids:
         raise HTTPException(422, "This condition does not select individual features")
+    if request.max_new_tokens and not (
+        request.operation in {"identity", "ablate", "scale"} and 16 <= request.max_new_tokens <= 32
+    ):
+        raise HTTPException(
+            422, "Generation jobs use 16–32 new tokens with identity, ablate, or scale"
+        )
     if any(v < 0 for v in request.feature_ids) or len(set(request.feature_ids)) != len(
         request.feature_ids
     ):
