@@ -1,3 +1,7 @@
+## Current product execution — WP17
+
+[**WP17 — Seven playground compute handoff**](17_seven_playgrounds_agent_handoff.md): the active, single GPU Agent task list. All seven example-first browser modules are implemented; reuse WP13–WP15 assets and replace only marked Demo results with real compute.
+
 ## Current website execution — WP16
 
 [**WP16: OpenSAE Vision + real SAEBase API Workspace**](16_web_vision_api_single_execution.md) is the **single active web integration and GPU Agent handoff**. The V5 static website and API-aware Workspace are on the live website repository; existing WP13–WP15 model results and APIs must be reused. No new plan or repeated GPU sweep.
