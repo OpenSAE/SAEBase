@@ -11,6 +11,8 @@ import math
 from pathlib import Path
 from typing import Any
 
+from . import core
+
 NAMES = ("benchmark", "training", "generation", "explanation", "circuit")
 FORBIDDEN = {
     "description",
@@ -28,6 +30,10 @@ SHA64 = set("0123456789abcdef")
 
 
 def _root() -> Path:
+    """Prefer an explicitly staged, read-only release bundle over built-in previews."""
+    staged = core.data_root() / "wp15"
+    if staged.is_dir():
+        return staged
     return Path(__file__).resolve().parents[1] / "data" / "wp15"
 
 
@@ -39,16 +45,17 @@ def _finite(value: Any) -> bool:
     return type(value) in (int, float) and math.isfinite(value)
 
 
-def _reject_secrets(value: Any) -> None:
+def _reject_secrets(value: Any, *, allow_reviewed_description: bool = False) -> None:
     if isinstance(value, dict):
-        found = FORBIDDEN.intersection(value)
+        forbidden = FORBIDDEN - ({"description"} if allow_reviewed_description else set())
+        found = forbidden.intersection(value)
         if found:
             raise ValueError("WP15 card contains unpublished text or weights")
         for item in value.values():
-            _reject_secrets(item)
+            _reject_secrets(item, allow_reviewed_description=allow_reviewed_description)
     elif isinstance(value, list):
         for item in value:
-            _reject_secrets(item)
+            _reject_secrets(item, allow_reviewed_description=allow_reviewed_description)
 
 
 def load_record(name: str) -> dict[str, Any]:
@@ -60,9 +67,16 @@ def load_record(name: str) -> dict[str, Any]:
     record = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(record, dict):
         raise ValueError("WP15 record must be an object")
-    _reject_secrets(record)
-    if name != "circuit" and record.get("rights_reviewed") is not False:
-        raise ValueError("WP15 cards stay unpublished until a person reviews them")
+    reviewed_description = (
+        name == "explanation"
+        and record.get("approved") is True
+        and record.get("human_reviewed") is True
+        and record.get("rights_reviewed") is True
+        and record.get("description_published") is True
+    )
+    _reject_secrets(record, allow_reviewed_description=reviewed_description)
+    if type(record.get("rights_reviewed")) is not bool:
+        raise ValueError("WP15 cards require explicit publication review state")
     if name == "benchmark":
         metrics = record.get("metrics")
         if (
@@ -105,18 +119,28 @@ def load_record(name: str) -> dict[str, Any]:
             if not isinstance(sample.get("conditions"), list) or len(sample["conditions"]) != 3:
                 raise ValueError("Generation sample needs noop, ablation, and scale")
     elif name == "explanation":
-        if (
+        if type(record.get("feature_id")) is not int or not _finite(
+            record.get("heldout_score")
+        ):
+            raise ValueError("Explanation card has no measured feature or held-out result")
+        if reviewed_description:
+            description = record.get("description")
+            if (
+                record.get("private_unpublished") is not False
+                or not isinstance(description, str)
+                or not 1 <= len(description.strip()) <= 600
+            ):
+                raise ValueError("Approved explanation must contain reviewed display text")
+        elif (
             record.get("approved") is not False
             or record.get("private_unpublished") is not True
             or record.get("description_published") is not False
-            or type(record.get("feature_id")) is not int
-            or not _finite(record.get("heldout_score"))
         ):
-            raise ValueError("Explanation card must stay unapproved")
+            raise ValueError("Unreviewed explanation cannot publish a description")
     else:
         graph = record.get("graph")
         if (
-            record.get("rights_reviewed") is not False
+            type(record.get("rights_reviewed")) is not bool
             or record.get("public_demo_prompt") is not True
             or not isinstance(graph, dict)
             or graph.get("schema") != "opensae.wp12.p6.graph.v1"
