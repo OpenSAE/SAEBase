@@ -6,6 +6,7 @@ text, decoded continuations, explanations, weights, or logits.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -74,7 +75,23 @@ def load_record(name: str) -> dict[str, Any]:
         and record.get("rights_reviewed") is True
         and record.get("description_published") is True
     )
-    _reject_secrets(record, allow_reviewed_description=reviewed_description)
+    reviewed_generation = (
+        name == "generation"
+        and record.get("rights_reviewed") is True
+        and record.get("public_prompt") is True
+        and record.get("public_continuations_reviewed") is True
+    )
+    safe_record = record
+    if reviewed_generation and isinstance(record.get("samples"), list):
+        safe_record = {
+            **record,
+            "samples": [
+                {key: value for key, value in sample.items() if key != "public_example"}
+                if isinstance(sample, dict) else sample
+                for sample in record["samples"]
+            ],
+        }
+    _reject_secrets(safe_record, allow_reviewed_description=reviewed_description)
     if type(record.get("rights_reviewed")) is not bool:
         raise ValueError("WP15 cards require explicit publication review state")
     if name == "benchmark":
@@ -107,17 +124,34 @@ def load_record(name: str) -> dict[str, Any]:
             raise ValueError("Training card is missing a real reloaded checkpoint")
     elif name == "generation":
         samples = record.get("samples")
-        if (
-            record.get("public_prompt") is not False
-            or not isinstance(samples, list)
-            or len(samples) != 2
-        ):
-            raise ValueError("Generation card must keep both prompts private")
+        if not isinstance(samples, list) or len(samples) != 2:
+            raise ValueError("Generation requires two measured prompt records")
+        if record.get("public_prompt") is not reviewed_generation:
+            raise ValueError("Public generation text needs explicit review approval")
         for sample in samples:
-            if not _sha(sample.get("prompt_sha256")) or type(sample.get("feature_id")) is not int:
-                raise ValueError("Generation sample is missing its source identity")
+            if not isinstance(sample, dict) or not _sha(sample.get("prompt_sha256")):
+                raise ValueError("Generation sample has no original source hash")
+            if type(sample.get("feature_id")) is not int:
+                raise ValueError("Generation sample has no measured feature")
             if not isinstance(sample.get("conditions"), list) or len(sample["conditions"]) != 3:
                 raise ValueError("Generation sample needs noop, ablation, and scale")
+            example = sample.get("public_example")
+            if reviewed_generation:
+                if not isinstance(example, dict) or set(example) != {
+                    "prompt_text",
+                    "baseline_continuation",
+                    "edited_continuation",
+                }:
+                    raise ValueError("Reviewed generation needs one explicit text example")
+                for field in example:
+                    text = example[field]
+                    if not isinstance(text, str) or not text.strip() or len(text) > 1000:
+                        raise ValueError("Public generation example has invalid text")
+                digest = hashlib.sha256(example["prompt_text"].encode("utf-8")).hexdigest()
+                if digest != sample["prompt_sha256"]:
+                    raise ValueError("Reviewed prompt does not match original GPU source")
+            elif example is not None:
+                raise ValueError("Unreviewed generation must not contain public text")
     elif name == "explanation":
         if type(record.get("feature_id")) is not int or not _finite(
             record.get("heldout_score")
