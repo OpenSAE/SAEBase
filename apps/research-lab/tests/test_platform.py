@@ -1241,10 +1241,12 @@ def test_opensae_workspace_cors_is_allowlisted():
             "Origin": allowed,
             "Access-Control-Request-Method": "POST",
             "Access-Control-Request-Headers": "authorization,content-type",
+            "Access-Control-Request-Private-Network": "true",
         },
     )
     assert response.status_code == 200
     assert "authorization" in response.headers["access-control-allow-headers"].lower()
+    assert response.headers["access-control-allow-private-network"] == "true"
     rejected = client.options(
         "/api/sites",
         headers={

@@ -38,6 +38,9 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["GET", "POST"],
     allow_headers=["Authorization", "Content-Type"],
+    # GitHub Pages is a public origin. Chrome blocks its calls to a local
+    # operator API unless this preflight answer is present.
+    allow_private_network=True,
 )
 app.mount("/assets", StaticFiles(directory=str(FRONTEND)), name="assets")
 # The private router responds 503 until explicitly configured with distinct
