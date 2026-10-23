@@ -77,7 +77,7 @@ A feature is complete only when a new user can see its real data or run its supp
 
 ## D. Current status (update in place, do not create a new plan)
 
-- Website: **MERGED**, Pages deployment to be verified on latest main.
+- Website: **MERGED AND DEPLOYED**, GitHub Pages build+deploy SUCCESS (site commit `1fef49acb27ad3b66dbd40da3d1b84fd0512ca4a`; Pages run `39910392095`). Live front end includes Vision, Contact, API and the connected Workspace assets.
 - Frontend API wiring: **IMPLEMENTED**; actual remote backend health check still required.
 - Backend CORS: **IMPLEMENTED ON WP15 BRANCH**, tests require CI execution.
 - Public HTTPS CPU API: **NOT VERIFIED**.
