@@ -7,6 +7,7 @@
 - [**WP15 — Complete all six workflows and release**](15_complete_six_workflows_and_release.md). Concrete engineering decisions, native integrations, user journeys and practical acceptance.
 - [**WP15 — GPU Agent command handoff**](15_gpu_agent_completion_runbook.md). Version setup, repair routes, commands, genuine artifacts and frontend integration.
 - [**WP15 — Completion matrix**](15_release_completion_matrix.csv). One row per mandatory feature and the release candidate; missing dependency is not a terminal status.
+- [**WP15 — Pre-release remaining handoff**](15_pre_release_remaining_handoff.md). Actual CI/CPU integration fixes completed; operator/GPU Agent follow-up is limited to approved real prompt assets, one private edit queue smoke, G2 decoded demos, G6 meaningful interpretation and remote staging proof.
 
 
 ## Work Plan 14 — Active release-first plan (takes precedence for launch)

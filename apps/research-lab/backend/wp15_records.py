@@ -6,10 +6,13 @@ text, decoded continuations, explanations, weights, or logits.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 from pathlib import Path
 from typing import Any
+
+from . import core
 
 NAMES = ("benchmark", "training", "generation", "explanation", "circuit")
 FORBIDDEN = {
@@ -28,6 +31,10 @@ SHA64 = set("0123456789abcdef")
 
 
 def _root() -> Path:
+    """Prefer an explicitly staged, read-only release bundle over built-in previews."""
+    staged = core.data_root() / "wp15"
+    if staged.is_dir():
+        return staged
     return Path(__file__).resolve().parents[1] / "data" / "wp15"
 
 
@@ -39,16 +46,17 @@ def _finite(value: Any) -> bool:
     return type(value) in (int, float) and math.isfinite(value)
 
 
-def _reject_secrets(value: Any) -> None:
+def _reject_secrets(value: Any, *, allow_reviewed_description: bool = False) -> None:
     if isinstance(value, dict):
-        found = FORBIDDEN.intersection(value)
+        forbidden = FORBIDDEN - ({"description"} if allow_reviewed_description else set())
+        found = forbidden.intersection(value)
         if found:
             raise ValueError("WP15 card contains unpublished text or weights")
         for item in value.values():
-            _reject_secrets(item)
+            _reject_secrets(item, allow_reviewed_description=allow_reviewed_description)
     elif isinstance(value, list):
         for item in value:
-            _reject_secrets(item)
+            _reject_secrets(item, allow_reviewed_description=allow_reviewed_description)
 
 
 def load_record(name: str) -> dict[str, Any]:
@@ -60,9 +68,33 @@ def load_record(name: str) -> dict[str, Any]:
     record = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(record, dict):
         raise ValueError("WP15 record must be an object")
-    _reject_secrets(record)
-    if name != "circuit" and record.get("rights_reviewed") is not False:
-        raise ValueError("WP15 cards stay unpublished until a person reviews them")
+    reviewed_description = (
+        name == "explanation"
+        and record.get("approved") is True
+        and record.get("human_reviewed") is True
+        and record.get("rights_reviewed") is True
+        and record.get("description_published") is True
+    )
+    reviewed_generation = (
+        name == "generation"
+        and record.get("rights_reviewed") is True
+        and record.get("public_prompt") is True
+        and record.get("public_continuations_reviewed") is True
+    )
+    safe_record = record
+    if reviewed_generation and isinstance(record.get("samples"), list):
+        safe_record = {
+            **record,
+            "samples": [
+                {key: value for key, value in sample.items() if key != "public_example"}
+                if isinstance(sample, dict)
+                else sample
+                for sample in record["samples"]
+            ],
+        }
+    _reject_secrets(safe_record, allow_reviewed_description=reviewed_description)
+    if type(record.get("rights_reviewed")) is not bool:
+        raise ValueError("WP15 cards require explicit publication review state")
     if name == "benchmark":
         metrics = record.get("metrics")
         if (
@@ -70,7 +102,8 @@ def load_record(name: str) -> dict[str, Any]:
             or record.get("upstream_commit") != "8042bb3828c6340da8d12062324e92b2077c571c"
             or not _sha(record.get("evidence_sha256"))
             or not isinstance(metrics, dict)
-            or set(metrics) != {
+            or set(metrics)
+            != {
                 "saebench.core.l0",
                 "saebench.core.mse",
                 "saebench.sparse_probing.sae_top_1_test_accuracy",
@@ -92,26 +125,55 @@ def load_record(name: str) -> dict[str, Any]:
             raise ValueError("Training card is missing a real reloaded checkpoint")
     elif name == "generation":
         samples = record.get("samples")
-        if record.get("public_prompt") is not False or not isinstance(samples, list) or len(samples) != 2:
-            raise ValueError("Generation card must keep both prompts private")
+        if not isinstance(samples, list) or len(samples) != 2:
+            raise ValueError("Generation requires two measured prompt records")
+        if record.get("public_prompt") is not reviewed_generation:
+            raise ValueError("Public generation text needs explicit review approval")
         for sample in samples:
-            if not _sha(sample.get("prompt_sha256")) or type(sample.get("feature_id")) is not int:
-                raise ValueError("Generation sample is missing its source identity")
+            if not isinstance(sample, dict) or not _sha(sample.get("prompt_sha256")):
+                raise ValueError("Generation sample has no original source hash")
+            if type(sample.get("feature_id")) is not int:
+                raise ValueError("Generation sample has no measured feature")
             if not isinstance(sample.get("conditions"), list) or len(sample["conditions"]) != 3:
                 raise ValueError("Generation sample needs noop, ablation, and scale")
+            example = sample.get("public_example")
+            if reviewed_generation:
+                if not isinstance(example, dict) or set(example) != {
+                    "prompt_text",
+                    "baseline_continuation",
+                    "edited_continuation",
+                }:
+                    raise ValueError("Reviewed generation needs one explicit text example")
+                for field in example:
+                    text = example[field]
+                    if not isinstance(text, str) or not text.strip() or len(text) > 1000:
+                        raise ValueError("Public generation example has invalid text")
+                digest = hashlib.sha256(example["prompt_text"].encode("utf-8")).hexdigest()
+                if digest != sample["prompt_sha256"]:
+                    raise ValueError("Reviewed prompt does not match original GPU source")
+            elif example is not None:
+                raise ValueError("Unreviewed generation must not contain public text")
     elif name == "explanation":
-        if (
+        if type(record.get("feature_id")) is not int or not _finite(record.get("heldout_score")):
+            raise ValueError("Explanation card has no measured feature or held-out result")
+        if reviewed_description:
+            description = record.get("description")
+            if (
+                record.get("private_unpublished") is not False
+                or not isinstance(description, str)
+                or not 1 <= len(description.strip()) <= 600
+            ):
+                raise ValueError("Approved explanation must contain reviewed display text")
+        elif (
             record.get("approved") is not False
             or record.get("private_unpublished") is not True
             or record.get("description_published") is not False
-            or type(record.get("feature_id")) is not int
-            or not _finite(record.get("heldout_score"))
         ):
-            raise ValueError("Explanation card must stay unapproved")
+            raise ValueError("Unreviewed explanation cannot publish a description")
     else:
         graph = record.get("graph")
         if (
-            record.get("rights_reviewed") is not False
+            type(record.get("rights_reviewed")) is not bool
             or record.get("public_demo_prompt") is not True
             or not isinstance(graph, dict)
             or graph.get("schema") != "opensae.wp12.p6.graph.v1"

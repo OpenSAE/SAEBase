@@ -706,9 +706,17 @@
           " at position " + sample.feature_position);
         append(box, "p", "quiet", "Prompt SHA256 " + sample.prompt_sha256.slice(0, 16) +
           "… · activation " + safeNumber(sample.feature_activation));
+        if (sample.public_example) {
+          append(box, "p", "quiet", "Reviewed author-approved example · local GPU output");
+          append(box, "p", "", "Input: " + sample.public_example.prompt_text);
+          append(box, "p", "", "Baseline continuation: " +
+            sample.public_example.baseline_continuation);
+          append(box, "p", "", "Edited continuation: " +
+            sample.public_example.edited_continuation);
+        }
         const table = append(box, "table");
         const head = append(append(table, "thead"), "tr");
-        ["Edit", "Same greedy text", "Step-0 max |Δ logit|", "P(clean argmax)", "Rank of clean argmax"].forEach(function (name) {
+        ["Edit", "Same greedy text", "Step-0 max |Δ logit|", "P(clean token, baseline)", "P(clean token, edited)", "Clean token rank after edit"].forEach(function (name) {
           append(head, "th", "", name);
         });
         const body = append(table, "tbody");
@@ -717,9 +725,20 @@
           append(row, "td", "", condition.name);
           append(row, "td", "", condition.same_continuation ? "yes" : "no");
           append(row, "td", "number", safeNumber(condition.step0_max_abs_logit_delta));
+          append(row, "td", "number", safeNumber(condition.clean_argmax_probability));
           append(row, "td", "number", safeNumber(condition.edited_probability_of_clean_argmax));
           append(row, "td", "", String(condition.clean_argmax_rank_after_edit));
         });
+        const edited = sample.conditions.find(function (condition) {
+          return condition.name === "ablate";
+        });
+        if (edited && edited.argmax_changed) {
+          append(box, "p", "", "Observed: ablation changed the first generated token. " +
+            "This is actual autoregressive generation, not the teacher-forced LIVE-03 record.");
+        } else {
+          append(box, "p", "quiet", "The generated token sequence may be unchanged even " +
+            "when the measured next-token distribution changes.");
+        }
       });
     } catch (error) { errorMessage(panel, error); }
   }
@@ -731,10 +750,22 @@
       const record = await get("/api/wp15/explanation");
       clear(panel);
       const box = append(panel, "div", "record");
-      append(box, "strong", "", "Unreviewed local candidate · feature " + record.feature_id);
-      append(box, "p", "", "Held-out activation score " + safeNumber(record.heldout_score) +
-        " on " + record.heldout_n_positive + " active and " + record.heldout_n_negative +
-        " inactive examples. Approved: no. The written hypothesis is not shown.");
+      const reviewed = record.approved === true && record.human_reviewed === true &&
+        record.rights_reviewed === true && record.description_published === true;
+      append(box, "strong", "", (reviewed ? "Reviewed feature hypothesis" :
+        "Unreviewed local candidate") + " · feature " + record.feature_id);
+      if (reviewed) {
+        append(box, "p", "", record.description);
+      } else {
+        append(box, "p", "quiet", "The written hypothesis has not been approved for publication.");
+      }
+      append(box, "p", "", "Held-out activation-prediction score " +
+        safeNumber(record.heldout_score) + " on " + record.heldout_n_positive +
+        " active and " + record.heldout_n_negative + " inactive examples.");
+      if (record.heldout_score <= 0.5) {
+        append(box, "p", "quiet", "This diagnostic is not strong evidence of a useful " +
+          "feature explanation. More independent positive and negative examples are needed.");
+      }
       append(box, "p", "quiet", record.note);
     } catch (error) { errorMessage(panel, error); }
   }
@@ -924,7 +955,7 @@
       });
       state.circuitsLoaded = true;
       byId("circuit-status").textContent = selector.options.length > 1 ?
-        "Recorded and reviewed graphs can be opened below." :
+        "Recorded source graphs can be inspected; WP15 publication review is still pending." :
         "No native graphs approved for publication. You can inspect a typed local JSON file.";
     } catch (error) { byId("circuit-status").textContent = error.message; }
   }
