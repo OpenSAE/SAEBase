@@ -31,28 +31,39 @@ def _hash_files(paths: list[Path]) -> str:
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--native", type=Path, required=True,
+        "--native",
+        type=Path,
+        required=True,
         help="Genuine circuit-tracer frontend v1 graph JSON",
     )
     parser.add_argument(
-        "--model-dir", type=Path, required=True,
+        "--model-dir",
+        type=Path,
+        required=True,
         help="Exact model checkpoint snapshot used during tracing",
     )
     parser.add_argument(
-        "--transcoder-dir", type=Path, required=True,
+        "--transcoder-dir",
+        type=Path,
+        required=True,
         help="Exact compatible transcoder snapshot used during tracing",
     )
     parser.add_argument(
-        "--card-output", type=Path, required=True,
+        "--card-output",
+        type=Path,
+        required=True,
         help="New reviewed-candidate circuit card JSON destination",
     )
     parser.add_argument(
-        "--summary-output", type=Path, required=True,
+        "--summary-output",
+        type=Path,
+        required=True,
         help="New private summary destination",
     )
     parser.add_argument("--tool-commit", default=DEFAULT_TOOL_COMMIT)
     parser.add_argument(
-        "--public-demo-prompt", action="store_true",
+        "--public-demo-prompt",
+        action="store_true",
         help="Confirm the original prompt was authored and may be shown",
     )
     args = parser.parse_args(argv)
@@ -99,9 +110,7 @@ def main(argv: list[str] | None = None) -> None:
     }
     args.card_output.parent.mkdir(parents=True, exist_ok=True)
     # Compact so the bounded graph stays under the Lab card size cap.
-    args.card_output.write_text(
-        json.dumps(card, sort_keys=True, separators=(",", ":")) + "\n"
-    )
+    args.card_output.write_text(json.dumps(card, sort_keys=True, separators=(",", ":")) + "\n")
     summary = {
         "full_nodes": len(record.nodes),
         "full_edges": len(record.edges),
@@ -112,9 +121,7 @@ def main(argv: list[str] | None = None) -> None:
         "source_sha256": selected.source_sha256,
     }
     args.summary_output.parent.mkdir(parents=True, exist_ok=True)
-    args.summary_output.write_text(
-        json.dumps(summary, indent=2, sort_keys=True) + "\n"
-    )
+    args.summary_output.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
     print(json.dumps(summary))
 
 
