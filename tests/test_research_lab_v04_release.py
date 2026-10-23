@@ -24,7 +24,7 @@ def test_release_version_and_notes_are_consistent():
     ]
     assert constants == [version]
     assert re.search(r"(?m)^## 0\.4\.0\b", (BASE / "CHANGELOG.md").read_text())
-    assert "version: 0.4.0" in (BASE / "CITATION.cff").read_text()
+    assert f"version: {version}" in (BASE / "CITATION.cff").read_text()
     assert (BASE / "docs/releases/v0.4.0.md").exists()
 
 
