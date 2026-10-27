@@ -23,11 +23,11 @@ def test_original_saebase_public_entrypoints_preserved():
 def test_openresearch_layers_are_additive():
     for name in (
         "saebase/runtime/train.py",
-        "saebase/runtime/registry.py",
+        "saebase/registry.py",
         "datasets/plugins.py",
         "datasets/artifacts.py",
-        "models/dlbase_plugins.py",
-        "tasks/dlbase_plugins.py",
+        "models/plugins.py",
+        "tasks/plugins.py",
         "models/gemma2_2b_base/gemma2_2b_base.py",
         "conf/sae_research.yaml",
         "harness/core/agent_flow.py",
@@ -50,8 +50,8 @@ def test_isolated_registries_preserve_old_namespaces():
     assert "saebase.model_plugins" in old_models
     assert "saebase.tasks" in old_tasks
     new_bootstrap = (ROOT / "saebase/runtime/plugin_bootstrap.py").read_text(encoding="utf-8")
-    assert "models.dlbase_plugins" in new_bootstrap
-    assert "tasks.dlbase_plugins" in new_bootstrap
+    assert "models.plugins" in new_bootstrap
+    assert "tasks.plugins" in new_bootstrap
     training = (ROOT / "saebase/runtime/train.py").read_text(encoding="utf-8")
     assert 'config_name="openresearch"' in training
 

@@ -30,8 +30,8 @@
       "description": "问题：新增 Dataset、Model、Task 时如何维持清晰边界与兼容性？",
       "status": "implemented",
       "evidence": [
-        "saebase/runtime/registry.py",
-        "tasks/runner.py"
+        "saebase/registry.py",
+        "saebase/runner.py"
       ],
       "next": "为每个扩展点增加契约测试。",
       "environment_refs": []
@@ -80,7 +80,7 @@
       "description": "方案：通过数据集、模型和任务三个插件注册表维护清晰的组件边界。",
       "status": "implemented",
       "evidence": [
-        "saebase/runtime/registry.py",
+        "saebase/registry.py",
         "saebase/runtime/plugin_bootstrap.py"
       ],
       "next": "增加自动注册矩阵测试。",
@@ -181,7 +181,7 @@
       "description": "目标：Dataset/Model/Task 注册映射可发现、可验证。",
       "status": "implemented",
       "evidence": [
-        "saebase/runtime/registry.py",
+        "saebase/registry.py",
         "datasets/plugins.py",
         "models/plugins.py",
         "tasks/plugins.py"
@@ -284,7 +284,7 @@
       "description": "目标：从 Python AST 输出节点、继承、成员与调用，附带已有 Knowledge 链接。",
       "status": "implemented",
       "evidence": [
-        "saebase/runtime/registry.py",
+        "saebase/registry.py",
         "harness/code/build.py",
         "harness/code/diff.py",
         "tests/test_atlas_interactivity.cjs"
@@ -379,7 +379,7 @@
       "description": "问题：模型、稀疏字典、Prompt 和七类 SAE 研究操作怎样共享可复用的组件结构？",
       "status": "implemented",
       "evidence": [
-        "saebase/runtime/registry.py",
+        "saebase/registry.py",
         "saebase/api/features.py",
         "tasks/sae_runtime.py"
       ]
@@ -391,7 +391,7 @@
       "description": "方案：SAEBase 提供稀疏特征研究实现，DLBase 组织科研执行与实验记录，共享已审计的模型、数据集和任务注册。",
       "status": "implemented",
       "evidence": [
-        "saebase/runtime/registry.py",
+        "saebase/registry.py",
         "saebase/api/__init__.py",
         "saebase/runtime/plugin_bootstrap.py",
         "tasks/plugins.py"
@@ -405,8 +405,8 @@
       "status": "implemented",
       "evidence": [
         "datasets/plugins.py",
-        "models/dlbase_plugins.py",
-        "tasks/dlbase_plugins.py"
+        "models/plugins.py",
+        "tasks/plugins.py"
       ]
     },
     {

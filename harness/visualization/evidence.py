@@ -18,7 +18,7 @@ CODE_TARGETS = {
     "g.registry": "code:function:saebase.registry:register_model",
     "g.dataset_gate": "code:function:saebase.registry:get_dataset_plugin",
     "g.model_gate": "code:function:models.gemma2_2b_base.model_task_dataset_compatibility:assert_compatible",
-    "g.pipeline": "code:function:tasks.runner:run_task",
+    "g.pipeline": "code:function:saebase.runner:run_task",
     "g.config": "code:function:saebase.runtime.train:main",
     "g.artifact_schema": "code:function:saebase.runtime.experiment_paths:prepare_run",
 }

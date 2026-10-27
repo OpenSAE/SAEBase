@@ -19,7 +19,7 @@
       "summary": "NLP Prompt manifest 和数据来源的版本化产物接口。"
     },
     {
-      "path": "saebase/runtime/registry.py",
+      "path": "saebase/registry.py",
       "context_ids": [],
       "summary": "数据集、模型与任务的插件接口和中心注册表。",
       "core_ids": [
