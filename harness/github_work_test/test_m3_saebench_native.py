@@ -12,13 +12,13 @@ if not ROOT:
 
 @pytest.mark.parametrize("metric,relpath,expected", [
     ("saebench.core.l0",
-     "tests/acceptance/test_data/core/core_expected_results.json",
+     "harness/github_work_test/acceptance/test_data/core/core_expected_results.json",
      376.97979736328125),
     ("saebench.core.mse",
-     "tests/acceptance/test_data/core/core_expected_results.json",
+     "harness/github_work_test/acceptance/test_data/core/core_expected_results.json",
      0.002910538576543331),
     ("saebench.sparse_probing.sae_top_1_test_accuracy",
-     "tests/acceptance/test_data/sparse_probing/sparse_probing_expected_results.json",
+     "harness/github_work_test/acceptance/test_data/sparse_probing/sparse_probing_expected_results.json",
      0.7744),
 ])
 def test_official_fixture_value_imported_exactly(metric, relpath, expected):
