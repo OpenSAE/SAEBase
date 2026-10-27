@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "goal": "示例：为分类任务新增正式接口，非实际改动",
+  "expected": [
+    {
+      "operation": "add",
+      "id": "code:method:tasks.classification.classification_module:ClassificationModule.predict_step"
+    }
+  ],
+  "knowledge_refs": [
+    "g.cub.logits"
+  ],
+  "core_refs": [
+    "g.pipeline"
+  ],
+  "notes": "Expected structure is not observed; rerun AST after modifying code."
+}
