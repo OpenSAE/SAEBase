@@ -91,7 +91,7 @@ def execute():
         raise ReviewError("Exactly one receipt is permitted")
     name = files[0].get("filename", "")
     match = re.fullmatch(
-        r"harness/github_harness/github_work_plan/agent_flow/([A-Za-z][A-Za-z0-9_-]{2,63})\.review-decisions\.json",
+        r"harness/github_work_plan/agent_flow/([A-Za-z][A-Za-z0-9_-]{2,63})\.review-decisions\.json",
         name,
     )
     if match is None or files[0].get("status") not in ("added", "modified"):
@@ -136,11 +136,11 @@ def execute():
             )
         if receipt.get("finalize") is True:
             flow.finalize(plan)
-    files_to_commit = [f"harness/github_harness/github_work_plan/agent_flow/{plan['id']}.json"]
+    files_to_commit = [f"harness/github_work_plan/agent_flow/{plan['id']}.json"]
     files_to_commit.extend(plan.get("adopted_authority_paths", []))
     if plan["phase"] == "finalized":
         files_to_commit.append(
-            f"harness/github_harness/github_work_plan/agent_flow/{plan['id']}.final.json"
+            f"harness/github_work_plan/agent_flow/{plan['id']}.final.json"
         )
     subprocess.run(["git", "config", "user.name", "openresearch-review[bot]"], check=True)
     subprocess.run(

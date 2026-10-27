@@ -8,7 +8,7 @@ description: 用户指定 OpenResearch Work Order，或需要选择 Core、科�
 1. 只读取用户点名的 `.cursor/work_orders/<ID>.yaml`，运行 `python .cursor/skills/workflow/run-work-order/saebase/tools/validate_work_order.py <ID>`。未成功验证，不按该工单执行。
 2. 区分两个不同的结构：`core_ids` 描述**项目架构/研发管理**，通过 `python harness/core/select.py <IDs>` 获取；`knowledge_ids` 描述 **LLM SAE 研究问题与源码依据**，通过 `harness/knowledge/select.py <IDs>` 按需读取。
 3. 读取 `context.doc.required`；`optional` 文件仅在当前任务需要时读取。涉及科学概念必须服从 `doc/knowledge/glossary.json` 和 `foundations/`；不得重新发明同义术语。
-4. 仅执行显式 `activation.<module>=true` 的功能：`core`、`code`、`knowledge`、`experiments`、`transfer`、`environment`。否则不主动遍历该目录。参考区 `harness/github_harness/github_work_plan/` 只能按 `context.harness.read_only` 中的具体文件只读参考。
+4. 仅执行显式 `activation.<module>=true` 的功能：`core`、`code`、`knowledge`、`experiments`、`transfer`、`environment`。否则不主动遍历该目录。参考区 `harness/github_work_plan/` 只能按 `context.harness.read_only` 中的具体文件只读参考。
 5. `activation.code=true` 且涉及修改代码时，先运行 `harness/code/build.py` 保存 Before，记录 Expected（Core ID 与 Knowledge ID 各自准确），完成后重新 AST 构建并使用 `harness/code/diff.py` 比较。不能拿 Expected 冒充 Observed。
 6. `activation.knowledge=true` 允许提出 Knowledge 或 Glossary 的修改提案，但不默认覆写 `doc/knowledge/`。若发现科学知识缺口，向 GitHub 管理方报告“哪个术语、定义、证据与关联目标”。
 7. `activation.core=true` 允许读指定项目设计目标并报告状态变化提案；不要把 Core 的工程里程碑标记为科研成果。

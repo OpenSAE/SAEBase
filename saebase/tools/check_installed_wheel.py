@@ -72,11 +72,11 @@ def smoke(dist_dir: Path) -> dict[str, str]:
                     "import saebase.cli, saebase.model_plugins, saebase.tasks.plugins; "
                     "import models.plugins, tasks.plugins, saebase.tools.m3_benchmark; "
                     "from saebase.registry import list_registered_task_keys; "
-                    "assert 'sae' in list_registered_task_keys(); "
+                    "assert {'sae','capture','intervene','generate','circuits','explain','benchmark','train'}.issubset(set(list_registered_task_keys())); "
                     "assert models.plugins._HOOKED_KEYS is saebase.model_plugins._HOOKED_KEYS; "
                     "assert tasks.plugins.SAETask is saebase.tasks.plugins.SAETask; "
                     "assert (files('conf')/'config.yaml').is_file(); "
-                    "assert (files('conf')/'openresearch.yaml').is_file(); "
+                    "assert (files('conf')/'sae_research.yaml').is_file(); "
                     "import saebase.runtime.train, saebase.datasets.plugins; "
                     "assert (files('conf')/'release'/'m5_matrix.json').is_file(); "
                     "assert (files('conf')/'release'/'m5_asset_provenance.json').is_file(); "
@@ -98,7 +98,14 @@ def smoke(dist_dir: Path) -> dict[str, str]:
             if r.returncode:
                 raise RuntimeError(f"Installed wheel command failed: {cmd}\n{r.stdout}\n{r.stderr}")
             outputs.append(r.stdout)
-        if "Tasks: sae" not in outputs[0] or "wheel configuration and API OK" not in outputs[-1]:
+        task_lines = [line for line in outputs[0].splitlines() if line.startswith("Tasks: ")]
+        if len(task_lines) != 1:
+            raise AssertionError("Installed CLI did not enumerate the task registry")
+        task_keys = {key.strip() for key in task_lines[0].removeprefix("Tasks: ").split(",")}
+        expected_tasks = {
+            "sae", "capture", "intervene", "generate", "circuits", "explain", "benchmark", "train"
+        }
+        if not expected_tasks.issubset(task_keys) or "wheel configuration and API OK" not in outputs[-1]:
             raise AssertionError("Wheel smoke test output does not match expectations")
         if str(target) not in outputs[-1]:
             raise AssertionError("Wheel smoke imported the checkout, not the installed package")
