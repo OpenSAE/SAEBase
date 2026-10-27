@@ -1,66 +1,30 @@
-"""
-Training dependency probe: used by :mod:`dlbase.train` before Hydra runs.
-
-Import this submodule directly (``from dlbase.runtime_check import ...``); package
-:mod:`dlbase` does not eagerly import PyTorch (see :mod:`dlbase` lazy exports).
-"""
-
+"""CPU-first dependency checks for the SAE research configuration."""
 from __future__ import annotations
-
 import sys
 from typing import List, Tuple
 
-_REQUIRED: Tuple[Tuple[str, str], ...] = (
+REQUIRED: Tuple[Tuple[str, str], ...] = (
     ("hydra", "hydra-core"),
     ("omegaconf", "omegaconf"),
-    ("pytorch_lightning", "pytorch-lightning"),
     ("torch", "torch"),
-    ("torchvision", "torchvision"),
-    ("PIL", "Pillow"),
-    ("cv2", "opencv-python"),
 )
 
+def missing_packages(*, profile: str = "llm") -> List[Tuple[str, str]]:
+    return [(mod, pip) for mod, pip in REQUIRED if not _available(mod)]
 
-def missing_packages(*, profile: str = "vision") -> List[Tuple[str, str]]:
-    missing: List[Tuple[str, str]] = []
-    required = (
-        _REQUIRED
-        if profile == "vision"
-        else (
-            ("hydra", "hydra-core"),
-            ("omegaconf", "omegaconf"),
-            ("torch", "torch"),
-        )
-    )
-    for mod, pip in required:
-        try:
-            __import__(mod)
-        except ImportError:
-            missing.append((mod, pip))
-    return missing
-
+def _available(module: str) -> bool:
+    try:
+        __import__(module)
+    except ImportError:
+        return False
+    return True
 
 def print_python_identity() -> None:
     print("[env] python:", sys.executable)
     print("[env] version:", sys.version.split()[0])
 
-
-def verify_training_runtime(*, context: str = "DLBase", profile: str = "vision") -> None:
+def verify_training_runtime(*, context: str = "DLBase", profile: str = "llm") -> None:
     print_python_identity()
     missing = missing_packages(profile=profile)
-    if not missing:
-        return
-    print(
-        f"[env] Missing packages in the current environment ({context}).\n"
-        "Install into the **same** interpreter you use to run training, then retry:\n"
-        f"  {sys.executable} -m pip install -r requirements.txt\n",
-        file=sys.stderr,
-    )
-    for mod, pip in missing:
-        print(f"  - cannot import `{mod}`  (see requirements: {pip})", file=sys.stderr)
-    print(
-        "\nTip: run `which python3` and ensure your shell activates the intended venv before "
-        "`pip install` and before `python3 -m dlbase.train`.",
-        file=sys.stderr,
-    )
-    raise SystemExit(1)
+    if missing:
+        raise SystemExit(f"Missing {context} dependencies: {missing}")

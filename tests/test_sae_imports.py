@@ -41,7 +41,6 @@ def test_package_layout():
     assert not (ROOT / "tasks" / "classification").exists()
     assert not (ROOT / "saebase" / "data" / "CUB_200").exists()
     assert not (ROOT / "saebase" / "data" / "I_RAVEN").exists()
-    assert not (ROOT / "models" / "resnet18_mlp").exists()
 
 
 def test_no_forbidden_imports_in_active_packages():
@@ -50,7 +49,7 @@ def test_no_forbidden_imports_in_active_packages():
         for path in root.rglob("*.py"):
             if root == ROOT / "models" and (
                 path.name in {"dlbase_plugins.py", "build.py"}
-                or path.relative_to(root).parts[0] in {"LLM", "vision"}
+                or path.relative_to(root).parts[0] == "LLM"
             ):
                 continue  # OpenResearch-only model namespace uses its own DLBase contract
             if "__pycache__" in path.parts:

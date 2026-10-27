@@ -28,7 +28,6 @@ def test_openresearch_layers_are_additive():
         "research_datasets/NLP/artifacts.py",
         "models/dlbase_plugins.py",
         "tasks/dlbase_plugins.py",
-        "models/vision/resnet18_mlp/factory.py",
         "models/LLM/gemma2_2b_base/gemma2_2b_base.py",
         "conf/openresearch.yaml",
         "harness/core/agent_flow.py",

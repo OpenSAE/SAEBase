@@ -13,7 +13,6 @@ class DLBaseDataModule(pl.LightningDataModule):
         self.train_set = None
         self.val_set = None
         self.test_set = None
-        self._cub_legacy_val_is_test = False
 
     def setup(self, stage=None):
         from dlbase.registry import get_dataset_plugin

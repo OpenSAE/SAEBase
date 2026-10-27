@@ -41,7 +41,7 @@ OmegaConf.register_new_resolver("dlbase_repo_root", _dlbase_repo_root, replace=T
 def main(cfg: DictConfig) -> Optional[float]:
     verify_training_runtime(
         context="dlbase.train",
-        profile="vision" if str(cfg.task.name) == "classification" else "llm",
+        profile="llm",
     )
     validate_hydra_cfg(cfg)
     from dlbase.experiment_paths import prepare_run

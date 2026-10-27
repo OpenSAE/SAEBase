@@ -1,14 +1,12 @@
 defaults:
-  - dataset: cub
-  - model: resnet18_mlp
-  - train: default
-  - logger: tensorboard
-  - paths: default
-  - task: classification
+  - dataset: ioi
+  - model: openresearch_gemma2_2b_base
+      - paths: default
+  - task: capture
   - experiment: default
   - _self_
 
-# Global random seed (Lightning + numpy + python)
+# Random seed for LLM SAE runs
 seed: 42
 
 # Leaf directory name: ${experiment.sub_name}_${seed} (e.g. basic_1). Same path overwrites previous run.
