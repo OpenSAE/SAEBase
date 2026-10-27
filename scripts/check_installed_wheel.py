@@ -45,6 +45,7 @@ def smoke(dist_dir: Path) -> dict[str, str]:
             [str(target / "bin" / "saebase-audit"), "--help"],
             [str(target / "bin" / "saebase-release-matrix"), "--help"],
             [str(target / "bin" / "saebase-release-gate"), "--help"],
+            [sys.executable, "-m", "dlbase.train", "--cfg", "job", "--help"],
             [sys.executable, "-c", (
                 "from pathlib import Path; from importlib.resources import files; "
                 "import saebase, main, conf; "
@@ -56,6 +57,8 @@ def smoke(dist_dir: Path) -> dict[str, str]:
                 "assert models.plugins._HOOKED_KEYS is saebase.model_plugins._HOOKED_KEYS; "
                 "assert tasks.plugins.SAETask is saebase.tasks.plugins.SAETask; "
                 "assert (files('conf')/'config.yaml').is_file(); "
+                "assert (files('conf')/'openresearch.yaml').is_file(); "
+                "import dlbase.train, research_datasets.plugins; "
                 "assert (files('conf')/'release'/'m5_matrix.json').is_file(); "
                 "assert (files('conf')/'release'/'m5_asset_provenance.json').is_file(); "
                 "assert (files('conf')/'sae'/'pythia70m_resid_sm.yaml').is_file(); "

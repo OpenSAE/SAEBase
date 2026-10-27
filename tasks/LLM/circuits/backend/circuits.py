@@ -355,6 +355,23 @@ def run_native_circuit_tracer(
         )
     if not 30 <= timeout_seconds <= 7200:
         raise ValueError("C1 GPU time budget required")
+    if offload is not None and offload not in {"cpu", "disk"}:
+        raise ValueError("Official circuit-tracer offload is cpu or disk")
+    if dtype is not None and dtype not in {
+        "float32",
+        "bfloat16",
+        "float16",
+        "fp32",
+        "bf16",
+        "fp16",
+    }:
+        raise ValueError("Official circuit-tracer dtype required")
+    if max_feature_nodes is not None and (
+        type(max_feature_nodes) is not int or not 1 <= max_feature_nodes <= 7500
+    ):
+        raise ValueError("Feature-node cap must stay inside the official limit")
+    if batch_size is not None and (type(batch_size) is not int or not 1 <= batch_size <= 256):
+        raise ValueError("Backward batch size must stay inside the official default range")
     if output.exists():
         raise FileExistsError("Do not overwrite an existing original graph")
     if shutil.which("circuit-tracer") is None:
@@ -376,20 +393,12 @@ def run_native_circuit_tracer(
         str(raw),
     ]
     if offload is not None:
-        if offload not in {"cpu", "disk"}:
-            raise ValueError("Official circuit-tracer offload is cpu or disk")
         cmd.extend(["--offload", offload])
     if dtype is not None:
-        if dtype not in {"float32", "bfloat16", "float16", "fp32", "bf16", "fp16"}:
-            raise ValueError("Official circuit-tracer dtype required")
         cmd.extend(["--dtype", dtype])
     if max_feature_nodes is not None:
-        if type(max_feature_nodes) is not int or not 1 <= max_feature_nodes <= 7500:
-            raise ValueError("Feature-node cap must stay inside the official limit")
         cmd.extend(["--max_feature_nodes", str(max_feature_nodes)])
     if batch_size is not None:
-        if type(batch_size) is not int or not 1 <= batch_size <= 256:
-            raise ValueError("Backward batch size must stay inside the official default range")
         cmd.extend(["--batch_size", str(batch_size)])
     if lazy_encoder:
         cmd.append("--lazy-encoder")

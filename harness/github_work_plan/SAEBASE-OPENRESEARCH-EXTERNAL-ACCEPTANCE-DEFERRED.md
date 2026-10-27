@@ -58,7 +58,7 @@
 
 ### D7. 全局验证、输出和禁止事项
 
-1. 不引入 CUB-200、ResNet 或 Vision classification。优先运行 `python -m pytest -q tests/test_no_unrelated_components.py` 和完整原 SAEBase 回归。
+1. 不引入与 LLM/SAE 无关的图像任务。优先运行 `python -m pytest -q tests/test_no_unrelated_components.py` 和完整原 SAEBase 回归。
 2. 运行 `python .cursor/hooks/validate_repo.py --full`、Python 3.11/3.12 CI、Ruff、Hydra 配置组合、轮子构建与 CLI，以及 Harness/Atlas 的 source/semantic checks；对于修复的每个缺陷新增可稳定重放的自动测试。
 3. GPU 仅对受此次改动影响的最小输入复验；使用已缓存的模型和权重、明确的测试预算、独立新实验目录。不要反复跑已确认相同结果，也不要扩大训练步数。
 4. 保持 `saebase/` 公共 API 与已经通过的七类 LLM Task 功能兼容。Harness Core、`.cursor`、审批 Ledger 与科研状态都不属于普通任务 Agent 可自行更改的范围；遇到治理权限限制，提交精确 patch/提案给负责人审核，不绕过 Hook。

@@ -25,6 +25,15 @@ python harness/visualization/build_pages.py
 
 Commands shown here are verification targets, not claims of having run them. GPU checkpoints, NNsight and vLLM backend compatibility, research reproducibility, browser interaction, full SAEBase test matrix and packages/wheels require follow-up evidence.
 
+## Explain generator
+
+`python -m dlbase.train task=explain` cannot put a Python callable in YAML. With no generator it refuses to invent text. Two supported entries:
+
+- `execute(cfg, generator=callable)` from `tasks.LLM.explain.operation`.
+- `task.generator=saebase_generate` with `task.approved=true` and `task.generator_model` set to a cached model id or directory. That name calls `saebase.generate.generate` (vLLM). Gemma-2 needs `generator_dtype=bfloat16`. Any other string is rejected and is not evaluated. The main environment on this machine does not have a complete vLLM install; use an isolated environment that already imports vLLM.
+
+`heldout_score` measures whether a supplied predictor agrees with the SAE feature being active. It is not a semantic accuracy for the generated sentence.
+
 ## Identified compatibility issue
 
 The new top-level `research_datasets/` Python package can shadow Hugging Face's third-party `datasets` package. OpenResearch provides `models.hf_compat.import_hf_datasets` and a subprocess-based adapter for supported data-loader calls. The original SAEBase research-lab applications may use the Hugging Face dataset object API directly and must be audited before this integration becomes a release.

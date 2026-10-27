@@ -40,6 +40,13 @@ class TrainPlan:
     device: str = "cuda"
     resume_checkpoint: str | None = None
     distributed_gpus: int = 1
+    # HookedTransformer load dtype. Independent of sae_dtype. float32 matches
+    # older plans; Gemma-2 2B on a 12GB GPU must set model_dtype="float16".
+    model_dtype: Literal["float32", "float16", "bfloat16"] = "float32"
+    # SAELens runner / activation dtype. Not applied to Sparsify.
+    sae_dtype: Literal["float32", "float16", "bfloat16"] = "float32"
+    store_batch_size_prompts: int | None = None
+    n_batches_in_buffer: int | None = None
 
     def validate(self, *, allow_large: bool = False) -> None:
         if self.backend not in {"saelens", "sparsify"}:
@@ -50,8 +57,31 @@ class TrainPlan:
             raise ValueError("Sparsify backend accepts its native TopK/--transcode route")
         if any(not SHA.fullmatch(x) for x in (self.model_revision, self.dataset_revision)):
             raise ValueError("Exact pinned model and dataset commits required")
-        if not (Path(self.model_path).is_dir() and Path(self.dataset_path).is_dir()):
-            raise FileNotFoundError("Native training needs existing immutable local snapshots")
+        if self.model_dtype not in {"float32", "float16", "bfloat16"} or self.sae_dtype not in {
+            "float32",
+            "float16",
+            "bfloat16",
+        }:
+            raise ValueError(
+                "model_dtype and sae_dtype must each be float32, float16, or bfloat16. "
+                "model_dtype loads the HookedTransformer; sae_dtype is the SAE/activation dtype. "
+                "Backends do not switch precision on their own."
+            )
+        if self.backend == "sparsify" and (self.model_dtype != "float32" or self.sae_dtype != "float32"):
+            raise ValueError(
+                "This Sparsify adapter has no dtype flag. Set model_dtype and sae_dtype to "
+                "float32; a different value would be ignored."
+            )
+        model_dir = Path(self.model_path)
+        data_path = Path(self.dataset_path)
+        if not model_dir.is_dir():
+            raise FileNotFoundError("Native training needs an existing local model snapshot directory")
+        data_is_file = data_path.is_file() and data_path.suffix in {".json", ".jsonl"}
+        if not (data_path.is_dir() or data_is_file):
+            raise FileNotFoundError(
+                "dataset_path must be an existing directory (snapshot or save_to_disk) "
+                "or a local .json/.jsonl file"
+            )
         if not self.hookpoint or any(x.isspace() for x in self.hookpoint):
             raise ValueError("Explicit concrete hookpoint required")
         if not re.fullmatch(r"[A-Za-z0-9_-]{3,64}", self.run_name):
@@ -154,12 +184,9 @@ def _saelens_train(plan: TrainPlan, checkpoint_dir: Path) -> None:
         context_size=plan.ctx_len,
         seed=0,
         device=plan.device,
-        # Runner ``dtype`` is the SAE/activation dtype. HookedTransformer still
-        # loads float32 unless this is forwarded; Gemma-2 2B float32 does not
-        # fit a 12GB GPU. float16 matches models.hooked_lm_common.
-        dtype="float16",
+        dtype=plan.sae_dtype,
         model_from_pretrained_kwargs={
-            "dtype": "float16",
+            "dtype": plan.model_dtype,
             "center_writing_weights": False,
         },
         n_checkpoints=1,
@@ -168,8 +195,16 @@ def _saelens_train(plan: TrainPlan, checkpoint_dir: Path) -> None:
         output_path=str(checkpoint_dir / "inference"),
         resume_from_checkpoint=plan.resume_checkpoint,
         logger=LoggingConfig(log_to_wandb=False),
-        store_batch_size_prompts=min(8, plan.max_examples),
-        n_batches_in_buffer=2,
+        **(
+            {}
+            if plan.store_batch_size_prompts is None
+            else {"store_batch_size_prompts": plan.store_batch_size_prompts}
+        ),
+        **(
+            {}
+            if plan.n_batches_in_buffer is None
+            else {"n_batches_in_buffer": plan.n_batches_in_buffer}
+        ),
     )
     LanguageModelSAETrainingRunner(
         runner, override_dataset=_open_local_training_dataset(plan.dataset_path)
@@ -289,6 +324,20 @@ def run_training(
     }
 
 
+def _plan_identity(record: dict) -> dict:
+    """Compare plans across the dtype fields added after the first frozen plans.
+
+    Missing keys mean the historical default (float32, SAELens buffer defaults).
+    """
+    normalized = dict(record)
+    normalized.pop("resume_checkpoint", None)
+    normalized.setdefault("model_dtype", "float32")
+    normalized.setdefault("sae_dtype", "float32")
+    normalized.setdefault("store_batch_size_prompts", None)
+    normalized.setdefault("n_batches_in_buffer", None)
+    return normalized
+
+
 def resume_sparsify_training(
     plan: TrainPlan,
     *,
@@ -326,10 +375,8 @@ def resume_sparsify_training(
     original = output / "plan.json"
     if not original.is_file():
         raise FileNotFoundError("Original frozen native training plan is missing")
-    prior = json.loads(original.read_text(encoding="utf-8"))
-    current = asdict(plan)
-    for record in (prior, current):
-        record.pop("resume_checkpoint", None)
+    prior = _plan_identity(json.loads(original.read_text(encoding="utf-8")))
+    current = _plan_identity(asdict(plan))
     if prior != current:
         raise ValueError("Full native resume requires the original immutable training plan")
     attempts = output / "resume_attempts"

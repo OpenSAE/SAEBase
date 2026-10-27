@@ -19,8 +19,11 @@ def _explain(
     if not bool(_task(cfg, "approved", False)):
         raise PermissionError("Auto-explanation needs task.approved=true")
     if generator is None:
+        generator = _allowlisted_generator(cfg)
+    if generator is None:
         raise RuntimeError(
-            "Supply a real inference provider with ExplainTask(generator=callable). "
+            "Supply a real inference provider with ExplainTask(generator=callable) "
+            "or task.generator=saebase_generate. "
             "The task will not invent an explanation or call a paid service implicitly."
         )
     discovery_path = Path(str(_task(cfg, "discovery_file", "")))
@@ -47,6 +50,21 @@ def _explain(
         "model_key": MODEL_KEY,
         "hypothesis": response,
     }
+
+
+def _allowlisted_generator(cfg: Any) -> Callable[[list[str]], str] | None:
+    """Resolve one named local generator. Arbitrary strings are not code."""
+    name = str(_task(cfg, "generator", "") or "").strip()
+    if not name:
+        return None
+    if name != "saebase_generate":
+        raise ValueError(
+            "Unknown explain generator. The only allowlisted local implementation "
+            "is saebase_generate."
+        )
+    from tasks.LLM.explain.local_generator import saebase_generate
+
+    return saebase_generate(cfg)
 
 
 def execute(cfg: Any, generator=None, predictor=None) -> dict[str, Any]:

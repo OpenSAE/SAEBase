@@ -4,9 +4,9 @@
 
 ## 结论
 
-七个 SAE 任务都在这张 RTX 5070（12GB）上用真实 Gemma-2-2B 和真实权重跑完。Capture、Intervene、Generate、Benchmark 数字来自官方任务入口。Circuits 用隔离环境里的 `circuit-tracer 0.5.0` 写出了 118 个节点、3636 条边的图。Explain 通过 `tasks.LLM.explain.operation.execute`，生成器是已加载的 Gemma。Train 以 float16 加载模型，完成 2 步，保存并重新加载了 SAE 权重。`saebase.generate.generate` 经 vLLM 0.27.1 生成的 8 个 token 与转向基线逐 token 相同。
+七个 SAE 任务都在这张 RTX 5070（12GB）上用真实 Gemma-2-2B 和真实权重跑完。这是运行时冒烟和有限验证，不是端到端科学验收。Capture、Intervene、Generate、Benchmark 数字来自官方任务入口。Circuits 用隔离环境里的 `circuit-tracer 0.5.0` 写出了 118 个节点、3636 条边的原始图，归一化和特征干预仍未通过。Explain 的 `heldout_score` 只是 SAE 激活一致性，不是语义正确性。Train 只完成 2 步。`saebase.generate.generate` 经 vLLM 0.27.1 生成的 8 个 token 与转向基线逐 token 相同。
 
-源码相对提交 `548d61a9d9f08cbc7b575d8982b37ff70a426426` 有两处未提交修改：训练加载器，以及 circuits 任务把显存参数传给官方 CLI。没有合并 PR，没有发版，没有改 `.cursor/` 或 harness 治理，没有把研究节点标成已验证。
+第一轮修复在 `f7dca13`。本轮 D1–D5 在其后的工作区完成，报告更新时尚未把本轮提交号写死；推送到 PR #60 之后以该提交为准。没有合并 PR，没有发版，没有改 `.cursor/` 或审批规则，没有把研究节点标成已验证。
 
 ## 环境
 
@@ -38,7 +38,7 @@ Hugging Face 读取使用了当次会话提供的 token，只放在进程环境�
 - 最大特征 14325，激活 171.10507202148438
 - 重构 L2 514.810302734375
 
-未改日志路径时，空的 `train.log` 会先被 Hydra 写进实验目录，`guard_existing_run` 随后报 `FileExistsError`。日志：`logs/capture_unmodified_entry.log`。`dlbase/` 是受保护目录，没有改它。绕过方式是 `hydra.job_logging.handlers.file.filename`。这是产品缺陷，任务本身在绕过之后通过。
+第一轮未改日志路径时，空的 `train.log` 会先被 Hydra 写进实验目录，`guard_existing_run` 随后报 `FileExistsError`。日志：`logs/capture_unmodified_entry.log`。当时用 `hydra.job_logging.handlers.file.filename` 绕过。D1 已去掉这个绕过，见下文复验。
 
 ### Intervene：通过
 
@@ -101,7 +101,7 @@ Capture 的激活数是 98，benchmark 的 L0 是 97。消融 L2 与 `evaluate_e
 
 预算：层 0，`blocks.0.hook_resid_post`，`d_sae=64`，`k=8`，topk，2 步，batch 16，上下文 16，32 条本地文本。`task.approved=false` 会拒绝，日志里有 `Native SAE training requires task.approved=true`。
 
-float32 的 Gemma-2-2B 在 12GB 上 OOM（约 11.46 GiB）。`LanguageModelSAERunnerConfig.dtype` 不会传给 HookedTransformer。修复是 `model_from_pretrained_kwargs={"dtype": "float16", "center_writing_weights": false}`，并把 `save_to_disk` 语料用 `load_from_disk` 交给 runner。快照目录名映射成 `google/gemma-2-2b`，否则 TransformerLens 拒绝该路径。
+float32 的 Gemma-2-2B 在 12GB 上 OOM（约 11.46 GiB）。`LanguageModelSAERunnerConfig.dtype` 不会传给 HookedTransformer。第一轮把模型加载写成固定 float16。D2 改为显式的 `model_dtype` 与 `sae_dtype`，默认都是 float32；12GB 上必须自己传入 `model_dtype=float16`。`save_to_disk` 语料用 `load_from_disk`。快照目录名映射成 `google/gemma-2-2b`。
 
 结果：`experiment/IOI/gemma2_2b_base/train/gpuacc_smoke_42/native_sae_training/checkpoint/inference/sae_weights.safetensors`（1189416 字节）。`SAE.load_from_disk` 得到 `TopKSAE`，`d_in=2304`，`d_sae=64`，`W_enc` 形状 `[2304, 64]`。随机输入的 encode 绝对值和 0.5275761485099792，重构 MSE 1.0148569345474243。记录：`extra/train_reload.json`。耗时 15.78 秒。这是冒烟，不是层 25 的完整训练。
 
@@ -131,7 +131,7 @@ rclone 远程 `research-5090`，类型 b2。用 `harness/transfer/b2.py` 做 `co
 
 源码 `saebase --help` 有完整参数，`--list` 列出 task `sae` 以及 Gemma-2-2B 模型。`python -m dlbase.train --cfg job --help` 列出 dataset、model、task（含 capture 到 train）。
 
-本地 wheel：`wheel/opensae_saebase-0.5.0-py3-none-any.whl`。装进 `/workspace/venvs/saebase-wheel` 后，`saebase --help` 和 `saebase --list` 可用。这个 wheel 不包含 `dlbase`，所以 `python -m dlbase.train` 必须从源码树运行。没有上传 PyPI。
+已发布的 v0.5.0 wheel 不包含 `dlbase`。本分支重新构建的 `wheel/opensae_saebase-0.5.0-py3-none-any.whl` 包含 `dlbase/train.py`、`conf/openresearch.yaml` 和 `research_datasets/plugins.py`。`scripts/check_installed_wheel.py` 在检出目录之外安装后返回 installation、三个 CLI、package resources 和 external working directory 都是 OK，并执行了 `python -m dlbase.train --cfg job --help`。没有上传 PyPI，公共 `saebase` 命令名没有改。
 
 Atlas：`harness.code.build` 与 `harness.visualization.export` 写到验收目录 `atlas/`，没有改仓库里的 harness 页面。`build_pages --check` 对仓库现有页面返回 0。导出计数：core 26，knowledge 29，code 1857，environment 15，context 64。这些是现有能力的导出，没有把节点标成已验证。
 
@@ -139,15 +139,32 @@ Atlas：`harness.code.build` 与 `harness.visualization.export` 写到验收目�
 
 `saebase/api/features.py`、`saebase/api/model.py`、`saebase/api/__init__.py`、`saebase/sae/loading.py`、`models/hooked_lm_common.py` 与标签 v0.5.0 字节相同。Capture 和编辑数字就是这套实现的数字。没有为了对照再占一次 GPU 重跑同一份代码。
 
-## 代码改动（未提交）
+## 已进入 PR #60 的代码
 
-1. `tasks/LLM/train/backend/training.py`：快照目录映射为官方模型 id；float16 传入 `from_pretrained`；本地 `save_to_disk` / JSON 语料；缩小 activation buffer。
+`f7dca13` 包含第一轮的两处运行时修复和本报告的初稿：
+
+1. `tasks/LLM/train/backend/training.py`：快照目录映射为官方模型 id；本地 `save_to_disk` / JSON 语料。
 2. `tasks/LLM/circuits/operation.py`：把任务配置里的 offload、dtype、batch、特征上限和 lazy encoder 传给已有的 circuit-tracer 包装。默认不填时行为与原来相同，`task.approved` 仍然必须为真。
 
-## 仍然存在的产品缺陷
+本轮在此之上修改了 Hydra 默认日志、训练 dtype 合同、circuits 参数校验顺序、Explain 白名单生成器，以及 wheel 打包范围。对应测试是 `tests/test_hydra_first_run.py`、`tests/test_train_plan_contract.py`、`tests/test_circuits_passthrough.py`、`tests/test_explain_generator.py`。
 
-- 未改路径时，`python -m dlbase.train` 会因为 Hydra 先写入空 `train.log` 而拒绝新的实验目录。
-- 发布的 wheel 不包含 `dlbase`。
-- 主环境的 vLLM 安装不完整。可用的引擎在 SAEReasoning 的虚拟环境里，版本是 0.27.1。
-- Explain 的 Hydra 配置不能携带 Python 可调用对象。带生成器的 `execute` 是实际跑通的入口。
-- `heldout_score` 不是语义正确性。
+## D1–D6
+
+| 项 | 结果 | 证据 |
+| --- | --- | --- |
+| D1 Hydra 首次运行 | PASS | 不再把日志改写到目录外。`python -m dlbase.train experiment.sub_name=d1capture seed=43 task.execute=true task.prompt='The capital of France is' task.device=cuda`，退出码 0。叶子里没有 `train.log`。`metadata/capture_result.json` 仍是激活数 98、特征 14325、激活 171.10507202148438、重构 L2 514.810302734375。CPU 回归覆盖干净目录、同 id 拒绝、另一 seed、失败后保留 `metadata/run.json`。 |
+| D2 训练 dtype 与数据路径 | PASS（2 步冒烟） | `model_dtype=float16`、`sae_dtype=float32` 显式传入。新目录 `train/gpuacc_d2_42/native_sae_training`。`SAE.load_from_disk`：`W_enc` `[2304, 64]` float32，有限，绝对值和 27.660303115844727。耗时 10.25 秒。未批准训练在单测里被拒绝。旧 plan 缺 dtype 字段时按 float32 比较。 |
+| D3 电路参数与归一化 | PASS（参数）；BLOCKED（归一化） | 非法 offload、dtype、节点数、batch、超时在创建目录之前拒绝。`approved=false` 是 `PermissionError`。真实前端 JSON 的误差节点是 `0_1_2`，官方导入器要求 `(\d+)_-1_(\d+)`，抛出 `Native reconstruction-error node mismatch`。没有猜测特征 id，也没有做特征干预。 |
+| D4 Explain 生成器 | PASS（运行时冒烟）；科学结论待定 | 白名单只有 `saebase_generate`，`os.system` 被拒绝。隔离 vLLM 返回文本 `Paris. The capital of the United States`，8 个新 token。`extra/d4_saebase_generate.json`。这不是语义 PASS。主环境 vLLM 仍不完整，官方解释器里这条路径不能启动。 |
+| D5 wheel | PASS（本分支构建）；已发布 v0.5.0 不含 dlbase | 见上文 CLI 段。`logs/wheel_smoke.log`。 |
+| D6 报告与环境 | PASS | 主环境 torch/vLLM 没有重装。上文“未提交”已改为 `f7dca13` 加本轮差异。 |
+
+D7：`python -m pytest -q tests` 为 437 passed、13 skipped。`python .cursor/hooks/validate_repo.py --full` 为 PASS。改过的 Python 文件 `ruff check` 通过。本机没有 Python 3.11，3.11 CI 只能等 GitHub。工作计划里那句点名图像任务的文字会触发仓库禁词测试，只改了这一句用词，没有改审批、预算或 Harness 规则。
+
+## 仍然存在的缺口
+
+- 电路原始图还不能无损变成 SAEBase 的标准图，特征干预没有执行。
+- Explain 没有独立语义标签。`heldout_score=1.0` 只表示激活是否出现。
+- Train 仍是层 0 的 2 步冒烟。
+- 主环境 vLLM 不完整。可用引擎在 `/workspace/SAEReasoning/.venv`，vLLM 0.27.1。
+- 已发布的 v0.5.0 wheel 不包含 `dlbase`。本分支新构建的 wheel 包含，但没有上传 PyPI。

@@ -17,3 +17,7 @@ task:
   generator_method: ''
   authorized_budget_usd: 0.0
   estimated_cost_usd: 0.0
+  # Empty keeps the Python callable entry. The only allowlisted name is
+  # saebase_generate; other strings are rejected and never executed.
+  generator: ''
+  generator_max_new_tokens: 24

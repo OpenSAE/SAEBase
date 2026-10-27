@@ -4,10 +4,20 @@ defaults:
   - paths: default
   - task: capture
   - experiment: default
+  # Hydra's default file handler creates ${output_dir}/train.log before
+  # dlbase.prepare_run. That empty file is then treated as a prior artifact.
+  # Console logging leaves a clean leaf; task logs still go under logs/.
+  - override hydra/job_logging: stdout
   - _self_
 
 # Random seed for LLM SAE runs
 seed: 42
+
+# Required by dlbase.cfg.config_validate. LLM tasks do not use conf/train/default.yaml.
+train:
+  max_epochs: 1
+  facets:
+    clear_experiment_leaf: true
 
 # Leaf directory name: ${experiment.sub_name}_${seed} (e.g. basic_1). Same path overwrites previous run.
 exp_run_leaf: ${experiment.sub_name}_${seed}
