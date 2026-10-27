@@ -336,7 +336,9 @@ def context_for_path(path: str) -> str:
     return "科研组件与执行接口"
 
 
-TECHNICAL = ("SAE", "LLM", "Hydra", "GPU", "CPU", "SAR", "RSS", "NLP", "API")\n\ndef _words(identifier: str) -> str:
+TECHNICAL = ("SAE", "LLM", "Hydra", "GPU", "CPU", "SAR", "RSS", "NLP", "API")
+
+def _words(identifier: str) -> str:
     value = str(identifier or "").split(".")[-1]
     value = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", value)
     return re.sub(r"_+", "_", value.strip("_")).lower()
