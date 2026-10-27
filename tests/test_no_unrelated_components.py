@@ -1,4 +1,5 @@
 """SAEBase accepts LLM/SAE research components without unrelated Vision tasks."""
+
 from pathlib import Path
 import re
 

@@ -327,7 +327,6 @@ SCOPES = (
 )
 
 
-
 def context_for_path(path: str) -> str:
     value = str(path or "")
     for prefix, label in SCOPES:
@@ -337,6 +336,7 @@ def context_for_path(path: str) -> str:
 
 
 TECHNICAL = ("SAE", "LLM", "Hydra", "GPU", "CPU", "SAR", "RSS", "NLP", "API")
+
 
 def _words(identifier: str) -> str:
     value = str(identifier or "").split(".")[-1]

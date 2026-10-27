@@ -1,4 +1,5 @@
 """Source-backed presentation for existing SAEBase Python interfaces."""
+
 from __future__ import annotations
 import copy
 import re
@@ -26,20 +27,29 @@ GROUP_SUMMARIES = {
 MODULES = {
     "saebase/api/features.py": ("SAE 特征捕获与编辑", "捕获激活、编码稀疏特征并执行受控编辑。"),
     "saebase/api/model.py": ("语言模型适配", "统一输入 Token、激活读取与编辑后输出。"),
-    "saebase/api/components.py": ("Transformer 组件分析", "分析 Attention Head、MLP Neuron 与残差贡献。"),
-    "research_datasets/NLP/artifacts.py": ("NLP Prompt 产物", "管理 Prompt JSONL、manifest 和数据来源。"),
+    "saebase/api/components.py": (
+        "Transformer 组件分析",
+        "分析 Attention Head、MLP Neuron 与残差贡献。",
+    ),
+    "research_datasets/NLP/artifacts.py": (
+        "NLP Prompt 产物",
+        "管理 Prompt JSONL、manifest 和数据来源。",
+    ),
     "research_datasets/NLP/prompts.py": ("NLP 输入读取", "加载已选数据集的真实 Prompt 记录。"),
     "dlbase/registry.py": ("科研组件注册", "注册和查询模型、数据集与 SAE 任务。"),
     "dlbase/train.py": ("SAE 任务执行入口", "校验配置并分派已登记的研究任务。"),
     "tasks/LLM/sae_runtime.py": ("七类 SAE 任务公共入口", "核验模型与数据并调用对应任务实现。"),
 }
 for _task, _title in {
-    "capture":"SAE 特征捕获", "intervene":"SAE 教师强制干预",
-    "generate":"SAE 生成干预", "circuits":"SAE 电路分析",
-    "explain":"SAE 自动解释", "benchmark":"SAE 基准评测",
-    "train":"SAE 训练",
+    "capture": "SAE 特征捕获",
+    "intervene": "SAE 教师强制干预",
+    "generate": "SAE 生成干预",
+    "circuits": "SAE 电路分析",
+    "explain": "SAE 自动解释",
+    "benchmark": "SAE 基准评测",
+    "train": "SAE 训练",
 }.items():
-    MODULES[f"tasks/LLM/{_task}/task.py"]=(_title, "调用对应的 SAE 实验实现与验证接口。")
+    MODULES[f"tasks/LLM/{_task}/task.py"] = (_title, "调用对应的 SAE 实验实现与验证接口。")
 CLASSES = {
     "DLBaseDataModule": ("NLP 数据管理", "装配来自独立 Prompt 来源的训练与评测记录。"),
     "DatasetPlugin": ("数据集注册接口", "定义 Prompt 数据集的加载及任务兼容条件。"),
@@ -212,9 +222,9 @@ def concrete_groups(output: dict) -> None:
                 continue
             family_id = f"code:family:{area}:{family}"
             family_title = {
-                                ("research_datasets", "NLP"): "NLP 文本输入数据集",
-                                ("models", "LLM"): "LLM 语言模型",
-                                ("tasks", "LLM"): "LLM 稀疏特征任务",
+                ("research_datasets", "NLP"): "NLP 文本输入数据集",
+                ("models", "LLM"): "LLM 语言模型",
+                ("tasks", "LLM"): "LLM 稀疏特征任务",
             }.get((area, family), f"{family} · {area} 实现")
             family_evidence = [node["path"] for node in family_shared[family]]
             family_evidence.extend(n["path"] for group in instances.values() for n in group)

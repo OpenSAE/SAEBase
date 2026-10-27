@@ -99,7 +99,10 @@ def existing_tree(graph: dict, *, view: str) -> dict:
             node["title"] = "Atlas 五棵 Tree 的职责与关联"
             node["description"] = "现在能够分别浏览项目架构、科研知识、源代码和环境结构。"
 
-        specific = {"g.registry": "Dataset、Model、SAE Task 插件注册", "g.pipeline": "SAE Task 运行前的适配检查"}
+        specific = {
+            "g.registry": "Dataset、Model、SAE Task 插件注册",
+            "g.pipeline": "SAE Task 运行前的适配检查",
+        }
         if node["id"] in specific:
             node["title"] = specific[node["id"]]
         node["summary"] = node.get("description", "").split("：", 1)[-1].strip()
@@ -149,18 +152,22 @@ def organize_knowledge_topics(output: dict) -> None:
     group_id = "knowledge:area:sae"
     if not any(edge["source"] == root_id for edge in output["edges"]):
         return
-    output["nodes"].append({
-        "id": group_id, "kind": "group",
-        "title": "LLM 稀疏特征与可解释性实验",
-        "summary": "按模型、SAE、Prompt 与七类研究任务浏览当前源码实现。",
-        "description": "按模型、SAE、Prompt 与七类研究任务浏览当前源码实现。",
-        "status": "implemented", "evidence": ["saebase/api/features.py"],
-        "presentation_only": True,
-    })
+    output["nodes"].append(
+        {
+            "id": group_id,
+            "kind": "group",
+            "title": "LLM 稀疏特征与可解释性实验",
+            "summary": "按模型、SAE、Prompt 与七类研究任务浏览当前源码实现。",
+            "description": "按模型、SAE、Prompt 与七类研究任务浏览当前源码实现。",
+            "status": "implemented",
+            "evidence": ["saebase/api/features.py"],
+            "presentation_only": True,
+        }
+    )
     for edge in output["edges"]:
         if edge["source"] == root_id:
             edge["source"] = group_id
-    output["edges"].append({"source":root_id,"target":group_id,"type":"contains"})
+    output["edges"].append({"source": root_id, "target": group_id, "type": "contains"})
 
 
 def balance_visible_navigation(graph: dict, *, limit: int = 10) -> None:
