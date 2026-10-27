@@ -5,7 +5,7 @@ import importlib
 import pytest
 
 from saebase.sae.registry import get_profile
-from scripts.phase_a_verify import TARGETS
+from saebase.tools.phase_a_verify import TARGETS
 
 EXPECTED = {
     "gemma270m": ("gemma270m", "gemma270m_scope_resid", "sae_lens", 5),
@@ -45,7 +45,7 @@ def test_gemma_scope_2_release_aliases():
     assert get_profile("gemma1b_scope_resid").sae_release == "gemma-scope-2-1b-pt-resid_post"
 
 def test_phase_a_requires_real_weights_for_evidence():
-    from scripts.phase_a_verify import verify_target
+    from saebase.tools.phase_a_verify import verify_target
     with pytest.raises(KeyError):
         verify_target("imaginary",device="cpu")
 

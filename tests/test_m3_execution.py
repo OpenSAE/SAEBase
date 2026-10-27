@@ -3,7 +3,7 @@ import json
 from types import SimpleNamespace
 import pytest
 import numpy as np
-from examples._synthetic_common import ResearchToyModel,ResearchToySAE
+from saebase.saebase.examples._synthetic_common import ResearchToyModel,ResearchToySAE
 from saebase.api import ModelAdapter
 from saebase.benchmarks import BenchmarkConfig,build_plan
 from saebase.benchmarks.runner import execute

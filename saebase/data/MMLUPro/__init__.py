@@ -1,19 +1,10 @@
-"""MMLU-Pro text prompts for SAEBase (preparation and evaluation)."""
-
-from saebase.data.MMLUPro.MMLUPro import (
-    CATEGORIES,
-    HF_DATASET_NAME,
-    build_prompt_items,
-    default_data_dir,
-    load_raw_mmlu_pro,
-    render_prompt,
-)
-
-__all__ = [
-    "CATEGORIES",
-    "HF_DATASET_NAME",
-    "build_prompt_items",
-    "default_data_dir",
-    "load_raw_mmlu_pro",
-    "render_prompt",
-]
+"""Legacy import forwarding to the canonical Dataset implementation."""
+from importlib import import_module as _import_module
+_impl = _import_module("saebase.datasets.MMLUPro")
+def __getattr__(name):
+    return getattr(_impl, name)
+def __dir__():
+    return sorted(set(globals()) | set(dir(_impl)))
+for _name in dir(_impl):
+    if not _name.startswith("_"):
+        globals()[_name] = getattr(_impl, _name)

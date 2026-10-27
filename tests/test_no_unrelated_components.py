@@ -5,23 +5,23 @@ import re
 
 ROOT = Path(__file__).resolve().parents[1]
 RETIRED_PATHS = (
-    "research_datasets/vision",
+    "datasets/vision",
     "models/vision",
     "tasks/vision",
     "conf/dataset/cub.yaml",
     "conf/model/resnet18_mlp.yaml",
     "conf/task/classification.yaml",
-    "dlbase/training/facets.py",
+    "saebase/runtime/training/facets.py",
 )
 CONTENT_ROOTS = ("harness", "doc", "research_datasets", "dlbase", ".cursor")
 CONTENT_FILES = (
     "models/dlbase_plugins.py",
     "tasks/dlbase_plugins.py",
-    "conf/openresearch.yaml",
+    "conf/sae_research.yaml",
     "conf/tasks_log.md",
     "README.md",
     "README_cn.md",
-    "docs/openresearch-integration.md",
+    "harness/github_development_doc/openresearch-integration.md",
 )
 RETIRED_TERMS = re.compile(
     r"(?i)CUB[-_ ]?200|ResNet(?:[-_ ]?18)?|"

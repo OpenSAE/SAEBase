@@ -4,7 +4,7 @@ from copy import deepcopy
 
 import pytest
 
-from scripts.generate_model_support import (
+from saebase.tools.generate_model_support import (
     ROOT, EVIDENCE_REL, _json, load_support, render_blocks, replace_block, validate_data,
 )
 

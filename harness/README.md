@@ -11,13 +11,13 @@
 | `environment/` | 当前硬件环境采集与比较 |
 | `transfer/` | 经授权的 B2 / rclone 校验传输 |
 | `visualization/` | Core、Knowledge、Code、Environment、Context 五树 Atlas |
-| `github_work_plan/` | 明确列出的待审或暂缓工作；不等于执行授权 |
+| `github_harness/github_work_plan/` | 明确列出的待审或暂缓工作；不等于执行授权 |
 
 ## 合并后的数据与执行边界
 
-- SAEBase 原有 Hugging Face 数据源和 `saebase/data/` 继续保留；来自 OpenResearch 的新增数据集位于 `research_datasets/`，确保 Python 官方 `datasets` 第三方包仍可正确导入。
+- SAEBase 原有 Hugging Face 数据源和 `saebase/data/` 继续保留；来自 OpenResearch 的新增数据集位于 `datasets/`，确保 Python 官方 `datasets` 第三方包仍可正确导入。
 - 原始 `models/plugins.py` 与 `tasks/plugins.py` 继续提供 SAEBase v0.5 兼容入口。新增 DLBase 注册接口分别为 `models/dlbase_plugins.py` 和 `tasks/dlbase_plugins.py`。
-- 原始 `conf/config.yaml` 不变；新 `dlbase.train` 使用 `conf/openresearch.yaml`。
+- 原始 `conf/config.yaml` 不变；新 `saebase.runtime.train` 使用 `conf/sae_research.yaml`。
 - 本目录引入的 OpenResearch Core/Knowledge 数据是迁移参考，尚未按 SAEBase 具体实现与科研证据逐项重审。生成图不代表 GPU 或实验结论已获验证。
 
 ## 可以立即执行的检查
@@ -25,7 +25,7 @@
 ```bash
 python .cursor/hooks/validate_repo.py --full
 python -m pytest -q tests/test_openresearch_integration.py
-python -m dlbase.train --cfg job
+python -m saebase.runtime.train --cfg job
 python harness/code/build.py
 python harness/visualization/export.py
 python harness/visualization/build_pages.py
@@ -36,7 +36,7 @@ python harness/visualization/build_pages.py --check
 
 ## 需要外部条件的验收
 
-[SAEBase × OpenResearch 外部实测计划](github_work_plan/SAEBASE-OPENRESEARCH-EXTERNAL-ACCEPTANCE-DEFERRED.md) 记录需要真实 GPU 权重、外部数据授权、目标机器或发布权限的检查。文件状态为 **DEFERRED**，不是已激活的工作命令，也不授权自动下载权重、执行长训练或生产部署。
+[SAEBase × OpenResearch 外部实测计划](github_harness/github_work_plan/SAEBASE-OPENRESEARCH-EXTERNAL-ACCEPTANCE-DEFERRED.md) 记录需要真实 GPU 权重、外部数据授权、目标机器或发布权限的检查。文件状态为 **DEFERRED**，不是已激活的工作命令，也不授权自动下载权重、执行长训练或生产部署。
 
 ## Agent 权限
 

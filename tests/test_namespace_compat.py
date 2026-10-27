@@ -19,14 +19,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 ENTRYPOINTS = {
     "saebase": ("main", "main"),
-    "saebase-prepare-prompts": ("prepare_prompts", "scripts.sae_prepare_prompts"),
-    "saebase-check-env": ("check_env", "scripts.check_env"),
-    "saebase-intervene": ("intervene", "scripts.m2_batch"),
-    "saebase-benchmark": ("benchmark", "scripts.m3_benchmark"),
-    "saebase-audit": ("audit", "scripts.m4_reliability"),
-    "saebase-ground-truth": ("ground_truth", "scripts.m4_ground_truth"),
-    "saebase-release-matrix": ("release_matrix", "scripts.m5_release_matrix"),
-    "saebase-release-gate": ("release_gate", "scripts.m5_release_gate"),
+    "saebase-prepare-prompts": ("prepare_prompts", "saebase.tools.sae_prepare_prompts"),
+    "saebase-check-env": ("check_env", "saebase.tools.check_env"),
+    "saebase-intervene": ("intervene", "saebase.tools.m2_batch"),
+    "saebase-benchmark": ("benchmark", "saebase.tools.m3_benchmark"),
+    "saebase-audit": ("audit", "saebase.tools.m4_reliability"),
+    "saebase-ground-truth": ("ground_truth", "saebase.tools.m4_ground_truth"),
+    "saebase-release-matrix": ("release_matrix", "saebase.tools.m5_release_matrix"),
+    "saebase-release-gate": ("release_gate", "saebase.tools.m5_release_gate"),
 }
 
 

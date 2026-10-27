@@ -16,20 +16,20 @@ from typing import Any
 
 import numpy as np
 
-from tasks.LLM.benchmark.controlled_inputs import (
+from tasks.benchmark.controlled_inputs import (
     BinaryFactor,
     ControlledInputManifest,
     MAX_FACTORS,
     load_controlled_input_manifest,
     save_controlled_input_manifest,
 )
-from tasks.LLM.benchmark.integrations.localization import (
+from tasks.benchmark.integrations.localization import (
     evaluate_localization,
     localization_grid_from_code_store,
     _original_localize,
 )
 from saebase.store import ShardedReader, fingerprint, resolve_positions
-from tasks.LLM.benchmark.backend.results import atomic_json
+from tasks.benchmark.backend.results import atomic_json
 
 
 SCHEMA = "saebase.localization.artifact.v1"

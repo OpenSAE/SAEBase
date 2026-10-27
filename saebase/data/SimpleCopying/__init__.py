@@ -1,17 +1,10 @@
-"""Simple copying (induction) prompts for SAEBase."""
-
-from saebase.data.SimpleCopying.SimpleCopying import (
-    copying_json_path,
-    default_data_dir,
-    generate_copying_prompts,
-    load_copying_prompts,
-    save_copying_prompts,
-)
-
-__all__ = [
-    "copying_json_path",
-    "default_data_dir",
-    "generate_copying_prompts",
-    "load_copying_prompts",
-    "save_copying_prompts",
-]
+"""Legacy import forwarding to the canonical Dataset implementation."""
+from importlib import import_module as _import_module
+_impl = _import_module("saebase.datasets.SimpleCopying")
+def __getattr__(name):
+    return getattr(_impl, name)
+def __dir__():
+    return sorted(set(globals()) | set(dir(_impl)))
+for _name in dir(_impl):
+    if not _name.startswith("_"):
+        globals()[_name] = getattr(_impl, _name)

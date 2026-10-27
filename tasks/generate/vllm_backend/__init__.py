@@ -1,6 +1,6 @@
-"""Compat re-export. Prefer ``tasks.LLM.generate.backend``."""
+"""Compat re-export. Prefer ``tasks.generate.backend``."""
 
-from tasks.LLM.generate.vllm_backend.generate import (
+from tasks.generate.vllm_backend.generate import (
     generate_vllm,
     packed_row,
     sampling_params_kwargs,

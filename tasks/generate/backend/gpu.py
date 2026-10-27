@@ -15,7 +15,7 @@ def stop_vllm() -> None:
     Does not search global processes or terminate externally launched servers.
     An externally configured VLLM_BASE_URL remains untouched.
     """
-    from tasks.LLM.generate.backend.engine import release
+    from tasks.generate.backend.engine import release
     from saebase.generate.server import stop_owned_server
 
     release()

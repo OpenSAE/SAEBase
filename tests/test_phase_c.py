@@ -12,7 +12,7 @@ import numpy as np
 import pytest
 import torch
 
-from examples._synthetic_common import ResearchToyModel, ResearchToySAE
+from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ActivationSite, ModelAdapter, SAEIdentity, capture_features, edit_features
 from saebase.integrations import (
     collect_rss_features, evaluate_rss, evaluate_sar, load_paper_module,

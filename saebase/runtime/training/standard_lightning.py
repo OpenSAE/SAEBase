@@ -3,7 +3,7 @@ Reusable Lightning training stack: loggers, checkpoints, Trainer kwargs, TensorB
 
 Task packages compose their own ``LightningModule`` and phase logic; this module hosts **engineering**
 pieces described in README (experiment leaf cleanup, TensorBoard/W&B loggers, checkpoint filenames,
-tqdm/LR wiring helpers). Toggle via ``train.facets`` (see ``dlbase.training.facets``).
+tqdm/LR wiring helpers). Toggle via ``train.facets`` (see ``saebase.runtime.training.facets``).
 """
 
 from __future__ import annotations

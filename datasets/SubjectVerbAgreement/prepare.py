@@ -5,10 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from research_datasets.NLP.SubjectVerbAgreement.SubjectVerbAgreement import generate_sva_prompts
-from research_datasets.NLP.SubjectVerbAgreement.tokenize import attach_token_ids, filter_with_model
-from research_datasets.NLP.artifacts import assert_available, make_manifest
-from research_datasets.NLP.artifacts import save_prompts
+from saebase.datasets.SubjectVerbAgreement.SubjectVerbAgreement import generate_sva_prompts
+from saebase.datasets.SubjectVerbAgreement.tokenize import attach_token_ids, filter_with_model
+from saebase.datasets.prompt_schema import assert_available, make_manifest
+from saebase.datasets.prompt_store import save_prompts
 
 
 def prepare_for_model(

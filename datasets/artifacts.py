@@ -281,7 +281,7 @@ def load_manifest(
     if not path.is_file():
         raise FileNotFoundError(
             f"Prompt manifest not found for {beh}/{model_key}: {path}. "
-            "Run scripts/sae_prepare_prompts.py first."
+            "Run saebase/tools/sae_prepare_prompts.py first."
         )
     manifest = json.loads(path.read_text(encoding="utf-8"))
     if str(manifest.get("model_key")) != str(model_key):

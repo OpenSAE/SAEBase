@@ -16,7 +16,7 @@ SPEC = BaseModelSpec(
     notes="Llama-3.1 8B base; Llama-Scope LXR-8x residual (TopK≈50).",
 )
 
-from saebase.data.prompt_schema import behaviors_for_model
+from saebase.datasets.prompt_schema import behaviors_for_model
 
 SUPPORTED_BEHAVIORS: frozenset[str] = behaviors_for_model("llama31_8b")
 

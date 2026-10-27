@@ -6,7 +6,7 @@ import tarfile
 
 import pytest
 
-from scripts.stage_d_archive import (
+from saebase.tools.stage_d_archive import (
     ROOT, _relative_file, build_compact, digest, verify_bundle,
     verify_checksums, verify_compact, verify_original_archives,
     build_raw, verify_raw_bundle,

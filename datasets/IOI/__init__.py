@@ -1,6 +1,6 @@
 """IOI compositional prompts for SAEBase (programmatic generation)."""
 
-from research_datasets.NLP.IOI.IOI import (
+from saebase.datasets.IOI.IOI import (
     default_data_dir,
     generate_ioi_prompts,
     ioi_json_path,

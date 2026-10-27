@@ -12,10 +12,10 @@ from pathlib import Path
 from typing import Any, Callable
 
 from saebase.api.model import ActivationSite
-from tasks.LLM.benchmark.backend.schema import MetricSpec
+from tasks.benchmark.backend.schema import MetricSpec
 
 API_VERSION = 1
-ENTRY_POINT_GROUP = "opensae.tasks.LLM.benchmark.extensions.v1"
+ENTRY_POINT_GROUP = "opensae.tasks.benchmark.extensions.v1"
 _KEY = re.compile(r"ext\.[a-z][a-z0-9_]+(?:\.[a-z][a-z0-9_]*)+")
 _DTYPES = frozenset({"float16", "float32", "float64", "bfloat16"})
 _NORMALIZATIONS = frozenset({"none", "layer_norm", "unit_norm", "folded", "custom"})

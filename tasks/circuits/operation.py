@@ -5,11 +5,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from tasks.LLM.sae_runtime import MODEL_KEY, _task, _prompt, _fingerprint_prompt
+from tasks.sae_runtime import MODEL_KEY, _task, _prompt, _fingerprint_prompt
 
 
 def _circuits(cfg: Any) -> dict[str, Any]:
-    from tasks.LLM.circuits.backend.circuits import run_native_circuit_tracer
+    from tasks.circuits.backend.circuits import run_native_circuit_tracer
 
     if not bool(_task(cfg, "approved", False)):
         raise PermissionError("Circuit tracing requires task.approved=true")

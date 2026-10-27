@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from tasks.LLM.sae_runtime import _task, _pair, _prompt, _fingerprint_prompt
+from tasks.sae_runtime import _task, _pair, _prompt, _fingerprint_prompt
 
 
 def _generative(cfg: Any) -> dict[str, Any]:
-    from tasks.LLM.intervene.backend.steering import GenerationSpec, compare_steered_generation
-    from tasks.LLM.intervene.backend.specs import Condition, MeasurementSample
+    from tasks.intervene.backend.steering import GenerationSpec, compare_steered_generation
+    from tasks.intervene.backend.specs import Condition, MeasurementSample
     from saebase.store import SampleRecord, TokenSelection
 
     pair = _pair(cfg)

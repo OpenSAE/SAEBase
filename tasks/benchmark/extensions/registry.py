@@ -41,9 +41,9 @@ def register_extension(bundle: ExtensionBundle) -> None:
         raise TypeError("expected an ExtensionBundle")
     if bundle.name in _BUNDLES:
         raise ValueError(f"extension already registered: {bundle.name}")
-    from dlbase.registry import list_registered_model_keys
+    from saebase.registry import list_registered_model_keys
     from saebase.sae.registry import SAE_KEYS, DEFAULT_SAE_FOR_MODEL
-    from tasks.LLM.benchmark.backend.registry import metric_specs, register_metric
+    from tasks.benchmark.backend.registry import metric_specs, register_metric
 
     model_keys = [x.key for x in bundle.models]
     sae_keys = [x.key for x in bundle.saes]

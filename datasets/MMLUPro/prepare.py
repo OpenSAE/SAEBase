@@ -5,10 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Sequence
 
-from research_datasets.NLP.MMLUPro.MMLUPro import HF_DATASET_NAME, build_prompt_items
-from research_datasets.NLP.MMLUPro.tokenize import attach_token_ids
-from research_datasets.NLP.artifacts import assert_available, make_manifest
-from research_datasets.NLP.artifacts import save_prompts
+from saebase.datasets.MMLUPro.MMLUPro import HF_DATASET_NAME, build_prompt_items
+from saebase.datasets.MMLUPro.tokenize import attach_token_ids
+from saebase.datasets.prompt_schema import assert_available, make_manifest
+from saebase.datasets.prompt_store import save_prompts
 
 
 def prepare_for_model(
@@ -52,7 +52,9 @@ def prepare_for_model(
         max_prompt_tokens=max_prompt_tokens,
     )
     if len(kept) < min_kept:
-        raise RuntimeError(f"MMLUPro/{model_key}: kept {len(kept)} < min_kept={min_kept}")
+        raise RuntimeError(
+            f"MMLUPro/{model_key}: kept {len(kept)} < min_kept={min_kept}"
+        )
     cats = categories if categories is not None else "all"
     if not isinstance(cats, str):
         cats = ",".join(str(c) for c in cats)
@@ -70,7 +72,7 @@ def prepare_for_model(
             "max_prompt_tokens": max_prompt_tokens,
             "drop_na_options": drop_na_options,
         },
-        source="research_datasets.NLP.MMLUPro.prepare",
+        source="datasets.MMLUPro.prepare",
         extra={
             "split": split,
             "categories": cats,

@@ -31,14 +31,14 @@ MODULES = {
         "Transformer 组件分析",
         "分析 Attention Head、MLP Neuron 与残差贡献。",
     ),
-    "research_datasets/NLP/artifacts.py": (
+    "datasets/artifacts.py": (
         "NLP Prompt 产物",
         "管理 Prompt JSONL、manifest 和数据来源。",
     ),
-    "research_datasets/NLP/prompts.py": ("NLP 输入读取", "加载已选数据集的真实 Prompt 记录。"),
-    "dlbase/registry.py": ("科研组件注册", "注册和查询模型、数据集与 SAE 任务。"),
-    "dlbase/train.py": ("SAE 任务执行入口", "校验配置并分派已登记的研究任务。"),
-    "tasks/LLM/sae_runtime.py": ("七类 SAE 任务公共入口", "核验模型与数据并调用对应任务实现。"),
+    "datasets/prompts.py": ("NLP 输入读取", "加载已选数据集的真实 Prompt 记录。"),
+    "saebase/runtime/registry.py": ("科研组件注册", "注册和查询模型、数据集与 SAE 任务。"),
+    "saebase/runtime/train.py": ("SAE 任务执行入口", "校验配置并分派已登记的研究任务。"),
+    "tasks/sae_runtime.py": ("七类 SAE 任务公共入口", "核验模型与数据并调用对应任务实现。"),
 }
 for _task, _title in {
     "capture": "SAE 特征捕获",
@@ -49,7 +49,7 @@ for _task, _title in {
     "benchmark": "SAE 基准评测",
     "train": "SAE 训练",
 }.items():
-    MODULES[f"tasks/LLM/{_task}/task.py"] = (_title, "调用对应的 SAE 实验实现与验证接口。")
+    MODULES[f"tasks/{_task}/task.py"] = (_title, "调用对应的 SAE 实验实现与验证接口。")
 CLASSES = {
     "DLBaseDataModule": ("NLP 数据管理", "装配来自独立 Prompt 来源的训练与评测记录。"),
     "DatasetPlugin": ("数据集注册接口", "定义 Prompt 数据集的加载及任务兼容条件。"),
@@ -126,7 +126,7 @@ def task_configuration_nodes(name: str, parent: str, nodes: list, edges: list) -
             "id": group_id,
             "kind": "group",
             "title": semantic_title(
-                "group", name, f"tasks/LLM/{name}/task.py", curated="管理科研任务的 Hydra 配置"
+                "group", name, f"tasks/{name}/task.py", curated="管理科研任务的 Hydra 配置"
             ),
             "summary": "任务配置按独立选项组织展示。",
             "description": "任务配置按独立选项组织展示。",
@@ -248,11 +248,11 @@ def concrete_groups(output: dict) -> None:
                 instance_id = "code:instance:" + area + ":" + name
                 family_path = (
                     (
-                        "tasks/LLM/"
+                        "tasks/"
                         if area == "tasks"
                         else "models/LLM/"
                         if area == "models"
-                        else "research_datasets/NLP/"
+                        else "datasets/"
                     )
                     + name
                     + "/task.py"

@@ -272,7 +272,7 @@ def test_checked_in_targets_match_catalog():
 
 
 def test_matrix_dry_run_lists_44(tmp_path):
-    from scripts.phase_d_matrix import main
+    from saebase.tools.phase_d_matrix import main
     code = main([
         "--dry-run", "--output", str(tmp_path), "--device", "cpu",
     ])
@@ -453,7 +453,7 @@ def test_layer_norm_snapshot_restores_and_clears():
 
 
 def test_verify_evidence_fails_on_tampered_checksum(tmp_path):
-    from scripts.phase_d_verify_evidence import verify_checksums
+    from saebase.tools.phase_d_verify_evidence import verify_checksums
     final = tmp_path / "final"
     final.mkdir()
     f = tmp_path / "notes.txt"

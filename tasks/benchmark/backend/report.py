@@ -103,7 +103,7 @@ def write_report(folder, config, plan, results, *, provenance=None):
         )
     # M4 appends a checksum-verified audit without changing existing M3 rows.
     if (root / "reliability_manifest.json").exists():
-        from tasks.LLM.benchmark.reliability.report import read_audit, render_audit_fragment
+        from tasks.benchmark.reliability.report import read_audit, render_audit_fragment
 
         attached = read_audit(root)
         document = document.replace("</html>", render_audit_fragment(attached) + "</html>")

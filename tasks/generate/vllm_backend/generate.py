@@ -8,8 +8,8 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
-from tasks.LLM.generate.backend import generate_vllm as _generate_vllm
-from tasks.LLM.generate.backend import packed_row, sampling_params_kwargs as _sampling_params_kwargs
+from tasks.generate.backend import generate_vllm as _generate_vllm
+from tasks.generate.backend import packed_row, sampling_params_kwargs as _sampling_params_kwargs
 
 CompleteFn = Callable[[int, dict[str, Any]], None]
 __all__ = ["generate_vllm", "packed_row", "sampling_params_kwargs"]

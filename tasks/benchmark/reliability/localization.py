@@ -14,11 +14,11 @@ import math
 
 import numpy as np
 
-from tasks.LLM.benchmark.backend.adapters.localization import (
+from tasks.benchmark.backend.adapters.localization import (
     grid_from_artifact,
     validate_localization_result,
 )
-from tasks.LLM.benchmark.integrations.localization import _original_localize
+from tasks.benchmark.integrations.localization import _original_localize
 
 
 def audit_localization(

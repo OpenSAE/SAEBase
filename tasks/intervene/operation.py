@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from tasks.LLM.sae_runtime import _task, _pair, _prompt, _fingerprint_prompt
+from tasks.sae_runtime import _task, _pair, _prompt, _fingerprint_prompt
 
 
 def _teacher_forced(cfg: Any) -> dict[str, Any]:

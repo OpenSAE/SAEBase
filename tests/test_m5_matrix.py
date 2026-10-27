@@ -7,7 +7,7 @@ from types import SimpleNamespace
 import pytest
 import torch
 
-from examples._synthetic_common import ResearchToyModel,ResearchToySAE
+from saebase.saebase.examples._synthetic_common import ResearchToyModel,ResearchToySAE
 from saebase.api import ModelAdapter
 from saebase.release import MatrixConfig,load_matrix,plan_matrix
 from saebase.release.runner import execute_matrix,verify_matrix

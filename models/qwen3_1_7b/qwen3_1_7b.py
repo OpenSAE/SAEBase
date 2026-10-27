@@ -27,7 +27,7 @@ SPEC = BaseModelSpec(
     ),
 )
 
-from saebase.data.prompt_schema import behaviors_for_model
+from saebase.datasets.prompt_schema import behaviors_for_model
 
 SUPPORTED_BEHAVIORS: frozenset[str] = behaviors_for_model("qwen3_1_7b")
 

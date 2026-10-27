@@ -1,6 +1,6 @@
 """MMLU-Pro text prompts for SAEBase (preparation and evaluation)."""
 
-from research_datasets.NLP.MMLUPro.MMLUPro import (
+from saebase.datasets.MMLUPro.MMLUPro import (
     CATEGORIES,
     HF_DATASET_NAME,
     build_prompt_items,

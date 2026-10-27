@@ -62,3 +62,16 @@ def verify_runtime(*, context: str = "SAEBase", mode: Mode = "core") -> None:
         f"Run `{sys.executable} -m pip install -e \"{requirement}\"` from the repository in the interpreter "
         "that runs SAEBase."
     )
+
+
+def __getattr__(name: str):
+    if name == "TaskModule":
+        from saebase.registry import TaskModule
+        return TaskModule
+    if name == "apply_lightning_reproducibility":
+        from saebase.runtime.training.seed import apply_lightning_reproducibility
+        return apply_lightning_reproducibility
+    if name == "verify_training_runtime":
+        from saebase.runtime.runtime_check import verify_training_runtime
+        return verify_training_runtime
+    raise AttributeError(name)

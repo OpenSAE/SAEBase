@@ -15,8 +15,8 @@ import torch
 
 from saebase.api import ActivationSite
 from saebase.api.features import snapshot_from_activation
-from tasks.LLM.intervene.backend.operators import apply_condition
-from tasks.LLM.intervene.backend.specs import Condition
+from tasks.intervene.backend.operators import apply_condition
+from tasks.intervene.backend.specs import Condition
 
 
 @dataclass(frozen=True)

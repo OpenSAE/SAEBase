@@ -16,7 +16,7 @@ SPEC = BaseModelSpec(
     notes="Qwen3.5 27B; official residual TopK SAE W80K L0_50.",
 )
 
-from saebase.data.prompt_schema import behaviors_for_model
+from saebase.datasets.prompt_schema import behaviors_for_model
 
 SUPPORTED_BEHAVIORS: frozenset[str] = behaviors_for_model("qwen35_27b")
 

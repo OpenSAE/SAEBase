@@ -17,7 +17,7 @@ import numpy as np
 import torch
 
 from saebase.api import ActivationSite, ModelAdapter, SAEIdentity, capture_features
-from saebase.data.controlled_inputs import (
+from saebase.datasets.controlled_inputs import (
     ControlledInputDesign, ControlledInputManifest, load_controlled_input_manifest,
 )
 

@@ -174,8 +174,8 @@ def module_semantics(path: str) -> str:
             return "准备" + subject + "的原始输入"
         if filename.lower() == (parts[2].lower() + ".py"):
             return "读取" + subject + "与目标标签"
-    if path.startswith("tasks/LLM/benchmark/"):
-        relative = path[len("tasks/LLM/benchmark/") :]
+    if path.startswith("tasks/benchmark/"):
+        relative = path[len("tasks/benchmark/") :]
         if relative in BENCHMARK_FILES:
             return BENCHMARK_FILES[relative]
     filename = PurePosixPath(path).name
@@ -303,24 +303,24 @@ SCOPES = (
     ("saebase/store/", "SAE 特征数据存储"),
     ("saebase/sae/", "稀疏自编码器配置与加载"),
     ("saebase/api/", "SAE 特征捕获与模型干预"),
-    ("tasks/LLM/benchmark/reliability/", "SAE 评测可靠性"),
-    ("tasks/LLM/benchmark/integrations/", "SAR 与 RSS 评测适配"),
-    ("tasks/LLM/benchmark/", "SAE 基准评测"),
-    ("tasks/LLM/intervene/", "教师强制特征干预"),
-    ("tasks/LLM/generate/", "生成过程中的 SAE 干预"),
-    ("tasks/LLM/circuits/", "候选因果电路分析"),
-    ("tasks/LLM/explain/", "SAE 特征解释"),
-    ("tasks/LLM/capture/", "SAE 特征捕获"),
-    ("tasks/LLM/train/", "稀疏自编码器训练"),
-    ("tasks/LLM/", "语言模型任务执行"),
+    ("tasks/benchmark/reliability/", "SAE 评测可靠性"),
+    ("tasks/benchmark/integrations/", "SAR 与 RSS 评测适配"),
+    ("tasks/benchmark/", "SAE 基准评测"),
+    ("tasks/intervene/", "教师强制特征干预"),
+    ("tasks/generate/", "生成过程中的 SAE 干预"),
+    ("tasks/circuits/", "候选因果电路分析"),
+    ("tasks/explain/", "SAE 特征解释"),
+    ("tasks/capture/", "SAE 特征捕获"),
+    ("tasks/train/", "稀疏自编码器训练"),
+    ("tasks/", "语言模型任务执行"),
     ("models/LLM/", "语言模型加载与运行"),
     ("datasets/NLP/", "模型文本输入数据"),
-    ("dlbase/cfg/", "训练配置与执行约束"),
-    ("dlbase/training/", "训练回调与优化调度"),
-    ("dlbase/registry.py", "数据、模型与任务注册"),
-    ("dlbase/experiment_paths.py", "实验产物的目录管理"),
-    ("dlbase/", "模型训练与实验记录"),
-    ("research_datasets/", "数据集加载与注册"),
+    ("saebase/runtime/cfg/", "训练配置与执行约束"),
+    ("saebase/runtime/training/", "训练回调与优化调度"),
+    ("saebase/runtime/registry.py", "数据、模型与任务注册"),
+    ("saebase/runtime/experiment_paths.py", "实验产物的目录管理"),
+    ("saebase/runtime/", "模型训练与实验记录"),
+    ("datasets/", "数据集加载与注册"),
     ("models/", "模型构建与兼容检查"),
     ("tasks/", "科研任务执行与评测"),
     ("harness/", "科研代码与项目结构校验"),

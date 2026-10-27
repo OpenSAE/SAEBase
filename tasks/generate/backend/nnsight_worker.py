@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NNsight-vLLM worker。用当前解释器以 ``python -m tasks.LLM.generate.backend.nnsight_worker`` 启动。
+"""NNsight-vLLM worker。用当前解释器以 ``python -m tasks.generate.backend.nnsight_worker`` 启动。
 
 vLLM 的 spawn 要求本文件作为 ``__main__``。不要在别的进程里 import 之后直接建引擎。
 模型名和层号由调用方传入，这里不写默认模型。
@@ -1049,7 +1049,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    from tasks.LLM.generate.backend.settings import apply_process_env
+    from tasks.generate.backend.settings import apply_process_env
 
     apply_process_env()
     main()

@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from saebase.api import ModelAdapter, load_registered
-from tasks.LLM.intervene.backend import BatchEngine, ExperimentIdentity, ResultWriter, RunBudget
+from tasks.intervene.backend import BatchEngine, ExperimentIdentity, ResultWriter, RunBudget
 from saebase.store import (
     ActivationIdentity,
     ActivationWriter,
@@ -36,14 +36,14 @@ from .adapters.localization import (
 )
 from .results import store_results, read_metrics
 from .report import write_report
-from tasks.LLM.benchmark.extensions.contracts import ExternalMetricContext
-from tasks.LLM.benchmark.extensions.registry import (
+from tasks.benchmark.extensions.contracts import ExternalMetricContext
+from tasks.benchmark.extensions.registry import (
     is_external_metric,
     external_metric,
     has_external_pair,
 )
-from tasks.LLM.benchmark.extensions.runtime import load_external_pair
-from tasks.LLM.benchmark.extensions.metrics import (
+from tasks.benchmark.extensions.runtime import load_external_pair
+from tasks.benchmark.extensions.metrics import (
     execute_external_metric,
     validate_external_metric_source,
 )

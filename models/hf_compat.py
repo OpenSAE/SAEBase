@@ -45,4 +45,4 @@ def load_repo_dataset_module(subpkg: str, module_name: str) -> ModuleType:
     """
     if not subpkg.isidentifier() or not module_name.isidentifier():
         raise ValueError("subpkg and module_name must be Python identifiers")
-    return importlib.import_module(f"saebase.data.{subpkg}.{module_name}")
+    return importlib.import_module(f"saebase.datasets.{subpkg}.{module_name}")

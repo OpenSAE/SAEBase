@@ -46,7 +46,7 @@ _DEFAULT_SOURCE_CANDIDATES = (
 
 
 def default_data_dir() -> str:
-    from research_datasets.NLP.artifacts import DEFAULT_DATA_ROOT
+    from saebase.datasets.artifact_layout import DEFAULT_DATA_ROOT
 
     return str(DEFAULT_DATA_ROOT / "MMLUPro")
 
@@ -80,7 +80,9 @@ def parse_categories(value: str | Sequence[str] | None) -> frozenset[str] | None
     for part in raw:
         key = CATEGORY_ALIASES.get(part, CATEGORY_ALIASES.get(part.lower(), part))
         if key not in CATEGORIES:
-            raise ValueError(f"Unknown MMLU-Pro category {part!r}. Valid: {sorted(CATEGORIES)}")
+            raise ValueError(
+                f"Unknown MMLU-Pro category {part!r}. Valid: {sorted(CATEGORIES)}"
+            )
         out.add(key)
     return frozenset(out)
 
@@ -319,7 +321,9 @@ def build_prompt_items(
     shots_pool: list[dict[str, Any]] = []
     if int(n_shot) > 0:
         if validation_rows is None:
-            val_raw = load_raw_mmlu_pro("validation", source_path=source_path, hf_name=hf_name)
+            val_raw = load_raw_mmlu_pro(
+                "validation", source_path=source_path, hf_name=hf_name
+            )
         else:
             val_raw = list(validation_rows)
         for row in val_raw:

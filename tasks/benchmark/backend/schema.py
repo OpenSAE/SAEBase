@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from saebase.api import ActivationSite
-from tasks.LLM.intervene.backend import Condition, MeasurementSample
+from tasks.intervene.backend import Condition, MeasurementSample
 from saebase.store import SampleRecord, fingerprint
 
 CONFIG_SCHEMA = "saebase.benchmark.config.v1"

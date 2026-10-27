@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from omegaconf import DictConfig
 
-from research_datasets.NLP.artifacts import canonicalize_behavior
-from research_datasets.NLP.artifacts import assert_available
-from research_datasets.NLP.artifacts import load_manifest
-from dlbase.registry import get_dataset_plugin, get_model_plugin, get_task_plugin
+from saebase.datasets.artifacts import canonicalize_behavior
+from saebase.datasets.artifacts import assert_available
+from saebase.datasets.artifacts import load_manifest
+from saebase.registry import get_dataset_plugin, get_model_plugin, get_task_plugin
 from saebase.sae.contracts import assert_manifest_matches
 from saebase.sae.registry import get_profile
 
@@ -50,7 +50,7 @@ def run_preflight(cfg: DictConfig) -> dict:
     if not require:
         raise ValueError(
             "activation_health in Phase A requires prepared prompts and a manifest; "
-            "run scripts/sae_prepare_prompts.py first"
+            "run saebase/tools/sae_prepare_prompts.py first"
         )
 
     data_root = cfg.paths.get("data_dir") if "paths" in cfg else None

@@ -69,7 +69,7 @@ def gate(tool, payload, active=None):
             rel = resolved.relative_to(ROOT).as_posix()
             if rel.startswith((".cursor/", "harness/", ".github/")):
                 return "Harness/Core and execution rules are never editable by task agents"
-            if rel == "dlbase" or rel.startswith("dlbase/"):
+            if rel == "dlbase" or rel.startswith("saebase/runtime/"):
                 return "DLBase requires separate architecture governance"
             if (
                 len(resolved.relative_to(ROOT).parts) == 1

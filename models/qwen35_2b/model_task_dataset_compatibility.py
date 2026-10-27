@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import FrozenSet
 from omegaconf import DictConfig
 
-from saebase.data.prompt_schema import behaviors_for_model
+from saebase.datasets.prompt_schema import behaviors_for_model
 from saebase.cfg.contracts import assert_prompt_source_in, assert_task_in
 
 _TASKS: FrozenSet[str] = frozenset({"sae"})

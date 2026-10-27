@@ -18,8 +18,8 @@ def test_package_metadata_matches_public_api_version():
 
 def test_public_distribution_has_required_files():
     for rel in ("LICENSE", "NOTICE", "CONTRIBUTING.md", "SECURITY.md", "CHANGELOG.md",
-                ".github/workflows/ci.yml", "MANIFEST.in", "docs/PROVENANCE.md",
-                "docs/RELEASE_CHECKLIST.md", "conf/__init__.py", "conf/config.yaml"):
+                ".github/workflows/ci.yml", "MANIFEST.in", "harness/github_development_doc/PROVENANCE.md",
+                "harness/github_development_doc/RELEASE_CHECKLIST.md", "conf/__init__.py", "conf/config.yaml"):
         assert (ROOT / rel).is_file(), rel
 
 

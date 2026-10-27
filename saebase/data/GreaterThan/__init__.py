@@ -1,17 +1,10 @@
-"""GreaterThan year-completion prompts for SAEBase."""
-
-from saebase.data.GreaterThan.GreaterThan import (
-    default_data_dir,
-    generate_greater_than_prompts,
-    greater_than_json_path,
-    load_greater_than_prompts,
-    save_greater_than_prompts,
-)
-
-__all__ = [
-    "default_data_dir",
-    "generate_greater_than_prompts",
-    "greater_than_json_path",
-    "load_greater_than_prompts",
-    "save_greater_than_prompts",
-]
+"""Legacy import forwarding to the canonical Dataset implementation."""
+from importlib import import_module as _import_module
+_impl = _import_module("saebase.datasets.GreaterThan")
+def __getattr__(name):
+    return getattr(_impl, name)
+def __dir__():
+    return sorted(set(globals()) | set(dir(_impl)))
+for _name in dir(_impl):
+    if not _name.startswith("_"):
+        globals()[_name] = getattr(_impl, _name)

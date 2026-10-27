@@ -2,7 +2,7 @@
 import os
 from pathlib import Path
 import pytest
-from examples._synthetic_common import ResearchToyModel,ResearchToySAE
+from saebase.saebase.examples._synthetic_common import ResearchToyModel,ResearchToySAE
 from saebase.api import ModelAdapter,ActivationSite
 from saebase.store import SampleRecord
 from saebase.interventions import MeasurementSample

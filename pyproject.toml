@@ -85,12 +85,12 @@ py-modules = ["main"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["saebase*", "models*", "tasks*", "scripts*", "conf*", "dlbase*", "research_datasets*"]
+include = ["saebase*", "models*", "tasks*", "conf*"]
 exclude = ["tests*", "examples*"]
 
 [tool.setuptools.package-data]
 conf = ["**/*.yaml", "**/*.yml", "**/*.md", "**/*.json"]
-saebase = ["**/*.md", "**/*.yaml", "**/*.json"]
+saebase = ["**/*.md", "**/*.yaml", "**/*.json", "**/*.html", "**/*.css", "**/*.js"]
 models = ["**/*.json", "**/*.yaml"]
 
 [tool.pytest.ini_options]

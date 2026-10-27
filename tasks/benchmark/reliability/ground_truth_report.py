@@ -4,8 +4,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from tasks.LLM.benchmark.integrations import load_paper_module
-from tasks.LLM.benchmark.backend.adapters.papers import source_identity
+from tasks.benchmark.integrations import load_paper_module
+from tasks.benchmark.backend.adapters.papers import source_identity
 from .schema import AuditConfig
 from .interaction_truth import verify_original_sar
 from .rss_truth import verify_original_rss

@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from saebase.sae.coverage import load_coverage, verify_cpu_sae_evidence
-from scripts.phase_bc_aggregate import aggregate
+from saebase.tools.phase_bc_aggregate import aggregate
 
 CATALOG = Path(__file__).resolve().parents[1] / "conf" / "coverage" / "stage_bc.json"
 

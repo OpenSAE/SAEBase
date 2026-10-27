@@ -7,8 +7,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from tasks.LLM.circuits.backend.circuits import import_native_graph_file, run_native_circuit_tracer
-from tasks.LLM.circuits.operation import execute
+from tasks.circuits.backend.circuits import import_native_graph_file, run_native_circuit_tracer
+from tasks.circuits.operation import execute
 
 
 def test_unapproved_circuit_is_refused(tmp_path: Path):
@@ -51,7 +51,7 @@ def test_operation_forwards_memory_options_and_keeps_defaults(monkeypatch, tmp_p
         captured.update(kwargs)
         return {"status": "native_raw_graph_generated_not_normalized"}
 
-    monkeypatch.setattr("tasks.LLM.circuits.backend.circuits.run_native_circuit_tracer", fake)
+    monkeypatch.setattr("tasks.circuits.backend.circuits.run_native_circuit_tracer", fake)
     cfg = SimpleNamespace(
         task={
             "approved": True,
@@ -83,7 +83,7 @@ def test_operation_defaults_do_not_invent_options(monkeypatch, tmp_path):
         captured.update(kwargs)
         return {"status": "native_raw_graph_generated_not_normalized"}
 
-    monkeypatch.setattr("tasks.LLM.circuits.backend.circuits.run_native_circuit_tracer", fake)
+    monkeypatch.setattr("tasks.circuits.backend.circuits.run_native_circuit_tracer", fake)
     monkeypatch.chdir(tmp_path)
     execute(
         SimpleNamespace(

@@ -25,10 +25,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "research_datasets/datamodule.py"
+        "datasets/datamodule.py"
       ],
       "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "research_datasets/datamodule.py"
+      "foundation": "datasets/datamodule.py"
     },
     {
       "id": "term.model",
@@ -71,10 +71,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "dlbase/registry.py"
+        "saebase/runtime/registry.py"
       ],
       "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "dlbase/registry.py"
+      "foundation": "saebase/runtime/registry.py"
     },
     {
       "id": "term.plugin",
@@ -86,10 +86,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "dlbase/registry.py"
+        "saebase/runtime/registry.py"
       ],
       "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "dlbase/registry.py"
+      "foundation": "saebase/runtime/registry.py"
     },
     {
       "id": "term.ast",
@@ -143,10 +143,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "dlbase/training/standard_lightning.py"
+        "saebase/runtime/training/standard_lightning.py"
       ],
       "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "dlbase/training/standard_lightning.py"
+      "foundation": "saebase/runtime/training/standard_lightning.py"
     },
     {
       "id": "term.tqdm",
@@ -157,10 +157,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "dlbase/training/training_callbacks.py"
+        "saebase/runtime/training/training_callbacks.py"
       ],
       "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "dlbase/training/training_callbacks.py"
+      "foundation": "saebase/runtime/training/training_callbacks.py"
     },
     {
       "id": "term.callback",
@@ -173,10 +173,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "dlbase/training/training_callbacks.py"
+        "saebase/runtime/training/training_callbacks.py"
       ],
       "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "dlbase/training/training_callbacks.py"
+      "foundation": "saebase/runtime/training/training_callbacks.py"
     },
     {
       "id": "term.code_tree",
@@ -439,10 +439,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "dlbase/experiment_paths.py"
+        "saebase/runtime/experiment_paths.py"
       ],
       "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "dlbase/experiment_paths.py"
+      "foundation": "saebase/runtime/experiment_paths.py"
     },
     {
       "id": "term.datamodule",
@@ -454,10 +454,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "research_datasets/datamodule.py"
+        "datasets/datamodule.py"
       ],
       "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "research_datasets/datamodule.py"
+      "foundation": "datasets/datamodule.py"
     },
     {
       "id": "term.dlbase",
@@ -469,10 +469,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "dlbase/registry.py"
+        "saebase/runtime/registry.py"
       ],
       "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
-      "foundation": "dlbase/registry.py"
+      "foundation": "saebase/runtime/registry.py"
     },
     {
       "id": "term.saebase",
@@ -498,10 +498,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "models/LLM/gemma2_2b_base/gemma2_2b_base.py"
+        "models/gemma2_2b_base/gemma2_2b_base.py"
       ],
       "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
-      "foundation": "models/LLM/gemma2_2b_base/gemma2_2b_base.py"
+      "foundation": "models/gemma2_2b_base/gemma2_2b_base.py"
     },
     {
       "id": "term.nlp",
@@ -513,10 +513,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "research_datasets/NLP/prompts.py"
+        "datasets/prompts.py"
       ],
       "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
-      "foundation": "research_datasets/NLP/prompts.py"
+      "foundation": "datasets/prompts.py"
     },
     {
       "id": "term.sparse_autoencoder",
@@ -543,10 +543,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "models/LLM/gemma2_2b_base/gemma2_2b_base.py"
+        "models/gemma2_2b_base/gemma2_2b_base.py"
       ],
       "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
-      "foundation": "models/LLM/gemma2_2b_base/gemma2_2b_base.py"
+      "foundation": "models/gemma2_2b_base/gemma2_2b_base.py"
     },
     {
       "id": "term.feature_capture",
@@ -588,10 +588,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "tasks/LLM/intervene/backend/steering.py"
+        "tasks/intervene/backend/steering.py"
       ],
       "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
-      "foundation": "tasks/LLM/intervene/backend/steering.py"
+      "foundation": "tasks/intervene/backend/steering.py"
     },
     {
       "id": "term.circuit_analysis",
@@ -603,10 +603,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "tasks/LLM/circuits/backend/circuits.py"
+        "tasks/circuits/backend/circuits.py"
       ],
       "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
-      "foundation": "tasks/LLM/circuits/backend/circuits.py"
+      "foundation": "tasks/circuits/backend/circuits.py"
     },
     {
       "id": "term.explain",
@@ -618,10 +618,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "tasks/LLM/explain/interpretation.py"
+        "tasks/explain/interpretation.py"
       ],
       "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
-      "foundation": "tasks/LLM/explain/interpretation.py"
+      "foundation": "tasks/explain/interpretation.py"
     },
     {
       "id": "term.benchmark",
@@ -633,10 +633,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "tasks/LLM/benchmark/backend/runner.py"
+        "tasks/benchmark/backend/runner.py"
       ],
       "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
-      "foundation": "tasks/LLM/benchmark/backend/runner.py"
+      "foundation": "tasks/benchmark/backend/runner.py"
     },
     {
       "id": "term.sae_training",
@@ -648,10 +648,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "tasks/LLM/train/backend/training.py"
+        "tasks/train/backend/training.py"
       ],
       "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
-      "foundation": "tasks/LLM/train/backend/training.py"
+      "foundation": "tasks/train/backend/training.py"
     }
   ]
 }

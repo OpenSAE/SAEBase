@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from tasks.LLM.sae_runtime import _task
+from tasks.sae_runtime import _task
 
 
 def saebase_generate(cfg: object) -> Callable[[list[str]], str]:

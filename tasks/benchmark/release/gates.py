@@ -136,7 +136,7 @@ def audit_distributions(dist: Path, expected_version: str = "0.2.0") -> dict:
         files = [x.name for x in archive if x.isfile()]
         if any(Path(x).suffix.lower() in banned_suffix for x in files):
             raise ValueError("binary checkpoint bundled in source distribution")
-        if not any(x.endswith("/docs/M5_RELEASE_NOTES.md") for x in files):
+        if not any(x.endswith("/harness/github_development_doc/M5_RELEASE_NOTES.md") for x in files):
             raise ValueError("M5 release notes absent from source archive")
     paths = wheel + source
     digests = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}

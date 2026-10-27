@@ -165,7 +165,7 @@ def test_help_and_listing_require_no_gpu(tmp_path):
 
 
 def test_preparation_rejects_unsupported_behaviors_before_download():
-    from scripts.sae_prepare_prompts import parse_args,prepare
+    from saebase.tools.sae_prepare_prompts import parse_args,prepare
     a=parse_args(["--behavior","MMLUPro"])
     with pytest.raises(ValueError,match="supports SimpleCopying"):
         prepare(a)

@@ -17,7 +17,7 @@ import numpy as np
 import torch
 
 from saebase.api import ActivationSite, ModelAdapter, SAEIdentity, capture_features
-from tasks.LLM.benchmark.controlled_inputs import (
+from tasks.benchmark.controlled_inputs import (
     ControlledInputDesign,
     ControlledInputManifest,
     load_controlled_input_manifest,

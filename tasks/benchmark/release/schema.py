@@ -7,7 +7,7 @@ from typing import Any
 from saebase.api import ActivationSite
 from saebase.sae.registry import get_profile
 from saebase.store import fingerprint
-from tasks.LLM.benchmark.backend.registry import get_metric
+from tasks.benchmark.backend.registry import get_metric
 import json
 
 MATRIX_SCHEMA = "saebase.m5.matrix.v1"
@@ -93,7 +93,7 @@ class MatrixConfig:
             self.conditions
         ):
             raise ValueError("unique intervention conditions required")
-        from tasks.LLM.intervene.backend import Condition
+        from tasks.intervene.backend import Condition
 
         for cond in self.conditions:
             Condition(

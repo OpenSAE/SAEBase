@@ -9,7 +9,7 @@ from pathlib import Path
 
 import yaml
 
-from scripts.check_documentation import ROOT, missing_links, validate
+from saebase.tools.check_documentation import ROOT, missing_links, validate
 
 
 def test_repository_docs_have_valid_relative_navigation():
@@ -17,10 +17,10 @@ def test_repository_docs_have_valid_relative_navigation():
     assert count >= 35
     assert not broken
     paths = {
-        "docs/first-experiment.md",
-        "docs/troubleshooting.md",
-        "docs/contributor-guide.md",
-        "docs/maintainer-workflow.md",
+        "harness/github_development_doc/first-experiment.md",
+        "harness/github_development_doc/troubleshooting.md",
+        "harness/github_development_doc/contributor-guide.md",
+        "harness/github_development_doc/maintainer-workflow.md",
         ".github/CODEOWNERS",
     }
     assert all((ROOT / name).is_file() for name in paths)
@@ -28,8 +28,8 @@ def test_repository_docs_have_valid_relative_navigation():
 
 def test_relative_link_checker_detects_bad_paths(tmp_path):
     guide = tmp_path / "README.md"
-    guide.write_text("[tutorial](docs/missing.md)\n", encoding="utf-8")
-    assert missing_links(guide, tmp_path) == ["README.md:1: docs/missing.md"]
+    guide.write_text("[tutorial](harness/github_development_doc/missing.md)\n", encoding="utf-8")
+    assert missing_links(guide, tmp_path) == ["README.md:1: harness/github_development_doc/missing.md"]
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "missing.md").write_text("# Present\n", encoding="utf-8")
     assert missing_links(guide, tmp_path) == []
@@ -54,7 +54,7 @@ def _run_first_experiment(tmp_path, *arguments):
     result = subprocess.run(
         [
             sys.executable,
-            "examples/quickstart/first_experiment.py",
+            "saebase/examples/quickstart/first_experiment.py",
             "--output",
             str(tmp_path / "example-output"),
             *arguments,
@@ -122,6 +122,6 @@ def test_examples_are_grouped_by_function():
 
 def test_first_experiment_entrypoint_is_documented():
     """Check the public quickstart script and its category README agree."""
-    script = ROOT / "examples/quickstart/first_experiment.py"
+    script = ROOT / "saebase/examples/quickstart/first_experiment.py"
     assert script.is_file()
     assert "first_experiment.py" in (script.parent / "README.md").read_text(encoding="utf-8")

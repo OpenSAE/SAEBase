@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 from omegaconf import DictConfig
 from models.hooked_lm_common import BaseModelSpec, HookedLMHandle, load_from_spec
-from saebase.data.prompt_schema import behaviors_for_model
+from saebase.datasets.prompt_schema import behaviors_for_model
 
 SPEC=BaseModelSpec(
     key="gpt2small", model_name="gpt2-small", family="gpt2",

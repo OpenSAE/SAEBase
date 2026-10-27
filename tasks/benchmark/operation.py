@@ -5,12 +5,12 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from tasks.LLM.sae_runtime import MODEL_KEY, _task
+from tasks.sae_runtime import MODEL_KEY, _task
 
 
 def _benchmark(cfg: Any) -> dict[str, Any]:
-    from tasks.LLM.benchmark.backend.schema import load_config
-    from tasks.LLM.benchmark.backend.runner import execute
+    from tasks.benchmark.backend.schema import load_config
+    from tasks.benchmark.backend.runner import execute
 
     path = Path(str(_task(cfg, "benchmark_config", "")))
     if not path.is_file():

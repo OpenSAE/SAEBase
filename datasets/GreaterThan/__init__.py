@@ -1,6 +1,6 @@
 """GreaterThan year-completion prompts for SAEBase."""
 
-from research_datasets.NLP.GreaterThan.GreaterThan import (
+from saebase.datasets.GreaterThan.GreaterThan import (
     default_data_dir,
     generate_greater_than_prompts,
     greater_than_json_path,

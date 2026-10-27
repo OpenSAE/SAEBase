@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from omegaconf import DictConfig, OmegaConf
 
-from dlbase.registry import get_dataset_plugin, get_model_plugin, get_task_plugin
+from saebase.registry import get_dataset_plugin, get_model_plugin, get_task_plugin
 
 
 def validate_hydra_cfg(cfg: DictConfig) -> None:

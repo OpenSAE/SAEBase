@@ -10,7 +10,7 @@ from saebase.api import ActivationSite, ModelAdapter
 from saebase.integrations import (
     LocalizationGrid, collect_localization_grid, evaluate_localization,
 )
-from examples._synthetic_common import ResearchToyModel, ResearchToySAE
+from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 
 
 class OriginalStub:

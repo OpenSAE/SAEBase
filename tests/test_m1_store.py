@@ -9,7 +9,7 @@ import numpy as np
 import pytest
 import torch
 
-from examples._synthetic_common import ResearchToyModel, ResearchToySAE
+from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ActivationSite, ModelAdapter
 from saebase.store import (ActivationIdentity, ActivationWriter, CacheIntegrityError,
                            CodeIdentity, SampleRecord, TokenSelection, ShardedReader,
@@ -408,7 +408,7 @@ def test_code_cache_detects_recaptured_activation_content_drift(tmp_path):
 
 
 def test_m0_and_m1_state_hashes_agree_for_model_and_sae():
-    from scripts.m0_reference_smoke import _sha_weights
+    from saebase.tools.m0_reference_smoke import _sha_weights
     model = ResearchToyModel()
     sae = ResearchToySAE()
     assert sha256_state_dict(model) == _sha_weights(model)

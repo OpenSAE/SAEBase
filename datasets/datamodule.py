@@ -15,7 +15,7 @@ class DLBaseDataModule(pl.LightningDataModule):
         self.test_set = None
 
     def setup(self, stage=None):
-        from dlbase.registry import get_dataset_plugin
+        from saebase.registry import get_dataset_plugin
 
         name = str(self.cfg.dataset.name)
         plugin = get_dataset_plugin(name)
@@ -54,7 +54,7 @@ class DLBaseDataModule(pl.LightningDataModule):
 
     def eval_split_note(self) -> str:
         """Human-readable note for summary.log about val/test splits."""
-        from dlbase.registry import get_dataset_plugin
+        from saebase.registry import get_dataset_plugin
 
         plugin = get_dataset_plugin(str(self.cfg.dataset.name))
         return plugin.eval_split_note(self)

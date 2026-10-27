@@ -16,7 +16,7 @@ SPEC = BaseModelSpec(
     notes="Gemma-2 9B PT; Scope 16k residual at layers 9/20/31 (PT/IT aligned).",
 )
 
-from saebase.data.prompt_schema import behaviors_for_model
+from saebase.datasets.prompt_schema import behaviors_for_model
 
 SUPPORTED_BEHAVIORS: frozenset[str] = behaviors_for_model("gemma2_9b_pt")
 

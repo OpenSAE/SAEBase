@@ -10,20 +10,20 @@
 
 ## D. GPU 首轮验收后的修复与复验工作（2026-10-27，本地 Agent 下一轮任务）
 
-**当前基线**：PR #60，已记录 GPU 实测的提交 `f7dca13dbc1d06ff06a3efb0780e7c2d27582282`。GPU 验收报告 [docs/gpu-acceptance-20261027.md](../../docs/gpu-acceptance-20261027.md)；原始私有证据目录 `/workspace/SAEBase-gpu-acceptance-20261027`。首次实测使用 RTX 5070 12GB、Gemma-2 2B、Gemma Scope SAE。CPU CI（Python 3.11/3.12、Ruff、Hydra、Harness、打包）在此基线通过。后续每次执行应先确认当前分支与 HEAD，并记录实际 commit，不能假定旧 SHA 是新 HEAD。
+**当前基线**：PR #60，已记录 GPU 实测的提交 `f7dca13dbc1d06ff06a3efb0780e7c2d27582282`。GPU 验收报告 [harness/github_development_doc/gpu-acceptance-20261027.md](../../harness/github_development_doc/gpu-acceptance-20261027.md)；原始私有证据目录 `/workspace/SAEBase-gpu-acceptance-20261027`。首次实测使用 RTX 5070 12GB、Gemma-2 2B、Gemma Scope SAE。CPU CI（Python 3.11/3.12、Ruff、Hydra、Harness、打包）在此基线通过。后续每次执行应先确认当前分支与 HEAD，并记录实际 commit，不能假定旧 SHA 是新 HEAD。
 
 **本轮目标**：先解决已观察到的产品缺陷，再做最小真实 GPU 复验；生成代码、测试、报告和提交。无需重复所有七类功能的完整运行。不得将正常 Python/CI 修复放进本文件等待 GPU。原始 A/B/C 验收条款仍保留，未获得实测证据的部分不得宣称 PASS。
 
 ### D1. P0 — 修复 Hydra 首次运行的日志与实验目录冲突
 
-- 证据：GPU 报告中 Capture 默认路径下的 `train.log` 被 Hydra 先写入，随后 `dlbase.experiment_paths.guard_existing_run` 抛出 `FileExistsError`。此前通过修改 `hydra.job_logging.handlers.file.filename` 绕过。
-- 检查 `dlbase/train.py`、`dlbase/experiment_paths.py`、`conf/openresearch.yaml` 及 Hydra 日志初始化时序，修复**首次干净运行**冲突，保留对于有历史产物目录的默认拒绝覆盖机制。不要以统一 `overwrite=true` 或删除历史记录作为修复。
+- 证据：GPU 报告中 Capture 默认路径下的 `train.log` 被 Hydra 先写入，随后 `saebase.runtime.experiment_paths.guard_existing_run` 抛出 `FileExistsError`。此前通过修改 `hydra.job_logging.handlers.file.filename` 绕过。
+- 检查 `saebase/runtime/train.py`、`saebase/runtime/experiment_paths.py`、`conf/sae_research.yaml` 及 Hydra 日志初始化时序，修复**首次干净运行**冲突，保留对于有历史产物目录的默认拒绝覆盖机制。不要以统一 `overwrite=true` 或删除历史记录作为修复。
 - 回归测试必须覆盖：干净目录默认配置正常创建；同一标识重跑时拒绝覆盖；不同 run 标识互不影响；错误退出保留诊断信息；未设置额外 Hydra CLI 日志重定向时也能运行。
-- 最小 GPU 复验：使用已缓存的模型与 SAE，重新从官方 `python -m dlbase.train` 入口运行一次小规模 Capture，不添加临时日志路径绕过。记录命令、退出码及元数据文件。
+- 最小 GPU 复验：使用已缓存的模型与 SAE，重新从官方 `python -m saebase.runtime.train` 入口运行一次小规模 Capture，不添加临时日志路径绕过。记录命令、退出码及元数据文件。
 
 ### D2. P0 — 修复 SAE Lens TrainPlan 数据与精度的配置契约
 
-- 证据：`tasks/LLM/train/backend/training.py` 已合入本轮成功的本地 2-step smoke 修正，但当前 `model_from_pretrained_kwargs` 直接写死 `dtype=float16`；`_open_local_training_dataset` 支持 JSON/JSONL 文件，而 `TrainPlan.validate()` 要求 `dataset_path` 必须是目录。
+- 证据：`tasks/train/backend/training.py` 已合入本轮成功的本地 2-step smoke 修正，但当前 `model_from_pretrained_kwargs` 直接写死 `dtype=float16`；`_open_local_training_dataset` 支持 JSON/JSONL 文件，而 `TrainPlan.validate()` 要求 `dataset_path` 必须是目录。
 - 保留 Gemma-2 2B 在 12GB GPU 上已验证的低精度加载能力，将模型加载 dtype **显式、受限地配置化**，区分模型加载 dtype 与 SAE 激活/训练 dtype；默认值、支持范围及异常信息必须有明确文档。不能在不同 backend 间静默切换精度。
 - 统一 TrainPlan 对目录快照、Hugging Face `save_to_disk` 目录、JSON/JSONL 本地文件的校验与实际加载语义，继续验证 immutable revision、真实文件存在性和权限边界；不得为通过测试取消来源校验。
 - 单元测试使用依赖注入或 Mock 检验加载参数传递、路径种类、无效 dtype、拒绝无权限训练，以及兼容旧计划的行为；无需真实 GPU 才能验证的逻辑全部纳入 CI。
@@ -32,13 +32,13 @@
 ### D3. P1 — Circuits 原生图规范化与接口回归
 
 - 当前实测仅证明 `circuit-tracer==0.5.0` 输出**原始** `native_graph.pt`，证据为 118 个节点和 3,636 条边，状态 `native_raw_graph_generated_not_normalized`；不等于完成了标准化图、因果边验证或 feature intervention。
-- 为 `tasks/LLM/circuits/operation.py` 新增的 `offload`、`dtype`、`batch_size`、`max_feature_nodes`、`lazy_encoder` 透传补测试：参数准确、非法参数拒绝、默认行为兼容、`task.approved=false` 必须拒绝，真实运行的预算/超时限制保留。
-- 研究 `tasks/LLM/circuits/backend/circuits.py` 已有 typed graph importer 与上游输出格式。如能取得**可信来源、明确版本的前端 JSON**，再调用正式 importer，并验证节点/边、error 与 logit 节点、端点 ID、原始 provenance、保存后 checksum；不要直接加载不可信 `.pt` 或猜测 node ID 与 feature ID 的对应关系。
+- 为 `tasks/circuits/operation.py` 新增的 `offload`、`dtype`、`batch_size`、`max_feature_nodes`、`lazy_encoder` 透传补测试：参数准确、非法参数拒绝、默认行为兼容、`task.approved=false` 必须拒绝，真实运行的预算/超时限制保留。
+- 研究 `tasks/circuits/backend/circuits.py` 已有 typed graph importer 与上游输出格式。如能取得**可信来源、明确版本的前端 JSON**，再调用正式 importer，并验证节点/边、error 与 logit 节点、端点 ID、原始 provenance、保存后 checksum；不要直接加载不可信 `.pt` 或猜测 node ID 与 feature ID 的对应关系。
 - 若当前真实产物无法无损转换，报告 `BLOCKED: native graph normalization`，写明缺失的具体上游接口/证据，不允许创建虚构的标准图。真实电路 feature intervention 也应与生成图分别验收。
 
 ### D4. P1 — Explain 生成器接入与证据边界
 
-- 当前 `tasks.LLM.explain.operation.execute(cfg, generator=...)` 的真实模型调用已成功；普通 Hydra YAML 不能存 Python Callable。这是可用入口限制，并非语义解释已经验证。
+- 当前 `tasks.explain.operation.execute(cfg, generator=...)` 的真实模型调用已成功；普通 Hydra YAML 不能存 Python Callable。这是可用入口限制，并非语义解释已经验证。
 - 评估可复用的显式 `generator` 装配方式，使 CLI 能选择已验证的本地/注册模型实现；禁止把任意字符串当作可执行代码、在 YAML 中嵌入对象或隐式请求外部 API。若会破坏现有边界，保持独立 Python 入口并在 README 中给出明确调用方式。
 - 添加 CPU 单元测试，覆盖未提供 generator 时显式失败、成功注入、错误输入、留出样本身份、没有语义标签时不产生语义正确率主张。
 - GPU 报告中的 `heldout_score=1.0` 是特征激活有无的预测一致性，**不是**自然语言解释的语义准确率。保持两项指标严格区分，未经人工/独立评价不得标为解释质量 PASS。
@@ -52,7 +52,7 @@
 ### D6. P2 — 环境与验收报告收尾
 
 - 主环境 `/venv/main` 的 vLLM 安装不完整；已有隔离虚拟环境中的 vLLM 0.27.1 能完成真实 8-token 基线验证。只在独立隔离环境中核对可重复性，未经许可不重装主环境、不更换全局 torch/CUDA。
-- 修订 [GPU 验收报告](../../docs/gpu-acceptance-20261027.md) 中的“代码改动（未提交）”历史措辞：两项改动已经进入 PR；记录对应 commit、测试与复验状态，保留首次实测时的真实 HEAD 和数据，而非覆盖历史信息。
+- 修订 [GPU 验收报告](../../harness/github_development_doc/gpu-acceptance-20261027.md) 中的“代码改动（未提交）”历史措辞：两项改动已经进入 PR；记录对应 commit、测试与复验状态，保留首次实测时的真实 HEAD 和数据，而非覆盖历史信息。
 - 报告区分 `runtime smoke passed`、`partial/limited validation`、`scientific acceptance pending`。Circuits 仍有标准化/干预缺口、Explain 仍无独立语义验证、Train 仅为 2-step smoke。
 - 只将脱敏的小体积 receipt、数值摘要、哈希与执行命令纳入 Git；不上传 HF token、原始私有 prompts、模型权重、大型 checkpoint 或未经批准的原始日志。
 
@@ -86,7 +86,7 @@
 
 原因：本次无可供授权的外部数据版本、网络下载额度与独立数据源许可证核查。
 
-1. 对 `research_datasets/NLP` 与现有 `saebase/data` 的重叠数据集（CounterFact、GreaterThan、IOI、MMLUPro、SimpleCopying）建立名称、split、prompt/text/token、来源 revision 的一致性矩阵。BBH、SubjectVerbAgreement 及其他来源另列。
+1. 对 `datasets/NLP` 与现有 `saebase/data` 的重叠数据集（CounterFact、GreaterThan、IOI、MMLUPro、SimpleCopying）建立名称、split、prompt/text/token、来源 revision 的一致性矩阵。BBH、SubjectVerbAgreement 及其他来源另列。
 2. 真实下载时固定 revision，检查第三方 `datasets`、`transformer_lens` 和 `sae_lens` 能在 SAEBase 命名空间中正常导入。用只读数据样本检查 `research_datasets` 路径，避免改变旧 `saebase/data` 产物或已发布结果。
 3. 对 Research Lab 原生 Hugging Face streaming、dataset object、tokenizer 接口进行端到端读取测试，检验 schema、shuffle/revision 与缓存行为，确认实验不会静默使用不同数据划分。
 

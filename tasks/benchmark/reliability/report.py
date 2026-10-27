@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from tasks.LLM.benchmark.backend.results import atomic_json
+from tasks.benchmark.backend.results import atomic_json
 
 AUDIT_SCHEMA = "saebase.m4.audit.v1"
 MANIFEST_SCHEMA = "saebase.m4.audit.manifest.v1"
@@ -96,7 +96,7 @@ def read_audit(root: str | Path) -> dict:
         raise ValueError("M4 audit content identity mismatch")
     truth = report.get("ground_truth")
     if truth is not None:
-        from tasks.LLM.benchmark.backend.adapters.papers import source_identity
+        from tasks.benchmark.backend.adapters.papers import source_identity
 
         for paper in ("sar", "rss"):
             source = truth["source_provenance"][paper]

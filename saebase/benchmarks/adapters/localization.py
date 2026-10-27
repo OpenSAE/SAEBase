@@ -16,7 +16,7 @@ from typing import Any
 
 import numpy as np
 
-from saebase.data.controlled_inputs import (
+from saebase.datasets.controlled_inputs import (
     BinaryFactor, ControlledInputManifest, MAX_FACTORS,
     load_controlled_input_manifest, save_controlled_input_manifest,
 )

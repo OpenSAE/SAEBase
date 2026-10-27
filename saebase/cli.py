@@ -1,6 +1,6 @@
 """Stable CLI entrypoints under the saebase namespace.
 
-Historical main.py and scripts.* modules remain importable. Import the
+Historical main.py and saebase.tools.* modules remain importable. Import the
 command implementation only when the corresponding CLI is invoked, so
 ordinary saebase imports do not require optional analysis backends.
 """
@@ -19,32 +19,32 @@ def main() -> object:
 
 
 def prepare_prompts() -> object:
-    return _dispatch("scripts.sae_prepare_prompts")
+    return _dispatch("saebase.tools.sae_prepare_prompts")
 
 
 def check_env() -> object:
-    return _dispatch("scripts.check_env")
+    return _dispatch("saebase.tools.check_env")
 
 
 def intervene() -> object:
-    return _dispatch("scripts.m2_batch")
+    return _dispatch("saebase.tools.m2_batch")
 
 
 def benchmark() -> object:
-    return _dispatch("scripts.m3_benchmark")
+    return _dispatch("saebase.tools.m3_benchmark")
 
 
 def audit() -> object:
-    return _dispatch("scripts.m4_reliability")
+    return _dispatch("saebase.tools.m4_reliability")
 
 
 def ground_truth() -> object:
-    return _dispatch("scripts.m4_ground_truth")
+    return _dispatch("saebase.tools.m4_ground_truth")
 
 
 def release_matrix() -> object:
-    return _dispatch("scripts.m5_release_matrix")
+    return _dispatch("saebase.tools.m5_release_matrix")
 
 
 def release_gate() -> object:
-    return _dispatch("scripts.m5_release_gate")
+    return _dispatch("saebase.tools.m5_release_gate")

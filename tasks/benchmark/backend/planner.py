@@ -24,7 +24,7 @@ def build_plan(config: BenchmarkConfig) -> dict[str, Any]:
     # No weights or real source code is loaded here. Cache hits cannot be
     # verified without resolving exact model/tokenizer/SAE SHA-256 identities.
     specs = [get_metric(m) for m in config.metrics]
-    from tasks.LLM.benchmark.extensions.runtime import validate_external_target
+    from tasks.benchmark.extensions.runtime import validate_external_target
 
     for target in config.targets:
         validate_external_target(target, config.sources)

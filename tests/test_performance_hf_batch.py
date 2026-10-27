@@ -15,7 +15,7 @@ from saebase.interventions import (
     ResultWriter,
 )
 from saebase.store import SampleRecord, TokenSelection, sha256_state_dict
-from examples._synthetic_common import ResearchToySAE
+from saebase.saebase.examples._synthetic_common import ResearchToySAE
 
 
 class Layer(torch.nn.Module):

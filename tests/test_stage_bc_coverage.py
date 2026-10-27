@@ -140,7 +140,7 @@ def test_registry_bootstrap_has_new_models_and_sae_profiles():
         assert key in saes
 
 def test_matryoshka_real_source_paths_are_concrete():
-    from scripts.phase_bc_source_metadata import probe_file_path
+    from saebase.tools.phase_bc_source_metadata import probe_file_path
     catalog = load_coverage(CATALOG)
     a = catalog.find("gemma2_2b_it_matryoshka_l12_32k")
     b = catalog.find("qwen35_4b_matryoshka_l15_65k")

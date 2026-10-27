@@ -3,7 +3,7 @@
   "purpose": "Reviewed SAEBase Code references to scientific Knowledge and Core architecture IDs",
   "mappings": [
     {
-      "path": "research_datasets/datamodule.py",
+      "path": "datasets/datamodule.py",
       "context_ids": [],
       "summary": "Lightning 数据模块通过 Registry 装配 Dataset。",
       "core_ids": [
@@ -11,7 +11,7 @@
       ]
     },
     {
-      "path": "research_datasets/NLP/artifacts.py",
+      "path": "datasets/artifacts.py",
       "context_ids": [
         "g.sae.prompt_artifacts"
       ],
@@ -19,7 +19,7 @@
       "summary": "NLP Prompt manifest 和数据来源的版本化产物接口。"
     },
     {
-      "path": "dlbase/registry.py",
+      "path": "saebase/runtime/registry.py",
       "context_ids": [],
       "summary": "数据集、模型与任务的插件接口和中心注册表。",
       "core_ids": [
@@ -27,7 +27,7 @@
       ]
     },
     {
-      "path": "dlbase/summary_log.py",
+      "path": "saebase/runtime/summary_log.py",
       "context_ids": [],
       "summary": "与具体任务无关的 summary.log 格式化和评测表验证。",
       "core_ids": [
@@ -35,7 +35,7 @@
       ]
     },
     {
-      "path": "dlbase/train.py",
+      "path": "saebase/runtime/train.py",
       "context_ids": [],
       "summary": "Hydra 唯一训练入口，完成基础环境和配置校验后交给任务分发。",
       "core_ids": [
@@ -43,7 +43,7 @@
       ]
     },
     {
-      "path": "models/LLM/gemma2_2b_base/gemma2_2b_base.py",
+      "path": "models/gemma2_2b_base/gemma2_2b_base.py",
       "context_ids": [
         "g.sae.gemma_model"
       ],
@@ -71,7 +71,7 @@
       "summary": "根据 SAE profile 选择实际加载配置。"
     },
     {
-      "path": "tasks/LLM/benchmark/backend/runner.py",
+      "path": "tasks/benchmark/backend/runner.py",
       "context_ids": [
         "g.sae.benchmark_runner"
       ],
@@ -81,7 +81,7 @@
       "summary": "SAE 基准指标与运行结果的任务调度。"
     },
     {
-      "path": "tasks/LLM/benchmark/integrations/rss.py",
+      "path": "tasks/benchmark/integrations/rss.py",
       "context_ids": [
         "g.sae.rss_adapter"
       ],
@@ -91,7 +91,7 @@
       "summary": "RSS 特征响应分析接口。"
     },
     {
-      "path": "tasks/LLM/benchmark/integrations/sar.py",
+      "path": "tasks/benchmark/integrations/sar.py",
       "context_ids": [
         "g.sae.sar_adapter"
       ],
@@ -101,7 +101,7 @@
       "summary": "SAR 特征组合性数据接入 SAE 评测接口。"
     },
     {
-      "path": "tasks/LLM/benchmark/reliability/runner.py",
+      "path": "tasks/benchmark/reliability/runner.py",
       "context_ids": [
         "g.sae.reliability"
       ],
@@ -111,7 +111,7 @@
       "summary": "SAE 可靠性与对照检验。"
     },
     {
-      "path": "tasks/LLM/capture/operation.py",
+      "path": "tasks/capture/operation.py",
       "context_ids": [
         "g.sae.capture_task"
       ],
@@ -121,7 +121,7 @@
       "summary": "LLM SAE 捕获任务的实际操作入口。"
     },
     {
-      "path": "tasks/LLM/circuits/backend/circuit_intervene.py",
+      "path": "tasks/circuits/backend/circuit_intervene.py",
       "context_ids": [
         "g.sae.circuit_edit"
       ],
@@ -131,7 +131,7 @@
       "summary": "候选电路路径的受控干预代码。"
     },
     {
-      "path": "tasks/LLM/circuits/backend/circuits.py",
+      "path": "tasks/circuits/backend/circuits.py",
       "context_ids": [
         "g.sae.circuit_trace"
       ],
@@ -141,7 +141,7 @@
       "summary": "真实模型组件的电路追踪接口。"
     },
     {
-      "path": "tasks/LLM/explain/interpretation.py",
+      "path": "tasks/explain/interpretation.py",
       "context_ids": [
         "g.sae.interpretation"
       ],
@@ -151,7 +151,7 @@
       "summary": "SAE 特征解释候选的生成与检验。"
     },
     {
-      "path": "tasks/LLM/explain/operation.py",
+      "path": "tasks/explain/operation.py",
       "context_ids": [
         "g.sae.explanation_task"
       ],
@@ -161,7 +161,7 @@
       "summary": "自动解释任务的实际执行入口。"
     },
     {
-      "path": "tasks/LLM/generate/backend/engine.py",
+      "path": "tasks/generate/backend/engine.py",
       "context_ids": [
         "g.sae.generation_engine"
       ],
@@ -171,7 +171,7 @@
       "summary": "生成干预执行后端。"
     },
     {
-      "path": "tasks/LLM/generate/operation.py",
+      "path": "tasks/generate/operation.py",
       "context_ids": [
         "g.sae.generation_task"
       ],
@@ -181,7 +181,7 @@
       "summary": "LLM 生成过程中 SAE 编辑与对照执行入口。"
     },
     {
-      "path": "tasks/LLM/intervene/operation.py",
+      "path": "tasks/intervene/operation.py",
       "context_ids": [
         "g.sae.teacher_forced"
       ],
@@ -191,7 +191,7 @@
       "summary": "固定输入下教师强制 SAE 干预的实际任务接口。"
     },
     {
-      "path": "tasks/LLM/train/backend/training.py",
+      "path": "tasks/train/backend/training.py",
       "context_ids": [
         "g.sae.train_backend"
       ],
@@ -201,7 +201,7 @@
       "summary": "SAE 原生训练后端及参数组织。"
     },
     {
-      "path": "tasks/LLM/train/operation.py",
+      "path": "tasks/train/operation.py",
       "context_ids": [
         "g.sae.train_task"
       ],

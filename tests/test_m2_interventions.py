@@ -7,7 +7,7 @@ import json
 import pytest
 import torch
 
-from examples._synthetic_common import ResearchToyModel, ResearchToySAE
+from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ActivationSite, ModelAdapter, capture_features, evaluate_edit
 from saebase.store import (ActivationIdentity, ActivationWriter, CodeIdentity, SampleRecord,
                            ShardedReader, TokenSelection, encode_from_store, sha256_state_dict)
@@ -303,13 +303,13 @@ def test_configurable_cli_dry_run_requires_no_remote_weights(tmp_path):
     from pathlib import Path
     conf=Path(__file__).resolve().parents[1]/'conf/interventions/pythia_feature_edits.json'
     repo=Path(__file__).resolve().parents[1]
-    r=subprocess.run([sys.executable,'scripts/m2_batch.py','--config',str(conf),'--dry-run'],
+    r=subprocess.run([sys.executable,'saebase/tools/m2_batch.py','--config',str(conf),'--dry-run'],
                      cwd=repo,capture_output=True,text=True,timeout=20)
     assert r.returncode==0,r.stderr
     obj=json.loads(r.stdout)
     assert obj['measurements']==4 and obj['steering_total_max_generated_tokens']==6
     assert not (repo/'experiment/m2').exists()
-    r=subprocess.run([sys.executable,'scripts/m2_batch.py','--config',str(conf)],
+    r=subprocess.run([sys.executable,'saebase/tools/m2_batch.py','--config',str(conf)],
                      cwd=repo,capture_output=True,text=True,timeout=20)
     assert r.returncode!=0 and '--real' in r.stderr
 
@@ -317,7 +317,7 @@ def test_configurable_cli_dry_run_requires_no_remote_weights(tmp_path):
 def test_m0_probe_uses_recorded_atol_and_rtol_and_rejects_drift():
     """Fixed absolute-only thresholds incorrectly rejected valid M0 comparisons."""
     import numpy as np
-    from scripts.m2_real_smoke import compare_m0_activation_probe
+    from saebase.tools.m2_real_smoke import compare_m0_activation_probe
 
     ref = np.array([5.0, -2.0, 0.0002, 0.0])
     # A 1.2e-4 change is legitimate at a reference magnitude of 5,

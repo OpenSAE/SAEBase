@@ -20,7 +20,7 @@ python -m harness.core.agent_flow serve OR-Knowledge-Demo-20261026 --port 8766
 
 浏览器打开终端打印的完整地址，其中 `#key=...` 只在当前本地审阅服务会话有效。**不要将包含 Key 的地址提交到 GitHub。**
 
-每次通过/否决都会立刻写入 `harness/github_work_plan/agent_flow/<ID>.json`；通过合法空 Knowledge 新节点，还会写入 `doc/knowledge/context_graph.json` 和 `doc/knowledge/glossary.json`，执行原有 Knowledge/Glossary 验证。服务器返回保存成功后才会自动切换节点。关闭页面不回滚已确认的操作。每次点击都受 JSON revision 和来源 SHA 限制；若其他程序改过权威图，将拒绝过期的审阅。
+每次通过/否决都会立刻写入 `harness/github_harness/github_work_plan/agent_flow/<ID>.json`；通过合法空 Knowledge 新节点，还会写入 `doc/knowledge/context_graph.json` 和 `doc/knowledge/glossary.json`，执行原有 Knowledge/Glossary 验证。服务器返回保存成功后才会自动切换节点。关闭页面不回滚已确认的操作。每次点击都受 JSON revision 和来源 SHA 限制；若其他程序改过权威图，将拒绝过期的审阅。
 
 ## 与科研实验的审批是两件事
 

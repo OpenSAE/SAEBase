@@ -17,14 +17,14 @@ import resource
 from typing import Callable
 
 from saebase.api import ModelAdapter, SAEIdentity
-from tasks.LLM.benchmark.backend import BenchmarkConfig
-from tasks.LLM.benchmark.backend.runner import execute as execute_benchmark
-from tasks.LLM.benchmark.backend.results import atomic_json, read_metrics
-from tasks.LLM.benchmark.backend.report import write_report
-from tasks.LLM.benchmark.backend.planner import build_plan
-from tasks.LLM.benchmark.reliability import AuditConfig
-from tasks.LLM.benchmark.reliability.runner import evaluate_m3
-from tasks.LLM.benchmark.reliability.report import write_audit, read_audit
+from tasks.benchmark.backend import BenchmarkConfig
+from tasks.benchmark.backend.runner import execute as execute_benchmark
+from tasks.benchmark.backend.results import atomic_json, read_metrics
+from tasks.benchmark.backend.report import write_report
+from tasks.benchmark.backend.planner import build_plan
+from tasks.benchmark.reliability import AuditConfig
+from tasks.benchmark.reliability.runner import evaluate_m3
+from tasks.benchmark.reliability.report import write_audit, read_audit
 from saebase.sae.registry import get_profile
 from saebase.store import fingerprint
 from .schema import MatrixConfig, MatrixTarget, STATUS_SCHEMA

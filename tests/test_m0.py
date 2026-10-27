@@ -9,10 +9,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from examples._synthetic_common import ResearchToyModel, ResearchToySAE
+from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import SAEIdentity, ActivationSite, LoadedResearchPair, ModelAdapter
 from saebase.runtime import required_packages, verify_runtime
-from scripts.m0_reference_smoke import _sha_weights, compare_references, record_reference
+from saebase.tools.m0_reference_smoke import _sha_weights, compare_references, record_reference
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -112,13 +112,13 @@ def test_reference_rejects_token_drift_and_empty_data():
 
 def test_m0_real_runner_documents_explicit_inputs():
     p = subprocess.run(
-        [sys.executable, "scripts/m0_reference_smoke.py", "--help"],
+        [sys.executable, "saebase/tools/m0_reference_smoke.py", "--help"],
         cwd=ROOT, capture_output=True, text=True, timeout=30,
     )
     assert p.returncode == 0, p.stderr
     assert "--reuse-prompts" in p.stdout
     assert "--compare-to" in p.stdout
-    assert (ROOT / "scripts/m0_real_smoke.sh").is_file()
+    assert (ROOT / "saebase/tools/m0_real_smoke.sh").is_file()
 
 
 def test_reference_hash_supports_zero_dimensional_state_tensors():

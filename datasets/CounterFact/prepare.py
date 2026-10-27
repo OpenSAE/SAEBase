@@ -5,10 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from research_datasets.NLP.CounterFact.CounterFact import load_raw_counterfact
-from research_datasets.NLP.CounterFact.tokenize import filter_with_model
-from research_datasets.NLP.artifacts import assert_available, make_manifest
-from research_datasets.NLP.artifacts import save_prompts
+from saebase.datasets.CounterFact.CounterFact import load_raw_counterfact
+from saebase.datasets.CounterFact.tokenize import filter_with_model
+from saebase.datasets.prompt_schema import assert_available, make_manifest
+from saebase.datasets.prompt_store import save_prompts
 
 
 def prepare_for_model(
@@ -24,9 +24,13 @@ def prepare_for_model(
 ) -> Path:
     assert_available("CounterFact", model_key)
     raw = load_raw_counterfact()
-    kept, policy = filter_with_model(raw, model, min_kept=min_kept, max_items=max_items)
+    kept, policy = filter_with_model(
+        raw, model, min_kept=min_kept, max_items=max_items
+    )
     if len(kept) < min_kept:
-        raise RuntimeError(f"CounterFact/{model_key}: kept {len(kept)} < min_kept={min_kept}")
+        raise RuntimeError(
+            f"CounterFact/{model_key}: kept {len(kept)} < min_kept={min_kept}"
+        )
     manifest = make_manifest(
         behavior="CounterFact",
         model_key=model_key,
@@ -40,6 +44,6 @@ def prepare_for_model(
             "require_single_token_targets": True,
             "max_items": max_items,
         },
-        source="research_datasets.NLP.CounterFact.prepare",
+        source="datasets.CounterFact.prepare",
     )
     return save_prompts(kept, manifest, data_root=data_root)

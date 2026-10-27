@@ -83,7 +83,7 @@
       "why_it_matters": "明确身份与输入条件支持跨实验对照。",
       "foundation": "doc/knowledge/foundations/sae_methods.md",
       "source_evidence": [
-        "tasks/LLM/sae_runtime.py"
+        "tasks/sae_runtime.py"
       ],
       "aliases": [
         "SAE provenance"
@@ -107,7 +107,7 @@
       "why_it_matters": "统一模型与输入身份使每组实验条件明确，支持可靠对照。",
       "foundation": "doc/knowledge/foundations/sae_methods.md",
       "source_evidence": [
-        "research_datasets/NLP/artifacts.py"
+        "datasets/artifacts.py"
       ],
       "aliases": [
         "Prompt artifact",
@@ -149,7 +149,7 @@
       "why_it_matters": "使因果对照的输入条件得到明确限定。",
       "foundation": "doc/knowledge/foundations/sae_methods.md",
       "source_evidence": [
-        "tasks/LLM/intervene/operation.py"
+        "tasks/intervene/operation.py"
       ],
       "aliases": [
         "teacher-forced intervention"
@@ -169,7 +169,7 @@
       "why_it_matters": "将静态输入编辑扩展至有状态的生成轨迹。",
       "foundation": "doc/knowledge/foundations/sae_methods.md",
       "source_evidence": [
-        "tasks/LLM/generate/operation.py"
+        "tasks/generate/operation.py"
       ],
       "aliases": [
         "generative intervention"
@@ -189,7 +189,7 @@
       "why_it_matters": "需要用实际干预证据评估候选电路的因果作用。",
       "foundation": "doc/knowledge/foundations/sae_methods.md",
       "source_evidence": [
-        "tasks/LLM/circuits/backend/circuits.py"
+        "tasks/circuits/backend/circuits.py"
       ],
       "aliases": [
         "circuit tracing"
@@ -209,7 +209,7 @@
       "why_it_matters": "特征意义随上下文变化，解释须结合独立检验。",
       "foundation": "doc/knowledge/foundations/sae_methods.md",
       "source_evidence": [
-        "tasks/LLM/explain/interpretation.py"
+        "tasks/explain/interpretation.py"
       ],
       "aliases": [
         "auto-explain"
@@ -229,7 +229,7 @@
       "why_it_matters": "可追溯的评测协议支持 SAE 和研究方法间的公平比较。",
       "foundation": "doc/knowledge/foundations/sae_methods.md",
       "source_evidence": [
-        "tasks/LLM/benchmark/backend/runner.py"
+        "tasks/benchmark/backend/runner.py"
       ],
       "aliases": [
         "SAE benchmark",
@@ -252,7 +252,7 @@
       "why_it_matters": "保留评测所需的采样、对照与原始实验来源。",
       "foundation": "doc/knowledge/foundations/sae_methods.md",
       "source_evidence": [
-        "tasks/LLM/benchmark/integrations/sar.py"
+        "tasks/benchmark/integrations/sar.py"
       ],
       "aliases": [
         "SAR",
@@ -271,7 +271,7 @@
       "why_it_matters": "训练产物的解释质量需在独立数据与指标上再验证。",
       "foundation": "doc/knowledge/foundations/sae_methods.md",
       "source_evidence": [
-        "tasks/LLM/train/backend/training.py"
+        "tasks/train/backend/training.py"
       ],
       "aliases": [
         "SAE training"

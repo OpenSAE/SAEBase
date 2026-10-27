@@ -16,7 +16,7 @@ SPEC = BaseModelSpec(
     notes="Gemma-3 4B IT; native Scope 2 residual SAE (same layers as PT).",
 )
 
-from saebase.data.prompt_schema import behaviors_for_model
+from saebase.datasets.prompt_schema import behaviors_for_model
 
 SUPPORTED_BEHAVIORS: frozenset[str] = behaviors_for_model("gemma3_4b_it")
 

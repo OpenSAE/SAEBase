@@ -2,7 +2,7 @@
 from __future__ import annotations
 from omegaconf import DictConfig
 from saebase.cfg.contracts import assert_prompt_source_in,assert_task_in
-from saebase.data.prompt_schema import behaviors_for_model
+from saebase.datasets.prompt_schema import behaviors_for_model
 
 _ALIASES={"CounterFact":"counterfact","SimpleCopying":"simple_copying",
           "SubjectVerbAgreement":"subject_verb_agreement"}

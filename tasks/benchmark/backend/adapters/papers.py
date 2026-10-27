@@ -4,7 +4,7 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 import numpy as np
-from tasks.LLM.benchmark.integrations import (
+from tasks.benchmark.integrations import (
     evaluate_sar,
     evaluate_rss,
     collect_rss_features,

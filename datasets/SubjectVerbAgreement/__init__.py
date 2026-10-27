@@ -1,6 +1,6 @@
 """Subject-verb agreement prompts for SAEBase."""
 
-from research_datasets.NLP.SubjectVerbAgreement.SubjectVerbAgreement import (
+from saebase.datasets.SubjectVerbAgreement.SubjectVerbAgreement import (
     default_data_dir,
     generate_sva_prompts,
     load_sva_prompts,

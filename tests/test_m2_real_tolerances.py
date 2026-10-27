@@ -2,7 +2,7 @@
 import numpy as np
 import pytest
 
-from scripts.m2_real_smoke import compare_m0_activation_probe
+from saebase.tools.m2_real_smoke import compare_m0_activation_probe
 
 
 def test_m0_probe_combines_absolute_and_relative_tolerances():

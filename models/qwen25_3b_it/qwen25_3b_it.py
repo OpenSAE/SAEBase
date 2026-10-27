@@ -17,7 +17,7 @@ SPEC = BaseModelSpec(
     notes="Qwen2.5 3B Instruct; HF logits backend; P0 aligned pair with qwen25_3b.",
 )
 
-from saebase.data.prompt_schema import behaviors_for_model
+from saebase.datasets.prompt_schema import behaviors_for_model
 
 SUPPORTED_BEHAVIORS: frozenset[str] = behaviors_for_model("qwen25_3b_it")
 

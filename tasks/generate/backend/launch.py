@@ -8,11 +8,11 @@ import subprocess
 import sys
 from typing import Any, Sequence
 
-from tasks.LLM.generate.backend.settings import apply_process_env, repo_root
+from tasks.generate.backend.settings import apply_process_env, repo_root
 
 
 def worker_cmd(argv: Sequence[str]) -> list[str]:
-    return [sys.executable, "-m", "tasks.LLM.generate.backend.nnsight_worker", *list(argv)]
+    return [sys.executable, "-m", "tasks.generate.backend.nnsight_worker", *list(argv)]
 
 
 def _child_env() -> dict[str, str]:
@@ -44,7 +44,7 @@ def _verify_available_worker_mode(argv: Sequence[str]) -> None:
 
 
 def _release_parent_gpu() -> None:
-    from tasks.LLM.generate.backend.gpu import free_cuda, stop_vllm
+    from tasks.generate.backend.gpu import free_cuda, stop_vllm
 
     stop_vllm()
     free_cuda()

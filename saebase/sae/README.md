@@ -40,7 +40,7 @@ Standalone Phase A registers `sae` only. Other protocol tasks live outside this 
 ## Commands
 
 ```bash
-python scripts/check_env.py --mode analysis
+python saebase/tools/check_env.py --mode analysis
 python3 -m saebase.sae.verify_registry --list
 python3 -m saebase.run \
   prompt_source=simple_copying model=pythia70m sae=pythia70m_resid_sm \

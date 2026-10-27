@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any, Callable
 
-from tasks.LLM.sae_runtime import MODEL_KEY, _task
+from tasks.sae_runtime import MODEL_KEY, _task
 
 
 def _explain(
@@ -14,7 +14,7 @@ def _explain(
     generator: Callable[[list[str]], str] | None,
     predictor: Callable[[str, str], bool] | None,
 ) -> dict[str, Any]:
-    from tasks.LLM.explain.interpretation import propose_interpretation
+    from tasks.explain.interpretation import propose_interpretation
 
     if not bool(_task(cfg, "approved", False)):
         raise PermissionError("Auto-explanation needs task.approved=true")
@@ -62,7 +62,7 @@ def _allowlisted_generator(cfg: Any) -> Callable[[list[str]], str] | None:
             "Unknown explain generator. The only allowlisted local implementation "
             "is saebase_generate."
         )
-    from tasks.LLM.explain.local_generator import saebase_generate
+    from tasks.explain.local_generator import saebase_generate
 
     return saebase_generate(cfg)
 

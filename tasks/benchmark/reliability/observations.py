@@ -10,9 +10,9 @@ import math
 import numpy as np
 
 from saebase.api import ActivationSite
-from tasks.LLM.benchmark.backend import BenchmarkConfig
-from tasks.LLM.benchmark.backend.results import read_metrics
-from tasks.LLM.intervene.backend import ExperimentIdentity, read_results
+from tasks.benchmark.backend import BenchmarkConfig
+from tasks.benchmark.backend.results import read_metrics
+from tasks.intervene.backend import ExperimentIdentity, read_results
 from saebase.store import ShardedReader, resolve_positions, sha256_state_dict
 from .schema import Observation
 
@@ -28,7 +28,7 @@ def _read_m3(root, *, localization_paper=None):
     root = Path(root)
     config = _read_config(root)
     rows = read_metrics(root, config.run_id)
-    from tasks.LLM.benchmark.backend.runner import validate_external_sources
+    from tasks.benchmark.backend.runner import validate_external_sources
 
     validate_external_sources(config, rows, root=root, localization_paper=localization_paper)
     provenance = json.loads((root / "provenance.json").read_text())

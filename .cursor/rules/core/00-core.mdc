@@ -8,9 +8,9 @@ alwaysApply: true
 - 本仓库保留 SAEBase v0.5.0 的独立 API、模型注册、研究工具和发布流程，同时加入 OpenResearch 的 DLBase 与 Harness。先辨认变更属于 dlbase、datasets、models、tasks、conf 或 Harness。
 - 真实运行契约以源码、注册表与 Hydra 配置为准；Agent 规则和工作流程以 .cursor/ 为准。README 只负责对人介绍仓库，不能作为 Agent 的强制规范来源。
 - 修改前阅读受影响模块、入口、现有注册与配置；必要时使用 .cursor/skills/ 下对应 Skill。
-- 未经用户明确批准，不修改 dlbase/ 的通用语义。修改权限由 .cursor/hooks/guard_paths.py 和 .cursor/policy.json 的额外防护共同约束；不得通过绕过检查达成修改。
+- 未经用户明确批准，不修改 saebase/runtime/ 的通用语义。修改权限由 .cursor/hooks/guard_paths.py 和 .cursor/policy.json 的额外防护共同约束；不得通过绕过检查达成修改。
 - 维护现有训练与评测语义。不能因重构、修复或验证而静默改变数据划分、指标、默认超参、checkpoint 或输出。
-- 保留 SAEBase 已有的 docs、examples、apps、work_plan 与发布工具。新增科研运行使用 dlbase.train，原有 saebase 命令保持兼容。辅助脚本使用 scripts/，自动测试使用 tests/，Cursor Hook 自身留在 .cursor/hooks/。
+- 保留 SAEBase 已有的 docs、examples、apps、work_plan 与发布工具。新增科研运行使用 saebase.runtime.train，原有 saebase 命令保持兼容。辅助脚本使用 saebase/tools/，自动测试使用 tests/，Cursor Hook 自身留在 .cursor/hooks/。
 - 新模型、数据集、任务必须经已有 Registry 和兼容性门控接入，不得绕过检查写隐藏分支。
 - 如需批量实验或训练，先确认数据路径、GPU/时长预算及潜在产物覆盖风险；不得擅自执行长训练来代替快速测试。
 - 修改后运行与变更相称的可执行验证；报告验证命令、结果、未验证的部分。不得把尚未运行的检查描述为已通过。

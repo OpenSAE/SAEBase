@@ -4,7 +4,7 @@ from __future__ import annotations
 import itertools
 import numpy as np
 
-from tasks.LLM.benchmark.backend.registry import get_metric
+from tasks.benchmark.backend.registry import get_metric
 from .resampling import group_samples, group_sums, estimate_with_draws, draw_group_indices
 from .schema import Observation, AuditConfig
 

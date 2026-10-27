@@ -25,7 +25,7 @@ def test_v050_package_version_and_release_notes():
     assert found == [project["version"]]
     changelog = (ROOT / "CHANGELOG.md").read_text()
     assert "## 0.5.0" in changelog
-    notes = (ROOT / "docs/releases/v0.5.0.md").read_text()
+    notes = (ROOT / "harness/github_development_doc/releases/v0.5.0.md").read_text()
     assert "Public Research Beta" in notes
     assert "16–32" in notes
     assert "Demo" in notes
@@ -33,16 +33,16 @@ def test_v050_package_version_and_release_notes():
     assert "v0.5.0" in notes
     assert f"version: {project['version']}" in (ROOT / "CITATION.cff").read_text()
     assert "## 0.6.0" in changelog
-    assert (ROOT / "docs/releases/v0.6.0.md").is_file()
+    assert (ROOT / "harness/github_development_doc/releases/v0.6.0.md").is_file()
 
 
 def test_v050_distinguishes_open_playground_from_owner_gpu_compute():
-    notes = (ROOT / "docs/releases/v0.5.0.md").read_text()
+    notes = (ROOT / "harness/github_development_doc/releases/v0.5.0.md").read_text()
     assert "operator authentication" in notes
     assert "no implied PyPI publication" in notes
     assert "no reliable" not in notes  # human-facing copy stays specific
     for text in ("README.md", "README_cn.md"):
-        assert "docs/releases/v0.6.0.md" in (ROOT / text).read_text()
-    backend = (ROOT / "apps/research-lab/backend/private_api.py").read_text()
+        assert "harness/github_development_doc/releases/v0.6.0.md" in (ROOT / text).read_text()
+    backend = (ROOT / "saebase/research_lab/backend/private_api.py").read_text()
     assert "OPENSAE_ENABLE_PRIVATE_JOBS" in backend
     assert "len(operator) < 32" in backend

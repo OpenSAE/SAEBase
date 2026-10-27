@@ -1,27 +1,27 @@
 ---
 description: DLBase、Dataset、Model、Task 四层边界及注册链路。
-globs: "dlbase/**,saebase/**,datasets/**,models/**,tasks/**"
+globs: "saebase/runtime/**,saebase/**,datasets/**,models/**,tasks/**"
 alwaysApply: false
 ---
 
 # 分层与依赖方向
 
-- dlbase/ 仅放与任意 Dataset、Model、Task 无关的通用原语：注册、配置校验、运行时检查、种子、调度、日志格式、通用 Lightning 组件。
+- saebase/runtime/ 仅放与任意 Dataset、Model、Task 无关的通用原语：注册、配置校验、运行时检查、种子、调度、日志格式、通用 Lightning 组件。
 - datasets/<name>/ 负责样本、加载、变换、数据划分和数据视角的 Task 准入；不负责模型结构或训练循环。
 - models/<name>/ 负责网络结构、构造和 Model × Task × Dataset 适配；不承担数据加载和任务训练编排。
 - tasks/<name>/ 负责模型与数据集的连接、训练、评估、指标映射及任务级 pipeline 检查。
 - conf/ 是 Hydra 配置入口；默认值以组合后的 YAML 为准，不能再维护另一套代码常量作为隐式默认。
-- 唯一正式训练入口为 python -m dlbase.train。调用链为 dlbase.train → tasks.runner → 注册的 TaskModule.run；不得新增根目录 main.py 或给 runner 增加任务名 if/else。
-- 插件在 datasets/plugins.py、models/plugins.py、tasks/plugins.py 中注册；dlbase/plugin_bootstrap.py 只统一加载插件，不知道具体组件名称。
-- 生产代码不得 import、runpy 或 subprocess 依赖 tests/ 或 scripts/，也不得将第三方参考副本当作运行时依赖。
+- 唯一正式训练入口为 python -m saebase.runtime.train。调用链为 saebase.runtime.train → tasks.runner → 注册的 TaskModule.run；不得新增根目录 main.py 或给 runner 增加任务名 if/else。
+- 插件在 datasets/plugins.py、models/plugins.py、tasks/plugins.py 中注册；saebase/runtime/plugin_bootstrap.py 只统一加载插件，不知道具体组件名称。
+- 生产代码不得 import、runpy 或 subprocess 依赖 tests/ 或 saebase/tools/，也不得将第三方参考副本当作运行时依赖。
 - 遵循现有模块平行化结构；新增可插拔组件位于所属二级目录。现有代码的非模板化命名不得为了满足文档描述而强制重命名。
-- dlbase/ 的公共接口变更需先给出跨组件影响分析和明确用户批准，优先修复所属业务组件。
+- saebase/runtime/ 的公共接口变更需先给出跨组件影响分析和明确用户批准，优先修复所属业务组件。
 
 ## SAEBase 不持有具体 Dataset / Task
 
 - `saebase/` 只含三个子目录：`api/`、`sae/`、`store/`，另保留根目录 `runtime.py`、license、版本和来源说明。其公共 SAE 原语由 Task 直接调用。
 - 具体数据集实现、Prompt 源、文本过滤和 JSONL/manifest 规范属于 `datasets/NLP/`；数据路径、schema、读写收敛到 `datasets/NLP/artifacts.py`。
-- 七个 Task 的特有输入采集、评测、干预、生成、训练与图计算逻辑位于 `tasks/LLM/<name>/`，不得反向迁回 SAEBase。
+- 七个 Task 的特有输入采集、评测、干预、生成、训练与图计算逻辑位于 `tasks/<name>/`，不得反向迁回 SAEBase。
 - 公共 Dataset/Model/Task 插件仅由 DLBase 注册；SAE profile 由 `saebase/sae/registry.py` 统一维护。禁止在 SAEBase 中新增平行 Registry/Runner/CLI 或 `data/`、`cfg/`。
 - 相同职责的小模块可在保持算法、验证逻辑、数据格式及溯源契约的前提下合并。数值计算语义不同的加载器和表示格式仍各自独立。
 - 任何迁移必须更新所有真实 Python import、Hydra 配置、测试、源码证据和 Code Tree。新增代码应通过无权重 CPU 检查。

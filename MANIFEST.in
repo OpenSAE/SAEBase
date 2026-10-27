@@ -15,3 +15,6 @@ global-exclude __pycache__ *.py[cod] .DS_Store
 
 # Stage D evidence lives in Git and the dedicated evidence release, not in pip packages.
 recursive-exclude conf/coverage/stage_d_evidence *
+
+recursive-include datasets *.py
+recursive-include saebase/research_lab *.html *.css *.js *.json

@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
-from tasks.LLM.benchmark.backend.results import atomic_json
+from tasks.benchmark.backend.results import atomic_json
 from saebase.sae.coverage import CoverageCatalog, load_coverage
 from saebase.sae.registry import get_profile
 

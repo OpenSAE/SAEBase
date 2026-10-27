@@ -34,7 +34,7 @@ class NativePilot:
             raise ValueError("Require the exact upstream commit SHA")
         if not 30 <= self.timeout_seconds <= 7200:
             raise ValueError("Bounded C1/C2 timeout required")
-        if not (self.repo_root / "scripts/m3_native_saebench_smoke.py").is_file():
+        if not (self.repo_root / "saebase/tools/m3_native_saebench_smoke.py").is_file():
             raise FileNotFoundError("Missing SAEBase native SAEBench entrypoint")
         expected = self.repo_root / "upstream"
         if self.upstream.resolve() != expected.resolve():
@@ -61,7 +61,7 @@ def native_pilot(job: NativePilot) -> dict[str, Any]:
         "HF_HUB_DISABLE_TELEMETRY": "1",
     }
     proc = subprocess.run(
-        [sys.executable, "scripts/m3_native_saebench_smoke.py"],
+        [sys.executable, "saebase/tools/m3_native_saebench_smoke.py"],
         cwd=job.repo_root,
         env=env,
         capture_output=True,

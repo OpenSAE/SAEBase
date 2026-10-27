@@ -14,7 +14,7 @@ import sys
 
 from saebase.runtime import verify_runtime
 from saebase.sae.registry import DEFAULT_SAE_FOR_MODEL, SAE_KEYS, get_profile
-from saebase.data.artifact_layout import BEHAVIOR_ALIASES
+from saebase.datasets.artifact_layout import BEHAVIOR_ALIASES
 
 
 def _project_root() -> Path:
@@ -43,7 +43,7 @@ def parse_args(argv: list[str] | None = None):
 
 
 def _prompt_source_group(name: str) -> str:
-    from saebase.data.artifact_layout import canonicalize_behavior
+    from saebase.datasets.artifact_layout import canonicalize_behavior
     canonical = canonicalize_behavior(name)
     # These are the canonical-to-Hydra groups shipped in conf/prompt_source/.
     group = next((alias for alias, target in BEHAVIOR_ALIASES.items()

@@ -20,5 +20,5 @@ context:
   knowledge_ids: []  # 例如 q.cub.train、g.cub.validation（科研知识）
   term_ids: []       # 例如 term.sae、term.sae.capture（术语）
   harness:
-    read_only: []    # 仅具体 harness/github_work_plan/ 文件
+    read_only: []    # 仅具体 harness/github_harness/github_work_plan/ 文件
   unlisted: deny

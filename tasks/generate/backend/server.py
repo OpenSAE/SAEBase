@@ -11,7 +11,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-from tasks.LLM.generate.backend.settings import (
+from tasks.generate.backend.settings import (
     DTYPE,
     GPU_MEMORY_UTILIZATION,
     HOST,

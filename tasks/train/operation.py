@@ -5,12 +5,12 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from tasks.LLM.sae_runtime import MODEL_KEY, _task
+from tasks.sae_runtime import MODEL_KEY, _task
 
 
 def _train(cfg: Any) -> dict[str, Any]:
     from omegaconf import OmegaConf
-    from tasks.LLM.train.backend.training import TrainPlan, run_training
+    from tasks.train.backend.training import TrainPlan, run_training
 
     if not bool(_task(cfg, "approved", False)):
         raise PermissionError("Native SAE training requires task.approved=true")

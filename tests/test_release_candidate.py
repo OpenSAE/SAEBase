@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from scripts import release_candidate as gate
+from saebase.tools import release_candidate as gate
 
 SHA = "a" * 40
 
@@ -68,7 +68,7 @@ def fake_project(tmp_path: Path, version: str = "0.3.0") -> tuple[Path, Path]:
             "saebase/__init__.py",
             "LICENSE",
             "CHANGELOG.md",
-            f"docs/releases/v{version}.md",
+            f"harness/github_development_doc/releases/v{version}.md",
         ):
             payload = (root / name).read_bytes()
             entry = tarfile.TarInfo(f"opensae_saebase-{version}/{name}")

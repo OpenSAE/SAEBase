@@ -15,4 +15,4 @@ What capability or bug does this change address?
 - [ ] New Python modules pass Ruff lint and formatting; changed adopted modules pass type checks.
 - [ ] No unrelated formatting or changes to scientific metrics and cached schema behavior.
 
-See [Code Quality](docs/code-quality.md) for local commands. Unmodified legacy modules are not required to pass repository-wide lint.
+See [Code Quality](harness/github_development_doc/code-quality.md) for local commands. Unmodified legacy modules are not required to pass repository-wide lint.

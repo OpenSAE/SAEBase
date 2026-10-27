@@ -167,7 +167,7 @@ def run_custom(
     args = [
         sys.executable,
         "-m",
-        "tasks.LLM.benchmark.native.custom_saebench",
+        "tasks.benchmark.native.custom_saebench",
         "--worker",
         "--upstream",
         str(upstream),
