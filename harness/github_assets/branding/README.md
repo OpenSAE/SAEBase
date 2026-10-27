@@ -5,4 +5,4 @@
 
 These are the original user-provided PNGs. Preserve their pixels, proportions, and colors. Do not redraw or replace them with other logo styles.
 
-Their usage and deployment requirements are in [`harness/github_work_plan/08_opensae_brand_identity_unification.md`](../../harness/github_work_plan/08_opensae_brand_identity_unification.md).
+Their usage and deployment requirements are in [`harness/github_work_plan/08_opensae_brand_identity_unification.md`](../../github_work_plan/08_opensae_brand_identity_unification.md).

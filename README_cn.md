@@ -34,7 +34,7 @@ SAEBase 集成了用于组织代码、科研知识、实验、运行环境和 Ag
 
 **Agent Harness：** [Agent Flow](harness/core/AGENT_FLOW.md) 进行结构化审阅 · [Cursor Rules 和 Skills](.cursor/) 支持 Agent 编程 · [实验追踪](harness/experiments/README.md) 管理可复现的科研流程。
 
-**查看：** [Atlas 可视化](harness/visualization/README.md) · [Harness 介绍](harness/README.md)
+**直接打开交互 Atlas：** [Core](https://atheavenma.github.io/opensae/openresearch/atlas/core.html) · [Knowledge](https://atheavenma.github.io/opensae/openresearch/atlas/knowledge.html) · [Code](https://atheavenma.github.io/opensae/openresearch/atlas/code.html) · [Environment](https://atheavenma.github.io/opensae/openresearch/atlas/environment.html) · [Context](https://atheavenma.github.io/opensae/openresearch/atlas/context.html) · [源码及部署说明](harness/visualization/README.md)
 
 ```bash
 python .cursor/hooks/validate_repo.py --full
@@ -46,7 +46,7 @@ python -m saebase.runtime.train --cfg job
 SAEBase 将预训练模型、SAE 字典、激活测量、受控特征干预、基准评测和可靠性分析连接为可复用的研究流程。
 
 <p align="center">
-  <img src="saebase/assets/figures/saebase_workflow.svg" alt="SAEBase 模型、激活提取、SAE 特征干预、评测与报告流程" width="1080"/>
+  <img src="harness/github_assets/figures/saebase_workflow.svg" alt="SAEBase 模型、激活提取、SAE 特征干预、评测与报告流程" width="1080"/>
 </p>
 
 **一次提取，多 SAE 评估。** 在相同的模型层位上，通过身份校验的激活缓存可以由兼容的 SAE checkpoint 复用，避免重复执行模型前向。
@@ -164,7 +164,7 @@ edited_activation = original_activation + decode(edited_codes) - decode(original
 
 查看源码：[SAEBase API](saebase/) · [Models](models/) · [Datasets](datasets/) · [Tasks](tasks/) · [Harness](harness/README.md) · [配置](conf/) · [仓库目录指南](harness/github_development_doc/repository-guide.md)。
 
-[参与贡献](CONTRIBUTING.md) · [更新记录](CHANGELOG.md) · [引用信息](CITATION.cff) · [Apache-2.0 许可证](LICENSE) · [安全说明](SECURITY.md)
+[参与贡献](.github/CONTRIBUTING.md) · [更新记录](harness/github_development_doc/CHANGELOG.md) · [引用信息](CITATION.cff) · [Apache-2.0 许可证](LICENSE) · [安全说明](.github/SECURITY.md)
 
 ---
 
