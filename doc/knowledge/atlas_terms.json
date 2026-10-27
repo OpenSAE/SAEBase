@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "atlas_context_vocabulary",
-  "purpose": "供五种 Atlas 节点共享的工程与环境术语，统一展示在 Context Tree；每条定义都有仓库内真实来源。",
+  "purpose": "SAEBase LLM / SAE / Harness 的工程与环境术语，按实际源码提供依据。",
   "categories": [
     {
       "id": "platform",
@@ -61,22 +61,6 @@
       "foundation": "tasks/runner.py"
     },
     {
-      "id": "term.classification",
-      "term": "分类任务",
-      "definition": "把输入样本映射到预定类别的任务类型；具体分类模型与数据集在运行配置中选择。",
-      "aliases": [
-        "classification",
-        "分类任务",
-        "分类训练"
-      ],
-      "category": "platform",
-      "source_evidence": [
-        "tasks/vision/classification/classification_task.py"
-      ],
-      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "tasks/vision/classification/classification_task.py"
-    },
-    {
       "id": "term.registry",
       "term": "Registry",
       "definition": "组件注册表。通过统一名称找到已注册的数据集、模型或任务，供运行入口调用。",
@@ -106,22 +90,6 @@
       ],
       "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
       "foundation": "dlbase/registry.py"
-    },
-    {
-      "id": "term.pipeline",
-      "term": "Pipeline",
-      "definition": "按顺序组织读取、检查、训练和评测的执行流程。",
-      "aliases": [
-        "pipeline",
-        "训练流程",
-        "执行流程"
-      ],
-      "category": "platform",
-      "source_evidence": [
-        "tasks/vision/classification/run.py"
-      ],
-      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "tasks/vision/classification/run.py"
     },
     {
       "id": "term.ast",
@@ -165,51 +133,6 @@
       ],
       "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
       "foundation": "conf/config.yaml"
-    },
-    {
-      "id": "term.tensor",
-      "term": "张量",
-      "definition": "按维度排列的数值集合；训练时常用它表示图像批次、特征和模型输出。",
-      "aliases": [
-        "tensor",
-        "张量"
-      ],
-      "category": "platform",
-      "source_evidence": [
-        "tasks/vision/classification/pipeline_checks.py"
-      ],
-      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "tasks/vision/classification/pipeline_checks.py"
-    },
-    {
-      "id": "term.mlp",
-      "term": "MLP",
-      "definition": "多层感知机，由多层全连接网络组成，可将特征映射为预测得分。",
-      "aliases": [
-        "MLP",
-        "多层感知机"
-      ],
-      "category": "platform",
-      "source_evidence": [
-        "models/vision/resnet18_mlp/resnet18_mlp.py"
-      ],
-      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "models/vision/resnet18_mlp/resnet18_mlp.py"
-    },
-    {
-      "id": "term.resnet_family",
-      "term": "ResNet",
-      "definition": "使用残差连接构建的神经网络家族；ResNet-18 是其中一种具体结构。",
-      "aliases": [
-        "ResNet",
-        "残差网络"
-      ],
-      "category": "platform",
-      "source_evidence": [
-        "models/vision/resnet18_mlp/resnet18_mlp.py"
-      ],
-      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "models/vision/resnet18_mlp/resnet18_mlp.py"
     },
     {
       "id": "term.tensorboard",
@@ -522,34 +445,6 @@
       "foundation": "dlbase/experiment_paths.py"
     },
     {
-      "id": "term.softmax",
-      "term": "Softmax",
-      "definition": "把模型产生的类别得分转换为加起来等于 1 的各类别概率。",
-      "aliases": [
-        "Softmax"
-      ],
-      "category": "platform",
-      "source_evidence": [
-        "tasks/vision/classification/classification_module.py"
-      ],
-      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "tasks/vision/classification/classification_module.py"
-    },
-    {
-      "id": "term.one_hot",
-      "term": "one-hot",
-      "definition": "一种标签表示方式，真实类别的位置为 1，其余类别位置为 0。",
-      "aliases": [
-        "one-hot"
-      ],
-      "category": "platform",
-      "source_evidence": [
-        "tasks/vision/classification/classification_module.py"
-      ],
-      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "tasks/vision/classification/classification_module.py"
-    },
-    {
       "id": "term.datamodule",
       "term": "DataModule",
       "definition": "把数据划分组织为训练、验证与测试加载器的组件。",
@@ -622,21 +517,6 @@
       ],
       "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
       "foundation": "research_datasets/NLP/prompts.py"
-    },
-    {
-      "id": "term.vision",
-      "term": "Vision",
-      "definition": "计算机视觉领域，主要处理图像数据及视觉任务，例如图像分类。",
-      "aliases": [
-        "Vision",
-        "视觉"
-      ],
-      "category": "platform",
-      "source_evidence": [
-        "models/vision/resnet18_mlp/resnet18_mlp.py"
-      ],
-      "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
-      "foundation": "models/vision/resnet18_mlp/resnet18_mlp.py"
     },
     {
       "id": "term.sparse_autoencoder",

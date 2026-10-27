@@ -1,12 +1,10 @@
 {
   "schema_version": 1,
-  "purpose": "Reviewed Code → scientific Knowledge and Code → Core project management ID links",
+  "purpose": "Reviewed SAEBase Code references to scientific Knowledge and Core architecture IDs",
   "mappings": [
     {
       "path": "research_datasets/datamodule.py",
-      "context_ids": [
-        "g.cub.dataset"
-      ],
+      "context_ids": [],
       "summary": "Lightning 数据模块通过 Registry 装配 Dataset。",
       "core_ids": [
         "g.dataset_gate"
@@ -21,30 +19,6 @@
       "summary": "NLP Prompt manifest 和数据来源的版本化产物接口。"
     },
     {
-      "path": "research_datasets/vision/CUB_200/CUB_200.py",
-      "context_ids": [
-        "g.cub.dataset"
-      ],
-      "summary": "对应模块的公开代码负责上述科研目标的实现；请以源码为准。",
-      "core_ids": [
-        "g.cub_dataset"
-      ]
-    },
-    {
-      "path": "research_datasets/vision/CUB_200/datamodule_setup.py",
-      "context_ids": [
-        "g.cub.dataset",
-        "g.cub.holdout",
-        "g.cub.validation"
-      ],
-      "summary": "配置 CUB-200 的训练、验证和测试划分；当前默认验证与测试同源。",
-      "core_ids": [
-        "g.split_integrity",
-        "g.cub_dataset",
-        "g.cub_eval_integrity"
-      ]
-    },
-    {
       "path": "dlbase/registry.py",
       "context_ids": [],
       "summary": "数据集、模型与任务的插件接口和中心注册表。",
@@ -54,10 +28,7 @@
     },
     {
       "path": "dlbase/summary_log.py",
-      "context_ids": [
-        "g.cub.metrics",
-        "g.cub.artifacts"
-      ],
+      "context_ids": [],
       "summary": "与具体任务无关的 summary.log 格式化和评测表验证。",
       "core_ids": [
         "g.artifact_schema"
@@ -65,9 +36,7 @@
     },
     {
       "path": "dlbase/train.py",
-      "context_ids": [
-        "g.cub.config"
-      ],
+      "context_ids": [],
       "summary": "Hydra 唯一训练入口，完成基础环境和配置校验后交给任务分发。",
       "core_ids": [
         "g.config"
@@ -80,18 +49,6 @@
       ],
       "core_ids": [],
       "summary": "Gemma-2 2B 基础模型身份及加载适配。"
-    },
-    {
-      "path": "models/vision/resnet18_mlp/resnet18_mlp.py",
-      "context_ids": [
-        "g.cub.resnet",
-        "g.cub.logits"
-      ],
-      "summary": "ResNet-18 主干以及可配置分类输出头。",
-      "core_ids": [
-        "g.model_gate",
-        "g.cub_model"
-      ]
     },
     {
       "path": "saebase/api/features.py",
@@ -252,55 +209,6 @@
         "g.llm_sae_training"
       ],
       "summary": "SAE 训练任务的统一入口。"
-    },
-    {
-      "path": "tasks/vision/classification/classification_module.py",
-      "context_ids": [
-        "g.cub.loss",
-        "g.cub.optimizer",
-        "g.cub.schedule"
-      ],
-      "summary": "分类任务的 Lightning Module、loss 与优化器配置。",
-      "core_ids": [
-        "g.pipeline",
-        "g.cub_optimization"
-      ]
-    },
-    {
-      "path": "tasks/vision/classification/pipeline_checks.py",
-      "context_ids": [
-        "g.cub.logits"
-      ],
-      "summary": "训练前组合兼容性及 logits 形状检查。",
-      "core_ids": [
-        "g.pipeline"
-      ]
-    },
-    {
-      "path": "tasks/vision/classification/post_train_eval.py",
-      "context_ids": [
-        "g.cub.metrics",
-        "g.cub.final_test"
-      ],
-      "summary": "对应模块的公开代码负责上述科研目标的实现；请以源码为准。",
-      "core_ids": [
-        "g.cub_eval_integrity"
-      ]
-    },
-    {
-      "path": "tasks/vision/classification/run.py",
-      "context_ids": [
-        "g.cub.optimizer",
-        "g.cub.checkpoint",
-        "g.cub.final_test"
-      ],
-      "summary": "分类任务训练流程、checkpoint 和训练后评测编排。",
-      "core_ids": [
-        "g.config",
-        "g.artifact_schema",
-        "g.cub_optimization",
-        "g.cub_eval_integrity"
-      ]
     }
   ],
   "knowledge_source": "doc/knowledge/context_graph.json",
