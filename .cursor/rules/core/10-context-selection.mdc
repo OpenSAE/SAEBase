@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Context Selection · Core 与科研 Knowledge 分离
 
-- `harness/core/project_graph.json` 是全项目架构、管理和设计树（Core），`doc/knowledge/context_graph.json` 是 CUB-200 × ResNet-18 具体科学任务树（Knowledge）；两者不得混淆。
+- `harness/core/project_graph.json` 是全项目架构、管理和设计树（Core），`doc/knowledge/context_graph.json` 是 SAE 的科研知识与证据树（Knowledge），两者按明确 ID 按需读取。
 - `doc/knowledge/glossary.json` 是科研术语的**唯一结构化字典**；Knowledge 节点只能使用已定义的 `term_ids`，新增术语先补定义/证据/背景说明再入树。
 - `doc/code/code_tree.json` 是真实 AST 派生快照；`doc/code/code_annotations.json` 中 `core_ids` 和 `context_ids` 必须分别引用 Core 和 Knowledge，不能未经验证从名字生成研究结论。
 - 未经用户明确指定某份文档、Work Order 或模块，不主动递归搜索、加载 `doc/` 或 `harness/`。修改代码仍应阅读实际相关业务源码、Hydra 配置与必要的测试。

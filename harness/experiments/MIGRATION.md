@@ -11,7 +11,7 @@
 | `experiment/tmp/` | `experiment/<dataset>/<model>/<task.path>/_tmp/<session>/` |
 | 无统一产物说明 | `<run>/metadata/run.json`（配置 hash、层级、类型目录） |
 
-默认 `task.path: classification`，因此没有 subtask 时既有 run leaf 的**目录名不变**。如果原来的 `basic_42` 已有产物，新的 `guard_existing_run` 会明确拒绝覆盖，需更换 sub_name/seed 或由用户显式设置 `experiment.overwrite=true`。不要为了迁移而自动启用覆盖。
+SAE Task 可分别使用 `capture`、`intervene`、`generate`、`circuits`、`explain`、`benchmark` 或 `train` 作为 `task.path`；目录按选择的 Task 独立组织。如果原来的 `basic_42` 已有产物，新的 `guard_existing_run` 会明确拒绝覆盖，需更换 sub_name/seed 或由用户显式设置 `experiment.overwrite=true`。不要为了迁移而自动启用覆盖。
 
 每次实验根目录还有 `analysis/<purpose>/<subpurpose>/`，每层分析叶子包含类型化目录以及 `metadata/context.json`，引用 `doc/knowledge/context_graph.json` 中的 Knowledge ID。运行 `python harness/experiments/validate.py <run-leaf>` 核对引用与产物结构。添加分组的 Python 函数是 `dlbase.experiment_paths.create_analysis_group`，而不是 Harness 中的运行时替代实现。
 

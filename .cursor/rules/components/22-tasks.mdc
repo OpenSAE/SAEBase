@@ -1,15 +1,14 @@
 ---
-description: Vision 与 LLM Task 契约、模块边界、执行与运行结果。
-globs: "tasks/**,conf/task/**,conf/tasks_log.md"
+description: 七类 LLM SAE Task 的职责、执行与实验产物契约。
+globs: "tasks/LLM/**,tasks/dlbase_plugins.py,conf/task/**,conf/tasks_log.md"
 alwaysApply: false
 ---
 
-# Task 领域边界
+# SAE Task 边界
 
-- Task 是领域相关、但不与具体 Dataset 或 Model 命名绑定的操作类型。Vision Task 位于 `tasks/vision/<name>/`，LLM Task 位于 `tasks/LLM/<name>/`。
-- 所有 Task 实现 `dlbase.registry.TaskModule` 的 `name` 和 `run(cfg)`，通过 `tasks/plugins.py` 注册、`tasks/runner.py` 分发。
-- 当前通用 Vision Task 是 `classification`。LLM 有 `capture`、`intervene`、`generate`、`circuits`、`explain`、`benchmark`、`train`。七个任务共同复用 `tasks/LLM/sae_runtime.py`，科学计算调用 SAEBase 已有接口。
-- Task 的方法说明须独立可读，具体 Model、Dataset 仅作为运行配置输入。任何注册表或通用 Task 名称均不能拼接模型或数据集身份。
-- 启动流程为 Dataset policy → Model compatibility → Task-specific checks。配置检查不加载权重，`execute: false` 只返回 `configured_only`。真实计算需要对应输入、资源及显式授权，并留下可追踪产物。
-- Vision 训练沿用原有 Lightning、optimizer、checkpoints 与指标实现。LLM 使用 SAEBase 的标准训练/生成/分析工具，外部后端和解释生成器按真实配置注入。
-- 修改数值方法、数据划分、checkpoint 选择时执行语义检查；已注册 Task 不代表 GPU 功能和科学结果经过端到端认证。
+- `tasks/LLM/` 包含 `capture`、`intervene`、`generate`、`circuits`、`explain`、`benchmark`、`train` 七个研究任务。
+- 所有通用 SAE Task 通过 `tasks/dlbase_plugins.py` 注册，`tasks/runner.py` 执行分发；SAEBase 原有 `tasks/plugins.py` 继续作为兼容入口。
+- `tasks/LLM/sae_runtime.py` 负责模型、SAE 权重、Prompt 身份与执行条件的公共校验。
+- 配置校验不得自动下载权重。真实计算需显式执行、审核环境预算与记录可追溯产物。
+- 生成和干预后端复用 SAEBase 实现，避免引入重复的默认入口与行为。
+- 修改数值、输入来源、checkpoint 或 SAE 特征语义时补充契约与行为回归。

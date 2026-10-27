@@ -6,7 +6,7 @@ description: 用户指定 OpenResearch Work Order，或需要选择 Core、科�
 # 执行 Work Order v3
 
 1. 只读取用户点名的 `.cursor/work_orders/<ID>.yaml`，运行 `python .cursor/skills/workflow/run-work-order/scripts/validate_work_order.py <ID>`。未成功验证，不按该工单执行。
-2. 区分两个不同的结构：`core_ids` 描述**项目架构/研发管理**，通过 `python harness/core/select.py <IDs>` 获取；`knowledge_ids` 描述**CUB-200 ResNet 科研问题与目标**，通过 `python harness/knowledge/select.py <IDs>` 获取；`term_ids` 用 `python harness/knowledge/terms.py <IDs>` 获取统一术语定义。只读指定 ID，避免上下文污染。
+2. 区分两个不同的结构：`core_ids` 描述**项目架构/研发管理**，通过 `python harness/core/select.py <IDs>` 获取；`knowledge_ids` 描述 **LLM SAE 研究问题与源码依据**，通过 `harness/knowledge/select.py <IDs>` 按需读取。
 3. 读取 `context.doc.required`；`optional` 文件仅在当前任务需要时读取。涉及科学概念必须服从 `doc/knowledge/glossary.json` 和 `foundations/`；不得重新发明同义术语。
 4. 仅执行显式 `activation.<module>=true` 的功能：`core`、`code`、`knowledge`、`experiments`、`transfer`、`environment`。否则不主动遍历该目录。参考区 `harness/github_work_plan/` 只能按 `context.harness.read_only` 中的具体文件只读参考。
 5. `activation.code=true` 且涉及修改代码时，先运行 `harness/code/build.py` 保存 Before，记录 Expected（Core ID 与 Knowledge ID 各自准确），完成后重新 AST 构建并使用 `harness/code/diff.py` 比较。不能拿 Expected 冒充 Observed。
