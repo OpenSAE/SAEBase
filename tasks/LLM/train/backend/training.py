@@ -82,6 +82,40 @@ class TrainPlan:
             raise FileNotFoundError("Cannot resume without native checkpoint directory")
 
 
+def _transformer_lens_model_name(model_path: str) -> str:
+    """Map a Hugging Face cache snapshot directory to its official model id.
+
+    TransformerLens resolves ``model_name`` against its official catalog before
+    opening files. A validated local snapshot such as
+    ``models--google--gemma-2-2b/snapshots/<rev>`` is the cached copy of
+    ``google/gemma-2-2b``; the directory itself is not an official name.
+    """
+    parts = Path(model_path).parts
+    if "snapshots" in parts:
+        index = parts.index("snapshots")
+        if index > 0 and parts[index - 1].startswith("models--"):
+            return parts[index - 1].removeprefix("models--").replace("--", "/")
+    return model_path
+
+
+def _open_local_training_dataset(dataset_path: str):
+    """Load a local corpus SAELens cannot open with ``load_dataset(path)``.
+
+    ``save_to_disk`` directories and JSON files are the formats this smoke
+    uses. A Hugging Face dataset id is left for SAELens itself.
+    """
+    path = Path(dataset_path)
+    if path.is_dir() and (path / "dataset_info.json").is_file():
+        from datasets import load_from_disk
+
+        return load_from_disk(str(path))
+    if path.is_file() and path.suffix in {".json", ".jsonl"}:
+        from datasets import load_dataset
+
+        return load_dataset("json", data_files=str(path), split="train")
+    return None
+
+
 def _saelens_train(plan: TrainPlan, checkpoint_dir: Path) -> None:
     """Original SAELens v6 nested config; its trainer computes real activations."""
     from sae_lens import (  # type: ignore[import-not-found]
@@ -105,8 +139,11 @@ def _saelens_train(plan: TrainPlan, checkpoint_dir: Path) -> None:
     if plan.architecture == "topk":
         options["k"] = plan.k
     sae = config_class(**options)
+    # TransformerLens rejects a snapshot directory. The cache folder name is
+    # the official id; callers keep the directory as the validated local copy.
+    model_name = _transformer_lens_model_name(plan.model_path)
     runner = LanguageModelSAERunnerConfig(
-        model_name=plan.model_path,
+        model_name=model_name,
         hook_name=plan.hookpoint,
         dataset_path=plan.dataset_path,
         dataset_trust_remote_code=False,
@@ -117,15 +154,26 @@ def _saelens_train(plan: TrainPlan, checkpoint_dir: Path) -> None:
         context_size=plan.ctx_len,
         seed=0,
         device=plan.device,
-        dtype="float32",
+        # Runner ``dtype`` is the SAE/activation dtype. HookedTransformer still
+        # loads float32 unless this is forwarded; Gemma-2 2B float32 does not
+        # fit a 12GB GPU. float16 matches models.hooked_lm_common.
+        dtype="float16",
+        model_from_pretrained_kwargs={
+            "dtype": "float16",
+            "center_writing_weights": False,
+        },
         n_checkpoints=1,
         checkpoint_path=str(checkpoint_dir),
         save_final_checkpoint=True,
         output_path=str(checkpoint_dir / "inference"),
         resume_from_checkpoint=plan.resume_checkpoint,
         logger=LoggingConfig(log_to_wandb=False),
+        store_batch_size_prompts=min(8, plan.max_examples),
+        n_batches_in_buffer=2,
     )
-    LanguageModelSAETrainingRunner(runner).run()
+    LanguageModelSAETrainingRunner(
+        runner, override_dataset=_open_local_training_dataset(plan.dataset_path)
+    ).run()
 
 
 def _sparsify_command(plan: TrainPlan) -> list[str]:
