@@ -13,10 +13,10 @@ from harness.code.interfaces import parse_file, function_interface
 CODE_TARGETS = {
     "q.modularity": "code:function:dlbase.registry:register_dataset",
     "s.registry": "code:function:dlbase.registry:register_dataset",
-    "s.compatibility": "code:function:research_datasets.plugins:_register_builtin_datasets",
+    "s.compatibility": "code:function:dlbase.registry:get_dataset_plugin",
     "s.hydra": "code:function:dlbase.train:main",
     "g.registry": "code:function:dlbase.registry:register_model",
-    "g.dataset_gate": "code:function:research_datasets.plugins:_register_builtin_datasets",
+    "g.dataset_gate": "code:function:dlbase.registry:get_dataset_plugin",
     "g.model_gate": "code:function:models.LLM.gemma2_2b_base.model_task_dataset_compatibility:assert_compatible",
     "g.pipeline": "code:function:tasks.runner:run_task",
     "g.config": "code:function:dlbase.train:main",

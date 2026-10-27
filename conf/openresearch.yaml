@@ -1,7 +1,7 @@
 defaults:
   - dataset: ioi
   - model: openresearch_gemma2_2b_base
-      - paths: default
+  - paths: default
   - task: capture
   - experiment: default
   - _self_
