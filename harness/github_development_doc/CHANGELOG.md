@@ -48,7 +48,7 @@
 - **Benchmark evidence archive:** Checksum-verified compact evidence release, offline verifier, explicit raw-file recovery checks, and a publication workflow gated on successful main-branch CI. Original GPU runs are not reconstructed from summaries.
 
 <!-- BEGIN VERIFIED_MODEL_SUPPORT -->
-- **Verified model and SAE coverage (2026-10-16):** **48/48** real-checkpoint compatibility tests, **48/48** benchmark evaluations on 64 held-out prompt groups, and **48/48** reliability audits across **18** model-SAE configurations. See the [verified model and SAE matrix](harness/github_development_doc/verified-model-matrix.md).
+- **Verified model and SAE coverage (2026-10-16):** **48/48** real-checkpoint compatibility tests, **48/48** benchmark evaluations on 64 held-out prompt groups, and **48/48** reliability audits across **18** model-SAE configurations. See the [verified model and SAE matrix](verified-model-matrix.md).
 <!-- END VERIFIED_MODEL_SUPPORT -->
 
 - **Earlier CPU checkpoint evidence:** 21/21 original CPU SAE weight/encode/decode checks with loaded-parameter hashes, a separately rechecked Gemma Scope 9B L20 source, and three genuine small-model benchmark and reliability runs (5 metric rows and 3 reliability audits per model). Original artifacts are linked from machine-readable ledgers. These CPU-era findings preceded the subsequently completed 48-site verification summarized above.
