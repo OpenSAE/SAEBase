@@ -4,7 +4,7 @@ from __future__ import annotations
 import math
 import torch
 from saebase.api import ModelAdapter, ActivationSite
-from tasks.LLM.intervene.backend import MeasurementSample
+from tasks.intervene.backend import MeasurementSample
 
 
 @torch.no_grad()
