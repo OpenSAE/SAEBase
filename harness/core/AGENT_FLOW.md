@@ -14,8 +14,8 @@
 在仓库根目录运行：
 
 ```bash
-python -m harness.core.agent_flow inspect OR-Knowledge-Demo-20261026
-python -m harness.core.agent_flow serve OR-Knowledge-Demo-20261026 --port 8766
+python -m harness.core.agent_flow inspect EXISTING_PLAN_ID
+python -m harness.core.agent_flow serve EXISTING_PLAN_ID --port 8766
 ```
 
 浏览器打开终端打印的完整地址，其中 `#key=...` 只在当前本地审阅服务会话有效。**不要将包含 Key 的地址提交到 GitHub。**
