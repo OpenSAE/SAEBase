@@ -24,7 +24,7 @@ def select_terms(glossary: dict, ids: list[str]) -> dict:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("ids", nargs="+", help="Stable term ID, e.g. term.resnet18")
+    parser.add_argument("ids", nargs="+", help="Stable term ID, e.g. term.sae")
     args = parser.parse_args()
     try:
         glossary = json.loads(GLOSSARY.read_text(encoding="utf-8"))

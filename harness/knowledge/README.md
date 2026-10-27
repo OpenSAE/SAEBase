@@ -8,7 +8,7 @@
 python harness/knowledge/validate.py
 python harness/knowledge/context_attributes.py
 python harness/knowledge/select.py q.cub.train s.cub.model
-python harness/knowledge/terms.py term.resnet18 term.logits
+python harness/knowledge/terms.py term.sae term.sae.capture
 ```
 
 [Context 浏览器](https://atheavenma.github.io/opensae/openresearch/atlas/context.html) 支持在对应节点卡片中展开文字、公式、示意图及实际代码。

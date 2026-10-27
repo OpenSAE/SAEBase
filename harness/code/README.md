@@ -11,4 +11,3 @@ python harness/visualization/export.py
 python harness/code/diff.py --before /tmp/code_before.json --after doc/code/code_tree.json
 ```
 
-树与源码的关系以稳定 ID、源码路径和行号表示。当前 ResNet 的前向接口、分类训练接口以及训练数据读取接口都可在 Code 节点展开。

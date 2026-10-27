@@ -1,1 +1,1 @@
-"""Shared dataset registry and DataModule; implementations under vision/ and NLP/."""
+"""NLP prompt sources and dataset registry for SAE research."""

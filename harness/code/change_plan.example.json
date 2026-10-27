@@ -4,7 +4,7 @@
   "expected": [
     {
       "operation": "add",
-      "id": "code:method:tasks.classification.classification_module:ClassificationModule.predict_step"
+      "id": "code:method:saebase.api.model:ModelAdapter.forward_logits"
     }
   ],
   "knowledge_refs": [

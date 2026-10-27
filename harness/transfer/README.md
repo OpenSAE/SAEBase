@@ -4,13 +4,13 @@
 
 ```bash
 # 先本机安装 rclone 并在用户配置区定义 b2remote。不要将密钥写入项目或 Work Order。
-python harness/transfer/b2.py push --local experiment/CUB_200 --remote b2remote:my-bucket/openresearch/CUB_200
+python harness/transfer/b2.py push --local experiment/IOI --remote b2remote:my-bucket/openresearch/IOI
 # 用户确认后才真正传输：
-python harness/transfer/b2.py push --local experiment/CUB_200 --remote b2remote:my-bucket/openresearch/CUB_200 --execute
+python harness/transfer/b2.py push --local experiment/IOI --remote b2remote:my-bucket/openresearch/IOI --execute
 # 传输后只读校验：
-python harness/transfer/b2.py verify --local experiment/CUB_200 --remote b2remote:my-bucket/openresearch/CUB_200 --execute
+python harness/transfer/b2.py verify --local experiment/IOI --remote b2remote:my-bucket/openresearch/IOI --execute
 # 需要从 B2 恢复时：
-python harness/transfer/b2.py pull --local ./restore/CUB_200 --remote b2remote:my-bucket/openresearch/CUB_200 --execute
+python harness/transfer/b2.py pull --local ./restore/IOI --remote b2remote:my-bucket/openresearch/IOI --execute
 ```
 
 使用 `rclone copy` 而非 `sync`，**不会主动删除目标端的额外文件**；也不使用 `purge`。可通过重复同一个 `copy` 任务实现增量传输/失败重试。完整性校验使用 `rclone check --one-way`，依据后端可用的校验和；大文件的哈希支持受后端能力约束。命令没有 `--execute` 时只显示计划，避免误触发传输。

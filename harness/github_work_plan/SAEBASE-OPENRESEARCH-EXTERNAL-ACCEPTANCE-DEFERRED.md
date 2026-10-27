@@ -25,7 +25,7 @@
 
 原因：本次无可供授权的外部数据版本、网络下载额度与独立数据源许可证核查。
 
-1. 对 `research_datasets/NLP` 与现有 `saebase/data` 的重叠数据集（CounterFact、GreaterThan、IOI、MMLUPro、SimpleCopying）建立名称、split、prompt/text/token、来源 revision 的一致性矩阵。BBH、SubjectVerbAgreement 及 CUB-200 另列。
+1. 对 `research_datasets/NLP` 与现有 `saebase/data` 的重叠数据集（CounterFact、GreaterThan、IOI、MMLUPro、SimpleCopying）建立名称、split、prompt/text/token、来源 revision 的一致性矩阵。BBH、SubjectVerbAgreement 及其他来源另列。
 2. 真实下载时固定 revision，检查第三方 `datasets`、`transformer_lens` 和 `sae_lens` 能在 SAEBase 命名空间中正常导入。用只读数据样本检查 `research_datasets` 路径，避免改变旧 `saebase/data` 产物或已发布结果。
 3. 对 Research Lab 原生 Hugging Face streaming、dataset object、tokenizer 接口进行端到端读取测试，检验 schema、shuffle/revision 与缓存行为，确认实验不会静默使用不同数据划分。
 

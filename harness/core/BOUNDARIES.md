@@ -3,7 +3,7 @@
 ## 分工
 
 1. **Core** 只管理全项目架构、开发目标、模块间标准与已有实现的状态。其图 `project_graph.json` 不能作为数据集/模型的科学理论。
-2. **Knowledge** 定义具体 CUB-200 ResNet 分类研究问题、目标、背景和术语字典，权威在 `doc/knowledge/`。用户未指定性能阈值，不可预设“训练好”的数值标准。
+2. **Knowledge** 维护 SAE 特征捕获、干预、解释、评测与训练问题，权威信息在 `doc/knowledge/`，研究结果依据真实实验单独验证。
 3. **Code** 生成 AST 类/函数图，派生数据放 `doc/code/`；`core_ids` 和 `context_ids` 分别引用两棵权威图。不能让人工图直接覆盖真实源码。
 4. **Environment** 由设备现场探测；真实值与虚构环境示例严格分离。
 5. **Experiments** 的生产协议写在 `dlbase/experiment_paths.py` 和 `conf/`，Harness 只验证/解释这些产物，不能成为训练主循环依赖。

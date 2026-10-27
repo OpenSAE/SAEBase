@@ -56,7 +56,7 @@ python harness/knowledge/validate.py
 使用 `OR-Atlas-MultiTree-Demo-20261026` 可以检查 Knowledge、Code、Environment、Context 之间的连续翻页（Core 不参与）。同一画布切换视图和节点，保留 Atlas 聚焦、缩放与进度。
 
 - Knowledge：`g.cub.agent_review_test`，位于分类训练方案下，具备科研问题、输入、预测输出和验收占位。
-- Code：`Resnet18MLP.atlas_review_probe`，位于真实类节点下，展示**提议**签名、参数、返回信息；不会创建 Python 方法。
+- Code：在真实 SAEBase 类与方法节点下审阅新接口提案，标注参数、返回值和实际源码依据。
 - Environment：`env:atlas_test_gpu_profile`，位于 GPU 分支下，设备型号、显存和驱动信息均为显式测试值。
 - Context：`term.atlas_test_calibration`，位于 Training 术语分组下，提供示意定义、公式、别名与用途。
 
