@@ -10,11 +10,9 @@
   <a href="#-quick-start"><b>🚀 Quick Start</b></a> &nbsp; | &nbsp;
   <a href="#-research-harness"><b>🧭 Harness</b></a> &nbsp; | &nbsp;
   <a href="#-research-workflows"><b>🔬 Workflows</b></a> &nbsp; | &nbsp;
-  <a href="#-research-lab"><b>🧪 Research Lab</b></a> &nbsp; | &nbsp;
-  <a href="#-documentation"><b>📚 Documentation</b></a>
+  <a href="https://huggingface.co/spaces/OpenSAE/SAEBase"><b>🤗 Research Lab</b></a> &nbsp; | &nbsp;
+  <a href="https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation"><b>🤗 Evaluation Dataset</b></a>
 </p>
-
-🤗 **Hugging Face:** [SAEBase Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Evaluation Dataset](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation)
 
 ---
 
@@ -26,20 +24,13 @@ SAEBase includes a research Harness for organizing code, scientific knowledge, e
 
 | Atlas Tree | Explore |
 | --- | --- |
-| **[Core](harness/core/project_graph.json)** | Project architecture, component responsibilities and research structure |
-| **[Knowledge](doc/knowledge/context_graph.json)** | Scientific questions, methods, goals and supporting evidence |
-| **[Code](harness/code/build.py)** | Source-backed Python modules, classes, functions and interfaces |
-| **[Environment](harness/environment/probe.py)** | GPU/CPU resources, dependencies and execution environments |
-| **[Context](doc/knowledge/glossary.json)** | Research terminology, definitions and implementation links |
+| **[Core](https://atheavenma.github.io/opensae/openresearch/atlas/core.html)** | Project architecture, component responsibilities and research structure |
+| **[Knowledge](https://atheavenma.github.io/opensae/openresearch/atlas/knowledge.html)** | Scientific questions, methods, goals and supporting evidence |
+| **[Code](https://atheavenma.github.io/opensae/openresearch/atlas/code.html)** | Source-backed Python modules, classes, functions and interfaces |
+| **[Environment](https://atheavenma.github.io/opensae/openresearch/atlas/environment.html)** | GPU/CPU resources, dependencies and execution environments |
+| **[Context](https://atheavenma.github.io/opensae/openresearch/atlas/context.html)** | Research terminology, definitions and implementation links |
 
 **Agent Harness:** [Agent Flow](harness/core/AGENT_FLOW.md) for structured reviews · [Cursor rules and skills](.cursor/) for coding agents · [Experiment tracking](harness/experiments/README.md) for reproducible research.
-
-**Open interactive Atlas:** [Core](https://atheavenma.github.io/opensae/openresearch/atlas/core.html) · [Knowledge](https://atheavenma.github.io/opensae/openresearch/atlas/knowledge.html) · [Code](https://atheavenma.github.io/opensae/openresearch/atlas/code.html) · [Environment](https://atheavenma.github.io/opensae/openresearch/atlas/environment.html) · [Context](https://atheavenma.github.io/opensae/openresearch/atlas/context.html) · [Local source and deployment guide](harness/visualization/README.md)
-
-```bash
-python .cursor/hooks/validate_repo.py --full
-python -m saebase.runtime.train --cfg job
-```
 
 ## 🧭 Overview
 
@@ -53,12 +44,17 @@ SAEBase connects pretrained models, SAE dictionaries, activation measurements, c
 
 ## ✨ Highlights
 
-- 🧠 **Model and SAE support.** Registered checkpoints, named activation sites, compatible adapters and verified model/SAE identities.
-- 🗃️ **Reusable activations.** Resumable sharded caches, lossless SAE codes, selected-token measurements and integrity checks.
-- 🎛️ **Feature interventions.** Identity, ablation, scaling, clamping, addition, coalitions and reconstruction, with downstream logit and behavioral readouts.
-- ⚡ **Faster experiments.** Opt-in suffix replay and KV-cached steering, including live tokenwise SAE edits and vLLM decoder-direction steering.
-- 📊 **Benchmarking and reliability.** Reconstruction, sparsity and behavioral metrics, paired comparisons, prompt-group bootstrap and negative controls.
-- 🧩 **Research integrations.** Original SAR and RSS estimators, Input Localization and verified imports of native SAEBench results.
+🧠 **Model and SAE support.** Registered checkpoints, named activation sites, compatible adapters and verified model/SAE identities.
+
+🗃️ **Reusable activations.** Resumable sharded caches, lossless SAE codes, selected-token measurements and integrity checks.
+
+🎛️ **Feature interventions.** Identity, ablation, scaling, clamping, addition, coalitions and reconstruction, with downstream logit and behavioral readouts.
+
+⚡ **Faster experiments.** Opt-in suffix replay and KV-cached steering, including live tokenwise SAE edits and vLLM decoder-direction steering.
+
+📊 **Benchmarking and reliability.** Reconstruction, sparsity and behavioral metrics, paired comparisons, prompt-group bootstrap and negative controls.
+
+🧩 **Research integrations.** Original SAR and RSS estimators, Input Localization and verified imports of native SAEBench results.
 
 ## 🧪 Research Lab
 

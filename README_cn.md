@@ -10,11 +10,9 @@
   <a href="#-快速开始"><b>🚀 快速开始</b></a> &nbsp; | &nbsp;
   <a href="#-research-harness"><b>🧭 Harness</b></a> &nbsp; | &nbsp;
   <a href="#-研究工作流"><b>🔬 研究工作流</b></a> &nbsp; | &nbsp;
-  <a href="#-research-lab"><b>🧪 Research Lab</b></a> &nbsp; | &nbsp;
-  <a href="#-文档"><b>📚 文档</b></a>
+  <a href="https://huggingface.co/spaces/OpenSAE/SAEBase"><b>🤗 Research Lab</b></a> &nbsp; | &nbsp;
+  <a href="https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation"><b>🤗 Evaluation Dataset</b></a>
 </p>
-
-🤗 **Hugging Face：** [SAEBase Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Evaluation Dataset](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation)
 
 ---
 
@@ -26,20 +24,13 @@ SAEBase 集成了用于组织代码、科研知识、实验、运行环境和 Ag
 
 | Atlas Tree | 内容 |
 | --- | --- |
-| **[Core](harness/core/project_graph.json)** | 项目架构、组件职责与科研结构 |
-| **[Knowledge](doc/knowledge/context_graph.json)** | 科研问题、方法、目标与证据 |
-| **[Code](harness/code/build.py)** | 基于真实 Python 源码的模块、类、函数与接口 |
-| **[Environment](harness/environment/probe.py)** | GPU/CPU 资源、依赖及运行环境 |
-| **[Context](doc/knowledge/glossary.json)** | 科研术语、定义与实现关联 |
+| **[Core](https://atheavenma.github.io/opensae/openresearch/atlas/core.html)** | 项目架构、组件职责与科研结构 |
+| **[Knowledge](https://atheavenma.github.io/opensae/openresearch/atlas/knowledge.html)** | 科研问题、方法、目标与证据 |
+| **[Code](https://atheavenma.github.io/opensae/openresearch/atlas/code.html)** | 基于真实 Python 源码的模块、类、函数与接口 |
+| **[Environment](https://atheavenma.github.io/opensae/openresearch/atlas/environment.html)** | GPU/CPU 资源、依赖及运行环境 |
+| **[Context](https://atheavenma.github.io/opensae/openresearch/atlas/context.html)** | 科研术语、定义与实现关联 |
 
 **Agent Harness：** [Agent Flow](harness/core/AGENT_FLOW.md) 进行结构化审阅 · [Cursor Rules 和 Skills](.cursor/) 支持 Agent 编程 · [实验追踪](harness/experiments/README.md) 管理可复现的科研流程。
-
-**直接打开交互 Atlas：** [Core](https://atheavenma.github.io/opensae/openresearch/atlas/core.html) · [Knowledge](https://atheavenma.github.io/opensae/openresearch/atlas/knowledge.html) · [Code](https://atheavenma.github.io/opensae/openresearch/atlas/code.html) · [Environment](https://atheavenma.github.io/opensae/openresearch/atlas/environment.html) · [Context](https://atheavenma.github.io/opensae/openresearch/atlas/context.html) · [源码及部署说明](harness/visualization/README.md)
-
-```bash
-python .cursor/hooks/validate_repo.py --full
-python -m saebase.runtime.train --cfg job
-```
 
 ## 🧭 概览
 
@@ -53,12 +44,17 @@ SAEBase 将预训练模型、SAE 字典、激活测量、受控特征干预、�
 
 ## ✨ 核心能力
 
-- 🧠 **模型与 SAE。** 已注册 checkpoint、明确的激活位置、模型适配器及来源身份校验。
-- 🗃️ **可复用的激活。** 支持恢复的分片缓存、无损 SAE 编码、指定 token 测量和完整性校验。
-- 🎛️ **特征干预。** Identity、ablation、scaling、clamping、addition、coalition 和 reconstruction，支持测量下游 logits 与行为变化。
-- ⚡ **高速执行。** 可选的 suffix replay、逐 token SAE KV 缓存干预，以及 vLLM decoder-direction steering。
-- 📊 **基准与可靠性。** 重构、稀疏性、行为指标、配对比较、按 prompt group 的 Bootstrap 与负对照。
-- 🧩 **研究集成。** 原始 SAR、RSS 估计器、Input Localization，以及已验证的 SAEBench 原生结果导入。
+🧠 **模型与 SAE。** 已注册 checkpoint、明确的激活位置、模型适配器及来源身份校验。
+
+🗃️ **可复用的激活。** 支持恢复的分片缓存、无损 SAE 编码、指定 token 测量和完整性校验。
+
+🎛️ **特征干预。** Identity、ablation、scaling、clamping、addition、coalition 和 reconstruction，支持测量下游 logits 与行为变化。
+
+⚡ **高速执行。** 可选的 suffix replay、逐 token SAE KV 缓存干预，以及 vLLM decoder-direction steering。
+
+📊 **基准与可靠性。** 重构、稀疏性、行为指标、配对比较、按 prompt group 的 Bootstrap 与负对照。
+
+🧩 **研究集成。** 原始 SAR、RSS 估计器、Input Localization，以及已验证的 SAEBench 原生结果导入。
 
 ## 🧪 Research Lab
 

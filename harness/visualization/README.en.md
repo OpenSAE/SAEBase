@@ -1,0 +1,49 @@
+# OpenResearch Atlas: Source-Backed Research Trees
+
+Core, Knowledge, Code, Environment, and Context share a centered, expandable tree interface with node focus, relationships, and source evidence. Core, Knowledge, Code, and Context describe evidence-backed project or research content. Environment displays measured or explicitly synthetic execution resources.
+
+## Interaction
+
+Click the child-count control to expand or collapse a branch. Select a card to focus its node while preserving neighboring branches. Expand **Attributes and Evidence** to view the node's explanation inside the tree. Resizing occurs within the same canvas; Fit is an explicit user action.
+
+Function cards show signatures, parameters, types, defaults, return meanings, and source excerpts. Class cards expose members and methods. Module cards collect actual functions and classes. Context cards define scientific and engineering terminology, source links, and relevant formulas; Knowledge cards distinguish research questions from implemented APIs.
+
+The display prioritizes evidence-backed explanations and links to actual Python source and related Context definitions.
+
+## Build and validation
+
+```bash
+python harness/core/validate.py
+python harness/knowledge/validate.py
+python harness/knowledge/context_attributes.py
+python harness/code/build.py
+python harness/visualization/export.py
+python harness/visualization/build_pages.py
+python -m http.server 8765
+```
+
+Open [Core](https://atheavenma.github.io/opensae/openresearch/atlas/core.html), [Knowledge](https://atheavenma.github.io/opensae/openresearch/atlas/knowledge.html), [Code](https://atheavenma.github.io/opensae/openresearch/atlas/code.html), [Environment](https://atheavenma.github.io/opensae/openresearch/atlas/environment.html), or [Context](https://atheavenma.github.io/opensae/openresearch/atlas/context.html). The public environment view may include clearly labeled synthetic resources.
+
+The published Atlas is maintained in a separate website repository. Its HTML, JavaScript, language overlay, and generated graph data must remain compatible. Updating the source repository alone does not publish a new site snapshot.
+
+## Component hierarchy
+
+Code Tree follows actual source directories, responsibilities, Python modules, classes and functions, and methods. A navigation parent should display no more than ten immediate children. Grouping reflects real module responsibilities and does not introduce new Python functionality.
+
+Individual datasets, models, and seven SAE research operations are shown separately. Configuration is attached to the corresponding task rather than embedded in a generic task name.
+
+## Node semantics and languages
+
+Node titles describe what each implementation does. Python identifiers, source line numbers, signatures, input and output contracts, and complete methods are available inside the expanded node. `harness/code/semantic_titles.py` and `harness/code/presentation.py` generate source-linked titles and details.
+
+Every Tree has Chinese and English display content linked by immutable node IDs. Context term definitions come from `doc/knowledge/glossary.json` and `doc/knowledge/atlas_terms.json`; the runtime English overlay is in `harness/visualization/locale-data.js`. Switching languages must preserve node focus, expansion, and review state without changing identifiers or evidence.
+
+English Markdown counterparts use the same document ID and a `.en.md` suffix where the original is Chinese. A missing translation must be reported rather than treated as an English scientific explanation. See [Atlas bilingual contract](ATLAS_I18N_PLAN.md).
+
+## Human review
+
+The existing tree supports human-review drafts. Purple represents unchecked, red an approved but not implemented placeholder, and gray a denied proposal. Review navigation follows actual tree order, with selectors and keyboard shortcuts; it does not turn a proposal into verified scientific evidence.
+
+A local authenticated review service can persist permitted decisions. The public GitHub Pages interface only saves local browser drafts, which may be exported and separately reviewed; it does not write directly to GitHub.
+
+See the [Agent review process](../core/AGENT_FLOW.en.md). Status remains independently evidenced per node, and published snapshots do not substitute for hardware tests or research verification.

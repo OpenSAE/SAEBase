@@ -36,7 +36,7 @@ Keep authoritative scientific data and evidence in existing JSON; retain languag
 
 Use stable documentation IDs and a paired locale representation for every Markdown document shown in Atlas. Original source path remains authoritative; the localized representation is a sibling or an i18n overlay, with explicit mappings in a manifest. Preserve heading anchors, internal links, code fences, citations, tables, equations, file paths and exact commands. A language switch must route to the same document ID and heading in the other locale.
 
-For every `doc/**` Markdown source displayed in the documentation reader, provide both `zh` and `en` versions before marking bilingual coverage complete. Also include any documentation from `harness/**`, README files, and other repository areas if linked from a Tree node. Distinguish technical source evidence from reader-facing explanatory documents: source code is always verbatim.
+Every Markdown document referenced by an Atlas authority graph must have an English version. If the original Markdown is Chinese, provide a paired `.en.md` file and record its path in `locale-data.js`; an original English Markdown file requires no duplicate. Chinese Markdown is optional. Source code and experimental identifiers always remain verbatim. The five Atlas trees themselves must support both Chinese and English.
 
 ## Export and frontend
 
@@ -57,4 +57,6 @@ The public Atlas lives in the website repository and must receive its correspond
 
 ## Deployment status
 
-Specification only. This file does not establish that translations or the published Atlas switch are implemented.
+Implemented for source-backed Core, Knowledge, Code, Environment, and Context nodes through `locale-data.js` and the `i18n.js` language switch. Context includes reviewed English definitions for all terms in the two authoritative glossaries; the runtime also provides English, source-anchored descriptions for other graph nodes. Linked Chinese Markdown documents have English companions mapped by stable source paths. The corresponding public Atlas scripts and HTML assets are published in the website repository.
+
+The `harness/github_work_test/test_atlas_localization.cjs` check enforces coverage for authoritative Context terms and the English versions of Markdown documents directly referenced by Atlas authority sources. Historical Work Plans and unrelated Markdown are outside this reader-facing coverage declaration. Browser interaction, language persistence, and published-site freshness still require their own acceptance checks.

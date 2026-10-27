@@ -45,6 +45,8 @@ jobs:
           node --check harness/visualization/app.js
           node --check harness/visualization/i18n.js
           node --check harness/visualization/atlas-public-balance.js
+          node --check harness/visualization/locale-data.js
+          node harness/github_work_test/test_atlas_localization.cjs
   offline-tests:
     runs-on: ubuntu-latest
     strategy:

@@ -42,6 +42,8 @@ const technical=(el)=>!!el?.closest?.("code,pre,kbd,.code-source,.source-code,.s
 function localize(raw,el){
  if(!raw||!CJK.test(raw))return raw;
  if(EXACT[raw.trim()])return raw.replace(raw.trim(),EXACT[raw.trim()]);
+ const known=window.OPENRESEARCH_ATLAS_I18N?.en?.[raw.trim()];
+ if(typeof known==="string"&&known.trim())return raw.replace(raw.trim(),known);
  // Preserve exact code excerpts and recorded source facts.
  if(technical(el))return raw;
  // Localized overlays can provide translated strings without changing underlying graph data.
@@ -55,6 +57,18 @@ function updateText(node){
  const source=native.get(node);
  const next=locale==="en"?localize(source,el):(ZH_UI[source.trim()]||source);
  if(node.nodeValue!==next)node.nodeValue=next;
+}
+// Documentation links follow stable source document IDs across languages.
+function translateLinks(root=document){
+ const english=window.OPENRESEARCH_ATLAS_I18N?.docs||{};
+ for(const anchor of root.querySelectorAll?.("a[href]")||[]){
+  if(!anchor.dataset.atlasOriginalHref)anchor.dataset.atlasOriginalHref=anchor.getAttribute("href");
+  const raw=anchor.dataset.atlasOriginalHref;
+  let resolved=raw;
+  const hit=raw.match(/^(https:\/\/github\.com\/OpenSAE\/SAEBase\/blob\/main\/)([^?#]+)(.*)$/);
+  if(hit&&locale==="en"&&english[hit[2]])resolved=hit[1]+english[hit[2]]+hit[3];
+  if(resolved!==anchor.getAttribute("href"))anchor.setAttribute("href",resolved);
+ }
 }
 function translate(root=document){
  const walk=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let node;
@@ -70,6 +84,7 @@ function translate(root=document){
    if(el.getAttribute(attr)!==value)el.setAttribute(attr,value);
   }
  }
+ translateLinks(root);
  document.documentElement.lang=locale==="zh"?"zh-CN":"en";
  document.querySelectorAll("#atlasLanguageSwitch button").forEach(button=>{
   const selected=button.dataset.lang===locale;
