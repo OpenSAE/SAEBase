@@ -20,7 +20,7 @@
 
 ## 🧭 Research Harness
 
-**[OpenResearch](https://github.com/OpenSAE/OpenResearch) · 开发中**
+**OpenResearch · 开发中**
 
 SAEBase 集成了用于组织代码、科研知识、实验、运行环境和 Agent 协作的 Research Harness。**Atlas** 将这些内容组织为五棵相互关联的研究 Tree。
 
@@ -34,7 +34,7 @@ SAEBase 集成了用于组织代码、科研知识、实验、运行环境和 Ag
 
 **Agent Harness：** [Agent Flow](harness/core/AGENT_FLOW.md) 进行结构化审阅 · [Cursor Rules 和 Skills](.cursor/) 支持 Agent 编程 · [实验追踪](harness/experiments/README.md) 管理可复现的科研流程。
 
-**查看：** [Atlas 可视化](harness/visualization/README.md) · [Harness 介绍](harness/README.md) · [OpenResearch GitHub](https://github.com/OpenSAE/OpenResearch)
+**查看：** [Atlas 可视化](harness/visualization/README.md) · [Harness 介绍](harness/README.md)
 
 ```bash
 python .cursor/hooks/validate_repo.py --full
