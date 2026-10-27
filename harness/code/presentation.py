@@ -49,7 +49,7 @@ for _task, _title in {
 }.items():
     MODULES[f"tasks/{_task}/task.py"] = (_title, "调用对应的 SAE 实验实现与验证接口。")
 CLASSES = {
-    "DLBaseDataModule": ("NLP 数据管理", "装配来自独立 Prompt 来源的训练与评测记录。"),
+    "SAEBaseDataModule": ("NLP 数据管理", "装配来自独立 Prompt 来源的训练与评测记录。"),
     "DatasetPlugin": ("数据集注册接口", "定义 Prompt 数据集的加载及任务兼容条件。"),
     "ModelPlugin": ("模型注册接口", "记录 LLM 构建与任务适配方式。"),
     "TaskPlugin": ("SAE Task 注册接口", "连接已实现的研究任务与调度入口。"),

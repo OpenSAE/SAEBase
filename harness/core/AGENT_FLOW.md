@@ -20,7 +20,7 @@ python -m harness.core.agent_flow serve OR-Knowledge-Demo-20261026 --port 8766
 
 浏览器打开终端打印的完整地址，其中 `#key=...` 只在当前本地审阅服务会话有效。**不要将包含 Key 的地址提交到 GitHub。**
 
-每次通过/否决都会立刻写入 `harness/github_harness/github_work_plan/agent_flow/<ID>.json`；通过合法空 Knowledge 新节点，还会写入 `doc/knowledge/context_graph.json` 和 `doc/knowledge/glossary.json`，执行原有 Knowledge/Glossary 验证。服务器返回保存成功后才会自动切换节点。关闭页面不回滚已确认的操作。每次点击都受 JSON revision 和来源 SHA 限制；若其他程序改过权威图，将拒绝过期的审阅。
+每次通过/否决都会立刻写入 `harness/github_work_plan/agent_flow/<ID>.json`；通过合法空 Knowledge 新节点，还会写入 `doc/knowledge/context_graph.json` 和 `doc/knowledge/glossary.json`，执行原有 Knowledge/Glossary 验证。服务器返回保存成功后才会自动切换节点。关闭页面不回滚已确认的操作。每次点击都受 JSON revision 和来源 SHA 限制；若其他程序改过权威图，将拒绝过期的审阅。
 
 ## 与科研实验的审批是两件事
 
@@ -51,13 +51,12 @@ python harness/knowledge/validate.py
 
 对于未配置写入后端的公开网页，颜色与本地 JSON 草稿是可持续的**审阅草稿**，不是源数据事实；要更新项目 JSON，使用本地服务或把导出的草稿交由受授权的人类审核合并。
 
-## 四棵 Tree 的实例审阅
+## 多棵 Tree 的实例审阅
 
-使用 `OR-Atlas-MultiTree-Demo-20261026` 可以检查 Knowledge、Code、Environment、Context 之间的连续翻页（Core 不参与）。同一画布切换视图和节点，保留 Atlas 聚焦、缩放与进度。
+Knowledge、Code、Environment、Context 与 Core 共用一套 Atlas 节点交互与来源验证。
+以实际存在并已通过来源校验的 Agent Flow ID 进入审阅页面，依照计划中的节点和证据导航。
+测试提案、样例设备、未存在的计划 ID 不构成真实科研证据。
 
-- Knowledge：`g.cub.agent_review_test`，位于分类训练方案下，具备科研问题、输入、预测输出和验收占位。
-- Code：在真实 SAEBase 类与方法节点下审阅新接口提案，标注参数、返回值和实际源码依据。
-- Environment：`env:atlas_test_gpu_profile`，位于 GPU 分支下，设备型号、显存和驱动信息均为显式测试值。
-- Context：`term.atlas_test_calibration`，位于 Training 术语分组下，提供示意定义、公式、别名与用途。
-
-公开页面每个 Approve/Deny 只保存浏览器 JSON 草稿；本地审阅服务保存 Plan Ledger，批准知识节点时同步更新 Knowledge/Glossary。其他测试提案不写入实际模型源码、设备探测或术语权威源。严格禁止将示意字段作为真实测量证据。
+公开页面的 Approve/Deny 只保存浏览器草稿。本地审阅服务在
+`harness/github_work_plan/agent_flow/` 写入经身份与版本检查的审阅决定，
+并按审批结果更新允许修改的权威图。未经核验的示例数据不得写入实际科研结果。

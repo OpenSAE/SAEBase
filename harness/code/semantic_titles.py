@@ -165,14 +165,14 @@ GENERIC_CURATED = {
 
 def module_semantics(path: str) -> str:
     parts = PurePosixPath(path).parts
-    if len(parts) >= 4 and parts[:2] == ("research_datasets", "NLP"):
-        subject = DATASET_SUBJECTS.get(parts[2], "语言模型评测样本")
+    if len(parts) >= 3 and parts[0] == "datasets":
+        subject = DATASET_SUBJECTS.get(parts[1], "语言模型评测样本")
         filename = parts[-1].lower()
         if filename == "tokenize.py":
             return "为" + subject + "构建 Token 编码"
         if filename == "prepare.py":
             return "准备" + subject + "的原始输入"
-        if filename.lower() == (parts[2].lower() + ".py"):
+        if filename.lower() == (parts[1].lower() + ".py"):
             return "读取" + subject + "与目标标签"
     if path.startswith("tasks/benchmark/"):
         relative = path[len("tasks/benchmark/") :]
