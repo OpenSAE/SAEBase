@@ -15,7 +15,7 @@ SPEC = BaseModelSpec(
     notes="EleutherAI Pythia-70M deduped; residual SAEs via sae_lens.",
 )
 
-from saebase.data.prompt_schema import behaviors_for_model
+from saebase.datasets.prompt_schema import behaviors_for_model
 
 SUPPORTED_BEHAVIORS: frozenset[str] = behaviors_for_model("pythia70m")
 

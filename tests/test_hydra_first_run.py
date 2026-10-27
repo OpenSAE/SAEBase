@@ -17,7 +17,7 @@ def _run(cwd: Path, *overrides: str) -> subprocess.CompletedProcess[str]:
     env["PYTHONPATH"] = str(ROOT)
     env["HYDRA_FULL_ERROR"] = "1"
     return subprocess.run(
-        [sys.executable, "-m", "dlbase.train", *overrides],
+        [sys.executable, "-m", "saebase.runtime.train", *overrides],
         cwd=cwd,
         env=env,
         capture_output=True,
@@ -68,7 +68,7 @@ def test_failed_task_keeps_the_run_leaf(tmp_path: Path):
     assert "generator" in result.stderr.lower() or "RuntimeError" in result.stderr
 
 
-@pytest.mark.parametrize("name", ["conf/openresearch.yaml"])
+@pytest.mark.parametrize("name", ["conf/sae_research.yaml"])
 def test_openresearch_config_disables_hydra_file_log(name: str):
     text = (ROOT / name).read_text(encoding="utf-8")
     assert "override hydra/job_logging: stdout" in text

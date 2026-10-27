@@ -11,16 +11,16 @@ import ast
 from harness.code.interfaces import parse_file, function_interface
 
 CODE_TARGETS = {
-    "q.modularity": "code:function:dlbase.registry:register_dataset",
-    "s.registry": "code:function:dlbase.registry:register_dataset",
-    "s.compatibility": "code:function:dlbase.registry:get_dataset_plugin",
-    "s.hydra": "code:function:dlbase.train:main",
-    "g.registry": "code:function:dlbase.registry:register_model",
-    "g.dataset_gate": "code:function:dlbase.registry:get_dataset_plugin",
-    "g.model_gate": "code:function:models.LLM.gemma2_2b_base.model_task_dataset_compatibility:assert_compatible",
-    "g.pipeline": "code:function:tasks.runner:run_task",
-    "g.config": "code:function:dlbase.train:main",
-    "g.artifact_schema": "code:function:dlbase.experiment_paths:prepare_run",
+    "q.modularity": "code:function:saebase.registry:register_dataset",
+    "s.registry": "code:function:saebase.registry:register_dataset",
+    "s.compatibility": "code:function:saebase.registry:get_dataset_plugin",
+    "s.hydra": "code:function:saebase.runtime.train:main",
+    "g.registry": "code:function:saebase.registry:register_model",
+    "g.dataset_gate": "code:function:saebase.registry:get_dataset_plugin",
+    "g.model_gate": "code:function:models.gemma2_2b_base.model_task_dataset_compatibility:assert_compatible",
+    "g.pipeline": "code:function:saebase.runner:run_task",
+    "g.config": "code:function:saebase.runtime.train:main",
+    "g.artifact_schema": "code:function:saebase.runtime.experiment_paths:prepare_run",
 }
 TERM_TARGETS = {}
 

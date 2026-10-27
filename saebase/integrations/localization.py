@@ -17,8 +17,10 @@ import numpy as np
 import torch
 
 from saebase.api import ActivationSite, ModelAdapter, SAEIdentity, capture_features
-from saebase.data.controlled_inputs import (
-    ControlledInputDesign, ControlledInputManifest, load_controlled_input_manifest,
+from saebase.datasets.controlled_inputs import (
+    ControlledInputDesign,
+    ControlledInputManifest,
+    load_controlled_input_manifest,
 )
 
 
@@ -29,7 +31,11 @@ def _ordered_states(values: Mapping[int, str], n_factors: int, *, label: str) ->
     if not isinstance(values, Mapping):
         raise TypeError(f"{label} must map integer Boolean state masks to strings")
     count = 1 << n_factors
-    if len(values) != count or any(type(mask) is not int for mask in values) or set(values) != set(range(count)):
+    if (
+        len(values) != count
+        or any(type(mask) is not int for mask in values)
+        or set(values) != set(range(count))
+    ):
         raise ValueError(f"{label} must have exactly the state keys 0..{count - 1}")
     ordered = tuple(values[i] for i in range(count))
     if any(not isinstance(v, str) or not v.strip() for v in ordered):
@@ -58,13 +64,19 @@ class LocalizationGrid:
         if type(self.n_factors) is not int or self.n_factors < 1:
             raise ValueError("n_factors must be a positive integer")
         z = np.asarray(self.codes)
-        if (z.ndim != 2 or z.shape[0] != (1 << self.n_factors)
-                or z.shape[1] < 1 or not np.issubdtype(z.dtype, np.number)
-                or not np.isfinite(z).all()):
+        if (
+            z.ndim != 2
+            or z.shape[0] != (1 << self.n_factors)
+            or z.shape[1] < 1
+            or not np.issubdtype(z.dtype, np.number)
+            or not np.isfinite(z).all()
+        ):
             raise ValueError("codes must be finite [2**n_factors, n_features] data")
-        if (len(self.state_sample_ids) != len(z)
-                or len(set(self.state_sample_ids)) != len(z)
-                or any(not isinstance(s, str) or not s.strip() for s in self.state_sample_ids)):
+        if (
+            len(self.state_sample_ids) != len(z)
+            or len(set(self.state_sample_ids)) != len(z)
+            or any(not isinstance(s, str) or not s.strip() for s in self.state_sample_ids)
+        ):
             raise ValueError("state_sample_ids must identify every input state uniquely")
         if self.activations is not None:
             h = np.asarray(self.activations)
@@ -73,8 +85,10 @@ class LocalizationGrid:
         if self.identity is not None:
             if z.shape[1] != self.identity.d_sae:
                 raise ValueError("SAE identity/code dimension mismatch")
-            if self.site is not None and (self.site.hook_name != self.identity.hook_name
-                                           or self.site.layer != self.identity.layer):
+            if self.site is not None and (
+                self.site.hook_name != self.identity.hook_name
+                or self.site.layer != self.identity.layer
+            ):
                 raise ValueError("SAE identity site differs from requested site")
 
     @property
@@ -118,8 +132,11 @@ class LocalizationResult:
             "assignment_cost": sum(int(mask).bit_count() for mask in self.assignment),
             "source": self.grid.source,
             "design_key": self.grid.design_key,
-            "site": ({"layer": site.layer, "hook_name": site.hook_name,
-                       "position": site.position} if site is not None else None),
+            "site": (
+                {"layer": site.layer, "hook_name": site.hook_name, "position": site.position}
+                if site is not None
+                else None
+            ),
             "identity": self.grid.identity.to_dict() if self.grid.identity else None,
             "estimator_version": self.estimator_version,
             "exact_source_sha256": self.exact_source_sha256,
@@ -155,12 +172,14 @@ def collect_localization_grid(
         prompts = _ordered_states(prompts_by_state, n_factors, label="prompts_by_state")
         records = None
     codes, activations = [], []
-    if identity is not None and (identity.hook_name != site.hook_name
-                                 or identity.layer != site.layer):
+    if identity is not None and (
+        identity.hook_name != site.hook_name or identity.layer != site.layer
+    ):
         raise ValueError("SAE identity site differs from requested site")
     for index, prompt in enumerate(prompts):
-        selected_site = (replace(site, position=design.states[index].position)
-                         if design is not None else site)
+        selected_site = (
+            replace(site, position=design.states[index].position) if design is not None else site
+        )
         if records is None:
             snapshot = capture_features(model, sae, site=selected_site, prompt=prompt)
         else:
@@ -169,11 +188,17 @@ def collect_localization_grid(
         codes.append(snapshot.codes.detach().cpu().numpy().astype(np.float64, copy=True))
         activations.append(snapshot.activation.detach().cpu().numpy().astype(np.float64, copy=True))
     return LocalizationGrid(
-        codes=np.stack(codes), activations=np.stack(activations),
+        codes=np.stack(codes),
+        activations=np.stack(activations),
         n_factors=n_factors,
-        state_sample_ids=(tuple(state.sample_id for state in design.states)
-                          if design is not None else tuple(f"state-{i}" for i in range(len(prompts)))),
-        source="saebase.capture_features", site=site, identity=identity,
+        state_sample_ids=(
+            tuple(state.sample_id for state in design.states)
+            if design is not None
+            else tuple(f"state-{i}" for i in range(len(prompts)))
+        ),
+        source="saebase.capture_features",
+        site=site,
+        identity=identity,
         design_key=design.key if design is not None else None,
     )
 
@@ -214,24 +239,34 @@ def localization_grid_from_code_store(
         raise ValueError("code store must have its SAEBase parent activation store")
     code_identity = codes_reader.manifest["identity"]
     activation_identity = activation_reader.manifest["identity"]
-    if controlled is not None and controlled.activation_identity_key != activation_reader.manifest["identity_key"]:
+    if (
+        controlled is not None
+        and controlled.activation_identity_key != activation_reader.manifest["identity_key"]
+    ):
         raise ValueError("controlled input manifest belongs to a different activation cache")
     if code_identity["activation_key"] != activation_reader.manifest["identity_key"]:
         raise ValueError("SAE code cache no longer matches its parent activation store")
-    if site is not None and (site.hook_name != activation_identity["hook_name"]
-                             or site.layer != activation_identity["layer"]):
+    if site is not None and (
+        site.hook_name != activation_identity["hook_name"]
+        or site.layer != activation_identity["layer"]
+    ):
         raise ValueError("requested site differs from cached activation site")
     if identity is not None:
         cached_sae = code_identity["sae"]
-        if (identity.sae_key != cached_sae["sae_key"]
-                or identity.d_in != cached_sae["d_in"]
-                or identity.d_sae != cached_sae["d_sae"]):
+        if (
+            identity.sae_key != cached_sae["sae_key"]
+            or identity.d_in != cached_sae["d_in"]
+            or identity.d_sae != cached_sae["d_sae"]
+        ):
             raise ValueError("SAE identity differs from cached SAE codes")
-        if (identity.hook_name != activation_identity["hook_name"]
-                or identity.layer != activation_identity["layer"]):
+        if (
+            identity.hook_name != activation_identity["hook_name"]
+            or identity.layer != activation_identity["layer"]
+        ):
             raise ValueError("SAE identity site differs from cached activation site")
     rows = []
     from saebase.store import fingerprint
+
     for mask, sample_id in enumerate(sample_ids):
         if not codes_reader.has(sample_id) or not activation_reader.has(sample_id):
             raise ValueError(f"missing cached input state: {sample_id}")
@@ -241,24 +276,37 @@ def localization_grid_from_code_store(
             raise ValueError("Localize requires exactly one captured token position per state")
         if code_sample.positions != activation_sample.positions:
             raise ValueError("code and activation positions differ")
-        if replace(code_sample.record, source_activation_sha256=None).key != activation_sample.record.key:
+        if (
+            replace(code_sample.record, source_activation_sha256=None).key
+            != activation_sample.record.key
+        ):
             raise ValueError("SAE codes and parent activations have different sample metadata")
         if controlled is not None:
             expected = controlled.states[mask]
-            site_digest = fingerprint({
-                "token_ids": list(code_sample.record.token_ids),
-                "positions": list(code_sample.positions),
-            })
-            if (site_digest != expected["token_site_sha256"]
-                    or code_sample.positions[0] != expected["position"]):
+            site_digest = fingerprint(
+                {
+                    "token_ids": list(code_sample.record.token_ids),
+                    "positions": list(code_sample.positions),
+                }
+            )
+            if (
+                site_digest != expected["token_site_sha256"]
+                or code_sample.positions[0] != expected["position"]
+            ):
                 raise ValueError("controlled input manifest token or position mismatch")
-        sha = hashlib.sha256(np.asarray(activation_sample.values, dtype=np.float32).tobytes(order="C")).hexdigest()
+        sha = hashlib.sha256(
+            np.asarray(activation_sample.values, dtype=np.float32).tobytes(order="C")
+        ).hexdigest()
         if code_sample.record.source_activation_sha256 != sha:
             raise ValueError("cached SAE code source-activation checksum mismatch")
         rows.append(np.array(code_sample.values[0], dtype=np.float64, copy=True))
     return LocalizationGrid(
-        codes=np.stack(rows), n_factors=n_factors, state_sample_ids=sample_ids,
-        source="saebase.code_store", site=site, identity=identity,
+        codes=np.stack(rows),
+        n_factors=n_factors,
+        state_sample_ids=sample_ids,
+        source="saebase.code_store",
+        site=site,
+        identity=identity,
         design_key=controlled.design_key if controlled is not None else None,
     )
 
@@ -292,8 +340,12 @@ def evaluate_localization(
     """
     if not isinstance(grid, LocalizationGrid):
         raise TypeError("grid must be a LocalizationGrid")
-    if (isinstance(relative_omission, bool) or not np.isscalar(relative_omission)
-            or not np.isfinite(relative_omission) or not 0 <= relative_omission <= 1):
+    if (
+        isinstance(relative_omission, bool)
+        or not np.isscalar(relative_omission)
+        or not np.isfinite(relative_omission)
+        or not 0 <= relative_omission <= 1
+    ):
         raise ValueError("relative_omission must be between 0 and 1")
     if pairs_per_scope is not None and (type(pairs_per_scope) is not int or pairs_per_scope < 1):
         raise ValueError("pairs_per_scope must be a positive integer or None")
@@ -314,9 +366,12 @@ def evaluate_localization(
     if not 0 <= budget < expected_length:
         raise ValueError("original Localize estimator returned invalid budget")
     assignment = np.asarray(native.assignment(budget)).copy()
-    if (assignment.shape != (grid.n_features,)
-            or not np.issubdtype(assignment.dtype, np.integer)
-            or np.any(assignment < 0) or np.any(assignment >= 1 << grid.n_factors)):
+    if (
+        assignment.shape != (grid.n_features,)
+        or not np.issubdtype(assignment.dtype, np.integer)
+        or np.any(assignment < 0)
+        or np.any(assignment >= 1 << grid.n_factors)
+    ):
         raise ValueError("original Localize estimator returned invalid feature scopes")
     estimated = None
     if pairs_per_scope is not None:
@@ -330,12 +385,21 @@ def evaluate_localization(
             raise ValueError("original Localize paired estimator returned an invalid curve")
     source = getattr(original.exact_scope_curve, "__code__", None)
     filename = source.co_filename if source is not None else None
-    digest = (hashlib.sha256(Path(filename).read_bytes()).hexdigest()
-              if filename and Path(filename).is_file() else None)
+    digest = (
+        hashlib.sha256(Path(filename).read_bytes()).hexdigest()
+        if filename and Path(filename).is_file()
+        else None
+    )
     return LocalizationResult(
-        curve=curve, assignment=assignment, budget=budget, total_variance=variance,
-        relative_omission=float(relative_omission), grid=grid,
+        curve=curve,
+        assignment=assignment,
+        budget=budget,
+        total_variance=variance,
+        relative_omission=float(relative_omission),
+        grid=grid,
         estimator_version=getattr(original, "__version__", None),
-        exact_source_sha256=digest, estimated_curve=estimated,
-        pairs_per_scope=pairs_per_scope, seed=seed if pairs_per_scope is not None else None,
+        exact_source_sha256=digest,
+        estimated_curve=estimated,
+        pairs_per_scope=pairs_per_scope,
+        seed=seed if pairs_per_scope is not None else None,
     )

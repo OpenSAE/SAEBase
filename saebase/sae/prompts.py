@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from saebase.data.artifact_layout import canonicalize_behavior
-from saebase.data.prompt_store import load_manifest, load_prompts
+from saebase.datasets.artifact_layout import canonicalize_behavior
+from saebase.datasets.prompt_store import load_manifest, load_prompts
 from saebase.sae.contracts import assert_manifest_matches
 
 

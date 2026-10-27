@@ -1,7 +1,7 @@
 """Validate integrated SAEBase source structure, Cursor hooks and Python syntax.
 
-The existing public SAEBase package is intentionally preserved alongside
-OpenResearch's DLBase, dataset and task execution layers.
+The unified SAEBase package integrates research datasets, models, tasks,
+runtime and its OpenResearch-compatible Harness.
 """
 
 from __future__ import annotations
@@ -36,15 +36,13 @@ def check(full: bool = False) -> list[str]:
         "saebase/data/__init__.py",
         "saebase/cli.py",
         "models/plugins.py",
-        "models/dlbase_plugins.py",
         "tasks/plugins.py",
-        "tasks/dlbase_plugins.py",
-        "research_datasets/plugins.py",
-        "research_datasets/NLP/artifacts.py",
-        "dlbase/train.py",
-        "dlbase/registry.py",
+        "datasets/plugins.py",
+        "datasets/artifacts.py",
+        "saebase/runtime/train.py",
+        "saebase/registry.py",
         "conf/config.yaml",
-        "conf/openresearch.yaml",
+        "conf/sae_research.yaml",
         "harness/core/agent_flow.py",
         "harness/knowledge/validate.py",
         "harness/code/build.py",
@@ -56,7 +54,7 @@ def check(full: bool = False) -> list[str]:
     if "saebase" not in policy.get("approved_roots", []):
         errors.append("SAEBase root must be registered in the policy")
     if full:
-        for directory in ("saebase", "dlbase", "datasets", "models", "tasks", "harness"):
+        for directory in ("saebase", "datasets", "models", "tasks", "harness"):
             for path in (ROOT / directory).rglob("*.py"):
                 try:
                     ast.parse(path.read_text(encoding="utf-8"), filename=str(path))

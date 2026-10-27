@@ -49,4 +49,4 @@ rows = generate(
 python -m saebase.generate.nnsight_worker smoke --model-id /path/to/weights --layer 0
 ```
 
-`generate` 协议模式依赖原研究工作区尚未随 SAEBase 发布的 task 实现，因此当前独立版本只开放相应预检与基础 worker 能力。详见 [`docs/PHASE_C.md`](../../docs/PHASE_C.md)。
+`generate` 协议模式依赖原研究工作区尚未随 SAEBase 发布的 task 实现，因此当前独立版本只开放相应预检与基础 worker 能力。详见 [`harness/github_development_doc/PHASE_C.md`](../../harness/github_development_doc/PHASE_C.md)。

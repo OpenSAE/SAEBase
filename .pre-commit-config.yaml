@@ -17,7 +17,7 @@ repos:
         always_run: true
       - id: ruff-new
         name: Ruff lint and format for newly added Python files
-        entry: python scripts/check_new_python_quality.py
+        entry: python saebase/tools/check_new_python_quality.py
         language: system
         pass_filenames: false
         always_run: true

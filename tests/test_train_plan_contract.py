@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from tasks.LLM.train.backend.training import TrainPlan, _plan_identity, run_training
+from tasks.train.backend.training import TrainPlan, _plan_identity, run_training
 
 
 def _plan(tmp_path: Path, **overrides) -> TrainPlan:

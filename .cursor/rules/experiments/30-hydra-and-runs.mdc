@@ -1,18 +1,17 @@
 ---
-description: Hydra 配置、训练命令、实验目录和产物维护约定。
-globs: "conf/**,dlbase/train.py,dlbase/training/**,dlbase/summary_log.py,tasks/**"
+description: SAEBase Hydra 配置、科研执行与可追溯产物约定。
+globs: "conf/**,saebase/runtime/**,tasks/**"
 alwaysApply: false
 ---
 
 # 实验与复现
 
-- 所有正式训练从仓库根执行 python -m dlbase.train；先用 python -m dlbase.train --cfg job 检查组合（这一步不代替真实训练/兼容性测试）。
-- Python 解释器与 pip 安装环境保持一致；使用 requirements.txt，优先检查运行时错误而不是盲目改依赖。
-- conf/config.yaml 用 defaults 组合 dataset/model/task/train/logger/paths/experiment；配置事实以 Hydra 合成值为准。
-- paths.root 由 dlbase_repo_root resolver 决定；paths.data_dir 默认 /workspace/data，数据存仓库外，可按机器覆盖。
-- 运行目录为 experiment/<dataset>/<model>/<task.path 中的层级>/<sub_name>_<seed>/，由 dlbase.experiment_paths 统一验证。每个叶子含 checkpoints/、metrics/、tables/、figures/、logs/、metadata/、reports/、tmp/；同名产物默认禁止覆盖，显式 experiment.overwrite=true 才可以替换。
-- 单次实验 sub_name 默认为 basic；Sweep 名称应短且只编码发生变化的参数。
-- facets 控制 checkpoint、早停、logger、TensorBoard、summary.log 等可选机制；不通过运行时私自覆盖 YAML 默认值。
-- 如用户明确要求后台训练，仅使用 tmux，并将启动 stdout/stderr 写入 experiment/<dataset>/<model>/<task.path>/_tmp/<session>/，而不是已废弃的全局 experiment/tmp/ 或可能被清理的 run 叶子；默认前台运行。长训练必须保存恢复信息，但不能承诺对话结束后继续监控。
-- Smoke 使用临时数据、短执行路径和可清理产物；禁止把一次 smoke 伪装成完整科研回归。
-- summary.log 的格式化由 dlbase/summary_log.py 负责，具体指标及 adapter 由 Task 提供。不要在 dlbase 硬编码某个具体任务的指标含义。
+- 新增七类 SAE 操作由 `python -m saebase.runtime.train` 执行，首先以 `--cfg job` 验证 Hydra 配置，不自动启动模型。
+- `conf/sae_research.yaml` 组合 Dataset、Model、Task、Paths、Experiment；历史 `conf/config.yaml` 继续服务兼容的 `saebase` 工作流。
+- `paths.root` 默认通过 Hydra 运行时工作目录确定；`paths.data_dir` 为 `${paths.root}/data`，可以显式覆盖并校验来源。
+- 新研究运行目录按 `experiment/<dataset>/<model>/<task.path>/<sub_name>_<seed>/` 组织，必须保留完整配置、模型身份和来源记录。
+- `saebase/runtime/experiment_paths.py` 防止覆盖已有产物。只有明确授权和显式配置的覆盖操作才可替换记录。
+- `summary.log` 由 `saebase/runtime/summary_log.py` 维护，具体数值含义由 Task 自行定义。
+- Lightning/TensorBoard 属于按需依赖，不应成为不使用训练辅助能力的简单配置检查的前置条件。
+- 最小 Smoke 使用临时工作目录和可追溯记录，不作为完整科研或 GPU 验收。
+- 长训练必须由用户明确批准，并保存恢复信息；不要承诺对话结束后继续监控。

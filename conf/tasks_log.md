@@ -1,5 +1,8 @@
 # SAEBase Task Registry
 
-当前统一任务包括 `capture`、`intervene`、`generate`、`circuits`、`explain`、`benchmark` 和 `train`。
+正式 SAE 操作包括 `capture`、`intervene`、`generate`、`circuits`、`explain`、`benchmark` 和 `train`。
 
-七类研究操作通过 `tasks/dlbase_plugins.py` 注册，由 `dlbase.train` 根据 Hydra 配置分发。真实模型、权重、数据来源与授权条件需由每个任务验证。默认 `execute: false` 仅用于检查配置，不启动模型计算。
+七类操作在 `tasks/plugins.py` 中通过 `saebase/registry.py` 统一注册，由
+`saebase/runner.py` 根据 Hydra `task.name` 分派。
+`python -m saebase.runtime.train --cfg job` 仅展示合成配置，不会加载模型或启动计算。
+真实实验应先通过任务准入、权重来源、身份、数据划分及执行授权校验。

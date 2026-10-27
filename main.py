@@ -5,6 +5,7 @@ Typical usage::
   python main.py --task sae --model pythia70m --prompt-source SimpleCopying \
     --sae pythia70m_resid_sm --layer 3 --data-dir ./data --device cpu
 """
+
 from __future__ import annotations
 
 import argparse
@@ -14,7 +15,7 @@ import sys
 
 from saebase.runtime import verify_runtime
 from saebase.sae.registry import DEFAULT_SAE_FOR_MODEL, SAE_KEYS, get_profile
-from saebase.data.artifact_layout import BEHAVIOR_ALIASES
+from saebase.datasets.artifact_layout import BEHAVIOR_ALIASES
 
 
 def _project_root() -> Path:
@@ -32,23 +33,43 @@ def parse_args(argv: list[str] | None = None):
     p.add_argument("--n-prompts", type=int, default=5)
     p.add_argument("--prompt-format", default=None)
     p.add_argument("--sub-path", default="basic")
-    p.add_argument("--data-dir", "--data-root", dest="data_dir", default=None,
-                   help="Prepared prompt root, relative to invocation directory")
-    p.add_argument("--run-dir", default=None,
-                   help="Hydra run output directory, relative to invocation directory")
+    p.add_argument(
+        "--data-dir",
+        "--data-root",
+        dest="data_dir",
+        default=None,
+        help="Prepared prompt root, relative to invocation directory",
+    )
+    p.add_argument(
+        "--run-dir",
+        default=None,
+        help="Hydra run output directory, relative to invocation directory",
+    )
     p.add_argument("--seed", type=int, default=1)
     p.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
-    p.add_argument("--list", action="store_true", help="List registered tasks, models and SAE profiles")
+    p.add_argument(
+        "--list", action="store_true", help="List registered tasks, models and SAE profiles"
+    )
     return p.parse_known_args(argv)
 
 
 def _prompt_source_group(name: str) -> str:
-    from saebase.data.artifact_layout import canonicalize_behavior
+    from saebase.datasets.artifact_layout import canonicalize_behavior
+
     canonical = canonicalize_behavior(name)
     # These are the canonical-to-Hydra groups shipped in conf/prompt_source/.
-    group = next((alias for alias, target in BEHAVIOR_ALIASES.items()
-                  if target == canonical and alias == alias.lower() and "-" not in alias), None)
-    if group is None or not (_project_root()/"conf"/"prompt_source"/(group+".yaml")).is_file():
+    group = next(
+        (
+            alias
+            for alias, target in BEHAVIOR_ALIASES.items()
+            if target == canonical and alias == alias.lower() and "-" not in alias
+        ),
+        None,
+    )
+    if (
+        group is None
+        or not (_project_root() / "conf" / "prompt_source" / (group + ".yaml")).is_file()
+    ):
         raise ValueError(f"Prompt source {name!r} has no bundled Hydra configuration")
     return group
 
@@ -57,7 +78,7 @@ def _absolute_from_caller(value: str | None, caller: Path) -> str | None:
     if value is None:
         return None
     path = Path(value).expanduser()
-    return str((path if path.is_absolute() else caller/path).resolve())
+    return str((path if path.is_absolute() else caller / path).resolve())
 
 
 def build_overrides(args: argparse.Namespace, caller: Path) -> list[str]:
@@ -112,8 +133,11 @@ def main() -> None:
     args, unknown = parse_args()
     if args.list:
         from saebase.registry import (
-            list_registered_model_keys, list_registered_sae_keys, list_registered_task_keys
+            list_registered_model_keys,
+            list_registered_sae_keys,
+            list_registered_task_keys,
         )
+
         print("Tasks:", ", ".join(list_registered_task_keys()))
         print("Models:", ", ".join(list_registered_model_keys()))
         print("SAEs:", ", ".join(list_registered_sae_keys()))

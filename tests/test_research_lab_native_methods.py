@@ -12,7 +12,7 @@ import numpy as np
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "apps" / "research-lab"))
+sys.path.insert(0, str(ROOT / "saebase" / "research_lab"))
 
 from backend.core import digest, has_complete_identity, load_sites  # noqa: E402
 from backend.methods import run_rss, run_sar  # noqa: E402

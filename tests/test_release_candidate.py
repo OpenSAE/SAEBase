@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from scripts import release_candidate as gate
+from saebase.tools import release_candidate as gate
 
 SHA = "a" * 40
 
@@ -21,7 +21,7 @@ def fake_project(tmp_path: Path, version: str = "0.3.0") -> tuple[Path, Path]:
     root.mkdir(parents=True)
     dist.mkdir(parents=True)
     (root / "saebase").mkdir()
-    (root / "docs" / "releases").mkdir(parents=True)
+    (root / "harness" / "github_development_doc" / "releases").mkdir(parents=True)
     entrypoints = {
         "saebase": "saebase.cli:main",
         "saebase-prepare-prompts": "saebase.cli:prepare_prompts",
@@ -44,7 +44,7 @@ def fake_project(tmp_path: Path, version: str = "0.3.0") -> tuple[Path, Path]:
     (root / "CHANGELOG.md").write_text(
         f"# Changelog\n\n## {version} - Candidate\n", encoding="utf-8"
     )
-    (root / "docs" / "releases" / f"v{version}.md").write_text(
+    (root / "harness" / "github_development_doc" / "releases" / f"v{version}.md").write_text(
         "# Candidate\n\nRelease notes.\n", encoding="utf-8"
     )
     (root / "LICENSE").write_text("Apache License, Version 2.0\n", encoding="utf-8")
@@ -68,7 +68,7 @@ def fake_project(tmp_path: Path, version: str = "0.3.0") -> tuple[Path, Path]:
             "saebase/__init__.py",
             "LICENSE",
             "CHANGELOG.md",
-            f"docs/releases/v{version}.md",
+            f"harness/github_development_doc/releases/v{version}.md",
         ):
             payload = (root / name).read_bytes()
             entry = tarfile.TarInfo(f"opensae_saebase-{version}/{name}")
@@ -98,7 +98,7 @@ def test_version_must_match_package_source_and_notes(tmp_path, monkeypatch):
     with pytest.raises(ValueError, match="disagree"):
         gate.project_info(root)
     (root / "saebase" / "__init__.py").write_text('__version__ = "0.3.0"\n', encoding="utf-8")
-    (root / "docs" / "releases" / "v0.3.0.md").unlink()
+    (root / "harness" / "github_development_doc" / "releases" / "v0.3.0.md").unlink()
     with pytest.raises(ValueError, match="notes missing"):
         gate.project_info(root)
 

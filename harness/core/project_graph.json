@@ -30,8 +30,8 @@
       "description": "问题：新增 Dataset、Model、Task 时如何维持清晰边界与兼容性？",
       "status": "implemented",
       "evidence": [
-        "dlbase/registry.py",
-        "tasks/runner.py"
+        "saebase/registry.py",
+        "saebase/runner.py"
       ],
       "next": "为每个扩展点增加契约测试。",
       "environment_refs": []
@@ -44,7 +44,7 @@
       "status": "partial",
       "evidence": [
         "conf/config.yaml",
-        "dlbase/summary_log.py"
+        "saebase/runtime/summary_log.py"
       ],
       "next": "标准化结构化产物与运行元数据。",
       "environment_refs": []
@@ -80,8 +80,8 @@
       "description": "方案：通过数据集、模型和任务三个插件注册表维护清晰的组件边界。",
       "status": "implemented",
       "evidence": [
-        "dlbase/registry.py",
-        "dlbase/plugin_bootstrap.py"
+        "saebase/registry.py",
+        "saebase/plugin_bootstrap.py"
       ],
       "next": "增加自动注册矩阵测试。",
       "environment_refs": []
@@ -93,9 +93,9 @@
       "description": "方案：NLP 数据集、LLM 模型与 SAE Task 的注册接口负责检查当前研究运行组合。",
       "status": "implemented",
       "evidence": [
-        "research_datasets/plugins.py",
-        "models/LLM/gemma2_2b_base/model_task_dataset_compatibility.py",
-        "tasks/LLM/sae_runtime.py"
+        "datasets/plugins.py",
+        "models/gemma2_2b_base/model_task_dataset_compatibility.py",
+        "tasks/sae_runtime.py"
       ],
       "next": "继续补充模型与任务组合的 CPU 回归检查。",
       "environment_refs": []
@@ -108,7 +108,7 @@
       "status": "implemented",
       "evidence": [
         "conf/config.yaml",
-        "dlbase/train.py"
+        "saebase/runtime/train.py"
       ],
       "next": "按唯一实验标识管理输出目录和历史产物。",
       "environment_refs": []
@@ -121,16 +121,16 @@
       "status": "partial",
       "evidence": [
         "conf/config.yaml",
-        "dlbase/experiment_paths.py",
+        "saebase/runtime/experiment_paths.py",
         "harness/experiments/validate.py"
       ],
-      "next": "将运行路径与产物规范实施到 dlbase。",
+      "next": "将运行路径与产物规范实施到 SAEBase Runtime。",
       "environment_refs": [],
       "last_change": {
         "date": "2026-10-25",
         "before": "planned",
         "after": "partial",
-        "explanation": "现状：实验路径协议已经在 dlbase 实现，尚未完成真实 GPU 训练回归。 证据：dlbase/experiment_paths.py、harness/experiments/validate.py。下一步：将运行路径与产物规范实施到 dlbase。"
+        "explanation": "现状：实验路径协议已经在 SAEBase Runtime 实现，尚未完成真实 GPU 训练回归。 证据：saebase/runtime/experiment_paths.py、harness/experiments/validate.py。下一步：将运行路径与产物规范实施到 SAEBase Runtime。"
       }
     },
     {
@@ -181,8 +181,8 @@
       "description": "目标：Dataset/Model/Task 注册映射可发现、可验证。",
       "status": "implemented",
       "evidence": [
-        "dlbase/registry.py",
-        "research_datasets/plugins.py",
+        "saebase/registry.py",
+        "datasets/plugins.py",
         "models/plugins.py",
         "tasks/plugins.py"
       ],
@@ -196,7 +196,7 @@
       "description": "目标：依据 NLP 数据集及 SAE Task 的适配关系检验输入配置。",
       "status": "implemented",
       "evidence": [
-        "research_datasets/plugins.py"
+        "datasets/plugins.py"
       ],
       "next": "增加多任务组合负样例。",
       "environment_refs": []
@@ -208,7 +208,7 @@
       "description": "目标：核验选定 LLM 模型与 SAE 任务、数据来源的兼容关系。",
       "status": "implemented",
       "evidence": [
-        "models/LLM/gemma2_2b_base/model_task_dataset_compatibility.py"
+        "models/gemma2_2b_base/model_task_dataset_compatibility.py"
       ],
       "next": "在真实模型环境下核验 SAE 激活位置。",
       "environment_refs": []
@@ -220,7 +220,7 @@
       "description": "目标：按 SAE Task 的执行协议校验模型、权重、输入及授权条件。",
       "status": "implemented",
       "evidence": [
-        "tasks/LLM/sae_runtime.py"
+        "tasks/sae_runtime.py"
       ],
       "next": "补充基于语义的最小断言。",
       "environment_refs": []
@@ -233,7 +233,7 @@
       "status": "implemented",
       "evidence": [
         "conf/config.yaml",
-        "dlbase/train.py"
+        "saebase/runtime/train.py"
       ],
       "next": "使每次运行显式关联配置哈希。",
       "environment_refs": []
@@ -246,8 +246,8 @@
       "status": "implemented",
       "evidence": [
         "conf/config.yaml",
-        "dlbase/experiment_paths.py",
-        "tests/test_harness_contracts.py"
+        "saebase/runtime/experiment_paths.py",
+        "harness/experiments/validate.py"
       ],
       "next": "实现公共目录初始化器。",
       "environment_refs": [],
@@ -255,7 +255,7 @@
         "date": "2026-10-25",
         "before": "planned",
         "after": "implemented",
-        "explanation": "现状：DLBase 支持分层 task.path、结构化产物和按 Knowledge ID 命名的分析子目录。 证据：dlbase/experiment_paths.py、tests/test_harness_contracts.py。下一步：实现公共目录初始化器。"
+        "explanation": "现状：SAEBase Runtime 支持分层 task.path、结构化产物和按 Knowledge ID 命名的分析子目录。 证据：saebase/runtime/experiment_paths.py、tests/test_harness_contracts.py。下一步：实现公共目录初始化器。"
       }
     },
     {
@@ -284,10 +284,10 @@
       "description": "目标：从 Python AST 输出节点、继承、成员与调用，附带已有 Knowledge 链接。",
       "status": "implemented",
       "evidence": [
-        "dlbase/registry.py",
+        "saebase/registry.py",
         "harness/code/build.py",
         "harness/code/diff.py",
-        "tests/test_atlas_interactivity.cjs"
+        "harness/visualization/app.js"
       ],
       "next": "实现生成器、差异比对与浏览器。",
       "environment_refs": [],
@@ -348,7 +348,7 @@
       "description": "目标：结合完整配置、模型权重和运行元数据重建实验。",
       "status": "not_implemented",
       "evidence": [
-        "dlbase/summary_log.py"
+        "saebase/runtime/summary_log.py"
       ],
       "next": "定义本地打包和验证边界。",
       "environment_refs": []
@@ -379,21 +379,21 @@
       "description": "问题：模型、稀疏字典、Prompt 和七类 SAE 研究操作怎样共享可复用的组件结构？",
       "status": "implemented",
       "evidence": [
-        "dlbase/registry.py",
+        "saebase/registry.py",
         "saebase/api/features.py",
-        "tasks/LLM/sae_runtime.py"
+        "tasks/sae_runtime.py"
       ]
     },
     {
       "id": "s.parallel_cores",
       "type": "solve",
-      "title": "SAEBase 与 DLBase 的统一任务接口",
-      "description": "方案：SAEBase 提供稀疏特征研究实现，DLBase 组织科研执行与实验记录，共享已审计的模型、数据集和任务注册。",
+      "title": "SAEBase 与 SAEBase Runtime 的统一任务接口",
+      "description": "方案：SAEBase 提供稀疏特征研究实现，SAEBase Runtime 组织科研执行与实验记录，共享已审计的模型、数据集和任务注册。",
       "status": "implemented",
       "evidence": [
-        "dlbase/registry.py",
+        "saebase/registry.py",
         "saebase/api/__init__.py",
-        "dlbase/plugin_bootstrap.py",
+        "saebase/plugin_bootstrap.py",
         "tasks/plugins.py"
       ]
     },
@@ -404,9 +404,9 @@
       "description": "目标：按 NLP 数据集、LLM 模型与七类 SAE 操作分别组织实现和注册；保留 SAEBase 原有公共 API。",
       "status": "implemented",
       "evidence": [
-        "research_datasets/plugins.py",
-        "models/dlbase_plugins.py",
-        "tasks/dlbase_plugins.py"
+        "datasets/plugins.py",
+        "models/plugins.py",
+        "tasks/plugins.py"
       ]
     },
     {
@@ -416,7 +416,7 @@
       "description": "目标：SAEBase 在选定模型层读取真实激活，用稀疏自编码器编码特征并记录特征值与重建量。",
       "status": "implemented",
       "evidence": [
-        "tasks/LLM/capture/task.py",
+        "tasks/capture/task.py",
         "saebase/api/features.py"
       ]
     },
@@ -427,7 +427,7 @@
       "description": "目标：在固定输入上替换指定稀疏特征并重新计算模型输出，以测量干预对原始类别得分的影响。",
       "status": "implemented",
       "evidence": [
-        "tasks/LLM/intervene/task.py",
+        "tasks/intervene/task.py",
         "saebase/api/features.py"
       ]
     },
@@ -438,8 +438,8 @@
       "description": "目标：在生成每个后续 token 时执行 SAEBase 特征编辑，并比较干预与基线生成的 token 序列。",
       "status": "implemented",
       "evidence": [
-        "tasks/LLM/generate/task.py",
-        "tasks/LLM/intervene/backend/steering.py"
+        "tasks/generate/task.py",
+        "tasks/intervene/backend/steering.py"
       ]
     },
     {
@@ -449,8 +449,8 @@
       "description": "目标：利用 SAEBase 的原生电路工具生成和保存有来源记录的特征关系图，实际执行需具备相应计算环境。",
       "status": "implemented",
       "evidence": [
-        "tasks/LLM/circuits/task.py",
-        "tasks/LLM/circuits/backend/circuits.py"
+        "tasks/circuits/task.py",
+        "tasks/circuits/backend/circuits.py"
       ]
     },
     {
@@ -460,8 +460,8 @@
       "description": "目标：以研究者指定的生成器产生特征含义假设，再用独立输入上的特征激活记录验证解释预测。",
       "status": "implemented",
       "evidence": [
-        "tasks/LLM/explain/task.py",
-        "tasks/LLM/explain/interpretation.py"
+        "tasks/explain/task.py",
+        "tasks/explain/interpretation.py"
       ]
     },
     {
@@ -471,8 +471,8 @@
       "description": "目标：通过 SAEBase 基准运行器对指定模型、稀疏特征和数据记录计算可追溯指标。",
       "status": "implemented",
       "evidence": [
-        "tasks/LLM/benchmark/task.py",
-        "tasks/LLM/benchmark/backend/runner.py"
+        "tasks/benchmark/task.py",
+        "tasks/benchmark/backend/runner.py"
       ]
     },
     {
@@ -482,8 +482,8 @@
       "description": "目标：通过 SAEBase 调用实际 SAE Lens 或 Sparsify 训练后端，并记录训练配置与检查点。",
       "status": "implemented",
       "evidence": [
-        "tasks/LLM/train/task.py",
-        "tasks/LLM/train/backend/training.py"
+        "tasks/train/task.py",
+        "tasks/train/backend/training.py"
       ]
     },
     {
@@ -521,7 +521,7 @@
       "evidence": [
         "harness/core/agent_flow.py",
         "harness/core/agent_apply.py",
-        "tests/test_agent_flow.py",
+        "harness/core/agent_flow.py",
         "harness/visualization/app.js"
       ],
       "next": "本地真人评审和 GitHub 原生 Approved 事件尚需端到端验收。",

@@ -6,7 +6,7 @@ from typing import Any
 
 import torch
 
-from saebase.data.artifact_layout import canonicalize_behavior
+from saebase.datasets.artifact_layout import canonicalize_behavior
 
 
 def assert_manifest_matches(
@@ -22,9 +22,7 @@ def assert_manifest_matches(
         )
     man_beh = canonicalize_behavior(str(manifest.get("behavior", beh)))
     if man_beh != beh:
-        raise RuntimeError(
-            f"manifest.behavior={man_beh!r} != requested={beh!r}"
-        )
+        raise RuntimeError(f"manifest.behavior={man_beh!r} != requested={beh!r}")
 
 
 def _vocab_size(model: Any) -> int | None:
@@ -103,9 +101,7 @@ def assert_prompt_record(
     if vocab is not None:
         bad = [t for t in check_ids if t < 0 or t >= vocab]
         if bad:
-            raise ValueError(
-                f"{ctx}: token ids out of vocab range [0, {vocab}): {bad[:5]}"
-            )
+            raise ValueError(f"{ctx}: token ids out of vocab range [0, {vocab}): {bad[:5]}")
 
 
 def assert_activation_sae_shapes(
@@ -120,15 +116,11 @@ def assert_activation_sae_shapes(
     if h.ndim != 1:
         raise ValueError(f"{ctx}: expected last-token activation 1-D, got {tuple(h.shape)}")
     if int(h.shape[-1]) != d_in:
-        raise RuntimeError(
-            f"{ctx}: activation dim {int(h.shape[-1])} != sae.d_in {d_in}"
-        )
+        raise RuntimeError(f"{ctx}: activation dim {int(h.shape[-1])} != sae.d_in {d_in}")
     if z.ndim != 1:
         raise ValueError(f"{ctx}: expected latent 1-D, got {tuple(z.shape)}")
     if int(z.shape[-1]) != d_sae:
-        raise RuntimeError(
-            f"{ctx}: latent dim {int(z.shape[-1])} != sae.d_sae {d_sae}"
-        )
+        raise RuntimeError(f"{ctx}: latent dim {int(z.shape[-1])} != sae.d_sae {d_sae}")
 
 
 def assert_finite_tensors(*tensors: torch.Tensor, ctx: str) -> None:

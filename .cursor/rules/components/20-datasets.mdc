@@ -1,14 +1,14 @@
 ---
-description: NLP Prompt 数据集、来源身份与模型适配契约。
-globs: "research_datasets/**,conf/dataset/**,conf/datasets_log.md"
+description: SAEBase Dataset 的来源、Prompt 协议及兼容性契约。
+globs: "datasets/**,saebase/data/**,conf/dataset/**,conf/datasets_log.md"
 alwaysApply: false
 ---
 
-# NLP Dataset 边界
+# Dataset 边界
 
-- `research_datasets/plugins.py` 负责注册已有 NLP 数据集。具体生成、准备、过滤和 Prompt 处理放在 `research_datasets/NLP/<name>/`。
-- 当前样本来源包括 CounterFact、GreaterThan、IOI、MMLUPro、SimpleCopying，以及 BBH、SubjectVerbAgreement 的独立读取代码。
-- SAEBase 原有 `saebase/data/` 对外接口保留；两个层级的数据协议应由测试明确核对，避免静默改变历史数据。
-- Prompt 存储采用稳定来源、manifest、模型键与 `prompts.jsonl`。真实数据读取需提供验证过的路径、revision 与模型身份。
-- 外部 Hugging Face `datasets` 包保持原有 Python 命名空间，科研数据专用包名为 `research_datasets`。
-- `conf/dataset/<name>.yaml` 只描述 NLP 研究输入。修改原始样本结构和划分时补充回归测试。
+- `datasets/<name>/` 保存具体 Prompt 数据集的生成、准备、读取、Token 编码与样本划分。
+- `datasets/plugins.py` 将可用数据集接入 `saebase/registry.py`，所有 Task 兼容性检查遵循同一 Registry。
+- `saebase/data/` 仅维护已发布 SAEBase API 所需的兼容导入，标准实现位于顶层 `datasets/`。
+- 源码安装使用 `saebase.datasets` Python 命名空间访问顶层源码，Wheel 也保留该命名空间；不能遮蔽第三方 Hugging Face `datasets` 包。
+- Prompt 产物通过稳定来源、manifest、模型身份和版本化 `prompts.jsonl` 校验；数据划分与修订不得静默变化。
+- 配置在 `conf/dataset/`，真实运行前校验模型身份、下载授权、文件路径及版本。

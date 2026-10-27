@@ -1,4 +1,4 @@
-"""One-shot import of plugin registration modules."""
+"""Single SAEBase registry bootstrap for datasets, models and research tasks."""
 
 from __future__ import annotations
 
@@ -9,8 +9,8 @@ def ensure_plugins_loaded() -> None:
     global _loaded
     if _loaded:
         return
-    import saebase.data.plugins  # noqa: F401
-    import saebase.model_plugins  # noqa: F401
-    import saebase.tasks.plugins  # noqa: F401
+    import saebase.datasets.plugins  # noqa: F401
+    import models.plugins  # noqa: F401
+    import tasks.plugins  # noqa: F401
 
     _loaded = True

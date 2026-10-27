@@ -3,7 +3,7 @@
 from pathlib import Path
 from subprocess import CompletedProcess
 
-from scripts import check_new_python_quality as quality
+from saebase.tools import check_new_python_quality as quality
 
 
 def test_new_file_discovery_uses_pr_base_and_excludes_existing(monkeypatch, tmp_path):

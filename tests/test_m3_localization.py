@@ -1,4 +1,5 @@
 """P3 Localize benchmark/curves/M4 acceptance on synthetic controlled input grids."""
+
 from __future__ import annotations
 
 import copy
@@ -11,21 +12,23 @@ import numpy as np
 import pytest
 import torch
 
-from examples._synthetic_common import ResearchToyModel, ResearchToySAE
-from saebase.api import ActivationSite, ModelAdapter
+from saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
+from saebase.api import ModelAdapter
 from saebase.data import BinaryFactor, ControlledInputDesign
 from saebase.benchmarks import BenchmarkConfig, build_plan
 from saebase.benchmarks.adapters.localization import (
-    read_localization_artifact, grid_from_artifact, validate_localization_result,
+    read_localization_artifact,
+    grid_from_artifact,
+    validate_localization_result,
 )
 from saebase.benchmarks.runner import execute, validate_external_sources
-from saebase.benchmarks.results import read_metrics
 from saebase.benchmarks.report import write_report
 from saebase.reliability import AuditConfig, evaluate_m3, write_audit, read_audit
 
 
 class NativeContract:
     """Checks that SAEBase delegates, without duplicating Localize's algorithms."""
+
     __version__ = "contract-v1"
 
     def __init__(self):
@@ -37,18 +40,21 @@ class NativeContract:
         assert z.shape == (8, 7) and n_factors == 3
         variance = float(np.var(z, axis=0).sum())
         assert variance > 0
-        curve = np.zeros(z.shape[1]*n_factors+1)
+        curve = np.zeros(z.shape[1] * n_factors + 1)
         curve[0] = variance
-        curve[1] = .5*variance
+        curve[1] = 0.5 * variance
 
         class ScopeResult:
             total_variance = variance
+
             def budget(self, tolerance):
-                assert tolerance == pytest.approx(.1 * variance)
+                assert tolerance == pytest.approx(0.1 * variance)
                 return 2
+
             def assignment(self, budget):
                 assert budget == 2
                 return np.asarray([1, 2, 0, 0, 0, 0, 0], dtype=int)
+
         result = ScopeResult()
         result.curve = curve
         return result
@@ -57,9 +63,9 @@ class NativeContract:
         assert pairs_per_scope == 32
         self.paired_seeds.append(seed)
         W = float(np.var(z, axis=0).sum())
-        estimated = np.zeros(z.shape[1]*3+1)
+        estimated = np.zeros(z.shape[1] * 3 + 1)
         estimated[0] = W
-        estimated[1] = W * (.2 + seed / 100)
+        estimated[1] = W * (0.2 + seed / 100)
         return estimated
 
 
@@ -71,7 +77,7 @@ def _design():
             BinaryFactor("second", ("3", "4")),
             BinaryFactor("third", ("5", "6")),
         ),
-        render=lambda x: f'{x["first"]} {x["second"]} {x["third"]}',
+        render=lambda x: f"{x['first']} {x['second']} {x['third']}",
     )
 
 
@@ -82,12 +88,17 @@ def _config(two=False, metrics=None, pairs=32):
     payload = {
         "schema": "saebase.benchmark.config.v1",
         "name": "Localization P3 acceptance",
-        "targets": [{"model_key": "synthetic", "layer": 0,
-                     "hook_name": "blocks.0.hook_resid_post",
-                     "sae_keys": ["sae-a", "sae-b"] if two else ["sae-a"]}],
+        "targets": [
+            {
+                "model_key": "synthetic",
+                "layer": 0,
+                "hook_name": "blocks.0.hook_resid_post",
+                "sae_keys": ["sae-a", "sae-b"] if two else ["sae-a"],
+            }
+        ],
         "dataset": {"id": "P3 synthetic factorial", "samples": [r.to_dict() for r in records]},
-        "metrics": metrics or ["localization.budget_at_90pct",
-                                "localization.budget_fraction_at_90pct"],
+        "metrics": metrics
+        or ["localization.budget_at_90pct", "localization.budget_fraction_at_90pct"],
         "conditions": [],
         "max_activation_rows": 32,
         "options": {
@@ -107,15 +118,17 @@ def _loader(two=False):
     model = ModelAdapter(ResearchToyModel().eval())
     counts = {"forward_calls": 0}
     original = model.model.run_with_cache
+
     def counted(*args, **kw):
         counts["forward_calls"] += 1
         return original(*args, **kw)
+
     model.model.run_with_cache = counted
     saes = {"sae-a": ResearchToySAE().eval()}
     if two:
         other = ResearchToySAE().eval()
         with torch.no_grad():
-            other.bias.add_(.1)
+            other.bias.add_(0.1)
         saes["sae-b"] = other
     return lambda mk, sk, layer: SimpleNamespace(model=model, sae=saes[sk]), counts
 
@@ -130,7 +143,11 @@ def test_localization_preflight_and_contracts():
     base = cfg.to_dict()
     cases = [
         ("sample_ids_by_state", [base["dataset"]["samples"][0]["sample_id"]] * 8, "exactly once"),
-        ("sample_ids_by_state", [x["sample_id"] for x in base["dataset"]["samples"][:7]], "exactly once"),
+        (
+            "sample_ids_by_state",
+            [x["sample_id"] for x in base["dataset"]["samples"][:7]],
+            "exactly once",
+        ),
         ("pairs_per_scope", 0, "positive"),
     ]
     for key, value, match in cases:
@@ -162,8 +179,8 @@ def test_localization_full_pipeline_and_reliability(tmp_path: Path):
     assert len(rows) == 4 and all(row["status"] == "completed" for row in rows)
     budgets = [r for r in rows if r["metric_id"] == "localization.budget_at_90pct"]
     fractions = [r for r in rows if r["metric_id"] == "localization.budget_fraction_at_90pct"]
-    assert [r["value"] for r in budgets] == [2., 2.]
-    assert [r["value"] for r in fractions] == pytest.approx([2/21, 2/21])
+    assert [r["value"] for r in budgets] == [2.0, 2.0]
+    assert [r["value"] for r in fractions] == pytest.approx([2 / 21, 2 / 21])
     assert all(r["n_valid"] == r["n_requested"] == 1 for r in rows)
     root = tmp_path / cfg.run_id
     assert "Input Localization Curves" in (root / "report.html").read_text()
@@ -181,7 +198,8 @@ def test_localization_full_pipeline_and_reliability(tmp_path: Path):
         artifacts[row["sae_id"]] = artifact
 
     audit_config = AuditConfig(
-        evaluation_seeds=(0, 1, 2, 3), bootstrap_replicates=30,
+        evaluation_seeds=(0, 1, 2, 3),
+        bootstrap_replicates=30,
         metric_ids=("localization.budget_at_90pct",),
     )
     initial = counts["forward_calls"]
@@ -206,8 +224,7 @@ def test_localization_full_pipeline_and_reliability(tmp_path: Path):
     assert "Matched Localize SAE comparisons" in html
     assert "not a confidence interval" in html
     assert (root / "reliability_summary.csv").exists()
-    again = execute(cfg, tmp_path, real=True, loader=loader,
-                    localization_paper=stub, resume=True)
+    again = execute(cfg, tmp_path, real=True, loader=loader, localization_paper=stub, resume=True)
     assert again == rows and counts["forward_calls"] == initial
 
 
@@ -221,7 +238,7 @@ def test_corrupt_curve_or_wrong_source_is_rejected(tmp_path):
     path = root / ref
     before = path.read_text()
     item = json.loads(before)
-    item["curve"][0] += .5
+    item["curve"][0] += 0.5
     path.write_text(json.dumps(item))
     with pytest.raises(ValueError, match="integrity"):
         validate_external_sources(cfg, rows, root=root, localization_paper=stub)
@@ -230,8 +247,11 @@ def test_corrupt_curve_or_wrong_source_is_rejected(tmp_path):
 
     # A function loaded from a genuinely different source file has a new digest.
     import importlib.util
+
     source = tmp_path / "revised_localize.py"
-    source.write_text("def exact_scope_curve(z, n_factors):" + chr(10) + "    return None" + chr(10))
+    source.write_text(
+        "def exact_scope_curve(z, n_factors):" + chr(10) + "    return None" + chr(10)
+    )
     spec = importlib.util.spec_from_file_location("revised_localize", source)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -243,17 +263,26 @@ def test_corrupt_curve_or_wrong_source_is_rejected(tmp_path):
 
 def test_cross_sae_mismatch_is_not_compared():
     from saebase.reliability.localization import compare_localization
+
     cfg = _config(two=True)
     data = {
         "design_manifest": {"design_key": "abc", "factors": [1], "states": [2]},
-        "source_sha256": "a", "n_factors": 3, "n_features": 7,
-        "relative_omission": .1, "budget_at_90pct": 2,
-        "budget_fraction_at_90pct": 2/21,
+        "source_sha256": "a",
+        "n_factors": 3,
+        "n_features": 7,
+        "relative_omission": 0.1,
+        "budget_at_90pct": 2,
+        "budget_fraction_at_90pct": 2 / 21,
     }
     audit = {"audit": {"sampling_stability": {"status": "not_requested"}}}
-    first = {"model_id": "synthetic", "sae_id": "sae-a", "metric_id": "localization.budget_at_90pct",
-             "dataset_id": "d", "split": "test",
-             "site": {"layer": 0, "hook_name": "blocks.0.hook_resid_post", "position": -1}}
+    first = {
+        "model_id": "synthetic",
+        "sae_id": "sae-a",
+        "metric_id": "localization.budget_at_90pct",
+        "dataset_id": "d",
+        "split": "test",
+        "site": {"layer": 0, "hook_name": "blocks.0.hook_resid_post", "position": -1},
+    }
     second = {**first, "sae_id": "sae-b"}
     diff = copy.deepcopy(data)
     diff["design_manifest"]["design_key"] = "changed"
@@ -272,4 +301,4 @@ def test_original_localize_native_when_installed(tmp_path):
     grid = grid_from_artifact(tmp_path / cfg.run_id, art)
     native = original.exact_scope_curve(grid.codes, n_factors=3)
     np.testing.assert_allclose(art["curve"], native.curve, atol=1e-10, rtol=0)
-    assert art["budget_at_90pct"] == native.budget(.1 * native.total_variance)
+    assert art["budget_at_90pct"] == native.budget(0.1 * native.total_variance)

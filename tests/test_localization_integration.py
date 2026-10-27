@@ -1,16 +1,18 @@
 """Offline Localize integration contracts; original estimator is optional."""
+
 from __future__ import annotations
 
-from types import SimpleNamespace
 import json
 import numpy as np
 import pytest
 
 from saebase.api import ActivationSite, ModelAdapter
 from saebase.integrations import (
-    LocalizationGrid, collect_localization_grid, evaluate_localization,
+    LocalizationGrid,
+    collect_localization_grid,
+    evaluate_localization,
 )
-from examples._synthetic_common import ResearchToyModel, ResearchToySAE
+from saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 
 
 class OriginalStub:
@@ -22,15 +24,19 @@ class OriginalStub:
     def exact_scope_curve(self, z, n_factors):
         self.received = np.array(z, copy=True)
         assert n_factors == 3
+
         class Result:
             total_variance = 1.0
             curve = np.linspace(1, 0, 22)
+
             def budget(self, tolerance):
-                assert tolerance == pytest.approx(.1)
+                assert tolerance == pytest.approx(0.1)
                 return 19
+
             def assignment(self, budget):
                 assert budget == 19
                 return np.array([1, 2, 3, 4, 0, 1, 2])
+
         return Result()
 
     def estimated_scope_curve(self, z, pairs_per_scope, seed):
@@ -42,11 +48,14 @@ def _collect():
     model = ModelAdapter(ResearchToyModel().eval())
     sae = ResearchToySAE().eval()
     return collect_localization_grid(
-        model, sae, site=ActivationSite(0, "blocks.0.hook_resid_post"),
+        model,
+        sae,
+        site=ActivationSite(0, "blocks.0.hook_resid_post"),
         prompts_by_state={
             i: f"{1 + (i & 1)} {3 + ((i >> 1) & 1)} {5 + ((i >> 2) & 1)}"
             for i in reversed(range(8))
-        }, n_factors=3
+        },
+        n_factors=3,
     )
 
 
@@ -66,9 +75,11 @@ def test_incomplete_states_rejected():
     model = ModelAdapter(ResearchToyModel().eval())
     with pytest.raises(ValueError, match="state keys"):
         collect_localization_grid(
-            model, ResearchToySAE().eval(),
+            model,
+            ResearchToySAE().eval(),
             site=ActivationSite(0, "blocks.0.hook_resid_post"),
-            prompts_by_state={i: str(i + 1) for i in range(7)}, n_factors=3
+            prompts_by_state={i: str(i + 1) for i in range(7)},
+            n_factors=3,
         )
 
 
@@ -88,4 +99,4 @@ def test_original_package_when_installed():
     result = evaluate_localization(grid, paper=paper)
     native = paper.exact_scope_curve(grid.codes, n_factors=3)
     np.testing.assert_allclose(result.curve, native.curve)
-    assert result.budget == native.budget(.1 * native.total_variance)
+    assert result.budget == native.budget(0.1 * native.total_variance)

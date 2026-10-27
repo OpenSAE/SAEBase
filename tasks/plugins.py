@@ -1,13 +1,23 @@
-"""Compatibility shim for historical tasks.plugins imports."""
+"""Register all shipped SAEBase research tasks in one Registry."""
 
-from __future__ import annotations
+from saebase.registry import register_task
+from saebase.sae.task import SAETask
+from tasks.capture.task import CaptureTask
+from tasks.intervene.task import InterveneTask
+from tasks.generate.task import GenerateTask
+from tasks.circuits.task import CircuitsTask
+from tasks.explain.task import ExplainTask
+from tasks.benchmark.task import BenchmarkTask
+from tasks.train.task import TrainTask
 
-from saebase.tasks import plugins as _canonical
-
-
-def __getattr__(name: str) -> object:
-    return getattr(_canonical, name)
-
-
-def __dir__() -> list[str]:
-    return sorted(set(globals()) | set(dir(_canonical)))
+for key, cls in (
+    ("sae", SAETask),
+    ("capture", CaptureTask),
+    ("intervene", InterveneTask),
+    ("generate", GenerateTask),
+    ("circuits", CircuitsTask),
+    ("explain", ExplainTask),
+    ("benchmark", BenchmarkTask),
+    ("train", TrainTask),
+):
+    register_task(key, cls)

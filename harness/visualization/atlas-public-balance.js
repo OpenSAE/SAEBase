@@ -15,7 +15,7 @@
     capture:"特征捕获",intervene:"受控特征干预",generate:"生成时特征编辑",
     circuits:"电路追踪与干预",explain:"特征自动解释",train:"SAE 训练",
     models:"模型实现",datasets:"数据集与输入",tasks:"科研任务",
-    dlbase:"训练与实验产物管理",saebase:"SAEBase 可复用算法"
+    runtime:"训练与实验产物管理",saebase:"SAEBase 可复用算法"
   };
   const ROLES=[
     ["capture","特征捕获与读取",/captur|activat|feature|encode|decode|token/i],

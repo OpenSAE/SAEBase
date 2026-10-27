@@ -1,17 +1,18 @@
-"""IOI compositional prompts for SAEBase (programmatic generation)."""
+"""Legacy import forwarding to the canonical Dataset implementation."""
 
-from saebase.data.IOI.IOI import (
-    default_data_dir,
-    generate_ioi_prompts,
-    ioi_json_path,
-    load_ioi_prompts,
-    save_ioi_prompts,
-)
+from importlib import import_module as _import_module
 
-__all__ = [
-    "default_data_dir",
-    "generate_ioi_prompts",
-    "ioi_json_path",
-    "load_ioi_prompts",
-    "save_ioi_prompts",
-]
+_impl = _import_module("saebase.datasets.IOI")
+
+
+def __getattr__(name: str) -> object:
+    return getattr(_impl, name)
+
+
+def __dir__() -> list[str]:
+    return sorted(set(globals()) | set(dir(_impl)))
+
+
+for _name in dir(_impl):
+    if not _name.startswith("_"):
+        globals()[_name] = getattr(_impl, _name)

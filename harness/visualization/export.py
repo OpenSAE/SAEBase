@@ -54,8 +54,8 @@ def existing_tree(graph: dict, *, view: str) -> dict:
     root_id = f"{view}:existing"
     labels = {
         "core": (
-            "OpenResearch 双核心与任务注册",
-            "展示 DLBase、SAEBase 和 Dataset、Model、Task 注册架构中已经实现的组件。",
+            "SAEBase 统一科研组件与任务注册",
+            "展示 SAEBase Runtime、Registry 与 Dataset、Model、Task 中已经实现的组件。",
         ),
         "knowledge": (
             "LLM SAE 科研方法与实现依据",
@@ -691,19 +691,19 @@ CODE_CONTEXT_SCOPES = (
     ("saebase/api/", ("term.sae", "term.saebase")),
     ("saebase/sae/", ("term.sae", "term.sparse_autoencoder")),
     ("saebase/store/", ("term.sae", "term.artifact")),
-    ("tasks/LLM/capture/", ("term.sae", "term.sae.capture")),
-    ("tasks/LLM/intervene/", ("term.sae", "term.sae.intervene")),
-    ("tasks/LLM/generate/", ("term.sae", "term.sae.generate")),
-    ("tasks/LLM/circuits/", ("term.sae", "term.sae.circuits")),
-    ("tasks/LLM/explain/", ("term.sae", "term.sae.explain")),
-    ("tasks/LLM/benchmark/", ("term.sae", "term.sae.benchmark")),
-    ("tasks/LLM/train/", ("term.sae", "term.sae.train")),
-    ("models/LLM/gemma2_2b_base/", ("term.gemma2_2b", "term.model")),
-    ("models/LLM/", ("term.llm", "term.model")),
-    ("datasets/NLP/", ("term.nlp", "term.sae.assets")),
-    ("dlbase/cfg/", ("term.hydra", "term.yaml")),
-    ("dlbase/training/", ("term.training", "term.lightning")),
-    ("dlbase/registry.py", ("term.registry", "term.plugin")),
+    ("tasks/capture/", ("term.sae", "term.sae.capture")),
+    ("tasks/intervene/", ("term.sae", "term.sae.intervene")),
+    ("tasks/generate/", ("term.sae", "term.sae.generate")),
+    ("tasks/circuits/", ("term.sae", "term.sae.circuits")),
+    ("tasks/explain/", ("term.sae", "term.sae.explain")),
+    ("tasks/benchmark/", ("term.sae", "term.sae.benchmark")),
+    ("tasks/train/", ("term.sae", "term.sae.train")),
+    ("models/gemma2_2b_base/", ("term.gemma2_2b", "term.model")),
+    ("models/", ("term.llm", "term.model")),
+    ("datasets/", ("term.nlp", "term.sae.assets")),
+    ("saebase/runtime/cfg/", ("term.hydra", "term.yaml")),
+    ("saebase/runtime/training/", ("term.training", "term.lightning")),
+    ("saebase/registry.py", ("term.registry", "term.plugin")),
 )
 
 

@@ -1,26 +1,24 @@
 ---
-description: SAEBase / OpenResearch 的最小全局行为与权限边界。
+description: SAEBase 与 OpenResearch Harness 的全局约束。
 alwaysApply: true
 ---
 
-# SAEBase / OpenResearch 全局约束
+# 项目与开发规范
 
-- 本仓库保留 SAEBase v0.5.0 的独立 API、模型注册、研究工具和发布流程，同时加入 OpenResearch 的 DLBase 与 Harness。先辨认变更属于 dlbase、datasets、models、tasks、conf 或 Harness。
-- 真实运行契约以源码、注册表与 Hydra 配置为准；Agent 规则和工作流程以 .cursor/ 为准。README 只负责对人介绍仓库，不能作为 Agent 的强制规范来源。
-- 修改前阅读受影响模块、入口、现有注册与配置；必要时使用 .cursor/skills/ 下对应 Skill。
-- 未经用户明确批准，不修改 dlbase/ 的通用语义。修改权限由 .cursor/hooks/guard_paths.py 和 .cursor/policy.json 的额外防护共同约束；不得通过绕过检查达成修改。
-- 维护现有训练与评测语义。不能因重构、修复或验证而静默改变数据划分、指标、默认超参、checkpoint 或输出。
-- 保留 SAEBase 已有的 docs、examples、apps、work_plan 与发布工具。新增科研运行使用 dlbase.train，原有 saebase 命令保持兼容。辅助脚本使用 scripts/，自动测试使用 tests/，Cursor Hook 自身留在 .cursor/hooks/。
-- 新模型、数据集、任务必须经已有 Registry 和兼容性门控接入，不得绕过检查写隐藏分支。
-- 如需批量实验或训练，先确认数据路径、GPU/时长预算及潜在产物覆盖风险；不得擅自执行长训练来代替快速测试。
-- 修改后运行与变更相称的可执行验证；报告验证命令、结果、未验证的部分。不得把尚未运行的检查描述为已通过。
-- 与用户交流和新增 Markdown 文档原则上使用中文；命令、Python 标识符、专有名词及引用可保留英文。
-- `doc/knowledge/`、`doc/code/` 和 `harness/` 是按任务选择的上下文资料；严格遵守 `.cursor/rules/core/10-context-selection.mdc`，普通开发不得主动全量浏览这些目录。
+- SAEBase 保留已发布的 SAE 算法、CLI、模型和实验来源，同时在单一架构中使用 `datasets/`、`models/`、`tasks/`、`saebase/`、`conf/`、`harness/`。
+- `saebase/registry.py` 和 `saebase/runner.py` 是组件注册与执行的权威代码；研究 Harness 是 Agent 协作、验证与知识组织工具。
+- 数据集、模型与任务直接按具体名称或科研操作分层，不新增领域类别中间目录。
+- 先阅读受影响代码、插件和 Hydra 配置；使用 `.cursor/skills/` 中对应的 Skill，并以源码和测试为事实依据。
+- 普通 Agent 未经审批不能修改 `saebase/runtime/`、`harness/`、`.cursor/` 和 `.github/` 的治理语义；权限由 Hooks 和明确的 Agent Flow 约束。
+- 不因重构静默改变历史科研结果、样本划分、模型身份、权重、指标、数值精度或实验产物。
+- 原 `saebase` CLI、`saebase/api/`、`saebase/data/` 的公开兼容入口保留；七类 SAE 操作经 `python -m saebase.runtime.train` 执行。
+- 辅助工具在 `saebase/tools/`，测试在 `tests/` 与 Research Lab 的测试目录，开发文档与历史 Work Plans 在 `harness/`。
+- 执行需先检查数据路径、GPU 预算、覆写风险和运行许可。训练结果与科研结论需要实际证据和独立验证。
+- 修改后运行与范围相称的回归、构建和文档验证，准确报告未执行项目；新增 Markdown 文档原则上使用中文。
+- Code、Knowledge、Context 和 Environment 只能按任务范围选择读取；Core 默认受保护。
 
-## Agent 执行任务流程
+# Agent Flow
 
-- 接到外部 `github_work_plan` 后先运行 `harness/core/agent_flow.py intake` 审计结构化节点清单，再用 Review HTML 向使用者显示红色预期变化。用户审核部署范围前禁止修改任务源文件。
-- Agent 可通过 `python -m harness.core.agent_flow inspect|scope|stage|observe|finalize` 读取审核范围和提出证据；不能通过脚本冒充人类 authorize/decide。
-- Core Tree、`harness/core/`、`harness/visualization/`、其他 Harness 治理文件、`.cursor/` 均为 Agent 不可修改边界。该权限约束不授权 Agent 修改治理层本身。
-- 不在当前授权任务范围内的任何 Node、源码或 Knowledge/Context 改动，必须先得到用户对新增范围的直接授权；不得自扩展 scope。
-- Code、Environment、Knowledge、Context 可以按精确 ID/证据按需读取；Core 默认屏蔽。黄色表示代码审阅过但功能未验收，只有执行结果独立审计且人类核准才可以在 Review Overlay 绿化节点。
+- 外部 Work Plan 须先进行结构审计与人类预审，再授权精确文件范围与命令。
+- Agent 不得伪造批准、扩大作用域或把局部测试标成完整科学验收。
+- 未得到用户对新范围的直接批准前，所有其他节点、源码和知识状态保持不变。

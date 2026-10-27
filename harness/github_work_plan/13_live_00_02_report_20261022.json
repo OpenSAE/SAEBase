@@ -1,0 +1,108 @@
+{
+  "schema": "opensae.wp13.live_agent_report.v1",
+  "report_date_utc": "2026-10-22",
+  "provenance": "User-relayed report from local GPU Agent; not an independent reading of the external /workspace filesystem.",
+  "source_branch": "harness/github_development_doc/wp13-real-world-integration",
+  "executed_source_commit": "903d837a1844d43133e2a3426703426ef1b99656",
+  "high_level": "LIVE-00, LIVE-01 and LIVE-02 reported PASS_WORKING without re-running GPU-00 or modifying the production Space.",
+  "jobs": [
+    {
+      "id": "LIVE-00",
+      "status": "PASS_WORKING",
+      "scope": "hardware_environment_inventory_only",
+      "run_dir": "/workspace/wp13/private/runs/LIVE-00-20261022T1905Z-903d837",
+      "gpu": "NVIDIA RTX 5070",
+      "total_vram_mib": 12227,
+      "free_vram_mib": 11765,
+      "driver": "595.91.07",
+      "free_workspace_gib_reported": 326,
+      "python": "3.12.3",
+      "torch": "2.14.1+cu130",
+      "transformerlens_backend": "legacy HookedTransformer",
+      "virtualenv": "/workspace/venvs/wp12-gpu00",
+      "docker_available": false,
+      "opensae_lab_data_configured": false,
+      "new_gpu_execution": false
+    },
+    {
+      "id": "LIVE-01",
+      "status": "PASS_WORKING",
+      "scope": "real_small_pretrained_model_and_sae_one_site",
+      "output": "/workspace/wp13/private/runs/LIVE-01-small-smoke.json",
+      "elapsed_seconds": 5.043,
+      "peak_vram_bytes": 557487104,
+      "model_key": "pythia70m",
+      "sae_key": "pythia70m_resid_sm",
+      "layer": 3,
+      "hook": "blocks.3.hook_resid_post",
+      "model_sha256": "dc595ff7ad9263a3ef34ce8975beadfe76b7271916c63a7a67b8a195d7e50a12",
+      "sae_sha256": "cde8b7c669860ec0dbd4b8ede465ff08868b317fc80010dac2703bc553c6585f",
+      "example": {
+        "token_count": 5,
+        "nonzero_sae_features": 37,
+        "edited_feature_id": 23870,
+        "reconstruction_mse": 0.030927371233701706,
+        "ablation_logit_delta_l2": 84.09748077392578
+      },
+      "prior_failure": "First harness call passed positional args to keyword-only smoke(); TypeError occurred before model weights loaded; corrected official CLI passed.",
+      "new_gpu00_matrix_run": false
+    },
+    {
+      "id": "LIVE-02",
+      "status": "PASS_WORKING",
+      "scope": "real_20_complete_sparse_traces_and_local_sqlite_ingest_not_publication",
+      "run_dir": "/workspace/wp13/private/runs/LIVE-02-20261022T1912Z-903d837/private_raw",
+      "first_copy": "/workspace/wp13/private/runs/LIVE-02-demo-01-L5.json",
+      "elapsed_seconds": 51.257,
+      "peak_vram_bytes": 2896735744,
+      "model_key": "gemma270m",
+      "sae_key": "gemma270m_scope_resid",
+      "sae_layers": [
+        5,
+        9
+      ],
+      "prompts_per_layer": 10,
+      "trace_count": 20,
+      "complete_sparse_codes": true,
+      "model_loaded_once_before_two_layer_saes": true,
+      "source_sha_matched_historical_reports_agent_claim": true,
+      "sqlite": {
+        "path": "/workspace/wp13/candidates/live02-feature-store-unreviewed/features.sqlite3",
+        "sha256": "a66adf07a4a2583b522744caca2f9b1a4dc9766969c7ce8e29b570b9f652e056",
+        "observations": 16788,
+        "distinct_features": 5804,
+        "reviewed_excerpts": 0
+      },
+      "observed_examples": [
+        {
+          "role": "content_token",
+          "layer": 5,
+          "token_position": 1,
+          "token_id": 50429,
+          "token_text": "Paris",
+          "feature_id": 506,
+          "activation": 225.42555236816406
+        },
+        {
+          "role": "shared_bos_not_semantic_context",
+          "token_text": "<bos>",
+          "feature_id": 923,
+          "activation_approx": 3405.25
+        }
+      ],
+      "warnings": [
+        "SAELens warned about direct repository ID; checkpoint loading nevertheless succeeded.",
+        "Review flags remain false. No public feature example or corpus release can be claimed."
+      ]
+    }
+  ],
+  "independent_numeric_review": "not_requested_for_product_readiness",
+  "public_text_approved": false,
+  "public_release_ready": false,
+  "large_archive_transfer_required": false,
+  "producer_next_actions": [
+    "Commit a tiny, redacted machine-readable run summary and optional small selected reviewed output samples, never full raw .pt or unreviewed text.",
+    "Compute real small controlled interventions using observed active features for LIVE-03.",
+    "Work with integration agent on reviewed feature/trace publication and CPU staging without requiring a large ZIP."
+  ]
+}

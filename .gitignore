@@ -37,3 +37,7 @@ coverage.json
 runs/
 # Work Plan 05 private corpus, weights, and run artifacts
 experiments/
+
+# Checked-in Research Lab source records (not experimental caches)
+!saebase/research_lab/data/
+!saebase/research_lab/data/**

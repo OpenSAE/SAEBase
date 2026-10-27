@@ -7,8 +7,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from tasks.LLM.explain.interpretation import propose_interpretation
-from tasks.LLM.explain.operation import execute
+from tasks.explain.interpretation import propose_interpretation
+from tasks.explain.operation import execute
 
 
 def _rows(prefix: str, active: bool) -> dict:
@@ -77,7 +77,7 @@ def test_injected_generator_records_activation_agreement_not_semantics(tmp_path)
 
 
 def test_allowlisted_name_calls_saebase_generate(monkeypatch):
-    from tasks.LLM.explain.local_generator import saebase_generate
+    from tasks.explain.local_generator import saebase_generate
 
     seen = {}
 
@@ -104,7 +104,7 @@ def test_allowlisted_name_calls_saebase_generate(monkeypatch):
 
 
 def test_allowlisted_generator_requires_model_and_approval():
-    from tasks.LLM.explain.local_generator import saebase_generate
+    from tasks.explain.local_generator import saebase_generate
 
     with pytest.raises(PermissionError):
         saebase_generate(SimpleNamespace(task={"approved": False}))

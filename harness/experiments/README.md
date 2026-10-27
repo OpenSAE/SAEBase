@@ -1,6 +1,6 @@
 # SAEBase 实验目录与可追溯性
 
-运行目录由 `dlbase/experiment_paths.py` 和 Hydra 管理，Harness 仅验证来源、配置与结果文件。
+运行目录由 `saebase/runtime/experiment_paths.py` 和 Hydra 管理，Harness 仅验证来源、配置与结果文件。
 
 ```text
 experiment/
@@ -24,7 +24,7 @@ experiment/
 `analysis/<purpose>/<subpurpose>/` 可用于独立分析，例如特征消融；研究关联使用 `doc/knowledge/context_graph.json` 中已存在的 SAE Knowledge ID。
 
 ```python
-from dlbase.experiment_paths import create_analysis_group
+from saebase.runtime.experiment_paths import create_analysis_group
 group = create_analysis_group(
     cfg, cwd, "feature_study/ablation",
     context_ids=["g.sae.feature_edit"],

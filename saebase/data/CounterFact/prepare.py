@@ -1,49 +1,18 @@
-"""Prepare CounterFact artifacts for a registry model_key."""
+"""Legacy import forwarding to the canonical Dataset implementation."""
 
-from __future__ import annotations
+from importlib import import_module as _import_module
 
-from pathlib import Path
-from typing import Any
-
-from saebase.data.CounterFact.CounterFact import load_raw_counterfact
-from saebase.data.CounterFact.tokenize import filter_with_model
-from saebase.data.prompt_schema import assert_available, make_manifest
-from saebase.data.prompt_store import save_prompts
+_impl = _import_module("saebase.datasets.CounterFact.prepare")
 
 
-def prepare_for_model(
-    model_key: str,
-    model: Any,
-    *,
-    loaded_model_name: str,
-    model_name: str,
-    seed: int = 0,
-    min_kept: int = 100,
-    max_items: int | None = 20_000,
-    data_root: str | Path | None = None,
-) -> Path:
-    assert_available("CounterFact", model_key)
-    raw = load_raw_counterfact()
-    kept, policy = filter_with_model(
-        raw, model, min_kept=min_kept, max_items=max_items
-    )
-    if len(kept) < min_kept:
-        raise RuntimeError(
-            f"CounterFact/{model_key}: kept {len(kept)} < min_kept={min_kept}"
-        )
-    manifest = make_manifest(
-        behavior="CounterFact",
-        model_key=model_key,
-        model_name=model_name,
-        loaded_model_name=loaded_model_name,
-        seed=seed,
-        generated_count=len(raw),
-        kept_count=len(kept),
-        filter_policy={
-            "name": policy,
-            "require_single_token_targets": True,
-            "max_items": max_items,
-        },
-        source="datasets.CounterFact.prepare",
-    )
-    return save_prompts(kept, manifest, data_root=data_root)
+def __getattr__(name: str) -> object:
+    return getattr(_impl, name)
+
+
+def __dir__() -> list[str]:
+    return sorted(set(globals()) | set(dir(_impl)))
+
+
+for _name in dir(_impl):
+    if not _name.startswith("_"):
+        globals()[_name] = getattr(_impl, _name)

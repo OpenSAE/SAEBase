@@ -43,19 +43,16 @@
     "q.transparency":"Atlas 五棵 Tree 的职责与关联",
     "g.registry":"模型、数据与 SAE Task 插件注册",
     "g.pipeline":"SAE Task 运行前的兼容检查",
-    "code:concrete:research_datasets":"NLP Prompt 数据集",
+    "code:concrete:datasets":"Prompt 数据集",
     "code:concrete:models":"LLM 模型实现",
     "code:concrete:tasks":"LLM SAE 任务执行",
-    "code:group:tasks":"LLM SAE 任务",
-    "code:family:research_datasets:NLP":"NLP Prompt 输入数据集",
-    "code:family:models:LLM":"LLM 模型",
-    "code:family:tasks:LLM":"SAE 任务"
+    "code:group:tasks":"SAE 研究任务",
   };
   const LEGACY_ONLY = new Set([
     "已有的项目功能","研究概念与依据","机器与执行条件",
     "现有代码能力","已有的模块化组件架构","已有的项目上下文组织",
-    "已有的训练配置与产物管理","正确读取图像与标签",
-    "保持输入尺寸与增强协议","定义训练损失","记录 Hydra 组合配置",
+    "已有的训练配置与产物管理",
+    "定义训练损失","记录 Hydra 组合配置",
     "确定随机性与执行环境","保存可追溯的结果文件",
     "可插拔组件注册","Task 运行前检查"
   ]);

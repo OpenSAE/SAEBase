@@ -1,9 +1,3 @@
-"""Register tasks actually shipped with SAEBase.
+"""Compatibility import of the unified Task registry."""
 
-Historical task configuration files are not standalone implementations.
-"""
-
-from saebase.registry import register_task
-from saebase.sae.task import SAETask
-
-register_task("sae", SAETask)
+from tasks.plugins import *

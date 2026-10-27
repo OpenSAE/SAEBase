@@ -294,7 +294,7 @@ def test_p7_ndif_does_not_run_without_explicit_permission():
 
 
 def test_p8_release_stays_blocked_until_independent_evidence():
-    report = audit_ledger(ROOT / "work_plan/12_capability_acceptance_matrix.csv")
+    report = audit_ledger(ROOT / "harness/github_work_plan/12_capability_acceptance_matrix.csv")
     assert report["capabilities"] == 50
     assert not report["release_ready"]
     assert len(report["missing"]) > 0

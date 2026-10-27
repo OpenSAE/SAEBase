@@ -1,17 +1,18 @@
-"""CounterFact text prompts for SAEBase (preparation and evaluation)."""
+"""Legacy import forwarding to the canonical Dataset implementation."""
 
-from saebase.data.CounterFact.CounterFact import (
-    default_data_dir,
-    filtered_json_path,
-    load_raw_counterfact,
-    normalize_counterfact_schema,
-    save_counterfact_filtered,
-)
+from importlib import import_module as _import_module
 
-__all__ = [
-    "default_data_dir",
-    "filtered_json_path",
-    "load_raw_counterfact",
-    "normalize_counterfact_schema",
-    "save_counterfact_filtered",
-]
+_impl = _import_module("saebase.datasets.CounterFact")
+
+
+def __getattr__(name: str) -> object:
+    return getattr(_impl, name)
+
+
+def __dir__() -> list[str]:
+    return sorted(set(globals()) | set(dir(_impl)))
+
+
+for _name in dir(_impl):
+    if not _name.startswith("_"):
+        globals()[_name] = getattr(_impl, _name)

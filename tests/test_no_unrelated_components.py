@@ -5,23 +5,23 @@ import re
 
 ROOT = Path(__file__).resolve().parents[1]
 RETIRED_PATHS = (
-    "research_datasets/vision",
+    "datasets/vision",
     "models/vision",
     "tasks/vision",
     "conf/dataset/cub.yaml",
     "conf/model/resnet18_mlp.yaml",
     "conf/task/classification.yaml",
-    "dlbase/training/facets.py",
+    "saebase/runtime/training/facets.py",
 )
-CONTENT_ROOTS = ("harness", "doc", "research_datasets", "dlbase", ".cursor")
+CONTENT_ROOTS = ("harness/core", "harness/code", "harness/knowledge", "harness/visualization", "doc", "datasets", "models", "tasks", ".cursor")
 CONTENT_FILES = (
-    "models/dlbase_plugins.py",
-    "tasks/dlbase_plugins.py",
-    "conf/openresearch.yaml",
+    "models/plugins.py",
+    "tasks/plugins.py",
+    "conf/sae_research.yaml",
     "conf/tasks_log.md",
     "README.md",
     "README_cn.md",
-    "docs/openresearch-integration.md",
+    "harness/github_development_doc/openresearch-integration.md",
 )
 RETIRED_TERMS = re.compile(
     r"(?i)CUB[-_ ]?200|ResNet(?:[-_ ]?18)?|"
@@ -40,7 +40,7 @@ def test_saebase_and_llm_entrypoints_remain():
     assert (ROOT / "saebase/api/features.py").is_file()
     assert (ROOT / "saebase/data/prompt_store.py").is_file()
     for task in ("capture", "intervene", "generate", "circuits", "explain", "benchmark", "train"):
-        assert (ROOT / "tasks" / "LLM" / task / "task.py").is_file(), task
+        assert (ROOT / "tasks" / task / "task.py").is_file(), task
 
 
 def test_no_retired_terms_in_integrated_sources():

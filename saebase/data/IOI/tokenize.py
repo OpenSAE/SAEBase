@@ -1,55 +1,18 @@
-"""Tokenization and filtering for IOI prompts."""
+"""Legacy import forwarding to the canonical Dataset implementation."""
 
-from __future__ import annotations
+from importlib import import_module as _import_module
 
-from typing import Any
-
-
-def attach_token_ids(items: list[dict[str, str]], model: Any) -> list[dict[str, Any]]:
-    kept: list[dict[str, Any]] = []
-    for ex in items:
-        t_io = model.to_tokens(" " + ex["io_name"], prepend_bos=False)
-        t_s = model.to_tokens(" " + ex["s_name"], prepend_bos=False)
-        if t_io.shape[1] != 1 or t_s.shape[1] != 1:
-            continue
-        kept.append(
-            {
-                "id": f"ioi-{len(kept):06d}",
-                "prompt": ex["prompt"],
-                "target": {
-                    "correct_text": ex["io_name"],
-                    "distractor_text": ex["s_name"],
-                },
-                "tokenization": {
-                    "correct_ids": [int(t_io[0, 0].item())],
-                    "distractor_ids": [int(t_s[0, 0].item())],
-                },
-                "io_name": ex["io_name"],
-                "s_name": ex["s_name"],
-                "tok_io": int(t_io[0, 0].item()),
-                "tok_s": int(t_s[0, 0].item()),
-            }
-        )
-    return kept
+_impl = _import_module("saebase.datasets.IOI.tokenize")
 
 
-def filter_argmax(items: list[dict[str, Any]], model: Any) -> list[dict[str, Any]]:
-    import torch  # noqa: PLC0415
-
-    kept: list[dict[str, Any]] = []
-    for ex in items:
-        with torch.no_grad():
-            logits = model(ex["prompt"])[0, -1]
-        if int(logits.argmax().item()) == int(ex["tok_io"]):
-            kept.append(ex)
-    return kept
+def __getattr__(name: str) -> object:
+    return getattr(_impl, name)
 
 
-def filter_with_model(
-    items: list[dict[str, Any]],
-    model: Any,
-    *,
-    min_kept: int = 100,
-) -> tuple[list[dict[str, Any]], str]:
-    kept = filter_argmax(items, model)
-    return kept, "argmax_correct"
+def __dir__() -> list[str]:
+    return sorted(set(globals()) | set(dir(_impl)))
+
+
+for _name in dir(_impl):
+    if not _name.startswith("_"):
+        globals()[_name] = getattr(_impl, _name)
