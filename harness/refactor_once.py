@@ -286,8 +286,8 @@ def __getattr__(name: str):
 ''', encoding="utf-8")
     entry = ROOT / "saebase/runtime/train.py"
     code = entry.read_text(encoding="utf-8")
-    code = code.replace("config_path=\\"../conf\\"", "config_path=\\"../../conf\\"")
-    code = code.replace("config_name=\\"openresearch\\"", "config_name=\\"sae_research\\"")
+    code = code.replace('config_path="../conf"', 'config_path="../../conf"')
+    code = code.replace('config_name="openresearch"', 'config_name="sae_research"')
     code = code.replace("Path(__file__).resolve().parents[1]", "Path(__file__).resolve().parents[2]")
     code = code.replace("dlbase.plugin_bootstrap", "saebase.plugin_bootstrap")
     code = code.replace("tasks.runner", "saebase.runner")
