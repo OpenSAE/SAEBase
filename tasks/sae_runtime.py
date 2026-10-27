@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 from typing import Any, Callable
 
-from dlbase.registry import TaskModule
+from saebase.research_registry import TaskModule
 
 MODEL_KEY = "gemma2_2b_base"
 SAE_KEY = "gemma2_2b_pt_l25_canonical"
@@ -31,7 +31,7 @@ def _task(cfg: Any, key: str, default: Any = None) -> Any:
 
 
 def _require_context(cfg: Any, operation: str) -> None:
-    from dlbase.registry import get_dataset_plugin, get_model_plugin
+    from saebase.research_registry import get_dataset_plugin, get_model_plugin
 
     if operation not in TASK_NAMES or str(cfg.task.name) != operation:
         raise ValueError("Task name must match its registered operation")
@@ -61,7 +61,7 @@ def _pair(cfg: Any):
 def _prompt(cfg: Any) -> str:
     value = str(_task(cfg, "prompt", "") or "").strip()
     if not value:
-        from research_datasets.NLP.prompts import read_first_prompt
+        from research_datasets.prompts import read_first_prompt
 
         value = read_first_prompt(cfg.dataset, model_key=str(cfg.model.name))
     if not 1 <= len(value) <= 4000:
@@ -88,13 +88,13 @@ def _maybe_save(operation: str, payload: dict[str, Any]) -> dict[str, Any]:
 
 # Each task owns its concrete execution implementation; SAEBase stays generic.
 RUNNER_MODULES = {
-    "capture": "tasks.LLM.capture.operation",
-    "intervene": "tasks.LLM.intervene.operation",
-    "generate": "tasks.LLM.generate.operation",
-    "circuits": "tasks.LLM.circuits.operation",
-    "explain": "tasks.LLM.explain.operation",
-    "benchmark": "tasks.LLM.benchmark.operation",
-    "train": "tasks.LLM.train.operation",
+    "capture": "tasks.capture.operation",
+    "intervene": "tasks.intervene.operation",
+    "generate": "tasks.generate.operation",
+    "circuits": "tasks.circuits.operation",
+    "explain": "tasks.explain.operation",
+    "benchmark": "tasks.benchmark.operation",
+    "train": "tasks.train.operation",
 }
 
 

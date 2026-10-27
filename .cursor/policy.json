@@ -6,7 +6,6 @@
     "apps",
     "assets",
     "conf",
-    "dlbase",
     "doc",
     "docs",
     "examples",
@@ -40,7 +39,6 @@
     "setup.py"
   ],
   "protected_roots": [
-    "dlbase",
     "saebase"
   ]
 }
