@@ -9,6 +9,7 @@ Run:
 No pretrained model download. Outputs an SAEBase benchmark report and reliability audit
 computed with the original independent Localize estimators.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -39,23 +40,27 @@ def build_demo() -> tuple[BenchmarkConfig, ModelAdapter, dict[str, ResearchToySA
             BinaryFactor("second", ("3", "4")),
             BinaryFactor("third", ("5", "6")),
         ),
-        render=lambda x: f'{x["first"]} {x["second"]} {x["third"]}',
+        render=lambda x: f"{x['first']} {x['second']} {x['third']}",
     )
     model = ModelAdapter(ResearchToyModel().eval())
     records = design.sample_records(model)
     a = ResearchToySAE().eval()
     b = ResearchToySAE().eval()
     with torch.no_grad():
-        b.bias.add_(.1)  # distinct SAE checkpoint identity
+        b.bias.add_(0.1)  # distinct SAE checkpoint identity
     data = {
         "schema": "saebase.benchmark.config.v1",
         "name": "Input Localization benchmark demonstration",
-        "targets": [{"model_key": "synthetic-toy", "sae_keys": ["toy-a", "toy-b"],
-                     "hook_name": "blocks.0.hook_resid_post", "layer": 0}],
-        "dataset": {"id": "toy-three-factor-grid",
-                    "samples": [row.to_dict() for row in records]},
-        "metrics": ["localization.budget_at_90pct",
-                    "localization.budget_fraction_at_90pct"],
+        "targets": [
+            {
+                "model_key": "synthetic-toy",
+                "sae_keys": ["toy-a", "toy-b"],
+                "hook_name": "blocks.0.hook_resid_post",
+                "layer": 0,
+            }
+        ],
+        "dataset": {"id": "toy-three-factor-grid", "samples": [row.to_dict() for row in records]},
+        "metrics": ["localization.budget_at_90pct", "localization.budget_fraction_at_90pct"],
         "conditions": [],
         "options": {
             "tokenizer_sha256": hashlib.sha256(b"ResearchToyModel.to_tokens").hexdigest(),
@@ -80,7 +85,9 @@ def main() -> None:
         print(json.dumps(build_plan(cfg), indent=2))
         return
     rows = execute(
-        cfg, args.output, real=True,
+        cfg,
+        args.output,
+        real=True,
         loader=lambda mk, sk, layer: SimpleNamespace(model=model, sae=saes[sk]),
     )
     root = args.output / cfg.run_id
@@ -92,15 +99,22 @@ def main() -> None:
     audit = evaluate_m3(root, audit_cfg)
     write_audit(root, audit)
     write_report(root, cfg, build_plan(cfg), rows)
-    print(json.dumps({
-        "run_id": cfg.run_id,
-        "metrics": [{k: row[k] for k in ("metric_id", "sae_id", "status", "value")}
-                    for row in rows],
-        "localization_comparisons": audit["localization_comparisons"],
-        "report": str(root / "report.html"),
-        "curves": str(root / "localization"),
-        "reliability": str(root / "reliability.json"),
-    }, indent=2, allow_nan=False))
+    print(
+        json.dumps(
+            {
+                "run_id": cfg.run_id,
+                "metrics": [
+                    {k: row[k] for k in ("metric_id", "sae_id", "status", "value")} for row in rows
+                ],
+                "localization_comparisons": audit["localization_comparisons"],
+                "report": str(root / "report.html"),
+                "curves": str(root / "localization"),
+                "reliability": str(root / "reliability.json"),
+            },
+            indent=2,
+            allow_nan=False,
+        )
+    )
 
 
 if __name__ == "__main__":

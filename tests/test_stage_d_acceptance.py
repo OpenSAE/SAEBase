@@ -1,4 +1,5 @@
 """CPU unit tests for Stage D scheduling, resume and acceptance contracts."""
+
 from __future__ import annotations
 
 import json
@@ -35,9 +36,7 @@ class TinyModel(torch.nn.Module):
 
     def __init__(self, hook_name: str = "blocks.12.hook_resid_post"):
         super().__init__()
-        self.weight = torch.nn.Parameter(
-            torch.arange(1, 13, dtype=torch.float).reshape(3, 4) / 10
-        )
+        self.weight = torch.nn.Parameter(torch.arange(1, 13, dtype=torch.float).reshape(3, 4) / 10)
         self.cfg = SimpleNamespace(n_layers=24, device="cpu", d_model=3)
         self.hook_name = hook_name
 
@@ -71,15 +70,23 @@ class AffineSAE(torch.nn.Module):
     def __init__(self, *, d_in=3, d_sae=5):
         super().__init__()
         self.cfg = SimpleNamespace(d_in=d_in, d_sae=d_sae, dtype="float32")
-        self.decoder_weight = torch.nn.Parameter(torch.tensor([
-            [1., 0., 0.], [0., 1., 0.], [0., 0., 1.],
-            [.1, .2, -.1], [.1, -.1, .3],
-        ]))
-        self.bias = torch.nn.Parameter(torch.tensor([.3, -.2, .1]))
+        self.decoder_weight = torch.nn.Parameter(
+            torch.tensor(
+                [
+                    [1.0, 0.0, 0.0],
+                    [0.0, 1.0, 0.0],
+                    [0.0, 0.0, 1.0],
+                    [0.1, 0.2, -0.1],
+                    [0.1, -0.1, 0.3],
+                ]
+            )
+        )
+        self.bias = torch.nn.Parameter(torch.tensor([0.3, -0.2, 0.1]))
 
     def encode(self, x):
         return torch.cat(
-            [x, torch.ones((*x.shape[:-1], 2), dtype=x.dtype, device=x.device)], -1,
+            [x, torch.ones((*x.shape[:-1], 2), dtype=x.dtype, device=x.device)],
+            -1,
         )
 
     def decode(self, z):
@@ -144,14 +151,26 @@ def test_acceptance_checksum_and_resume(tmp_path):
     payload["artifact_sha256"] = canonical_payload_sha256(payload)
     path = write_acceptance(tmp_path, payload)
     assert read_acceptance(path)["artifact_sha256"] == payload["artifact_sha256"]
-    assert should_skip_resume(
-        tmp_path, model_key="qwen35_2b", sae_key="qwen35_2b_resid_w32k",
-        layer=12, resume=True,
-    ) is not None
-    assert should_skip_resume(
-        tmp_path, model_key="qwen35_2b", sae_key="qwen35_2b_resid_w32k",
-        layer=12, resume=False,
-    ) is None
+    assert (
+        should_skip_resume(
+            tmp_path,
+            model_key="qwen35_2b",
+            sae_key="qwen35_2b_resid_w32k",
+            layer=12,
+            resume=True,
+        )
+        is not None
+    )
+    assert (
+        should_skip_resume(
+            tmp_path,
+            model_key="qwen35_2b",
+            sae_key="qwen35_2b_resid_w32k",
+            layer=12,
+            resume=False,
+        )
+        is None
+    )
     bad = dict(payload)
     bad["artifact_sha256"] = "c" * 64
     bad_path = path.with_name("L12_bad.json")
@@ -207,7 +226,10 @@ def test_verify_detects_hook_mismatch():
 
     with pytest.raises(ValueError, match="hook"):
         verify_pair_site(
-            sae_key="qwen35_2b_resid_w32k", layer=12, device="cpu", load_fn=load_fn,
+            sae_key="qwen35_2b_resid_w32k",
+            layer=12,
+            device="cpu",
+            load_fn=load_fn,
         )
 
 
@@ -217,14 +239,21 @@ def test_verify_detects_dimension_mismatch():
     sae.cfg = SimpleNamespace(d_in=99, d_sae=5, dtype="float32")
 
     def load_fn(sae_key, layer, device=None, model_key_override=None):
-        return model, sae, {
-            "hook_name": "blocks.12.hook_resid_post",
-            "loaded_model_name": "tiny",
-        }
+        return (
+            model,
+            sae,
+            {
+                "hook_name": "blocks.12.hook_resid_post",
+                "loaded_model_name": "tiny",
+            },
+        )
 
     with pytest.raises(ValueError, match="shape|dimension"):
         verify_pair_site(
-            sae_key="qwen35_2b_resid_w32k", layer=12, device="cpu", load_fn=load_fn,
+            sae_key="qwen35_2b_resid_w32k",
+            layer=12,
+            device="cpu",
+            load_fn=load_fn,
         )
 
 
@@ -245,19 +274,26 @@ def test_verify_detects_noop_feature_edit(monkeypatch):
     monkeypatch.setattr(api, "edit_features", fake_edit)
     with pytest.raises(ValueError, match="ablation"):
         verify_pair_site(
-            sae_key="qwen35_2b_resid_w32k", layer=12, device="cpu", load_fn=load_fn,
+            sae_key="qwen35_2b_resid_w32k",
+            layer=12,
+            device="cpu",
+            load_fn=load_fn,
         )
 
 
 def test_status_and_final_matrix(tmp_path):
     records = build_site_records(load_coverage(CATALOG))
     site = records[0]
-    update_status(tmp_path, site.key.id, {
-        "status": "blocked_access",
-        "pair_verified": False,
-        "error_type": "GatedRepoError",
-        "error": "401",
-    })
+    update_status(
+        tmp_path,
+        site.key.id,
+        {
+            "status": "blocked_access",
+            "pair_verified": False,
+            "error_type": "GatedRepoError",
+            "error": "401",
+        },
+    )
     matrix = build_final_matrix(tmp_path, records)
     assert matrix["n_sites"] == 48
     assert matrix["counts"].get("blocked_access") == 1
@@ -273,9 +309,16 @@ def test_checked_in_targets_match_catalog():
 
 def test_matrix_dry_run_lists_44(tmp_path):
     from saebase.tools.phase_d_matrix import main
-    code = main([
-        "--dry-run", "--output", str(tmp_path), "--device", "cpu",
-    ])
+
+    code = main(
+        [
+            "--dry-run",
+            "--output",
+            str(tmp_path),
+            "--device",
+            "cpu",
+        ]
+    )
     assert code == 0
     body = json.loads((tmp_path / "stage_d_targets.json").read_text())
     assert body["n_sites"] == 48
@@ -283,6 +326,7 @@ def test_matrix_dry_run_lists_44(tmp_path):
 
 def test_resolve_evaluation_host_auto_override_for_transfer():
     from saebase.sae.stage_d import resolve_evaluation_host
+
     host, override = resolve_evaluation_host(
         catalog_model_key="gemma2_2b_it",
         sae_key="gemma2_2b_it_matryoshka_l12_32k",
@@ -293,6 +337,7 @@ def test_resolve_evaluation_host_auto_override_for_transfer():
 
 def test_assert_host_rejects_base_labeled_as_it():
     from saebase.sae.stage_d import assert_host_matches_label
+
     with pytest.raises(ValueError, match="IT|instruct|base"):
         assert_host_matches_label(
             evaluation_host_model_key="gemma2_2b_it",
@@ -306,6 +351,7 @@ def test_population_corpus_has_64_groups_and_no_overlap():
         POPULATION_MIN_EVAL_GROUPS,
         load_population_corpus,
     )
+
     corpus = load_population_corpus(DEFAULT_POPULATION_PATH)
     assert corpus["n_evaluation_groups"] >= POPULATION_MIN_EVAL_GROUPS
     assert corpus["n_selection"] >= 16
@@ -316,6 +362,7 @@ def test_population_corpus_has_64_groups_and_no_overlap():
 
 def test_population_flag_rejects_tiny_corpus(tmp_path):
     from saebase.sae.stage_d import load_population_corpus
+
     tiny = tmp_path / "tiny.jsonl"
     rows = [
         {"split": "selection", "group_id": "s0", "prompt": "sel A"},
@@ -348,16 +395,28 @@ def test_resume_fingerprint_mismatch_forces_rerun(tmp_path):
     }
     payload["artifact_sha256"] = canonical_payload_sha256(payload)
     write_acceptance(tmp_path, payload)
-    assert should_skip_resume(
-        tmp_path, model_key="qwen35_2b", sae_key="qwen35_2b_resid_w32k",
-        layer=12, resume=True,
-        expected={"hook_name": "blocks.12.hook_resid_post", "protocol": "stage_d.pair.v2"},
-    ) is not None
-    assert should_skip_resume(
-        tmp_path, model_key="qwen35_2b", sae_key="qwen35_2b_resid_w32k",
-        layer=12, resume=True,
-        expected={"hook_name": "blocks.12.hook_resid_pre", "protocol": "stage_d.pair.v2"},
-    ) is None
+    assert (
+        should_skip_resume(
+            tmp_path,
+            model_key="qwen35_2b",
+            sae_key="qwen35_2b_resid_w32k",
+            layer=12,
+            resume=True,
+            expected={"hook_name": "blocks.12.hook_resid_post", "protocol": "stage_d.pair.v2"},
+        )
+        is not None
+    )
+    assert (
+        should_skip_resume(
+            tmp_path,
+            model_key="qwen35_2b",
+            sae_key="qwen35_2b_resid_w32k",
+            layer=12,
+            resume=True,
+            expected={"hook_name": "blocks.12.hook_resid_pre", "protocol": "stage_d.pair.v2"},
+        )
+        is None
+    )
 
 
 def test_layer_norm_snapshot_restores_and_clears():
@@ -367,7 +426,9 @@ def test_layer_norm_snapshot_restores_and_clears():
     class LayerNormTopK(torch.nn.Module):
         def __init__(self):
             super().__init__()
-            self.cfg = SimpleNamespace(d_in=4, d_sae=4, dtype="float32", normalize_activations="layer_norm")
+            self.cfg = SimpleNamespace(
+                d_in=4, d_sae=4, dtype="float32", normalize_activations="layer_norm"
+            )
             self.W_enc = torch.nn.Parameter(torch.eye(4))
             self.W_dec = torch.nn.Parameter(torch.eye(4))
             self.b_dec = torch.nn.Parameter(torch.zeros(4))
@@ -454,6 +515,7 @@ def test_layer_norm_snapshot_restores_and_clears():
 
 def test_verify_evidence_fails_on_tampered_checksum(tmp_path):
     from saebase.tools.phase_d_verify_evidence import verify_checksums
+
     final = tmp_path / "final"
     final.mkdir()
     f = tmp_path / "notes.txt"
@@ -469,6 +531,7 @@ def test_verify_evidence_fails_on_tampered_checksum(tmp_path):
 
 def test_rebuild_canonical_status_is_exactly_48(tmp_path):
     from saebase.sae.stage_d import rebuild_canonical_status
+
     records = build_site_records(load_coverage(CATALOG))
     update_status(tmp_path, "bogus|extra|L0|blocks.0.hook_resid_pre", {"status": "failed_numeric"})
     update_status(tmp_path, records[0].key.id, {"status": "pair_verified", "pair_verified": True})

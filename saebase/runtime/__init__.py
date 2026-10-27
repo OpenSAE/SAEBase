@@ -1,4 +1,5 @@
 """Import-light dependency checks scoped to the requested SAEBase capability."""
+
 from __future__ import annotations
 
 from importlib.util import find_spec
@@ -53,13 +54,11 @@ def verify_runtime(*, context: str = "SAEBase", mode: Mode = "core") -> None:
     missing = missing_packages(mode)
     if not missing:
         return
-    requirement = {
-        "core": ".", "analysis": ".[analysis]", "generation": ".[generation]"
-    }[mode]
+    requirement = {"core": ".", "analysis": ".[analysis]", "generation": ".[generation]"}[mode]
     details = ", ".join(f"{mod} ({pip})" for mod, pip in missing)
     raise RuntimeError(
         f"{context}: missing dependencies for {mode}: {details}. "
-        f"Run `{sys.executable} -m pip install -e \"{requirement}\"` from the repository in the interpreter "
+        f'Run `{sys.executable} -m pip install -e "{requirement}"` from the repository in the interpreter '
         "that runs SAEBase."
     )
 
@@ -67,11 +66,14 @@ def verify_runtime(*, context: str = "SAEBase", mode: Mode = "core") -> None:
 def __getattr__(name: str):
     if name == "TaskModule":
         from saebase.registry import TaskModule
+
         return TaskModule
     if name == "apply_lightning_reproducibility":
         from saebase.runtime.training.seed import apply_lightning_reproducibility
+
         return apply_lightning_reproducibility
     if name == "verify_training_runtime":
         from saebase.runtime.runtime_check import verify_training_runtime
+
         return verify_training_runtime
     raise AttributeError(name)

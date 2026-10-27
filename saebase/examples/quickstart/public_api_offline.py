@@ -4,6 +4,7 @@ Run: python saebase/examples/quickstart/public_api_offline.py
 Shows selection of a particular token/site, SAE editing and output effects.
 Numbers are from an intentionally tiny synthetic model/SAE, not paper results.
 """
+
 from __future__ import annotations
 
 import json
@@ -15,8 +16,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import torch
 
 from saebase.api import (
-    ActivationSite, ModelAdapter, SAEIdentity, capture_features,
-    coalition_replacements, edit_features, evaluate_edit,
+    ActivationSite,
+    ModelAdapter,
+    SAEIdentity,
+    capture_features,
+    coalition_replacements,
+    edit_features,
+    evaluate_edit,
 )
 
 
@@ -25,9 +31,9 @@ class TinyModel(torch.nn.Module):
         super().__init__()
         self.output = torch.nn.Linear(3, 4, bias=False)
         with torch.no_grad():
-            self.output.weight.copy_(torch.tensor([
-                [1., 0., 0.], [0., 1., 0.], [0., 0., 1.], [.2, .1, -.2]
-            ]))
+            self.output.weight.copy_(
+                torch.tensor([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [0.2, 0.1, -0.2]])
+            )
         self.cfg = type("Config", (), {"n_layers": 1, "device": "cpu"})()
 
     def to_tokens(self, prompt: str):
@@ -55,13 +61,13 @@ class TinySAE(torch.nn.Module):
     def __init__(self):
         super().__init__()
         self.cfg = type("Config", (), {"d_in": 3, "d_sae": 4})()
-        self.bias = torch.nn.Parameter(torch.tensor([.01, -.02, .04]))
+        self.bias = torch.nn.Parameter(torch.tensor([0.01, -0.02, 0.04]))
 
     def encode(self, x):
         return torch.cat((x, torch.ones_like(x[..., :1])), dim=-1)
 
     def decode(self, z):
-        return z[..., :3] * .8 + self.bias
+        return z[..., :3] * 0.8 + self.bias
 
 
 def main():
@@ -69,8 +75,11 @@ def main():
     sae = TinySAE().eval()
     site = ActivationSite(layer=0, hook_name="blocks.0.hook_resid_post", position=-2)
     identity = SAEIdentity.for_custom(
-        sae=sae, model_key="tiny", checkpoint="local-synthetic-demo",
-        hook_name=site.hook_name, layer=site.layer,
+        sae=sae,
+        model_key="tiny",
+        checkpoint="local-synthetic-demo",
+        hook_name=site.hook_name,
+        layer=site.layer,
     )
     snapshot = capture_features(model, sae, site=site, prompt="3 5 7")
     replacements = coalition_replacements(
@@ -78,12 +87,10 @@ def main():
     )
     patch = edit_features(sae, snapshot, replacements=replacements)
     result = evaluate_edit(model, sae, site=site, prompt="3 5 7", replacements=replacements)
-    assert torch.allclose(patch.activation - snapshot.residual,
-                          sae.decode(patch.codes[None])[0])
+    assert torch.allclose(patch.activation - snapshot.residual, sae.decode(patch.codes[None])[0])
     assert not torch.allclose(result.baseline_logits, result.edited_logits)
     record = {
-        "site": {"hook_name": site.hook_name, "layer": site.layer,
-                 "token_position": site.position},
+        "site": {"hook_name": site.hook_name, "layer": site.layer, "token_position": site.position},
         "sae_identity": identity.to_dict(),
         "baseline_logits": result.baseline_logits.tolist(),
         "edited_logits": result.edited_logits.tolist(),

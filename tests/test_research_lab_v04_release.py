@@ -29,7 +29,11 @@ def test_release_version_and_notes_are_consistent():
 
 
 def test_research_lab_report_distinguishes_experiment_scope_from_software():
-    report = json.loads((BASE / "harness/github_development_doc/research-lab/release-evidence-v0.4.0.json").read_text())
+    report = json.loads(
+        (
+            BASE / "harness/github_development_doc/research-lab/release-evidence-v0.4.0.json"
+        ).read_text()
+    )
     assert report["software_version"] == "0.4.0"
     assert report["historical_reference"]["prompt_groups_per_site"] == 64
     assert report["new_cohort"]["parent_groups"] == 500
@@ -64,6 +68,8 @@ def test_readmes_and_workplan_refer_to_actual_preview():
         txt = (BASE / name).read_text(encoding="utf-8")
         assert "harness/github_development_doc/releases/v0.4.0.md" in txt
         assert "Research Lab" in txt
-    plan = (BASE / "harness/github_work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md").read_text()
+    plan = (
+        BASE / "harness/github_work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md"
+    ).read_text()
     assert "harness/github_development_doc/research-lab/release-acceptance.md" in plan
     assert "K16" in plan and "RSS" in plan

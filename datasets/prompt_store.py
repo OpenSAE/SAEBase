@@ -72,8 +72,7 @@ def load_manifest(
         )
     if canonicalize_behavior(str(manifest.get("behavior", beh))) != beh:
         raise RuntimeError(
-            f"Artifact behavior mismatch: manifest={manifest.get('behavior')!r} "
-            f"requested={beh!r}"
+            f"Artifact behavior mismatch: manifest={manifest.get('behavior')!r} requested={beh!r}"
         )
     return manifest
 
@@ -90,9 +89,7 @@ def load_prompts(
         load_manifest(beh, model_key, data_root=data_root)
     path = prompts_path(beh, model_key, data_root=data_root)
     if not path.is_file():
-        raise FileNotFoundError(
-            f"Prompt artifact not found for {beh}/{model_key}: {path}"
-        )
+        raise FileNotFoundError(f"Prompt artifact not found for {beh}/{model_key}: {path}")
     rows: list[dict[str, Any]] = []
     with path.open(encoding="utf-8") as fh:
         for line in fh:

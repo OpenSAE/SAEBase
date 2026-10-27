@@ -188,7 +188,11 @@ def features(
     """Search the immutable SQLite feature store, or the legacy compact index."""
     try:
         return explore.feature_search(
-            query=q, model=model, site_id=site_id, limit=limit, offset=offset,
+            query=q,
+            model=model,
+            site_id=site_id,
+            limit=limit,
+            offset=offset,
         )
     except core.InvalidEvidence as exc:
         _bad_evidence(exc)
@@ -275,20 +279,27 @@ def explore_search(request: ExploreSearch) -> dict[str, Any]:
             if not request.query.strip():
                 raise HTTPException(422, "Enter an explanation search term")
             return explore.feature_search(
-                mode="explanation", query=request.query[:200],
-                site_id=request.site_id, limit=request.limit,
+                mode="explanation",
+                query=request.query[:200],
+                site_id=request.site_id,
+                limit=request.limit,
             )
         if request.mode == "inference":
             matches = explore.recorded_inference(
-                request.query, site_id=request.site_id,
+                request.query,
+                site_id=request.site_id,
             )
             if not matches:
                 raise HTTPException(
-                    503, "No exact reviewed recorded prompt matches this input. "
+                    503,
+                    "No exact reviewed recorded prompt matches this input. "
                     "Live inference requires an authorized local/GPU worker.",
                 )
-            return {"mode": "recorded_only", "total": len(matches),
-                    "items": matches[:request.limit]}
+            return {
+                "mode": "recorded_only",
+                "total": len(matches),
+                "items": matches[: request.limit],
+            }
         if request.mode == "token":
             trace = explore.recorded_trace(request.trace_id)
             if trace is None:
@@ -296,10 +307,14 @@ def explore_search(request: ExploreSearch) -> dict[str, Any]:
             if request.position is None:
                 raise HTTPException(422, "A token position is required")
             return {
-                "mode": "recorded_token_topk", "trace_id": trace["trace_id"],
-                "site_id": trace["site_id"], "position": request.position,
+                "mode": "recorded_token_topk",
+                "trace_id": trace["trace_id"],
+                "site_id": trace["site_id"],
+                "position": request.position,
                 "items": explore.strongest_features(
-                    trace, token_position=request.position, top_k=request.limit,
+                    trace,
+                    token_position=request.position,
+                    top_k=request.limit,
                 ),
             }
         raise HTTPException(422, "Unknown search mode")
@@ -494,12 +509,18 @@ def sae_assets(model_key: str = "") -> dict[str, Any]:
             and (not model_key or site["model"] == model_key)
         ]
         return {
-            "total": len(items), "items": items,
-            "mode": "registered_metadata_only", "source": "historical_verified_sites",
+            "total": len(items),
+            "items": items,
+            "mode": "registered_metadata_only",
+            "source": "historical_verified_sites",
         }
     items = registered_catalog_json(model_key=model_key or None)
-    return {"total": len(items), "items": items, "mode": "registered_metadata_only",
-            "source": "saebase_python_registry"}
+    return {
+        "total": len(items),
+        "items": items,
+        "mode": "registered_metadata_only",
+        "source": "saebase_python_registry",
+    }
 
 
 @app.post("/api/jobs")

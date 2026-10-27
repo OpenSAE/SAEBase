@@ -41,7 +41,11 @@ def reference(value, kind, check_exists=True):
     parts = value.split("/")
     demand(all(part not in ("", ".", "..") for part in parts), "Unsafe path traversal")
     demand(tuple(parts) == PurePosixPath(value).parts, "Noncanonical path")
-    prefixes = ("doc/knowledge/", "doc/code/") if kind == "doc" else ("harness/github_harness/github_work_plan/",)
+    prefixes = (
+        ("doc/knowledge/", "doc/code/")
+        if kind == "doc"
+        else ("harness/github_harness/github_work_plan/",)
+    )
     demand(any(value.startswith(p) for p in prefixes), f"Reference is outside {kind}: {value}")
     dest = (ROOT / value).resolve(strict=False)
     roots = ("doc/knowledge", "doc/code") if kind == "doc" else ("harness/github_work_plan",)

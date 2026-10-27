@@ -1,4 +1,5 @@
 """End-to-end controlled Boolean input design and cache provenance tests."""
+
 from __future__ import annotations
 
 import hashlib
@@ -12,15 +13,23 @@ import torch
 from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ActivationSite, ModelAdapter
 from saebase.data import (
-    BinaryFactor, ControlledInputDesign, ControlledInputManifest,
-    collect_controlled_input_activations, load_controlled_input_manifest,
+    BinaryFactor,
+    ControlledInputDesign,
+    ControlledInputManifest,
+    collect_controlled_input_activations,
+    load_controlled_input_manifest,
 )
 from saebase.integrations import (
-    collect_localization_grid, localization_grid_from_code_store,
+    collect_localization_grid,
+    localization_grid_from_code_store,
 )
 from saebase.store import (
-    ActivationIdentity, ActivationWriter, CodeIdentity, ShardedReader,
-    encode_from_store, sha256_state_dict,
+    ActivationIdentity,
+    ActivationWriter,
+    CodeIdentity,
+    ShardedReader,
+    encode_from_store,
+    sha256_state_dict,
 )
 
 
@@ -31,8 +40,9 @@ def _design():
         BinaryFactor("right", ("5", "6")),
     )
     return ControlledInputDesign.from_renderer(
-        factors=factors, name="toy-factorial",
-        render=lambda x: f'{x["left"]} {x["middle"]} {x["right"]}'
+        factors=factors,
+        name="toy-factorial",
+        render=lambda x: f"{x['left']} {x['middle']} {x['right']}",
     )
 
 
@@ -41,12 +51,13 @@ def _components():
     sae = ResearchToySAE().eval()
     site = ActivationSite(0, "blocks.0.hook_resid_post")
     activation_identity = ActivationIdentity(
-        model_key="test-model", model_state_sha256=sha256_state_dict(adapter.model),
+        model_key="test-model",
+        model_state_sha256=sha256_state_dict(adapter.model),
         tokenizer_sha256=hashlib.sha256(b"test-tokenizer").hexdigest(),
-        hook_name=site.hook_name, layer=site.layer,
+        hook_name=site.hook_name,
+        layer=site.layer,
     )
-    sae_identity = CodeIdentity("test-sae", sha256_state_dict(sae),
-                               sae.cfg.d_in, sae.cfg.d_sae)
+    sae_identity = CodeIdentity("test-sae", sha256_state_dict(sae), sae.cfg.d_in, sae.cfg.d_sae)
     return adapter, sae, site, activation_identity, sae_identity
 
 
@@ -87,8 +98,10 @@ def test_design_rejects_tokenizer_state_collisions_before_capture():
     model = ModelAdapter(CollidingTokens().eval())
     with pytest.raises(ValueError, match="identical token IDs"):
         collect_localization_grid(
-            model, ResearchToySAE().eval(),
-            site=ActivationSite(0, "blocks.0.hook_resid_post"), design=_design()
+            model,
+            ResearchToySAE().eval(),
+            site=ActivationSite(0, "blocks.0.hook_resid_post"),
+            design=_design(),
         )
 
 
@@ -111,7 +124,8 @@ def test_invalid_factor_states_and_positions():
         )
     with pytest.raises(ValueError, match="token position"):
         ControlledInputDesign.from_renderer(
-            factors=factors, render=lambda x: "1 2 3 " + x["x"] + x["y"],
+            factors=factors,
+            render=lambda x: "1 2 3 " + x["x"] + x["y"],
             position=100,
         ).sample_records(_components()[0])
 
@@ -124,9 +138,7 @@ def test_direct_design_localize_capture_preserves_bitmask_order():
     assert direct.state_sample_ids == tuple(s.sample_id for s in design.states)
     assert direct.codes.shape == (8, 7)
     with pytest.raises(ValueError, match="not both"):
-        collect_localization_grid(
-            model, sae, site=site, design=design, n_factors=3
-        )
+        collect_localization_grid(model, sae, site=site, design=design, n_factors=3)
 
 
 def test_factorial_cache_and_manifest_reuse(tmp_path: Path):
@@ -143,12 +155,18 @@ def test_factorial_cache_and_manifest_reuse(tmp_path: Path):
         source_path = writer.path
     code_path, code_stats = encode_from_store(source_path, sae, sae_id)
     assert code_stats.collected == 8
-    original_grid = localization_grid_from_code_store(code_path, manifest=first.manifest_path, site=site)
-    mapped_grid = localization_grid_from_code_store(code_path, manifest=second.manifest_path, site=site)
+    original_grid = localization_grid_from_code_store(
+        code_path, manifest=first.manifest_path, site=site
+    )
+    mapped_grid = localization_grid_from_code_store(
+        code_path, manifest=second.manifest_path, site=site
+    )
     assert original_grid.design_key == original.key
     assert mapped_grid.design_key == transformed.key
     assert original_grid.state_sample_ids == tuple(s.sample_id for s in original.states)
-    np.testing.assert_allclose(mapped_grid.codes, original_grid.codes[list(mapping.values())], rtol=0, atol=0)
+    np.testing.assert_allclose(
+        mapped_grid.codes, original_grid.codes[list(mapping.values())], rtol=0, atol=0
+    )
     assert sorted(original_grid.state_sample_ids) == sorted(mapped_grid.state_sample_ids)
     live_grid = collect_localization_grid(model, sae, site=site, design=original)
     np.testing.assert_allclose(live_grid.codes, original_grid.codes, rtol=0, atol=0)
@@ -180,6 +198,7 @@ def test_manifest_rejects_modified_source_and_model_identity(tmp_path: Path):
     good["activation_identity_key"] = "b" * 64
     good.pop("manifest_sha256")
     from saebase.store import fingerprint
+
     good["manifest_sha256"] = fingerprint(good)
     different = ControlledInputManifest.from_dict(good)
     with pytest.raises(ValueError, match="different activation cache"):
@@ -196,6 +215,7 @@ def test_manifest_position_integrity(tmp_path: Path):
     altered["states"][0]["position"] = 1
     altered.pop("manifest_sha256")
     from saebase.store import fingerprint
+
     altered["manifest_sha256"] = fingerprint(altered)
     with pytest.raises(ValueError, match="position mismatch"):
         localization_grid_from_code_store(

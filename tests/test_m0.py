@@ -1,11 +1,11 @@
 """M0 minimal-install contracts and reference recorder tests (no model downloads)."""
+
 from __future__ import annotations
 
 import json
 from pathlib import Path
 import subprocess
 import sys
-from types import SimpleNamespace
 
 import pytest
 
@@ -22,14 +22,17 @@ def make_bundle():
     sae = ResearchToySAE().eval()
     site = ActivationSite(layer=0, hook_name="blocks.0.hook_resid_post")
     identity = SAEIdentity.for_custom(
-        sae=sae, model_key="research-toy", checkpoint="synthetic://test",
-        hook_name=site.hook_name, layer=site.layer,
+        sae=sae,
+        model_key="research-toy",
+        checkpoint="synthetic://test",
+        hook_name=site.hook_name,
+        layer=site.layer,
     )
     return LoadedResearchPair(model=ModelAdapter(model), sae=sae, identity=identity)
 
 
 def test_optional_checkpoint_packages_not_imported_by_base_api():
-    code = r'''
+    code = r"""
 import builtins
 import torch
 base = builtins.__import__
@@ -41,10 +44,13 @@ builtins.__import__ = guarded
 import saebase.sae.loading
 from saebase.api import capture_features, evaluate_edit
 print('minimal imports OK')
-'''
+"""
     result = subprocess.run(
-        [sys.executable, "-c", code], cwd=ROOT,
-        capture_output=True, text=True, timeout=30,
+        [sys.executable, "-c", code],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=30,
     )
     assert result.returncode == 0, result.stderr
     assert "minimal imports OK" in result.stdout
@@ -113,7 +119,10 @@ def test_reference_rejects_token_drift_and_empty_data():
 def test_m0_real_runner_documents_explicit_inputs():
     p = subprocess.run(
         [sys.executable, "saebase/tools/m0_reference_smoke.py", "--help"],
-        cwd=ROOT, capture_output=True, text=True, timeout=30,
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=30,
     )
     assert p.returncode == 0, p.stderr
     assert "--reuse-prompts" in p.stdout
@@ -123,11 +132,13 @@ def test_m0_real_runner_documents_explicit_inputs():
 
 def test_reference_hash_supports_zero_dimensional_state_tensors():
     import torch
+
     class ScalarState(torch.nn.Module):
         def __init__(self):
             super().__init__()
             self.register_buffer("scalar", torch.tensor(0.5))
             self.register_buffer("vector", torch.arange(5.0))
+
     module = ScalarState()
     old_hash = _sha_weights(module)
     assert len(old_hash) == 64
@@ -136,7 +147,6 @@ def test_reference_hash_supports_zero_dimensional_state_tensors():
 
 
 def test_transformerlens_keyword_hook_callback_compatibility():
-    import torch
 
     class KeywordHookModel(ResearchToyModel):
         def run_with_hooks(self, tokens, fwd_hooks):

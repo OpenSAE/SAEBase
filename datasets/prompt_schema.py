@@ -87,9 +87,7 @@ def assert_available(behavior: str, model_key: str) -> None:
     beh = canonicalize_behavior(behavior)
     key = str(model_key)
     if key not in MODEL_BEHAVIOR_MATRIX:
-        raise KeyError(
-            f"Unknown model_key={key!r}. Valid: {sorted(MODEL_BEHAVIOR_MATRIX)}"
-        )
+        raise KeyError(f"Unknown model_key={key!r}. Valid: {sorted(MODEL_BEHAVIOR_MATRIX)}")
     if beh not in MODEL_BEHAVIOR_MATRIX[key]:
         raise RuntimeError(
             f"Behavior {beh!r} is not available for model_key={key!r}. "

@@ -5,6 +5,7 @@ Install the original method first:
 
 This example uses a deterministic synthetic model/SAE, not paper results.
 """
+
 from __future__ import annotations
 
 import json
@@ -26,15 +27,20 @@ def main() -> None:
         state: f"{1 + (state & 1)} {3 + ((state >> 1) & 1)} {5 + ((state >> 2) & 1)}"
         for state in range(8)
     }
-    grid = collect_localization_grid(
-        model, sae, site=site, prompts_by_state=prompts, n_factors=3
-    )
+    grid = collect_localization_grid(model, sae, site=site, prompts_by_state=prompts, n_factors=3)
     result = evaluate_localization(grid)
-    print(json.dumps({"data_type": "synthetic demonstration",
-                      **result.summary(),
-                      "scope_curve": result.curve.tolist(),
-                      "feature_scope_masks": result.assignment.tolist()},
-                     indent=2, allow_nan=False))
+    print(
+        json.dumps(
+            {
+                "data_type": "synthetic demonstration",
+                **result.summary(),
+                "scope_curve": result.curve.tolist(),
+                "feature_scope_masks": result.assignment.tolist(),
+            },
+            indent=2,
+            allow_nan=False,
+        )
+    )
 
 
 if __name__ == "__main__":

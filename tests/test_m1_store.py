@@ -1,4 +1,5 @@
 """M1 contracts: identities, selection, streaming, atomic resume, CSR, and SAE reuse."""
+
 from __future__ import annotations
 
 from dataclasses import replace
@@ -11,23 +12,47 @@ import torch
 
 from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ActivationSite, ModelAdapter
-from saebase.store import (ActivationIdentity, ActivationWriter, CacheIntegrityError,
-                           CodeIdentity, SampleRecord, TokenSelection, ShardedReader,
-                           capture_selected, collect_activations, encode_from_store,
-                           resolve_positions, sha256_state_dict)
+from saebase.store import (
+    ActivationIdentity,
+    ActivationWriter,
+    CacheIntegrityError,
+    CodeIdentity,
+    SampleRecord,
+    TokenSelection,
+    ShardedReader,
+    capture_selected,
+    collect_activations,
+    encode_from_store,
+    resolve_positions,
+    sha256_state_dict,
+)
 
 
 def identity(**changes):
-    return replace(ActivationIdentity(model_key="toy", model_state_sha256="a" * 64,
-                                      tokenizer_sha256="b" * 64,
-                                      hook_name="blocks.0.hook_resid_post", layer=0), **changes)
+    return replace(
+        ActivationIdentity(
+            model_key="toy",
+            model_state_sha256="a" * 64,
+            tokenizer_sha256="b" * 64,
+            hook_name="blocks.0.hook_resid_post",
+            layer=0,
+        ),
+        **changes,
+    )
 
 
-def sample(name="one", tokens=(1, 2, 3), *, selection=None, mask=None, offsets=None,
-           split="evaluation"):
-    return SampleRecord(name, tokens, attention_mask=mask,
-                        selection=selection or TokenSelection(), token_offsets=offsets,
-                        prompt_group_id="g1", split=split)
+def sample(
+    name="one", tokens=(1, 2, 3), *, selection=None, mask=None, offsets=None, split="evaluation"
+):
+    return SampleRecord(
+        name,
+        tokens,
+        attention_mask=mask,
+        selection=selection or TokenSelection(),
+        token_offsets=offsets,
+        prompt_group_id="g1",
+        split=split,
+    )
 
 
 def site():
@@ -39,16 +64,22 @@ def live_identity(model):
 
 
 def codes(key="sae-a", digest="c"):
-    return CodeIdentity(sae_key=key, sae_state_sha256=digest * 64,
-                        d_in=4, d_sae=7)
+    return CodeIdentity(sae_key=key, sae_state_sha256=digest * 64, d_in=4, d_sae=7)
 
 
-@pytest.mark.parametrize("field,value", [
-    ("model_state_sha256", "c" * 64), ("tokenizer_sha256", "d" * 64),
-    ("chat_template_sha256", "e" * 64), ("hook_name", "blocks.0.hook_mlp_out"),
-    ("layer", 1), ("dtype", "float16"),
-    ("preprocessing", {"bos": False}), ("execution", {"backend": "tl"}),
-])
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("model_state_sha256", "c" * 64),
+        ("tokenizer_sha256", "d" * 64),
+        ("chat_template_sha256", "e" * 64),
+        ("hook_name", "blocks.0.hook_mlp_out"),
+        ("layer", 1),
+        ("dtype", "float16"),
+        ("preprocessing", {"bos": False}),
+        ("execution", {"backend": "tl"}),
+    ],
+)
 def test_identity_provenance_invalidation(field, value):
     if field == "layer":
         altered = replace(identity(), layer=1, hook_name="blocks.1.hook_resid_post")
@@ -73,11 +104,19 @@ def test_identity_rejects_mutable_or_invalid_provenance():
 def test_selection_last_mask_indices_span_and_all():
     tokens = (101, 5, 6, 99)
     assert resolve_positions(sample(tokens=tokens, mask=(1, 1, 1, 0))) == (2,)
-    assert resolve_positions(sample(tokens=tokens, mask=(1, 1, 0, 0),
-                                    selection=TokenSelection("all_valid"))) == (0, 1)
-    assert resolve_positions(sample(tokens=tokens, selection=TokenSelection("indices", (2, 1)))) == (2, 1)
-    assert resolve_positions(sample(tokens=tokens, selection=TokenSelection("span", char_span=(3, 8)),
-                                    offsets=((0, 0), (0, 4), (4, 7), (0, 0)))) == (1, 2)
+    assert resolve_positions(
+        sample(tokens=tokens, mask=(1, 1, 0, 0), selection=TokenSelection("all_valid"))
+    ) == (0, 1)
+    assert resolve_positions(
+        sample(tokens=tokens, selection=TokenSelection("indices", (2, 1)))
+    ) == (2, 1)
+    assert resolve_positions(
+        sample(
+            tokens=tokens,
+            selection=TokenSelection("span", char_span=(3, 8)),
+            offsets=((0, 0), (0, 4), (4, 7), (0, 0)),
+        )
+    ) == (1, 2)
     with pytest.raises(ValueError, match="token_offsets"):
         sample(tokens=tokens, selection=TokenSelection("span", char_span=(0, 1)))
     with pytest.raises(ValueError, match="valid"):
@@ -90,7 +129,7 @@ def test_dense_roundtrip_resumability_and_consistent_metadata(tmp_path):
     r1 = sample("a", (3, 4, 5), selection=TokenSelection("all_valid"))
     r2 = sample("b", (1, 2, 4))
     a = np.arange(12, dtype=np.float32).reshape(3, 4)
-    b = np.array([[11., 12., 13., 14.]], dtype=np.float32)
+    b = np.array([[11.0, 12.0, 13.0, 14.0]], dtype=np.float32)
     with ActivationWriter(tmp_path, identity(), width=4, shard_target_bytes=128) as writer:
         assert writer.append(r1, a)
         assert writer.append(r2, b)
@@ -119,7 +158,7 @@ def test_dense_roundtrip_resumability_and_consistent_metadata(tmp_path):
 
 
 def test_small_shards_streaming_and_window_budget(tmp_path):
-    rows = [sample(f"row-{i:04d}", (i, i+1)) for i in range(112)]
+    rows = [sample(f"row-{i:04d}", (i, i + 1)) for i in range(112)]
     with ActivationWriter(tmp_path, identity(), width=4, shard_target_bytes=128) as writer:
         for i, record in enumerate(rows):
             assert writer.append(record, np.full((1, 4), i, dtype=np.float32))
@@ -145,31 +184,36 @@ def test_finite_shape_dtype_errors(tmp_path):
             w.append(sample(), np.ones((1, 3)))
 
 
-@pytest.mark.parametrize("dtype,atol", [("float32", 0), ("float16", .003), ("bfloat16", .03)])
+@pytest.mark.parametrize("dtype,atol", [("float32", 0), ("float16", 0.003), ("bfloat16", 0.03)])
 def test_numeric_storage_precisions_and_error_bounds(tmp_path, dtype, atol):
-    values = np.array([[1.111, -2.222, .14159, 3.333]], dtype=np.float32)
-    with ActivationWriter(tmp_path, identity(dtype=dtype), width=4,
-                          shard_target_bytes=256) as writer:
+    values = np.array([[1.111, -2.222, 0.14159, 3.333]], dtype=np.float32)
+    with ActivationWriter(
+        tmp_path, identity(dtype=dtype), width=4, shard_target_bytes=256
+    ) as writer:
         writer.append(sample(), values)
         assert writer.max_observed_quantization_error <= atol
         path = writer.path
     np.testing.assert_allclose(ShardedReader(path).get("one").values, values, atol=atol, rtol=0)
     if dtype != "float32":
         with pytest.raises(ValueError, match="conversion error"):
-            with ActivationWriter(tmp_path / "limited", identity(dtype=dtype), width=4,
-                                  max_quantization_error=0.0) as w:
+            with ActivationWriter(
+                tmp_path / "limited", identity(dtype=dtype), width=4, max_quantization_error=0.0
+            ) as w:
                 w.append(sample(), values)
 
 
 def test_manifest_is_commit_barrier_and_orphans_ignored(tmp_path, monkeypatch):
     import saebase.store.shards as mod
+
     writer = ActivationWriter(tmp_path, identity(), width=4, shard_target_bytes=256)
     writer.append(sample(), np.array([[1, 2, 3, 4]], dtype=np.float32))
     real = mod._atomic_json
+
     def crash(path, value):
         if Path(path).name == "manifest.json" and value["shards"]:
             raise OSError("simulated crash after writing shard files")
         return real(path, value)
+
     with monkeypatch.context() as m:
         m.setattr(mod, "_atomic_json", crash)
         with pytest.raises(OSError, match="simulated crash"):
@@ -185,16 +229,17 @@ def test_manifest_is_commit_barrier_and_orphans_ignored(tmp_path, monkeypatch):
 
 
 def test_corruption_detection_and_explicit_repair(tmp_path):
-    r1 = sample("a", (1, 2, 3)); r2 = sample("b", (2, 3, 4))
+    r1 = sample("a", (1, 2, 3))
+    r2 = sample("b", (2, 3, 4))
     with ActivationWriter(tmp_path, identity(), width=4, shard_target_bytes=128) as w:
         w.append(r1, np.ones((1, 4), dtype=np.float32))
         w.flush()
         w.append(r2, np.ones((1, 4), dtype=np.float32) * 2)
         path = w.path
     reader = ShardedReader(path)
-    corrupt = path / 'shards' / 'shard-00000.npy'
+    corrupt = path / "shards" / "shard-00000.npy"
     raw = bytearray(corrupt.read_bytes())
-    raw[-4:] = b'BADD'
+    raw[-4:] = b"BADD"
     corrupt.write_bytes(raw)
     with pytest.raises(CacheIntegrityError, match="corrupted shard"):
         ShardedReader(path)
@@ -206,11 +251,11 @@ def test_corruption_detection_and_explicit_repair(tmp_path):
         w.append(r1, np.ones((1, 4), dtype=np.float32))
     after = ShardedReader(path)
     assert after.sample_count == 2
-    assert len(after.manifest['repairs']) == 1
-    np.testing.assert_allclose(after.get('a').values, np.ones((1, 4)))
+    assert len(after.manifest["repairs"]) == 1
+    np.testing.assert_allclose(after.get("a").values, np.ones((1, 4)))
     # A corrupted sidecar is also detected.
-    sidecar = path / 'shards' / after.manifest['shards'][0]['sidecar']
-    sidecar.write_text('BROKEN')
+    sidecar = path / "shards" / after.manifest["shards"][0]["sidecar"]
+    sidecar.write_text("BROKEN")
     with pytest.raises(CacheIntegrityError, match="sidecar"):
         ShardedReader(path)
 
@@ -220,18 +265,24 @@ def test_capture_multi_site_matches_existing_api_and_skips_repeats(tmp_path):
         def __init__(self):
             super().__init__()
             self.cache_calls = 0
+
         def run_with_cache(self, *args, **kwargs):
             self.cache_calls += 1
             return super().run_with_cache(*args, **kwargs)
+
     model = CountingModel().eval()
     adapter = ModelAdapter(model)
     ids = torch.tensor([[1, 2, 3, 4]], dtype=torch.long)
     actual = capture_selected(adapter, tokens=ids, site=site(), positions=(0, 3, 1))
     assert actual.shape == (3, 4) and model.cache_calls == 1
     for i, pos in enumerate((0, 3, 1)):
-        np.testing.assert_allclose(actual[i], adapter.capture(tokens=ids, site=replace(site(), position=pos)))
-    records = [sample('a', (1, 2, 3), selection=TokenSelection('all_valid')),
-               sample('b', (1, 2, 3, 4))]
+        np.testing.assert_allclose(
+            actual[i], adapter.capture(tokens=ids, site=replace(site(), position=pos))
+        )
+    records = [
+        sample("a", (1, 2, 3), selection=TokenSelection("all_valid")),
+        sample("b", (1, 2, 3, 4)),
+    ]
     with ActivationWriter(tmp_path, live_identity(model), width=4, shard_target_bytes=256) as w:
         assert collect_activations(adapter, records, w, site=site()).collected == 2
         path = w.path
@@ -241,23 +292,27 @@ def test_capture_multi_site_matches_existing_api_and_skips_repeats(tmp_path):
         assert stats.collected == 0 and stats.reused == 2
     assert model.cache_calls == before
     reader = ShardedReader(path)
-    assert reader.get('a').positions == (0, 1, 2)
-    assert reader.get('b').positions == (3,)
+    assert reader.get("a").positions == (0, 1, 2)
+    assert reader.get("b").positions == (3,)
 
 
 def test_hf_hooks_capture_multiple_positions_in_one_backend_call():
     class HFStyle(ResearchToyModel):
-        _saebase_backend = 'hf_hooks'
+        _saebase_backend = "hf_hooks"
+
         def __init__(self):
             super().__init__()
             self.calls = 0
+
         def get_resid(self, ids, layer, offsets):
             self.calls += 1
             assert layer == 0
             h = self._hidden(ids)
             return h[0, [ids.shape[1] - 1 - k for k in offsets]]
+
         def run_with_patch(self, *a, **k):
             return self(ids)
+
     adapter = ModelAdapter(HFStyle().eval())
     ids = torch.tensor([[1, 2, 3, 4]])
     out = capture_selected(adapter, tokens=ids, site=site(), positions=(2, 0))
@@ -271,13 +326,18 @@ def test_second_sae_uses_cached_rows_without_model_forward(tmp_path):
         def __init__(self):
             super().__init__()
             self.capture_calls = 0
+
         def run_with_cache(self, *a, **k):
             self.capture_calls += 1
             return super().run_with_cache(*a, **k)
+
     model = CountingModel().eval()
     adapter = ModelAdapter(model)
-    records = [sample('one', (1, 2, 3)), sample('two', (4, 5, 6)),
-               sample('three', (3, 3, 7), selection=TokenSelection('indices', (0, 2)))]
+    records = [
+        sample("one", (1, 2, 3)),
+        sample("two", (4, 5, 6)),
+        sample("three", (3, 3, 7), selection=TokenSelection("indices", (0, 2))),
+    ]
     with ActivationWriter(tmp_path, live_identity(model), width=4, shard_target_bytes=256) as w:
         collect_activations(adapter, records, w, site=site())
         raw_path = w.path
@@ -286,10 +346,22 @@ def test_second_sae_uses_cached_rows_without_model_forward(tmp_path):
     sae2 = ResearchToySAE().eval()
     with torch.no_grad():
         sae2.bias.add_(0.5)
-    code_path1, stats1 = encode_from_store(raw_path, sae1, replace(codes('A', 'c'), sae_state_sha256=sha256_state_dict(sae1)), layout='csr', max_rows=3,
-                                           shard_target_bytes=256)
-    code_path2, stats2 = encode_from_store(raw_path, sae2, replace(codes('B', 'd'), sae_state_sha256=sha256_state_dict(sae2)), layout='dense', max_rows=3,
-                                           shard_target_bytes=256)
+    code_path1, stats1 = encode_from_store(
+        raw_path,
+        sae1,
+        replace(codes("A", "c"), sae_state_sha256=sha256_state_dict(sae1)),
+        layout="csr",
+        max_rows=3,
+        shard_target_bytes=256,
+    )
+    code_path2, stats2 = encode_from_store(
+        raw_path,
+        sae2,
+        replace(codes("B", "d"), sae_state_sha256=sha256_state_dict(sae2)),
+        layout="dense",
+        max_rows=3,
+        shard_target_bytes=256,
+    )
     assert model.capture_calls == forwards
     assert stats1.collected == 3 and stats2.collected == 3
     assert code_path1 != code_path2
@@ -299,53 +371,64 @@ def test_second_sae_uses_cached_rows_without_model_forward(tmp_path):
         expected = sae1.encode(torch.as_tensor(np.array(cached.values))).detach().numpy()
         np.testing.assert_array_equal(ShardedReader(code_path1).get(r.sample_id).values, expected)
         np.testing.assert_array_equal(ShardedReader(code_path2).get(r.sample_id).values, expected)
-    new_path, stats = encode_from_store(raw_path, sae1, replace(codes('A', 'c'), sae_state_sha256=sha256_state_dict(sae1)), layout='csr',
-                                        max_rows=3, shard_target_bytes=256)
+    new_path, stats = encode_from_store(
+        raw_path,
+        sae1,
+        replace(codes("A", "c"), sae_state_sha256=sha256_state_dict(sae1)),
+        layout="csr",
+        max_rows=3,
+        shard_target_bytes=256,
+    )
     assert new_path == code_path1 and stats.collected == 0 and stats.reused == 3
 
 
 def test_csr_exact_zeros_and_all_features_preserved(tmp_path):
     from saebase.store import CodeWriter
+
     with ActivationWriter(tmp_path, identity(), width=4) as w:
         w.append(sample(), np.ones((1, 4), dtype=np.float32))
         raw_path = w.path
     # d_sae=7; intentionally include a feature far beyond typical top-k.
     code = np.array([[0, 0, -3, 0, 1e-5, 0, 4]], dtype=np.float32)
-    with CodeWriter(raw_path, codes(), layout='csr', shard_target_bytes=128) as w:
+    with CodeWriter(raw_path, codes(), layout="csr", shard_target_bytes=128) as w:
         w.append(sample(), code)
         path = w.path
-    np.testing.assert_array_equal(ShardedReader(path).get('one').values, code)
-    assert ShardedReader(path).manifest['layout'] == 'csr'
-    assert len(list(path.glob('shards/*-indptr.npy'))) == 1
+    np.testing.assert_array_equal(ShardedReader(path).get("one").values, code)
+    assert ShardedReader(path).manifest["layout"] == "csr"
+    assert len(list(path.glob("shards/*-indptr.npy"))) == 1
 
 
 def test_mask_right_padding_supported_and_left_padding_rejected(tmp_path):
     adapter = ModelAdapter(ResearchToyModel().eval())
-    good = sample('a', (1,2,3,0,0), mask=(1,1,1,0,0))
+    good = sample("a", (1, 2, 3, 0, 0), mask=(1, 1, 1, 0, 0))
     with ActivationWriter(tmp_path, live_identity(adapter.model), width=4) as w:
         collect_activations(adapter, [good], w, site=site())
-        np.testing.assert_allclose(ShardedReader(w.path).get('a').values[0],
-                                   adapter.capture(tokens=torch.tensor([[1,2,3,0,0]]),
-                                                   site=replace(site(), position=2)))
+        np.testing.assert_allclose(
+            ShardedReader(w.path).get("a").values[0],
+            adapter.capture(
+                tokens=torch.tensor([[1, 2, 3, 0, 0]]), site=replace(site(), position=2)
+            ),
+        )
     with ActivationWriter(tmp_path, live_identity(adapter.model), width=4) as w:
-        bad = sample('b', (0,0,1,2,3), mask=(0,0,1,1,1))
+        bad = sample("b", (0, 0, 1, 2, 3), mask=(0, 0, 1, 1, 1))
         with pytest.raises(ValueError, match="right-side padding"):
             collect_activations(adapter, [bad], w, site=site())
 
 
 def test_memory_map_corruption_is_checked_even_when_initial_verification_deferred(tmp_path):
     with ActivationWriter(tmp_path, identity(), width=4) as w:
-        w.append(sample(), np.ones((1,4), dtype=np.float32))
-        path=w.path
+        w.append(sample(), np.ones((1, 4), dtype=np.float32))
+        path = w.path
     lazy = ShardedReader(path, verify_shards=False)
-    p = path / 'shards/shard-00000.npy'
-    p.write_bytes(p.read_bytes()+b'X')
+    p = path / "shards/shard-00000.npy"
+    p.write_bytes(p.read_bytes() + b"X")
     with pytest.raises(CacheIntegrityError, match="corrupted"):
-        lazy.get('one')
+        lazy.get("one")
 
 
 def test_dense_and_sparse_code_layouts_can_coexist(tmp_path):
     from saebase.store import CodeWriter
+
     with ActivationWriter(tmp_path, identity(), width=4) as w:
         w.append(sample(), np.ones((1, 4), dtype=np.float32))
         raw_path = w.path
@@ -357,17 +440,26 @@ def test_dense_and_sparse_code_layouts_can_coexist(tmp_path):
         writer.append(sample(), dense_codes)
         sparse_path = writer.path
     assert dense_path != sparse_path
-    np.testing.assert_array_equal(ShardedReader(dense_path).get("one").values,
-                                  ShardedReader(sparse_path).get("one").values)
+    np.testing.assert_array_equal(
+        ShardedReader(dense_path).get("one").values, ShardedReader(sparse_path).get("one").values
+    )
 
 
 def test_frozen_m0_reference_fixture_is_actual_verified_public_checkpoint_data():
-    reference = json.loads((Path(__file__).parent / "fixtures/m0_reference_public.json").read_text())
+    reference = json.loads(
+        (Path(__file__).parent / "fixtures/m0_reference_public.json").read_text()
+    )
     assert reference["schema"] == "saebase.m0.reference.v1"
     assert reference["real_checkpoint_validated"] is True
     assert reference["sample_count"] == 3
-    assert reference["model_state_sha256"] == "dc595ff7ad9263a3ef34ce8975beadfe76b7271916c63a7a67b8a195d7e50a12"
-    assert reference["sae_state_sha256"] == "cde8b7c669860ec0dbd4b8ede465ff08868b317fc80010dac2703bc553c6585f"
+    assert (
+        reference["model_state_sha256"]
+        == "dc595ff7ad9263a3ef34ce8975beadfe76b7271916c63a7a67b8a195d7e50a12"
+    )
+    assert (
+        reference["sae_state_sha256"]
+        == "cde8b7c669860ec0dbd4b8ede465ff08868b317fc80010dac2703bc553c6585f"
+    )
 
 
 def test_collect_refuses_incorrect_model_weight_fingerprint(tmp_path):
@@ -409,6 +501,7 @@ def test_code_cache_detects_recaptured_activation_content_drift(tmp_path):
 
 def test_m0_and_m1_state_hashes_agree_for_model_and_sae():
     from saebase.tools.m0_reference_smoke import _sha_weights
+
     model = ResearchToyModel()
     sae = ResearchToySAE()
     assert sha256_state_dict(model) == _sha_weights(model)
@@ -431,6 +524,7 @@ def test_state_hash_is_strict_for_inplace_and_data_edits():
 
 def test_many_shards_use_incremental_metadata_index(tmp_path, monkeypatch):
     import saebase.store.shards as mod
+
     original = mod.ShardedReader
     calls = []
 
@@ -438,10 +532,11 @@ def test_many_shards_use_incremental_metadata_index(tmp_path, monkeypatch):
         def __init__(self, *a, **k):
             calls.append(1)
             super().__init__(*a, **k)
+
     monkeypatch.setattr(mod, "ShardedReader", CountingReader)
     with ActivationWriter(tmp_path, identity(), width=4, shard_target_bytes=128) as w:
         for idx in range(190):
-            w.append(sample(f"item-{idx:05d}", (idx, idx+1)), np.full((1, 4), idx, np.float32))
+            w.append(sample(f"item-{idx:05d}", (idx, idx + 1)), np.full((1, 4), idx, np.float32))
         path = w.path
     assert len(calls) == 1, "writer should not reindex every prior shard after each flush"
     assert original(path).sample_count == 190

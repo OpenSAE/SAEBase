@@ -166,7 +166,11 @@ def inspect_distributions(
             raise ValueError("sdist project metadata differs from source")
         if _static_version(archive.extractfile(versions[0]).read().decode("utf-8")) != version:
             raise ValueError("sdist package version differs from wheel")
-        for required in ("LICENSE", "CHANGELOG.md", f"harness/github_development_doc/releases/v{version}.md"):
+        for required in (
+            "LICENSE",
+            "CHANGELOG.md",
+            f"harness/github_development_doc/releases/v{version}.md",
+        ):
             if root_path + required not in names:
                 raise ValueError(f"sdist missing release source: {required}")
 

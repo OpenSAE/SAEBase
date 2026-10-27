@@ -22,13 +22,22 @@ _ALIAS = {
 
 
 def assert_compatible(cfg: DictConfig) -> None:
-    if str(cfg.task.name) != 'sae':
+    if str(cfg.task.name) != "sae":
         from saebase.datasets.prompt_schema import assert_available
+
         task = str(cfg.task.name)
-        if task not in {'capture','intervene','generate','circuits','explain','benchmark','train'}:
-            raise ValueError(f'Unsupported SAE task: {task}')
+        if task not in {
+            "capture",
+            "intervene",
+            "generate",
+            "circuits",
+            "explain",
+            "benchmark",
+            "train",
+        }:
+            raise ValueError(f"Unsupported SAE task: {task}")
         name = str(cfg.dataset.name)
-        assert_available(name, 'gemma2_2b_base')
+        assert_available(name, "gemma2_2b_base")
         return
     assert_task_in(cfg, _TASKS, "gemma2_2b_base")
     allowed = set(behaviors_for_model("gemma2_2b_base"))

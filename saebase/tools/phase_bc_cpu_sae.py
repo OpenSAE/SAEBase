@@ -3,16 +3,15 @@
 No language-model weights are loaded. A passed SAE-only record must not be
 presented as successful end-to-end model/intervention verification.
 """
+
 from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
-import hashlib
 import json
 import os
 from pathlib import Path
 import platform
-import sys
 
 import torch
 
@@ -58,17 +57,22 @@ def verify_cpu_sae(sae_key: str, layer: int, catalog_path: str | Path = DEFAULT_
     if not torch.equal(z, repeated):
         raise ValueError("SAE encoding is not deterministic")
     record = {
-        "schema": SCHEMA, "status": "sae_checkpoint_verified_only",
-        "model_sae_pair_verified": False, "model_loaded": False,
-        "sae_key": sae_key, "model_key": profile.model_key,
-        "layer": layer, "hook_name": profile.hook_name(layer),
+        "schema": SCHEMA,
+        "status": "sae_checkpoint_verified_only",
+        "model_sae_pair_verified": False,
+        "model_loaded": False,
+        "sae_key": sae_key,
+        "model_key": profile.model_key,
+        "layer": layer,
+        "hook_name": profile.hook_name(layer),
         "source": source,
         "sae_state_sha256": sha256_state_dict(sae),
-        "d_in": d_in, "d_sae": d_sae,
+        "d_in": d_in,
+        "d_sae": d_sae,
         "synthetic_probe_l0": [int(torch.count_nonzero(z[i]).item()) for i in range(2)],
-        "synthetic_probe_reconstruction_mse": float(torch.mean(
-            (x.float() - recon.float()) ** 2
-        ).item()),
+        "synthetic_probe_reconstruction_mse": float(
+            torch.mean((x.float() - recon.float()) ** 2).item()
+        ),
         "torch": str(torch.__version__),
         "python": platform.python_version(),
         "verified_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -93,10 +97,14 @@ def main(argv=None) -> int:
         if token:
             message = message.replace(token, "[redacted]")
         record = {
-            "schema": SCHEMA, "status": "blocked",
-            "model_sae_pair_verified": False, "model_loaded": False,
-            "sae_key": args.sae_key, "layer": args.layer,
-            "error_type": type(exc).__name__, "error": message[:1000],
+            "schema": SCHEMA,
+            "status": "blocked",
+            "model_sae_pair_verified": False,
+            "model_loaded": False,
+            "sae_key": args.sae_key,
+            "layer": args.layer,
+            "error_type": type(exc).__name__,
+            "error": message[:1000],
             "checked_at_utc": datetime.now(timezone.utc).isoformat(),
         }
     dest.write_text(json.dumps(record, indent=2, allow_nan=False) + "\n", encoding="utf-8")

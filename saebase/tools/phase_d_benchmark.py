@@ -7,6 +7,7 @@ native M3, then M4 against stored activations (no second model load for audit).
 ``conf/coverage/stage_d_population.jsonl`` with ≥64 independent evaluation
 groups. Feature IDs are chosen only on the selection split.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -30,7 +31,6 @@ from saebase.sae.stage_d import (
     PROMPTS,
     PROTOCOL_POPULATION,
     PROTOCOL_SMOKE,
-    file_sha256,
     load_population_corpus,
     relative_under,
     resolve_evaluation_host,
@@ -85,7 +85,8 @@ def run_site(
         raise ValueError(f"layer {layer} not selected for {sae_key}")
     profile = get_profile(sae_key)
     evaluation_host, override = resolve_evaluation_host(
-        catalog_model_key=entry.model_key, sae_key=sae_key,
+        catalog_model_key=entry.model_key,
+        sae_key=sae_key,
     )
     dataset_sha = None
     protocol = PROTOCOL_SMOKE
@@ -109,7 +110,10 @@ def run_site(
         protocol = PROTOCOL_POPULATION
 
     raw_model, sae, meta = load_model_and_sae(
-        sae_key, layer, device=device, model_key_override=override,
+        sae_key,
+        layer,
+        device=device,
+        model_key_override=override,
     )
     model = ModelAdapter(raw_model)
     site = ActivationSite(layer, meta["hook_name"], position=-1)
@@ -117,6 +121,7 @@ def run_site(
         raise ValueError("loaded SAE hook disagrees with registry")
     loaded_name = meta.get("loaded_model_name")
     from saebase.sae.stage_d import assert_host_matches_label
+
     assert_host_matches_label(
         evaluation_host_model_key=evaluation_host,
         loaded_model_name=loaded_name,
@@ -144,14 +149,21 @@ def run_site(
     sel_rows = []
     for i, prompt in enumerate(selection_prompts):
         tokens = model.tokens(prompt=prompt).detach().cpu().tolist()[0]
-        sel_rows.append({
-            "group_id": f"sel-{i:02d}",
-            "prompt": prompt,
-            "token_ids": tokens,
-        })
+        sel_rows.append(
+            {
+                "group_id": f"sel-{i:02d}",
+                "prompt": prompt,
+                "token_ids": tokens,
+            }
+        )
     _write_token_ledger(
-        output, host=evaluation_host, sae_key=sae_key, layer=layer,
-        split="selection", rows=sel_rows, tokenizer_name=str(tokenizer_name),
+        output,
+        host=evaluation_host,
+        sae_key=sae_key,
+        layer=layer,
+        split="selection",
+        rows=sel_rows,
+        tokenizer_name=str(tokenizer_name),
     )
 
     samples = []
@@ -160,21 +172,30 @@ def run_site(
         prompt = row["prompt"] if isinstance(row, dict) else row
         group_id = row["group_id"] if isinstance(row, dict) else f"eval-{i:02d}"
         tokens = model.tokens(prompt=prompt).detach().cpu().tolist()[0]
-        eval_rows.append({
-            "group_id": group_id,
-            "prompt": prompt,
-            "token_ids": tokens,
-        })
-        samples.append({
-            "sample_id": f"stage-d-{evaluation_host}-L{layer}-{group_id}",
-            "token_ids": tokens,
-            "prompt_group_id": group_id,
-            "split": "test",
-            "selection": {"mode": "indices", "indices": [len(tokens) - 1]},
-        })
+        eval_rows.append(
+            {
+                "group_id": group_id,
+                "prompt": prompt,
+                "token_ids": tokens,
+            }
+        )
+        samples.append(
+            {
+                "sample_id": f"stage-d-{evaluation_host}-L{layer}-{group_id}",
+                "token_ids": tokens,
+                "prompt_group_id": group_id,
+                "split": "test",
+                "selection": {"mode": "indices", "indices": [len(tokens) - 1]},
+            }
+        )
     _write_token_ledger(
-        output, host=evaluation_host, sae_key=sae_key, layer=layer,
-        split="evaluation", rows=eval_rows, tokenizer_name=str(tokenizer_name),
+        output,
+        host=evaluation_host,
+        sae_key=sae_key,
+        layer=layer,
+        split="evaluation",
+        rows=eval_rows,
+        tokenizer_name=str(tokenizer_name),
     )
 
     if not smoke_only and len({s["prompt_group_id"] for s in samples}) < POPULATION_MIN_EVAL_GROUPS:
@@ -184,36 +205,40 @@ def run_site(
     n_conditions = 2
     max_rows = 24 if smoke_only else max(64, n_samples)
     max_meas = 24 if smoke_only else max(128, n_samples * n_conditions)
-    config = BenchmarkConfig.from_dict({
-        "schema": "saebase.benchmark.config.v1",
-        "name": f"Stage D {evaluation_host} {sae_key} L{layer}",
-        "targets": [{
-            "model_key": evaluation_host,
-            "sae_keys": [sae_key],
-            "layer": layer,
-            "hook_name": site.hook_name,
-        }],
-        "dataset": {
-            "id": f"saebase-stage-d-{protocol}-{evaluation_host}-L{layer}",
-            "samples": samples,
-        },
-        "metrics": [
-            "core.l0",
-            "core.reconstruction_mse",
-            "core.explained_variance",
-            "intervention.logit_delta_l2",
-        ],
-        "conditions": [
-            {"name": "identity", "operation": "identity"},
-            {"name": "feature-ablation", "operation": "ablate", "feature_ids": [chosen]},
-        ],
-        "max_activation_rows": max_rows,
-        "max_measurements": max_meas,
-        "sample_batch": 1,
-        "microbatch": 1,
-        "seed": 0,
-        "tolerance": 0.01,
-    })
+    config = BenchmarkConfig.from_dict(
+        {
+            "schema": "saebase.benchmark.config.v1",
+            "name": f"Stage D {evaluation_host} {sae_key} L{layer}",
+            "targets": [
+                {
+                    "model_key": evaluation_host,
+                    "sae_keys": [sae_key],
+                    "layer": layer,
+                    "hook_name": site.hook_name,
+                }
+            ],
+            "dataset": {
+                "id": f"saebase-stage-d-{protocol}-{evaluation_host}-L{layer}",
+                "samples": samples,
+            },
+            "metrics": [
+                "core.l0",
+                "core.reconstruction_mse",
+                "core.explained_variance",
+                "intervention.logit_delta_l2",
+            ],
+            "conditions": [
+                {"name": "identity", "operation": "identity"},
+                {"name": "feature-ablation", "operation": "ablate", "feature_ids": [chosen]},
+            ],
+            "max_activation_rows": max_rows,
+            "max_measurements": max_meas,
+            "sample_batch": 1,
+            "microbatch": 1,
+            "seed": 0,
+            "tolerance": 0.01,
+        }
+    )
     runs_root = output / "runs"
     runs_root.mkdir(parents=True, exist_ok=True)
     rows = execute(
@@ -275,23 +300,27 @@ def run_site(
         "feature_selection_split": "selection" if not smoke_only else "smoke",
         "sample_count": len(samples),
         "n_independent_evaluation_groups": len({s["prompt_group_id"] for s in samples}),
-        "dataset_sha256": dataset_sha or __import__("hashlib").sha256(
-            "\n".join(PROMPTS).encode("utf-8")
-        ).hexdigest(),
+        "dataset_sha256": dataset_sha
+        or __import__("hashlib").sha256("\n".join(PROMPTS).encode("utf-8")).hexdigest(),
         "population_corpus_sha256": dataset_sha,
         "benchmark_metric_rows": len(rows),
         "reliability_metric_audits": len(audit["metric_audits"]),
         "n_model_reloads_for_audit": 0,
         "m3_run_id": config.run_id,
         "m3_metrics_sha256": json.loads((root / "metrics_manifest.json").read_text())["sha256"],
-        "m4_audit_sha256": json.loads((root / "reliability_manifest.json").read_text())["audit_sha256"],
+        "m4_audit_sha256": json.loads((root / "reliability_manifest.json").read_text())[
+            "audit_sha256"
+        ],
         "reconstruction_diagnostics": recon_diag,
-        "metric_results": [{
-            "metric_id": row["metric_id"],
-            "condition": row["condition_id"],
-            "value": row["value"],
-            "n_valid": row["n_valid"],
-        } for row in rows],
+        "metric_results": [
+            {
+                "metric_id": row["metric_id"],
+                "condition": row["condition_id"],
+                "value": row["value"],
+                "n_valid": row["n_valid"],
+            }
+            for row in rows
+        ],
     }
     if not smoke_only:
         # Prefer corpus hash for smoke dataset_sha field when population.
@@ -301,17 +330,21 @@ def run_site(
     summary_path = reports / f"{evaluation_host}_{sae_key}_L{layer}_m3m4.json"
     atomic_json(summary_path, record)
     site_id = f"{evaluation_host}|{sae_key}|L{layer}|{site.hook_name}"
-    update_status(output, site_id, {
-        "benchmark_verified": True,
-        "reliability_verified": True,
-        "status": "reliability_verified",
-        "protocol": "smoke_only" if smoke_only else "population",
-        "m3_run_id": config.run_id,
-        "m3m4_summary": relative_under(output, summary_path),
-        "dataset_sha256": record["dataset_sha256"],
-        "evaluation_host_model_key": evaluation_host,
-        "loaded_model_name": loaded_name,
-    })
+    update_status(
+        output,
+        site_id,
+        {
+            "benchmark_verified": True,
+            "reliability_verified": True,
+            "status": "reliability_verified",
+            "protocol": "smoke_only" if smoke_only else "population",
+            "m3_run_id": config.run_id,
+            "m3m4_summary": relative_under(output, summary_path),
+            "dataset_sha256": record["dataset_sha256"],
+            "evaluation_host_model_key": evaluation_host,
+            "loaded_model_name": loaded_name,
+        },
+    )
     return record
 
 

@@ -3,6 +3,7 @@
 Supports every catalog profile and selected layer. Writes checksum-bound
 acceptance JSON under ``<output>/acceptance/<model>/<sae>/L<layer>.json``.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -36,7 +37,9 @@ CATALOG = ROOT / "conf" / "coverage" / "stage_bc.json"
 def _git_commit() -> str:
     try:
         return subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True,
+            ["git", "rev-parse", "HEAD"],
+            cwd=ROOT,
+            text=True,
         ).strip()
     except Exception:
         return "unknown"
@@ -84,32 +87,46 @@ def run_one(
         expected=expected,
     )
     if skipped is not None:
-        update_status(output, site_id, {
-            "status": "pair_verified",
-            "pair_verified": True,
-            "acceptance_path": relative_under(
-                output,
-                output / "acceptance" / evaluation_host / sae_key / f"L{layer}.json",
-            ),
-            "resumed": True,
-            "protocol": PROTOCOL_PAIR,
-            "sae_state_sha256": skipped.get("sae_state_sha256"),
-            "model_state_sha256": skipped.get("model_state_sha256"),
-            "evaluation_host_model_key": evaluation_host,
-            "loaded_model_name": skipped.get("loaded_model_name"),
-        })
-        append_attempt(output, {
-            "site_id": site_id, "event": "resume_skip", "started_at_utc": started,
-            "status": "pair_verified",
-        })
+        update_status(
+            output,
+            site_id,
+            {
+                "status": "pair_verified",
+                "pair_verified": True,
+                "acceptance_path": relative_under(
+                    output,
+                    output / "acceptance" / evaluation_host / sae_key / f"L{layer}.json",
+                ),
+                "resumed": True,
+                "protocol": PROTOCOL_PAIR,
+                "sae_state_sha256": skipped.get("sae_state_sha256"),
+                "model_state_sha256": skipped.get("model_state_sha256"),
+                "evaluation_host_model_key": evaluation_host,
+                "loaded_model_name": skipped.get("loaded_model_name"),
+            },
+        )
+        append_attempt(
+            output,
+            {
+                "site_id": site_id,
+                "event": "resume_skip",
+                "started_at_utc": started,
+                "status": "pair_verified",
+            },
+        )
         return skipped
 
-    append_attempt(output, {
-        "site_id": site_id, "event": "start", "device": device,
-        "started_at_utc": started,
-        "evaluation_host_model_key": evaluation_host,
-        "model_key_override": auto_override,
-    })
+    append_attempt(
+        output,
+        {
+            "site_id": site_id,
+            "event": "start",
+            "device": device,
+            "started_at_utc": started,
+            "evaluation_host_model_key": evaluation_host,
+            "model_key_override": auto_override,
+        },
+    )
     try:
         record = verify_pair_site(
             sae_key=sae_key,
@@ -127,52 +144,75 @@ def run_one(
         if torch.cuda.is_available() and device.startswith("cuda"):
             record["gpu_name"] = torch.cuda.get_device_name(0)
         from saebase.sae.stage_d import canonical_payload_sha256
+
         record.pop("artifact_sha256", None)
         record["artifact_sha256"] = canonical_payload_sha256(record)
         path = write_acceptance(output, record)
-        update_status(output, site_id, {
-            "status": "pair_verified",
-            "pair_verified": True,
-            "acceptance_path": relative_under(output, path),
-            "protocol": PROTOCOL_PAIR,
-            "sae_state_sha256": record["sae_state_sha256"],
-            "model_state_sha256": record["model_state_sha256"],
-            "evaluation_host_model_key": evaluation_host,
-            "trained_on_model_key": record.get("trained_on_model_key"),
-            "transfer_kind": record.get("transfer_kind"),
-            "loaded_model_name": record.get("loaded_model_name"),
-            "error_type": None,
-            "error": None,
-        })
-        append_attempt(output, {
-            "site_id": site_id, "event": "end", "status": "passed",
-            "ended_at_utc": datetime.now(timezone.utc).isoformat(),
-            "peak_cuda_allocated_bytes": record.get("peak_cuda_allocated_bytes"),
-            "supersedes_prior": True,
-        })
+        update_status(
+            output,
+            site_id,
+            {
+                "status": "pair_verified",
+                "pair_verified": True,
+                "acceptance_path": relative_under(output, path),
+                "protocol": PROTOCOL_PAIR,
+                "sae_state_sha256": record["sae_state_sha256"],
+                "model_state_sha256": record["model_state_sha256"],
+                "evaluation_host_model_key": evaluation_host,
+                "trained_on_model_key": record.get("trained_on_model_key"),
+                "transfer_kind": record.get("transfer_kind"),
+                "loaded_model_name": record.get("loaded_model_name"),
+                "error_type": None,
+                "error": None,
+            },
+        )
+        append_attempt(
+            output,
+            {
+                "site_id": site_id,
+                "event": "end",
+                "status": "passed",
+                "ended_at_utc": datetime.now(timezone.utc).isoformat(),
+                "peak_cuda_allocated_bytes": record.get("peak_cuda_allocated_bytes"),
+                "supersedes_prior": True,
+            },
+        )
         return record
     except Exception as exc:
         record = failure_record(
-            sae_key=sae_key, layer=layer, device=device, exc=exc,
+            sae_key=sae_key,
+            layer=layer,
+            device=device,
+            exc=exc,
             model_key=evaluation_host,
         )
         record["git_commit"] = git_commit
         from saebase.sae.stage_d import canonical_payload_sha256
+
         record.pop("artifact_sha256", None)
         record["artifact_sha256"] = canonical_payload_sha256(record)
         path = write_acceptance(output, record)
-        update_status(output, site_id, {
-            "status": record["status"],
-            "pair_verified": False,
-            "acceptance_path": relative_under(output, path),
-            "error_type": record["error_type"],
-            "error": record["error"],
-        })
-        append_attempt(output, {
-            "site_id": site_id, "event": "end", "status": record["status"],
-            "ended_at_utc": datetime.now(timezone.utc).isoformat(),
-            "error_type": record["error_type"],
-        })
+        update_status(
+            output,
+            site_id,
+            {
+                "status": record["status"],
+                "pair_verified": False,
+                "acceptance_path": relative_under(output, path),
+                "error_type": record["error_type"],
+                "error": record["error"],
+            },
+        )
+        append_attempt(
+            output,
+            {
+                "site_id": site_id,
+                "event": "end",
+                "status": record["status"],
+                "ended_at_utc": datetime.now(timezone.utc).isoformat(),
+                "error_type": record["error_type"],
+            },
+        )
         return record
 
 

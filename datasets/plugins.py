@@ -9,7 +9,7 @@ from omegaconf import DictConfig
 from saebase.datasets.artifact_layout import BEHAVIOR_ALIASES, canonicalize_behavior
 from saebase.datasets.prompt_schema import assert_available
 from saebase.cfg.contracts import assert_prompt_source_in, assert_task_in
-from saebase.registry import (register_prompt_source, register_prompt_source_alias, register_dataset)
+from saebase.registry import register_prompt_source, register_prompt_source_alias, register_dataset
 
 _TASKS_SAE: FrozenSet[str] = frozenset({"sae"})
 _TASKS_DISCOVERY: FrozenSet[str] = frozenset({"sae", "discovery", "logic_chain"})
@@ -46,9 +46,9 @@ def _tasks_for(canonical: str) -> FrozenSet[str]:
 
 
 def _make_assert(canonical: str):
-    alias_set = frozenset(
-        k for k, v in BEHAVIOR_ALIASES.items() if v == canonical
-    ) | frozenset({canonical})
+    alias_set = frozenset(k for k, v in BEHAVIOR_ALIASES.items() if v == canonical) | frozenset(
+        {canonical}
+    )
     allowed_tasks = _tasks_for(canonical)
 
     def assert_compatible(cfg: DictConfig) -> None:
@@ -62,8 +62,7 @@ def _make_assert(canonical: str):
 def _notes(canonical: str):
     def notes() -> str:
         return (
-            f"Prompt source {canonical}: prepared artifacts under "
-            f"data_dir/{canonical}/<model>/v1"
+            f"Prompt source {canonical}: prepared artifacts under data_dir/{canonical}/<model>/v1"
         )
 
     return notes

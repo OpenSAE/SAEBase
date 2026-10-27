@@ -6,6 +6,7 @@ editable installation and have commit 8042bb3828c6340da8d12062324e92b2077c571c.
 The two native protocols use the same Pythia model and same SAE checkpoint,
 with their own documented dataset and metric configurations.
 """
+
 from __future__ import annotations
 import json
 from pathlib import Path
@@ -34,22 +35,28 @@ MODEL = "pythia-70m-deduped"
 DATASET = "fancyzhx/ag_news"
 COMMIT = "8042bb3828c6340da8d12062324e92b2077c571c"
 
+
 def validate(path: Path, metric: str, native: dict) -> float:
     value, digest, _ = import_native(
-        path, metric, expected_sae_id=SAE_ID,
-        expected_model_name=MODEL, expected_sae_release=RELEASE,
+        path,
+        metric,
+        expected_sae_id=SAE_ID,
+        expected_model_name=MODEL,
+        expected_sae_release=RELEASE,
         expected_commit=COMMIT,
     )
     assert len(digest) == 64
-    path_keys = {"saebench.core.l0": ("sparsity","l0"),
-                 "saebench.core.mse": ("reconstruction_quality","mse"),
-                 "saebench.sparse_probing.sae_top_1_test_accuracy":
-                     ("sae","sae_top_1_test_accuracy")}[metric]
+    path_keys = {
+        "saebench.core.l0": ("sparsity", "l0"),
+        "saebench.core.mse": ("reconstruction_quality", "mse"),
+        "saebench.sparse_probing.sae_top_1_test_accuracy": ("sae", "sae_top_1_test_accuracy"),
+    }[metric]
     expected = native["eval_result_metrics"]
     for key in path_keys:
         expected = expected[key]
     assert value == float(expected), (metric, value, expected)
     return value
+
 
 def main() -> None:
     torch.set_num_threads(2)
@@ -77,8 +84,12 @@ def main() -> None:
         compute_featurewise_density_statistics=True,
         compute_featurewise_weight_based_metrics=True,
         exclude_special_tokens_from_reconstruction=False,
-        dataset=DATASET, context_size=32, output_folder=str(core_root),
-        device="cpu", dtype="float32", force_rerun=True,
+        dataset=DATASET,
+        context_size=32,
+        output_folder=str(core_root),
+        device="cpu",
+        dtype="float32",
+        force_rerun=True,
     )
     assert len(core) == 1, f"expected one native core result; got {len(core)}"
     core_path = Path(get_results_filepath(str(core_root), RELEASE, SAE_ID))
@@ -93,16 +104,27 @@ def main() -> None:
     # Official upstream API and original train/test/probe implementation.
     # The small sample budget keeps the CPU regression test bounded.
     cfg = SparseProbingEvalConfig(
-        model_name=MODEL, dataset_names=[DATASET],
-        random_seed=44, probe_train_set_size=64,
-        probe_test_set_size=32, context_length=32,
-        sae_batch_size=64, llm_batch_size=4, llm_dtype="float32",
-        k_values=[1], lower_vram_usage=True,
+        model_name=MODEL,
+        dataset_names=[DATASET],
+        random_seed=44,
+        probe_train_set_size=64,
+        probe_test_set_size=32,
+        context_length=32,
+        sae_batch_size=64,
+        llm_batch_size=4,
+        llm_dtype="float32",
+        k_values=[1],
+        lower_vram_usage=True,
     )
     sparse = upstream_sparse.run_eval(
-        cfg, [(RELEASE, SAE_ID)], "cpu", str(sparse_root),
-        force_rerun=True, clean_up_activations=True,
-        save_activations=False, artifacts_path=str(output / "temporary"),
+        cfg,
+        [(RELEASE, SAE_ID)],
+        "cpu",
+        str(sparse_root),
+        force_rerun=True,
+        clean_up_activations=True,
+        save_activations=False,
+        artifacts_path=str(output / "temporary"),
     )
     assert len(sparse) == 1, f"expected one native Sparse Probing result: {list(sparse)}"
     sparse_path = Path(get_results_filepath(str(sparse_root), RELEASE, SAE_ID))
@@ -114,8 +136,11 @@ def main() -> None:
 
     evidence = {
         "schema": "saebase.m3.native-saebench.v1",
-        "upstream_commit": COMMIT, "model_name": MODEL,
-        "sae_release": RELEASE, "sae_id": SAE_ID, "dataset": DATASET,
+        "upstream_commit": COMMIT,
+        "model_name": MODEL,
+        "sae_release": RELEASE,
+        "sae_id": SAE_ID,
+        "dataset": DATASET,
         "native_metrics": {**core_metrics, sparse_metric: sparse_value},
         "core_config": core_native["eval_config"],
         "sparse_probing_config": sparse_native["eval_config"],
@@ -125,6 +150,7 @@ def main() -> None:
     }
     (output / "evidence.json").write_text(json.dumps(evidence, indent=2) + "\n")
     print(json.dumps(evidence, indent=2))
+
 
 if __name__ == "__main__":
     main()

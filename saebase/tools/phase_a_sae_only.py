@@ -2,6 +2,7 @@
 
 SAE-only success is not model-SAE pair acceptance. No model is loaded.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -79,7 +80,7 @@ def main(argv=None) -> int:
             "error": error[:1500],
         }
     path = args.output / f"{args.model}.json"
-    path.write_text(json.dumps(result, sort_keys=True, indent=2, allow_nan=False)+"\n")
+    path.write_text(json.dumps(result, sort_keys=True, indent=2, allow_nan=False) + "\n")
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0 if result["status"] == "sae_checkpoint_verified_only" else 1
 

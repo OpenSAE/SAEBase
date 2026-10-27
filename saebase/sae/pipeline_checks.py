@@ -58,7 +58,8 @@ def run_preflight(cfg: DictConfig) -> dict:
 
     data_root = cfg.paths.get("data_dir") if "paths" in cfg else None
     manifest = load_manifest(
-        behavior, model_key,
+        behavior,
+        model_key,
         data_root=str(data_root) if data_root is not None else None,
     )
     assert_manifest_matches(manifest, behavior=behavior, model_key=model_key)

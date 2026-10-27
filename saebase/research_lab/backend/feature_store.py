@@ -319,8 +319,9 @@ def query_feature_store(
     return {"items": rows, "total": total, "limit": limit, "offset": offset}
 
 
-
-def feature_by_id(site_id: str, feature_id: int, *, root: Path | None = None) -> dict[str, Any] | None:
+def feature_by_id(
+    site_id: str, feature_id: int, *, root: Path | None = None
+) -> dict[str, Any] | None:
     """Exact feature lookup, linked previous/next, and public examples from SQLite.
 
     None is also returned if SQLite is not installed; callers may then fall
@@ -343,7 +344,8 @@ def feature_by_id(site_id: str, feature_id: int, *, root: Path | None = None) ->
             return None
         row = dict(found)
         row["examples"] = [
-            dict(item) for item in connection.execute(
+            dict(item)
+            for item in connection.execute(
                 """SELECT sample_id,token_position,activation,prompt_group_id,
                 token_text,text_excerpt FROM examples WHERE feature_key=?
                 ORDER BY activation DESC,sample_id,token_position LIMIT ?""",
@@ -361,6 +363,7 @@ def feature_by_id(site_id: str, feature_id: int, *, root: Path | None = None) ->
         return row
     finally:
         connection.close()
+
 
 def _escape_like(value: str) -> str:
     return value.replace("!", "!!").replace("%", "!%").replace("_", "!_")

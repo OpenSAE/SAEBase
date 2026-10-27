@@ -139,7 +139,9 @@ def execute():
     files_to_commit = [f"harness/github_harness/github_work_plan/agent_flow/{plan['id']}.json"]
     files_to_commit.extend(plan.get("adopted_authority_paths", []))
     if plan["phase"] == "finalized":
-        files_to_commit.append(f"harness/github_harness/github_work_plan/agent_flow/{plan['id']}.final.json")
+        files_to_commit.append(
+            f"harness/github_harness/github_work_plan/agent_flow/{plan['id']}.final.json"
+        )
     subprocess.run(["git", "config", "user.name", "openresearch-review[bot]"], check=True)
     subprocess.run(
         ["git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"],

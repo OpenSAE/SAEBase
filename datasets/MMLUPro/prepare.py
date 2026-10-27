@@ -52,9 +52,7 @@ def prepare_for_model(
         max_prompt_tokens=max_prompt_tokens,
     )
     if len(kept) < min_kept:
-        raise RuntimeError(
-            f"MMLUPro/{model_key}: kept {len(kept)} < min_kept={min_kept}"
-        )
+        raise RuntimeError(f"MMLUPro/{model_key}: kept {len(kept)} < min_kept={min_kept}")
     cats = categories if categories is not None else "all"
     if not isinstance(cats, str):
         cats = ",".join(str(c) for c in cats)

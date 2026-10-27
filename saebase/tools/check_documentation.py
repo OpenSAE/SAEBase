@@ -22,7 +22,13 @@ DOCS = (
 
 
 def markdown_files(root: Path) -> list[Path]:
-    return sorted([*(root / p for p in DOCS), *(root / "docs").rglob("*.md"), *(root / "examples").rglob("*.md")])
+    return sorted(
+        [
+            *(root / p for p in DOCS),
+            *(root / "docs").rglob("*.md"),
+            *(root / "examples").rglob("*.md"),
+        ]
+    )
 
 
 def missing_links(path: Path, root: Path) -> list[str]:

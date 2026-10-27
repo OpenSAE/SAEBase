@@ -3,6 +3,7 @@
 
 Works as `python saebase/tools/sae_prepare_prompts.py` and as `python -m saebase.tools.sae_prepare_prompts`.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -48,11 +49,13 @@ def prepare(args):
 
     get_model_plugin(args.model_key)  # refuse unregistered models before weight loading
     import importlib
+
     mod = importlib.import_module(f"models.{args.model_key}.{args.model_key}")
     handle = mod.load_model(device=args.device)
-    data_root = (Path(args.data_root).expanduser().resolve() if args.data_root else None)
+    data_root = Path(args.data_root).expanduser().resolve() if args.data_root else None
     out = prepare_for_model(
-        args.model_key, handle.model,
+        args.model_key,
+        handle.model,
         model_name=mod.get_spec().model_name,
         loaded_model_name=handle.loaded_name,
         n_generate=args.n_generate,

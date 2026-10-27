@@ -31,13 +31,11 @@ class PromptSourcePlugin:
     notes: Callable[[], str]
 
 
-
 @dataclass(frozen=True)
 class DatasetPlugin:
     setup: Callable[[Any, DictConfig, Any], None]
     assert_task_supported: Callable[[DictConfig], None]
     eval_split_note: Callable[[Any], str]
-
 
 
 @dataclass(frozen=True)
@@ -116,9 +114,7 @@ def register_model(
 ) -> None:
     if name in _MODEL_REGISTRY:
         raise ValueError(f"register_model: {name!r} is already registered")
-    _MODEL_REGISTRY[name] = ModelPlugin(
-        assert_compatible=assert_compatible, construct=construct
-    )
+    _MODEL_REGISTRY[name] = ModelPlugin(assert_compatible=assert_compatible, construct=construct)
 
 
 def register_sae(
@@ -200,13 +196,16 @@ def register_dataset(name: str, setup, assert_task_supported, eval_split_note) -
         raise ValueError(f"Dataset already registered: {name}")
     _DATASET_REGISTRY[name] = DatasetPlugin(setup, assert_task_supported, eval_split_note)
 
+
 def register_dataset_alias(alias: str, canonical: str) -> None:
     if alias in _DATASET_ALIASES:
         raise ValueError(f"Dataset alias already registered: {alias}")
     _DATASET_ALIASES[alias] = canonical
 
+
 def resolve_dataset_name(name: str) -> str:
     return _DATASET_ALIASES.get(str(name), str(name))
+
 
 def get_dataset_plugin(name: str) -> DatasetPlugin:
     _ensure_plugins()
@@ -214,6 +213,7 @@ def get_dataset_plugin(name: str) -> DatasetPlugin:
     if key not in _DATASET_REGISTRY:
         raise ValueError(f"Unknown dataset.name: {name}")
     return _DATASET_REGISTRY[key]
+
 
 def list_registered_dataset_keys() -> list[str]:
     _ensure_plugins()

@@ -117,8 +117,12 @@ def validate_data(catalog: dict, final: dict, status: dict, root: Path) -> dict:
     if final.get("counts") != states:
         raise ValueError("final matrix state counts do not match rows")
     return dict(
-        catalog=targets, rows=found, total=len(rows), profiles=len(targets),
-        date=final["updated_at_utc"].split("T")[0], **counts,
+        catalog=targets,
+        rows=found,
+        total=len(rows),
+        profiles=len(targets),
+        date=final["updated_at_utc"].split("T")[0],
+        **counts,
     )
 
 
@@ -230,7 +234,9 @@ def generate(*, check: bool, root: Path = ROOT) -> list[str]:
             changed.append(name)
             if not check:
                 path.write_text(rendered, encoding="utf-8")
-    if "](verified-model-matrix.md)" not in (root / "harness/github_development_doc/index.md").read_text(encoding="utf-8"):
+    if "](verified-model-matrix.md)" not in (
+        root / "harness/github_development_doc/index.md"
+    ).read_text(encoding="utf-8"):
         raise ValueError("docs index does not link the current verified matrix")
     if check and changed:
         raise ValueError("stale model-support docs: " + ", ".join(changed))
@@ -247,7 +253,11 @@ def main() -> int:
         changed = generate(check=args.check)
     except (ValueError, KeyError, OSError, TypeError) as error:
         parser.exit(1, f"model support validation failed: {error}\n")
-    print("Verified model support docs" if args.check else "Regenerated: " + (", ".join(changed) or "no changes"))
+    print(
+        "Verified model support docs"
+        if args.check
+        else "Regenerated: " + (", ".join(changed) or "no changes")
+    )
     return 0
 
 

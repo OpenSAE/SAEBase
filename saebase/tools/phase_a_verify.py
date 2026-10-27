@@ -3,6 +3,7 @@
 Run one entry at a time. No synthetic fixtures count as verified checkpoints.
 Requires the original model and SAE weights, and often a CUDA GPU / HF access.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -10,8 +11,6 @@ import hashlib
 import json
 import os
 import platform
-import sys
-from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -42,9 +41,12 @@ PROMPTS = (
 def identity_patch(model: ModelAdapter, snapshot, site: ActivationSite) -> float:
     """Patching the *same* saved activation must preserve original logits."""
     baseline = model.forward_logits(tokens=snapshot.tokens).detach().float().cpu()
-    patched = model.patch_logits(
-        tokens=snapshot.tokens, site=site, activation=snapshot.activation
-    ).detach().float().cpu()
+    patched = (
+        model.patch_logits(tokens=snapshot.tokens, site=site, activation=snapshot.activation)
+        .detach()
+        .float()
+        .cpu()
+    )
     if baseline.shape != patched.shape:
         raise ValueError(f"identity logits shape mismatch: {baseline.shape} vs {patched.shape}")
     return float((baseline - patched).abs().max().item())
@@ -53,8 +55,14 @@ def identity_patch(model: ModelAdapter, snapshot, site: ActivationSite) -> float
 def verify_target(name: str, *, device: str = "cuda", prompts=PROMPTS) -> dict:
     sae_key, layer, expected_width = TARGETS[name]
     profile = get_profile(sae_key)
-    if profile.model_key not in {"gemma270m", "gemma1b", "gemma2_2b_base",
-                                  "qwen35_2b", "qwen3_8b", "llama31_8b"}:
+    if profile.model_key not in {
+        "gemma270m",
+        "gemma1b",
+        "gemma2_2b_base",
+        "qwen35_2b",
+        "qwen3_8b",
+        "llama31_8b",
+    }:
         raise ValueError("phase A profile unexpectedly points to a different model")
     raw_model, sae, metadata = load_model_and_sae(sae_key, layer, device=device)
     model = ModelAdapter(raw_model)
@@ -89,32 +97,45 @@ def verify_target(name: str, *, device: str = "cuda", prompts=PROMPTS) -> dict:
         selected = int(torch.argmax(torch.abs(z)).item())
         edited = edit_features(sae, snap, replacements={selected: 0.0})
         base_logits = model.forward_logits(tokens=snap.tokens).detach().float()
-        edited_logits = model.patch_logits(
-            tokens=snap.tokens, site=site, activation=edited.activation
-        ).detach().float()
-        feature_logit_delta_l2 = float(torch.linalg.vector_norm(
-            base_logits - edited_logits
-        ).item())
-        if not torch.isfinite(torch.tensor(feature_logit_delta_l2)) or feature_logit_delta_l2 <= 1e-8:
+        edited_logits = (
+            model.patch_logits(tokens=snap.tokens, site=site, activation=edited.activation)
+            .detach()
+            .float()
+        )
+        feature_logit_delta_l2 = float(torch.linalg.vector_norm(base_logits - edited_logits).item())
+        if (
+            not torch.isfinite(torch.tensor(feature_logit_delta_l2))
+            or feature_logit_delta_l2 <= 1e-8
+        ):
             raise ValueError("active SAE feature ablation did not measurably affect logits")
-        results.append({
-            "prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(),
-            "l0": int(torch.count_nonzero(z).item()),
-            "reconstruction_mse": float(torch.mean((x-recon)**2).item()),
-            "identity_patch_max_abs_logit_error": err,
-            "ablated_feature_id": selected,
-            "feature_ablation_logit_delta_l2": feature_logit_delta_l2,
-        })
+        results.append(
+            {
+                "prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(),
+                "l0": int(torch.count_nonzero(z).item()),
+                "reconstruction_mse": float(torch.mean((x - recon) ** 2).item()),
+                "identity_patch_max_abs_logit_error": err,
+                "ablated_feature_id": selected,
+                "feature_ablation_logit_delta_l2": feature_logit_delta_l2,
+            }
+        )
     return {
         "schema": "saebase.phase_a.real_acceptance.v1",
-        "model": name, "model_key": profile.model_key, "sae_key": sae_key,
-        "model_repo": profile.model_name, "sae_repo": profile.repo_id or profile.sae_release,
-        "sae_id": profile.sae_id(layer), "layer": layer, "hook": site.hook_name,
+        "model": name,
+        "model_key": profile.model_key,
+        "sae_key": sae_key,
+        "model_repo": profile.model_name,
+        "sae_repo": profile.repo_id or profile.sae_release,
+        "sae_id": profile.sae_id(layer),
+        "layer": layer,
+        "hook": site.hook_name,
         "loaded_model_name": metadata.get("loaded_model_name"),
         "model_state_sha256": sha256_state_dict(raw_model),
         "sae_state_sha256": sha256_state_dict(sae),
-        "d_model": expected_width, "d_sae": int(sae.cfg.d_sae),
-        "device": device, "sample_count": len(results), "probes": results,
+        "d_model": expected_width,
+        "d_sae": int(sae.cfg.d_sae),
+        "device": device,
+        "sample_count": len(results),
+        "probes": results,
         "python": platform.python_version(),
         "torch": torch.__version__,
         "verified_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -151,21 +172,28 @@ def main(argv=None):
                 message = message.replace(token, "[redacted]")
             result = {
                 "schema": "saebase.phase_a.real_acceptance.v1",
-                "status": "blocked" if isinstance(exc, (OSError, ImportError, RuntimeError))
-                          else "failed",
-                "model": name, "device": args.device,
+                "status": "blocked"
+                if isinstance(exc, (OSError, ImportError, RuntimeError))
+                else "failed",
+                "model": name,
+                "device": args.device,
                 "error_type": type(exc).__name__,
                 "error": message[:1500],
                 "verified_at_utc": datetime.now(timezone.utc).isoformat(),
                 "real_weights_validated": False,
             }
         target = args.output / f"{name}.json"
-        target.write_text(json.dumps(result, indent=2, allow_nan=False)+"\n")
+        target.write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
         complete.append({"model": name, "status": result["status"], "evidence": str(target)})
-        print(f'{result["status"].upper()}: {name}: {target}', flush=True)
+        print(f"{result['status'].upper()}: {name}: {target}", flush=True)
         if result["status"] != "passed":
-            print(json.dumps({"error_type": result["error_type"],
-                              "error": result["error"]}, ensure_ascii=False), flush=True)
+            print(
+                json.dumps(
+                    {"error_type": result["error_type"], "error": result["error"]},
+                    ensure_ascii=False,
+                ),
+                flush=True,
+            )
     print(json.dumps(complete, indent=2))
     return 1 if failures else 0
 

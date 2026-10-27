@@ -57,7 +57,9 @@ def json_obj(path: Path) -> dict:
 def _relative_file(root: Path, relative: str) -> Path:
     pure = PurePosixPath(relative)
     if (
-        not relative or pure.is_absolute() or pure.as_posix() != relative
+        not relative
+        or pure.is_absolute()
+        or pure.as_posix() != relative
         or any(part in ("", ".", "..") for part in pure.parts)
     ):
         raise ValueError(f"unsafe relative path: {relative}")
@@ -85,11 +87,9 @@ def verify_checksums(root: Path) -> int:
         if digest(file) != sha:
             raise ValueError(f"checksum mismatch for {rel}")
         included[rel] = sha
-    actual = {
-        path.relative_to(base).as_posix()
-        for path in base.rglob("*")
-        if path.is_file()
-    } - {"final/checksums.sha256"}
+    actual = {path.relative_to(base).as_posix() for path in base.rglob("*") if path.is_file()} - {
+        "final/checksums.sha256"
+    }
     if set(included) != actual:
         raise ValueError(
             f"checksum coverage mismatch: missing {sorted(actual - set(included))}; "
@@ -115,8 +115,7 @@ def verify_compact(root: Path = ROOT) -> dict:
         raise ValueError("unexpected status ledger schema")
     targets, rows = cat["targets"], final["rows"]
     expected = {
-        (p["model_key"], p["sae_key"], layer)
-        for p in targets for layer in p["selected_layers"]
+        (p["model_key"], p["sae_key"], layer) for p in targets for layer in p["selected_layers"]
     }
     found = set()
     keys = set()
@@ -160,7 +159,8 @@ def verify_compact(root: Path = ROOT) -> dict:
     if found != expected or keys != set(status.get("sites", {})):
         raise ValueError("catalog/ledger/final matrix coverage disagreement")
     if (
-        len(targets) != 18 or len(rows) != 48
+        len(targets) != 18
+        or len(rows) != 48
         or final.get("n_sites") != 48
         or final.get("n_pair_verified") != 48
         or final.get("n_population_m3m4") != 48
@@ -184,9 +184,11 @@ def verify_compact(root: Path = ROOT) -> dict:
     for entry in records:
         name = entry["file"]
         if (
-            PurePosixPath(name).name != name or not name.endswith(".tar.gz")
+            PurePosixPath(name).name != name
+            or not name.endswith(".tar.gz")
             or re.fullmatch(r"[0-9a-f]{64}", str(entry.get("sha256", ""))) is None
-            or not isinstance(entry.get("bytes"), int) or entry["bytes"] <= 0
+            or not isinstance(entry.get("bytes"), int)
+            or entry["bytes"] <= 0
         ):
             raise ValueError(f"malformed original archive index row: {entry}")
     for path in SUPPORT_FILES:
@@ -214,7 +216,9 @@ def _files_to_package(root: Path) -> list[Path]:
 def _archive(output: Path, entries: dict[str, Path | bytes]) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     with output.open("wb") as raw_file:
-        with gzip.GzipFile(filename="", mode="wb", fileobj=raw_file, mtime=0, compresslevel=9) as gz:
+        with gzip.GzipFile(
+            filename="", mode="wb", fileobj=raw_file, mtime=0, compresslevel=9
+        ) as gz:
             with tarfile.open(mode="w", fileobj=gz, format=tarfile.PAX_FORMAT) as tar:
                 for name, source in sorted(entries.items()):
                     info = tarfile.TarInfo(name=f"{SNAPSHOT}/{name}")
@@ -237,7 +241,9 @@ def _payload_json(value: dict) -> bytes:
 def source_commit() -> str:
     try:
         sha = subprocess.check_output(
-            ["git", "rev-parse", "--verify", "HEAD"], cwd=ROOT, text=True,
+            ["git", "rev-parse", "--verify", "HEAD"],
+            cwd=ROOT,
+            text=True,
             stderr=subprocess.DEVNULL,
         ).strip()
         if re.fullmatch(r"[0-9a-f]{40}", sha):
@@ -275,8 +281,10 @@ def build_compact(root: Path, destination: Path, *, commit: str | None = None) -
     summary_path.write_bytes(payload)
     validator = destination / "verify-stage-d.py"
     shutil.copyfile(root / "saebase/tools/stage_d_archive.py", validator)
-    sums = [f"{digest(destination / name)}  {name}" for name in
-            (artifact.name, summary_path.name, validator.name)]
+    sums = [
+        f"{digest(destination / name)}  {name}"
+        for name in (artifact.name, summary_path.name, validator.name)
+    ]
     (destination / "SHA256SUMS").write_text("\n".join(sums) + "\n", encoding="ascii")
     verify_bundle(artifact)
     return artifact
@@ -290,10 +298,13 @@ def _extract_checked(archive: Path, destination: Path) -> Path:
             name = member.name
             pure = PurePosixPath(name)
             if (
-                not member.isfile() or pure.is_absolute()
-                or len(pure.parts) < 2 or pure.parts[0] != SNAPSHOT
+                not member.isfile()
+                or pure.is_absolute()
+                or len(pure.parts) < 2
+                or pure.parts[0] != SNAPSHOT
                 or any(piece in (".", "..", "") for piece in pure.parts)
-                or name in seen or member.size > 20_000_000
+                or name in seen
+                or member.size > 20_000_000
             ):
                 raise ValueError(f"unsafe or unexpected archive member: {name}")
             seen.add(name)
@@ -329,7 +340,10 @@ def verify_bundle(archive: Path) -> dict:
             if file.stat().st_size != meta.get("bytes") or digest(file) != meta.get("sha256"):
                 raise ValueError(f"bundle file hash mismatch: {rel}")
         audit = verify_compact(base)
-        if audit != manifest.get("audit") or manifest.get("archive_contains_full_raw_runs") is not False:
+        if (
+            audit != manifest.get("audit")
+            or manifest.get("archive_contains_full_raw_runs") is not False
+        ):
             raise ValueError("bundle falsely claims raw data or has inconsistent audit counts")
         return audit
 
@@ -352,12 +366,19 @@ def verify_original_archives(raw_dir: Path, index: dict) -> dict:
             for member in archive:
                 pure = PurePosixPath(member.name)
                 if (
-                    pure.is_absolute() or ".." in pure.parts or member.issym()
-                    or member.islnk() or not (member.isfile() or member.isdir())
+                    pure.is_absolute()
+                    or ".." in pure.parts
+                    or member.issym()
+                    or member.islnk()
+                    or not (member.isfile() or member.isdir())
                 ):
                     raise ValueError(f"unsafe contents in {name}: {member.name}")
         total += file.stat().st_size
-    return {"verified_archives": len(records), "original_bytes": total, "status": "byte_hash_verified"}
+    return {
+        "verified_archives": len(records),
+        "original_bytes": total,
+        "status": "byte_hash_verified",
+    }
 
 
 def build_raw(root: Path, raw_dir: Path, destination: Path) -> Path:

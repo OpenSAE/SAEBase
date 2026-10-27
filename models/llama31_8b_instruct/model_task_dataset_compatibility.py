@@ -9,7 +9,9 @@ from omegaconf import DictConfig
 from saebase.datasets.prompt_schema import behaviors_for_model
 from saebase.cfg.contracts import assert_prompt_source_in, assert_task_in
 
-_TASKS: FrozenSet[str] = frozenset({"sae", "vllm_sae_steer", "cross_model_filtering", "sae_upgrade"})
+_TASKS: FrozenSet[str] = frozenset(
+    {"sae", "vllm_sae_steer", "cross_model_filtering", "sae_upgrade"}
+)
 
 _ALIAS = {
     "CounterFact": "counterfact",

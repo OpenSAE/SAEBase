@@ -6,6 +6,7 @@ module claims real-checkpoint acceptance unless those weights are actually
 loaded and its numerical checks succeed. The pure record_reference function
 is intentionally testable with small deterministic model/SAE doubles.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -62,8 +63,17 @@ def _sha_weights(module: Any) -> str:
 
 
 def _versions() -> dict[str, str | None]:
-    names = ["torch", "numpy", "omegaconf", "hydra-core", "transformer-lens",
-             "sae-lens", "huggingface-hub", "safetensors", "transformers"]
+    names = [
+        "torch",
+        "numpy",
+        "omegaconf",
+        "hydra-core",
+        "transformer-lens",
+        "sae-lens",
+        "huggingface-hub",
+        "safetensors",
+        "transformers",
+    ]
     result: dict[str, str | None] = {}
     for name in names:
         try:
@@ -89,8 +99,12 @@ def _probe(vector: torch.Tensor, *, n: int = 12) -> list[float]:
 
 @torch.no_grad()
 def record_reference(
-    bundle: Any, prompts: Sequence[Mapping[str, Any]], *,
-    seed: int, rtol: float = 1e-4, atol: float = 1e-4,
+    bundle: Any,
+    prompts: Sequence[Mapping[str, Any]],
+    *,
+    seed: int,
+    rtol: float = 1e-4,
+    atol: float = 1e-4,
     reference_type: str = "synthetic_test",
 ) -> dict[str, Any]:
     """Record real operations and reject token/site/reconstruction drift.
@@ -115,12 +129,16 @@ def record_reference(
     chat_template = getattr(tokenizer, "chat_template", None)
     tokenizer_record = {
         "class": (type(tokenizer).__module__ + "." + type(tokenizer).__qualname__)
-                 if tokenizer is not None else None,
+        if tokenizer is not None
+        else None,
         "name_or_path": getattr(tokenizer, "name_or_path", None),
         "bos_token_id": getattr(tokenizer, "bos_token_id", None),
         "eos_token_id": getattr(tokenizer, "eos_token_id", None),
-        "chat_template_sha256": (hashlib.sha256(chat_template.encode()).hexdigest()
-                                 if isinstance(chat_template, str) else None),
+        "chat_template_sha256": (
+            hashlib.sha256(chat_template.encode()).hexdigest()
+            if isinstance(chat_template, str)
+            else None
+        ),
     }
     rows = []
     for sample in prompts:
@@ -137,7 +155,11 @@ def record_reference(
         if float(codes[top].abs()) <= 0:
             raise RuntimeError("SAE did not activate any feature for the reference prompt")
         changed = evaluate_edit(
-            model, sae, site=site, tokens=tokens, replacements={top: 0.0},
+            model,
+            sae,
+            site=site,
+            tokens=tokens,
+            replacements={top: 0.0},
             verify_identity=True,
         )
         if not bool(torch.isfinite(changed.logit_delta).all()):
@@ -155,7 +177,9 @@ def record_reference(
             "codes_l0": int(torch.count_nonzero(codes).item()),
             "selected_feature": top,
             "selected_feature_value": float(codes[top].item()),
-            "reconstruction_mse": float(((snapshot.activation - snapshot.reconstruction).float() ** 2).mean().item()),
+            "reconstruction_mse": float(
+                ((snapshot.activation - snapshot.reconstruction).float() ** 2).mean().item()
+            ),
             "baseline_logit_probe": _probe(baseline),
             "identity_max_logit_abs_error": err,
             "edit_logit_delta_l2": float(changed.logit_delta.float().norm().item()),
@@ -191,7 +215,15 @@ def compare_references(current: Mapping[str, Any], prior: Mapping[str, Any]) -> 
     """Strict identity match; numeric probes compared using reference tolerances."""
     if prior.get("real_checkpoint_validated") != current.get("real_checkpoint_validated"):
         raise ValueError("Reference provenance type differs")
-    for name in ("model_key", "sae_key", "model_state_sha256", "sae_state_sha256", "tokenizer", "site", "seed"):
+    for name in (
+        "model_key",
+        "sae_key",
+        "model_state_sha256",
+        "sae_state_sha256",
+        "tokenizer",
+        "site",
+        "seed",
+    ):
         if current.get(name) != prior.get(name):
             raise RuntimeError(f"Reference mismatch: {name}")
     ref_rows, rows = prior.get("samples", []), current.get("samples", [])
@@ -200,12 +232,25 @@ def compare_references(current: Mapping[str, Any], prior: Mapping[str, Any]) -> 
     rtol = float(current["tolerances"]["rtol"])
     atol = float(current["tolerances"]["atol"])
     for actual, ref in zip(rows, ref_rows):
-        for key in ("sample_id", "prompt_sha256", "token_ids", "selected_feature",
-                    "activation_dim", "sae_width", "codes_l0"):
+        for key in (
+            "sample_id",
+            "prompt_sha256",
+            "token_ids",
+            "selected_feature",
+            "activation_dim",
+            "sae_width",
+            "codes_l0",
+        ):
             if actual[key] != ref[key]:
                 raise RuntimeError(f"Reference mismatch for {ref['sample_id']}: {key}")
-        for key in ("activation_probe", "baseline_logit_probe", "edited_logit_probe",
-                    "selected_feature_value", "reconstruction_mse", "edit_logit_delta_l2"):
+        for key in (
+            "activation_probe",
+            "baseline_logit_probe",
+            "edited_logit_probe",
+            "selected_feature_value",
+            "reconstruction_mse",
+            "edit_logit_delta_l2",
+        ):
             if not np.allclose(actual[key], ref[key], rtol=rtol, atol=atol):
                 raise RuntimeError(f"Reference numerical drift for {ref['sample_id']}: {key}")
 
@@ -230,6 +275,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
 def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
     from saebase.runtime import verify_runtime
+
     verify_runtime(context="M0 real checkpoint acceptance", mode="analysis")
     random.seed(args.seed)
     np.random.seed(args.seed)
@@ -238,16 +284,23 @@ def main(argv: Sequence[str] | None = None) -> int:
         torch.cuda.manual_seed_all(args.seed)
 
     bundle = load_registered(
-        model_key=MODEL_KEY, sae_key=SAE_KEY, layer=LAYER, device=args.device,
+        model_key=MODEL_KEY,
+        sae_key=SAE_KEY,
+        layer=LAYER,
+        device=args.device,
     )
     if bundle.identity.model_key != MODEL_KEY or bundle.identity.sae_key != SAE_KEY:
         raise RuntimeError("Loaded weights do not match requested Pythia profile")
     args.data_dir = args.data_dir.expanduser().resolve()
     if not args.reuse_prompts:
         prepare_for_model(
-            MODEL_KEY, bundle.model.model, model_name=get_profile(SAE_KEY).model_name,
+            MODEL_KEY,
+            bundle.model.model,
+            model_name=get_profile(SAE_KEY).model_name,
             loaded_model_name=bundle.identity.loaded_model_name or MODEL_KEY,
-            n_generate=args.n_generate, min_kept=args.min_kept, seed=args.seed,
+            n_generate=args.n_generate,
+            min_kept=args.min_kept,
+            seed=args.seed,
             data_root=args.data_dir,
         )
     manifest = load_manifest("SimpleCopying", MODEL_KEY, data_root=args.data_dir)
@@ -257,15 +310,23 @@ def main(argv: Sequence[str] | None = None) -> int:
     if len(prompts) < args.n_prompts:
         raise RuntimeError("Not enough prepared prompts for requested reference")
     report = record_reference(
-        bundle, prompts[:args.n_prompts], seed=args.seed,
+        bundle,
+        prompts[: args.n_prompts],
+        seed=args.seed,
         reference_type="real_pythia70m_sae",
     )
     from saebase.datasets.artifact_layout import manifest_path, prompts_path
+
     report["prompt_manifest"] = {
-        "behavior": manifest["behavior"], "model_key": manifest["model_key"],
+        "behavior": manifest["behavior"],
+        "model_key": manifest["model_key"],
         "kept_count": manifest["kept_count"],
-        "manifest_sha256": _hash_file(manifest_path("SimpleCopying", MODEL_KEY, data_root=args.data_dir)),
-        "prompts_sha256": _hash_file(prompts_path("SimpleCopying", MODEL_KEY, data_root=args.data_dir)),
+        "manifest_sha256": _hash_file(
+            manifest_path("SimpleCopying", MODEL_KEY, data_root=args.data_dir)
+        ),
+        "prompts_sha256": _hash_file(
+            prompts_path("SimpleCopying", MODEL_KEY, data_root=args.data_dir)
+        ),
     }
     if args.compare_to:
         previous = json.loads(args.compare_to.read_text(encoding="utf-8"))

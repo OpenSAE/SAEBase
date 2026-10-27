@@ -7,9 +7,14 @@ import tarfile
 import pytest
 
 from saebase.tools.stage_d_archive import (
-    ROOT, _relative_file, build_compact, digest, verify_bundle,
-    verify_checksums, verify_compact, verify_original_archives,
-    build_raw, verify_raw_bundle,
+    ROOT,
+    _relative_file,
+    build_compact,
+    digest,
+    verify_bundle,
+    verify_checksums,
+    verify_compact,
+    verify_original_archives,
 )
 
 
@@ -34,9 +39,7 @@ def test_checksum_gate_detects_corruption_and_unlisted_files(tmp_path):
     (base / "final").mkdir(parents=True)
     (base / "one.json").write_bytes(b'{"test":1}\n')
     sha = digest(base / "one.json")
-    (base / "final/checksums.sha256").write_text(
-        f"{sha}  one.json\n", encoding="ascii"
-    )
+    (base / "final/checksums.sha256").write_text(f"{sha}  one.json\n", encoding="ascii")
     with pytest.raises(ValueError, match="199"):
         verify_checksums(tmp_path)
     (base / "one.json").write_bytes(b'{"test":2}\n')

@@ -4,6 +4,7 @@ Input directories contain extracted JSON files from GitHub Actions artifacts.
 A corrected checkpoint may supersede exactly one previously BLOCKED observation,
 without re-running unrelated successful SAE downloads.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -42,14 +43,13 @@ def _records(folder: Path, catalog) -> dict[tuple[str, int], dict[str, Any]]:
 
 
 def aggregate(
-    source_dir: Path, catalog_path: Path = CATALOG,
+    source_dir: Path,
+    catalog_path: Path = CATALOG,
     replacements_dir: Path | None = None,
 ) -> dict[str, Any]:
     catalog = load_coverage(catalog_path)
     expected = {
-        (item.sae_key, layer)
-        for item in catalog.entries
-        for layer in item.cpu_probe_layers
+        (item.sae_key, layer) for item in catalog.entries for layer in item.cpu_probe_layers
     }
     base = _records(source_dir, catalog)
     if set(base) - expected:
@@ -68,8 +68,7 @@ def aggregate(
                 raise ValueError("replacement must be a successful genuine checkpoint artifact")
             base[key] = {**replacement, "repaired_after_block": existing is not None}
     missing = sorted(expected - set(base))
-    passed = sorted(x for x, v in base.items()
-                    if v["status"] == "sae_checkpoint_verified_only")
+    passed = sorted(x for x, v in base.items() if v["status"] == "sae_checkpoint_verified_only")
     blocked = sorted(x for x, v in base.items() if v["status"] != "sae_checkpoint_verified_only")
     results = [{**base[key]} for key in sorted(base)]
     return {
@@ -97,10 +96,11 @@ def main(argv=None) -> int:
     parser.add_argument("--output", type=Path, default=Path("stage_bc_cpu_result.json"))
     args = parser.parse_args(argv)
     summary = aggregate(args.source_dir, args.catalog, args.replacements_dir)
-    args.output.write_text(json.dumps(summary, indent=2, allow_nan=False) + "\n",
-                           encoding="utf-8")
-    print(f"SAE-only {summary['sae_only_verified']}/{summary['expected']} verified; "
-          f"{summary['failed_or_blocked']} blocked; {summary['missing']} missing.")
+    args.output.write_text(json.dumps(summary, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+    print(
+        f"SAE-only {summary['sae_only_verified']}/{summary['expected']} verified; "
+        f"{summary['failed_or_blocked']} blocked; {summary['missing']} missing."
+    )
     if summary["blocked_checkpoints"]:
         print("Blocked:", *summary["blocked_checkpoints"], sep="\n- ")
     if summary["missing_checkpoints"]:

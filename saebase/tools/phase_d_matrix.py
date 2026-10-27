@@ -3,6 +3,7 @@
 Schedules one model family at a time, skips proven passes under ``--resume``,
 and writes environment / status / attempt ledgers under ``--output``.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -33,7 +34,9 @@ CATALOG = ROOT / "conf" / "coverage" / "stage_bc.json"
 def _git_commit() -> str:
     try:
         return subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True,
+            ["git", "rev-parse", "HEAD"],
+            cwd=ROOT,
+            text=True,
         ).strip()
     except Exception:
         return "unknown"
@@ -52,13 +55,16 @@ def write_environment(output: Path) -> dict:
     }
     if torch.cuda.is_available():
         props = torch.cuda.get_device_properties(0)
-        info.update({
-            "gpu_name": torch.cuda.get_device_name(0),
-            "vram_bytes": int(props.total_memory),
-            "compute_capability": f"{props.major}.{props.minor}",
-        })
+        info.update(
+            {
+                "gpu_name": torch.cuda.get_device_name(0),
+                "vram_bytes": int(props.total_memory),
+                "compute_capability": f"{props.major}.{props.minor}",
+            }
+        )
     try:
         import shutil
+
         usage = shutil.disk_usage("/workspace")
         info["disk_total_bytes"] = usage.total
         info["disk_free_bytes"] = usage.free
@@ -149,6 +155,7 @@ def main(argv=None) -> int:
     if args.dry_run:
         if args.finalize:
             from saebase.sae.stage_d import rebuild_canonical_status
+
             rebuild_canonical_status(args.output, records)
             matrix = build_final_matrix(args.output, records)
             final_dir = args.output / "final"
@@ -165,17 +172,27 @@ def main(argv=None) -> int:
         if current_model is not None and rec.model_key != current_model:
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
-            print(json.dumps({
-                "event": "model_family_complete",
-                "model_key": current_model,
-            }), flush=True)
+            print(
+                json.dumps(
+                    {
+                        "event": "model_family_complete",
+                        "model_key": current_model,
+                    }
+                ),
+                flush=True,
+            )
         current_model = rec.model_key
-        print(json.dumps({
-            "event": "verify_start",
-            "model_key": rec.model_key,
-            "sae_key": rec.sae_key,
-            "layer": rec.layer,
-        }), flush=True)
+        print(
+            json.dumps(
+                {
+                    "event": "verify_start",
+                    "model_key": rec.model_key,
+                    "sae_key": rec.sae_key,
+                    "layer": rec.layer,
+                }
+            ),
+            flush=True,
+        )
         result = run_one(
             sae_key=rec.sae_key,
             layer=rec.layer,
@@ -186,25 +203,36 @@ def main(argv=None) -> int:
         ok = result.get("status") == "passed"
         if not ok:
             failures += 1
-        print(json.dumps({
-            "event": "verify_end",
-            "status": result.get("status"),
-            "model_key": rec.model_key,
-            "sae_key": rec.sae_key,
-            "layer": rec.layer,
-            "peak_cuda_allocated_bytes": result.get("peak_cuda_allocated_bytes"),
-        }), flush=True)
+        print(
+            json.dumps(
+                {
+                    "event": "verify_end",
+                    "status": result.get("status"),
+                    "model_key": rec.model_key,
+                    "sae_key": rec.sae_key,
+                    "layer": rec.layer,
+                    "peak_cuda_allocated_bytes": result.get("peak_cuda_allocated_bytes"),
+                }
+            ),
+            flush=True,
+        )
         if torch.cuda.is_available():
             allocated = torch.cuda.memory_allocated()
             reserved = torch.cuda.memory_reserved()
-            print(json.dumps({
-                "event": "resource_snapshot",
-                "cuda_allocated_bytes": allocated,
-                "cuda_reserved_bytes": reserved,
-            }), flush=True)
+            print(
+                json.dumps(
+                    {
+                        "event": "resource_snapshot",
+                        "cuda_allocated_bytes": allocated,
+                        "cuda_reserved_bytes": reserved,
+                    }
+                ),
+                flush=True,
+            )
 
     if args.finalize:
         from saebase.sae.stage_d import rebuild_canonical_status
+
         rebuild_canonical_status(args.output, records)
         matrix = build_final_matrix(args.output, records)
         final_dir = args.output / "final"
@@ -240,7 +268,8 @@ def main(argv=None) -> int:
         if matrix.get("publication_note"):
             summary_md.extend(["## Note", "", matrix["publication_note"], ""])
         (final_dir / "stage_d_summary.md").write_text(
-            "\n".join(summary_md) + "\n", encoding="utf-8",
+            "\n".join(summary_md) + "\n",
+            encoding="utf-8",
         )
         if not matrix.get("stage_d_complete"):
             return 1 if failures else 2

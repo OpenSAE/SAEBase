@@ -27,9 +27,7 @@ def prepare_for_model(
     tok = attach_token_ids(raw, model)
     kept = filter_logit_diff(tok, model)
     if len(kept) < min_kept:
-        raise RuntimeError(
-            f"SimpleCopying/{model_key}: kept {len(kept)} < min_kept={min_kept}"
-        )
+        raise RuntimeError(f"SimpleCopying/{model_key}: kept {len(kept)} < min_kept={min_kept}")
     manifest = make_manifest(
         behavior="SimpleCopying",
         model_key=model_key,

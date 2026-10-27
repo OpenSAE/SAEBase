@@ -6,12 +6,11 @@ Fails when:
 - compact metric numbers disagree with metrics.jsonl
 - checksums.sha256 entries do not match file contents
 """
+
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
-import sys
 from pathlib import Path
 
 from saebase.sae.coverage import load_coverage
@@ -26,7 +25,9 @@ ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "conf" / "coverage" / "stage_bc.json"
 
 
-def _mean_from_metrics(metrics_path: Path, metric_id: str, condition: str | None = None) -> float | None:
+def _mean_from_metrics(
+    metrics_path: Path, metric_id: str, condition: str | None = None
+) -> float | None:
     vals = []
     for line in metrics_path.read_text(encoding="utf-8").splitlines():
         if not line.strip():
@@ -93,8 +94,12 @@ def verify_evidence(output: Path, *, evidence_root: Path | None = None) -> list[
             continue
         root = output / "runs" / run_id
         need = [
-            "resolved_config.json", "plan.json", "metrics.jsonl",
-            "metrics_manifest.json", "reliability.json", "reliability_manifest.json",
+            "resolved_config.json",
+            "plan.json",
+            "metrics.jsonl",
+            "metrics_manifest.json",
+            "reliability.json",
+            "reliability_manifest.json",
         ]
         missing = [n for n in need if not (root / n).exists()]
         if missing:
@@ -133,7 +138,9 @@ def verify_evidence(output: Path, *, evidence_root: Path | None = None) -> list[
                         f"{path.name}: metric {mid}/{cond} value {value} not in metrics.jsonl"
                     )
         manifest = json.loads((root / "metrics_manifest.json").read_text(encoding="utf-8"))
-        if summary.get("m3_metrics_sha256") and summary["m3_metrics_sha256"] != manifest.get("sha256"):
+        if summary.get("m3_metrics_sha256") and summary["m3_metrics_sha256"] != manifest.get(
+            "sha256"
+        ):
             errors.append(f"{path.name}: m3_metrics_sha256 disagrees with metrics_manifest")
 
     # Acceptance checksums (canonical L<layer>.json only; notes stay in history).

@@ -2,6 +2,7 @@
 
 This is an upstream existence check; it is never a real-weight acceptance.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -24,11 +25,13 @@ def probe_file_path(entry: CoverageEntry, layer: int) -> str | None:
     if p["loader"] == "dictionary_learning":
         return p["source_file_id"].rstrip("/") + "/ae.pt"
     if key.startswith("gemma3_4b_") or key in {
-        "gemma270m_scope_resid", "gemma1b_scope_resid",
+        "gemma270m_scope_resid",
+        "gemma1b_scope_resid",
     }:
         return p["source_file_id"].rstrip("/") + "/params.safetensors"
     if key == "gemma2_2b_pt_l25_canonical":
         from saebase.sae.registry import get_profile
+
         physical = get_profile(key).resolved_physical_path
         if physical:
             return physical.rstrip("/") + "/params.npz"
@@ -59,8 +62,10 @@ def check_sources(catalog_path: str | Path = CATALOG) -> dict:
             item = entry.source(layer)
             file = probe_file_path(entry, layer)
             data = {
-                "sae_key": entry.sae_key, "layer": layer,
-                "repo_id": item["repo_id"], "source_file": file,
+                "sae_key": entry.sae_key,
+                "layer": layer,
+                "repo_id": item["repo_id"],
+                "source_file": file,
                 "status": "unresolved_path" if file is None else "pending",
             }
             if file:
@@ -68,18 +73,22 @@ def check_sources(catalog_path: str | Path = CATALOG) -> dict:
                     metadata = get_hf_file_metadata(
                         hf_hub_url(repo_id=item["repo_id"], filename=file)
                     )
-                    data.update({
-                        "status": "source_file_found",
-                        "size_bytes": metadata.size,
-                        "etag": metadata.etag,
-                        "commit_hash": metadata.commit_hash,
-                    })
+                    data.update(
+                        {
+                            "status": "source_file_found",
+                            "size_bytes": metadata.size,
+                            "etag": metadata.etag,
+                            "commit_hash": metadata.commit_hash,
+                        }
+                    )
                 except Exception as exc:
-                    data.update({
-                        "status": "source_check_failed",
-                        "error_type": type(exc).__name__,
-                        "error": str(exc)[:350],
-                    })
+                    data.update(
+                        {
+                            "status": "source_check_failed",
+                            "error_type": type(exc).__name__,
+                            "error": str(exc)[:350],
+                        }
+                    )
             records.append(data)
     return {
         "schema": "saebase.coverage.source_metadata.v1",
@@ -100,11 +109,13 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
     result = check_sources(args.catalog)
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(result, indent=2, allow_nan=False)+"\n")
-    print(json.dumps({k:v for k,v in result.items() if k!="entries"}, indent=2))
+    args.output.write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
+    print(json.dumps({k: v for k, v in result.items() if k != "entries"}, indent=2))
     for entry in result["entries"]:
         if entry["status"] == "source_check_failed":
-            print(f"CHECK FAILED: {entry['sae_key']} L{entry['layer']}: {entry['error_type']}: {entry['error'][:100]}")
+            print(
+                f"CHECK FAILED: {entry['sae_key']} L{entry['layer']}: {entry['error_type']}: {entry['error'][:100]}"
+            )
     return 0 if result["failed"] == 0 else 1
 
 

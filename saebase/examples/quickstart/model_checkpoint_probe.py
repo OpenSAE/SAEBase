@@ -5,6 +5,7 @@ python saebase/examples/quickstart/model_checkpoint_probe.py --model pythia70m -
 Both choices are configured; real model compatibility must be checked on the
 machine and in the exact environment used by the researcher.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -37,12 +38,27 @@ def main():
     tokens = pair.model.tokens(prompt=prompt)
     snap = capture_features(pair.model, pair.sae, tokens=tokens, site=pair.site)
     rank = int(snap.codes.abs().argmax())
-    edit = evaluate_edit(pair.model, pair.sae, site=pair.site, tokens=tokens,
-                         replacements={rank: 0.0}, verify_identity=True)
-    print(json.dumps({"status": "executed", "model": args.model, "identity": pair.identity.to_dict(),
-                      "captured_feature_count": int(snap.codes.numel()),
-                      "removed_feature": rank, "logit_delta_norm": float(edit.logit_delta.norm()),
-                      }, indent=2))
+    edit = evaluate_edit(
+        pair.model,
+        pair.sae,
+        site=pair.site,
+        tokens=tokens,
+        replacements={rank: 0.0},
+        verify_identity=True,
+    )
+    print(
+        json.dumps(
+            {
+                "status": "executed",
+                "model": args.model,
+                "identity": pair.identity.to_dict(),
+                "captured_feature_count": int(snap.codes.numel()),
+                "removed_feature": rank,
+                "logit_delta_norm": float(edit.logit_delta.norm()),
+            },
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":

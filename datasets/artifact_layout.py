@@ -64,9 +64,7 @@ DEFAULT_EXPERIMENT_ROOT = Path(__file__).resolve().parents[2] / "experiment"
 def canonicalize_behavior(name: str) -> str:
     key = str(name)
     if key not in BEHAVIOR_ALIASES:
-        raise KeyError(
-            f"Unknown behavior {key!r}. Valid: {sorted(set(BEHAVIOR_ALIASES.values()))}"
-        )
+        raise KeyError(f"Unknown behavior {key!r}. Valid: {sorted(set(BEHAVIOR_ALIASES.values()))}")
     return BEHAVIOR_ALIASES[key]
 
 

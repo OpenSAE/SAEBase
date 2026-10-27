@@ -7,6 +7,7 @@ The optional --evaluate mode requires the original sae_localize package:
     pip install git+https://github.com/OpenSAE/SAE-Input-Localization.git
 All data in this example is synthetic.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -23,11 +24,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ActivationSite, ModelAdapter
 from saebase.data import (
-    BinaryFactor, ControlledInputDesign, collect_controlled_input_activations,
+    BinaryFactor,
+    ControlledInputDesign,
+    collect_controlled_input_activations,
 )
 from saebase.integrations import localization_grid_from_code_store, evaluate_localization
 from saebase.store import (
-    ActivationIdentity, ActivationWriter, CodeIdentity, encode_from_store, sha256_state_dict,
+    ActivationIdentity,
+    ActivationWriter,
+    CodeIdentity,
+    encode_from_store,
+    sha256_state_dict,
 )
 
 
@@ -46,8 +53,11 @@ class FactorialToyModel(ResearchToyModel):
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--evaluate", action="store_true",
-                        help="Run the original Localize estimator (optional dependency)")
+    parser.add_argument(
+        "--evaluate",
+        action="store_true",
+        help="Run the original Localize estimator (optional dependency)",
+    )
     args = parser.parse_args()
 
     factors = (
@@ -56,8 +66,9 @@ def main() -> None:
         BinaryFactor("third", ("5", "6")),
     )
     identity_design = ControlledInputDesign.from_renderer(
-        factors=factors, name="three-factor-toy",
-        render=lambda x: f'{x["first"]} {x["second"]} {x["third"]}',
+        factors=factors,
+        name="three-factor-toy",
+        render=lambda x: f"{x['first']} {x['second']} {x['third']}",
     )
     # new state mask -> old state mask. The same eight prompt/SAE pairs are reused.
     xor_map = {i: ((i & 1) ^ ((i >> 1) & 1)) | (i & ~1) for i in range(8)}
@@ -67,13 +78,17 @@ def main() -> None:
     sae = ResearchToySAE().eval()
     site = ActivationSite(0, "blocks.0.hook_resid_post")
     activation_id = ActivationIdentity(
-        model_key="controlled-toy", model_state_sha256=sha256_state_dict(model.model),
+        model_key="controlled-toy",
+        model_state_sha256=sha256_state_dict(model.model),
         tokenizer_sha256=hashlib.sha256(b"FactorialToyModel.to_tokens.v1").hexdigest(),
-        hook_name=site.hook_name, layer=site.layer,
+        hook_name=site.hook_name,
+        layer=site.layer,
     )
     sae_id = CodeIdentity(
-        "research-toy", sha256_state_dict(sae),
-        d_in=sae.cfg.d_in, d_sae=sae.cfg.d_sae,
+        "research-toy",
+        sha256_state_dict(sae),
+        d_in=sae.cfg.d_in,
+        d_sae=sae.cfg.d_sae,
     )
 
     with TemporaryDirectory() as tmp:
@@ -81,9 +96,7 @@ def main() -> None:
             identity_run = collect_controlled_input_activations(
                 model, identity_design, writer, site=site
             )
-            mixed_run = collect_controlled_input_activations(
-                model, mixed_design, writer, site=site
-            )
+            mixed_run = collect_controlled_input_activations(model, mixed_design, writer, site=site)
             activation_path = writer.path
 
         code_path, code_stats = encode_from_store(activation_path, sae, sae_id)

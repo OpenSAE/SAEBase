@@ -1,8 +1,10 @@
 """Map physical /datasets sources into the saebase.datasets Python namespace.
 This avoids shadowing the third-party Hugging Face datasets package.
 """
+
 from pathlib import Path
 from setuptools import find_packages, setup
+
 datasets = Path(__file__).resolve().parent / "datasets"
 packages = set(find_packages(exclude=("tests*",)))
 packages.update({"saebase.datasets"})
