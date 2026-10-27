@@ -28,10 +28,10 @@ from pytorch_lightning.utilities.rank_zero import rank_zero_info, rank_zero_only
 
 
 def env_suppresses_tensorboard_auto_launch() -> bool:
-    """True during pytest or when ``DLBASE_SMOKE`` is set (registry smoke / quick runs without TB)."""
+    """True during pytest or when ``SAEBASE_SMOKE`` is set (registry smoke / quick runs without TB)."""
     if os.environ.get("PYTEST_CURRENT_TEST"):
         return True
-    v = os.environ.get("DLBASE_SMOKE", "").strip().lower()
+    v = os.environ.get("SAEBASE_SMOKE", "").strip().lower()
     return v in ("1", "true", "yes", "on")
 
 
