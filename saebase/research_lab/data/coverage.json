@@ -1,0 +1,32 @@
+{
+  "schema": "opensae.platform.coverage.v1",
+  "context": "planned_new_500_prompt_run; separate from historical_64_group_stage_d",
+  "base": "all_48_historical_sites",
+  "deep": [
+    "qwen3_1_7b_base:qwen3_1_7b_base_resid_w32k:L14",
+    "gemma1b:gemma1b_scope_resid:L13",
+    "gemma3_4b_pt:gemma3_4b_pt_scope_resid:L22",
+    "gemma3_4b_it:gemma3_4b_it_scope_resid:L22",
+    "llama31_8b:llama31_8b_lxr_8x:L21",
+    "mistral7b_instruct:mistral7b_instruct_tc_l16_131k:L16"
+  ],
+  "sar": [
+    "qwen3_1_7b_base:qwen3_1_7b_base_resid_w32k:L14",
+    "gemma3_4b_pt:gemma3_4b_pt_scope_resid:L22",
+    "llama31_8b:llama31_8b_lxr_8x:L21"
+  ],
+  "online_candidate": "gemma3_4b_it:gemma3_4b_it_scope_resid:L22",
+  "protocols": {
+    "capture": "opensae.capture.10x50.v1",
+    "intervention": "opensae.intervention.10x50.v1",
+    "sar": "sar.original.k16.m384.fit256.v1",
+    "rss": "rss.transform.v1",
+    "localization": "opensae.localization.six_factors.v1"
+  },
+  "localize_designs": [
+    "synthetic_known_factor_control",
+    "real_model_six_factor_design"
+  ],
+  "coalition_per_prompt": 384,
+  "provisional_features_per_prompt": 16
+}
