@@ -13,10 +13,10 @@ RETIRED_PATHS = (
     "conf/task/classification.yaml",
     "saebase/runtime/training/facets.py",
 )
-CONTENT_ROOTS = ("harness", "doc", "research_datasets", "dlbase", ".cursor")
+CONTENT_ROOTS = ("harness/core", "harness/code", "harness/knowledge", "harness/visualization", "doc", "datasets", "models", "tasks", ".cursor")
 CONTENT_FILES = (
-    "models/dlbase_plugins.py",
-    "tasks/dlbase_plugins.py",
+    "models/plugins.py",
+    "tasks/plugins.py",
     "conf/sae_research.yaml",
     "conf/tasks_log.md",
     "README.md",
@@ -40,7 +40,7 @@ def test_saebase_and_llm_entrypoints_remain():
     assert (ROOT / "saebase/api/features.py").is_file()
     assert (ROOT / "saebase/data/prompt_store.py").is_file()
     for task in ("capture", "intervene", "generate", "circuits", "explain", "benchmark", "train"):
-        assert (ROOT / "tasks" / "LLM" / task / "task.py").is_file(), task
+        assert (ROOT / "tasks" / task / "task.py").is_file(), task
 
 
 def test_no_retired_terms_in_integrated_sources():

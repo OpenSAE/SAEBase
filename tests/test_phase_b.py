@@ -259,10 +259,12 @@ def test_huggingface_datasets_import_works_without_sys_path_mutation(monkeypatch
     assert sys.modules["datasets"] is hf
 
 
-def test_no_root_datasets_package_left():
+def test_canonical_datasets_tree_and_hf_import_coexist():
     from pathlib import Path
     root = Path(__file__).resolve().parents[1]
-    assert not (root / "datasets").exists()
+    assert (root / "datasets" / "plugins.py").is_file()
+    assert not (root / "research_datasets").exists()
+    assert not (root / "dlbase").exists()
     assert (root / "saebase" / "data" / "prompt_store.py").exists()
     from saebase.data.artifact_layout import DEFAULT_DATA_ROOT, DEFAULT_EXPERIMENT_ROOT
     assert DEFAULT_DATA_ROOT == root / "data"

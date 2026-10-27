@@ -195,7 +195,7 @@ def test_run_config_consistency(tmp_path):
     from saebase.registry import list_registered_task_keys
     from saebase.runtime import missing_packages
 
-    assert list_registered_task_keys() == ["sae"]
+    assert set(list_registered_task_keys()) == {"sae", "capture", "intervene", "generate", "circuits", "explain", "benchmark", "train"}
     validate_hydra_cfg(fake_cfg(tmp_path))
     bad = fake_cfg(tmp_path)
     bad.sae.name = "none"
@@ -208,13 +208,13 @@ def test_help_and_listing_require_no_gpu(tmp_path):
     commands = [
         [sys.executable, str(ROOT / "main.py"), "--help"],
         [sys.executable, str(ROOT / "main.py"), "--list"],
-        [sys.executable, str(ROOT / "scripts" / "sae_prepare_prompts.py"), "--help"],
+        [sys.executable, str(ROOT / "saebase" / "tools" / "sae_prepare_prompts.py"), "--help"],
     ]
     for cmd in commands:
         p = subprocess.run(cmd, cwd=tmp_path, capture_output=True, text=True, timeout=30)
         assert p.returncode == 0, p.stderr
     assert (
-        "Tasks: sae"
+        "sae"
         in subprocess.run(commands[1], cwd=tmp_path, capture_output=True, text=True).stdout
     )
 
@@ -299,7 +299,7 @@ def test_pythia_example_config_files_have_required_groups():
     assert task["evaluation"] == "activation_health"
     sae = yaml.safe_load((conf / "sae" / "pythia70m_resid_sm.yaml").read_text())["sae"]
     assert sae["name"] == "pythia70m_resid_sm"
-    assert (ROOT / "scripts" / "phase_a_smoke.sh").is_file()
+    assert (ROOT / "saebase" / "tools" / "phase_a_smoke.sh").is_file()
 
 
 def test_missing_external_batchtopk_loader_reports_boundary():

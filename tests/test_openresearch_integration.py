@@ -41,19 +41,27 @@ def test_openresearch_layers_are_additive():
 
 def test_seven_llm_tasks_present():
     for task in ("capture", "intervene", "generate", "circuits", "explain", "benchmark", "train"):
-        assert (ROOT / "tasks" / "LLM" / task / "task.py").exists(), task
+        assert (ROOT / "tasks" / task / "task.py").exists(), task
 
 
-def test_isolated_registries_preserve_old_namespaces():
-    old_models = (ROOT / "models/plugins.py").read_text(encoding="utf-8")
-    old_tasks = (ROOT / "tasks/plugins.py").read_text(encoding="utf-8")
-    assert "saebase.model_plugins" in old_models
-    assert "saebase.tasks" in old_tasks
-    new_bootstrap = (ROOT / "saebase/runtime/plugin_bootstrap.py").read_text(encoding="utf-8")
-    assert "models.plugins" in new_bootstrap
-    assert "tasks.plugins" in new_bootstrap
+def test_unified_registry_and_hydra_entrypoint():
+    registry = (ROOT / "saebase/registry.py").read_text(encoding="utf-8")
+    assert "def register_dataset(" in registry
+    assert "def register_model(" in registry
+    assert "def register_task(" in registry
+    models = (ROOT / "models/plugins.py").read_text(encoding="utf-8")
+    tasks = (ROOT / "tasks/plugins.py").read_text(encoding="utf-8")
+    assert "register_model" in models and "register_sae" in models
+    assert "CaptureTask" in tasks and "TrainTask" in tasks
+    bootstrap = (ROOT / "saebase/plugin_bootstrap.py").read_text(encoding="utf-8")
+    assert "models.plugins" in bootstrap
+    assert "tasks.plugins" in bootstrap
+    assert "saebase.datasets.plugins" in bootstrap
     training = (ROOT / "saebase/runtime/train.py").read_text(encoding="utf-8")
-    assert 'config_name="openresearch"' in training
+    assert 'config_name="sae_research"' in training
+    for retired in ("dlbase", "research_datasets", "tasks/LLM"):
+        assert not (ROOT / retired).exists()
+
 
 
 def test_graph_and_policy_parse():
@@ -66,6 +74,6 @@ def test_graph_and_policy_parse():
 
 
 def test_python_syntax_in_added_modules():
-    for root in ("dlbase", "research_datasets", "harness"):
+    for root in ("saebase/runtime", "datasets", "harness"):
         for file in (ROOT / root).rglob("*.py"):
             ast.parse(file.read_text(encoding="utf-8"), filename=str(file))

@@ -32,8 +32,8 @@ def test_relative_link_checker_detects_bad_paths(tmp_path):
     assert missing_links(guide, tmp_path) == [
         "README.md:1: harness/github_development_doc/missing.md"
     ]
-    (tmp_path / "docs").mkdir()
-    (tmp_path / "docs" / "missing.md").write_text("# Present\n", encoding="utf-8")
+    (tmp_path / "harness" / "github_development_doc").mkdir(parents=True)
+    (tmp_path / "harness" / "github_development_doc" / "missing.md").write_text("# Present\n", encoding="utf-8")
     assert missing_links(guide, tmp_path) == []
 
 
@@ -101,7 +101,7 @@ def test_first_experiment_writes_persistent_metrics_and_audit(tmp_path):
 
 def test_examples_are_grouped_by_function():
     """The public examples tree should use task names, not numeric filenames."""
-    root = ROOT / "examples"
+    root = ROOT / "saebase" / "examples"
     categories = {
         "quickstart",
         "activations",
