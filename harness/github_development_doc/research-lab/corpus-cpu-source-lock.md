@@ -101,8 +101,8 @@ scientific claims need independent collection and design.
 
 ## Related resources
 
-- [Work Plan 04](../../github_harness/github_work_plan/04_research_platform_execution_plan.md)
-- [Work Plan 05](../../github_harness/github_work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md)
+- [Work Plan 04](../../github_work_plan/04_research_platform_execution_plan.md)
+- [Work Plan 05](../../github_work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md)
 - [Issue #41](https://github.com/OpenSAE/SAEBase/issues/41)
 - [Research Lab CPU-to-GPU handoff](cpu-gpu-handoff.md)
 

@@ -47,4 +47,4 @@ Use `--public-demo-prompt` **only** when the original prompt is author-approved.
 
 A public CPU Lab may display safe measured summaries, but **does not** perform model inference. For reviewed published text, use a separate immutable `$OPENSAE_LAB_DATA/wp15/` bundle. A reviewed `generation.json` may contain `public_example` only when the source prompt's SHA256 matches and all publication review flags are true. A reviewed `explanation.json` may display a human-approved description; an unreviewed candidate never exposes its text.
 
-G1 capture and edit stay on the local Python API or authenticated owner-only worker. For full commands to stage a reviewed G1 trace, see [the WP15 pre-release handoff](../github_harness/github_work_plan/15_pre_release_remaining_handoff.md).
+G1 capture and edit stay on the local Python API or authenticated owner-only worker. For full commands to stage a reviewed G1 trace, see [the WP15 pre-release handoff](../github_work_plan/15_pre_release_remaining_handoff.md).
