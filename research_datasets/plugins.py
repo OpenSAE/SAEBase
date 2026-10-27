@@ -14,22 +14,22 @@ SAE_TASKS = frozenset({
 
 def _register_builtin_datasets() -> None:
     def setup_cub_datamodule(dm, cfg, stage=None):
-        from datasets.vision.CUB_200.datamodule_setup import setup_cub_datamodule
+        from research_datasets.vision.CUB_200.datamodule_setup import setup_cub_datamodule
         return setup_cub_datamodule(dm, cfg, stage)
 
     def cub_assert(cfg):
-        from datasets.vision.CUB_200.dataset_task_policy import assert_task_supported
+        from research_datasets.vision.CUB_200.dataset_task_policy import assert_task_supported
         return assert_task_supported(cfg)
 
     def cub_eval_split_note(dm):
-        from datasets.vision.CUB_200.datamodule_setup import cub_eval_split_note
+        from research_datasets.vision.CUB_200.datamodule_setup import cub_eval_split_note
         return cub_eval_split_note(dm)
 
     register_dataset("CUB_200", setup_cub_datamodule, cub_assert, cub_eval_split_note)
     register_dataset_alias("CUB", "CUB_200")
 
     def setup_nlp(dm, cfg, stage=None):
-        from datasets.NLP.prompts import read_prompts
+        from research_datasets.NLP.prompts import read_prompts
         records = read_prompts(cfg.dataset, model_key=str(cfg.model.name))
         dm.train_set = [item for item in records if str(item.get("split", "train")) == "train"]
         dm.val_set = [item for item in records if item.get("split") in ("val", "validation")]
@@ -41,7 +41,7 @@ def _register_builtin_datasets() -> None:
         name, task = str(cfg.dataset.name), str(cfg.task.name)
         if name not in NLP_NAMES or task not in SAE_TASKS:
             raise ValueError(f"NLP dataset {name!r} supports SAEBase tasks, received {task!r}")
-        from datasets.NLP.artifacts import assert_available
+        from research_datasets.NLP.artifacts import assert_available
         assert_available(name, str(cfg.model.name))
 
     def nlp_split_note(dm):

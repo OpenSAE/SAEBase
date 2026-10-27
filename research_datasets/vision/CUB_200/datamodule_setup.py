@@ -1,4 +1,4 @@
-"""CUB-200 Lightning datamodule wiring (registered via ``datasets.plugins``)."""
+"""CUB-200 Lightning datamodule wiring (registered via ``research_datasets.plugins``)."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ import torchvision.transforms as T
 from omegaconf import DictConfig
 from torch.utils.data import random_split
 
-from datasets.vision.CUB_200 import CUB200
+from research_datasets.vision.CUB_200 import CUB200
 
 
 def _cub_transforms(image_size: int, train: bool):
