@@ -104,6 +104,26 @@ for (const [source, target] of Object.entries(locales.docs)) {
   assert(content.length >= 200, "Empty English document: " + target);
   assert(!CJK.test(content), "English document contains Chinese prose: " + target);
 }
+// Every Markdown source directly referenced by an Atlas authority graph has
+// an English version; existing English documents need no duplicate file.
+const linkedMarkdown = new Set();
+function scanReferences(value) {
+  if (typeof value === "string") {
+    if (/^(?:[\w.-]+\/)*[\w.-]+\.md$/.test(value)) linkedMarkdown.add(value);
+    return;
+  }
+  if (Array.isArray(value)) value.forEach(scanReferences);
+  else if (value && typeof value === "object") Object.values(value).forEach(scanReferences);
+}
+for (const authority of [core, knowledge, glossary, vocabulary]) scanReferences(authority);
+for (const relative of linkedMarkdown) {
+  const sourceFile = path.join(ROOT, relative);
+  assert(fs.existsSync(sourceFile), "Broken Atlas Markdown reference: " + relative);
+  if (CJK.test(fs.readFileSync(sourceFile, "utf8"))) {
+    assert(locales.docs[relative],
+      "Linked Chinese Markdown has no English variant: " + relative);
+  }
+}
 for (const view of ["core", "knowledge", "code", "environment", "context"]) {
   const html = fs.readFileSync(
     path.join(ROOT, "harness/visualization", view + ".html"), "utf8"
