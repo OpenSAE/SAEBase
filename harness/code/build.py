@@ -82,7 +82,7 @@ def build(include_harness=False):
         make_node(
             "code:root",
             "root",
-            "OpenResearch · 代码结构",
+            "SAEBase · 源代码结构",
             doc="由当前代码静态分析自动生成；点击展开包、模块、类与方法。",
         )
     ]
@@ -211,7 +211,7 @@ def build(include_harness=False):
     return {
         "schema_version": 1,
         "kind": "code",
-        "project": "OpenResearch",
+        "project": "SAEBase",
         "source_sha256": digester.hexdigest(),
         "scope": roots,
         "extraction": "Python AST; unresolved dynamic calls deliberately omitted",

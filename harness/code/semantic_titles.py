@@ -245,7 +245,6 @@ OBJECTS = (
     (r"(coverage|accepted|acceptance|verification)", "模型与 SAE 覆盖验收"),
     (r"(dataset|datamodule|sample|loader)", "数据样本与加载流程"),
     (r"(training|train|optim|scheduler|learning.rate|epoch)", "模型训练参数"),
-    (r"(classif|resnet|vision|image)", "图像分类模型"),
     (r"(checkpoint|artifact|shard|storage|manifest)", "实验产物与存储"),
     (r"(schema|contract|policy|permission|guard)", "接口约束与数据协议"),
     (r"(config|setting|param)", "任务运行配置"),
@@ -315,9 +314,7 @@ SCOPES = (
     ("tasks/LLM/train/", "稀疏自编码器训练"),
     ("tasks/LLM/", "语言模型任务执行"),
     ("models/LLM/", "语言模型加载与运行"),
-    ("models/vision/", "图像分类模型"),
     ("datasets/NLP/", "模型文本输入数据"),
-    ("datasets/vision/", "图像样本与数据划分"),
     ("dlbase/cfg/", "训练配置与执行约束"),
     ("dlbase/training/", "训练回调与优化调度"),
     ("dlbase/registry.py", "数据、模型与任务注册"),
@@ -329,7 +326,6 @@ SCOPES = (
     ("harness/", "科研代码与项目结构校验"),
 )
 
-TECHNICAL = ("SAE", "LLM", "Hydra", "GPU", "CPU", "SAR", "RSS", "ResNet", "NLP", "API", "CUB-200")
 
 
 def context_for_path(path: str) -> str:
@@ -340,7 +336,7 @@ def context_for_path(path: str) -> str:
     return "科研组件与执行接口"
 
 
-def _words(identifier: str) -> str:
+TECHNICAL = ("SAE", "LLM", "Hydra", "GPU", "CPU", "SAR", "RSS", "NLP", "API")\n\ndef _words(identifier: str) -> str:
     value = str(identifier or "").split(".")[-1]
     value = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", value)
     return re.sub(r"_+", "_", value.strip("_")).lower()
