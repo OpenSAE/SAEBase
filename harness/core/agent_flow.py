@@ -8,7 +8,7 @@ PLANS = ROOT / "harness/github_work_plan/agent_flow"
 VIEWS = ("knowledge", "code", "environment", "context")
 SCHEMA = "openresearch.agent_flow.v1"
 PROTECTED = (".cursor/", ".github/", "harness/", "dlbase/")
-EDITABLE = ("datasets/", "models/", "tasks/", "conf/", "saebase/",
+EDITABLE = ("research_datasets/", "models/", "tasks/", "conf/", "saebase/",
             "doc/knowledge/", "doc/code/", "tests/", "scripts/")
 AUTHORITY = {"knowledge": "doc/knowledge/context_graph.json",
              "code": "doc/code/code_tree.json",

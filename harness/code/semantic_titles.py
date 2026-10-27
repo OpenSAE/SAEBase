@@ -159,7 +159,7 @@ GENERIC_CURATED = {
 
 def module_semantics(path: str) -> str:
     parts = PurePosixPath(path).parts
-    if len(parts) >= 4 and parts[:2] == ("datasets", "NLP"):
+    if len(parts) >= 4 and parts[:2] == ("research_datasets", "NLP"):
         subject = DATASET_SUBJECTS.get(parts[2], "语言模型评测样本")
         filename = parts[-1].lower()
         if filename == "tokenize.py":
@@ -316,7 +316,7 @@ SCOPES = (
     ("dlbase/registry.py", "数据、模型与任务注册"),
     ("dlbase/experiment_paths.py", "实验产物的目录管理"),
     ("dlbase/", "模型训练与实验记录"),
-    ("datasets/", "数据集加载与注册"),
+    ("research_datasets/", "数据集加载与注册"),
     ("models/", "模型构建与兼容检查"),
     ("tasks/", "科研任务执行与评测"),
     ("harness/", "科研代码与项目结构校验"),

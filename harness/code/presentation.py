@@ -18,7 +18,7 @@ from harness.code.semantic_titles import (
 GROUPS = {
     "dlbase":"DLBase 训练配置、运行与实验产物",
     "saebase":"SAEBase 特征表示与模型干预",
-    "datasets":"Dataset 读取、划分与注册",
+    "research_datasets":"Dataset 读取、划分与注册",
     "models":"Model 构建、插件与兼容性",
     "tasks":"Vision 分类与 LLM SAE 任务",
     "harness":"Harness 代码树、环境与知识验证",
@@ -27,7 +27,7 @@ GROUPS = {
 GROUP_SUMMARIES = {
     "dlbase": "为多种科研任务提供公共训练入口、实验记录、优化调度和组件注册工具。",
     "saebase": "为 LLM 稀疏特征捕获、干预、生成、电路、解释、基准与训练提供公共算法和可复用接口。",
-    "datasets": "把数据样本和标签组织为训练、验证、测试批次，并提供统一的数据集注册入口。",
+    "research_datasets": "把数据样本和标签组织为训练、验证、测试批次，并提供统一的数据集注册入口。",
     "models": "创建神经网络模型，检查模型与输入、任务的兼容关系，并提供统一构建入口。",
     "tasks": "按通用任务类型组织训练和评测流程，具体模型与数据集由实验配置选择。",
     "harness": "负责检查代码结构、记录科研知识、管理运行环境和生成 Atlas 浏览页面。",
@@ -239,7 +239,7 @@ METHODS = {
 # Presentation-only groups organize existing Python modules by their source
 # directory. Each concrete component owns its implementation details.
 CONCRETE = {
-    "datasets": ("CUB-200 与 NLP 数据集", "逐一查看 CUB-200、NLP 样本的读取、划分和适配实现。"),
+    "research_datasets": ("CUB-200 与 NLP 数据集", "逐一查看 CUB-200、NLP 样本的读取、划分和适配实现。"),
     "models": ("Vision 与 LLM 模型实现", "查看 ResNet-18、Gemma-2 2B 的结构、构建与兼容性实现。"),
     "tasks": ("分类训练与 LLM SAE 任务", "查看分类训练和七项 LLM SAE 任务的执行流程与配置。"),
 }
@@ -247,7 +247,7 @@ CONCRETE = {
 # Human-readable names describe verified existing directories. Newly added
 # component directories still receive a scoped branch automatically.
 INSTANCE_LABELS = {
-    ("datasets", "CUB_200"): (
+    ("research_datasets", "CUB_200"): (
         "CUB-200 鸟类数据集", "该数据集的图像、标注、划分与数据适配实现。"
     ),
     ("models", "resnet18_mlp"): (
@@ -262,7 +262,7 @@ INSTANCE_LABELS = {
 KEY_METHODS = {
     "code:method:models.vision.resnet18_mlp.resnet18_mlp:Resnet18MLP.forward":
         "按当前 head_style 处理输入：MLP 模式使用 ResNet 特征并传给 MLP 头；线性模式经过 ResNet 各层与池化，再由全连接分类层输出 logits。",
-    "code:method:datasets.vision.CUB_200.CUB_200:CUB200.__getitem__":
+    "code:method:research_datasets.vision.CUB_200.CUB_200:CUB200.__getitem__":
         "根据数据集的局部索引读取图像与已有标注，并执行配置中的预处理。",
     "code:method:tasks.vision.classification.classification_task:ClassificationTask.run":
         "把当前任务配置交给已存在的分类训练执行函数。",
@@ -270,7 +270,7 @@ KEY_METHODS = {
         "构建现有分类任务使用的优化器和学习率调度。",
     "code:method:tasks.vision.classification.classification_module:ClassificationModule.training_step":
         "计算训练批次的损失和可记录的训练指标。",
-    "code:method:datasets.datamodule:DLBaseDataModule.setup":
+    "code:method:research_datasets.datamodule:DLBaseDataModule.setup":
         "根据当前数据集配置准备训练、验证和测试数据。",
 }
 
@@ -278,7 +278,7 @@ KEY_METHODS = {
 # The snippet always comes from the actual tracked file, not LLM-authored code.
 PUBLIC_EXCERPTS = frozenset({
     "code:method:models.vision.resnet18_mlp.resnet18_mlp:Resnet18MLP.forward",
-    "code:method:datasets.vision.CUB_200.CUB_200:CUB200.__getitem__",
+    "code:method:research_datasets.vision.CUB_200.CUB_200:CUB200.__getitem__",
     "code:method:tasks.vision.classification.classification_task:ClassificationTask.run",
     "code:method:tasks.vision.classification.classification_module:ClassificationModule.configure_optimizers",
 })
@@ -350,7 +350,7 @@ def concrete_groups(output: dict) -> None:
     edges = output["edges"]
     for area, (title, summary) in CONCRETE.items():
         parent_id = "code:group:" + area
-        families = ("vision", "NLP") if area == "datasets" else ("vision", "LLM")
+        families = ("vision", "NLP") if area == "research_datasets" else ("vision", "LLM")
         family_modules = {family: {} for family in families}
         family_shared = {family: [] for family in families}
         for node in nodes:
@@ -387,8 +387,8 @@ def concrete_groups(output: dict) -> None:
                 continue
             family_id = f"code:family:{area}:{family}"
             family_title = {
-                ("datasets", "vision"): "Vision 图像数据集",
-                ("datasets", "NLP"): "NLP 文本输入数据集",
+                ("research_datasets", "vision"): "Vision 图像数据集",
+                ("research_datasets", "NLP"): "NLP 文本输入数据集",
                 ("models", "vision"): "Vision 图像模型",
                 ("models", "LLM"): "LLM 语言模型",
                 ("tasks", "vision"): "Vision 分类训练任务",

@@ -9,13 +9,13 @@ from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
-CODE_ROOTS = ("dlbase", "saebase", "datasets", "models", "tasks")
+CODE_ROOTS = ("dlbase", "saebase", "research_datasets", "models", "tasks")
 ANNOTATIONS = ROOT / "doc/code/code_annotations.json"
 DEFAULT_OUT = ROOT / "doc/code/code_tree.json"
 GROUP_LABELS = {
     "dlbase": "DLBase · 通用训练基础",
     "saebase": "SAEBase · LLM 稀疏特征研究基础",
-    "datasets": "Datasets · 数据实现",
+    "research_datasets": "Datasets · 数据实现",
     "models": "Models · 网络构建",
     "tasks": "Tasks · 科研任务",
     "harness": "Harness · 可选工具",
