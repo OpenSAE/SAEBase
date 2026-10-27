@@ -41,7 +41,7 @@ def fake_project(tmp_path: Path, version: str = "0.3.0") -> tuple[Path, Path]:
     )
     (root / "pyproject.toml").write_text(project, encoding="utf-8")
     (root / "saebase" / "__init__.py").write_text(f'__version__ = "{version}"\n', encoding="utf-8")
-    (root / "CHANGELOG.md").write_text(
+    (root / "harness/github_development_doc/CHANGELOG.md").write_text(
         f"# Changelog\n\n## {version} - Candidate\n", encoding="utf-8"
     )
     (root / "harness" / "github_development_doc" / "releases" / f"v{version}.md").write_text(

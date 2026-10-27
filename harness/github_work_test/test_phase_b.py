@@ -261,7 +261,7 @@ def test_huggingface_datasets_import_works_without_sys_path_mutation(monkeypatch
 
 def test_canonical_datasets_tree_and_hf_import_coexist():
     from pathlib import Path
-    root = Path(__file__).resolve().parents[1]
+    root = Path(__file__).resolve().parents[2]
     assert (root / "datasets" / "plugins.py").is_file()
     assert not (root / "research_datasets").exists()
     assert not (root / "dlbase").exists()

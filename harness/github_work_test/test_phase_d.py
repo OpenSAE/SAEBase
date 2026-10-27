@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 import tomllib
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_package_metadata_matches_public_api_version():

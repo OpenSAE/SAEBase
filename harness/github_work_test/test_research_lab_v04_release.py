@@ -8,7 +8,7 @@ import re
 import tomllib
 from pathlib import Path
 
-BASE = Path(__file__).resolve().parents[1]
+BASE = Path(__file__).resolve().parents[2]
 
 
 def test_release_version_and_notes_are_consistent():
@@ -23,7 +23,7 @@ def test_release_version_and_notes_are_consistent():
         and isinstance(node.value, ast.Constant)
     ]
     assert constants == [version]
-    assert re.search(r"(?m)^## 0\.4\.0\b", (BASE / "CHANGELOG.md").read_text())
+    assert re.search(r"(?m)^## 0\.4\.0\b", (BASE / "harness/github_development_doc/CHANGELOG.md").read_text())
     assert f"version: {version}" in (BASE / "CITATION.cff").read_text()
     assert (BASE / "harness/github_development_doc/releases/v0.4.0.md").exists()
 
