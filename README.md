@@ -25,7 +25,7 @@ This branch integrates the [OpenResearch](https://github.com/OpenSAE/OpenResearc
 | --- | --- |
 | `saebase/` | Existing public SAEBase primitives, registries, CLI, benchmark and release compatibility remain authoritative. |
 | `dlbase/` | OpenResearch's separate Hydra training/execution and Dataset/Model/Task registry. |
-| `datasets/` | Additive Vision/CUB-200 and NLP prompt-source implementations; original `saebase/data/` is retained. |
+| `research_datasets/` | Additive Vision/CUB-200 and NLP prompt-source implementations; original `saebase/data/` is retained. |
 | `models/` | Existing SAEBase model keys remain; `models/vision/` and `models/LLM/` provide OpenResearch adapters. |
 | `tasks/` | Original compatibility plugin interface remains; `tasks/LLM/` adds capture, intervene, generate, circuits, explain, benchmark, and train executors. |
 | `harness/` and `.cursor/` | Agent Flow, Core/Knowledge/Code/Environment, Atlas visualization, scoped hooks and skills. |
@@ -41,7 +41,7 @@ python .cursor/hooks/validate_repo.py --full
 python -m dlbase.train --cfg job
 ```
 
-The top-level `datasets` research package overlaps the third-party Hugging Face `datasets` import name. OpenResearch's loader `models/hf_compat.py` uses an isolated adapter for supported loaders. Audit third-party dataset consumers before using this branch in production. Model-weight compatibility, GPU inference, Atlas snapshot generation and full original SAEBase regression tests are **not yet certified** in this integration branch.
+The OpenResearch dataset package is isolated as `research_datasets` so third-party Hugging Face `datasets` and the existing SAEBase loaders keep their original import identity. Real remote dataset access and full Research Lab behavior still require acceptance checks. Model-weight compatibility, GPU inference, Atlas snapshot generation and full original SAEBase regression tests are **not yet certified** in this integration branch.
 
 [Architecture and migration notes](docs/openresearch-integration.md) · [Harness](harness/README.md) · [Atlas sources](harness/visualization/README.md) · [Cursor rules](.cursor/rules/core/00-core.mdc)
 

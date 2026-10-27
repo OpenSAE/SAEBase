@@ -52,7 +52,7 @@ def gate(command, plan_id=None):
             permitted = (
                 "tasks/",
                 "models/",
-                "datasets/",
+                "research_datasets/",
                 "saebase/",
                 "conf/",
                 "doc/knowledge/",
@@ -76,7 +76,7 @@ def gate(command, plan_id=None):
                         for root in (
                             "tasks/",
                             "models/",
-                            "datasets/",
+                            "research_datasets/",
                             "saebase/",
                             "conf/",
                             "doc/knowledge/",

@@ -8,7 +8,7 @@
 | --- | --- |
 | `saebase/` | 保留原有 SAEBase 基础算法、API、模型/SAE 注册、CLI 与科研实现。 |
 | `dlbase/` | 新增独立 Hydra 执行入口与 Dataset/Model/Task Registry。 |
-| `datasets/` | 并入 Vision CUB-200 与 NLP 数据集；保留原有 `saebase/data/`。 |
+| `research_datasets/` | 并入 Vision CUB-200 与 NLP 数据集；保留原有 `saebase/data/`。 |
 | `models/` | 保留全部旧模型，新增 Vision 和 OpenResearch 的 Gemma-2 适配。 |
 | `tasks/` | 保留旧任务入口，新增七类 LLM Task。 |
 | `harness/` 与 `.cursor/` | 引入 Agent Flow、五棵 Tree、Atlas、Hooks、规则和 Skills。 |
@@ -21,7 +21,7 @@ python .cursor/hooks/validate_repo.py --full
 python -m dlbase.train --cfg job
 ```
 
-新增顶层 `datasets` 与 Hugging Face 的同名第三方库存在命名冲突，已引入隔离数据加载适配器；正式使用前仍需完成其余调用路径、GPU 环境、权重兼容性和全部回归测试的验收。
+OpenResearch 的新数据集保存在 `research_datasets/`，与 Hugging Face 第三方 `datasets` 包隔离；真实外部数据读取、GPU 环境和权重兼容性仍需要独立验收。
 
 [迁移说明](docs/openresearch-integration.md) · [Harness](harness/README.md) · [Atlas](harness/visualization/README.md)
 

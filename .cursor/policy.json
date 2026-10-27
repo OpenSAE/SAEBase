@@ -6,7 +6,6 @@
     "apps",
     "assets",
     "conf",
-    "datasets",
     "dlbase",
     "doc",
     "docs",
@@ -18,7 +17,8 @@
     "scripts",
     "tasks",
     "tests",
-    "work_plan"
+    "work_plan",
+    "research_datasets"
   ],
   "approved_files": [
     ".cursorignore",
