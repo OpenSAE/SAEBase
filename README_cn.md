@@ -1,5 +1,31 @@
 # 🧱 SAEBase：稀疏自编码器研究基础设施
 
+## OpenResearch Harness 与统一科研工作区
+
+当前开发分支在保留 SAEBase v0.5 的 API、CLI、模型注册、数据处理、实验后端和发布流程的基础上，增量引入 [OpenResearch](https://github.com/OpenSAE/OpenResearch) 的执行层与治理框架。该分支属于源代码集成阶段，尚未构成新的正式发行版本。
+
+| 模块 | 整合方式 |
+| --- | --- |
+| `saebase/` | 保留原有 SAEBase 基础算法、API、模型/SAE 注册、CLI 与科研实现。 |
+| `dlbase/` | 新增独立 Hydra 执行入口与 Dataset/Model/Task Registry。 |
+| `datasets/` | 并入 Vision CUB-200 与 NLP 数据集；保留原有 `saebase/data/`。 |
+| `models/` | 保留全部旧模型，新增 Vision 和 OpenResearch 的 Gemma-2 适配。 |
+| `tasks/` | 保留旧任务入口，新增七类 LLM Task。 |
+| `harness/` 与 `.cursor/` | 引入 Agent Flow、五棵 Tree、Atlas、Hooks、规则和 Skills。 |
+| `doc/` | 引入知识图与代码关系说明；继承的节点状态需要按 SAEBase 实际情况重新核验。 |
+
+原有 `conf/config.yaml` 和 `saebase` 命令保持不变；DLBase 使用 `conf/openresearch.yaml` 和 `python -m dlbase.train`。为避免破坏旧插件入口，新注册模块分别使用 `models/dlbase_plugins.py` 和 `tasks/dlbase_plugins.py`。
+
+```bash
+python .cursor/hooks/validate_repo.py --full
+python -m dlbase.train --cfg job
+```
+
+新增顶层 `datasets` 与 Hugging Face 的同名第三方库存在命名冲突，已引入隔离数据加载适配器；正式使用前仍需完成其余调用路径、GPU 环境、权重兼容性和全部回归测试的验收。
+
+[迁移说明](docs/openresearch-integration.md) · [Harness](harness/README.md) · [Atlas](harness/visualization/README.md)
+
+
 🌍 语言：[English](README.md) | [中文](README_cn.md) &nbsp; [![CI](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml)
 
 **最新软件版本：** [v0.5.0 Public Research Beta](docs/releases/v0.5.0.md) · [OpenSAE Playground](https://atheavenma.github.io/opensae/workspace.html) · [Python API](docs/python-api.md)

@@ -17,6 +17,34 @@
 
 ---
 
+## OpenResearch Harness and Unified Research Workspace
+
+This branch integrates the [OpenResearch](https://github.com/OpenSAE/OpenResearch) execution and governance layers **without replacing SAEBase's published v0.5 API, CLI, registries, releases, model catalog, or original datasets**. It is a source-workspace integration under development, not a new public software release.
+
+| Component | Ownership and compatibility |
+| --- | --- |
+| `saebase/` | Existing public SAEBase primitives, registries, CLI, benchmark and release compatibility remain authoritative. |
+| `dlbase/` | OpenResearch's separate Hydra training/execution and Dataset/Model/Task registry. |
+| `datasets/` | Additive Vision/CUB-200 and NLP prompt-source implementations; original `saebase/data/` is retained. |
+| `models/` | Existing SAEBase model keys remain; `models/vision/` and `models/LLM/` provide OpenResearch adapters. |
+| `tasks/` | Original compatibility plugin interface remains; `tasks/LLM/` adds capture, intervene, generate, circuits, explain, benchmark, and train executors. |
+| `harness/` and `.cursor/` | Agent Flow, Core/Knowledge/Code/Environment, Atlas visualization, scoped hooks and skills. |
+| `doc/` | Versioned context and Code graph source references, originally derived from OpenResearch; transferred statuses need SAEBase-specific review. |
+
+**Separate entry points.** The existing `saebase` commands and `conf/config.yaml` retain their previous meaning. New DLBase operations use `python -m dlbase.train`, `conf/openresearch.yaml`, and `models/dlbase_plugins.py` / `tasks/dlbase_plugins.py` (original plugin compatibility shims remain intact). Select `model=openresearch_gemma2_2b_base` for the OpenResearch-style Gemma configuration; the original `model=gemma2_2b_base` preset is unchanged.
+
+```bash
+# Structural validation, independent of GPU/checkpoint downloads
+python .cursor/hooks/validate_repo.py --full
+
+# New task configuration preview. Requires Hydra/Lightning and source checkout.
+python -m dlbase.train --cfg job
+```
+
+The top-level `datasets` research package overlaps the third-party Hugging Face `datasets` import name. OpenResearch's loader `models/hf_compat.py` uses an isolated adapter for supported loaders. Audit third-party dataset consumers before using this branch in production. Model-weight compatibility, GPU inference, Atlas snapshot generation and full original SAEBase regression tests are **not yet certified** in this integration branch.
+
+[Architecture and migration notes](docs/openresearch-integration.md) · [Harness](harness/README.md) · [Atlas sources](harness/visualization/README.md) · [Cursor rules](.cursor/rules/core/00-core.mdc)
+
 ## 🧭 Overview
 
 SAEBase connects pretrained models, SAE dictionaries, activation measurements, controlled feature interventions, benchmarks, and reliability analysis in one reusable workflow.
