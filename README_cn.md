@@ -2,7 +2,7 @@
 
 ## OpenResearch Harness 与统一科研工作区
 
-当前开发分支在保留 SAEBase v0.5 的 API、CLI、模型注册、数据处理、实验后端和发布流程的基础上，增量引入 [OpenResearch](https://github.com/OpenSAE/OpenResearch) 的执行层与治理框架。该分支属于源代码集成阶段，尚未构成新的正式发行版本。
+SAEBase v0.6.0 在保留 v0.5 的 API、CLI、模型注册、科研后端和历史版本的基础上，正式整合 [OpenResearch](https://github.com/OpenSAE/OpenResearch) 的执行层与 Harness。新的 wheel 同时包含 DLBase 和 NLP 科研组件。
 
 | 模块 | 整合方式 |
 | --- | --- |
@@ -21,14 +21,14 @@ python .cursor/hooks/validate_repo.py --full
 python -m dlbase.train --cfg job
 ```
 
-OpenResearch 的新数据集保存在 `research_datasets/`，与 Hugging Face 第三方 `datasets` 包隔离；真实外部数据读取、GPU 环境和权重兼容性仍需要独立验收。
+OpenResearch 的新数据集保存在 `research_datasets/`，与 Hugging Face 第三方 `datasets` 包隔离；已有 Gemma-2 2B 的有限 GPU 实测；真实实验的模型兼容、语义解释和科研结论仍应逐项核验。
 
 [迁移说明](docs/openresearch-integration.md) · [Harness](harness/README.md) · [Atlas](harness/visualization/README.md)
 
 
 🌍 语言：[English](README.md) | [中文](README_cn.md) &nbsp; [![CI](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml)
 
-**最新软件版本：** [v0.5.0 Public Research Beta](docs/releases/v0.5.0.md) · [OpenSAE Playground](https://atheavenma.github.io/opensae/workspace.html) · [Python API](docs/python-api.md)
+**最新软件版本：** [v0.6.0 Unified SAE Research Workspace](docs/releases/v0.6.0.md) · [OpenSAE Playground](https://atheavenma.github.io/opensae/workspace.html) · [Python API](docs/python-api.md)
 
 👉 **简介。** SAEBase 用于理解、测试和修改语言模型中的稀疏自编码器（SAE）特征。它提供激活提取与复用、重构分析、特征干预、下游行为评测以及可追溯的实验结果。
 

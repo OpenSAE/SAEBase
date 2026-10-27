@@ -155,3 +155,9 @@ publish private GPU artifacts, or provision a public inference service.
 
 This is deliberately scoped to **v0.5.0 only** and cannot publish
 future versions. Prior v0.4.0 and all historical tags stay immutable.
+
+## One-time maintainer-authorized SAEBase v0.6.0 publication
+
+The maintainer explicitly authorized the v0.6.0 release following review of PR #60 and its source-bound CPU CI and documented bounded real-GPU tests. [The version-specific dispatch](../.github/workflows/saebase-v060-release-dispatch.yml) may act **only** after a successful push-to-main CI for the exact current main SHA, provided that source declares version 0.6.0 and contains its release notes.
+
+The dispatch requests the existing `software-release.yml` `mode=publish` with `PUBLISH-v0.6.0`. The normal release gate still checks the original six CI contexts, wheel/sdist installation, tag immutability, SHA-256 and source identity. It cannot publish other versions or replace a version tag. No PyPI, GPU model assets or private research data are published.

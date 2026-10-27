@@ -1,6 +1,6 @@
 # SAEBase × OpenResearch code integration
 
-This note describes the additive integration branch. The public SAEBase 0.5.0 package remains the compatibility baseline, while OpenResearch provides the research execution layout and agent harness.
+This note describes the SAEBase v0.6.0 integration. SAEBase v0.5.0 remains the backward-compatibility baseline; v0.6.0 includes OpenResearch execution and agent harness components in the source and software distributions.
 
 ## Merge and ownership rules
 
@@ -23,7 +23,7 @@ python harness/visualization/export.py
 python harness/visualization/build_pages.py
 ```
 
-Commands shown here are verification targets, not claims of having run them. GPU checkpoints, NNsight and vLLM backend compatibility, research reproducibility, browser interaction, full SAEBase test matrix and packages/wheels require follow-up evidence.
+These commands are also covered by the release CI where applicable. Bounded real-GPU execution is recorded in the 2026-10-27 GPU report, with scientific limits and remaining blockers stated there.
 
 ## Explain generator
 
@@ -36,6 +36,6 @@ Commands shown here are verification targets, not claims of having run them. GPU
 
 ## Identified compatibility issue
 
-The new top-level `research_datasets/` Python package can shadow Hugging Face's third-party `datasets` package. OpenResearch provides `models.hf_compat.import_hf_datasets` and a subprocess-based adapter for supported data-loader calls. The original SAEBase research-lab applications may use the Hugging Face dataset object API directly and must be audited before this integration becomes a release.
+The `research_datasets/` package uses its own Python name, avoiding a collision with Hugging Face's `datasets` package. Research Lab and the legacy dataset readers retain their original imports.
 
-The original Python distribution currently packages its public API and existing model/task shims; the merged source workspace is not yet declared a new installable release. Do not publish PyPI artifacts or merge to main until compatibility tests and a release review pass.
+The v0.6.0 distribution includes DLBase, the Hydra resources and registered NLP components, in addition to the original public API and model/task shims. The immutable GitHub release is governed by the documented exact-source CI workflow; no PyPI upload is implied.

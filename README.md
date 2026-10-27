@@ -2,7 +2,7 @@
 
 🌍 Languages: [English](README.md) | [中文](README_cn.md) &nbsp; [![CI](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml)
 
-**Latest software release:** [v0.5.0 Public Research Beta](docs/releases/v0.5.0.md) · [OpenSAE Playground](https://atheavenma.github.io/opensae/workspace.html) · [Python API](docs/python-api.md)
+**Latest software release:** [v0.6.0 Unified SAE Research Workspace](docs/releases/v0.6.0.md) · [OpenSAE Playground](https://atheavenma.github.io/opensae/workspace.html) · [Python API](docs/python-api.md)
 
 👉 **TL;DR.** SAEBase helps researchers understand, test, and modify sparse autoencoder (SAE) features in language models. Capture activations, evaluate reconstructions, edit features, measure downstream effects, and reproduce results with checkpoint-aware caches.
 
@@ -19,7 +19,7 @@
 
 ## OpenResearch Harness and Unified Research Workspace
 
-This branch integrates the [OpenResearch](https://github.com/OpenSAE/OpenResearch) execution and governance layers **without replacing SAEBase's published v0.5 API, CLI, registries, releases, model catalog, or original datasets**. It is a source-workspace integration under development, not a new public software release.
+SAEBase v0.6.0 integrates the [OpenResearch](https://github.com/OpenSAE/OpenResearch) execution and Harness layers **while preserving the SAEBase v0.5 API, CLI, model catalog, registries and historical releases**. The new wheel also includes DLBase and NLP research components.
 
 | Component | Ownership and compatibility |
 | --- | --- |

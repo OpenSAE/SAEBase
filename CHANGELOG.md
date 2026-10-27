@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 0.6.0 — Unified SAE Research Workspace
+
+- **Architecture:** integrate the OpenResearch DLBase runtime, Gemma-2 2B LLM adapter and NLP-only `research_datasets` alongside SAEBase's existing API and model catalog.
+- **Seven operations:** source-backed capture, intervention, generation, circuits, explanation, benchmarking and SAE training with explicit approvals and experiment provenance.
+- **Harness and Atlas:** Core/Knowledge/Code/Environment/Context trees, bilingual UI, source evidence and scoped agent execution rules.
+- **Validated changes:** CPU CI and independent 12 GB GPU execution receipts, plus correction of Hydra first-run logging, optional training dtype and local dataset formats, circuit parameter checks and explicit explanation generator selection.
+- **Packaging:** wheel/sdist now include DLBase and required Hydra/NLP resources; original nine SAEBase console commands remain unchanged.
+- **Scientific caveats:** original circuit output is not fully normalized or intervention-validated; explanation text lacks independently scored semantic quality; the training acceptance is a two-step smoke, not a complete converged model. No private weights, prompts or raw GPU experiment archives are included.
+
+
 ## 0.5.0 — SAEBase Public Research Beta and Seven Workflows
 
 - **OpenSAE website and Workspace:** seven example-first browser workflows at https://atheavenma.github.io/opensae/workspace.html, with token/feature inspection, intervention parameters, generation comparisons, circuit graphs, benchmark metrics, training records and interpretation diagnostics.
