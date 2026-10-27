@@ -53,7 +53,7 @@ def _pair(cfg: Any):
 def _prompt(cfg: Any) -> str:
     value = str(_task(cfg, "prompt", "") or "").strip()
     if not value:
-        from datasets.NLP.prompts import read_first_prompt
+        from research_datasets.NLP.prompts import read_first_prompt
         value = read_first_prompt(cfg.dataset, model_key=str(cfg.model.name))
     if not 1 <= len(value) <= 4000:
         raise ValueError("Use a nonempty prompt up to 4000 characters")

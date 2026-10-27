@@ -1,7 +1,7 @@
 """Validate supported Gemma-2 2B task and NLP dataset combinations."""
 from __future__ import annotations
 from omegaconf import DictConfig
-from datasets.NLP.artifacts import assert_available
+from research_datasets.NLP.artifacts import assert_available
 
 SAE_TASKS = frozenset({"capture", "intervene", "generate",
                        "circuits", "explain", "benchmark", "train"})

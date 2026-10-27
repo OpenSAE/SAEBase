@@ -12,7 +12,7 @@ from tasks.LLM.benchmark.health_results import EvaluationResult
 from tasks.LLM.benchmark.analyze import analyze_prompt_activation
 from saebase.sae.loading import load_model_and_sae
 from tasks.LLM.benchmark.pipeline_checks import run_preflight
-from datasets.NLP.legacy_prompts import load_behavior_prompts
+from research_datasets.NLP.legacy_prompts import load_behavior_prompts
 from tasks.LLM.benchmark.health_results import summarize_rows, write_run_summary
 
 

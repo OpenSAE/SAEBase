@@ -10,7 +10,7 @@ def ensure_plugins_loaded() -> None:
     global _loaded
     if _loaded:
         return
-    import datasets.plugins  # noqa: F401 — registers datasets
+    import research_datasets.plugins  # noqa: F401 — registers datasets
     import models.dlbase_plugins  # noqa: F401
     import tasks.dlbase_plugins  # noqa: F401
 

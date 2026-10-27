@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from omegaconf import DictConfig
 
-from datasets.NLP.artifacts import canonicalize_behavior
-from datasets.NLP.artifacts import assert_available
-from datasets.NLP.artifacts import load_manifest
+from research_datasets.NLP.artifacts import canonicalize_behavior
+from research_datasets.NLP.artifacts import assert_available
+from research_datasets.NLP.artifacts import load_manifest
 from dlbase.registry import get_dataset_plugin, get_model_plugin, get_task_plugin
 from saebase.sae.contracts import assert_manifest_matches
 from saebase.sae.registry import get_profile

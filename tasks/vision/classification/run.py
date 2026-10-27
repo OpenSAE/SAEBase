@@ -20,7 +20,7 @@ from omegaconf import DictConfig, open_dict
 from pytorch_lightning.callbacks import EarlyStopping, LearningRateMonitor
 from pytorch_lightning.utilities.rank_zero import rank_zero_info, rank_zero_warn
 
-from datasets.datamodule import DLBaseDataModule
+from research_datasets.datamodule import DLBaseDataModule
 from dlbase.training.facets import merge_classification_task_facets, merge_train_facets
 from dlbase.training.seed import apply_lightning_reproducibility
 from dlbase.training.standard_lightning import (
