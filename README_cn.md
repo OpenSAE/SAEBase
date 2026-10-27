@@ -1,31 +1,5 @@
 # 🧱 SAEBase：稀疏自编码器研究基础设施
 
-## OpenResearch Harness 与统一科研工作区
-
-SAEBase v0.6.0 在保留 v0.5 的 API、CLI、模型注册、科研后端和历史版本的基础上，正式整合 [OpenResearch](https://github.com/OpenSAE/OpenResearch) 的执行层与 Harness。新的 wheel 同时包含 DLBase 和 NLP 科研组件。
-
-| 模块 | 整合方式 |
-| --- | --- |
-| `saebase/` | 保留原有 SAEBase 基础算法、API、模型/SAE 注册、CLI 与科研实现。 |
-| `dlbase/` | 新增独立 Hydra 执行入口与 Dataset/Model/Task Registry。 |
-| `research_datasets/` | 仅并入 NLP Prompt 数据集；保留原有 `saebase/data/`。 |
-| `models/` | 保留全部旧模型，新增 OpenResearch 的 Gemma-2 LLM 适配。 |
-| `tasks/` | 保留旧任务入口，新增七类 LLM Task。 |
-| `harness/` 与 `.cursor/` | 引入 Agent Flow、五棵 Tree、Atlas、Hooks、规则和 Skills。 |
-| `doc/` | 引入知识图与代码关系说明；继承的节点状态需要按 SAEBase 实际情况重新核验。 |
-
-原有 `conf/config.yaml` 和 `saebase` 命令保持不变；DLBase 使用 `conf/openresearch.yaml` 和 `python -m dlbase.train`。为避免破坏旧插件入口，新注册模块分别使用 `models/dlbase_plugins.py` 和 `tasks/dlbase_plugins.py`。
-
-```bash
-python .cursor/hooks/validate_repo.py --full
-python -m dlbase.train --cfg job
-```
-
-OpenResearch 的新数据集保存在 `research_datasets/`，与 Hugging Face 第三方 `datasets` 包隔离；已有 Gemma-2 2B 的有限 GPU 实测；真实实验的模型兼容、语义解释和科研结论仍应逐项核验。
-
-[迁移说明](docs/openresearch-integration.md) · [Harness](harness/README.md) · [Atlas](harness/visualization/README.md)
-
-
 🌍 语言：[English](README.md) | [中文](README_cn.md) &nbsp; [![CI](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml)
 
 **最新软件版本：** [v0.6.0 Unified SAE Research Workspace](docs/releases/v0.6.0.md) · [OpenSAE Playground](https://atheavenma.github.io/opensae/workspace.html) · [Python API](docs/python-api.md)
@@ -34,6 +8,7 @@ OpenResearch 的新数据集保存在 `research_datasets/`，与 Hugging Face �
 
 <p align="center">
   <a href="#-快速开始"><b>🚀 快速开始</b></a> &nbsp; | &nbsp;
+  <a href="#-research-harness"><b>🧭 Harness</b></a> &nbsp; | &nbsp;
   <a href="#-研究工作流"><b>🔬 研究工作流</b></a> &nbsp; | &nbsp;
   <a href="#-research-lab"><b>🧪 Research Lab</b></a> &nbsp; | &nbsp;
   <a href="#-文档"><b>📚 文档</b></a>
@@ -42,6 +17,29 @@ OpenResearch 的新数据集保存在 `research_datasets/`，与 Hugging Face �
 🤗 **Hugging Face：** [SAEBase Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Evaluation Dataset](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation)
 
 ---
+
+## 🧭 Research Harness
+
+**[OpenResearch](https://github.com/OpenSAE/OpenResearch) · 开发中**
+
+SAEBase 集成了用于组织代码、科研知识、实验、运行环境和 Agent 协作的 Research Harness。**Atlas** 将这些内容组织为五棵相互关联的研究 Tree。
+
+| Atlas Tree | 内容 |
+| --- | --- |
+| **[Core](harness/core/project_graph.json)** | 项目架构、组件职责与科研结构 |
+| **[Knowledge](doc/knowledge/context_graph.json)** | 科研问题、方法、目标与证据 |
+| **[Code](harness/code/build.py)** | 基于真实 Python 源码的模块、类、函数与接口 |
+| **[Environment](harness/environment/probe.py)** | GPU/CPU 资源、依赖及运行环境 |
+| **[Context](doc/knowledge/glossary.json)** | 科研术语、定义与实现关联 |
+
+**Agent Harness：** [Agent Flow](harness/core/AGENT_FLOW.md) 进行结构化审阅 · [Cursor Rules 和 Skills](.cursor/) 支持 Agent 编程 · [实验追踪](harness/experiments/README.md) 管理可复现的科研流程。
+
+**查看：** [Atlas 可视化](harness/visualization/README.md) · [Harness 介绍](harness/README.md) · [OpenResearch GitHub](https://github.com/OpenSAE/OpenResearch)
+
+```bash
+python .cursor/hooks/validate_repo.py --full
+python -m dlbase.train --cfg job
+```
 
 ## 🧭 概览
 
@@ -75,7 +73,7 @@ SAEBase 将预训练模型、SAE 字典、激活测量、受控特征干预、�
 | RSS | 六个层位，共 138,000 条原始输入和候选变体记录 |
 | Input Localization | 一个 64 状态的输入网格、55 个有观测支持的特征 |
 
-[**打开 Research Lab**](https://huggingface.co/spaces/OpenSAE/SAEBase) · [数据集](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation) · [实验结果](docs/research-lab/results-20261020.md) · [软件版本说明](docs/releases/v0.4.0.md)
+[**打开 Research Lab**](https://huggingface.co/spaces/OpenSAE/SAEBase) · [数据集](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation) · [实验结果](docs/research-lab/results-20261020.md) · [软件版本说明](docs/releases/v0.6.0.md)
 
 ## 🚀 快速开始
 
@@ -158,13 +156,13 @@ edited_activation = original_activation + decode(edited_codes) - decode(original
 **已验证的模型与 SAE（2026-10-16）。** 覆盖 **18** 组模型与 SAE 配置（270M-9B），**48/48** 个选定层位通过真实权重兼容性检查，**48/48** 个完成基于 64 组独立留出提示的基准评估，**48/48** 个完成统计可靠性审计。详见[模型支持与逐层验证结果](docs/verified-model-matrix.md)。
 <!-- END VERIFIED_MODEL_SUPPORT -->
 
-这里的兼容性、基准评测与可靠性结果基于已记录的参考协议；模型注册成功不代表所有后端的科学结果均可互换。[模型与 SAE 验证矩阵](docs/verified-model-matrix.md) · [验证说明](docs/validation.md)
+[模型与 SAE 验证矩阵](docs/verified-model-matrix.md) · [验证方法](docs/validation.md)
 
 ## 📚 文档
 
 [入门指南](docs/getting-started.md) · [Python API](docs/python-api.md) · [示例](examples/README.md) · [Research Lab](apps/research-lab/README.md) · [文档目录](docs/index.md)
 
-仓库按用途组织：`saebase/` 存放核心 API 和执行引擎，`models/` 管理模型适配器，`conf/` 保存实验配置，`examples/` 提供可运行的例子，`assets/` 保存图片和品牌素材，`docs/` 包含教程与可复现实验证据。早期验证脚本和工作计划与 Quickstart 分开保留。[仓库目录指南](docs/repository-guide.md)
+查看源码：[SAEBase API](saebase/) · [Models](models/) · [Datasets](research_datasets/) · [Tasks](tasks/LLM/) · [Harness](harness/README.md) · [配置](conf/) · [仓库目录指南](docs/repository-guide.md)。
 
 [参与贡献](CONTRIBUTING.md) · [更新记录](CHANGELOG.md) · [引用信息](CITATION.cff) · [Apache-2.0 许可证](LICENSE) · [安全说明](SECURITY.md)
 

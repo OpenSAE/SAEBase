@@ -8,6 +8,7 @@
 
 <p align="center">
   <a href="#-quick-start"><b>🚀 Quick Start</b></a> &nbsp; | &nbsp;
+  <a href="#-research-harness"><b>🧭 Harness</b></a> &nbsp; | &nbsp;
   <a href="#-research-workflows"><b>🔬 Workflows</b></a> &nbsp; | &nbsp;
   <a href="#-research-lab"><b>🧪 Research Lab</b></a> &nbsp; | &nbsp;
   <a href="#-documentation"><b>📚 Documentation</b></a>
@@ -17,33 +18,28 @@
 
 ---
 
-## OpenResearch Harness and Unified Research Workspace
+## 🧭 Research Harness
 
-SAEBase v0.6.0 integrates the [OpenResearch](https://github.com/OpenSAE/OpenResearch) execution and Harness layers **while preserving the SAEBase v0.5 API, CLI, model catalog, registries and historical releases**. The new wheel also includes DLBase and NLP research components.
+**[OpenResearch](https://github.com/OpenSAE/OpenResearch) · In development**
 
-| Component | Ownership and compatibility |
+SAEBase includes a research Harness for organizing code, scientific knowledge, experiments, computing environments, and agent collaboration. **Atlas** connects these through five research trees.
+
+| Atlas Tree | Explore |
 | --- | --- |
-| `saebase/` | Existing public SAEBase primitives, registries, CLI, benchmark and release compatibility remain authoritative. |
-| `dlbase/` | OpenResearch's separate Hydra training/execution and Dataset/Model/Task registry. |
-| `research_datasets/` | Additive NLP prompt-source implementations; original `saebase/data/` is retained. |
-| `models/` | Existing SAEBase model keys remain; `models/LLM/` provides OpenResearch LLM adapters. |
-| `tasks/` | Original compatibility plugin interface remains; `tasks/LLM/` adds capture, intervene, generate, circuits, explain, benchmark, and train executors. |
-| `harness/` and `.cursor/` | Agent Flow, Core/Knowledge/Code/Environment, Atlas visualization, scoped hooks and skills. |
-| `doc/` | Versioned context and Code graph source references, originally derived from OpenResearch; transferred statuses need SAEBase-specific review. |
+| **[Core](harness/core/project_graph.json)** | Project architecture, component responsibilities and research structure |
+| **[Knowledge](doc/knowledge/context_graph.json)** | Scientific questions, methods, goals and supporting evidence |
+| **[Code](harness/code/build.py)** | Source-backed Python modules, classes, functions and interfaces |
+| **[Environment](harness/environment/probe.py)** | GPU/CPU resources, dependencies and execution environments |
+| **[Context](doc/knowledge/glossary.json)** | Research terminology, definitions and implementation links |
 
-**Separate entry points.** The existing `saebase` commands and `conf/config.yaml` retain their previous meaning. New DLBase operations use `python -m dlbase.train`, `conf/openresearch.yaml`, and `models/dlbase_plugins.py` / `tasks/dlbase_plugins.py` (original plugin compatibility shims remain intact). Select `model=openresearch_gemma2_2b_base` for the OpenResearch-style Gemma configuration; the original `model=gemma2_2b_base` preset is unchanged.
+**Agent Harness:** [Agent Flow](harness/core/AGENT_FLOW.md) for structured reviews · [Cursor rules and skills](.cursor/) for coding agents · [Experiment tracking](harness/experiments/README.md) for reproducible research.
+
+**Explore:** [Atlas visualization](harness/visualization/README.md) · [Harness overview](harness/README.md) · [OpenResearch GitHub](https://github.com/OpenSAE/OpenResearch)
 
 ```bash
-# Structural validation, independent of GPU/checkpoint downloads
 python .cursor/hooks/validate_repo.py --full
-
-# New task configuration preview. Requires Hydra/Lightning and source checkout.
 python -m dlbase.train --cfg job
 ```
-
-The OpenResearch dataset package is isolated as `research_datasets` so third-party Hugging Face `datasets` and the existing SAEBase loaders keep their original import identity. Real remote dataset access and full Research Lab behavior still require acceptance checks. Model-weight compatibility, GPU inference, Atlas snapshot generation and full original SAEBase regression tests are **not yet certified** in this integration branch.
-
-[Architecture and migration notes](docs/openresearch-integration.md) · [Harness](harness/README.md) · [Atlas sources](harness/visualization/README.md) · [Cursor rules](.cursor/rules/core/00-core.mdc)
 
 ## 🧭 Overview
 
@@ -77,7 +73,7 @@ The [Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) displays publi
 | RSS | 138,000 records of clean inputs and proposed variants across six sites |
 | Input Localization | One 64-state input grid and 55 observed features |
 
-[**Open the Research Lab**](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Dataset](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation) · [Recorded results](docs/research-lab/results-20261020.md) · [Software release notes](docs/releases/v0.4.0.md)
+[**Open the Research Lab**](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Dataset](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation) · [Recorded results](docs/research-lab/results-20261020.md) · [Software release notes](docs/releases/v0.6.0.md)
 
 ## 🚀 Quick Start
 
@@ -160,13 +156,13 @@ On one RTX 5070 with Qwen3-1.7B Base, opt-in block-suffix replay accelerated the
 **Verified checkpoints (2026-10-16).** Across **18** model-SAE configurations (270M-9B), **48/48** selected model/layer sites passed real-checkpoint compatibility tests, **48/48** completed benchmark evaluations on 64 held-out prompt groups, and **48/48** completed reliability audits. See the [verified model and SAE matrix](docs/verified-model-matrix.md).
 <!-- END VERIFIED_MODEL_SUPPORT -->
 
-The reported compatibility, benchmark and reliability checks use the recorded reference protocol; registered checkpoints are not automatically equivalent across all backends. [Model/SAE matrix](docs/verified-model-matrix.md) · [Validation](docs/validation.md)
+[Model/SAE matrix](docs/verified-model-matrix.md) · [Validation methods](docs/validation.md)
 
 ## 📚 Documentation
 
 [Getting Started](docs/getting-started.md) · [Python API](docs/python-api.md) · [Examples](examples/README.md) · [Research Lab](apps/research-lab/README.md) · [Full documentation](docs/index.md)
 
-The repository is organized by use: `saebase/` for the research API and engines, `models/` for adapters, `conf/` for configurations, `examples/` for runnable tasks, `assets/` for figures and branding, and `docs/` for guides and reproducible evidence. Historical validation scripts and work plans remain available separately from the Quick Start. See [Repository Guide](docs/repository-guide.md).
+Explore the code: [SAEBase API](saebase/) · [Models](models/) · [Datasets](research_datasets/) · [Tasks](tasks/LLM/) · [Harness](harness/README.md) · [Configuration](conf/) · [Repository Guide](docs/repository-guide.md).
 
 [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md) · [Citation](CITATION.cff) · [Apache-2.0 License](LICENSE) · [Security](SECURITY.md)
 
