@@ -156,7 +156,7 @@ def test_complete_activation_health_and_json(tmp_path, monkeypatch):
 
 
 def test_cli_path_overrides_resolve_from_caller(tmp_path):
-    from main import parse_args, build_overrides
+    from saebase.cli_compat import parse_args, build_overrides
 
     args, unknown = parse_args(
         [
@@ -180,7 +180,7 @@ def test_cli_path_overrides_resolve_from_caller(tmp_path):
 
 
 def test_unbundled_task_and_invalid_layer_fail_early(tmp_path):
-    from main import parse_args, build_overrides
+    from saebase.cli_compat import parse_args, build_overrides
 
     args, _ = parse_args(["--task", "discovery"])
     with pytest.raises(ValueError, match="not packaged"):
@@ -206,8 +206,8 @@ def test_run_config_consistency(tmp_path):
 
 def test_help_and_listing_require_no_gpu(tmp_path):
     commands = [
-        [sys.executable, str(ROOT / "main.py"), "--help"],
-        [sys.executable, str(ROOT / "main.py"), "--list"],
+        [sys.executable, "-m", "saebase.cli_compat", "--help"],
+        [sys.executable, "-m", "saebase.cli_compat", "--list"],
         [sys.executable, str(ROOT / "saebase" / "tools" / "sae_prepare_prompts.py"), "--help"],
     ]
     for cmd in commands:
