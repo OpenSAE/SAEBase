@@ -55,10 +55,20 @@ BEHAVIOR_ALIASES: dict[str, str] = {
     "LiveCodeBench": "LiveCodeBench",
 }
 
-# Package-relative default: <SAEBase>/data
-DEFAULT_DATA_ROOT = Path(__file__).resolve().parents[2] / "data"
-# Protocol / Hydra run artifacts (gitignore); not prompt artifacts.
-DEFAULT_EXPERIMENT_ROOT = Path(__file__).resolve().parents[2] / "experiment"
+def _default_workspace_root() -> Path:
+    """Use the source checkout for editable installs; cwd for installed wheels.
+
+    Physical sources live in top-level datasets/ in a checkout, while installed
+    distributions place them in saebase/datasets/ to avoid shadowing HF datasets.
+    Writing experimental output into site-packages is never a useful default.
+    """
+    directory = Path(__file__).resolve().parent
+    return Path.cwd().resolve() if directory.parent.name == "saebase" else directory.parent
+
+
+# Prompt and experimental outputs share a workspace root, not a Python package root.
+DEFAULT_DATA_ROOT = _default_workspace_root() / "data"
+DEFAULT_EXPERIMENT_ROOT = _default_workspace_root() / "experiment"
 
 
 def canonicalize_behavior(name: str) -> str:

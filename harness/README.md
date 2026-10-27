@@ -36,7 +36,7 @@ python harness/visualization/build_pages.py --check
 
 ## 需要外部条件的验收
 
-[SAEBase × OpenResearch 外部实测计划](github_harness/github_work_plan/SAEBASE-OPENRESEARCH-EXTERNAL-ACCEPTANCE-DEFERRED.md) 记录需要真实 GPU 权重、外部数据授权、目标机器或发布权限的检查。文件状态为 **DEFERRED**，不是已激活的工作命令，也不授权自动下载权重、执行长训练或生产部署。
+[SAEBase × OpenResearch 外部实测计划](github_work_plan/SAEBASE-OPENRESEARCH-EXTERNAL-ACCEPTANCE-DEFERRED.md) 记录需要真实 GPU 权重、外部数据授权、目标机器或发布权限的检查。文件状态为 **DEFERRED**，不是已激活的工作命令，也不授权自动下载权重、执行长训练或生产部署。
 
 ## Agent 权限
 

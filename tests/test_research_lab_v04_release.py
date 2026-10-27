@@ -64,9 +64,12 @@ def test_research_lab_report_distinguishes_experiment_scope_from_software():
 
 
 def test_readmes_and_workplan_refer_to_actual_preview():
+    current_version = tomllib.loads((BASE / "pyproject.toml").read_text())["project"]["version"]
+    historical_notes = BASE / "harness/github_development_doc/releases/v0.4.0.md"
+    assert historical_notes.is_file()
     for name in ("README.md", "README_cn.md"):
         txt = (BASE / name).read_text(encoding="utf-8")
-        assert "harness/github_development_doc/releases/v0.4.0.md" in txt
+        assert f"harness/github_development_doc/releases/v{current_version}.md" in txt
         assert "Research Lab" in txt
     plan = (
         BASE / "harness/github_work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md"
