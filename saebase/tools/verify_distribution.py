@@ -12,7 +12,7 @@ import zipfile
 
 NEEDED_WHEEL = {
     "saebase/cli.py",
-    "saebase/cli.py",
+    "saebase/cli_compat.py",
     "saebase/model_plugins.py",
     "saebase/extensions/__init__.py",
     "saebase/extensions/contracts.py",

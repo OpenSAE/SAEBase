@@ -18,7 +18,7 @@ from saebase.registry import (
 ROOT = Path(__file__).resolve().parents[2]
 
 ENTRYPOINTS = {
-    "saebase": ("main", "main"),
+    "saebase": ("main", "saebase.cli_compat"),
     "saebase-prepare-prompts": ("prepare_prompts", "saebase.tools.sae_prepare_prompts"),
     "saebase-check-env": ("check_env", "saebase.tools.check_env"),
     "saebase-intervene": ("intervene", "saebase.tools.m2_batch"),

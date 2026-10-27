@@ -21,10 +21,10 @@ def test_package_metadata_matches_public_api_version():
 def test_public_distribution_has_required_files():
     for rel in (
         "LICENSE",
-        "NOTICE",
-        "CONTRIBUTING.md",
-        "SECURITY.md",
-        "CHANGELOG.md",
+        "harness/github_development_doc/legal/NOTICE",
+        ".github/CONTRIBUTING.md",
+        ".github/SECURITY.md",
+        "harness/github_development_doc/CHANGELOG.md",
         ".github/workflows/ci.yml",
         "MANIFEST.in",
         "harness/github_development_doc/PROVENANCE.md",
@@ -36,7 +36,7 @@ def test_public_distribution_has_required_files():
 
 
 def test_cli_uses_caller_working_directory():
-    from main import parse_args, build_overrides
+    from saebase.cli_compat import parse_args, build_overrides
 
     caller = ROOT / "outside-example"
     args, _ = parse_args(["--model", "pythia70m", "--device", "cpu"])

@@ -67,7 +67,7 @@ def fake_project(tmp_path: Path, version: str = "0.3.0") -> tuple[Path, Path]:
             "pyproject.toml",
             "saebase/__init__.py",
             "LICENSE",
-            "CHANGELOG.md",
+            "harness/github_development_doc/CHANGELOG.md",
             f"harness/github_development_doc/releases/v{version}.md",
         ):
             payload = (root / name).read_bytes()

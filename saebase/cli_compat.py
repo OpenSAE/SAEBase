@@ -2,7 +2,7 @@
 
 Typical usage::
 
-  python main.py --task sae --model pythia70m --prompt-source SimpleCopying \
+  python -m saebase.cli_compat --task sae --model pythia70m --prompt-source SimpleCopying \
     --sae pythia70m_resid_sm --layer 3 --data-dir ./data --device cpu
 """
 
