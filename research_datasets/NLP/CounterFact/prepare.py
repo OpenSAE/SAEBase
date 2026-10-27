@@ -5,10 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from datasets.NLP.CounterFact.CounterFact import load_raw_counterfact
-from datasets.NLP.CounterFact.tokenize import filter_with_model
-from datasets.NLP.artifacts import assert_available, make_manifest
-from datasets.NLP.artifacts import save_prompts
+from research_datasets.NLP.CounterFact.CounterFact import load_raw_counterfact
+from research_datasets.NLP.CounterFact.tokenize import filter_with_model
+from research_datasets.NLP.artifacts import assert_available, make_manifest
+from research_datasets.NLP.artifacts import save_prompts
 
 
 def prepare_for_model(
@@ -44,6 +44,6 @@ def prepare_for_model(
             "require_single_token_targets": True,
             "max_items": max_items,
         },
-        source="datasets.NLP.CounterFact.prepare",
+        source="research_datasets.NLP.CounterFact.prepare",
     )
     return save_prompts(kept, manifest, data_root=data_root)

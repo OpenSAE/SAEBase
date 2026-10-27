@@ -31,7 +31,7 @@ TEMPLATE = "The {noun} lasted from the year {century}{YY:02d} to the year {centu
 
 
 def default_data_dir() -> str:
-    from datasets.NLP.artifacts import DEFAULT_DATA_ROOT
+    from research_datasets.NLP.artifacts import DEFAULT_DATA_ROOT
 
     return str(DEFAULT_DATA_ROOT / "GreaterThan")
 

@@ -1,6 +1,6 @@
 """CounterFact text prompts for SAEBase (preparation and evaluation)."""
 
-from datasets.NLP.CounterFact.CounterFact import (
+from research_datasets.NLP.CounterFact.CounterFact import (
     default_data_dir,
     filtered_json_path,
     load_raw_counterfact,
