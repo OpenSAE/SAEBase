@@ -34,8 +34,10 @@ def compare(before, after):
                     "after": new[node_id]["signature"],
                 }
             )
+
     def edgekey(obj):
         return (obj["source"], obj["type"], obj["target"])
+
     oe = {edgekey(e) for e in before["edges"]}
     ne = {edgekey(e) for e in after["edges"]}
     return {

@@ -144,7 +144,9 @@ def build_prompt_items(
         cache = Path(default_data_dir()) / "hf_cache.jsonl"
         if cache.is_file():
             rows = [
-                json.loads(line) for line in cache.read_text(encoding="utf-8").splitlines() if line.strip()
+                json.loads(line)
+                for line in cache.read_text(encoding="utf-8").splitlines()
+                if line.strip()
             ]
         if not rows:
             try:
