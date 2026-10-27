@@ -1,0 +1,308 @@
+{
+  "schema_version": 1,
+  "purpose": "Reviewed Code → scientific Knowledge and Code → Core project management ID links",
+  "mappings": [
+    {
+      "path": "datasets/datamodule.py",
+      "context_ids": [
+        "g.cub.dataset"
+      ],
+      "summary": "Lightning 数据模块通过 Registry 装配 Dataset。",
+      "core_ids": [
+        "g.dataset_gate"
+      ]
+    },
+    {
+      "path": "datasets/NLP/artifacts.py",
+      "context_ids": [
+        "g.sae.prompt_artifacts"
+      ],
+      "core_ids": [],
+      "summary": "NLP Prompt manifest 和数据来源的版本化产物接口。"
+    },
+    {
+      "path": "datasets/vision/CUB_200/CUB_200.py",
+      "context_ids": [
+        "g.cub.dataset"
+      ],
+      "summary": "对应模块的公开代码负责上述科研目标的实现；请以源码为准。",
+      "core_ids": [
+        "g.cub_dataset"
+      ]
+    },
+    {
+      "path": "datasets/vision/CUB_200/datamodule_setup.py",
+      "context_ids": [
+        "g.cub.dataset",
+        "g.cub.holdout",
+        "g.cub.validation"
+      ],
+      "summary": "配置 CUB-200 的训练、验证和测试划分；当前默认验证与测试同源。",
+      "core_ids": [
+        "g.split_integrity",
+        "g.cub_dataset",
+        "g.cub_eval_integrity"
+      ]
+    },
+    {
+      "path": "dlbase/registry.py",
+      "context_ids": [],
+      "summary": "数据集、模型与任务的插件接口和中心注册表。",
+      "core_ids": [
+        "g.registry"
+      ]
+    },
+    {
+      "path": "dlbase/summary_log.py",
+      "context_ids": [
+        "g.cub.metrics",
+        "g.cub.artifacts"
+      ],
+      "summary": "与具体任务无关的 summary.log 格式化和评测表验证。",
+      "core_ids": [
+        "g.artifact_schema"
+      ]
+    },
+    {
+      "path": "dlbase/train.py",
+      "context_ids": [
+        "g.cub.config"
+      ],
+      "summary": "Hydra 唯一训练入口，完成基础环境和配置校验后交给任务分发。",
+      "core_ids": [
+        "g.config"
+      ]
+    },
+    {
+      "path": "models/LLM/gemma2_2b_base/gemma2_2b_base.py",
+      "context_ids": [
+        "g.sae.gemma_model"
+      ],
+      "core_ids": [],
+      "summary": "Gemma-2 2B 基础模型身份及加载适配。"
+    },
+    {
+      "path": "models/vision/resnet18_mlp/resnet18_mlp.py",
+      "context_ids": [
+        "g.cub.resnet",
+        "g.cub.logits"
+      ],
+      "summary": "ResNet-18 主干以及可配置分类输出头。",
+      "core_ids": [
+        "g.model_gate",
+        "g.cub_model"
+      ]
+    },
+    {
+      "path": "saebase/api/features.py",
+      "context_ids": [
+        "g.sae.activation_capture",
+        "g.sae.feature_edit"
+      ],
+      "core_ids": [
+        "g.llm_capture",
+        "g.llm_teacher_forcing"
+      ],
+      "summary": "SAE 特征读取和可控特征编辑 API。"
+    },
+    {
+      "path": "saebase/sae/registry.py",
+      "context_ids": [
+        "g.sae.sae_registry"
+      ],
+      "core_ids": [],
+      "summary": "根据 SAE profile 选择实际加载配置。"
+    },
+    {
+      "path": "tasks/LLM/benchmark/backend/runner.py",
+      "context_ids": [
+        "g.sae.benchmark_runner"
+      ],
+      "core_ids": [
+        "g.llm_benchmark"
+      ],
+      "summary": "SAE 基准指标与运行结果的任务调度。"
+    },
+    {
+      "path": "tasks/LLM/benchmark/integrations/rss.py",
+      "context_ids": [
+        "g.sae.rss_adapter"
+      ],
+      "core_ids": [
+        "g.llm_benchmark"
+      ],
+      "summary": "RSS 特征响应分析接口。"
+    },
+    {
+      "path": "tasks/LLM/benchmark/integrations/sar.py",
+      "context_ids": [
+        "g.sae.sar_adapter"
+      ],
+      "core_ids": [
+        "g.llm_benchmark"
+      ],
+      "summary": "SAR 特征组合性数据接入 SAE 评测接口。"
+    },
+    {
+      "path": "tasks/LLM/benchmark/reliability/runner.py",
+      "context_ids": [
+        "g.sae.reliability"
+      ],
+      "core_ids": [
+        "g.llm_benchmark"
+      ],
+      "summary": "SAE 可靠性与对照检验。"
+    },
+    {
+      "path": "tasks/LLM/capture/operation.py",
+      "context_ids": [
+        "g.sae.capture_task"
+      ],
+      "core_ids": [
+        "g.llm_capture"
+      ],
+      "summary": "LLM SAE 捕获任务的实际操作入口。"
+    },
+    {
+      "path": "tasks/LLM/circuits/backend/circuit_intervene.py",
+      "context_ids": [
+        "g.sae.circuit_edit"
+      ],
+      "core_ids": [
+        "g.llm_circuits"
+      ],
+      "summary": "候选电路路径的受控干预代码。"
+    },
+    {
+      "path": "tasks/LLM/circuits/backend/circuits.py",
+      "context_ids": [
+        "g.sae.circuit_trace"
+      ],
+      "core_ids": [
+        "g.llm_circuits"
+      ],
+      "summary": "真实模型组件的电路追踪接口。"
+    },
+    {
+      "path": "tasks/LLM/explain/interpretation.py",
+      "context_ids": [
+        "g.sae.interpretation"
+      ],
+      "core_ids": [
+        "g.llm_explain"
+      ],
+      "summary": "SAE 特征解释候选的生成与检验。"
+    },
+    {
+      "path": "tasks/LLM/explain/operation.py",
+      "context_ids": [
+        "g.sae.explanation_task"
+      ],
+      "core_ids": [
+        "g.llm_explain"
+      ],
+      "summary": "自动解释任务的实际执行入口。"
+    },
+    {
+      "path": "tasks/LLM/generate/backend/engine.py",
+      "context_ids": [
+        "g.sae.generation_engine"
+      ],
+      "core_ids": [
+        "g.llm_generation"
+      ],
+      "summary": "生成干预执行后端。"
+    },
+    {
+      "path": "tasks/LLM/generate/operation.py",
+      "context_ids": [
+        "g.sae.generation_task"
+      ],
+      "core_ids": [
+        "g.llm_generation"
+      ],
+      "summary": "LLM 生成过程中 SAE 编辑与对照执行入口。"
+    },
+    {
+      "path": "tasks/LLM/intervene/operation.py",
+      "context_ids": [
+        "g.sae.teacher_forced"
+      ],
+      "core_ids": [
+        "g.llm_teacher_forcing"
+      ],
+      "summary": "固定输入下教师强制 SAE 干预的实际任务接口。"
+    },
+    {
+      "path": "tasks/LLM/train/backend/training.py",
+      "context_ids": [
+        "g.sae.train_backend"
+      ],
+      "core_ids": [
+        "g.llm_sae_training"
+      ],
+      "summary": "SAE 原生训练后端及参数组织。"
+    },
+    {
+      "path": "tasks/LLM/train/operation.py",
+      "context_ids": [
+        "g.sae.train_task"
+      ],
+      "core_ids": [
+        "g.llm_sae_training"
+      ],
+      "summary": "SAE 训练任务的统一入口。"
+    },
+    {
+      "path": "tasks/vision/classification/classification_module.py",
+      "context_ids": [
+        "g.cub.loss",
+        "g.cub.optimizer",
+        "g.cub.schedule"
+      ],
+      "summary": "分类任务的 Lightning Module、loss 与优化器配置。",
+      "core_ids": [
+        "g.pipeline",
+        "g.cub_optimization"
+      ]
+    },
+    {
+      "path": "tasks/vision/classification/pipeline_checks.py",
+      "context_ids": [
+        "g.cub.logits"
+      ],
+      "summary": "训练前组合兼容性及 logits 形状检查。",
+      "core_ids": [
+        "g.pipeline"
+      ]
+    },
+    {
+      "path": "tasks/vision/classification/post_train_eval.py",
+      "context_ids": [
+        "g.cub.metrics",
+        "g.cub.final_test"
+      ],
+      "summary": "对应模块的公开代码负责上述科研目标的实现；请以源码为准。",
+      "core_ids": [
+        "g.cub_eval_integrity"
+      ]
+    },
+    {
+      "path": "tasks/vision/classification/run.py",
+      "context_ids": [
+        "g.cub.optimizer",
+        "g.cub.checkpoint",
+        "g.cub.final_test"
+      ],
+      "summary": "分类任务训练流程、checkpoint 和训练后评测编排。",
+      "core_ids": [
+        "g.config",
+        "g.artifact_schema",
+        "g.cub_optimization",
+        "g.cub_eval_integrity"
+      ]
+    }
+  ],
+  "knowledge_source": "doc/knowledge/context_graph.json",
+  "core_source": "harness/core/project_graph.json"
+}
