@@ -103,6 +103,7 @@ def move_project_resources() -> None:
 
 def merge_datasets() -> None:
     DATA.mkdir(exist_ok=True)
+    research = (DATA / "plugins.py").read_text(encoding="utf-8")
     # Existing SAEBase readers are the reference implementations for public APIs.
     # The relocated OpenResearch artifacts, manifest and prompt readers remain
     # in datasets/ alongside them, without two implementations of each reader.
@@ -140,7 +141,6 @@ def merge_datasets() -> None:
     # Retain original dataset identity and availability and the research-specific
     # registered training dataset plugin in one registration module.
     original = (OLD_DATA / "plugins.py").read_text(encoding="utf-8")
-    research = (DATA / "plugins.py").read_text(encoding="utf-8")
     start = research.find("NLP_NAMES =")
     if start < 0:
         raise RuntimeError("Research Dataset registry shape changed")
