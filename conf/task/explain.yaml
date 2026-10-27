@@ -1,0 +1,19 @@
+# @package _global_
+# Each task is model/dataset independent; compose selections through Hydra.
+task:
+  name: explain
+  path: explain
+  execute: false
+  sae_key: gemma2_2b_pt_l25_canonical
+  layer: 25
+  device: cpu
+  prompt: ''
+  approved: false
+  discovery_file: ''
+  heldout_file: ''
+  site_id: ''
+  feature_id: 0
+  generator_model: ''
+  generator_method: ''
+  authorized_budget_usd: 0.0
+  estimated_cost_usd: 0.0

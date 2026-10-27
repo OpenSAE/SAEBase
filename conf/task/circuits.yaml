@@ -1,0 +1,14 @@
+# @package _global_
+# Each task is model/dataset independent; compose selections through Hydra.
+task:
+  name: circuits
+  path: circuits
+  execute: false
+  sae_key: gemma2_2b_pt_l25_canonical
+  layer: 25
+  device: cpu
+  prompt: ''
+  approved: false
+  transcoder_set: gemma
+  slug: gemma2b-trace
+  timeout_seconds: 1800

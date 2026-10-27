@@ -1,0 +1,13 @@
+# @package _global_
+# Each task is model/dataset independent; compose selections through Hydra.
+task:
+  name: intervene
+  path: intervene
+  execute: false
+  sae_key: gemma2_2b_pt_l25_canonical
+  layer: 25
+  device: cpu
+  prompt: ''
+  feature_id: 0
+  value: 0.0
+  verify_identity: true
