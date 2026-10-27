@@ -81,7 +81,7 @@ def project_info(root: Path = ROOT) -> tuple[str, str, dict[str, str]]:
     declared = _static_version((root / "saebase" / "__init__.py").read_text(encoding="utf-8"))
     if declared != version:
         raise ValueError("pyproject.toml and saebase.__version__ disagree")
-    changelog = (root / "CHANGELOG.md").read_text(encoding="utf-8")
+    changelog = (root / "harness/github_development_doc/CHANGELOG.md").read_text(encoding="utf-8")
     if re.search(rf"^##[ \t]+{re.escape(version)}(?=\s|$)", changelog, re.M) is None:
         raise ValueError(f"CHANGELOG.md lacks a release heading for {version}")
     notes = root / "harness/github_development_doc" / "releases" / f"v{version}.md"
@@ -168,7 +168,7 @@ def inspect_distributions(
             raise ValueError("sdist package version differs from wheel")
         for required in (
             "LICENSE",
-            "CHANGELOG.md",
+            "harness/github_development_doc/CHANGELOG.md",
             f"harness/github_development_doc/releases/v{version}.md",
         ):
             if root_path + required not in names:
