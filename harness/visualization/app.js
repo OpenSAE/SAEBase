@@ -34,40 +34,25 @@
   // application. Upgrade only older, generic headings from actual node IDs,
   // Python symbols and paths, without touching the authoritative source files.
   const LEGACY_TITLES = {
-    "core:existing":"OpenResearch 双核心与任务注册",
-    "knowledge:existing":"CUB-200 的 ResNet-18 训练与评测",
-    "context:root":"科研术语定义与源码依据",
-    "env:root":"CPU、GPU 与科研任务执行环境",
-    "code:root":"OpenResearch Python 实现树",
-    "q.modularity":"Dataset、Model、Task Registry 解耦",
+    "core:existing":"SAEBase 研究架构与任务注册",
+    "knowledge:existing":"LLM SAE 科研方法与实现依据",
+    "context:root":"SAE 技术术语及源码依据",
+    "env:root":"CPU、GPU 与任务执行环境",
+    "code:root":"SAEBase Python 实现树",
+    "q.modularity":"Dataset、Model、SAE Task Registry",
     "q.transparency":"Atlas 五棵 Tree 的职责与关联",
-    "q.cub.reproducibility":"Hydra 配置、随机种子与实验结果追溯",
-    "g.cub.dataset":"CUB-200 图像与标签读取",
-    "g.cub.transforms":"CUB-200 输入尺寸与图像增强",
-    "g.cub.loss":"CUB-200 分类训练损失",
-    "g.cub.config":"CUB-200 Hydra 训练配置记录",
-    "g.cub.seed":"训练随机种子与运行环境记录",
-    "g.cub.artifacts":"CUB-200 训练结果文件追溯",
-    "g.registry":"Dataset、Model、Task 插件注册",
-    "g.pipeline":"Task 执行前的注册与兼容检查",
-    "code:concrete:datasets":"CUB-200 与 NLP 数据集",
-    "code:concrete:models":"Vision 与 LLM 模型实现",
-    "code:concrete:tasks":"分类训练与 LLM SAE 任务",
-    "code:group:dlbase":"DLBase 训练配置、运行与实验产物",
-    "code:group:saebase":"SAEBase 特征表示与模型干预",
-    "code:group:datasets":"Dataset 读取、划分与注册",
-    "code:group:models":"Model 构建、插件与兼容性",
-    "code:group:tasks":"Vision 分类与 LLM SAE 任务",
-    "code:group:harness":"Harness 代码树、环境与知识验证",
-    "code:family:datasets:vision":"Vision 图像数据集",
-    "code:family:datasets:NLP":"NLP 文本输入数据集",
-    "code:family:models:vision":"Vision 图像模型",
-    "code:family:models:LLM":"LLM 语言模型",
-    "code:family:tasks:vision":"Vision 分类训练任务",
-    "code:family:tasks:LLM":"LLM 稀疏特征任务"
+    "g.registry":"模型、数据与 SAE Task 插件注册",
+    "g.pipeline":"SAE Task 运行前的兼容检查",
+    "code:concrete:research_datasets":"NLP Prompt 数据集",
+    "code:concrete:models":"LLM 模型实现",
+    "code:concrete:tasks":"LLM SAE 任务执行",
+    "code:group:tasks":"LLM SAE 任务",
+    "code:family:research_datasets:NLP":"NLP Prompt 输入数据集",
+    "code:family:models:LLM":"LLM 模型",
+    "code:family:tasks:LLM":"SAE 任务"
   };
   const LEGACY_ONLY = new Set([
-    "已有的项目功能","已有的分类研究组件","研究概念与依据","机器与执行条件",
+    "已有的项目功能","研究概念与依据","机器与执行条件",
     "现有代码能力","已有的模块化组件架构","已有的项目上下文组织",
     "已有的训练配置与产物管理","正确读取图像与标签",
     "保持输入尺寸与增强协议","定义训练损失","记录 Hydra 组合配置",
@@ -191,9 +176,7 @@
               ? item.parent_id.split(":").pop() : "";
             if(view==="code" && parentSymbol && !original.includes(parentSymbol))
               return parentSymbol+" · "+original;
-            if(view==="knowledge" && item.node_id.startsWith("g.cub.") &&
-               !original.includes("CUB"))
-              return "CUB-200 · "+original;
+
             return original;
           })(),
           description: after.description || origin.description || baseNode.description || "",

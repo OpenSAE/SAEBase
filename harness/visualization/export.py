@@ -58,8 +58,8 @@ def existing_tree(graph: dict, *, view: str) -> dict:
             "展示 DLBase、SAEBase 和 Dataset、Model、Task 注册架构中已经实现的组件。",
         ),
         "knowledge": (
-            "Vision 分类与 LLM SAE 研究方法",
-            "按 CUB-200 分类及 LLM SAE 的八类源码支持方法组织研究知识，科学结论另行审计。",
+            "LLM SAE 科研方法与实现依据",
+            "按 SAE 特征捕获、干预、生成、电路、解释、基准和训练组织有源码依据的研究方法。",
         ),
     }
     title, summary = labels[view]
@@ -98,21 +98,8 @@ def existing_tree(graph: dict, *, view: str) -> dict:
         elif node["id"] == "q.transparency":
             node["title"] = "Atlas 五棵 Tree 的职责与关联"
             node["description"] = "现在能够分别浏览项目架构、科研知识、源代码和环境结构。"
-        elif node["id"] == "q.cub.reproducibility":
-            node["title"] = "Hydra 配置、随机种子与实验结果追溯"
-            node["description"] = (
-                "已有训练配置、随机种子和分层结果目录记录。真实复现实验可依据这些记录执行。"
-            )
-        specific = {
-            "g.cub.dataset": "CUB-200 图像与标签读取",
-            "g.cub.transforms": "CUB-200 输入尺寸与图像增强",
-            "g.cub.loss": "CUB-200 分类训练损失",
-            "g.cub.config": "CUB-200 Hydra 训练配置记录",
-            "g.cub.seed": "训练随机种子与运行环境记录",
-            "g.cub.artifacts": "CUB-200 训练结果文件追溯",
-            "g.registry": "Dataset、Model、Task 插件注册",
-            "g.pipeline": "Task 执行前的注册与兼容检查",
-        }
+
+        specific = {"g.registry": "Dataset、Model、SAE Task 插件注册", "g.pipeline": "SAE Task 运行前的适配检查"}
         if node["id"] in specific:
             node["title"] = specific[node["id"]]
         node["summary"] = node.get("description", "").split("：", 1)[-1].strip()
@@ -157,93 +144,23 @@ def existing_tree(graph: dict, *, view: str) -> dict:
 
 
 def organize_knowledge_topics(output: dict) -> None:
-    """Group existing research methods by scientific domain, not Work Plan IDs."""
-    nodes = {node["id"]: node for node in output["nodes"]}
-    group_specs = (
-        (
-            "knowledge:area:cub",
-            "CUB-200 图像分类与 ResNet-18",
-            "以 CUB-200 的图像、分类模型、训练和实验复现组织现有方法。",
-            "datasets/vision/CUB_200/CUB_200.py",
-        ),
-        (
-            "knowledge:area:sae",
-            "LLM 稀疏特征与可解释性实验",
-            "以真实 SAEBase 和 LLM Task 接口组织特征解释、干预与评测方法。",
-            "saebase/api/features.py",
-        ),
-    )
-    for key, title, summary, proof in group_specs:
-        node = {
-            "id": key,
-            "kind": "group",
-            "title": title,
-            "summary": summary,
-            "description": summary,
-            "status": "implemented",
-            "evidence": [proof],
-            "presentation_only": True,
-        }
-        output["nodes"].append(node)
-        nodes[key] = node
-        output["edges"].append({"source": "knowledge:existing", "target": key, "type": "contains"})
+    """Organize source-backed SAE research without unrelated task domains."""
+    root_id = "knowledge:existing"
+    group_id = "knowledge:area:sae"
+    if not any(edge["source"] == root_id for edge in output["edges"]):
+        return
+    output["nodes"].append({
+        "id": group_id, "kind": "group",
+        "title": "LLM 稀疏特征与可解释性实验",
+        "summary": "按模型、SAE、Prompt 与七类研究任务浏览当前源码实现。",
+        "description": "按模型、SAE、Prompt 与七类研究任务浏览当前源码实现。",
+        "status": "implemented", "evidence": ["saebase/api/features.py"],
+        "presentation_only": True,
+    })
     for edge in output["edges"]:
-        if edge["source"] != "knowledge:existing":
-            continue
-        target = edge["target"]
-        if target in {x[0] for x in group_specs}:
-            continue
-        edge["source"] = (
-            "knowledge:area:sae"
-            if target.startswith(("q.sae.", "s.sae.", "g.sae."))
-            else "knowledge:area:cub"
-        )
-    cub_topics = {
-        "data": ("CUB-200 图像、标签与输入转换", "datasets/vision/CUB_200/datamodule_setup.py"),
-        "model": ("ResNet-18 主干与 200 类分类输出", "models/vision/resnet18_mlp/resnet18_mlp.py"),
-        "train": (
-            "分类损失、优化器与学习率",
-            "tasks/vision/classification/classification_module.py",
-        ),
-        "provenance": ("Hydra 配置、随机种子与结果追溯", "dlbase/experiment_paths.py"),
-    }
-
-    def topic(node_id: str) -> str:
-        if node_id in {"g.cub.dataset", "g.cub.transforms", "s.cub.data"}:
-            return "data"
-        if node_id in {"s.cub.model", "g.cub.resnet", "g.cub.logits"}:
-            return "model"
-        if node_id in {"s.cub.training", "g.cub.loss", "g.cub.optimizer", "g.cub.schedule"}:
-            return "train"
-        return "provenance"
-
-    cub_links = [edge for edge in output["edges"] if edge["source"] == "knowledge:area:cub"]
-    for key, (title, proof) in cub_topics.items():
-        members = [edge for edge in cub_links if topic(edge["target"]) == key]
-        if not members:
-            continue
-        gid = "knowledge:topic:cub:" + key
-        label = {
-            "data": "图像与数据",
-            "model": "分类模型",
-            "train": "优化与训练",
-            "provenance": "运行和复现",
-        }[key]
-        output["nodes"].append(
-            {
-                "id": gid,
-                "kind": "group",
-                "title": title,
-                "summary": "CUB-200 " + label + " 的源码支持研究组件。",
-                "description": "展示已有输入、模型或运行接口及其可核验依据。",
-                "status": "implemented",
-                "evidence": [proof],
-                "presentation_only": True,
-            }
-        )
-        output["edges"].append({"source": "knowledge:area:cub", "target": gid, "type": "contains"})
-        for edge in members:
-            edge["source"] = gid
+        if edge["source"] == root_id:
+            edge["source"] = group_id
+    output["edges"].append({"source":root_id,"target":group_id,"type":"contains"})
 
 
 def balance_visible_navigation(graph: dict, *, limit: int = 10) -> None:
@@ -776,9 +693,7 @@ CODE_CONTEXT_SCOPES = (
     ("tasks/LLM/train/", ("term.sae", "term.sae.train")),
     ("models/LLM/gemma2_2b_base/", ("term.gemma2_2b", "term.model")),
     ("models/LLM/", ("term.llm", "term.model")),
-    ("models/vision/resnet18_mlp/", ("term.resnet18", "term.model")),
     ("datasets/NLP/", ("term.nlp", "term.sae.assets")),
-    ("datasets/vision/", ("term.dataset", "term.cub200")),
     ("dlbase/cfg/", ("term.hydra", "term.yaml")),
     ("dlbase/training/", ("term.training", "term.lightning")),
     ("dlbase/registry.py", ("term.registry", "term.plugin")),
