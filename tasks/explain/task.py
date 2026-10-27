@@ -1,7 +1,7 @@
 """SAEBase automatic feature-explanation task, requiring a real generator."""
 
 from __future__ import annotations
-from tasks.LLM.sae_runtime import SAEOperationTask, execute_task
+from tasks.sae_runtime import SAEOperationTask, execute_task
 
 
 class ExplainTask(SAEOperationTask):

@@ -1,6 +1,6 @@
 """SAEBase circuits task."""
 
-from tasks.LLM.sae_runtime import SAEOperationTask
+from tasks.sae_runtime import SAEOperationTask
 
 
 class CircuitsTask(SAEOperationTask):
