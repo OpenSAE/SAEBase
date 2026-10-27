@@ -4,4 +4,4 @@ This historical documentation URL is retained so existing external links, refere
 
 Read the current, feature-oriented **[Feature Interventions and Steering](feature-interventions.md)** guide for the full technical explanation and saebase.examples.
 
-For the rest of the toolkit, see the [Documentation Index](index.md) and [Examples Index](../../saebase/saebase/examples/README.md).
+For the rest of the toolkit, see the [Documentation Index](index.md) and [Examples Index](../../saebase/examples/README.md).

@@ -1,6 +1,6 @@
 # SAEBase API Reference
 
-SAEBase organizes its APIs around loading models, inspecting representations, reusing activations, running feature interventions, benchmarking and reliability analysis. For runnable code, see [Python API](python-api.md) and [Examples](../../saebase/saebase/examples/README.md).
+SAEBase organizes its APIs around loading models, inspecting representations, reusing activations, running feature interventions, benchmarking and reliability analysis. For runnable code, see [Python API](python-api.md) and [Examples](../../saebase/examples/README.md).
 
 ## Models and features
 
