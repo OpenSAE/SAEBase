@@ -19,7 +19,8 @@ NAV = re.compile(
 def build_page(template: str, view: str) -> str:
     if view not in VIEWS:
         raise ValueError(f"Unexpected view {view!r}")
-    if 'id="atlasLanguageSwitch"' not in template or 'src="./i18n.js' not in template:\n        raise ValueError("Atlas template requires a visible bilingual switch and its runtime")\n    html = template.replace("<body>", f'<body data-atlas-view="{view}">', 1)
+    if 'id="atlasLanguageSwitch"' not in template or 'src="./i18n.js' not in template:\n        raise ValueError("Atlas template requires a visible bilingual switch and its runtime")
+    html = template.replace("<body>", f'<body data-atlas-view="{view}">', 1)
     html = html.replace(
         "<title>OpenResearch · Atlas</title>",
         f"<title>OpenResearch Atlas · {view.title()}</title>", 1,
