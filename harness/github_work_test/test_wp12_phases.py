@@ -32,7 +32,7 @@ from saebase.wp12.circuits import (
 from saebase.wp12.acceptance import audit_ledger, inspect_archive
 from saebase.wp12.ndif import remote_ndif_capture
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_p3_sequential_and_parallel_plan_roundtrip():
