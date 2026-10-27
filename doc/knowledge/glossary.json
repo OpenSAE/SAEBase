@@ -55,7 +55,7 @@
       "definition": "包含 200 种鸟类的细粒度图像分类数据集，提供样本标签及官方训练/测试划分。",
       "why_it_matters": "明确 200 类鸟类图像、标签及官方训练与测试划分的标准来源。",
       "source_evidence": [
-        "datasets/vision/CUB_200/CUB_200.py",
+        "research_datasets/vision/CUB_200/CUB_200.py",
         "conf/dataset/cub.yaml"
       ],
       "foundation": "doc/knowledge/foundations/dataset.md",
@@ -94,8 +94,8 @@
       "definition": "数据集发布者指定的训练数据和测试数据分离方案。",
       "why_it_matters": "官方测试数据用于模型方案确定之后的最终评测。",
       "source_evidence": [
-        "datasets/vision/CUB_200/CUB_200.py",
-        "datasets/vision/CUB_200/datamodule_setup.py"
+        "research_datasets/vision/CUB_200/CUB_200.py",
+        "research_datasets/vision/CUB_200/datamodule_setup.py"
       ],
       "foundation": "doc/knowledge/foundations/dataset.md",
       "related_node_ids": [
@@ -117,7 +117,7 @@
       "why_it_matters": "当前默认配置中，Lightning 验证集来自官方测试划分；规范评测可进一步从官方训练集建立独立验证集。",
       "source_evidence": [
         "conf/dataset/cub.yaml",
-        "datasets/vision/CUB_200/datamodule_setup.py"
+        "research_datasets/vision/CUB_200/datamodule_setup.py"
       ],
       "foundation": "doc/knowledge/foundations/evaluation.md",
       "related_node_ids": [
@@ -142,7 +142,7 @@
       "definition": "在模型选择和超参决策完成后用于最终估计性能的测试数据。",
       "why_it_matters": "测试集的独立性由实际模型选择流程和数据使用记录共同决定。",
       "source_evidence": [
-        "datasets/vision/CUB_200/datamodule_setup.py",
+        "research_datasets/vision/CUB_200/datamodule_setup.py",
         "tasks/vision/classification/post_train_eval.py"
       ],
       "foundation": "doc/knowledge/foundations/evaluation.md",
@@ -192,7 +192,7 @@
       "why_it_matters": "这是现有数据模块支持的一种验证策略。",
       "source_evidence": [
         "conf/dataset/cub.yaml",
-        "datasets/vision/CUB_200/datamodule_setup.py"
+        "research_datasets/vision/CUB_200/datamodule_setup.py"
       ],
       "foundation": "doc/knowledge/foundations/dataset.md",
       "related_node_ids": [
@@ -210,7 +210,7 @@
       "definition": "以训练与验证份额描述官方训练集内部划分的参数。",
       "why_it_matters": "与 val_split_fraction 分别对应两种可选择的训练集内部划分配置。",
       "source_evidence": [
-        "datasets/vision/CUB_200/datamodule_setup.py",
+        "research_datasets/vision/CUB_200/datamodule_setup.py",
         "conf/dataset/cub.yaml"
       ],
       "foundation": "doc/knowledge/foundations/dataset.md",
@@ -230,7 +230,7 @@
       "definition": "训练时对图像随机变换，以增加输入扰动和训练样本的有效多样性。",
       "why_it_matters": "训练随机变换与验证确定性变换必须分开报告。",
       "source_evidence": [
-        "datasets/vision/CUB_200/datamodule_setup.py"
+        "research_datasets/vision/CUB_200/datamodule_setup.py"
       ],
       "foundation": "doc/knowledge/foundations/dataset.md",
       "related_node_ids": [
@@ -250,7 +250,7 @@
       "definition": "图像输入模型之前的裁剪、缩放、归一化等处理步骤。",
       "why_it_matters": "改变预处理可能改变可比性和模型输入分布。",
       "source_evidence": [
-        "datasets/vision/CUB_200/datamodule_setup.py"
+        "research_datasets/vision/CUB_200/datamodule_setup.py"
       ],
       "foundation": "doc/knowledge/foundations/dataset.md",
       "related_node_ids": [
@@ -828,7 +828,7 @@
       "why_it_matters": "统一模型与输入身份使每组实验条件明确，支持可靠对照。",
       "foundation": "doc/knowledge/foundations/sae_methods.md",
       "source_evidence": [
-        "datasets/NLP/artifacts.py"
+        "research_datasets/NLP/artifacts.py"
       ],
       "aliases": [
         "Prompt artifact",

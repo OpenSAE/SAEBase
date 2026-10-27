@@ -25,10 +25,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "datasets/datamodule.py"
+        "research_datasets/datamodule.py"
       ],
       "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "datasets/datamodule.py"
+      "foundation": "research_datasets/datamodule.py"
     },
     {
       "id": "term.model",
@@ -559,10 +559,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "datasets/datamodule.py"
+        "research_datasets/datamodule.py"
       ],
       "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "datasets/datamodule.py"
+      "foundation": "research_datasets/datamodule.py"
     },
     {
       "id": "term.dlbase",
@@ -618,10 +618,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "datasets/NLP/prompts.py"
+        "research_datasets/NLP/prompts.py"
       ],
       "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
-      "foundation": "datasets/NLP/prompts.py"
+      "foundation": "research_datasets/NLP/prompts.py"
     },
     {
       "id": "term.vision",

@@ -93,7 +93,7 @@
       "description": "方案：Dataset policy、Model compatibility、Task pipeline checks 依次校验组合。",
       "status": "implemented",
       "evidence": [
-        "datasets/vision/CUB_200/dataset_task_policy.py",
+        "research_datasets/vision/CUB_200/dataset_task_policy.py",
         "models/vision/resnet18_mlp/model_task_dataset_compatibility.py",
         "tasks/vision/classification/pipeline_checks.py"
       ],
@@ -182,7 +182,7 @@
       "status": "implemented",
       "evidence": [
         "dlbase/registry.py",
-        "datasets/plugins.py",
+        "research_datasets/plugins.py",
         "models/plugins.py",
         "tasks/plugins.py"
       ],
@@ -196,7 +196,7 @@
       "description": "目标：数据集自己声明和验证允许的 Task。",
       "status": "implemented",
       "evidence": [
-        "datasets/vision/CUB_200/dataset_task_policy.py"
+        "research_datasets/vision/CUB_200/dataset_task_policy.py"
       ],
       "next": "增加多任务组合负样例。",
       "environment_refs": []
@@ -265,7 +265,7 @@
       "description": "目标：清晰记录独立验证集与最终测试集的来源，分别用于模型选择和最终报告。",
       "status": "partial",
       "evidence": [
-        "datasets/vision/CUB_200/datamodule_setup.py",
+        "research_datasets/vision/CUB_200/datamodule_setup.py",
         "conf/dataset/cub.yaml"
       ],
       "next": "当前 CUB 默认 val 与 test 同源，后续需独立评测方案。",
@@ -405,7 +405,7 @@
       "description": "方案：沿用 CUB 官方划分、明确变换与分类损失，并通过 Hydra 保存配置、Lightning 训练与 checkpoint 评测构成基线。",
       "status": "partial",
       "evidence": [
-        "datasets/vision/CUB_200/datamodule_setup.py",
+        "research_datasets/vision/CUB_200/datamodule_setup.py",
         "tasks/vision/classification/run.py"
       ],
       "next": "修复默认 val/test 同源的评测限制。",
@@ -418,8 +418,8 @@
       "description": "目标：从 CUB-200 官方文件读取图像与标签，明确训练、验证和测试来源及输入变换。",
       "status": "implemented",
       "evidence": [
-        "datasets/vision/CUB_200/CUB_200.py",
-        "datasets/vision/CUB_200/datamodule_setup.py"
+        "research_datasets/vision/CUB_200/CUB_200.py",
+        "research_datasets/vision/CUB_200/datamodule_setup.py"
       ],
       "next": "验证 split 计数、类别映射与数据缺失时的错误信号。",
       "environment_refs": []
@@ -458,7 +458,7 @@
       "description": "目标：验证集用于选模，最终测试集独立评估；对现有默认 val=test 情况必须标注其局限。",
       "status": "partial",
       "evidence": [
-        "datasets/vision/CUB_200/datamodule_setup.py",
+        "research_datasets/vision/CUB_200/datamodule_setup.py",
         "tasks/vision/classification/post_train_eval.py"
       ],
       "next": "将默认划分和独立评测协议分离。",
@@ -496,10 +496,10 @@
       "description": "目标：视觉与文本的数据、模型及任务分别存放在 Vision、NLP 和 LLM 家族目录下，公共加载与注册入口留在一级目录。",
       "status": "implemented",
       "evidence": [
-        "datasets/plugins.py",
+        "research_datasets/plugins.py",
         "models/plugins.py",
         "tasks/plugins.py",
-        "datasets/NLP/prompts.py"
+        "research_datasets/NLP/prompts.py"
       ]
     },
     {
@@ -510,7 +510,7 @@
       "status": "implemented",
       "evidence": [
         "dlbase/train.py",
-        "datasets/vision/CUB_200/datamodule_setup.py",
+        "research_datasets/vision/CUB_200/datamodule_setup.py",
         "models/vision/resnet18_mlp/resnet18_mlp.py",
         "tasks/vision/classification/run.py"
       ]

@@ -3,7 +3,7 @@
   "purpose": "Reviewed Code → scientific Knowledge and Code → Core project management ID links",
   "mappings": [
     {
-      "path": "datasets/datamodule.py",
+      "path": "research_datasets/datamodule.py",
       "context_ids": [
         "g.cub.dataset"
       ],
@@ -13,7 +13,7 @@
       ]
     },
     {
-      "path": "datasets/NLP/artifacts.py",
+      "path": "research_datasets/NLP/artifacts.py",
       "context_ids": [
         "g.sae.prompt_artifacts"
       ],
@@ -21,7 +21,7 @@
       "summary": "NLP Prompt manifest 和数据来源的版本化产物接口。"
     },
     {
-      "path": "datasets/vision/CUB_200/CUB_200.py",
+      "path": "research_datasets/vision/CUB_200/CUB_200.py",
       "context_ids": [
         "g.cub.dataset"
       ],
@@ -31,7 +31,7 @@
       ]
     },
     {
-      "path": "datasets/vision/CUB_200/datamodule_setup.py",
+      "path": "research_datasets/vision/CUB_200/datamodule_setup.py",
       "context_ids": [
         "g.cub.dataset",
         "g.cub.holdout",

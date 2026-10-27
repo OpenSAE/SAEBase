@@ -53,7 +53,7 @@
         {
           "type": "reference",
           "label": "数据读取代码",
-          "path": "datasets/vision/CUB_200/CUB_200.py"
+          "path": "research_datasets/vision/CUB_200/CUB_200.py"
         }
       ]
     },

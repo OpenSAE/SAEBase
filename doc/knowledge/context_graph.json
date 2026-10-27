@@ -34,8 +34,8 @@
       "description": "问题：如何从 CUB-200 官方训练和测试数据构造图像、标签及用于选模的独立验证集？",
       "status": "partial",
       "evidence": [
-        "datasets/vision/CUB_200/CUB_200.py",
-        "datasets/vision/CUB_200/datamodule_setup.py"
+        "research_datasets/vision/CUB_200/CUB_200.py",
+        "research_datasets/vision/CUB_200/datamodule_setup.py"
       ],
       "next": "检查验证集与测试集重叠风险。",
       "term_ids": [
@@ -72,7 +72,7 @@
       "description": "问题：怎样分离模型选择与最终测试，并以 Top-1 指标报告分类表现？",
       "status": "partial",
       "evidence": [
-        "datasets/vision/CUB_200/datamodule_setup.py",
+        "research_datasets/vision/CUB_200/datamodule_setup.py",
         "tasks/vision/classification/post_train_eval.py"
       ],
       "next": "修正当前默认 val=test 的评测协议。",
@@ -110,7 +110,7 @@
       "description": "方案：从 CUB 官方训练数据划出验证集，保留官方测试集用于最终评测，并记录图像变换。",
       "status": "partial",
       "evidence": [
-        "datasets/vision/CUB_200/datamodule_setup.py"
+        "research_datasets/vision/CUB_200/datamodule_setup.py"
       ],
       "next": "选择一种独立验证划分并运行检查。",
       "term_ids": [
@@ -226,7 +226,7 @@
       "description": "目标：从 CUB-200 文件结构读取图像、标签和官方 train/test 标识，保持类别数量与样本对应关系。",
       "status": "implemented",
       "evidence": [
-        "datasets/vision/CUB_200/CUB_200.py",
+        "research_datasets/vision/CUB_200/CUB_200.py",
         "conf/dataset/cub.yaml"
       ],
       "next": "检查类别映射及缺失数据行为。",
@@ -243,7 +243,7 @@
       "description": "目标：固定图像变换和输入分辨率，训练阶段使用增强，评测阶段使用稳定变换，记录可复现的配置。",
       "status": "implemented",
       "evidence": [
-        "datasets/vision/CUB_200/datamodule_setup.py",
+        "research_datasets/vision/CUB_200/datamodule_setup.py",
         "conf/dataset/cub.yaml"
       ],
       "next": "核验 448×448 输入与转换前后的一致性。",
@@ -261,7 +261,7 @@
       "description": "目标：从官方训练集中选择一种验证集划分方式，核验各划分之间的样本独立性。",
       "status": "partial",
       "evidence": [
-        "datasets/vision/CUB_200/datamodule_setup.py"
+        "research_datasets/vision/CUB_200/datamodule_setup.py"
       ],
       "next": "配置训练集内部验证比例并检查样本独立性。",
       "term_ids": [
@@ -388,7 +388,7 @@
       "status": "partial",
       "evidence": [
         "conf/dataset/cub.yaml",
-        "datasets/vision/CUB_200/datamodule_setup.py"
+        "research_datasets/vision/CUB_200/datamodule_setup.py"
       ],
       "next": "关闭默认 val=test 评测路径的研究结论风险。",
       "term_ids": [
@@ -510,7 +510,7 @@
       "status": "partial",
       "evidence": [
         "conf/dataset/cub.yaml",
-        "datasets/vision/CUB_200/datamodule_setup.py"
+        "research_datasets/vision/CUB_200/datamodule_setup.py"
       ],
       "next": "更换默认验证数据来源后提供独立性证据。",
       "term_ids": [
@@ -561,7 +561,7 @@
       "description": "研究问题：如何把 Gemma-2 2B、SAE 配置和 Prompt 组织为可核对输入？ 相关方法具有源码接口，科学效果和边界条件仍需独立评估。",
       "status": "partial",
       "evidence": [
-        "datasets/NLP/artifacts.py",
+        "research_datasets/NLP/artifacts.py",
         "models/LLM/gemma2_2b_base/gemma2_2b_base.py",
         "saebase/sae/registry.py"
       ],
@@ -578,7 +578,7 @@
       "description": "模型身份与 Prompt 数据的静态协议已经有实际代码；端到端科学结果另行评估。",
       "status": "implemented",
       "evidence": [
-        "datasets/NLP/artifacts.py",
+        "research_datasets/NLP/artifacts.py",
         "models/LLM/gemma2_2b_base/gemma2_2b_base.py",
         "saebase/sae/registry.py"
       ],
@@ -592,10 +592,10 @@
       "id": "g.sae.prompt_artifacts",
       "type": "goal",
       "title": "按数据集和模型存储可追溯 Prompt",
-      "description": "代码方法：按数据集和模型存储可追溯 Prompt。依据位于 datasets/NLP/artifacts.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "description": "代码方法：按数据集和模型存储可追溯 Prompt。依据位于 research_datasets/NLP/artifacts.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
       "status": "implemented",
       "evidence": [
-        "datasets/NLP/artifacts.py"
+        "research_datasets/NLP/artifacts.py"
       ],
       "term_ids": [
         "term.sae",
