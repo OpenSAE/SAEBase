@@ -5,7 +5,7 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 TASK_NAMES = ("capture", "intervene", "generate", "circuits", "explain", "benchmark", "train")
 FORBIDDEN_TOP = {"dlbase", "torchvision", "cv2"}
 

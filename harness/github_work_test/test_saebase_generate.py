@@ -9,7 +9,7 @@ import pytest
 
 from saebase.generate import generate, packed_row, resolve_backend, sampling_params_kwargs
 
-REPO = Path(__file__).resolve().parents[1]
+REPO = Path(__file__).resolve().parents[2]
 TASKS = REPO / "tasks"
 
 LEGACY_HF_OR_VLLM_IMPORT = {

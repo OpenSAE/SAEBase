@@ -14,7 +14,7 @@ from saebase.sae.registry import get_profile
 from saebase.sae.sparsify_adapter import SparsifyDenseAdapter
 from saebase.sae.loading import _phase_a_sae_lens_source
 
-CATALOG = Path(__file__).resolve().parents[1] / "conf" / "coverage" / "stage_bc.json"
+CATALOG = Path(__file__).resolve().parents[2] / "conf" / "coverage" / "stage_bc.json"
 
 
 def test_multilayer_matrix_and_independent_architecture_extras():
