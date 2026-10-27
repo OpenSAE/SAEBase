@@ -1,11 +1,14 @@
 """Validate supported Gemma-2 2B task and NLP dataset combinations."""
+
 from __future__ import annotations
 from omegaconf import DictConfig
 from research_datasets.NLP.artifacts import assert_available
 
-SAE_TASKS = frozenset({"capture", "intervene", "generate",
-                       "circuits", "explain", "benchmark", "train"})
+SAE_TASKS = frozenset(
+    {"capture", "intervene", "generate", "circuits", "explain", "benchmark", "train"}
+)
 DATASETS = {"CounterFact", "GreaterThan", "IOI", "MMLUPro", "SimpleCopying"}
+
 
 def assert_compatible(cfg: DictConfig) -> None:
     if str(cfg.model.name) != "gemma2_2b_base":

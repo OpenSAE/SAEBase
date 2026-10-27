@@ -1,4 +1,5 @@
 """SAEBase live capture task."""
+
 from tasks.LLM.sae_runtime import SAEOperationTask
 
 

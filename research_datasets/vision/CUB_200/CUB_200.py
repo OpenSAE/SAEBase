@@ -166,7 +166,9 @@ class CUB200(Dataset):
         self.bounding_boxes_file = os.path.join(self.cub_root, "bounding_boxes.txt")
         self.parts_locs_file = os.path.join(self.cub_root, "parts", "part_locs.txt")
         self.attributes_file = os.path.join(self.cub_root, "attributes", "attributes.txt")
-        self.image_attributes_file = os.path.join(self.cub_root, "attributes", "image_attribute_labels.txt")
+        self.image_attributes_file = os.path.join(
+            self.cub_root, "attributes", "image_attribute_labels.txt"
+        )
 
         self._train_ids: List[str] = []
         self._test_ids: List[str] = []

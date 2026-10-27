@@ -14,7 +14,9 @@ from pytorch_lightning import seed_everything
 __all__ = ["apply_lightning_reproducibility"]
 
 
-def apply_lightning_reproducibility(seed: int, *, workers: bool = True, verbose: bool = True) -> int:
+def apply_lightning_reproducibility(
+    seed: int, *, workers: bool = True, verbose: bool = True
+) -> int:
     """
     Thin wrapper around Lightning's ``seed_everything`` plus deterministic cuDNN flags.
 
@@ -29,6 +31,7 @@ def apply_lightning_reproducibility(seed: int, *, workers: bool = True, verbose:
 def apply_seed(seed: int) -> None:
     import random
     import numpy as np
+
     random.seed(seed)
     np.random.seed(seed)
     try:

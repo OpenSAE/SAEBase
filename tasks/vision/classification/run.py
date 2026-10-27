@@ -178,7 +178,9 @@ def run_classification_training(cfg: DictConfig) -> None:
                 )
 
             trainer2 = pl.Trainer(
-                **lightning_trainer_kwargs(cfg, M, callbacks_p2, loggers, enable_progress_bar=enable_pb)
+                **lightning_trainer_kwargs(
+                    cfg, M, callbacks_p2, loggers, enable_progress_bar=enable_pb
+                )
             )
             trainer2.fit(model_p2, datamodule=dm)
             phase2_ran = True
@@ -189,7 +191,13 @@ def run_classification_training(cfg: DictConfig) -> None:
         and val_still_strictly_decreasing(val_hist.val_losses, min_delta, window=3)
     )
     undertrained_warn = False
-    if undertrained and train_f.model_checkpoint and mc is not None and mc.best_model_path and os.path.isfile(mc.best_model_path):
+    if (
+        undertrained
+        and train_f.model_checkpoint
+        and mc is not None
+        and mc.best_model_path
+        and os.path.isfile(mc.best_model_path)
+    ):
         dst = os.path.join(os.getcwd(), BEST_CHECKPOINT_FILENAME)
         if os.path.normpath(mc.best_model_path) != os.path.normpath(dst):
             os.replace(mc.best_model_path, dst)
@@ -304,4 +312,6 @@ def run_classification_training(cfg: DictConfig) -> None:
         )
         rank_zero_info(f"Wrote summary.log to {summary_path}")
     elif not train_f.summary_log or not task_f.post_train_eval_and_summary:
-        rank_zero_info("summary.log skipped (train.facets.summary_log or task.facets.post_train_eval_and_summary is false).")
+        rank_zero_info(
+            "summary.log skipped (train.facets.summary_log or task.facets.post_train_eval_and_summary is false)."
+        )

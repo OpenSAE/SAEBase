@@ -50,7 +50,7 @@ def register_extension(bundle: ExtensionBundle) -> None:
     metric_keys = [x.spec.metric_id for x in bundle.metrics]
     for keys, existing, kind in (
         (model_keys, set(_MODELS) | set(list_registered_model_keys()), "model"),
-        (sae_keys, set(_SAES) | set(SAE_KEYS) | set(DEFAULT_SAE_FOR_MODEL) | {'none'}, "SAE"),
+        (sae_keys, set(_SAES) | set(SAE_KEYS) | set(DEFAULT_SAE_FOR_MODEL) | {"none"}, "SAE"),
         (metric_keys, set(_METRICS) | {x.metric_id for x in metric_specs()}, "metric"),
     ):
         if len(keys) != len(set(keys)):

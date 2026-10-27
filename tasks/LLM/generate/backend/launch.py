@@ -27,10 +27,12 @@ def _verify_available_worker_mode(argv: Sequence[str]) -> None:
     """Fail fast when archived experiment-only code is missing."""
     if argv and argv[0] == "generate":
         missing = [
-            rel for rel in (
+            rel
+            for rel in (
                 "tasks/10_cross_model_steering/gemmascope_rows.py",
                 "tasks/13_functional_concept_validation/sae_edit.py",
-            ) if not (repo_root() / rel).is_file()
+            )
+            if not (repo_root() / rel).is_file()
         ]
         if missing:
             raise RuntimeError(
@@ -99,8 +101,13 @@ def run_worker_stream(argv: Sequence[str], *, timeout: float = 7200) -> dict[str
     _verify_available_worker_mode(argv)
     _release_parent_gpu()
     proc = subprocess.Popen(
-        worker_cmd(argv), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-        text=True, env=_child_env(), cwd=str(repo_root()), bufsize=1,
+        worker_cmd(argv),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        env=_child_env(),
+        cwd=str(repo_root()),
+        bufsize=1,
     )
     assert proc.stdout is not None
     lines: queue.Queue[str | None] = queue.Queue()

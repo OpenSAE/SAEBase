@@ -1,6 +1,8 @@
 """Register the independent Vision classifier and seven SAEBase LLM tasks."""
+
 from __future__ import annotations
 from dlbase.registry import register_task
+
 
 def _register_builtin_tasks() -> None:
     from tasks.vision.classification.classification_task import ClassificationTask
@@ -23,5 +25,6 @@ def _register_builtin_tasks() -> None:
         ("train", TrainTask),
     ):
         register_task(key, cls)
+
 
 _register_builtin_tasks()

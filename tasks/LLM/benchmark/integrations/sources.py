@@ -22,7 +22,9 @@ def load_paper_module(path: str | Path, *, paper: str) -> ModuleType:
     if source.is_dir():
         source = source / f"{paper}.py"
     if not source.is_file() or source.name != f"{paper}.py":
-        raise FileNotFoundError(f"Provide a local {paper}.py from the {paper.upper()} repository; got {source}")
+        raise FileNotFoundError(
+            f"Provide a local {paper}.py from the {paper.upper()} repository; got {source}"
+        )
     spec = importlib.util.spec_from_file_location(f"_saebase_reference_{paper}", source)
     if spec is None or spec.loader is None:
         raise ImportError(f"Unable to load estimator file {source}")

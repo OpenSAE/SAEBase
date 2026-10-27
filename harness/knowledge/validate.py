@@ -1,4 +1,5 @@
 """Validate the authoritative knowledge graph without importing any training code."""
+
 from __future__ import annotations
 
 import argparse
@@ -37,6 +38,7 @@ def acyclic(nodes: set[str], edges: list[dict], types: set[str]):
         if edge["type"] in types:
             graph[edge["source"]].append(edge["target"])
     color = {}
+
     def visit(node: str):
         if color.get(node) == 1:
             fail(f"Cycle in {','.join(sorted(types))} starting at {node}")
@@ -46,6 +48,7 @@ def acyclic(nodes: set[str], edges: list[dict], types: set[str]):
         for child in graph[node]:
             visit(child)
         color[node] = 2
+
     for key in sorted(nodes):
         visit(key)
 
@@ -63,7 +66,7 @@ def validate(graph: dict) -> dict:
     for obj in nodes:
         if not isinstance(obj, dict):
             fail("Node must be an object")
-        key,kind,status = obj.get("id"),obj.get("type"),obj.get("status")
+        key, kind, status = obj.get("id"), obj.get("type"), obj.get("status")
         if not isinstance(key, str) or not key or key in mapping:
             fail(f"Duplicate or empty node id: {key!r}")
         if kind not in KINDS or status not in STATES:
@@ -83,14 +86,14 @@ def validate(graph: dict) -> dict:
     for edge in edges:
         if not isinstance(edge, dict):
             fail("Edge must be an object")
-        a,b,kind = edge.get("source"),edge.get("target"),edge.get("type")
+        a, b, kind = edge.get("source"), edge.get("target"), edge.get("type")
         if a not in mapping or b not in mapping or a == b or kind not in RELATIONS:
             fail(f"Invalid edge: {edge}")
-        if (mapping[a]["type"],mapping[b]["type"]) not in ALLOWED[kind]:
+        if (mapping[a]["type"], mapping[b]["type"]) not in ALLOWED[kind]:
             fail(f"Illegal {kind} edge from {mapping[a]['type']} to {mapping[b]['type']}")
-        if (a,b,kind) in seen:
-            fail(f"Duplicate edge: {(a,b,kind)}")
-        seen.add((a,b,kind))
+        if (a, b, kind) in seen:
+            fail(f"Duplicate edge: {(a, b, kind)}")
+        seen.add((a, b, kind))
         if b in parent_of:
             fail(f"Node {b} has multiple parents; this is a tree, not an execution graph")
         parent_of[b] = a
@@ -102,10 +105,13 @@ def validate(graph: dict) -> dict:
         refresh_status(copy.deepcopy(graph))
     except (ValueError, KeyError) as exc:
         fail(str(exc))
-    return {"nodes": len(nodes), "edges": len(edges), "statuses": dict(
-        (state, sum(n["status"] == state for n in nodes)) for state in sorted(STATES)
-    )}
-
+    return {
+        "nodes": len(nodes),
+        "edges": len(edges),
+        "statuses": dict(
+            (state, sum(n["status"] == state for n in nodes)) for state in sorted(STATES)
+        ),
+    }
 
 
 def validate_scientific(graph: dict, glossary: dict, root: Path = ROOT) -> dict:
@@ -119,7 +125,7 @@ def validate_scientific(graph: dict, glossary: dict, root: Path = ROOT) -> dict:
     terms = glossary.get("terms", [])
     if not isinstance(categories, list) or not isinstance(terms, list):
         fail("Glossary categories and terms must be lists")
-    category_ids = [c.get("id") for c in categories if isinstance(c,dict)]
+    category_ids = [c.get("id") for c in categories if isinstance(c, dict)]
     if len(set(category_ids)) != len(category_ids) or not category_ids:
         fail("Duplicate or empty glossary category")
     by_term = {}
@@ -136,14 +142,20 @@ def validate_scientific(graph: dict, glossary: dict, root: Path = ROOT) -> dict:
                 fail(f"Missing glossary {field}: {key}")
         if entry.get("category") not in category_ids:
             fail(f"Unknown category: {key}")
-        if not isinstance(entry.get("aliases"), list) or not all(isinstance(a,str) and a for a in entry["aliases"]):
+        if not isinstance(entry.get("aliases"), list) or not all(
+            isinstance(a, str) and a for a in entry["aliases"]
+        ):
             fail(f"Invalid aliases: {key}")
         if not isinstance(entry.get("source_evidence"), list) or not entry["source_evidence"]:
             fail(f"Missing glossary source evidence: {key}")
         for filename in [*entry["source_evidence"], entry["foundation"]]:
-            if not isinstance(filename, str) or filename.startswith("/") or ".." in filename.split("/"):
+            if (
+                not isinstance(filename, str)
+                or filename.startswith("/")
+                or ".." in filename.split("/")
+            ):
                 fail(f"Unsafe glossary evidence path: {key}")
-            if not (root/filename).is_file():
+            if not (root / filename).is_file():
                 fail(f"Missing glossary evidence file: {key}: {filename}")
         refs = entry.get("related_node_ids")
         if not isinstance(refs, list) or not refs or len(set(refs)) != len(refs):
@@ -152,7 +164,7 @@ def validate_scientific(graph: dict, glossary: dict, root: Path = ROOT) -> dict:
             fail(f"Unknown related knowledge node in {key}")
         by_term[key] = entry
         backlink[key] = set(refs)
-    forward = {key:set() for key in by_term}
+    forward = {key: set() for key in by_term}
     for node in graph["nodes"]:
         term_ids = node.get("term_ids")
         if not isinstance(term_ids, list) or not term_ids or len(set(term_ids)) != len(term_ids):
@@ -170,19 +182,19 @@ def validate_scientific(graph: dict, glossary: dict, root: Path = ROOT) -> dict:
 
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("path",nargs="?",default=str(DEFAULT))
-    args=parser.parse_args()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("path", nargs="?", default=str(DEFAULT))
+    args = parser.parse_args()
     try:
-        graph=json.loads(Path(args.path).read_text(encoding="utf-8"))
-        glossary=json.loads((ROOT/"doc/knowledge/glossary.json").read_text(encoding="utf-8"))
-        result=validate_scientific(graph, glossary)
-    except (GraphError,OSError,ValueError) as e:
-        print(f"INVALID knowledge graph: {e}",file=sys.stderr)
+        graph = json.loads(Path(args.path).read_text(encoding="utf-8"))
+        glossary = json.loads((ROOT / "doc/knowledge/glossary.json").read_text(encoding="utf-8"))
+        result = validate_scientific(graph, glossary)
+    except (GraphError, OSError, ValueError) as e:
+        print(f"INVALID knowledge graph: {e}", file=sys.stderr)
         return 1
     print("VALID knowledge graph:", result)
     return 0
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     sys.exit(main())

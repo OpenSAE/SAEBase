@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import pickle
 import sys
 import time
@@ -47,7 +46,11 @@ def _unpack_layer_out(out):
     """Last-token resid for decode-step mutation. Returns (x_last, hidden_ref, gemma_tuple)."""
     if isinstance(out, (tuple, list)) and len(out) >= 2:
         hidden, residual = out[0], out[1]
-        if torch_is_tensor(hidden) and torch_is_tensor(residual) and tuple(hidden.shape) == tuple(residual.shape):
+        if (
+            torch_is_tensor(hidden)
+            and torch_is_tensor(residual)
+            and tuple(hidden.shape) == tuple(residual.shape)
+        ):
             # Full (B,T,D) or (T,D) tensors — take last position.
             summed = hidden + residual
             if summed.ndim >= 2:
@@ -74,7 +77,11 @@ def _unpack_full_sequence(out):
 
     if isinstance(out, (tuple, list)) and len(out) >= 2:
         a, b = out[0], out[1]
-        if isinstance(a, torch.Tensor) and isinstance(b, torch.Tensor) and tuple(a.shape) == tuple(b.shape):
+        if (
+            isinstance(a, torch.Tensor)
+            and isinstance(b, torch.Tensor)
+            and tuple(a.shape) == tuple(b.shape)
+        ):
             tens = (a + b).detach().float()
         elif isinstance(a, (list, tuple)) and isinstance(b, (list, tuple)):
             # Per-token lists (Gemma-style)
@@ -223,7 +230,7 @@ def cmd_smoke(args: argparse.Namespace) -> dict:
 def _rows_from_state(state: dict):
     import torch
 
-    _tm0 = __import__('importlib').import_module('tasks.10_cross_model_steering.gemmascope_rows')
+    _tm0 = __import__("importlib").import_module("tasks.10_cross_model_steering.gemmascope_rows")
     PairSteerRows = _tm0.PairSteerRows
 
     def t(key: str):
@@ -280,7 +287,7 @@ def _keep_mask(spec, job: dict, d_sae: int, device):
 
 
 def _edit_hidden(hidden, spec, mode: str, sae_pack, job: dict, keep_mask=None):
-    _tm1 = __import__('importlib').import_module('tasks.13_functional_concept_validation.sae_edit')
+    _tm1 = __import__("importlib").import_module("tasks.13_functional_concept_validation.sae_edit")
     apply_ablate = _tm1.apply_ablate
 
     if mode == "ablate":
@@ -356,7 +363,7 @@ def _margin_from_saved(cap, index: int, job: dict):
 
 def _edit_generated_span(out, spec, n_prompt: int) -> None:
     """Ablate selected features on generated positions of a prefill residual."""
-    _tm2 = __import__('importlib').import_module('tasks.13_functional_concept_validation.sae_edit')
+    _tm2 = __import__("importlib").import_module("tasks.13_functional_concept_validation.sae_edit")
     apply_ablate = _tm2.apply_ablate
 
     if spec is None:
@@ -383,7 +390,11 @@ def _edit_generated_span(out, spec, n_prompt: int) -> None:
 
     if isinstance(out, (tuple, list)) and len(out) >= 2:
         hidden, residual = out[0], out[1]
-        if torch_is_tensor(hidden) and torch_is_tensor(residual) and tuple(hidden.shape) == tuple(residual.shape):
+        if (
+            torch_is_tensor(hidden)
+            and torch_is_tensor(residual)
+            and tuple(hidden.shape) == tuple(residual.shape)
+        ):
             _edit_tensor(hidden, residual)
             return
         if isinstance(hidden, (list, tuple)) and isinstance(residual, (list, tuple)):
@@ -442,7 +453,7 @@ def _teacher_force_trace(model, jobs, *, layer, qwen35, load_s, chunk_n: int = 1
     import nnsight
     import torch
 
-    _tm3 = __import__('importlib').import_module('tasks.13_functional_concept_validation.sae_edit')
+    _tm3 = __import__("importlib").import_module("tasks.13_functional_concept_validation.sae_edit")
     SetEditSpec = _tm3.SetEditSpec
 
     out_rows = []
@@ -485,10 +496,19 @@ def _teacher_force_trace(model, jobs, *, layer, qwen35, load_s, chunk_n: int = 1
             }
             out_rows.append(row)
             with prog.open("a", encoding="utf-8") as fh:
-                fh.write(json.dumps({"question_id": row["question_id"], "method": row.get("method"), "margin": row.get("margin")}) + "\n")
+                fh.write(
+                    json.dumps(
+                        {
+                            "question_id": row["question_id"],
+                            "method": row.get("method"),
+                            "margin": row.get("margin"),
+                        }
+                    )
+                    + "\n"
+                )
         print(
-            f"[worker] tf-prefill {start}:{start+len(chunk_jobs)}/{len(jobs)} "
-            f"chunk_s={time.perf_counter()-t_chunk:.2f}",
+            f"[worker] tf-prefill {start}:{start + len(chunk_jobs)}/{len(jobs)} "
+            f"chunk_s={time.perf_counter() - t_chunk:.2f}",
             flush=True,
         )
     gen_s = time.perf_counter() - t_gen
@@ -506,7 +526,8 @@ def _teacher_force_trace(model, jobs, *, layer, qwen35, load_s, chunk_n: int = 1
 
 def cmd_generate(args: argparse.Namespace) -> dict:
     import nnsight
-    _tm4 = __import__('importlib').import_module('tasks.10_cross_model_steering.gemmascope_rows')
+
+    _tm4 = __import__("importlib").import_module("tasks.10_cross_model_steering.gemmascope_rows")
     apply_intervention_from_rows = _tm4.apply_intervention_from_rows
 
     jobs_path = Path(args.jobs)
@@ -518,7 +539,11 @@ def cmd_generate(args: argparse.Namespace) -> dict:
     qwen35 = _is_qwen35(model_id)
     official = bool(blob.get("official", False))
     mode = str(blob.get("mode") or "steer")
-    ignore_eos = True if mode == "teacher_force" else ((not official) if blob.get("ignore_eos") is None else bool(blob["ignore_eos"]))
+    ignore_eos = (
+        True
+        if mode == "teacher_force"
+        else ((not official) if blob.get("ignore_eos") is None else bool(blob["ignore_eos"]))
+    )
     mode = str(blob.get("mode") or "steer")
     dump_resid_dir = blob.get("dump_resid_dir")
     parity_dir = blob.get("parity_dir")
@@ -549,7 +574,9 @@ def cmd_generate(args: argparse.Namespace) -> dict:
     pair_rows = [_rows_from_state(j["rows"]) if j.get("rows") else None for j in jobs]
     edit_specs = []
     if mode in {"ablate", "keep", "teacher_force"}:
-        _tm5 = __import__('importlib').import_module('tasks.13_functional_concept_validation.sae_edit')
+        _tm5 = __import__("importlib").import_module(
+            "tasks.13_functional_concept_validation.sae_edit"
+        )
         SetEditSpec = _tm5.SetEditSpec
 
         for job in jobs:
@@ -577,7 +604,9 @@ def cmd_generate(args: argparse.Namespace) -> dict:
             w_t = sae_pack.get("w_enc_t")
             d_sae = int(w_t.shape[1] if w_t is not None else sae_pack["w_enc"].shape[0])
             device = (w_t if w_t is not None else sae_pack["w_enc"]).device
-            keep_masks = [_keep_mask(spec, job, d_sae, device) for spec, job in zip(chunk_edits, chunk_jobs)]
+            keep_masks = [
+                _keep_mask(spec, job, d_sae, device) for spec, job in zip(chunk_edits, chunk_jobs)
+            ]
         with model.trace(
             temperature=0.0,
             top_p=1.0,
@@ -614,7 +643,9 @@ def cmd_generate(args: argparse.Namespace) -> dict:
                         for step in tracer.iter[:job_tokens]:
                             cap_lg.append(model.logits)
                             if int(step) < len(forced):
-                                model.samples = torch.full_like(model.samples, int(forced[int(step)]))
+                                model.samples = torch.full_like(
+                                    model.samples, int(forced[int(step)])
+                                )
                             saved[i] = tracer.result.save()
                     elif need_loop:
                         for step in tracer.iter[:job_tokens]:
@@ -641,7 +672,10 @@ def cmd_generate(args: argparse.Namespace) -> dict:
                     if pdir is not None:
                         saved[f"cx_{i}"] = cap_x
                         saved[f"c2_{i}"] = cap_x2
-        print(f"[worker] chunk {start}:{start+len(chunk_jobs)} keys={list(saved.keys())}", flush=True)
+        print(
+            f"[worker] chunk {start}:{start + len(chunk_jobs)} keys={list(saved.keys())}",
+            flush=True,
+        )
         Path("/workspace/SAEReasoning/experiment/tmp/13_worker_keys.txt").write_text(
             repr(list(saved.keys())) + "\n", encoding="utf-8"
         )
@@ -767,7 +801,9 @@ def _save_parity_caps(dest, *, question_id, cap_x, cap_x2):
     )
 
 
-def _dump_generated_resid(model, *, prompt: str, text: str, layer: int, dest: Path, n_gen: int = 0, qwen35: bool = False):
+def _dump_generated_resid(
+    model, *, prompt: str, text: str, layer: int, dest: Path, n_gen: int = 0, qwen35: bool = False
+):
     import torch
 
     full = str(prompt) + str(text)
@@ -831,7 +867,6 @@ def cmd_probe_layer(args: argparse.Namespace) -> dict:
 
 def cmd_dump_resid(args: argparse.Namespace) -> dict:
     """Dump layer resid for existing prompt+gen_text (no new sampling)."""
-    import nnsight
     import torch
 
     jobs_path = Path(args.jobs)
@@ -909,7 +944,11 @@ def cmd_dump_resid(args: argparse.Namespace) -> dict:
             # Same slice as 10a: one forward of prompt+text, keep the last n_gen
             # positions. Do not encode the prompt and the generation separately.
             for job, dest, ids, n_prompt in packed:
-                n_gen = int(job.get("n_gen_tokens") or job.get("generated_tokens") or max(0, len(ids) - int(n_prompt)))
+                n_gen = int(
+                    job.get("n_gen_tokens")
+                    or job.get("generated_tokens")
+                    or max(0, len(ids) - int(n_prompt))
+                )
                 path = _dump_generated_resid(
                     model,
                     prompt=str(job.get("prompt") or ""),
@@ -927,7 +966,14 @@ def cmd_dump_resid(args: argparse.Namespace) -> dict:
 
                     saved_t = torch.load(path, map_location="cpu", weights_only=False)
                     n_tok = int(saved_t.shape[0]) if hasattr(saved_t, "shape") else 0
-                rows.append({"question_id": job.get("question_id"), "resid_path": str(path) if path else None, "ok": ok, "n_tok": n_tok})
+                rows.append(
+                    {
+                        "question_id": job.get("question_id"),
+                        "resid_path": str(path) if path else None,
+                        "ok": ok,
+                        "n_tok": n_tok,
+                    }
+                )
         except Exception as exc:  # noqa: BLE001
             print(f"[worker] dump batch {start} failed ({exc}); serial fallback", flush=True)
             for job, dest, ids, n_prompt in packed:
@@ -937,13 +983,23 @@ def cmd_dump_resid(args: argparse.Namespace) -> dict:
                     text=str(job.get("gen_text") or job.get("text") or ""),
                     layer=layer,
                     dest=dest,
-                    n_gen=int(job.get("n_gen_tokens") or job.get("generated_tokens") or max(0, len(ids) - n_prompt)),
+                    n_gen=int(
+                        job.get("n_gen_tokens")
+                        or job.get("generated_tokens")
+                        or max(0, len(ids) - n_prompt)
+                    ),
                     qwen35=qwen35,
                 )
                 ok = path is not None
                 n_ok += int(ok)
-                rows.append({"question_id": job.get("question_id"), "resid_path": str(path) if path else None, "ok": ok})
-        print(f"[worker] dump {start+len(chunk)}/{len(pending)}", flush=True)
+                rows.append(
+                    {
+                        "question_id": job.get("question_id"),
+                        "resid_path": str(path) if path else None,
+                        "ok": ok,
+                    }
+                )
+        print(f"[worker] dump {start + len(chunk)}/{len(pending)}", flush=True)
     return {
         "ok": n_ok == len(jobs),
         "phase": "dump_resid",

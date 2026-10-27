@@ -22,7 +22,7 @@ import html
 from typing import Any, Dict, List, Optional, Tuple
 
 from omegaconf import DictConfig
-from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
+from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.utilities.rank_zero import rank_zero_info, rank_zero_only, rank_zero_warn
 
@@ -91,11 +91,15 @@ def build_lightning_loggers(cfg: DictConfig) -> List:
             )
         )
     if not loggers:
-        raise ValueError("Enable at least one logger in conf (tensorboard or wandb), or set train.facets.lightning_loggers=false and pass logger=False to Trainer.")
+        raise ValueError(
+            "Enable at least one logger in conf (tensorboard or wandb), or set train.facets.lightning_loggers=false and pass logger=False to Trainer."
+        )
     return loggers
 
 
-def build_model_checkpoint_callbacks(cfg: DictConfig, dirpath: str) -> Tuple[ModelCheckpoint, List[ModelCheckpoint]]:
+def build_model_checkpoint_callbacks(
+    cfg: DictConfig, dirpath: str
+) -> Tuple[ModelCheckpoint, List[ModelCheckpoint]]:
     """Monitored top-1 as ``best.ckpt``; optional periodic ``epoch_<epoch>.ckpt``."""
     c = cfg.train.checkpoint
     mc_best = ModelCheckpoint(
@@ -191,9 +195,9 @@ def write_tensorboard_jump_page(cwd: str, url: str, manual_cmd: str) -> None:
     os.makedirs(tb_dir, exist_ok=True)
     path = os.path.join(tb_dir, "open_tensorboard.html")
     body = (
-        "<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"/>"
+        '<!DOCTYPE html>\n<html lang="en"><head><meta charset="utf-8"/>'
         "<title>TensorBoard</title></head><body>\n"
-        f"<p><a href=\"{url}\">Open TensorBoard</a></p>\n"
+        f'<p><a href="{url}">Open TensorBoard</a></p>\n'
         f"<p>CLI fallback:</p><pre>{html.escape(manual_cmd)}</pre>\n"
         "</body></html>\n"
     )

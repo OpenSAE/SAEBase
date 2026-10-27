@@ -35,8 +35,11 @@ class SARResult:
         return {
             "metrics": {k: (v if np.isfinite(v) else None) for k, v in self.metrics.items()},
             "feature_ids": self.feature_ids.tolist(),
-            "site": {"hook_name": self.site.hook_name, "layer": self.site.layer,
-                     "position": self.site.position},
+            "site": {
+                "hook_name": self.site.hook_name,
+                "layer": self.site.layer,
+                "position": self.site.position,
+            },
             "n_coalitions": int(len(self.masks)),
             "n_fit": int(len(self.fit_indices)),
             "n_held": int(len(self.held_indices)),
@@ -62,15 +65,11 @@ def _check_affine_decode(sae: Any, snapshot: Any, indices: list[int]) -> None:
         return
     h = snapshot.activation
     individual = [
-        edit_features(sae, snapshot, replacements={i: 0.0}).activation - h
-        for i in indices
+        edit_features(sae, snapshot, replacements={i: 0.0}).activation - h for i in indices
     ]
     for selected in ((indices[0], indices[1]), tuple(indices)):
-        actual = edit_features(
-            sae, snapshot, replacements={i: 0.0 for i in selected}
-        ).activation
-        additive_delta = sum((individual[indices.index(i)] for i in selected),
-                             torch.zeros_like(h))
+        actual = edit_features(sae, snapshot, replacements={i: 0.0 for i in selected}).activation
+        additive_delta = sum((individual[indices.index(i)] for i in selected), torch.zeros_like(h))
         if not torch.allclose(actual.float(), (h + additive_delta).float(), rtol=1e-4, atol=1e-4):
             raise ValueError(
                 "SAE decoder is not additive for the selected features. "
@@ -116,12 +115,15 @@ def evaluate_sar(
     model.capabilities.require("forward")
     model.capabilities.require("capture")
     model.capabilities.require("patch")
-    if identity is not None and (identity.hook_name != site.hook_name or identity.layer != site.layer):
+    if identity is not None and (
+        identity.hook_name != site.hook_name or identity.layer != site.layer
+    ):
         raise ValueError("SAE identity site differs from requested activation site")
     ids = model.tokens(prompt=prompt, tokens=tokens)
     snapshot = capture_features(model, sae, tokens=ids, site=site)
-    if identity is not None and (identity.d_in != snapshot.activation.numel()
-                                 or identity.d_sae != snapshot.codes.numel()):
+    if identity is not None and (
+        identity.d_in != snapshot.activation.numel() or identity.d_sae != snapshot.codes.numel()
+    ):
         raise ValueError("SAE identity dimensions differ from captured features")
     if K > snapshot.codes.numel():
         raise ValueError(f"K={K} exceeds SAE feature count {snapshot.codes.numel()}")
@@ -133,11 +135,15 @@ def evaluate_sar(
     clean = _scalar(readout(baseline_logits), name="readout")
     if verify_replay:
         replay_logits = model.patch_logits(
-            tokens=ids, site=site, activation=snapshot.activation,
+            tokens=ids,
+            site=site,
+            activation=snapshot.activation,
             readout_position=readout_position,
         )
         if not torch.allclose(baseline_logits.float(), replay_logits.float(), rtol=1e-4, atol=1e-4):
-            raise RuntimeError("Identity patch changed the behavior; verify hook, model and eval mode")
+            raise RuntimeError(
+                "Identity patch changed the behavior; verify hook, model and eval mode"
+            )
 
     masks, fit, held = paper.coalitions(K=K, M=M, p=p, n_fit=n_fit, seed=seed)
     masks = np.asarray(masks, dtype=bool)
@@ -150,7 +156,9 @@ def evaluate_sar(
         if replacements:
             patch = edit_features(sae, snapshot, replacements=replacements)
             logits = model.patch_logits(
-                tokens=ids, site=site, activation=patch.activation,
+                tokens=ids,
+                site=site,
+                activation=patch.activation,
                 readout_position=readout_position,
             )
         else:
@@ -167,8 +175,13 @@ def evaluate_sar(
         clean_metrics[str(key)] = float(arr)
     return SARResult(
         metrics=clean_metrics,
-        feature_ids=np.asarray(selected, dtype=int), masks=masks.copy(),
-        fit_indices=fit.copy(), held_indices=held.copy(), responses=responses,
-        full_response=clean, site=site, source_tokens=ids.detach().cpu().numpy().copy(),
+        feature_ids=np.asarray(selected, dtype=int),
+        masks=masks.copy(),
+        fit_indices=fit.copy(),
+        held_indices=held.copy(),
+        responses=responses,
+        full_response=clean,
+        site=site,
+        source_tokens=ids.detach().cpu().numpy().copy(),
         identity=identity,
     )

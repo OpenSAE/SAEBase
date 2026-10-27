@@ -4,6 +4,7 @@ Child status roll-up is available as an explicit analytic view only, not as an
 automatic mutation when a node is approved, denied, or partially implemented.
 This prevents review proposals from rewriting the statuses of ancestor nodes.
 """
+
 from __future__ import annotations
 
 STATES = {"not_implemented", "partial", "implemented"}
@@ -51,7 +52,9 @@ def refresh_status(graph, *, propagate=False):
             raise ValueError("Unknown hierarchy node " + key)
         visiting.add(key)
         values = children.get(key, [])
-        state = child_status([resolve(child) for child in values]) if values else nodes[key]["status"]
+        state = (
+            child_status([resolve(child) for child in values]) if values else nodes[key]["status"]
+        )
         if state not in STATES:
             raise ValueError("Unknown state " + str(state) + " for " + key)
         nodes[key]["status"] = state

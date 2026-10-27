@@ -197,9 +197,7 @@ def describe_classification_input_for_summary(cfg: DictConfig) -> str:
 
     if input_format == "panels":
         gh, gw = 4 * h, 4 * h
-        return (
-            f"3 x {gh} x {gw} (RGB 4×4 grid from 16×{h}×{h} panels via panels_to_rgb_grid, CHW)"
-        )
+        return f"3 x {gh} x {gw} (RGB 4×4 grid from 16×{h}×{h} panels via panels_to_rgb_grid, CHW)"
     return f"{in_channels} x {h} x {h} (image, CHW after transforms)"
 
 

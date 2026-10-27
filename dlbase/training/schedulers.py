@@ -21,5 +21,7 @@ def make_warmup_cosine_lambda(max_epochs: int, warmup_epochs: float, min_lr_rati
     return lr_lambda
 
 
-def build_warmup_cosine(optimizer: Optimizer, max_epochs: int, warmup_epochs: float, min_lr_ratio: float) -> LambdaLR:
+def build_warmup_cosine(
+    optimizer: Optimizer, max_epochs: int, warmup_epochs: float, min_lr_ratio: float
+) -> LambdaLR:
     return LambdaLR(optimizer, make_warmup_cosine_lambda(max_epochs, warmup_epochs, min_lr_ratio))

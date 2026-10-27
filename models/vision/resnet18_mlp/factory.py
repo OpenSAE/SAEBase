@@ -3,6 +3,7 @@
 All ResNet head selection and legacy CUB handling belong to this concrete
 model implementation, not the shared models/plugins.py registration layer.
 """
+
 from __future__ import annotations
 
 from omegaconf import DictConfig

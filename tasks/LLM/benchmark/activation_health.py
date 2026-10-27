@@ -30,18 +30,14 @@ def run_activation_health(cfg: DictConfig) -> EvaluationResult:
     if data_root is not None:
         data_root = str(data_root)
 
-    manifest, prompts = load_behavior_prompts(
-        behavior, model_key, n=n, data_root=data_root
-    )
+    manifest, prompts = load_behavior_prompts(behavior, model_key, n=n, data_root=data_root)
 
     model, sae, sae_meta = load_model_and_sae(
         sae_key, layer, device=device, model_key_override=model_key
     )
     hook_name = str(sae_meta["hook_name"])
     if model_key == "pythia410m" and "hook_mlp_out" not in hook_name:
-        raise RuntimeError(
-            f"pythia410m unexpected hook_name={hook_name!r}; expected hook_mlp_out"
-        )
+        raise RuntimeError(f"pythia410m unexpected hook_name={hook_name!r}; expected hook_mlp_out")
 
     per_prompt: list[dict[str, Any]] = []
     for i, ex in enumerate(prompts):

@@ -40,7 +40,9 @@ DEFAULT_SUBSETS = (
 )
 
 
-def _cache_bbh_from_hf(out_path: Path, subsets: tuple[str, ...], *, max_items: int) -> list[dict[str, Any]]:
+def _cache_bbh_from_hf(
+    out_path: Path, subsets: tuple[str, ...], *, max_items: int
+) -> list[dict[str, Any]]:
     """Fetch BBH in a subprocess so HuggingFace ``datasets`` is not shadowed."""
     import subprocess
     import sys
@@ -81,7 +83,10 @@ print(len(rows), file=sys.stderr)
         cmd,
         check=True,
         cwd="/tmp",
-        env={**dict(**{k: v for k, v in __import__("os").environ.items() if k != "PYTHONPATH"}), "PYTHONPATH": ""},
+        env={
+            **dict(**{k: v for k, v in __import__("os").environ.items() if k != "PYTHONPATH"}),
+            "PYTHONPATH": "",
+        },
     )
     rows: list[dict[str, Any]] = []
     if out_path.is_file():
@@ -138,7 +143,9 @@ def build_prompt_items(
     if not rows:
         cache = Path(default_data_dir()) / "hf_cache.jsonl"
         if cache.is_file():
-            rows = [json.loads(l) for l in cache.read_text(encoding="utf-8").splitlines() if l.strip()]
+            rows = [
+                json.loads(l) for l in cache.read_text(encoding="utf-8").splitlines() if l.strip()
+            ]
         if not rows:
             try:
                 rows = _cache_bbh_from_hf(cache, subsets, max_items=int(max_items))

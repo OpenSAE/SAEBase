@@ -19,9 +19,7 @@ def assert_dataset_name_in(cfg: DictConfig, allowed: FrozenSet[str], context: st
         raise ValueError(f"{context}: unsupported dataset.name={ds!r}")
 
 
-def assert_prompt_source_in(
-    cfg: DictConfig, allowed: FrozenSet[str], context: str
-) -> None:
+def assert_prompt_source_in(cfg: DictConfig, allowed: FrozenSet[str], context: str) -> None:
     # Support temporary alias ``dataset`` during migration of call sites.
     if "prompt_source" in cfg and "name" in cfg.prompt_source:
         name = str(cfg.prompt_source.name)

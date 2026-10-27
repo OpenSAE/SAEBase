@@ -23,7 +23,9 @@ def _single_label_acc(logits: torch.Tensor, labels: torch.Tensor) -> torch.Tenso
     return (pred == labels).float().mean()
 
 
-def _multi_label_f1_micro(logits: torch.Tensor, labels: torch.Tensor, threshold: float = 0.5) -> torch.Tensor:
+def _multi_label_f1_micro(
+    logits: torch.Tensor, labels: torch.Tensor, threshold: float = 0.5
+) -> torch.Tensor:
     """Micro-averaged F1 for multi-label: treats all (sample, class) pairs as one pool."""
     preds = (logits.sigmoid() > threshold).float()
     tp = (preds * labels).sum()
@@ -43,7 +45,9 @@ class ClassificationModule(pl.LightningModule):
         self.is_transformer = "transformer" in cfg.model.name
         self._input_format = getattr(cfg.dataset, "input_format", "image")
         self._multi_label = bool(getattr(cfg.dataset, "multi_label", False))
-        self._label_smoothing = float(OmegaConf.select(cfg, "train.loss.label_smoothing", default=0.0) or 0.0)
+        self._label_smoothing = float(
+            OmegaConf.select(cfg, "train.loss.label_smoothing", default=0.0) or 0.0
+        )
         self._run_loss_sum = 0.0
         self._run_acc_sum = 0.0
         self._run_count = 0

@@ -4,6 +4,7 @@ SAEBase's canonical layout is <data_root>/<dataset>/<model>/v1/prompts.jsonl
 with a matching manifest.json. Legacy JSON snapshots remain supported.
 No implicit downloads, synthetic prompts, or train/test split inventions.
 """
+
 from __future__ import annotations
 
 import json
@@ -58,11 +59,13 @@ def read_prompts(dataset_cfg: Any, *, model_key: str | None = None) -> list[dict
         if path.name == "prompts.jsonl" and path.parent.name == "v1":
             # Real SAEBase artifact: verify the manifest identifies its source.
             from research_datasets.NLP.artifacts import load_prompts
+
             expected_model = path.parent.parent.name
             if model_key is not None and expected_model != model_key:
                 raise ValueError("Prompt artifact model does not match selected model")
-            rows = load_prompts(name, expected_model, data_root=path.parents[3],
-                                require_manifest=True)
+            rows = load_prompts(
+                name, expected_model, data_root=path.parents[3], require_manifest=True
+            )
         else:
             with path.open(encoding="utf-8") as source:
                 rows = [json.loads(line) for line in source if line.strip()]

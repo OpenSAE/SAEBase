@@ -5,6 +5,7 @@ implementations. The external Hugging Face package uses the same import name.
 Run its read-only loader in an isolated child process rather than replacing
 sys.modules, changing the global import search path or mixing package objects.
 """
+
 from __future__ import annotations
 
 import json
@@ -40,19 +41,22 @@ class IsolatedHFDatasets:
     """
 
     def _load(self, operation: str, *args: Any, **kwargs: Any) -> Any:
-        request = json.dumps({
-            "operation": operation, "args": args, "kwargs": kwargs
-        }, allow_nan=False)
+        request = json.dumps(
+            {"operation": operation, "args": args, "kwargs": kwargs}, allow_nan=False
+        )
         try:
             result = subprocess.run(
                 [sys.executable, "-I", "-c", _LOADER],
-                input=request, text=True, capture_output=True,
-                timeout=900, check=True,
+                input=request,
+                text=True,
+                capture_output=True,
+                timeout=900,
+                check=True,
             )
         except subprocess.CalledProcessError as exc:
             raise RuntimeError(
-                "The isolated Hugging Face datasets loader failed: " +
-                (exc.stderr or "").strip()[-1800:]
+                "The isolated Hugging Face datasets loader failed: "
+                + (exc.stderr or "").strip()[-1800:]
             ) from exc
         except subprocess.TimeoutExpired as exc:
             raise TimeoutError("Hugging Face dataset loading exceeded the time budget") from exc

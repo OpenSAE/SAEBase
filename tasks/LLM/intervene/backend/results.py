@@ -4,6 +4,7 @@ Files are committed by an atomic manifest replacement. Every committed JSONL
 shard is SHA-256 checked during resume; uncommitted files can be safely ignored.
 This is an exclusively locked local filesystem writer, not a distributed DB.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -43,8 +44,14 @@ def _atomic(path: Path, data: bytes) -> None:
 class ResultWriter:
     """One active writer per directory, with manifest-based resume."""
 
-    def __init__(self, root: str | Path, identity: ExperimentIdentity, *,
-                 shard_rows: int = 128, resume: bool = True) -> None:
+    def __init__(
+        self,
+        root: str | Path,
+        identity: ExperimentIdentity,
+        *,
+        shard_rows: int = 128,
+        resume: bool = True,
+    ) -> None:
         if type(shard_rows) is not int or shard_rows < 1:
             raise ValueError("shard_rows must be positive")
         self.root = Path(root)
@@ -62,8 +69,13 @@ class ResultWriter:
                 if not resume:
                     raise FileExistsError(f"existing experiment {self.root}")
                 self.manifest = self._read_json(path)
-                if self.manifest.get("schema") != SCHEMA or self.manifest.get("identity") != identity.to_dict():
-                    raise MeasurementIntegrityError("experiment identity/schema changed; cannot resume")
+                if (
+                    self.manifest.get("schema") != SCHEMA
+                    or self.manifest.get("identity") != identity.to_dict()
+                ):
+                    raise MeasurementIntegrityError(
+                        "experiment identity/schema changed; cannot resume"
+                    )
                 if self.manifest.get("identity_key") != identity.key:
                     raise MeasurementIntegrityError("experiment digest changed")
                 for shard in self.manifest["shards"]:
@@ -79,14 +91,21 @@ class ResultWriter:
                     for line in rows:
                         item = json.loads(line)
                         key = item.get("measurement_id")
-                        if not isinstance(key, str) or key != fingerprint(item["measurement_identity"]):
+                        if not isinstance(key, str) or key != fingerprint(
+                            item["measurement_identity"]
+                        ):
                             raise MeasurementIntegrityError("measurement identity tampered")
                         if key in self._index:
                             raise MeasurementIntegrityError("duplicate measurement identity")
                         self._index.add(key)
             else:
-                self.manifest = {"schema": SCHEMA, "identity": identity.to_dict(),
-                                 "identity_key": identity.key, "shards": [], "rows": 0}
+                self.manifest = {
+                    "schema": SCHEMA,
+                    "identity": identity.to_dict(),
+                    "identity_key": identity.key,
+                    "shards": [],
+                    "rows": 0,
+                }
                 _atomic(path, (stable_json(self.manifest) + "\n").encode())
         except Exception:
             fcntl.flock(self._lock.fileno(), fcntl.LOCK_UN)
@@ -131,9 +150,10 @@ class ResultWriter:
         # committed shard because the next index is exactly manifest shard count.
         _atomic(self.root / name, data)
         updated = dict(self.manifest)
-        updated["shards"] = [*self.manifest["shards"],
-                             {"index": index, "filename": name,
-                              "sha256": _sha(data), "rows": len(self._pending)}]
+        updated["shards"] = [
+            *self.manifest["shards"],
+            {"index": index, "filename": name, "sha256": _sha(data), "rows": len(self._pending)},
+        ]
         updated["rows"] = self.manifest["rows"] + len(self._pending)
         _atomic(self.root / "manifest.json", (stable_json(updated) + "\n").encode())
         self.manifest = updated

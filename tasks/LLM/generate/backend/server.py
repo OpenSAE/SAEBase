@@ -119,7 +119,9 @@ def ensure_server(*, model: str) -> None:
             )
         time.sleep(1.0)
     stop_owned_server()
-    raise RuntimeError(f"vLLM server did not become healthy at {server_base_url()}. See {log_path}.")
+    raise RuntimeError(
+        f"vLLM server did not become healthy at {server_base_url()}. See {log_path}."
+    )
 
 
 def post_completions(body: dict) -> dict:

@@ -32,9 +32,7 @@ def prepare_for_model(
     tok = attach_token_ids(raw, model, strategy=strategy)
     kept = filter_greedy_in_greater(tok, model)
     if len(kept) < min_kept:
-        raise RuntimeError(
-            f"GreaterThan/{model_key}: kept {len(kept)} < min_kept={min_kept}"
-        )
+        raise RuntimeError(f"GreaterThan/{model_key}: kept {len(kept)} < min_kept={min_kept}")
     manifest = make_manifest(
         behavior="GreaterThan",
         model_key=model_key,

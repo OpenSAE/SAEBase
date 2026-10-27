@@ -23,8 +23,14 @@ _REQUIRED: Tuple[Tuple[str, str], ...] = (
 
 def missing_packages(*, profile: str = "vision") -> List[Tuple[str, str]]:
     missing: List[Tuple[str, str]] = []
-    required = _REQUIRED if profile == "vision" else (
-        ("hydra", "hydra-core"), ("omegaconf", "omegaconf"), ("torch", "torch"),
+    required = (
+        _REQUIRED
+        if profile == "vision"
+        else (
+            ("hydra", "hydra-core"),
+            ("omegaconf", "omegaconf"),
+            ("torch", "torch"),
+        )
     )
     for mod, pip in required:
         try:

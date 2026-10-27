@@ -3,6 +3,7 @@
 Consolidated verbatim behavior rules from SAEBase layout/schema/store; data
 belongs to datasets rather than the SAE/model implementation package.
 """
+
 from __future__ import annotations
 
 import json
@@ -70,9 +71,7 @@ DEFAULT_EXPERIMENT_ROOT = Path(__file__).resolve().parents[2] / "experiment"
 def canonicalize_behavior(name: str) -> str:
     key = str(name)
     if key not in BEHAVIOR_ALIASES:
-        raise KeyError(
-            f"Unknown behavior {key!r}. Valid: {sorted(set(BEHAVIOR_ALIASES.values()))}"
-        )
+        raise KeyError(f"Unknown behavior {key!r}. Valid: {sorted(set(BEHAVIOR_ALIASES.values()))}")
     return BEHAVIOR_ALIASES[key]
 
 
@@ -138,7 +137,6 @@ def balance_report_path(
     )
 
 
-
 _LOGIC_BEHAVIORS: frozenset[str] = frozenset(
     {
         "CounterFact",
@@ -191,9 +189,7 @@ def assert_available(behavior: str, model_key: str) -> None:
     beh = canonicalize_behavior(behavior)
     key = str(model_key)
     if key not in MODEL_BEHAVIOR_MATRIX:
-        raise KeyError(
-            f"Unknown model_key={key!r}. Valid: {sorted(MODEL_BEHAVIOR_MATRIX)}"
-        )
+        raise KeyError(f"Unknown model_key={key!r}. Valid: {sorted(MODEL_BEHAVIOR_MATRIX)}")
     if beh not in MODEL_BEHAVIOR_MATRIX[key]:
         raise RuntimeError(
             f"Behavior {beh!r} is not available for model_key={key!r}. "
@@ -237,7 +233,6 @@ def make_manifest(
     if extra:
         payload.update(extra)
     return payload
-
 
 
 _ALLOWED_SCHEMA = frozenset({SCHEMA_VERSION, SCHEMA_VERSION_PAIRED})
@@ -296,8 +291,7 @@ def load_manifest(
         )
     if canonicalize_behavior(str(manifest.get("behavior", beh))) != beh:
         raise RuntimeError(
-            f"Artifact behavior mismatch: manifest={manifest.get('behavior')!r} "
-            f"requested={beh!r}"
+            f"Artifact behavior mismatch: manifest={manifest.get('behavior')!r} requested={beh!r}"
         )
     return manifest
 
@@ -314,9 +308,7 @@ def load_prompts(
         load_manifest(beh, model_key, data_root=data_root)
     path = prompts_path(beh, model_key, data_root=data_root)
     if not path.is_file():
-        raise FileNotFoundError(
-            f"Prompt artifact not found for {beh}/{model_key}: {path}"
-        )
+        raise FileNotFoundError(f"Prompt artifact not found for {beh}/{model_key}: {path}")
     rows: list[dict[str, Any]] = []
     with path.open(encoding="utf-8") as fh:
         for line in fh:

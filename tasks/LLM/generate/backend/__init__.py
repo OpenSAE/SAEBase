@@ -6,7 +6,12 @@ HuggingFace packed decode stays in
 ``tasks.03_logic_chain_validation.hf_runtime``，不会被静默选中。
 """
 
-from tasks.LLM.generate.backend.api import packed_row, resolve_backend, sampling_params_kwargs, vllm_available
+from tasks.LLM.generate.backend.api import (
+    packed_row,
+    resolve_backend,
+    sampling_params_kwargs,
+    vllm_available,
+)
 from tasks.LLM.generate.backend.engine import generate
 from tasks.LLM.generate.backend.vllm import generate_vllm
 

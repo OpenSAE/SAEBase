@@ -4,6 +4,7 @@ The catalog truth source remains ``conf/coverage/stage_bc.json``. This module
 adds resumable execution state and the pair-acceptance contract from the Stage D
 handoff plan. Historical A/B/C evidence is joined, never overwritten.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -30,16 +31,18 @@ FEATURE_DELTA_MIN = 1e-8
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
 
 # Sites already accepted on CPU with real pair + M3/M4 (Stage B) or Stage A.
-PRIOR_PAIR_VERIFIED: frozenset[tuple[str, str, int]] = frozenset({
-    ("pythia410m", "pythia410m_mlp_topk", 4),
-    ("qwen3_1_7b_base", "qwen3_1_7b_base_resid_w32k", 7),
-    ("r1_distill_qwen15b", "r1_distill_qwen15b_resid_l20", 20),
-    ("qwen35_2b", "qwen35_2b_resid_w32k", 12),
-})
+PRIOR_PAIR_VERIFIED: frozenset[tuple[str, str, int]] = frozenset(
+    {
+        ("pythia410m", "pythia410m_mlp_topk", 4),
+        ("qwen3_1_7b_base", "qwen3_1_7b_base_resid_w32k", 7),
+        ("r1_distill_qwen15b", "r1_distill_qwen15b_resid_l20", 20),
+        ("qwen35_2b", "qwen35_2b_resid_w32k", 12),
+    }
+)
 
 # Preferred model-family order for one-at-a-time GPU sweeps.
 DEFAULT_MODEL_ORDER: tuple[str, ...] = (
-    "qwen35_2b",          # D1 calibration
+    "qwen35_2b",  # D1 calibration
     "pythia410m",
     "qwen3_1_7b_base",
     "qwen3_1_7b",
@@ -70,25 +73,24 @@ PROTOCOL_SMOKE = "stage_d.smoke_only.v1"
 PROTOCOL_POPULATION = "stage_d.population.v1"
 POPULATION_MIN_EVAL_GROUPS = 64
 DEFAULT_POPULATION_PATH = (
-    Path(__file__).resolve().parents[2]
-    / "conf"
-    / "coverage"
-    / "stage_d_population.jsonl"
+    Path(__file__).resolve().parents[2] / "conf" / "coverage" / "stage_d_population.jsonl"
 )
 
-STATUS_VALUES = frozenset({
-    "registered",
-    "sae_only_verified",
-    "pair_verified",
-    "benchmark_verified",
-    "reliability_verified",
-    "blocked_access",
-    "blocked_compute",
-    "blocked_loader",
-    "failed_numeric",
-    "failed_integrity",
-    "skipped_prior",
-})
+STATUS_VALUES = frozenset(
+    {
+        "registered",
+        "sae_only_verified",
+        "pair_verified",
+        "benchmark_verified",
+        "reliability_verified",
+        "blocked_access",
+        "blocked_compute",
+        "blocked_loader",
+        "failed_numeric",
+        "failed_integrity",
+        "skipped_prior",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -149,8 +151,12 @@ def _wave_for(model_key: str, access: str) -> str:
     if access in {"gated_model", "gated_large_model"}:
         return "gated"
     if model_key in {
-        "qwen3_8b", "mistral7b_instruct", "r1_distill_llama8b",
-        "llama31_8b", "qwen35_9b", "gemma2_9b_pt",
+        "qwen3_8b",
+        "mistral7b_instruct",
+        "r1_distill_llama8b",
+        "llama31_8b",
+        "qwen35_9b",
+        "gemma2_9b_pt",
     }:
         return "large"
     return "open_small"
@@ -163,22 +169,24 @@ def build_site_records(catalog: CoverageCatalog) -> list[SiteRecord]:
         for layer in entry.selected_layers:
             source = entry.source(layer)
             prior = (entry.model_key, entry.sae_key, layer) in PRIOR_PAIR_VERIFIED
-            records.append(SiteRecord(
-                model_key=entry.model_key,
-                sae_key=entry.sae_key,
-                layer=layer,
-                hook_name=source["hook_name"],
-                access=entry.access,
-                tier=entry.tier,
-                architecture=entry.architecture,
-                size=entry.size,
-                repo_id=str(source["repo_id"]),
-                source_file_id=str(source["source_file_id"]),
-                status="skipped_prior" if prior else "registered",
-                prior_pair_verified=prior,
-                skip_by_default=prior,
-                execution_wave=_wave_for(entry.model_key, entry.access),
-            ))
+            records.append(
+                SiteRecord(
+                    model_key=entry.model_key,
+                    sae_key=entry.sae_key,
+                    layer=layer,
+                    hook_name=source["hook_name"],
+                    access=entry.access,
+                    tier=entry.tier,
+                    architecture=entry.architecture,
+                    size=entry.size,
+                    repo_id=str(source["repo_id"]),
+                    source_file_id=str(source["source_file_id"]),
+                    status="skipped_prior" if prior else "registered",
+                    prior_pair_verified=prior,
+                    skip_by_default=prior,
+                    execution_wave=_wave_for(entry.model_key, entry.access),
+                )
+            )
     if len(records) != 48:
         raise ValueError(f"expected 48 sites, got {len(records)}")
     ids = [r.key.id for r in records]
@@ -284,10 +292,7 @@ def resolve_evaluation_host(
                 f"{sorted(profile.allowed_model_keys())}"
             )
         return model_key_override, model_key_override
-    if (
-        catalog_model_key != profile.model_key
-        and catalog_model_key in profile.allowed_model_keys()
-    ):
+    if catalog_model_key != profile.model_key and catalog_model_key in profile.allowed_model_keys():
         return catalog_model_key, catalog_model_key
     return catalog_model_key, None
 
@@ -388,7 +393,9 @@ def relative_under(output: Path, path: Path | str | None) -> str | None:
         return str(p)
 
 
-def rebuild_canonical_status(output: Path, records: list[SiteRecord] | None = None) -> dict[str, Any]:
+def rebuild_canonical_status(
+    output: Path, records: list[SiteRecord] | None = None
+) -> dict[str, Any]:
     """Rewrite status.json to exactly the 48 catalog keys; archive extras."""
     if records is None:
         root = Path(__file__).resolve().parents[2]
@@ -416,8 +423,10 @@ def rebuild_canonical_status(output: Path, records: list[SiteRecord] | None = No
         if pair_ok:
             prev["pair_verified"] = True
             if prev.get("status") in {None, "registered", "sae_only_verified"}:
-                prev["status"] = "pair_verified" if not rec.prior_pair_verified else prev.get(
-                    "status", "skipped_prior"
+                prev["status"] = (
+                    "pair_verified"
+                    if not rec.prior_pair_verified
+                    else prev.get("status", "skipped_prior")
                 )
             if rec.prior_pair_verified and prev.get("status") == "registered":
                 prev["status"] = "skipped_prior"
@@ -425,9 +434,7 @@ def rebuild_canonical_status(output: Path, records: list[SiteRecord] | None = No
             if key in prev:
                 prev[key] = relative_under(output, prev[key])
         sites[site_id] = prev
-    extras = {
-        k: v for k, v in old.get("sites", {}).items() if k not in expected
-    }
+    extras = {k: v for k, v in old.get("sites", {}).items() if k not in expected}
     if extras:
         archive = {
             "schema": "saebase.stage_d.status_archive.v1",
@@ -435,11 +442,14 @@ def rebuild_canonical_status(output: Path, records: list[SiteRecord] | None = No
             "sites": extras,
         }
         atomic_json(output / "status_archive_extras.json", archive)
-        append_attempt(output, {
-            "event": "status_rebuild",
-            "archived_extra_keys": sorted(extras),
-            "n_canonical": 48,
-        })
+        append_attempt(
+            output,
+            {
+                "event": "status_rebuild",
+                "archived_extra_keys": sorted(extras),
+                "n_canonical": 48,
+            },
+        )
     payload = {
         "schema": SCHEMA_STATUS,
         "sites": sites,
@@ -492,7 +502,10 @@ def classify_exception(exc: BaseException) -> str:
         return "blocked_compute"
     if name in {"ImportError", "ModuleNotFoundError", "UnsupportedCapability"}:
         return "blocked_loader"
-    if "could not load any model candidate" in msg or "not found. valid official model names" in msg:
+    if (
+        "could not load any model candidate" in msg
+        or "not found. valid official model names" in msg
+    ):
         return "blocked_loader"
     if name in {"ValueError", "AssertionError", "RuntimeError"} and (
         "identity" in msg or "dimension" in msg or "nonfinite" in msg or "feature" in msg
@@ -501,7 +514,9 @@ def classify_exception(exc: BaseException) -> str:
     if "sha" in msg or "integrity" in msg or "manifest" in msg:
         return "failed_integrity"
     if name in {"OSError", "HTTPError", "HfHubHTTPError"}:
-        return "blocked_access" if any(x in msg for x in ("401", "403", "gated")) else "blocked_loader"
+        return (
+            "blocked_access" if any(x in msg for x in ("401", "403", "gated")) else "blocked_loader"
+        )
     return "failed_numeric"
 
 
@@ -604,13 +619,16 @@ def should_skip_resume(
             if want is None:
                 continue
             if got.get(key) != want:
-                append_attempt(output, {
-                    "event": "resume_fingerprint_mismatch",
-                    "site_id": f"{model_key}|{sae_key}|L{layer}",
-                    "field": key,
-                    "expected": want,
-                    "found": got.get(key),
-                })
+                append_attempt(
+                    output,
+                    {
+                        "event": "resume_fingerprint_mismatch",
+                        "site_id": f"{model_key}|{sae_key}|L{layer}",
+                        "field": key,
+                        "expected": want,
+                        "found": got.get(key),
+                    },
+                )
                 return None
     return record
 
@@ -648,7 +666,10 @@ def verify_pair_site(
     )
     loader = load_fn or load_model_and_sae
     raw_model, sae, metadata = loader(
-        sae_key, layer, device=device, model_key_override=override,
+        sae_key,
+        layer,
+        device=device,
+        model_key_override=override,
     )
     loaded_model_name = metadata.get("loaded_model_name")
     assert_host_matches_label(
@@ -680,12 +701,21 @@ def verify_pair_site(
             raise ValueError("activation/SAE dimensions disagree")
         if recon.shape != x.shape:
             raise ValueError("reconstruction shape mismatch")
-        if not (torch.isfinite(x).all() and torch.isfinite(z).all() and torch.isfinite(recon).all()):
+        if not (
+            torch.isfinite(x).all() and torch.isfinite(z).all() and torch.isfinite(recon).all()
+        ):
             raise ValueError("nonfinite SAE activations or reconstruction")
         baseline = model.forward_logits(tokens=snap.tokens).detach().float().cpu()
-        patched = model.patch_logits(
-            tokens=snap.tokens, site=site, activation=snap.activation,
-        ).detach().float().cpu()
+        patched = (
+            model.patch_logits(
+                tokens=snap.tokens,
+                site=site,
+                activation=snap.activation,
+            )
+            .detach()
+            .float()
+            .cpu()
+        )
         if baseline.shape != patched.shape:
             raise ValueError("identity logits shape mismatch")
         err = float((baseline - patched).abs().max().item())
@@ -695,21 +725,30 @@ def verify_pair_site(
             raise ValueError("SAE has no active features on acceptance prompt")
         selected = int(torch.argmax(torch.abs(z)).item())
         edited = edit_features(sae, snap, replacements={selected: 0.0})
-        edited_logits = model.patch_logits(
-            tokens=snap.tokens, site=site, activation=edited.activation,
-        ).detach().float().cpu()
+        edited_logits = (
+            model.patch_logits(
+                tokens=snap.tokens,
+                site=site,
+                activation=edited.activation,
+            )
+            .detach()
+            .float()
+            .cpu()
+        )
         delta = float(torch.linalg.vector_norm(baseline - edited_logits).item())
         if not torch.isfinite(torch.tensor(delta)) or delta <= FEATURE_DELTA_MIN:
             raise ValueError("active SAE feature ablation did not measurably affect logits")
-        probes.append({
-            "prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(),
-            "token_ids": snap.tokens.detach().cpu().tolist()[0],
-            "l0": int(torch.count_nonzero(z).item()),
-            "reconstruction_mse": float(torch.mean((x - recon) ** 2).item()),
-            "identity_patch_max_abs_logit_error": err,
-            "ablated_feature_id": selected,
-            "feature_ablation_logit_l2": delta,
-        })
+        probes.append(
+            {
+                "prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(),
+                "token_ids": snap.tokens.detach().cpu().tolist()[0],
+                "l0": int(torch.count_nonzero(z).item()),
+                "reconstruction_mse": float(torch.mean((x - recon) ** 2).item()),
+                "identity_patch_max_abs_logit_error": err,
+                "ablated_feature_id": selected,
+                "feature_ablation_logit_l2": delta,
+            }
+        )
         if device.startswith("cuda") and torch.cuda.is_available():
             peak_alloc = max(peak_alloc, int(torch.cuda.max_memory_allocated()))
 
@@ -723,12 +762,11 @@ def verify_pair_site(
         model_dtype = "unknown"
     try:
         from saebase.sae.registry import _BASE_SPECS
+
         host_repo = _BASE_SPECS[evaluation_host].model_name
     except Exception:
         host_repo = profile.model_name
-    dataset_sha = hashlib.sha256(
-        "\n".join(prompts).encode("utf-8")
-    ).hexdigest()
+    dataset_sha = hashlib.sha256("\n".join(prompts).encode("utf-8")).hexdigest()
     payload = {
         "schema": SCHEMA_ACCEPTANCE,
         "status": "passed",
@@ -769,7 +807,10 @@ def verify_pair_site(
 
 def write_acceptance(output: Path, record: dict[str, Any]) -> Path:
     path = acceptance_path(
-        output, record["model_key"], record["sae_key"], int(record["layer"]),
+        output,
+        record["model_key"],
+        record["sae_key"],
+        int(record["layer"]),
     )
     if "artifact_sha256" not in record:
         record = dict(record)
@@ -808,7 +849,9 @@ def failure_record(
 
 
 def _pair_verified_from_evidence(
-    output: Path, rec: SiteRecord, site_status: dict[str, Any],
+    output: Path,
+    rec: SiteRecord,
+    site_status: dict[str, Any],
 ) -> bool:
     """Derive pair_verified only from acceptance artifacts or prior CPU proof."""
     if rec.prior_pair_verified:
@@ -845,30 +888,33 @@ def build_final_matrix(output: Path, records: list[SiteRecord]) -> dict[str, Any
         state = site_status.get("status", rec.status)
         pair_ok = _pair_verified_from_evidence(output, rec, site_status)
         counts[state] = counts.get(state, 0) + 1
-        rows.append({
-            "model_key": rec.model_key,
-            "sae_key": rec.sae_key,
-            "layer": rec.layer,
-            "hook_name": rec.hook_name,
-            "access": rec.access,
-            "execution_wave": rec.execution_wave,
-            "prior_pair_verified": rec.prior_pair_verified,
-            "status": state,
-            "pair_verified": pair_ok,
-            "benchmark_verified": bool(site_status.get("benchmark_verified")),
-            "reliability_verified": bool(site_status.get("reliability_verified")),
-            "protocol": site_status.get("protocol"),
-            "acceptance_path": relative_under(output, site_status.get("acceptance_path")),
-            "m3m4_summary": relative_under(output, site_status.get("m3m4_summary")),
-            "error_type": site_status.get("error_type"),
-            "error": site_status.get("error"),
-            "sae_state_sha256": site_status.get("sae_state_sha256"),
-            "model_state_sha256": site_status.get("model_state_sha256"),
-        })
+        rows.append(
+            {
+                "model_key": rec.model_key,
+                "sae_key": rec.sae_key,
+                "layer": rec.layer,
+                "hook_name": rec.hook_name,
+                "access": rec.access,
+                "execution_wave": rec.execution_wave,
+                "prior_pair_verified": rec.prior_pair_verified,
+                "status": state,
+                "pair_verified": pair_ok,
+                "benchmark_verified": bool(site_status.get("benchmark_verified")),
+                "reliability_verified": bool(site_status.get("reliability_verified")),
+                "protocol": site_status.get("protocol"),
+                "acceptance_path": relative_under(output, site_status.get("acceptance_path")),
+                "m3m4_summary": relative_under(output, site_status.get("m3m4_summary")),
+                "error_type": site_status.get("error_type"),
+                "error": site_status.get("error"),
+                "sae_state_sha256": site_status.get("sae_state_sha256"),
+                "model_state_sha256": site_status.get("model_state_sha256"),
+            }
+        )
     n_pair = sum(1 for r in rows if r["pair_verified"])
     n_pop = sum(1 for r in rows if r.get("protocol") == "population" and r["reliability_verified"])
     n_smoke = sum(
-        1 for r in rows
+        1
+        for r in rows
         if r.get("protocol") in {None, "smoke_only", PROTOCOL_SMOKE} and r["reliability_verified"]
     )
     complete = n_pair == 48 and n_pop == 48

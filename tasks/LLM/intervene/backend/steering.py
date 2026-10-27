@@ -4,6 +4,7 @@ Each generated step recomputes the entire prefix; no KV cache assumptions.
 This slow, unambiguous reference is an acceptance oracle for future high-speed
 vLLM/NNsight or cached-decoding implementations, not a performance claim.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -35,19 +36,32 @@ class GenerationSpec:
             raise ValueError("max_new_tokens must be a positive integer")
         if type(self.seed) is not int or self.seed < 0:
             raise ValueError("seed must be nonnegative")
-        if not isinstance(self.temperature, (float, int)) or not math.isfinite(self.temperature) or self.temperature < 0:
+        if (
+            not isinstance(self.temperature, (float, int))
+            or not math.isfinite(self.temperature)
+            or self.temperature < 0
+        ):
             raise ValueError("temperature must be nonnegative and finite")
         if self.top_k is not None and (type(self.top_k) is not int or self.top_k < 1):
             raise ValueError("top_k must be a positive integer")
-        if any(type(i) is not int or i < 0 for i in self.eos_token_ids) or len(set(self.eos_token_ids)) != len(self.eos_token_ids):
+        if any(type(i) is not int or i < 0 for i in self.eos_token_ids) or len(
+            set(self.eos_token_ids)
+        ) != len(self.eos_token_ids):
             raise ValueError("eos_token_ids must be distinct nonnegative token IDs")
-        if self.max_context_tokens is not None and (type(self.max_context_tokens) is not int or self.max_context_tokens < 1):
+        if self.max_context_tokens is not None and (
+            type(self.max_context_tokens) is not int or self.max_context_tokens < 1
+        ):
             raise ValueError("max_context_tokens must be positive")
 
     def to_dict(self) -> dict[str, Any]:
-        return {"max_new_tokens": self.max_new_tokens, "seed": self.seed,
-                "temperature": float(self.temperature), "top_k": self.top_k,
-                "eos_token_ids": list(self.eos_token_ids), "max_context_tokens": self.max_context_tokens}
+        return {
+            "max_new_tokens": self.max_new_tokens,
+            "seed": self.seed,
+            "temperature": float(self.temperature),
+            "top_k": self.top_k,
+            "eos_token_ids": list(self.eos_token_ids),
+            "max_context_tokens": self.max_context_tokens,
+        }
 
 
 def _distribution_shift(
@@ -93,9 +107,15 @@ def _sample(logits: torch.Tensor, spec: GenerationSpec, *, rng: torch.Generator)
 
 
 @torch.no_grad()
-def compare_steered_generation(model: ModelAdapter, sae: Any, *,
-                                site: ActivationSite, sample: MeasurementSample,
-                                condition: Condition, spec: GenerationSpec) -> dict[str, Any]:
+def compare_steered_generation(
+    model: ModelAdapter,
+    sae: Any,
+    *,
+    site: ActivationSite,
+    sample: MeasurementSample,
+    condition: Condition,
+    spec: GenerationSpec,
+) -> dict[str, Any]:
     """Generate independent baseline and steered continuations from the same prompt.
 
     Baseline and steered traces use identically seeded independent RNGs (common
@@ -106,13 +126,18 @@ def compare_steered_generation(model: ModelAdapter, sae: Any, *,
     model.capabilities.require("capture")
     model.capabilities.require("patch")
     original = sample.tokens
-    if spec.max_context_tokens is not None and len(original) + spec.max_new_tokens > spec.max_context_tokens:
+    if (
+        spec.max_context_tokens is not None
+        and len(original) + spec.max_new_tokens > spec.max_context_tokens
+    ):
         raise ValueError("requested generation exceeds the configured context limit")
     eos = set(spec.eos_token_ids)
     result: dict[str, Any] = {}
     for label, steered in (("baseline", False), ("steered", True)):
         seed_material = hashlib.sha256(f"{spec.seed}:{sample.record.key}".encode()).digest()
-        rng = torch.Generator(device="cpu").manual_seed(int.from_bytes(seed_material[:8], "little") % (2**63-1))
+        rng = torch.Generator(device="cpu").manual_seed(
+            int.from_bytes(seed_material[:8], "little") % (2**63 - 1)
+        )
         current = list(original)
         generated: list[int] = []
         steps: list[dict[str, Any]] = []
@@ -123,8 +148,12 @@ def compare_steered_generation(model: ModelAdapter, sae: Any, *,
                 current_site = ActivationSite(site.layer, site.hook_name, position)
                 snapshot = capture_features(model, sae, site=current_site, tokens=input_ids)
                 patch = apply_condition(sae, snapshot, condition)
-                logits = model.patch_logits(tokens=input_ids, site=current_site,
-                                           activation=patch.activation, readout_position=-1)
+                logits = model.patch_logits(
+                    tokens=input_ids,
+                    site=current_site,
+                    activation=patch.activation,
+                    readout_position=-1,
+                )
                 clean = model.forward_logits(tokens=input_ids, readout_position=-1)
                 feature_id = condition.feature_ids[0] if condition.feature_ids else None
                 activation = None
@@ -144,44 +173,85 @@ def compare_steered_generation(model: ModelAdapter, sae: Any, *,
             if tok in eos:
                 break
         result[label + "_generated_token_ids"] = generated
-        result[label + "_stop_reason"] = "eos" if generated and generated[-1] in eos else "max_new_tokens"
+        result[label + "_stop_reason"] = (
+            "eos" if generated and generated[-1] in eos else "max_new_tokens"
+        )
         if steered:
             result["steered_steps"] = steps
-    result["same_continuation"] = result["baseline_generated_token_ids"] == result["steered_generated_token_ids"]
+    result["same_continuation"] = (
+        result["baseline_generated_token_ids"] == result["steered_generated_token_ids"]
+    )
     result["shared_prefix_tokens"] = len(original)
-    result["first_different_generated_index"] = next((i for i, (a,b) in enumerate(zip(
-        result["baseline_generated_token_ids"], result["steered_generated_token_ids"])) if a != b), None)
+    result["first_different_generated_index"] = next(
+        (
+            i
+            for i, (a, b) in enumerate(
+                zip(result["baseline_generated_token_ids"], result["steered_generated_token_ids"])
+            )
+            if a != b
+        ),
+        None,
+    )
     return result
 
 
 @torch.no_grad()
-def run_steering(model: ModelAdapter, sae: Any, identity: ExperimentIdentity,
-                 samples: Sequence[MeasurementSample], condition: Condition,
-                 spec: GenerationSpec, writer: ResultWriter, *,
-                 budget: RunBudget | None = None) -> dict[str, Any]:
+def run_steering(
+    model: ModelAdapter,
+    sae: Any,
+    identity: ExperimentIdentity,
+    samples: Sequence[MeasurementSample],
+    condition: Condition,
+    spec: GenerationSpec,
+    writer: ResultWriter,
+    *,
+    budget: RunBudget | None = None,
+) -> dict[str, Any]:
     if writer.identity.key != identity.key:
         raise ValueError("result writer identity mismatch")
-    if model.backend != identity.backend or sha256_state_dict(model.model) != identity.model_state_sha256 or sha256_state_dict(sae) != identity.sae_state_sha256:
+    if (
+        model.backend != identity.backend
+        or sha256_state_dict(model.model) != identity.model_state_sha256
+        or sha256_state_dict(sae) != identity.sae_state_sha256
+    ):
         raise ValueError("model/SAE differs from recorded identity")
     limits = budget or RunBudget()
-    if len(samples) > limits.max_measurements or 2 * len(samples) * spec.max_new_tokens > limits.max_generated_tokens:
+    if (
+        len(samples) > limits.max_measurements
+        or 2 * len(samples) * spec.max_new_tokens > limits.max_generated_tokens
+    ):
         raise ValueError("generation exceeds declared token/sample budget")
     done, reused = 0, 0
     for sample in samples:
-        measurement_identity = {"schema": "saebase.m2.steering.v1", "experiment": identity.key,
-                                "sample": sample.to_dict(), "condition": condition.to_dict(),
-                                "generation": spec.to_dict()}
+        measurement_identity = {
+            "schema": "saebase.m2.steering.v1",
+            "experiment": identity.key,
+            "sample": sample.to_dict(),
+            "condition": condition.to_dict(),
+            "generation": spec.to_dict(),
+        }
         key = fingerprint(measurement_identity)
         if writer.has(key):
             reused += 1
             continue
-        value = compare_steered_generation(model, sae, site=identity.site,
-                                           sample=sample, condition=condition, spec=spec)
-        if writer.append({"schema": "saebase.m2.steering.v1",
-                          "measurement_identity": measurement_identity, "measurement_id": key,
-                          "sample_id": sample.record.sample_id, "condition_name": condition.name,
-                          "generation": spec.to_dict(), "result": value}):
+        value = compare_steered_generation(
+            model, sae, site=identity.site, sample=sample, condition=condition, spec=spec
+        )
+        if writer.append(
+            {
+                "schema": "saebase.m2.steering.v1",
+                "measurement_identity": measurement_identity,
+                "measurement_id": key,
+                "sample_id": sample.record.sample_id,
+                "condition_name": condition.name,
+                "generation": spec.to_dict(),
+                "result": value,
+            }
+        ):
             done += 1
         writer.flush()
-    return {"measured": done, "reused": reused,
-            "tokens_budgeted": 2 * len(samples) * spec.max_new_tokens}
+    return {
+        "measured": done,
+        "reused": reused,
+        "tokens_budgeted": 2 * len(samples) * spec.max_new_tokens,
+    }

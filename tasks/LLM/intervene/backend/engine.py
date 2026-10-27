@@ -5,6 +5,7 @@ uses the original single-prompt API explicitly (no misleading batch claims).
 Right padding is supported because all patches/readouts precede it in a causal
 model. Left padding or noncausal models require a different adapter.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -59,12 +60,19 @@ class RunBudget:
             raise ValueError("max_measurements must be positive")
         if type(self.max_generated_tokens) is not int or self.max_generated_tokens < 0:
             raise ValueError("max_generated_tokens must be nonnegative")
-        if self.max_seconds is not None and (not math.isfinite(self.max_seconds) or self.max_seconds <= 0):
+        if self.max_seconds is not None and (
+            not math.isfinite(self.max_seconds) or self.max_seconds <= 0
+        ):
             raise ValueError("max_seconds must be finite and positive")
 
 
-def dry_run(samples: Sequence[MeasurementSample], conditions: Sequence[Condition], *,
-            microbatch: int = 16, budget: RunBudget | None = None) -> dict[str, Any]:
+def dry_run(
+    samples: Sequence[MeasurementSample],
+    conditions: Sequence[Condition],
+    *,
+    microbatch: int = 16,
+    budget: RunBudget | None = None,
+) -> dict[str, Any]:
     if type(microbatch) is not int or microbatch < 1:
         raise ValueError("microbatch must be positive")
     if not samples or not conditions:
@@ -77,19 +85,25 @@ def dry_run(samples: Sequence[MeasurementSample], conditions: Sequence[Condition
     lim = budget or RunBudget()
     if count > lim.max_measurements:
         raise ValueError(f"{count} measurements exceed budget {lim.max_measurements}")
-    return {"samples": len(samples), "conditions": len(conditions), "measurements": count,
-            "max_token_length": max(s.valid_length for s in samples), "microbatch": microbatch,
-            "minimum_patch_forwards_tl": math.ceil(count / microbatch),
-            "estimated_runtime_seconds": None,
-            "note": "Model/GPU-dependent run time and VRAM require an actual pilot run."}
+    return {
+        "samples": len(samples),
+        "conditions": len(conditions),
+        "measurements": count,
+        "max_token_length": max(s.valid_length for s in samples),
+        "microbatch": microbatch,
+        "minimum_patch_forwards_tl": math.ceil(count / microbatch),
+        "estimated_runtime_seconds": None,
+        "note": "Model/GPU-dependent run time and VRAM require an actual pilot run.",
+    }
 
 
-def _padded_tokens(samples: Sequence[MeasurementSample], *, device: torch.device,
-                   pad_token_id: int) -> torch.Tensor:
+def _padded_tokens(
+    samples: Sequence[MeasurementSample], *, device: torch.device, pad_token_id: int
+) -> torch.Tensor:
     size = max(s.valid_length for s in samples)
     tokens = torch.full((len(samples), size), pad_token_id, device=device, dtype=torch.long)
     for i, s in enumerate(samples):
-        tokens[i, :s.valid_length] = torch.tensor(s.tokens, dtype=torch.long, device=device)
+        tokens[i, : s.valid_length] = torch.tensor(s.tokens, dtype=torch.long, device=device)
     return tokens
 
 
@@ -98,8 +112,9 @@ def _is_oom(exc: BaseException) -> bool:
     return isinstance(exc, torch.cuda.OutOfMemoryError) or "out of memory" in str(exc).lower()
 
 
-def _metrics(baseline: torch.Tensor, patched: torch.Tensor, sample: MeasurementSample,
-             delta_h: float) -> dict[str, Any]:
+def _metrics(
+    baseline: torch.Tensor, patched: torch.Tensor, sample: MeasurementSample, delta_h: float
+) -> dict[str, Any]:
     if baseline.shape != patched.shape or baseline.ndim != 1:
         raise ValueError("baseline/edited logits must have equal [vocab] shapes")
     b, p = baseline.float(), patched.float()
@@ -117,16 +132,31 @@ def _metrics(baseline: torch.Tensor, patched: torch.Tensor, sample: MeasurementS
     target = sample.target_token_id
     reference = sample.reference_token_id
     if target is not None:
-        if isinstance(target, bool) or not isinstance(target, int) or target >= b.numel() or target < 0:
+        if (
+            isinstance(target, bool)
+            or not isinstance(target, int)
+            or target >= b.numel()
+            or target < 0
+        ):
             raise IndexError("target token ID exceeds vocabulary")
         if reference is not None and (
-            isinstance(reference, bool) or not isinstance(reference, int)
-            or reference >= b.numel() or reference < 0
+            isinstance(reference, bool)
+            or not isinstance(reference, int)
+            or reference >= b.numel()
+            or reference < 0
         ):
             raise IndexError("reference token ID exceeds vocabulary")
         top_b = torch.argmax(b)
         top_p = torch.argmax(p)
-        pieces.extend([b[target], p[target], diff[target], (top_b == target).to(b.dtype), (top_p == target).to(b.dtype)])
+        pieces.extend(
+            [
+                b[target],
+                p[target],
+                diff[target],
+                (top_b == target).to(b.dtype),
+                (top_p == target).to(b.dtype),
+            ]
+        )
         if reference is not None:
             pieces.extend([b[target] - b[reference], p[target] - p[reference]])
     values = torch.stack(pieces).detach().cpu().tolist()
@@ -150,7 +180,9 @@ def _metrics(baseline: torch.Tensor, patched: torch.Tensor, sample: MeasurementS
     return out
 
 
-def _boundary_digests_for(model: Any, sae: Any, lease: VerifiedCheckpointSession | None) -> tuple[str, str]:
+def _boundary_digests_for(
+    model: Any, sae: Any, lease: VerifiedCheckpointSession | None
+) -> tuple[str, str]:
     if lease is None:
         return sha256_state_dict(model), sha256_state_dict(sae)
     return lease.leased_sha256(model), lease.leased_sha256(sae)
@@ -163,14 +195,21 @@ class BatchEngine:
     encoding. Their provenance must match the live model/SAE states. Model
     forwards for downstream logits are *still necessary* after patching.
     """
-    def __init__(self, model: ModelAdapter, sae: Any, identity: ExperimentIdentity, *,
-                 activation_reader: ShardedReader | None = None,
-                 code_reader: ShardedReader | None = None,
-                 pad_token_id: int | None = None,
-                 enable_hf_masked_batch: bool = False,
-                 enable_suffix_replay: bool = False,
-                 identity_lease: VerifiedCheckpointSession | None = None,
-                 release_content_check: bool | None = None) -> None:
+
+    def __init__(
+        self,
+        model: ModelAdapter,
+        sae: Any,
+        identity: ExperimentIdentity,
+        *,
+        activation_reader: ShardedReader | None = None,
+        code_reader: ShardedReader | None = None,
+        pad_token_id: int | None = None,
+        enable_hf_masked_batch: bool = False,
+        enable_suffix_replay: bool = False,
+        identity_lease: VerifiedCheckpointSession | None = None,
+        release_content_check: bool | None = None,
+    ) -> None:
         self.model, self.sae, self.identity = model, sae, identity
         self.activation_reader, self.code_reader = activation_reader, code_reader
         self.pad_token_id = pad_token_id
@@ -220,11 +259,17 @@ class BatchEngine:
             if activation_reader.kind != "activations" or activation_reader.width != self.d_in:
                 raise ValueError("activation reader kind/width mismatch")
             provenance = m["identity"]
-            for k, v in (("model_state_sha256", identity.model_state_sha256),
-                         ("hook_name", identity.site.hook_name), ("layer", identity.site.layer)):
+            for k, v in (
+                ("model_state_sha256", identity.model_state_sha256),
+                ("hook_name", identity.site.hook_name),
+                ("layer", identity.site.layer),
+            ):
                 if provenance.get(k) != v:
                     raise ValueError(f"activation provenance mismatch: {k}")
-            if identity.tokenizer_sha256 and provenance.get("tokenizer_sha256") != identity.tokenizer_sha256:
+            if (
+                identity.tokenizer_sha256
+                and provenance.get("tokenizer_sha256") != identity.tokenizer_sha256
+            ):
                 raise ValueError("tokenizer provenance mismatch")
         if code_reader is not None:
             if activation_reader is None:
@@ -257,38 +302,52 @@ class BatchEngine:
             expected = replace(record, source_activation_sha256=source_hash)
             if c.record.key != expected.key or c.positions != a.positions:
                 raise ValueError("cached SAE code record or source activation differs")
-            z = torch.tensor(c.values[0].copy(), dtype=torch.float32,
-                             device=_sae_input(self.sae, h).device)
+            z = torch.tensor(
+                c.values[0].copy(), dtype=torch.float32, device=_sae_input(self.sae, h).device
+            )
         return h, z
 
     def _hf_batch_enabled(self) -> bool:
-        return bool(self.enable_hf_masked_batch and self.model.backend == "hf_hooks"
-                    and callable(getattr(self.model.model, "run_batch", None)))
+        return bool(
+            self.enable_hf_masked_batch
+            and self.model.backend == "hf_hooks"
+            and callable(getattr(self.model.model, "run_batch", None))
+        )
 
     def _suffix_replay_enabled(self) -> bool:
         probe = getattr(self.model.model, "supports_suffix_replay", None)
-        return bool(self.enable_suffix_replay and self.model.backend == "hf_hooks"
-                    and callable(probe) and probe())
+        return bool(
+            self.enable_suffix_replay
+            and self.model.backend == "hf_hooks"
+            and callable(probe)
+            and probe()
+        )
 
-    def _hf_batch(self, samples: Sequence[MeasurementSample],
-                  patches: torch.Tensor | None = None
-                  ) -> tuple[torch.Tensor, torch.Tensor]:
+    def _hf_batch(
+        self, samples: Sequence[MeasurementSample], patches: torch.Tensor | None = None
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         """Execute a masked batch only when the caller explicitly opts in."""
         if self.pad_token_id is None and len({s.valid_length for s in samples}) > 1:
             raise ValueError("mixed token lengths require explicit pad_token_id")
         device = self.model.tokens(
-            tokens=torch.tensor([samples[0].tokens], dtype=torch.long)).device
+            tokens=torch.tensor([samples[0].tokens], dtype=torch.long)
+        ).device
         ids = _padded_tokens(
-            samples, device=device,
-            pad_token_id=self.pad_token_id if self.pad_token_id is not None else 0)
+            samples,
+            device=device,
+            pad_token_id=self.pad_token_id if self.pad_token_id is not None else 0,
+        )
         mask = torch.zeros_like(ids)
         for i, sample in enumerate(samples):
-            mask[i, :sample.valid_length] = 1
+            mask[i, : sample.valid_length] = 1
         return self.model.model.run_batch(
-            ids, layer=self.identity.site.layer,
+            ids,
+            layer=self.identity.site.layer,
             positions=[s.patch_position for s in samples],
             readout_positions=[s.readout_index for s in samples],
-            attention_mask=mask, patches=patches)
+            attention_mask=mask,
+            patches=patches,
+        )
 
     @torch.no_grad()
     def _suffix_baselines(
@@ -308,9 +367,7 @@ class BatchEngine:
             self.counters["suffix_prefix_forwards"] += 1
             self.counters["model_forwards"] += 1
             self.counters["combined_capture_forwards"] += 1
-            site = ActivationSite(
-                layer, self.identity.site.hook_name, sample.patch_position
-            )
+            site = ActivationSite(layer, self.identity.site.hook_name, sample.patch_position)
             activation = hidden[0, sample.patch_position]
             snapshot = snapshot_from_activation(
                 self.sae, tokens=ids, site=site, activation=activation
@@ -321,7 +378,9 @@ class BatchEngine:
         return snapshots, baselines
 
     @torch.no_grad()
-    def _baselines(self, samples: Sequence[MeasurementSample]) -> tuple[list[FeatureSnapshot], list[torch.Tensor]]:
+    def _baselines(
+        self, samples: Sequence[MeasurementSample]
+    ) -> tuple[list[FeatureSnapshot], list[torch.Tensor]]:
         if self._suffix_replay_enabled():
             return self._suffix_baselines(samples)
         # Padding token never read; right-pad positions must be strictly later
@@ -330,11 +389,16 @@ class BatchEngine:
             if self.pad_token_id is None and len({s.valid_length for s in samples}) > 1:
                 raise ValueError("mixed token lengths require explicit pad_token_id")
             ids = self.model.tokens(tokens=torch.tensor([samples[0].tokens], dtype=torch.long))
-            padded = _padded_tokens(samples, device=ids.device,
-                                    pad_token_id=self.pad_token_id if self.pad_token_id is not None else 0)
+            padded = _padded_tokens(
+                samples,
+                device=ids.device,
+                pad_token_id=self.pad_token_id if self.pad_token_id is not None else 0,
+            )
             needs_capture = any(self.activation_reader is None for _ in samples)
             if needs_capture:
-                out, cache = self.model.model.run_with_cache(padded, names_filter=self.identity.site.hook_name)
+                out, cache = self.model.model.run_with_cache(
+                    padded, names_filter=self.identity.site.hook_name
+                )
                 h_all = cache[self.identity.site.hook_name]
                 if h_all.ndim != 3 or tuple(h_all.shape[:2]) != tuple(padded.shape):
                     raise RuntimeError("batched activation hook mismatch")
@@ -342,7 +406,11 @@ class BatchEngine:
                 out = self.model.model(padded)
                 h_all = None
             logits = getattr(out, "logits", out)
-            if not isinstance(logits, torch.Tensor) or logits.ndim != 3 or logits.shape[:2] != padded.shape:
+            if (
+                not isinstance(logits, torch.Tensor)
+                or logits.ndim != 3
+                or logits.shape[:2] != padded.shape
+            ):
                 raise RuntimeError("model batch logits shape mismatch")
             ret = []
             bs = []
@@ -360,19 +428,33 @@ class BatchEngine:
                     ln_mu, ln_std = _layer_norm_stats(h_in)
                     ln_mu, ln_std = ln_mu.detach().clone(), ln_std.detach().clone()
                 reconstruction = _decode(
-                    self.sae, z, self.d_in, ln_mu=ln_mu, ln_std=ln_std, activation=h,
+                    self.sae,
+                    z,
+                    self.d_in,
+                    ln_mu=ln_mu,
+                    ln_std=ln_std,
+                    activation=h,
                 ).to(device=h.device, dtype=h.dtype)
-                ret.append(FeatureSnapshot(
-                    tokens=torch.tensor([sample.tokens], device=padded.device, dtype=torch.long),
-                    site=ActivationSite(self.identity.site.layer, self.identity.site.hook_name, sample.patch_position),
-                    activation=h.detach().clone(), codes=z.detach().clone(),
-                    reconstruction=reconstruction.detach().clone(),
-                    ln_mu=ln_mu, ln_std=ln_std,
-                ))
+                ret.append(
+                    FeatureSnapshot(
+                        tokens=torch.tensor(
+                            [sample.tokens], device=padded.device, dtype=torch.long
+                        ),
+                        site=ActivationSite(
+                            self.identity.site.layer,
+                            self.identity.site.hook_name,
+                            sample.patch_position,
+                        ),
+                        activation=h.detach().clone(),
+                        codes=z.detach().clone(),
+                        reconstruction=reconstruction.detach().clone(),
+                        ln_mu=ln_mu,
+                        ln_std=ln_std,
+                    )
+                )
                 bs.append(baseline)
             return ret, bs
-        if (self.model.backend == "hf_hooks"
-                and self._hf_batch_enabled()):
+        if self.model.backend == "hf_hooks" and self._hf_batch_enabled():
             activations, logits = self._hf_batch(samples)
             snapshots: list[FeatureSnapshot] = []
             baselines: list[torch.Tensor] = []
@@ -388,32 +470,50 @@ class BatchEngine:
                     ln_mu, ln_std = _layer_norm_stats(_sae_input(self.sae, h).unsqueeze(0))
                     ln_mu, ln_std = ln_mu.detach().clone(), ln_std.detach().clone()
                 reconstruction = _decode(
-                    self.sae, z, self.d_in, ln_mu=ln_mu, ln_std=ln_std, activation=h,
+                    self.sae,
+                    z,
+                    self.d_in,
+                    ln_mu=ln_mu,
+                    ln_std=ln_std,
+                    activation=h,
                 ).to(device=h.device, dtype=h.dtype)
-                snapshots.append(FeatureSnapshot(
-                    tokens=torch.tensor([sample.tokens], device=h.device, dtype=torch.long),
-                    site=ActivationSite(self.identity.site.layer, self.identity.site.hook_name,
-                                        sample.patch_position),
-                    activation=h.detach().clone(), codes=z.detach().clone(),
-                    reconstruction=reconstruction.detach().clone(), ln_mu=ln_mu, ln_std=ln_std,
-                ))
+                snapshots.append(
+                    FeatureSnapshot(
+                        tokens=torch.tensor([sample.tokens], device=h.device, dtype=torch.long),
+                        site=ActivationSite(
+                            self.identity.site.layer,
+                            self.identity.site.hook_name,
+                            sample.patch_position,
+                        ),
+                        activation=h.detach().clone(),
+                        codes=z.detach().clone(),
+                        reconstruction=reconstruction.detach().clone(),
+                        ln_mu=ln_mu,
+                        ln_std=ln_std,
+                    )
+                )
                 baselines.append(logits[i])
             return snapshots, baselines
         # One unpadded forward can return the site activation and the baseline
         # logits. Models without that primitive keep capture plus forward_logits.
         from saebase.api.features import capture_features, snapshot_from_activation
+
         ret, bs = [], []
         combined = callable(getattr(self.model, "capture_with_logits", None))
         for s in samples:
             ids = self.model.tokens(tokens=torch.tensor([s.tokens], dtype=torch.long))
-            site = ActivationSite(self.identity.site.layer, self.identity.site.hook_name, s.patch_position)
+            site = ActivationSite(
+                self.identity.site.layer, self.identity.site.hook_name, s.patch_position
+            )
             cached = self._read_cache(s) if self.activation_reader is not None else None
             baseline = None
             if cached is None and combined:
                 activation, baseline = self.model.capture_with_logits(
                     tokens=ids, site=site, readout_position=s.readout_index
                 )
-                snapshot = snapshot_from_activation(self.sae, tokens=ids, site=site, activation=activation)
+                snapshot = snapshot_from_activation(
+                    self.sae, tokens=ids, site=site, activation=activation
+                )
                 self.counters["combined_capture_forwards"] += 1
                 self.counters["model_forwards"] += 1
                 self.counters["sae_encodes"] += 1
@@ -430,10 +530,21 @@ class BatchEngine:
                     ln_mu, ln_std = _layer_norm_stats(h_in)
                     ln_mu, ln_std = ln_mu.detach().clone(), ln_std.detach().clone()
                 reconstructed = _decode(
-                    self.sae, z, self.d_in, ln_mu=ln_mu, ln_std=ln_std, activation=h,
+                    self.sae,
+                    z,
+                    self.d_in,
+                    ln_mu=ln_mu,
+                    ln_std=ln_std,
+                    activation=h,
                 ).to(device=h.device, dtype=h.dtype)
                 snapshot = FeatureSnapshot(
-                    ids, site, h, z, reconstructed, ln_mu=ln_mu, ln_std=ln_std,
+                    ids,
+                    site,
+                    h,
+                    z,
+                    reconstructed,
+                    ln_mu=ln_mu,
+                    ln_std=ln_std,
                 )
             if baseline is None:
                 baseline = self.model.forward_logits(tokens=ids, readout_position=s.readout_index)
@@ -470,7 +581,9 @@ class BatchEngine:
             for index in grouped[key]:
                 sample, activation = jobs[index]
                 if activation.ndim != 1 or activation.shape[0] != hidden.shape[-1]:
-                    raise ValueError("suffix replay activation width does not match the cached site")
+                    raise ValueError(
+                        "suffix replay activation width does not match the cached site"
+                    )
                 patched = hidden.clone()
                 patched[0, sample.patch_position] = activation.to(
                     device=patched.device, dtype=patched.dtype
@@ -488,42 +601,62 @@ class BatchEngine:
         return produced  # type: ignore[return-value]
 
     @torch.no_grad()
-    def _patched_logits(self, jobs: Sequence[tuple[MeasurementSample, torch.Tensor]]) -> list[torch.Tensor]:
+    def _patched_logits(
+        self, jobs: Sequence[tuple[MeasurementSample, torch.Tensor]]
+    ) -> list[torch.Tensor]:
         if self._suffix_replay_enabled():
             return self._suffix_patched_logits(jobs)
-        if (self.model.backend == "hf_hooks"
-                and self._hf_batch_enabled()):
+        if self.model.backend == "hf_hooks" and self._hf_batch_enabled():
             samples = [sample for sample, _ in jobs]
             patches = torch.stack([h for _, h in jobs])
             _, logits = self._hf_batch(samples, patches=patches)
             return [logits[i] for i in range(len(jobs))]
         if self.model.backend != "transformer_lens":
-            logits = [self.model.patch_logits(tokens=self.model.tokens(tokens=torch.tensor([s.tokens])),
-                        site=ActivationSite(self.identity.site.layer, self.identity.site.hook_name, s.patch_position),
-                        activation=h, readout_position=s.readout_index) for s,h in jobs]
+            logits = [
+                self.model.patch_logits(
+                    tokens=self.model.tokens(tokens=torch.tensor([s.tokens])),
+                    site=ActivationSite(
+                        self.identity.site.layer, self.identity.site.hook_name, s.patch_position
+                    ),
+                    activation=h,
+                    readout_position=s.readout_index,
+                )
+                for s, h in jobs
+            ]
             self.counters["patch_forwards"] += len(logits)
             self.counters["model_forwards"] += len(logits)
             return logits
-        samples = [s for s,_ in jobs]
+        samples = [s for s, _ in jobs]
         device = self.model.tokens(tokens=torch.tensor([samples[0].tokens])).device
         padded = _padded_tokens(samples, device=device, pad_token_id=self.pad_token_id or 0)
         positions = [s.patch_position for s in samples]
-        replacements = torch.stack([h.to(device=device) for _,h in jobs])
+        replacements = torch.stack([h.to(device=device) for _, h in jobs])
+
         def replace(h: torch.Tensor, hook: Any = None) -> torch.Tensor:
             if h.ndim != 3 or tuple(h.shape[:2]) != tuple(padded.shape) or h.shape[-1] != self.d_in:
                 raise RuntimeError("batched patch hook shape or SAE width differs")
             changed = h.clone()
             rows = torch.arange(len(jobs), device=h.device)
-            changed[rows, torch.tensor(positions, device=h.device)] = replacements.to(device=h.device, dtype=h.dtype)
+            changed[rows, torch.tensor(positions, device=h.device)] = replacements.to(
+                device=h.device, dtype=h.dtype
+            )
             return changed
-        out = self.model.model.run_with_hooks(padded, fwd_hooks=[(self.identity.site.hook_name, replace)])
-        logits = getattr(out, "logits", out)
-        if not isinstance(logits, torch.Tensor) or logits.ndim != 3 or logits.shape[:2] != padded.shape:
-            raise RuntimeError("batched patch logits shape mismatch")
-        return [logits[i, s.readout_index].detach().clone() for i,s in enumerate(samples)]
 
-    def _baselines_split(self, active: Sequence[MeasurementSample]
-                         ) -> tuple[tuple[list[FeatureSnapshot], list[torch.Tensor]], int]:
+        out = self.model.model.run_with_hooks(
+            padded, fwd_hooks=[(self.identity.site.hook_name, replace)]
+        )
+        logits = getattr(out, "logits", out)
+        if (
+            not isinstance(logits, torch.Tensor)
+            or logits.ndim != 3
+            or logits.shape[:2] != padded.shape
+        ):
+            raise RuntimeError("batched patch logits shape mismatch")
+        return [logits[i, s.readout_index].detach().clone() for i, s in enumerate(samples)]
+
+    def _baselines_split(
+        self, active: Sequence[MeasurementSample]
+    ) -> tuple[tuple[list[FeatureSnapshot], list[torch.Tensor]], int]:
         """Split a baseline/capture batch after OOM. One-example failure still raises."""
         try:
             return self._baselines(active), 0
@@ -538,10 +671,18 @@ class BatchEngine:
             return (left[0] + right[0], left[1] + right[1]), left_retries + right_retries + 1
 
     @torch.no_grad()
-    def run(self, samples: Sequence[MeasurementSample], conditions: Sequence[Condition],
-            writer: ResultWriter, *, sample_batch: int = 8, microbatch: int = 16,
-            budget: RunBudget | None = None, verify_identity: bool = True,
-            tolerance: float = 1e-4) -> ExecutionStats:
+    def run(
+        self,
+        samples: Sequence[MeasurementSample],
+        conditions: Sequence[Condition],
+        writer: ResultWriter,
+        *,
+        sample_batch: int = 8,
+        microbatch: int = 16,
+        budget: RunBudget | None = None,
+        verify_identity: bool = True,
+        tolerance: float = 1e-4,
+    ) -> ExecutionStats:
         dry_run(samples, conditions, microbatch=microbatch, budget=budget)
         if self.release_content_check:
             if self.identity_lease is not None:
@@ -549,8 +690,10 @@ class BatchEngine:
             else:
                 model_sha = sha256_state_dict(self.model.model)
                 sae_sha = sha256_state_dict(self.sae)
-                if (model_sha != self.identity.model_state_sha256
-                        or sae_sha != self.identity.sae_state_sha256):
+                if (
+                    model_sha != self.identity.model_state_sha256
+                    or sae_sha != self.identity.sae_state_sha256
+                ):
                     raise RuntimeError("content checksum differs from the experiment identity")
         if writer.identity.key != self.identity.key:
             raise ValueError("result store experiment identity mismatch")
@@ -563,7 +706,7 @@ class BatchEngine:
         safe_microbatch = microbatch
         for offset in range(0, len(samples), sample_batch):
             group = []
-            for sample in samples[offset:offset+sample_batch]:
+            for sample in samples[offset : offset + sample_batch]:
                 needed = []
                 for condition in conditions:
                     mid = measurement_id(self.identity, sample, condition)
@@ -575,7 +718,11 @@ class BatchEngine:
                     group.append((sample, needed))
             if not group:
                 continue
-            if budget is not None and budget.max_seconds is not None and perf_counter() - started > budget.max_seconds:
+            if (
+                budget is not None
+                and budget.max_seconds is not None
+                and perf_counter() - started > budget.max_seconds
+            ):
                 raise TimeoutError("batch measurement elapsed time exceeds run budget")
             # These baseline examples include diverse lengths. The TL backend
             # runs one batch forward and one batch capture where needed.
@@ -584,18 +731,26 @@ class BatchEngine:
             retries += baseline_retries
             if baseline_retries:
                 safe_microbatch = min(safe_microbatch, max(1, len(active) // 2))
-            baselines += 1 if self.model.backend == "transformer_lens" or self._hf_batch_enabled() else len(active)
+            baselines += (
+                1
+                if self.model.backend == "transformer_lens" or self._hf_batch_enabled()
+                else len(active)
+            )
             if verify_identity:
                 # Replay at the baseline forward's width. A narrower microbatch
                 # changes the GEMM reduction and is not an identity-patch error.
-                pending: list[tuple[list[tuple[MeasurementSample, FeatureSnapshot]], list[torch.Tensor]]] = [
-                    (list(zip(active, snapshots)), list(ref_logits))
-                ]
+                pending: list[
+                    tuple[list[tuple[MeasurementSample, FeatureSnapshot]], list[torch.Tensor]]
+                ] = [(list(zip(active, snapshots)), list(ref_logits))]
                 while pending:
                     subset, expected_logits = pending.pop()
                     try:
                         replay = self._patched_logits([(s, snap.activation) for s, snap in subset])
-                        patches += 1 if self.model.backend == "transformer_lens" or self._hf_batch_enabled() else len(subset)
+                        patches += (
+                            1
+                            if self.model.backend == "transformer_lens" or self._hf_batch_enabled()
+                            else len(subset)
+                        )
                     except (torch.cuda.OutOfMemoryError, RuntimeError) as exc:
                         if not _is_oom(exc):
                             raise
@@ -613,25 +768,38 @@ class BatchEngine:
                             pending.append((list(zip(half_samples, half_snaps)), list(half_logits)))
                         continue
                     for expected, actual in zip(expected_logits, replay):
-                        if not torch.allclose(expected.float(), actual.float(), rtol=1e-5, atol=tolerance):
+                        if not torch.allclose(
+                            expected.float(), actual.float(), rtol=1e-5, atol=tolerance
+                        ):
                             error = float((expected.float() - actual.float()).abs().max().item())
                             raise RuntimeError(f"identity patch mismatch; max logits error {error}")
-            all_jobs: list[tuple[MeasurementSample, Condition, str, FeatureSnapshot, torch.Tensor, torch.Tensor]] = []
+            all_jobs: list[
+                tuple[
+                    MeasurementSample, Condition, str, FeatureSnapshot, torch.Tensor, torch.Tensor
+                ]
+            ] = []
             for (sample, jobs), snapshot, baseline in zip(group, snapshots, ref_logits):
                 for condition, mid in jobs:
                     patch = apply_condition(self.sae, snapshot, condition)
                     delta = patch.activation.to(snapshot.activation.device) - snapshot.activation
                     all_jobs.append((sample, condition, mid, snapshot, baseline, patch.activation))
-                    if condition.operation == "identity" and float(torch.linalg.vector_norm(delta).item()) > tolerance:
+                    if (
+                        condition.operation == "identity"
+                        and float(torch.linalg.vector_norm(delta).item()) > tolerance
+                    ):
                         raise RuntimeError("identity SAE edit does not preserve activation")
             i = 0
             while i < len(all_jobs):
                 width = min(safe_microbatch, len(all_jobs) - i)
                 while True:
-                    chunk = all_jobs[i:i+width]
+                    chunk = all_jobs[i : i + width]
                     try:
                         updated = self._patched_logits([(job[0], job[5]) for job in chunk])
-                        patches += 1 if self.model.backend == "transformer_lens" or self._hf_batch_enabled() else len(chunk)
+                        patches += (
+                            1
+                            if self.model.backend == "transformer_lens" or self._hf_batch_enabled()
+                            else len(chunk)
+                        )
                         break
                     except (torch.cuda.OutOfMemoryError, RuntimeError) as exc:
                         if not _is_oom(exc):
@@ -648,22 +816,41 @@ class BatchEngine:
                     sample, condition, mid, snapshot, baseline, activation = job
                     delta = activation.to(snapshot.activation.device) - snapshot.activation
                     same_width = len(chunk) == len(active)
-                    if (condition.operation == "identity" and same_width
-                            and not torch.allclose(baseline.float(), edited.float(), rtol=1e-5, atol=tolerance)):
+                    if (
+                        condition.operation == "identity"
+                        and same_width
+                        and not torch.allclose(
+                            baseline.float(), edited.float(), rtol=1e-5, atol=tolerance
+                        )
+                    ):
                         raise RuntimeError("identity patch changes model logits")
                     result = {
                         "schema": "saebase.m2.measurement.v1",
-                        "measurement_identity": {"schema":"saebase.m2.measurement.v1", "experiment":self.identity.key,
-                                                 "sample":sample.to_dict(), "condition":condition.to_dict()},
-                        "measurement_id": mid, "sample_id": sample.record.sample_id,
-                        "condition_name": condition.name, "operator": condition.operation,
-                        "patch_position": sample.patch_position, "readout_position": sample.readout_index,
+                        "measurement_identity": {
+                            "schema": "saebase.m2.measurement.v1",
+                            "experiment": self.identity.key,
+                            "sample": sample.to_dict(),
+                            "condition": condition.to_dict(),
+                        },
+                        "measurement_id": mid,
+                        "sample_id": sample.record.sample_id,
+                        "condition_name": condition.name,
+                        "operator": condition.operation,
+                        "patch_position": sample.patch_position,
+                        "readout_position": sample.readout_index,
                         "model_backend": self.model.backend,
-                        "metrics": _metrics(baseline, edited, sample, float(torch.linalg.vector_norm(delta.float()).item())),
+                        "metrics": _metrics(
+                            baseline,
+                            edited,
+                            sample,
+                            float(torch.linalg.vector_norm(delta.float()).item()),
+                        ),
                     }
                     if writer.append(result):
                         done += 1
                 i += len(chunk)
             writer.flush()  # committed at least once per sample batch for resume.
         elapsed = perf_counter() - started
-        return ExecutionStats(done, reused, baselines, patches, retries, peak, elapsed, self.model.backend)
+        return ExecutionStats(
+            done, reused, baselines, patches, retries, peak, elapsed, self.model.backend
+        )

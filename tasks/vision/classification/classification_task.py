@@ -14,4 +14,5 @@ class ClassificationTask(TaskModule):
 
     def run(self, cfg: DictConfig) -> None:
         from tasks.vision.classification.run import run_classification_training
+
         run_classification_training(cfg)

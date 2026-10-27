@@ -13,9 +13,7 @@ from pytorch_lightning.utilities.rank_zero import rank_zero_info
 from typing_extensions import override
 
 
-def val_still_strictly_decreasing(
-    vals: List[float], min_delta: float, window: int = 3
-) -> bool:
+def val_still_strictly_decreasing(vals: List[float], min_delta: float, window: int = 3) -> bool:
     """True if the last ``window`` validation losses strictly decrease epoch-to-epoch."""
     if len(vals) < window:
         return False
@@ -97,9 +95,7 @@ class CompactTQDMProgressBar(TQDMProgressBar):
     BAR_FORMAT = "{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}] {postfix}"
 
     @override
-    def get_metrics(
-        self, trainer: pl.Trainer, pl_module: pl.LightningModule
-    ) -> dict[str, Any]:
+    def get_metrics(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> dict[str, Any]:
         items = dict(trainer.progress_bar_metrics)
         out: dict[str, Any] = {}
         # Train: epoch running mean (train/*_bar); val: epoch aggregates (official Lightning defaults).

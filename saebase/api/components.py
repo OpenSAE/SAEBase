@@ -3,6 +3,7 @@
 Keeps block-residual differences distinct from native projected components;
 both original numerical implementations and contracts are retained.
 """
+
 from __future__ import annotations
 from dataclasses import dataclass
 import torch
@@ -64,7 +65,6 @@ def capture_block_components(
     )
     result.check()
     return result
-
 
 
 @dataclass(frozen=True)

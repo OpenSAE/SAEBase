@@ -10,7 +10,9 @@ from typing import Any
 
 def write_run_summary(payload: dict[str, Any], path: Path | None = None) -> Path:
     out = path or Path.cwd() / "sae_activation_summary.json"
-    out.write_text(json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
+    out.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8"
+    )
     return out
 
 
@@ -36,9 +38,7 @@ def summarize_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "reconstruction_mse_median": _median(mses),
         "fve_median": _median(fves) if fves else None,
         "fve_mean": (sum(fves) / len(fves)) if fves else None,
-        "failures": [
-            {"prompt_idx": r.get("prompt_idx"), "error": r.get("error")} for r in fails
-        ],
+        "failures": [{"prompt_idx": r.get("prompt_idx"), "error": r.get("error")} for r in fails],
     }
 
 

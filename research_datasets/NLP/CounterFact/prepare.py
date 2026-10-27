@@ -24,13 +24,9 @@ def prepare_for_model(
 ) -> Path:
     assert_available("CounterFact", model_key)
     raw = load_raw_counterfact()
-    kept, policy = filter_with_model(
-        raw, model, min_kept=min_kept, max_items=max_items
-    )
+    kept, policy = filter_with_model(raw, model, min_kept=min_kept, max_items=max_items)
     if len(kept) < min_kept:
-        raise RuntimeError(
-            f"CounterFact/{model_key}: kept {len(kept)} < min_kept={min_kept}"
-        )
+        raise RuntimeError(f"CounterFact/{model_key}: kept {len(kept)} < min_kept={min_kept}")
     manifest = make_manifest(
         behavior="CounterFact",
         model_key=model_key,

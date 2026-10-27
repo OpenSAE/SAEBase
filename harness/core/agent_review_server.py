@@ -4,11 +4,11 @@ Local-only HTTP endpoint. Review controls are part of knowledge.html/code.html,
 not a standalone review application. A browser key in the fragment is never
 returned by GET /api/review/state or stored in public static assets.
 """
+
 from __future__ import annotations
 
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
-from pathlib import Path
 import secrets
 import threading
 from urllib.parse import quote, urlsplit
@@ -19,7 +19,7 @@ from harness.core import agent_proposal_review as proposal
 ROOT = engine.ROOT / "harness/visualization"
 MAX_BODY = 8192
 STATIC = {
-    "/" : None,
+    "/": None,
     "/index.html": ("index.html", "text/html; charset=utf-8"),
     "/core.html": ("core.html", "text/html; charset=utf-8"),
     "/knowledge.html": ("knowledge.html", "text/html; charset=utf-8"),
@@ -42,17 +42,18 @@ def create_server(plan_id: str, port: int = 0) -> ThreadingHTTPServer:
             host, bound = self.server.server_address
             return self.headers.get("Host") == f"{host}:{bound}"
 
-        def send(self, status, data=b"", mime="application/json; charset=utf-8",
-                 *, location=None):
+        def send(self, status, data=b"", mime="application/json; charset=utf-8", *, location=None):
             self.send_response(status)
             self.send_header("Content-Type", mime)
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header("X-Frame-Options", "DENY")
             self.send_header("Referrer-Policy", "no-referrer")
-            self.send_header("Content-Security-Policy",
-                             "default-src 'self'; script-src 'self'; style-src 'self'; "
-                             "connect-src 'self'; img-src 'self'; frame-ancestors 'none'")
+            self.send_header(
+                "Content-Security-Policy",
+                "default-src 'self'; script-src 'self'; style-src 'self'; "
+                "connect-src 'self'; img-src 'self'; frame-ancestors 'none'",
+            )
             if location:
                 self.send_header("Location", location)
             self.send_header("Content-Length", str(len(data)))
@@ -87,9 +88,11 @@ def create_server(plan_id: str, port: int = 0) -> ThreadingHTTPServer:
             if urlsplit(self.path).path != "/api/review/decision":
                 return self.send(404, b'{"error":"Not found"}')
             expected_origin = "http://" + self.headers.get("Host", "")
-            if (self.headers.get("Origin") != expected_origin or
-                self.headers.get("X-Atlas-Review-Key") != secret or
-                self.headers.get("Content-Type", "").split(";")[0] != "application/json"):
+            if (
+                self.headers.get("Origin") != expected_origin
+                or self.headers.get("X-Atlas-Review-Key") != secret
+                or self.headers.get("Content-Type", "").split(";")[0] != "application/json"
+            ):
                 return self.send(403, b'{"error":"Human review origin or key rejected"}')
             try:
                 size = int(self.headers.get("Content-Length", "0"))
@@ -100,10 +103,14 @@ def create_server(plan_id: str, port: int = 0) -> ThreadingHTTPServer:
                     raise engine.FlowError("Expected a review object")
                 with lock:
                     plan = engine.load(plan_id)
-                    if type(data.get("revision")) is not int or data["revision"] != plan["revision"]:
+                    if (
+                        type(data.get("revision")) is not int
+                        or data["revision"] != plan["revision"]
+                    ):
                         raise engine.FlowError("Stale review; reload Atlas before continuing")
-                    body = proposal.decide(plan, data.get("key"), data.get("decision"),
-                                           actor="Human via local Atlas")
+                    body = proposal.decide(
+                        plan, data.get("key"), data.get("decision"), actor="Human via local Atlas"
+                    )
                 return self.send(200, json.dumps(body, ensure_ascii=False).encode())
             except (ValueError, KeyError, OSError, TypeError) as exc:
                 return self.send(409, json.dumps({"error": str(exc)}).encode())

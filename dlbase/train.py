@@ -39,7 +39,10 @@ OmegaConf.register_new_resolver("dlbase_repo_root", _dlbase_repo_root, replace=T
 
 @hydra.main(version_base=None, config_path="../conf", config_name="openresearch")
 def main(cfg: DictConfig) -> Optional[float]:
-    verify_training_runtime(context="dlbase.train", profile="vision" if str(cfg.task.name) == "classification" else "llm")
+    verify_training_runtime(
+        context="dlbase.train",
+        profile="vision" if str(cfg.task.name) == "classification" else "llm",
+    )
     validate_hydra_cfg(cfg)
     from dlbase.experiment_paths import prepare_run
 

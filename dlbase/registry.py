@@ -14,13 +14,10 @@ class TaskModule(ABC):
 
     @property
     @abstractmethod
-    def name(self) -> str:
-        ...
+    def name(self) -> str: ...
 
     @abstractmethod
-    def run(self, cfg: DictConfig) -> None:
-        ...
-
+    def run(self, cfg: DictConfig) -> None: ...
 
 
 @dataclass(frozen=True)
@@ -81,7 +78,9 @@ def register_dataset(
 
 def register_dataset_alias(alias: str, canonical: str) -> None:
     if alias in _DATASET_ALIASES:
-        raise ValueError(f"register_dataset_alias: {alias!r} already mapped to {_DATASET_ALIASES[alias]!r}")
+        raise ValueError(
+            f"register_dataset_alias: {alias!r} already mapped to {_DATASET_ALIASES[alias]!r}"
+        )
     _DATASET_ALIASES[alias] = canonical
 
 

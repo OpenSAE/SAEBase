@@ -1,4 +1,5 @@
 """Versioned, deterministic experiment definitions for M2 interventions."""
+
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
@@ -17,6 +18,7 @@ class Condition:
     IDs; untouched SAE features and reconstruction residual are preserved.
     reconstruction is the separately identified *full SAE replacement* control.
     """
+
     name: str
     operation: str
     feature_ids: tuple[int, ...] = ()
@@ -31,11 +33,21 @@ class Condition:
             raise ValueError(f"unknown intervention operation {self.operation!r}")
         for field_name in ("feature_ids", "retained_ids"):
             ids = getattr(self, field_name)
-            if not isinstance(ids, tuple) or len(set(ids)) != len(ids) or any(type(x) is not int or x < 0 for x in ids):
+            if (
+                not isinstance(ids, tuple)
+                or len(set(ids)) != len(ids)
+                or any(type(x) is not int or x < 0 for x in ids)
+            ):
                 raise ValueError(f"{field_name} requires distinct, nonnegative integer feature IDs")
-        if not isinstance(self.value, (float, int)) or isinstance(self.value, bool) or not math.isfinite(self.value):
+        if (
+            not isinstance(self.value, (float, int))
+            or isinstance(self.value, bool)
+            or not math.isfinite(self.value)
+        ):
             raise ValueError("intervention value must be a finite scalar")
-        if self.operation in {"identity", "reconstruction"} and (self.feature_ids or self.retained_ids):
+        if self.operation in {"identity", "reconstruction"} and (
+            self.feature_ids or self.retained_ids
+        ):
             raise ValueError("identity and reconstruction do not select individual features")
         if self.operation not in {"identity", "reconstruction"} and not self.feature_ids:
             raise ValueError("feature intervention needs at least one feature ID")
@@ -92,11 +104,15 @@ class MeasurementSample:
 
     @property
     def tokens(self) -> tuple[int, ...]:
-        return self.record.token_ids[:self.valid_length]
+        return self.record.token_ids[: self.valid_length]
 
     def to_dict(self) -> dict[str, Any]:
-        return {"record": self.record.to_dict(), "readout_position": self.readout_position,
-                "target_token_id": self.target_token_id, "reference_token_id": self.reference_token_id}
+        return {
+            "record": self.record.to_dict(),
+            "readout_position": self.readout_position,
+            "target_token_id": self.target_token_id,
+            "reference_token_id": self.reference_token_id,
+        }
 
 
 @dataclass(frozen=True)
@@ -113,9 +129,16 @@ class ExperimentIdentity:
     def __post_init__(self) -> None:
         for name in ("model_state_sha256", "sae_state_sha256"):
             value = getattr(self, name)
-            if not isinstance(value, str) or len(value) != 64 or any(ch not in "0123456789abcdef" for ch in value):
+            if (
+                not isinstance(value, str)
+                or len(value) != 64
+                or any(ch not in "0123456789abcdef" for ch in value)
+            ):
                 raise ValueError(f"{name} must be a lowercase SHA-256 digest")
-        if self.tokenizer_sha256 is not None and (len(self.tokenizer_sha256) != 64 or any(ch not in "0123456789abcdef" for ch in self.tokenizer_sha256)):
+        if self.tokenizer_sha256 is not None and (
+            len(self.tokenizer_sha256) != 64
+            or any(ch not in "0123456789abcdef" for ch in self.tokenizer_sha256)
+        ):
             raise ValueError("tokenizer_sha256 must be a SHA-256 digest")
         if not isinstance(self.site, ActivationSite):
             raise TypeError("site must be an ActivationSite")
@@ -126,13 +149,26 @@ class ExperimentIdentity:
         return fingerprint({"schema": "saebase.m2.experiment.v1", **self.to_dict()})
 
     def to_dict(self) -> dict[str, Any]:
-        return {"model_state_sha256": self.model_state_sha256,
-                "sae_state_sha256": self.sae_state_sha256,
-                "site": asdict(self.site), "model_key": self.model_key,
-                "sae_key": self.sae_key, "tokenizer_sha256": self.tokenizer_sha256,
-                "backend": self.backend, "metadata": self.metadata}
+        return {
+            "model_state_sha256": self.model_state_sha256,
+            "sae_state_sha256": self.sae_state_sha256,
+            "site": asdict(self.site),
+            "model_key": self.model_key,
+            "sae_key": self.sae_key,
+            "tokenizer_sha256": self.tokenizer_sha256,
+            "backend": self.backend,
+            "metadata": self.metadata,
+        }
 
 
-def measurement_id(experiment: ExperimentIdentity, sample: MeasurementSample, condition: Condition) -> str:
-    return fingerprint({"schema": "saebase.m2.measurement.v1", "experiment": experiment.key,
-                        "sample": sample.to_dict(), "condition": condition.to_dict()})
+def measurement_id(
+    experiment: ExperimentIdentity, sample: MeasurementSample, condition: Condition
+) -> str:
+    return fingerprint(
+        {
+            "schema": "saebase.m2.measurement.v1",
+            "experiment": experiment.key,
+            "sample": sample.to_dict(),
+            "condition": condition.to_dict(),
+        }
+    )

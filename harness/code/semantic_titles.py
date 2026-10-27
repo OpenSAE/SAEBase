@@ -4,6 +4,7 @@ Headlines describe an operation and its research object. They deliberately do
 not render source file paths, CamelCase names, or function signatures. Source
 symbols and paths remain available in each node's structured attributes.
 """
+
 from __future__ import annotations
 
 import re
@@ -152,8 +153,13 @@ SPECIAL_SYMBOLS = {
 }
 
 GENERIC_CURATED = {
-    "执行科研任务", "初始化组件", "执行任务", "读取数据",
-    "管理源码对象", "运行任务入口", "处理任务接口",
+    "执行科研任务",
+    "初始化组件",
+    "执行任务",
+    "读取数据",
+    "管理源码对象",
+    "运行任务入口",
+    "处理任务接口",
 }
 
 
@@ -169,7 +175,7 @@ def module_semantics(path: str) -> str:
         if filename.lower() == (parts[2].lower() + ".py"):
             return "读取" + subject + "与目标标签"
     if path.startswith("tasks/LLM/benchmark/"):
-        relative = path[len("tasks/LLM/benchmark/"):]
+        relative = path[len("tasks/LLM/benchmark/") :]
         if relative in BENCHMARK_FILES:
             return BENCHMARK_FILES[relative]
     filename = PurePosixPath(path).name
@@ -195,6 +201,7 @@ def module_semantics(path: str) -> str:
         "server.py": "提供" + context_for_path(path) + "的服务端接口",
     }
     return simple.get(filename, "实现" + context_for_path(path))
+
 
 # Long compound objects take precedence over individual identifier tokens.
 OBJECTS = (
@@ -324,6 +331,7 @@ SCOPES = (
 
 TECHNICAL = ("SAE", "LLM", "Hydra", "GPU", "CPU", "SAR", "RSS", "ResNet", "NLP", "API", "CUB-200")
 
+
 def context_for_path(path: str) -> str:
     value = str(path or "")
     for prefix, label in SCOPES:
@@ -360,27 +368,36 @@ def _clean_title(value: str) -> str:
     return value
 
 
-def semantic_title(kind: str, symbol: str, path: str,
-                   curated: str = "", summary: str = "") -> str:
+def semantic_title(kind: str, symbol: str, path: str, curated: str = "", summary: str = "") -> str:
     """One Chinese operation/concept, not a function-name/path inventory."""
     if symbol in {"to_dict", "from_dict", "key"} and kind != "module":
         action = {
-            "to_dict": "序列化", "from_dict": "还原",
+            "to_dict": "序列化",
+            "from_dict": "还原",
             "key": "生成",
         }[symbol]
         subject = (
-            "SAE 模型身份记录" if "saebase/store/identity.py" in path else
-            "SAE 元数据" if "saebase/api/metadata.py" in path else
-            "受控输入的实验参数" if "controlled_inputs.py" in path else
-            "基准评测计划" if "/planner.py" in path else
-            "基准结果的数据字段" if "/schema.py" in path else
-            "实验记录"
+            "SAE 模型身份记录"
+            if "saebase/store/identity.py" in path
+            else "SAE 元数据"
+            if "saebase/api/metadata.py" in path
+            else "受控输入的实验参数"
+            if "controlled_inputs.py" in path
+            else "基准评测计划"
+            if "/planner.py" in path
+            else "基准结果的数据字段"
+            if "/schema.py" in path
+            else "实验记录"
         )
         return _clean_title(action + subject)
     if symbol in SPECIAL_SYMBOLS and kind != "module":
         return _clean_title(SPECIAL_SYMBOLS[symbol])
-    if curated and curated not in GENERIC_CURATED and \
-            re.search(r"[\u3400-\u9fff]", curated) and " · " not in curated:
+    if (
+        curated
+        and curated not in GENERIC_CURATED
+        and re.search(r"[\u3400-\u9fff]", curated)
+        and " · " not in curated
+    ):
         return _clean_title(curated)
     context = context_for_path(path)
     if kind == "root":
@@ -425,10 +442,20 @@ def semantic_title(kind: str, symbol: str, path: str,
 
 
 def semantic_summary(title: str, kind: str, path: str, existing: str = "") -> str:
-    if existing and re.search(r"[\u3400-\u9fff]", existing) and             not re.search(r"(?:源文件 |实际定义了 |当前源码中已定义)", existing):
+    if (
+        existing
+        and re.search(r"[\u3400-\u9fff]", existing)
+        and not re.search(r"(?:源文件 |实际定义了 |当前源码中已定义)", existing)
+    ):
         return existing
     return f"负责{title}；源码依据和调用参数可在节点的展开说明中查看。"
 
 
 def title_is_semantic(title: str) -> bool:
-    return bool(re.search(r"[\u3400-\u9fff]", title)) and            " · " not in title and "/" not in title and "\\" not in title and            not re.search(r"(?:^|\s)(?:def|class)\s|\.py\b|WP\d+", title, re.I)
+    return (
+        bool(re.search(r"[\u3400-\u9fff]", title))
+        and " · " not in title
+        and "/" not in title
+        and "\\" not in title
+        and not re.search(r"(?:^|\s)(?:def|class)\s|\.py\b|WP\d+", title, re.I)
+    )

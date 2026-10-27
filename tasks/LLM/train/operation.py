@@ -1,16 +1,17 @@
 """Concrete train task implementation; SAEBase supplies reusable primitives."""
+
 from __future__ import annotations
 
-import json
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
-from tasks.LLM.sae_runtime import MODEL_KEY, _task, _pair, _prompt, _fingerprint_prompt
+from tasks.LLM.sae_runtime import MODEL_KEY, _task
 
 
 def _train(cfg: Any) -> dict[str, Any]:
     from omegaconf import OmegaConf
     from tasks.LLM.train.backend.training import TrainPlan, run_training
+
     if not bool(_task(cfg, "approved", False)):
         raise PermissionError("Native SAE training requires task.approved=true")
     raw = _task(cfg, "train_plan")
@@ -20,12 +21,13 @@ def _train(cfg: Any) -> dict[str, Any]:
     if MODEL_KEY not in plan.model_path and "gemma" not in plan.model_path.lower():
         raise ValueError("Training model snapshot path must identify the selected Gemma-2 2B model")
     summary = run_training(
-        plan, output=Path.cwd() / "checkpoints" / "native_sae_training",
-        approved=True, allow_large=bool(_task(cfg, "allow_large", False)),
+        plan,
+        output=Path.cwd() / "checkpoints" / "native_sae_training",
+        approved=True,
+        allow_large=bool(_task(cfg, "allow_large", False)),
         timeout_seconds=int(_task(cfg, "timeout_seconds", 1800)),
     )
-    return {"status": "executed", "operation": "train",
-            "model_key": MODEL_KEY, "native": summary}
+    return {"status": "executed", "operation": "train", "model_key": MODEL_KEY, "native": summary}
 
 
 def execute(cfg: Any) -> dict[str, Any]:

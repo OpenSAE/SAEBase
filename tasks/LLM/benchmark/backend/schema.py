@@ -3,6 +3,7 @@
 The resolved configuration is a deterministic identity; heavyweight model
 loading and external estimator imports are never performed during validation.
 """
+
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
@@ -13,13 +14,16 @@ from typing import Any, Mapping
 
 from saebase.api import ActivationSite
 from tasks.LLM.intervene.backend import Condition, MeasurementSample
-from saebase.store import SampleRecord, TokenSelection, fingerprint
+from saebase.store import SampleRecord, fingerprint
 
 CONFIG_SCHEMA = "saebase.benchmark.config.v1"
 RESULT_SCHEMA = "saebase.benchmark.metric.v1"
 STATUSES = frozenset({"completed", "failed", "unsupported", "blocked", "undefined"})
-UNITS = frozenset({"prompt", "prompt_group", "variant", "token", "coalition", "measurement", "dataset"})
+UNITS = frozenset(
+    {"prompt", "prompt_group", "variant", "token", "coalition", "measurement", "dataset"}
+)
 DIRECTIONS = frozenset({"higher", "lower", "contextual", "none"})
+
 
 def _fields(value: Any, allowed: set[str], what: str) -> dict[str, Any]:
     if not isinstance(value, dict):
@@ -29,15 +33,18 @@ def _fields(value: Any, allowed: set[str], what: str) -> dict[str, Any]:
         raise ValueError(f"unknown {what} fields: {sorted(extra)}")
     return value
 
+
 def _str(value: Any, what: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{what} must be a nonempty string")
     return value
 
+
 def _positive(value: Any, what: str, *, allow_zero: bool = False) -> int:
     if type(value) is not int or (value < 0 if allow_zero else value < 1):
         raise ValueError(f"{what} must be a {'nonnegative' if allow_zero else 'positive'} integer")
     return value
+
 
 @dataclass(frozen=True)
 class MetricSpec:
@@ -57,6 +64,7 @@ class MetricSpec:
             raise ValueError("unknown metric unit or direction")
         if not isinstance(self.required_inputs, tuple) or not self.required_inputs:
             raise ValueError("required_inputs must be nonempty")
+
 
 @dataclass(frozen=True)
 class MetricResult:
@@ -86,7 +94,11 @@ class MetricResult:
     def __post_init__(self) -> None:
         if self.status not in STATUSES or self.sample_unit not in UNITS:
             raise ValueError("invalid MetricResult status/unit")
-        if type(self.n_valid) is not int or type(self.n_requested) is not int or not 0 <= self.n_valid <= self.n_requested:
+        if (
+            type(self.n_valid) is not int
+            or type(self.n_requested) is not int
+            or not 0 <= self.n_valid <= self.n_requested
+        ):
             raise ValueError("invalid sample count")
         if self.status == "completed" and (self.value is None or not math.isfinite(self.value)):
             raise ValueError("completed metric needs a finite value")
@@ -94,7 +106,9 @@ class MetricResult:
             raise ValueError("noncompleted metric must have null value")
         if self.status != "completed" and not self.reason:
             raise ValueError("noncompleted metric needs a reason")
-        if self.value is not None and (type(self.value) not in (float, int) or not math.isfinite(self.value)):
+        if self.value is not None and (
+            type(self.value) not in (float, int) or not math.isfinite(self.value)
+        ):
             raise ValueError("metric value must be finite")
         if self.status == "completed" and self.n_valid == 0:
             raise ValueError("completed metric must contain observations")
@@ -102,6 +116,7 @@ class MetricResult:
 
     def to_dict(self) -> dict[str, Any]:
         return json.loads(json.dumps({"schema": RESULT_SCHEMA, **asdict(self)}, allow_nan=False))
+
 
 @dataclass(frozen=True)
 class BenchmarkTarget:
@@ -115,6 +130,7 @@ class BenchmarkTarget:
             raise ValueError("sae_keys must be unique and nonempty")
         for key in self.sae_keys:
             _str(key, "sae_key")
+
 
 @dataclass(frozen=True)
 class BenchmarkConfig:
@@ -140,7 +156,13 @@ class BenchmarkConfig:
             raise ValueError("targets, samples and metrics must be nonempty")
         if len(set(self.metrics)) != len(self.metrics):
             raise ValueError("duplicate metric IDs")
-        if len({(t.model_key, t.site.hook_name, t.site.layer, s) for t in self.targets for s in t.sae_keys}) != sum(len(t.sae_keys) for t in self.targets):
+        if len(
+            {
+                (t.model_key, t.site.hook_name, t.site.layer, s)
+                for t in self.targets
+                for s in t.sae_keys
+            }
+        ) != sum(len(t.sae_keys) for t in self.targets):
             raise ValueError("duplicate target/SAE pairing")
         if len({s.record.sample_id for s in self.samples}) != len(self.samples):
             raise ValueError("duplicate sample IDs")
@@ -149,7 +171,11 @@ class BenchmarkConfig:
         for fld in ("max_measurements", "max_activation_rows", "microbatch", "sample_batch"):
             _positive(getattr(self, fld), fld)
         _positive(self.seed, "seed", allow_zero=True)
-        if type(self.tolerance) not in (float, int) or not math.isfinite(self.tolerance) or self.tolerance < 0:
+        if (
+            type(self.tolerance) not in (float, int)
+            or not math.isfinite(self.tolerance)
+            or self.tolerance < 0
+        ):
             raise ValueError("tolerance must be finite and nonnegative")
         if not isinstance(self.sources, dict) or not isinstance(self.options, dict):
             raise ValueError("sources/options must be objects")
@@ -170,63 +196,153 @@ class BenchmarkConfig:
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "schema": CONFIG_SCHEMA, "name": self.name,
-            "targets": [{"model_key": t.model_key, "sae_keys": list(t.sae_keys),
-                         "layer": t.site.layer, "hook_name": t.site.hook_name,
-                         "position": t.site.position} for t in self.targets],
-            "dataset": {"id": self.dataset_id, "samples": [
-                {**s.record.to_dict(), "readout_position": s.readout_position,
-                 "target_token_id": s.target_token_id, "reference_token_id": s.reference_token_id}
-                for s in self.samples]},
+            "schema": CONFIG_SCHEMA,
+            "name": self.name,
+            "targets": [
+                {
+                    "model_key": t.model_key,
+                    "sae_keys": list(t.sae_keys),
+                    "layer": t.site.layer,
+                    "hook_name": t.site.hook_name,
+                    "position": t.site.position,
+                }
+                for t in self.targets
+            ],
+            "dataset": {
+                "id": self.dataset_id,
+                "samples": [
+                    {
+                        **s.record.to_dict(),
+                        "readout_position": s.readout_position,
+                        "target_token_id": s.target_token_id,
+                        "reference_token_id": s.reference_token_id,
+                    }
+                    for s in self.samples
+                ],
+            },
             "metrics": list(self.metrics),
             "conditions": [c.to_dict() for c in self.conditions],
-            "seed": self.seed, "max_measurements": self.max_measurements,
+            "seed": self.seed,
+            "max_measurements": self.max_measurements,
             "max_activation_rows": self.max_activation_rows,
-            "microbatch": self.microbatch, "sample_batch": self.sample_batch,
-            "tolerance": self.tolerance, "sources": self.sources, "options": self.options,
+            "microbatch": self.microbatch,
+            "sample_batch": self.sample_batch,
+            "tolerance": self.tolerance,
+            "sources": self.sources,
+            "options": self.options,
         }
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "BenchmarkConfig":
-        raw = _fields(dict(data), {"schema", "name", "targets", "dataset", "metrics", "conditions",
-                                 "seed", "max_measurements", "max_activation_rows", "microbatch",
-                                 "sample_batch", "tolerance", "sources", "options"}, "benchmark")
+        raw = _fields(
+            dict(data),
+            {
+                "schema",
+                "name",
+                "targets",
+                "dataset",
+                "metrics",
+                "conditions",
+                "seed",
+                "max_measurements",
+                "max_activation_rows",
+                "microbatch",
+                "sample_batch",
+                "tolerance",
+                "sources",
+                "options",
+            },
+            "benchmark",
+        )
         if raw.get("schema") != CONFIG_SCHEMA:
             raise ValueError(f"benchmark schema must be {CONFIG_SCHEMA}")
         targets = []
         for entry in raw["targets"]:
-            e = _fields(entry, {"model_key", "sae_keys", "layer", "hook_name", "position"}, "target")
-            targets.append(BenchmarkTarget(e["model_key"], tuple(e["sae_keys"]),
-                                           ActivationSite(e["layer"], e["hook_name"], e.get("position", -1))))
+            e = _fields(
+                entry, {"model_key", "sae_keys", "layer", "hook_name", "position"}, "target"
+            )
+            targets.append(
+                BenchmarkTarget(
+                    e["model_key"],
+                    tuple(e["sae_keys"]),
+                    ActivationSite(e["layer"], e["hook_name"], e.get("position", -1)),
+                )
+            )
         dataset = _fields(raw["dataset"], {"id", "samples"}, "dataset")
         samples = []
         for row in dataset["samples"]:
-            r = _fields(row, {"sample_id", "token_ids", "selection", "attention_mask", "prompt_group_id",
-                              "split", "variant_role", "token_offsets", "source_activation_sha256",
-                              "readout_position", "target_token_id", "reference_token_id"}, "sample")
-            record = SampleRecord.from_dict({"selection": {"mode": "last_valid"}, **{k:v for k,v in r.items()
-                if k not in {"readout_position", "target_token_id", "reference_token_id"}}})
-            samples.append(MeasurementSample(record, readout_position=r.get("readout_position", -1),
-                                             target_token_id=r.get("target_token_id"),
-                                             reference_token_id=r.get("reference_token_id")))
+            r = _fields(
+                row,
+                {
+                    "sample_id",
+                    "token_ids",
+                    "selection",
+                    "attention_mask",
+                    "prompt_group_id",
+                    "split",
+                    "variant_role",
+                    "token_offsets",
+                    "source_activation_sha256",
+                    "readout_position",
+                    "target_token_id",
+                    "reference_token_id",
+                },
+                "sample",
+            )
+            record = SampleRecord.from_dict(
+                {
+                    "selection": {"mode": "last_valid"},
+                    **{
+                        k: v
+                        for k, v in r.items()
+                        if k not in {"readout_position", "target_token_id", "reference_token_id"}
+                    },
+                }
+            )
+            samples.append(
+                MeasurementSample(
+                    record,
+                    readout_position=r.get("readout_position", -1),
+                    target_token_id=r.get("target_token_id"),
+                    reference_token_id=r.get("reference_token_id"),
+                )
+            )
         conditions = []
         for entry in raw.get("conditions", []):
-            e = _fields(entry, {"name", "operation", "feature_ids", "value", "retained_ids"}, "condition")
-            conditions.append(Condition(name=e["name"], operation=e["operation"],
-                                        feature_ids=tuple(e.get("feature_ids", ())),
-                                        retained_ids=tuple(e.get("retained_ids", ())),
-                                        value=e.get("value", 0.0)))
+            e = _fields(
+                entry, {"name", "operation", "feature_ids", "value", "retained_ids"}, "condition"
+            )
+            conditions.append(
+                Condition(
+                    name=e["name"],
+                    operation=e["operation"],
+                    feature_ids=tuple(e.get("feature_ids", ())),
+                    retained_ids=tuple(e.get("retained_ids", ())),
+                    value=e.get("value", 0.0),
+                )
+            )
         from .registry import get_metric
+
         metrics = tuple(raw["metrics"])
         for metric_id in metrics:
             get_metric(metric_id)
-        return cls(name=raw["name"], targets=tuple(targets), dataset_id=dataset["id"],
-                   samples=tuple(samples), metrics=metrics, conditions=tuple(conditions),
-                   seed=raw.get("seed", 0), max_measurements=raw.get("max_measurements", 100000),
-                   max_activation_rows=raw.get("max_activation_rows", 100000),
-                   microbatch=raw.get("microbatch", 16), sample_batch=raw.get("sample_batch", 8),
-                   tolerance=raw.get("tolerance", 1e-4), sources=raw.get("sources", {}),
-                   options=raw.get("options", {}))
+        return cls(
+            name=raw["name"],
+            targets=tuple(targets),
+            dataset_id=dataset["id"],
+            samples=tuple(samples),
+            metrics=metrics,
+            conditions=tuple(conditions),
+            seed=raw.get("seed", 0),
+            max_measurements=raw.get("max_measurements", 100000),
+            max_activation_rows=raw.get("max_activation_rows", 100000),
+            microbatch=raw.get("microbatch", 16),
+            sample_batch=raw.get("sample_batch", 8),
+            tolerance=raw.get("tolerance", 1e-4),
+            sources=raw.get("sources", {}),
+            options=raw.get("options", {}),
+        )
+
 
 def load_config(path: str | Path) -> BenchmarkConfig:
     path = Path(path)
@@ -236,7 +352,9 @@ def load_config(path: str | Path) -> BenchmarkConfig:
         try:
             import yaml
         except ImportError as exc:
-            raise RuntimeError("YAML configs require the optional PyYAML dependency; JSON is always supported") from exc
+            raise RuntimeError(
+                "YAML configs require the optional PyYAML dependency; JSON is always supported"
+            ) from exc
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
     else:
         raise ValueError("benchmark config must be .json, .yaml or .yml")

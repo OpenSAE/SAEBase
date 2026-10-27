@@ -1,4 +1,5 @@
 """Validate the project-management graph independently of scientific Knowledge."""
+
 from __future__ import annotations
 import json
 from pathlib import Path
@@ -11,6 +12,7 @@ from harness.knowledge.validate import validate, GraphError
 
 GRAPH = ROOT / "harness/core/project_graph.json"
 
+
 def main():
     try:
         result = validate(json.loads(GRAPH.read_text(encoding="utf-8")))
@@ -19,6 +21,7 @@ def main():
         return 1
     print("VALID Core project-management tree:", result)
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
