@@ -206,7 +206,8 @@ const DOC_EN={
   "harness/core/BOUNDARIES.md": "harness/core/BOUNDARIES.en.md",
   "harness/core/TREE_CONTRACTS.md": "harness/core/TREE_CONTRACTS.en.md",
   "harness/visualization/README.md": "harness/visualization/README.en.md",
-  "harness/README.md": "harness/README.en.md"
+  "harness/README.md": "harness/README.en.md",
+  "harness/transfer/README.md": "harness/transfer/README.en.md"
 };
 window.OPENRESEARCH_ATLAS_I18N={en:TEXT_EN,terms:TERM_EN,core:CORE_EN,knowledge:KNOWLEDGE_EN,docs:DOC_EN};
 })();
