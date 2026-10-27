@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "kind": "environment_profile",
+  "synthetic": true,
+  "captured_at_utc": null,
+  "hostname_hash": "example-only",
+  "platform": {
+    "system": "Synthetic Linux",
+    "release": "example",
+    "machine": "x86_64",
+    "source": "fictional demonstration"
+  },
+  "cpu": {
+    "logical_count": 32,
+    "physical_count": 16,
+    "model": "Demo CPU (fictional)",
+    "source": "synthetic"
+  },
+  "memory": {
+    "total_bytes": 137438953472,
+    "available_bytes": 103079215104,
+    "source": "synthetic"
+  },
+  "gpu": {
+    "status": "synthetic",
+    "devices": [
+      {
+        "index": 0,
+        "name": "Demo GPU A (fictional)",
+        "memory_mib": 24576,
+        "driver_version": "not observed"
+      }
+    ],
+    "source": "synthetic"
+  },
+  "storage": {
+    "total_bytes": 2199023255552,
+    "used_bytes": 549755813888,
+    "free_bytes": 1649267441664,
+    "source": "synthetic",
+    "path_label": "example filesystem"
+  },
+  "execution": {
+    "commands": {
+      "tmux": true,
+      "sbatch": false,
+      "docker": true,
+      "podman": false,
+      "python": true,
+      "nvidia-smi": true,
+      "rclone": true
+    },
+    "virtual_environment": true,
+    "python_version": "3.x (example)",
+    "python_executable": "python",
+    "cuda_visible_devices_set": false,
+    "sandbox": "unknown",
+    "network": "not probed",
+    "source": "synthetic"
+  },
+  "notes": [
+    "SYNTHETIC DEMONSTRATION ONLY",
+    "Not a real OpenResearch machine measurement"
+  ]
+}
