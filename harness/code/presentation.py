@@ -354,7 +354,9 @@ def balance_code_hierarchy(output: dict, *, max_children: int = MAX_ATLAS_CHILDR
         raise ValueError("Atlas Code navigation uses ten-child presentation scopes")
     by_id = {n["id"]: n for n in output["nodes"]}
     edges = output["edges"]
-    for iteration in range(48):
+    # Each large source node may need its own bounded scope after workspace expansion.
+    # The source-node count is a finite cap; a static 48-pass limit is too small.
+    for iteration in range(max(48, len(output["nodes"]))):
         child_map = defaultdict(list)
         for edge in edges:
             if edge["type"] == "contains":
