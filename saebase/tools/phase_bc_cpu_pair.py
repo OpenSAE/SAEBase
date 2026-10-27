@@ -22,7 +22,7 @@ from saebase.sae.registry import get_profile
 from saebase.store import sha256_state_dict
 from models.hf_hooks_backend import load_hf_hooks_model
 
-CATALOG = Path(__file__).resolve().parents[1] / "conf" / "coverage" / "stage_bc.json"
+CATALOG = Path(__file__).resolve().parents[2] / "conf" / "coverage" / "stage_bc.json"
 PROMPTS = ("The capital of France is", "The scientist explained the experiment.")
 
 

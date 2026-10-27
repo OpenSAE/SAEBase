@@ -21,7 +21,7 @@ import zipfile
 from email.parser import Parser
 from pathlib import Path, PurePosixPath
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 SCHEMA = "saebase.software_release_evidence.v1"
 REQUIRED_CI = (
     "offline-tests (3.11)",
@@ -84,7 +84,7 @@ def project_info(root: Path = ROOT) -> tuple[str, str, dict[str, str]]:
     changelog = (root / "CHANGELOG.md").read_text(encoding="utf-8")
     if re.search(rf"^##[ \t]+{re.escape(version)}(?=\s|$)", changelog, re.M) is None:
         raise ValueError(f"CHANGELOG.md lacks a release heading for {version}")
-    notes = root / "docs" / "releases" / f"v{version}.md"
+    notes = root / "harness/github_development_doc" / "releases" / f"v{version}.md"
     if not notes.is_file() or not notes.read_text(encoding="utf-8").strip():
         raise ValueError(f"release notes missing for v{version}")
     entrypoints = project["scripts"]

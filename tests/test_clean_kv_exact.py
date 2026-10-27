@@ -11,7 +11,7 @@ from types import SimpleNamespace
 import pytest
 import torch
 
-from saebase.saebase.examples._synthetic_common import ResearchToySAE
+from saebase.examples._synthetic_common import ResearchToySAE
 from models.hf_hooks_backend import HFHooksModel
 from saebase.api import ModelAdapter
 from saebase.interventions.kv_cache_exact import (

@@ -14,7 +14,7 @@ from types import ModuleType
 import pytest
 import torch
 
-from saebase.saebase.examples._synthetic_common import ResearchToySAE
+from saebase.examples._synthetic_common import ResearchToySAE
 from saebase.interventions.specs import Condition
 from saebase.vllm_backend.sae_interventions import InterpVLLMSAE
 

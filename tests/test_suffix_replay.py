@@ -13,7 +13,7 @@ from saebase.interventions.clean_prefix import (
     edited_logits_clean_prefix,
 )
 from saebase.store import sha256_state_dict
-from saebase.saebase.examples._synthetic_common import ResearchToySAE
+from saebase.examples._synthetic_common import ResearchToySAE
 from tests.test_performance_hf_batch import records
 
 

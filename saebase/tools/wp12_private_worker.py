@@ -24,7 +24,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("An existing absolute OPENSAE_PRIVATE_DATA directory is required")
     if os.environ.get("OPENSAE_ENABLE_PRIVATE_JOBS") != "1":
         parser.error("OPENSAE_ENABLE_PRIVATE_JOBS must be explicitly set to 1")
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "apps" / "research-lab"))
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "apps" / "research-lab"))
     from backend.private_worker import execute_one
 
     report = execute_one(root=Path(root), device=arguments.device)

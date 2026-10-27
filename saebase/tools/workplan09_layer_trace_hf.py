@@ -16,7 +16,7 @@ from pathlib import Path
 os.environ.setdefault("HF_HOME", "/workspace/.hf_home")
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 import torch  # noqa: E402

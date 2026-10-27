@@ -12,7 +12,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
+from saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ActivationSite, ModelAdapter
 from saebase.integrations import evaluate_sar, evaluate_rss, collect_rss_features, load_paper_module
 

@@ -13,7 +13,7 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from saebase.api import ActivationSite, ModelAdapter, load_registered
 from saebase.integrations import evaluate_sar, load_paper_module
 
@@ -38,7 +38,7 @@ def main() -> None:
         ids = model.model.to_single_token(" Emma"), model.model.to_single_token(" Rachel")
         readout = lambda logits: logits[ids[0]] - logits[ids[1]]
     else:
-        from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
+        from saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 
         model = ModelAdapter(ResearchToyModel().eval())
         sae = ResearchToySAE().eval()

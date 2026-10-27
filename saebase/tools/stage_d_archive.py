@@ -23,7 +23,7 @@ import tarfile
 import tempfile
 from pathlib import Path, PurePosixPath
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 EVIDENCE = Path("conf/coverage/stage_d_evidence")
 SNAPSHOT = "stage-d-evidence-20261016"
 MANIFEST_NAME = "BUNDLE_MANIFEST.json"

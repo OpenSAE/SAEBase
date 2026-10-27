@@ -12,9 +12,9 @@ from pathlib import Path
 import sys
 import tempfile
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
+from saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ActivationSite, ModelAdapter
 from saebase.store import SampleRecord, TokenSelection, sha256_state_dict
 from saebase.interventions import (

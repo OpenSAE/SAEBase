@@ -9,7 +9,7 @@ import sys
 
 import pytest
 
-from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
+from saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import SAEIdentity, ActivationSite, LoadedResearchPair, ModelAdapter
 from saebase.runtime import required_packages, verify_runtime
 from saebase.tools.m0_reference_smoke import _sha_weights, compare_references, record_reference

@@ -37,7 +37,7 @@ from saebase.sae.stage_d import (
     update_status,
 )
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 CATALOG = ROOT / "conf" / "coverage" / "stage_bc.json"
 DEFAULT_POPULATION = ROOT / "conf" / "coverage" / "stage_d_population.jsonl"
 

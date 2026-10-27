@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import torch
 
-from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
+from saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ActivationSite, ModelAdapter, capture_features
 from saebase.api.features import _decode
 from saebase.interventions import Condition, apply_condition

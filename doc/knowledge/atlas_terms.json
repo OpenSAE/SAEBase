@@ -55,10 +55,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "tasks/runner.py"
+        "saebase/runner.py"
       ],
       "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "tasks/runner.py"
+      "foundation": "saebase/runner.py"
     },
     {
       "id": "term.registry",
@@ -71,10 +71,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "saebase/runtime/registry.py"
+        "saebase/registry.py"
       ],
       "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "saebase/runtime/registry.py"
+      "foundation": "saebase/registry.py"
     },
     {
       "id": "term.plugin",
@@ -86,10 +86,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "saebase/runtime/registry.py"
+        "saebase/registry.py"
       ],
       "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
-      "foundation": "saebase/runtime/registry.py"
+      "foundation": "saebase/registry.py"
     },
     {
       "id": "term.ast",
@@ -469,10 +469,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "saebase/runtime/registry.py"
+        "saebase/registry.py"
       ],
       "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
-      "foundation": "saebase/runtime/registry.py"
+      "foundation": "saebase/registry.py"
     },
     {
       "id": "term.saebase",

@@ -12,7 +12,7 @@ import re
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 LINK = re.compile(r"!?\[[^\]\n]+\]\((<[^>]+>|[^)\s]+)(?:\s+\"[^\"]+\")?\)")
 DOCS = (
     "README.md",
@@ -25,8 +25,8 @@ def markdown_files(root: Path) -> list[Path]:
     return sorted(
         [
             *(root / p for p in DOCS),
-            *(root / "docs").rglob("*.md"),
-            *(root / "examples").rglob("*.md"),
+            *(root / "harness/github_development_doc").rglob("*.md"),
+            *(root / "saebase/examples").rglob("*.md"),
         ]
     )
 

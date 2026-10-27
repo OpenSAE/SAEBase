@@ -19,11 +19,11 @@ from pathlib import Path
 from types import SimpleNamespace
 import sys
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import torch
 
-from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
+from saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ModelAdapter
 from saebase.data import BinaryFactor, ControlledInputDesign
 from saebase.benchmarks import BenchmarkConfig, build_plan

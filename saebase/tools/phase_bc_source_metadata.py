@@ -12,7 +12,7 @@ from pathlib import Path
 
 from saebase.sae.coverage import CoverageEntry, load_coverage
 
-CATALOG = Path(__file__).resolve().parents[1] / "conf" / "coverage" / "stage_bc.json"
+CATALOG = Path(__file__).resolve().parents[2] / "conf" / "coverage" / "stage_bc.json"
 
 
 def probe_file_path(entry: CoverageEntry, layer: int) -> str | None:

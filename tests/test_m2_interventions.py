@@ -8,7 +8,7 @@ import json
 import pytest
 import torch
 
-from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
+from saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ActivationSite, ModelAdapter, capture_features, evaluate_edit
 from saebase.store import (
     ActivationIdentity,

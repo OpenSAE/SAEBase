@@ -27,7 +27,7 @@ from saebase.sae.stage_d import (
 )
 from saebase.tools.phase_d_verify import run_one
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 CATALOG = ROOT / "conf" / "coverage" / "stage_bc.json"
 
 

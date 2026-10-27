@@ -33,7 +33,7 @@ def main(argv: list[str] | None = None) -> int:
         "heldout",
     }:
         parser.error("Require exact source site, feature, discovery and heldout fields")
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "apps" / "research-lab"))
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "apps" / "research-lab"))
     from backend.auto_interp_local import LocalAutoInterpreter
 
     worker = LocalAutoInterpreter.from_local_snapshot(args.local_model, device=args.device)

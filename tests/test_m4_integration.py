@@ -4,7 +4,7 @@ import json
 from types import SimpleNamespace
 import pytest
 
-from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
+from saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ModelAdapter
 from saebase.benchmarks import BenchmarkConfig
 from saebase.benchmarks.runner import execute

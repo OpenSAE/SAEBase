@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 import torch
 
-from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
+from saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ActivationSite, ModelAdapter
 from saebase.interventions import (
     BatchEngine,

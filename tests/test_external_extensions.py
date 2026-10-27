@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 import torch
 
-from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
+from saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 from saebase.api import ActivationSite
 from saebase.benchmarks import BenchmarkConfig, MetricSpec, build_plan
 from saebase.benchmarks.runner import execute

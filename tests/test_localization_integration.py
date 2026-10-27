@@ -12,7 +12,7 @@ from saebase.integrations import (
     collect_localization_grid,
     evaluate_localization,
 )
-from saebase.saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
+from saebase.examples._synthetic_common import ResearchToyModel, ResearchToySAE
 
 
 class OriginalStub:
