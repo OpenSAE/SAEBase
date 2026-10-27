@@ -419,8 +419,8 @@ def test_configurable_cli_dry_run_requires_no_remote_weights(tmp_path):
     import sys
     from pathlib import Path
 
-    conf = Path(__file__).resolve().parents[1] / "conf/interventions/pythia_feature_edits.json"
-    repo = Path(__file__).resolve().parents[1]
+    conf = Path(__file__).resolve().parents[2] / "conf/interventions/pythia_feature_edits.json"
+    repo = Path(__file__).resolve().parents[2]
     r = subprocess.run(
         [sys.executable, "saebase/tools/m2_batch.py", "--config", str(conf), "--dry-run"],
         cwd=repo,

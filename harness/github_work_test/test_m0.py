@@ -14,7 +14,7 @@ from saebase.api import SAEIdentity, ActivationSite, LoadedResearchPair, ModelAd
 from saebase.runtime import required_packages, verify_runtime
 from saebase.tools.m0_reference_smoke import _sha_weights, compare_references, record_reference
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def make_bundle():
