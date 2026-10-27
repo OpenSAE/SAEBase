@@ -7,7 +7,7 @@ alwaysApply: true
 
 - SAEBase 保留已发布的 SAE 算法、CLI、模型和实验来源，同时在单一架构中使用 `datasets/`、`models/`、`tasks/`、`saebase/`、`conf/`、`harness/`。
 - `saebase/registry.py` 和 `saebase/runner.py` 是组件注册与执行的权威代码；研究 Harness 是 Agent 协作、验证与知识组织工具。
-- 数据集、模型与任务直接按具体名称或科研操作分层，不新增 NLP/LLM/Vision 中间目录。
+- 数据集、模型与任务直接按具体名称或科研操作分层，不新增领域类别中间目录。
 - 先阅读受影响代码、插件和 Hydra 配置；使用 `.cursor/skills/` 中对应的 Skill，并以源码和测试为事实依据。
 - 普通 Agent 未经审批不能修改 `saebase/runtime/`、`harness/`、`.cursor/` 和 `.github/` 的治理语义；权限由 Hooks 和明确的 Agent Flow 约束。
 - 不因重构静默改变历史科研结果、样本划分、模型身份、权重、指标、数值精度或实验产物。
