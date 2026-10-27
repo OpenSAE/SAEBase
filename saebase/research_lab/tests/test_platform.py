@@ -263,7 +263,8 @@ def test_share_and_reproduce_manifest_cannot_be_silently_rewritten(tmp_path):
 
 def test_readonly_api_and_real_source_status():
     assert client.get("/").status_code == 200
-    assert client.get("/saebase/assets/styles.css").status_code == 200
+    assert client.get("/assets/styles.css").status_code == 200
+    assert client.get("/assets/app.js").status_code == 200
     info = client.get("/api/summary")
     assert info.status_code == 200
     payload = info.json()

@@ -16,7 +16,7 @@ import sys
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(REPO_ROOT / "apps" / "research-lab"))
+sys.path.insert(0, str(REPO_ROOT / "saebase" / "research_lab"))
 from backend import core, published_wp12  # noqa: E402
 
 SCHEMA = "opensae.wp13.live03_teacher_forced_summary.v1"

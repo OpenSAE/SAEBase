@@ -14,7 +14,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
-sys.path.insert(0, str(ROOT / "apps" / "research-lab"))
+sys.path.insert(0, str(ROOT / "saebase" / "research_lab"))
 
 from backend import core, explore  # noqa: E402
 from backend.feature_store import feature_store_count  # noqa: E402

@@ -14,12 +14,12 @@ from fastapi.testclient import TestClient
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
-sys.path.insert(0, str(ROOT / "apps" / "research-lab"))
+sys.path.insert(0, str(ROOT / "saebase" / "research_lab"))
 
 from backend.api import app  # noqa: E402
 from saebase.tools.wp13_stage_live03 import main, translate_summary  # noqa: E402
 
-SOURCE = ROOT / "work_plan" / "LIVE-03-small-summary.json"
+SOURCE = ROOT / "harness" / "github_work_plan" / "LIVE-03-small-summary.json"
 client = TestClient(app)
 
 
