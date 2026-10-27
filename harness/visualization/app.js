@@ -1404,7 +1404,7 @@
         path.startsWith("/") || path.includes("..") || path.includes("\\"))
       return null;
     const suffix = typeof line === "number" && line > 0 ? "#L" + line : "";
-    return "https://github.com/OpenSAE/SAEBase/blob/sync-openresearch-harness-20261027/" +
+    return "https://github.com/OpenSAE/SAEBase/blob/main/" +
       path.split("/").map(encodeURIComponent).join("/") + suffix;
   }
   function diagramShape(group, tag, attributes, value) {
@@ -1629,7 +1629,7 @@
     if (n.foundation) {
       const block = section(area, "Background");
       const a = el("a", "context-link", n.foundation);
-      a.href = "https://github.com/OpenSAE/OpenResearch/blob/main/" + n.foundation;
+      a.href = "https://github.com/OpenSAE/SAEBase/blob/main/" + n.foundation;
       a.target = "_blank"; a.rel = "noopener noreferrer"; block.appendChild(a);
     }
     if (n.evidence?.length) {
@@ -1639,7 +1639,7 @@
         const path = source.split(":")[0];
         if (path.startsWith("https://")) a.href = path;
         else if (!path.startsWith("/") && !path.includes("..")) {
-          a.href = "https://github.com/OpenSAE/OpenResearch/blob/main/" + path;
+          a.href = "https://github.com/OpenSAE/SAEBase/blob/main/" + path;
         }
         a.target = "_blank"; a.rel = "noopener noreferrer"; block.appendChild(a);
       }
