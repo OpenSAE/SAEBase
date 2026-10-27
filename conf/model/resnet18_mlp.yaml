@@ -1,0 +1,9 @@
+# @package _global_
+model:
+  name: resnet18_mlp
+  output_size: ${dataset.num_classes}
+  in_channels: 3
+  # linear：单层 fc。auto 在 CUB_200 / CUB 上同样解析为 linear；mlp 为 MLP 头。
+  head_style: linear
+  dropout: 0.0
+  small_input: false

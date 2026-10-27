@@ -1,0 +1,15 @@
+# @package _global_
+dataset:
+  name: CUB_200
+  num_classes: 200
+  input_format: image
+  data_path: ${paths.data_dir}/${dataset.name}
+  # 与细粒度参考脚本一致：RandomCrop/CenterCrop 后为 448×448（见 datasets/CUB_200/datamodule_setup.py）
+  image_size: 448
+  batch_size: 64
+  num_workers: 12
+  pin_memory: true
+  # 默认不拆分官方 train→独立 val：Lightning val 与官方 test 为同一数据集（与参考脚本「每 epoch 用 test 评估」语义对齐）。
+  # 若需从官方 train 再划 val，可改回 train_val_ratio: [7, 1] 并设置 val_split_fraction（>0 时与 ratio 二选一逻辑见 datamodule_setup）。
+  train_val_ratio: null
+  val_split_fraction: 0

@@ -1,0 +1,12 @@
+# @package _global_
+# Each task is model/dataset independent; compose selections through Hydra.
+task:
+  name: benchmark
+  path: benchmark
+  execute: false
+  sae_key: gemma2_2b_pt_l25_canonical
+  layer: 25
+  device: cpu
+  prompt: ''
+  benchmark_config: ''
+  resume: true
