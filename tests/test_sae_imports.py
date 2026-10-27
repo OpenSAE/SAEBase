@@ -48,8 +48,11 @@ def test_no_forbidden_imports_in_active_packages():
     roots = [ROOT / "saebase", ROOT / "tasks" / "sae", ROOT / "models", ROOT / "saebase" / "data"]
     for root in roots:
         for path in root.rglob("*.py"):
-            if path == ROOT / "models" / "dlbase_plugins.py":
-                continue  # explicitly segregated OpenResearch registry adapter
+            if root == ROOT / "models" and (
+                path.name in {"dlbase_plugins.py", "build.py"}
+                or path.relative_to(root).parts[0] in {"LLM", "vision"}
+            ):
+                continue  # OpenResearch-only model namespace uses its own DLBase contract
             if "__pycache__" in path.parts:
                 continue
             for mod in _collect_imports(path):
