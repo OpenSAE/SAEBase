@@ -1,8 +1,0 @@
-# @package _global_
-task:
-  name: classification
-  path: classification # 支持 classification/subtask/subsubtask 的目录层级
-  facets:
-    # 默认单阶段。为 true 时，阶段 1 跑满 max_epochs 且 val 未早停，才会再训 max_epochs 且学习率恒定。
-    phase_two_extension: false
-    post_train_eval_and_summary: true
