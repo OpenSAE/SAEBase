@@ -10,36 +10,6 @@ permissions:
   contents: read
 
 jobs:
-  integration-format:
-    if: github.event_name == 'pull_request' && github.head_ref == 'sync-openresearch-harness-20261027' && github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.head_ref }}
-          fetch-depth: 0
-          persist-credentials: true
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.11"
-      - name: Format only newly added Python files on integration branch
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          python -m pip install "ruff>=0.12,<0.16"
-          mapfile -d '' files < <(git diff --name-only --diff-filter=A -z "$BASE_SHA"...HEAD -- '*.py')
-          if (( ${#files[@]} == 0 )); then exit 0; fi
-          ruff format "${files[@]}"
-          git add -u -- "${files[@]}"
-          if git diff --cached --quiet; then exit 0; fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "style: format SAE-only integration files"
-          git push origin "HEAD:${{ github.head_ref }}"
   hydra-composition:
     runs-on: ubuntu-latest
     steps:
