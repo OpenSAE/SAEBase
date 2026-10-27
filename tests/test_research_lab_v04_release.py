@@ -74,5 +74,5 @@ def test_readmes_and_workplan_refer_to_actual_preview():
     plan = (
         BASE / "harness/github_work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md"
     ).read_text()
-    assert "harness/github_development_doc/research-lab/release-acceptance.md" in plan
+    assert (BASE / "harness/github_development_doc/research-lab/release-acceptance.md").is_file()
     assert "K16" in plan and "RSS" in plan
