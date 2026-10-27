@@ -10,6 +10,28 @@ permissions:
   contents: read
 
 jobs:
+  harness-source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Validate Core and Knowledge source graphs
+        run: |
+          python harness/core/validate.py
+          python harness/knowledge/validate.py
+      - name: Regenerate Code and Atlas snapshots in temporary CI checkout
+        run: |
+          python harness/code/build.py
+          python harness/visualization/export.py
+          python harness/visualization/build_pages.py
+          python harness/visualization/build_pages.py --check
+      - name: Check interactive Atlas JavaScript
+        run: |
+          node --check harness/visualization/app.js
+          node --check harness/visualization/i18n.js
+          node --check harness/visualization/atlas-public-balance.js
   offline-tests:
     runs-on: ubuntu-latest
     strategy:
