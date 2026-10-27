@@ -193,5 +193,20 @@ for(const [view,graph] of Object.entries(graphs)){
   }
  }
 }
-window.OPENRESEARCH_ATLAS_I18N={en:TEXT_EN,terms:TERM_EN,core:CORE_EN,knowledge:KNOWLEDGE_EN};
+const DOC_EN={
+  "doc/knowledge/foundations/sae_methods.md": "doc/knowledge/foundations/sae_methods.en.md",
+  "doc/knowledge/README.md": "doc/knowledge/README.en.md",
+  "doc/knowledge/CONTEXT_STYLE.md": "doc/knowledge/CONTEXT_STYLE.en.md",
+  "harness/knowledge/README.md": "harness/knowledge/README.en.md",
+  "harness/code/README.md": "harness/code/README.en.md",
+  "harness/environment/README.md": "harness/environment/README.en.md",
+  "harness/experiments/README.md": "harness/experiments/README.en.md",
+  "harness/core/README.md": "harness/core/README.en.md",
+  "harness/core/AGENT_FLOW.md": "harness/core/AGENT_FLOW.en.md",
+  "harness/core/BOUNDARIES.md": "harness/core/BOUNDARIES.en.md",
+  "harness/core/TREE_CONTRACTS.md": "harness/core/TREE_CONTRACTS.en.md",
+  "harness/visualization/README.md": "harness/visualization/README.en.md",
+  "harness/README.md": "harness/README.en.md"
+};
+window.OPENRESEARCH_ATLAS_I18N={en:TEXT_EN,terms:TERM_EN,core:CORE_EN,knowledge:KNOWLEDGE_EN,docs:DOC_EN};
 })();
