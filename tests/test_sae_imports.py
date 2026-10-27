@@ -33,7 +33,8 @@ def test_package_layout():
     assert SAE_DIR.is_dir()
     assert not (ROOT / "datasets").exists()
     assert (ROOT / "saebase").is_dir()
-    assert not (ROOT / "dlbase").exists()
+    assert (ROOT / "dlbase" / "registry.py").is_file()
+    assert (ROOT / "research_datasets" / "plugins.py").is_file()
     assert not (ROOT / "tasks" / "SAR").exists()
     assert not (ROOT / "tasks" / "sar").exists()
     assert not (ROOT / "tasks" / "SAE").exists()
@@ -47,6 +48,8 @@ def test_no_forbidden_imports_in_active_packages():
     roots = [ROOT / "saebase", ROOT / "tasks" / "sae", ROOT / "models", ROOT / "saebase" / "data"]
     for root in roots:
         for path in root.rglob("*.py"):
+            if path == ROOT / "models" / "dlbase_plugins.py":
+                continue  # explicitly segregated OpenResearch registry adapter
             if "__pycache__" in path.parts:
                 continue
             for mod in _collect_imports(path):

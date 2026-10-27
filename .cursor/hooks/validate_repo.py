@@ -33,7 +33,7 @@ def check(full: bool=False) -> list[str]:
         "saebase/data/__init__.py","saebase/cli.py",
         "models/plugins.py","models/dlbase_plugins.py",
         "tasks/plugins.py","tasks/dlbase_plugins.py",
-        "datasets/plugins.py","datasets/NLP/artifacts.py",
+        "research_datasets/plugins.py","research_datasets/NLP/artifacts.py",
         "dlbase/train.py","dlbase/registry.py",
         "conf/config.yaml","conf/openresearch.yaml",
         "harness/core/agent_flow.py","harness/knowledge/validate.py",

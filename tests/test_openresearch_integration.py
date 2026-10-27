@@ -12,8 +12,8 @@ def test_original_saebase_public_entrypoints_preserved():
         assert (ROOT/name).is_file(),name
 
 def test_openresearch_layers_are_additive():
-    for name in ("dlbase/train.py","dlbase/registry.py","datasets/plugins.py",
-                 "datasets/NLP/artifacts.py","models/dlbase_plugins.py",
+    for name in ("dlbase/train.py","dlbase/registry.py","research_datasets/plugins.py",
+                 "research_datasets/NLP/artifacts.py","models/dlbase_plugins.py",
                  "tasks/dlbase_plugins.py","models/vision/resnet18_mlp/factory.py",
                  "models/LLM/gemma2_2b_base/gemma2_2b_base.py",
                  "conf/openresearch.yaml","harness/core/agent_flow.py",
@@ -42,6 +42,6 @@ def test_graph_and_policy_parse():
         assert isinstance(json.loads((ROOT/file).read_text(encoding="utf-8")),dict)
 
 def test_python_syntax_in_added_modules():
-    for root in ("dlbase","datasets","harness"):
+    for root in ("dlbase","research_datasets","harness"):
         for file in (ROOT/root).rglob("*.py"):
             ast.parse(file.read_text(encoding="utf-8"),filename=str(file))

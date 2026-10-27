@@ -16,7 +16,7 @@ def stop_vllm() -> None:
     An externally configured VLLM_BASE_URL remains untouched.
     """
     from tasks.LLM.generate.backend.engine import release
-    from tasks.LLM.generate.backend.server import stop_owned_server
+    from saebase.generate.server import stop_owned_server
 
     release()
     stop_owned_server()
