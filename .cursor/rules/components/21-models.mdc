@@ -1,13 +1,13 @@
 ---
-description: LLM 与 SAE 模型身份、兼容性及插件注册规范。
+description: 语言模型与 SAE 权重的身份、兼容性与注册契约。
 globs: "models/**,saebase/sae/**,conf/model/**,conf/models_log.md"
 alwaysApply: false
 ---
 
 # Model 边界
 
-- SAEBase 原有模型与 SAE 注册接口保持兼容。新增 LLM 适配位于 `models/LLM/<name>/`，通用模型构建属于 `models/`。
-- SAE 字典按模型、层与 Hook 在 `saebase/sae/registry.py` 中追踪真实权重和来源。
-- `models/plugins.py` 保留原 SAEBase 入口。DLBase 通过 `models/dlbase_plugins.py` 注册 Gemma-2 2B 适配。
-- 特征干预与评测前核查模型身份、Token、SAE 维度和实际激活位置。
-- 只有明确授权的实际执行才加载大型模型或下载权重。配置与插件检查应保持 CPU 轻量。
+- `models/<name>/` 包含具体模型的构建、适配和 Model × Task × Dataset 兼容性检查；不再增加 NLP/LLM/Vision 目录层级。
+- SAEBase 原有模型与 SAE profiles 均保留，统一经 `models/plugins.py` 和 `saebase/registry.py` 注册。
+- `saebase/sae/registry.py` 保留来源、模型、层、Hook 和 SAE checkpoint 的准确身份及兼容关系。
+- 公共构建与延迟加载放在 `models/` 的通用模块；不得平行创建第二套模型 Registry 或 Runtime。
+- 只在获批准的真实实验中下载或加载大模型，配置与插件检测保持 CPU 轻量。
