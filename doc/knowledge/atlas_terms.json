@@ -460,11 +460,11 @@
       "foundation": "datasets/datamodule.py"
     },
     {
-      "id": "term.dlbase",
-      "term": "DLBase",
+      "id": "term.saebase_runtime",
+      "term": "SAEBase Runtime",
       "definition": "提供训练配置、组件注册、任务分发和实验文件管理的通用基础模块。",
       "aliases": [
-        "dlbase",
+        "科研组件运行时",
         "通用训练基础"
       ],
       "category": "platform",

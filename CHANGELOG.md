@@ -4,11 +4,11 @@
 
 ## 0.6.0 — Unified SAE Research Workspace
 
-- **Architecture:** integrate the OpenResearch DLBase runtime, Gemma-2 2B LLM adapter and NLP-only `research_datasets` alongside SAEBase's existing API and model catalog.
+- **Architecture:** integrate the research runtime, Gemma-2 2B model adapter and prompt dataset sources alongside SAEBase's existing API and model catalog.
 - **Seven operations:** source-backed capture, intervention, generation, circuits, explanation, benchmarking and SAE training with explicit approvals and experiment provenance.
 - **Harness and Atlas:** Core/Knowledge/Code/Environment/Context trees, bilingual UI, source evidence and scoped agent execution rules.
 - **Validated changes:** CPU CI and independent 12 GB GPU execution receipts, plus correction of Hydra first-run logging, optional training dtype and local dataset formats, circuit parameter checks and explicit explanation generator selection.
-- **Packaging:** wheel/sdist now include DLBase and required Hydra/NLP resources; original nine SAEBase console commands remain unchanged.
+- **Packaging:** wheel/sdist now include SAEBase Runtime and required Hydra/prompt resources; original nine SAEBase console commands remain unchanged.
 - **Scientific caveats:** original circuit output is not fully normalized or intervention-validated; explanation text lacks independently scored semantic quality; the training acceptance is a two-step smoke, not a complete converged model. No private weights, prompts or raw GPU experiment archives are included.
 
 

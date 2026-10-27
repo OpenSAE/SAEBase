@@ -54,8 +54,8 @@ def existing_tree(graph: dict, *, view: str) -> dict:
     root_id = f"{view}:existing"
     labels = {
         "core": (
-            "OpenResearch 双核心与任务注册",
-            "展示 DLBase、SAEBase 和 Dataset、Model、Task 注册架构中已经实现的组件。",
+            "SAEBase 统一科研组件与任务注册",
+            "展示 SAEBase Runtime、Registry 与 Dataset、Model、Task 中已经实现的组件。",
         ),
         "knowledge": (
             "LLM SAE 科研方法与实现依据",

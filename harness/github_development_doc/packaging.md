@@ -29,7 +29,7 @@ Neither of these commands downloads LLM or SAE checkpoint weights.
 | `saebase.model_plugins` and `saebase.tasks.plugins` | Canonical built-in registration; each executes once |
 | `main`, `models.plugins`, `tasks.plugins` | Backward-compatible imports and launch paths retained |
 | `models.*`, `saebase.tools.*`, `tasks.*`, `conf.*` | Legacy implementation/configuration packages retained for compatibility |
-| `dlbase`, `research_datasets` | Included in wheels built from this branch so `python -m saebase.runtime.train` works outside the checkout. The published v0.5.0 wheel does not contain them. `saebase` command names are unchanged. |
+| `saebase.runtime`, `saebase.datasets` | Unified runtime and prompt dataset modules are packaged into installed wheels without shadowing Hugging Face `datasets`. Historical `saebase` commands remain unchanged. |
 
 Do not rename old configuration roots, cache schema IDs, CLI flags or existing
 task/model registry identifiers. Further consolidation of `models`,
