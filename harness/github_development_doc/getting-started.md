@@ -49,4 +49,4 @@ Use [Model and SAE Support](model-support.md) to choose checkpoints, [Activation
 
 For external SAR, RSS, Input Localization and SAEBench measurements, see [Research Integrations](research-integrations.md). To prepare your own prompts and source manifests, consult the [Data and Python API Guide](python-api.md).
 
-[Examples](../../saebase/saebase/examples/README.md) · [Documentation](index.md) · [Troubleshooting](troubleshooting.md)
+[Examples](../../saebase/examples/README.md) · [Documentation](index.md) · [Troubleshooting](troubleshooting.md)

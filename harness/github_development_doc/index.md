@@ -8,7 +8,7 @@ Start with a working example, then choose the research task you want to perform.
 - [First Experiment](first-experiment.md) — create an HTML report, CSV metrics, source records and a reliability audit without model downloads.
 - [Getting Started](getting-started.md) — installation, preflight and real-checkpoint commands.
 - [Python API](python-api.md) · [API Reference](API.md) — model adapters, SAE features, stores and evaluation.
-- [Runnable Examples](../../saebase/saebase/examples/README.md) · [Troubleshooting](troubleshooting.md).
+- [Runnable Examples](../../saebase/examples/README.md) · [Troubleshooting](troubleshooting.md).
 
 ## Research workflows
 

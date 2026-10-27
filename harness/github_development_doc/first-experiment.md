@@ -109,6 +109,6 @@ Different metrics, inputs or checkpoints must have distinct identities.
 - To contribute a bug fix, test, example or documentation improvement,
   follow the [Contributor Guide](contributor-guide.md).
 
-[Examples Index](../../saebase/saebase/examples/README.md) ·
+[Examples Index](../../saebase/examples/README.md) ·
 [Troubleshooting](troubleshooting.md) ·
 [Python API](python-api.md)
