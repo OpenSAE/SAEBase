@@ -5,14 +5,14 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from datasets.NLP.GreaterThan.GreaterThan import generate_greater_than_prompts
-from datasets.NLP.GreaterThan.tokenize import (
+from research_datasets.NLP.GreaterThan.GreaterThan import generate_greater_than_prompts
+from research_datasets.NLP.GreaterThan.tokenize import (
     attach_token_ids,
     filter_greedy_in_greater,
     strategy_for_model_key,
 )
-from datasets.NLP.artifacts import assert_available, make_manifest
-from datasets.NLP.artifacts import save_prompts
+from research_datasets.NLP.artifacts import assert_available, make_manifest
+from research_datasets.NLP.artifacts import save_prompts
 
 
 def prepare_for_model(
@@ -47,7 +47,7 @@ def prepare_for_model(
             "name": "greedy_in_greater_set",
             "tokenize_strategy": strategy,
         },
-        source="datasets.NLP.GreaterThan.prepare",
+        source="research_datasets.NLP.GreaterThan.prepare",
         extra={"tokenized_kept": len(tok)},
     )
     return save_prompts(kept, manifest, data_root=data_root)

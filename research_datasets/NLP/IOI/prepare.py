@@ -5,10 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from datasets.NLP.IOI.IOI import generate_ioi_prompts
-from datasets.NLP.IOI.tokenize import attach_token_ids, filter_with_model
-from datasets.NLP.artifacts import assert_available, make_manifest
-from datasets.NLP.artifacts import save_prompts
+from research_datasets.NLP.IOI.IOI import generate_ioi_prompts
+from research_datasets.NLP.IOI.tokenize import attach_token_ids, filter_with_model
+from research_datasets.NLP.artifacts import assert_available, make_manifest
+from research_datasets.NLP.artifacts import save_prompts
 
 
 def prepare_for_model(
@@ -40,7 +40,7 @@ def prepare_for_model(
             "name": policy,
             "require_single_token_targets": True,
         },
-        source="datasets.NLP.IOI.prepare",
+        source="research_datasets.NLP.IOI.prepare",
         extra={"single_token_kept": len(tok)},
     )
     return save_prompts(kept, manifest, data_root=data_root)
