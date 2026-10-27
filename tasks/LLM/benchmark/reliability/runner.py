@@ -27,7 +27,6 @@ def evaluate_m3(
     localization_items = []
     sae_cache = {}
     population = defaultdict(dict)
-    all_by_metric = defaultdict(list)
     for m in metrics:
         if cfg.metric_ids and m["metric_id"] not in cfg.metric_ids:
             continue

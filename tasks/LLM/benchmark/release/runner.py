@@ -260,7 +260,7 @@ def execute_matrix(
     sae_loader: Callable | None = None,
     fail_after_models: int | None = None,
 ) -> dict:
-    plan = plan_matrix(matrix)
+    plan_matrix(matrix)  # retain validation before executing the matrix
     if not real:
         raise ValueError("M5 checkpoint evaluation requires explicit real=True")
     root = Path(output) / matrix.matrix_id

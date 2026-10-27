@@ -41,8 +41,8 @@ def command(
     if not 1 <= transfers <= 32 or not 1 <= checkers <= 64:
         raise ValueError("Concurrency out of bounds")
     r = remote_path(remote)
-    l = local_path(local, action in ("push", "verify"))
-    source, dest = (l, r) if action in ("push", "verify") else (r, l)
+    local_ref = local_path(local, action in ("push", "verify"))
+    source, dest = (local_ref, r) if action in ("push", "verify") else (r, local_ref)
     op = "check" if action == "verify" else "copy"
     args = [
         "rclone",

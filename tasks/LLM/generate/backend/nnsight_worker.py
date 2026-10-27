@@ -628,7 +628,6 @@ def cmd_generate(args: argparse.Namespace) -> dict:
                     cap_x2 = []
                     cap_lg = list().save()
                     saved[f"cap{i}"] = cap_lg
-                    step_i = 0
                     need_loop = (
                         (mode == "steer" and rows is not None)
                         or mode == "keep"

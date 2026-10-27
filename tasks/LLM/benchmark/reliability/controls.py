@@ -56,7 +56,6 @@ def check_sar_negatives(paper, *, seed: int = 20) -> dict:
 def check_rss_controls(paper, *, seed: int = 21) -> dict:
     f = fixture(seed=seed)
     selected = f["selection"]
-    held = f["held_out"]
     kwargs = {"rho": 0.8, "kappa": 0.9, "tau": 0.1, "M": 12, "K": 3}
     support, direction, mean = paper.rss(selected, **kwargs)
     rng = np.random.default_rng(seed + 19)
