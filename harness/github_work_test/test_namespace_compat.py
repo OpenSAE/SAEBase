@@ -15,7 +15,7 @@ from saebase.registry import (
     list_registered_task_keys,
 )
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 ENTRYPOINTS = {
     "saebase": ("main", "main"),
