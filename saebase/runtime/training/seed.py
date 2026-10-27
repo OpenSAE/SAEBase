@@ -1,7 +1,7 @@
 """
-Global reproducibility policy for DLBase and SpatialPheno.
+Global reproducibility policy for SAEBase training.
 
-RNG state is set exclusively via :func:`pytorch_lightning.seed_everything` (Python ``random``,
+Training RNG state uses :func:`pytorch_lightning.seed_everything` (Python ``random``,
 NumPy, PyTorch, ``PL_GLOBAL_SEED`` / worker env). We then align cuDNN with the former standalone
 ``setup_seed`` behavior (deterministic kernels; disable benchmark), which Lightning does not set.
 """

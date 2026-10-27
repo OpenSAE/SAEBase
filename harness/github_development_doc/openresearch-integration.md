@@ -1,16 +1,37 @@
-# SAEBase × OpenResearch code integration
+# SAEBase and OpenResearch architecture
 
-This note describes the SAEBase v0.6.0 integration. SAEBase v0.5.0 remains the backward-compatibility baseline; v0.6.0 includes OpenResearch execution and agent harness components in the source and software distributions.
+SAEBase v0.6.0 introduced the research Harness and seven research operations.
+This development branch unifies the component layout without changing the
+published v0.6.0 tag or production Research Lab deployment.
 
-## Merge and ownership rules
+## Component ownership
 
-1. Preserve SAEBase's existing `saebase/` code, registry adapters, CLI, `apps/`, original models and `harness/github_development_doc/`. Do not replace the v0.5.0 API with the smaller OpenResearch subset.
-2. Copy OpenResearch `datasets/`, `saebase/runtime/`, the Gemma LLM adapter, seven LLM task families, `harness/`, `.cursor/`, `doc/`, and nonconflicting Hydra YAML groups. These are additive paths.
-3. Where module names have different meanings, keep both: `models/plugins.py` remains SAEBase's legacy delegation; `models/dlbase_plugins.py` is the DLBase registration implementation. The same rule applies to `tasks/plugins.py` and `tasks/dlbase_plugins.py`.
-4. Keep `conf/config.yaml` for the released SAEBase workflow; `conf/sae_research.yaml` is the DLBase entrypoint. Keep original `conf/model/gemma2_2b_base.yaml`; choose `conf/model/openresearch_gemma2_2b_base.yaml` for DLBase's lazy model configuration.
-5. Keep `saebase/data/` and original prompt builders. The new `datasets/` modules carry OpenResearch's separate prompt artifact layout. Do not silently migrate experiment datasets, checksums, or benchmarks.
-6. OpenResearch's prior Code/Knowledge JSON and Core graph were copied for reference and require SAEBase-specific evidence review. Public Atlas snapshots must be regenerated from SAEBase before they can represent this repository's verified state.
-7. Temporary OpenResearch work plans, demo ledgers and privileged GitHub-only notes are excluded. Governance code and Cursor approval gates are included.
+- `datasets/` contains the canonical prompt sources and dataset plugins.
+  `saebase/data/` retains narrowly scoped compatibility imports.
+  The Python import namespace is `saebase.datasets` so Hugging Face
+  `datasets` remains importable.
+- `models/` contains model adapters and registrations, preserving the verified
+  SAEBase model and checkpoint catalog.
+- `tasks/` contains capture, intervene, generate, circuits, explain,
+  benchmark and train. The historical `sae` task remains an API compatibility
+  entry, not a separate Registry.
+- `saebase/registry.py` is the central registry and
+  `saebase/plugin_bootstrap.py` loads the model, dataset and task plugins.
+- `saebase/runtime/` hosts shared configuration, training and experiment
+  execution. Agent edits to this protected layer require explicit review.
+- `saebase/research_lab/` contains the Research Lab service and its static
+  assets. The publication and evidence-review gates remain unchanged.
+- `harness/github_development_doc/` contains developer documentation and
+  `harness/github_work_plan/` retains historical work plans. Their old
+  experiment records are not automatically new release evidence.
+
+## Verification
+
+For changes on the refactor branch, run Python 3.11 and 3.12 offline tests,
+quality checks, Hydra composition, the installed-wheel test, the Research Lab
+offline checks, the Harness source and Atlas checks, and pinned research
+integration tests. Run bounded GPU smoke tests only for affected model/task
+interfaces. Do not merge while required checks fail.
 
 ## Checkpoints
 
@@ -38,4 +59,4 @@ These commands are also covered by the release CI where applicable. Bounded real
 
 The `datasets/` package uses its own Python name, avoiding a collision with Hugging Face's `datasets` package. Research Lab and the legacy dataset readers retain their original imports.
 
-The v0.6.0 distribution includes DLBase, the Hydra resources and registered NLP components, in addition to the original public API and model/task shims. The immutable GitHub release is governed by the documented exact-source CI workflow; no PyPI upload is implied.
+The v0.6.0 distribution includes SAEBase runtime, the Hydra resources and registered NLP components, in addition to the original public API and model/task shims. The immutable GitHub release is governed by the documented exact-source CI workflow; no PyPI upload is implied.

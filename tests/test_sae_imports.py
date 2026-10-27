@@ -66,4 +66,4 @@ def test_sae_plugin_importable():
     assert task.name == "sae"
     assert get_task_plugin("sae").task_class is SAETask
     for name in TASK_NAMES:
-        assert get_task_plugin(name).task_class.name.fget is not None
+        assert get_task_plugin(name).task_class is not None

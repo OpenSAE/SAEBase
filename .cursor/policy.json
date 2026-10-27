@@ -3,22 +3,15 @@
   "approved_roots": [
     ".cursor",
     ".github",
-    "apps",
-    "assets",
     "conf",
-    "dlbase",
     "doc",
-    "docs",
-    "examples",
     "experiment",
     "harness",
     "models",
     "saebase",
-    "scripts",
     "tasks",
     "tests",
-    "work_plan",
-    "research_datasets"
+    "datasets"
   ],
   "approved_files": [
     ".cursorignore",
@@ -40,7 +33,9 @@
     "setup.py"
   ],
   "protected_roots": [
-    "dlbase",
-    "saebase"
+    "saebase/runtime",
+    "harness",
+    ".cursor",
+    ".github"
   ]
 }

@@ -7,7 +7,7 @@ From the repository root (or with that root on ``PYTHONPATH``)::
   python -m saebase.runtime.train train.max_epochs=50 seed=1
 
 Overrides use Hydra syntax. ``paths.root`` is the parent of this package
-(``${dlbase_repo_root:}``), not the process cwd. ``config_path`` points at
+(``${saebase_repo_root:}``), not the process cwd. ``config_path`` points at
 the repository ``conf/`` directory.
 """
 
@@ -29,12 +29,14 @@ from omegaconf import DictConfig, OmegaConf  # noqa: E402 - import ordering foll
 from saebase.runtime.cfg.config_validate import validate_hydra_cfg  # noqa: E402 - import ordering follows runtime/bootstrap contract
 
 
-def _dlbase_repo_root() -> str:
-    """Directory that contains the ``dlbase`` package (the repository root)."""
+def _saebase_repo_root() -> str:
+    """Directory containing the SAEBase source workspace."""
     return str(Path(__file__).resolve().parents[2])
 
 
-OmegaConf.register_new_resolver("dlbase_repo_root", _dlbase_repo_root, replace=True)
+OmegaConf.register_new_resolver("saebase_repo_root", _saebase_repo_root, replace=True)
+# Legacy Hydra configuration snapshots may still use this resolver name.
+OmegaConf.register_new_resolver("dlbase_repo_root", _saebase_repo_root, replace=True)
 
 
 @hydra.main(version_base=None, config_path="../../conf", config_name="sae_research")
