@@ -10,6 +10,37 @@ permissions:
   contents: read
 
 jobs:
+  integration-autofix:
+    if: github.event_name == 'pull_request' && github.head_ref == 'sync-openresearch-harness-20261027' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Ruff autoformat added integration modules only
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install "ruff>=0.12,<0.16"
+          mapfile -d '' files < <(git diff --name-only --diff-filter=A -z "$BASE_SHA"...HEAD -- '*.py')
+          if (( ${#files[@]} == 0 )); then exit 0; fi
+          ruff check --fix "${files[@]}" || true
+          ruff format "${files[@]}"
+          git add -- "${files[@]}"
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "style: apply Ruff to newly integrated Python modules"
+          git push origin "HEAD:${{ github.head_ref }}"
   offline-tests:
     runs-on: ubuntu-latest
     strategy:
