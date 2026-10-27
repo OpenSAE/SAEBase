@@ -1,7 +1,7 @@
 # @package _global_
 train:
   max_epochs: 128
-  # Standard training stack (dlbase); toggle without editing task code. Defaults: all on.
+  # Standard training stack (SAEBase runtime); toggle without editing task code. Defaults: all on.
   facets:
     clear_experiment_leaf: true
     tqdm_epoch_progress: true
@@ -26,7 +26,7 @@ train:
     # 与 facets.early_stopping 同时为 true 时才挂 EarlyStopping。本任务默认跑满 max_epochs。
     enable: false
     monitor: val/acc
-    # patience is computed in saebase.runtime.standard_lightning / classification run: max(5, int(0.1 * train.max_epochs)); one val per epoch
+    # patience is computed in saebase.runtime.standard_lightning / training run: max(5, int(0.1 * train.max_epochs)); one val per epoch
     mode: max
     min_delta: 0.0
 

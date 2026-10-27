@@ -28,7 +28,7 @@ def print_python_identity() -> None:
     print("[env] version:", sys.version.split()[0])
 
 
-def verify_training_runtime(*, context: str = "DLBase", profile: str = "llm") -> None:
+def verify_training_runtime(*, context: str = "SAEBase", profile: str = "llm") -> None:
     print_python_identity()
     missing = missing_packages(profile=profile)
     if missing:

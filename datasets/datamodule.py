@@ -4,7 +4,7 @@ from torch.utils.data import DataLoader
 from omegaconf import DictConfig
 
 
-class DLBaseDataModule(pl.LightningDataModule):
+class SAEBaseDataModule(pl.LightningDataModule):
     """Builds train/val/test loaders from Hydra ``dataset`` config."""
 
     def __init__(self, cfg: DictConfig):

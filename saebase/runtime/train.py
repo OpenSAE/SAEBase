@@ -35,8 +35,6 @@ def _saebase_repo_root() -> str:
 
 
 OmegaConf.register_new_resolver("saebase_repo_root", _saebase_repo_root, replace=True)
-# Legacy Hydra configuration snapshots may still use this resolver name.
-OmegaConf.register_new_resolver("dlbase_repo_root", _saebase_repo_root, replace=True)
 
 
 @hydra.main(version_base=None, config_path="../../conf", config_name="sae_research")

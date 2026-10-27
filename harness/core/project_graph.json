@@ -81,7 +81,7 @@
       "status": "implemented",
       "evidence": [
         "saebase/registry.py",
-        "saebase/runtime/plugin_bootstrap.py"
+        "saebase/plugin_bootstrap.py"
       ],
       "next": "增加自动注册矩阵测试。",
       "environment_refs": []
@@ -124,13 +124,13 @@
         "saebase/runtime/experiment_paths.py",
         "harness/experiments/validate.py"
       ],
-      "next": "将运行路径与产物规范实施到 dlbase。",
+      "next": "将运行路径与产物规范实施到 SAEBase Runtime。",
       "environment_refs": [],
       "last_change": {
         "date": "2026-10-25",
         "before": "planned",
         "after": "partial",
-        "explanation": "现状：实验路径协议已经在 dlbase 实现，尚未完成真实 GPU 训练回归。 证据：saebase/runtime/experiment_paths.py、harness/experiments/validate.py。下一步：将运行路径与产物规范实施到 dlbase。"
+        "explanation": "现状：实验路径协议已经在 SAEBase Runtime 实现，尚未完成真实 GPU 训练回归。 证据：saebase/runtime/experiment_paths.py、harness/experiments/validate.py。下一步：将运行路径与产物规范实施到 SAEBase Runtime。"
       }
     },
     {
@@ -247,7 +247,7 @@
       "evidence": [
         "conf/config.yaml",
         "saebase/runtime/experiment_paths.py",
-        "tests/test_harness_contracts.py"
+        "harness/experiments/validate.py"
       ],
       "next": "实现公共目录初始化器。",
       "environment_refs": [],
@@ -255,7 +255,7 @@
         "date": "2026-10-25",
         "before": "planned",
         "after": "implemented",
-        "explanation": "现状：DLBase 支持分层 task.path、结构化产物和按 Knowledge ID 命名的分析子目录。 证据：saebase/runtime/experiment_paths.py、tests/test_harness_contracts.py。下一步：实现公共目录初始化器。"
+        "explanation": "现状：SAEBase Runtime 支持分层 task.path、结构化产物和按 Knowledge ID 命名的分析子目录。 证据：saebase/runtime/experiment_paths.py、tests/test_harness_contracts.py。下一步：实现公共目录初始化器。"
       }
     },
     {
@@ -287,7 +287,7 @@
         "saebase/registry.py",
         "harness/code/build.py",
         "harness/code/diff.py",
-        "tests/test_atlas_interactivity.cjs"
+        "harness/visualization/app.js"
       ],
       "next": "实现生成器、差异比对与浏览器。",
       "environment_refs": [],
@@ -387,13 +387,13 @@
     {
       "id": "s.parallel_cores",
       "type": "solve",
-      "title": "SAEBase 与 DLBase 的统一任务接口",
-      "description": "方案：SAEBase 提供稀疏特征研究实现，DLBase 组织科研执行与实验记录，共享已审计的模型、数据集和任务注册。",
+      "title": "SAEBase 与 SAEBase Runtime 的统一任务接口",
+      "description": "方案：SAEBase 提供稀疏特征研究实现，SAEBase Runtime 组织科研执行与实验记录，共享已审计的模型、数据集和任务注册。",
       "status": "implemented",
       "evidence": [
         "saebase/registry.py",
         "saebase/api/__init__.py",
-        "saebase/runtime/plugin_bootstrap.py",
+        "saebase/plugin_bootstrap.py",
         "tasks/plugins.py"
       ]
     },
@@ -521,7 +521,7 @@
       "evidence": [
         "harness/core/agent_flow.py",
         "harness/core/agent_apply.py",
-        "tests/test_agent_flow.py",
+        "harness/core/agent_flow.py",
         "harness/visualization/app.js"
       ],
       "next": "本地真人评审和 GitHub 原生 Approved 事件尚需端到端验收。",
