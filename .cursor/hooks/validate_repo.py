@@ -22,11 +22,11 @@ def check(full: bool=False) -> list[str]:
                 errors.append("Missing Cursor hook "+script)
     for rule in (ROOT/".cursor/rules").rglob("*.mdc"):
         body=rule.read_text(encoding="utf-8")
-        if not body.startswith("---\\n") or "\\n---\\n" not in body[4:]:
+        if not body.startswith("---\n") or "\n---\n" not in body[4:]:
             errors.append("Invalid Cursor rule "+str(rule))
     for skill in (ROOT/".cursor/skills").rglob("SKILL.md"):
         body=skill.read_text(encoding="utf-8")
-        if not body.startswith("---\\n") or "name:" not in body:
+        if not body.startswith("---\n") or "name:" not in body:
             errors.append("Invalid Cursor skill "+str(skill))
     required=[
         "saebase/api/__init__.py","saebase/sae/__init__.py",
