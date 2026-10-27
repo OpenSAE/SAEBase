@@ -55,6 +55,7 @@ BEHAVIOR_ALIASES: dict[str, str] = {
     "LiveCodeBench": "LiveCodeBench",
 }
 
+
 def _default_workspace_root() -> Path:
     """Use the source checkout for editable installs; cwd for installed wheels.
 
