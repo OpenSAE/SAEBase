@@ -10,7 +10,7 @@ Core、Knowledge、Code、Environment、Context 共用一套居中分叉、Focus
 - **类**：职责、全部成员属性、类中定义的每个方法。每个方法拥有完整的函数接口和源码。
 - **模块**：包含的类、函数，以及当前模块中主要的源码部分。
 - **Context**：简洁定义、原理、来源、现有实现；适合的概念附带公式、SVG 示意图和真实代码。
-- **Knowledge**：CUB-200 分类与 LLM SAE 八个研究方向；区分尚待验证的研究问题与已经有代码证据的方法接口。
+- **Knowledge**：LLM SAE 的八个研究方向；区分尚待验证的研究问题与已经有代码证据的方法接口。
 
 界面文字采用肯定式，优先显示直接职责与证据。实际源码按文件和行号链接，术语及模型说明由 [Context 的权威数据](../../doc/knowledge/) 维护。
 
@@ -36,7 +36,7 @@ Code Tree 按真实源目录 → 子模块职责 → Python 模块 → 类／函
 
 ## 节点标题的语义约定
 
-Atlas Code Tree 的节点名称必须是一句有内容的中文功能概括，例如「校验 Hydra 训练配置与注册组件」「计算模型激活的重建损失」「为输入样本附加 Token 编码」。科研约定名称 SAE、ResNet、Hydra、Token 等可按惯用缩写书写。
+Atlas Code Tree 的节点名称必须是一句有内容的中文功能概括，例如「校验 Hydra 训练配置与注册组件」「计算模型激活的重建损失」「为输入样本附加 Token 编码」。科研约定名称 SAE、Hydra、Token 等可按惯用缩写书写。
 
 标题只回答「这个节点做什么」。Python 的函数名、类名、方法签名、文件位置和源码行号存放在**展开节点说明与依据**中，使用原始源码身份保证可复查。Code 节点从实际 Python AST 提取，`harness/code/semantic_titles.py` 负责按功能生成中文标题；`harness/code/presentation.py` 负责保留经过核对的中文说明与源码接口。
 

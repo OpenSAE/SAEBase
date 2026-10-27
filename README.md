@@ -25,8 +25,8 @@ This branch integrates the [OpenResearch](https://github.com/OpenSAE/OpenResearc
 | --- | --- |
 | `saebase/` | Existing public SAEBase primitives, registries, CLI, benchmark and release compatibility remain authoritative. |
 | `dlbase/` | OpenResearch's separate Hydra training/execution and Dataset/Model/Task registry. |
-| `research_datasets/` | Additive Vision/CUB-200 and NLP prompt-source implementations; original `saebase/data/` is retained. |
-| `models/` | Existing SAEBase model keys remain; `models/vision/` and `models/LLM/` provide OpenResearch adapters. |
+| `research_datasets/` | Additive NLP prompt-source implementations; original `saebase/data/` is retained. |
+| `models/` | Existing SAEBase model keys remain; `models/LLM/` provides OpenResearch LLM adapters. |
 | `tasks/` | Original compatibility plugin interface remains; `tasks/LLM/` adds capture, intervene, generate, circuits, explain, benchmark, and train executors. |
 | `harness/` and `.cursor/` | Agent Flow, Core/Knowledge/Code/Environment, Atlas visualization, scoped hooks and skills. |
 | `doc/` | Versioned context and Code graph source references, originally derived from OpenResearch; transferred statuses need SAEBase-specific review. |

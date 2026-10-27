@@ -8,8 +8,8 @@
 | --- | --- |
 | `saebase/` | 保留原有 SAEBase 基础算法、API、模型/SAE 注册、CLI 与科研实现。 |
 | `dlbase/` | 新增独立 Hydra 执行入口与 Dataset/Model/Task Registry。 |
-| `research_datasets/` | 并入 Vision CUB-200 与 NLP 数据集；保留原有 `saebase/data/`。 |
-| `models/` | 保留全部旧模型，新增 Vision 和 OpenResearch 的 Gemma-2 适配。 |
+| `research_datasets/` | 仅并入 NLP Prompt 数据集；保留原有 `saebase/data/`。 |
+| `models/` | 保留全部旧模型，新增 OpenResearch 的 Gemma-2 LLM 适配。 |
 | `tasks/` | 保留旧任务入口，新增七类 LLM Task。 |
 | `harness/` 与 `.cursor/` | 引入 Agent Flow、五棵 Tree、Atlas、Hooks、规则和 Skills。 |
 | `doc/` | 引入知识图与代码关系说明；继承的节点状态需要按 SAEBase 实际情况重新核验。 |

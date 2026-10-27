@@ -7,7 +7,7 @@
   const LABELS = {
     api:"SAEBase API 与特征接口",sae:"SAE 字典与加载",
     store:"特征数据与分片存储",llm:"语言模型与 SAE 操作",
-    nlp:"NLP 样本与 Prompt",vision:"视觉训练与模型",
+    nlp:"NLP 样本与 Prompt",
     benchmark:"SAE 指标与可靠性评测",reliability:"统计可靠性",
     integrations:"SAR、RSS 与基准集成",backend:"计算执行后端",
     adapters:"外部基准适配",metrics:"评测指标计算",release:"评测结果发布",

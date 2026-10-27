@@ -5,7 +5,7 @@
 | 结构 | 回答的问题 | 数据来源 | 默认编辑方 |
 | --- | --- | --- | --- |
 | **Core Tree** | 项目为什么这样设计？总体目标/里程碑如何依赖？ | `harness/core/project_graph.json` | GitHub 端规划者 |
-| **Knowledge Tree** | CUB-200 分类与 LLM SAE 特征捕获、干预、解释、评测和训练分别有哪些方法与验证问题？ | `doc/knowledge/context_graph.json` | GitHub 端科研上下文管理 |
+| **Knowledge Tree** | LLM SAE 特征捕获、干预、解释、评测与训练有哪些方法和验证问题？ | `doc/knowledge/context_graph.json` | GitHub 端科研上下文管理 |
 | **Code Tree** | 当前仓库实际上有什么类、方法、模块关系？ | AST 生成 `doc/code/code_tree.json` | 自动化工具 |
 | **Environment Tree** | 当前任务在哪台机器、哪些资源上运行？ | 探测器 / 环境快照 | 本地机器 |
 | **Glossary** | Knowledge Tree 的术语统一是什么意思？ | `doc/knowledge/glossary.json` | GitHub 端科研上下文管理 |

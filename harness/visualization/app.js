@@ -1407,7 +1407,7 @@
         path.startsWith("/") || path.includes("..") || path.includes("\\"))
       return null;
     const suffix = typeof line === "number" && line > 0 ? "#L" + line : "";
-    return "https://github.com/OpenSAE/OpenResearch/blob/main/" +
+    return "https://github.com/OpenSAE/SAEBase/blob/sync-openresearch-harness-20261027/" +
       path.split("/").map(encodeURIComponent).join("/") + suffix;
   }
   function diagramShape(group, tag, attributes, value) {
@@ -1417,8 +1417,7 @@
   }
   function attributeDiagram(type) {
     const diagram = svg("svg",{viewBox:"0 0 390 128",class:"attribute-diagram",
-      role:"img", "aria-label":type==="residual"?
-      "残差路径 F(x) 与捷径 x 相加的结构示意":"CUB 官方训练与测试分开的结构示意"});
+      role:"img", "aria-label":"可核对的科研概念示意"});
     if (type==="residual") {
       diagramShape(diagram,"rect",{x:10,y:46,width:62,height:34,rx:7,class:"diagram-box"});
       diagramShape(diagram,"text",{x:41,y:67,"text-anchor":"middle"},"输入 x");
@@ -1432,14 +1431,6 @@
       diagramShape(diagram,"path",{d:"M303 64 L329 64",class:"diagram-edge"});
       diagramShape(diagram,"text",{x:356,y:67,"text-anchor":"middle"},"输出");
       diagramShape(diagram,"text",{x:185,y:89,"text-anchor":"middle"},"捷径连接");
-    } else if(type==="cub_split") {
-      diagramShape(diagram,"text",{x:195,y:23,"text-anchor":"middle"},"CUB-200-2011 官方数据");
-      diagramShape(diagram,"rect",{x:16,y:42,width:166,height:62,rx:8,class:"diagram-box"});
-      diagramShape(diagram,"rect",{x:208,y:42,width:166,height:62,rx:8,class:"diagram-box"});
-      diagramShape(diagram,"text",{x:99,y:67,"text-anchor":"middle"},"训练数据");
-      diagramShape(diagram,"text",{x:99,y:84,"text-anchor":"middle"},"Official Train");
-      diagramShape(diagram,"text",{x:291,y:67,"text-anchor":"middle"},"测试数据");
-      diagramShape(diagram,"text",{x:291,y:84,"text-anchor":"middle"},"Official Test");
     }
     return diagram;
   }
