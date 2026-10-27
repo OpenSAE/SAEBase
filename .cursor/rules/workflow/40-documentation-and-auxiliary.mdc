@@ -1,0 +1,16 @@
+---
+description: 工程文档、诊断脚本与结构化交付规范。
+globs: ".cursor/**,**/*.md,conf/**,scripts/**,tests/**"
+alwaysApply: false
+---
+
+# 文档与辅助文件
+
+- README 面向人类介绍项目、安装、快速使用和贡献入口；不得重新成为 Agent 强制阅读的架构规范。
+- Agent 行为规范进入 .cursor/rules，标准流程进入 .cursor/skills，可执行检查进入 .cursor/hooks。
+- conf/datasets_log.md、conf/models_log.md、conf/tasks_log.md 保留为人类可读的组件摘要；必要时随组件修改同步，但不重复维护完整默认配置。
+- 科研知识、理论、假设、实验协议和研究决策放在 `doc/knowledge/`；代码设计、实现计划、技术分析放在 `doc/code/`。只有用户或当前 Work Order 指定时才读取正文；临时输出进入 `experiment/`，不要在仓库根制造报告、日志或临时脚本。
+- 可复用人工执行脚本仅放 scripts/，自动测试仅放 tests/，Cursor Hook 的 Python 实现例外放 .cursor/hooks/。
+- 代码中不以「参见 README 某章节」作为契约或 API 定义；引用对应源码、YAML 或 .cursor/rules 更准确。
+- Markdown 与面向用户的说明使用中文，代码片段、文件路径及通用技术名词可保留英文。
+- 交付应包含改动范围、验证证据、已知限制和潜在运行时影响；不得宣称 Hooks 能验证任意语义等价。
