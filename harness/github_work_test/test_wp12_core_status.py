@@ -9,7 +9,7 @@ import pytest
 
 from saebase.wp12.acceptance import audit_ledger
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_core_pass_matrix_is_specific_and_not_release_certification():

@@ -7,7 +7,7 @@ from pathlib import Path
 import ast
 import tomllib
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_v050_package_version_and_release_notes():
@@ -23,7 +23,7 @@ def test_v050_package_version_and_release_notes():
         and isinstance(node.value, ast.Constant)
     ]
     assert found == [project["version"]]
-    changelog = (ROOT / "CHANGELOG.md").read_text()
+    changelog = (ROOT / "harness/github_development_doc/CHANGELOG.md").read_text()
     assert "## 0.5.0" in changelog
     notes = (ROOT / "harness/github_development_doc/releases/v0.5.0.md").read_text()
     assert "Public Research Beta" in notes
