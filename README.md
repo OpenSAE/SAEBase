@@ -20,7 +20,7 @@
 
 ## 🧭 Research Harness
 
-**[OpenResearch](https://github.com/OpenSAE/OpenResearch) · In development**
+**OpenResearch · In development**
 
 SAEBase includes a research Harness for organizing code, scientific knowledge, experiments, computing environments, and agent collaboration. **Atlas** connects these through five research trees.
 
@@ -34,7 +34,7 @@ SAEBase includes a research Harness for organizing code, scientific knowledge, e
 
 **Agent Harness:** [Agent Flow](harness/core/AGENT_FLOW.md) for structured reviews · [Cursor rules and skills](.cursor/) for coding agents · [Experiment tracking](harness/experiments/README.md) for reproducible research.
 
-**Explore:** [Atlas visualization](harness/visualization/README.md) · [Harness overview](harness/README.md) · [OpenResearch GitHub](https://github.com/OpenSAE/OpenResearch)
+**Explore:** [Atlas visualization](harness/visualization/README.md) · [Harness overview](harness/README.md)
 
 ```bash
 python .cursor/hooks/validate_repo.py --full
