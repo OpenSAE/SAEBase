@@ -57,7 +57,7 @@ def read_prompts(dataset_cfg: Any, *, model_key: str | None = None) -> list[dict
     if path.suffix == ".jsonl":
         if path.name == "prompts.jsonl" and path.parent.name == "v1":
             # Real SAEBase artifact: verify the manifest identifies its source.
-            from datasets.NLP.artifacts import load_prompts
+            from research_datasets.NLP.artifacts import load_prompts
             expected_model = path.parent.parent.name
             if model_key is not None and expected_model != model_key:
                 raise ValueError("Prompt artifact model does not match selected model")

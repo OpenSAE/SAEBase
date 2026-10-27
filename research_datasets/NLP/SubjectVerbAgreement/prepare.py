@@ -5,10 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from datasets.NLP.SubjectVerbAgreement.SubjectVerbAgreement import generate_sva_prompts
-from datasets.NLP.SubjectVerbAgreement.tokenize import attach_token_ids, filter_with_model
-from datasets.NLP.artifacts import assert_available, make_manifest
-from datasets.NLP.artifacts import save_prompts
+from research_datasets.NLP.SubjectVerbAgreement.SubjectVerbAgreement import generate_sva_prompts
+from research_datasets.NLP.SubjectVerbAgreement.tokenize import attach_token_ids, filter_with_model
+from research_datasets.NLP.artifacts import assert_available, make_manifest
+from research_datasets.NLP.artifacts import save_prompts
 
 
 def prepare_for_model(

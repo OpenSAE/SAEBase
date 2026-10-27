@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from datasets.NLP.artifacts import canonicalize_behavior
-from datasets.NLP.artifacts import load_manifest, load_prompts
+from research_datasets.NLP.artifacts import canonicalize_behavior
+from research_datasets.NLP.artifacts import load_manifest, load_prompts
 from saebase.sae.contracts import assert_manifest_matches
 
 
