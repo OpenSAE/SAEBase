@@ -1,0 +1,14 @@
+---
+description: Dataset 的领域分层、源文件、样本和任务适配契约。
+globs: "datasets/**,conf/dataset/**,conf/datasets_log.md"
+alwaysApply: false
+---
+
+# Dataset 领域边界
+
+- 通用入口 `datasets/plugins.py`、`datasets/datamodule.py` 只承担注册、基础 DataModule 和共用读取协议。具体数据集的预处理、划分、生成及过滤放在 `datasets/vision/<name>/` 或 `datasets/NLP/<name>/`。
+- Vision 当前含 `datasets/vision/CUB_200/`，NLP 当前含 CounterFact、GreaterThan、IOI、MMLUPro、SimpleCopying。新数据集必须归入对应家族。
+- `DatasetPlugin` 的注册名称决定实例，任务准入通过真实 Dataset policy 验证。多个数据集共享的通用代码可位于 `datasets/` 一级目录，公共层不得出现某个数据集的专属算法实现。
+- NLP 任务的 prompt 数据按 `<data_dir>/<Dataset>/<model>/v1/prompts.jsonl` 及 manifest 组织。允许显式外部 JSON/JSONL 输入，验证真实文件、模型和样本来源；区分 train/val/test，禁止隐式生成评测样本。
+- Hugging Face 的 `datasets` 与本地同名模块发生命名冲突时，遵循 `models/hf_datasets_bridge.py` 的隔离方式；不得修改全局 `sys.modules` 冒充第三方模块。
+- `conf/dataset/<name>.yaml` 提供独立数据配置；修改样本结构、标签和划分必须添加契约测试。

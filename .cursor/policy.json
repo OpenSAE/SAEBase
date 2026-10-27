@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "approved_roots": [
+    ".cursor",
+    "conf",
+    "datasets",
+    "dlbase",
+    "saebase",
+    "models",
+    "tasks",
+    "scripts",
+    "tests",
+    "doc",
+    "experiment",
+    "harness",
+    ".github"
+  ],
+  "approved_files": [
+    "README.md",
+    "requirements.txt",
+    ".gitignore",
+    ".cursorignore"
+  ],
+  "protected_roots": [
+    "dlbase",
+    "saebase"
+  ]
+}

@@ -1,0 +1,13 @@
+---
+description: Vision 与 LLM 模型隔离、构造、兼容性与插件契约。
+globs: "models/**,conf/model/**,conf/models_log.md"
+alwaysApply: false
+---
+
+# Model 领域边界
+
+- 模型实现只能位于 `models/vision/<name>/` 或 `models/LLM/<name>/`，两个家族共用的构建工具可放在 `models/` 一级目录。
+- 通用的 `models/plugins.py` 仅执行插件注册和转发。模型结构、初始化、head 选择、tokenizer、输入处理、兼容性检查均应存在于对应模型目录。ResNet 构造实现位于 `models/vision/resnet18_mlp/factory.py`。
+- 当前 LLM 仅注册 Gemma-2 2B Base。SAE 是独立于 LLM 模型的稀疏特征编码器，在 `saebase/sae/registry.py` 按模型、层和 Hook 记录来源。
+- 与 Dataset、Task 的组合准入属于模型实例中的 `model_task_dataset_compatibility.py`。通用 Task 定义和命名不得带入具体 Model 或 Dataset 身份。
+- 权重下载和模型加载只在用户明确调用真实执行路径时发生。插件查询、Hydra 校验和 Atlas 生成须保持轻量。
