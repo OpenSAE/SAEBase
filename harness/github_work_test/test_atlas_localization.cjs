@@ -119,6 +119,12 @@ for (const authority of [core, knowledge, glossary, vocabulary]) scanReferences(
 for (const relative of linkedMarkdown) {
   const sourceFile = path.join(ROOT, relative);
   assert(fs.existsSync(sourceFile), "Broken Atlas Markdown reference: " + relative);
+  // Root README.md is already English; its language selector legitimately
+  // contains the self-identifying word "中文".
+  if (relative === "README.md") {
+    assert(fs.readFileSync(sourceFile, "utf8").includes("Research Infrastructure"));
+    continue;
+  }
   if (CJK.test(fs.readFileSync(sourceFile, "utf8"))) {
     assert(locales.docs[relative],
       "Linked Chinese Markdown has no English variant: " + relative);
