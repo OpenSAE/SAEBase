@@ -51,9 +51,7 @@ def test_operation_forwards_memory_options_and_keeps_defaults(monkeypatch, tmp_p
         captured.update(kwargs)
         return {"status": "native_raw_graph_generated_not_normalized"}
 
-    monkeypatch.setattr(
-        "tasks.LLM.circuits.backend.circuits.run_native_circuit_tracer", fake
-    )
+    monkeypatch.setattr("tasks.LLM.circuits.backend.circuits.run_native_circuit_tracer", fake)
     cfg = SimpleNamespace(
         task={
             "approved": True,
@@ -85,9 +83,7 @@ def test_operation_defaults_do_not_invent_options(monkeypatch, tmp_path):
         captured.update(kwargs)
         return {"status": "native_raw_graph_generated_not_normalized"}
 
-    monkeypatch.setattr(
-        "tasks.LLM.circuits.backend.circuits.run_native_circuit_tracer", fake
-    )
+    monkeypatch.setattr("tasks.LLM.circuits.backend.circuits.run_native_circuit_tracer", fake)
     monkeypatch.chdir(tmp_path)
     execute(
         SimpleNamespace(

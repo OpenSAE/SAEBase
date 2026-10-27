@@ -6,7 +6,7 @@
 
 七个 SAE 任务都在这张 RTX 5070（12GB）上用真实 Gemma-2-2B 和真实权重跑完。这是运行时冒烟和有限验证，不是端到端科学验收。Capture、Intervene、Generate、Benchmark 数字来自官方任务入口。Circuits 用隔离环境里的 `circuit-tracer 0.5.0` 写出了 118 个节点、3636 条边的原始图，归一化和特征干预仍未通过。Explain 的 `heldout_score` 只是 SAE 激活一致性，不是语义正确性。Train 只完成 2 步。`saebase.generate.generate` 经 vLLM 0.27.1 生成的 8 个 token 与转向基线逐 token 相同。
 
-第一轮修复在 `f7dca13`。本轮 D1–D5 在其后的工作区完成，报告更新时尚未把本轮提交号写死；推送到 PR #60 之后以该提交为准。没有合并 PR，没有发版，没有改 `.cursor/` 或审批规则，没有把研究节点标成已验证。
+第一轮修复在 `f7dca13`。本轮功能提交是 `d866172`，随后有一次只改 Ruff 排版的提交。没有合并 PR，没有发版，没有改 `.cursor/` 或审批规则，没有把研究节点标成已验证。
 
 ## 环境
 
@@ -159,7 +159,7 @@ Atlas：`harness.code.build` 与 `harness.visualization.export` 写到验收目�
 | D5 wheel | PASS（本分支构建）；已发布 v0.5.0 不含 dlbase | 见上文 CLI 段。`logs/wheel_smoke.log`。 |
 | D6 报告与环境 | PASS | 主环境 torch/vLLM 没有重装。上文“未提交”已改为 `f7dca13` 加本轮差异。 |
 
-D7：`python -m pytest -q tests` 为 437 passed、13 skipped。`python .cursor/hooks/validate_repo.py --full` 为 PASS。改过的 Python 文件 `ruff check` 通过。本机没有 Python 3.11，3.11 CI 只能等 GitHub。工作计划里那句点名图像任务的文字会触发仓库禁词测试，只改了这一句用词，没有改审批、预算或 Harness 规则。
+D7：本机 `python -m pytest -q tests` 为 437 passed、13 skipped。`python .cursor/hooks/validate_repo.py --full` 为 PASS。GitHub 上 Python 3.11 与 3.12 的 offline-tests、Hydra、package、harness-source 已通过。第一次 quality 因 Ruff format 失败，排版后重推。本机没有 Python 3.11。工作计划里那句点名图像任务的文字会触发仓库禁词测试，只改了这一句用词，没有改审批、预算或 Harness 规则。
 
 ## 仍然存在的缺口
 

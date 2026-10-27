@@ -57,7 +57,10 @@ def test_injected_generator_records_activation_agreement_not_semantics(tmp_path)
     assert hypothesis["status"] == "heldout_tested"
     assert hypothesis["heldout_score"] == 1.0
     assert hypothesis["evaluation_kind"] == "SAE_binary_activation_prediction_not_semantic_truth"
-    assert "semantic" not in hypothesis["evaluation_kind"] or "not_semantic" in hypothesis["evaluation_kind"]
+    assert (
+        "semantic" not in hypothesis["evaluation_kind"]
+        or "not_semantic" in hypothesis["evaluation_kind"]
+    )
     direct = propose_interpretation(
         site_id="blocks.25.hook_resid_post",
         feature_id=14325,

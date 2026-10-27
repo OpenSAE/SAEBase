@@ -31,9 +31,8 @@ def saebase_generate(cfg: object) -> Callable[[list[str]], str]:
     def generator(snippets: list[str]) -> str:
         if not snippets or any(not isinstance(text, str) or not text for text in snippets):
             raise ValueError("Generator needs the activating discovery snippets")
-        ask = (
-            "In one short sentence, what do these snippets have in common? "
-            + " | ".join(snippets)
+        ask = "In one short sentence, what do these snippets have in common? " + " | ".join(
+            snippets
         )
         if len(ask) > 4000:
             raise ValueError("Explanation prompt exceeds 4000 characters")

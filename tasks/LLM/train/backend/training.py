@@ -67,7 +67,9 @@ class TrainPlan:
                 "model_dtype loads the HookedTransformer; sae_dtype is the SAE/activation dtype. "
                 "Backends do not switch precision on their own."
             )
-        if self.backend == "sparsify" and (self.model_dtype != "float32" or self.sae_dtype != "float32"):
+        if self.backend == "sparsify" and (
+            self.model_dtype != "float32" or self.sae_dtype != "float32"
+        ):
             raise ValueError(
                 "This Sparsify adapter has no dtype flag. Set model_dtype and sae_dtype to "
                 "float32; a different value would be ignored."
@@ -75,7 +77,9 @@ class TrainPlan:
         model_dir = Path(self.model_path)
         data_path = Path(self.dataset_path)
         if not model_dir.is_dir():
-            raise FileNotFoundError("Native training needs an existing local model snapshot directory")
+            raise FileNotFoundError(
+                "Native training needs an existing local model snapshot directory"
+            )
         data_is_file = data_path.is_file() and data_path.suffix in {".json", ".jsonl"}
         if not (data_path.is_dir() or data_is_file):
             raise FileNotFoundError(
