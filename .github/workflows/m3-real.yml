@@ -43,7 +43,7 @@ jobs:
           # M3 must preserve measured L0 and reconstruction MSE, not merely
           # produce finite but arbitrary scores.
           import json
-          ref=json.loads(Path('tests/fixtures/m0_reference_public.json').read_text())
+          ref=json.loads(Path('harness/github_work_test/fixtures/m0_reference_public.json').read_text())
           original=next(x for x in ref['samples'] if x['token_ids']==[40587,37083,15458])
           by_id={r['metric_id']:r['value'] for r in rows if r['condition_id'] is None}
           assert by_id['core.l0']==original['codes_l0']

@@ -44,7 +44,7 @@ jobs:
         env:
           SAEBASE_SAEBENCH_ROOT: upstream
           SAEBASE_NATIVE_RESULTS: ${{ runner.temp }}/m3-native-results
-        run: python -m pytest -q tests/test_m3_saebench_native.py
+        run: python -m pytest -q harness/github_work_test/test_m3_saebench_native.py
       - name: Archive complete upstream native evidence
         if: always()
         uses: actions/upload-artifact@v4
