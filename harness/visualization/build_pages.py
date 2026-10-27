@@ -31,12 +31,12 @@ def build_page(template: str, view: str) -> str:
     )
     html = html.replace(
         'href="../../README.md" title="OpenResearch project"',
-        'href="https://github.com/OpenSAE/OpenResearch" title="OpenResearch project"',
+        'href="https://github.com/OpenSAE/SAEBase" title="OpenResearch project"',
         1,
     )
     html = html.replace(
         'href="../README.md">Guide',
-        'href="https://github.com/OpenSAE/OpenResearch/blob/main/harness/visualization/README.md">Guide',
+        'href="https://github.com/OpenSAE/SAEBase/blob/main/harness/visualization/README.md">Guide',
         1,
     )
 
