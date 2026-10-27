@@ -1,0 +1,1 @@
+"""benchmark registered task."""
