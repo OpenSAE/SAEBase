@@ -37,10 +37,11 @@ GitHub Pages 是静态 HTML，没有安全的仓库写入身份。公开 Atlas �
 ## 测试
 
 ```bash
-python -m unittest discover -s tests -p "test_atlas_review.py" -v
-python -m unittest discover -s tests -p "test_agent_flow.py" -v
-node tests/test_atlas_interactivity.cjs
+python -m pytest -q tests/test_harness_migration.py tests/test_openresearch_integration.py
+python harness/core/validate.py
 python harness/knowledge/validate.py
+node --check harness/visualization/app.js
+python harness/visualization/build_pages.py --check
 ```
 
 只有本地实际的点击、刷新和来源图校验完成后，才能将这一交互功能标记为通过完整人工验收。

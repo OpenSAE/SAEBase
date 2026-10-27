@@ -45,9 +45,9 @@
 
 ### D5. P1 — Wheel 与源码安装契约
 
-- 已观察到 v0.5.0 wheel 包含原 SAEBase CLI，但不包含新 `dlbase`。检查 `pyproject.toml` 的 package discovery、CLI scripts 与兼容性要求。
-- 目标是 SAEBase 与新增 DLBase 在声明支持的安装方式下行为一致。如果将 DLBase 纳入 wheel，需保持现有公共 CLI/模块不变，并添加**脱离源码目录**的 clean venv 构建安装、CLI、Hydra 配置与最小 Registry 导入测试；注意 Hydra 配置资源也必须随 wheel 分发。
-- 如果设计决定新 DLBase 只能作为源检出开发工具，必须在两份 README、安装说明和发布清单中明确，且增加测试防止误宣称 wheel 可运行它。不能无评审改变 v0.5.0 发布面或自动上传 PyPI。
+- 已观察到 v0.5.0 wheel 包含原 SAEBase CLI，但不包含新 新增 SAEBase Runtime。检查 `pyproject.toml` 的 package discovery、CLI scripts 与兼容性要求。
+- 目标是 SAEBase 与新增 SAEBase Runtime 在声明支持的安装方式下行为一致。如果将 SAEBase Runtime 纳入 wheel，需保持现有公共 CLI/模块不变，并添加**脱离源码目录**的 clean venv 构建安装、CLI、Hydra 配置与最小 Registry 导入测试；注意 Hydra 配置资源也必须随 wheel 分发。
+- 如果设计决定新 SAEBase Runtime 只能作为源检出开发工具，必须在两份 README、安装说明和发布清单中明确，且增加测试防止误宣称 wheel 可运行它。不能无评审改变 v0.5.0 发布面或自动上传 PyPI。
 
 ### D6. P2 — 环境与验收报告收尾
 
@@ -87,7 +87,7 @@
 原因：本次无可供授权的外部数据版本、网络下载额度与独立数据源许可证核查。
 
 1. 对 `datasets/NLP` 与现有 `saebase/data` 的重叠数据集（CounterFact、GreaterThan、IOI、MMLUPro、SimpleCopying）建立名称、split、prompt/text/token、来源 revision 的一致性矩阵。BBH、SubjectVerbAgreement 及其他来源另列。
-2. 真实下载时固定 revision，检查第三方 `datasets`、`transformer_lens` 和 `sae_lens` 能在 SAEBase 命名空间中正常导入。用只读数据样本检查 `research_datasets` 路径，避免改变旧 `saebase/data` 产物或已发布结果。
+2. 真实下载时固定 revision，检查第三方 `datasets`、`transformer_lens` 和 `sae_lens` 能在 SAEBase 命名空间中正常导入。用只读数据样本检查 `datasets/` 路径，避免改变旧 `saebase/data` 产物或已发布结果。
 3. 对 Research Lab 原生 Hugging Face streaming、dataset object、tokenizer 接口进行端到端读取测试，检验 schema、shuffle/revision 与缓存行为，确认实验不会静默使用不同数据划分。
 
 产物：每种数据源的 immutable revision、license review、样本量、hash、split、read-only 测试报告、与历史协议差异表。
@@ -98,7 +98,7 @@
 
 1. 在目标 CPU/GPU 机器运行 `harness/environment/probe.py`，核验磁盘路径、可见设备、CUDA capability、driver、RAM 与部署依赖。
 2. 仅经明确授权才执行 Backblaze B2 / rclone 实体传输，验收双端校验和及恢复策略。没有凭据时不测试生产桶。
-3. 完成可安装 wheel 与源检出两条路径的实机 CLI 验收。核验 SAEBase 老入口和 DLBase 新入口均能独立执行，无碰撞。
+3. 完成可安装 wheel 与源检出两条路径的实机 CLI 验收。核验 SAEBase 老入口和 SAEBase Runtime 新入口均能独立执行，无碰撞。
 4. Atlas 静态视图应以本 SAEBase 源码、实际 Knowledge/Code/Environment 证据重新生成；公开发布需要用户指定目标网站与权限。人工复核 Knowledge/Core 导入节点的状态、Evidence、跨 Tree 链接与中英文本。原 OpenResearch 图的绿色状态不能直接成为 SAEBase 通过证明。
 
 产物：环境快照、部署流水线日志、源码和页面资产 SHA、权限审批、回滚说明与人类审批记录。

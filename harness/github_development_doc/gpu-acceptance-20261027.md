@@ -131,7 +131,7 @@ rclone 远程 `research-5090`，类型 b2。用 `harness/transfer/b2.py` 做 `co
 
 源码 `saebase --help` 有完整参数，`--list` 列出 task `sae` 以及 Gemma-2-2B 模型。`python -m saebase.runtime.train --cfg job --help` 列出 dataset、model、task（含 capture 到 train）。
 
-已发布的 v0.5.0 wheel 不包含 `dlbase`。本分支重新构建的 `wheel/opensae_saebase-0.5.0-py3-none-any.whl` 包含 `saebase/runtime/train.py`、`conf/sae_research.yaml` 和 `datasets/plugins.py`。`saebase/tools/check_installed_wheel.py` 在检出目录之外安装后返回 installation、三个 CLI、package resources 和 external working directory 都是 OK，并执行了 `python -m saebase.runtime.train --cfg job --help`。没有上传 PyPI，公共 `saebase` 命令名没有改。
+已发布的 v0.5.0 wheel 不包含 bundled research runtime。本分支重新构建的 `wheel/opensae_saebase-0.5.0-py3-none-any.whl` 包含 `saebase/runtime/train.py`、`conf/sae_research.yaml` 和 `datasets/plugins.py`。`saebase/tools/check_installed_wheel.py` 在检出目录之外安装后返回 installation、三个 CLI、package resources 和 external working directory 都是 OK，并执行了 `python -m saebase.runtime.train --cfg job --help`。没有上传 PyPI，公共 `saebase` 命令名没有改。
 
 Atlas：`harness.code.build` 与 `harness.visualization.export` 写到验收目录 `atlas/`，没有改仓库里的 harness 页面。`build_pages --check` 对仓库现有页面返回 0。导出计数：core 26，knowledge 29，code 1857，environment 15，context 64。这些是现有能力的导出，没有把节点标成已验证。
 
@@ -156,7 +156,7 @@ Atlas：`harness.code.build` 与 `harness.visualization.export` 写到验收目�
 | D2 训练 dtype 与数据路径 | PASS（2 步冒烟） | `model_dtype=float16`、`sae_dtype=float32` 显式传入。新目录 `train/gpuacc_d2_42/native_sae_training`。`SAE.load_from_disk`：`W_enc` `[2304, 64]` float32，有限，绝对值和 27.660303115844727。耗时 10.25 秒。未批准训练在单测里被拒绝。旧 plan 缺 dtype 字段时按 float32 比较。 |
 | D3 电路参数与归一化 | PASS（参数）；BLOCKED（归一化） | 非法 offload、dtype、节点数、batch、超时在创建目录之前拒绝。`approved=false` 是 `PermissionError`。真实前端 JSON 的误差节点是 `0_1_2`，官方导入器要求 `(\d+)_-1_(\d+)`，抛出 `Native reconstruction-error node mismatch`。没有猜测特征 id，也没有做特征干预。 |
 | D4 Explain 生成器 | PASS（运行时冒烟）；科学结论待定 | 白名单只有 `saebase_generate`，`os.system` 被拒绝。隔离 vLLM 返回文本 `Paris. The capital of the United States`，8 个新 token。`extra/d4_saebase_generate.json`。这不是语义 PASS。主环境 vLLM 仍不完整，官方解释器里这条路径不能启动。 |
-| D5 wheel | PASS（本分支构建）；已发布 v0.5.0 不含 dlbase | 见上文 CLI 段。`logs/wheel_smoke.log`。 |
+| D5 wheel | PASS（本分支构建）；已发布 v0.5.0 不含新增研究运行时 | 见上文 CLI 段。`logs/wheel_smoke.log`。 |
 | D6 报告与环境 | PASS | 主环境 torch/vLLM 没有重装。上文“未提交”已改为 `f7dca13` 加本轮差异。 |
 
 D7：本机 `python -m pytest -q tests` 为 437 passed、13 skipped。`python .cursor/hooks/validate_repo.py --full` 为 PASS。GitHub 上 Python 3.11 与 3.12 的 offline-tests、Hydra、package、harness-source 已通过。第一次 quality 因 Ruff format 失败，排版后重推。本机没有 Python 3.11。工作计划里那句点名图像任务的文字会触发仓库禁词测试，只改了这一句用词，没有改审批、预算或 Harness 规则。
@@ -167,4 +167,4 @@ D7：本机 `python -m pytest -q tests` 为 437 passed、13 skipped。`python .c
 - Explain 没有独立语义标签。`heldout_score=1.0` 只表示激活是否出现。
 - Train 仍是层 0 的 2 步冒烟。
 - 主环境 vLLM 不完整。可用引擎在 `/workspace/SAEReasoning/.venv`，vLLM 0.27.1。
-- 已发布的 v0.5.0 wheel 不包含 `dlbase`。本分支新构建的 wheel 包含，但没有上传 PyPI。
+- 已发布的 v0.5.0 wheel 不包含 bundled research runtime。本分支新构建的 wheel 包含，但没有上传 PyPI。
