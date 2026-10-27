@@ -103,9 +103,19 @@ def smoke(dist_dir: Path) -> dict[str, str]:
             raise AssertionError("Installed CLI did not enumerate the task registry")
         task_keys = {key.strip() for key in task_lines[0].removeprefix("Tasks: ").split(",")}
         expected_tasks = {
-            "sae", "capture", "intervene", "generate", "circuits", "explain", "benchmark", "train"
+            "sae",
+            "capture",
+            "intervene",
+            "generate",
+            "circuits",
+            "explain",
+            "benchmark",
+            "train",
         }
-        if not expected_tasks.issubset(task_keys) or "wheel configuration and API OK" not in outputs[-1]:
+        if (
+            not expected_tasks.issubset(task_keys)
+            or "wheel configuration and API OK" not in outputs[-1]
+        ):
             raise AssertionError("Wheel smoke test output does not match expectations")
         if str(target) not in outputs[-1]:
             raise AssertionError("Wheel smoke imported the checkout, not the installed package")
