@@ -1,26 +1,25 @@
-"""Explicit model backends and safe access to external Hugging Face datasets.
+"""Explicit imports for Hugging Face and TransformerLens integrations.
 
-OpenResearch's own top-level datasets/ component tree shadows the third-party
-package name. The isolated reader resolves that collision on real data reads.
-No model weights, data or provider APIs load during plugin registration.
+SAEBase's prompt modules live under ``saebase.data``.  The top-level
+``datasets`` name therefore belongs unambiguously to Hugging Face; loading
+the model stack never edits ``sys.path`` or the global ``sys.modules`` cache.
 """
+
 from __future__ import annotations
 
 import importlib
 from types import ModuleType
-from models.hf_datasets_bridge import IsolatedHFDatasets
 
 
-def import_hf_datasets() -> ModuleType | IsolatedHFDatasets:
-    """Read Hugging Face datasets while retaining the local datasets/ package.
-
-    When 'datasets' is the local OpenResearch package, use the isolated
-    Hugging Face loader. The original package remains untouched.
-    """
-    candidate = importlib.import_module("datasets")
-    if hasattr(candidate, "load_dataset") and hasattr(candidate, "load_from_disk"):
-        return candidate
-    return IsolatedHFDatasets()
+def import_hf_datasets() -> ModuleType:
+    """Return the installed Hugging Face datasets package."""
+    hf = importlib.import_module("datasets")
+    if not hasattr(hf, "load_dataset"):
+        raise ImportError(
+            "The installed `datasets` package does not expose load_dataset. "
+            "Install Hugging Face datasets in this environment."
+        )
+    return hf
 
 
 def import_transformer_lens() -> ModuleType:
@@ -46,4 +45,4 @@ def load_repo_dataset_module(subpkg: str, module_name: str) -> ModuleType:
     """
     if not subpkg.isidentifier() or not module_name.isidentifier():
         raise ValueError("subpkg and module_name must be Python identifiers")
-    return importlib.import_module(f"datasets.NLP.{subpkg}.{module_name}")
+    return importlib.import_module(f"saebase.data.{subpkg}.{module_name}")
