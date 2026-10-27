@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "project": "OpenResearch",
+  "project": "SAEBase / OpenResearch Integration",
   "kind": "core",
   "revision_basis": "b7982c9fa002a5064d37000c571c678374d687b4",
   "source_policy": "Only source-backed status; 'implemented' means implementation observed, not tested",
@@ -9,7 +9,7 @@
     "addresses",
     "decomposes"
   ],
-  "notes": "Migration from former Knowledge Tree to Core: preserve IDs and the project-level governance semantics. Scientific context lives separately in doc/knowledge.",
+  "notes": "Migration from former Knowledge Tree to Core: preserve IDs and the project-level governance semantics. Scientific context lives separately in doc/knowledge.\nImported from OpenResearch as reference context. SAEBase-specific statuses and evidence require separate validation.",
   "nodes": [
     {
       "id": "q.research",
