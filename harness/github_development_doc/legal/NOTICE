@@ -1,0 +1,7 @@
+SAEBase
+
+Copyright (c) OpenSAE contributors.
+
+The release package is distributed under the Apache License, Version 2.0.
+Third-party libraries, datasets, model weights, and SAE checkpoints retain their respective licenses and access conditions.
+See ../PROVENANCE.md before publicly distributing code and model assets.

@@ -17,7 +17,7 @@ LINK = re.compile(r"!?\[[^\]\n]+\]\((<[^>]+>|[^)\s]+)(?:\s+\"[^\"]+\")?\)")
 DOCS = (
     "README.md",
     "README_cn.md",
-    "CONTRIBUTING.md",
+    ".github/CONTRIBUTING.md",
 )
 
 

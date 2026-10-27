@@ -67,7 +67,7 @@ def smoke(dist_dir: Path) -> dict[str, str]:
                 "-c",
                 (
                     "from pathlib import Path; from importlib.resources import files; "
-                    "import saebase, main, conf; "
+                    "import saebase, conf; "
                     "from saebase.api import ModelAdapter, ActivationSite; "
                     "import saebase.cli, saebase.model_plugins, saebase.tasks.plugins; "
                     "import models.plugins, tasks.plugins, saebase.tools.m3_benchmark; "
@@ -81,10 +81,7 @@ def smoke(dist_dir: Path) -> dict[str, str]:
                     "assert (files('conf')/'release'/'m5_matrix.json').is_file(); "
                     "assert (files('conf')/'release'/'m5_asset_provenance.json').is_file(); "
                     "assert (files('conf')/'sae'/'pythia70m_resid_sm.yaml').is_file(); "
-                    "from main import parse_args, build_overrides; "
-                    "from pathlib import Path as _P; "
-                    "_a,_=parse_args(['--device','cpu']); "
-                    "assert 'paths.root='+str(_P.cwd()) in build_overrides(_a,_P.cwd()); "
+                    "from saebase.cli import main as cli_main; assert callable(cli_main); "
                     "print(Path(saebase.__file__).resolve()); "
                     "print('wheel configuration and API OK')"
                 ),

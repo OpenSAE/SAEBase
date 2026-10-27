@@ -192,7 +192,7 @@ The resumable Activation Store has been accepted and shipped as part of SAEBase 
 | Analysis dependencies | Same clean GitHub Actions CI, separate `analysis-install` job | Passed |
 | Wheel and sdist | Same CI, `package` job | Passed |
 | Real pretrained checkpoint | [real activation-store run #38642950452](https://github.com/OpenSAE/SAEBase/actions/runs/38642950452), public Pythia-70M + registered pretrained SAE | Passed |
-| Original reference comparison | [reference validation fixture](../../tests/fixtures/m0_reference_public.json), same model/SAE full-state SHA-256 and stored activation probes | Passed |
+| Original reference comparison | [reference validation fixture](../github_work_test/fixtures/m0_reference_public.json), same model/SAE full-state SHA-256 and stored activation probes | Passed |
 | Resume and SAE code reuse | Actual real-model artifact, zero model calls during resumed capture/SAE code encoding | Passed |
 
 The [real-model artifact](https://github.com/OpenSAE/SAEBase/actions/runs/38642950452/artifacts/11931745526) contains `m1_reference.json` with:

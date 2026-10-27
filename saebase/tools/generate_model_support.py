@@ -205,12 +205,12 @@ def render_blocks(s: dict) -> dict[str, str]:
             f"reliability audits ({date}). See the "
             "[per-layer reports](verified-model-matrix.md)."
         ),
-        "CHANGELOG.md": (
+        "harness/github_development_doc/CHANGELOG.md": (
             f"- **Verified model and SAE coverage ({date}):** **{pair}** "
             f"real-checkpoint compatibility tests, **{bench}** benchmark "
             f"evaluations on 64 held-out prompt groups, and **{rel}** "
             f"reliability audits across **{profiles}** model-SAE configurations. "
-            "See the [verified model and SAE matrix](harness/github_development_doc/verified-model-matrix.md)."
+            "See the [verified model and SAE matrix](verified-model-matrix.md)."
         ),
         "harness/github_development_doc/verified-model-matrix.md": render_table(s),
     }

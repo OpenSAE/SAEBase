@@ -1,13 +1,13 @@
-include README.md README_cn.md LICENSE NOTICE CONTRIBUTING.md SECURITY.md CHANGELOG.md CITATION.cff
+include README.md README_cn.md LICENSE CITATION.cff
 include requirements.txt
 recursive-include .github *.yml *.md
 recursive-include conf *.yaml *.md *.json
-recursive-include harness/github_development_doc *.md *.json
+recursive-include harness/github_development_doc *.md *.json *.cff NOTICE
 recursive-include saebase *.md
-recursive-include tests *.py
-recursive-include tests/fixtures *.json
-recursive-include examples *.py *.sh
-recursive-include scripts *.sh *.py
+recursive-include harness/github_work_test *.py
+recursive-include harness/github_work_test/fixtures *.json
+recursive-include saebase/examples *.py *.sh
+recursive-include saebase/tools *.py
 prune data
 prune experiment
 prune .venv

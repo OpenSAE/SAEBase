@@ -81,7 +81,7 @@ Issues = "https://github.com/OpenSAE/SAEBase/issues"
 
 [tool.setuptools]
 include-package-data = true
-py-modules = ["main"]
+py-modules = []
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -94,7 +94,7 @@ saebase = ["**/*.md", "**/*.yaml", "**/*.json", "**/*.html", "**/*.css", "**/*.j
 models = ["**/*.json", "**/*.yaml"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["harness/github_work_test"]
 
 [tool.ruff]
 line-length = 100

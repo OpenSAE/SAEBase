@@ -1,6 +1,6 @@
 """Stable CLI entrypoints under the saebase namespace.
 
-Historical main.py and saebase.tools.* modules remain importable. Import the
+The original activation-health command is preserved in saebase.cli_compat. Import the
 command implementation only when the corresponding CLI is invoked, so
 ordinary saebase imports do not require optional analysis backends.
 """
@@ -15,7 +15,7 @@ def _dispatch(module: str) -> object:
 
 
 def main() -> object:
-    return _dispatch("main")
+    return _dispatch("saebase.cli_compat")
 
 
 def prepare_prompts() -> object:

@@ -34,7 +34,7 @@ SAEBase includes a research Harness for organizing code, scientific knowledge, e
 
 **Agent Harness:** [Agent Flow](harness/core/AGENT_FLOW.md) for structured reviews · [Cursor rules and skills](.cursor/) for coding agents · [Experiment tracking](harness/experiments/README.md) for reproducible research.
 
-**Explore:** [Atlas visualization](harness/visualization/README.md) · [Harness overview](harness/README.md)
+**Open interactive Atlas:** [Core](https://atheavenma.github.io/opensae/openresearch/atlas/core.html) · [Knowledge](https://atheavenma.github.io/opensae/openresearch/atlas/knowledge.html) · [Code](https://atheavenma.github.io/opensae/openresearch/atlas/code.html) · [Environment](https://atheavenma.github.io/opensae/openresearch/atlas/environment.html) · [Context](https://atheavenma.github.io/opensae/openresearch/atlas/context.html) · [Local source and deployment guide](harness/visualization/README.md)
 
 ```bash
 python .cursor/hooks/validate_repo.py --full
@@ -46,7 +46,7 @@ python -m saebase.runtime.train --cfg job
 SAEBase connects pretrained models, SAE dictionaries, activation measurements, controlled feature interventions, benchmarks, and reliability analysis in one reusable workflow.
 
 <p align="center">
-  <img src="saebase/assets/figures/saebase_workflow.svg" alt="SAEBase: models and inputs, reusable activation capture, SAE feature edits, benchmarking and reports" width="1080"/>
+  <img src="harness/github_assets/figures/saebase_workflow.svg" alt="SAEBase: models and inputs, reusable activation capture, SAE feature edits, benchmarking and reports" width="1080"/>
 </p>
 
 **Capture once, evaluate multiple SAEs.** Verified activations can be reused across compatible SAE checkpoints at the same model site, without repeating the language-model forward pass.
@@ -164,7 +164,7 @@ On one RTX 5070 with Qwen3-1.7B Base, opt-in block-suffix replay accelerated the
 
 Explore the code: [SAEBase API](saebase/) · [Models](models/) · [Datasets](datasets/) · [Tasks](tasks/) · [Harness](harness/README.md) · [Configuration](conf/) · [Repository Guide](harness/github_development_doc/repository-guide.md).
 
-[Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md) · [Citation](CITATION.cff) · [Apache-2.0 License](LICENSE) · [Security](SECURITY.md)
+[Contributing](.github/CONTRIBUTING.md) · [Changelog](harness/github_development_doc/CHANGELOG.md) · [Citation](CITATION.cff) · [Apache-2.0 License](LICENSE) · [Security](.github/SECURITY.md)
 
 ---
 

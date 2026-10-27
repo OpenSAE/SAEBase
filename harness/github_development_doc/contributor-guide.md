@@ -83,6 +83,6 @@ contract. A real model/SAE pair claim requires exact model and checkpoint
 provenance, site/hook compatibility and actual acceptance evidence.
 Scientific conclusions need the original evaluation protocol and data.
 
-[Contributing rules](../../CONTRIBUTING.md) ·
+[Contributing rules](../../.github/CONTRIBUTING.md) ·
 [CI Lanes](ci-maintenance.md) ·
-[Security Policy](../../SECURITY.md)
+[Security Policy](../../.github/SECURITY.md)

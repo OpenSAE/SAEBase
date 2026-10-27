@@ -1,5 +1,5 @@
 """
-Hydra evaluation entry (lives under ``saebase/``). Prefer ``python main.py``.
+Hydra evaluation entry (lives under ``saebase/``). Prefer the ``saebase`` console command.
 
 Direct use::
 

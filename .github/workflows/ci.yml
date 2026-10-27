@@ -98,7 +98,7 @@ jobs:
           saebase-check-env --mode core
           python -m saebase.sae.verify_registry --list
       - name: Check v0.4.0 Research Lab release manifest and docs
-        run: python -m pytest -q tests/test_research_lab_v04_release.py
+        run: python -m pytest -q harness/github_work_test/test_research_lab_v04_release.py
       - name: Run offline public API example
         run: python saebase/examples/quickstart/public_api_offline.py
       - name: Run persistent first experiment and reliability audit
@@ -265,9 +265,9 @@ jobs:
           python -m pip install -e ".[dev]"
           python -m pip install "git+https://github.com/OpenSAE/SAE-Input-Localization.git@82b86d7ca20051cc16f7528a0966f4531c4a8eb3"
       - name: Run original-estimator benchmark acceptance
-        run: python -m pytest -q tests/test_m3_localization.py -k native
+        run: python -m pytest -q harness/github_work_test/test_m3_localization.py -k native
       - name: Validate Research Lab six-factor synthetic truth with original Localize
-        run: python -m pytest -q tests/test_research_lab_controlled_native.py
+        run: python -m pytest -q harness/github_work_test/test_research_lab_controlled_native.py
       - name: Run full Localize benchmark and reliability demo
         run: python saebase/examples/research_integrations/localization_benchmark.py --output "$(mktemp -d)"
       - name: Export both 64-state controlled input designs (CPU)
