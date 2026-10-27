@@ -1,0 +1,14 @@
+---
+description: 七类 LLM SAE Task 的职责、执行与实验产物契约。
+globs: "tasks/LLM/**,tasks/dlbase_plugins.py,conf/task/**,conf/tasks_log.md"
+alwaysApply: false
+---
+
+# SAE Task 边界
+
+- `tasks/LLM/` 包含 `capture`、`intervene`、`generate`、`circuits`、`explain`、`benchmark`、`train` 七个研究任务。
+- 所有通用 SAE Task 通过 `tasks/dlbase_plugins.py` 注册，`tasks/runner.py` 执行分发；SAEBase 原有 `tasks/plugins.py` 继续作为兼容入口。
+- `tasks/LLM/sae_runtime.py` 负责模型、SAE 权重、Prompt 身份与执行条件的公共校验。
+- 配置校验不得自动下载权重。真实计算需显式执行、审核环境预算与记录可追溯产物。
+- 生成和干预后端复用 SAEBase 实现，避免引入重复的默认入口与行为。
+- 修改数值、输入来源、checkpoint 或 SAE 特征语义时补充契约与行为回归。

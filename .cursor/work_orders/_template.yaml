@@ -1,0 +1,24 @@
+# Work Order v3. Copy to OR-001.yaml and explicitly activate selected components.
+version: 3
+id: TEMPLATE
+status: template
+goal: "填写本次科研或开发目标"
+
+activation:
+  core: false
+  code: false
+  knowledge: false
+  experiments: false
+  transfer: false
+  environment: false
+
+context:
+  doc:
+    required: []
+    optional: []
+  core_ids: []       # 例如 q.research、g.code_tree（项目架构）
+  knowledge_ids: []  # 例如 q.cub.train、g.cub.validation（科研知识）
+  term_ids: []       # 例如 term.sae、term.sae.capture（术语）
+  harness:
+    read_only: []    # 仅具体 harness/github_work_plan/ 文件
+  unlisted: deny

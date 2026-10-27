@@ -1,0 +1,65 @@
+# @package _global_
+train:
+  max_epochs: 128
+  # Standard training stack (dlbase); toggle without editing task code. Defaults: all on.
+  facets:
+    clear_experiment_leaf: true
+    tqdm_epoch_progress: true
+    epoch_eta_hours: true
+    learning_rate_monitor: true
+    model_checkpoint: true
+    early_stopping: true
+    lightning_loggers: true
+    tensorboard_auto_launch_after_fit: true
+    summary_log: true
+  # Training tqdm postfix updates every N batches (running epoch mean changes slowly when N>1).
+  progress_bar_refresh_rate: 20
+  accelerator: auto
+  devices: 1
+  precision: null
+  gradient_clip_val: 0.0
+  log_every_n_steps: 100
+  deterministic: true
+  benchmark: false
+
+  early_stopping:
+    # 与 facets.early_stopping 同时为 true 时才挂 EarlyStopping。本任务默认跑满 max_epochs。
+    enable: false
+    monitor: val/acc
+    # patience is computed in dlbase.standard_lightning / classification run: max(5, int(0.1 * train.max_epochs)); one val per epoch
+    mode: max
+    min_delta: 0.0
+
+  checkpoint:
+    monitor: val/acc
+    mode: max
+    # Best weights are always written as best.ckpt (single monitored top-1).
+    # If true, also keep periodic snapshots epoch_<epoch>.ckpt (no zero-padding) every N epochs.
+    keep_intermediate: false
+    keep_every_n_epochs: 10
+
+  optimizer:
+    name: SGD
+    # 0.1 * dataset.batch_size / 256，当前 batch_size=64。改 batch 时需一并改 lr。
+    lr: 0.025
+    # 与 lr 相同时不拆 backbone / head 参数组。
+    head_lr: 0.025
+    momentum: 0.9
+    nesterov: false
+    weight_decay: 5.0e-4
+    # 仅当 optimizer.name 改为 AdamW 时使用。
+    betas: [0.9, 0.999]
+    eps: 1.0e-8
+
+  lr_scheduler:
+    name: cosine_annealing
+    t_max: 128
+    eta_min: 0.0
+    # 仅当 name 改为 warmup_cosine 时使用。warmup 长度在代码中为 max(5, int(0.1 * train.max_epochs))。
+    min_lr_ratio: 0.01
+
+  loss:
+    label_smoothing: 0.1
+
+  # 仅当 task.facets.phase_two_extension 为 true 且进入阶段 2 时由 run.py 写入；配置里保持 null。
+  phase2_constant_lr: null

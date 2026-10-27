@@ -1,0 +1,762 @@
+{
+  "schema_version": 1,
+  "kind": "knowledge",
+  "project": "SAEBase LLM Sparse Autoencoder Research",
+  "title": "SAEBase 科研问题与实现依据",
+  "purpose": "组织 SAE 的模型与 Prompt 资产、特征捕获、干预、生成、电路、解释、基准和训练方法。",
+  "status_note": "Knowledge 节点状态由独立审阅证据确认；SAE 方法节点表示源码接口实现，科研结论需另有实验证据。",
+  "glossary": "doc/knowledge/glossary.json",
+  "nodes": [
+    {
+      "id": "q.sae.methods",
+      "type": "question",
+      "title": "如何形成可复现的 LLM SAE 研究流程？",
+      "description": "研究问题：将模型与数据身份、特征测量、干预、生成、电路、解释、评测和训练组织为可核验方法；科学结论仍需独立实验。",
+      "status": "partial",
+      "evidence": [
+        "tasks/LLM/sae_runtime.py",
+        "saebase/api/features.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.reproducible"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "q.sae.assets",
+      "type": "question",
+      "title": "如何把 Gemma-2 2B、SAE 配置和 Prompt 组织为可核对输入？",
+      "description": "研究问题：如何把 Gemma-2 2B、SAE 配置和 Prompt 组织为可核对输入？ 相关方法具有源码接口，科学效果和边界条件仍需独立评估。",
+      "status": "partial",
+      "evidence": [
+        "research_datasets/NLP/artifacts.py",
+        "models/LLM/gemma2_2b_base/gemma2_2b_base.py",
+        "saebase/sae/registry.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.assets"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "s.sae.assets",
+      "type": "solve",
+      "title": "模型、SAE 与 Prompt 的身份和产物协议",
+      "description": "模型身份与 Prompt 数据的静态协议已经有实际代码；端到端科学结果另行评估。",
+      "status": "implemented",
+      "evidence": [
+        "research_datasets/NLP/artifacts.py",
+        "models/LLM/gemma2_2b_base/gemma2_2b_base.py",
+        "saebase/sae/registry.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.assets"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.prompt_artifacts",
+      "type": "goal",
+      "title": "按数据集和模型存储可追溯 Prompt",
+      "description": "代码方法：按数据集和模型存储可追溯 Prompt。依据位于 research_datasets/NLP/artifacts.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "research_datasets/NLP/artifacts.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.assets",
+        "term.sae.reproducible"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.gemma_model",
+      "type": "goal",
+      "title": "加载 Gemma-2 2B 模型适配接口",
+      "description": "代码方法：加载 Gemma-2 2B 模型适配接口。依据位于 models/LLM/gemma2_2b_base/gemma2_2b_base.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "models/LLM/gemma2_2b_base/gemma2_2b_base.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.assets",
+        "term.sae.reproducible"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.sae_registry",
+      "type": "goal",
+      "title": "按 SAE 身份选择稀疏字典配置",
+      "description": "代码方法：按 SAE 身份选择稀疏字典配置。依据位于 saebase/sae/registry.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "saebase/sae/registry.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.assets",
+        "term.sae.reproducible"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "q.sae.capture",
+      "type": "question",
+      "title": "如何捕获相同输入位置的 SAE 特征响应？",
+      "description": "研究问题：如何捕获相同输入位置的 SAE 特征响应？ 相关方法具有源码接口，科学效果和边界条件仍需独立评估。",
+      "status": "partial",
+      "evidence": [
+        "saebase/api/features.py",
+        "tasks/LLM/capture/operation.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.capture"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "s.sae.capture",
+      "type": "solve",
+      "title": "SAE 特征捕获与激活读取",
+      "description": "通过明确的模型、SAE 和激活位置读取特征与编码结果，代码接口已经存在。",
+      "status": "implemented",
+      "evidence": [
+        "saebase/api/features.py",
+        "tasks/LLM/capture/operation.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.capture"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.activation_capture",
+      "type": "goal",
+      "title": "调用 SAEBase 实际激活与特征捕获",
+      "description": "代码方法：调用 SAEBase 实际激活与特征捕获。依据位于 saebase/api/features.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "saebase/api/features.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.capture"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.capture_task",
+      "type": "goal",
+      "title": "通过统一任务入口执行特征捕获",
+      "description": "代码方法：通过统一任务入口执行特征捕获。依据位于 tasks/LLM/capture/operation.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/capture/operation.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.capture"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "q.sae.intervene",
+      "type": "question",
+      "title": "如何比较固定输入下特征干预与基线结果？",
+      "description": "研究问题：如何比较固定输入下特征干预与基线结果？ 相关方法具有源码接口，科学效果和边界条件仍需独立评估。",
+      "status": "partial",
+      "evidence": [
+        "saebase/api/features.py",
+        "tasks/LLM/intervene/operation.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.intervene"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "s.sae.intervene",
+      "type": "solve",
+      "title": "教师强制特征干预与受控对比",
+      "description": "在确定输入和读取点上执行编辑并组织可比较的下游结果，接口已经存在。",
+      "status": "implemented",
+      "evidence": [
+        "saebase/api/features.py",
+        "tasks/LLM/intervene/operation.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.intervene"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.feature_edit",
+      "type": "goal",
+      "title": "使用 SAE 特征编辑操作",
+      "description": "代码方法：使用 SAE 特征编辑操作。依据位于 saebase/api/features.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "saebase/api/features.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.intervene"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.teacher_forced",
+      "type": "goal",
+      "title": "执行教师强制干预任务",
+      "description": "代码方法：执行教师强制干预任务。依据位于 tasks/LLM/intervene/operation.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/intervene/operation.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.intervene"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "q.sae.generate",
+      "type": "question",
+      "title": "如何衡量生成过程中 SAE 特征修改的影响？",
+      "description": "研究问题：如何衡量生成过程中 SAE 特征修改的影响？ 相关方法具有源码接口，科学效果和边界条件仍需独立评估。",
+      "status": "partial",
+      "evidence": [
+        "tasks/LLM/generate/operation.py",
+        "tasks/LLM/generate/backend/engine.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.generate"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "s.sae.generate",
+      "type": "solve",
+      "title": "生成干预与基线续写对照",
+      "description": "组织逐步干预的生成操作和基线对照；生成质量仍需独立验证。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/generate/operation.py",
+        "tasks/LLM/generate/backend/engine.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.generate"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.generation_task",
+      "type": "goal",
+      "title": "执行 SAE 生成对照任务",
+      "description": "代码方法：执行 SAE 生成对照任务。依据位于 tasks/LLM/generate/operation.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/generate/operation.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.generate"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.generation_engine",
+      "type": "goal",
+      "title": "调度生成干预的执行后端",
+      "description": "代码方法：调度生成干预的执行后端。依据位于 tasks/LLM/generate/backend/engine.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/generate/backend/engine.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.generate"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "q.sae.circuits",
+      "type": "question",
+      "title": "如何从激活与干预寻找候选因果电路？",
+      "description": "研究问题：如何从激活与干预寻找候选因果电路？ 相关方法具有源码接口，科学效果和边界条件仍需独立评估。",
+      "status": "partial",
+      "evidence": [
+        "tasks/LLM/circuits/backend/circuits.py",
+        "tasks/LLM/circuits/backend/circuit_intervene.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.circuits"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "s.sae.circuits",
+      "type": "solve",
+      "title": "电路追踪与局部路径干预",
+      "description": "对实际模型组件进行电路追踪和局部干预；因果解释需要额外核验。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/circuits/backend/circuits.py",
+        "tasks/LLM/circuits/backend/circuit_intervene.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.circuits"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.circuit_trace",
+      "type": "goal",
+      "title": "调用源代码中的电路追踪接口",
+      "description": "代码方法：调用源代码中的电路追踪接口。依据位于 tasks/LLM/circuits/backend/circuits.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/circuits/backend/circuits.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.circuits"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.circuit_edit",
+      "type": "goal",
+      "title": "执行候选电路路径干预",
+      "description": "代码方法：执行候选电路路径干预。依据位于 tasks/LLM/circuits/backend/circuit_intervene.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/circuits/backend/circuit_intervene.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.circuits"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "q.sae.explain",
+      "type": "question",
+      "title": "如何生成并独立检验 SAE 特征解释？",
+      "description": "研究问题：如何生成并独立检验 SAE 特征解释？ 相关方法具有源码接口，科学效果和边界条件仍需独立评估。",
+      "status": "partial",
+      "evidence": [
+        "tasks/LLM/explain/interpretation.py",
+        "tasks/LLM/explain/operation.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.explain"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "s.sae.explain",
+      "type": "solve",
+      "title": "特征解释假设与独立样本检验",
+      "description": "通过实际的解释候选生成和执行接口组织解释任务；解释准确性需独立证据。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/explain/interpretation.py",
+        "tasks/LLM/explain/operation.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.explain"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.interpretation",
+      "type": "goal",
+      "title": "生成特征解释候选假设",
+      "description": "代码方法：生成特征解释候选假设。依据位于 tasks/LLM/explain/interpretation.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/explain/interpretation.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.explain"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.explanation_task",
+      "type": "goal",
+      "title": "通过 LLM Task 入口运行解释流程",
+      "description": "代码方法：通过 LLM Task 入口运行解释流程。依据位于 tasks/LLM/explain/operation.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/explain/operation.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.explain"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "q.sae.benchmark",
+      "type": "question",
+      "title": "如何以受控指标和可靠性对照比较 SAE？",
+      "description": "研究问题：如何以受控指标和可靠性对照比较 SAE？ 相关方法具有源码接口，科学效果和边界条件仍需独立评估。",
+      "status": "partial",
+      "evidence": [
+        "tasks/LLM/benchmark/backend/runner.py",
+        "tasks/LLM/benchmark/reliability/runner.py",
+        "tasks/LLM/benchmark/integrations/sar.py",
+        "tasks/LLM/benchmark/integrations/rss.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.benchmark"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "s.sae.benchmark",
+      "type": "solve",
+      "title": "SAE 基准评测、可靠性与行为组合性适配",
+      "description": "评测执行、统计复核和 SAR/RSS 适配有真实代码；实验结论仍需对应结果。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/benchmark/backend/runner.py",
+        "tasks/LLM/benchmark/reliability/runner.py",
+        "tasks/LLM/benchmark/integrations/sar.py",
+        "tasks/LLM/benchmark/integrations/rss.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.benchmark"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.benchmark_runner",
+      "type": "goal",
+      "title": "组织指定 SAE 与样本的基准执行",
+      "description": "代码方法：组织指定 SAE 与样本的基准执行。依据位于 tasks/LLM/benchmark/backend/runner.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/benchmark/backend/runner.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.benchmark",
+        "term.sae.reproducible"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.reliability",
+      "type": "goal",
+      "title": "执行评测可靠性和对照检验",
+      "description": "代码方法：执行评测可靠性和对照检验。依据位于 tasks/LLM/benchmark/reliability/runner.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/benchmark/reliability/runner.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.benchmark",
+        "term.sae.reproducible"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.sar_adapter",
+      "type": "goal",
+      "title": "适配 SAR 特征组合性评测",
+      "description": "代码方法：适配 SAR 特征组合性评测。依据位于 tasks/LLM/benchmark/integrations/sar.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/benchmark/integrations/sar.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.benchmark",
+        "term.sae.sar_rss",
+        "term.sae.reproducible"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.rss_adapter",
+      "type": "goal",
+      "title": "适配 RSS 特征响应评测",
+      "description": "代码方法：适配 RSS 特征响应评测。依据位于 tasks/LLM/benchmark/integrations/rss.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/benchmark/integrations/rss.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.benchmark",
+        "term.sae.sar_rss",
+        "term.sae.reproducible"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "q.sae.train",
+      "type": "question",
+      "title": "如何训练并归档可追溯的稀疏自编码器？",
+      "description": "研究问题：如何训练并归档可追溯的稀疏自编码器？ 相关方法具有源码接口，科学效果和边界条件仍需独立评估。",
+      "status": "partial",
+      "evidence": [
+        "tasks/LLM/train/operation.py",
+        "tasks/LLM/train/backend/training.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.train"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "s.sae.train",
+      "type": "solve",
+      "title": "SAE 训练执行与权重保存接口",
+      "description": "通过实际任务执行和训练后端组织 SAE 训练；训练质量与复现由后续运行证明。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/train/operation.py",
+        "tasks/LLM/train/backend/training.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.train"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.train_task",
+      "type": "goal",
+      "title": "通过 Task 接口启动 SAE 训练",
+      "description": "代码方法：通过 Task 接口启动 SAE 训练。依据位于 tasks/LLM/train/operation.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/train/operation.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.train"
+      ],
+      "environment_refs": []
+    },
+    {
+      "id": "g.sae.train_backend",
+      "type": "goal",
+      "title": "执行原生 SAE 训练后端",
+      "description": "代码方法：执行原生 SAE 训练后端。依据位于 tasks/LLM/train/backend/training.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "status": "implemented",
+      "evidence": [
+        "tasks/LLM/train/backend/training.py"
+      ],
+      "term_ids": [
+        "term.sae",
+        "term.sae.train"
+      ],
+      "environment_refs": []
+    }
+  ],
+  "edges": [
+    {
+      "source": "q.sae.methods",
+      "target": "q.sae.assets",
+      "type": "refines"
+    },
+    {
+      "source": "q.sae.assets",
+      "target": "s.sae.assets",
+      "type": "addresses"
+    },
+    {
+      "source": "s.sae.assets",
+      "target": "g.sae.prompt_artifacts",
+      "type": "decomposes"
+    },
+    {
+      "source": "s.sae.assets",
+      "target": "g.sae.gemma_model",
+      "type": "decomposes"
+    },
+    {
+      "source": "s.sae.assets",
+      "target": "g.sae.sae_registry",
+      "type": "decomposes"
+    },
+    {
+      "source": "q.sae.methods",
+      "target": "q.sae.capture",
+      "type": "refines"
+    },
+    {
+      "source": "q.sae.capture",
+      "target": "s.sae.capture",
+      "type": "addresses"
+    },
+    {
+      "source": "s.sae.capture",
+      "target": "g.sae.activation_capture",
+      "type": "decomposes"
+    },
+    {
+      "source": "s.sae.capture",
+      "target": "g.sae.capture_task",
+      "type": "decomposes"
+    },
+    {
+      "source": "q.sae.methods",
+      "target": "q.sae.intervene",
+      "type": "refines"
+    },
+    {
+      "source": "q.sae.intervene",
+      "target": "s.sae.intervene",
+      "type": "addresses"
+    },
+    {
+      "source": "s.sae.intervene",
+      "target": "g.sae.feature_edit",
+      "type": "decomposes"
+    },
+    {
+      "source": "s.sae.intervene",
+      "target": "g.sae.teacher_forced",
+      "type": "decomposes"
+    },
+    {
+      "source": "q.sae.methods",
+      "target": "q.sae.generate",
+      "type": "refines"
+    },
+    {
+      "source": "q.sae.generate",
+      "target": "s.sae.generate",
+      "type": "addresses"
+    },
+    {
+      "source": "s.sae.generate",
+      "target": "g.sae.generation_task",
+      "type": "decomposes"
+    },
+    {
+      "source": "s.sae.generate",
+      "target": "g.sae.generation_engine",
+      "type": "decomposes"
+    },
+    {
+      "source": "q.sae.methods",
+      "target": "q.sae.circuits",
+      "type": "refines"
+    },
+    {
+      "source": "q.sae.circuits",
+      "target": "s.sae.circuits",
+      "type": "addresses"
+    },
+    {
+      "source": "s.sae.circuits",
+      "target": "g.sae.circuit_trace",
+      "type": "decomposes"
+    },
+    {
+      "source": "s.sae.circuits",
+      "target": "g.sae.circuit_edit",
+      "type": "decomposes"
+    },
+    {
+      "source": "q.sae.methods",
+      "target": "q.sae.explain",
+      "type": "refines"
+    },
+    {
+      "source": "q.sae.explain",
+      "target": "s.sae.explain",
+      "type": "addresses"
+    },
+    {
+      "source": "s.sae.explain",
+      "target": "g.sae.interpretation",
+      "type": "decomposes"
+    },
+    {
+      "source": "s.sae.explain",
+      "target": "g.sae.explanation_task",
+      "type": "decomposes"
+    },
+    {
+      "source": "q.sae.methods",
+      "target": "q.sae.benchmark",
+      "type": "refines"
+    },
+    {
+      "source": "q.sae.benchmark",
+      "target": "s.sae.benchmark",
+      "type": "addresses"
+    },
+    {
+      "source": "s.sae.benchmark",
+      "target": "g.sae.benchmark_runner",
+      "type": "decomposes"
+    },
+    {
+      "source": "s.sae.benchmark",
+      "target": "g.sae.reliability",
+      "type": "decomposes"
+    },
+    {
+      "source": "s.sae.benchmark",
+      "target": "g.sae.sar_adapter",
+      "type": "decomposes"
+    },
+    {
+      "source": "s.sae.benchmark",
+      "target": "g.sae.rss_adapter",
+      "type": "decomposes"
+    },
+    {
+      "source": "q.sae.methods",
+      "target": "q.sae.train",
+      "type": "refines"
+    },
+    {
+      "source": "q.sae.train",
+      "target": "s.sae.train",
+      "type": "addresses"
+    },
+    {
+      "source": "s.sae.train",
+      "target": "g.sae.train_task",
+      "type": "decomposes"
+    },
+    {
+      "source": "s.sae.train",
+      "target": "g.sae.train_backend",
+      "type": "decomposes"
+    }
+  ],
+  "status_policy": "not_implemented / partial / implemented; each node has independently audited evidence",
+  "child_order": "Top to bottom as listed in edges; no explicit execution/dependency links"
+}

@@ -1,0 +1,9 @@
+# @package _global_
+dataset:
+  name: CounterFact
+  input_format: text
+  data_path: ${paths.data_dir}/${dataset.name}
+  prompt_file: ''
+  batch_size: 8
+  num_workers: 0
+  pin_memory: false

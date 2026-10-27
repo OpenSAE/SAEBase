@@ -1,0 +1,13 @@
+# GitHub-only 协调说明：阻止 Cursor 普通 AI 访问，不代表 OS 级权限隔离。
+harness/core/GITHUB_ONLY.md
+# 大量示例/第三方依赖与机器本地产物不进入 Agent 索引。
+harness/**/.git/
+harness/**/node_modules/
+harness/**/.venv/
+harness/**/__pycache__/
+harness/**/.cache/
+harness/environment/out/
+experiment/**/tmp/
+
+# Agent default context excludes Core governance and source rules.
+harness/core/**

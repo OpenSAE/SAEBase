@@ -1,0 +1,657 @@
+{
+  "schema_version": 1,
+  "kind": "atlas_context_vocabulary",
+  "purpose": "SAEBase LLM / SAE / Harness 的工程与环境术语，按实际源码提供依据。",
+  "categories": [
+    {
+      "id": "platform",
+      "title": "框架、代码与任务",
+      "description": "数据、模型、任务及源码接口的统一概念"
+    },
+    {
+      "id": "runtime",
+      "title": "硬件与执行工具",
+      "description": "计算设备、容量单位和环境工具的含义"
+    }
+  ],
+  "terms": [
+    {
+      "id": "term.dataset",
+      "term": "Dataset",
+      "definition": "按配置提供样本、标签和数据划分的组件；训练程序从它获得输入数据。",
+      "aliases": [
+        "数据集",
+        "dataset"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "research_datasets/datamodule.py"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "research_datasets/datamodule.py"
+    },
+    {
+      "id": "term.model",
+      "term": "Model",
+      "definition": "接收输入并产生预测或特征的计算组件；模型结构由自己的实现文件决定。",
+      "aliases": [
+        "模型",
+        "model"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "models/build.py"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "models/build.py"
+    },
+    {
+      "id": "term.task",
+      "term": "Task",
+      "definition": "规定训练或评测要做什么的通用任务类型；运行时再选择数据集和模型。",
+      "aliases": [
+        "任务",
+        "task"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "tasks/runner.py"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "tasks/runner.py"
+    },
+    {
+      "id": "term.registry",
+      "term": "Registry",
+      "definition": "组件注册表。通过统一名称找到已注册的数据集、模型或任务，供运行入口调用。",
+      "aliases": [
+        "Registry",
+        "注册表",
+        "注册中心"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "dlbase/registry.py"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "dlbase/registry.py"
+    },
+    {
+      "id": "term.plugin",
+      "term": "插件",
+      "definition": "按统一接口接入框架的组件；新增实现可登记并由公共入口调用。",
+      "aliases": [
+        "plugin",
+        "插件"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "dlbase/registry.py"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "dlbase/registry.py"
+    },
+    {
+      "id": "term.ast",
+      "term": "AST",
+      "definition": "抽象语法树。Python 解析源码得到的结构，能定位真实类、函数及调用关系。",
+      "aliases": [
+        "AST",
+        "抽象语法树"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "harness/code/build.py"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/code/build.py"
+    },
+    {
+      "id": "term.api",
+      "term": "API",
+      "definition": "程序与组件之间约定的调用接口，说明怎样传入参数并取得结果。",
+      "aliases": [
+        "API"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "harness/code/README.md"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/code/README.md"
+    },
+    {
+      "id": "term.yaml",
+      "term": "YAML",
+      "definition": "常用于保存可读配置的文本格式；本项目的实验选项由 YAML 文件组合。",
+      "aliases": [
+        "YAML"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "conf/config.yaml"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "conf/config.yaml"
+    },
+    {
+      "id": "term.tensorboard",
+      "term": "TensorBoard",
+      "definition": "把训练日志中的损失、指标等随时间变化的信息展示为曲线的工具。",
+      "aliases": [
+        "TensorBoard"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "dlbase/training/standard_lightning.py"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "dlbase/training/standard_lightning.py"
+    },
+    {
+      "id": "term.tqdm",
+      "term": "TQDM",
+      "definition": "用于展示迭代进度的工具；这里显示训练批次及其进度信息。",
+      "aliases": [
+        "TQDM"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "dlbase/training/training_callbacks.py"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "dlbase/training/training_callbacks.py"
+    },
+    {
+      "id": "term.callback",
+      "term": "训练回调",
+      "definition": "训练过程中在特定时刻触发的辅助函数，用于记录指标、保存权重等。",
+      "aliases": [
+        "callback",
+        "callbacks",
+        "回调"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "dlbase/training/training_callbacks.py"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "dlbase/training/training_callbacks.py"
+    },
+    {
+      "id": "term.code_tree",
+      "term": "Code Tree",
+      "definition": "从真实 Python 源码组织模块、类、函数和方法的浏览视图。",
+      "aliases": [
+        "Code Tree",
+        "Code"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "harness/visualization/README.md"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/visualization/README.md"
+    },
+    {
+      "id": "term.core_tree",
+      "term": "Core Tree",
+      "definition": "说明项目级结构、公共组件边界及管理目标的浏览视图。",
+      "aliases": [
+        "Core Tree",
+        "Core"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "harness/core/TREE_CONTRACTS.md"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/core/TREE_CONTRACTS.md"
+    },
+    {
+      "id": "term.knowledge_tree",
+      "term": "Knowledge Tree",
+      "definition": "说明研究问题、方案和验证目标的浏览视图。",
+      "aliases": [
+        "Knowledge Tree",
+        "Knowledge"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "harness/core/TREE_CONTRACTS.md"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/core/TREE_CONTRACTS.md"
+    },
+    {
+      "id": "term.environment_tree",
+      "term": "Environment Tree",
+      "definition": "说明运行实验需要的硬件、软件与执行资源的浏览视图。",
+      "aliases": [
+        "Environment Tree",
+        "Environment"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "harness/core/TREE_CONTRACTS.md"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/core/TREE_CONTRACTS.md"
+    },
+    {
+      "id": "term.context_tree",
+      "term": "Context",
+      "definition": "术语定义与来源的统一入口，为各 Atlas 节点的专有名词提供解释。",
+      "aliases": [
+        "Context"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "harness/visualization/README.md"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/visualization/README.md"
+    },
+    {
+      "id": "term.cpu",
+      "term": "CPU",
+      "definition": "通用中央处理器，负责运行系统和程序中的一般计算任务。",
+      "aliases": [
+        "CPU",
+        "中央处理器"
+      ],
+      "category": "runtime",
+      "source_evidence": [
+        "harness/environment/README.md"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/environment/README.md"
+    },
+    {
+      "id": "term.gpu",
+      "term": "GPU",
+      "definition": "擅长并行计算的图形处理器，常用于加速神经网络训练。",
+      "aliases": [
+        "GPU",
+        "图形处理器"
+      ],
+      "category": "runtime",
+      "source_evidence": [
+        "harness/environment/README.md"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/environment/README.md"
+    },
+    {
+      "id": "term.gib",
+      "term": "GiB",
+      "definition": "二进制容量单位；1 GiB 等于 1024 MiB。",
+      "aliases": [
+        "GiB"
+      ],
+      "category": "runtime",
+      "source_evidence": [
+        "harness/environment/probe.py"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/environment/probe.py"
+    },
+    {
+      "id": "term.tib",
+      "term": "TiB",
+      "definition": "二进制容量单位；1 TiB 等于 1024 GiB。",
+      "aliases": [
+        "TiB"
+      ],
+      "category": "runtime",
+      "source_evidence": [
+        "harness/environment/probe.py"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/environment/probe.py"
+    },
+    {
+      "id": "term.tmux",
+      "term": "tmux",
+      "definition": "终端会话管理工具，可保持长时间运行的命令并在之后重新连接。",
+      "aliases": [
+        "tmux",
+        "后台终端会话"
+      ],
+      "category": "runtime",
+      "source_evidence": [
+        "harness/environment/README.md"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/environment/README.md"
+    },
+    {
+      "id": "term.sbatch",
+      "term": "sbatch",
+      "definition": "集群作业提交命令，用来把计算任务交给集群调度系统。",
+      "aliases": [
+        "sbatch",
+        "集群作业提交"
+      ],
+      "category": "runtime",
+      "source_evidence": [
+        "harness/environment/README.md"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/environment/README.md"
+    },
+    {
+      "id": "term.docker",
+      "term": "Docker",
+      "definition": "通过容器封装程序和依赖，帮助在隔离环境中运行应用。",
+      "aliases": [
+        "Docker",
+        "容器运行环境"
+      ],
+      "category": "runtime",
+      "source_evidence": [
+        "harness/environment/README.md"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/environment/README.md"
+    },
+    {
+      "id": "term.podman",
+      "term": "Podman",
+      "definition": "用于创建和运行容器的工具，提供另一种容器执行方式。",
+      "aliases": [
+        "Podman",
+        "替代容器运行环境"
+      ],
+      "category": "runtime",
+      "source_evidence": [
+        "harness/environment/README.md"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/environment/README.md"
+    },
+    {
+      "id": "term.rclone",
+      "term": "rclone",
+      "definition": "文件同步工具，用于在存储位置之间复制或校验文件。",
+      "aliases": [
+        "rclone",
+        "文件同步工具"
+      ],
+      "category": "runtime",
+      "source_evidence": [
+        "harness/transfer/README.md"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/transfer/README.md"
+    },
+    {
+      "id": "term.nvidia_smi",
+      "term": "nvidia-smi",
+      "definition": "查看 NVIDIA GPU 状态和显存等信息的命令行工具。",
+      "aliases": [
+        "nvidia-smi",
+        "图形设备检测工具"
+      ],
+      "category": "runtime",
+      "source_evidence": [
+        "harness/environment/README.md"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/environment/README.md"
+    },
+    {
+      "id": "term.python",
+      "term": "Python",
+      "definition": "执行项目训练、评测、数据处理和工具脚本的编程语言。",
+      "aliases": [
+        "Python",
+        "Python 解释器"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "harness/code/README.md"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/code/README.md"
+    },
+    {
+      "id": "term.function_signature",
+      "term": "函数签名",
+      "definition": "描述函数名称、参数及其类型的接口声明，用于判断如何调用函数。",
+      "aliases": [
+        "函数签名"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "harness/code/README.md"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "harness/code/README.md"
+    },
+    {
+      "id": "term.artifact",
+      "term": "实验产物",
+      "definition": "一次实验留下的结果文件，例如指标、日志、模型权重和报告。",
+      "aliases": [
+        "实验产物",
+        "产物"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "dlbase/experiment_paths.py"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "dlbase/experiment_paths.py"
+    },
+    {
+      "id": "term.datamodule",
+      "term": "DataModule",
+      "definition": "把数据划分组织为训练、验证与测试加载器的组件。",
+      "aliases": [
+        "DataModule",
+        "数据管理器"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "research_datasets/datamodule.py"
+      ],
+      "why_it_matters": "用于理解 Atlas 中的相关节点和源码职责。",
+      "foundation": "research_datasets/datamodule.py"
+    },
+    {
+      "id": "term.dlbase",
+      "term": "DLBase",
+      "definition": "提供训练配置、组件注册、任务分发和实验文件管理的通用基础模块。",
+      "aliases": [
+        "dlbase",
+        "通用训练基础"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "dlbase/registry.py"
+      ],
+      "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
+      "foundation": "dlbase/registry.py"
+    },
+    {
+      "id": "term.saebase",
+      "term": "SAEBase",
+      "definition": "支持语言模型内部特征捕获、特征修改、电路分析、评测及稀疏自编码器训练的研究模块。",
+      "aliases": [
+        "saebase"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "saebase/api/__init__.py"
+      ],
+      "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
+      "foundation": "saebase/api/__init__.py"
+    },
+    {
+      "id": "term.llm",
+      "term": "LLM",
+      "definition": "大语言模型。用于处理和生成文本，研究时还可分析其内部计算活动。",
+      "aliases": [
+        "LLM",
+        "语言模型"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "models/LLM/gemma2_2b_base/gemma2_2b_base.py"
+      ],
+      "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
+      "foundation": "models/LLM/gemma2_2b_base/gemma2_2b_base.py"
+    },
+    {
+      "id": "term.nlp",
+      "term": "NLP",
+      "definition": "自然语言处理。负责把文本和语言行为转化为可供程序读取及评测的研究输入。",
+      "aliases": [
+        "NLP",
+        "自然语言处理"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "research_datasets/NLP/prompts.py"
+      ],
+      "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
+      "foundation": "research_datasets/NLP/prompts.py"
+    },
+    {
+      "id": "term.sparse_autoencoder",
+      "term": "SAE",
+      "definition": "稀疏自编码器。把模型内部激活表示成少量活跃特征，再重建原始激活，用于解释和干预神经网络。",
+      "aliases": [
+        "SAE",
+        "稀疏自编码器"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "saebase/api/features.py"
+      ],
+      "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
+      "foundation": "saebase/api/features.py"
+    },
+    {
+      "id": "term.gemma2_2b",
+      "term": "Gemma-2 2B",
+      "definition": "Google 发布的 Gemma 2 系列约 20 亿参数语言模型，这里选用其基础预训练版本。",
+      "aliases": [
+        "Gemma-2 2B",
+        "gemma2_2b_base"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "models/LLM/gemma2_2b_base/gemma2_2b_base.py"
+      ],
+      "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
+      "foundation": "models/LLM/gemma2_2b_base/gemma2_2b_base.py"
+    },
+    {
+      "id": "term.feature_capture",
+      "term": "特征捕获",
+      "definition": "在指定语言模型层读取真实激活，并用对应的 SAE 提取特征值。",
+      "aliases": [
+        "capture",
+        "特征捕获"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "saebase/api/features.py"
+      ],
+      "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
+      "foundation": "saebase/api/features.py"
+    },
+    {
+      "id": "term.intervene",
+      "term": "教师强制干预",
+      "definition": "保留给定输入的完整 token 序列，通过替换特征比较同一输入条件下模型输出的变化。",
+      "aliases": [
+        "intervene",
+        "教师强制干预"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "saebase/api/features.py"
+      ],
+      "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
+      "foundation": "saebase/api/features.py"
+    },
+    {
+      "id": "term.generate",
+      "term": "生成干预",
+      "definition": "在模型继续生成文本时修改选定特征，并与原始生成行为进行比较。",
+      "aliases": [
+        "generate",
+        "生成干预"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "tasks/LLM/intervene/backend/steering.py"
+      ],
+      "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
+      "foundation": "tasks/LLM/intervene/backend/steering.py"
+    },
+    {
+      "id": "term.circuit_analysis",
+      "term": "电路分析",
+      "definition": "分析模型内部多个计算特征及它们之间的联系，并记录实际图数据和来源。",
+      "aliases": [
+        "circuits",
+        "电路分析"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "tasks/LLM/circuits/backend/circuits.py"
+      ],
+      "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
+      "foundation": "tasks/LLM/circuits/backend/circuits.py"
+    },
+    {
+      "id": "term.explain",
+      "term": "自动解释",
+      "definition": "根据特征激活的输入片段生成候选说明，再利用独立样本检测这些说明的预测能力。",
+      "aliases": [
+        "explain",
+        "自动解释"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "tasks/LLM/explain/interpretation.py"
+      ],
+      "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
+      "foundation": "tasks/LLM/explain/interpretation.py"
+    },
+    {
+      "id": "term.benchmark",
+      "term": "基准评测",
+      "definition": "用固定指标、数据样本和计算协议衡量特征表示或干预方法的表现。",
+      "aliases": [
+        "benchmark",
+        "基准评测"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "tasks/LLM/benchmark/backend/runner.py"
+      ],
+      "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
+      "foundation": "tasks/LLM/benchmark/backend/runner.py"
+    },
+    {
+      "id": "term.sae_training",
+      "term": "SAE 训练",
+      "definition": "通过真实训练后端学习稀疏特征编码与重建，产生可检查的模型参数和训练产物。",
+      "aliases": [
+        "train",
+        "SAE 训练"
+      ],
+      "category": "platform",
+      "source_evidence": [
+        "tasks/LLM/train/backend/training.py"
+      ],
+      "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
+      "foundation": "tasks/LLM/train/backend/training.py"
+    }
+  ]
+}

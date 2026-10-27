@@ -1,0 +1,6 @@
+# @package _global_
+model:
+  name: gemma2_2b_base
+  hf_id: google/gemma-2-2b
+  device: cpu
+  lazy: true

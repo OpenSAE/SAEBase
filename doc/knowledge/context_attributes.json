@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "kind": "context_attributes",
+  "purpose": "SAE 专用 Context 扩展属性，目前以可追溯的科研术语及代码证据为依据。",
+  "entries": []
+}

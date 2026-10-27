@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "approved_roots": [
+    ".cursor",
+    ".github",
+    "apps",
+    "assets",
+    "conf",
+    "dlbase",
+    "doc",
+    "docs",
+    "examples",
+    "experiment",
+    "harness",
+    "models",
+    "saebase",
+    "scripts",
+    "tasks",
+    "tests",
+    "work_plan",
+    "research_datasets"
+  ],
+  "approved_files": [
+    ".cursorignore",
+    ".gitignore",
+    ".pre-commit-config.yaml",
+    "CHANGELOG.md",
+    "CODE_OF_CONDUCT.md",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "MANIFEST.in",
+    "Makefile",
+    "NOTICE",
+    "README.md",
+    "README_cn.md",
+    "main.py",
+    "pyproject.toml",
+    "requirements-dev.txt",
+    "requirements.txt",
+    "setup.py"
+  ],
+  "protected_roots": [
+    "dlbase",
+    "saebase"
+  ]
+}

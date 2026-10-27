@@ -1,0 +1,15 @@
+# @package _global_
+# Each task is model/dataset independent; compose selections through Hydra.
+task:
+  name: generate
+  path: generate
+  execute: false
+  sae_key: gemma2_2b_pt_l25_canonical
+  layer: 25
+  device: cpu
+  prompt: ''
+  feature_id: 0
+  intervention: add
+  value: 1.0
+  max_new_tokens: 8
+  temperature: 0.0

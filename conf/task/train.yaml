@@ -1,0 +1,14 @@
+# @package _global_
+# Each task is model/dataset independent; compose selections through Hydra.
+task:
+  name: train
+  path: train
+  execute: false
+  sae_key: gemma2_2b_pt_l25_canonical
+  layer: 25
+  device: cpu
+  prompt: ''
+  approved: false
+  train_plan: null
+  allow_large: false
+  timeout_seconds: 1800

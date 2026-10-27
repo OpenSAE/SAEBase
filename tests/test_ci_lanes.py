@@ -40,7 +40,7 @@ def workflow(name: str) -> dict:
 
 def test_only_essential_ci_and_pinned_research_run_on_pull_requests():
     paths = sorted(WORKFLOWS.glob("*.yml"))
-    assert len(paths) == 20
+    assert len(paths) == 21
     auto = {path.name for path in paths if "pull_request" in workflow(path.name)["on"]}
     assert auto == {"ci.yml", "research-regression.yml"}
     for name in MANUAL:
@@ -114,3 +114,22 @@ def test_one_time_research_lab_release_preserves_main_ci_guard():
     assert 'TAG: "v0.4.0"' in source
     assert "gh workflow run software-release.yml" in source
     assert "PUBLISH-$TAG" in source
+
+
+def test_one_time_saebase_v060_dispatch_stays_sha_and_version_bounded():
+    flow = workflow("saebase-v060-release-dispatch.yml")
+    assert set(flow["on"]) == {"workflow_run"}
+    assert flow["on"]["workflow_run"]["workflows"] == ["CI"]
+    gate = flow["jobs"]["release"]["if"]
+    for clause in (
+        "workflow_run.conclusion == 'success'",
+        "workflow_run.event == 'push'",
+        "head_branch == 'main'",
+        "head_repository.full_name == github.repository",
+    ):
+        assert clause in gate
+    source = (WORKFLOWS / "saebase-v060-release-dispatch.yml").read_text()
+    assert 'VERSION: "0.6.0"' in source and 'TAG: "v0.6.0"' in source
+    assert "software-release.yml" in source and 'PUBLISH-$TAG' in source
+    assert "repos/$REPO/branches/main" in source
+    assert "git/ref/tags/$TAG" in source

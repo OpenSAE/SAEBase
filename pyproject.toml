@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "opensae-saebase"
-version = "0.5.0"
+version = "0.6.0"
 description = "Research infrastructure for sparse autoencoder evaluation and interventions"
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
@@ -85,7 +85,7 @@ py-modules = ["main"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["saebase*", "models*", "tasks*", "scripts*", "conf*"]
+include = ["saebase*", "models*", "tasks*", "scripts*", "conf*", "dlbase*", "research_datasets*"]
 exclude = ["tests*", "examples*"]
 
 [tool.setuptools.package-data]

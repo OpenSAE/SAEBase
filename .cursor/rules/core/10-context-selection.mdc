@@ -1,0 +1,23 @@
+---
+description: 按任务激活 Core / Code / Knowledge / Glossary；未指定时不加载无关上下文。
+alwaysApply: true
+---
+
+# Context Selection · Core 与科研 Knowledge 分离
+
+- `harness/core/project_graph.json` 是全项目架构、管理和设计树（Core），`doc/knowledge/context_graph.json` 是 SAE 的科研知识与证据树（Knowledge），两者按明确 ID 按需读取。
+- `doc/knowledge/glossary.json` 是科研术语的**唯一结构化字典**；Knowledge 节点只能使用已定义的 `term_ids`，新增术语先补定义/证据/背景说明再入树。
+- `doc/code/code_tree.json` 是真实 AST 派生快照；`doc/code/code_annotations.json` 中 `core_ids` 和 `context_ids` 必须分别引用 Core 和 Knowledge，不能未经验证从名字生成研究结论。
+- 未经用户明确指定某份文档、Work Order 或模块，不主动递归搜索、加载 `doc/` 或 `harness/`。修改代码仍应阅读实际相关业务源码、Hydra 配置与必要的测试。
+- 仅根据用户明确指定的 `.cursor/work_orders/<ID>.yaml` 激活当前工作单；使用 `run-work-order` Skill 验证 v3。分别按照 `core_ids`、`knowledge_ids`、`term_ids` 提取**少量节点**，不要把整本字典和整棵树加载进 Context。
+- `activation.core/code/knowledge/experiments/transfer/environment` 默认关闭；不允许 Agent 自己扩大启用范围。未列出的 `doc/` 或 `harness/github_work_plan/` 文件不得主动浏览或通过 Subagent/Shell/MCP 变相获取。
+- Core 的项目决策与 Knowledge 的科研语义均由 GitHub 端维护。Agent 可以提交有事实依据的修改提案；未经授权不直接替换两套权威图与 Glossary。
+- 激活 `code` 且执行代码修改时，先保存旧 AST、提出 Expected 变化，完成后重建并比较 Observed 变化，不以图代替运行测试。
+- `harness/core/GITHUB_ONLY.md` 是 GitHub 端规划资料，本地 Agent 不应阅读。`.cursorignore` 只能阻止常规 AI 读取，不是系统级文件权限。
+- `unlisted: deny` 是 Agent 应遵守的工作协议，不是 Cursor 原生安全沙箱。任务授权不自动延续到下一任务。
+
+## Agent Flow · Core shield
+
+- 除 Github 人类治理侧外，Agent 不遍历 Core Tree；新的部署/执行流程只涉及 `knowledge`、`code`、`environment`、`context` 四个 review 视图。
+- `harness/core/agent_flow.py inspect` 只返回当前人工批准的计划记录，不意味着可以读取/修改 Core 权威图。
+- `harness/github_work_plan/agent_flow` 包含可审计的流程数据；Agent 只能提交新的提案与真实运行证据，人类审批通过 GitHub PR review 或本地 loopback UI 落地。
