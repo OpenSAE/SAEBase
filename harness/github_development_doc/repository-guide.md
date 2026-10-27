@@ -14,7 +14,7 @@ SAEBase separates runnable examples, research code, published evidence and engin
 | [`saebase/`](../../saebase) | Python APIs for loading, measuring, editing and reporting | [API guide](python-api.md) |
 | [`models/`](../../models) and [`conf/`](../../conf) | Model adapters, SAE profiles and experiment configurations | [Model support](model-support.md) |
 | [`saebase/research_lab/`](../../saebase/research_lab/README.md) | Browser-based exploration of recorded measurements | [Research Lab](../../saebase/research_lab/README.md) |
-| [`saebase/assets/`](../../saebase/assets) | Branding and workflow figures used in documentation | [Workflow diagram](../../saebase/assets/figures/saebase_workflow.svg) |
+| [`saebase/assets/`](../github_assets) | Branding and workflow figures used in documentation | [Workflow diagram](../github_assets/figures/saebase_workflow.svg) |
 | [`harness/github_development_doc/`](index.md) | Tutorials, API details, scientific protocols and verified reports | [Documentation](index.md) |
 | [`saebase/tools/`](../../saebase/tools/README.md) | Maintenance, verification and reproducible GPU experiment entrypoints | [Script guide](../../saebase/tools/README.md) |
 | [`harness/github_work_plan/`](../github_work_plan/README.md) | Historical implementation plans and execution records | [Engineering history](../github_work_plan/README.md) |

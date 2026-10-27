@@ -1,6 +1,6 @@
 # Maintainer Workflow
 
-SAEBase is the shared software infrastructure for OpenSAE projects. Its own [Contributing Guide](../../CONTRIBUTING.md) defines the repository-specific test and provenance expectations; the [OpenSAE Governance](https://github.com/OpenSAE/.github/blob/main/GOVERNANCE.md) and [Code of Conduct](https://github.com/OpenSAE/.github/blob/main/CODE_OF_CONDUCT.md) apply across the organization.
+SAEBase is the shared software infrastructure for OpenSAE projects. Its own [Contributing Guide](../../.github/CONTRIBUTING.md) defines the repository-specific test and provenance expectations; the [OpenSAE Governance](https://github.com/OpenSAE/.github/blob/main/GOVERNANCE.md) and [Code of Conduct](https://github.com/OpenSAE/.github/blob/main/CODE_OF_CONDUCT.md) apply across the organization.
 
 ## Review and ownership
 

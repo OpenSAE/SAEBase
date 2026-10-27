@@ -38,8 +38,8 @@ Start with a working example, then choose the research task you want to perform.
 ## Repository and maintenance
 
 - [**Repository Guide**](repository-guide.md) — where examples, configuration, research code, assets and evidence live.
-- [Contributing](../../CONTRIBUTING.md) · [Maintainer Workflow](maintainer-workflow.md) · [CI Checks](ci-maintenance.md)
-- [Packaging](packaging.md) · [Software Release Process](release-process.md) · [Security](../../SECURITY.md)
+- [Contributing](../../.github/CONTRIBUTING.md) · [Maintainer Workflow](maintainer-workflow.md) · [CI Checks](ci-maintenance.md)
+- [Packaging](packaging.md) · [Software Release Process](release-process.md) · [Security](../../.github/SECURITY.md)
 - [Historical Research and Engineering Notes](history.md) — older implementation, compatibility and checkpoint records.
 
 Versioned source identities and older command aliases remain usable for reproducibility. They are not required to follow the current Quick Start.

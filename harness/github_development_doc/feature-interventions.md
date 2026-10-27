@@ -172,7 +172,7 @@ steered continuation. A separate unmodified continuation supplies a baseline.
 The [manual `m2` real-smoke workflow](../../.github/workflows/real-smoke.yml) downloads
 public Pythia-70M and the `pythia70m_resid_sm` SAE and verifies:
 
-1. Exact loaded model and SAE full state digests from the [real checkpoint reference fixture](../../tests/fixtures/m0_reference_public.json).
+1. Exact loaded model and SAE full state digests from the [real checkpoint reference fixture](../github_work_test/fixtures/m0_reference_public.json).
 2. reference activation probes and SAE activation sparsity.
 3. Reused activation/code caches and selected feature IDs with real weights.
 4. A strict native, same-batch identity check (<=1e-4 maximum per-logit
