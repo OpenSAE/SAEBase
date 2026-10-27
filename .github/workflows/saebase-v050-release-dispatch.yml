@@ -49,7 +49,7 @@ jobs:
             --jq '.content' | base64 -d | grep -q 'version = "0.5.0"'
           gh api "repos/$REPO/contents/docs/releases/v0.5.0.md?ref=$SOURCE_SHA" \
             --jq '.sha' | grep -Eq '^[a-f0-9]{40}$'
-          gh api "repos/$REPO/contents/work_plan/17_seven_playgrounds_agent_handoff.md?ref=$SOURCE_SHA" \
+          gh api "repos/$REPO/contents/harness/github_work_plan/17_seven_playgrounds_agent_handoff.md?ref=$SOURCE_SHA" \
             --jq '.sha' | grep -Eq '^[a-f0-9]{40}$'
       - name: Dispatch existing source-bound release verifier and publisher
         shell: bash

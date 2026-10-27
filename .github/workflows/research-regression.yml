@@ -7,11 +7,11 @@ on:
       - "saebase/benchmarks/**"
       - "saebase/reliability/**"
       - "saebase/integrations/**"
-      - "tests/test_phase_c_reference_contract.py"
-      - "tests/test_m3_paper_adapters.py"
-      - "tests/test_research_lab_native_methods.py"
+      - "harness/github_work_test/test_phase_c_reference_contract.py"
+      - "harness/github_work_test/test_m3_paper_adapters.py"
+      - "harness/github_work_test/test_research_lab_native_methods.py"
       - "apps/research-lab/backend/methods.py"
-      - "tests/test_m4_ground_truth.py"
+      - "harness/github_work_test/test_m4_ground_truth.py"
       - "scripts/m4_ground_truth.py"
       - ".github/workflows/research-regression.yml"
   push:
@@ -20,9 +20,9 @@ on:
       - "saebase/benchmarks/**"
       - "saebase/reliability/**"
       - "saebase/integrations/**"
-      - "tests/test_phase_c_reference_contract.py"
-      - "tests/test_m3_paper_adapters.py"
-      - "tests/test_m4_ground_truth.py"
+      - "harness/github_work_test/test_phase_c_reference_contract.py"
+      - "harness/github_work_test/test_m3_paper_adapters.py"
+      - "harness/github_work_test/test_m4_ground_truth.py"
       - "scripts/m4_ground_truth.py"
       - ".github/workflows/research-regression.yml"
   workflow_dispatch:
@@ -63,12 +63,12 @@ jobs:
         env:
           SAEBASE_SAR_SOURCE: originals/sar/sar.py
           SAEBASE_RSS_SOURCE: originals/rss/rss.py
-        run: python -m pytest -q tests/test_phase_c_reference_contract.py tests/test_m3_paper_adapters.py
+        run: python -m pytest -q harness/github_work_test/test_phase_c_reference_contract.py harness/github_work_test/test_m3_paper_adapters.py
       - name: Verify Research Lab original SAR and RSS CPU result parity
         env:
           SAEBASE_SAR_SOURCE: originals/sar/sar.py
           SAEBASE_RSS_SOURCE: originals/rss/rss.py
-        run: python -m pytest -q tests/test_research_lab_native_methods.py
+        run: python -m pytest -q harness/github_work_test/test_research_lab_native_methods.py
 
   synthetic-ground-truth:
     runs-on: ubuntu-latest
@@ -96,7 +96,7 @@ jobs:
           SAEBASE_RSS_SOURCE: originals/rss/rss.py
         run: |
           set -euo pipefail
-          python -m pytest -q tests/test_m4_ground_truth.py
+          python -m pytest -q harness/github_work_test/test_m4_ground_truth.py
           saebase-ground-truth \
             --config conf/reliability/m4_ground_truth.json \
             --sar-source originals/sar/sar.py \
