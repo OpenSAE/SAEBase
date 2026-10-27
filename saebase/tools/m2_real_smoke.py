@@ -17,11 +17,11 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-import numpy as np
-import torch
+import numpy as np  # noqa: E402
+import torch  # noqa: E402
 
-from saebase.api import ActivationSite, capture_features, evaluate_edit, load_registered
-from saebase.store import (
+from saebase.api import ActivationSite, capture_features, evaluate_edit, load_registered  # noqa: E402
+from saebase.store import (  # noqa: E402
     ActivationIdentity,
     ActivationWriter,
     CodeIdentity,
@@ -33,7 +33,7 @@ from saebase.store import (
     fingerprint,
     sha256_state_dict,
 )
-from saebase.interventions import (
+from saebase.interventions import (  # noqa: E402
     BatchEngine,
     Condition,
     ExperimentIdentity,

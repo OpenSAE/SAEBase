@@ -70,7 +70,7 @@ def run(sae_key: str, output: Path) -> dict:
         config,
         output,
         real=True,
-        loader=lambda mk, sk, l: SimpleNamespace(model=model, sae=sae),
+        loader=lambda mk, sk, layer: SimpleNamespace(model=model, sae=sae),
     )
     if len(rows) != 5 or any(x["status"] != "completed" for x in rows):
         raise ValueError("real Stage B Benchmark incomplete")

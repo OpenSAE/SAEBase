@@ -17,8 +17,8 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from saebase.store import SampleRecord, TokenSelection
-from saebase.interventions import (
+from saebase.store import SampleRecord, TokenSelection  # noqa: E402
+from saebase.interventions import (  # noqa: E402
     BatchEngine,
     Condition,
     ExperimentIdentity,

@@ -72,9 +72,8 @@ def main(argv=None) -> int:
         if args.sae_only:
             from saebase.sae.loading import load_sae_for_profile
 
-            resolver = lambda model_key, sae_key, layer: load_sae_for_profile(
-                sae_key, layer, device="cpu"
-            )[0]
+            def resolver(model_key, sae_key, layer):
+                return load_sae_for_profile(sae_key, layer, device="cpu")[0]
         report = evaluate_m3(args.m3_root, cfg, sae_resolver=resolver)
         if args.ground_truth:
             from saebase.reliability.ground_truth_report import (

@@ -9,7 +9,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from saebase.runtime import missing_packages, print_python_identity, required_packages
+from saebase.runtime import missing_packages, print_python_identity, required_packages  # noqa: E402
 
 
 def main():

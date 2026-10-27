@@ -188,6 +188,9 @@ jobs:
                   break
               except Exception:
                   time.sleep(0.5)
+          if result is None:
+              import subprocess
+              subprocess.run(["docker", "logs", "opensae-lab-ci"], check=False)
           assert result is not None, "CPU container did not start"
           assert result["sites_verified"] == 48
           assert result["historical_groups_per_site"] == 64
