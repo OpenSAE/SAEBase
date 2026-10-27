@@ -1,6 +1,6 @@
 """Simple copying (induction) prompts for SAEBase."""
 
-from datasets.NLP.SimpleCopying.SimpleCopying import (
+from research_datasets.NLP.SimpleCopying.SimpleCopying import (
     copying_json_path,
     default_data_dir,
     generate_copying_prompts,

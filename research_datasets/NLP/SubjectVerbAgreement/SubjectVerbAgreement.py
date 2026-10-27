@@ -42,7 +42,7 @@ TEMPLATE = "The {subj} {prep} the {attr}"
 
 
 def default_data_dir() -> str:
-    from datasets.NLP.artifacts import DEFAULT_DATA_ROOT
+    from research_datasets.NLP.artifacts import DEFAULT_DATA_ROOT
 
     return str(DEFAULT_DATA_ROOT / "SubjectVerbAgreement")
 

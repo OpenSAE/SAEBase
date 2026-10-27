@@ -5,10 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from datasets.NLP.SimpleCopying.SimpleCopying import generate_copying_prompts
-from datasets.NLP.SimpleCopying.tokenize import attach_token_ids, filter_logit_diff
-from datasets.NLP.artifacts import assert_available, make_manifest
-from datasets.NLP.artifacts import save_prompts
+from research_datasets.NLP.SimpleCopying.SimpleCopying import generate_copying_prompts
+from research_datasets.NLP.SimpleCopying.tokenize import attach_token_ids, filter_logit_diff
+from research_datasets.NLP.artifacts import assert_available, make_manifest
+from research_datasets.NLP.artifacts import save_prompts
 
 
 def prepare_for_model(
@@ -42,7 +42,7 @@ def prepare_for_model(
             "name": "logit_diff",
             "require_single_token_targets": True,
         },
-        source="datasets.NLP.SimpleCopying.prepare",
+        source="research_datasets.NLP.SimpleCopying.prepare",
         extra={"single_token_kept": len(tok)},
     )
     return save_prompts(kept, manifest, data_root=data_root)

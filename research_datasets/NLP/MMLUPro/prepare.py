@@ -5,10 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Sequence
 
-from datasets.NLP.MMLUPro.MMLUPro import HF_DATASET_NAME, build_prompt_items
-from datasets.NLP.MMLUPro.tokenize import attach_token_ids
-from datasets.NLP.artifacts import assert_available, make_manifest
-from datasets.NLP.artifacts import save_prompts
+from research_datasets.NLP.MMLUPro.MMLUPro import HF_DATASET_NAME, build_prompt_items
+from research_datasets.NLP.MMLUPro.tokenize import attach_token_ids
+from research_datasets.NLP.artifacts import assert_available, make_manifest
+from research_datasets.NLP.artifacts import save_prompts
 
 
 def prepare_for_model(
@@ -72,7 +72,7 @@ def prepare_for_model(
             "max_prompt_tokens": max_prompt_tokens,
             "drop_na_options": drop_na_options,
         },
-        source="datasets.NLP.MMLUPro.prepare",
+        source="research_datasets.NLP.MMLUPro.prepare",
         extra={
             "split": split,
             "categories": cats,
