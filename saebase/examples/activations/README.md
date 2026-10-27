@@ -13,4 +13,4 @@ python saebase/examples/activations/activation_store.py
 bash saebase/examples/activations/activation_health.sh
 ```
 
-[Examples index](../README.md) · [Activation Store](../../harness/github_development_doc/activation-store.md)
+[Examples index](../README.md) · [Activation Store](../../../harness/github_development_doc/activation-store.md)

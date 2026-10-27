@@ -16,4 +16,4 @@ python saebase/examples/benchmarking/ground_truth_controls.py
 
 These examples demonstrate method execution rather than scientific claims about pretrained SAE quality.
 
-[Examples index](../README.md) · [Benchmarking](../../harness/github_development_doc/benchmarking.md) · [Reliability](../../harness/github_development_doc/reliability.md)
+[Examples index](../README.md) · [Benchmarking](../../../harness/github_development_doc/benchmarking.md) · [Reliability](../../../harness/github_development_doc/reliability.md)

@@ -21,4 +21,4 @@ python saebase/examples/research_integrations/input_localization.py
 
 The default SAR/RSS examples use synthetic inputs; the paper repositories are needed for their original estimators. Install Input Localization separately before its saebase.examples.
 
-[Examples index](../README.md) · [Research Integrations](../../harness/github_development_doc/research-integrations.md)
+[Examples index](../README.md) · [Research Integrations](../../../harness/github_development_doc/research-integrations.md)
