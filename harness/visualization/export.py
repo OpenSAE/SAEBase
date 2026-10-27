@@ -698,12 +698,12 @@ CODE_CONTEXT_SCOPES = (
     ("tasks/explain/", ("term.sae", "term.sae.explain")),
     ("tasks/benchmark/", ("term.sae", "term.sae.benchmark")),
     ("tasks/train/", ("term.sae", "term.sae.train")),
-    ("models/LLM/gemma2_2b_base/", ("term.gemma2_2b", "term.model")),
-    ("models/LLM/", ("term.llm", "term.model")),
-    ("datasets/NLP/", ("term.nlp", "term.sae.assets")),
+    ("models/gemma2_2b_base/", ("term.gemma2_2b", "term.model")),
+    ("models/", ("term.llm", "term.model")),
+    ("datasets/", ("term.nlp", "term.sae.assets")),
     ("saebase/runtime/cfg/", ("term.hydra", "term.yaml")),
     ("saebase/runtime/training/", ("term.training", "term.lightning")),
-    ("saebase/runtime/registry.py", ("term.registry", "term.plugin")),
+    ("saebase/registry.py", ("term.registry", "term.plugin")),
 )
 
 

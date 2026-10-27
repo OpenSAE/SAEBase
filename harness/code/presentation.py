@@ -9,17 +9,15 @@ from pathlib import Path, PurePosixPath
 from harness.code.semantic_titles import semantic_title, semantic_summary, context_for_path
 
 GROUPS = {
-    "dlbase": "DLBase 执行与实验记录",
     "saebase": "SAE 特征、模型适配与实验基础",
-    "research_datasets": "NLP Prompt 数据集与来源",
+    "datasets": "NLP Prompt 数据集与来源",
     "models": "LLM 模型适配与兼容性",
     "tasks": "SAE 捕获、干预、生成、解释和评测任务",
     "harness": "Harness 代码结构与研究证据",
 }
 GROUP_SUMMARIES = {
-    "dlbase": "负责 LLM SAE 任务运行、配置、组件注册与实验产物管理。",
     "saebase": "提供 SAE 模型表示、特征干预、评测和存储的通用实现。",
-    "research_datasets": "组织 NLP Prompt、数据来源及其可追溯的版本化输入。",
+    "datasets": "组织 NLP Prompt、数据来源及其可追溯的版本化输入。",
     "models": "实现语言模型的加载、激活位置与任务兼容性检查。",
     "tasks": "执行七类 LLM SAE 科研任务并保留原有 SAEBase 接口。",
     "harness": "维护项目结构、代码树、科研术语、实验审阅与环境记录。",
@@ -36,7 +34,7 @@ MODULES = {
         "管理 Prompt JSONL、manifest 和数据来源。",
     ),
     "datasets/prompts.py": ("NLP 输入读取", "加载已选数据集的真实 Prompt 记录。"),
-    "saebase/runtime/registry.py": ("科研组件注册", "注册和查询模型、数据集与 SAE 任务。"),
+    "saebase/registry.py": ("科研组件注册", "注册和查询模型、数据集与 SAE 任务。"),
     "saebase/runtime/train.py": ("SAE 任务执行入口", "校验配置并分派已登记的研究任务。"),
     "tasks/sae_runtime.py": ("七类 SAE 任务公共入口", "核验模型与数据并调用对应任务实现。"),
 }
@@ -72,7 +70,7 @@ METHODS = {
     "forward": ("运行模型前向计算", "计算输入对应的模型表示与输出。"),
 }
 CONCRETE = {
-    "research_datasets": ("NLP 数据集实现", "查看语言模型 Prompt 来源、读取和产物协议。"),
+    "datasets": ("NLP 数据集实现", "查看语言模型 Prompt 来源、读取和产物协议。"),
     "models": ("LLM 模型实现", "查看实际语言模型和任务兼容性。"),
     "tasks": ("七类 LLM SAE 任务", "查看特征捕获、干预、生成、电路、解释、评测与训练。"),
 }
@@ -164,126 +162,58 @@ def task_configuration_nodes(name: str, parent: str, nodes: list, edges: list) -
 
 
 def concrete_groups(output: dict) -> None:
-    """Present language-model data, models and SAE task implementations."""
+    """Group physical datasets, model adapters, and SAE tasks directly by component."""
     nodes = output["nodes"]
     edges = output["edges"]
     for area, (title, summary) in CONCRETE.items():
-        parent_id = "code:group:" + area
-        families = ("NLP",) if area == "research_datasets" else ("LLM",)
-        family_modules = {family: {} for family in families}
-        family_shared = {family: [] for family in families}
+        parent = "code:group:" + area
+        instances = defaultdict(list)
+        common = []
         for node in nodes:
             if node["kind"] != "module":
                 continue
-            parts = PurePosixPath(node.get("path", "")).parts
-            if len(parts) < 3 or parts[0] != area or parts[1] not in family_modules:
+            parts = PurePosixPath(node.get("path") or "").parts
+            if not parts or parts[0] != area:
                 continue
-            family = parts[1]
-            if len(parts) >= 4:
-                family_modules[family].setdefault(parts[2], []).append(node)
+            if len(parts) >= 3:
+                instances[parts[1]].append(node)
             else:
-                family_shared[family].append(node)
-        scoped = {
-            item["id"]
-            for instances in family_modules.values()
-            for group in instances.values()
-            for item in group
-        }
-        scoped.update(item["id"] for group in family_shared.values() for item in group)
-        if not scoped:
+                common.append(node)
+        selected = common + [node for group in instances.values() for node in group]
+        if not selected:
             continue
-        edges = [
-            edge
-            for edge in edges
-            if not (
-                edge["type"] == "contains"
-                and edge["source"] == parent_id
-                and edge["target"] in scoped
-            )
-        ]
+        ids = {node["id"] for node in selected}
+        edges = [edge for edge in edges
+                 if not (edge["type"] == "contains" and edge["source"] == parent
+                         and edge["target"] in ids)]
         group_id = "code:concrete:" + area
-        nodes.append(
-            {
-                "id": group_id,
-                "kind": "group",
-                "title": title,
-                "summary": summary,
-                "description": summary,
-                "status": "implemented",
-                "evidence": [n["path"] for n in nodes if n["id"] in scoped],
-                "presentation_only": True,
-                "source_symbol": "",
-            }
-        )
-        edges.append({"source": parent_id, "target": group_id, "type": "contains"})
-        for family in families:
-            instances = family_modules[family]
-            if not instances and not family_shared[family]:
-                continue
-            family_id = f"code:family:{area}:{family}"
-            family_title = {
-                ("research_datasets", "NLP"): "NLP 文本输入数据集",
-                ("models", "LLM"): "LLM 语言模型",
-                ("tasks", "LLM"): "LLM 稀疏特征任务",
-            }.get((area, family), f"{family} · {area} 实现")
-            family_evidence = [node["path"] for node in family_shared[family]]
-            family_evidence.extend(n["path"] for group in instances.values() for n in group)
-            nodes.append(
-                {
-                    "id": family_id,
-                    "kind": "group",
-                    "title": family_title,
-                    "summary": f"{family_title} 领域的具体组件及其公共接口。",
-                    "description": f"{family_title} 领域的具体组件及其公共接口。",
-                    "status": "implemented",
-                    "evidence": family_evidence,
-                    "presentation_only": True,
-                    "source_symbol": "",
-                }
+        nodes.append({
+            "id": group_id, "kind": "group", "title": title,
+            "summary": summary, "description": summary, "status": "implemented",
+            "evidence": [node["path"] for node in selected],
+            "presentation_only": True, "source_symbol": "",
+        })
+        edges.append({"source": parent, "target": group_id, "type": "contains"})
+        for module in common:
+            edges.append({"source": group_id, "target": module["id"], "type": "contains"})
+        for name, modules in sorted(instances.items()):
+            instance_id = "code:instance:" + area + ":" + name
+            sample = modules[0]["path"]
+            instance_title, instance_summary = INSTANCE_LABELS.get(
+                (area, name),
+                ("组织" + context_for_path(sample), "真实源码与对应组件的接口说明。"),
             )
-            edges.append({"source": group_id, "target": family_id, "type": "contains"})
-            for shared in family_shared[family]:
-                edges.append({"source": family_id, "target": shared["id"], "type": "contains"})
-            for name, modules in sorted(instances.items()):
-                instance_id = "code:instance:" + area + ":" + name
-                family_path = (
-                    (
-                        "tasks/"
-                        if area == "tasks"
-                        else "models/LLM/"
-                        if area == "models"
-                        else "datasets/"
-                    )
-                    + name
-                    + "/task.py"
-                )
-                instance_title, instance_summary = INSTANCE_LABELS.get(
-                    (area, name),
-                    (
-                        "组织" + context_for_path(family_path),
-                        "汇总该科研功能的真实模型、数据与任务实现及接口。",
-                    ),
-                )
-                nodes.append(
-                    {
-                        "id": instance_id,
-                        "kind": "group",
-                        "title": instance_title,
-                        "summary": instance_summary,
-                        "description": instance_summary,
-                        "status": "implemented",
-                        "evidence": [m["path"] for m in modules],
-                        "presentation_only": True,
-                        "source_symbol": "",
-                    }
-                )
-                edges.append({"source": family_id, "target": instance_id, "type": "contains"})
-                if area == "tasks":
-                    task_configuration_nodes(name, instance_id, nodes, edges)
-                for module in modules:
-                    edges.append(
-                        {"source": instance_id, "target": module["id"], "type": "contains"}
-                    )
+            nodes.append({
+                "id": instance_id, "kind": "group", "title": instance_title,
+                "summary": instance_summary, "description": instance_summary,
+                "status": "implemented", "evidence": [m["path"] for m in modules],
+                "presentation_only": True, "source_symbol": "",
+            })
+            edges.append({"source": group_id, "target": instance_id, "type": "contains"})
+            if area == "tasks":
+                task_configuration_nodes(name, instance_id, nodes, edges)
+            for module in modules:
+                edges.append({"source": instance_id, "target": module["id"], "type": "contains"})
     output["edges"] = edges
 
 
