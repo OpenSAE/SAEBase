@@ -23,10 +23,10 @@ import dlbase.plugin_bootstrap as _plugin_bootstrap
 
 _plugin_bootstrap.ensure_plugins_loaded()
 
-import hydra
-from omegaconf import DictConfig, OmegaConf
+import hydra  # noqa: E402 - import ordering follows runtime/bootstrap contract
+from omegaconf import DictConfig, OmegaConf  # noqa: E402 - import ordering follows runtime/bootstrap contract
 
-from dlbase.cfg.config_validate import validate_hydra_cfg
+from dlbase.cfg.config_validate import validate_hydra_cfg  # noqa: E402 - import ordering follows runtime/bootstrap contract
 
 
 def _dlbase_repo_root() -> str:

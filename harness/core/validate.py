@@ -8,7 +8,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from harness.knowledge.validate import validate, GraphError
+from harness.knowledge.validate import validate, GraphError  # noqa: E402 - import ordering follows runtime/bootstrap contract
 
 GRAPH = ROOT / "harness/core/project_graph.json"
 

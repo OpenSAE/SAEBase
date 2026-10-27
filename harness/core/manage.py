@@ -7,7 +7,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from harness.knowledge import manage as engine
+from harness.knowledge import manage as engine  # noqa: E402 - import ordering follows runtime/bootstrap contract
 
 if __name__ == "__main__":
     engine.DEFAULT = ROOT / "harness/core/project_graph.json"

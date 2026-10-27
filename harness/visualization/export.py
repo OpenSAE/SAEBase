@@ -18,10 +18,10 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from harness.code.presentation import readable_code_tree
-from harness.knowledge.context_attributes import validate_attributes
-from harness.visualization.evidence import attach_evidence, CODE_TARGETS, TERM_TARGETS
-from harness.visualization.language import verify_public_prose
+from harness.code.presentation import readable_code_tree  # noqa: E402 - import ordering follows runtime/bootstrap contract
+from harness.knowledge.context_attributes import validate_attributes  # noqa: E402 - import ordering follows runtime/bootstrap contract
+from harness.visualization.evidence import attach_evidence, CODE_TARGETS, TERM_TARGETS  # noqa: E402 - import ordering follows runtime/bootstrap contract
+from harness.visualization.language import verify_public_prose  # noqa: E402 - import ordering follows runtime/bootstrap contract
 
 DEFAULT = ROOT / "harness/visualization/data.js"
 STRUCTURE = ROOT / "harness/visualization/atlas-structure.js"

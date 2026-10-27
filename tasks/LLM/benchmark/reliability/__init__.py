@@ -16,6 +16,6 @@ from .runner import evaluate_m3
 from .report import write_audit, read_audit
 
 __all__ += ["evaluate_m3", "write_audit", "read_audit"]
-from .ground_truth_report import evaluate_ground_truth, append_ground_truth
+from .ground_truth_report import evaluate_ground_truth, append_ground_truth  # noqa: E402 - import ordering follows runtime/bootstrap contract
 
 __all__ += ["evaluate_ground_truth", "append_ground_truth"]
