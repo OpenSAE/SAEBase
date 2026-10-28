@@ -171,7 +171,7 @@ def build() -> str:
     if prefix not in source:
         raise ValueError("Missing source-generated Atlas snapshot")
     graphs = json.loads(source.split(prefix, 1)[1].strip().removesuffix(";"))
-    if graphs["context"].get("project") != "SAEBase":
+    if not str(graphs["context"].get("project", "")).startswith("SAEBase"):
         raise ValueError("Foreign Context data must not be included in SAEBase")
     context = json.loads((ROOT / "doc/knowledge/i18n/context.en.json").read_text(encoding="utf-8"))
     trees = json.loads((HERE / "i18n/trees.en.json").read_text(encoding="utf-8"))
