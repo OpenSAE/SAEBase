@@ -726,7 +726,7 @@ GROUP_SUMMARIES = {
     "code:root": "Browse dataset loaders, language-model adapters, seven SAE research task families, and shared research APIs.",
     "code:group:datasets": "Organize prompt datasets, source acquisition, and reproducible input artifacts.",
     "code:group:models": "Organize model loading, activation sites, and task compatibility checks.",
-    "code:group:saebase": "Collect SAE representations, feature interventions, benchmarks, and storage interfaces.",
+    "code:group:saebase": "Explore implemented research capabilities from sparse feature representations to interventions, evaluations, and reproducibility.",
     "code:group:tasks": "Group the seven supported SAE research operations and their execution interfaces.",
     "code:concrete:datasets": "Locate prompt sources, dataset readers, and reproducible input artifact contracts.",
     "code:concrete:models": "Locate concrete model adapters and research-task compatibility implementations.",
@@ -796,7 +796,7 @@ def group_label(node: dict, descendants: list[dict], children: dict, by_id: dict
     named = {
         "code:group:datasets": "Browse prompt datasets and source preparation",
         "code:group:models": "Browse language-model adapters and compatibility",
-        "code:group:saebase": "Browse SAEBase feature APIs, caches, and evaluation",
+        "code:group:saebase": "Explore SAEBase research capabilities by scientific and engineering concepts",
         "code:group:tasks": "Browse SAE research tasks and execution",
         "code:group:harness": "Browse research Harness and source verification",
         "code:concrete:datasets": "Explore individual research datasets",
