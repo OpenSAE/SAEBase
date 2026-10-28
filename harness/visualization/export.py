@@ -806,6 +806,10 @@ def main() -> int:
         attach_evidence(graphs["context"], code, TERM_TARGETS)
         attach_context_explanations(graphs)
         verify_public_prose(graphs)
+        from harness.visualization.semantic_quality import validate_all_trees
+
+        audit = validate_all_trees(graphs)
+        print("FIVE_TREE_SEMANTICS=" + json.dumps(audit, ensure_ascii=False))
         for name, graph in graphs.items():
             ids = {node["id"] for node in graph["nodes"]}
             if len(ids) != len(graph["nodes"]):
