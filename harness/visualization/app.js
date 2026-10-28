@@ -1843,7 +1843,7 @@
       });
     }
     // Source and Context links use the same in-place navigation as top tabs.
-    // Modified clicks retain browser-native opening in another tab/window.
+    // Capture before expanded SVG cards stop bubbling; modified clicks keep native behavior.
     document.addEventListener("click", event => {
       if (event.defaultPrevented || event.button !== 0 ||
           event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
@@ -1861,7 +1861,7 @@
       event.preventDefault();
       if (focus) navigate(focus, target, false);
       else if (target !== config.view) activateView(target);
-    });
+    }, true);
     for (const [direction, elementId] of [[-1, "atlasChildPrev"], [1, "atlasChildNext"]]) {
       const button = $(elementId);
       button?.addEventListener("click", () => {
