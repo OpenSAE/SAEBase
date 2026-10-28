@@ -156,7 +156,7 @@ assert(!read("harness/visualization/locale-runtime.js").includes("eval("));
      "Missing source-reviewed SAR parameter meaning: " + key);
  }
  for (const entry of Object.values(locales.nodes.code)) {
-   assert(!/^Browse \\d+ source-backed child interfaces\\.$/.test(entry.summary),
+   assert(!/^Browse \d+ source-backed child interfaces\.$/.test(entry.summary),
      "Code group descriptions must communicate purpose, not child counts");
  }
 
