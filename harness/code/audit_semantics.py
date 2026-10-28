@@ -99,11 +99,16 @@ def main() -> None:
         # Baseline is recorded from the first fully source-reviewed rollout.
         # The global debt remains visible and each later change may reduce it.
         # Increasing generic summaries or sibling collisions requires review.
-        limits = {"template_summary": 1824, "repeated_sibling_title": 204,
-                  "repeated_sibling_summary": 204}
-        exceeded = {key: (report["counts"].get(key, 0), allowed)
-                    for key, allowed in limits.items()
-                    if report["counts"].get(key, 0) > allowed}
+        limits = {
+            "template_summary": 1824,
+            "repeated_sibling_title": 204,
+            "repeated_sibling_summary": 204,
+        }
+        exceeded = {
+            key: (report["counts"].get(key, 0), allowed)
+            for key, allowed in limits.items()
+            if report["counts"].get(key, 0) > allowed
+        }
         if exceeded:
             raise ValueError("Atlas semantic debt regressed: " + repr(exceeded))
 
