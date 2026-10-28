@@ -120,7 +120,7 @@ for (const [view, graph] of Object.entries(original)) {
   }
 }
 assert.equal(counts.nodes, Object.values(original).reduce((n, t) => n + t.nodes.length, 0));
-assert(counts.translatedFields > 20000, "Nested translation coverage unexpectedly dropped");
+assert(counts.translatedFields > counts.nodes * 2, "Nested translation coverage unexpectedly dropped");
 assert.equal(errors.length, 0,
   "Bilingual Atlas nested-field audit found " + errors.length + " defects:\n" +
   errors.slice(0, 40).join("\n"));
