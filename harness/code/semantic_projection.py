@@ -99,8 +99,16 @@ def compact_public_code_tree(graph: dict) -> dict:
         seen = set()
         current = parents.get(node_id)
         while current not in keep:
-            if current is None or current in seen:
-                raise ValueError("Orphan or cycle in compacted source: " + node_id)
+            if current is None:
+                # Excluded __init__.py forwarding modules can leave AST class
+                # records without a visible source parent. Keep these
+                # records under the real top-level source area.
+                path = nodes[node_id].get("path") or ""
+                area = path.split("/", 1)[0]
+                owner = "code:group:" + area
+                return owner if owner in keep else root
+            if current in seen:
+                raise ValueError("Cycle in compacted source: " + node_id)
             seen.add(current)
             current = parents.get(current)
         return current
