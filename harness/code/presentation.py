@@ -374,6 +374,7 @@ def readable_code_tree(graph: dict) -> dict:
             raise ValueError("Stale source review for " + node["id"])
         if review:
             label, summary = review["zh_title"], review["zh_summary"]
+            node["context_term_ids"] = review["context_term_ids"]
         elif kind == "root":
             label, summary = (
                 "浏览科研系统的实际功能",
