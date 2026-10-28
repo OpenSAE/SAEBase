@@ -65,6 +65,9 @@ jobs:
           assert 10 <= direct <= 20, f"Expected conceptual categories, got {direct}"
           print("Code concept hierarchy accepted; root categories:", direct)
           PY
+      - name: Audit Code Tree semantics and duplication
+        run: |
+          python harness/code/audit_semantics.py
       - name: Check interactive Atlas JavaScript
         run: |
           node --check harness/visualization/app.js
