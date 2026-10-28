@@ -547,7 +547,7 @@ def term_match(text: str, alias: str):
 def explanatory_text(node: dict, view: str) -> str:
     """State the evidence-backed responsibility, not the node's name and count."""
     summary = re.sub(
-        r"^(?:问题|方案|目标|定义|现状)[:：]\\s*",
+        r"^(?:问题|方案|目标|定义|现状)[:：]\s*",
         "",
         str(node.get("description") or node.get("summary") or ""),
     ).strip()
@@ -685,7 +685,7 @@ def attach_context_explanations(graphs: dict) -> None:
                 title = str(node.get("title") or "")
                 explanation = str(node.get("reader_explanation") or "")
                 banned = (
-                    r"第\\d+组|按源码职责浏览|分组浏览相关|"
+                    r"第\d+组|按源码职责浏览|分组浏览相关|"
                     r"按实际源码目录、定义职责|"
                     r"这是一个功能分组，名称是|"
                     r"按同一来源与主题整理已有节点"
@@ -698,7 +698,7 @@ def attach_context_explanations(graphs: dict) -> None:
         node_ids = {node["id"] for node in graph["nodes"]}
         for node in graph["nodes"]:
             if (":nav:" in node["id"] or ":public-nav:" in node["id"]
-                    or re.search(r"第\\d+组", str(node.get("title") or ""))):
+                    or re.search(r"第\d+组", str(node.get("title") or ""))):
                 raise ValueError("Synthetic navigation node rejected: " + node["id"])
         sibling_titles = set()
         for edge in graph["edges"]:
