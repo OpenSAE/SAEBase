@@ -81,6 +81,7 @@ def validate_all_trees(graphs: dict) -> dict:
                     groups[(normalized(node.get("title")), normalized(node.get("summary")))].append(id_)
             for pair, ids in groups.items():
                 if len(ids) > 1:
+                    hard.append((view, parent, "same sibling title and summary", ids))
                     counts["exact_duplicate_sibling_groups"] += 1
                     if len(examples["exact_duplicate_sibling_groups"]) < 60:
                         examples["exact_duplicate_sibling_groups"].append({
