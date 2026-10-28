@@ -1,6 +1,6 @@
 """Semantic Code tree acceptance: concepts describe work; AST remains authority."""
 
-from collections import Counter, defaultdict
+from collections import defaultdict
 import json
 from pathlib import Path
 
@@ -25,8 +25,10 @@ def test_saebase_concepts_are_meaningful_and_lossless() -> None:
     assert len(domains) == 14, "Concept domain changes require a reviewed catalog update"
     assert len(set(by_id[x]["title"] for x in domains)) == len(domains)
     source_modules = {
-        n["id"] for n in source["nodes"]
-        if n.get("kind") == "module" and (n.get("path") or "").startswith("saebase/")
+        n["id"]
+        for n in source["nodes"]
+        if n.get("kind") == "module"
+        and (n.get("path") or "").startswith("saebase/")
         and not n["path"].endswith("/__init__.py")
         and not is_reexport_only(n)
     }
@@ -42,9 +44,10 @@ def test_saebase_concepts_are_meaningful_and_lossless() -> None:
             assert node["evidence"], node_id
             assert node["english_title"] and node["english_summary"], node_id
             assert node["title"] != node["summary"], node_id
-            assert not any(word in node["title"] for word in (
-                "第1组", "第2组", "相关操作", "其他接口", "源码职责浏览"
-            )), node_id
+            assert not any(
+                word in node["title"]
+                for word in ("第1组", "第2组", "相关操作", "其他接口", "源码职责浏览")
+            ), node_id
             assert len(children[node_id]) <= 20, (node_id, len(children[node_id]))
             queue.extend(children[node_id])
         else:
@@ -58,16 +61,15 @@ def test_saebase_concepts_are_meaningful_and_lossless() -> None:
     # The source tree is not deleted or rewritten by this presentation hierarchy.
     excluded = {n["id"] for n in source["nodes"] if is_reexport_only(n)}
     test_internals = {
-        n["id"] for n in source["nodes"]
+        n["id"]
+        for n in source["nodes"]
         if n.get("kind") in {"function", "method", "class"}
         and (n.get("path") or "").startswith("saebase/research_lab/tests/")
     }
     # The Atlas intentionally omits __init__, private helpers, and test
     # assertions. Every displayed implementation must still be an actual AST
     # entity; public module retention is checked above.
-    displayed_source_ids = {
-        n["id"] for n in visible["nodes"] if not n.get("presentation_only")
-    }
+    displayed_source_ids = {n["id"] for n in visible["nodes"] if not n.get("presentation_only")}
     assert displayed_source_ids.issubset(originals)
     assert not displayed_source_ids.intersection(excluded | test_internals)
     assert visible["concept_hierarchy_schema"] == "saebase.atlas.concepts.v1"
@@ -82,12 +84,10 @@ def test_every_concept_has_distinct_sibling_responsibility() -> None:
         if edge["type"] == "contains":
             child_map[edge["source"]].append(edge["target"])
     for parent, children in child_map.items():
-        unique = [by_id[key]["title"] for key in children
-                  if by_id[key].get("concept_group")]
+        unique = [by_id[key]["title"] for key in children if by_id[key].get("concept_group")]
         assert len(unique) == len(set(unique)), (parent, unique)
     actual = [n for n in graph["nodes"] if n.get("concept_group")]
     assert all(n["id"].startswith("code:concept:") for n in actual)
     assert not any(n["id"].startswith("code:nav:") for n in graph["nodes"])
-    excessive = {node_id: len(items) for node_id, items in child_map.items()
-                 if len(items) > 20}
+    excessive = {node_id: len(items) for node_id, items in child_map.items() if len(items) > 20}
     assert not excessive, "Code Tree exceeds 20 children per node: " + repr(excessive)
