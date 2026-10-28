@@ -340,7 +340,80 @@ def action_label(node: dict, name: str, path: str) -> str:
     return "Inspect " + human(name) + " interface for " + scope
 
 
-def group_label(node: dict, descendants: list[dict]) -> str:
+# Reviewed navigation-language rules derived from actual source responsibilities.
+# These are display categories, not additional research or implementation nodes.
+NAVIGATION_EN = {
+    "激活捕获与特征读取": "Capture activations and inspect SAE features",
+    "特征干预与生成": "Apply feature interventions during model execution",
+    "电路追踪与归因": "Trace candidate circuits and feature attribution",
+    "解释与假设检验": "Generate and test feature explanations",
+    "指标、对照与评测": "Evaluate metrics, baselines, and controls",
+    "训练与参数更新": "Train and update model parameters",
+    "数据、产物与存储": "Manage datasets, artifacts, and storage",
+    "约束、校验与配置": "Validate interfaces and experiment configuration",
+    "运行入口与调度": "Dispatch research runs and execution backends",
+    "公共辅助函数与接口": "Inspect shared source interfaces",
+    "API 与调用接口": "Inspect public APIs and call boundaries",
+    "SAE 字典、加载与覆盖率": "Load sparse dictionaries and verify coverage",
+    "SAE 特征与实验产物存储": "Store sparse features and experiment artifacts",
+    "LLM 模型与 SAE 任务": "Connect language models to SAE research tasks",
+    "NLP 样本与 Prompt": "Prepare language inputs and prompt datasets",
+    "SAE 评测与可靠性": "Benchmark SAE methods and assess reliability",
+    "评测稳定性与统计检验": "Evaluate statistical reliability and controls",
+    "SAR、RSS 与外部基准集成": "Integrate SAR, RSS, and external benchmarks",
+    "任务执行后端": "Execute registered research tasks",
+    "任务入口与公共接口": "Dispatch tasks through shared interfaces",
+    "可扩展基准接口": "Register and invoke benchmark extensions",
+    "外部基准适配": "Adapt external benchmarking methods",
+    "评测指标计算": "Compute benchmarking and evaluation metrics",
+    "评测结果发布与验证": "Validate and publish evaluation reports",
+    "原生实现与基线": "Run native algorithms and baseline comparisons",
+    "生成式 SAE 特征干预": "Steer sparse features during generation",
+    "教师强制与特征干预": "Compare teacher-forced feature interventions",
+    "SAE 特征捕获": "Capture sparse features from model activations",
+    "电路追踪与干预": "Trace circuits and intervene on candidate paths",
+    "SAE 自动解释": "Generate and assess feature explanations",
+    "SAE 训练": "Train sparse autoencoder dictionaries",
+    "管理科研任务的 Hydra 配置": "Compose research task configuration with Hydra",
+    "配置科研任务的运行参数": "Set experiment and task execution parameters",
+    "组织模型构建与兼容检查": "Build model adapters and check compatibility",
+    "组织数据集加载与注册": "Load and register prompt datasets",
+    "管理稀疏特征研究软件与运行接口": "Inspect sparse-feature APIs and runtime calls",
+    "管理SAE 研究验证工具": "Validate SAE research methods and source evidence",
+    "管理Research Lab 数据服务与证据核查": "Serve and verify Research Lab evidence",
+    "管理SAE 基准任务规划与指标计算": "Plan SAE benchmarks and calculate evaluation metrics",
+    "管理SAE 研究能力验证与执行": "Run SAE capability and integration checks",
+    "管理实验产物的目录管理": "Manage reproducible experiment output directories",
+    "管理训练配置与执行约束": "Validate training settings and execution constraints",
+    "管理生成过程中的 SAE 干预": "Control SAE interventions during generation",
+    "管理vLLM 文本生成计算后端": "Execute generation through the vLLM backend",
+    "研究概念与依据": "Explore scientific concepts and evidence",
+}
+
+
+def first_source_path(node_id: str, children: dict, by_id: dict) -> str:
+    """Ground a presentation-only group in the first real descendant file."""
+    pending = [node_id]
+    visited = set()
+    while pending:
+        current = pending.pop(0)
+        if current in visited:
+            continue
+        visited.add(current)
+        node = by_id.get(current, {})
+        path = node.get("path") or node.get("source_path") or ""
+        if path.endswith(".py"):
+            return path
+        for evidence in node.get("evidence", []):
+            source = evidence.split(":", 1)[0]
+            if source.endswith(".py"):
+                return source
+        pending.extend(children.get(current, []))
+    return ""
+
+
+def group_label(node: dict, descendants: list[dict], children: dict, by_id: dict) -> str:
+    """Write navigable action labels from source-backed groups, not opaque IDs."""
     node_id = node["id"]
     if node_id == "code:root":
         return "Explore SAEBase research implementations"
@@ -366,9 +439,29 @@ def group_label(node: dict, descendants: list[dict]) -> str:
             return "Build and validate " + label + " language models"
         if family == "tasks":
             return "Execute " + TASK_NAMES.get(tokens[3], label) + " research operations"
-    selected = next((child for child in descendants if child.get("path")), {})
-    return "Browse " + domain(selected.get("path", "")) + " source interfaces"
-
+    if len(tokens) >= 4 and tokens[1] == "configurations":
+        task = tokens[3]
+        return "Compose Hydra configuration for " + TASK_NAMES.get(task, human(task))
+    if len(tokens) >= 5 and tokens[1] == "config":
+        task = tokens[3]
+        return "Set execution options for " + TASK_NAMES.get(task, human(task))
+    source = first_source_path(node_id, children, by_id)
+    scope = domain(source) if source else "SAEBase research operations"
+    if node.get("navigation_scope") == "source_range":
+        section = re.search(r"第(\d+)组", node.get("title", ""))
+        number = section.group(1) if section else "1"
+        return "Inspect " + scope + " interfaces, source section " + number
+    label = NAVIGATION_EN.get(node.get("title", ""))
+    if label:
+        return label + " for " + scope
+    if node.get("title", "").startswith("按源码职责浏览"):
+        return "Inspect source-defined operations for " + scope
+    if node.get("title", "").startswith("分组浏览"):
+        return "Inspect related source interfaces for " + scope
+    if descendants:
+        first = next((item for item in descendants if item.get("path")), {})
+        return "Browse " + domain(first.get("path") or source) + " source interfaces"
+    return "Browse source-backed SAEBase component interfaces"
 
 def make_code(node: dict, children: dict, by_id: dict) -> dict:
     kind = node.get("kind", "component")
@@ -403,7 +496,7 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
         summary = doc or title + "."
     else:
         descendants = [by_id[c] for c in children.get(node["id"], []) if c in by_id]
-        title = group_label(node, descendants)
+        title = group_label(node, descendants, children, by_id)
         summary = "Browse " + str(len(descendants)) + " source-backed child interfaces."
         reviewed_status = "source_hierarchy"
 
@@ -451,11 +544,16 @@ def disambiguate_code_titles(nodes: dict, sources: dict) -> None:
             continue
         for node_id in ids:
             node = sources[node_id]
+            if node.get("kind") == "group":
+                # The navigation hierarchy already carries its source scope.
+                # Repeated roles under separate parents can share a title.
+                continue
             path = node.get("path") or node.get("source_path") or ""
             section = human(path.rsplit("/", 1)[-1].removesuffix(".py"))
             if node.get("kind") == "method":
                 section = human(node_id.rsplit(":", 1)[-1].rsplit(".", 1)[0])
-            nodes[node_id]["title"] += " in " + section
+            if section and section != "component":
+                nodes[node_id]["title"] += " in " + section
     # A source location is unique even where duplicate methods share a name.
     # Any remaining collisions are caught by stable IDs and the source panel.
 
