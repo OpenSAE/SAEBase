@@ -296,6 +296,10 @@ PARAMETER_CONTEXT = {
 
 # Stable reviewed descriptions for the most prominent SAEBase interfaces.
 # Add research-critical entries here only after inspecting the actual source.
+REVIEWED_INTERFACES = json.loads(
+    (ROOT / "harness/code/reviewed_semantics.json").read_text(encoding="utf-8")
+)["nodes"]
+
 REVIEWED_CODE = {
     "code:module:tasks.generate.task": ("Register the generation-time feature steering task", "GenerateTask selects the generation operation; token edits and sequence comparison run in its implementation module."),
     "code:module:tasks.generate.operation": ("Compare SAE-edited and baseline token generation", "Construct a prompt-bound token sample and feature condition, then evaluate generated continuations with and without edits."),
@@ -889,9 +893,7 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
     reviewed = REVIEWED_CODE.get(node["id"])
     doc = source_description(node)
     reviewed_status = "reviewed" if reviewed else ("source_docstring" if doc else "source_identity")
-    source_review = json.loads(
-        (ROOT / "harness/code/reviewed_semantics.json").read_text(encoding="utf-8")
-    )["nodes"].get(node["id"])
+    source_review = REVIEWED_INTERFACES.get(node["id"])
     if source_review and (
         source_review["source_path"] != path
         or source_review["source_symbol"] != name
