@@ -1842,6 +1842,26 @@
         }
       });
     }
+    // Source and Context links use the same in-place navigation as top tabs.
+    // Modified clicks retain browser-native opening in another tab/window.
+    document.addEventListener("click", event => {
+      if (event.defaultPrevented || event.button !== 0 ||
+          event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+      const link = event.target?.closest?.("a[href]");
+      if (!link || link.closest(".tabs") || link.target === "_blank") return;
+      const url = new URL(link.href, window.location.href);
+      const matched = url.pathname.match(
+        /\\/(core|knowledge|code|environment|context)\\.html$/
+      );
+      if (!matched || url.origin !== window.location.origin) return;
+      const target = matched[1], focus = url.searchParams.get("focus");
+      if (!VIEWS[target] || !DATA[target]) return;
+      if (focus && !((reviewGraphs[target]?.nodes || DATA[target].nodes || [])
+          .some(node => node.id === focus) || DATA.code?.source_api_index?.[focus])) return;
+      event.preventDefault();
+      if (focus) navigate(focus, target, false);
+      else if (target !== config.view) activateView(target);
+    });
     for (const [direction, elementId] of [[-1, "atlasChildPrev"], [1, "atlasChildNext"]]) {
       const button = $(elementId);
       button?.addEventListener("click", () => {
