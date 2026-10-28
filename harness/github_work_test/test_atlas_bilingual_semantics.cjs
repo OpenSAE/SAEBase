@@ -111,10 +111,16 @@ assert.deepEqual(Object.keys(data).sort(),
 localize("zh");
 for (const [view, graph] of Object.entries(original)) {
   for (let i = 0; i < graph.nodes.length; i++) {
-    assert.equal(data[view].nodes[i].title, graph.nodes[i].title,
-      "Chinese round-trip changed " + view + "/" + graph.nodes[i].id);
+    for (const field of ["title", "summary", "description", "reader_explanation",
+      "technical_description", "why_it_matters", "aliases", "attributes", "facts"]) {
+      assert.equal(JSON.stringify(data[view].nodes[i][field]),
+        JSON.stringify(graph.nodes[i][field]),
+        "Chinese round-trip changed " + view + "/" + graph.nodes[i].id + "." + field);
+    }
   }
 }
+assert.equal(counts.nodes, Object.values(original).reduce((n, t) => n + t.nodes.length, 0));
+assert(counts.translatedFields > 20000, "Nested translation coverage unexpectedly dropped");
 assert.equal(errors.length, 0,
   "Bilingual Atlas nested-field audit found " + errors.length + " defects:\n" +
   errors.slice(0, 40).join("\n"));
