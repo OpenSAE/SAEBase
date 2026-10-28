@@ -39,6 +39,8 @@ jobs:
           python harness/code/build.py
           python harness/visualization/export.py
           python harness/visualization/build_pages.py
+          python harness/visualization/build_language.py
+          python harness/visualization/build_language.py --check
           python harness/visualization/build_pages.py --check
       - name: Check interactive Atlas JavaScript
         run: |
