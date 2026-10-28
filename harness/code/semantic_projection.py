@@ -9,6 +9,7 @@ deleted. The source-backed AST remains in doc/code/code_tree.json.
 from __future__ import annotations
 
 from collections import defaultdict
+import re
 
 from harness.code.audit_semantics import normalize, purpose
 from harness.code.presentation import SOURCE_REVIEWS
@@ -92,6 +93,23 @@ def compact_public_code_tree(graph: dict) -> dict:
             for member in members:
                 if member != canonical:
                     keep.discard(member)
+
+    # Alternative parameter scales of the same model are concrete source
+    # profiles, not separate scientific operations. The already reviewed
+    # model-family concept owns their individual configuration interfaces.
+    for parent, ids in children.items():
+        variants = defaultdict(list)
+        for child in ids:
+            if child.startswith("code:instance:models:"):
+                slug = child.rsplit(":", 1)[-1]
+                family = re.sub(r"_[0-9]+(?:p[0-9]+)?b$", "", slug)
+                if family != slug:
+                    variants[family].append(child)
+        if parent in keep:
+            for members in variants.values():
+                if len(members) > 1:
+                    for member in members:
+                        keep.discard(member)
 
     def visible_parent(node_id: str) -> str:
         seen = set()
