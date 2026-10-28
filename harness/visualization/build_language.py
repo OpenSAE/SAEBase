@@ -896,7 +896,7 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
     source_review = REVIEWED_INTERFACES.get(node["id"])
     if source_review and (
         source_review["source_path"] != path
-        or source_review["source_symbol"] != name
+        or source_review["source_symbol"] != (symbol if kind == "module" else name)
     ):
         raise ValueError("Outdated bilingual source review: " + node["id"])
     if source_review:
