@@ -66,6 +66,29 @@ CONCRETE = {
 }
 # Reviewed task responsibilities. A task family, its plugin entry, and its
 # implementation are distinct concepts, even when all share the same operation.
+MODEL_MODULE_RESPONSIBILITIES = {
+    "model": (
+        "模型规格与权重加载接口",
+        "声明模型权重候选路径、HookedLM 规格和按配置构建模型的入口。",
+    ),
+    "compatibility": (
+        "任务与 Prompt 来源兼容性检查",
+        "检查选定模型支持的 SAE 研究任务和数据来源，并验证调用配置。",
+    ),
+}
+
+
+def model_module_role(path: str) -> tuple[str, str] | None:
+    parts = PurePosixPath(path).parts
+    if len(parts) != 3 or parts[0] != "models":
+        return None
+    if parts[2] == parts[1] + ".py":
+        return MODEL_MODULE_RESPONSIBILITIES["model"]
+    if parts[2] == "model_task_dataset_compatibility.py":
+        return MODEL_MODULE_RESPONSIBILITIES["compatibility"]
+    return None
+
+
 TASK_INSTANCE_SEMANTICS = {
     "capture": (
         "SAE 激活捕获与稀疏特征读取",
@@ -365,6 +388,8 @@ def readable_code_tree(graph: dict) -> dict:
             lookup = labels.get(kind, FUNCTIONS)
             key = node.get("path", "") if kind == "module" else original
             known = lookup.get(key)
+            if kind == "module" and model_module_role(node.get("path", "")):
+                known = model_module_role(node["path"])
             curated_title = known[0] if known else ""
             label = semantic_title(kind, original, node.get("path", ""), curated=curated_title)
             summary = semantic_summary(label, kind, node.get("path", ""), known[1] if known else "")
