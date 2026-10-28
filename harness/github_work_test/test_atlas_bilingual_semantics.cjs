@@ -125,6 +125,9 @@ assert.equal(errors.length, 0,
   "Bilingual Atlas nested-field audit found " + errors.length + " defects:\n" +
   errors.slice(0, 40).join("\n"));
 
+ // The structural test above restores Chinese; switch to English before
+ // checking the English action summaries against those saved Chinese records.
+ localize("en");
  // Semantic parity requires source-derived actions, not only nonempty English.
  // The paired Chinese source explicitly states these operations.
  const chineseCode = new Map(original.code.nodes.map(n => [n.id, n]));
