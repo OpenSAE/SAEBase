@@ -100,3 +100,10 @@ The acceptance report records exact repository commits, per-tree node counts, Ch
 - Multiple real modules may support a single concept. Preserve their AST IDs, signatures, source paths, methods, and original implementation. New source modules require explicit Context-grounded membership before publication.
 
 - Pure backwards-compatible Python import re-exports are not standalone research capabilities. Avoid duplicate Atlas cards while leaving imports and canonical implementations intact.
+
+## Independent sibling responsibilities
+
+- Every research node among siblings needs a distinguishable input, method, output, constraint, or scientific purpose. Renaming a verb or appending a source identifier, path, or index does not establish a new research capability.
+- Research task families, registry adapters, and concrete implementations serve distinct functions. Verify their behavior against actual Python definitions. Maintain reviewed bilingual interface records in `harness/code/reviewed_semantics.json`.
+- Summaries explain independently verified behavior. Show an expanded explanation only when it adds information beyond the visible summary. Repetitive source-pointer templates are semantic review failures.
+- Run `harness/code/audit_semantics.py` on generated graphs to identify generic source summaries and sibling collisions. Validate reviewed source identities, translations, and uniquely useful responsibilities before publishing.
