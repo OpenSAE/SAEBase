@@ -53,6 +53,13 @@ jobs:
           code = graph["code"]
           parent_counts = Counter(e["source"] for e in code["edges"] if e["type"] == "contains")
           excess = {k: v for k, v in parent_counts.items() if v > 20}
+          by_id = {n["id"]: n for n in code["nodes"]}
+          for parent in excess:
+              children = [e["target"] for e in code["edges"]
+                          if e["type"] == "contains" and e["source"] == parent]
+              print("OVERSIZED", parent, "=>",
+                    [(child, by_id[child].get("title"), by_id[child].get("path"))
+                     for child in children], flush=True)
           assert not excess, f"Code functional hierarchy exceeds 20 direct children: {excess}"
           direct = parent_counts["code:group:saebase"]
           assert 10 <= direct <= 20, f"Expected conceptual categories, got {direct}"
