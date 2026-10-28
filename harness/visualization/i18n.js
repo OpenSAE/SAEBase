@@ -49,7 +49,9 @@ function localize(raw,el){
  // Localized overlays can provide translated strings without changing underlying graph data.
  const translated=window.SAEBASE_ATLAS_UI?.[raw.trim()];
  if(typeof translated==="string"&&translated.trim())return raw.replace(raw.trim(),translated);
- return "English translation unavailable";
+ // A missing English mapping is a build-time localization defect, not user-facing prose.
+ // Hide only the unknown explanatory text; technical source remains untouched.
+ return "";
 }
 function updateText(node){
  const el=node.parentElement;if(!el||el.closest("#atlasLanguageSwitch")||["SCRIPT","STYLE","NOSCRIPT"].includes(el.tagName))return;
@@ -99,7 +101,7 @@ const watcher=new MutationObserver(records=>{
  for(const record of records){
   if(record.type==="characterData"){
    const n=record.target;
-   if(native.has(n)&&n.nodeValue!==native.get(n)&&n.nodeValue!=="English translation unavailable")native.set(n,n.nodeValue);
+   if(native.has(n)&&n.nodeValue!==native.get(n)&&n.nodeValue!=="")native.set(n,n.nodeValue);
   }
  }
  translate();
