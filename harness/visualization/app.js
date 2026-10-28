@@ -1568,7 +1568,7 @@
         const heading=el("summary","node-method-summary",item.name);
         details.appendChild(heading);
         const body=el("div","node-method-body");
-        renderInterface(body,item,node.path);
+        renderInterface(body,item,item.source_path||node.path);
         details.appendChild(body);
         section.appendChild(details);
       }
