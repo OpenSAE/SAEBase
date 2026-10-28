@@ -49,8 +49,8 @@
 
 - 新增辅助代码：`saebase/tools/harness_trial_<case>.py`。这是**测验专用的小型纯 Python 工具**，不得进入 SAE Runtime、Registry、模型或任务调用链；测验分支默认不合并到正式产品。
 - Agent 自测：`tests/harness_exam/test_<case>.py`。
-- 候选审阅 Tree：`experiment/harness_exam/<RUN_ID>/<CASE>/review_candidate.json`。
-- 预期 AST 差异及来源说明：`experiment/harness_exam/<RUN_ID>/<CASE>/expected_code_diff.json` 与 `selfcheck.json`。
+- 候选审阅 Tree：`tests/harness_exam/review_packets/<RUN_ID>/<CASE>/review_candidate.json`。
+- 预期 AST 差异及来源说明：`tests/harness_exam/review_packets/<RUN_ID>/<CASE>/expected_code_diff.json` 与 `selfcheck.json`。
 
 `<RUN_ID>` 必须在派题时具体化为一个固定字符串；不能把包含通配符的目录授权给 Agent。当前 Hook 不支持“整个目录可写”等宽泛权限；`allowed_paths` 逐文件写入，新增文件在 preflight 时可不存在。评审者的隐藏测试/真实 Tree 输出置于单独只读环境，不放进 Agent 的可编辑列表。
 
