@@ -67,7 +67,7 @@ jobs:
           PY
       - name: Audit Code Tree semantics and duplication
         run: |
-          python harness/code/audit_semantics.py
+          python harness/code/audit_semantics.py --check
       - name: Check interactive Atlas JavaScript
         run: |
           node --check harness/visualization/app.js
