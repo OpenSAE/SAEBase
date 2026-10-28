@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from harness.code.presentation import readable_code_tree
+from harness.code.functional_taxonomy import is_reexport_only
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -21,12 +22,13 @@ def test_saebase_concepts_are_meaningful_and_lossless() -> None:
     parent = "code:group:saebase"
     domains = children[parent]
     assert 10 <= len(domains) <= 20, len(domains)
-    assert len(domains) == 15, "Concept domain changes require a reviewed catalog update"
+    assert len(domains) == 14, "Concept domain changes require a reviewed catalog update"
     assert len(set(by_id[x]["title"] for x in domains)) == len(domains)
     source_modules = {
         n["id"] for n in source["nodes"]
         if n.get("kind") == "module" and (n.get("path") or "").startswith("saebase/")
         and not n["path"].endswith("/__init__.py")
+        and not is_reexport_only(n)
     }
     seen_modules = []
     queue = list(domains)
@@ -51,8 +53,11 @@ def test_saebase_concepts_are_meaningful_and_lossless() -> None:
     assert set(seen_modules) == source_modules
     assert len(seen_modules) == len(source_modules), "Duplicated module assignment"
     assert len(generated) >= 30
+    assert not any(is_reexport_only(n) for n in visible["nodes"])
+    assert sum(is_reexport_only(n) for n in source["nodes"]) >= 24
     # The source tree is not deleted or rewritten by this presentation hierarchy.
-    assert originals.issubset(set(by_id))
+    excluded = {n["id"] for n in source["nodes"] if is_reexport_only(n)}
+    assert (originals - excluded).issubset(set(by_id))
     assert visible["concept_hierarchy_schema"] == "saebase.atlas.concepts.v1"
 
 
