@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def normalize(text: str) -> str:
-    return re.sub(r"[\\W_]+", "", str(text or ""), flags=re.UNICODE).casefold()
+    return re.sub(r"[\W_]+", "", str(text or ""), flags=re.UNICODE).casefold()
 
 
 def audit(graphs: dict) -> dict:
