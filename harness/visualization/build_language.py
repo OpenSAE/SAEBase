@@ -61,29 +61,64 @@ ROLES = (
     ("conf/", "experiment configuration"),
 )
 VERBS = {
-    "get": "Get", "read": "Read", "load": "Load", "capture": "Capture",
-    "encode": "Encode", "decode": "Decode", "build": "Build", "construct": "Construct",
-    "register": "Register", "validate": "Validate", "verify": "Verify",
-    "check": "Check", "compute": "Compute", "calculate": "Calculate",
-    "evaluate": "Evaluate", "compare": "Compare", "intervene": "Intervene",
-    "steer": "Steer", "generate": "Generate", "train": "Train",
-    "prepare": "Prepare", "filter": "Filter", "normalize": "Normalize",
-    "save": "Save", "write": "Write", "export": "Export", "parse": "Parse",
-    "select": "Select", "extract": "Extract", "run": "Run", "create": "Create",
-    "update": "Update", "render": "Render", "inspect": "Inspect",
-    "collect": "Collect", "measure": "Measure", "trace": "Trace",
-    "sample": "Sample", "list": "List",
+    "get": "Get",
+    "read": "Read",
+    "load": "Load",
+    "capture": "Capture",
+    "encode": "Encode",
+    "decode": "Decode",
+    "build": "Build",
+    "construct": "Construct",
+    "register": "Register",
+    "validate": "Validate",
+    "verify": "Verify",
+    "check": "Check",
+    "compute": "Compute",
+    "calculate": "Calculate",
+    "evaluate": "Evaluate",
+    "compare": "Compare",
+    "intervene": "Intervene",
+    "steer": "Steer",
+    "generate": "Generate",
+    "train": "Train",
+    "prepare": "Prepare",
+    "filter": "Filter",
+    "normalize": "Normalize",
+    "save": "Save",
+    "write": "Write",
+    "export": "Export",
+    "parse": "Parse",
+    "select": "Select",
+    "extract": "Extract",
+    "run": "Run",
+    "create": "Create",
+    "update": "Update",
+    "render": "Render",
+    "inspect": "Inspect",
+    "collect": "Collect",
+    "measure": "Measure",
+    "trace": "Trace",
+    "sample": "Sample",
+    "list": "List",
 }
 UI = {
-    "组件职责": "Component responsibility", "函数接口": "Function interface",
-    "源码组成": "Module composition", "类属性": "Class fields",
-    "类方法": "Class methods", "完整源码": "Complete source code",
+    "组件职责": "Component responsibility",
+    "函数接口": "Function interface",
+    "源码组成": "Module composition",
+    "类属性": "Class fields",
+    "类方法": "Class methods",
+    "完整源码": "Complete source code",
     "对应的真实代码": "Related source implementation",
-    "为什么重要": "Why this matters", "其他名称": "Alternative names",
-    "真实依据": "Source evidence", "基础解释": "Foundational reference",
-    "源代码标识": "Source identifier", "设备与执行信息": "Runtime facts",
-    "方法签名": "Method signature", "输入参数": "Input parameters",
-    "返回值": "Return value", "专业词汇 · Context": "Technical terms · Context",
+    "为什么重要": "Why this matters",
+    "其他名称": "Alternative names",
+    "真实依据": "Source evidence",
+    "基础解释": "Foundational reference",
+    "源代码标识": "Source identifier",
+    "设备与执行信息": "Runtime facts",
+    "方法签名": "Method signature",
+    "输入参数": "Input parameters",
+    "返回值": "Return value",
+    "专业词汇 · Context": "Technical terms · Context",
 }
 PARAMETERS = {
     "name": "The registered component or item name.",
@@ -128,23 +163,37 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
     if kind in {"function", "method"}:
         prefix = name.split("_", 1)[0].lower()
         verb = VERBS.get(prefix)
-        label = (verb + " " + human(name[len(prefix):].lstrip("_"))) if verb else human(name)
+        label = (verb + " " + human(name[len(prefix) :].lstrip("_"))) if verb else human(name)
         title = label.strip() + " · " + human(file_stem) + " (" + name + ")"
         desc = (
-            "The Python " + kind + " " + (symbol or name) + " in " + path
-            + " implements " + context
+            "The Python "
+            + kind
+            + " "
+            + (symbol or name)
+            + " in "
+            + path
+            + " implements "
+            + context
             + ". Its source signature, parameters, and return expressions are available below."
         )
     elif kind == "class":
         title = human(name) + " · " + context
         desc = (
-            "The class " + name + " in " + path + " implements " + context
+            "The class "
+            + name
+            + " in "
+            + path
+            + " implements "
+            + context
             + ". Its declared fields and methods are available in the source details."
         )
     elif kind == "module":
         title = human(file_stem) + " · " + context
         desc = (
-            "The module " + path + " implements " + context
+            "The module "
+            + path
+            + " implements "
+            + context
             + ". Child nodes enumerate the actual Python definitions."
         )
     else:
@@ -153,8 +202,10 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
         category = role(path or first.get("path", ""))
         title = category.capitalize() + " · " + human(node["id"].split(":")[-1])
         desc = (
-            "This navigation group contains " + str(len(descendants))
-            + " source-backed nodes associated with " + category
+            "This navigation group contains "
+            + str(len(descendants))
+            + " source-backed nodes associated with "
+            + category
             + ". The child nodes retain their actual source identities."
         )
     return {
@@ -190,8 +241,14 @@ def build() -> str:
             for node in graph["nodes"]:
                 if node["id"].startswith("context:nav:"):
                     titles = [nodes[x]["title"] for x in children[node["id"]] if x in nodes]
-                    title = ("Terminology: " + titles[0] + " to " + titles[-1]) if titles else "Research terminology"
-                    summary = "Browse " + str(len(titles)) + " defined scientific and engineering terms."
+                    title = (
+                        ("Terminology: " + titles[0] + " to " + titles[-1])
+                        if titles
+                        else "Research terminology"
+                    )
+                    summary = (
+                        "Browse " + str(len(titles)) + " defined scientific and engineering terms."
+                    )
                     nodes[node["id"]] = {"title": title, "summary": summary, "description": summary}
         elif view == "code":
             nodes = {n["id"]: make_code(n, children, by_id) for n in graph["nodes"]}
@@ -199,13 +256,17 @@ def build() -> str:
             nodes = dict(trees["views"][view])
         if set(nodes) != set(by_id):
             raise ValueError(
-                "Missing " + view + " translations: "
-                + str(sorted(set(by_id) - set(nodes))[:10])
+                "Missing " + view + " translations: " + str(sorted(set(by_id) - set(nodes))[:10])
             )
         for node_id, obj in nodes.items():
             for key in ("title", "summary", "description"):
                 value = obj.get(key)
-                if not isinstance(value, str) or not value.strip() or CJK.search(value) or "\ufffd" in value:
+                if (
+                    not isinstance(value, str)
+                    or not value.strip()
+                    or CJK.search(value)
+                    or "\ufffd" in value
+                ):
                     raise ValueError("Invalid English field: " + view + "/" + node_id + "/" + key)
         translated[view] = nodes
     for original, english in DOCS.items():
