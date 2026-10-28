@@ -119,6 +119,27 @@ for (const [view, graph] of Object.entries(original)) {
     }
   }
 }
+// Regression: actionable Chinese Code titles must not collapse into the old
+// "Inspect ... interface" or "Provide ... for ..." English templates.
+const codeOriginal = new Map(original.code.nodes.map(n => [n.id, n]));
+for (const node of data.code.nodes) {
+  if (!["function", "method", "module", "class"].includes(node.kind)) continue;
+  const zh = codeOriginal.get(node.id);
+  if (zh?.title && /[\u3400-\u9fff]/.test(zh.title)) {
+    assert(!/^Inspect .* interface for |^Inspect .* implementation for |^Provide .* for /.test(node.title),
+      "Generic English Code title for " + node.id + ": " + node.title);
+  }
+}
+for (const [id, verb] of [
+  ["code:function:datasets.CounterFact.CounterFact:filtered_json_path", "Locate"],
+  ["code:function:saebase.benchmarks.metrics.reconstruction:loss_recovered", "Compute"],
+  ["code:class:datasets.controlled_inputs:BinaryFactor", "Manage"],
+  ["code:module:datasets.controlled_inputs", "Implement"]
+]) {
+  const node = data.code.nodes.find(n => n.id === id);
+  assert(node?.title.startsWith(verb + " "), id + " lost its Chinese source action");
+}
+
 assert.equal(counts.nodes, Object.values(original).reduce((n, t) => n + t.nodes.length, 0));
 assert(counts.translatedFields > counts.nodes * 2, "Nested translation coverage unexpectedly dropped");
 assert.equal(errors.length, 0,
