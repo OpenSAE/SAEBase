@@ -392,6 +392,54 @@ def fold_unreviewed_interfaces(output: dict) -> None:
             ):
                 raise ValueError("Class method source lost during consolidation: " + node["id"])
         excluded.add(node["id"])
+    # A generic class is also an interface container, not automatically a
+    # separate research capability. Fold it only when no reviewed or externally
+    # referenced child remains. Preserve its fields and every method in the
+    # owning module's expandable source interface.
+    classes = defaultdict(list)
+    for node in output["nodes"]:
+        if node["kind"] != "class" or node["id"] in protected:
+            continue
+        if "源码依据和调用参数可在节点的展开说明中查看" not in node.get("summary", ""):
+            continue
+        parent = by_id.get(incoming.get(node["id"]))
+        if not parent or parent.get("kind") != "module":
+            continue
+        surviving = [
+            edge["target"] for edge in output["edges"]
+            if edge["type"] == "contains" and edge["source"] == node["id"]
+            and edge["target"] not in excluded
+        ]
+        if surviving:
+            continue
+        fields = next(
+            (attr.get("fields", []) for attr in node.get("attributes", [])
+             if attr.get("type") == "fields"), []
+        )
+        methods = next(
+            (attr.get("methods", []) for attr in node.get("attributes", [])
+             if attr.get("type") == "class_methods"), []
+        )
+        classes[parent["id"]].append({
+            "name": node["source_symbol"],
+            "symbol_id": node["id"],
+            "path": node["path"],
+            "line": node.get("line"),
+            "fields": copy.deepcopy(fields),
+            "methods": copy.deepcopy(methods),
+        })
+        excluded.add(node["id"])
+    for parent_id, entries in classes.items():
+        parent = by_id[parent_id]
+        parent.setdefault("attributes", []).append({
+            "type": "class_interfaces",
+            "label": "类定义、属性及方法 · " + str(len(entries)) + " 个",
+            "classes": sorted(entries, key=lambda item: (item.get("line", 0), item["name"])),
+        })
+        for attr in parent["attributes"]:
+            if attr.get("type") == "module_contents":
+                hidden = {item["name"] for item in entries}
+                attr["classes"] = [name for name in attr.get("classes", []) if name not in hidden]
     for parent_id, methods in combined.items():
         parent = by_id[parent_id]
         parent.setdefault("attributes", []).append({
@@ -410,7 +458,18 @@ def fold_unreviewed_interfaces(output: dict) -> None:
     # Preserve the exact AST relationship as an immutable source-level record,
     # while giving the visual tree an edge between the surviving owners.
     # The function symbol identities also survive in class_methods attributes.
-    aliases = {id_: incoming[id_] for id_ in excluded}
+    first_owner = {id_: incoming[id_] for id_ in excluded}
+
+    def owner(id_: str) -> str:
+        visited = set()
+        while id_ in first_owner:
+            if id_ in visited:
+                raise ValueError("Cyclic collapsed Code ownership")
+            visited.add(id_)
+            id_ = first_owner[id_]
+        return id_
+
+    aliases = {id_: owner(id_) for id_ in excluded}
     retained_edges = []
     source_relations = []
     seen = set()
