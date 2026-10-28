@@ -69,10 +69,10 @@ def test_reviewed_methods_have_unique_source_grounded_sibling_meanings() -> None
         if edge["type"] == "contains":
             siblings[edge["source"]].append(edge["target"])
     reviews = catalog["nodes"]
-    assert len(reviews) >= 43
+    assert len(reviews) >= 66
     for node_id, reviewed in reviews.items():
         node = by_id[node_id]
-        assert node["kind"] == "method"
+        assert node["kind"] in {"method", "module"}
         assert node["path"] == reviewed["source_path"]
         assert node["source_symbol"] == reviewed["source_symbol"]
         assert node["title"] == reviewed["zh_title"]
@@ -80,6 +80,8 @@ def test_reviewed_methods_have_unique_source_grounded_sibling_meanings() -> None
         assert reviewed["en_title"] != reviewed["en_summary"]
         assert node["title"] != node["summary"]
         assert (ROOT / node["path"]).is_file(), node_id
+    assert any(node_id.startswith("code:module:saebase.research_lab.backend.")
+               for node_id in reviews)
     for members in siblings.values():
         selected = [by_id[item] for item in members if item in reviews]
         for field in ("title", "summary"):
