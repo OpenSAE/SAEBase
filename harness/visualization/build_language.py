@@ -550,7 +550,7 @@ CODE_RESPONSIBILITY_PHRASES = {
     "为IOI 间接宾语任务样本构建 Token 编码": "Tokenize indirect-object-identification examples.",
     "将输入文本编码为 Token 序列": "Encode input text into token sequences.",
     "为数字比较任务定位数据文件": "Locate dataset files for numerical comparison.",
-    "为输入样本编码 Token": "Encode tokens for input examples."
+    "为输入样本编码 Token": "Encode tokens for input examples.",
     "定位筛选后的数据文件": "Locate the filtered dataset file.",
     "附加多选问答的干扰选项": "Attach distractor options to multiple-choice examples.",
     "选择模型对应的分词策略": "Select the tokenization strategy for the chosen model.",
