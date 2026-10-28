@@ -551,14 +551,14 @@ def explanatory_text(node: dict, view: str) -> str:
     creates the false impression of deeper documentation.
     """
     detail = re.sub(
-        r"^(?:问题|方案|目标|定义|现状)[:：]\\s*",
+        r"^(?:问题|方案|目标|定义|现状)[:：]\s*",
         "",
         str(node.get("description") or ""),
     ).strip()
     summary = str(node.get("summary") or "").strip()
     if not detail:
         return ""
-    normalize = lambda value: re.sub(r"[\\s。.,;；：:]+", "", value).lower()
+    normalize = lambda value: re.sub(r"[\s。.,;；：:]+", "", value).lower()
     if not normalize(detail) or normalize(detail) == normalize(summary):
         return ""
     if summary and normalize(summary) in normalize(detail):
