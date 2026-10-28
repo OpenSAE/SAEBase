@@ -66,6 +66,10 @@
     if (labels[value.trim()]) return labels[value.trim()];
     const methodCount = value.match(/^类中全部方法 · (\d+) 个$/);
     if (methodCount) return "Class methods (" + methodCount[1] + ")";
+    const foldedCount = value.match(/^源码接口与实现依据 · (\d+) 项$/);
+    if (foldedCount) return "Verified source interfaces (" + foldedCount[1] + ")";
+    const moduleCount = value.match(/^模块中实际定义的函数接口 · (\d+) 个$/);
+    if (moduleCount) return "Module function interfaces (" + moduleCount[1] + ")";
     const name = sourceName(node);
     if (key === "title" || key === "label") {
       const linked = parent?.symbol_id && projection.nodes?.code?.[parent.symbol_id];
@@ -110,8 +114,14 @@
       };
       if (literalMeanings[value]) return literalMeanings[value];
 
-      // Do not fabricate semantics from an annotation or a source identifier.
-      // Unreviewed meanings are absent, while source signatures stay visible.
+      // Preserve English interface coverage without inventing a scientific
+      // responsibility. The exact name, type, default and implementation
+      // are always included alongside this technical-only fallback.
+      if (field) {
+        const type = String(parent?.annotation || "").trim();
+        return "Declared parameter " + field + (type ? " (" + type + ")" : "") +
+          "; consult its exact source usage and default.";
+      }
       return "";
     }
     if (key === "value") return en.summary;

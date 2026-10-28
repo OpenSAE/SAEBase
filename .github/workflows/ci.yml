@@ -65,9 +65,16 @@ jobs:
           assert 10 <= direct <= 20, f"Expected conceptual categories, got {direct}"
           print("Code concept hierarchy accepted; root categories:", direct)
           PY
-      - name: Audit Code Tree semantics and duplication
+      - name: Audit all Atlas trees and retain full semantic-duplicate report
         run: |
-          python harness/code/audit_semantics.py --check
+          python harness/code/audit_semantics.py --output atlas-semantic-audit.json --check
+          python -m pip install -q pytest
+          python -m pytest -q harness/github_work_test/test_atlas_semantic_audit.py harness/github_work_test/test_atlas_semantic_projection.py
+      - name: Upload full Atlas duplicate inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: atlas-semantic-duplicate-inventory
+          path: atlas-semantic-audit.json
       - name: Check interactive Atlas JavaScript
         run: |
           node --check harness/visualization/app.js

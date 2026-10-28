@@ -776,6 +776,7 @@
   }
   function locateView(id) {
     if (byId.has(id)) return config.view;
+    if (DATA.code?.source_api_index?.[id]) return "code";
     for (const key of Object.keys(VIEWS)) {
       if ((reviewGraphs[key]?.nodes || DATA[key]?.nodes || []).some(n => n.id === id)) return key;
     }
@@ -826,6 +827,11 @@
   // its explanation; wheel, keyboard and review arrows never expand it.
   function navigate(id, view, replace, options={}) {
     const target = view || locateView(id);
+    const foldedOwner = target === "code" && DATA.code?.source_api_index?.[id];
+    if (foldedOwner) {
+      id = foldedOwner;
+      options = {...options, toggle:true};
+    }
     if (!target || !(reviewGraphs[target]?.nodes || DATA[target]?.nodes || []).some(n => n.id === id)) return false;
     const sameFocus = target===config.view && config.focusId===id;
     const wasExpanded = sameFocus && config.expandedAttributes.has(id);
@@ -871,8 +877,10 @@
     rebuildHierarchy();
     config.expanded = initialExpanded();
     const deep = getSearchFocus();
-    if (deep && byId.has(deep)) {
-      config.mode = "focus"; config.focusId = deep;
+    const sourceOwner = deep && DATA[config.view]?.source_api_index?.[deep];
+    if (deep && (byId.has(deep) || (sourceOwner && byId.has(sourceOwner)))) {
+      config.mode = "focus"; config.focusId = byId.has(deep) ? deep : sourceOwner;
+      if (sourceOwner) config.expandedAttributes.add(sourceOwner);
     }
     bind();
     render(true);
@@ -1523,6 +1531,26 @@
   }
   function renderAttributeBlock(parent,attr,node) {
     if(!attr || typeof attr.label!=="string")return;
+    if(attr.type==="source_interfaces") {
+      const section=attributeSection(parent,attr.label);
+      // Source symbols are technical detail, not fictional research cards.
+      for(const item of attr.members||[]) {
+        const details=el("details","node-method-details");
+        const heading=el("summary","node-method-summary",
+          (item.kind||"source")+" · "+(item.source_symbol||item.id));
+        details.appendChild(heading);
+        const body=el("div","node-method-body");
+        const originalPath=item.path||node.path||"";
+        if(item.signature)body.appendChild(el("code","node-attribute-signature",item.signature));
+        for(const block of item.attributes||[]) {
+          renderAttributeBlock(body,block,{path:originalPath,id:item.id});
+        }
+        if(originalPath)sourceAnchor(body,originalPath,item.line||1,"查看真实源码");
+        details.appendChild(body);
+        section.appendChild(details);
+      }
+      return;
+    }
     if(attr.type==="class_methods") {
       const section=attributeSection(parent,attr.label);
       for(const item of attr.methods||[]) {
@@ -1859,7 +1887,10 @@
         }
         const next = getSearchFocus();
         config.expandedAttributes.clear();
-        config.focusId = next && byId.has(next) ? next : null;
+        const sourceOwner = next && DATA[config.view]?.source_api_index?.[next];
+        config.focusId = next && byId.has(next) ? next :
+          sourceOwner && byId.has(sourceOwner) ? sourceOwner : null;
+        if (sourceOwner && config.focusId) config.expandedAttributes.add(sourceOwner);
         config.mode = config.focusId ? "focus" : "overview";
         config.detailsOpen = false;
         config.query = ""; $("search").value = "";

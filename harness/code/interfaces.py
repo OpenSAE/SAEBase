@@ -517,6 +517,12 @@ def enrich_code_node(node: dict, methods_description: dict[str, tuple[str, str]]
             },
             {"type": "reference", "label": "完整模块", "path": node["path"], "line": 1},
         ]
+        if functions:
+            node["attributes"].append({
+                "type": "class_methods",
+                "label": "模块中实际定义的函数接口 · " + str(len(functions)) + " 个",
+                "methods": [function_interface(fn, contents) for fn in functions],
+            })
 
 
 def enrich_code_tree(graph: dict, methods_description: dict[str, tuple[str, str]]) -> dict:

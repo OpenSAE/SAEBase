@@ -107,3 +107,11 @@ The acceptance report records exact repository commits, per-tree node counts, Ch
 - Research task families, registry adapters, and concrete implementations serve distinct functions. Verify their behavior against actual Python definitions. Maintain reviewed bilingual interface records in `harness/code/reviewed_semantics.json`.
 - Summaries explain independently verified behavior. Show an expanded explanation only when it adds information beyond the visible summary. Repetitive source-pointer templates are semantic review failures.
 - Run `harness/code/audit_semantics.py` on generated graphs to identify generic source summaries and sibling collisions. Validate reviewed source identities, translations, and uniquely useful responsibilities before publishing.
+
+## Semantic projection and zero-duplicate release gate
+
+- The authoritative AST graph is an interface inventory, not a list of distinct scientific capabilities. Unreviewed API symbols with generic descriptions are folded into their closest source-backed conceptual owner and remain accessible in expanded source-interface details, including stable source IDs, signatures, parameter and return details, code and paths.
+- Independently reviewed scientific operations and canonical concepts remain navigable nodes. Source-symbol spelling, file names, or swapped action verbs cannot establish a new capability.
+- Compaction rechecks the *resulting* parent-child graph until no newly adjacent duplicate remains. It preserves the complete AST identity ledger and redirects legacy source deep links to their visible owner.
+- `python harness/code/audit_semantics.py --output atlas-semantic-audit.json --check` checks the generated five-tree site, not a pre-translation hand-picked sample. CI rejects generic boilerplate, tautological cards, repeated sibling titles/summaries and near-identical sibling responsibilities. No historical allowance is permitted.
+- A genuine operation with a different input, constraint, output or scientific effect receives reviewed bilingual semantics before becoming a separate card. Combining display nodes never rewrites or deletes Python implementations.
