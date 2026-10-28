@@ -83,12 +83,29 @@ def audit(graphs: dict) -> dict:
 
 
 def main() -> None:
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true")
+    options = parser.parse_args()
     text = (ROOT / "harness/visualization/data.js").read_text(encoding="utf-8")
     prefix = "window.OPENRESEARCH_ATLAS = "
     if prefix not in text:
         raise ValueError("Missing source-generated Atlas")
     graphs = json.loads(text.partition(prefix)[2].strip().removesuffix(";"))
-    print("ATLAS_SEMANTIC_AUDIT=" + json.dumps(audit(graphs), ensure_ascii=False))
+    report = audit(graphs)
+    print("ATLAS_SEMANTIC_AUDIT=" + json.dumps(report, ensure_ascii=False))
+    if options.check:
+        # Baseline is recorded from the first fully source-reviewed rollout.
+        # The global debt remains visible and each later change may reduce it.
+        # Increasing generic summaries or sibling collisions requires review.
+        limits = {"template_summary": 1824, "repeated_sibling_title": 204,
+                  "repeated_sibling_summary": 204}
+        exceeded = {key: (report["counts"].get(key, 0), allowed)
+                    for key, allowed in limits.items()
+                    if report["counts"].get(key, 0) > allowed}
+        if exceeded:
+            raise ValueError("Atlas semantic debt regressed: " + repr(exceeded))
 
 
 if __name__ == "__main__":
