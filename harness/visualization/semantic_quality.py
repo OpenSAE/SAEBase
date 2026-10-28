@@ -82,7 +82,7 @@ def validate_all_trees(graphs: dict) -> dict:
             for pair, ids in groups.items():
                 if len(ids) > 1:
                     counts["exact_duplicate_sibling_groups"] += 1
-                    if len(examples["exact_duplicate_sibling_groups"]) < 12:
+                    if len(examples["exact_duplicate_sibling_groups"]) < 60:
                         examples["exact_duplicate_sibling_groups"].append({
                             "parent": parent, "ids": ids,
                         })
