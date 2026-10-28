@@ -213,6 +213,10 @@ def build() -> str:
             raise ValueError("Missing English document for " + original)
         if CJK.search((ROOT / english).read_text(encoding="utf-8")):
             raise ValueError("Chinese text appears in English Markdown: " + english)
+    ui_record = json.loads((HERE / "i18n/ui.en.json").read_text(encoding="utf-8"))
+    if ui_record.get("project") != "SAEBase":
+        raise ValueError("Foreign UI terminology overlay")
+    UI.update(ui_record["ui"])
     record = {
         "schema": "saebase.atlas.locale.v2",
         "project": "SAEBase",
