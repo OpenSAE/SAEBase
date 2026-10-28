@@ -14,6 +14,45 @@ const source = read("harness/visualization/data.js");
 const prefix = "window.OPENRESEARCH_ATLAS = ";
 assert(source.includes(prefix), "Missing SAEBase-generated graph");
 const graph = JSON.parse(source.split(prefix)[1].trim().replace(/;\s*$/, ""));
+// Generated Atlas graphs may never invent ordinal groups or count-based
+// responsibilities. All generated Code presentation nodes link real Context.
+const contextIds = new Set(graph.context.nodes.filter(n =>
+  n.id.startsWith("term.")).map(n => n.id));
+for (const [view, tree] of Object.entries(graph)) {
+  for (const node of tree.nodes) {
+    assert(!/:(?:public-nav|nav):/.test(node.id),
+      "Fabricated navigation node: " + view + "/" + node.id);
+    assert(!/(?:第\\d+组|按实际源码目录、定义职责|分组浏览相关接口)/.test(
+      [node.title,node.summary,node.description,node.reader_explanation].join(" ")),
+      "Count-based pseudo-purpose: " + view + "/" + node.id);
+    if (view === "code" && node.presentation_only) {
+      assert(node.context_term_ids?.length > 0,
+        "Generated Code group lacks Context: " + node.id);
+      assert(node.context_term_ids.every(id => contextIds.has(id)),
+        "Generated Code group references unknown Context: " + node.id);
+    }
+  }
+}
+// Legacy snapshots are cleaned by flattening existing parent links, never by
+// creating a replacement fake concept or dropping a real source child.
+const compatibilityWindow = {};
+vm.runInNewContext(read("harness/visualization/atlas-public-balance.js"),
+  {window:compatibilityWindow});
+const sample = {
+  nodes: [{id:"code:root"},{id:"code:nav:old",kind:"group"},
+    {id:"code:public-nav:older",kind:"group"},
+    ...Array.from({length:13}, (_,i)=>({id:"code:function:"+i,kind:"function"}))],
+  edges: [{source:"code:root",target:"code:nav:old",type:"contains"},
+    {source:"code:nav:old",target:"code:public-nav:older",type:"contains"},
+    ...Array.from({length:13}, (_,i)=>({
+      source:"code:public-nav:older",target:"code:function:"+i,type:"contains"}))]
+};
+const cleanup = compatibilityWindow.SAEBASE_ATLAS_REMOVE_FAKE_NAVIGATION;
+assert.equal(cleanup(sample).removed, 2);
+assert.equal(sample.nodes.length, 14);
+assert.equal(sample.edges.length, 13);
+assert(sample.edges.every(e => e.source === "code:root" &&
+  e.target.startsWith("code:function:")), "Legacy cleanup lost real children");
 const window = {};
 vm.runInNewContext(read("harness/visualization/locale-data.js"), {window});
 const locales = window.SAEBASE_ATLAS_LOCALES;
