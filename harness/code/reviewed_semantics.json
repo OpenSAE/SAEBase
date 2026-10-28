@@ -1167,6 +1167,62 @@
         "term.model",
         "term.api"
       ]
+    },
+    "code:class:datasets.controlled_inputs:ControlledInputState": {
+      "source_path": "datasets/controlled_inputs.py",
+      "source_symbol": "ControlledInputState",
+      "zh_title": "记录一个因素组合的受控输入状态",
+      "zh_summary": "保存状态位掩码、Prompt、样本身份和实际 Token 读出位置。",
+      "en_title": "Record a single factorial input state",
+      "en_summary": "Store the condition mask, prompt, sample identity, and token readout position.",
+      "context_term_ids": [
+        "term.dataset"
+      ]
+    },
+    "code:class:datasets.controlled_inputs:ControlledInputCapture": {
+      "source_path": "datasets/controlled_inputs.py",
+      "source_symbol": "ControlledInputCapture",
+      "zh_title": "汇总受控输入的实际激活采集结果",
+      "zh_summary": "组合已采集的 SampleRecord、收集统计和带有设计身份的 Manifest。",
+      "en_title": "Aggregate measured activations for controlled inputs",
+      "en_summary": "Bind collected SampleRecords, capture statistics, and a provenance manifest.",
+      "context_term_ids": [
+        "term.sae.capture",
+        "term.dataset"
+      ]
+    },
+    "code:module:tasks.intervene.native.interventions": {
+      "source_path": "tasks/intervene/native/interventions.py",
+      "source_symbol": "tasks/intervene/native/interventions.py",
+      "zh_title": "执行原生 PyTorch Hook 与 SAE 特征编辑计划",
+      "zh_summary": "使用强类型干预条件构造 SAE 编码修改和模型模块级的补丁操作。",
+      "en_title": "Execute typed PyTorch and SAE feature intervention plans",
+      "en_summary": "Construct executable feature edits and model-module Hook intervention plans.",
+      "context_term_ids": [
+        "term.sae.intervene"
+      ]
+    },
+    "code:module:tasks.intervene.native.ndif": {
+      "source_path": "tasks/intervene/native/ndif.py",
+      "source_symbol": "tasks/intervene/native/ndif.py",
+      "zh_title": "通过授权 NDIF 执行远程 NNsight 捕获",
+      "zh_summary": "核对远程模型身份与授权条件，在 NDIF 服务上执行真正的 Trace。",
+      "en_title": "Run authorized remote activation traces through NDIF",
+      "en_summary": "Validate remote deployment credentials and run a source-bound NNsight trace.",
+      "context_term_ids": [
+        "term.sae.intervene"
+      ]
+    },
+    "code:module:tasks.intervene.native.pyvene": {
+      "source_path": "tasks/intervene/native/pyvene.py",
+      "source_symbol": "tasks/intervene/native/pyvene.py",
+      "zh_title": "构造与序列化原生 pyvene 因果干预配置",
+      "zh_summary": "指定层、组件、位置及原生干预类型，连接上游 IntervenableModel 的执行接口。",
+      "en_title": "Configure and serialize native pyvene causal interventions",
+      "en_summary": "Specify layers, components, positions, and original pyvene intervention types.",
+      "context_term_ids": [
+        "term.sae.intervene"
+      ]
     }
   }
 }
