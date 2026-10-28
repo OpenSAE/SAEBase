@@ -34,7 +34,8 @@
     "模块职责": "Module purpose", "完整模块": "Complete module source",
     "类定义源码": "Class definition source",
     "当前任务配置": "Current task configuration",
-    "配置文件来源": "Configuration file source"
+    "配置文件来源": "Configuration file source",
+    "由源码推导": "Inferred from source"
   });
   window.SAEBASE_ATLAS_UI = labels;
 
@@ -45,12 +46,16 @@
     return node.source_symbol || node.path || node.id;
   }
   function translateString(value, key, parent, node, en) {
-    if (!CJK.test(value) || skip.has(key)) return value;
+    if (!CJK.test(value)) return value;
+    if (key === "annotation" && value === "由源码推导") return "Inferred from source";
+    if (skip.has(key)) return value;
     if (labels[value.trim()]) return labels[value.trim()];
     const methodCount = value.match(/^类中全部方法 · (\d+) 个$/);
     if (methodCount) return "Class methods (" + methodCount[1] + ")";
     const name = sourceName(node);
     if (key === "title" || key === "label") {
+      const linked = parent?.symbol_id && projection.nodes?.code?.[parent.symbol_id];
+      if (linked?.title) return linked.title;
       if (parent?.interface?.name) return "Interface: " + parent.interface.name;
       if (parent?.name) return "Source field: " + parent.name;
       if (parent?.path) return "Source: " + parent.path;
