@@ -54,8 +54,8 @@
         {
           "name": "adapters",
           "title": "SAE 适配与运行验证",
-          "summary": "验证不同 SAE 实现和研究后端能否满足接口约束。",
-          "description": "验证不同 SAE 实现和研究后端能否满足接口约束。",
+          "summary": "核验 SAE 实现与研究后端的接口约束和适配条件。",
+          "description": "核验 SAE 实现与研究后端的接口约束和适配条件。",
           "en_title": "SAE adapters and execution validation",
           "en_summary": "Check integration adapters, available layers, and execution-time SAE requirements.",
           "en_description": "Check integration adapters, available layers, and execution-time SAE requirements.",
@@ -270,7 +270,7 @@
       "children": [
         {
           "name": "uncertainty",
-          "title": "不确定性估计与稳定排序",
+          "title": "置信区间估计与排序稳定性",
           "summary": "利用 Bootstrap、重采样和判别能力分析指标稳定性。",
           "description": "利用 Bootstrap、重采样和判别能力分析指标稳定性。",
           "en_title": "Uncertainty and ranking stability",
@@ -692,8 +692,8 @@
       "summary": "验证激活、干预、GPU 运行、基准与发布的可复现性质。",
       "description": "验证激活、干预、GPU 运行、基准与发布的可复现性质。",
       "en_title": "Implementation verification and research tooling",
-      "en_summary": "Run source and performance checks without conflating tool availability with scientific validation.",
-      "en_description": "Run source and performance checks without conflating tool availability with scientific validation.",
+      "en_summary": "Verify implementation behavior, execution performance, and evidence for SAE research tools.",
+      "en_description": "Verify implementation behavior, execution performance, and evidence for SAE research tools.",
       "context_terms": [
         "term.api",
         "term.sae"
@@ -796,8 +796,8 @@
         {
           "name": "gpu_execution",
           "title": "GPU 执行与生成后端一致性",
-          "summary": "验证 GPU Worker、计算环境和不同生成后端的输出一致性。",
-          "description": "验证 GPU Worker、计算环境和不同生成后端的输出一致性。",
+          "summary": "验证 GPU Worker、执行环境及多种生成后端的输出一致性。",
+          "description": "验证 GPU Worker、执行环境及多种生成后端的输出一致性。",
           "en_title": "GPU execution and generation parity",
           "en_summary": "Test GPU workers and parity between generation backends under recorded settings.",
           "en_description": "Test GPU workers and parity between generation backends under recorded settings.",
@@ -876,8 +876,8 @@
         {
           "name": "intervention_frameworks",
           "title": "外部框架的电路与特征干预",
-          "summary": "在不同 Hook 与因果操作框架之间执行受控编辑和追踪。",
-          "description": "在不同 Hook 与因果操作框架之间执行受控编辑和追踪。",
+          "summary": "通过多种 Hook 和因果操作框架执行受控编辑与追踪。",
+          "description": "通过多种 Hook 和因果操作框架执行受控编辑与追踪。",
           "en_title": "Circuit and feature intervention backends",
           "en_summary": "Implement causal circuit edits and controlled interventions in supported research frameworks.",
           "en_description": "Implement causal circuit edits and controlled interventions in supported research frameworks.",
