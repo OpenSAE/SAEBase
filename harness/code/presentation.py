@@ -367,7 +367,9 @@ def fold_unreviewed_interfaces(output: dict) -> None:
         kind = parent.get("kind")
         if node["kind"] == "method" and kind != "class":
             continue
-        if node["kind"] == "function" and kind != "module":
+        if node["kind"] == "function" and not (
+            kind == "module" or (kind == "group" and parent.get("concept_group"))
+        ):
             continue
         interface = next(
             (attr["interface"] for attr in node.get("attributes", [])
@@ -376,7 +378,7 @@ def fold_unreviewed_interfaces(output: dict) -> None:
         )
         if not interface or not interface.get("signature"):
             raise ValueError("Cannot consolidate source interface: " + node["id"])
-        if kind == "module":
+        if kind in {"module", "group"}:
             combined[parent["id"]].append({
                 **copy.deepcopy(interface),
                 "symbol_id": node["id"],
@@ -404,7 +406,10 @@ def fold_unreviewed_interfaces(output: dict) -> None:
         if "源码依据和调用参数可在节点的展开说明中查看" not in node.get("summary", ""):
             continue
         parent = by_id.get(incoming.get(node["id"]))
-        if not parent or parent.get("kind") != "module":
+        if not parent or not (
+            parent.get("kind") == "module"
+            or (parent.get("kind") == "group" and parent.get("concept_group"))
+        ):
             continue
         surviving = [
             edge["target"] for edge in output["edges"]
