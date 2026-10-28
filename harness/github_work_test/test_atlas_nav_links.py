@@ -1,4 +1,5 @@
 """Regression for standalone SAEBase Atlas navigation on the index entrypoint."""
+
 from pathlib import Path
 import importlib.util
 
