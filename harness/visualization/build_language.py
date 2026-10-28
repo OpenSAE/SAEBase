@@ -367,13 +367,17 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
          if item.get("type") == "interface" and item.get("interface")),
         {},
     )
-    args = [p.get("name", "") for p in interface.get("parameters", []) if p.get("name")]
+    args = [
+        p.get("name", "")
+        for p in interface.get("parameters", [])
+        if p.get("name") and not CJK.search(str(p["name"]))
+    ]
     returns = interface.get("returns") or {}
-    annotation = returns.get("annotation", "")
+    annotation = str(returns.get("annotation") or "")
     details = []
     if args:
         details.append("Declared inputs: " + ", ".join(args) + ".")
-    if annotation and annotation != "None":
+    if annotation and annotation != "None" and not CJK.search(annotation):
         details.append("Declared return type: " + annotation + ".")
     if path:
         details.append("Source: " + path + ".")
