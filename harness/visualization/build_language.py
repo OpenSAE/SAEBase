@@ -247,7 +247,7 @@ MEANING_TRANSLATIONS = {
     "汇总器的名称": "Name identifying the result aggregator.",
     "传入指标适配器的附加参数": "Additional arguments supplied to the metric adapter.",
     "随机性设置覆盖的数据加载工作进程": "Data-loader workers covered by random seed initialization.",
-    "控制执行状态的输出详细度": "Verbosity setting controlling execution-status output."
+    "控制执行状态的输出详细度": "Verbosity setting controlling execution-status output.",
 }
 # These explanations are reviewed against the actual evaluate_sar implementation.
 # The key is a stable source symbol, not an English/Chinese sentence fragment.
@@ -553,17 +553,27 @@ def code_group_summary(node: dict, title: str, source_path: str) -> str:
     if len(tokens) >= 4 and tokens[1] == "instance":
         family, item = tokens[2], tokens[3]
         if family == "datasets":
-            return "Group " + DATASET_NAMES.get(item, human(item)) + " prompt loading and preparation interfaces."
+            return (
+                "Group "
+                + DATASET_NAMES.get(item, human(item))
+                + " prompt loading and preparation interfaces."
+            )
         if family == "models":
             return "Group " + human(item) + " model construction and compatibility interfaces."
         if family == "tasks":
-            return "Group " + TASK_NAMES.get(item, human(item)) + " configuration and execution interfaces."
+            return (
+                "Group "
+                + TASK_NAMES.get(item, human(item))
+                + " configuration and execution interfaces."
+            )
     if node.get("navigation_scope") == "source_range":
         return "Locate a contiguous source section of " + domain(source_path) + " interfaces."
     if node.get("title") in NAVIGATION_EN:
         return NAVIGATION_EN[node["title"]].rstrip(".") + " in " + domain(source_path) + "."
     if source_path:
-        return "Navigate " + domain(source_path) + " implementations represented by this source group."
+        return (
+            "Navigate " + domain(source_path) + " implementations represented by this source group."
+        )
     return title.rstrip(".") + " across existing SAEBase components."
 
 
