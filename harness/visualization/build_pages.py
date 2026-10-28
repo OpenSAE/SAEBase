@@ -13,7 +13,7 @@ import sys
 HERE = Path(__file__).resolve().parent
 VIEWS = ("core", "knowledge", "code", "environment", "context")
 NAV = re.compile(
-    r'<button class="tab(?: active)?" data-graph="(core|knowledge|code|environment|context)">(.*?)</button>',
+    r'<a class="tab(?: active)?" data-graph="(core|knowledge|code|environment|context)" href="\\1\\.html">(.*?)</a>',
     flags=re.DOTALL,
 )
 
