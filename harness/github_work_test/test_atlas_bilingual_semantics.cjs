@@ -143,16 +143,17 @@ assert.equal(errors.length, 0,
      "English summary must represent the operation in the Chinese source: " + id);
  }
  let translatedResponsibilities = 0;
+ let sourceResponsibilities = 0;
  for (const [id, zh] of chineseCode) {
    const line = String(zh.summary || "");
    if (!/^负责.+；源码依据和调用参数可在节点的展开说明中查看。$/.test(line))
      continue;
+   sourceResponsibilities++;
    const en = englishCode.get(id);
    if (en && !/^Inspect .+ interface for /.test(en.summary))
      translatedResponsibilities++;
  }
- assert(translatedResponsibilities >= 1200,
-   "Too many Code nodes fell back to mechanical source-symbol descriptions: " +
-   translatedResponsibilities);
+ assert.equal(translatedResponsibilities, sourceResponsibilities,
+   "Some Chinese Code responsibilities fell back to mechanical source-symbol descriptions");
 
 console.log("SAEBase bilingual semantic field audit", counts);
