@@ -871,8 +871,10 @@
     rebuildHierarchy();
     config.expanded = initialExpanded();
     const deep = getSearchFocus();
-    if (deep && byId.has(deep)) {
-      config.mode = "focus"; config.focusId = deep;
+    const sourceOwner = deep && DATA[config.view]?.source_api_index?.[deep];
+    if (deep && (byId.has(deep) || (sourceOwner && byId.has(sourceOwner)))) {
+      config.mode = "focus"; config.focusId = byId.has(deep) ? deep : sourceOwner;
+      if (sourceOwner) config.expandedAttributes.add(sourceOwner);
     }
     bind();
     render(true);
@@ -1879,7 +1881,10 @@
         }
         const next = getSearchFocus();
         config.expandedAttributes.clear();
-        config.focusId = next && byId.has(next) ? next : null;
+        const sourceOwner = next && DATA[config.view]?.source_api_index?.[next];
+        config.focusId = next && byId.has(next) ? next :
+          sourceOwner && byId.has(sourceOwner) ? sourceOwner : null;
+        if (sourceOwner && config.focusId) config.expandedAttributes.add(sourceOwner);
         config.mode = config.focusId ? "focus" : "overview";
         config.detailsOpen = false;
         config.query = ""; $("search").value = "";
