@@ -541,9 +541,16 @@ def fold_redundant_module_cards(output: dict) -> None:
         siblings[parent["id"], node["title"], node["summary"]].append(node)
     folded = {}
     for (parent_id, _title, _summary), members in siblings.items():
-        if len(members) < 2:
-            continue
         parent = by_id[parent_id]
+        # Reviewed functional parents already convey the capability. A sole
+        # unreviewed module underneath such a parent is an implementation
+        # detail, while every exact source interface remains available there.
+        semantic_owner = (
+            parent.get("concept_group")
+            or parent_id.startswith(("code:instance:", "code:concrete:"))
+        )
+        if len(members) < 2 and not semantic_owner:
+            continue
         entries = []
         for node in members:
             entries.append({
