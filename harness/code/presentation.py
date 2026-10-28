@@ -37,16 +37,12 @@ MODULES = {
     "saebase/runtime/train.py": ("SAE 任务执行入口", "校验配置并分派已登记的研究任务。"),
     "tasks/sae_runtime.py": ("七类 SAE 任务公共入口", "核验模型与数据并调用对应任务实现。"),
 }
-for _task, _title in {
-    "capture": "SAE 特征捕获",
-    "intervene": "SAE 教师强制干预",
-    "generate": "SAE 生成干预",
-    "circuits": "SAE 电路分析",
-    "explain": "SAE 自动解释",
-    "benchmark": "SAE 基准评测",
-    "train": "SAE 训练",
-}.items():
-    MODULES[f"tasks/{_task}/task.py"] = (_title, "调用对应的 SAE 实验实现与验证接口。")
+for _task, _pair in TASK_WRAPPER_SUMMARIES.items():
+    MODULES[f"tasks/{_task}/task.py"] = _pair
+for _task, _pair in TASK_IMPLEMENTATION_SUMMARIES.items():
+    MODULES[f"tasks/{_task}/operation.py"] = _pair
+for _stem, _pair in INTERVENTION_MODULES.items():
+    MODULES[f"tasks/intervene/backend/{_stem}.py"] = _pair
 CLASSES = {
     "SAEBaseDataModule": ("NLP 数据管理", "装配来自独立 Prompt 来源的训练与评测记录。"),
     "DatasetPlugin": ("数据集注册接口", "定义 Prompt 数据集的加载及任务兼容条件。"),
@@ -73,7 +69,69 @@ CONCRETE = {
     "models": ("LLM 模型实现", "查看实际语言模型和任务兼容性。"),
     "tasks": ("七类 LLM SAE 任务", "查看特征捕获、干预、生成、电路、解释、评测与训练。"),
 }
-INSTANCE_LABELS = {}
+# Reviewed task responsibilities. A task family, its plugin entry, and its
+# implementation are distinct concepts, even when all share the same operation.
+TASK_INSTANCE_SEMANTICS = {
+    "capture": (
+        "SAE 激活捕获与稀疏特征读取",
+        "面向选定模型层采集真实激活，形成带有特征位置和重建信息的研究记录。",
+    ),
+    "intervene": (
+        "教师强制条件下的 SAE 因果编辑",
+        "在固定输入上设置特征替换条件，对比编辑前后的模型输出分数。",
+    ),
+    "generate": (
+        "生成过程中的 SAE 特征控制",
+        "在模型逐步生成文本时应用选定 SAE 特征编辑，记录基线与干预后的生成行为。",
+    ),
+    "circuits": (
+        "基于特征与连接的因果电路分析",
+        "对指定模型与输入构建候选特征电路，并保存可复查的追踪结果。",
+    ),
+    "explain": (
+        "SAE 特征假设生成与验证",
+        "通过真实解释生成器提出特征作用假设，并在留出样本上检查解释预测。",
+    ),
+    "benchmark": (
+        "SAE 性能与研究假设的基准评测",
+        "按照评测配置执行重建、干预和可靠性等指标，并汇总可追溯结果。",
+    ),
+    "train": (
+        "SAE 字典学习与训练验收",
+        "基于指定的模型激活训练稀疏自编码器，并保存检查点及训练指标。",
+    ),
+}
+TASK_WRAPPER_SUMMARIES = {
+    "capture": ("绑定激活捕获任务入口", "将 CaptureTask 注册为 capture 操作，交由统一运行器加载模型、SAE 和输入配置。"),
+    "intervene": ("绑定教师强制干预任务入口", "将 InterveneTask 指向 intervene 操作；特征替换和 Logit 对比由具体执行模块负责。"),
+    "generate": ("绑定生成干预任务入口", "通过 GenerateTask 声明 generate 操作，并将任务配置交给统一 SAE 运行接口。"),
+    "circuits": ("绑定电路追踪任务入口", "用 CircuitsTask 声明 circuits 操作，连接通用任务注册表与电路计算流程。"),
+    "explain": ("提供解释器依赖与任务分派", "ExplainTask 接受解释生成器与预测器，并在 run 时转交给解释任务执行逻辑。"),
+    "benchmark": ("绑定基准评测任务入口", "BenchmarkTask 选择 benchmark 操作，由运行器继续加载配置和已注册的评测后端。"),
+    "train": ("绑定 SAE 训练任务入口", "TrainTask 声明 train 操作，统一接收 Hydra 配置并交给训练实现。"),
+}
+TASK_IMPLEMENTATION_SUMMARIES = {
+    "capture": ("提取激活特征及重建统计", "捕获指定 Hook 的 SAE 编码，返回活跃特征数、最强特征以及重建范数。"),
+    "intervene": ("替换稀疏特征并测量输出变化", "对固定 Prompt 替换指定 SAE 特征，比较前后 Logit 并返回变化范数及候选 Token。"),
+    "generate": ("比较逐步生成前后的特征干预", "把 Prompt 转成可定位的 Token 样本，构造特征编辑条件并调用逐步生成对照评估。"),
+    "circuits": ("运行原生电路追踪并保存图结构", "核验执行授权与输入配置后调用电路追踪器，在独立目录输出分析产物。"),
+    "explain": ("生成特征解释并测试泛化预测", "读取发现与留出输入，调用真实解释生成器，并检查解释对新样本的预测能力。"),
+    "benchmark": ("执行配置化基准并汇总指标", "读取已存在的评测配置，核验 Gemma 模型目标，再调用真实评测运行器保存指标。"),
+    "train": ("执行训练计划并写入 SAE 检查点", "校验训练授权与模型快照，构造 TrainPlan 并把结果保存到独立检查点目录。"),
+}
+# Reviewed modules explain a specific source responsibility. Avoid treating
+# every backend file as another implementation of the same research goal.
+INTERVENTION_MODULES = {
+    "clean_prefix": ("重算干净前缀的编辑对照", "每步重算原始前缀，在该前缀上运行 SAE 编辑以提供无缓存歧义的参考结果。"),
+    "engine": ("批量执行干预并管理重试", "按计算预算调度批量 Hook 前向传播，处理微批重试和可恢复的测量任务。"),
+    "hf_cached_steering": ("在持久 KV 缓存中逐 Token 编辑特征", "每个新 Token 都编码真实残差并执行特征修改，同时保存编辑过的 KV 历史。"),
+    "kv_cache_exact": ("核对独立干净 KV 与编辑解码", "使用独立的干净与编辑分支检验增量解码一致性，保留其试验协议和误差证据。"),
+    "operators": ("应用 SAE 特征空间编辑算子", "根据消融、缩放、钳制、添加或特征集合条件生成 FeaturePatch。"),
+    "results": ("原子写入干预测量记录", "通过 JSONL 分片、校验和与 Manifest 提供崩溃恢复及实验测量追溯。"),
+    "specs": ("定义可复现的干预条件与样本身份", "声明特征集合、编辑幅度、样本读出位置及实验身份的校验约束。"),
+    "steering": ("逐步重算前缀进行生成对照", "使用无 KV 缓存的参考解码，比较每一步 SAE 编辑与基线生成结果。"),
+}
+INSTANCE_LABELS = {("tasks", key): value for key, value in TASK_INSTANCE_SEMANTICS.items()}
 KEY_METHODS = {
     "code:function:saebase.api.features:capture_features": "捕获模型激活并编码为 SAE 特征。",
 }
@@ -219,7 +277,12 @@ def concrete_groups(output: dict) -> None:
             )
             nodes.append({
                 "id": instance_id, "kind": "group", "title": instance_title,
-                "summary": instance_summary, "description": instance_summary,
+                "summary": instance_summary,
+                "description": (
+                    "该研究任务集合负责组织 " + name + " 的独立实现、配置与执行证据。"
+                    if area != "tasks"
+                    else instance_summary
+                ),
                 "status": "implemented", "evidence": [m["path"] for m in modules],
                 "presentation_only": True, "source_symbol": "",
                 "context_term_ids": [{"datasets": "term.dataset", "models": "term.model",
