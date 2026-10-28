@@ -30,7 +30,7 @@ The published Atlas is maintained in a separate website repository. Its HTML, Ja
 
 ## Component hierarchy
 
-Code Tree follows actual source directories, responsibilities, Python modules, classes and functions, and methods. A navigation parent should display no more than ten immediate children. Grouping reflects real module responsibilities and does not introduce new Python functionality.
+Code Tree follows actual source directories, responsibilities, Python modules, classes and functions, and methods. The interface displays at most ten actual children per page. Additional children use UI pagination, not synthetic Tree nodes or numbered source ranges. Every generated feature node needs an independent evidenced responsibility and a valid authoritative Context reference.
 
 Individual datasets, models, and seven SAE research operations are shown separately. Configuration is attached to the corresponding task rather than embedded in a generic task name.
 
