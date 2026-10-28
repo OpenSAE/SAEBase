@@ -102,6 +102,14 @@ VERBS = {
     "trace": "Trace",
     "sample": "Sample",
     "list": "List",
+    "make": "Build", "assert": "Validate", "is": "Check",
+    "has": "Check", "supports": "Check", "can": "Check",
+    "attach": "Attach", "append": "Append", "apply": "Apply",
+    "publish": "Publish", "release": "Release", "close": "Close",
+    "rebuild": "Rebuild", "resolve": "Resolve", "canonicalize": "Normalize",
+    "serialize": "Serialize", "deserialize": "Deserialize",
+    "subsample": "Subsample", "tokenize": "Tokenize",
+    "reindex": "Reindex", "estimate": "Estimate",
 }
 UI = {
     "组件职责": "Component responsibility",
@@ -467,6 +475,10 @@ def action_label(node: dict, name: str, path: str) -> str:
     if name in {"n_states", "n_factors"}:
         unit = "states" if name == "n_states" else "experimental factors"
         return "Count " + unit + " in " + (owner or scope)
+    if name in {"reconstruction_mse", "reconstruction_stats"}:
+        return "Compute SAE reconstruction metrics for " + scope
+    if name == "canonicalize_behavior":
+        return "Normalize experiment behavior labels for " + scope
     if name.startswith("from_") and owner:
         return "Build " + owner + " from " + human(name[5:]).lower()
     words = name.lstrip("_").split("_", 1)
