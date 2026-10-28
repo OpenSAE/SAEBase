@@ -41,7 +41,7 @@ MODULES = {
         "分析 SAE 基准实验结果", "汇总基准任务的实际评测记录，形成可追溯的结果分析。"
     ),
     "tasks/benchmark/reliability/bootstrap.py": (
-        "估计 SAE 评测分数的置信区间", "重采样评测观测值并计算分数区间，表示结果的不确定程度。"
+        "估计 SAE 评测分数的置信区间", "重采样评测观测值并计算分数区间，刻画分数的统计波动范围。"
     ),
     "tasks/benchmark/reliability/discriminability.py": (
         "衡量 SAE 指标的区分能力", "比较不同实验条件的指标分布，分析分数能否有效区分条件。"
