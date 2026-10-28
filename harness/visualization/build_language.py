@@ -431,6 +431,42 @@ NAVIGATION_EN = {
     "研究概念与依据": "Explore scientific concepts and evidence",
 }
 
+# Group summaries express the actual responsibility captured by the Chinese
+# source, instead of reporting a count of nested implementation interfaces.
+GROUP_SUMMARIES = {
+    "code:root": "Browse dataset loaders, language-model adapters, seven SAE research task families, and shared research APIs.",
+    "code:group:datasets": "Organize prompt datasets, source acquisition, and reproducible input artifacts.",
+    "code:group:models": "Organize model loading, activation sites, and task compatibility checks.",
+    "code:group:saebase": "Collect SAE representations, feature interventions, benchmarks, and storage interfaces.",
+    "code:group:tasks": "Group the seven supported SAE research operations and their execution interfaces.",
+    "code:concrete:datasets": "Locate prompt sources, dataset readers, and reproducible input artifact contracts.",
+    "code:concrete:models": "Locate concrete model adapters and research-task compatibility implementations.",
+    "code:concrete:tasks": "Locate capture, intervene, generate, circuits, explain, benchmark, and train implementations.",
+}
+
+
+def code_group_summary(node: dict, title: str, source_path: str) -> str:
+    """Explain an existing source hierarchy using its scope and actual role."""
+    node_id = node["id"]
+    if node_id in GROUP_SUMMARIES:
+        return GROUP_SUMMARIES[node_id]
+    tokens = node_id.split(":")
+    if len(tokens) >= 4 and tokens[1] == "instance":
+        family, item = tokens[2], tokens[3]
+        if family == "datasets":
+            return "Group " + DATASET_NAMES.get(item, human(item)) + " prompt loading and preparation interfaces."
+        if family == "models":
+            return "Group " + human(item) + " model construction and compatibility interfaces."
+        if family == "tasks":
+            return "Group " + TASK_NAMES.get(item, human(item)) + " configuration and execution interfaces."
+    if node.get("navigation_scope") == "source_range":
+        return "Locate a contiguous source section of " + domain(source_path) + " interfaces."
+    if node.get("title") in NAVIGATION_EN:
+        return NAVIGATION_EN[node["title"]].rstrip(".") + " in " + domain(source_path) + "."
+    if source_path:
+        return "Navigate " + domain(source_path) + " implementations represented by this source group."
+    return title.rstrip(".") + " across existing SAEBase components."
+
 
 def first_source_path(node_id: str, children: dict, by_id: dict) -> str:
     """Ground a presentation-only group in the first real descendant file."""
@@ -531,7 +567,7 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
             title = "Provide " + human(name) + " for " + scope
         summary = doc or title + "."
     elif kind == "module":
-        title = MODULE_ACTIONS.get(stem, "Read and execute " + human(stem) + " interfaces")
+        title = MODULE_ACTIONS.get(stem, "Inspect " + human(stem) + " implementation")
         title += " for " + scope
         if doc and len(doc) <= 120 and doc.split(" ", 1)[0] in SOURCE_VERBS:
             title = doc.rstrip(".")
@@ -539,16 +575,8 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
     else:
         descendants = [by_id[c] for c in children.get(node["id"], []) if c in by_id]
         title = group_label(node, descendants, children, by_id)
-        # A node's purpose is the supported operation, not the number of children.
-        # Derive its English explanation from the real source scope and title.
         source_path = first_source_path(node["id"], children, by_id)
-        source_role = role(source_path) if source_path else "SAEBase research components"
-        if node["id"] == "code:root":
-            summary = "Navigate the implemented datasets, model adapters, SAE operations and shared research infrastructure."
-        elif node["id"].startswith("code:group:"):
-            summary = "Organize " + source_role + " by source-backed functional responsibilities."
-        else:
-            summary = "Group related " + source_role + " implementations within " + scope + "."
+        summary = code_group_summary(node, title, source_path)
         reviewed_status = "source_hierarchy"
 
     interface = next(
