@@ -52,4 +52,4 @@ See the [Agent review process](../core/AGENT_FLOW.en.md). Status remains indepen
 
 ## Research-concept Code Tree
 
-The `saebase/` branch now begins with 15 source-backed research domains, followed by meaningful subdomains and actual modules. `harness/code/atlas_concepts.json` defines the reviewed bilingual responsibilities, Context terms, and precise source membership. Original module IDs, paths, signatures, and methods are retained. A functional parent has no more than 20 direct children, with 10 preferred; UI pagination does not replace the scientific hierarchy.
+The `saebase/` branch now begins with 14 source-backed research domains, followed by meaningful subdomains and actual modules. `harness/code/atlas_concepts.json` defines the reviewed bilingual responsibilities, Context terms, and precise source membership. Original module IDs, paths, signatures, and methods are retained. A functional parent has no more than 20 direct children, with 10 preferred; UI pagination does not replace the scientific hierarchy.
