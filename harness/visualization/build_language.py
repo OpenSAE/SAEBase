@@ -850,7 +850,14 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
     reviewed = REVIEWED_CODE.get(node["id"])
     doc = source_description(node)
     reviewed_status = "reviewed" if reviewed else ("source_docstring" if doc else "source_identity")
-    if reviewed:
+    if node.get("concept_group"):
+        # Human-reviewed bilingual responsibilities from the concept catalog.
+        # Do not infer concept titles from a Python identifier or child count.
+        title = node["english_title"]
+        summary = node["english_summary"]
+        doc = node["english_description"]
+        reviewed_status = "context_grounded_concept"
+    elif reviewed:
         title, summary = reviewed
     elif kind in {"function", "method"}:
         title = action_label(node, name, path)
