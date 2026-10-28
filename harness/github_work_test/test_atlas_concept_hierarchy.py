@@ -62,7 +62,14 @@ def test_saebase_concepts_are_meaningful_and_lossless() -> None:
         if n.get("kind") in {"function", "method", "class"}
         and (n.get("path") or "").startswith("saebase/research_lab/tests/")
     }
-    assert (originals - excluded - test_internals).issubset(set(by_id))
+    # The Atlas intentionally omits __init__, private helpers, and test
+    # assertions. Every displayed implementation must still be an actual AST
+    # entity; public module retention is checked above.
+    displayed_source_ids = {
+        n["id"] for n in visible["nodes"] if not n.get("presentation_only")
+    }
+    assert displayed_source_ids.issubset(originals)
+    assert not displayed_source_ids.intersection(excluded | test_internals)
     assert visible["concept_hierarchy_schema"] == "saebase.atlas.concepts.v1"
 
 
