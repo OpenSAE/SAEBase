@@ -949,14 +949,15 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
         details.append("Declared return type: " + annotation + ".")
     if path:
         details.append("Source: " + path + ".")
-    description = summary.rstrip(".") + "."
-    if details:
-        description += " " + " ".join(details)
+    # Expanded cards already show the distinct responsibility in summary.
+    # Technical evidence belongs in description/attributes, not a second
+    # paraphrase of the same sentence under "What this node does".
+    description = " ".join(details) if details else (doc or summary)
     return {
         "title": title,
         "summary": summary,
         "description": description,
-        "reader_explanation": description,
+        "reader_explanation": "",
         "translation_origin": reviewed_status,
     }
 
