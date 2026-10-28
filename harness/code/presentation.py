@@ -7,14 +7,14 @@ from pathlib import Path, PurePosixPath
 from harness.code.semantic_titles import semantic_title, semantic_summary, context_for_path
 
 GROUPS = {
-    "saebase": "SAE 特征、模型适配与实验基础",
+    "saebase": "SAEBase 科研功能与实现概览",
     "datasets": "NLP Prompt 数据集与来源",
     "models": "LLM 模型适配与兼容性",
     "tasks": "SAE 捕获、干预、生成、解释和评测任务",
     "harness": "Harness 代码结构与研究证据",
 }
 GROUP_SUMMARIES = {
-    "saebase": "提供 SAE 模型表示、特征干预、评测和存储的通用实现。",
+    "saebase": "按科研概念浏览特征表示、模型接口、因果干预、基准评测、训练与验证的真实实现。",
     "datasets": "组织 NLP Prompt、数据来源及其可追溯的版本化输入。",
     "models": "实现语言模型的加载、激活位置与任务兼容性检查。",
     "tasks": "执行七类 LLM SAE 科研任务并保留原有 SAEBase 接口。",
