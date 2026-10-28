@@ -12,7 +12,7 @@ import re
 import unicodedata
 
 EDGES = {"contains", "refines", "addresses", "decomposes"}
-PUNCTUATION = re.compile(r"[\\s\\W_]+", re.UNICODE)
+PUNCTUATION = re.compile(r"[\s\W_]+", re.UNICODE)
 GENERIC_CODE = "源码依据和调用参数可在节点的展开说明中查看"
 
 
