@@ -49,6 +49,7 @@ jobs:
           node --check harness/visualization/atlas-public-balance.js
           node --check harness/visualization/locale-data.js
           node harness/github_work_test/test_atlas_localization.cjs
+          node harness/github_work_test/test_atlas_bilingual_semantics.cjs
   offline-tests:
     runs-on: ubuntu-latest
     strategy:
