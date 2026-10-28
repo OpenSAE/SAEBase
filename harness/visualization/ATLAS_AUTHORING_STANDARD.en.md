@@ -36,7 +36,7 @@ Summaries explain a node's main role. Descriptions add inputs, processing, outpu
 
 Core/Knowledge authority edges and Code AST containment edges have distinct semantics. Cross-tree references remain references. Children keep the recorded edge or source-line order. Status is based on each node's own evidence; an implemented API does not prove scientific effectiveness or successful GPU experiments.
 
-Keep a presentation parent's immediate fanout at approximately ten or fewer. For Code, add deterministic navigation groups based on real packages, functional responsibilities, and source order. Navigation groups must not fabricate capabilities or research questions.
+Display at most ten actual children per page. Pagination is UI state and must never create a Tree node. Reject numbered batches, source-range placeholders, and functional nodes without a unique source-backed purpose and a valid authoritative Context term ID.
 
 ## 4. Code Tree requirements
 
@@ -86,7 +86,7 @@ All repository links resolve to the correct public project and actual file paths
 
 ## 9. Release gates
 
-**Fail on:** foreign project identity, unrelated project-specific content in SAEBase, missing Context IDs, missing English fields, Chinese-language English prose except literal source excerpts, replacement characters, incorrect evidence links, fabricated function signatures or experiment results, broken tree edges, excessive fanout, missing JS chunks, mismatched hashes, or broken browser language switching.
+**Fail on:** foreign project identity, unrelated project-specific content in SAEBase, missing Context IDs, missing English fields, Chinese-language English prose except literal source excerpts, replacement characters, incorrect evidence links, fabricated function signatures or experiment results, broken tree edges, fabricated navigation nodes, missing source-child pagination, missing JS chunks, mismatched hashes, or broken browser language switching.
 
 **Permitted:** original-language code comments explicitly labeled as verbatim source, English-only Markdown, unknown hardware measurements, and scientific questions remaining unverified.
 

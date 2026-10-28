@@ -32,21 +32,19 @@ def test_legacy_component_directories_removed() -> None:
         assert not (ROOT / directory).exists(), directory
 
 
-def test_code_role_groups_follow_actual_source_semantics() -> None:
-    """Contracts are configuration checks, not circuit traces by substring."""
-    from harness.code.presentation import _source_role
+def test_code_navigation_requires_real_source_and_context() -> None:
+    """No ordinal, role-guess, or source-range navigation pseudo-components."""
+    from harness.code.presentation import readable_code_tree
 
-    assert _source_role({"path": "saebase/sae/contracts.py"}) == "contract"
-    assert _source_role({"path": "tasks/circuits/backend/circuits.py"}) == "circuit"
-    assert (
-        _source_role(
-            {
-                "path": "saebase/research_lab/backend/api.py",
-                "source_symbol": "trace_circuit",
-            }
-        )
-        == "circuit"
-    )
-    assert _source_role({"path": "tasks/benchmark/backend/metrics/reconstruction.py"}) == (
-        "evaluation"
-    )
+    graph = json.loads((ROOT / "doc/code/code_tree.json").read_text(encoding="utf-8"))
+    visible = readable_code_tree(graph)
+    originals = {n["id"] for n in graph["nodes"]}
+    for node in visible["nodes"]:
+        assert not node["id"].startswith("code:nav:"), node["id"]
+        assert "第1组" not in node["title"] and "第2组" not in node["title"]
+        if node.get("presentation_only"):
+            assert node.get("context_term_ids"), node["id"]
+        else:
+            assert node["id"] in originals, node["id"]
+    for edge in visible["edges"]:
+        assert edge["source"] != edge["target"]

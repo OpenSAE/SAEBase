@@ -74,11 +74,11 @@
     }
   }
   improveLegacyTitles();
-  // Legacy public snapshots may contain older Code source entities. Group only
-  // nodes actually present after the source-backed Atlas structure overlay.
-  if(typeof window.OPENRESEARCH_ATLAS_BALANCE==="function"){
-    window.OPENRESEARCH_ATLAS_BALANCE(DATA.code,"code");
-    window.OPENRESEARCH_ATLAS_BALANCE(DATA.context,"context");
+  // Discard navigation-only nodes in legacy static data and structure patches.
+  // Reattach real children to their nearest real ancestor; never create a
+  // synthetic node merely to cap the number of visible cards.
+  for (const tree of Object.values(DATA)) {
+    window.SAEBASE_ATLAS_REMOVE_FAKE_NAVIGATION?.(tree);
   }
   const VIEWS = {
     core: { root: "core:existing", primary: ["contains", "refines", "addresses", "decomposes"] },
@@ -660,6 +660,9 @@
     animateNextRender: false,
     renderedView: null
   };
+  const PAGE_SIZE = 10;
+  // A page is a viewport choice, NOT a source node or Context concept.
+  const childPages = new Map();
   let parents = new Map(), children = new Map(), byId = new Map();
   let rootIds = [];
   let drag = null, bounceFrame = null, wheelStamp = 0;
@@ -708,6 +711,28 @@
     // Child edges are intentionally rendered in stored top-to-bottom order.
     const preferred = VIEWS[config.view].root;
     rootIds = byId.has(preferred) ? [preferred] : [...byId.keys()].filter(id => !parents.has(id));
+  }
+  function pagedChildren(id) {
+    const all = (children.get(id) || []).filter(key => byId.has(key));
+    if (config.query.trim() || all.length <= PAGE_SIZE) return all;
+    const maxPage = Math.ceil(all.length / PAGE_SIZE) - 1;
+    const page = Math.min(childPages.get(id) || 0, maxPage);
+    return all.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  }
+  function updateChildPager() {
+    const panel = $("atlasChildPager");
+    if (!panel) return;
+    const all = config.focusId ? (children.get(config.focusId) || []) : [];
+    const enabled = config.mode === "focus" && all.length > PAGE_SIZE;
+    panel.classList.toggle("is-hidden", !enabled);
+    if (!enabled) return;
+    const pages = Math.ceil(all.length / PAGE_SIZE);
+    const index = Math.min(childPages.get(config.focusId) || 0, pages - 1);
+    $("atlasChildCount").textContent =
+      (index * PAGE_SIZE + 1) + "–" +
+      Math.min((index + 1) * PAGE_SIZE, all.length) + " / " + all.length;
+    $("atlasChildPrev").disabled = index === 0;
+    $("atlasChildNext").disabled = index >= pages - 1;
   }
   function ancestors(id) {
     const result = []; const seen = new Set();
@@ -914,7 +939,7 @@
       if (config.query && !needed.has(id)) return;
       seen.add(id); list.push({ id, depth, role: "overview" });
       if (config.query || config.expanded.has(id)) {
-        for (const child of children.get(id) || []) visit(child, depth + 1);
+        for (const child of pagedChildren(id)) visit(child, depth + 1);
       }
     }
     for (const id of rootIds) visit(id, 0);
@@ -973,7 +998,7 @@
     if (!byId.has(id)) return layoutOverview();
     const chain = ancestors(id);
     const ancestorsShown = chain.slice(Math.max(0, chain.length - 3), -1);
-    const kids = (children.get(id) || []).filter(x => byId.has(x));
+    const kids = pagedChildren(id);
     const siblings = siblingsOf(id), at = siblings.indexOf(id);
     const peerIds = [siblings[at-1],siblings[at+1]].filter(Boolean)
       .filter(key => !ancestorsShown.includes(key) && !kids.includes(key));
@@ -1662,7 +1687,7 @@
       config.zoomInitialized = true;
     }
     setScale();
-    updateBreadcrumb(); renderOutline(); renderDetails(); setDrawerState();
+    updateBreadcrumb(); updateChildPager(); renderOutline(); renderDetails(); setDrawerState();
     $("canvasWrap").classList.toggle("in-focus", config.mode === "focus");
     $("diffControl").classList.toggle("is-hidden", config.view !== "code");
     $("focusHint").textContent = config.view === "environment" && graph().synthetic
@@ -1745,6 +1770,18 @@
   }
   function bind() {
     bindCanvasPan();
+    for (const [direction, elementId] of [[-1, "atlasChildPrev"], [1, "atlasChildNext"]]) {
+      const button = $(elementId);
+      button?.addEventListener("click", () => {
+        const id = config.focusId;
+        if (!id) return;
+        const pages = Math.ceil((children.get(id) || []).length / PAGE_SIZE);
+        const next = Math.max(0, Math.min(pages - 1,
+          (childPages.get(id) || 0) + direction));
+        childPages.set(id, next);
+        render(false);
+      });
+    }
     // Each public HTML is a genuine URL; same-view focus changes use browser history.
     $("overviewBack").addEventListener("click", () => overview(true));
     $("outlineToggle").addEventListener("click", () => {

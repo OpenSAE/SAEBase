@@ -142,7 +142,6 @@ def existing_tree(graph: dict, *, view: str) -> dict:
     }
     if view == "knowledge":
         organize_knowledge_topics(output)
-    balance_visible_navigation(output)
     return output
 
 
@@ -170,90 +169,8 @@ def organize_knowledge_topics(output: dict) -> None:
     output["edges"].append({"source": root_id, "target": group_id, "type": "contains"})
 
 
-def balance_visible_navigation(graph: dict, *, limit: int = 10) -> None:
-    """Keep public non-Code Atlas views within ten children per visible node.
-
-    The last-resort partitions expose actual node names as readable headings.
-    Only presentation nodes are inserted; original research IDs and statuses
-    remain unchanged.
-    """
-    by_id = {node["id"]: node for node in graph["nodes"]}
-    edges = graph["edges"]
-    view = graph["kind"]
-    for _ in range(120):
-        children = defaultdict(list)
-        for edge in edges:
-            if edge["type"] in HIERARCHY | {"contains"}:
-                children[edge["source"]].append(edge["target"])
-        over = [(key, values) for key, values in children.items() if len(values) > limit]
-        if not over:
-            return
-        parent, kids = sorted(over, key=lambda x: x[0])[0]
-        chosen = []
-        if view == "context" and parent == "context:category:training":
-            subareas = {
-                "loss": {"term.cross_entropy", "term.label_smoothing"},
-                "optimizer": {
-                    "term.sgd",
-                    "term.momentum",
-                    "term.weight_decay",
-                    "term.learning_rate",
-                    "term.cosine",
-                },
-                "process": {"term.batch_size", "term.epoch", "term.lightning", "term.checkpoint"},
-            }
-            labels = {
-                "loss": "监督损失与标签策略",
-                "optimizer": "优化器、动量与学习率",
-                "process": "批次、训练轮次与权重检查点",
-            }
-            for key, members in subareas.items():
-                subset = [id for id in kids if id in members]
-                if subset:
-                    chosen.append((key, labels[key], subset))
-            used = {x for _k, _label, members in chosen for x in members}
-            extra = [id for id in kids if id not in used]
-            if extra:
-                chosen.append(("other", "训练流程相关术语", extra))
-        if len(chosen) < 2:
-            count = max(limit, (len(kids) + limit - 1) // limit)
-            buckets = [kids[i : i + count] for i in range(0, len(kids), count)]
-            chosen = []
-            for i, members in enumerate(buckets):
-                first, last = by_id[members[0]]["title"], by_id[members[-1]]["title"]
-                title = ("术语：" if view == "context" else "节点：") + first + " 至 " + last
-                chosen.append((str(i), title, members))
-        if len(chosen) > limit or len(chosen) < 2:
-            raise ValueError("Cannot balance Atlas navigation at " + parent)
-        old = {(parent, id) for id in kids}
-        edges[:] = [
-            edge
-            for edge in edges
-            if edge["type"] not in HIERARCHY | {"contains"}
-            or (edge["source"], edge["target"]) not in old
-        ]
-        for tag, title, members in chosen:
-            gid = view + ":nav:" + sha256((parent + "|" + tag).encode()).hexdigest()[:14]
-            if gid in by_id:
-                raise ValueError("Duplicate Atlas navigation group " + gid)
-            node = {
-                "id": gid,
-                "kind": "group",
-                "title": title,
-                "summary": "按同一来源与主题整理已有节点。",
-                "description": "包含以下已有科研或术语节点的直接链接。",
-                "status": "implemented",
-                "evidence": graph.get("source", [])
-                if isinstance(graph.get("source"), list)
-                else [graph.get("source") or "doc/knowledge/glossary.json"],
-                "presentation_only": True,
-            }
-            graph["nodes"].append(node)
-            by_id[gid] = node
-            edges.append({"source": parent, "target": gid, "type": "contains"})
-            for child in members:
-                edges.append({"source": gid, "target": child, "type": "contains"})
-    raise ValueError("Atlas navigation hierarchy exceeded safe rebalancing depth")
+# Page size is enforced by the browser, never by inventing a Concept node.
+# A source symbol remains attached to its actual module and class.
 
 
 def readable_environment(profile: dict) -> dict:
@@ -628,38 +545,15 @@ def term_match(text: str, alias: str):
 
 
 def explanatory_text(node: dict, view: str) -> str:
+    """State the evidence-backed responsibility, not the node's name and count."""
     summary = re.sub(
         r"^(?:问题|方案|目标|定义|现状)[:：]\s*",
         "",
-        str(node.get("summary") or node.get("description") or ""),
+        str(node.get("description") or node.get("summary") or ""),
     ).strip()
-    summary = summary.rstrip("。； ")
-    title = node.get("title") or node["id"]
-    role = {
-        "root": "这是该视图的总览节点",
-        "group": "这是一个功能分组",
-        "module": "这是已有源码中的一个模块",
-        "class": "这是已有源码中的一个可复用组件",
-        "function": "这是已有源码中的一个可调用函数",
-        "method": "这是一个类内部实现的操作",
-        "term": "这是由 Context 统一定义的概念",
-        "device": "这是执行环境中的一项计算资源",
-        "capability": "这是执行环境中的一项工具或能力",
-        "question": "这是现有科研或工程问题的说明节点",
-        "solve": "这是现有问题的一种实现方案",
-        "goal": "这是现有实现中的具体目标",
-    }.get(node.get("kind") or node.get("type"), "这是一个已记录的研究节点")
-    introduction = f"{role}，名称是“{title}”。"
-    statement = f"它的作用是：{summary}。" if summary else ""
-    if view == "code":
-        continuation = "下方的源码接口和出处可用于核对它实际执行的操作。"
-    elif view == "environment":
-        continuation = "这一视图标明资源与运行工具的含义；演示配置中的数值来自合成示例。"
-    elif view == "context":
-        continuation = "术语含义与出处由 Context 集中维护。"
-    else:
-        continuation = "下方给出可核对的实现依据和相关概念。"
-    return introduction + statement + continuation
+    if not summary:
+        raise ValueError("Missing actual node purpose: " + node["id"])
+    return summary
 
 
 def semantic_terms(node: dict) -> str:
@@ -704,6 +598,13 @@ CODE_CONTEXT_SCOPES = (
     ("saebase/runtime/cfg/", ("term.hydra", "term.yaml")),
     ("saebase/runtime/training/", ("term.training", "term.lightning")),
     ("saebase/registry.py", ("term.registry", "term.plugin")),
+    # A source node without a specialized term still has its real engineering
+    # domain, rather than an invented navigation category.
+    ("saebase/", ("term.saebase",)),
+    ("datasets/", ("term.dataset",)),
+    ("models/", ("term.model",)),
+    ("tasks/", ("term.task",)),
+    ("conf/", ("term.yaml",)),
 )
 
 
@@ -757,11 +658,62 @@ def attach_context_explanations(graphs: dict) -> None:
             )
             if any(tid not in context_ids for tid in selected):
                 raise ValueError("Undefined Context term in " + node["id"])
-            if view == "code" and node.get("kind") in {"module", "class", "method", "function"}:
-                # Put the verified research-domain terms first, then retain
-                # matching technical terms from the readable description.
-                selected = list(dict.fromkeys(exact_code_context(node, context_ids) + selected))
+            # Generator-declared Context links are part of the node contract.
+            # Validate the IDs rather than replacing them with lexical guesses.
+            explicit = node.get("context_term_ids") or []
+            if any(tid not in context_ids for tid in explicit):
+                raise ValueError("Invalid Context reference in " + node["id"])
+            if view == "code":
+                code_roots = {
+                    "code:root": ["term.code_tree"],
+                    "code:group:saebase": ["term.saebase"],
+                    "code:group:datasets": ["term.dataset"],
+                    "code:group:models": ["term.model"],
+                    "code:group:tasks": ["term.task"],
+                    "code:group:harness": ["term.code_tree"],
+                }
+                selected = list(dict.fromkeys(
+                    explicit + code_roots.get(node["id"], [])
+                    + exact_code_context(node, context_ids) + selected
+                ))
+            else:
+                selected = list(dict.fromkeys(explicit + selected))
+            if node.get("presentation_only") and view != "context":
+                if not selected:
+                    raise ValueError("Generated node lacks authoritative Context: "
+                                     + view + "/" + node["id"])
+                title = str(node.get("title") or "")
+                explanation = str(node.get("reader_explanation") or "")
+                banned = (
+                    r"第\d+组|按源码职责浏览|分组浏览相关|"
+                    r"按实际源码目录、定义职责|"
+                    r"这是一个功能分组，名称是|"
+                    r"按同一来源与主题整理已有节点"
+                )
+                if re.search(banned, title + " " + explanation):
+                    raise ValueError("Generic synthetic node rejected: "
+                                     + view + "/" + node["id"])
             node["context_term_ids"] = selected
+    for view, graph in graphs.items():
+        node_ids = {node["id"] for node in graph["nodes"]}
+        for node in graph["nodes"]:
+            if (":nav:" in node["id"] or ":public-nav:" in node["id"]
+                    or re.search(r"第\d+组", str(node.get("title") or ""))):
+                raise ValueError("Synthetic navigation node rejected: " + node["id"])
+        sibling_titles = set()
+        for edge in graph["edges"]:
+            if edge["type"] not in HIERARCHY | {"contains"}:
+                continue
+            if edge["source"] not in node_ids or edge["target"] not in node_ids:
+                continue
+            child = next((n for n in graph["nodes"] if n["id"] == edge["target"]), None)
+            if not child or not child.get("presentation_only"):
+                continue
+            signature = (edge["source"], child["title"])
+            if signature in sibling_titles:
+                raise ValueError("Duplicate generated node responsibility: "
+                                 + view + "/" + child["id"])
+            sibling_titles.add(signature)
 
 
 def glossary_graph(glossary: dict, allowed_knowledge: set[str]) -> dict:
@@ -778,17 +730,11 @@ def structure_patch(graphs: dict) -> dict:
     """
     code = graphs["code"]
     context = graphs["context"]
-    grouped_code = [node for node in code["nodes"] if node["id"].startswith("code:nav:")]
-    code_parents = {
-        edge["target"]: edge["source"]
-        for edge in code["edges"]
-        if edge["type"] == "contains"
-        and (edge["source"].startswith("code:nav:") or edge["target"].startswith("code:nav:"))
-    }
+    # No fake Code navigation nodes or source-range parents are published.
     context_extra = [
         node
         for node in context["nodes"]
-        if node["id"].startswith(("term.sae", "context:category:sae_", "context:nav:"))
+        if node["id"].startswith(("term.sae", "context:category:sae_"))
     ]
     context_extra_ids = {node["id"] for node in context_extra}
     context_parents = {
@@ -801,8 +747,8 @@ def structure_patch(graphs: dict) -> dict:
         "schema": "openresearch.atlas.structure.v1",
         "knowledge": graphs["knowledge"],
         "code": {
-            "nodes": grouped_code,
-            "parents": code_parents,
+            "nodes": [],
+            "parents": {},
             "science_links": {
                 node["id"]: node.get("context_ids", [])
                 for node in code["nodes"]
@@ -845,8 +791,6 @@ def main() -> int:
                 load(Path(args.glossary)), knowledge_ids, load(Path(args.context_attributes))
             ),
         }
-        balance_visible_navigation(graphs["environment"])
-        balance_visible_navigation(graphs["context"])
         attach_evidence(graphs["core"], code, CODE_TARGETS)
         attach_evidence(graphs["knowledge"], code, CODE_TARGETS)
         attach_evidence(graphs["context"], code, TERM_TARGETS)

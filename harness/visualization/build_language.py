@@ -915,28 +915,67 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
     }
 
 
+# Source directory responsibilities, not ordinal or numbered navigation groups.
+SOURCE_AREA_NAMES = {
+    "cfg": "Hydra configuration", "extensions": "research extensions",
+    "api": "feature APIs", "sae": "SAE dictionaries", "store": "feature storage",
+    "runtime": "experiment execution", "benchmark": "SAE benchmarking",
+    "benchmarks": "SAE benchmarking", "metrics": "evaluation metrics",
+    "reliability": "statistical reliability", "integrations": "benchmark integration",
+    "backend": "execution backends", "adapters": "external adapters",
+    "training": "SAE training", "research_lab": "Research Lab",
+    "tools": "research verification", "generation": "text generation",
+    "vllm_backend": "vLLM generation", "data": "research data",
+    "saebase": "SAEBase infrastructure", "tasks": "SAE tasks",
+    "datasets": "prompt datasets", "models": "language models",
+    "capture": "activation capture", "intervene": "feature interventions",
+    "generate": "feature steering", "circuits": "circuit tracing",
+    "explain": "feature explanation", "train": "SAE training",
+}
+
+
+def source_responsibility(node: dict, depth: int = 1) -> str:
+    """Describe real source ownership, never fabricate a grouping entity."""
+    path = str(node.get("path") or node.get("source_path") or "")
+    segments = path.split("/")
+    directories = segments[:-1]
+    if len(directories) <= 1:
+        return human(segments[-1].removesuffix(".py")).lower() + " implementation"
+    context = directories[-depth:]
+    words = [SOURCE_AREA_NAMES.get(item, human(item).lower() + " operations")
+             for item in context]
+    return " and ".join(words)
+
+
 def disambiguate_code_titles(nodes: dict, sources: dict) -> None:
-    """Prefer real subdomains for duplicate titles; never append raw symbols."""
+    """Add the smallest semantically grounded source qualifier needed."""
     duplicates = defaultdict(list)
     for node_id, en in nodes.items():
         duplicates[en["title"]].append(node_id)
     for ids in duplicates.values():
-        if len(ids) == 1:
+        if len(ids) < 2:
             continue
+        # Distinguish actual module ownership before adding a file/symbol label.
+        # A duplicate title under distinct packages must still be meaningful if
+        # navigation flattens those packages in a later release.
+        qualifiers = {}
+        for depth in range(1, 5):
+            qualifiers = {nid: source_responsibility(sources[nid], depth)
+                          for nid in ids}
+            if len(set(qualifiers.values())) == len(ids):
+                break
         for node_id in ids:
             node = sources[node_id]
             if node.get("kind") == "group":
-                # The navigation hierarchy already carries its source scope.
-                # Repeated roles under separate parents can share a title.
                 continue
-            path = node.get("path") or node.get("source_path") or ""
-            section = human(path.rsplit("/", 1)[-1].removesuffix(".py"))
-            if node.get("kind") == "method":
-                section = human(node_id.rsplit(":", 1)[-1].rsplit(".", 1)[0])
-            if section and section != "component":
-                nodes[node_id]["title"] += " in " + section
-    # A source location is unique even where duplicate methods share a name.
-    # Any remaining collisions are caught by stable IDs and the source panel.
+            qualifier = qualifiers[node_id]
+            if list(qualifiers.values()).count(qualifier) > 1:
+                # A distinct source module is the final factual disambiguator.
+                path = str(node.get("path") or node.get("source_path") or "")
+                qualifier += " within " + human(path.rsplit("/", 1)[-1].removesuffix(".py"))
+                if node.get("kind") == "method":
+                    qualifier += " of " + human(node_id.rsplit(":", 1)[-1].rsplit(".", 1)[0])
+            nodes[node_id]["title"] += " within " + qualifier
 
 
 def build() -> str:

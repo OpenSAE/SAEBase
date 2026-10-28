@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 import copy
-import re
-from hashlib import sha256
 from collections import defaultdict
 from pathlib import Path, PurePosixPath
 from harness.code.semantic_titles import semantic_title, semantic_summary, context_for_path
@@ -126,19 +124,20 @@ def task_configuration_nodes(name: str, parent: str, nodes: list, edges: list) -
             "title": semantic_title(
                 "group", name, f"tasks/{name}/task.py", curated="管理科研任务的 Hydra 配置"
             ),
-            "summary": "任务配置按独立选项组织展示。",
-            "description": "任务配置按独立选项组织展示。",
+            "summary": "汇集 " + name + " 任务实际使用的 Hydra YAML 选项与可执行配置。",
+            "description": "以任务 " + name + " 的配置文件为准，定义调用和资源选项。",
             "status": "implemented",
             "evidence": sources,
             "presentation_only": True,
             "source_symbol": "",
+            "context_term_ids": ["term.task", "term.yaml"],
         }
     )
     edges.append({"source": parent, "target": group_id, "type": "contains"})
     for path, content in configurations:
         source = str(path.relative_to(ROOT))
-        label = "配置科研任务的运行参数" if path.stem == name else "配置任务输入与执行参数"
-        summary = "定义任务类型、运行层级与训练和评测选项。"
+        label = "配置 " + name + " 任务的 " + path.stem + " 运行选项"
+        summary = "读取 " + source + " 中声明的实际任务类型和执行参数。"
         config_id = "code:config:tasks:" + name + ":" + path.stem
         nodes.append(
             {
@@ -152,6 +151,7 @@ def task_configuration_nodes(name: str, parent: str, nodes: list, edges: list) -
                 "source_path": source,
                 "presentation_only": True,
                 "source_symbol": "",
+                "context_term_ids": ["term.task", "term.yaml"],
                 "attributes": [
                     {"type": "code", "label": "当前任务配置", "value": content, "source": source},
                     {"type": "reference", "label": "配置文件来源", "path": source},
@@ -192,6 +192,8 @@ def concrete_groups(output: dict) -> None:
             "summary": summary, "description": summary, "status": "implemented",
             "evidence": [node["path"] for node in selected],
             "presentation_only": True, "source_symbol": "",
+            "context_term_ids": [{"datasets": "term.dataset", "models": "term.model",
+                                  "tasks": "term.task"}[area]],
         })
         edges.append({"source": parent, "target": group_id, "type": "contains"})
         for module in common:
@@ -201,13 +203,26 @@ def concrete_groups(output: dict) -> None:
             sample = modules[0]["path"]
             instance_title, instance_summary = INSTANCE_LABELS.get(
                 (area, name),
-                ("组织" + context_for_path(sample), "真实源码与对应组件的接口说明。"),
+                (
+                    ("读取" + name + " 数据集输入")
+                    if area == "datasets"
+                    else ("加载" + name + " 语言模型")
+                    if area == "models"
+                    else ("执行" + name + " SAE 科研任务"),
+                    ("加载并准备 " + name + " 对应的真实 Prompt 与样本记录。")
+                    if area == "datasets"
+                    else ("构建 " + name + " 模型并核查任务兼容条件。")
+                    if area == "models"
+                    else ("执行 " + name + " 对应的 SAE 研究操作及其配置。"),
+                ),
             )
             nodes.append({
                 "id": instance_id, "kind": "group", "title": instance_title,
                 "summary": instance_summary, "description": instance_summary,
                 "status": "implemented", "evidence": [m["path"] for m in modules],
                 "presentation_only": True, "source_symbol": "",
+                "context_term_ids": [{"datasets": "term.dataset", "models": "term.model",
+                                      "tasks": "term.task"}[area]],
             })
             edges.append({"source": group_id, "target": instance_id, "type": "contains"})
             if area == "tasks":
@@ -221,181 +236,9 @@ def concrete_groups(output: dict) -> None:
 # symbol name and source location remain in each AST node's metadata and
 # expanded interface; neither is part of its public headline.
 
-# An AST contains real source entities but is not itself a readable navigation
-# hierarchy. Insert source-backed presentation groups without renaming actual
-# functions, changing their IDs, or modifying the authoritative AST snapshot.
-MAX_ATLAS_CHILDREN = 10
-CODE_ROLES = (
-    ("capture", "激活捕获与特征读取", r"\b(?:capture|activat(?:ion|ions|e)?|features?|encod(?:e|er|ing)|decod(?:e|er|ing)|tokens?|tokeniz(?:e|er|ation))\b"),
-    ("intervene", "特征干预与生成", r"\b(?:interven(?:e|tion|tions)|edit(?:s|ing)?|patch(?:es|ing)?|steer(?:ing)?|generat(?:e|ion|ive|or)|forward|infer(?:ence)?)\b"),
-    ("circuit", "电路追踪与归因", r"\b(?:circuits?|attribut(?:e|ion)|trac(?:e|ing|er)|gradients?|residuals?)\b"),
-    ("explain", "解释与假设检验", r"\b(?:explain|explanations?|interpret(?:ation|er)?|hypothes(?:is|es))\b"),
-    ("evaluation", "指标、对照与评测", r"\b(?:benchmarks?|benchmarking|metrics?|evaluat(?:e|ion|ions)|scores?|assess(?:ment)?|loss(?:es)?|auroc|reports?|reporting|reliab(?:ility|le)|rank(?:ing)?|reconstruct(?:ion|s|ed|ing)?|truth)\b"),
-    ("training", "训练与参数更新", r"\b(?:train(?:ing|er)?|optim(?:ize|ization|izer)|schedul(?:er|e|ing)|backward|fit|epochs?|checkpoints?|learn(?:ing)?)\b"),
-    ("data", "数据、产物与存储", r"\b(?:data(?:set|sets)?|prompts?|artifacts?|manifests?|shards?|store|files?|paths?|read|write|save|load|collect)\b"),
-    ("contract", "约束、校验与配置", r"\b(?:validat(?:e|ion|or)|checks?|verif(?:y|ication)|guard|configs?|configuration|schema|contracts?|requires?|assert|policy)\b"),
-    ("runtime", "运行入口与调度", r"\b(?:runtime|runner|run|execute|setup|init|launch|start|stop|build|create|make|construct)\b"),
-)
-
-CODE_DIR_LABELS = {
-    "api": "API 与调用接口",
-    "sae": "SAE 字典、加载与覆盖率",
-    "store": "SAE 特征与实验产物存储",
-    "llm": "LLM 模型与 SAE 任务",
-    "nlp": "NLP 样本与 Prompt",
-    "benchmark": "SAE 评测与可靠性",
-    "reliability": "评测稳定性与统计检验",
-    "integrations": "SAR、RSS 与外部基准集成",
-    "backend": "任务执行后端",
-    "adapters": "外部基准适配",
-    "metrics": "评测指标计算",
-    "release": "评测结果发布与验证",
-    "native": "原生实现与基线",
-    "extensions": "可扩展基准接口",
-    "generate": "生成式 SAE 特征干预",
-    "intervene": "教师强制与特征干预",
-    "capture": "SAE 特征捕获",
-    "circuits": "电路追踪与干预",
-    "explain": "SAE 自动解释",
-    "train": "SAE 训练",
-    "entry": "任务入口与公共接口",
-}
-
-
-def _source_role(node: dict) -> str:
-    symbol = str(node.get("source_symbol") or node.get("title") or "")
-    path = PurePosixPath(node.get("path") or "")
-    # Match complete identifier words: 'contracts' must never match 'trace'.
-    # Exact source symbols have priority over the surrounding file's domain.
-    text = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", symbol).lower().replace("_", " ")
-    for key, _title, pattern in CODE_ROLES:
-        if re.search(pattern, text):
-            return key
-    text = path.stem.lower().replace("_", " ")
-    for key, _title, pattern in CODE_ROLES:
-        if re.search(pattern, text):
-            return key
-    return "helpers"
-
-
-def _code_buckets(parent_id: str, child_ids: list[str], by_id: dict) -> tuple[str, list] | None:
-    children = [by_id[key] for key in child_ids]
-    # Source directory boundaries outrank speculative method categories.
-    directories = [PurePosixPath(node.get("path") or "").parts[:-1] for node in children]
-    if all(directories):
-        prefix = []
-        for parts in zip(*directories):
-            if len(set(parts)) != 1:
-                break
-            prefix.append(parts[0])
-        depth = len(prefix)
-        scopes = defaultdict(list)
-        for node, parts in zip(children, directories):
-            piece = parts[depth] if depth < len(parts) else "entry"
-            scopes[piece.lower()].append(node["id"])
-        if 1 < len(scopes) <= MAX_ATLAS_CHILDREN:
-            labels = {
-                key: CODE_DIR_LABELS.get(
-                    key, "管理" + context_for_path(by_id[scopes[key][0]].get("path", ""))
-                )
-                for key in scopes
-            }
-            return "directory", [
-                (key, labels[key], members) for key, members in scopes.items()
-            ]
-    roles = defaultdict(list)
-    for node in children:
-        roles[_source_role(node)].append(node["id"])
-    if 1 < len(roles) <= MAX_ATLAS_CHILDREN:
-        labels = {key: title for key, title, _ in CODE_ROLES}
-        labels["helpers"] = "公共辅助函数与接口"
-        return "role", [(key, labels[key], members) for key, members in roles.items()]
-    # Explicit, deterministic source ranges are a last resort for a single
-    # very large class or densely populated package. This preserves its
-    # source order instead of inventing research-method categories.
-    ordered = sorted(
-        children, key=lambda n: (n.get("path") or "", int(n.get("line") or 0), n["id"])
-    )
-    chunk_size = max(
-        MAX_ATLAS_CHILDREN, (len(ordered) + MAX_ATLAS_CHILDREN - 1) // MAX_ATLAS_CHILDREN
-    )
-    chunks = [ordered[i : i + chunk_size] for i in range(0, len(ordered), chunk_size)]
-    if len(chunks) < 2:
-        return None
-    entries = []
-    for i, chunk in enumerate(chunks):
-        paths = {n.get("path") for n in chunk}
-        first, last = chunk[0], chunk[-1]
-        if len(paths) == 1 and first.get("line") and last.get("line"):
-            title = "分组浏览相关接口与方法（第" + str(i + 1) + "组）"
-        else:
-            title = "按源码职责浏览相关操作（第" + str(i + 1) + "组）"
-        entries.append((str(i), title, [n["id"] for n in chunk]))
-    return "source_range", entries
-
-
-def balance_code_hierarchy(output: dict, *, max_children: int = MAX_ATLAS_CHILDREN) -> None:
-    """Keep every direct Code child list within a readable navigational bound."""
-    if max_children != MAX_ATLAS_CHILDREN:
-        raise ValueError("Atlas Code navigation uses ten-child presentation scopes")
-    by_id = {n["id"]: n for n in output["nodes"]}
-    edges = output["edges"]
-    # Each large source node may need its own bounded scope after workspace expansion.
-    # The source-node count is a finite cap; a static 48-pass limit is too small.
-    for iteration in range(max(48, len(output["nodes"]))):
-        child_map = defaultdict(list)
-        for edge in edges:
-            if edge["type"] == "contains":
-                child_map[edge["source"]].append(edge["target"])
-        offenders = [
-            (parent, kids) for parent, kids in child_map.items() if len(kids) > max_children
-        ]
-        if not offenders:
-            return
-        parent, kids = sorted(offenders, key=lambda pair: pair[0])[0]
-        partition = _code_buckets(parent, kids, by_id)
-        if partition is None:
-            raise ValueError("Cannot form bounded source-backed Code scopes at " + parent)
-        method, buckets = partition
-        if len(buckets) > max_children or len(buckets) < 2:
-            raise ValueError("Invalid Code navigation partition at " + parent)
-        original_edges = {(parent, key) for key in kids}
-        edges[:] = [
-            edge
-            for edge in edges
-            if edge["type"] != "contains" or (edge["source"], edge["target"]) not in original_edges
-        ]
-        for key, label, members in buckets:
-            digest = sha256((parent + "|" + method + "|" + key).encode()).hexdigest()[:14]
-            gid = "code:nav:" + digest
-            if gid in by_id:
-                raise ValueError("Duplicate Code navigation node " + gid)
-            provenance = sorted(
-                {by_id[child].get("path") or "" for child in members if by_id[child].get("path")}
-            )
-            node = {
-                "id": gid,
-                "kind": "group",
-                "title": label,
-                "summary": "按实际源码目录、定义职责或声明位置组织 "
-                + str(len(members))
-                + " 个已存在的源码实体。",
-                "description": "本导航分组涵盖对应源码实体，其接口和来源仍在各自原始节点中。",
-                "status": "implemented",
-                "presentation_only": True,
-                "navigation_scope": method,
-                "source_symbol": "",
-                "path": "",
-                "evidence": provenance,
-                "context_ids": [],
-                "core_ids": [],
-            }
-            output["nodes"].append(node)
-            by_id[gid] = node
-            edges.append({"source": parent, "target": gid, "type": "contains"})
-            for child in members:
-                edges.append({"source": gid, "target": child, "type": "contains"})
-    raise ValueError("Atlas hierarchy exceeded safe rebalancing depth")
+# Navigation is a view concern. A Python source node is not a research method
+# merely because its parent has many children. The Atlas UI paginates children
+# without adding invented scope nodes or changing authoritative source IDs.
 
 
 def readable_code_tree(graph: dict) -> dict:
@@ -497,5 +340,4 @@ def readable_code_tree(graph: dict) -> dict:
     from harness.code.interfaces import enrich_code_tree
 
     enrich_code_tree(output, METHODS)
-    balance_code_hierarchy(output)
     return output
