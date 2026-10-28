@@ -818,6 +818,22 @@ def main() -> int:
                         and normalize(node.get("summary")) == normalize(node.get("description"))):
                     node["description"] = ""
         verify_public_prose(graphs)
+        # Generation itself rejects repetitive display responsibilities, so
+        # the no-duplicate promise does not depend solely on a later CI job.
+        from harness.code.audit_semantics import audit
+        semantic_report = audit(graphs)
+        blockers = (
+            "repeated_sibling_title", "repeated_sibling_summary",
+            "similar_sibling_purpose", "repeated_global_title",
+            "repeated_global_summary", "similar_global_purpose",
+            "template_summary", "tautological_purpose",
+        )
+        defects = {
+            key: semantic_report["counts"].get(key, 0)
+            for key in blockers if semantic_report["counts"].get(key, 0)
+        }
+        if defects:
+            raise ValueError("Atlas generation rejected repetitive semantics: " + repr(defects))
         for name, graph in graphs.items():
             ids = {node["id"] for node in graph["nodes"]}
             if len(ids) != len(graph["nodes"]):
