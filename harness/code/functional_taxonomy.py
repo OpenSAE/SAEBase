@@ -190,3 +190,72 @@ def organize_saebase_concepts(output: dict) -> dict:
     output["concept_hierarchy_schema"] = config["schema"]
     return {"concepts": len(concepts), "semantic_groups": len(created),
             "source_modules": len(original_ids)}
+
+
+# Extra depth is created only for these six reviewed source responsibilities.
+# Research Lab test functions are represented by their test module as evidence;
+# they are not public capabilities.
+DETAIL_SCOPES = {
+    "code:module:saebase.registry": "registry",
+    "code:module:saebase.research_lab.backend.api": "lab_api",
+    "code:module:saebase.sae.stage_d": "sae_acceptance",
+    "code:module:tasks.benchmark.stage_d": "benchmark_acceptance",
+    "code:concrete:models": "model_families",
+    "code:instance:tasks:benchmark": "benchmark_task",
+}
+
+
+def organize_oversized_concepts(output: dict) -> None:
+    """Break reviewed, overfull branches into actual distinct responsibilities."""
+    path = ROOT / "harness/code/oversized_concepts.json"
+    catalog = json.loads(path.read_text(encoding="utf-8"))
+    if catalog.get("schema") != "saebase.atlas.oversized.v1":
+        raise ValueError("Unexpected detailed concept catalog")
+    parents = catalog["parents"]
+    if set(x["id"] for x in parents) != set(DETAIL_SCOPES):
+        raise ValueError("Detailed concept source ownership changed without review")
+    by_id = {n["id"]: n for n in output["nodes"]}
+    for record in parents:
+        parent = record["id"]
+        if parent not in by_id:
+            raise ValueError("Missing source parent for concept refinement: " + parent)
+        edges = [e for e in output["edges"]
+                 if e["type"] == "contains" and e["source"] == parent]
+        members = [by_id[e["target"]] for e in edges]
+        if len(members) <= catalog["max_children"]:
+            raise ValueError("Expected an overfull source responsibility at " + parent)
+        groups = record["groups"]
+        grouped = defaultdict(list)
+        for node in members:
+            if record["match_on"] == "symbol":
+                lookup = node.get("source_symbol") or node["id"].rsplit(":", 1)[-1]
+            elif record["match_on"] == "path_or_id":
+                lookup = node.get("path") or node["id"]
+            else:
+                raise ValueError("Unknown exact source selector")
+            hits = [sub["name"] for sub in groups
+                    if any(re.fullmatch(regex, lookup) for regex in sub["patterns"])]
+            if len(hits) != 1:
+                raise ValueError("Ambiguous detailed source responsibility: "
+                                 + node["id"] + " -> " + repr(hits))
+            grouped[hits[0]].append(node)
+        if set(grouped) != set(g["name"] for g in groups):
+            raise ValueError("Empty detailed source responsibility at " + parent)
+        output["edges"] = [e for e in output["edges"] if e not in edges]
+        for sub in groups:
+            items = grouped[sub["name"]]
+            if len(items) > catalog["max_children"]:
+                raise ValueError("Oversized reviewed detail: " + parent + "/" + sub["name"])
+            group_id = "code:concept:" + DETAIL_SCOPES[parent] + ":" + sub["name"]
+            if group_id in by_id:
+                raise ValueError("Repeated semantic concept " + group_id)
+            new_node = _concept_node(sub, group_id, items)
+            output["nodes"].append(new_node)
+            by_id[group_id] = new_node
+            output["edges"].append({
+                "source": parent, "target": group_id, "type": "contains"
+            })
+            for item in items:
+                output["edges"].append({
+                    "source": group_id, "target": item["id"], "type": "contains"
+                })
