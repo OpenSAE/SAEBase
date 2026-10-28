@@ -804,6 +804,10 @@ def main() -> int:
         attach_evidence(graphs["core"], code, CODE_TARGETS)
         attach_evidence(graphs["knowledge"], code, CODE_TARGETS)
         attach_evidence(graphs["context"], code, TERM_TARGETS)
+        # Keep the raw AST/source-backed inventory; display only semantic
+        # capabilities as independent cards. All folded APIs remain expandable.
+        from harness.code.semantic_projection import compact_public_code_tree
+        compact_public_code_tree(graphs["code"])
         attach_context_explanations(graphs)
         verify_public_prose(graphs)
         for name, graph in graphs.items():
