@@ -22,7 +22,19 @@ HIERARCHY = "contains"
 
 
 def _source_record(node: dict) -> dict:
-    """Preserve original IDs and complete expanded API data."""
+    """Preserve original IDs and code; omit unverified callable paraphrases."""
+    import copy
+
+    attributes = copy.deepcopy(node.get("attributes") or [])
+    for block in attributes:
+        interfaces = ([block["interface"]] if block.get("type") == "interface"
+                      else block.get("methods", []) if block.get("type") == "class_methods"
+                      else [])
+        for info in interfaces:
+            # Generated Chinese fallback prose has no independently verified
+            # English translation. Exact signatures, returns and code remain.
+            if any("\\u3400" <= c <= "\\u9fff" for c in info.get("purpose", "")):
+                info.pop("purpose", None)
     return {
         "id": node["id"],
         "kind": node.get("kind", ""),
@@ -31,7 +43,7 @@ def _source_record(node: dict) -> dict:
         "line": node.get("line"),
         "signature": node.get("signature", ""),
         "context_term_ids": node.get("context_term_ids") or [],
-        "attributes": node.get("attributes") or [],
+        "attributes": attributes,
     }
 
 
