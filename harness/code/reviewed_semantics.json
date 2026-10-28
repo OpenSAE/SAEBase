@@ -996,6 +996,177 @@
         "term.sae",
         "term.sparse_autoencoder"
       ]
+    },
+    "code:class:datasets.controlled_inputs:BinaryFactor": {
+      "source_path": "datasets/controlled_inputs.py",
+      "source_symbol": "BinaryFactor",
+      "zh_title": "声明受控输入中的二元因素",
+      "zh_summary": "记录每个实验因素的名称、两种可选状态及对应的输入含义。",
+      "en_title": "Define a binary experimental input factor",
+      "en_summary": "Represent a named factor and its two alternative input states.",
+      "context_term_ids": [
+        "term.dataset"
+      ]
+    },
+    "code:class:datasets.controlled_inputs:ControlledInputDesign": {
+      "source_path": "datasets/controlled_inputs.py",
+      "source_symbol": "ControlledInputDesign",
+      "zh_title": "构建完整的因素状态实验设计",
+      "zh_summary": "将多个二元因素展开为全部输入条件，并核验各条件的 Prompt 与样本身份。",
+      "en_title": "Construct a complete factorial input design",
+      "en_summary": "Enumerate all binary factor combinations and validate prompts and sample identities.",
+      "context_term_ids": [
+        "term.dataset"
+      ]
+    },
+    "code:class:datasets.controlled_inputs:ControlledInputManifest": {
+      "source_path": "datasets/controlled_inputs.py",
+      "source_symbol": "ControlledInputManifest",
+      "zh_title": "固化受控输入的可追溯清单",
+      "zh_summary": "保存因素、状态编号、样本索引和校验字段，用于复现输入集合。",
+      "en_title": "Store a provenance manifest for controlled inputs",
+      "en_summary": "Persist factor-state identities, sample indices, and validation metadata.",
+      "context_term_ids": [
+        "term.dataset",
+        "term.artifact"
+      ]
+    },
+    "code:module:datasets.controlled_inputs": {
+      "source_path": "datasets/controlled_inputs.py",
+      "source_symbol": "datasets/controlled_inputs.py",
+      "zh_title": "构造带来源标识的受控输入集合",
+      "zh_summary": "创建因素组合、Prompt 与激活记录之间可核验的输入映射。",
+      "en_title": "Build source-bound controlled input sets",
+      "en_summary": "Connect factorial prompts to stable sample IDs and activation-record identities.",
+      "context_term_ids": [
+        "term.dataset"
+      ]
+    },
+    "code:module:datasets.datamodule": {
+      "source_path": "datasets/datamodule.py",
+      "source_symbol": "datasets/datamodule.py",
+      "zh_title": "装配科研训练与评测数据加载器",
+      "zh_summary": "读取 Hydra 数据集配置，构造训练、验证及测试阶段的 DataLoader。",
+      "en_title": "Assemble training and evaluation data loaders",
+      "en_summary": "Resolve dataset plugins and construct train, validation, and test data loaders.",
+      "context_term_ids": [
+        "term.dataset"
+      ]
+    },
+    "code:module:tasks.circuits.backend.circuit_intervene": {
+      "source_path": "tasks/circuits/backend/circuit_intervene.py",
+      "source_symbol": "tasks/circuits/backend/circuit_intervene.py",
+      "zh_title": "使用 Transcoder 特征编辑验证电路效应",
+      "zh_summary": "在真实前向传播中替换指定特征贡献，并测量输出 Logit 变化。",
+      "en_title": "Intervene on circuit features with native transcoders",
+      "en_summary": "Patch actual model activations with transcoder feature edits and measure logit effects.",
+      "context_term_ids": [
+        "term.sae.circuits"
+      ]
+    },
+    "code:module:tasks.circuits.backend.circuits": {
+      "source_path": "tasks/circuits/backend/circuits.py",
+      "source_symbol": "tasks/circuits/backend/circuits.py",
+      "zh_title": "调用原生电路追踪并保存图记录",
+      "zh_summary": "执行实际的电路归因追踪，并保存图节点、连接和版本化分析产物。",
+      "en_title": "Run native circuit attribution and preserve graph records",
+      "en_summary": "Execute an upstream circuit trace and save typed graph nodes and provenance.",
+      "context_term_ids": [
+        "term.sae.circuits"
+      ]
+    },
+    "code:module:tasks.circuits.backend.clt_intervene": {
+      "source_path": "tasks/circuits/backend/clt_intervene.py",
+      "source_symbol": "tasks/circuits/backend/clt_intervene.py",
+      "zh_title": "执行跨层 CLT 特征因果编辑",
+      "zh_summary": "沿后续 Transformer 层应用 Cross-Layer Transcoder 的特征增量，检验预测变化。",
+      "en_title": "Apply causal edits across layers using CLT features",
+      "en_summary": "Patch downstream model layers with cross-layer transcoder feature contributions.",
+      "context_term_ids": [
+        "term.sae.circuits"
+      ]
+    },
+    "code:module:tasks.explain.interpretation": {
+      "source_path": "tasks/explain/interpretation.py",
+      "source_symbol": "tasks/explain/interpretation.py",
+      "zh_title": "生成 SAE 特征解释并评估留出预测",
+      "zh_summary": "调用研究者提供的解释生成器与预测器，核查描述对独立样本的预测效果。",
+      "en_title": "Generate SAE interpretations and test held-out predictions",
+      "en_summary": "Use supplied generator and predictor callbacks to evaluate feature hypotheses.",
+      "context_term_ids": [
+        "term.sae.explain"
+      ]
+    },
+    "code:module:tasks.explain.local_generator": {
+      "source_path": "tasks/explain/local_generator.py",
+      "source_symbol": "tasks/explain/local_generator.py",
+      "zh_title": "配置本地解释生成模型的回调",
+      "zh_summary": "根据授权的 Hydra 设置装配本地文本生成函数，提供解释候选文本。",
+      "en_title": "Configure a local explanation-generator callback",
+      "en_summary": "Build an approved local text generator callable for feature interpretation.",
+      "context_term_ids": [
+        "term.sae.explain"
+      ]
+    },
+    "code:module:saebase.api.component_analysis": {
+      "source_path": "saebase/api/component_analysis.py",
+      "source_symbol": "saebase/api/component_analysis.py",
+      "zh_title": "分解 Transformer Block 的残差变化",
+      "zh_summary": "根据 Block 前后状态计算 Attention 与 MLP 的残差贡献并核查求和一致性。",
+      "en_title": "Decompose transformer block residual changes",
+      "en_summary": "Measure attention and MLP block-level residual differences and validate their sum.",
+      "context_term_ids": [
+        "term.sae",
+        "term.model"
+      ]
+    },
+    "code:module:saebase.api.fine_components": {
+      "source_path": "saebase/api/fine_components.py",
+      "source_symbol": "saebase/api/fine_components.py",
+      "zh_title": "计算 Attention Head 与 MLP Neuron 的细粒度贡献",
+      "zh_summary": "按单独 Head 和 Neuron 形成残差投影向量，并记录偏置与重建误差。",
+      "en_title": "Compute per-head and per-neuron residual contributions",
+      "en_summary": "Measure individually projected attention-head and MLP-neuron vectors.",
+      "context_term_ids": [
+        "term.sae",
+        "term.model"
+      ]
+    },
+    "code:module:saebase.api.metadata": {
+      "source_path": "saebase/api/metadata.py",
+      "source_symbol": "saebase/api/metadata.py",
+      "zh_title": "记录模型与 SAE 配对的身份和来源",
+      "zh_summary": "保存检查点、层位置、Hook、编码维度和权重版本的可序列化身份。",
+      "en_title": "Record model–SAE pairing identity and provenance",
+      "en_summary": "Serialize checkpoint, Hook, layer, dictionary dimensions, and revision metadata.",
+      "context_term_ids": [
+        "term.sae",
+        "term.artifact"
+      ]
+    },
+    "code:module:models.build": {
+      "source_path": "models/build.py",
+      "source_symbol": "models/build.py",
+      "zh_title": "按 Registry 装配指定的语言模型",
+      "zh_summary": "从配置检索模型插件，在兼容性校验后构造对应权重实例。",
+      "en_title": "Construct a registered language model from configuration",
+      "en_summary": "Resolve the selected plugin, validate task compatibility, and build model weights.",
+      "context_term_ids": [
+        "term.model",
+        "term.registry"
+      ]
+    },
+    "code:module:models.hf_hooks_backend": {
+      "source_path": "models/hf_hooks_backend.py",
+      "source_symbol": "models/hf_hooks_backend.py",
+      "zh_title": "以 Hugging Face Hook 读取与修改模型残差",
+      "zh_summary": "提供残差流捕获、前向补丁和模型 Logit 读出的后端适配。",
+      "en_title": "Capture and patch residual streams with Hugging Face Hooks",
+      "en_summary": "Implement residual activation capture, forward patches, and logit readouts.",
+      "context_term_ids": [
+        "term.model",
+        "term.api"
+      ]
     }
   }
 }
