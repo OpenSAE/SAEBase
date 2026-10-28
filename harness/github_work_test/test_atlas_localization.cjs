@@ -13,7 +13,7 @@ const load = file => JSON.parse(read(file));
 const source = read("harness/visualization/data.js");
 const prefix = "window.OPENRESEARCH_ATLAS = ";
 assert(source.includes(prefix), "Missing SAEBase-generated graph");
-const graph = JSON.parse(source.split(prefix)[1].trim().replace(/;\s*$/, ""));
+const graph = JSON.parse(source.slice(source.indexOf(prefix) + prefix.length).trim().replace(/;\s*$/, ""));
 // Generated Atlas graphs may never invent ordinal groups or count-based
 // responsibilities. All generated Code presentation nodes link real Context.
 const contextIds = new Set(graph.context.nodes.filter(n =>
