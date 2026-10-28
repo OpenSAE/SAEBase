@@ -22,8 +22,7 @@ def test_generated_atlas_keeps_all_source_interfaces():
     assert SOURCE_REVIEWS.keys() <= retained
     assert len(projected["nodes"]) < len(original_ids)
     assert not any(
-        "源码依据和调用参数" in str(node.get("summary") or "")
-        for node in projected["nodes"]
+        "源码依据和调用参数" in str(node.get("summary") or "") for node in projected["nodes"]
     )
     by_id = {node["id"]: node for node in projected["nodes"]}
     for owner, node in by_id.items():
