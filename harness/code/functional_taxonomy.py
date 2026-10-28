@@ -19,12 +19,21 @@ PARENT = "code:group:saebase"
 # Pure compatibility re-exports preserve historical Python imports but do not
 # implement independent scientific operations. The source remains in GitHub;
 # Atlas represents the canonical implementation instead.
-})
+REEXPORT_DOCSTRINGS = frozenset(
+    {
+        "Legacy import forwarding to the canonical Dataset implementation.",
+        "Compatibility import for Dataset plugin registration.",
+        "Compatibility import of the unified Task registry.",
+        "Compatibility re-export of the unified model plugin module.",
+    }
+)
 
 
 def is_reexport_only(node: dict) -> bool:
-    return (node.get("kind") == "module"
-            and str(node.get("description") or "").strip() in REEXPORT_DOCSTRINGS)
+    return (
+        node.get("kind") == "module"
+        and str(node.get("description") or "").strip() in REEXPORT_DOCSTRINGS
+    )
 
 
 def _source_area(path: str) -> str:
@@ -38,19 +47,22 @@ def _concept_node(spec: dict, node_id: str, modules: list[dict]) -> dict:
     # A concrete Dataset/Model instance is a navigation parent backed by
     # actual Python files, so its evidence supplies source paths when it has
     # no direct module path of its own.
-    paths = list(dict.fromkeys(
-        str(p).split(":", 1)[0]
-        for n in modules
-        for p in ([n["path"]] if n.get("path") else n.get("evidence") or [])
-        if p
-    ))
+    paths = list(
+        dict.fromkeys(
+            str(p).split(":", 1)[0]
+            for n in modules
+            for p in ([n["path"]] if n.get("path") else n.get("evidence") or [])
+            if p
+        )
+    )
     if not paths:
         raise ValueError("Concept without source implementations: " + node_id)
     if not spec.get("context_terms"):
         raise ValueError("Concept lacks Context: " + node_id)
-    if not all(spec.get(k) for k in (
-        "title", "summary", "description", "en_title", "en_summary", "en_description"
-    )):
+    if not all(
+        spec.get(k)
+        for k in ("title", "summary", "description", "en_title", "en_summary", "en_description")
+    ):
         raise ValueError("Incomplete conceptual responsibility: " + node_id)
     return {
         "id": node_id,
@@ -84,8 +96,7 @@ def organize_saebase_concepts(output: dict) -> dict:
     if len(groups) != len(concepts) or not (10 <= len(groups) <= max_children):
         raise ValueError("Require 10-20 unique top-level Code concepts")
     by_id = {n["id"]: n for n in output["nodes"]}
-    direct = [e for e in output["edges"]
-              if e["type"] == "contains" and e["source"] == PARENT]
+    direct = [e for e in output["edges"] if e["type"] == "contains" and e["source"] == PARENT]
     original_ids = [e["target"] for e in direct]
     if len(original_ids) != len(set(original_ids)):
         raise ValueError("Duplicate direct source children")
@@ -96,15 +107,20 @@ def organize_saebase_concepts(output: dict) -> dict:
     # at this one hierarchy level are redirected.
     assignments = defaultdict(list)
     for node in original_modules:
-        matches = [c["name"] for c in concepts
-                   if _source_area(node["path"]) in c["source_dirs"]]
+        matches = [c["name"] for c in concepts if _source_area(node["path"]) in c["source_dirs"]]
         if len(matches) != 1:
-            raise ValueError("Unclassified or multiply classified module: "
-                             + node["path"] + " -> " + repr(matches))
+            raise ValueError(
+                "Unclassified or multiply classified module: "
+                + node["path"]
+                + " -> "
+                + repr(matches)
+            )
         assignments[matches[0]].append(node)
     if set(assignments) != set(groups):
-        raise ValueError("Catalog concepts have no source implementations: "
-                         + repr(set(groups) - set(assignments)))
+        raise ValueError(
+            "Catalog concepts have no source implementations: "
+            + repr(set(groups) - set(assignments))
+        )
     output["edges"] = [e for e in output["edges"] if e not in direct]
     created = []
     for category in concepts:
@@ -128,38 +144,50 @@ def organize_saebase_concepts(output: dict) -> dict:
                 # Tooling is organized by executable verification intent; the
                 # tools/ package label is not part of a tool's functional name.
                 match_path = short.removeprefix("tools/") if name == "verification" else short
-                matches = [x["name"] for x in subgroups
-                           if any(re.fullmatch(p, match_path) for p in x["patterns"])]
+                matches = [
+                    x["name"]
+                    for x in subgroups
+                    if any(re.fullmatch(p, match_path) for p in x["patterns"])
+                ]
                 if len(matches) != 1:
-                    raise ValueError("Non-unique source responsibility: "
-                                     + node["path"] + " -> " + repr(matches))
+                    raise ValueError(
+                        "Non-unique source responsibility: " + node["path"] + " -> " + repr(matches)
+                    )
                 partition[matches[0]].append(node)
             if len(partition) != len(subgroups):
-                raise ValueError("Empty subdomain in " + category_id + ": "
-                                 + repr(set(subnames) - set(partition)))
+                raise ValueError(
+                    "Empty subdomain in "
+                    + category_id
+                    + ": "
+                    + repr(set(subnames) - set(partition))
+                )
             for sub in subgroups:
                 group_id = category_id + ":" + sub["name"]
                 items = partition[sub["name"]]
                 if len(items) > max_children:
-                    raise ValueError("Functional subdomain exceeds twenty real modules: "
-                                     + group_id + " -> " + str(len(items)))
+                    raise ValueError(
+                        "Functional subdomain exceeds twenty real modules: "
+                        + group_id
+                        + " -> "
+                        + str(len(items))
+                    )
                 sub_node = _concept_node(sub, group_id, items)
                 created.append(sub_node)
                 by_id[group_id] = sub_node
-                output["edges"].append({
-                    "source": category_id, "target": group_id, "type": "contains"
-                })
+                output["edges"].append(
+                    {"source": category_id, "target": group_id, "type": "contains"}
+                )
                 for item in items:
-                    output["edges"].append({
-                        "source": group_id, "target": item["id"], "type": "contains"
-                    })
+                    output["edges"].append(
+                        {"source": group_id, "target": item["id"], "type": "contains"}
+                    )
         else:
             if len(members) > max_children:
                 raise ValueError("Unpartitioned functional domain: " + category_id)
             for item in members:
-                output["edges"].append({
-                    "source": category_id, "target": item["id"], "type": "contains"
-                })
+                output["edges"].append(
+                    {"source": category_id, "target": item["id"], "type": "contains"}
+                )
     output["nodes"].extend(created)
     new_ids = {n["id"] for n in created}
     assert not new_ids.intersection(original_ids)
@@ -183,8 +211,11 @@ def organize_saebase_concepts(output: dict) -> dict:
         if len(descend[parent]) > max_children:
             raise ValueError("Concept fanout exceeds 20: " + parent)
     output["concept_hierarchy_schema"] = config["schema"]
-    return {"concepts": len(concepts), "semantic_groups": len(created),
-            "source_modules": len(original_ids)}
+    return {
+        "concepts": len(concepts),
+        "semantic_groups": len(created),
+        "source_modules": len(original_ids),
+    }
 
 
 # Extra depth is created only for these six reviewed source responsibilities.
@@ -214,8 +245,7 @@ def organize_oversized_concepts(output: dict) -> None:
         parent = record["id"]
         if parent not in by_id:
             raise ValueError("Missing source parent for concept refinement: " + parent)
-        edges = [e for e in output["edges"]
-                 if e["type"] == "contains" and e["source"] == parent]
+        edges = [e for e in output["edges"] if e["type"] == "contains" and e["source"] == parent]
         members = [by_id[e["target"]] for e in edges]
         if len(members) <= catalog["max_children"]:
             raise ValueError("Expected an overfull source responsibility at " + parent)
@@ -228,11 +258,15 @@ def organize_oversized_concepts(output: dict) -> None:
                 lookup = node.get("path") or node["id"]
             else:
                 raise ValueError("Unknown exact source selector")
-            hits = [sub["name"] for sub in groups
-                    if any(re.fullmatch(regex, lookup) for regex in sub["patterns"])]
+            hits = [
+                sub["name"]
+                for sub in groups
+                if any(re.fullmatch(regex, lookup) for regex in sub["patterns"])
+            ]
             if len(hits) != 1:
-                raise ValueError("Ambiguous detailed source responsibility: "
-                                 + node["id"] + " -> " + repr(hits))
+                raise ValueError(
+                    "Ambiguous detailed source responsibility: " + node["id"] + " -> " + repr(hits)
+                )
             grouped[hits[0]].append(node)
         if set(grouped) != set(g["name"] for g in groups):
             raise ValueError("Empty detailed source responsibility at " + parent)
@@ -247,10 +281,8 @@ def organize_oversized_concepts(output: dict) -> None:
             new_node = _concept_node(sub, group_id, items)
             output["nodes"].append(new_node)
             by_id[group_id] = new_node
-            output["edges"].append({
-                "source": parent, "target": group_id, "type": "contains"
-            })
+            output["edges"].append({"source": parent, "target": group_id, "type": "contains"})
             for item in items:
-                output["edges"].append({
-                    "source": group_id, "target": item["id"], "type": "contains"
-                })
+                output["edges"].append(
+                    {"source": group_id, "target": item["id"], "type": "contains"}
+                )
