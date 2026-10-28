@@ -1523,6 +1523,28 @@
   }
   function renderAttributeBlock(parent,attr,node) {
     if(!attr || typeof attr.label!=="string")return;
+    if(attr.type==="class_interfaces"){
+      const section=attributeSection(parent,attr.label);
+      for(const sourceClass of attr.classes||[]){
+        const details=el("details","node-method-details");
+        details.appendChild(el("summary","node-method-summary",sourceClass.name));
+        const body=el("div","node-method-body");
+        if(sourceClass.fields?.length){
+          renderAttributeBlock(body,{
+            type:"fields",label:"实际类属性",fields:sourceClass.fields
+          },node);
+        }
+        if(sourceClass.methods?.length){
+          renderAttributeBlock(body,{
+            type:"class_methods",label:"已定义的类方法",methods:sourceClass.methods
+          },node);
+        }
+        sourceAnchor(body,sourceClass.path,sourceClass.line,"查看完整类定义");
+        details.appendChild(body);
+        section.appendChild(details);
+      }
+      return;
+    }
     if(attr.type==="class_methods") {
       const section=attributeSection(parent,attr.label);
       for(const item of attr.methods||[]) {
