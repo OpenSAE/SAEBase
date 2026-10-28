@@ -55,3 +55,37 @@ def test_concept_categories_and_reviewed_task_modules_survive():
         assert "code:module:tasks." + name + ".task" in retained
         assert "code:module:tasks." + name + ".operation" in retained
     assert sum(node.get("concept_group", False) for node in graph["nodes"]) >= 30
+
+def test_global_code_semantics_are_distinct_and_source_is_lossless() -> None:
+    from harness.code.audit_semantics import audit
+
+    source = json.loads((ROOT / "doc/code/code_tree.json").read_text(encoding="utf-8"))
+    graph = compact_public_code_tree(readable_code_tree(source))
+    by_id = {node["id"]: node for node in graph["nodes"]}
+    hidden = graph["source_api_index"]
+    for duplicate in (
+        "code:module:models.gemma1b.gemma1b",
+        "code:module:models.gemma1b.model_task_dataset_compatibility",
+        "code:method:saebase.examples.quickstart.public_api_offline:TinyModel.forward",
+        "code:concept:benchmark_acceptance:pair_acceptance",
+    ):
+        assert duplicate in hidden, duplicate
+        assert hidden[duplicate] in by_id
+    batch = by_id["code:method:saebase.interventions.engine:BatchEngine.run"]
+    contract = by_id["code:method:saebase.registry:TaskModule.run"]
+    assert batch["title"] != contract["title"]
+    assert batch["summary"] != contract["summary"]
+    assert "微批" in batch["summary"]
+    assert "DictConfig" in contract["summary"]
+    groups = [
+        by_id["code:configurations:tasks:" + name]
+        for name in ("capture", "intervene", "generate", "circuits", "explain", "benchmark", "train")
+    ]
+    assert len({group["title"] for group in groups}) == len(groups)
+    report = audit({"code": graph})
+    for key in (
+        "repeated_global_title", "repeated_global_summary",
+        "similar_global_purpose", "repeated_sibling_title",
+        "repeated_sibling_summary", "similar_sibling_purpose",
+    ):
+        assert report["counts"].get(key, 0) == 0, (key, report["sample"].get(key))
