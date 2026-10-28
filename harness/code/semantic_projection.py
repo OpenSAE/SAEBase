@@ -177,9 +177,13 @@ def compact_public_code_tree(graph: dict) -> dict:
                     continue
                 reviewed = [item for item in group if item in SOURCE_REVIEWS]
                 if len(reviewed) > 1:
-                    raise ValueError("Duplicate independently reviewed responsibilities: " + repr(reviewed))
-                retained = reviewed[0] if reviewed else (
-                    None if nodes[parent].get("concept_group") else sorted(group)[0]
+                    raise ValueError(
+                        "Duplicate independently reviewed responsibilities: " + repr(reviewed)
+                    )
+                retained = (
+                    reviewed[0]
+                    if reviewed
+                    else (None if nodes[parent].get("concept_group") else sorted(group)[0])
                 )
                 for item in group:
                     if item != retained:
@@ -214,14 +218,20 @@ def compact_public_code_tree(graph: dict) -> dict:
     source_edges = []
     for node_id in keep:
         if node_id != root:
-            source_edges.append({
-                "type": HIERARCHY, "source": visible_parent(node_id), "target": node_id,
-            })
+            source_edges.append(
+                {
+                    "type": HIERARCHY,
+                    "source": visible_parent(node_id),
+                    "target": node_id,
+                }
+            )
     graph["nodes"] = [node for node in graph["nodes"] if node["id"] in keep]
     graph["edges"] = [
-        edge for edge in graph["edges"]
+        edge
+        for edge in graph["edges"]
         if edge.get("type") != HIERARCHY
-        and edge.get("source") in keep and edge.get("target") in keep
+        and edge.get("source") in keep
+        and edge.get("target") in keep
     ] + source_edges
     graph["source_api_index"] = mapping
     graph["source_api_total"] = len(originals)
