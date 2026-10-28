@@ -5,6 +5,7 @@ import copy
 from collections import defaultdict
 from pathlib import Path, PurePosixPath
 from harness.code.semantic_titles import semantic_title, semantic_summary, context_for_path
+from harness.code.functional_taxonomy import is_reexport_only
 
 GROUPS = {
     "saebase": "SAEBase 科研功能与实现概览",
@@ -254,6 +255,10 @@ def readable_code_tree(graph: dict) -> dict:
         path = item.get("path", "")
         raw = item["title"]
         if kind == "module" and path.endswith("/__init__.py"):
+            continue
+        if is_reexport_only(item):
+            # Do not elevate legacy import forwards into duplicate functional
+            # nodes. Canonical source implementations remain in their trees.
             continue
         if kind in ("function", "method") and raw.startswith("_"):
             if item["id"] not in KEY_METHODS:
