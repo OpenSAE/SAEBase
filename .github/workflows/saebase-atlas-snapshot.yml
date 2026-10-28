@@ -44,6 +44,8 @@ jobs:
           python harness/visualization/export.py
           python harness/visualization/build_pages.py
           python harness/visualization/build_pages.py --check
+          python harness/visualization/build_language.py
+          python harness/visualization/build_language.py --check
           node --check harness/visualization/app.js
           node --check harness/visualization/i18n.js
           node --check harness/visualization/locale-data.js
@@ -67,7 +69,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f doc/code/code_tree.json harness/visualization/data.js harness/visualization/atlas-structure.js
+          git add -f doc/code/code_tree.json harness/visualization/data.js harness/visualization/atlas-structure.js harness/visualization/locale-data.js
           git add harness/visualization/{core,knowledge,code,environment,context,glossary}.html
           if ! git diff --cached --quiet; then
             git commit -m "chore(atlas): refresh SAEBase source-backed snapshots [atlas snapshot] [skip ci]"
