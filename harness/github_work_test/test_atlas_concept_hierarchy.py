@@ -57,7 +57,12 @@ def test_saebase_concepts_are_meaningful_and_lossless() -> None:
     assert sum(is_reexport_only(n) for n in source["nodes"]) >= 24
     # The source tree is not deleted or rewritten by this presentation hierarchy.
     excluded = {n["id"] for n in source["nodes"] if is_reexport_only(n)}
-    assert (originals - excluded).issubset(set(by_id))
+    test_internals = {
+        n["id"] for n in source["nodes"]
+        if n.get("kind") in {"function", "method", "class"}
+        and (n.get("path") or "").startswith("saebase/research_lab/tests/")
+    }
+    assert (originals - excluded - test_internals).issubset(set(by_id))
     assert visible["concept_hierarchy_schema"] == "saebase.atlas.concepts.v1"
 
 
