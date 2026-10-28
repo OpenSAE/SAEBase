@@ -500,6 +500,99 @@ def fold_unreviewed_interfaces(output: dict) -> None:
     output["folded_interface_count"] = len(excluded)
 
 
+
+def fold_redundant_module_cards(output: dict) -> None:
+    """Keep duplicate implementation files as complete owner source details.
+
+    This is conservative: only repeated generic module cards under a real
+    source-backed concept/group, with no independently displayed child, may
+    be folded. Referenced Knowledge evidence remains as individual Code nodes.
+    """
+    source = json.loads((ROOT / "doc/knowledge/context_graph.json").read_text(encoding="utf-8"))
+    knowledge_paths = {
+        str(p).split(":", 1)[0]
+        for node in source["nodes"]
+        if str(node["id"]).startswith(("s.sae.", "g.sae."))
+        for p in node.get("evidence", [])
+    }
+    by_id = {node["id"]: node for node in output["nodes"]}
+    incoming = {}
+    children = defaultdict(list)
+    for edge in output["edges"]:
+        if edge["type"] == "contains":
+            incoming[edge["target"]] = edge["source"]
+            children[edge["source"]].append(edge["target"])
+    siblings = defaultdict(list)
+    for node in output["nodes"]:
+        if node["kind"] != "module":
+            continue
+        if node["id"] in SOURCE_REVIEWS or node.get("path") in knowledge_paths:
+            continue
+        if "源码依据和调用参数可在节点的展开说明中查看" not in node.get("summary", ""):
+            continue
+        parent = by_id.get(incoming.get(node["id"]))
+        if not parent or parent["kind"] != "group" or children.get(node["id"]):
+            continue
+        siblings[parent["id"], node["title"], node["summary"]].append(node)
+    folded = {}
+    for (parent_id, _title, _summary), members in siblings.items():
+        if len(members) < 2:
+            continue
+        parent = by_id[parent_id]
+        entries = []
+        for node in members:
+            entries.append({
+                "id": node["id"], "path": node["path"],
+                "line": node.get("line", 1),
+                "source_symbol": node.get("source_symbol"),
+                "attributes": copy.deepcopy(node.get("attributes") or []),
+            })
+            folded[node["id"]] = parent_id
+        parent.setdefault("attributes", []).append({
+            "type": "source_modules",
+            "label": "共同实现此功能的源码模块 · " + str(len(entries)) + " 个",
+            "modules": sorted(entries, key=lambda item: item["path"]),
+        })
+    if not folded:
+        output["folded_module_count"] = 0
+        return
+    prior = output.get("source_interface_owners", {})
+    def owner(id_: str) -> str:
+        target = prior.get(id_, id_)
+        return folded.get(target, target)
+
+    archived = output.get("folded_source_relations", [])
+    seen = set()
+    edges = []
+    for edge in output["edges"]:
+        src, dst = edge["source"], edge["target"]
+        if src in folded or dst in folded:
+            if edge["type"] == "contains":
+                continue
+            archived.append(copy.deepcopy(edge))
+            s, t = owner(src), owner(dst)
+            if s == t:
+                continue
+            new_edge = {
+                **edge, "source": s, "target": t,
+                "original_source": src, "original_target": dst,
+            }
+        else:
+            new_edge = edge
+        key = (new_edge["source"], new_edge["target"], new_edge["type"])
+        if key not in seen:
+            edges.append(new_edge)
+            seen.add(key)
+    output["nodes"] = [n for n in output["nodes"] if n["id"] not in folded]
+    output["edges"] = edges
+    output["source_interface_owners"] = {
+        **{key: owner(key) for key in prior},
+        **folded,
+    }
+    output["folded_source_relations"] = archived
+    output["folded_module_count"] = len(folded)
+
+
 def readable_code_tree(graph: dict) -> dict:
     """Presentation-only, already-existing component subset of an AST snapshot."""
     output = copy.deepcopy(graph)
@@ -622,4 +715,5 @@ def readable_code_tree(graph: dict) -> dict:
 
     organize_oversized_concepts(output)
     fold_unreviewed_interfaces(output)
+    fold_redundant_module_cards(output)
     return output
