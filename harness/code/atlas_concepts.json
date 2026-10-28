@@ -1,0 +1,1082 @@
+{
+  "schema": "saebase.atlas.concepts.v1",
+  "max_children": 20,
+  "preferred_children": 10,
+  "concepts": [
+    {
+      "name": "sae_resources",
+      "title": "稀疏特征表示与 SAE 资源",
+      "summary": "定义 SAE 字典、检查点、特征结构及其加载与兼容条件。",
+      "description": "定义 SAE 字典、检查点、特征结构及其加载与兼容条件。",
+      "en_title": "SAE representations and model resources",
+      "en_summary": "Define sparse dictionaries, load checkpoints, and validate feature-compatible configurations.",
+      "en_description": "Define sparse dictionaries, load checkpoints, and validate feature-compatible configurations.",
+      "context_terms": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ],
+      "patterns": [],
+      "source_dirs": [
+        "sae"
+      ],
+      "children": [
+        {
+          "name": "profiles",
+          "title": "SAE 身份、注册与加载",
+          "summary": "核查模型、Hook、字典版本及检查点之间的对应关系。",
+          "description": "核查模型、Hook、字典版本及检查点之间的对应关系。",
+          "en_title": "SAE identity, registry, and loading",
+          "en_summary": "Resolve registered SAE profiles and validate checkpoint and activation-site compatibility.",
+          "en_description": "Resolve registered SAE profiles and validate checkpoint and activation-site compatibility.",
+          "context_terms": [
+            "term.sae"
+          ],
+          "patterns": [
+            "^sae/(?:catalog|contracts|loading|registry|task|verify_registry)\\.py$"
+          ]
+        },
+        {
+          "name": "diagnostics",
+          "title": "特征激活分析与覆盖率",
+          "summary": "分析 SAE 激活、输入样本及重建质量的可观测指标。",
+          "description": "分析 SAE 激活、输入样本及重建质量的可观测指标。",
+          "en_title": "Feature activation and coverage diagnostics",
+          "en_summary": "Analyze sparse activations, prompt inputs, reconstruction records, and feature coverage.",
+          "en_description": "Analyze sparse activations, prompt inputs, reconstruction records, and feature coverage.",
+          "context_terms": [
+            "term.sae",
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^sae/(?:activation_health|analyze|coverage|prompts|results)\\.py$"
+          ]
+        },
+        {
+          "name": "adapters",
+          "title": "SAE 适配与运行验证",
+          "summary": "验证不同 SAE 实现和研究后端能否满足接口约束。",
+          "description": "验证不同 SAE 实现和研究后端能否满足接口约束。",
+          "en_title": "SAE adapters and execution validation",
+          "en_summary": "Check integration adapters, available layers, and execution-time SAE requirements.",
+          "en_description": "Check integration adapters, available layers, and execution-time SAE requirements.",
+          "context_terms": [
+            "term.sae",
+            "term.api"
+          ],
+          "patterns": [
+            "^sae/(?:env_check|pipeline_checks|scope2_clt|scope2_native|sparsify_adapter|stage_d)\\.py$"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "model_apis",
+      "title": "模型激活与 Transformer 组件接口",
+      "summary": "读取模型中间表示，定位层和 Hook，并解释组件级贡献。",
+      "description": "读取模型中间表示，定位层和 Hook，并解释组件级贡献。",
+      "en_title": "Model activations and Transformer interfaces",
+      "en_summary": "Inspect layer hooks, attention components, and the model interface for feature-level analysis.",
+      "en_description": "Inspect layer hooks, attention components, and the model interface for feature-level analysis.",
+      "context_terms": [
+        "term.model",
+        "term.api"
+      ],
+      "patterns": [],
+      "source_dirs": [
+        "api"
+      ],
+      "children": []
+    },
+    {
+      "name": "interventions",
+      "title": "教师强制的 SAE 特征干预",
+      "summary": "在捕获的激活上实施特征编辑，并验证缓存和重放的一致性。",
+      "description": "在捕获的激活上实施特征编辑，并验证缓存和重放的一致性。",
+      "en_title": "Teacher-forced SAE feature interventions",
+      "en_summary": "Edit captured activations and verify causal patches, replay, and cached-prefix consistency.",
+      "en_description": "Edit captured activations and verify causal patches, replay, and cached-prefix consistency.",
+      "context_terms": [
+        "term.sae.intervene",
+        "term.intervene"
+      ],
+      "patterns": [],
+      "source_dirs": [
+        "interventions"
+      ],
+      "children": []
+    },
+    {
+      "name": "generation",
+      "title": "生成阶段的 SAE 特征控制",
+      "summary": "将稀疏特征编辑接入逐 Token 解码及可选生成后端。",
+      "description": "将稀疏特征编辑接入逐 Token 解码及可选生成后端。",
+      "en_title": "Generation-time SAE feature control",
+      "en_summary": "Apply feature edits during token generation through local workers and acceleration backends.",
+      "en_description": "Apply feature edits during token generation through local workers and acceleration backends.",
+      "context_terms": [
+        "term.sae.generate",
+        "term.generate"
+      ],
+      "patterns": [],
+      "source_dirs": [
+        "generate",
+        "vllm_backend"
+      ],
+      "children": [
+        {
+          "name": "generation_runtime",
+          "title": "生成服务与任务调度",
+          "summary": "配置生成请求、工作进程、设备和运行参数。",
+          "description": "配置生成请求、工作进程、设备和运行参数。",
+          "en_title": "Generation service and request execution",
+          "en_summary": "Manage generation requests, worker processes, GPU resources, and runtime options.",
+          "en_description": "Manage generation requests, worker processes, GPU resources, and runtime options.",
+          "context_terms": [
+            "term.sae.generate"
+          ],
+          "patterns": [
+            "^generate/.*\\.py$"
+          ]
+        },
+        {
+          "name": "steering_backend",
+          "title": "vLLM 特征编辑后端",
+          "summary": "在 vLLM 解码中执行 SAE 编辑和输出控制。",
+          "description": "在 vLLM 解码中执行 SAE 编辑和输出控制。",
+          "en_title": "vLLM steering and decoding backend",
+          "en_summary": "Connect sparse-feature interventions to the vLLM generation backend.",
+          "en_description": "Connect sparse-feature interventions to the vLLM generation backend.",
+          "context_terms": [
+            "term.sae.generate"
+          ],
+          "patterns": [
+            "^vllm_backend/.*\\.py$"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "benchmarks",
+      "title": "SAE 基准、指标与外部协议",
+      "summary": "定义评测目标、计算指标，并接入受控研究基准。",
+      "description": "定义评测目标、计算指标，并接入受控研究基准。",
+      "en_title": "SAE benchmarks, metrics, and integrations",
+      "en_summary": "Plan evaluation protocols, compute metrics, and integrate verified external research benchmarks.",
+      "en_description": "Plan evaluation protocols, compute metrics, and integrate verified external research benchmarks.",
+      "context_terms": [
+        "term.sae.benchmark",
+        "term.benchmark"
+      ],
+      "patterns": [],
+      "source_dirs": [
+        "benchmarks",
+        "integrations",
+        "extensions"
+      ],
+      "children": [
+        {
+          "name": "metrics",
+          "title": "重建与干预评测指标",
+          "summary": "计算重建误差、特征干预结果及公共评测量。",
+          "description": "计算重建误差、特征干预结果及公共评测量。",
+          "en_title": "Reconstruction and intervention metrics",
+          "en_summary": "Compute baseline SAE metrics, intervention effects, and reconstruction scores.",
+          "en_description": "Compute baseline SAE metrics, intervention effects, and reconstruction scores.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^benchmarks/metrics/.*\\.py$"
+          ]
+        },
+        {
+          "name": "adapters",
+          "title": "外部 Benchmark 方法适配",
+          "summary": "将 Localize、SAEBench 等基准协议接到统一的评测接口。",
+          "description": "将 Localize、SAEBench 等基准协议接到统一的评测接口。",
+          "en_title": "External benchmark adapters",
+          "en_summary": "Connect published localization and SAE benchmark implementations to shared evaluation contracts.",
+          "en_description": "Connect published localization and SAE benchmark implementations to shared evaluation contracts.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^benchmarks/adapters/.*\\.py$"
+          ]
+        },
+        {
+          "name": "execution",
+          "title": "基准计划、执行与结果汇总",
+          "summary": "构建评测计划、登记配置、运行评测并生成结果报告。",
+          "description": "构建评测计划、登记配置、运行评测并生成结果报告。",
+          "en_title": "Benchmark planning, execution, and reports",
+          "en_summary": "Construct benchmark plans, execute selected evaluations, and publish structured results.",
+          "en_description": "Construct benchmark plans, execute selected evaluations, and publish structured results.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^benchmarks/(?:planner|registry|report|results|runner|schema)\\.py$"
+          ]
+        },
+        {
+          "name": "research_integrations",
+          "title": "SAR、RSS 与局部性研究集成",
+          "summary": "连接组合性、响应分数与局部性研究的输入和评估器。",
+          "description": "连接组合性、响应分数与局部性研究的输入和评估器。",
+          "en_title": "SAR, RSS, and localization integrations",
+          "en_summary": "Integrate compositionality, redistribution, and localization evaluation methods.",
+          "en_description": "Integrate compositionality, redistribution, and localization evaluation methods.",
+          "context_terms": [
+            "term.sae.sar_rss"
+          ],
+          "patterns": [
+            "^integrations/.*\\.py$"
+          ]
+        },
+        {
+          "name": "extensions",
+          "title": "可扩展评测协议",
+          "summary": "约束外部评测器的参数、注册、指标及调用方式。",
+          "description": "约束外部评测器的参数、注册、指标及调用方式。",
+          "en_title": "Extensible evaluation contracts",
+          "en_summary": "Validate and invoke externally registered benchmark providers and metrics.",
+          "en_description": "Validate and invoke externally registered benchmark providers and metrics.",
+          "context_terms": [
+            "term.benchmark",
+            "term.plugin"
+          ],
+          "patterns": [
+            "^extensions/.*\\.py$"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "reliability",
+      "title": "评测可靠性与统计检验",
+      "summary": "通过对照设计、重采样和统计分析衡量研究结论稳定性。",
+      "description": "通过对照设计、重采样和统计分析衡量研究结论稳定性。",
+      "en_title": "Statistical reliability and evaluation controls",
+      "en_summary": "Assess score uncertainty, controlled ground truth, and reproducibility of benchmark comparisons.",
+      "en_description": "Assess score uncertainty, controlled ground truth, and reproducibility of benchmark comparisons.",
+      "context_terms": [
+        "term.sae.benchmark"
+      ],
+      "patterns": [],
+      "source_dirs": [
+        "reliability"
+      ],
+      "children": [
+        {
+          "name": "uncertainty",
+          "title": "不确定性估计与稳定排序",
+          "summary": "利用 Bootstrap、重采样和判别能力分析指标稳定性。",
+          "description": "利用 Bootstrap、重采样和判别能力分析指标稳定性。",
+          "en_title": "Uncertainty and ranking stability",
+          "en_summary": "Estimate paired uncertainty and quantify whether metrics preserve meaningful rankings.",
+          "en_description": "Estimate paired uncertainty and quantify whether metrics preserve meaningful rankings.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^reliability/(?:bootstrap|resampling|ranking|discriminability|localization)\\.py$"
+          ]
+        },
+        {
+          "name": "controls",
+          "title": "参考答案与受控对照",
+          "summary": "定义已知因素、交互真值及其对照关系。",
+          "description": "定义已知因素、交互真值及其对照关系。",
+          "en_title": "Controlled references and ground truth",
+          "en_summary": "Construct explicit experimental controls and feature-interaction reference outcomes.",
+          "en_description": "Construct explicit experimental controls and feature-interaction reference outcomes.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^reliability/(?:controls|ground_truth|interaction_truth|rss_truth)\\.py$"
+          ]
+        },
+        {
+          "name": "reporting",
+          "title": "统计结果记录与可靠性报告",
+          "summary": "汇集可靠性观测、运行配置及报告。",
+          "description": "汇集可靠性观测、运行配置及报告。",
+          "en_title": "Reliability observations and reporting",
+          "en_summary": "Record evaluation observations and report comparisons against expected reference outcomes.",
+          "en_description": "Record evaluation observations and report comparisons against expected reference outcomes.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^reliability/(?:observations|ground_truth_report|report|runner|schema)\\.py$"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "datasets",
+      "title": "受控输入与 Prompt 数据协议",
+      "summary": "准备七类研究数据集，并维护样本身份与可追溯产物。",
+      "description": "准备七类研究数据集，并维护样本身份与可追溯产物。",
+      "en_title": "Controlled inputs and prompt datasets",
+      "en_summary": "Prepare task-specific prompts, preserve sample identities, and validate dataset artifact contracts.",
+      "en_description": "Prepare task-specific prompts, preserve sample identities, and validate dataset artifact contracts.",
+      "context_terms": [
+        "term.dataset",
+        "term.nlp"
+      ],
+      "patterns": [],
+      "source_dirs": [
+        "data"
+      ],
+      "children": [
+        {
+          "name": "BBH",
+          "title": "BIG-Bench Hard 推理数据",
+          "summary": "读取、准备并编码 BBH 研究任务的受控输入。",
+          "description": "读取、准备并编码 BBH 研究任务的受控输入。",
+          "en_title": "BIG-Bench Hard reasoning prompts",
+          "en_summary": "Load, prepare, and tokenize BBH samples for reproducible experiments.",
+          "en_description": "Load, prepare, and tokenize BBH samples for reproducible experiments.",
+          "context_terms": [
+            "term.dataset"
+          ],
+          "patterns": [
+            "^data/BBH/.*\\.py$"
+          ]
+        },
+        {
+          "name": "CounterFact",
+          "title": "CounterFact 反事实知识数据",
+          "summary": "读取、准备并编码 CounterFact 研究任务的受控输入。",
+          "description": "读取、准备并编码 CounterFact 研究任务的受控输入。",
+          "en_title": "CounterFact factual-editing prompts",
+          "en_summary": "Load, prepare, and tokenize CounterFact samples for reproducible experiments.",
+          "en_description": "Load, prepare, and tokenize CounterFact samples for reproducible experiments.",
+          "context_terms": [
+            "term.dataset"
+          ],
+          "patterns": [
+            "^data/CounterFact/.*\\.py$"
+          ]
+        },
+        {
+          "name": "GreaterThan",
+          "title": "数值比较实验数据",
+          "summary": "读取、准备并编码 GreaterThan 研究任务的受控输入。",
+          "description": "读取、准备并编码 GreaterThan 研究任务的受控输入。",
+          "en_title": "Numerical comparison prompts",
+          "en_summary": "Load, prepare, and tokenize GreaterThan samples for reproducible experiments.",
+          "en_description": "Load, prepare, and tokenize GreaterThan samples for reproducible experiments.",
+          "context_terms": [
+            "term.dataset"
+          ],
+          "patterns": [
+            "^data/GreaterThan/.*\\.py$"
+          ]
+        },
+        {
+          "name": "IOI",
+          "title": "间接宾语识别实验数据",
+          "summary": "读取、准备并编码 IOI 研究任务的受控输入。",
+          "description": "读取、准备并编码 IOI 研究任务的受控输入。",
+          "en_title": "Indirect-object identification prompts",
+          "en_summary": "Load, prepare, and tokenize IOI samples for reproducible experiments.",
+          "en_description": "Load, prepare, and tokenize IOI samples for reproducible experiments.",
+          "context_terms": [
+            "term.dataset"
+          ],
+          "patterns": [
+            "^data/IOI/.*\\.py$"
+          ]
+        },
+        {
+          "name": "MMLUPro",
+          "title": "MMLU-Pro 学科评测数据",
+          "summary": "读取、准备并编码 MMLUPro 研究任务的受控输入。",
+          "description": "读取、准备并编码 MMLUPro 研究任务的受控输入。",
+          "en_title": "MMLU-Pro evaluation prompts",
+          "en_summary": "Load, prepare, and tokenize MMLUPro samples for reproducible experiments.",
+          "en_description": "Load, prepare, and tokenize MMLUPro samples for reproducible experiments.",
+          "context_terms": [
+            "term.dataset"
+          ],
+          "patterns": [
+            "^data/MMLUPro/.*\\.py$"
+          ]
+        },
+        {
+          "name": "SimpleCopying",
+          "title": "序列复制实验数据",
+          "summary": "读取、准备并编码 SimpleCopying 研究任务的受控输入。",
+          "description": "读取、准备并编码 SimpleCopying 研究任务的受控输入。",
+          "en_title": "Sequence copying prompts",
+          "en_summary": "Load, prepare, and tokenize SimpleCopying samples for reproducible experiments.",
+          "en_description": "Load, prepare, and tokenize SimpleCopying samples for reproducible experiments.",
+          "context_terms": [
+            "term.dataset"
+          ],
+          "patterns": [
+            "^data/SimpleCopying/.*\\.py$"
+          ]
+        },
+        {
+          "name": "SubjectVerbAgreement",
+          "title": "主谓一致实验数据",
+          "summary": "读取、准备并编码 SubjectVerbAgreement 研究任务的受控输入。",
+          "description": "读取、准备并编码 SubjectVerbAgreement 研究任务的受控输入。",
+          "en_title": "Subject-verb agreement prompts",
+          "en_summary": "Load, prepare, and tokenize SubjectVerbAgreement samples for reproducible experiments.",
+          "en_description": "Load, prepare, and tokenize SubjectVerbAgreement samples for reproducible experiments.",
+          "context_terms": [
+            "term.dataset"
+          ],
+          "patterns": [
+            "^data/SubjectVerbAgreement/.*\\.py$"
+          ]
+        },
+        {
+          "name": "data_contracts",
+          "title": "数据记录、缓存与版本契约",
+          "summary": "定义 Prompt 记录、实验因素、缓存位置和可复现样本标识。",
+          "description": "定义 Prompt 记录、实验因素、缓存位置和可复现样本标识。",
+          "en_title": "Dataset records and artifact contracts",
+          "en_summary": "Validate prompt schemas, controlled input designs, and versioned artifact storage.",
+          "en_description": "Validate prompt schemas, controlled input designs, and versioned artifact storage.",
+          "context_terms": [
+            "term.dataset",
+            "term.artifact"
+          ],
+          "patterns": [
+            "^data/(?:artifact_layout|controlled_inputs|plugins|prompt_schema|prompt_store)\\.py$"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "feature_storage",
+      "title": "特征身份、缓存和分片存储",
+      "summary": "保存 SAE 特征、实验产物身份及分片访问结构。",
+      "description": "保存 SAE 特征、实验产物身份及分片访问结构。",
+      "en_title": "Feature identities and shard storage",
+      "en_summary": "Persist feature activations, reproducible artifact identities, and shard indexing.",
+      "en_description": "Persist feature activations, reproducible artifact identities, and shard indexing.",
+      "context_terms": [
+        "term.artifact",
+        "term.sae"
+      ],
+      "patterns": [],
+      "source_dirs": [
+        "store"
+      ],
+      "children": []
+    },
+    {
+      "name": "runtime",
+      "title": "实验配置、训练与执行生命周期",
+      "summary": "组合 Hydra 配置，管理训练、资源检查和实验产物。",
+      "description": "组合 Hydra 配置，管理训练、资源检查和实验产物。",
+      "en_title": "Experiment configuration and execution lifecycle",
+      "en_summary": "Validate Hydra settings, run model training, and track reproducible execution state.",
+      "en_description": "Validate Hydra settings, run model training, and track reproducible execution state.",
+      "context_terms": [
+        "term.saebase_runtime",
+        "term.yaml"
+      ],
+      "patterns": [],
+      "source_dirs": [
+        "runtime",
+        "cfg"
+      ],
+      "children": [
+        {
+          "name": "configuration",
+          "title": "配置组合与合法性约束",
+          "summary": "校验 Hydra 参数、任务契约及接口兼容性。",
+          "description": "校验 Hydra 参数、任务契约及接口兼容性。",
+          "en_title": "Configuration composition and validation",
+          "en_summary": "Validate Hydra configuration and callable constraints before experiment execution.",
+          "en_description": "Validate Hydra configuration and callable constraints before experiment execution.",
+          "context_terms": [
+            "term.yaml"
+          ],
+          "patterns": [
+            "^(?:cfg/|runtime/cfg/).*\\.py$"
+          ]
+        },
+        {
+          "name": "training",
+          "title": "训练优化、调度与回调",
+          "summary": "定义训练步骤、随机种子、优化调度和生命周期钩子。",
+          "description": "定义训练步骤、随机种子、优化调度和生命周期钩子。",
+          "en_title": "Training, optimization, and callbacks",
+          "en_summary": "Control optimization schedules, repeatable random seeds, and training callbacks.",
+          "en_description": "Control optimization schedules, repeatable random seeds, and training callbacks.",
+          "context_terms": [
+            "term.sae_training",
+            "term.callback"
+          ],
+          "patterns": [
+            "^runtime/training/.*\\.py$"
+          ]
+        },
+        {
+          "name": "execution",
+          "title": "实验启动、运行记录与产物目录",
+          "summary": "启动任务并记录设备、结果和实验目录。",
+          "description": "启动任务并记录设备、结果和实验目录。",
+          "en_title": "Experiment launch and run records",
+          "en_summary": "Check runtime availability, execute configured experiments, and capture result paths.",
+          "en_description": "Check runtime availability, execute configured experiments, and capture result paths.",
+          "context_terms": [
+            "term.saebase_runtime"
+          ],
+          "patterns": [
+            "^runtime/(?:train|runtime_check|summary_log|experiment_paths)\\.py$"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "registry",
+      "title": "注册表、插件与公共命令入口",
+      "summary": "将科研组件组合成可配置的公共接口及命令行工作流。",
+      "description": "将科研组件组合成可配置的公共接口及命令行工作流。",
+      "en_title": "Component registries and public entry points",
+      "en_summary": "Register models, datasets, and tasks and expose their validated public command interfaces.",
+      "en_description": "Register models, datasets, and tasks and expose their validated public command interfaces.",
+      "context_terms": [
+        "term.registry",
+        "term.api"
+      ],
+      "patterns": [],
+      "source_dirs": [
+        "(root)",
+        "tasks"
+      ],
+      "children": [
+        {
+          "name": "plugins",
+          "title": "组件注册与任务发现",
+          "summary": "登记并解析 SAE 研究所需的模型、数据和操作插件。",
+          "description": "登记并解析 SAE 研究所需的模型、数据和操作插件。",
+          "en_title": "Plugin registration and task discovery",
+          "en_summary": "Resolve model, dataset, and task plugins through the common registry.",
+          "en_description": "Resolve model, dataset, and task plugins through the common registry.",
+          "context_terms": [
+            "term.registry",
+            "term.plugin"
+          ],
+          "patterns": [
+            "^(?:registry|plugin_bootstrap|model_plugins)\\.py$",
+            "^tasks/plugins\\.py$"
+          ]
+        },
+        {
+          "name": "commands",
+          "title": "CLI 与统一运行入口",
+          "summary": "解析命令行请求，分派已注册科研任务并提供兼容接口。",
+          "description": "解析命令行请求，分派已注册科研任务并提供兼容接口。",
+          "en_title": "CLI and shared execution entry points",
+          "en_summary": "Dispatch configured SAE operations and maintain public command compatibility.",
+          "en_description": "Dispatch configured SAE operations and maintain public command compatibility.",
+          "context_terms": [
+            "term.task",
+            "term.api"
+          ],
+          "patterns": [
+            "^(?:cli|cli_compat|run|runner)\\.py$"
+          ]
+        },
+        {
+          "name": "experiment_support",
+          "title": "实验探索、结果和随机性支持",
+          "summary": "组织科研探索结果与可复现随机性设置。",
+          "description": "组织科研探索结果与可复现随机性设置。",
+          "en_title": "Experiment exploration and reproducibility support",
+          "en_summary": "Provide exploratory workflows, output records, and deterministic seeding.",
+          "en_description": "Provide exploratory workflows, output records, and deterministic seeding.",
+          "context_terms": [
+            "term.saebase_runtime"
+          ],
+          "patterns": [
+            "^(?:explore|results|seed)\\.py$"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "research_lab",
+      "title": "Research Lab 的数据、分析与服务",
+      "summary": "接入实验资料、组织探索任务并发布可追溯的研究结果。",
+      "description": "接入实验资料、组织探索任务并发布可追溯的研究结果。",
+      "en_title": "Research Lab data, analysis, and services",
+      "en_summary": "Operate source-backed research data flows, feature exploration, and published evidence.",
+      "en_description": "Operate source-backed research data flows, feature exploration, and published evidence.",
+      "context_terms": [
+        "term.saebase",
+        "term.api"
+      ],
+      "patterns": [],
+      "source_dirs": [
+        "research_lab"
+      ],
+      "children": [
+        {
+          "name": "acquisition",
+          "title": "实验语料采集与特征数据",
+          "summary": "导入数据、过滤重复记录并构建特征存储与受控输入。",
+          "description": "导入数据、过滤重复记录并构建特征存储与受控输入。",
+          "en_title": "Corpus acquisition and feature datasets",
+          "en_summary": "Ingest source-controlled corpora, identify duplicates, and prepare feature readouts.",
+          "en_description": "Ingest source-controlled corpora, identify duplicates, and prepare feature readouts.",
+          "context_terms": [
+            "term.dataset",
+            "term.artifact"
+          ],
+          "patterns": [
+            "^research_lab/backend/(?:acquire|controlled_designs|corpus_lock|feature_store|ingest|near_duplicates|readouts|transforms)\\.py$"
+          ]
+        },
+        {
+          "name": "service",
+          "title": "Research Lab API、任务与执行",
+          "summary": "提供 API、作业队列、实验计划和计算执行接口。",
+          "description": "提供 API、作业队列、实验计划和计算执行接口。",
+          "en_title": "Research Lab APIs and job execution",
+          "en_summary": "Serve research endpoints, execute scheduled methods, and manage private workers.",
+          "en_description": "Serve research endpoints, execute scheduled methods, and manage private workers.",
+          "context_terms": [
+            "term.api"
+          ],
+          "patterns": [
+            "^research_lab/backend/(?:api|core|jobs|methods|plan|private_api|private_worker)\\.py$"
+          ]
+        },
+        {
+          "name": "interpretability",
+          "title": "特征探索与自动解释",
+          "summary": "支持研究者检查特征响应并生成可追溯解释材料。",
+          "description": "支持研究者检查特征响应并生成可追溯解释材料。",
+          "en_title": "Feature exploration and automated interpretation",
+          "en_summary": "Explore activation features and run source-backed interpretation methods.",
+          "en_description": "Explore activation features and run source-backed interpretation methods.",
+          "context_terms": [
+            "term.sae.explain"
+          ],
+          "patterns": [
+            "^research_lab/backend/(?:auto_interp|auto_interp_local|explore)\\.py$"
+          ]
+        },
+        {
+          "name": "provenance",
+          "title": "实验审核、发表和结果版本",
+          "summary": "核对输入版本、研究变体及公开记录的证据完整性。",
+          "description": "核对输入版本、研究变体及公开记录的证据完整性。",
+          "en_title": "Evidence auditing, publication, and provenance",
+          "en_summary": "Audit variants and provenance before publishing reviewed research artifacts.",
+          "en_description": "Audit variants and provenance before publishing reviewed research artifacts.",
+          "context_terms": [
+            "term.artifact"
+          ],
+          "patterns": [
+            "^research_lab/backend/(?:publish|published_wp12|source_audit|variant_audit|wp15_records)\\.py$"
+          ]
+        },
+        {
+          "name": "tests",
+          "title": "Research Lab 的可执行验收",
+          "summary": "通过运行测试核查探索接口、结果记录和发布产物。",
+          "description": "通过运行测试核查探索接口、结果记录和发布产物。",
+          "en_title": "Research Lab acceptance tests",
+          "en_summary": "Verify service interfaces, research results, and reproducible publication behavior.",
+          "en_description": "Verify service interfaces, research results, and reproducible publication behavior.",
+          "context_terms": [
+            "term.api"
+          ],
+          "patterns": [
+            "^research_lab/tests/.*\\.py$"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "examples",
+      "title": "可运行示例与科研教程",
+      "summary": "展示模型加载、特征编辑、基准评测和方法集成的可执行用法。",
+      "description": "展示模型加载、特征编辑、基准评测和方法集成的可执行用法。",
+      "en_title": "Executable examples and research tutorials",
+      "en_summary": "Demonstrate public SAE APIs through minimal reproducible research workflows.",
+      "en_description": "Demonstrate public SAE APIs through minimal reproducible research workflows.",
+      "context_terms": [
+        "term.api",
+        "term.sae"
+      ],
+      "patterns": [],
+      "source_dirs": [
+        "examples"
+      ],
+      "children": [
+        {
+          "name": "quickstart",
+          "title": "模型加载与首次实验",
+          "summary": "提供模型加载与首次实验的可执行源码与参数示例。",
+          "description": "提供模型加载与首次实验的可执行源码与参数示例。",
+          "en_title": "Model loading and first experiments",
+          "en_summary": "Provide runnable source examples for model loading and first experiments.",
+          "en_description": "Provide runnable source examples for model loading and first experiments.",
+          "context_terms": [
+            "term.api"
+          ],
+          "patterns": [
+            "^examples/quickstart/.*\\.py$"
+          ]
+        },
+        {
+          "name": "activations",
+          "title": "激活数据读取示例",
+          "summary": "提供激活数据读取示例的可执行源码与参数示例。",
+          "description": "提供激活数据读取示例的可执行源码与参数示例。",
+          "en_title": "Activation storage examples",
+          "en_summary": "Provide runnable source examples for activation storage examples.",
+          "en_description": "Provide runnable source examples for activation storage examples.",
+          "context_terms": [
+            "term.api"
+          ],
+          "patterns": [
+            "^examples/activations/.*\\.py$"
+          ]
+        },
+        {
+          "name": "benchmarking",
+          "title": "基准对照与可信度演示",
+          "summary": "提供基准对照与可信度演示的可执行源码与参数示例。",
+          "description": "提供基准对照与可信度演示的可执行源码与参数示例。",
+          "en_title": "Benchmark controls and reliability examples",
+          "en_summary": "Provide runnable source examples for benchmark controls and reliability examples.",
+          "en_description": "Provide runnable source examples for benchmark controls and reliability examples.",
+          "context_terms": [
+            "term.api"
+          ],
+          "patterns": [
+            "^examples/benchmarking/.*\\.py$"
+          ]
+        },
+        {
+          "name": "extensions",
+          "title": "第三方模型和基准示例",
+          "summary": "提供第三方模型和基准示例的可执行源码与参数示例。",
+          "description": "提供第三方模型和基准示例的可执行源码与参数示例。",
+          "en_title": "External provider integration examples",
+          "en_summary": "Provide runnable source examples for external provider integration examples.",
+          "en_description": "Provide runnable source examples for external provider integration examples.",
+          "context_terms": [
+            "term.api"
+          ],
+          "patterns": [
+            "^examples/extensions/.*\\.py$"
+          ]
+        },
+        {
+          "name": "interventions",
+          "title": "批量特征编辑示例",
+          "summary": "提供批量特征编辑示例的可执行源码与参数示例。",
+          "description": "提供批量特征编辑示例的可执行源码与参数示例。",
+          "en_title": "Batch feature intervention examples",
+          "en_summary": "Provide runnable source examples for batch feature intervention examples.",
+          "en_description": "Provide runnable source examples for batch feature intervention examples.",
+          "context_terms": [
+            "term.api"
+          ],
+          "patterns": [
+            "^examples/interventions/.*\\.py$"
+          ]
+        },
+        {
+          "name": "research_integrations",
+          "title": "科研方法与输入定位演示",
+          "summary": "提供科研方法与输入定位演示的可执行源码与参数示例。",
+          "description": "提供科研方法与输入定位演示的可执行源码与参数示例。",
+          "en_title": "Scientific integration examples",
+          "en_summary": "Provide runnable source examples for scientific integration examples.",
+          "en_description": "Provide runnable source examples for scientific integration examples.",
+          "context_terms": [
+            "term.api"
+          ],
+          "patterns": [
+            "^examples/research_integrations/.*\\.py$"
+          ]
+        },
+        {
+          "name": "common",
+          "title": "可复现实验的合成输入",
+          "summary": "提供可复现实验的合成输入的可执行源码与参数示例。",
+          "description": "提供可复现实验的合成输入的可执行源码与参数示例。",
+          "en_title": "Reproducible synthetic inputs",
+          "en_summary": "Provide runnable source examples for reproducible synthetic inputs.",
+          "en_description": "Provide runnable source examples for reproducible synthetic inputs.",
+          "context_terms": [
+            "term.api"
+          ],
+          "patterns": [
+            "^examples/_synthetic_common\\.py$"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "verification",
+      "title": "实现验收、性能核查与研究工具",
+      "summary": "验证激活、干预、GPU 运行、基准与发布的可复现性质。",
+      "description": "验证激活、干预、GPU 运行、基准与发布的可复现性质。",
+      "en_title": "Implementation verification and research tooling",
+      "en_summary": "Run source and performance checks without conflating tool availability with scientific validation.",
+      "en_description": "Run source and performance checks without conflating tool availability with scientific validation.",
+      "context_terms": [
+        "term.api",
+        "term.sae"
+      ],
+      "patterns": [],
+      "source_dirs": [
+        "tools"
+      ],
+      "children": [
+        {
+          "name": "repository_quality",
+          "title": "依赖、安装包和文档验收",
+          "summary": "检查源代码质量、发行包、文档和模型支持清单。",
+          "description": "检查源代码质量、发行包、文档和模型支持清单。",
+          "en_title": "Package, dependency, and documentation checks",
+          "en_summary": "Check code quality, installed distributions, documentation, and model support manifests.",
+          "en_description": "Check code quality, installed distributions, documentation, and model support manifests.",
+          "context_terms": [
+            "term.api"
+          ],
+          "patterns": [
+            "^(?:check_.*|verify_distribution|stage_d_archive|generate_model_support|release_candidate)\\.py$"
+          ]
+        },
+        {
+          "name": "sae_capture_validation",
+          "title": "SAE 捕获、层位置和身份核验",
+          "summary": "检查模型激活采集、SAE 配对、特征宽度及可追溯身份。",
+          "description": "检查模型激活采集、SAE 配对、特征宽度及可追溯身份。",
+          "en_title": "Activation capture and SAE identity checks",
+          "en_summary": "Verify activation sites, SAE compatibility, and feature-record identity.",
+          "en_description": "Verify activation sites, SAE compatibility, and feature-record identity.",
+          "context_terms": [
+            "term.sae.capture"
+          ],
+          "patterns": [
+            "^(?:m0_.*|m1_.*|phase_bc_cpu_sae|wp12_p2_capture|workplan09_layer_trace_.*|workplan09_identity_.*)\\.py$"
+          ]
+        },
+        {
+          "name": "intervention_validation",
+          "title": "干预重放与特征编辑验收",
+          "summary": "核查 SAE 编辑、批量任务及生成干预结果。",
+          "description": "核查 SAE 编辑、批量任务及生成干预结果。",
+          "en_title": "Feature-edit intervention acceptance",
+          "en_summary": "Validate controlled feature editing, replay, and steering results.",
+          "en_description": "Validate controlled feature editing, replay, and steering results.",
+          "context_terms": [
+            "term.sae.intervene"
+          ],
+          "patterns": [
+            "^(?:m2_.*|workplan11_fast_steering_gpu|workplan11_qwen_suffix|wp15_steer|wp12_p1_smoke)\\.py$"
+          ]
+        },
+        {
+          "name": "benchmark_execution",
+          "title": "基准运行与编码指标核验",
+          "summary": "运行 SAE 评测并核对指标、计算协议与 CPU 对照。",
+          "description": "运行 SAE 评测并核对指标、计算协议与 CPU 对照。",
+          "en_title": "Benchmark execution and metric checks",
+          "en_summary": "Run benchmark comparisons and validate metric computation and evaluation inputs.",
+          "en_description": "Run benchmark comparisons and validate metric computation and evaluation inputs.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^(?:m3_.*|phase_a_benchmark|phase_bc_cpu_benchmark|phase_d_benchmark|benchmark_encoding)\\.py$"
+          ]
+        },
+        {
+          "name": "statistical_checks",
+          "title": "可靠性与分布统计核验",
+          "summary": "计算受控真值、Bootstrap 及跨实验结果的一致性。",
+          "description": "计算受控真值、Bootstrap 及跨实验结果的一致性。",
+          "en_title": "Reliability and statistical acceptance",
+          "en_summary": "Check resampling uncertainty, ground truth, and reproducible benchmark summaries.",
+          "en_description": "Check resampling uncertainty, ground truth, and reproducible benchmark summaries.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^(?:m4_.*|m5_release_matrix|phase_bc_aggregate)\\.py$"
+          ]
+        },
+        {
+          "name": "release_gates",
+          "title": "科研产物与运行阶段验收",
+          "summary": "核查评测阶段证据、发行约束和发布前测试结果。",
+          "description": "核查评测阶段证据、发行约束和发布前测试结果。",
+          "en_title": "Research artifact and release gates",
+          "en_summary": "Verify execution receipts, archived evidence, and release acceptance criteria.",
+          "en_description": "Verify execution receipts, archived evidence, and release acceptance criteria.",
+          "context_terms": [
+            "term.artifact"
+          ],
+          "patterns": [
+            "^(?:m5_release_gate|phase_d_verify.*|phase_a_verify|wp12_p8_acceptance|workplan11_acceptance_gpu)\\.py$"
+          ]
+        },
+        {
+          "name": "gpu_execution",
+          "title": "GPU 执行与生成后端一致性",
+          "summary": "验证 GPU Worker、计算环境和不同生成后端的输出一致性。",
+          "description": "验证 GPU Worker、计算环境和不同生成后端的输出一致性。",
+          "en_title": "GPU execution and generation parity",
+          "en_summary": "Test GPU workers and parity between generation backends under recorded settings.",
+          "en_description": "Test GPU workers and parity between generation backends under recorded settings.",
+          "context_terms": [
+            "term.gpu",
+            "term.generate"
+          ],
+          "patterns": [
+            "^(?:workplan09_gpu06.*|workplan09_gpu_pilot|workplan10_gpu)\\.py$"
+          ]
+        },
+        {
+          "name": "qwen_performance",
+          "title": "Qwen 缓存、内核与吞吐量分析",
+          "summary": "评估 Qwen 推理中的缓存、精度和性能差异。",
+          "description": "评估 Qwen 推理中的缓存、精度和性能差异。",
+          "en_title": "Qwen inference, caching, and profiling",
+          "en_summary": "Measure Qwen inference caching, kernel parity, and timing behavior.",
+          "en_description": "Measure Qwen inference caching, kernel parity, and timing behavior.",
+          "context_terms": [
+            "term.llm"
+          ],
+          "patterns": [
+            "^workplan09_qwen_.*\\.py$"
+          ]
+        },
+        {
+          "name": "research_lab_tools",
+          "title": "研究解释与展示产物的验证",
+          "summary": "验证解释器、内部执行器和可发布的研究材料。",
+          "description": "验证解释器、内部执行器和可发布的研究材料。",
+          "en_title": "Research interpretation and published artifacts",
+          "en_summary": "Check automatic interpretation, private execution, and curated research bundles.",
+          "en_description": "Check automatic interpretation, private execution, and curated research bundles.",
+          "context_terms": [
+            "term.sae.explain"
+          ],
+          "patterns": [
+            "^(?:wp12_autointerpret|wp12_private_worker|wp13_.*|wp15_import_.*)\\.py$"
+          ]
+        },
+        {
+          "name": "evidence_management",
+          "title": "实验矩阵、Prompt 与来源证据",
+          "summary": "准备研究输入并核查实验矩阵和数据来源。",
+          "description": "准备研究输入并核查实验矩阵和数据来源。",
+          "en_title": "Experiment matrices and source evidence",
+          "en_summary": "Build controlled experiment matrices and preserve the source metadata for each run.",
+          "en_description": "Build controlled experiment matrices and preserve the source metadata for each run.",
+          "context_terms": [
+            "term.artifact"
+          ],
+          "patterns": [
+            "^(?:phase_a_sae_only|phase_bc_source_metadata|phase_bc_cpu_pair|phase_bc_matrix|phase_d_matrix|sae_prepare_prompts)\\.py$"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "research_backends",
+      "title": "跨框架的研究操作实现",
+      "summary": "为电路分析、干预、训练和外部基准提供实际适配实现。",
+      "description": "为电路分析、干预、训练和外部基准提供实际适配实现。",
+      "en_title": "Cross-framework research implementations",
+      "en_summary": "Implement feature interventions, circuit tracing, training, and benchmark adapters across compatible frameworks.",
+      "en_description": "Implement feature interventions, circuit tracing, training, and benchmark adapters across compatible frameworks.",
+      "context_terms": [
+        "term.sae",
+        "term.api"
+      ],
+      "patterns": [],
+      "source_dirs": [
+        "wp12"
+      ],
+      "children": [
+        {
+          "name": "intervention_frameworks",
+          "title": "外部框架的电路与特征干预",
+          "summary": "在不同 Hook 与因果操作框架之间执行受控编辑和追踪。",
+          "description": "在不同 Hook 与因果操作框架之间执行受控编辑和追踪。",
+          "en_title": "Circuit and feature intervention backends",
+          "en_summary": "Implement causal circuit edits and controlled interventions in supported research frameworks.",
+          "en_description": "Implement causal circuit edits and controlled interventions in supported research frameworks.",
+          "context_terms": [
+            "term.sae.circuits",
+            "term.sae.intervene"
+          ],
+          "patterns": [
+            "^wp12/(?:circuit_intervene|circuits|clt_intervene|interventions|ndif|pyvene)\\.py$"
+          ]
+        },
+        {
+          "name": "benchmark_adapters",
+          "title": "研究后端的基准覆盖",
+          "summary": "为外部 SAE 评测器建立运行接口和验收口径。",
+          "description": "为外部 SAE 评测器建立运行接口和验收口径。",
+          "en_title": "Cross-framework benchmark adapters",
+          "en_summary": "Connect external SAE benchmarking implementations and verify supported behavior.",
+          "en_description": "Connect external SAE benchmarking implementations and verify supported behavior.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^wp12/(?:acceptance|benchmarks|custom_saebench)\\.py$"
+          ]
+        },
+        {
+          "name": "training_adapters",
+          "title": "外部研究训练适配",
+          "summary": "连接研究后端可执行的 SAE 训练操作。",
+          "description": "连接研究后端可执行的 SAE 训练操作。",
+          "en_title": "Research training adapters",
+          "en_summary": "Adapt model and SAE training to supported execution backends.",
+          "en_description": "Adapt model and SAE training to supported execution backends.",
+          "context_terms": [
+            "term.sae.train"
+          ],
+          "patterns": [
+            "^wp12/training\\.py$"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "release",
+      "title": "科研软件的发布约束和验收",
+      "summary": "定义版本交付、发布计划、验证门槛与记录结构。",
+      "description": "定义版本交付、发布计划、验证门槛与记录结构。",
+      "en_title": "Software release planning and acceptance",
+      "en_summary": "Define explicit release criteria, verification gates, and versioned delivery records.",
+      "en_description": "Define explicit release criteria, verification gates, and versioned delivery records.",
+      "context_terms": [
+        "term.artifact"
+      ],
+      "patterns": [],
+      "source_dirs": [
+        "release"
+      ],
+      "children": []
+    }
+  ]
+}
