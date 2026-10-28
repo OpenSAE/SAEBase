@@ -78,6 +78,24 @@
       if (projection.meaning_translations?.[value]) return projection.meaning_translations[value];
       if (field && projection.parameter_meanings[field])
         return projection.parameter_meanings[field];
+
+      // Translate the exact structure of legacy Chinese AST descriptions.
+      // These templates describe types/fields, not verified runtime behavior.
+      const typedInput = value.match(/^(.+) 类型的输入，参与当前函数的计算。$/);
+      if (typedInput) return "Input argument annotated with type " + typedInput[1] + ".";
+      const typedReturn = value.match(/^函数返回的 (.+) 类型结果。$/);
+      if (typedReturn) return "Result returned by the function, annotated as " + typedReturn[1] + ".";
+      const storedField = value.match(/^(.+) 是这个组件保存的内部属性，用于其方法读取初始化状态或计算参数。$/);
+      if (storedField) return "Stored instance field " + storedField[1] + " accessed by this class's methods.";
+      const literalMeanings = {
+        "当前过程生成的文字说明或标识。": "Textual description or identifier produced by this operation.",
+        "本函数通过状态更新、训练执行或写入操作完成工作。": "This callable updates state, executes a training step, or writes an output.",
+        "传入当前函数的具名数据，具体使用位置见源码。": "Named input supplied by the caller.",
+        "由代码中的 return 表达式产生的结果。": "Value computed by the function's return expression.",
+        "调用科研任务运行流程后的返回结果。": "Result returned by the registered research task execution.",
+      };
+      if (literalMeanings[value]) return literalMeanings[value];
+
       // Do not fabricate semantics from an annotation or a source identifier.
       // Unreviewed meanings are absent, while source signatures stay visible.
       return "";
