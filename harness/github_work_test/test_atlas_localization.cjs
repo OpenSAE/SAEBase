@@ -90,6 +90,36 @@ for (const term of [...glossary.terms, ...technical.terms]) {
   assert(en.why_it_matters && !cjk.test(en.why_it_matters), "Missing Context rationale: " + term.id);
   assert(locales.nodes.context[term.id].title === en.title, "Translation detached from authority: " + term.id);
 }
+// Derive the required document set from the actual rendered node graph.
+// A hand-picked allowlist cannot silently omit a newly linked Chinese page.
+const referencedDocs = new Set();
+function collectDocuments(value) {
+  if (typeof value === "string") {
+    const candidate = value.split("#")[0].split("?")[0];
+    if (/^(?:[A-Za-z0-9_.-]+\/)*[A-Za-z0-9_.-]+\.md$/.test(candidate))
+      referencedDocs.add(candidate);
+  } else if (Array.isArray(value)) {
+    for (const item of value) collectDocuments(item);
+  } else if (value && typeof value === "object") {
+    for (const item of Object.values(value)) collectDocuments(item);
+  }
+}
+for (const tree of Object.values(graph)) for (const node of tree.nodes)
+  collectDocuments(node);
+for (const original of referencedDocs) {
+  assert(fs.existsSync(path.join(ROOT, original)),
+    "Atlas references a missing Markdown document: " + original);
+  // The root README is authored in English and retains a self-identifying
+  // Chinese language selector. It is already the required English version.
+  if (original === "README.md" || original.endsWith(".en.md")) continue;
+  const prose = read(original);
+  if (cjk.test(prose)) {
+    const english = locales.docs[original];
+    assert(english && fs.existsSync(path.join(ROOT, english)),
+      "Tree-linked Chinese Markdown lacks English counterpart: " + original);
+  }
+}
+
 for (const [original, english] of Object.entries(locales.docs)) {
   assert(fs.existsSync(path.join(ROOT, original)), "Missing Markdown authority: " + original);
   assert(fs.existsSync(path.join(ROOT, english)), "Missing English document: " + english);
