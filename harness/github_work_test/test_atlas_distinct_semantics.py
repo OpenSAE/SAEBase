@@ -87,3 +87,36 @@ def test_reviewed_methods_have_unique_source_grounded_sibling_meanings() -> None
         for field in ("title", "summary"):
             values = [node[field] for node in selected]
             assert len(values) == len(set(values)), values
+
+def test_reviewed_sibling_purposes_are_semantically_distinct() -> None:
+    """Reject similar reviewed explanations beyond exact-string collisions."""
+    import re
+
+    records = json.loads(
+        (ROOT / "harness/code/reviewed_semantics.json").read_text(encoding="utf-8")
+    )["nodes"]
+
+    def bigrams(text: str) -> set[str]:
+        value = re.sub(r"[\W_]+", "", text, flags=re.UNICODE).casefold()
+        return {value[i : i + 2] for i in range(len(value) - 1)}
+
+    def overlap(left: str, right: str) -> float:
+        a, b = bigrams(left), bigrams(right)
+        return len(a & b) / max(1, len(a | b))
+
+    grouped: dict[str, list[tuple[str, dict]]] = {}
+    for node_id, record in records.items():
+        if node_id.startswith("code:method:"):
+            parent = node_id.rsplit(".", 1)[0]
+        else:
+            parent = record["source_path"].rsplit("/", 1)[0]
+        grouped.setdefault(parent, []).append((node_id, record))
+    for parent, group in grouped.items():
+        for position, (node_id, left) in enumerate(group):
+            for other_id, right in group[position + 1 :]:
+                assert overlap(left["zh_summary"], right["zh_summary"]) < 0.8, (
+                    parent, node_id, other_id, "Chinese meaning"
+                )
+                assert overlap(left["en_summary"], right["en_summary"]) < 0.8, (
+                    parent, node_id, other_id, "English meaning"
+                )
