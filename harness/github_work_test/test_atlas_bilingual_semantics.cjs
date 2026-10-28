@@ -121,6 +121,7 @@ for (const [view, graph] of Object.entries(original)) {
 }
 // Regression: actionable Chinese Code titles must not collapse into the old
 // "Inspect ... interface" or "Provide ... for ..." English templates.
+localize("en");
 const codeOriginal = new Map(original.code.nodes.map(n => [n.id, n]));
 for (const node of data.code.nodes) {
   if (!["function", "method", "module", "class"].includes(node.kind)) continue;
@@ -139,6 +140,7 @@ for (const [id, verb] of [
   const node = data.code.nodes.find(n => n.id === id);
   assert(node?.title.startsWith(verb + " "), id + " lost its Chinese source action");
 }
+localize("zh");
 
 assert.equal(counts.nodes, Object.values(original).reduce((n, t) => n + t.nodes.length, 0));
 assert(counts.translatedFields > counts.nodes * 2, "Nested translation coverage unexpectedly dropped");
