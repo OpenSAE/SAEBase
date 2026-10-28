@@ -67,9 +67,9 @@ jobs:
           PY
       - name: Audit all Atlas trees and retain full semantic-duplicate report
         run: |
-          python harness/code/audit_semantics.py --output atlas-semantic-audit.json
+          python harness/code/audit_semantics.py --output atlas-semantic-audit.json --check
           python -m pip install -q pytest
-          python -m pytest -q harness/github_work_test/test_atlas_semantic_audit.py
+          python -m pytest -q harness/github_work_test/test_atlas_semantic_audit.py harness/github_work_test/test_atlas_semantic_projection.py
       - name: Upload full Atlas duplicate inventory
         uses: actions/upload-artifact@v4
         with:
