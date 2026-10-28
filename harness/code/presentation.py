@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import copy
+import json
 from collections import defaultdict
 from pathlib import Path, PurePosixPath
 from harness.code.semantic_titles import semantic_title, semantic_summary, context_for_path
@@ -137,6 +138,11 @@ KEY_METHODS = {
 }
 PUBLIC_EXCERPTS = frozenset(KEY_METHODS)
 ROOT = Path(__file__).resolve().parents[2]
+SOURCE_REVIEWS = json.loads(
+    (ROOT / "harness/code/reviewed_semantics.json").read_text(encoding="utf-8")
+)["nodes"]
+
+
 
 
 def source_excerpt(node: dict) -> str | None:
@@ -337,7 +343,15 @@ def readable_code_tree(graph: dict) -> dict:
         kind = node["kind"]
         original = node["title"]
         node["source_symbol"] = original
-        if kind == "root":
+        review = SOURCE_REVIEWS.get(node["id"])
+        if review and (
+            review["source_path"] != node.get("path")
+            or review["source_symbol"] != original
+        ):
+            raise ValueError("Stale source review for " + node["id"])
+        if review:
+            label, summary = review["zh_title"], review["zh_summary"]
+        elif kind == "root":
             label, summary = (
                 "浏览科研系统的实际功能",
                 ("按数据集、模型、实验运行与 SAE 分析方法浏览已实现的代码。"),
