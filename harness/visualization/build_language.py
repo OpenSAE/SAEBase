@@ -475,9 +475,72 @@ def action_label(node: dict, name: str, path: str) -> str:
         return verb + " " + human(words[1]).lower() + " for " + scope
     if verb:
         return verb + " " + scope
-    # An unrecognized symbol is described as a named interface, not assigned a
-    # guessed scientific effect.
-    return "Inspect " + human(name) + " interface for " + scope
+    # The Chinese source annotation supplies a semantic operation verb.
+    return evidence_action(node, name, path)
+
+
+# Fallback verbs must preserve a Chinese source action when there is no reviewed
+# English docstring. They describe the role, not an unverified scientific effect.
+CHINESE_ACTION_VERBS = (
+    ("定位", "Locate"), ("查找", "Find"), ("读取", "Read"), ("加载", "Load"),
+    ("校验", "Validate"), ("验证", "Verify"), ("检查", "Check"),
+    ("筛选", "Filter"), ("解析", "Resolve"), ("计算", "Compute"),
+    ("评估", "Evaluate"), ("评测", "Evaluate"), ("比较", "Compare"),
+    ("重建", "Reconstruct"), ("构建", "Build"), ("生成", "Generate"),
+    ("记录", "Record"), ("保存", "Save"), ("导出", "Export"),
+    ("注册", "Register"), ("采集", "Collect"), ("捕获", "Capture"),
+    ("干预", "Intervene on"), ("应用", "Apply"), ("装配", "Assemble"),
+    ("转换", "Convert"), ("规范化", "Normalize"), ("格式化", "Format"),
+    ("去除", "Remove"), ("删除", "Delete"), ("更新", "Update"),
+    ("排序", "Sort"), ("切分", "Split"), ("合并", "Merge"),
+    ("判断", "Check"), ("汇总", "Summarize"), ("整理", "Organize"),
+    ("关闭", "Close"), ("启动", "Start"), ("训练", "Train"),
+    ("为", "Attach"), ("标注", "Annotate"), ("计算", "Compute"),
+    ("提供", "Expose"), ("定义", "Define"), ("执行", "Execute"),
+    ("处理", "Process"), ("管理", "Manage"),
+)
+
+
+def evidence_action(node: dict, name: str, path: str) -> str:
+    """Translate an existing Chinese action and attach the real AST symbol."""
+    chinese = str(node.get("title", ""))
+    prefix = next((english for zh, english in CHINESE_ACTION_VERBS if chinese.startswith(zh)), "")
+    if not prefix:
+        prefix = "Handle" if node.get("kind") in {"function", "method"} else "Implement"
+    if chinese.startswith("为") and not name.startswith("attach_"):
+        prefix = "Prepare"
+    # Source symbol and module scope remain visible in the expanded Code panel.
+    subject = human(name).lower()
+    if name in {"main", "__main__"}:
+        subject = "the entry point"
+    if name.endswith(("_path", "_dir", "_root")) and prefix in {"Process", "Handle"}:
+        prefix = "Locate"
+    if name.startswith(("is_", "has_", "supports_", "can_")) and prefix == "Handle":
+        prefix = "Check"
+    return prefix + " " + subject + " for " + domain(path)
+
+
+def class_action(node: dict, name: str, scope: str) -> str:
+    """Use the class's actual responsibility rather than a generic Provide."""
+    chinese = str(node.get("title", ""))
+    normalized = human(name)
+    if name.endswith(("Error", "Exception")):
+        verb = "Report"
+    elif name.endswith(("Model", "Adapter", "Backend")):
+        verb = "Adapt"
+    elif name.endswith(("Writer", "Logger")):
+        verb = "Write"
+    elif name.endswith(("Registry", "Catalog")):
+        verb = "Register"
+    elif name.endswith(("Loader", "DataModule")):
+        verb = "Load"
+    elif name.endswith(("Plugin", "Contract", "Interface")):
+        verb = "Define"
+    elif chinese.startswith(("管理", "执行", "处理")):
+        verb = "Manage"
+    else:
+        verb = "Represent"
+    return verb + " " + normalized + " for " + scope
 
 
 # Reviewed navigation-language rules derived from actual source responsibilities.
@@ -673,11 +736,14 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
         elif name.endswith(("Result", "Record", "Manifest", "Snapshot", "State")):
             title = "Represent " + human(name) + " for " + scope
         else:
-            title = "Provide " + human(name) + " for " + scope
+            title = class_action(node, name, scope)
         summary = doc or title + "."
     elif kind == "module":
-        title = MODULE_ACTIONS.get(stem, "Inspect " + human(stem) + " implementation")
-        title += " for " + scope
+        title = MODULE_ACTIONS.get(stem)
+        if title is None:
+            title = evidence_action(node, stem, path)
+        else:
+            title += " for " + scope
         if doc and len(doc) <= 120 and doc.split(" ", 1)[0] in SOURCE_VERBS:
             title = doc.rstrip(".")
         summary = doc or title + "."
