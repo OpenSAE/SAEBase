@@ -953,11 +953,19 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
     # Technical evidence belongs in description/attributes, not a second
     # paraphrase of the same sentence under "What this node does".
     description = " ".join(details) if details else (doc or summary)
+    additional_explanation = ""
+    if node["id"].startswith("code:configurations:tasks:"):
+        task = node["id"].rsplit(":", 1)[-1]
+        additional_explanation = (
+            "The actual Hydra configuration files for "
+            + TASK_NAMES.get(task, human(task))
+            + " declare runtime inputs and resource settings."
+        )
     return {
         "title": title,
         "summary": summary,
         "description": description,
-        "reader_explanation": "",
+        "reader_explanation": additional_explanation,
         "translation_origin": reviewed_status,
     }
 
