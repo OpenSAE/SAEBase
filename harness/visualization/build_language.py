@@ -1074,7 +1074,7 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
     # In the absence of reviewed scientific prose, publish concrete, source-
     # verified interface facts rather than repeating the title verbatim.
     # These describe the code contract, not an invented research result.
-    compact = lambda value: re.sub(r"[\\W_]+", "", str(value)).casefold()
+    compact = lambda value: re.sub(r"[\W_]+", "", str(value)).casefold()
     if compact(title) == compact(summary):
         if kind in {"function", "method"}:
             named = [p for p in args if p not in {"self", "cls"}]
