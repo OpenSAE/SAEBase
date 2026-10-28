@@ -1,0 +1,75 @@
+name: SAEBase Atlas snapshots (project isolated)
+
+on:
+  push:
+    branches:
+      - fix/atlas-project-isolation-20261027
+    paths:
+      - ".github/workflows/saebase-atlas-snapshot.yml"
+      - "harness/visualization/**"
+      - "harness/code/**"
+      - "harness/core/**"
+      - "harness/environment/**"
+      - "doc/knowledge/**"
+      - "saebase/**"
+      - "datasets/**"
+      - "models/**"
+      - "tasks/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: saebase-atlas-snapshot-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regenerate:
+    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[atlas snapshot]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build SAEBase-only Code, Context, and five-tree snapshots
+        run: |
+          python harness/core/validate.py
+          python harness/knowledge/validate.py
+          python harness/code/build.py
+          python harness/visualization/export.py
+          python harness/visualization/build_pages.py
+          python harness/visualization/build_pages.py --check
+          node --check harness/visualization/app.js
+          node --check harness/visualization/i18n.js
+          node --check harness/visualization/locale-data.js
+      - name: Verify that this is a SAEBase snapshot
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          body = Path("harness/visualization/data.js").read_text(encoding="utf-8")
+          start = body.index("window.OPENRESEARCH_ATLAS = ") + len("window.OPENRESEARCH_ATLAS = ")
+          graph = json.loads(body[start:].strip().removesuffix(";"))
+          ids = [n["id"] for n in graph["knowledge"]["nodes"]]
+          assert any("sae" in node for node in ids), "SAEBase Knowledge is absent"
+          assert not any("cub" in node for node in ids), "OpenResearch Vision Knowledge leaked"
+          source = str(graph["code"])
+          assert "saebase/" in source and "tasks/" in source
+          assert "dlbase/" not in source, "OpenResearch Runtime leaked"
+          print({k: len(v["nodes"]) for k,v in graph.items()})
+          PY
+      - name: Commit versioned source-owned snapshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f doc/code/code_tree.json harness/visualization/data.js harness/visualization/atlas-structure.js
+          git add harness/visualization/{core,knowledge,code,environment,context,glossary}.html
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(atlas): refresh SAEBase source-backed snapshots [atlas snapshot] [skip ci]"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
