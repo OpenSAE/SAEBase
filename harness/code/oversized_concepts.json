@@ -337,8 +337,8 @@
         {
           "name": "gemma2",
           "title": "Gemma-2 模型家族",
-          "summary": "组织 Gemma-2 不同规模及基础、指令版本的接口。",
-          "description": "组织 Gemma-2 不同规模及基础、指令版本的接口。",
+          "summary": "组织 Gemma-2 各规模的基础与指令版本接口。",
+          "description": "组织 Gemma-2 各规模的基础与指令版本接口。",
           "en_title": "Gemma-2 model family",
           "en_summary": "Load Gemma-2 base and instruction-tuned variants across supported scales.",
           "en_description": "Load Gemma-2 base and instruction-tuned variants across supported scales.",
@@ -367,8 +367,8 @@
         {
           "name": "qwen",
           "title": "Qwen 模型家族",
-          "summary": "管理 Qwen 不同世代与规模的模型加载及研究兼容接口。",
-          "description": "管理 Qwen 不同世代与规模的模型加载及研究兼容接口。",
+          "summary": "管理 Qwen 系列多代模型的加载及研究兼容接口。",
+          "description": "管理 Qwen 系列多代模型的加载及研究兼容接口。",
           "en_title": "Qwen model family",
           "en_summary": "Load Qwen model families and validate their research-task compatibility.",
           "en_description": "Load Qwen model families and validate their research-task compatibility.",
