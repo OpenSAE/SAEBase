@@ -163,6 +163,62 @@ def audit(graphs: dict) -> dict:
             if description and summary and normalize(description) == normalize(summary):
                 issues["duplicated_description"].append(_node_record(node) | {"tree": view})
 
+        if view == "code":
+            # A semantic role duplicated under DIFFERENT parents was invisible
+            # to the original sibling-only audit. Treat the entire Code Tree
+            # as one responsibility inventory, while keeping full provenance.
+            owner_of = {
+                child: parent for parent, members in children.items()
+                for child in members
+            }
+            for field in ("title", "summary"):
+                global_groups = defaultdict(list)
+                for node in nodes.values():
+                    value = normalize(node.get(field))
+                    if value:
+                        global_groups[value].append(node["id"])
+                for members in global_groups.values():
+                    if len(members) < 2:
+                        continue
+                    issues["repeated_global_" + field].append({
+                        "tree": view,
+                        "parent": "<all Code branches>",
+                        "reason": "exact normalized " + field + " across Code parents",
+                        "size": len(members),
+                        "members": [
+                            _node_record(nodes[item]) | {"parent_id": owner_of.get(item, "")}
+                            for item in members
+                        ],
+                    })
+
+            all_ids = list(nodes)
+            semantic_pairs = []
+            for index, left in enumerate(all_ids):
+                x = nodes[left]
+                x_title, x_summary = purpose(x.get("title")), purpose(x.get("summary"))
+                if len(x_title) < 8 or len(x_summary) < 8:
+                    continue
+                for right in all_ids[index + 1:]:
+                    y = nodes[right]
+                    if owner_of.get(left) == owner_of.get(right):
+                        continue  # sibling similarity has its own report
+                    y_title, y_summary = purpose(y.get("title")), purpose(y.get("summary"))
+                    if len(y_title) < 8 or len(y_summary) < 8:
+                        continue
+                    if x_title == y_title and x_summary == y_summary:
+                        semantic_pairs.append((left, right))
+            for members in _components(all_ids, semantic_pairs):
+                issues["similar_global_purpose"].append({
+                    "tree": view,
+                    "parent": "<all Code branches>",
+                    "reason": "same title and summary purpose after action verb normalization",
+                    "size": len(members),
+                    "members": [
+                        _node_record(nodes[item]) | {"parent_id": owner_of.get(item, "")}
+                        for item in members
+                    ],
+                })
+
         for parent, candidate_ids in children.items():
             ids = list(dict.fromkeys(candidate_ids))
             if len(ids) < 1:
@@ -263,8 +319,12 @@ def main() -> None:
         for key, records in report["sample"].items()
     }
     print("ATLAS_SEMANTIC_AUDIT=" + json.dumps(compact, ensure_ascii=False))
-    blockers = ("repeated_sibling_title", "repeated_sibling_summary",
-                "similar_sibling_purpose", "template_summary", "tautological_purpose")
+    blockers = (
+        "repeated_sibling_title", "repeated_sibling_summary",
+        "similar_sibling_purpose", "repeated_global_title",
+        "repeated_global_summary", "similar_global_purpose",
+        "template_summary", "tautological_purpose",
+    )
     if args.check and any(report["counts"].get(key, 0) for key in blockers):
         raise SystemExit("Atlas semantic collisions remain; inspect --output report")
 
