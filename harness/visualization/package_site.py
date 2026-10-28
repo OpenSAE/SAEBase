@@ -64,6 +64,10 @@ def bundle(output: Path) -> dict:
     if not re.fullmatch(r"[0-9a-f]{40}", source_commit):
         raise ValueError("Source checkout needs a real commit identity")
     output.mkdir(parents=True, exist_ok=True)
+    # A smaller regenerated snapshot must not leave orphan JavaScript chunks
+    # from the previous commit in the public deployment directory.
+    for old_chunk in output.glob("data-[0-9][0-9][0-9].js"):
+        old_chunk.unlink()
     chunks = [raw[i : i + SHARD_CHARS] for i in range(0, len(raw), SHARD_CHARS)]
     names: list[str] = []
     hashes: dict[str, str] = {}
