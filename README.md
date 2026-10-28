@@ -18,17 +18,17 @@
 
 ## 🧭 Research Harness
 
-**OpenResearch · In development**
+**SAEBase Atlas · Five research trees**
 
 SAEBase includes a research Harness for organizing code, scientific knowledge, experiments, computing environments, and agent collaboration. **Atlas** connects these through five research trees.
 
 | Atlas Tree | Explore |
 | --- | --- |
-| **[Core](https://atheavenma.github.io/opensae/openresearch/atlas/core.html)** | Project architecture, component responsibilities and research structure |
-| **[Knowledge](https://atheavenma.github.io/opensae/openresearch/atlas/knowledge.html)** | Scientific questions, methods, goals and supporting evidence |
-| **[Code](https://atheavenma.github.io/opensae/openresearch/atlas/code.html)** | Source-backed Python modules, classes, functions and interfaces |
-| **[Environment](https://atheavenma.github.io/opensae/openresearch/atlas/environment.html)** | GPU/CPU resources, dependencies and execution environments |
-| **[Context](https://atheavenma.github.io/opensae/openresearch/atlas/context.html)** | Research terminology, definitions and implementation links |
+| **[Core](https://atheavenma.github.io/opensae/saebase/atlas/core.html)** | Project architecture, component responsibilities and research structure |
+| **[Knowledge](https://atheavenma.github.io/opensae/saebase/atlas/knowledge.html)** | Scientific questions, methods, goals and supporting evidence |
+| **[Code](https://atheavenma.github.io/opensae/saebase/atlas/code.html)** | Source-backed Python modules, classes, functions and interfaces |
+| **[Environment](https://atheavenma.github.io/opensae/saebase/atlas/environment.html)** | GPU/CPU resources, dependencies and execution environments |
+| **[Context](https://atheavenma.github.io/opensae/saebase/atlas/context.html)** | Research terminology, definitions and implementation links |
 
 **Agent Harness:** [Agent Flow](harness/core/AGENT_FLOW.md) for structured reviews · [Cursor rules and skills](.cursor/) for coding agents · [Experiment tracking](harness/experiments/README.md) for reproducible research.
 
