@@ -349,9 +349,6 @@ def fold_unreviewed_interfaces(output: dict) -> None:
         "code:function:saebase.benchmarks.metrics.reconstruction:loss_recovered",
         "code:function:datasets.CounterFact.CounterFact:filtered_json_path",
     })
-    for edge in output["edges"]:
-        if edge["type"] != "contains":
-            protected.update((edge["source"], edge["target"]))
     incoming = {}
     for edge in output["edges"]:
         if edge["type"] == "contains":
@@ -410,10 +407,36 @@ def fold_unreviewed_interfaces(output: dict) -> None:
                     if name not in hidden_names
                 ]
     output["nodes"] = [node for node in output["nodes"] if node["id"] not in excluded]
-    output["edges"] = [
-        edge for edge in output["edges"]
-        if edge["source"] not in excluded and edge["target"] not in excluded
-    ]
+    # Preserve the exact AST relationship as an immutable source-level record,
+    # while giving the visual tree an edge between the surviving owners.
+    # The function symbol identities also survive in class_methods attributes.
+    aliases = {id_: incoming[id_] for id_ in excluded}
+    retained_edges = []
+    source_relations = []
+    seen = set()
+    for edge in output["edges"]:
+        source, target = edge["source"], edge["target"]
+        if source in excluded or target in excluded:
+            if edge["type"] == "contains":
+                continue
+            source_relations.append(copy.deepcopy(edge))
+            source, target = aliases.get(source, source), aliases.get(target, target)
+            if source == target:
+                continue
+            rewritten = {
+                **edge, "source": source, "target": target,
+                "original_source": edge["source"],
+                "original_target": edge["target"],
+            }
+        else:
+            rewritten = edge
+        key = (rewritten["source"], rewritten["target"], rewritten["type"])
+        if key not in seen:
+            retained_edges.append(rewritten)
+            seen.add(key)
+    output["edges"] = retained_edges
+    output["source_interface_owners"] = aliases
+    output["folded_source_relations"] = source_relations
     output["folded_interface_count"] = len(excluded)
 
 
