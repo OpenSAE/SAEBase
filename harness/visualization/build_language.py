@@ -1228,6 +1228,17 @@ def build() -> str:
                     or "\ufffd" in value
                 ):
                     raise ValueError("Invalid English field: " + view + "/" + node_id + "/" + key)
+        from harness.visualization.semantic_quality import normalized
+
+        repeated = [
+            node_id for node_id, item in nodes.items()
+            if normalized(item.get("title", "")) == normalized(item.get("summary", ""))
+        ]
+        if repeated:
+            raise ValueError(
+                "English title and summary repeat in " + view + ": "
+                + repr(repeated[:20])
+            )
         translated[view] = nodes
     for original, english in DOCS.items():
         if not (ROOT / original).is_file() or not (ROOT / english).is_file():
