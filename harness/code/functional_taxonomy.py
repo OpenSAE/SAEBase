@@ -40,7 +40,15 @@ def _source_area(path: str) -> str:
 
 
 def _concept_node(spec: dict, node_id: str, modules: list[dict]) -> dict:
-    paths = list(dict.fromkeys(n["path"] for n in modules))
+    # A concrete Dataset/Model instance is a navigation parent backed by
+    # actual Python files, so its evidence supplies source paths when it has
+    # no direct module path of its own.
+    paths = list(dict.fromkeys(
+        str(p).split(":", 1)[0]
+        for n in modules
+        for p in ([n["path"]] if n.get("path") else n.get("evidence") or [])
+        if p
+    ))
     if not paths:
         raise ValueError("Concept without source implementations: " + node_id)
     if not spec.get("context_terms"):
