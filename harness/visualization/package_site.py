@@ -3,6 +3,8 @@
 The large Code Tree is emitted as ordered, UTF-8-safe JSON-string chunks so
 the site can reconstruct the graph without eval, dynamic imports, or requests
 to an unrelated OpenResearch project.
+
+Follow ATLAS_AUTHORING_STANDARD.md before generating or publishing Atlas data.
 """
 
 from __future__ import annotations

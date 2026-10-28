@@ -16,7 +16,7 @@ Atlas 让研究者通过五棵结构化树，独立理解研究目标、科学�
 | Environment | 实际在哪种条件下执行？ | `harness/environment/probe.py` 的实测快照及明确标记的合成示例 | 硬件、软件、资源与执行限制 |
 | Context | 技术术语与科学概念是什么？ | `doc/knowledge/glossary.json`、`doc/knowledge/atlas_terms.json` | 唯一术语 ID、定义、别名、原理、来源 |
 
-**禁止交叉复用项目数据。** `OpenSAE/SAEBase` 的任何 Tree 不引用 OpenResearch 的权威节点集合、旧图快照、演示研究任务或 CUB/Vision 样例。OpenResearch 保留它自己的五棵 Tree；共用 CSS/JS 实现时必须使用项目标识、独立路径和独立持久化存储。公开 URL 为 `/opensae/saebase/atlas/{core,knowledge,code,environment,context}.html`，不能将 `/opensae/openresearch/atlas/` 重定向成 SAEBase。
+**禁止交叉复用项目数据。** `OpenSAE/SAEBase` 的任何 Tree 不引用 OpenResearch 的权威节点集合、旧图快照、演示研究任务或 其他项目专属的旧样例。OpenResearch 保留它自己的五棵 Tree；共用 CSS/JS 实现时必须使用项目标识、独立路径和独立持久化存储。公开 URL 为 `/opensae/saebase/atlas/{core,knowledge,code,environment,context}.html`，不能将 `/opensae/openresearch/atlas/` 重定向成 SAEBase。
 
 ## 2. 先 Context，后逐树映射
 
@@ -41,7 +41,7 @@ Atlas 让研究者通过五棵结构化树，独立理解研究目标、科学�
 ## 4. Code Tree 特别规范
 
 - 代码权威来源为真实 Python AST：模块路径、类名、成员属性、方法、参数、类型、默认值、返回表达式、函数主体、源码行号均来自实际源码。缺失不得猜测。
-- `datasets/`、`models/`、`tasks/` 展开至具体实体，取消 NLP/LLM/Vision 等人为中间层；按源代码中的一等目录组织。
+- `datasets/`、`models/`、`tasks/` 展开至具体实体，取消 领域分类等人为中间层；按源代码中的一等目录组织。
 - 优先展示任务/模块在系统中的作用，再展示源码接口；标识符和完整签名放在节点展开详情，不能让它们主导节点标题。
 - 每个可见的方法有参数与返回意义、必要的精确代码来源。代码、路径、标识符、哈希等原样保留，不进行机器翻译。
 - 英文 Code 标题若通过生成器辅助创建，必须有明确的 AST 字段及语义规则，并通过“重名、空泛措辞、乱码、路径堆砌、作用误判”检查；实际科研关键节点优先使用已审定的特定英文说明。
@@ -82,7 +82,7 @@ Atlas 让研究者通过五棵结构化树，独立理解研究目标、科学�
 
 ## 9. 失败条件与验收清单
 
-**必须失败**：错误项目 ID、混入 CUB/Vision 旧研发内容、跨仓库错误链接、丢失 Context ID、英文缺字段、含中文的英文说明（技术引用除外）、乱码 U+FFFD、杜撰的源码或实验结论、导航断边、丢失发布 JS 文件、过大的单层子节点、站点分块哈希不匹配、浏览器节点切换失效。
+**必须失败**：错误项目 ID、混入 其他项目专属的旧研发内容、跨仓库错误链接、丢失 Context ID、英文缺字段、含中文的英文说明（技术引用除外）、乱码 U+FFFD、杜撰的源码或实验结论、导航断边、丢失发布 JS 文件、过大的单层子节点、站点分块哈希不匹配、浏览器节点切换失效。
 
 **可接受**：代码片段原文包含中文注释但明确标注“源码原文”；文档只存在英文；Environment 资料标记 unknown；尚未开展 GPU 科学实验而状态保持未验证。
 

@@ -42,7 +42,7 @@ Keep a presentation parent's immediate fanout at approximately ten or fewer. For
 
 Modules, classes, fields, methods, function signatures, parameters, annotations, defaults, return expressions, code excerpts, and source lines are extracted from real Python AST. No guessed APIs.
 
-Dataset, Model, and Task trees follow their actual first-level implementation directories rather than invented NLP/LLM/Vision intermediate folders. Put readable, role-based titles first; preserve exact Python names and complete interfaces in expanded details.
+Dataset, Model, and Task trees follow their actual first-level implementation directories rather than invented domain-category intermediate folders. Put readable, role-based titles first; preserve exact Python names and complete interfaces in expanded details.
 
 Generated English Code titles need real source context and must pass checks against repetition, meaningless generic phrases, mojibake, accidental path concatenation, and incorrect inferred responsibilities. Reviewed, domain-specific explanations take precedence over automated naming.
 
@@ -86,7 +86,7 @@ All repository links resolve to the correct public project and actual file paths
 
 ## 9. Release gates
 
-**Fail on:** foreign project identity, OpenResearch-only CUB/Vision content in SAEBase, missing Context IDs, missing English fields, Chinese-language English prose except literal source excerpts, replacement characters, incorrect evidence links, fabricated function signatures or experiment results, broken tree edges, excessive fanout, missing JS chunks, mismatched hashes, or broken browser language switching.
+**Fail on:** foreign project identity, unrelated project-specific content in SAEBase, missing Context IDs, missing English fields, Chinese-language English prose except literal source excerpts, replacement characters, incorrect evidence links, fabricated function signatures or experiment results, broken tree edges, excessive fanout, missing JS chunks, mismatched hashes, or broken browser language switching.
 
 **Permitted:** original-language code comments explicitly labeled as verbatim source, English-only Markdown, unknown hardware measurements, and scientific questions remaining unverified.
 

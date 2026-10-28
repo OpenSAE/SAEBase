@@ -1,5 +1,7 @@
 """Build the source-ID English overlay for SAEBase's five Atlas trees.
 
+This generator MUST follow ATLAS_AUTHORING_STANDARD.md, especially its
+Context-first ID mapping, project isolation, and bilingual release gates.
 Scientific Context, Core, Knowledge and Environment use reviewed translations.
 Code labels are composed from real Python AST symbols, paths and interfaces.
 """
