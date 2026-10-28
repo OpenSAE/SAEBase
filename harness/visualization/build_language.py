@@ -889,7 +889,18 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
     reviewed = REVIEWED_CODE.get(node["id"])
     doc = source_description(node)
     reviewed_status = "reviewed" if reviewed else ("source_docstring" if doc else "source_identity")
-    if node.get("concept_group"):
+    source_review = json.loads(
+        (ROOT / "harness/code/reviewed_semantics.json").read_text(encoding="utf-8")
+    )["nodes"].get(node["id"])
+    if source_review and (
+        source_review["source_path"] != path
+        or source_review["source_symbol"] != name
+    ):
+        raise ValueError("Outdated bilingual source review: " + node["id"])
+    if source_review:
+        title, summary = source_review["en_title"], source_review["en_summary"]
+        reviewed_status = "source_reviewed_interface"
+    elif node.get("concept_group"):
         # Human-reviewed bilingual responsibilities from the concept catalog.
         # Do not infer concept titles from a Python identifier or child count.
         title = node["english_title"]
