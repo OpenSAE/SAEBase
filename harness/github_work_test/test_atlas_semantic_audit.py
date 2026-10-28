@@ -35,7 +35,7 @@ def test_verb_swaps_cannot_hide_repeated_research_objects():
         {"source": "root", "target": "b", "type": "contains"},
     ]}}
     result = audit(tree)
-    assert result["counts"]["repeated_sibling_title"] == 0
+    assert result["counts"].get("repeated_sibling_title", 0) == 0
     assert result["counts"]["similar_sibling_purpose"] == 1
 
 
