@@ -437,6 +437,187 @@ def domain(path: str) -> str:
         return "registered SAE research tasks"
     return role(path)
 
+# Paired Chinese-to-English meaning rules for AST presentation summaries.
+# These translate the existing source-derived Chinese description; do not
+# attribute additional functionality beyond what that source states.
+CODE_RESPONSIBILITY_OBJECTS = {
+    "模型构建与兼容检查": "model construction and compatibility checks",
+    "稀疏特征研究软件与运行接口": "sparse-feature research and runtime interfaces",
+    "SAE 研究验证工具": "SAE research validation tools",
+    "Research Lab 数据服务与证据核查": "Research Lab data services and evidence checks",
+    "Research Lab 展示、数据与实验记录": "Research Lab presentations, datasets, and experiment records",
+    "模型执行过程": "model execution",
+    "评测指标与结果": "evaluation metrics and results",
+    "稀疏特征表示": "sparse-feature representations",
+    "稀疏自编码器配置与加载": "sparse autoencoder configuration and loading",
+    "模型输入文本": "model input text",
+    "外部基准与扩展": "external benchmarks and extensions",
+    "数据样本与加载流程": "dataset examples and loading",
+    "教师强制特征干预": "teacher-forced feature interventions",
+    "SAE 基准评测": "SAE benchmarks",
+    "数据集加载与注册": "dataset loading and registration",
+    "实验文件与缓存": "experiment files and caches",
+    "SAE 研究能力验证与执行": "SAE capability checks and execution",
+    "SAE 评测与结果可靠性": "SAE evaluation and result reliability",
+    "生成过程中的 SAE 干预": "SAE interventions during generation",
+    "SAE 特征局部性": "SAE feature locality",
+    "SAE 评测可靠性": "SAE evaluation reliability",
+    "实验记录": "experiment records",
+    "模型张量与梯度": "model tensors and gradients",
+    "实验产物与存储": "experiment artifacts and storage",
+    "实验产物的完整性校验值": "artifact integrity checksums",
+    "基准结果的数据字段": "benchmark result fields",
+    "生成时 SAE 特征干预": "generation-time SAE feature interventions",
+    "任务运行配置": "task execution configurations",
+    "模型训练参数": "model training parameters",
+    "SAE 特征捕获与模型干预": "SAE feature capture and model interventions",
+    "候选因果电路分析": "candidate causal circuit analyses",
+    "模型生成服务": "model generation services",
+    "模型与 SAE 覆盖验收": "model and SAE coverage acceptance checks",
+    "模型训练与实验记录": "model training and experiment records",
+    "SAE 模型身份记录": "SAE model identity records",
+    "模型激活读取与前向预测": "activation reads and model forward predictions",
+    "科研软件发布与验收": "research software release and acceptance checks",
+    "实验产物的目录管理": "experiment artifact directories",
+    "受控输入的实验条件": "controlled-input experiment conditions",
+    "受控输入的实验参数": "controlled-input experiment parameters",
+    "SAE 特征数据存储": "SAE feature data storage",
+    "数据集的默认存储目录": "default dataset storage directories",
+    "模型预测与数据筛选": "model predictions and data filtering",
+    "当前任务资源": "resources held by the current task",
+    "SAE 基准任务规划与指标计算": "SAE benchmark planning and metric computation",
+    "SAE 特征解释": "SAE feature explanations",
+    "SAE 权重加载与实例化": "SAE weight loading and instantiation",
+    "稀疏自编码器训练": "sparse autoencoder training",
+    "受控实验的因素数量": "the number of controlled experiment factors",
+    "模型内部激活与梯度追踪": "internal model activation and gradient tracing",
+    "设备与显存配置": "device and GPU memory configurations",
+    "生成过程中的特征干预": "feature interventions during generation",
+    "SAE 模型注册与身份": "SAE model registration and identity",
+    "Transformer 组件贡献分析": "Transformer component contribution analyses",
+    "基准执行目标": "benchmark execution targets",
+    "科研扩展接口与准入": "research extension interfaces and admission checks",
+    "组件注册表": "component registries",
+    "模型检查点": "model checkpoints",
+    "评测可靠性": "evaluation reliability",
+    "训练配置与执行约束": "training settings and execution constraints",
+    "SAE 模型与位置覆盖验收": "SAE model and activation-site coverage checks",
+    "语言模型任务执行": "language-model task execution",
+    "模型输入的 Token 序列": "model input token sequences",
+    "SAR 与 RSS 评测适配": "SAR and RSS evaluation adapters",
+    "vLLM 文本生成计算后端": "the vLLM text-generation backend",
+    "模型激活位置": "model activation sites",
+    "批量干预执行流程": "batch intervention execution",
+    "干预任务的性能统计": "intervention task performance statistics",
+    "模型干预的计算预算": "model intervention compute budgets",
+    "KV 缓存逐步校验": "stepwise KV-cache checks",
+    "KV 缓存一致性异常": "KV-cache consistency violations",
+    "特征编辑实验条件": "feature-editing experimental conditions",
+    "干预实验的身份记录": "intervention experiment identity records",
+    "生成干预的参数协议": "generation intervention parameter contracts",
+    "一次特征编辑操作": "a single feature-editing operation",
+    "多步骤特征干预计划": "multi-step feature intervention plans",
+    "SAE 特征捕获": "SAE feature capture",
+    "任务执行流程": "task execution workflows",
+    "接口约束与数据协议": "interface constraints and data contracts",
+    "最大概率预测样本": "highest-probability prediction examples",
+    "按预测分数差异筛选样本": "examples filtered by prediction-score differences",
+    "Prompt 数据产物": "prompt artifacts",
+    "模型支持的数据任务": "dataset tasks supported by the model",
+    "评估器源码的校验值": "the evaluator source checksum",
+    "核对基准评测的数据来源身份": "benchmark dataset source identities",
+    "载入原生基准实现": "native benchmark implementations",
+    "SAE 重建损失的恢复比例": "the fraction of reconstructed SAE loss",
+    "目标序列的负对数似然": "negative log-likelihood for the target sequence",
+    "模型权重与训练状态": "model weights and training state",
+    "用于推理的模型权重": "weights for model inference",
+    "特征编辑与日志记录": "feature edits and log records",
+    "模型及 SAE 加载": "model and SAE loading",
+    "数据划分与评测口径": "dataset splits and evaluation definitions",
+    "数据集评测和兼容信息": "dataset evaluation and compatibility metadata",
+    "运行结果及模型输出": "run results and model outputs",
+    "评估指标配置": "evaluation metric settings"
+}
+
+CODE_RESPONSIBILITY_PHRASES = {
+    "为输入样本附加 Token 编码": "Attach token IDs to input samples.",
+    "为数字比较样本附加 Token 编码": "Attach token IDs to numerical comparison examples.",
+    "为 IOI 样本附加 Token 编码": "Attach token IDs to indirect-object-identification examples.",
+    "为序列复制样本附加 Token 编码": "Attach token IDs to copying-task examples.",
+    "为主谓一致样本附加 Token 编码": "Attach token IDs to subject-verb-agreement examples.",
+    "为CounterFact 反事实知识样本构建 Token 编码": "Tokenize CounterFact knowledge-editing examples.",
+    "为数字大小比较样本构建 Token 编码": "Tokenize numerical-comparison examples.",
+    "为IOI 间接宾语任务样本构建 Token 编码": "Tokenize indirect-object-identification examples.",
+    "将输入文本编码为 Token 序列": "Encode input text into token sequences.",
+    "为数字比较任务定位数据文件": "Locate dataset files for numerical comparison.",
+    "为输入样本编码 Token": "Encode tokens for input examples."
+}
+
+CODE_RESPONSIBILITY_VERBS = {
+    "实现": "Implement",
+    "处理": "Process",
+    "管理": "Manage",
+    "执行": "Run",
+    "校验": "Validate",
+    "读取": "Read",
+    "构建": "Build",
+    "保存": "Save",
+    "评估": "Evaluate",
+    "生成": "Generate",
+    "采集": "Capture",
+    "序列化": "Serialize",
+    "判断": "Determine",
+    "解析": "Parse",
+    "定位": "Locate",
+    "整理": "Organize",
+    "计算": "Compute",
+    "重建": "Reconstruct",
+    "还原": "Restore",
+    "关闭": "Close",
+    "筛选": "Filter",
+    "统计": "Count",
+    "查找": "Find",
+    "应用": "Apply",
+    "编码": "Encode",
+    "准备": "Prepare",
+    "训练": "Train",
+    "提供": "Provide",
+    "检查": "Check",
+    "检测": "Detect",
+    "推断": "Infer",
+    "附加": "Attach",
+    "标注": "Annotate",
+    "导出": "Export",
+    "配置": "Configure",
+    "加载": "Load",
+    "选择": "Select",
+    "记录": "Record",
+}
+
+
+def source_paired_code_summary(node: dict) -> str:
+    """Translate substantive Chinese AST source summaries using reviewed terms.
+
+    Return an empty string for unknown terms instead of inventing a translation.
+    English source docstrings continue to take precedence.
+    """
+    summary = str(node.get("summary") or "").strip()
+    match = re.fullmatch(
+        r"负责(.+?)；源码依据和调用参数可在节点的展开说明中查看。", summary
+    )
+    if not match:
+        return ""
+    action = match.group(1).strip()
+    if action in CODE_RESPONSIBILITY_PHRASES:
+        return CODE_RESPONSIBILITY_PHRASES[action]
+    for verb, english_verb in CODE_RESPONSIBILITY_VERBS.items():
+        if action.startswith(verb):
+            object_name = action[len(verb):].strip()
+            english_object = CODE_RESPONSIBILITY_OBJECTS.get(object_name)
+            if english_object:
+                return english_verb + " " + english_object + "."
+    return ""
+
 
 def source_description(node: dict) -> str:
     """Use source docstrings only where they are legible English evidence."""
@@ -666,7 +847,7 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
         title = action_label(node, name, path)
         if doc and len(doc) <= 120 and doc.split(" ", 1)[0] in SOURCE_VERBS:
             title = doc.rstrip(".")
-        summary = doc or title + "."
+        summary = doc or source_paired_code_summary(node) or title + "."
     elif kind == "class":
         if name.endswith(("Config", "Cfg", "Options", "Spec")):
             title = "Configure " + human(name) + " for " + scope
@@ -674,13 +855,13 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
             title = "Represent " + human(name) + " for " + scope
         else:
             title = "Provide " + human(name) + " for " + scope
-        summary = doc or title + "."
+        summary = doc or source_paired_code_summary(node) or title + "."
     elif kind == "module":
         title = MODULE_ACTIONS.get(stem, "Inspect " + human(stem) + " implementation")
         title += " for " + scope
         if doc and len(doc) <= 120 and doc.split(" ", 1)[0] in SOURCE_VERBS:
             title = doc.rstrip(".")
-        summary = doc or title + "."
+        summary = doc or source_paired_code_summary(node) or title + "."
     else:
         descendants = [by_id[c] for c in children.get(node["id"], []) if c in by_id]
         title = group_label(node, descendants, children, by_id)
