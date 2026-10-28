@@ -66,6 +66,12 @@
     if (labels[value.trim()]) return labels[value.trim()];
     const methodCount = value.match(/^类中全部方法 · (\d+) 个$/);
     if (methodCount) return "Class methods (" + methodCount[1] + ")";
+    const foldedCount = value.match(/^源码接口与实现依据 · (\d+) 项$/);
+    if (foldedCount) return "Verified source interfaces (" + foldedCount[1] + ")";
+    const moduleCount = value.match(/^模块中实际定义的函数接口 · (\d+) 个$/);
+    if (moduleCount) return "Module function interfaces (" + moduleCount[1] + ")";
+    if (key === "purpose" && /^负责.+源码依据和调用参数/.test(value))
+      return "";
     const name = sourceName(node);
     if (key === "title" || key === "label") {
       const linked = parent?.symbol_id && projection.nodes?.code?.[parent.symbol_id];
