@@ -26,7 +26,6 @@ def audit(graphs: dict) -> dict:
         if edge["type"] == "contains":
             children[edge["source"]].append(edge["target"])
     summary_counts = Counter(normalize(n.get("summary", "")) for n in by_id.values())
-    title_counts = Counter(normalize(n.get("title", "")) for n in by_id.values())
     issues = defaultdict(list)
     for node in by_id.values():
         title = normalize(node.get("title"))
@@ -47,9 +46,7 @@ def audit(graphs: dict) -> dict:
                     texts[norm].append(key)
             for keys in texts.values():
                 if len(keys) > 1:
-                    issues["repeated_sibling_" + field].append(
-                        {"parent": parent, "members": keys}
-                    )
+                    issues["repeated_sibling_" + field].append({"parent": parent, "members": keys})
         parent_title = normalize(by_id.get(parent, {}).get("title"))
         parent_summary = normalize(by_id.get(parent, {}).get("summary"))
         for key in ids:
@@ -64,11 +61,14 @@ def audit(graphs: dict) -> dict:
         "code_nodes": len(by_id),
         "counts": {k: len(v) for k, v in issues.items()},
         "top_repeated_summaries": [
-            {"count": count, "example": next(
-                n["summary"] for n in by_id.values()
-                if normalize(n.get("summary")) == value
-            )}
-            for value, count in summary_counts.most_common(15) if count > 2
+            {
+                "count": count,
+                "example": next(
+                    n["summary"] for n in by_id.values() if normalize(n.get("summary")) == value
+                ),
+            }
+            for value, count in summary_counts.most_common(15)
+            if count > 2
         ],
         "sample": {k: v[:12] for k, v in issues.items()},
     }
