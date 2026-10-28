@@ -1,3 +1,5 @@
+> **Normative prerequisite:** [SAEBase Atlas Authoring Standard](ATLAS_AUTHORING_STANDARD.en.md). OpenResearch uses independent authoritative graphs and deployment routes.
+
 # OpenResearch Atlas: Source-Backed Research Trees
 
 Core, Knowledge, Code, Environment, and Context share a centered, expandable tree interface with node focus, relationships, and source evidence. Core, Knowledge, Code, and Context describe evidence-backed project or research content. Environment displays measured or explicitly synthetic execution resources.
@@ -22,7 +24,7 @@ python harness/visualization/build_pages.py
 python -m http.server 8765
 ```
 
-Open [Core](https://atheavenma.github.io/opensae/openresearch/atlas/core.html), [Knowledge](https://atheavenma.github.io/opensae/openresearch/atlas/knowledge.html), [Code](https://atheavenma.github.io/opensae/openresearch/atlas/code.html), [Environment](https://atheavenma.github.io/opensae/openresearch/atlas/environment.html), or [Context](https://atheavenma.github.io/opensae/openresearch/atlas/context.html). The public environment view may include clearly labeled synthetic resources.
+Open [Core](https://atheavenma.github.io/opensae/saebase/atlas/core.html), [Knowledge](https://atheavenma.github.io/opensae/saebase/atlas/knowledge.html), [Code](https://atheavenma.github.io/opensae/saebase/atlas/code.html), [Environment](https://atheavenma.github.io/opensae/saebase/atlas/environment.html), or [Context](https://atheavenma.github.io/opensae/saebase/atlas/context.html). The public environment view may include clearly labeled synthetic resources.
 
 The published Atlas is maintained in a separate website repository. Its HTML, JavaScript, language overlay, and generated graph data must remain compatible. Updating the source repository alone does not publish a new site snapshot.
 

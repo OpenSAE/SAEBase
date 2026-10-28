@@ -1,5 +1,7 @@
 # Atlas bilingual language switching specification
 
+> Implementation and publication MUST follow [SAEBase Atlas Authoring Standard](ATLAS_AUTHORING_STANDARD.en.md), including project isolation and Context-first translation.
+
 ## Goal
 
 The same Chinese / English selection governs all five Atlas trees (Core, Knowledge, Code, Environment, Context), node details, Context glossary, review controls, and every document surfaced by the Atlas documentation reader. Language switching must preserve the exact node ID, selected tree, expanded nodes, focus, zoom, review decision, URL review token, and scroll position.

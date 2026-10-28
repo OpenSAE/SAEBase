@@ -70,9 +70,7 @@ def bundle(output: Path) -> dict:
         # Strings are JSON-escaped. This creates no executable source fragments.
         payload = (
             "window.SAEBASE_ATLAS_PARTS=window.SAEBASE_ATLAS_PARTS||[];\n"
-            f"window.SAEBASE_ATLAS_PARTS[{i}]="
-            + json.dumps(chunk, ensure_ascii=False)
-            + ";\n"
+            f"window.SAEBASE_ATLAS_PARTS[{i}]=" + json.dumps(chunk, ensure_ascii=False) + ";\n"
         )
         (output / name).write_text(payload, encoding="utf-8")
         names.append(name)
@@ -81,13 +79,13 @@ def bundle(output: Path) -> dict:
     bootstrap = (
         "/* SAEBase Atlas: reconstruct the verified source graph without eval. */\n"
         "(function(){\n"
-        f'  const expected={len(names)};\n'
+        f"  const expected={len(names)};\n"
         "  const p=window.SAEBASE_ATLAS_PARTS;\n"
-        "  if(!Array.isArray(p)||p.length!==expected||p.some(x=>typeof x!==\"string\"))\n"
-        "    throw new Error(\"Incomplete SAEBase Atlas source snapshot\");\n"
-        "  const g=JSON.parse(p.join(\"\"));\n"
-        "  if(!String(g.context?.project||\"\").startsWith(\"SAEBase\"))\n"
-        "    throw new Error(\"Foreign Atlas project rejected\");\n"
+        '  if(!Array.isArray(p)||p.length!==expected||p.some(x=>typeof x!=="string"))\n'
+        '    throw new Error("Incomplete SAEBase Atlas source snapshot");\n'
+        '  const g=JSON.parse(p.join(""));\n'
+        '  if(!String(g.context?.project||"").startsWith("SAEBase"))\n'
+        '    throw new Error("Foreign Atlas project rejected");\n'
         "  window.OPENRESEARCH_ATLAS=g;\n"
         "  delete window.SAEBASE_ATLAS_PARTS;\n"
         "})();\n"

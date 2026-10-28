@@ -1,4 +1,6 @@
-# OpenResearch Atlas · 节点内展开式知识浏览
+> **树的生成、写作、翻译及发布必须首先遵守**：[SAEBase Atlas 生成与编写规范](ATLAS_AUTHORING_STANDARD.md)。OpenResearch 使用独立来源和网址。
+
+# SAEBase Atlas · 节点内展开式知识浏览
 
 Core、Knowledge、Code、Environment、Context 共用一套居中分叉、Focus Mode、颜色与节点属性渲染。Core、Knowledge、Code、Context 聚焦有来源的现有功能与方法；Environment 显示现场观测或明确标记的演示配置。
 
@@ -26,7 +28,7 @@ python harness/visualization/build_pages.py
 python -m http.server 8765
 ```
 
-从 [Code Tree](https://atheavenma.github.io/opensae/openresearch/atlas/code.html) 或 [Context Tree](https://atheavenma.github.io/opensae/openresearch/atlas/context.html) 进入。公开 Environment 采用合成示例设备。
+从 [Code Tree](https://atheavenma.github.io/opensae/saebase/atlas/code.html) 或 [Context Tree](https://atheavenma.github.io/opensae/saebase/atlas/context.html) 进入。公开 Environment 采用合成示例设备。
 
 公开 Atlas 存放在独立的学术主页仓库。构建器会生成完整的 `data.js` 和较小的 `atlas-structure.js`。后者以权威 Knowledge 和 Code 分组结果更新已发布的大型快照。发布 Atlas 更改时同步 `app.js`、`style.css`、`atlas-structure.js` 及 HTML 资源版本；如需完整更新代码实体和源码说明，再同步 `data.js`。
 

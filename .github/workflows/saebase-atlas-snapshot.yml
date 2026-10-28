@@ -3,6 +3,7 @@ name: SAEBase Atlas snapshots (project isolated)
 on:
   push:
     branches:
+      - main
       - fix/atlas-project-isolation-20261027
     paths:
       - ".github/workflows/saebase-atlas-snapshot.yml"
