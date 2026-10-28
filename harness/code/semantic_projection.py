@@ -91,6 +91,47 @@ def compact_public_code_tree(graph: dict) -> dict:
         for node_id, node in nodes.items()
         if node_id == root or _independently_described(node)
     }
+
+    # Public cards are scientific capabilities, not repeated model adapters or
+    # generic Python method names. Compare all Code branches, not just siblings.
+    # Unreviewed source entities with a globally repeated title OR summary
+    # remain accessible as full interfaces under their nearest semantic owner.
+    from collections import Counter
+
+    global_titles = Counter(
+        normalize(nodes[item].get("title")) for item in keep
+        if nodes[item].get("kind") in {"module", "class", "method", "function"}
+    )
+    global_summaries = Counter(
+        normalize(nodes[item].get("summary")) for item in keep
+        if nodes[item].get("kind") in {"module", "class", "method", "function"}
+    )
+    for item in list(keep):
+        node = nodes[item]
+        if node.get("kind") not in {"module", "class", "method", "function"}:
+            continue
+        if item in SOURCE_REVIEWS:
+            continue
+        title, summary = normalize(node.get("title")), normalize(node.get("summary"))
+        if (title and global_titles[title] > 1) or (
+            summary and global_summaries[summary] > 1
+        ):
+            keep.discard(item)
+
+    # These are source-level copies of the same Stage D model–SAE acceptance
+    # protocol. Represent each scientific operation once in SAE acceptance,
+    # retaining every Benchmark implementation and source ID as expanded
+    # interfaces in the Benchmark family.
+    for suffix in ("site_plan", "acceptance_ledger", "evidence_integrity", "pair_acceptance"):
+        canonical = "code:concept:sae_acceptance:" + suffix
+        duplicate = "code:concept:benchmark_acceptance:" + suffix
+        if canonical not in nodes or duplicate not in nodes:
+            raise ValueError("Missing paired Stage D acceptance concepts: " + suffix)
+        for field in ("title", "summary"):
+            if normalize(nodes[canonical].get(field)) != normalize(nodes[duplicate].get(field)):
+                raise ValueError("Stage D concepts diverged; review before folding: " + suffix)
+        keep.discard(duplicate)
+
     # Only semantic collision inside one parent qualifies for automatic
     # folding; a reviewed node's distinct verified role is never erased.
     for parent, ids in children.items():

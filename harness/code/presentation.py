@@ -200,6 +200,17 @@ def source_excerpt(node: dict) -> str | None:
     return "\n".join(line[minimum_indent:].rstrip() for line in extract).rstrip()
 
 
+TASK_CONFIGURATION_ROLES = {
+    "capture": "SAE 激活捕获",
+    "intervene": "教师强制特征干预",
+    "generate": "特征引导文本生成",
+    "circuits": "特征电路追踪",
+    "explain": "特征解释与泛化验证",
+    "benchmark": "SAE 基准评测",
+    "train": "稀疏字典训练",
+}
+
+
 def task_configuration_nodes(name: str, parent: str, nodes: list, edges: list) -> None:
     """Attach real Hydra task YAML under the corresponding generic task."""
     directory = ROOT / "conf/task"
@@ -221,11 +232,12 @@ def task_configuration_nodes(name: str, parent: str, nodes: list, edges: list) -
         {
             "id": group_id,
             "kind": "group",
-            "title": semantic_title(
-                "group", name, f"tasks/{name}/task.py", curated="管理科研任务的 Hydra 配置"
+            "title": "配置 " + TASK_CONFIGURATION_ROLES[name] + " 的 Hydra 执行选项",
+            "summary": (
+                "汇集 " + TASK_CONFIGURATION_ROLES[name]
+                + " 使用的真实 YAML 输入、执行参数与资源设置。"
             ),
-            "summary": "汇集 " + name + " 任务实际使用的 Hydra YAML 选项与可执行配置。",
-            "description": "以任务 " + name + " 的配置文件为准，定义调用和资源选项。",
+            "description": "以对应任务的 Hydra YAML 配置声明运行所需的选项。",
             "status": "implemented",
             "evidence": sources,
             "presentation_only": True,

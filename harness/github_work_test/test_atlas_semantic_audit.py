@@ -117,3 +117,63 @@ def test_purpose_removes_template_without_adding_symbol_identity():
         "负责管理SAE 研究能力验证与执行；源码依据和调用参数可在节点的展开说明中查看。"
     ) == purpose("实现SAE 研究能力验证与执行")
     assert similarity("捕获SAE特征激活并计算重建", "捕获SAE特征激活并计算重建误差") > 0.82
+
+def test_cross_branch_duplicate_roles_are_detected() -> None:
+    """Two separately nested source symbols with one actual purpose must fail."""
+    tree = {
+        "code": {
+            "nodes": [
+                {"id": "root", "title": "SAE 科研能力", "summary": "组织科研方法"},
+                {"id": "p1", "title": "研究模块 A", "summary": "实验分组 A"},
+                {"id": "p2", "title": "研究模块 B", "summary": "实验分组 B"},
+                {
+                    "id": "a",
+                    "kind": "method",
+                    "title": "实现稀疏特征研究软件与运行接口",
+                    "summary": "负责实现稀疏特征研究软件与运行接口",
+                    "path": "saebase/a.py",
+                },
+                {
+                    "id": "b",
+                    "kind": "method",
+                    "title": "管理稀疏特征研究软件与运行接口",
+                    "summary": "负责管理稀疏特征研究软件与运行接口",
+                    "path": "saebase/b.py",
+                },
+            ],
+            "edges": [
+                {"type": "contains", "source": "root", "target": "p1"},
+                {"type": "contains", "source": "root", "target": "p2"},
+                {"type": "contains", "source": "p1", "target": "a"},
+                {"type": "contains", "source": "p2", "target": "b"},
+            ],
+        }
+    }
+    report = audit(tree)
+    assert report["counts"].get("repeated_sibling_title", 0) == 0
+    assert report["counts"]["similar_global_purpose"] == 1
+    assert {item["parent_id"] for item in report["issues"]["similar_global_purpose"][0]["members"]} == {"p1", "p2"}
+
+
+def test_cross_branch_identical_titles_and_descriptions_fail() -> None:
+    graph = {
+        "code": {
+            "nodes": [
+                {"id": "root", "title": "科研系统"},
+                {"id": "p", "title": "训练", "summary": "训练运行"},
+                {"id": "q", "title": "评测", "summary": "评测运行"},
+                {"id": "a", "title": "处理模型运行", "summary": "执行具体模型分析"},
+                {"id": "b", "title": "处理模型运行", "summary": "执行具体模型分析"},
+            ],
+            "edges": [
+                {"type": "contains", "source": "root", "target": "p"},
+                {"type": "contains", "source": "root", "target": "q"},
+                {"type": "contains", "source": "p", "target": "a"},
+                {"type": "contains", "source": "q", "target": "b"},
+            ],
+        }
+    }
+    report = audit(graph)
+    assert report["counts"]["repeated_global_title"] == 1
+    assert report["counts"]["repeated_global_summary"] == 1
+    assert {node["id"] for node in report["issues"]["repeated_global_title"][0]["members"]} == {"a", "b"}
