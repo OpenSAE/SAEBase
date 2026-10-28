@@ -1071,6 +1071,41 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
     ]
     returns = interface.get("returns") or {}
     annotation = str(returns.get("annotation") or "")
+    # In the absence of reviewed scientific prose, publish concrete, source-
+    # verified interface facts rather than repeating the title verbatim.
+    # These describe the code contract, not an invented research result.
+    compact = lambda value: re.sub(r"[\\W_]+", "", str(value)).casefold()
+    if compact(title) == compact(summary):
+        if kind in {"function", "method"}:
+            named = [p for p in args if p not in {"self", "cls"}]
+            if named:
+                summary = "Accepts declared source parameters " + ", ".join(named[:8]) + "."
+            elif annotation and annotation != "None":
+                summary = "Returns the declared " + annotation + " result from this callable."
+            else:
+                summary = "Exposes a callable with the actual signature " + str(
+                    interface.get("signature") or node.get("signature") or name
+                ) + "."
+        elif kind == "class":
+            fields = next(
+                (a.get("fields", []) for a in node.get("attributes", [])
+                 if a.get("type") == "fields"), []
+            )
+            methods = next(
+                (a.get("methods", []) for a in node.get("attributes", [])
+                 if a.get("type") == "class_methods"), []
+            )
+            field_names = [x.get("name", "") for x in fields if x.get("name")]
+            method_names = [x.get("name", "") for x in methods if x.get("name")]
+            if field_names:
+                summary = "Stores declared fields " + ", ".join(field_names[:8]) + "."
+            elif method_names:
+                summary = "Provides declared methods " + ", ".join(method_names[:8]) + "."
+            else:
+                summary = "Defines the source type " + name + " at " + path + "."
+        else:
+            summary = "Exposes the verified source implementation at " + (path or node["id"]) + "."
+        reviewed_status = "source_interface_facts"
     details = []
     if args:
         details.append("Declared inputs: " + ", ".join(args) + ".")
