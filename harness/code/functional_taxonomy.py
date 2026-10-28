@@ -19,11 +19,6 @@ PARENT = "code:group:saebase"
 # Pure compatibility re-exports preserve historical Python imports but do not
 # implement independent scientific operations. The source remains in GitHub;
 # Atlas represents the canonical implementation instead.
-REEXPORT_DOCSTRINGS = frozenset({
-    "Legacy import forwarding to the canonical Dataset implementation.",
-    "Compatibility import for Dataset plugin registration.",
-    "Compatibility import of the unified Task registry.",
-    "Compatibility re-export of the unified model plugin module.",
 })
 
 
