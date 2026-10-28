@@ -37,12 +37,6 @@ MODULES = {
     "saebase/runtime/train.py": ("SAE 任务执行入口", "校验配置并分派已登记的研究任务。"),
     "tasks/sae_runtime.py": ("七类 SAE 任务公共入口", "核验模型与数据并调用对应任务实现。"),
 }
-for _task, _pair in TASK_WRAPPER_SUMMARIES.items():
-    MODULES[f"tasks/{_task}/task.py"] = _pair
-for _task, _pair in TASK_IMPLEMENTATION_SUMMARIES.items():
-    MODULES[f"tasks/{_task}/operation.py"] = _pair
-for _stem, _pair in INTERVENTION_MODULES.items():
-    MODULES[f"tasks/intervene/backend/{_stem}.py"] = _pair
 CLASSES = {
     "SAEBaseDataModule": ("NLP 数据管理", "装配来自独立 Prompt 来源的训练与评测记录。"),
     "DatasetPlugin": ("数据集注册接口", "定义 Prompt 数据集的加载及任务兼容条件。"),
@@ -131,6 +125,12 @@ INTERVENTION_MODULES = {
     "specs": ("定义可复现的干预条件与样本身份", "声明特征集合、编辑幅度、样本读出位置及实验身份的校验约束。"),
     "steering": ("逐步重算前缀进行生成对照", "使用无 KV 缓存的参考解码，比较每一步 SAE 编辑与基线生成结果。"),
 }
+for _task, _pair in TASK_WRAPPER_SUMMARIES.items():
+    MODULES[f"tasks/{_task}/task.py"] = _pair
+for _task, _pair in TASK_IMPLEMENTATION_SUMMARIES.items():
+    MODULES[f"tasks/{_task}/operation.py"] = _pair
+for _stem, _pair in INTERVENTION_MODULES.items():
+    MODULES[f"tasks/intervene/backend/{_stem}.py"] = _pair
 INSTANCE_LABELS = {("tasks", key): value for key, value in TASK_INSTANCE_SEMANTICS.items()}
 KEY_METHODS = {
     "code:function:saebase.api.features:capture_features": "捕获模型激活并编码为 SAE 特征。",
