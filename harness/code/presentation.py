@@ -340,4 +340,7 @@ def readable_code_tree(graph: dict) -> dict:
     from harness.code.interfaces import enrich_code_tree
 
     enrich_code_tree(output, METHODS)
+    from harness.code.functional_taxonomy import organize_saebase_concepts
+
+    organize_saebase_concepts(output)
     return output
