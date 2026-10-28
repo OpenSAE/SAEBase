@@ -329,6 +329,87 @@ def concrete_groups(output: dict) -> None:
 # without adding invented scope nodes or changing authoritative source IDs.
 
 
+def fold_unreviewed_interfaces(output: dict) -> None:
+    """Keep source functions as owner interfaces until their role is reviewed.
+
+    Actual Python source symbols and detailed signatures remain accessible in
+    their owning module or class. This avoids presenting an invented research
+    operation for each function lacking a distinct, reviewed responsibility.
+    Cross-tree evidence targets remain directly navigable.
+    """
+    from harness.visualization.evidence import CODE_TARGETS, TERM_TARGETS
+
+    by_id = {node["id"]: node for node in output["nodes"]}
+    protected = set(CODE_TARGETS.values()) | set(TERM_TARGETS.values()) | set(KEY_METHODS)
+    protected.update(SOURCE_REVIEWS)
+    for edge in output["edges"]:
+        if edge["type"] != "contains":
+            protected.update((edge["source"], edge["target"]))
+    incoming = {}
+    for edge in output["edges"]:
+        if edge["type"] == "contains":
+            incoming[edge["target"]] = edge["source"]
+    combined = defaultdict(list)
+    excluded = set()
+    for node in output["nodes"]:
+        if node["kind"] not in {"method", "function"} or node["id"] in protected:
+            continue
+        if "源码依据和调用参数可在节点的展开说明中查看" not in node.get("summary", ""):
+            continue
+        parent = by_id.get(incoming.get(node["id"]))
+        if not parent:
+            continue
+        kind = parent.get("kind")
+        if node["kind"] == "method" and kind != "class":
+            continue
+        if node["kind"] == "function" and kind != "module":
+            continue
+        interface = next(
+            (attr["interface"] for attr in node.get("attributes", [])
+             if attr.get("type") == "interface"),
+            None,
+        )
+        if not interface or not interface.get("signature"):
+            raise ValueError("Cannot consolidate source interface: " + node["id"])
+        if kind == "module":
+            combined[parent["id"]].append({
+                **copy.deepcopy(interface),
+                "symbol_id": node["id"],
+                "source_path": node["path"],
+            })
+        else:
+            blocks = [
+                attr for attr in parent.get("attributes", [])
+                if attr.get("type") == "class_methods"
+            ]
+            if not blocks or not any(
+                method.get("name") == node["source_symbol"]
+                for method in blocks[0].get("methods", [])
+            ):
+                raise ValueError("Class method source lost during consolidation: " + node["id"])
+        excluded.add(node["id"])
+    for parent_id, methods in combined.items():
+        parent = by_id[parent_id]
+        parent.setdefault("attributes", []).append({
+            "type": "class_methods",
+            "label": "函数源码接口与参数 · " + str(len(methods)) + " 个",
+            "methods": sorted(methods, key=lambda item: (item.get("line", 0), item["name"])),
+        })
+        for attribute in parent["attributes"]:
+            if attribute.get("type") == "module_contents":
+                hidden_names = {item["name"] for item in methods}
+                attribute["functions"] = [
+                    name for name in attribute.get("functions", [])
+                    if name not in hidden_names
+                ]
+    output["nodes"] = [node for node in output["nodes"] if node["id"] not in excluded]
+    output["edges"] = [
+        edge for edge in output["edges"]
+        if edge["source"] not in excluded and edge["target"] not in excluded
+    ]
+    output["folded_interface_count"] = len(excluded)
+
+
 def readable_code_tree(graph: dict) -> dict:
     """Presentation-only, already-existing component subset of an AST snapshot."""
     output = copy.deepcopy(graph)
@@ -450,4 +531,5 @@ def readable_code_tree(graph: dict) -> dict:
     from harness.code.functional_taxonomy import organize_oversized_concepts
 
     organize_oversized_concepts(output)
+    fold_unreviewed_interfaces(output)
     return output
