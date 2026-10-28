@@ -1058,6 +1058,15 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
     scope = domain(path)
     reviewed = REVIEWED_CODE.get(node["id"])
     doc = source_description(node)
+    paired = source_paired_code_summary(node)
+    has_source_responsibility = re.fullmatch(
+        r"负责.+；源码依据和调用参数可在节点的展开说明中查看。",
+        str(node.get("summary") or "").strip(),
+    )
+    if has_source_responsibility and not (reviewed or doc or paired):
+        raise ValueError(
+            "Untranslated Code responsibility: " + node["id"] + ": " + str(node["summary"])
+        )
     reviewed_status = "reviewed" if reviewed else ("source_docstring" if doc else "source_identity")
     if reviewed:
         title, summary = reviewed
@@ -1065,7 +1074,7 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
         title = action_label(node, name, path)
         if doc and len(doc) <= 120 and doc.split(" ", 1)[0] in SOURCE_VERBS:
             title = doc.rstrip(".")
-        summary = doc or source_paired_code_summary(node) or title + "."
+        summary = doc or paired or title + "."
     elif kind == "class":
         if name.endswith(("Config", "Cfg", "Options", "Spec")):
             title = "Configure " + human(name) + " for " + scope
@@ -1073,13 +1082,13 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
             title = "Represent " + human(name) + " for " + scope
         else:
             title = "Provide " + human(name) + " for " + scope
-        summary = doc or source_paired_code_summary(node) or title + "."
+        summary = doc or paired or title + "."
     elif kind == "module":
         title = MODULE_ACTIONS.get(stem, "Inspect " + human(stem) + " implementation")
         title += " for " + scope
         if doc and len(doc) <= 120 and doc.split(" ", 1)[0] in SOURCE_VERBS:
             title = doc.rstrip(".")
-        summary = doc or source_paired_code_summary(node) or title + "."
+        summary = doc or paired or title + "."
     else:
         descendants = [by_id[c] for c in children.get(node["id"], []) if c in by_id]
         title = group_label(node, descendants, children, by_id)
