@@ -210,6 +210,7 @@ def compact_public_code_tree(graph: dict) -> dict:
                     "label": "源码接口与实现依据 · " + str(len(source_records[node_id])) + " 项",
                     "members": source_records[node_id],
                 }
+            )
     source_edges = []
     for node_id in keep:
         if node_id != root:
