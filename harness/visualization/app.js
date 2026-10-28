@@ -1523,6 +1523,26 @@
   }
   function renderAttributeBlock(parent,attr,node) {
     if(!attr || typeof attr.label!=="string")return;
+    if(attr.type==="source_interfaces") {
+      const section=attributeSection(parent,attr.label);
+      // Source symbols are technical detail, not fictional research cards.
+      for(const item of attr.members||[]) {
+        const details=el("details","node-method-details");
+        const heading=el("summary","node-method-summary",
+          (item.kind||"source")+" · "+(item.source_symbol||item.id));
+        details.appendChild(heading);
+        const body=el("div","node-method-body");
+        const originalPath=item.path||node.path||"";
+        if(item.signature)body.appendChild(el("code","node-attribute-signature",item.signature));
+        for(const block of item.attributes||[]) {
+          renderAttributeBlock(body,block,{path:originalPath,id:item.id});
+        }
+        if(originalPath)sourceAnchor(body,originalPath,item.line||1,"查看真实源码");
+        details.appendChild(body);
+        section.appendChild(details);
+      }
+      return;
+    }
     if(attr.type==="class_methods") {
       const section=attributeSection(parent,attr.label);
       for(const item of attr.methods||[]) {
