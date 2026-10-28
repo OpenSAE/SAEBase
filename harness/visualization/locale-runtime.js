@@ -75,6 +75,7 @@
       const owner = node?.id === "g.sae.sar_adapter" || /(?:^|:)evaluate_sar$/.test(node?.id || "") ? "evaluate_sar" : (node?.source_symbol?.split(".").pop() || "");
       const context = projection.parameter_context?.[owner];
       if (field && context?.[field]) return context[field];
+      if (projection.meaning_translations?.[value]) return projection.meaning_translations[value];
       if (field && projection.parameter_meanings[field])
         return projection.parameter_meanings[field];
       // Do not fabricate semantics from an annotation or a source identifier.
