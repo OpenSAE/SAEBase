@@ -33,7 +33,7 @@ def _source_record(node: dict) -> dict:
         for info in interfaces:
             # Generated Chinese fallback prose has no independently verified
             # English translation. Exact signatures, returns and code remain.
-            if any("\\u3400" <= c <= "\\u9fff" for c in info.get("purpose", "")):
+            if any(0x3400 <= ord(c) <= 0x9FFF for c in info.get("purpose", "")):
                 info.pop("purpose", None)
     return {
         "id": node["id"],
