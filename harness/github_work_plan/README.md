@@ -1,3 +1,7 @@
+## Harness-only local Agent examination — WP18
+
+[**WP18 — Harness 测验与独立验收**](18_harness_local_agent_examination_and_independent_acceptance.md)：针对 Cursor Rules、Skills、Hooks、Agent Flow、Work Order、Code/Context/Environment 与 Atlas 五棵树的测试计划。包含 12 组单元/负面验证、6 个需要在隔离分支中真实修改代码的小任务、候选 Tree 交付要求及独立评审评分门槛。**目前仅是计划，未授权本地 Agent 执行；不涉及 SAE 科研功能，也不取代 WP15–WP17。**
+
 ## Current product execution — WP17
 
 [**WP17 — Seven playground compute handoff**](17_seven_playgrounds_agent_handoff.md): the active, single GPU Agent task list. All seven example-first browser modules are implemented; reuse WP13–WP15 assets and replace only marked Demo results with real compute.
