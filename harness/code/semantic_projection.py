@@ -45,6 +45,7 @@ def _source_record(node: dict) -> dict:
         "kind": node.get("kind", ""),
         "source_symbol": node.get("source_symbol", ""),
         "path": node.get("path") or node.get("source_path") or "",
+        "evidence": node.get("evidence") or [],
         "line": node.get("line"),
         "signature": node.get("signature", ""),
         "context_term_ids": node.get("context_term_ids") or [],
