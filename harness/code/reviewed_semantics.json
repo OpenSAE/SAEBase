@@ -208,6 +208,142 @@
       "zh_summary": "核查作业编号和所有者摘要，仅返回该所有者对应的任务状态字段。",
       "en_title": "Read a job status under its owner's scope",
       "en_summary": "Return status metadata for a job owned by the requesting identity."
+    },
+    "code:method:saebase.sae.registry:SAEProfile.base": {
+      "source_path": "saebase/sae/registry.py",
+      "source_symbol": "base",
+      "zh_title": "查询当前 SAE 对应的基础模型规格",
+      "zh_summary": "按模型 Key 读取受测语言模型的 BaseModelSpec。",
+      "en_title": "Resolve the base model specification for an SAE",
+      "en_summary": "Look up the SAE profile's BaseModelSpec from its model key."
+    },
+    "code:method:saebase.sae.registry:SAEProfile.hook_name": {
+      "source_path": "saebase/sae/registry.py",
+      "source_symbol": "hook_name",
+      "zh_title": "构造 SAE 层对应的 Hook 名称",
+      "zh_summary": "校验目标层编号并返回 Transformer Block 的 Hook 路径。",
+      "en_title": "Resolve the activation Hook name for an SAE layer",
+      "en_summary": "Validate a layer index and construct its transformer Hook path."
+    },
+    "code:method:saebase.sae.registry:SAEProfile.sae_folder": {
+      "source_path": "saebase/sae/registry.py",
+      "source_symbol": "sae_folder",
+      "zh_title": "确定指定层的 SAE 权重目录",
+      "zh_summary": "根据已解析物理路径或目录模板定位相应 SAE 资源。",
+      "en_title": "Find the SAE checkpoint directory for a layer",
+      "en_summary": "Resolve the physical directory or layer-formatted template for stored SAE weights."
+    },
+    "code:method:saebase.sae.registry:SAEProfile.sae_id": {
+      "source_path": "saebase/sae/registry.py",
+      "source_symbol": "sae_id",
+      "zh_title": "解析指定层的 SAE 身份标识",
+      "zh_summary": "优先使用已登记的层映射，再按逻辑 ID 或 Hook 模板解析身份。",
+      "en_title": "Resolve the SAE identity for a selected layer",
+      "en_summary": "Choose a registered layer-specific SAE ID or derive it from a validated template."
+    },
+    "code:method:saebase.sae.registry:SAEProfile.transfer_meta": {
+      "source_path": "saebase/sae/registry.py",
+      "source_symbol": "transfer_meta",
+      "zh_title": "打包 SAE 发布与权重来源元数据",
+      "zh_summary": "汇总发布版本、逻辑 SAE ID 和实际权重路径，供组件间传递。",
+      "en_title": "Export transferable SAE release metadata",
+      "en_summary": "Return release identity and resolved checkpoint-location fields as a mapping."
+    },
+    "code:method:saebase.sae.stage_d:SiteKey.as_tuple": {
+      "source_path": "saebase/sae/stage_d.py",
+      "source_symbol": "as_tuple",
+      "zh_title": "读取模型、SAE 与层编号三元组",
+      "zh_summary": "将站点身份投影为模型 Key、SAE Key 和 Layer 的有序组合。",
+      "en_title": "Read the model–SAE–layer key tuple",
+      "en_summary": "Return the site identity as its model, SAE, and layer tuple."
+    },
+    "code:method:saebase.sae.stage_d:SiteKey.id": {
+      "source_path": "saebase/sae/stage_d.py",
+      "source_symbol": "id",
+      "zh_title": "编码包含 Hook 的受测站点 ID",
+      "zh_summary": "将模型、SAE、层编号和 Hook 串联成可追溯的站点标识。",
+      "en_title": "Encode an evaluation site identifier with its Hook",
+      "en_summary": "Create a stable site identifier from model, SAE, layer, and Hook fields."
+    },
+    "code:method:saebase.store.identity:VerifiedCheckpointSession.mint": {
+      "source_path": "saebase/store/identity.py",
+      "source_symbol": "mint",
+      "zh_title": "为模型权重建立校验会话",
+      "zh_summary": "对给定模块权重计算状态签名及内容哈希，并保存弱引用。",
+      "en_title": "Create a verified model-checkpoint session",
+      "en_summary": "Hash module states and pin their identities for subsequent checkpoint verification."
+    },
+    "code:method:saebase.store.identity:VerifiedCheckpointSession.open": {
+      "source_path": "saebase/store/identity.py",
+      "source_symbol": "open",
+      "zh_title": "查询权重校验会话是否仍有效",
+      "zh_summary": "读取当前会话的开放状态，供后续操作核查权重租约。",
+      "en_title": "Read the checkpoint session validity state",
+      "en_summary": "Expose whether the pinned checkpoint-verification session remains open."
+    },
+    "code:method:saebase.store.identity:VerifiedCheckpointSession.strict_recheck": {
+      "source_path": "saebase/store/identity.py",
+      "source_symbol": "strict_recheck",
+      "zh_title": "重新核验固定模型权重的 SHA256",
+      "zh_summary": "逐个计算已登记模块的实际权重哈希，检查会话对应的字节身份。",
+      "en_title": "Reverify the exact bytes of pinned model weights",
+      "en_summary": "Rehash each pinned module and invalidate the session if its checkpoint digest changes."
+    },
+    "code:method:saebase.store.shards:ShardedReader.metadata": {
+      "source_path": "saebase/store/shards.py",
+      "source_symbol": "metadata",
+      "zh_title": "按样本编号读取存储记录元数据",
+      "zh_summary": "从分片索引还原选定 SampleRecord 的身份与样本字段。",
+      "en_title": "Read sample metadata from a shard index",
+      "en_summary": "Reconstruct the selected SampleRecord using its stored index entry."
+    },
+    "code:method:saebase.store.shards:ShardedReader.row_count": {
+      "source_path": "saebase/store/shards.py",
+      "source_symbol": "row_count",
+      "zh_title": "统计 Manifest 记录的分片行数",
+      "zh_summary": "累加全部分片的行数，返回该存储集合的样本记录总量。",
+      "en_title": "Count rows across all stored shards",
+      "en_summary": "Sum the row counts recorded in the shard manifest."
+    },
+    "code:method:saebase.runtime.training.training_callbacks:EpochEtaHoursCallback.on_train_start": {
+      "source_path": "saebase/runtime/training/training_callbacks.py",
+      "source_symbol": "on_train_start",
+      "zh_title": "初始化训练轮次耗时统计",
+      "zh_summary": "在训练开始时记录计时起点，并重置已完成 Epoch 计数。",
+      "en_title": "Initialize epoch timing at training start",
+      "en_summary": "Set the performance timer and reset the completed-epoch counter."
+    },
+    "code:method:saebase.runtime.training.training_callbacks:EpochEtaHoursCallback.on_validation_epoch_end": {
+      "source_path": "saebase/runtime/training/training_callbacks.py",
+      "source_symbol": "on_validation_epoch_end",
+      "zh_title": "更新剩余训练时长估计",
+      "zh_summary": "依据已完成轮次与实际耗时，记录预估的完整训练小时数。",
+      "en_title": "Update estimated full-training duration",
+      "en_summary": "Use completed validation epochs and elapsed time to estimate training duration."
+    },
+    "code:method:saebase.runtime.training.training_callbacks:CompactTQDMProgressBar.sanity_check_description": {
+      "source_path": "saebase/runtime/training/training_callbacks.py",
+      "source_symbol": "sanity_check_description",
+      "zh_title": "标注训练前的验证检查进度",
+      "zh_summary": "为 Sanity Check 进度条返回简短的 san 阶段名称。",
+      "en_title": "Label the sanity-check progress stage",
+      "en_summary": "Return the compact san label for preliminary validation progress."
+    },
+    "code:method:saebase.runtime.training.training_callbacks:CompactTQDMProgressBar.validation_description": {
+      "source_path": "saebase/runtime/training/training_callbacks.py",
+      "source_symbol": "validation_description",
+      "zh_title": "标注正式验证进度",
+      "zh_summary": "为验证阶段的进度条返回 val 阶段名称。",
+      "en_title": "Label the regular validation progress stage",
+      "en_summary": "Return the compact val label for normal validation progress."
+    },
+    "code:method:saebase.runtime.training.training_callbacks:CompactTQDMProgressBar.on_validation_batch_start": {
+      "source_path": "saebase/runtime/training/training_callbacks.py",
+      "source_symbol": "on_validation_batch_start",
+      "zh_title": "更新验证批次与数据加载器提示",
+      "zh_summary": "在验证批次启动时显示验证状态与当前 DataLoader 编号。",
+      "en_title": "Update validation-batch progress context",
+      "en_summary": "Set the displayed validation or sanity-check label and DataLoader index."
     }
   }
 }
