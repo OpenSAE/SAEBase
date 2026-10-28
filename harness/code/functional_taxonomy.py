@@ -16,6 +16,22 @@ CATALOG = ROOT / "harness/code/atlas_concepts.json"
 PARENT = "code:group:saebase"
 
 
+# Pure compatibility re-exports preserve historical Python imports but do not
+# implement independent scientific operations. The source remains in GitHub;
+# Atlas represents the canonical implementation instead.
+REEXPORT_DOCSTRINGS = frozenset({
+    "Legacy import forwarding to the canonical Dataset implementation.",
+    "Compatibility import for Dataset plugin registration.",
+    "Compatibility import of the unified Task registry.",
+    "Compatibility re-export of the unified model plugin module.",
+})
+
+
+def is_reexport_only(node: dict) -> bool:
+    return (node.get("kind") == "module"
+            and str(node.get("description") or "").strip() in REEXPORT_DOCSTRINGS)
+
+
 def _source_area(path: str) -> str:
     pieces = Path(path).parts
     if len(pieces) < 2 or pieces[0] != "saebase":
