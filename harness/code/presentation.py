@@ -277,12 +277,7 @@ def concrete_groups(output: dict) -> None:
             )
             nodes.append({
                 "id": instance_id, "kind": "group", "title": instance_title,
-                "summary": instance_summary,
-                "description": (
-                    "该研究任务集合负责组织 " + name + " 的独立实现、配置与执行证据。"
-                    if area != "tasks"
-                    else instance_summary
-                ),
+                "summary": instance_summary, "description": instance_summary,
                 "status": "implemented", "evidence": [m["path"] for m in modules],
                 "presentation_only": True, "source_symbol": "",
                 "context_term_ids": [{"datasets": "term.dataset", "models": "term.model",
