@@ -128,3 +128,16 @@ def test_reviewed_sibling_purposes_are_semantically_distinct() -> None:
                     other_id,
                     "English meaning",
                 )
+
+
+def test_source_attributes_add_evidence_instead_of_repeating_card_summary() -> None:
+    source = json.loads((ROOT / "doc/code/code_tree.json").read_text(encoding="utf-8"))
+    code = readable_code_tree(source)
+    for node in code["nodes"]:
+        if node.get("kind") not in {"class", "module"}:
+            continue
+        for attribute in node.get("attributes") or []:
+            assert not (
+                attribute.get("type") == "text"
+                and attribute.get("value") == node.get("summary")
+            ), node["id"]
