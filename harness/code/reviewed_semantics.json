@@ -792,6 +792,210 @@
         "term.saebase",
         "term.api"
       ]
+    },
+    "code:module:saebase.sae.activation_health": {
+      "source_path": "saebase/sae/activation_health.py",
+      "source_symbol": "saebase/sae/activation_health.py",
+      "zh_title": "评测 SAE 编码与重建的激活健康程度",
+      "zh_summary": "执行末 Token 激活捕获、稀疏字典编码和重建质量统计。",
+      "en_title": "Evaluate the health of SAE activations and reconstructions",
+      "en_summary": "Run last-token Hook capture, SAE encoding, and reconstruction health checks.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.analyze": {
+      "source_path": "saebase/sae/analyze.py",
+      "source_symbol": "saebase/sae/analyze.py",
+      "zh_title": "计算 Prompt 激活的 SAE 稀疏性与重建指标",
+      "zh_summary": "对输入文本捕获 Hook 状态，统计激活特征数量与重建误差。",
+      "en_title": "Analyze SAE sparsity and reconstruction on prompt activations",
+      "en_summary": "Capture Hook activations and calculate sparse feature statistics and reconstruction measurements.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.catalog": {
+      "source_path": "saebase/sae/catalog.py",
+      "source_symbol": "saebase/sae/catalog.py",
+      "zh_title": "索引已注册的 Gemma Scope 2 SAE 资源",
+      "zh_summary": "整理官方模型与 SAE 资源身份，并记录版本、宽度和层覆盖信息。",
+      "en_title": "Index registered Gemma Scope 2 SAE assets",
+      "en_summary": "List official model and SAE asset identities with layer, width, and revision metadata.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.contracts": {
+      "source_path": "saebase/sae/contracts.py",
+      "source_symbol": "saebase/sae/contracts.py",
+      "zh_title": "核验 Prompt 产物与 SAE 形状协议",
+      "zh_summary": "校验样本记录、模型身份、张量数值和稀疏编码的维度约束。",
+      "en_title": "Validate Prompt artifacts and SAE tensor contracts",
+      "en_summary": "Check source manifests, SAE tensor dimensions, finite values, and sample record requirements.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.coverage": {
+      "source_path": "saebase/sae/coverage.py",
+      "source_symbol": "saebase/sae/coverage.py",
+      "zh_title": "规划 SAE 模型层与结构覆盖矩阵",
+      "zh_summary": "建立按模型规模、SAE 架构和 Layer 划分的预期评测位置。",
+      "en_title": "Plan coverage across model scales, layers, and SAE architectures",
+      "en_summary": "Define expected site combinations for subsequent checkpoint and evaluation verification.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.env_check": {
+      "source_path": "saebase/sae/env_check.py",
+      "source_symbol": "saebase/sae/env_check.py",
+      "zh_title": "检查 SAE 运行环境中的核心依赖",
+      "zh_summary": "探测 PyTorch、TransformerLens、SAELens、Hub 和 CUDA 软件条件。",
+      "en_title": "Probe dependencies of the SAE execution environment",
+      "en_summary": "Check the availability of PyTorch, TransformerLens, SAELens, Hub, and CUDA.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.loading": {
+      "source_path": "saebase/sae/loading.py",
+      "source_symbol": "saebase/sae/loading.py",
+      "zh_title": "按注册配置加载语言模型与稀疏字典",
+      "zh_summary": "从登记的模型与 SAE 身份定位权重，并构造可用于激活分析的配对实例。",
+      "en_title": "Load model and sparse dictionary from registered profiles",
+      "en_summary": "Resolve model and SAE checkpoint identities and construct matched analysis resources.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.pipeline_checks": {
+      "source_path": "saebase/sae/pipeline_checks.py",
+      "source_symbol": "saebase/sae/pipeline_checks.py",
+      "zh_title": "执行 SAE 评测任务的预检约束",
+      "zh_summary": "检查 Hydra 输入、模型与 SAE 配对和 Prompt Manifest 的可用条件。",
+      "en_title": "Validate SAE evaluation preflight requirements",
+      "en_summary": "Check configured task compatibility, model-SAE pairs, and prompt manifest readiness.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.prompts": {
+      "source_path": "saebase/sae/prompts.py",
+      "source_symbol": "saebase/sae/prompts.py",
+      "zh_title": "读取准备好的 SAE 评测输入文本",
+      "zh_summary": "按研究行为和模型 Key 加载受控 Prompt 与其追溯信息。",
+      "en_title": "Load prepared prompts for SAE evaluation",
+      "en_summary": "Retrieve source-identified prompt records for the selected behavior and model.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.registry": {
+      "source_path": "saebase/sae/registry.py",
+      "source_symbol": "saebase/sae/registry.py",
+      "zh_title": "维护 SAE 字典配置与模型适配身份",
+      "zh_summary": "登记 SAE 版本、层位置、Hook 名称和对应基础模型的配置。",
+      "en_title": "Register SAE profiles independently from base models",
+      "en_summary": "Bind SAE releases, Hook coordinates, layer coverage, and compatible model specifications.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.results": {
+      "source_path": "saebase/sae/results.py",
+      "source_symbol": "saebase/sae/results.py",
+      "zh_title": "保存 SAE 评测结果与行级统计摘要",
+      "zh_summary": "序列化评测记录并汇总有效观测、指标和文件路径。",
+      "en_title": "Persist SAE evaluation results and row-level summaries",
+      "en_summary": "Write structured evaluation JSON and aggregate status and metric records.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.scope2_clt": {
+      "source_path": "saebase/sae/scope2_clt.py",
+      "source_symbol": "saebase/sae/scope2_clt.py",
+      "zh_title": "实现跨层 Transcoder 的原生权重代数",
+      "zh_summary": "读取 Gemma Scope 2 CLT 的逐层编码与多目标层解码张量。",
+      "en_title": "Implement native cross-layer transcoder shard algebra",
+      "en_summary": "Handle Gemma Scope 2 cross-layer encoding and target-layer decoding tensors.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.scope2_native": {
+      "source_path": "saebase/sae/scope2_native.py",
+      "source_symbol": "saebase/sae/scope2_native.py",
+      "zh_title": "加载官方 Gemma Scope 2 稀疏模型格式",
+      "zh_summary": "校验官方配置和 Safetensors，装配 JumpReLU SAE、Transcoder 与 Crosscoder。",
+      "en_title": "Load authentic Gemma Scope 2 sparse model formats",
+      "en_summary": "Read official configs and Safetensors for JumpReLU SAEs, transcoders, and crosscoders.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.sparsify_adapter": {
+      "source_path": "saebase/sae/sparsify_adapter.py",
+      "source_symbol": "saebase/sae/sparsify_adapter.py",
+      "zh_title": "将原生 Sparsify 特征输出适配为稠密向量",
+      "zh_summary": "保留原生 TopK 选择，转换编码值和索引以接入 SAEBase 接口。",
+      "en_title": "Adapt native Sparsify features to dense SAEBase codes",
+      "en_summary": "Convert original TopK values and indices into dense code vectors for SAEBase.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.stage_d": {
+      "source_path": "saebase/sae/stage_d.py",
+      "source_symbol": "saebase/sae/stage_d.py",
+      "zh_title": "维护模型与 SAE 配对的验收记录",
+      "zh_summary": "安排受测站点并保存结果状态、证据校验和最终覆盖矩阵。",
+      "en_title": "Manage model–SAE pairing acceptance evidence",
+      "en_summary": "Schedule evaluation sites and record execution status, checksums, and coverage results.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.task": {
+      "source_path": "saebase/sae/task.py",
+      "source_symbol": "saebase/sae/task.py",
+      "zh_title": "将 SAE 健康检查分派给已注册评估器",
+      "zh_summary": "从 Hydra 任务配置解析评测类型，并调用相应的 SAE 评估实现。",
+      "en_title": "Dispatch an SAE health task to its registered evaluator",
+      "en_summary": "Resolve the selected evaluation plugin from Hydra configuration and execute its SAE checks.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.verify_registry": {
+      "source_path": "saebase/sae/verify_registry.py",
+      "source_symbol": "saebase/sae/verify_registry.py",
+      "zh_title": "列出当前注册的 SAE 配对配置",
+      "zh_summary": "打印模型 Key、字典发布版本及受支持的层和 Hook 选项。",
+      "en_title": "List registered SAE profiles and checkpoint choices",
+      "en_summary": "Print the model keys, SAE releases, and declared activation-site registrations.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
     }
   }
 }
