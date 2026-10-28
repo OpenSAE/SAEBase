@@ -78,7 +78,8 @@
     }
     if (key === "value") return en.summary;
     if (key === "name" && parent?.path) return parent.path;
-    return "Source-linked " + key.replace(/_/g, " ") + " for " + name;
+    // Unrecognized free-form prose requires an explicit reviewed translation.
+    return "";
   }
   function translateNested(value, key, parent, node, en) {
     if (typeof value === "string")
