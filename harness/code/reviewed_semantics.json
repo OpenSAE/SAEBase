@@ -1,0 +1,1001 @@
+{
+  "schema": "saebase.atlas.reviewed_semantics.v1",
+  "nodes": {
+    "code:method:datasets.controlled_inputs:ControlledInputDesign.n_states": {
+      "source_path": "datasets/controlled_inputs.py",
+      "source_symbol": "n_states",
+      "zh_title": "统计受控输入条件数量",
+      "zh_summary": "返回设计中已定义的状态数，用于检查因素组合覆盖。",
+      "en_title": "Count controlled input states",
+      "en_summary": "Return the number of enumerated states in the controlled-input design.",
+      "context_term_ids": [
+        "term.dataset",
+        "term.sae"
+      ]
+    },
+    "code:method:datasets.controlled_inputs:ControlledInputDesign.reindex": {
+      "source_path": "datasets/controlled_inputs.py",
+      "source_symbol": "reindex",
+      "zh_title": "重映射受控条件坐标",
+      "zh_summary": "按双射映射重新分配状态位置，并沿用既有输入样本。",
+      "en_title": "Remap controlled condition coordinates",
+      "en_summary": "Permute existing input-state masks while reusing the same samples.",
+      "context_term_ids": [
+        "term.dataset",
+        "term.sae"
+      ]
+    },
+    "code:method:datasets.controlled_inputs:ControlledInputDesign.sample_ids_by_state": {
+      "source_path": "datasets/controlled_inputs.py",
+      "source_symbol": "sample_ids_by_state",
+      "zh_title": "按因素状态索引样本 ID",
+      "zh_summary": "建立状态位掩码到样本身份的映射表。",
+      "en_title": "Index sample identities by factor state",
+      "en_summary": "Return the mapping from state bit masks to sample identifiers.",
+      "context_term_ids": [
+        "term.dataset",
+        "term.sae"
+      ]
+    },
+    "code:method:datasets.controlled_inputs:ControlledInputDesign.sample_records": {
+      "source_path": "datasets/controlled_inputs.py",
+      "source_symbol": "sample_records",
+      "zh_title": "构建逐状态 Token 样本记录",
+      "zh_summary": "逐个状态执行分词与校验，并生成包含模型 Token 位置的样本记录。",
+      "en_title": "Build tokenized records for each input state",
+      "en_summary": "Tokenize and validate all design states and create model-bound sample records.",
+      "context_term_ids": [
+        "term.dataset",
+        "term.sae"
+      ]
+    },
+    "code:method:datasets.controlled_inputs:ControlledInputManifest.sample_ids_by_state": {
+      "source_path": "datasets/controlled_inputs.py",
+      "source_symbol": "sample_ids_by_state",
+      "zh_title": "从 Manifest 读取状态样本索引",
+      "zh_summary": "从存档状态字段恢复位掩码与样本编号的对应关系。",
+      "en_title": "Read state identities from a manifest",
+      "en_summary": "Map serialized state masks to the sample IDs stored in the manifest.",
+      "context_term_ids": [
+        "term.dataset",
+        "term.sae"
+      ]
+    },
+    "code:method:models.hf_hooks_backend:HFHooksModel.cache_site_hidden": {
+      "source_path": "models/hf_hooks_backend.py",
+      "source_symbol": "cache_site_hidden",
+      "zh_title": "提取指定层完整序列的隐藏状态",
+      "zh_summary": "捕获目标层所有 Token 的残差隐藏向量，返回三维激活张量。",
+      "en_title": "Capture complete hidden states at a layer",
+      "en_summary": "Return full-sequence residual activations from the selected transformer block.",
+      "context_term_ids": [
+        "term.model",
+        "term.api"
+      ]
+    },
+    "code:method:models.hf_hooks_backend:HFHooksModel.cache_site_with_logits": {
+      "source_path": "models/hf_hooks_backend.py",
+      "source_symbol": "cache_site_with_logits",
+      "zh_title": "同时采集隐藏状态和预测分数",
+      "zh_summary": "在一次前向计算中返回目标层激活与每个 Token 的词表 Logit。",
+      "en_title": "Capture hidden activations together with logits",
+      "en_summary": "Return site activations and vocabulary logits from a single forward pass.",
+      "context_term_ids": [
+        "term.model",
+        "term.api"
+      ]
+    },
+    "code:method:models.hf_hooks_backend:HFHooksModel.run_batch": {
+      "source_path": "models/hf_hooks_backend.py",
+      "source_symbol": "run_batch",
+      "zh_title": "批量测量指定位置的激活与 Logit",
+      "zh_summary": "按样本位置执行 Hook 前向传播，返回批量激活和读出预测分数。",
+      "en_title": "Run batched activation and logit readouts",
+      "en_summary": "Return per-sample Hook activations and readout logits at selected token positions.",
+      "context_term_ids": [
+        "term.model",
+        "term.api"
+      ]
+    },
+    "code:method:models.hf_hooks_backend:HFHooksModel.run_with_patch": {
+      "source_path": "models/hf_hooks_backend.py",
+      "source_symbol": "run_with_patch",
+      "zh_title": "在指定层注入残差补丁并计算 Logit",
+      "zh_summary": "用位置映射替换残差激活，再读取指定输出位置的词表分数。",
+      "en_title": "Compute logits with residual activation patches",
+      "en_summary": "Apply position-specific residual patches and return logits at the requested readout.",
+      "context_term_ids": [
+        "term.model",
+        "term.api"
+      ]
+    },
+    "code:method:saebase.api.components:ComponentContributions.n_components": {
+      "source_path": "saebase/api/components.py",
+      "source_symbol": "n_components",
+      "zh_title": "统计分解后的模型组件数量",
+      "zh_summary": "读取组件贡献向量矩阵的首维长度，确定可分析的组件个数。",
+      "en_title": "Count decomposition components",
+      "en_summary": "Read the leading dimension of component contribution vectors.",
+      "context_term_ids": [
+        "term.model",
+        "term.sae"
+      ]
+    },
+    "code:method:saebase.api.components:ComponentContributions.projected_sum": {
+      "source_path": "saebase/api/components.py",
+      "source_symbol": "projected_sum",
+      "zh_title": "汇总组件向量与残差偏置",
+      "zh_summary": "将各组件贡献向量求和并加上偏置项，恢复总贡献向量。",
+      "en_title": "Sum component vectors with the residual bias",
+      "en_summary": "Combine per-component contribution vectors and their bias into a single total.",
+      "context_term_ids": [
+        "term.model",
+        "term.sae"
+      ]
+    },
+    "code:method:saebase.api.fine_components:ComponentContributions.n_components": {
+      "source_path": "saebase/api/fine_components.py",
+      "source_symbol": "n_components",
+      "zh_title": "统计细粒度分解组件的个数",
+      "zh_summary": "返回细粒度贡献向量的数量，以便组织后续组件分析。",
+      "en_title": "Count fine-grained contribution components",
+      "en_summary": "Return the number of fine-grained component contribution vectors.",
+      "context_term_ids": [
+        "term.model",
+        "term.sae"
+      ]
+    },
+    "code:method:saebase.api.fine_components:ComponentContributions.projected_sum": {
+      "source_path": "saebase/api/fine_components.py",
+      "source_symbol": "projected_sum",
+      "zh_title": "重建细粒度分量的总体贡献",
+      "zh_summary": "汇总细粒度组件向量并添加偏置，得到重建后的总投影。",
+      "en_title": "Reconstruct the aggregate fine-grained projection",
+      "en_summary": "Sum fine-grained contribution vectors and their bias to obtain the combined projection.",
+      "context_term_ids": [
+        "term.model",
+        "term.sae"
+      ]
+    },
+    "code:method:saebase.api.metadata:SAEIdentity.site": {
+      "source_path": "saebase/api/metadata.py",
+      "source_symbol": "site",
+      "zh_title": "从 SAE 元数据定位模型 Hook",
+      "zh_summary": "使用保存的层编号和 Hook 名称构造 ActivationSite。",
+      "en_title": "Resolve the activation Hook from SAE identity",
+      "en_summary": "Construct an ActivationSite from the recorded layer and Hook name.",
+      "context_term_ids": [
+        "term.sae",
+        "term.api"
+      ]
+    },
+    "code:method:saebase.api.metadata:SAEIdentity.from_loaded": {
+      "source_path": "saebase/api/metadata.py",
+      "source_symbol": "from_loaded",
+      "zh_title": "从加载的 SAE 校验并建立模型身份",
+      "zh_summary": "核查编码维度与权重元数据，再构建 SAEIdentity 记录。",
+      "en_title": "Validate identity from a loaded SAE",
+      "en_summary": "Check SAE dimensions against metadata before constructing its identity record.",
+      "context_term_ids": [
+        "term.sae",
+        "term.api"
+      ]
+    },
+    "code:method:saebase.api.metadata:SAEIdentity.for_custom": {
+      "source_path": "saebase/api/metadata.py",
+      "source_symbol": "for_custom",
+      "zh_title": "为自定义 SAE 构建身份记录",
+      "zh_summary": "将检查点、模型、层位置与自定义加载信息交给统一身份校验入口。",
+      "en_title": "Create an identity record for a custom SAE",
+      "en_summary": "Bind custom checkpoint, model, and activation-site metadata through the validated identity constructor.",
+      "context_term_ids": [
+        "term.sae",
+        "term.api"
+      ]
+    },
+    "code:method:saebase.api.model:ModelAdapter.capture": {
+      "source_path": "saebase/api/model.py",
+      "source_symbol": "capture",
+      "zh_title": "采集指定 Hook 的激活向量",
+      "zh_summary": "核验捕获能力与目标层位置，返回模型在所选 Token 的特征向量。",
+      "en_title": "Capture an activation vector at a model Hook",
+      "en_summary": "Validate the activation site and return the hidden vector at the selected token.",
+      "context_term_ids": [
+        "term.sae",
+        "term.api"
+      ]
+    },
+    "code:method:saebase.api.model:ModelAdapter.capture_with_logits": {
+      "source_path": "saebase/api/model.py",
+      "source_symbol": "capture_with_logits",
+      "zh_title": "一次调用同时读取激活和基线 Logit",
+      "zh_summary": "采集目标 Hook 向量，并读取指定位置的输出分数以供后续对照。",
+      "en_title": "Capture activations and baseline logits together",
+      "en_summary": "Return the site vector and readout logits, using a shared forward when the backend supports it.",
+      "context_term_ids": [
+        "term.sae",
+        "term.api"
+      ]
+    },
+    "code:method:saebase.api.nnsight_local:NNsightLocal.capture": {
+      "source_path": "saebase/api/nnsight_local.py",
+      "source_symbol": "capture",
+      "zh_title": "使用 NNsight 追踪单次输入",
+      "zh_summary": "在一个 trace 上下文中保存目标组件激活并转换成 Tensor。",
+      "en_title": "Capture one activation trace with NNsight",
+      "en_summary": "Trace a single input and materialize the selected component activation as a tensor.",
+      "context_term_ids": [
+        "term.sae",
+        "term.api"
+      ]
+    },
+    "code:method:saebase.api.nnsight_local:NNsightLocal.capture_many": {
+      "source_path": "saebase/api/nnsight_local.py",
+      "source_symbol": "capture_many",
+      "zh_title": "按输入顺序批量执行 NNsight 追踪",
+      "zh_summary": "在统一追踪环境中逐次调用 invoker，并按提交顺序返回各项激活。",
+      "en_title": "Capture multiple ordered NNsight invocations",
+      "en_summary": "Trace multiple inputs and return captured activations in original invocation order.",
+      "context_term_ids": [
+        "term.sae",
+        "term.api"
+      ]
+    },
+    "code:method:saebase.research_lab.backend.jobs:JobQueue.enqueue": {
+      "source_path": "saebase/research_lab/backend/jobs.py",
+      "source_symbol": "enqueue",
+      "zh_title": "登记具有幂等身份的研究作业",
+      "zh_summary": "校验请求与所有者身份后，将作业和私有输入引用存入队列。",
+      "en_title": "Enqueue an idempotent research job",
+      "en_summary": "Validate ownership and request identity before storing a queued private-input reference.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:method:saebase.research_lab.backend.jobs:JobQueue.claim": {
+      "source_path": "saebase/research_lab/backend/jobs.py",
+      "source_symbol": "claim",
+      "zh_title": "为执行 Worker 原子领取排队作业",
+      "zh_summary": "核验 Worker 身份与租期，在事务中领取最早可执行的任务。",
+      "en_title": "Atomically claim the next queued research job",
+      "en_summary": "Reserve the oldest queued job for a validated worker under a bounded lease.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:method:saebase.research_lab.backend.jobs:JobQueue.heartbeat": {
+      "source_path": "saebase/research_lab/backend/jobs.py",
+      "source_symbol": "heartbeat",
+      "zh_title": "续约运行中作业的 Worker 租期",
+      "zh_summary": "验证作业与尝试编号，并延长对应 Worker 的运行租约。",
+      "en_title": "Renew an active worker job lease",
+      "en_summary": "Validate the current worker attempt and extend the running job lease.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:method:saebase.research_lab.backend.jobs:JobQueue.finish": {
+      "source_path": "saebase/research_lab/backend/jobs.py",
+      "source_symbol": "finish",
+      "zh_title": "提交已完成作业的结果摘要或错误码",
+      "zh_summary": "由执行 Worker 报告结果哈希或净化后的错误编号并更新作业状态。",
+      "en_title": "Commit a job result digest or error code",
+      "en_summary": "Record a worker's result hash or sanitized failure code for the current attempt.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:method:saebase.research_lab.backend.jobs:JobQueue.reap_expired": {
+      "source_path": "saebase/research_lab/backend/jobs.py",
+      "source_symbol": "reap_expired",
+      "zh_title": "回收过期租期并安排作业重试",
+      "zh_summary": "扫描租期到期的运行记录，按尝试次数重新排队或标记终止。",
+      "en_title": "Reclaim expired leases and schedule retries",
+      "en_summary": "Recover timed-out jobs and apply retry limits to their queue status.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:method:saebase.research_lab.backend.jobs:JobQueue.status": {
+      "source_path": "saebase/research_lab/backend/jobs.py",
+      "source_symbol": "status",
+      "zh_title": "按所有者权限查询研究作业状态",
+      "zh_summary": "核查作业编号和所有者摘要，仅返回该所有者对应的任务状态字段。",
+      "en_title": "Read a job status under its owner's scope",
+      "en_summary": "Return status metadata for a job owned by the requesting identity.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:method:saebase.sae.registry:SAEProfile.base": {
+      "source_path": "saebase/sae/registry.py",
+      "source_symbol": "base",
+      "zh_title": "查询当前 SAE 对应的基础模型规格",
+      "zh_summary": "按模型 Key 读取受测语言模型的 BaseModelSpec。",
+      "en_title": "Resolve the base model specification for an SAE",
+      "en_summary": "Look up the SAE profile's BaseModelSpec from its model key.",
+      "context_term_ids": [
+        "term.sae",
+        "term.artifact"
+      ]
+    },
+    "code:method:saebase.sae.registry:SAEProfile.hook_name": {
+      "source_path": "saebase/sae/registry.py",
+      "source_symbol": "hook_name",
+      "zh_title": "构造 SAE 层对应的 Hook 名称",
+      "zh_summary": "校验目标层编号并返回 Transformer Block 的 Hook 路径。",
+      "en_title": "Resolve the activation Hook name for an SAE layer",
+      "en_summary": "Validate a layer index and construct its transformer Hook path.",
+      "context_term_ids": [
+        "term.sae",
+        "term.artifact"
+      ]
+    },
+    "code:method:saebase.sae.registry:SAEProfile.sae_folder": {
+      "source_path": "saebase/sae/registry.py",
+      "source_symbol": "sae_folder",
+      "zh_title": "确定指定层的 SAE 权重目录",
+      "zh_summary": "根据已解析物理路径或目录模板定位相应 SAE 资源。",
+      "en_title": "Find the SAE checkpoint directory for a layer",
+      "en_summary": "Resolve the physical directory or layer-formatted template for stored SAE weights.",
+      "context_term_ids": [
+        "term.sae",
+        "term.artifact"
+      ]
+    },
+    "code:method:saebase.sae.registry:SAEProfile.sae_id": {
+      "source_path": "saebase/sae/registry.py",
+      "source_symbol": "sae_id",
+      "zh_title": "解析指定层的 SAE 身份标识",
+      "zh_summary": "优先使用已登记的层映射，再按逻辑 ID 或 Hook 模板解析身份。",
+      "en_title": "Resolve the SAE identity for a selected layer",
+      "en_summary": "Choose a registered layer-specific SAE ID or derive it from a validated template.",
+      "context_term_ids": [
+        "term.sae",
+        "term.artifact"
+      ]
+    },
+    "code:method:saebase.sae.registry:SAEProfile.transfer_meta": {
+      "source_path": "saebase/sae/registry.py",
+      "source_symbol": "transfer_meta",
+      "zh_title": "打包 SAE 发布与权重来源元数据",
+      "zh_summary": "汇总发布版本、逻辑 SAE ID 和实际权重路径，供组件间传递。",
+      "en_title": "Export transferable SAE release metadata",
+      "en_summary": "Return release identity and resolved checkpoint-location fields as a mapping.",
+      "context_term_ids": [
+        "term.sae",
+        "term.artifact"
+      ]
+    },
+    "code:method:saebase.sae.stage_d:SiteKey.as_tuple": {
+      "source_path": "saebase/sae/stage_d.py",
+      "source_symbol": "as_tuple",
+      "zh_title": "读取模型、SAE 与层编号三元组",
+      "zh_summary": "将站点身份投影为模型 Key、SAE Key 和 Layer 的有序组合。",
+      "en_title": "Read the model–SAE–layer key tuple",
+      "en_summary": "Return the site identity as its model, SAE, and layer tuple.",
+      "context_term_ids": [
+        "term.sae",
+        "term.artifact"
+      ]
+    },
+    "code:method:saebase.sae.stage_d:SiteKey.id": {
+      "source_path": "saebase/sae/stage_d.py",
+      "source_symbol": "id",
+      "zh_title": "编码包含 Hook 的受测站点 ID",
+      "zh_summary": "将模型、SAE、层编号和 Hook 串联成可追溯的站点标识。",
+      "en_title": "Encode an evaluation site identifier with its Hook",
+      "en_summary": "Create a stable site identifier from model, SAE, layer, and Hook fields.",
+      "context_term_ids": [
+        "term.sae",
+        "term.artifact"
+      ]
+    },
+    "code:method:saebase.store.identity:VerifiedCheckpointSession.mint": {
+      "source_path": "saebase/store/identity.py",
+      "source_symbol": "mint",
+      "zh_title": "为模型权重建立校验会话",
+      "zh_summary": "对给定模块权重计算状态签名及内容哈希，并保存弱引用。",
+      "en_title": "Create a verified model-checkpoint session",
+      "en_summary": "Hash module states and pin their identities for subsequent checkpoint verification.",
+      "context_term_ids": [
+        "term.artifact",
+        "term.sae"
+      ]
+    },
+    "code:method:saebase.store.identity:VerifiedCheckpointSession.open": {
+      "source_path": "saebase/store/identity.py",
+      "source_symbol": "open",
+      "zh_title": "查询权重校验会话是否仍有效",
+      "zh_summary": "读取当前会话的开放状态，供后续操作核查权重租约。",
+      "en_title": "Read the checkpoint session validity state",
+      "en_summary": "Expose whether the pinned checkpoint-verification session remains open.",
+      "context_term_ids": [
+        "term.artifact",
+        "term.sae"
+      ]
+    },
+    "code:method:saebase.store.identity:VerifiedCheckpointSession.strict_recheck": {
+      "source_path": "saebase/store/identity.py",
+      "source_symbol": "strict_recheck",
+      "zh_title": "重新核验固定模型权重的 SHA256",
+      "zh_summary": "逐个计算已登记模块的实际权重哈希，检查会话对应的字节身份。",
+      "en_title": "Reverify the exact bytes of pinned model weights",
+      "en_summary": "Rehash each pinned module and invalidate the session if its checkpoint digest changes.",
+      "context_term_ids": [
+        "term.artifact",
+        "term.sae"
+      ]
+    },
+    "code:method:saebase.store.shards:ShardedReader.metadata": {
+      "source_path": "saebase/store/shards.py",
+      "source_symbol": "metadata",
+      "zh_title": "按样本编号读取存储记录元数据",
+      "zh_summary": "从分片索引还原选定 SampleRecord 的身份与样本字段。",
+      "en_title": "Read sample metadata from a shard index",
+      "en_summary": "Reconstruct the selected SampleRecord using its stored index entry.",
+      "context_term_ids": [
+        "term.artifact",
+        "term.sae"
+      ]
+    },
+    "code:method:saebase.store.shards:ShardedReader.row_count": {
+      "source_path": "saebase/store/shards.py",
+      "source_symbol": "row_count",
+      "zh_title": "统计 Manifest 记录的分片行数",
+      "zh_summary": "累加全部分片的行数，返回该存储集合的样本记录总量。",
+      "en_title": "Count rows across all stored shards",
+      "en_summary": "Sum the row counts recorded in the shard manifest.",
+      "context_term_ids": [
+        "term.artifact",
+        "term.sae"
+      ]
+    },
+    "code:method:saebase.runtime.training.training_callbacks:EpochEtaHoursCallback.on_train_start": {
+      "source_path": "saebase/runtime/training/training_callbacks.py",
+      "source_symbol": "on_train_start",
+      "zh_title": "初始化训练轮次耗时统计",
+      "zh_summary": "在训练开始时记录计时起点，并重置已完成 Epoch 计数。",
+      "en_title": "Initialize epoch timing at training start",
+      "en_summary": "Set the performance timer and reset the completed-epoch counter.",
+      "context_term_ids": [
+        "term.sae_training",
+        "term.callback"
+      ]
+    },
+    "code:method:saebase.runtime.training.training_callbacks:EpochEtaHoursCallback.on_validation_epoch_end": {
+      "source_path": "saebase/runtime/training/training_callbacks.py",
+      "source_symbol": "on_validation_epoch_end",
+      "zh_title": "更新剩余训练时长估计",
+      "zh_summary": "依据已完成轮次与实际耗时，记录预估的完整训练小时数。",
+      "en_title": "Update estimated full-training duration",
+      "en_summary": "Use completed validation epochs and elapsed time to estimate training duration.",
+      "context_term_ids": [
+        "term.sae_training",
+        "term.callback"
+      ]
+    },
+    "code:method:saebase.runtime.training.training_callbacks:CompactTQDMProgressBar.sanity_check_description": {
+      "source_path": "saebase/runtime/training/training_callbacks.py",
+      "source_symbol": "sanity_check_description",
+      "zh_title": "标注训练前的验证检查进度",
+      "zh_summary": "为 Sanity Check 进度条返回简短的 san 阶段名称。",
+      "en_title": "Label the sanity-check progress stage",
+      "en_summary": "Return the compact san label for preliminary validation progress.",
+      "context_term_ids": [
+        "term.sae_training",
+        "term.callback"
+      ]
+    },
+    "code:method:saebase.runtime.training.training_callbacks:CompactTQDMProgressBar.validation_description": {
+      "source_path": "saebase/runtime/training/training_callbacks.py",
+      "source_symbol": "validation_description",
+      "zh_title": "标注正式验证进度",
+      "zh_summary": "为验证阶段的进度条返回 val 阶段名称。",
+      "en_title": "Label the regular validation progress stage",
+      "en_summary": "Return the compact val label for normal validation progress.",
+      "context_term_ids": [
+        "term.sae_training",
+        "term.callback"
+      ]
+    },
+    "code:method:saebase.runtime.training.training_callbacks:CompactTQDMProgressBar.on_validation_batch_start": {
+      "source_path": "saebase/runtime/training/training_callbacks.py",
+      "source_symbol": "on_validation_batch_start",
+      "zh_title": "更新验证批次与数据加载器提示",
+      "zh_summary": "在验证批次启动时显示验证状态与当前 DataLoader 编号。",
+      "en_title": "Update validation-batch progress context",
+      "en_summary": "Set the displayed validation or sanity-check label and DataLoader index.",
+      "context_term_ids": [
+        "term.sae_training",
+        "term.callback"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.acquire": {
+      "source_path": "saebase/research_lab/backend/acquire.py",
+      "source_symbol": "saebase/research_lab/backend/acquire.py",
+      "zh_title": "从指定版本导出研究数据源",
+      "zh_summary": "通过 CPU 流式导出十个来源的数据，并记录修订哈希与授权审阅状态。",
+      "en_title": "Export pinned research dataset sources",
+      "en_summary": "Stream source datasets on CPU and retain revision hashes and licensing review metadata.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.api": {
+      "source_path": "saebase/research_lab/backend/api.py",
+      "source_symbol": "saebase/research_lab/backend/api.py",
+      "zh_title": "提供 Research Lab 研究浏览与查询接口",
+      "zh_summary": "通过 FastAPI 暴露数据集、特征记录、实验报告及受控 GPU 作业入口。",
+      "en_title": "Serve Research Lab exploration APIs",
+      "en_summary": "Expose source-bound datasets, feature observations, reports, and explicitly gated job requests.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.auto_interp": {
+      "source_path": "saebase/research_lab/backend/auto_interp.py",
+      "source_symbol": "saebase/research_lab/backend/auto_interp.py",
+      "zh_title": "生成特征解释候选并验证留出数据",
+      "zh_summary": "接收研究者提供的生成器和预测器，输出带来源的解释假设及留出测试记录。",
+      "en_title": "Propose feature interpretations with held-out checks",
+      "en_summary": "Use researcher-supplied generator and predictor callbacks to test source-identified feature hypotheses.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.auto_interp_local": {
+      "source_path": "saebase/research_lab/backend/auto_interp_local.py",
+      "source_symbol": "saebase/research_lab/backend/auto_interp_local.py",
+      "zh_title": "使用本地模型执行 SAE 特征解释",
+      "zh_summary": "将已加载的指令模型接入特征解释流程，对真实激活样本计算留出预测。",
+      "en_title": "Interpret SAE features with a local model",
+      "en_summary": "Connect a local instruction model to source-identified feature examples and held-out scoring.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.controlled_designs": {
+      "source_path": "saebase/research_lab/backend/controlled_designs.py",
+      "source_symbol": "saebase/research_lab/backend/controlled_designs.py",
+      "zh_title": "构建六因素受控输入设计",
+      "zh_summary": "创建两套完整的六因素状态表，供局部性实验与数学对照使用。",
+      "en_title": "Construct six-factor controlled input designs",
+      "en_summary": "Generate complete factor-state grids and a mathematical control for localization experiments.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.core": {
+      "source_path": "saebase/research_lab/backend/core.py",
+      "source_symbol": "saebase/research_lab/backend/core.py",
+      "zh_title": "校验已发布研究证据的真实来源",
+      "zh_summary": "以只读方式读取已存档的观测，核对模型身份、内容哈希和结果协议。",
+      "en_title": "Validate provenance of published Research Lab evidence",
+      "en_summary": "Read archived observations and verify their source identity and integrity checks.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.corpus_lock": {
+      "source_path": "saebase/research_lab/backend/corpus_lock.py",
+      "source_symbol": "saebase/research_lab/backend/corpus_lock.py",
+      "zh_title": "固定研究语料的版本与样本摘要",
+      "zh_summary": "记录十个上游修订、每个来源的样本指纹和统一批次摘要。",
+      "en_title": "Lock corpus revisions and sample fingerprints",
+      "en_summary": "Bind upstream commits to deterministic sample digests and a redacted corpus audit record.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.explore": {
+      "source_path": "saebase/research_lab/backend/explore.py",
+      "source_symbol": "saebase/research_lab/backend/explore.py",
+      "zh_title": "探索实际 SAE 特征与 Token 轨迹",
+      "zh_summary": "读取带校验和的特征轨迹并组织模型 Token 与稀疏激活的对应视图。",
+      "en_title": "Explore recorded SAE features and token traces",
+      "en_summary": "Inspect checksum-bound token trajectories and feature activation observations.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.feature_store": {
+      "source_path": "saebase/research_lab/backend/feature_store.py",
+      "source_symbol": "saebase/research_lab/backend/feature_store.py",
+      "zh_title": "建立 SAE 特征检索的 SQLite 索引",
+      "zh_summary": "以经核验的真实测量记录构建只读检索数据库，支持大字典特征查询。",
+      "en_title": "Build the SQLite index for SAE feature browsing",
+      "en_summary": "Index checkpoint-verified observations for scalable read-only feature searches.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.ingest": {
+      "source_path": "saebase/research_lab/backend/ingest.py",
+      "source_symbol": "saebase/research_lab/backend/ingest.py",
+      "zh_title": "导入本地数据集与 SAE 测量记录",
+      "zh_summary": "校验已导出数据、样本身份和真实激活，并以结构化格式保存研究输入。",
+      "en_title": "Ingest exported datasets and SAE observations",
+      "en_summary": "Validate and persist locally exported samples and checkpoint-identified activation records.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.jobs": {
+      "source_path": "saebase/research_lab/backend/jobs.py",
+      "source_symbol": "saebase/research_lab/backend/jobs.py",
+      "zh_title": "维护可恢复的私有研究作业队列",
+      "zh_summary": "通过 SQLite 保存幂等作业、租期和重试状态，使用哈希引用私人输入。",
+      "en_title": "Maintain a durable private research job queue",
+      "en_summary": "Track idempotent job leases, retries, and private input references in SQLite.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.methods": {
+      "source_path": "saebase/research_lab/backend/methods.py",
+      "source_symbol": "saebase/research_lab/backend/methods.py",
+      "zh_title": "适配 SAR、RSS 与局部性评估器",
+      "zh_summary": "加载固定版本的原始研究实现，在已存档的真实测量上调用估计器。",
+      "en_title": "Adapt pinned SAR, RSS, and localization estimators",
+      "en_summary": "Invoke pinned original estimators against source-identified saved measurements.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.near_duplicates": {
+      "source_path": "saebase/research_lab/backend/near_duplicates.py",
+      "source_symbol": "saebase/research_lab/backend/near_duplicates.py",
+      "zh_title": "筛查研究 Prompt 的词汇近重复",
+      "zh_summary": "根据 Token 词组重合度计算候选样本之间的近重复分数与样本索引。",
+      "en_title": "Screen lexical near-duplicates among prompts",
+      "en_summary": "Compare token shingles and report overlap scores for candidate sample identities.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.plan": {
+      "source_path": "saebase/research_lab/backend/plan.py",
+      "source_symbol": "saebase/research_lab/backend/plan.py",
+      "zh_title": "编译 GPU 研究任务与资源需求",
+      "zh_summary": "依据数据与模型身份生成确定性的任务 Manifest，记录待执行作业及输入条件。",
+      "en_title": "Compile the GPU research execution manifest",
+      "en_summary": "Construct deterministic job plans from dataset identities and verified resource requirements.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.private_api": {
+      "source_path": "saebase/research_lab/backend/private_api.py",
+      "source_symbol": "saebase/research_lab/backend/private_api.py",
+      "zh_title": "保护私有实验作业的 API 边界",
+      "zh_summary": "核验操作员和 Worker 的访问凭据，为队列创建受权限保护的请求接口。",
+      "en_title": "Authorize private research job APIs",
+      "en_summary": "Validate separate operator and worker credentials before exposing private job requests.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.private_worker": {
+      "source_path": "saebase/research_lab/backend/private_worker.py",
+      "source_symbol": "saebase/research_lab/backend/private_worker.py",
+      "zh_title": "执行身份校验后的 SAE 私有干预作业",
+      "zh_summary": "在本地原始模型与 SAE 权重上运行获授权的教师强制编辑，返回结果身份摘要。",
+      "en_title": "Execute private, identity-bound SAE intervention jobs",
+      "en_summary": "Run approved teacher-forced feature edits with local weights and return result digests.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.publish": {
+      "source_path": "saebase/research_lab/backend/publish.py",
+      "source_symbol": "saebase/research_lab/backend/publish.py",
+      "zh_title": "发布带审批与版本身份的实验摘要",
+      "zh_summary": "核验公开授权、结果类型和来源协议后写入内容固定的研究报告。",
+      "en_title": "Publish reviewed immutable research summaries",
+      "en_summary": "Require explicit approval and provenance metadata before writing public result records.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.published_wp12": {
+      "source_path": "saebase/research_lab/backend/published_wp12.py",
+      "source_symbol": "saebase/research_lab/backend/published_wp12.py",
+      "zh_title": "读取已批准的历史工程验证记录",
+      "zh_summary": "按受控类别返回已发布的干预、基准、训练和电路验证产物。",
+      "en_title": "Read approved historical research evidence cards",
+      "en_summary": "Serve approved intervention, benchmark, training, and circuit artifacts by category.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.readouts": {
+      "source_path": "saebase/research_lab/backend/readouts.py",
+      "source_symbol": "saebase/research_lab/backend/readouts.py",
+      "zh_title": "校验完整序列评分与输入对齐",
+      "zh_summary": "核查逐 Token 概率、候选续写及输入锚点，汇总任务读出分数。",
+      "en_title": "Validate sequence readouts and input alignment",
+      "en_summary": "Check per-token log-probability records and aligned candidate continuation scores.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.source_audit": {
+      "source_path": "saebase/research_lab/backend/source_audit.py",
+      "source_symbol": "saebase/research_lab/backend/source_audit.py",
+      "zh_title": "审查多来源数据集的取样与身份",
+      "zh_summary": "按固定修订审核十个语料来源，导出样本哈希及输入审查结果。",
+      "en_title": "Audit source-pinned dataset sample batches",
+      "en_summary": "Verify sample identities and export redacted findings for ten upstream sources.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.transforms": {
+      "source_path": "saebase/research_lab/backend/transforms.py",
+      "source_symbol": "saebase/research_lab/backend/transforms.py",
+      "zh_title": "构建 RSS 特征响应的输入变体",
+      "zh_summary": "依据基础 Prompt 形成受控变换候选，并划分选择与留出实现。",
+      "en_title": "Construct controlled RSS prompt variants",
+      "en_summary": "Generate proposed prompt transformations and assign selection versus held-out variants.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.variant_audit": {
+      "source_path": "saebase/research_lab/backend/variant_audit.py",
+      "source_symbol": "saebase/research_lab/backend/variant_audit.py",
+      "zh_title": "核对 RSS 变体的数量与来源身份",
+      "zh_summary": "汇总每条基础 Prompt 的变换候选，并输出可核查的变体哈希统计。",
+      "en_title": "Audit RSS proposal counts and identities",
+      "en_summary": "Summarize generated variant hashes and identities for frozen prompt sources.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.research_lab.backend.wp15_records": {
+      "source_path": "saebase/research_lab/backend/wp15_records.py",
+      "source_symbol": "saebase/research_lab/backend/wp15_records.py",
+      "zh_title": "读取五类已测量研究结果卡片",
+      "zh_summary": "按基准、训练、生成、解释与电路类别读取已存档的数值记录。",
+      "en_title": "Read five categories of recorded research metrics",
+      "en_summary": "Load source-verified measurement cards for benchmark, training, generation, interpretation, and circuits.",
+      "context_term_ids": [
+        "term.saebase",
+        "term.api"
+      ]
+    },
+    "code:module:saebase.sae.activation_health": {
+      "source_path": "saebase/sae/activation_health.py",
+      "source_symbol": "saebase/sae/activation_health.py",
+      "zh_title": "评测 SAE 编码与重建的激活健康程度",
+      "zh_summary": "执行末 Token 激活捕获、稀疏字典编码和重建质量统计。",
+      "en_title": "Evaluate the health of SAE activations and reconstructions",
+      "en_summary": "Run last-token Hook capture, SAE encoding, and reconstruction health checks.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.analyze": {
+      "source_path": "saebase/sae/analyze.py",
+      "source_symbol": "saebase/sae/analyze.py",
+      "zh_title": "计算 Prompt 激活的 SAE 稀疏性与重建指标",
+      "zh_summary": "对输入文本捕获 Hook 状态，统计激活特征数量与重建误差。",
+      "en_title": "Analyze SAE sparsity and reconstruction on prompt activations",
+      "en_summary": "Capture Hook activations and calculate sparse feature statistics and reconstruction measurements.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.catalog": {
+      "source_path": "saebase/sae/catalog.py",
+      "source_symbol": "saebase/sae/catalog.py",
+      "zh_title": "索引已注册的 Gemma Scope 2 SAE 资源",
+      "zh_summary": "整理官方模型与 SAE 资源身份，并记录版本、宽度和层覆盖信息。",
+      "en_title": "Index registered Gemma Scope 2 SAE assets",
+      "en_summary": "List official model and SAE asset identities with layer, width, and revision metadata.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.contracts": {
+      "source_path": "saebase/sae/contracts.py",
+      "source_symbol": "saebase/sae/contracts.py",
+      "zh_title": "核验 Prompt 产物与 SAE 形状协议",
+      "zh_summary": "校验样本记录、模型身份、张量数值和稀疏编码的维度约束。",
+      "en_title": "Validate Prompt artifacts and SAE tensor contracts",
+      "en_summary": "Check source manifests, SAE tensor dimensions, finite values, and sample record requirements.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.coverage": {
+      "source_path": "saebase/sae/coverage.py",
+      "source_symbol": "saebase/sae/coverage.py",
+      "zh_title": "规划 SAE 模型层与结构覆盖矩阵",
+      "zh_summary": "建立按模型规模、SAE 架构和 Layer 划分的预期评测位置。",
+      "en_title": "Plan coverage across model scales, layers, and SAE architectures",
+      "en_summary": "Define expected site combinations for subsequent checkpoint and evaluation verification.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.env_check": {
+      "source_path": "saebase/sae/env_check.py",
+      "source_symbol": "saebase/sae/env_check.py",
+      "zh_title": "检查 SAE 运行环境中的核心依赖",
+      "zh_summary": "探测 PyTorch、TransformerLens、SAELens、Hub 和 CUDA 软件条件。",
+      "en_title": "Probe dependencies of the SAE execution environment",
+      "en_summary": "Check the availability of PyTorch, TransformerLens, SAELens, Hub, and CUDA.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.loading": {
+      "source_path": "saebase/sae/loading.py",
+      "source_symbol": "saebase/sae/loading.py",
+      "zh_title": "按注册配置加载语言模型与稀疏字典",
+      "zh_summary": "从登记的模型与 SAE 身份定位权重，并构造可用于激活分析的配对实例。",
+      "en_title": "Load model and sparse dictionary from registered profiles",
+      "en_summary": "Resolve model and SAE checkpoint identities and construct matched analysis resources.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.pipeline_checks": {
+      "source_path": "saebase/sae/pipeline_checks.py",
+      "source_symbol": "saebase/sae/pipeline_checks.py",
+      "zh_title": "执行 SAE 评测任务的预检约束",
+      "zh_summary": "检查 Hydra 输入、模型与 SAE 配对和 Prompt Manifest 的可用条件。",
+      "en_title": "Validate SAE evaluation preflight requirements",
+      "en_summary": "Check configured task compatibility, model-SAE pairs, and prompt manifest readiness.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.prompts": {
+      "source_path": "saebase/sae/prompts.py",
+      "source_symbol": "saebase/sae/prompts.py",
+      "zh_title": "读取准备好的 SAE 评测输入文本",
+      "zh_summary": "按研究行为和模型 Key 加载受控 Prompt 与其追溯信息。",
+      "en_title": "Load prepared prompts for SAE evaluation",
+      "en_summary": "Retrieve source-identified prompt records for the selected behavior and model.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.registry": {
+      "source_path": "saebase/sae/registry.py",
+      "source_symbol": "saebase/sae/registry.py",
+      "zh_title": "维护 SAE 字典配置与模型适配身份",
+      "zh_summary": "登记 SAE 版本、层位置、Hook 名称和对应基础模型的配置。",
+      "en_title": "Register SAE profiles independently from base models",
+      "en_summary": "Bind SAE releases, Hook coordinates, layer coverage, and compatible model specifications.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.results": {
+      "source_path": "saebase/sae/results.py",
+      "source_symbol": "saebase/sae/results.py",
+      "zh_title": "保存 SAE 评测结果与行级统计摘要",
+      "zh_summary": "序列化评测记录并汇总有效观测、指标和文件路径。",
+      "en_title": "Persist SAE evaluation results and row-level summaries",
+      "en_summary": "Write structured evaluation JSON and aggregate status and metric records.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.scope2_clt": {
+      "source_path": "saebase/sae/scope2_clt.py",
+      "source_symbol": "saebase/sae/scope2_clt.py",
+      "zh_title": "实现跨层 Transcoder 的原生权重代数",
+      "zh_summary": "读取 Gemma Scope 2 CLT 的逐层编码与多目标层解码张量。",
+      "en_title": "Implement native cross-layer transcoder shard algebra",
+      "en_summary": "Handle Gemma Scope 2 cross-layer encoding and target-layer decoding tensors.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.scope2_native": {
+      "source_path": "saebase/sae/scope2_native.py",
+      "source_symbol": "saebase/sae/scope2_native.py",
+      "zh_title": "加载官方 Gemma Scope 2 稀疏模型格式",
+      "zh_summary": "校验官方配置和 Safetensors，装配 JumpReLU SAE、Transcoder 与 Crosscoder。",
+      "en_title": "Load authentic Gemma Scope 2 sparse model formats",
+      "en_summary": "Read official configs and Safetensors for JumpReLU SAEs, transcoders, and crosscoders.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.sparsify_adapter": {
+      "source_path": "saebase/sae/sparsify_adapter.py",
+      "source_symbol": "saebase/sae/sparsify_adapter.py",
+      "zh_title": "将原生 Sparsify 特征输出适配为稠密向量",
+      "zh_summary": "保留原生 TopK 选择，转换编码值和索引以接入 SAEBase 接口。",
+      "en_title": "Adapt native Sparsify features to dense SAEBase codes",
+      "en_summary": "Convert original TopK values and indices into dense code vectors for SAEBase.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.stage_d": {
+      "source_path": "saebase/sae/stage_d.py",
+      "source_symbol": "saebase/sae/stage_d.py",
+      "zh_title": "维护模型与 SAE 配对的验收记录",
+      "zh_summary": "安排受测站点并保存结果状态、证据校验和最终覆盖矩阵。",
+      "en_title": "Manage model–SAE pairing acceptance evidence",
+      "en_summary": "Schedule evaluation sites and record execution status, checksums, and coverage results.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.task": {
+      "source_path": "saebase/sae/task.py",
+      "source_symbol": "saebase/sae/task.py",
+      "zh_title": "将 SAE 健康检查分派给已注册评估器",
+      "zh_summary": "从 Hydra 任务配置解析评测类型，并调用相应的 SAE 评估实现。",
+      "en_title": "Dispatch an SAE health task to its registered evaluator",
+      "en_summary": "Resolve the selected evaluation plugin from Hydra configuration and execute its SAE checks.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    },
+    "code:module:saebase.sae.verify_registry": {
+      "source_path": "saebase/sae/verify_registry.py",
+      "source_symbol": "saebase/sae/verify_registry.py",
+      "zh_title": "列出当前注册的 SAE 配对配置",
+      "zh_summary": "打印模型 Key、字典发布版本及受支持的层和 Hook 选项。",
+      "en_title": "List registered SAE profiles and checkpoint choices",
+      "en_summary": "Print the model keys, SAE releases, and declared activation-site registrations.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sparse_autoencoder"
+      ]
+    }
+  }
+}

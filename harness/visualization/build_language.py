@@ -296,7 +296,36 @@ PARAMETER_CONTEXT = {
 
 # Stable reviewed descriptions for the most prominent SAEBase interfaces.
 # Add research-critical entries here only after inspecting the actual source.
+REVIEWED_INTERFACES = json.loads(
+    (ROOT / "harness/code/reviewed_semantics.json").read_text(encoding="utf-8")
+)["nodes"]
+
 REVIEWED_CODE = {
+    "code:module:tasks.generate.task": ("Register the generation-time feature steering task", "GenerateTask selects the generation operation; token edits and sequence comparison run in its implementation module."),
+    "code:module:tasks.generate.operation": ("Compare SAE-edited and baseline token generation", "Construct a prompt-bound token sample and feature condition, then evaluate generated continuations with and without edits."),
+    "code:module:tasks.intervene.task": ("Register the teacher-forced feature intervention task", "InterveneTask selects the intervention operation and delegates input and SAE resolution to the shared task dispatcher."),
+    "code:module:tasks.intervene.operation": ("Measure output changes after an SAE feature replacement", "Replace one SAE code at a fixed prompt and compare baseline versus edited logits, output candidates, and change magnitude."),
+    "code:module:tasks.capture.task": ("Register the activation capture task", "CaptureTask binds the capture operation to the standard model, SAE, and prompt configuration dispatcher."),
+    "code:module:tasks.capture.operation": ("Record sparse feature activations and reconstruction norms", "Capture model activations at an SAE Hook and report active features, highest-magnitude codes, and reconstruction norm."),
+    "code:module:tasks.circuits.task": ("Register the circuit analysis task", "CircuitsTask selects the causal circuit operation through the shared SAE research task registry."),
+    "code:module:tasks.circuits.operation": ("Trace model feature circuits and save analysis artifacts", "Verify circuit-execution approval and configuration, invoke the native circuit tracer, and write the resulting figures."),
+    "code:module:tasks.explain.task": ("Dispatch an explanation task with generator dependencies", "ExplainTask receives an actual explanation generator and predictor and routes them to the explanation runtime."),
+    "code:module:tasks.explain.operation": ("Generate and evaluate SAE feature explanations", "Read discovery and held-out records, invoke a real generator, and evaluate predictions against held-out examples."),
+    "code:module:tasks.benchmark.task": ("Register the SAE benchmark task", "BenchmarkTask selects the benchmark operation so the shared dispatcher can load an evaluation configuration."),
+    "code:module:tasks.benchmark.operation": ("Execute a registered benchmark configuration and collect metrics", "Validate evaluation targets and run the benchmark executor against the configured Gemma model, returning measured result rows."),
+    "code:module:tasks.train.task": ("Register the SAE training task", "TrainTask exposes the train operation through the unified Hydra task and model dispatcher."),
+    "code:module:tasks.train.operation": ("Run the SAE training plan and persist checkpoints", "Verify approval and model snapshot settings, construct TrainPlan, and write the training summary and checkpoints."),
+    "code:module:tasks.intervene.backend.clean_prefix": ("Recompute the clean prefix for a reference intervention", "Recalculate the original prefix at each edited step to preserve the clean-history reference used for comparisons."),
+    "code:module:tasks.intervene.backend.engine": ("Batch SAE edits under an explicit compute budget", "Schedule Hook forwards in batches, handle retries and task resumption, and record execution statistics."),
+    "code:module:tasks.intervene.backend.hf_cached_steering": ("Apply live SAE edits using a persistent KV cache", "Encode the actual residual at each new token, edit SAE features, and preserve the edited decoding history."),
+    "code:module:tasks.intervene.backend.kv_cache_exact": ("Check clean-KV and edited-step decoding parity", "Compare separate clean and edited KV paths against full-prefix reference results under experimental validation conditions."),
+    "code:module:tasks.intervene.backend.operators": ("Apply interventions to the SAE feature coordinates", "Construct FeaturePatch values for ablation, scaling, clamping, addition, reconstruction, and coalitions."),
+    "code:module:tasks.intervene.backend.results": ("Atomically store intervention measurement shards", "Write JSONL measurement shards with checksums and a resumable manifest that protects committed results."),
+    "code:module:tasks.intervene.backend.specs": ("Validate intervention conditions and sample identities", "Define typed conditions, measurement positions, and reproducible experiment identity records."),
+    "code:module:tasks.intervene.backend.steering": ("Generate a no-cache per-token SAE steering reference", "Recompute the full token prefix before each SAE edit and compare edited continuation with the original sequence."),
+    "code:module:tasks.intervene.native.interventions": ("Compose native PyTorch and SAE intervention plans", "Represent native interventions and SAE feature edits as executable, typed plans with explicit selection semantics."),
+    "code:module:tasks.intervene.native.ndif": ("Run explicitly approved remote NDIF activation captures", "Validate deployment identity and authorization before invoking a remote NNsight trace."),
+    "code:module:tasks.intervene.native.pyvene": ("Compose and serialize native pyvene intervention configurations", "Specify layers, positions, components, and upstream pyvene execution settings for controlled interventions."),
     # Actual benchmark modules: preserve their research responsibilities rather
     # than presenting only the underspecified Python module stem.
     "code:module:tasks.benchmark.analyze": (
@@ -722,6 +751,16 @@ NAVIGATION_EN = {
 
 # Group summaries express the actual responsibility captured by the Chinese
 # source, instead of reporting a count of nested implementation interfaces.
+TASK_GROUP_MEANINGS = {
+    "capture": ("Capture model activations as sparse SAE features", "Collect genuine Hook activations from a selected model and produce traceable sparse codes and reconstruction measurements."),
+    "intervene": ("Evaluate causal SAE feature edits on fixed input", "Define replacement conditions for teacher-forced model forwards and compare output logits with unchanged input."),
+    "generate": ("Compare feature-steered and baseline text generation", "Apply sparse-feature edits during new-token generation and record their effect on the resulting sequences."),
+    "circuits": ("Trace candidate causal circuits in model features", "Trace feature and component interactions for an approved model/input combination and preserve circuit artifacts."),
+    "explain": ("Propose and test SAE feature hypotheses", "Generate feature descriptions with a real provider and test their predictive behavior on held-out samples."),
+    "benchmark": ("Assess SAE reconstruction, interventions, and reliability", "Configure and run reproducible baseline, intervention, and statistical evaluation protocols."),
+    "train": ("Train sparse dictionaries from language-model activations", "Fit SAE parameters to selected activations and retain checkpoints, optimization records, and training metadata."),
+}
+
 GROUP_SUMMARIES = {
     "code:root": "Browse dataset loaders, language-model adapters, seven SAE research task families, and shared research APIs.",
     "code:group:datasets": "Organize prompt datasets, source acquisition, and reproducible input artifacts.",
@@ -739,6 +778,8 @@ def code_group_summary(node: dict, title: str, source_path: str) -> str:
     node_id = node["id"]
     if node_id in GROUP_SUMMARIES:
         return GROUP_SUMMARIES[node_id]
+    if node_id.startswith("code:instance:tasks:"):
+        return TASK_GROUP_MEANINGS[node_id.rsplit(":", 1)[-1]][1]
     tokens = node_id.split(":")
     if len(tokens) >= 4 and tokens[1] == "instance":
         family, item = tokens[2], tokens[3]
@@ -805,6 +846,8 @@ def group_label(node: dict, descendants: list[dict], children: dict, by_id: dict
     }
     if node_id in named:
         return named[node_id]
+    if node_id.startswith("code:instance:tasks:"):
+        return TASK_GROUP_MEANINGS[node_id.rsplit(":", 1)[-1]][0]
     tokens = node_id.split(":")
     if len(tokens) >= 4 and tokens[1] == "instance":
         family = tokens[2]
@@ -850,13 +893,42 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
     reviewed = REVIEWED_CODE.get(node["id"])
     doc = source_description(node)
     reviewed_status = "reviewed" if reviewed else ("source_docstring" if doc else "source_identity")
-    if node.get("concept_group"):
+    source_review = REVIEWED_INTERFACES.get(node["id"])
+    if source_review and (
+        source_review["source_path"] != path
+        or source_review["source_symbol"] != (symbol if kind == "module" else name)
+    ):
+        raise ValueError("Outdated bilingual source review: " + node["id"])
+    if source_review:
+        title, summary = source_review["en_title"], source_review["en_summary"]
+        reviewed_status = "source_reviewed_interface"
+    elif node.get("concept_group"):
         # Human-reviewed bilingual responsibilities from the concept catalog.
         # Do not infer concept titles from a Python identifier or child count.
         title = node["english_title"]
         summary = node["english_summary"]
         doc = node["english_description"]
         reviewed_status = "context_grounded_concept"
+    elif kind == "module" and path.startswith("models/") and len(path.split("/")) == 3:
+        family, filename = path.split("/")[1:]
+        if filename == family + ".py":
+            title = "Load model specifications and checkpoint candidates"
+            summary = (
+                "Declare the BaseModelSpec, weight candidates, and model loading "
+                "entry points for the registered language model."
+            )
+        elif filename == "model_task_dataset_compatibility.py":
+            title = "Validate supported SAE tasks and prompt sources"
+            summary = (
+                "Check the model's registered task keys and allowable dataset "
+                "or prompt-source combinations against the request."
+            )
+        else:
+            title, summary = (
+                evidence_action(node, stem, path),
+                doc or "Expose source-defined model interfaces.",
+            )
+        reviewed_status = "source_checked_model_role"
     elif reviewed:
         title, summary = reviewed
     elif kind in {"function", "method"}:
@@ -910,14 +982,23 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
         details.append("Declared return type: " + annotation + ".")
     if path:
         details.append("Source: " + path + ".")
-    description = summary.rstrip(".") + "."
-    if details:
-        description += " " + " ".join(details)
+    # Expanded cards already show the distinct responsibility in summary.
+    # Technical evidence belongs in description/attributes, not a second
+    # paraphrase of the same sentence under "What this node does".
+    description = " ".join(details) if details else (doc or summary)
+    additional_explanation = ""
+    if node["id"].startswith("code:configurations:tasks:"):
+        task = node["id"].rsplit(":", 1)[-1]
+        additional_explanation = (
+            "The actual Hydra configuration files for "
+            + TASK_NAMES.get(task, human(task))
+            + " declare runtime inputs and resource settings."
+        )
     return {
         "title": title,
         "summary": summary,
         "description": description,
-        "reader_explanation": description,
+        "reader_explanation": additional_explanation,
         "translation_origin": reviewed_status,
     }
 

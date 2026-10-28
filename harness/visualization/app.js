@@ -1137,9 +1137,13 @@
       });
       const content=el("div","node-attributes-inner");
       content.setAttribute("aria-label",node.title+" 的完整解释与证据");
-      const intro=attributeSection(content,"这个节点在做什么");
-      intro.appendChild(el("p","node-attribute-text",
-        node.reader_explanation || plain(node.description || node.summary || "")));
+      const extraExplanation=plain(node.reader_explanation || "");
+      if(extraExplanation &&
+          extraExplanation.replace(/\s+/g,"") !==
+          plain(node.summary || "").replace(/\s+/g,"")){
+        const intro=attributeSection(content,"这个节点在做什么");
+        intro.appendChild(el("p","node-attribute-text",extraExplanation));
+      }
       const termIds=node.context_term_ids || [];
       if(termIds.length){
         const terms=attributeSection(content,"专业词汇 · Context");
@@ -1613,8 +1617,11 @@
       : ({unchecked:"Unchecked",denied:"Denied",not_implemented:"Not Implemented",
           partial:"Partial",implemented:"Implemented"})[n.status] || "Unknown"));
     area.appendChild(status);
-    area.appendChild(el("p", "detail-description",
-      n.reader_explanation || plain(n.description || "")));
+    const extra=plain(n.reader_explanation || "");
+    if(extra && extra.replace(/\s+/g,"") !==
+        plain(n.summary || "").replace(/\s+/g,"")){
+      area.appendChild(el("p","detail-description",extra));
+    }
     if(n.context_term_ids?.length){
       const context=section(area,"专业词汇 · Context");
       for(const id of n.context_term_ids){

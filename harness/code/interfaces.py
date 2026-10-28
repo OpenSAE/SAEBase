@@ -468,7 +468,6 @@ def enrich_code_node(node: dict, methods_description: dict[str, tuple[str, str]]
                 funcs.append(function_interface(method, contents, summary, key=method.name))
         fields = class_fields(declaration)
         node["attributes"] = [
-            {"type": "text", "label": "组件职责", "value": node["summary"]},
             {"type": "fields", "label": "类属性", "fields": fields},
             {"type": "class_methods", "label": f"类中全部方法 · {len(funcs)} 个", "methods": funcs},
             {
@@ -501,7 +500,6 @@ def enrich_code_node(node: dict, methods_description: dict[str, tuple[str, str]]
         classes = [item for item in declaration.body if isinstance(item, ast.ClassDef)]
         first = functions[0] if functions else classes[0] if classes else None
         node["attributes"] = [
-            {"type": "text", "label": "模块职责", "value": node["summary"]},
             {
                 "type": "module_contents",
                 "label": "源码组成",
