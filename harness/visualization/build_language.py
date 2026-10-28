@@ -297,6 +297,24 @@ PARAMETER_CONTEXT = {
 # Stable reviewed descriptions for the most prominent SAEBase interfaces.
 # Add research-critical entries here only after inspecting the actual source.
 REVIEWED_CODE = {
+    # Actual benchmark modules: preserve their research responsibilities rather
+    # than presenting only the underspecified Python module stem.
+    "code:module:tasks.benchmark.analyze": (
+        "Analyze SAE benchmark results and activations",
+        "Inspect captured model activations, SAE encodings, and reconstruction behavior in benchmark analysis.",
+    ),
+    "code:module:tasks.benchmark.reliability.bootstrap": (
+        "Estimate uncertainty with paired SAE bootstrap comparisons",
+        "Use deterministic, paired bootstrap resampling to estimate percentile intervals for SAE comparisons.",
+    ),
+    "code:module:tasks.benchmark.reliability.discriminability": (
+        "Measure how SAE metrics distinguish controlled degradations",
+        "Evaluate metric rankings against controlled degradation and paired ground-truth uncertainty.",
+    ),
+    "code:module:tasks.benchmark.backend.adapters.localization": (
+        "Integrate feature-localization evaluations with SAE benchmarks",
+        "Validate input grids and checksum-linked curve artifacts for feature-localization evaluations.",
+    ),
     "code:class:datasets.controlled_inputs:BinaryFactor": (
         "Define a named binary experimental factor",
         "Represent one controlled-input factor with exactly two distinct, nonempty string levels.",
@@ -523,6 +541,20 @@ def action_label(node: dict, name: str, path: str) -> str:
 # Fallback verbs must preserve a Chinese source action when there is no reviewed
 # English docstring. They describe the role, not an unverified scientific effect.
 CHINESE_ACTION_VERBS = (
+    # Common action verbs emitted by harness/code/semantic_titles.py.
+    # Keep them explicit so unrecognized symbols do not become "Handle..." or
+    # "Implement..." titles when a Chinese semantic action already exists.
+    ("分析", "Analyze"), ("估计", "Estimate"), ("测量", "Measure"),
+    ("统计", "Count"), ("核验", "Verify"), ("核对", "Verify"),
+    ("审查", "Audit"), ("构造", "Construct"), ("接入", "Integrate"),
+    ("复用", "Reuse"), ("运行", "Run"), ("规划", "Plan"),
+    ("追溯", "Trace"), ("连接", "Connect"), ("发现", "Discover"),
+    ("检测", "Detect"), ("列出", "List"), ("载入", "Load"),
+    ("附加", "Attach"), ("清理", "Clean"), ("停止", "Stop"),
+    ("序列化", "Serialize"), ("还原", "Restore"), ("打包", "Pack"),
+    ("提交", "Submit"), ("组织", "Organize"), ("准备", "Prepare"),
+    ("配置", "Configure"), ("初始化", "Initialize"), ("选择", "Select"),
+    ("报告", "Report"), ("建立", "Establish"), ("推断", "Infer"),
     ("定位", "Locate"),
     ("查找", "Find"),
     ("读取", "Read"),
