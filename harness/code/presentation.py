@@ -348,6 +348,7 @@ def fold_unreviewed_interfaces(output: dict) -> None:
     protected.update({
         "code:function:saebase.benchmarks.metrics.reconstruction:loss_recovered",
         "code:function:datasets.CounterFact.CounterFact:filtered_json_path",
+        "code:class:datasets.controlled_inputs:BinaryFactor",
     })
     incoming = {}
     for edge in output["edges"]:
