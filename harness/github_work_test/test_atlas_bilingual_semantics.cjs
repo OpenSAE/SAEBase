@@ -122,6 +122,14 @@ for (const [view, graph] of Object.entries(original)) {
 // Regression: actionable Chinese Code titles must not collapse into the old
 // "Inspect ... interface" or "Provide ... for ..." English templates.
 localize("en");
+// Title and summary must explain different information, not just vary in punctuation.
+const semanticKey = value => String(value || "").toLowerCase().replace(/[\\W_]+/g, "");
+for (const [view, graph] of Object.entries(data)) {
+  for (const node of graph.nodes) {
+    assert.notEqual(semanticKey(node.title), semanticKey(node.summary),
+      view + "/" + node.id + " repeats its English title as its summary");
+  }
+}
 const codeOriginal = new Map(original.code.nodes.map(n => [n.id, n]));
 for (const node of data.code.nodes) {
   if (!["function", "method", "module", "class"].includes(node.kind)) continue;
