@@ -1,0 +1,573 @@
+{
+  "schema": "saebase.atlas.oversized.v1",
+  "max_children": 20,
+  "parents": [
+    {
+      "id": "code:module:saebase.registry",
+      "match_on": "symbol",
+      "groups": [
+        {
+          "name": "contracts",
+          "title": "模型、数据集和任务的插件契约",
+          "summary": "定义组件注册时必须提供的类型与调用条件。",
+          "description": "定义组件注册时必须提供的类型与调用条件。",
+          "en_title": "Model, dataset, and task plugin contracts",
+          "en_summary": "Specify callable contracts and component identities required by the registry.",
+          "en_description": "Specify callable contracts and component identities required by the registry.",
+          "context_terms": [
+            "term.registry",
+            "term.plugin"
+          ],
+          "patterns": [
+            "^(?:DatasetPlugin|ModelPlugin|PromptSourcePlugin|SAEPlugin|TaskModule|TaskPlugin)$"
+          ]
+        },
+        {
+          "name": "registration",
+          "title": "注册模型、SAE 与科研操作",
+          "summary": "建立模型、数据来源、SAE 和任务的名称映射。",
+          "description": "建立模型、数据来源、SAE 和任务的名称映射。",
+          "en_title": "Register models, SAEs, and research operations",
+          "en_summary": "Bind names, aliases, and implementations to the shared research registry.",
+          "en_description": "Bind names, aliases, and implementations to the shared research registry.",
+          "context_terms": [
+            "term.registry"
+          ],
+          "patterns": [
+            "^register_.*$"
+          ]
+        },
+        {
+          "name": "lookup",
+          "title": "按照身份读取已注册组件",
+          "summary": "查询当前可用的数据、模型、稀疏字典和任务实现。",
+          "description": "查询当前可用的数据、模型、稀疏字典和任务实现。",
+          "en_title": "Retrieve registered research components",
+          "en_summary": "Resolve registered datasets, model adapters, SAEs, and task plugins.",
+          "en_description": "Resolve registered datasets, model adapters, SAEs, and task plugins.",
+          "context_terms": [
+            "term.registry"
+          ],
+          "patterns": [
+            "^get_.*$"
+          ]
+        },
+        {
+          "name": "discovery",
+          "title": "组件名称解析与清单查询",
+          "summary": "列举有效组件名称并统一解析可用别名。",
+          "description": "列举有效组件名称并统一解析可用别名。",
+          "en_title": "Registry discovery and alias resolution",
+          "en_summary": "List available registry keys and resolve canonical component names.",
+          "en_description": "List available registry keys and resolve canonical component names.",
+          "context_terms": [
+            "term.registry"
+          ],
+          "patterns": [
+            "^(?:list_registered_.*|resolve_.*)$"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "code:module:saebase.research_lab.backend.api",
+      "match_on": "symbol",
+      "groups": [
+        {
+          "name": "catalog",
+          "title": "Research Lab 数据与服务目录",
+          "summary": "提供数据集、Prompt、模型站点及运行状态的查询接口。",
+          "description": "提供数据集、Prompt、模型站点及运行状态的查询接口。",
+          "en_title": "Research Lab dataset and service catalog",
+          "en_summary": "Serve source-backed data listings, activation sites, and service status.",
+          "en_description": "Serve source-backed data listings, activation sites, and service status.",
+          "context_terms": [
+            "term.api",
+            "term.dataset"
+          ],
+          "patterns": [
+            "^(?:index|health|summary|datasets|prompts|sites|site_cache|results|sae_assets)$"
+          ]
+        },
+        {
+          "name": "features",
+          "title": "特征查询、相关性与导出",
+          "summary": "读取 SAE 特征数据、统计关系及可分享的说明材料。",
+          "description": "读取 SAE 特征数据、统计关系及可分享的说明材料。",
+          "en_title": "SAE feature queries and exports",
+          "en_summary": "Expose sparse feature records, correlations, and exportable explanations.",
+          "en_description": "Expose sparse feature records, correlations, and exportable explanations.",
+          "context_terms": [
+            "term.sae",
+            "term.api"
+          ],
+          "patterns": [
+            "^(?:features|feature_details|feature_export|feature_correlations)$"
+          ]
+        },
+        {
+          "name": "explore",
+          "title": "特征轨迹检索与搜索",
+          "summary": "检索实验轨迹并解析研究者发起的特征查询。",
+          "description": "检索实验轨迹并解析研究者发起的特征查询。",
+          "en_title": "Feature trajectory exploration",
+          "en_summary": "Search feature traces and explore model activation observations.",
+          "en_description": "Search feature traces and explore model activation observations.",
+          "context_terms": [
+            "term.sae.explain"
+          ],
+          "patterns": [
+            "^(?:ExploreSearch|explore_search|explore_trace|explore_traces)$"
+          ]
+        },
+        {
+          "name": "reports",
+          "title": "分析与评测报告接口",
+          "summary": "浏览已有分析记录并读取具体评测报告。",
+          "description": "浏览已有分析记录并读取具体评测报告。",
+          "en_title": "Analysis and evaluation reports",
+          "en_summary": "List and retrieve reviewed analysis and evaluation report records.",
+          "en_description": "List and retrieve reviewed analysis and evaluation report records.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^(?:analyses|reports|get_report)$"
+          ]
+        },
+        {
+          "name": "preflight",
+          "title": "干预预检与研究作业提交",
+          "summary": "校验干预参数并提交可追溯的研究执行请求。",
+          "description": "校验干预参数并提交可追溯的研究执行请求。",
+          "en_title": "Intervention preflight and research jobs",
+          "en_summary": "Check feature edit requests before submitting controlled research jobs.",
+          "en_description": "Check feature edit requests before submitting controlled research jobs.",
+          "context_terms": [
+            "term.sae.intervene"
+          ],
+          "patterns": [
+            "^(?:InterventionSpec|preflight|submit_jobs|wp12_compute)$"
+          ]
+        },
+        {
+          "name": "archived_results",
+          "title": "研究能力清单与历史实验记录",
+          "summary": "根据已发布记录定位实验结果与源证据。",
+          "description": "根据已发布记录定位实验结果与源证据。",
+          "en_title": "Research capability and historical records",
+          "en_summary": "Read published research capability catalogs and experiment records.",
+          "en_description": "Read published research capability catalogs and experiment records.",
+          "context_terms": [
+            "term.artifact"
+          ],
+          "patterns": [
+            "^(?:wp12_catalog|wp12_record|wp15_record)$"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "code:module:saebase.sae.stage_d",
+      "match_on": "symbol",
+      "groups": [
+        {
+          "name": "site_plan",
+          "title": "SAE 站点身份与评测调度",
+          "summary": "定义模型、SAE、层位置的受测组合，并准备可执行计划。",
+          "description": "定义模型、SAE、层位置的受测组合，并准备可执行计划。",
+          "en_title": "SAE site identities and evaluation scheduling",
+          "en_summary": "Construct model-SAE-site identities and schedule compatible evaluation work.",
+          "en_description": "Construct model-SAE-site identities and schedule compatible evaluation work.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^(?:SiteKey|SiteRecord|build_site_records|schedule_sites|write_stage_d_targets|load_stage_d_targets|load_population_corpus|resolve_evaluation_host|assert_host_matches_label|acceptance_path)$"
+          ]
+        },
+        {
+          "name": "acceptance_ledger",
+          "title": "评测状态、失败与断点恢复",
+          "summary": "记录受测组合的运行尝试、结果状态和重试决策。",
+          "description": "记录受测组合的运行尝试、结果状态和重试决策。",
+          "en_title": "Acceptance ledger and resume decisions",
+          "en_summary": "Track evaluation attempts, recover state, and record accepted or failed runs.",
+          "en_description": "Track evaluation attempts, recover state, and record accepted or failed runs.",
+          "context_terms": [
+            "term.artifact"
+          ],
+          "patterns": [
+            "^(?:append_attempt|load_status|update_status|read_acceptance|write_acceptance|rebuild_canonical_status|failure_record|classify_exception)$"
+          ]
+        },
+        {
+          "name": "evidence_integrity",
+          "title": "校验和、来源与证据完整性",
+          "summary": "验证实验产物的哈希、可引用路径和断点身份。",
+          "description": "验证实验产物的哈希、可引用路径和断点身份。",
+          "en_title": "Hashes, provenance, and evidence integrity",
+          "en_summary": "Verify output hashes, source paths, and resumable acceptance identity.",
+          "en_description": "Verify output hashes, source paths, and resumable acceptance identity.",
+          "context_terms": [
+            "term.artifact"
+          ],
+          "patterns": [
+            "^(?:file_sha256|canonical_payload_sha256|write_checksums_manifest|redact_secrets|relative_under|resume_fingerprint_fields|should_skip_resume)$"
+          ]
+        },
+        {
+          "name": "pair_acceptance",
+          "title": "模型与 SAE 配对的数值验收",
+          "summary": "对实际模型站点执行配对验证并汇总最终覆盖矩阵。",
+          "description": "对实际模型站点执行配对验证并汇总最终覆盖矩阵。",
+          "en_title": "Model–SAE pair acceptance",
+          "en_summary": "Verify model and SAE pairing at an activation site and assemble final coverage results.",
+          "en_description": "Verify model and SAE pairing at an activation site and assemble final coverage results.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^(?:verify_pair_site|build_final_matrix)$"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "code:module:tasks.benchmark.stage_d",
+      "match_on": "symbol",
+      "groups": [
+        {
+          "name": "site_plan",
+          "title": "SAE 站点身份与评测调度",
+          "summary": "定义模型、SAE、层位置的受测组合，并准备可执行计划。",
+          "description": "定义模型、SAE、层位置的受测组合，并准备可执行计划。",
+          "en_title": "SAE site identities and evaluation scheduling",
+          "en_summary": "Construct model-SAE-site identities and schedule compatible evaluation work.",
+          "en_description": "Construct model-SAE-site identities and schedule compatible evaluation work.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^(?:SiteKey|SiteRecord|build_site_records|schedule_sites|write_stage_d_targets|load_stage_d_targets|load_population_corpus|resolve_evaluation_host|assert_host_matches_label|acceptance_path)$"
+          ]
+        },
+        {
+          "name": "acceptance_ledger",
+          "title": "评测状态、失败与断点恢复",
+          "summary": "记录受测组合的运行尝试、结果状态和重试决策。",
+          "description": "记录受测组合的运行尝试、结果状态和重试决策。",
+          "en_title": "Acceptance ledger and resume decisions",
+          "en_summary": "Track evaluation attempts, recover state, and record accepted or failed runs.",
+          "en_description": "Track evaluation attempts, recover state, and record accepted or failed runs.",
+          "context_terms": [
+            "term.artifact"
+          ],
+          "patterns": [
+            "^(?:append_attempt|load_status|update_status|read_acceptance|write_acceptance|rebuild_canonical_status|failure_record|classify_exception)$"
+          ]
+        },
+        {
+          "name": "evidence_integrity",
+          "title": "校验和、来源与证据完整性",
+          "summary": "验证实验产物的哈希、可引用路径和断点身份。",
+          "description": "验证实验产物的哈希、可引用路径和断点身份。",
+          "en_title": "Hashes, provenance, and evidence integrity",
+          "en_summary": "Verify output hashes, source paths, and resumable acceptance identity.",
+          "en_description": "Verify output hashes, source paths, and resumable acceptance identity.",
+          "context_terms": [
+            "term.artifact"
+          ],
+          "patterns": [
+            "^(?:file_sha256|canonical_payload_sha256|write_checksums_manifest|redact_secrets|relative_under|resume_fingerprint_fields|should_skip_resume)$"
+          ]
+        },
+        {
+          "name": "pair_acceptance",
+          "title": "模型与 SAE 配对的数值验收",
+          "summary": "对实际模型站点执行配对验证并汇总最终覆盖矩阵。",
+          "description": "对实际模型站点执行配对验证并汇总最终覆盖矩阵。",
+          "en_title": "Model–SAE pair acceptance",
+          "en_summary": "Verify model and SAE pairing at an activation site and assemble final coverage results.",
+          "en_description": "Verify model and SAE pairing at an activation site and assemble final coverage results.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^(?:verify_pair_site|build_final_matrix)$"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "code:concrete:models",
+      "match_on": "path_or_id",
+      "groups": [
+        {
+          "name": "shared_adapters",
+          "title": "模型加载、Hook 与通用兼容接口",
+          "summary": "组织 Hugging Face、TransformerLens 与统一注册的模型适配。",
+          "description": "组织 Hugging Face、TransformerLens 与统一注册的模型适配。",
+          "en_title": "Shared model loading and Hook adapters",
+          "en_summary": "Load language-model backends, control activation Hooks, and check common contracts.",
+          "en_description": "Load language-model backends, control activation Hooks, and check common contracts.",
+          "context_terms": [
+            "term.llm",
+            "term.model"
+          ],
+          "patterns": [
+            "^models/[^/]+\\.py$"
+          ]
+        },
+        {
+          "name": "gemma_small",
+          "title": "Gemma 小模型与基础系列",
+          "summary": "管理 Gemma 早期基础规模的模型标识和任务适配。",
+          "description": "管理 Gemma 早期基础规模的模型标识和任务适配。",
+          "en_title": "Gemma small and foundation variants",
+          "en_summary": "Load early Gemma variants and check task-specific model compatibility.",
+          "en_description": "Load early Gemma variants and check task-specific model compatibility.",
+          "context_terms": [
+            "term.model"
+          ],
+          "patterns": [
+            "^code:instance:models:(?:gemma1b|gemma1b_it|gemma270m)$"
+          ]
+        },
+        {
+          "name": "gemma2",
+          "title": "Gemma-2 模型家族",
+          "summary": "组织 Gemma-2 各规模的基础与指令版本接口。",
+          "description": "组织 Gemma-2 各规模的基础与指令版本接口。",
+          "en_title": "Gemma-2 model family",
+          "en_summary": "Load Gemma-2 base and instruction-tuned variants across supported scales.",
+          "en_description": "Load Gemma-2 base and instruction-tuned variants across supported scales.",
+          "context_terms": [
+            "term.model"
+          ],
+          "patterns": [
+            "^code:instance:models:gemma2_.*$"
+          ]
+        },
+        {
+          "name": "gemma3",
+          "title": "Gemma-3 模型家族",
+          "summary": "组织 Gemma-3 模型权重、激活接口及任务兼容约束。",
+          "description": "组织 Gemma-3 模型权重、激活接口及任务兼容约束。",
+          "en_title": "Gemma-3 model family",
+          "en_summary": "Expose Gemma-3 base and instruction-tuned model adapters.",
+          "en_description": "Expose Gemma-3 base and instruction-tuned model adapters.",
+          "context_terms": [
+            "term.model"
+          ],
+          "patterns": [
+            "^code:instance:models:gemma3_.*$"
+          ]
+        },
+        {
+          "name": "qwen",
+          "title": "Qwen 模型家族",
+          "summary": "管理 Qwen 系列多代模型的加载及研究兼容接口。",
+          "description": "管理 Qwen 系列多代模型的加载及研究兼容接口。",
+          "en_title": "Qwen model family",
+          "en_summary": "Load Qwen model families and validate their research-task compatibility.",
+          "en_description": "Load Qwen model families and validate their research-task compatibility.",
+          "context_terms": [
+            "term.model"
+          ],
+          "patterns": [
+            "^code:instance:models:qwen.*$"
+          ]
+        },
+        {
+          "name": "gpt_pythia",
+          "title": "GPT-2 与 Pythia 研究模型",
+          "summary": "集中语言模型实验常用的 GPT-2 与 Pythia 适配。",
+          "description": "集中语言模型实验常用的 GPT-2 与 Pythia 适配。",
+          "en_title": "GPT-2 and Pythia research models",
+          "en_summary": "Provide baseline GPT-2 and Pythia model profiles for SAE studies.",
+          "en_description": "Provide baseline GPT-2 and Pythia model profiles for SAE studies.",
+          "context_terms": [
+            "term.model"
+          ],
+          "patterns": [
+            "^code:instance:models:(?:gpt2small|pythia410m|pythia70m)$"
+          ]
+        },
+        {
+          "name": "llama_mistral",
+          "title": "Llama、Mistral 与蒸馏模型",
+          "summary": "整合指令模型与蒸馏模型的加载、激活和兼容接口。",
+          "description": "整合指令模型与蒸馏模型的加载、激活和兼容接口。",
+          "en_title": "Llama, Mistral, and distilled models",
+          "en_summary": "Connect Llama, Mistral, and distilled variants to common research adapters.",
+          "en_description": "Connect Llama, Mistral, and distilled variants to common research adapters.",
+          "context_terms": [
+            "term.model"
+          ],
+          "patterns": [
+            "^code:instance:models:(?:llama.*|mistral.*|r1_distill_.*)$"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "code:instance:tasks:benchmark",
+      "match_on": "path_or_id",
+      "groups": [
+        {
+          "name": "benchmark_frontend",
+          "title": "基准任务、受控输入与总入口",
+          "summary": "组织评测任务、激活检查、受控输入及 Hydra 配置。",
+          "description": "组织评测任务、激活检查、受控输入及 Hydra 配置。",
+          "en_title": "Benchmark task entry and controlled inputs",
+          "en_summary": "Connect task configuration, activation-health checks, and benchmark input design.",
+          "en_description": "Connect task configuration, activation-health checks, and benchmark input design.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^code:configurations:tasks:benchmark$",
+            "^tasks/benchmark/(?:activation_health|analyze|controlled_inputs|health_results|operation|pipeline_checks|stage_d|task)\\.py$"
+          ]
+        },
+        {
+          "name": "benchmark_adapters",
+          "title": "论文方法与第三方 Benchmark 适配",
+          "summary": "接入特征局部性、论文指标及 SAEBench 原生实现。",
+          "description": "接入特征局部性、论文指标及 SAEBench 原生实现。",
+          "en_title": "Published-method and benchmark adapters",
+          "en_summary": "Adapt localization, research-paper methods, and SAEBench evaluation protocols.",
+          "en_description": "Adapt localization, research-paper methods, and SAEBench evaluation protocols.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^tasks/benchmark/backend/adapters/.*\\.py$"
+          ]
+        },
+        {
+          "name": "benchmark_metrics",
+          "title": "SAE 重建、干预与基础指标",
+          "summary": "计算实验的重建误差、基准分数和干预响应。",
+          "description": "计算实验的重建误差、基准分数和干预响应。",
+          "en_title": "SAE reconstruction and intervention metrics",
+          "en_summary": "Compute benchmark scores, reconstruction losses, and feature-edit effects.",
+          "en_description": "Compute benchmark scores, reconstruction losses, and feature-edit effects.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^tasks/benchmark/backend/metrics/.*\\.py$"
+          ]
+        },
+        {
+          "name": "benchmark_backend",
+          "title": "评测协议、运行器与结果保存",
+          "summary": "定义评测计划、注册、执行与结果文件格式。",
+          "description": "定义评测计划、注册、执行与结果文件格式。",
+          "en_title": "Benchmark contracts, runner, and results",
+          "en_summary": "Plan benchmark runs, validate schemas, and write structured evaluation reports.",
+          "en_description": "Plan benchmark runs, validate schemas, and write structured evaluation reports.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^tasks/benchmark/backend/(?:planner|registry|report|results|runner|schema)\\.py$"
+          ]
+        },
+        {
+          "name": "benchmark_extensions",
+          "title": "可扩展评测器与指标注册",
+          "summary": "对第三方评测器进行协议注册、指标调用与运行隔离。",
+          "description": "对第三方评测器进行协议注册、指标调用与运行隔离。",
+          "en_title": "Extensible evaluator and metric registry",
+          "en_summary": "Register external evaluation providers under explicit contracts.",
+          "en_description": "Register external evaluation providers under explicit contracts.",
+          "context_terms": [
+            "term.plugin",
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^tasks/benchmark/extensions/.*\\.py$"
+          ]
+        },
+        {
+          "name": "benchmark_integrations",
+          "title": "SAR、RSS 与局部性评测",
+          "summary": "将特征组合性、响应分数及输入局部性接入统一评测。",
+          "description": "将特征组合性、响应分数及输入局部性接入统一评测。",
+          "en_title": "SAR, RSS, and feature localization",
+          "en_summary": "Evaluate feature compositionality, response redistribution, and input localization.",
+          "en_description": "Evaluate feature compositionality, response redistribution, and input localization.",
+          "context_terms": [
+            "term.sae.sar_rss"
+          ],
+          "patterns": [
+            "^tasks/benchmark/integrations/.*\\.py$"
+          ]
+        },
+        {
+          "name": "benchmark_native",
+          "title": "原生 SAE 基准及对照方法",
+          "summary": "执行仓库内原生基准及对照评测流程。",
+          "description": "执行仓库内原生基准及对照评测流程。",
+          "en_title": "Native SAE benchmark baselines",
+          "en_summary": "Run bundled SAE evaluations and baseline comparisons.",
+          "en_description": "Run bundled SAE evaluations and baseline comparisons.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^tasks/benchmark/native/.*\\.py$"
+          ]
+        },
+        {
+          "name": "benchmark_release",
+          "title": "基准结果发布与验证门槛",
+          "summary": "验证科研结果交付、版本及结构化发布协议。",
+          "description": "验证科研结果交付、版本及结构化发布协议。",
+          "en_title": "Benchmark release and acceptance gates",
+          "en_summary": "Check evaluation release plans, evidence gates, and result schemas.",
+          "en_description": "Check evaluation release plans, evidence gates, and result schemas.",
+          "context_terms": [
+            "term.artifact"
+          ],
+          "patterns": [
+            "^tasks/benchmark/release/.*\\.py$"
+          ]
+        },
+        {
+          "name": "reliability_truth",
+          "title": "可靠性对照与特征交互真值",
+          "summary": "建立可靠性评测的受控答案、输入对照和特征交互参照。",
+          "description": "建立可靠性评测的受控答案、输入对照和特征交互参照。",
+          "en_title": "Controlled reliability ground truth",
+          "en_summary": "Construct controlled references, expected feature interactions, and comparison outcomes.",
+          "en_description": "Construct controlled references, expected feature interactions, and comparison outcomes.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^tasks/benchmark/reliability/(?:controls|ground_truth|ground_truth_report|interaction_truth|rss_truth)\\.py$"
+          ]
+        },
+        {
+          "name": "reliability_statistics",
+          "title": "重采样、可靠性指标与统计报告",
+          "summary": "检验评测分数、排名和局部性指标的统计稳定性。",
+          "description": "检验评测分数、排名和局部性指标的统计稳定性。",
+          "en_title": "Resampling, metric reliability, and statistical reports",
+          "en_summary": "Estimate uncertainty and stability of SAE metrics, rankings, and localization outcomes.",
+          "en_description": "Estimate uncertainty and stability of SAE metrics, rankings, and localization outcomes.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^tasks/benchmark/reliability/(?:bootstrap|discriminability|localization|observations|ranking|report|resampling|runner|schema)\\.py$"
+          ]
+        }
+      ]
+    }
+  ]
+}

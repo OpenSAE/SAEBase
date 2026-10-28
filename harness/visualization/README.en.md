@@ -49,3 +49,7 @@ The existing tree supports human-review drafts. Purple represents unchecked, red
 A local authenticated review service can persist permitted decisions. The public GitHub Pages interface only saves local browser drafts, which may be exported and separately reviewed; it does not write directly to GitHub.
 
 See the [Agent review process](../core/AGENT_FLOW.en.md). Status remains independently evidenced per node, and published snapshots do not substitute for hardware tests or research verification.
+
+## Research-concept Code Tree
+
+The `saebase/` branch now begins with 14 source-backed research domains, followed by meaningful subdomains and actual modules. `harness/code/atlas_concepts.json` defines the reviewed bilingual responsibilities, Context terms, and precise source membership. Original module IDs, paths, signatures, and methods are retained. A functional parent has no more than 20 direct children, with 10 preferred; UI pagination does not replace the scientific hierarchy.
