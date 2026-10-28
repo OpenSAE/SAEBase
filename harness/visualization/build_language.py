@@ -295,6 +295,16 @@ def domain(path: str) -> str:
         return "Gemma-2 2B model" if name == "gemma2_2b_base" else human(name) + " model"
     if len(parts) >= 3 and parts[0] == "tasks":
         return TASK_NAMES.get(parts[1], human(parts[1]) + " research")
+    if len(parts) >= 4 and parts[:2] == ["saebase", "data"]:
+        return DATASET_NAMES.get(parts[2], human(parts[2])) + " prompt compatibility"
+    if len(parts) >= 3 and parts[:2] == ["saebase", "interventions"]:
+        return "feature editing and steering"
+    if len(parts) >= 4 and parts[:3] == ["saebase", "examples", "interventions"]:
+        return "intervention research examples"
+    if len(parts) >= 3 and parts[:2] == ["saebase", "release"]:
+        return "software release verification"
+    if len(parts) == 2 and parts == ["saebase", "runner.py"]:
+        return "registered SAE research tasks"
     return role(path)
 
 

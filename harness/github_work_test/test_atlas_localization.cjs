@@ -57,6 +57,30 @@ for (const [view, tree] of Object.entries(graph)) {
   }
 }
 
+// Source-backed sibling nodes must have distinct natural-language names.
+// Equal titles in distant packages are valid, but sibling headings cannot
+// force users to inspect hashed IDs to tell research operations apart.
+const byParent = new Map();
+for (const edge of graph.code.edges) {
+  if (edge.type !== "contains") continue;
+  if (!byParent.has(edge.source)) byParent.set(edge.source, []);
+  byParent.get(edge.source).push(edge.target);
+}
+for (const [parent, childIds] of byParent) {
+  const titles = new Map();
+  for (const id of childIds) {
+    const title = locales.nodes.code[id]?.title;
+    if (!title) continue;
+    if (!titles.has(title)) titles.set(title, []);
+    titles.get(title).push(id);
+  }
+  for (const [title, ids] of titles) {
+    assert.equal(ids.length, 1,
+      "Ambiguous sibling Code titles under " + parent + ": " + title +
+      " [" + ids.join(", ") + "]");
+  }
+}
+
 const glossary = load("doc/knowledge/glossary.json");
 const technical = load("doc/knowledge/atlas_terms.json");
 const scientific = load("doc/knowledge/i18n/context.en.json");
