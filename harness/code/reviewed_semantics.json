@@ -713,7 +713,7 @@
       "source_path": "saebase/research_lab/backend/publish.py",
       "source_symbol": "saebase/research_lab/backend/publish.py",
       "zh_title": "发布带审批与版本身份的实验摘要",
-      "zh_summary": "核验公开授权、结果类型和来源协议后写入不可变研究报告。",
+      "zh_summary": "核验公开授权、结果类型和来源协议后写入内容固定的研究报告。",
       "en_title": "Publish reviewed immutable research summaries",
       "en_summary": "Require explicit approval and provenance metadata before writing public result records.",
       "context_term_ids": [
