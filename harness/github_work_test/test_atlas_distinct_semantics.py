@@ -138,6 +138,5 @@ def test_source_attributes_add_evidence_instead_of_repeating_card_summary() -> N
             continue
         for attribute in node.get("attributes") or []:
             assert not (
-                attribute.get("type") == "text"
-                and attribute.get("value") == node.get("summary")
+                attribute.get("type") == "text" and attribute.get("value") == node.get("summary")
             ), node["id"]
