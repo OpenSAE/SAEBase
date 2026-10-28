@@ -22,7 +22,7 @@ for (const [view, tree] of Object.entries(graph)) {
   for (const node of tree.nodes) {
     assert(!/:(?:public-nav|nav):/.test(node.id),
       "Fabricated navigation node: " + view + "/" + node.id);
-    assert(!/(?:第\\d+组|按实际源码目录、定义职责|分组浏览相关接口)/.test(
+    assert(!/(?:第\d+组|按实际源码目录、定义职责|分组浏览相关接口)/.test(
       [node.title,node.summary,node.description,node.reader_explanation].join(" ")),
       "Count-based pseudo-purpose: " + view + "/" + node.id);
     if (view === "code" && node.presentation_only) {
