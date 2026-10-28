@@ -150,6 +150,37 @@ def compact_public_code_tree(graph: dict) -> dict:
             current = parents.get(current)
         return current
 
+    # Folding a navigation instance can bring its former children together
+    # under one concept. Re-audit the *final* parents until no newly adjacent
+    # source interfaces repeat. This prevents post-compaction collisions.
+    changed = True
+    while changed:
+        changed = False
+        visible_children = defaultdict(list)
+        for node_id in keep:
+            if node_id != root:
+                visible_children[visible_parent(node_id)].append(node_id)
+        for parent, ids in visible_children.items():
+            collisions = defaultdict(list)
+            for node_id in ids:
+                node = nodes[node_id]
+                key = (normalize(node.get("title")), normalize(node.get("summary")))
+                if all(key):
+                    collisions[key].append(node_id)
+            for group in collisions.values():
+                if len(group) < 2:
+                    continue
+                reviewed = [item for item in group if item in SOURCE_REVIEWS]
+                if len(reviewed) > 1:
+                    raise ValueError("Duplicate independently reviewed responsibilities: " + repr(reviewed))
+                retained = reviewed[0] if reviewed else (
+                    None if nodes[parent].get("concept_group") else sorted(group)[0]
+                )
+                for item in group:
+                    if item != retained:
+                        keep.discard(item)
+                        changed = True
+
     originals = set(nodes)
     source_records = defaultdict(list)
     mapping = {}
