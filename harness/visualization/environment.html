@@ -9,8 +9,8 @@
   <link rel="stylesheet" href="./style.css?v=locale-20261027">
   <script defer src="./data.js"></script>
   <script defer src="./atlas-structure.js?v=research-hierarchy-20261026"></script>
-  <script defer src="./atlas-public-balance.js?v=code-nav-20261027"></script>
-  <script defer src="./app.js?v=review-dfs-20261026"></script>
+  <script defer src="./atlas-public-balance.js?v=context-cleanup-20261028"></script>
+  <script defer src="./app.js?v=source-only-pages-20261028"></script>
   <script defer src="./locale-data.js?v=saebase-bilingual-20261027"></script>
   <script defer src="./locale-runtime.js?v=saebase-bilingual-20261027"></script>
   <script defer src="./i18n.js?v=saebase-bilingual-20261027"></script>
@@ -34,6 +34,11 @@
         <div class="navigation">
           <button id="overviewBack" class="overview-back" title="Return to the full tree" aria-label="Return to overview">← <span>Overview</span></button>
           <div id="breadcrumb" class="breadcrumb" aria-label="Current node path"></div>
+          <div id="atlasChildPager" class="child-pager is-hidden" role="group" aria-label="Pages of actual source children">
+            <button type="button" id="atlasChildPrev" aria-label="Previous child page">‹</button>
+            <span id="atlasChildCount" aria-live="polite"></span>
+            <button type="button" id="atlasChildNext" aria-label="Next child page">›</button>
+          </div>
         </div>
         <div class="tool-actions">
           <label class="search-box"><span class="search-symbol" aria-hidden="true">⌕</span><input type="search" id="search" placeholder="Find a node…" aria-label="Find a node" autocomplete="off"></label>
