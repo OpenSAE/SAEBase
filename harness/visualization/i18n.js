@@ -1,7 +1,7 @@
 /* Atlas language control. Language-neutral graph IDs and state are untouched. */
 (function(){
 "use strict";
-const KEY="openresearch.atlas.locale";
+const KEY="saebase.atlas.locale";
 const params=new URLSearchParams(location.search);
 const requested=params.get("lang");
 const saved=(()=>{try{return localStorage.getItem(KEY)}catch{return null}})();
@@ -47,7 +47,7 @@ function localize(raw,el){
  // Preserve exact code excerpts and recorded source facts.
  if(technical(el))return raw;
  // Localized overlays can provide translated strings without changing underlying graph data.
- const translated=window.OPENRESEARCH_ATLAS_I18N?.en?.[raw.trim()];
+ const translated=window.SAEBASE_ATLAS_UI?.[raw.trim()];
  if(typeof translated==="string"&&translated.trim())return raw.replace(raw.trim(),translated);
  return "English translation unavailable";
 }
@@ -60,7 +60,7 @@ function updateText(node){
 }
 // Documentation links follow stable source document IDs across languages.
 function translateLinks(root=document){
- const english=window.OPENRESEARCH_ATLAS_I18N?.docs||{};
+ const english=window.SAEBASE_ATLAS_LOCALES?.docs||{};
  for(const anchor of root.querySelectorAll?.("a[href]")||[]){
   if(!anchor.dataset.atlasOriginalHref)anchor.dataset.atlasOriginalHref=anchor.getAttribute("href");
   const raw=anchor.dataset.atlasOriginalHref;
@@ -111,6 +111,7 @@ function setLanguage(next){
  locale=next;try{localStorage.setItem(KEY,next)}catch{}
  const url=new URL(location.href);url.searchParams.set("lang",next);
  history.replaceState(history.state,"",url);
+ window.SAEBASE_ATLAS_SET_NODE_LANGUAGE?.(locale);
  translate();
 }
 function initialize(){
@@ -121,9 +122,10 @@ function initialize(){
   if(!/^(?:core|knowledge|code|environment|context)\.html(?:[?#]|$)/.test(a.getAttribute("href")||""))return;
   a.addEventListener("click",()=>{try{localStorage.setItem(KEY,locale)}catch{}});
  });
+ window.SAEBASE_ATLAS_SET_NODE_LANGUAGE?.(locale);
  translate();
  watcher.observe(document.body,{subtree:true,childList:true,characterData:true});
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",initialize,{once:true});else initialize();
-window.OPENRESEARCH_ATLAS_SET_LANGUAGE=setLanguage;
+window.SAEBASE_ATLAS_SET_LANGUAGE=setLanguage;
 })();

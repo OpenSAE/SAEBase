@@ -226,32 +226,17 @@ def concrete_groups(output: dict) -> None:
 # functions, changing their IDs, or modifying the authoritative AST snapshot.
 MAX_ATLAS_CHILDREN = 10
 CODE_ROLES = (
-    ("capture", "激活捕获与特征读取", r"capture|activat|feature|encode|decode|token"),
-    ("intervene", "特征干预与生成", r"interven|edit|patch|steer|generat|forward|infer"),
-    ("circuit", "电路追踪与归因", r"circuit|attribut|trac|gradient|residual"),
-    ("explain", "解释与假设检验", r"explain|interpret|hypothesi"),
-    (
-        "evaluation",
-        "指标、对照与评测",
-        r"bench|metric|evaluat|score|assess|loss|auroc|report|reliab|rank|truth",
-    ),
-    ("training", "训练与参数更新", r"train|optim|schedul|backward|fit|epoch|checkpoint|learn"),
-    (
-        "data",
-        "数据、产物与存储",
-        r"data|dataset|prompt|artifact|manifest|shard|store|file|path|read|write|save|load|collect",
-    ),
-    (
-        "contract",
-        "约束、校验与配置",
-        r"valid|check|verify|guard|config|schema|contract|require|assert|policy",
-    ),
-    (
-        "runtime",
-        "运行入口与调度",
-        r"runtime|runner|run|execute|setup|init|launch|start|stop|build|create|make|construct",
-    ),
+    ("capture", "激活捕获与特征读取", r"\b(?:capture|activat(?:ion|ions|e)?|features?|encod(?:e|er|ing)|decod(?:e|er|ing)|tokens?|tokeniz(?:e|er|ation))\b"),
+    ("intervene", "特征干预与生成", r"\b(?:interven(?:e|tion|tions)|edit(?:s|ing)?|patch(?:es|ing)?|steer(?:ing)?|generat(?:e|ion|ive|or)|forward|infer(?:ence)?)\b"),
+    ("circuit", "电路追踪与归因", r"\b(?:circuits?|attribut(?:e|ion)|trac(?:e|ing|er)|gradients?|residuals?)\b"),
+    ("explain", "解释与假设检验", r"\b(?:explain|explanations?|interpret(?:ation|er)?|hypothes(?:is|es))\b"),
+    ("evaluation", "指标、对照与评测", r"\b(?:benchmarks?|benchmarking|metrics?|evaluat(?:e|ion|ions)|scores?|assess(?:ment)?|loss(?:es)?|auroc|reports?|reporting|reliab(?:ility|le)|rank(?:ing)?|reconstruct(?:ion|s|ed|ing)?|truth)\b"),
+    ("training", "训练与参数更新", r"\b(?:train(?:ing|er)?|optim(?:ize|ization|izer)|schedul(?:er|e|ing)|backward|fit|epochs?|checkpoints?|learn(?:ing)?)\b"),
+    ("data", "数据、产物与存储", r"\b(?:data(?:set|sets)?|prompts?|artifacts?|manifests?|shards?|store|files?|paths?|read|write|save|load|collect)\b"),
+    ("contract", "约束、校验与配置", r"\b(?:validat(?:e|ion|or)|checks?|verif(?:y|ication)|guard|configs?|configuration|schema|contracts?|requires?|assert|policy)\b"),
+    ("runtime", "运行入口与调度", r"\b(?:runtime|runner|run|execute|setup|init|launch|start|stop|build|create|make|construct)\b"),
 )
+
 CODE_DIR_LABELS = {
     "api": "API 与调用接口",
     "sae": "SAE 字典、加载与覆盖率",
@@ -280,8 +265,9 @@ CODE_DIR_LABELS = {
 def _source_role(node: dict) -> str:
     symbol = str(node.get("source_symbol") or node.get("title") or "")
     path = PurePosixPath(node.get("path") or "")
+    # Match complete identifier words: 'contracts' must never match 'trace'.
     # Exact source symbols have priority over the surrounding file's domain.
-    text = symbol.lower().replace("_", " ")
+    text = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", symbol).lower().replace("_", " ")
     for key, _title, pattern in CODE_ROLES:
         if re.search(pattern, text):
             return key
@@ -315,7 +301,7 @@ def _code_buckets(parent_id: str, child_ids: list[str], by_id: dict) -> tuple[st
                 for key in scopes
             }
             return "directory", [
-                (key, labels[key], members) for key, members in sorted(scopes.items())
+                (key, labels[key], members) for key, members in scopes.items()
             ]
     roles = defaultdict(list)
     for node in children:
@@ -323,7 +309,7 @@ def _code_buckets(parent_id: str, child_ids: list[str], by_id: dict) -> tuple[st
     if 1 < len(roles) <= MAX_ATLAS_CHILDREN:
         labels = {key: title for key, title, _ in CODE_ROLES}
         labels["helpers"] = "公共辅助函数与接口"
-        return "role", [(key, labels[key], members) for key, members in sorted(roles.items())]
+        return "role", [(key, labels[key], members) for key, members in roles.items()]
     # Explicit, deterministic source ranges are a last resort for a single
     # very large class or densely populated package. This preserves its
     # source order instead of inventing research-method categories.

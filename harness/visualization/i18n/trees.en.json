@@ -1,0 +1,364 @@
+{
+  "schema": "saebase.atlas.trees.en.v1",
+  "project": "SAEBase",
+  "source_locale": "zh",
+  "target_locale": "en",
+  "views": {
+    "core": {
+      "core:existing": {
+        "title": "SAEBase component architecture and task registry",
+        "summary": "The project connects its shared SAEBase runtime, single plugin registry, datasets, models, and research tasks through verifiable interfaces.",
+        "description": "The project connects its shared SAEBase runtime, single plugin registry, datasets, models, and research tasks through verifiable interfaces."
+      },
+      "q.modularity": {
+        "title": "How do datasets, models, and tasks remain independent?",
+        "summary": "Dataset, Model, and Task implementations use registered interfaces and explicit compatibility checks, allowing each component to evolve without duplicating the runtime.",
+        "description": "Dataset, Model, and Task implementations use registered interfaces and explicit compatibility checks, allowing each component to evolve without duplicating the runtime."
+      },
+      "q.transparency": {
+        "title": "How do the five Atlas trees relate?",
+        "summary": "Core covers architecture, Knowledge covers scientific methods, Code covers actual source, Environment covers execution resources, and Context defines the shared terminology.",
+        "description": "Core covers architecture, Knowledge covers scientific methods, Code covers actual source, Environment covers execution resources, and Context defines the shared terminology."
+      },
+      "s.registry": {
+        "title": "Decouple components through the registry",
+        "summary": "Dataset, Model, and Task plugins are registered through common SAEBase interfaces rather than hard-coded task branches.",
+        "description": "Dataset, Model, and Task plugins are registered through common SAEBase interfaces rather than hard-coded task branches."
+      },
+      "s.compatibility": {
+        "title": "Validate compatibility across three components",
+        "summary": "Registered dataset, model, and SAE task interfaces check that a proposed experimental combination is supported before execution.",
+        "description": "Registered dataset, model, and SAE task interfaces check that a proposed experimental combination is supported before execution."
+      },
+      "s.hydra": {
+        "title": "Compose experiments through Hydra",
+        "summary": "A composed configuration, explicit runtime entry point, and fixed random seed define the parameters of each experiment.",
+        "description": "A composed configuration, explicit runtime entry point, and fixed random seed define the parameters of each experiment."
+      },
+      "s.explainability": {
+        "title": "Separate architecture, scientific knowledge, code, and terminology",
+        "summary": "Core, Knowledge, Code, Environment, and the glossary have distinct evidence sources and responsibilities for understanding the same project.",
+        "description": "Core, Knowledge, Code, Environment, and the glossary have distinct evidence sources and responsibilities for understanding the same project."
+      },
+      "g.registry": {
+        "title": "Register dataset, model, and SAE task plugins",
+        "summary": "The runtime exposes discoverable, verifiable mappings to registered datasets, models, and research tasks.",
+        "description": "The runtime exposes discoverable, verifiable mappings to registered datasets, models, and research tasks."
+      },
+      "g.dataset_gate": {
+        "title": "Enforce dataset and task compatibility",
+        "summary": "Dataset source identity, sample protocol, and task adapter constraints are checked before creating an experimental run.",
+        "description": "Dataset source identity, sample protocol, and task adapter constraints are checked before creating an experimental run."
+      },
+      "g.model_gate": {
+        "title": "Validate model compatibility",
+        "summary": "A selected language model must be compatible with the task, source dataset, SAE profile, and activation positions.",
+        "description": "A selected language model must be compatible with the task, source dataset, SAE profile, and activation positions."
+      },
+      "g.pipeline": {
+        "title": "Check SAE task readiness before execution",
+        "summary": "The task pipeline validates model identities, checkpoint availability, input data, and required authorizations.",
+        "description": "The task pipeline validates model identities, checkpoint availability, input data, and required authorizations."
+      },
+      "g.config": {
+        "title": "Record complete experiment configuration",
+        "summary": "The output records the resolved Hydra configuration, random seed, and execution entry point for reproducibility.",
+        "description": "The output records the resolved Hydra configuration, random seed, and execution entry point for reproducibility."
+      },
+      "g.artifact_schema": {
+        "title": "Organize results into typed artifact directories",
+        "summary": "Experiment leaf directories separate reports, metrics, tables, checkpoints, figures, logs, metadata, and temporary files.",
+        "description": "Experiment leaf directories separate reports, metrics, tables, checkpoints, figures, logs, metadata, and temporary files."
+      },
+      "g.context": {
+        "title": "Maintain evidence-linked scientific knowledge",
+        "summary": "Stable node IDs, independently reviewed status, parent-child relationships, and source evidence describe existing research capabilities.",
+        "description": "Stable node IDs, independently reviewed status, parent-child relationships, and source evidence describe existing research capabilities."
+      },
+      "g.code_tree": {
+        "title": "Build a verifiable Python Code Tree",
+        "summary": "The Code Tree extracts real Python entities, inheritance and member relations, and existing scientific links from the AST.",
+        "description": "The Code Tree extracts real Python entities, inheritance and member relations, and existing scientific links from the AST."
+      },
+      "g.env_tree": {
+        "title": "Capture actual execution-environment observations",
+        "summary": "Hardware probes record processor, memory, GPU, disk, and runtime details, distinguishing observed measurements from examples.",
+        "description": "Hardware probes record processor, memory, GPU, disk, and runtime details, distinguishing observed measurements from examples."
+      },
+      "q.multi_domain": {
+        "title": "How can multiple SAE research tasks share components?",
+        "summary": "Seven SAE operations share model, sparse dictionary, and prompt identities while remaining separately registered tasks.",
+        "description": "Seven SAE operations share model, sparse dictionary, and prompt identities while remaining separately registered tasks."
+      },
+      "s.parallel_cores": {
+        "title": "Unify SAE algorithms and runtime task execution",
+        "summary": "SAEBase implements feature research methods; its shared runtime provides task execution and artifact tracking through one registry.",
+        "description": "SAEBase implements feature research methods; its shared runtime provides task execution and artifact tracking through one registry."
+      },
+      "g.domain_families": {
+        "title": "Organize datasets, models, and research operations",
+        "summary": "Individual datasets, language models, and seven SAE tasks live in dedicated source folders while existing public SAEBase APIs remain compatible.",
+        "description": "Individual datasets, language models, and seven SAE tasks live in dedicated source folders while existing public SAEBase APIs remain compatible."
+      },
+      "g.llm_capture": {
+        "title": "Capture sparse features from language models",
+        "summary": "At a selected layer, SAEBase records actual model activations, SAE feature codes, and reconstruction quantities.",
+        "description": "At a selected layer, SAEBase records actual model activations, SAE feature codes, and reconstruction quantities."
+      },
+      "g.llm_teacher_forcing": {
+        "title": "Intervene on LLM features under fixed inputs",
+        "summary": "The experiment edits a sparse feature while preserving the input tokens and measures the effect on model logits.",
+        "description": "The experiment edits a sparse feature while preserving the input tokens and measures the effect on model logits."
+      },
+      "g.llm_generation": {
+        "title": "Edit LLM features during generation",
+        "summary": "Feature interventions run at generation steps and are compared with baseline continuations using actual token sequences.",
+        "description": "Feature interventions run at generation steps and are compared with baseline continuations using actual token sequences."
+      },
+      "g.llm_circuits": {
+        "title": "Trace and evaluate SAE circuits",
+        "summary": "SAEBase circuit tools construct source-linked candidate feature relations; running them requires compatible compute and independent validation.",
+        "description": "SAEBase circuit tools construct source-linked candidate feature relations; running them requires compatible compute and independent validation."
+      },
+      "g.llm_explain": {
+        "title": "Generate and test feature explanations",
+        "summary": "A selected explanation generator proposes feature semantics, which are then tested on separate activation measurements.",
+        "description": "A selected explanation generator proposes feature semantics, which are then tested on separate activation measurements."
+      },
+      "g.llm_benchmark": {
+        "title": "Evaluate SAE feature representations",
+        "summary": "The benchmark runner computes traceable reconstruction, activation, and behavioral metrics for selected models, SAEs, and samples.",
+        "description": "The benchmark runner computes traceable reconstruction, activation, and behavioral metrics for selected models, SAEs, and samples."
+      },
+      "g.llm_sae_training": {
+        "title": "Train sparse autoencoders",
+        "summary": "SAEBase invokes registered SAE Lens or Sparsify training backends and records actual configurations and checkpoints.",
+        "description": "SAEBase invokes registered SAE Lens or Sparsify training backends and records actual configurations and checkpoints."
+      }
+    },
+    "knowledge": {
+      "knowledge:existing": {
+        "title": "LLM SAE methods and source evidence",
+        "summary": "This tree groups source-backed methods for feature capture, intervention, generation, circuits, explanations, benchmarking, and training.",
+        "description": "This tree groups source-backed methods for feature capture, intervention, generation, circuits, explanations, benchmarking, and training."
+      },
+      "s.sae.assets": {
+        "title": "Model, SAE, and prompt identity protocol",
+        "summary": "Actual code defines model identities and prompt artifact formats; end-to-end scientific outcomes require separate evaluation.",
+        "description": "Actual code defines model identities and prompt artifact formats; end-to-end scientific outcomes require separate evaluation."
+      },
+      "g.sae.prompt_artifacts": {
+        "title": "Store traceable prompt artifacts by dataset and model",
+        "summary": "The prompt artifact API records dataset identity, selected model, and provenance. The implementation is in datasets/artifacts.py.",
+        "description": "The prompt artifact API records dataset identity, selected model, and provenance. The implementation is in datasets/artifacts.py."
+      },
+      "g.sae.gemma_model": {
+        "title": "Load the Gemma-2 2B model adapter",
+        "summary": "The Gemma-2 2B adapter in models/gemma2_2b_base/gemma2_2b_base.py provides the model identity and loading interface.",
+        "description": "The Gemma-2 2B adapter in models/gemma2_2b_base/gemma2_2b_base.py provides the model identity and loading interface."
+      },
+      "g.sae.sae_registry": {
+        "title": "Select SAE configurations by checkpoint identity",
+        "summary": "The SAE registry resolves sparse dictionaries by model and SAE identities as implemented in saebase/sae/registry.py.",
+        "description": "The SAE registry resolves sparse dictionaries by model and SAE identities as implemented in saebase/sae/registry.py."
+      },
+      "s.sae.capture": {
+        "title": "Capture SAE features from model activations",
+        "summary": "The capture method reads a known model activation hook and encodes it with a compatible SAE.",
+        "description": "The capture method reads a known model activation hook and encodes it with a compatible SAE."
+      },
+      "g.sae.activation_capture": {
+        "title": "Call SAEBase activation and feature capture",
+        "summary": "The API in saebase/api/features.py reads actual activations and produces sparse feature responses.",
+        "description": "The API in saebase/api/features.py reads actual activations and produces sparse feature responses."
+      },
+      "g.sae.capture_task": {
+        "title": "Run feature capture through the task interface",
+        "summary": "The capture operation in tasks/capture/operation.py runs under the shared registered task protocol.",
+        "description": "The capture operation in tasks/capture/operation.py runs under the shared registered task protocol."
+      },
+      "s.sae.intervene": {
+        "title": "Teacher-forced feature edits and controlled comparisons",
+        "summary": "With inputs and activation positions fixed, the intervention interface records comparable downstream outputs.",
+        "description": "With inputs and activation positions fixed, the intervention interface records comparable downstream outputs."
+      },
+      "g.sae.feature_edit": {
+        "title": "Apply SAE feature-editing operations",
+        "summary": "Feature editing functions in saebase/api/features.py modify selected sparse contributions under defined conditions.",
+        "description": "Feature editing functions in saebase/api/features.py modify selected sparse contributions under defined conditions."
+      },
+      "g.sae.teacher_forced": {
+        "title": "Execute fixed-input interventions",
+        "summary": "The intervention task in tasks/intervene/operation.py evaluates edited model outputs against the unchanged-input baseline.",
+        "description": "The intervention task in tasks/intervene/operation.py evaluates edited model outputs against the unchanged-input baseline."
+      },
+      "s.sae.generate": {
+        "title": "Compare generation-time edits with baseline continuations",
+        "summary": "Generation operations apply stepwise feature changes and record the corresponding baseline and edited token sequences.",
+        "description": "Generation operations apply stepwise feature changes and record the corresponding baseline and edited token sequences."
+      },
+      "g.sae.generation_task": {
+        "title": "Run SAE generation comparisons",
+        "summary": "The generation task in tasks/generate/operation.py evaluates output changes during autoregressive generation.",
+        "description": "The generation task in tasks/generate/operation.py evaluates output changes during autoregressive generation."
+      },
+      "g.sae.generation_engine": {
+        "title": "Dispatch the generation intervention backend",
+        "summary": "The engine in tasks/generate/backend/engine.py coordinates the generation-time intervention backend.",
+        "description": "The engine in tasks/generate/backend/engine.py coordinates the generation-time intervention backend."
+      },
+      "s.sae.circuits": {
+        "title": "Trace circuits and intervene on local paths",
+        "summary": "The circuit method explores relations among actual model components; proposed causal interpretations require further tests.",
+        "description": "The circuit method explores relations among actual model components; proposed causal interpretations require further tests."
+      },
+      "g.sae.circuit_trace": {
+        "title": "Invoke source-backed circuit tracing",
+        "summary": "The circuits backend in tasks/circuits/backend/circuits.py constructs candidate paths from actual model computations.",
+        "description": "The circuits backend in tasks/circuits/backend/circuits.py constructs candidate paths from actual model computations."
+      },
+      "g.sae.circuit_edit": {
+        "title": "Intervene on candidate circuit paths",
+        "summary": "The path intervention implementation in tasks/circuits/backend/circuit_intervene.py tests selected internal connections.",
+        "description": "The path intervention implementation in tasks/circuits/backend/circuit_intervene.py tests selected internal connections."
+      },
+      "s.sae.explain": {
+        "title": "Generate feature hypotheses and validate them independently",
+        "summary": "The explanation interface produces candidate descriptions whose predictive value needs held-out tests.",
+        "description": "The explanation interface produces candidate descriptions whose predictive value needs held-out tests."
+      },
+      "g.sae.interpretation": {
+        "title": "Generate feature-meaning hypotheses",
+        "summary": "The implementation in tasks/explain/interpretation.py proposes explanations from observed feature activation examples.",
+        "description": "The implementation in tasks/explain/interpretation.py proposes explanations from observed feature activation examples."
+      },
+      "g.sae.explanation_task": {
+        "title": "Run feature explanations through the task interface",
+        "summary": "The task in tasks/explain/operation.py executes the explanation workflow with explicit generator settings.",
+        "description": "The task in tasks/explain/operation.py executes the explanation workflow with explicit generator settings."
+      },
+      "s.sae.benchmark": {
+        "title": "SAE benchmarks, reliability checks, and SAR/RSS adapters",
+        "summary": "Actual code implements metric execution, statistical controls, and integration adapters; empirical findings need corresponding measurements.",
+        "description": "Actual code implements metric execution, statistical controls, and integration adapters; empirical findings need corresponding measurements."
+      },
+      "g.sae.benchmark_runner": {
+        "title": "Run benchmarks for selected SAEs and samples",
+        "summary": "The benchmark backend executes named metrics and records the evaluated model, SAE, and dataset conditions.",
+        "description": "The benchmark backend executes named metrics and records the evaluated model, SAE, and dataset conditions."
+      },
+      "g.sae.reliability": {
+        "title": "Evaluate metric reliability and controls",
+        "summary": "The reliability implementation measures variation and controlled contrasts across experiment records.",
+        "description": "The reliability implementation measures variation and controlled contrasts across experiment records."
+      },
+      "g.sae.sar_adapter": {
+        "title": "Adapt SAR compositionality evaluation",
+        "summary": "The SAR integration preserves feature compositionality evaluation protocols through the shared benchmark interface.",
+        "description": "The SAR integration preserves feature compositionality evaluation protocols through the shared benchmark interface."
+      },
+      "g.sae.rss_adapter": {
+        "title": "Adapt RSS response-sensitivity evaluation",
+        "summary": "The RSS integration measures response changes under its source-defined comparison protocol.",
+        "description": "The RSS integration measures response changes under its source-defined comparison protocol."
+      },
+      "s.sae.train": {
+        "title": "Train SAEs and record learned weights",
+        "summary": "The training interface delegates to a native backend and records checkpoints; convergence and quality require independent evidence.",
+        "description": "The training interface delegates to a native backend and records checkpoints; convergence and quality require independent evidence."
+      },
+      "g.sae.train_task": {
+        "title": "Launch SAE training through the task interface",
+        "summary": "The registered training operation in tasks/train/operation.py starts and tracks an authorized SAE training run.",
+        "description": "The registered training operation in tasks/train/operation.py starts and tracks an authorized SAE training run."
+      },
+      "g.sae.train_backend": {
+        "title": "Execute native SAE training",
+        "summary": "The backend in tasks/train/backend/training.py runs the registered training implementation and writes its outputs.",
+        "description": "The backend in tasks/train/backend/training.py runs the registered training implementation and writes its outputs."
+      },
+      "knowledge:area:sae": {
+        "title": "Sparse features and LLM interpretability",
+        "summary": "Browse model identities, SAE checkpoints, prompts, and seven implemented SAE research operations.",
+        "description": "Browse model identities, SAE checkpoints, prompts, and seven implemented SAE research operations."
+      }
+    },
+    "environment": {
+      "env:root": {
+        "title": "CPU, GPU, and research execution environments",
+        "summary": "A clearly marked synthetic environment illustrates how observed execution resources are organized.",
+        "description": "A clearly marked synthetic environment illustrates how observed execution resources are organized."
+      },
+      "env:platform": {
+        "title": "Operating system and architecture",
+        "summary": "Synthetic sample: the operating system is Synthetic Linux on an x86_64 hardware architecture.",
+        "description": "Synthetic sample: the operating system is Synthetic Linux on an x86_64 hardware architecture."
+      },
+      "env:cpu": {
+        "title": "Central processing unit",
+        "summary": "Synthetic sample: 32 logical processors and 16 physical CPU cores.",
+        "description": "Synthetic sample: 32 logical processors and 16 physical CPU cores."
+      },
+      "env:memory": {
+        "title": "System memory",
+        "summary": "Synthetic sample: 128.0 GiB total system memory and 96.0 GiB currently available.",
+        "description": "Synthetic sample: 128.0 GiB total system memory and 96.0 GiB currently available."
+      },
+      "env:gpu": {
+        "title": "Graphics processing devices",
+        "summary": "The synthetic example lists one graphics processor to illustrate device organization.",
+        "description": "The synthetic example lists one graphics processor to illustrate device organization."
+      },
+      "env:gpu:0": {
+        "title": "Graphics processing device 1",
+        "summary": "Synthetic sample: 24.0 GiB of device memory; the hardware model is not a measured local device.",
+        "description": "Synthetic sample: 24.0 GiB of device memory; the hardware model is not a measured local device."
+      },
+      "env:storage": {
+        "title": "Project storage volume",
+        "summary": "Synthetic sample: 2.0 TiB total capacity and 1.5 TiB available storage.",
+        "description": "Synthetic sample: 2.0 TiB total capacity and 1.5 TiB available storage."
+      },
+      "env:command:tmux": {
+        "title": "Persistent terminal sessions",
+        "summary": "The synthetic example describes tmux availability; actual capability must be checked on the execution machine.",
+        "description": "The synthetic example describes tmux availability; actual capability must be checked on the execution machine."
+      },
+      "env:command:sbatch": {
+        "title": "Cluster job submission",
+        "summary": "The synthetic example describes an sbatch scheduler command; actual availability requires a machine probe.",
+        "description": "The synthetic example describes an sbatch scheduler command; actual availability requires a machine probe."
+      },
+      "env:command:docker": {
+        "title": "Container runtime",
+        "summary": "The synthetic example shows Docker as a possible way to manage isolated application environments.",
+        "description": "The synthetic example shows Docker as a possible way to manage isolated application environments."
+      },
+      "env:command:podman": {
+        "title": "Alternative container runtime",
+        "summary": "The synthetic example lists Podman for managing containerized execution.",
+        "description": "The synthetic example lists Podman for managing containerized execution."
+      },
+      "env:command:python": {
+        "title": "Python interpreter",
+        "summary": "The synthetic example includes a Python interpreter; actual interpreter and dependency versions must be checked.",
+        "description": "The synthetic example includes a Python interpreter; actual interpreter and dependency versions must be checked."
+      },
+      "env:command:nvidia-smi": {
+        "title": "Graphics device diagnostics",
+        "summary": "The synthetic example includes a GPU diagnostic utility; this does not prove that the local machine has an NVIDIA GPU.",
+        "description": "The synthetic example includes a GPU diagnostic utility; this does not prove that the local machine has an NVIDIA GPU."
+      },
+      "env:command:rclone": {
+        "title": "File synchronization tools",
+        "summary": "The synthetic example lists rclone for remote copy and integrity checks; configuration and authorization remain separate.",
+        "description": "The synthetic example lists rclone for remote copy and integrity checks; configuration and authorization remain separate."
+      },
+      "env:execution": {
+        "title": "Available execution tools",
+        "summary": "These example entries illustrate command and environment categories, not verified capabilities of the user's machine.",
+        "description": "These example entries illustrate command and environment categories, not verified capabilities of the user's machine."
+      }
+    }
+  }
+}

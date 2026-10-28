@@ -6,4 +6,4 @@ Each scientific question has a stable identifier, an independently maintained st
 
 An implemented interface establishes the existence of verifiable source code, not the validity of a scientific conclusion. Experimental effectiveness requires independent evidence.
 
-[SAE method foundations](foundations/sae_methods.en.md) · [Knowledge Tree](https://atheavenma.github.io/opensae/openresearch/atlas/knowledge.html)
+[SAE method foundations](foundations/sae_methods.en.md) · [Knowledge Tree](https://atheavenma.github.io/opensae/saebase/atlas/knowledge.html)

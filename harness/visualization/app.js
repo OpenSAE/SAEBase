@@ -4,6 +4,8 @@
 
 
   const DATA = window.OPENRESEARCH_ATLAS || {};
+  if (DATA.context && !String(DATA.context.project || "").startsWith("SAEBase"))
+    throw new Error("Foreign Atlas project loaded into SAEBase");
   // The large public data.js is refreshed independently of the canonical
   // repository. This generated overlay carries only source-backed structure.
   const STRUCTURE = window.OPENRESEARCH_ATLAS_PATCH;
@@ -1853,6 +1855,12 @@
     }
   }
 
+  // Refresh translated labels without discarding focus, zoom or review state.
+  window.addEventListener("saebase-atlas-locale", () => {
+    render(false);
+    if (config.detailsOpen) renderDetails();
+    updateBreadcrumb();
+  });
   init();
 })();
 

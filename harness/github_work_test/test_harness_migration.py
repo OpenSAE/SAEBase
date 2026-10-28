@@ -30,3 +30,23 @@ def test_agent_plan_storage_matches_harness_structure() -> None:
 def test_legacy_component_directories_removed() -> None:
     for directory in ("dlbase", "research_datasets", "apps", "scripts", "examples", "work_plan"):
         assert not (ROOT / directory).exists(), directory
+
+
+def test_code_role_groups_follow_actual_source_semantics() -> None:
+    """Contracts are configuration checks, not circuit traces by substring."""
+    from harness.code.presentation import _source_role
+
+    assert _source_role({"path": "saebase/sae/contracts.py"}) == "contract"
+    assert _source_role({"path": "tasks/circuits/backend/circuits.py"}) == "circuit"
+    assert (
+        _source_role(
+            {
+                "path": "saebase/research_lab/backend/api.py",
+                "source_symbol": "trace_circuit",
+            }
+        )
+        == "circuit"
+    )
+    assert _source_role({"path": "tasks/benchmark/backend/metrics/reconstruction.py"}) == (
+        "evaluation"
+    )

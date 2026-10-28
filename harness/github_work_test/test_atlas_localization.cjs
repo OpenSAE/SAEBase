@@ -1,142 +1,142 @@
 "use strict";
 
-// Pure Node regression. Source graphs and the deployed locale script share
-// immutable IDs; Chinese / English rendering does not mutate graph identity.
+// Project-isolated SAEBase acceptance: all five trees, reviewed Context,
+// real source IDs, referenced English documents, and UTF-8-safe titles.
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
 const ROOT = path.resolve(__dirname, "../..");
-const read = rel => JSON.parse(fs.readFileSync(path.join(ROOT, rel), "utf8"));
-const glossary = read("doc/knowledge/glossary.json");
-const vocabulary = read("doc/knowledge/atlas_terms.json");
-const core = read("harness/core/project_graph.json");
-const knowledge = read("doc/knowledge/context_graph.json");
-const terms = [...glossary.terms, ...vocabulary.terms];
-const categories = [...glossary.categories, ...vocabulary.categories];
-const context = {
-  nodes: [
-    {
-      id: "context:root",
-      title: "科研术语定义与源码依据",
-      summary: "这里集中解释 Atlas 中使用的科研与工程术语，并给出可核对的资料来源。",
-      description: "这里集中解释 Atlas 中使用的科研与工程术语，并给出可核对的资料来源."
-    },
-    ...categories.map(category => ({
-      id: "context:category:" + category.id,
-      title: category.title, summary: category.description,
-      description: category.description
-    })),
-    ...terms.map(term => ({
-      id: term.id,
-      title: term.term,
-      summary: term.definition,
-      description: term.definition,
-      why_it_matters: term.why_it_matters,
-      aliases: term.aliases,
-      attributes: [
-        {type: "text", label: "为什么重要", value: term.why_it_matters},
-        {type: "text", label: "其他名称", value: term.aliases.join("、")}
-      ]
-    }))
-  ]
-};
-const CJK = /[\u3400-\u9fff]/;
-const graphs = {
-  context,
-  core: {nodes: core.nodes},
-  knowledge: {nodes: knowledge.nodes},
-  code: {nodes: [{
-    id: "code:function:saebase.api.features:capture_features",
-    title: "提取语言模型的 SAE 特征",
-    summary: "从指定位置提取 SAE 响应。",
-    source_symbol: "capture_features",
-    path: "saebase/api/features.py"
-  }]},
-  environment: {nodes: [{
-    id: "env:gpu",
-    title: "设备与执行信息",
-    description: "该节点描述实际测量的 GPU 资源。"
-  }]}
-};
-const window = {OPENRESEARCH_ATLAS: graphs};
-vm.runInNewContext(
-  fs.readFileSync(path.join(ROOT, "harness/visualization/locale-data.js"), "utf8"),
-  {window}, {filename: "locale-data.js"}
+const read = file => fs.readFileSync(path.join(ROOT, file), "utf8");
+const load = file => JSON.parse(read(file));
+const source = read("harness/visualization/data.js");
+const prefix = "window.OPENRESEARCH_ATLAS = ";
+assert(source.includes(prefix), "Missing SAEBase-generated graph");
+const graph = JSON.parse(source.split(prefix)[1].trim().replace(/;\s*$/, ""));
+const window = {};
+vm.runInNewContext(read("harness/visualization/locale-data.js"), {window});
+const locales = window.SAEBASE_ATLAS_LOCALES;
+assert(locales && locales.project === "SAEBase", "Foreign or missing project locale");
+assert.equal(locales.schema, "saebase.atlas.locale.v2");
+assert(graph.context.project.startsWith("SAEBase"), "Foreign Context tree");
+assert.deepEqual(
+  Object.keys(locales.nodes).sort(),
+  ["core", "knowledge", "code", "environment", "context"].sort()
 );
-const locales = window.OPENRESEARCH_ATLAS_I18N;
-assert(locales && locales.en, "Missing Atlas English locale overlay");
 
-for (const term of terms) {
-  assert(locales.terms[term.id], "Missing English Context entry: " + term.id);
-}
-for (const [view, graph] of Object.entries(graphs)) {
-  for (const node of graph.nodes) {
-    for (const key of ["title", "summary", "description", "why_it_matters"]) {
-      const raw = node[key];
-      if (!raw || !CJK.test(raw)) continue;
-      const translated = locales.en[raw.trim()];
-      assert.equal(typeof translated, "string",
-        "Missing " + view + " " + node.id + "." + key);
-      assert(translated.length > 10 || key === "title",
-        "Empty translation: " + view + " " + node.id + "." + key);
-      assert(!CJK.test(translated),
-        "English translation contains Chinese: " + view + " " + node.id + "." + key);
+const cjk = /[\u3400-\u9fff]/;
+const bad = /[\ufffd]/;
+let translated = 0;
+for (const [view, tree] of Object.entries(graph)) {
+  const ids = new Set();
+  const mapped = locales.nodes[view];
+  assert.equal(Object.keys(mapped).length, tree.nodes.length,
+    "Locale data must cover every node of " + view);
+  for (const node of tree.nodes) {
+    assert(!ids.has(node.id), "Repeated source ID " + node.id);
+    ids.add(node.id);
+    const fields = mapped[node.id];
+    assert(fields, "Missing English translation " + view + ":" + node.id);
+    for (const field of ["title", "summary", "description"]) {
+      const value = fields[field];
+      assert(typeof value === "string" && value.trim(), node.id + "." + field);
+      assert(!cjk.test(value) && !bad.test(value), "Invalid UTF-8 title or prose: " + node.id + "." + field);
     }
-    for (const item of node.attributes || []) {
-      for (const key of ["label", "value"]) {
-        if (typeof item[key] === "string" && CJK.test(item[key])) {
-          assert(locales.en[item[key].trim()],
-            "Missing attribute " + node.id + "." + key);
-        }
-      }
+    if (view === "code" && ["module", "function", "class", "method"].includes(node.kind)) {
+      assert(!fields.title.includes(" · "), "Code title must be a readable action, not concatenated tokens: " + node.id);
+      assert(!/ in component$|^Source detail for /.test(fields.title),
+        "Code title must describe the real implementation: " + node.id);
+      assert(node.path && fields.description.includes(node.path),
+        "Code explanation must cite actual source: " + node.id);
     }
+    translated++;
+  }
+  for (const edge of tree.edges) {
+    assert(ids.has(edge.source) && ids.has(edge.target), "Broken " + view + " edge");
   }
 }
 
-assert(Object.keys(locales.docs).length >= 13, "Missing English Markdown document coverage");
-for (const [source, target] of Object.entries(locales.docs)) {
-  assert(fs.existsSync(path.join(ROOT, source)), "Missing source Markdown: " + source);
-  assert(fs.existsSync(path.join(ROOT, target)), "Missing English Markdown: " + target);
-  assert(target.endsWith(".en.md"), "English document is not a paired locale: " + target);
-  const content = fs.readFileSync(path.join(ROOT, target), "utf8");
-  assert(content.length >= 200, "Empty English document: " + target);
-  assert(!CJK.test(content), "English document contains Chinese prose: " + target);
+// Source-backed sibling nodes must have distinct natural-language names.
+// Equal titles in distant packages are valid, but sibling headings cannot
+// force users to inspect hashed IDs to tell research operations apart.
+const byParent = new Map();
+for (const edge of graph.code.edges) {
+  if (edge.type !== "contains") continue;
+  if (!byParent.has(edge.source)) byParent.set(edge.source, []);
+  byParent.get(edge.source).push(edge.target);
 }
-// Every Markdown source directly referenced by an Atlas authority graph has
-// an English version; existing English documents need no duplicate file.
-const linkedMarkdown = new Set();
-function scanReferences(value) {
+for (const [parent, childIds] of byParent) {
+  const titles = new Map();
+  for (const id of childIds) {
+    const title = locales.nodes.code[id]?.title;
+    if (!title) continue;
+    if (!titles.has(title)) titles.set(title, []);
+    titles.get(title).push(id);
+  }
+  for (const [title, ids] of titles) {
+    assert.equal(ids.length, 1,
+      "Ambiguous sibling Code titles under " + parent + ": " + title +
+      " [" + ids.join(", ") + "]");
+  }
+}
+
+const glossary = load("doc/knowledge/glossary.json");
+const technical = load("doc/knowledge/atlas_terms.json");
+const scientific = load("doc/knowledge/i18n/context.en.json");
+for (const term of [...glossary.terms, ...technical.terms]) {
+  const en = scientific.nodes[term.id];
+  assert(en, "Untranslated authoritative scientific term: " + term.id);
+  assert(en.why_it_matters && !cjk.test(en.why_it_matters), "Missing Context rationale: " + term.id);
+  assert(locales.nodes.context[term.id].title === en.title, "Translation detached from authority: " + term.id);
+}
+// Derive the required document set from the actual rendered node graph.
+// A hand-picked allowlist cannot silently omit a newly linked Chinese page.
+const referencedDocs = new Set();
+function collectDocuments(value) {
   if (typeof value === "string") {
-    if (/^(?:[\w.-]+\/)*[\w.-]+\.md$/.test(value)) linkedMarkdown.add(value);
-    return;
-  }
-  if (Array.isArray(value)) value.forEach(scanReferences);
-  else if (value && typeof value === "object") Object.values(value).forEach(scanReferences);
-}
-for (const authority of [core, knowledge, glossary, vocabulary]) scanReferences(authority);
-for (const relative of linkedMarkdown) {
-  const sourceFile = path.join(ROOT, relative);
-  assert(fs.existsSync(sourceFile), "Broken Atlas Markdown reference: " + relative);
-  // Root README.md is already English; its language selector legitimately
-  // contains the self-identifying word "中文".
-  if (relative === "README.md") {
-    assert(fs.readFileSync(sourceFile, "utf8").includes("Research Infrastructure"));
-    continue;
-  }
-  if (CJK.test(fs.readFileSync(sourceFile, "utf8"))) {
-    assert(locales.docs[relative],
-      "Linked Chinese Markdown has no English variant: " + relative);
+    const candidate = value.split("#")[0].split("?")[0];
+    if (/^(?:[A-Za-z0-9_.-]+\/)*[A-Za-z0-9_.-]+\.md$/.test(candidate))
+      referencedDocs.add(candidate);
+  } else if (Array.isArray(value)) {
+    for (const item of value) collectDocuments(item);
+  } else if (value && typeof value === "object") {
+    for (const item of Object.values(value)) collectDocuments(item);
   }
 }
-for (const view of ["core", "knowledge", "code", "environment", "context"]) {
-  const html = fs.readFileSync(
-    path.join(ROOT, "harness/visualization", view + ".html"), "utf8"
-  );
-  assert(html.includes('src="./locale-data.js'),
-    "Tree has no locale overlay: " + view);
-  assert(html.indexOf('src="./locale-data.js') < html.indexOf('src="./i18n.js'),
-    "Incorrect language-script order: " + view);
+for (const tree of Object.values(graph)) for (const node of tree.nodes)
+  collectDocuments(node);
+for (const original of referencedDocs) {
+  assert(fs.existsSync(path.join(ROOT, original)),
+    "Atlas references a missing Markdown document: " + original);
+  // The root README is authored in English and retains a self-identifying
+  // Chinese language selector. It is already the required English version.
+  if (original === "README.md" || original.endsWith(".en.md")) continue;
+  const prose = read(original);
+  if (cjk.test(prose)) {
+    const english = locales.docs[original];
+    assert(english && fs.existsSync(path.join(ROOT, english)),
+      "Tree-linked Chinese Markdown lacks English counterpart: " + original);
+  }
 }
-console.log("Atlas English/Chinese source mapping and Markdown documents: OK");
+
+for (const [original, english] of Object.entries(locales.docs)) {
+  assert(fs.existsSync(path.join(ROOT, original)), "Missing Markdown authority: " + original);
+  assert(fs.existsSync(path.join(ROOT, english)), "Missing English document: " + english);
+  assert(english.endsWith(".en.md"), "English document must be distinct: " + english);
+  assert(!cjk.test(read(english)), "Untranslated English Markdown prose: " + english);
+}
+for (const view of Object.keys(graph)) {
+  const html = read("harness/visualization/" + view + ".html");
+  assert(html.includes("SAEBase Atlas"), "Wrong project page branding: " + view);
+  for (const script of ["data.js", "locale-data.js", "locale-runtime.js", "i18n.js"]) {
+    assert(html.includes("./" + script), "Missing runtime " + script + " in " + view);
+  }
+  assert(html.indexOf("locale-data.js") < html.indexOf("locale-runtime.js"),
+    "Locale must load before application in " + view);
+  assert(html.indexOf("locale-runtime.js") < html.indexOf("i18n.js"),
+    "Locale runtime must load before switch in " + view);
+  assert(!html.includes("opensae/openresearch/atlas"), "SAEBase page points at OpenResearch");
+}
+assert(!read("harness/visualization/locale-runtime.js").includes("eval("));
+console.log("SAEBase-only bilingual Atlas accepted:", translated, "nodes, 5 trees");
