@@ -776,6 +776,7 @@
   }
   function locateView(id) {
     if (byId.has(id)) return config.view;
+    if (DATA.code?.source_api_index?.[id]) return "code";
     for (const key of Object.keys(VIEWS)) {
       if ((reviewGraphs[key]?.nodes || DATA[key]?.nodes || []).some(n => n.id === id)) return key;
     }
@@ -826,6 +827,11 @@
   // its explanation; wheel, keyboard and review arrows never expand it.
   function navigate(id, view, replace, options={}) {
     const target = view || locateView(id);
+    const foldedOwner = target === "code" && DATA.code?.source_api_index?.[id];
+    if (foldedOwner) {
+      id = foldedOwner;
+      options = {...options, toggle:true};
+    }
     if (!target || !(reviewGraphs[target]?.nodes || DATA[target]?.nodes || []).some(n => n.id === id)) return false;
     const sameFocus = target===config.view && config.focusId===id;
     const wasExpanded = sameFocus && config.expandedAttributes.has(id);
