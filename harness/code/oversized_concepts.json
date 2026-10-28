@@ -538,18 +538,33 @@
           ]
         },
         {
-          "name": "benchmark_reliability",
-          "title": "可靠性、真值与稳定性评测",
-          "summary": "检验模型与 SAE 指标的统计可靠性及受控参考。",
-          "description": "检验模型与 SAE 指标的统计可靠性及受控参考。",
-          "en_title": "Reliability, controls, and statistical inference",
-          "en_summary": "Estimate uncertainty, validate ground truth, and compare stable SAE rankings.",
-          "en_description": "Estimate uncertainty, validate ground truth, and compare stable SAE rankings.",
+          "name": "reliability_truth",
+          "title": "可靠性对照与特征交互真值",
+          "summary": "建立可靠性评测的受控答案、输入对照和特征交互参照。",
+          "description": "建立可靠性评测的受控答案、输入对照和特征交互参照。",
+          "en_title": "Controlled reliability ground truth",
+          "en_summary": "Construct controlled references, expected feature interactions, and comparison outcomes.",
+          "en_description": "Construct controlled references, expected feature interactions, and comparison outcomes.",
           "context_terms": [
             "term.sae.benchmark"
           ],
           "patterns": [
-            "^tasks/benchmark/reliability/.*\\.py$"
+            "^tasks/benchmark/reliability/(?:controls|ground_truth|ground_truth_report|interaction_truth|rss_truth)\\.py$"
+          ]
+        },
+        {
+          "name": "reliability_statistics",
+          "title": "重采样、可靠性指标与统计报告",
+          "summary": "检验评测分数、排名和局部性指标的统计稳定性。",
+          "description": "检验评测分数、排名和局部性指标的统计稳定性。",
+          "en_title": "Resampling, metric reliability, and statistical reports",
+          "en_summary": "Estimate uncertainty and stability of SAE metrics, rankings, and localization outcomes.",
+          "en_description": "Estimate uncertainty and stability of SAE metrics, rankings, and localization outcomes.",
+          "context_terms": [
+            "term.sae.benchmark"
+          ],
+          "patterns": [
+            "^tasks/benchmark/reliability/(?:bootstrap|discriminability|localization|observations|ranking|report|resampling|runner|schema)\\.py$"
           ]
         }
       ]
