@@ -76,3 +76,6 @@ def test_every_concept_has_distinct_sibling_responsibility() -> None:
     actual = [n for n in graph["nodes"] if n.get("concept_group")]
     assert all(n["id"].startswith("code:concept:") for n in actual)
     assert not any(n["id"].startswith("code:nav:") for n in graph["nodes"])
+    excessive = {node_id: len(items) for node_id, items in child_map.items()
+                 if len(items) > 20}
+    assert not excessive, "Code Tree exceeds 20 children per node: " + repr(excessive)
