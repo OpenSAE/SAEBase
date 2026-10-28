@@ -102,6 +102,70 @@ VERBS = {
     "trace": "Trace",
     "sample": "Sample",
     "list": "List",
+    "attach": "Attach",
+    "append": "Append",
+    "apply": "Apply",
+    "assert": "Validate",
+    "audit": "Audit",
+    "balance": "Balance",
+    "benchmark": "Benchmark",
+    "bootstrap": "Initialize",
+    "canonicalize": "Canonicalize",
+    "close": "Close",
+    "cmd": "Run",
+    "copy": "Copy",
+    "discover": "Discover",
+    "edit": "Edit",
+    "ensure": "Ensure",
+    "execute": "Execute",
+    "fit": "Fit",
+    "flush": "Flush",
+    "format": "Format",
+    "forward": "Compute forward pass of",
+    "handle": "Handle",
+    "has": "Check whether",
+    "import": "Import",
+    "is": "Check whether",
+    "make": "Build",
+    "match": "Match",
+    "merge": "Merge",
+    "on": "Handle",
+    "patch": "Patch",
+    "plot": "Plot",
+    "predict": "Predict",
+    "print": "Print",
+    "propose": "Propose",
+    "publish": "Publish",
+    "rebuild": "Rebuild",
+    "redact": "Redact",
+    "require": "Require",
+    "resolve": "Resolve",
+    "resume": "Resume",
+    "score": "Score",
+    "stop": "Stop",
+    "store": "Store",
+    "subsample": "Subsample",
+    "summarize": "Summarize",
+    "test": "Test",
+    "to": "Convert to",
+    "upload": "Upload",
+    "download": "Download",
+    "serialize": "Serialize",
+    "deserialize": "Deserialize",
+    "remove": "Remove",
+    "replace": "Replace",
+    "sort": "Sort",
+    "split": "Split",
+    "round": "Round",
+    "reset": "Reset",
+    "clear": "Clear",
+    "find": "Find",
+    "count": "Count",
+    "hash": "Hash",
+    "infer": "Infer",
+    "launch": "Launch",
+    "open": "Open",
+    "require": "Require",
 }
 UI = {
     "组件职责": "Component responsibility",
@@ -374,6 +438,25 @@ SOURCE_VERBS = (
     "Select",
     "Resolve",
     "Estimate",
+    "Attach",
+    "Append",
+    "Apply",
+    "Audit",
+    "Check",
+    "Count",
+    "Derive",
+    "Discover",
+    "Execute",
+    "Hash",
+    "Keep",
+    "Measure",
+    "Patch",
+    "Return",
+    "Remove",
+    "Replace",
+    "Store",
+    "Test",
+    "Write",
 )
 SOURCE_REJECT = ("暂无", "请结合", "待审阅", "source-linked detail", "no verified")
 
@@ -460,6 +543,22 @@ def action_label(node: dict, name: str, path: str) -> str:
         return "Reconstruct " + (owner or scope) + " from a dictionary"
     if name == "__init__":
         return "Initialize " + (owner or scope) + " state"
+    if name in {"__call__", "_call"}:
+        return "Invoke " + (owner or scope) + " on supplied inputs"
+    if name in {"__len__", "_len"}:
+        return "Count items held by " + (owner or scope)
+    if name in {"__iter__", "_iter"}:
+        return "Iterate over " + (owner or scope)
+    if name == "main":
+        return "Run " + human(path.rsplit("/", 1)[-1].removesuffix(".py")) + " entry point for " + scope
+    if name.startswith("test_"):
+        return "Test " + human(name[5:]).lower() + " in " + scope
+    if name.startswith("cmd_"):
+        return "Run " + human(name[4:]).lower() + " command for " + scope
+    if name.startswith("default_"):
+        return "Select default " + human(name[8:]).lower() + " for " + scope
+    if name.endswith(("_path", "_dir", "_root", "_directory")):
+        return "Locate " + human(name).lower() + " for " + scope
     if name in {"default_data_dir", "data_dir"}:
         return "Locate the default data directory for " + scope
     if name == "assert_compatible":
