@@ -42,6 +42,13 @@ const technical=(el)=>!!el?.closest?.("code,pre,kbd,.code-source,.source-code,.s
 function localize(raw,el){
  if(!raw||!CJK.test(raw))return raw;
  if(EXACT[raw.trim()])return raw.replace(raw.trim(),EXACT[raw.trim()]);
+ const fullEvidence=raw.trim().match(/^(.+) 的完整解释与证据$/);
+ if(fullEvidence)return "Full explanation and evidence for " + fullEvidence[1];
+ const contextual=raw.trim().match(/^在 Context 中查看“(.+)”$/);
+ if(contextual)return 'View "' + contextual[1] + '" in Context';
+ const memberList=raw.trim().match(/^(类|函数)：(.+)$/);
+ if(memberList)return (memberList[1]==="类"?"Classes: ":"Functions: ")+memberList[2];
+
  const known=window.OPENRESEARCH_ATLAS_I18N?.en?.[raw.trim()];
  if(typeof known==="string"&&known.trim())return raw.replace(raw.trim(),known);
  // Preserve exact code excerpts and recorded source facts.
@@ -49,7 +56,9 @@ function localize(raw,el){
  // Localized overlays can provide translated strings without changing underlying graph data.
  const translated=window.SAEBASE_ATLAS_UI?.[raw.trim()];
  if(typeof translated==="string"&&translated.trim())return raw.replace(raw.trim(),translated);
- return "English translation unavailable";
+ // A missing English mapping is a build-time localization defect, not user-facing prose.
+ // Hide only the unknown explanatory text; technical source remains untouched.
+ return "";
 }
 function updateText(node){
  const el=node.parentElement;if(!el||el.closest("#atlasLanguageSwitch")||["SCRIPT","STYLE","NOSCRIPT"].includes(el.tagName))return;
@@ -99,7 +108,7 @@ const watcher=new MutationObserver(records=>{
  for(const record of records){
   if(record.type==="characterData"){
    const n=record.target;
-   if(native.has(n)&&n.nodeValue!==native.get(n)&&n.nodeValue!=="English translation unavailable")native.set(n,n.nodeValue);
+   if(native.has(n)&&n.nodeValue!==native.get(n)&&n.nodeValue!=="")native.set(n,n.nodeValue);
   }
  }
  translate();

@@ -140,6 +140,136 @@ PARAMETERS = {
     "feature_ids": "Selected SAE feature indices.",
     "output": "Output artifact destination.",
     "argv": "Command-line arguments passed to the entry point.",
+    "readout_position": "Token position from which model logits are read; -1 selects the final token.",
+    "verify_replay": "Whether to check that replaying the unedited activation preserves the baseline logits.",
+    "require_affine_decode": "Whether to verify that selected SAE feature contributions decode additively.",
+    "identity": "Optional SAE checkpoint and activation-site identity metadata used for consistency checks.",
+}
+
+# Verified human-facing Chinese descriptions mapped to faithful English.
+# Generic source-code templates are intentionally absent from this table.
+MEANING_TRANSLATIONS = {
+    "当前类实例": "The current class instance, passed as self.",
+    "当前类对象": "The class object being operated on.",
+    "当前实验组合配置": "Composed configuration for the current experiment.",
+    "模型与张量的执行设备": "Device on which the model and tensors execute.",
+    "文件系统或数据根目录": "Root directory for files or datasets.",
+    "当前操作使用的文件或目录路径。": "Path to the file or directory used by this operation.",
+    "输入／输出文件路径": "Path for input or output files.",
+    "当前条件的判断结果。": "Result of evaluating the current condition.",
+    "模型预测结果": "Outputs produced by the model's prediction step.",
+    "随机数初始化种子": "Seed used to initialize a reproducible random generator.",
+    "注册或检索时使用的组件名称": "Component identifier used for registration or lookup.",
+    "当前模型的类别得分张量。": "Tensor of class or token scores produced by the current model.",
+    "调用方传入的额外位置参数": "Additional positional arguments provided by the caller.",
+    "调用方传入的额外命名参数": "Additional keyword arguments provided by the caller.",
+    "模型或函数接收的输入张量／数值": "Input tensor or scalar passed into the model or function.",
+    "当前校验或日志的上下文标识": "Context identifier used to label a validation or log record.",
+    "当前训练和预测使用的模型": "Model used for the current training and prediction step.",
+    "当前实验运行目录": "Directory containing the current experiment run.",
+    "待校验或转换的输入值": "Input value to validate or convert.",
+    "需要评测的数据划分名称": "Name of the dataset split to evaluate.",
+    "当前任务的组合配置": "Configuration composed for the current research task.",
+    "允许使用的名称集合": "Set of names accepted by the current interface.",
+    "模型前向计算产生的输出张量或类别得分。": "Model output tensor or scores from the forward pass.",
+    "当前训练使用的参数优化器": "Optimizer used to update trainable parameters.",
+    "模型检查点保存目录": "Directory where model checkpoints are saved.",
+    "训练生命周期回调列表": "Callbacks invoked during the training lifecycle.",
+    "训练指标记录器列表": "Loggers that collect training metrics.",
+    "训练进度条的启用标记": "Whether the training progress bar is enabled.",
+    "本地工具或服务的访问地址": "Address used to access a local tool or service.",
+    "手动启动可视化服务的命令": "Command for starting the visualization service manually.",
+    "连续验证轮次的指标列表": "Metric values collected across successive validation rounds.",
+    "判断指标变化所需的最小幅度": "Minimum metric change used to detect a meaningful difference.",
+    "判断趋势使用的连续轮数": "Number of consecutive epochs or rounds considered for a trend.",
+    "本次训练开始时间": "Recorded start time of the current training run.",
+    "本次训练结束时间": "Recorded end time of the current training run.",
+    "本次训练的结构化运行信息": "Structured metadata describing the training run.",
+    "最佳模型权重文件路径": "Path to the best model checkpoint weights.",
+    "本次评测的数据划分与口径说明": "Description of the evaluated data split and metric definition.",
+    "已经格式化的评测结果内容": "Evaluation results after formatting for output.",
+    "本次运行的会话名称": "Session name associated with this execution.",
+    "科研任务的注册名称": "Registry name of the research task.",
+    "本次分析关联的知识节点编号": "Knowledge node identifier associated with this analysis.",
+    "输入 x": "Input x.",
+    "当前被访问的样本索引": "Index of the sample currently being accessed.",
+    "各数据划分及其对应指标的映射": "Mapping from dataset splits to their associated metrics.",
+    "相对于当前实验的子目录层级": "Subdirectory relative to the current experiment run.",
+    "运行任务的注册名称": "Name identifying the registered research task.",
+    "模型或 SAE 组件标识": "Identifier of the model or SAE component.",
+    "实际激活位置": "Activation site used to capture or patch a model.",
+    "完整模型权重与配置": "Model weights and configuration for the selected checkpoint.",
+    "结果产物的类型": "Type of artifact produced by the operation.",
+    "模型与任务组合的兼容性检查函数": "Callable that checks model and task compatibility.",
+    "样本的真实目标": "Ground-truth target associated with the sample.",
+    "网络响应检查的时间限制（秒）": "Timeout in seconds for checking a network response.",
+    "训练的总轮次数": "Total number of training epochs.",
+    "数据加载模块的构建入口函数": "Callable that constructs the data-loading module.",
+    "数据集支持任务的检查函数": "Callable that checks whether a dataset supports a task.",
+    "用于描述数据划分的函数": "Callable that describes the dataset split.",
+    "当前记录的附加说明": "Additional annotation associated with the current record.",
+    "检查模型与任务及数据集适配条件的入口函数": "Callable that checks compatibility across model, task, and dataset.",
+    "当前批次的输入及标签": "Input records and target labels for the current batch.",
+    "用于转换任务指标的适配函数": "Adapter callable that converts task metric values.",
+    "模型创建函数": "Factory callable that constructs the model.",
+    "需要准备的数据阶段": "Data preparation stage to run.",
+    "模型训练状态文件": "File containing the model training state.",
+    "当前分析目标的人类可读说明": "Human-readable description of the current analysis target.",
+    "当前批次在本轮中的序号": "Index of the current batch within its epoch.",
+    "当前数据加载器的序号": "Index of the current data loader.",
+    "数据加载时的批量样本数": "Number of samples per loaded batch.",
+    "当前任务计算得到的损失值。": "Loss value computed by the current research task.",
+    "组件别名": "Alternative name used to identify the component.",
+    "组件的正式注册名称": "Canonical registry name of the component.",
+    "结果表中数据划分的显示顺序": "Display order of dataset splits in the results table.",
+    "结果表中指标的显示顺序": "Display order of metrics in the results table.",
+    "指标数值格式化函数映射": "Mapping from metrics to numerical formatting functions.",
+    "训练初始阶段的学习率预热轮数": "Number of learning-rate warmup epochs at the start of training.",
+    "最小学习率与初始学习率的比例": "Ratio of the minimum learning rate to the initial learning rate.",
+    "模型输出的原始类别得分": "Raw class scores emitted by the model.",
+    "每次参数更新的样本数量": "Number of samples contributing to each parameter update.",
+    "由当前配置准备的训练数据集": "Training dataset prepared from the active configuration.",
+    "用于当前训练配置的验证数据集": "Validation dataset used by the active training configuration.",
+    "用于训练后评测的测试数据集": "Test dataset used for post-training evaluation.",
+    "按配置装配数据加载模块的回调函数": "Callback that builds the data-loading module from configuration.",
+    "检查数据集支持指定任务的入口函数": "Callable that verifies support for a specified task in the dataset.",
+    "生成数据集评测划分说明的入口函数": "Callable that generates a description of evaluation splits.",
+    "根据配置创建模型实例的回调函数": "Callback that constructs a model instance from configuration.",
+    "当前注册的具体科研任务类": "Concrete research task class currently registered.",
+    "训练进度条的文字布局模板": "Text formatting template for the training progress bar.",
+    "预计执行的训练总轮数": "Planned total number of training epochs.",
+    "训练开始时记录的时间戳": "Timestamp recorded when training begins.",
+    "当前累计完成的训练轮数": "Number of training epochs completed so far.",
+    "历次验证阶段计算的损失值列表": "List of loss values recorded across validation rounds.",
+    "第一训练阶段结束时记录的学习率": "Learning rate recorded at the end of the first training phase.",
+    "具体科研任务类": "Concrete research task class used for execution.",
+    "多标签预测概率的判定阈值": "Probability threshold used to classify multilabel predictions.",
+    "汇总器的名称": "Name identifying the result aggregator.",
+    "传入指标适配器的附加参数": "Additional arguments supplied to the metric adapter.",
+    "随机性设置覆盖的数据加载工作进程": "Data-loader workers covered by random seed initialization.",
+    "控制执行状态的输出详细度": "Verbosity setting controlling execution-status output."
+}
+# These explanations are reviewed against the actual evaluate_sar implementation.
+# The key is a stable source symbol, not an English/Chinese sentence fragment.
+PARAMETER_CONTEXT = {
+    "evaluate_sar": {
+        "p": "Probability passed to the original SAR coalition sampler to control feature inclusion.",
+        "readout_position": "Token index for baseline and intervention logit readouts; -1 selects the last token.",
+        "verify_replay": "Checks that patching the captured, unedited activation reproduces baseline logits before evaluating coalitions.",
+        "identity": "Optional SAEIdentity metadata validated against the hook, layer and captured SAE dimensions; returned with the SAR result.",
+        "K": "Number of highest-absolute-activation SAE features selected for coalition analysis.",
+        "M": "Number of feature coalitions generated and evaluated with model patches.",
+        "n_fit": "Number of coalition samples assigned to fitting; the remaining samples are held out.",
+        "readout": "Function mapping the logits at the readout position to a single scalar response.",
+        "paper": "Original SAR paper module providing coalition sampling and the SAR estimator.",
+        "require_affine_decode": "Checks that ablating selected SAE features has additive effects on decoded activations.",
+        "site": "Activation hook and layer at which the SAE features are captured and edited.",
+        "model": "Model adapter used for activation capture and controlled logit evaluation.",
+        "sae": "Sparse autoencoder used to encode activations and decode feature edits.",
+        "prompt": "Optional text input to tokenize when explicit token IDs are not supplied.",
+        "tokens": "Optional pretokenized model input passed to the model adapter.",
+        "seed": "Random seed passed to the original SAR coalition sampler.",
+    }
 }
 
 
@@ -400,6 +530,42 @@ NAVIGATION_EN = {
     "研究概念与依据": "Explore scientific concepts and evidence",
 }
 
+# Group summaries express the actual responsibility captured by the Chinese
+# source, instead of reporting a count of nested implementation interfaces.
+GROUP_SUMMARIES = {
+    "code:root": "Browse dataset loaders, language-model adapters, seven SAE research task families, and shared research APIs.",
+    "code:group:datasets": "Organize prompt datasets, source acquisition, and reproducible input artifacts.",
+    "code:group:models": "Organize model loading, activation sites, and task compatibility checks.",
+    "code:group:saebase": "Collect SAE representations, feature interventions, benchmarks, and storage interfaces.",
+    "code:group:tasks": "Group the seven supported SAE research operations and their execution interfaces.",
+    "code:concrete:datasets": "Locate prompt sources, dataset readers, and reproducible input artifact contracts.",
+    "code:concrete:models": "Locate concrete model adapters and research-task compatibility implementations.",
+    "code:concrete:tasks": "Locate capture, intervene, generate, circuits, explain, benchmark, and train implementations.",
+}
+
+
+def code_group_summary(node: dict, title: str, source_path: str) -> str:
+    """Explain an existing source hierarchy using its scope and actual role."""
+    node_id = node["id"]
+    if node_id in GROUP_SUMMARIES:
+        return GROUP_SUMMARIES[node_id]
+    tokens = node_id.split(":")
+    if len(tokens) >= 4 and tokens[1] == "instance":
+        family, item = tokens[2], tokens[3]
+        if family == "datasets":
+            return "Group " + DATASET_NAMES.get(item, human(item)) + " prompt loading and preparation interfaces."
+        if family == "models":
+            return "Group " + human(item) + " model construction and compatibility interfaces."
+        if family == "tasks":
+            return "Group " + TASK_NAMES.get(item, human(item)) + " configuration and execution interfaces."
+    if node.get("navigation_scope") == "source_range":
+        return "Locate a contiguous source section of " + domain(source_path) + " interfaces."
+    if node.get("title") in NAVIGATION_EN:
+        return NAVIGATION_EN[node["title"]].rstrip(".") + " in " + domain(source_path) + "."
+    if source_path:
+        return "Navigate " + domain(source_path) + " implementations represented by this source group."
+    return title.rstrip(".") + " across existing SAEBase components."
+
 
 def first_source_path(node_id: str, children: dict, by_id: dict) -> str:
     """Ground a presentation-only group in the first real descendant file."""
@@ -500,7 +666,7 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
             title = "Provide " + human(name) + " for " + scope
         summary = doc or title + "."
     elif kind == "module":
-        title = MODULE_ACTIONS.get(stem, "Read and execute " + human(stem) + " interfaces")
+        title = MODULE_ACTIONS.get(stem, "Inspect " + human(stem) + " implementation")
         title += " for " + scope
         if doc and len(doc) <= 120 and doc.split(" ", 1)[0] in SOURCE_VERBS:
             title = doc.rstrip(".")
@@ -508,7 +674,8 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
     else:
         descendants = [by_id[c] for c in children.get(node["id"], []) if c in by_id]
         title = group_label(node, descendants, children, by_id)
-        summary = "Browse " + str(len(descendants)) + " source-backed child interfaces."
+        source_path = first_source_path(node["id"], children, by_id)
+        summary = code_group_summary(node, title, source_path)
         reviewed_status = "source_hierarchy"
 
     interface = next(
@@ -641,6 +808,8 @@ def build() -> str:
         "docs": DOCS,
         "ui": UI,
         "parameter_meanings": PARAMETERS,
+        "parameter_context": PARAMETER_CONTEXT,
+        "meaning_translations": MEANING_TRANSLATIONS,
     }
     return (
         "/* Generated SAEBase-only English fields; do not edit by hand. */\n"

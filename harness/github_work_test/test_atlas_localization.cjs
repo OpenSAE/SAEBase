@@ -139,4 +139,25 @@ for (const view of Object.keys(graph)) {
   assert(!html.includes("opensae/openresearch/atlas"), "SAEBase page points at OpenResearch");
 }
 assert(!read("harness/visualization/locale-runtime.js").includes("eval("));
+
+ // Meaningful bilingual coverage must include nested interface semantics.
+ // A nonempty English title alone is not an adequate translation gate.
+ const runtime = read("harness/visualization/locale-runtime.js");
+ const switcher = read("harness/visualization/i18n.js");
+ assert(!switcher.includes('return "English translation unavailable"'),
+   "Never render missing translations as reader-facing prose");
+ assert(!runtime.includes("its behavior is defined in the source"),
+   "Unreviewed parameters must not receive invented English explanations");
+ assert(!runtime.includes("Source-linked " + "key.replace"),
+   "Unreviewed nested fields must not receive generic English explanations");
+ const sar = locales.parameter_context?.evaluate_sar;
+ for (const key of ["p", "readout_position", "verify_replay", "identity"]) {
+   assert(typeof sar?.[key] === "string" && sar[key].length > 35,
+     "Missing source-reviewed SAR parameter meaning: " + key);
+ }
+ for (const entry of Object.values(locales.nodes.code)) {
+   assert(!/^Browse \d+ source-backed child interfaces\.$/.test(entry.summary),
+     "Code group descriptions must communicate purpose, not child counts");
+ }
+
 console.log("SAEBase-only bilingual Atlas accepted:", translated, "nodes, 5 trees");
