@@ -550,18 +550,7 @@
       renderReviewCategories();
     });
     $("atlasReviewExport").addEventListener("click",exportBrowserDraft);
-    // Existing Atlas tabs remain available in review mode without reloading.
-    if (typeof document.querySelectorAll === "function")
-      for(const tab of document.querySelectorAll(".tabs [data-graph]"))
-        tab.addEventListener("click", event => {
-          if(!review || tab.dataset.graph === "core") return;
-          event.preventDefault();
-          const choice=reviewQueue.find(item=>item.view===tab.dataset.graph);
-          if(choice){
-            reviewFilter={level:"view",view:tab.dataset.graph};
-            navigate(choice.node_id,choice.view,false);
-          }
-        });
+    // Top-level tabs use the unified switcher, including review mode.
     bar.classList.remove("is-hidden");
     updateReviewBar();
   }
@@ -663,6 +652,8 @@
   const PAGE_SIZE = 10;
   // A page is a viewport choice, NOT a source node or Context concept.
   const childPages = new Map();
+  // Independent focus, expansion, zoom and scroll for each Atlas tree.
+  const viewStates = new Map();
   let parents = new Map(), children = new Map(), byId = new Map();
   let rootIds = [];
   let drag = null, bounceFrame = null, wheelStamp = 0;
@@ -761,18 +752,20 @@
   }
   function setAddress(focusId, replace) {
     if (!window.history?.pushState || !window.location?.pathname) return;
-    // Review mode switches the URL and Atlas graph in place; no new HTML load.
-    const path = review ? config.view + ".html" : window.location.pathname;
-    const params=[];
-    if(requestedReview()) params.push("review="+encodeURIComponent(requestedReview()));
-    if(focusId) params.push("focus="+encodeURIComponent(focusId));
-    const url = path + (params.length?"?"+params.join("&"):"") +
-      (requestedReview()?window.location.hash||"":"");
+    const base = window.location.pathname.replace(
+      /(?:index|core|knowledge|code|environment|context)\.html$/, ""
+    );
+    const path = (base.endsWith("/") ? base : base + "/") + config.view + ".html";
+    const params = new URLSearchParams(window.location.search || "");
+    if (focusId) params.set("focus", focusId);
+    else params.delete("focus");
+    const url = path + (params.toString() ? "?" + params : "") +
+      (window.location.hash || "");
     try {
       window.history[replace ? "replaceState" : "pushState"](
         { view: config.view, focusId: focusId || null }, "", url
       );
-    } catch (_) { /* file:// mode may reject history; still allow local navigation */ }
+    } catch (_) { /* file:// mode may reject history */ }
   }
   function locateView(id) {
     if (byId.has(id)) return config.view;
@@ -782,17 +775,54 @@
     }
     return null;
   }
-  function activateReviewView(view) {
-    if (!review || view === "core" || !VIEWS[view] || !DATA[view]) return false;
+  function saveViewState() {
+    const canvas = $("canvasWrap");
+    viewStates.set(config.view, {
+      mode: config.mode, focusId: config.focusId,
+      expanded: new Set(config.expanded),
+      expandedAttributes: new Set(config.expandedAttributes),
+      query: config.query, zoom: config.zoom,
+      zoomInitialized: config.zoomInitialized,
+      outlineOpen: config.outlineOpen, detailsOpen: config.detailsOpen,
+      scrollLeft: canvas?.scrollLeft || 0, scrollTop: canvas?.scrollTop || 0
+    });
+  }
+  function activateView(view, options = {}) {
+    if (!VIEWS[view] || !DATA[view]) return false;
+    if (view === config.view) return true;
+    saveViewState();
     config.view = view;
-    if(document.body?.dataset) document.body.dataset.atlasView = view;
+    if (document.body?.dataset) document.body.dataset.atlasView = view;
     rebuildHierarchy();
-    config.expanded = initialExpanded();
-    config.expandedAttributes.clear();
-    // The same DOM and canvas stay mounted across different trees.
-    if(typeof document.querySelectorAll === "function")
-      for(const tab of document.querySelectorAll(".tabs [data-graph]"))
-        tab.classList.toggle("active", tab.dataset.graph === view);
+    const prior = viewStates.get(view);
+    config.mode = prior?.mode || "overview";
+    config.focusId = prior?.focusId || null;
+    if (config.focusId && !byId.has(config.focusId)) {
+      config.focusId = null;
+      config.mode = "overview";
+    }
+    config.expanded = prior ? new Set(prior.expanded) : initialExpanded();
+    config.expandedAttributes = prior ? new Set(prior.expandedAttributes) : new Set();
+    config.query = prior?.query || "";
+    config.zoom = prior?.zoom ?? 1;
+    config.zoomInitialized = prior?.zoomInitialized ?? false;
+    config.outlineOpen = prior?.outlineOpen || false;
+    config.detailsOpen = !!prior?.detailsOpen && !!config.focusId;
+    config.animateNextRender = false;
+    $("search").value = config.query;
+    for (const tab of document.querySelectorAll(".tabs [data-graph]")) {
+      const active = tab.dataset.graph === view;
+      tab.classList.toggle("active", active);
+      if (active) tab.setAttribute("aria-current", "page");
+      else tab.removeAttribute("aria-current");
+    }
+    if (review && view !== "core") reviewFilter = {level:"view", view};
+    $("atlasReviewBar").classList.toggle("is-hidden", !review || view === "core");
+    render(false, true);
+    const canvas = $("canvasWrap");
+    canvas.scrollLeft = prior?.scrollLeft || 0;
+    canvas.scrollTop = prior?.scrollTop || 0;
+    if (options.history !== false) setAddress(config.focusId, false);
     return true;
   }
   function siblingsOf(id) {
@@ -835,17 +865,8 @@
     if (!target || !(reviewGraphs[target]?.nodes || DATA[target]?.nodes || []).some(n => n.id === id)) return false;
     const sameFocus = target===config.view && config.focusId===id;
     const wasExpanded = sameFocus && config.expandedAttributes.has(id);
-    if (target !== config.view) {
-      if (review) {
-        // Fast cross-tree page turn: preserve scroll/zoom and shared draft state.
-        if (!activateReviewView(target)) return false;
-      } else {
-        if(window.location) window.location.href = target+".html?"+
-          (requestedReview()?"review="+encodeURIComponent(requestedReview())+"&":"")+
-          "focus="+encodeURIComponent(id)+(requestedReview()?window.location.hash||"":"");
-        return true;
-      }
-    }
+    if (target !== config.view && !activateView(target, {history:false}))
+      return false;
     config.mode = "focus";
     config.focusId = id;
     config.query = "";
@@ -1711,7 +1732,7 @@
       if (changed) section(area, "Observed change").appendChild(el("p", "", changed.fields.join(", ")));
     }
   }
-  function render(autoFit) {
+  function render(autoFit, preserveViewport = false) {
     const layout = normalizeLayout(config.mode === "focus" ? layoutFocus() : layoutOverview());
     config.visible = layout.visible;
     drawSVG(layout);
@@ -1732,7 +1753,7 @@
     $("collapse").disabled = config.mode === "focus";
     $("expand").disabled = config.mode === "focus";
     if (review) updateReviewBar();
-    if (config.mode === "focus") centerSelected();
+    if (config.mode === "focus" && !preserveViewport) centerSelected();
     else if (autoFit && typeof $("canvasWrap").scrollTo === "function") {
       $("canvasWrap").scrollTo({ left: 0, top: 0 });
     }
@@ -1805,6 +1826,42 @@
   }
   function bind() {
     bindCanvasPan();
+    // All five tabs switch the mounted graph; links still work without JS
+    // and support browser-native new-tab gestures.
+    for (const tab of document.querySelectorAll(".tabs [data-graph]")) {
+      tab.addEventListener("click", event => {
+        if (event.defaultPrevented || event.button !== 0 ||
+            event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+        const target = tab.dataset.graph;
+        if (!VIEWS[target] || !DATA[target]) return;
+        event.preventDefault();
+        if (target !== config.view) activateView(target);
+        if (review && target !== "core" && !config.focusId) {
+          const first = reviewQueue.find(item => item.view === target);
+          if (first) navigate(first.node_id, target, true);
+        }
+      });
+    }
+    // Source and Context links use the same in-place navigation as top tabs.
+    // Capture before expanded SVG cards stop bubbling; modified clicks keep native behavior.
+    document.addEventListener("click", event => {
+      if (event.defaultPrevented || event.button !== 0 ||
+          event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+      const link = event.target?.closest?.("a[href]");
+      if (!link || link.closest(".tabs") || link.target === "_blank") return;
+      const url = new URL(link.href, window.location.href);
+      const matched = url.pathname.match(
+        /\/(core|knowledge|code|environment|context)\.html$/
+      );
+      if (!matched || url.origin !== window.location.origin) return;
+      const target = matched[1], focus = url.searchParams.get("focus");
+      if (!VIEWS[target] || !DATA[target]) return;
+      if (focus && !((reviewGraphs[target]?.nodes || DATA[target].nodes || [])
+          .some(node => node.id === focus) || DATA.code?.source_api_index?.[focus])) return;
+      event.preventDefault();
+      if (focus) navigate(focus, target, false);
+      else if (target !== config.view) activateView(target);
+    }, true);
     for (const [direction, elementId] of [[-1, "atlasChildPrev"], [1, "atlasChildNext"]]) {
       const button = $(elementId);
       button?.addEventListener("click", () => {
@@ -1880,21 +1937,25 @@
     });
     if (window.addEventListener) {
       window.addEventListener("popstate", () => {
-        if(review) {
-          const current = (window.location?.pathname || "").match(/\/(core|knowledge|code|environment|context)\.html$/);
-          if(current && current[1] !== config.view && current[1] !== "core")
-            activateReviewView(current[1]);
-        }
+        const match = (window.location?.pathname || "").match(
+          /\/(core|knowledge|code|environment|context)\.html$/
+        );
+        const target = match?.[1] || "core";
+        if (target !== config.view) activateView(target, {history:false});
         const next = getSearchFocus();
-        config.expandedAttributes.clear();
         const sourceOwner = next && DATA[config.view]?.source_api_index?.[next];
-        config.focusId = next && byId.has(next) ? next :
+        const focusId = next && byId.has(next) ? next :
           sourceOwner && byId.has(sourceOwner) ? sourceOwner : null;
-        if (sourceOwner && config.focusId) config.expandedAttributes.add(sourceOwner);
-        config.mode = config.focusId ? "focus" : "overview";
-        config.detailsOpen = false;
-        config.query = ""; $("search").value = "";
-        render(true);
+        if (config.focusId !== focusId) {
+          config.focusId = focusId;
+          config.mode = focusId ? "focus" : "overview";
+          config.expandedAttributes.clear();
+          if (sourceOwner && focusId) config.expandedAttributes.add(focusId);
+          config.detailsOpen = false;
+          config.query = ""; $("search").value = "";
+          render(false);
+        }
+        if (review) updateReviewBar();
       });
       window.addEventListener("keydown", event => {
         if(handleReviewShortcut(event))return;
