@@ -124,4 +124,35 @@ assert(counts.translatedFields > counts.nodes * 2, "Nested translation coverage 
 assert.equal(errors.length, 0,
   "Bilingual Atlas nested-field audit found " + errors.length + " defects:\n" +
   errors.slice(0, 40).join("\n"));
+
+ // Semantic parity requires source-derived actions, not only nonempty English.
+ // The paired Chinese source explicitly states these operations.
+ const chineseCode = new Map(original.code.nodes.map(n => [n.id, n]));
+ const englishCode = new Map(data.code.nodes.map(n => [n.id, n]));
+ const exactPairs = [
+   ["code:function:datasets.GreaterThan.GreaterThan:attach_greater_than_token_ids",
+     "Attach token IDs to numerical comparison examples."],
+   ["code:function:datasets.MMLUPro.MMLUPro:attach_distractors",
+     "Attach distractor options to multiple-choice examples."],
+   ["code:function:datasets.GreaterThan.tokenize:strategy_for_model_key",
+     "Select the tokenization strategy for the chosen model."],
+ ];
+ for (const [id, meaning] of exactPairs) {
+   assert(chineseCode.has(id) && englishCode.has(id), "Missing source identity " + id);
+   assert.equal(englishCode.get(id).summary, meaning,
+     "English summary must represent the operation in the Chinese source: " + id);
+ }
+ let translatedResponsibilities = 0;
+ for (const [id, zh] of chineseCode) {
+   const line = String(zh.summary || "");
+   if (!/^负责.+；源码依据和调用参数可在节点的展开说明中查看。$/.test(line))
+     continue;
+   const en = englishCode.get(id);
+   if (en && !/^Inspect .+ interface for /.test(en.summary))
+     translatedResponsibilities++;
+ }
+ assert(translatedResponsibilities >= 1200,
+   "Too many Code nodes fell back to mechanical source-symbol descriptions: " +
+   translatedResponsibilities);
+
 console.log("SAEBase bilingual semantic field audit", counts);
