@@ -35,7 +35,11 @@
     "类定义源码": "Class definition source",
     "当前任务配置": "Current task configuration",
     "配置文件来源": "Configuration file source",
-    "由源码推导": "Inferred from source"
+    "由源码推导": "Inferred from source",
+    "设备名称": "Device name", "驱动版本": "Driver version",
+    "命令标识": "Command identifier", "Python 版本": "Python version",
+    "网络条件": "Network status", "沙箱条件": "Sandbox environment",
+    "待采集": "Not measured", "待现场采集": "Not measured on a live machine"
   });
   window.SAEBASE_ATLAS_UI = labels;
 
@@ -112,8 +116,10 @@
       return value.map(item => translateNested(item, key, parent, node, en));
     if (value && typeof value === "object") {
       const out = {};
-      for (const [childKey, item] of Object.entries(value))
-        out[childKey] = translateNested(item, childKey, value, node, en);
+      for (const [childKey, item] of Object.entries(value)) {
+        const localizedKey = key === "facts" ? (labels[childKey] || childKey) : childKey;
+        out[localizedKey] = translateNested(item, childKey, value, node, en);
+      }
       return out;
     }
     return value;
@@ -121,7 +127,7 @@
   function snapshot(node) {
     if (original.has(node)) return original.get(node);
     const keys = ["title", "summary", "description", "reader_explanation",
-      "technical_description", "why_it_matters", "aliases", "attributes"];
+      "technical_description", "why_it_matters", "aliases", "attributes", "facts"];
     const state = {};
     for (const key of keys) {
       if (Object.prototype.hasOwnProperty.call(node, key))
@@ -155,6 +161,8 @@
           node.aliases = en.aliases || saved.aliases.filter(x => !CJK.test(x));
         if (Object.prototype.hasOwnProperty.call(saved, "attributes"))
           node.attributes = translateNested(saved.attributes, "attributes", null, node, en);
+        if (Object.prototype.hasOwnProperty.call(saved, "facts"))
+          node.facts = translateNested(saved.facts, "facts", null, node, en);
         if (CJK.test(node.title) || CJK.test(node.summary) || CJK.test(node.description)
             || /[\ufffd]/.test(node.title))
           throw new Error("Invalid English SAEBase node " + node.id);
