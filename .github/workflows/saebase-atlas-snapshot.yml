@@ -48,6 +48,7 @@ jobs:
           python harness/visualization/build_language.py --check
           node --check harness/visualization/app.js
           node --check harness/visualization/i18n.js
+          node --check harness/visualization/locale-runtime.js
           node --check harness/visualization/locale-data.js
       - name: Verify that this is a SAEBase snapshot
         run: |
