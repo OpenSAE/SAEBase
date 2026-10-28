@@ -25,8 +25,6 @@ def _source_record(node: dict) -> dict:
     return {
         "id": node["id"],
         "kind": node.get("kind", ""),
-        "title": node.get("title", ""),
-        "summary": node.get("summary", ""),
         "source_symbol": node.get("source_symbol", ""),
         "path": node.get("path") or node.get("source_path") or "",
         "line": node.get("line"),
