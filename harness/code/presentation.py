@@ -354,4 +354,7 @@ def readable_code_tree(graph: dict) -> dict:
     from harness.code.functional_taxonomy import organize_saebase_concepts
 
     organize_saebase_concepts(output)
+    from harness.code.functional_taxonomy import organize_oversized_concepts
+
+    organize_oversized_concepts(output)
     return output
