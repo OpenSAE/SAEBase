@@ -101,7 +101,16 @@ def compact_public_code_tree(graph: dict) -> dict:
             reviewed = [x for x in members if x in SOURCE_REVIEWS]
             if len(reviewed) > 1:
                 raise ValueError("Reviewed sibling responsibilities collide: " + repr(reviewed))
-            canonical = reviewed[0] if reviewed else members[0]
+            # If a curated concept already represents the same role, its
+            # actual source modules belong in the concept's interface list.
+            # Otherwise retain exactly one source-backed responsibility card.
+            canonical = (
+                reviewed[0]
+                if reviewed
+                else None
+                if parent in keep and nodes[parent].get("concept_group")
+                else members[0]
+            )
             for member in members:
                 if member != canonical:
                     keep.discard(member)
