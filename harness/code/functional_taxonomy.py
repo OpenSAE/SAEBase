@@ -106,8 +106,11 @@ def organize_saebase_concepts(output: dict) -> dict:
             partition = defaultdict(list)
             for node in members:
                 short = node["path"].removeprefix("saebase/")
+                # Tooling is organized by executable verification intent; the
+                # tools/ package label is not part of a tool's functional name.
+                match_path = short.removeprefix("tools/") if name == "verification" else short
                 matches = [x["name"] for x in subgroups
-                           if any(re.fullmatch(p, short) for p in x["patterns"])]
+                           if any(re.fullmatch(p, match_path) for p in x["patterns"])]
                 if len(matches) != 1:
                     raise ValueError("Non-unique source responsibility: "
                                      + node["path"] + " -> " + repr(matches))
