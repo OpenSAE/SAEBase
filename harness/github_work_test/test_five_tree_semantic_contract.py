@@ -15,14 +15,25 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def fixture_graphs() -> dict:
     terms = {
-        "nodes": [{"id": "term.sae", "title": "SAE",
-                   "summary": "稀疏字典", "description": "用特征表示模型激活。"}],
+        "nodes": [
+            {
+                "id": "term.sae",
+                "title": "SAE",
+                "summary": "稀疏字典",
+                "description": "用特征表示模型激活。",
+            }
+        ],
         "edges": [],
     }
     other = {
-        "nodes": [{"id": "x", "title": "采集模型表示",
-                   "summary": "读取指定 Hook 的真实激活向量。",
-                   "description": "读取指定 Hook 的真实激活向量。"}],
+        "nodes": [
+            {
+                "id": "x",
+                "title": "采集模型表示",
+                "summary": "读取指定 Hook 的真实激活向量。",
+                "description": "读取指定 Hook 的真实激活向量。",
+            }
+        ],
         "edges": [],
     }
     return {
