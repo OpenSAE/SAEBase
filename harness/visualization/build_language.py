@@ -1228,7 +1228,11 @@ def build() -> str:
                     or "\ufffd" in value
                 ):
                     raise ValueError("Invalid English field: " + view + "/" + node_id + "/" + key)
-        from harness.visualization.semantic_quality import normalized
+        try:
+            from harness.visualization.semantic_quality import normalized
+        except ModuleNotFoundError:
+            # The published build runs this module as a direct Python script.
+            from semantic_quality import normalized
 
         repeated = [
             node_id for node_id, item in nodes.items()
