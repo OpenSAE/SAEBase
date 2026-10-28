@@ -80,13 +80,15 @@ def test_reviewed_methods_have_unique_source_grounded_sibling_meanings() -> None
         assert reviewed["en_title"] != reviewed["en_summary"]
         assert node["title"] != node["summary"]
         assert (ROOT / node["path"]).is_file(), node_id
-    assert any(node_id.startswith("code:module:saebase.research_lab.backend.")
-               for node_id in reviews)
+    assert any(
+        node_id.startswith("code:module:saebase.research_lab.backend.") for node_id in reviews
+    )
     for members in siblings.values():
         selected = [by_id[item] for item in members if item in reviews]
         for field in ("title", "summary"):
             values = [node[field] for node in selected]
             assert len(values) == len(set(values)), values
+
 
 def test_reviewed_sibling_purposes_are_semantically_distinct() -> None:
     """Reject similar reviewed explanations beyond exact-string collisions."""
@@ -115,8 +117,14 @@ def test_reviewed_sibling_purposes_are_semantically_distinct() -> None:
         for position, (node_id, left) in enumerate(group):
             for other_id, right in group[position + 1 :]:
                 assert overlap(left["zh_summary"], right["zh_summary"]) < 0.8, (
-                    parent, node_id, other_id, "Chinese meaning"
+                    parent,
+                    node_id,
+                    other_id,
+                    "Chinese meaning",
                 )
                 assert overlap(left["en_summary"], right["en_summary"]) < 0.8, (
-                    parent, node_id, other_id, "English meaning"
+                    parent,
+                    node_id,
+                    other_id,
+                    "English meaning",
                 )
