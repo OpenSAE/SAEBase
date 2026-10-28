@@ -1851,7 +1851,7 @@
       if (!link || link.closest(".tabs") || link.target === "_blank") return;
       const url = new URL(link.href, window.location.href);
       const matched = url.pathname.match(
-        /\\/(core|knowledge|code|environment|context)\\.html$/
+        /\/(core|knowledge|code|environment|context)\.html$/
       );
       if (!matched || url.origin !== window.location.origin) return;
       const target = matched[1], focus = url.searchParams.get("focus");
