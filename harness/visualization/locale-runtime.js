@@ -67,7 +67,7 @@
     }
     if (key === "meaning") {
       const field = parent?.name || "";
-      const owner = node?.source_symbol?.split(".").pop() || "";
+      const owner = node?.id === "g.sae.sar_adapter" || /(?:^|:)evaluate_sar$/.test(node?.id || "") ? "evaluate_sar" : (node?.source_symbol?.split(".").pop() || "");
       const context = projection.parameter_context?.[owner];
       if (field && context?.[field]) return context[field];
       if (field && projection.parameter_meanings[field])
