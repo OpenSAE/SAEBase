@@ -6,6 +6,7 @@ kept as expandable source records under the closest genuinely described
 research node. No source code, signature, ID, or original AST snapshot is
 deleted. The source-backed AST remains in doc/code/code_tree.json.
 """
+
 from __future__ import annotations
 
 from collections import defaultdict
@@ -27,9 +28,13 @@ def _source_record(node: dict) -> dict:
 
     attributes = copy.deepcopy(node.get("attributes") or [])
     for block in attributes:
-        interfaces = ([block["interface"]] if block.get("type") == "interface"
-                      else block.get("methods", []) if block.get("type") == "class_methods"
-                      else [])
+        interfaces = (
+            [block["interface"]]
+            if block.get("type") == "interface"
+            else block.get("methods", [])
+            if block.get("type") == "class_methods"
+            else []
+        )
         for info in interfaces:
             # Generated Chinese fallback prose has no independently verified
             # English translation. Exact signatures, returns and code remain.
@@ -81,7 +86,8 @@ def compact_public_code_tree(graph: dict) -> dict:
             children[parent].append(child)
 
     keep = {
-        node_id for node_id, node in nodes.items()
+        node_id
+        for node_id, node in nodes.items()
         if node_id == root or _independently_described(node)
     }
     # Only semantic collision inside one parent qualifies for automatic
@@ -91,8 +97,7 @@ def compact_public_code_tree(graph: dict) -> dict:
         for child in ids:
             if child in keep:
                 node = nodes[child]
-                fingerprint = (normalize(node.get("title")),
-                               normalize(node.get("summary")))
+                fingerprint = (normalize(node.get("title")), normalize(node.get("summary")))
                 if all(fingerprint):
                     duplicates[fingerprint].append(child)
         for members in duplicates.values():
@@ -199,11 +204,12 @@ def compact_public_code_tree(graph: dict) -> dict:
         if normalize(node.get("summary")) == normalize(node.get("description")):
             node["description"] = ""
         if source_records[node_id]:
-            node.setdefault("attributes", []).append({
-                "type": "source_interfaces",
-                "label": "源码接口与实现依据 · " + str(len(source_records[node_id])) + " 项",
-                "members": source_records[node_id],
-            })
+            node.setdefault("attributes", []).append(
+                {
+                    "type": "source_interfaces",
+                    "label": "源码接口与实现依据 · " + str(len(source_records[node_id])) + " 项",
+                    "members": source_records[node_id],
+                }
     source_edges = []
     for node_id in keep:
         if node_id != root:
