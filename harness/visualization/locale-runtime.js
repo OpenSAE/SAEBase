@@ -161,7 +161,10 @@
         if (!en || !en.title || !en.summary || !en.description)
           throw new Error("Untranslated SAEBase node " + view + "/" + node.id);
         for (const key of ["title", "summary", "description"]) node[key] = en[key];
-        node.reader_explanation = en.reader_explanation || en.description;
+        // Empty is intentional: the collapsed card already states the purpose.
+        // A missing independent explanation must not repeat the summary.
+        node.reader_explanation = Object.prototype.hasOwnProperty.call(
+          en, "reader_explanation") ? en.reader_explanation : "";
         if (saved.technical_description)
           node.technical_description = translateNested(
             saved.technical_description, "technical_description", null, node, en);
