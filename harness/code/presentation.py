@@ -263,6 +263,12 @@ def readable_code_tree(graph: dict) -> dict:
         if kind in ("function", "method") and raw.startswith("_"):
             if item["id"] not in KEY_METHODS:
                 continue
+        if (kind in {"function", "method", "class"}
+                and path.startswith("saebase/research_lab/tests/")):
+            # An acceptance test is evidence of the Research Lab contract, not
+            # dozens of separate public research capabilities. The test module
+            # and original Python source remain available as evidence.
+            continue
         # Keep all other real symbols: no synthetic classes or functions.
         selected.append(item)
     visible = {node["id"] for node in selected}
