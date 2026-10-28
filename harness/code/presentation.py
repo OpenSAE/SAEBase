@@ -116,14 +116,14 @@ TASK_IMPLEMENTATION_SUMMARIES = {
 # Reviewed modules explain a specific source responsibility. Avoid treating
 # every backend file as another implementation of the same research goal.
 INTERVENTION_MODULES = {
-    "clean_prefix": ("重算干净前缀的编辑对照", "每步重算原始前缀，在该前缀上运行 SAE 编辑以提供无缓存歧义的参考结果。"),
+    "clean_prefix": ("重算干净前缀的编辑对照", "每步重算原始前缀，在该前缀上运行 SAE 编辑以提供明确的干净历史参考结果。"),
     "engine": ("批量执行干预并管理重试", "按计算预算调度批量 Hook 前向传播，处理微批重试和可恢复的测量任务。"),
     "hf_cached_steering": ("在持久 KV 缓存中逐 Token 编辑特征", "每个新 Token 都编码真实残差并执行特征修改，同时保存编辑过的 KV 历史。"),
     "kv_cache_exact": ("核对独立干净 KV 与编辑解码", "使用独立的干净与编辑分支检验增量解码一致性，保留其试验协议和误差证据。"),
     "operators": ("应用 SAE 特征空间编辑算子", "根据消融、缩放、钳制、添加或特征集合条件生成 FeaturePatch。"),
     "results": ("原子写入干预测量记录", "通过 JSONL 分片、校验和与 Manifest 提供崩溃恢复及实验测量追溯。"),
     "specs": ("定义可复现的干预条件与样本身份", "声明特征集合、编辑幅度、样本读出位置及实验身份的校验约束。"),
-    "steering": ("逐步重算前缀进行生成对照", "使用无 KV 缓存的参考解码，比较每一步 SAE 编辑与基线生成结果。"),
+    "steering": ("逐步重算前缀进行生成对照", "使用完整前缀重算的参考解码，比较每一步 SAE 编辑与基线生成结果。"),
 }
 for _task, _pair in TASK_WRAPPER_SUMMARIES.items():
     MODULES[f"tasks/{_task}/task.py"] = _pair
