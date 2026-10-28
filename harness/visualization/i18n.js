@@ -42,6 +42,13 @@ const technical=(el)=>!!el?.closest?.("code,pre,kbd,.code-source,.source-code,.s
 function localize(raw,el){
  if(!raw||!CJK.test(raw))return raw;
  if(EXACT[raw.trim()])return raw.replace(raw.trim(),EXACT[raw.trim()]);
+ const fullEvidence=raw.trim().match(/^(.+) 的完整解释与证据$/);
+ if(fullEvidence)return "Full explanation and evidence for " + fullEvidence[1];
+ const contextual=raw.trim().match(/^在 Context 中查看“(.+)”$/);
+ if(contextual)return 'View "' + contextual[1] + '" in Context';
+ const memberList=raw.trim().match(/^(类|函数)：(.+)$/);
+ if(memberList)return (memberList[1]==="类"?"Classes: ":"Functions: ")+memberList[2];
+
  const known=window.OPENRESEARCH_ATLAS_I18N?.en?.[raw.trim()];
  if(typeof known==="string"&&known.trim())return raw.replace(raw.trim(),known);
  // Preserve exact code excerpts and recorded source facts.
