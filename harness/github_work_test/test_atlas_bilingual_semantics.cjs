@@ -135,7 +135,7 @@ for (const [id, verb] of [
   ["code:function:datasets.CounterFact.CounterFact:filtered_json_path", "Locate"],
   ["code:function:saebase.benchmarks.metrics.reconstruction:loss_recovered", "Compute"],
   ["code:class:datasets.controlled_inputs:BinaryFactor", "Define"],
-  ["code:module:datasets.controlled_inputs", "Implement"]
+  ["code:module:datasets.controlled_inputs", "Build"]
 ]) {
   const node = data.code.nodes.find(n => n.id === id);
   assert(node?.title.startsWith(verb + " "), id + " lost its Chinese source action");

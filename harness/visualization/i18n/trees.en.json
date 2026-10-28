@@ -254,13 +254,13 @@
       },
       "g.sae.sar_adapter": {
         "title": "Adapt SAR compositionality evaluation",
-        "summary": "The SAR integration preserves feature compositionality evaluation protocols through the shared benchmark interface.",
-        "description": "The SAR integration preserves feature compositionality evaluation protocols through the shared benchmark interface."
+        "summary": "Construct selected-feature coalitions, measure scalar model responses after activation patches, and use the original SAR estimator to assess feature composition.",
+        "description": "Construct selected-feature coalitions, measure scalar model responses after activation patches, and use the original SAR estimator to assess feature composition."
       },
       "g.sae.rss_adapter": {
         "title": "Adapt RSS response-sensitivity evaluation",
-        "summary": "The RSS integration measures response changes under its source-defined comparison protocol.",
-        "description": "The RSS integration measures response changes under its source-defined comparison protocol."
+        "summary": "Capture SAE codes for clean, selection, and held-out prompt variants; measure feature response directions and evaluate stability using the original RSS estimator.",
+        "description": "Capture SAE codes for clean, selection, and held-out prompt variants; measure feature response directions and evaluate stability using the original RSS estimator."
       },
       "s.sae.train": {
         "title": "Train SAEs and record learned weights",

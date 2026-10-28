@@ -72,7 +72,7 @@ def test_reviewed_methods_have_unique_source_grounded_sibling_meanings() -> None
     assert len(reviews) >= 66
     for node_id, reviewed in reviews.items():
         node = by_id[node_id]
-        assert node["kind"] in {"method", "module"}
+        assert node["kind"] in {"method", "module", "class"}
         assert node["path"] == reviewed["source_path"]
         assert node["source_symbol"] == reviewed["source_symbol"]
         assert node["title"] == reviewed["zh_title"]

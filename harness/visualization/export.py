@@ -467,14 +467,21 @@ def context_graph(
         allowed_links = [
             key for key in term.get("related_node_ids", []) if key in allowed_knowledge
         ]
-        attributes = [
-            {
+        # Repeated generic importance text adds no new scientific meaning.
+        # Keep the authoritative term definition and source evidence instead.
+        generic_importance = "用于理解 Atlas 中的相关节点和源码职责。"
+        importance = (
+            "" if term["why_it_matters"] == generic_importance
+            else term["why_it_matters"]
+        )
+        attributes = []
+        if importance:
+            attributes.append({
                 "type": "text",
                 "label": "为什么重要",
-                "value": term["why_it_matters"],
+                "value": importance,
                 "source": term["foundation"],
-            },
-        ]
+            })
         if term.get("aliases"):
             attributes.append(
                 {
@@ -508,7 +515,7 @@ def context_graph(
                 "title": term["term"],
                 "summary": term["definition"],
                 "description": term["definition"],
-                "why_it_matters": term["why_it_matters"],
+                "why_it_matters": importance,
                 "aliases": term["aliases"],
                 "foundation": term["foundation"],
                 "status": "implemented",
@@ -806,6 +813,10 @@ def main() -> int:
         attach_evidence(graphs["context"], code, TERM_TARGETS)
         attach_context_explanations(graphs)
         verify_public_prose(graphs)
+        from harness.visualization.semantic_quality import validate_all_trees
+
+        audit = validate_all_trees(graphs)
+        print("FIVE_TREE_SEMANTICS=" + json.dumps(audit, ensure_ascii=False))
         for name, graph in graphs.items():
             ids = {node["id"] for node in graph["nodes"]}
             if len(ids) != len(graph["nodes"]):

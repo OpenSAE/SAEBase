@@ -329,6 +329,287 @@ def concrete_groups(output: dict) -> None:
 # without adding invented scope nodes or changing authoritative source IDs.
 
 
+def fold_unreviewed_interfaces(output: dict) -> None:
+    """Keep source functions as owner interfaces until their role is reviewed.
+
+    Actual Python source symbols and detailed signatures remain accessible in
+    their owning module or class. This avoids presenting an invented research
+    operation for each function lacking a distinct, reviewed responsibility.
+    Cross-tree evidence targets remain directly navigable.
+    """
+    from harness.visualization.evidence import CODE_TARGETS, TERM_TARGETS
+    from harness.visualization.build_language import REVIEWED_CODE
+
+    by_id = {node["id"]: node for node in output["nodes"]}
+    protected = set(CODE_TARGETS.values()) | set(TERM_TARGETS.values()) | set(KEY_METHODS)
+    protected.update(SOURCE_REVIEWS)
+    protected.update(REVIEWED_CODE)
+    # Public research actions and source paths are asserted by the bilingual
+    # interface contract. Their exact evidence links remain independently
+    # navigable even when neighboring generic helpers are consolidated.
+    protected.update({
+        "code:function:saebase.benchmarks.metrics.reconstruction:loss_recovered",
+        "code:function:datasets.CounterFact.CounterFact:filtered_json_path",
+        "code:class:datasets.controlled_inputs:BinaryFactor",
+    })
+    incoming = {}
+    for edge in output["edges"]:
+        if edge["type"] == "contains":
+            incoming[edge["target"]] = edge["source"]
+    combined = defaultdict(list)
+    excluded = set()
+    for node in output["nodes"]:
+        if node["kind"] not in {"method", "function"} or node["id"] in protected:
+            continue
+        if "源码依据和调用参数可在节点的展开说明中查看" not in node.get("summary", ""):
+            continue
+        parent = by_id.get(incoming.get(node["id"]))
+        if not parent:
+            continue
+        kind = parent.get("kind")
+        if node["kind"] == "method" and kind != "class":
+            continue
+        if node["kind"] == "function" and not (
+            kind == "module" or (kind == "group" and parent.get("concept_group"))
+        ):
+            continue
+        interface = next(
+            (attr["interface"] for attr in node.get("attributes", [])
+             if attr.get("type") == "interface"),
+            None,
+        )
+        if not interface or not interface.get("signature"):
+            raise ValueError("Cannot consolidate source interface: " + node["id"])
+        if kind in {"module", "group"}:
+            combined[parent["id"]].append({
+                **copy.deepcopy(interface),
+                "symbol_id": node["id"],
+                "source_path": node["path"],
+            })
+        else:
+            blocks = [
+                attr for attr in parent.get("attributes", [])
+                if attr.get("type") == "class_methods"
+            ]
+            if not blocks or not any(
+                method.get("name") == node["source_symbol"]
+                for method in blocks[0].get("methods", [])
+            ):
+                raise ValueError("Class method source lost during consolidation: " + node["id"])
+        excluded.add(node["id"])
+    # A generic class is also an interface container, not automatically a
+    # separate research capability. Fold it only when no reviewed or externally
+    # referenced child remains. Preserve its fields and every method in the
+    # owning module's expandable source interface.
+    classes = defaultdict(list)
+    for node in output["nodes"]:
+        if node["kind"] != "class" or node["id"] in protected:
+            continue
+        if "源码依据和调用参数可在节点的展开说明中查看" not in node.get("summary", ""):
+            continue
+        parent = by_id.get(incoming.get(node["id"]))
+        if not parent or not (
+            parent.get("kind") == "module"
+            or (parent.get("kind") == "group" and parent.get("concept_group"))
+        ):
+            continue
+        surviving = [
+            edge["target"] for edge in output["edges"]
+            if edge["type"] == "contains" and edge["source"] == node["id"]
+            and edge["target"] not in excluded
+        ]
+        if surviving:
+            continue
+        fields = next(
+            (attr.get("fields", []) for attr in node.get("attributes", [])
+             if attr.get("type") == "fields"), []
+        )
+        methods = next(
+            (attr.get("methods", []) for attr in node.get("attributes", [])
+             if attr.get("type") == "class_methods"), []
+        )
+        classes[parent["id"]].append({
+            "name": node["source_symbol"],
+            "symbol_id": node["id"],
+            "path": node["path"],
+            "line": node.get("line"),
+            "fields": copy.deepcopy(fields),
+            "methods": copy.deepcopy(methods),
+        })
+        excluded.add(node["id"])
+    for parent_id, entries in classes.items():
+        parent = by_id[parent_id]
+        parent.setdefault("attributes", []).append({
+            "type": "class_interfaces",
+            "label": "类定义、属性及方法 · " + str(len(entries)) + " 个",
+            "classes": sorted(entries, key=lambda item: (item.get("line", 0), item["name"])),
+        })
+        for attr in parent["attributes"]:
+            if attr.get("type") == "module_contents":
+                hidden = {item["name"] for item in entries}
+                attr["classes"] = [name for name in attr.get("classes", []) if name not in hidden]
+    for parent_id, methods in combined.items():
+        parent = by_id[parent_id]
+        parent.setdefault("attributes", []).append({
+            "type": "class_methods",
+            "label": "函数源码接口与参数 · " + str(len(methods)) + " 个",
+            "methods": sorted(methods, key=lambda item: (item.get("line", 0), item["name"])),
+        })
+        for attribute in parent["attributes"]:
+            if attribute.get("type") == "module_contents":
+                hidden_names = {item["name"] for item in methods}
+                attribute["functions"] = [
+                    name for name in attribute.get("functions", [])
+                    if name not in hidden_names
+                ]
+    output["nodes"] = [node for node in output["nodes"] if node["id"] not in excluded]
+    # Preserve the exact AST relationship as an immutable source-level record,
+    # while giving the visual tree an edge between the surviving owners.
+    # The function symbol identities also survive in class_methods attributes.
+    first_owner = {id_: incoming[id_] for id_ in excluded}
+
+    def owner(id_: str) -> str:
+        visited = set()
+        while id_ in first_owner:
+            if id_ in visited:
+                raise ValueError("Cyclic collapsed Code ownership")
+            visited.add(id_)
+            id_ = first_owner[id_]
+        return id_
+
+    aliases = {id_: owner(id_) for id_ in excluded}
+    retained_edges = []
+    source_relations = []
+    seen = set()
+    for edge in output["edges"]:
+        source, target = edge["source"], edge["target"]
+        if source in excluded or target in excluded:
+            if edge["type"] == "contains":
+                continue
+            source_relations.append(copy.deepcopy(edge))
+            source, target = aliases.get(source, source), aliases.get(target, target)
+            if source == target:
+                continue
+            rewritten = {
+                **edge, "source": source, "target": target,
+                "original_source": edge["source"],
+                "original_target": edge["target"],
+            }
+        else:
+            rewritten = edge
+        key = (rewritten["source"], rewritten["target"], rewritten["type"])
+        if key not in seen:
+            retained_edges.append(rewritten)
+            seen.add(key)
+    output["edges"] = retained_edges
+    output["source_interface_owners"] = aliases
+    output["folded_source_relations"] = source_relations
+    output["folded_interface_count"] = len(excluded)
+
+
+
+def fold_redundant_module_cards(output: dict) -> None:
+    """Keep duplicate implementation files as complete owner source details.
+
+    This is conservative: only repeated generic module cards under a real
+    source-backed concept/group, with no independently displayed child, may
+    be folded. Referenced Knowledge evidence remains as individual Code nodes.
+    """
+    from harness.visualization.build_language import REVIEWED_CODE
+
+    source = json.loads((ROOT / "doc/knowledge/context_graph.json").read_text(encoding="utf-8"))
+    knowledge_paths = {
+        str(p).split(":", 1)[0]
+        for node in source["nodes"]
+        if str(node["id"]).startswith(("s.sae.", "g.sae."))
+        for p in node.get("evidence", [])
+    }
+    by_id = {node["id"]: node for node in output["nodes"]}
+    incoming = {}
+    children = defaultdict(list)
+    for edge in output["edges"]:
+        if edge["type"] == "contains":
+            incoming[edge["target"]] = edge["source"]
+            children[edge["source"]].append(edge["target"])
+    siblings = defaultdict(list)
+    for node in output["nodes"]:
+        if node["kind"] != "module":
+            continue
+        if (node["id"] in SOURCE_REVIEWS or node["id"] in REVIEWED_CODE
+                or node.get("path") in knowledge_paths):
+            continue
+        if "源码依据和调用参数可在节点的展开说明中查看" not in node.get("summary", ""):
+            continue
+        parent = by_id.get(incoming.get(node["id"]))
+        if not parent or parent["kind"] != "group" or children.get(node["id"]):
+            continue
+        siblings[parent["id"], node["title"], node["summary"]].append(node)
+    folded = {}
+    for (parent_id, _title, _summary), members in siblings.items():
+        parent = by_id[parent_id]
+        # Reviewed functional parents already convey the capability. A sole
+        # unreviewed module underneath such a parent is an implementation
+        # detail, while every exact source interface remains available there.
+        semantic_owner = (
+            parent.get("concept_group")
+            or parent_id.startswith(("code:instance:", "code:concrete:"))
+        )
+        if len(members) < 2 and not semantic_owner:
+            continue
+        entries = []
+        for node in members:
+            entries.append({
+                "id": node["id"], "path": node["path"],
+                "line": node.get("line", 1),
+                "source_symbol": node.get("source_symbol"),
+                "attributes": copy.deepcopy(node.get("attributes") or []),
+            })
+            folded[node["id"]] = parent_id
+        parent.setdefault("attributes", []).append({
+            "type": "source_modules",
+            "label": "共同实现此功能的源码模块 · " + str(len(entries)) + " 个",
+            "modules": sorted(entries, key=lambda item: item["path"]),
+        })
+    if not folded:
+        output["folded_module_count"] = 0
+        return
+    prior = output.get("source_interface_owners", {})
+    def owner(id_: str) -> str:
+        target = prior.get(id_, id_)
+        return folded.get(target, target)
+
+    archived = output.get("folded_source_relations", [])
+    seen = set()
+    edges = []
+    for edge in output["edges"]:
+        src, dst = edge["source"], edge["target"]
+        if src in folded or dst in folded:
+            if edge["type"] == "contains":
+                continue
+            archived.append(copy.deepcopy(edge))
+            s, t = owner(src), owner(dst)
+            if s == t:
+                continue
+            new_edge = {
+                **edge, "source": s, "target": t,
+                "original_source": src, "original_target": dst,
+            }
+        else:
+            new_edge = edge
+        key = (new_edge["source"], new_edge["target"], new_edge["type"])
+        if key not in seen:
+            edges.append(new_edge)
+            seen.add(key)
+    output["nodes"] = [n for n in output["nodes"] if n["id"] not in folded]
+    output["edges"] = edges
+    output["source_interface_owners"] = {
+        **{key: owner(key) for key in prior},
+        **folded,
+    }
+    output["folded_source_relations"] = archived
+    output["folded_module_count"] = len(folded)
+
+
 def readable_code_tree(graph: dict) -> dict:
     """Presentation-only, already-existing component subset of an AST snapshot."""
     output = copy.deepcopy(graph)
@@ -450,4 +731,6 @@ def readable_code_tree(graph: dict) -> dict:
     from harness.code.functional_taxonomy import organize_oversized_concepts
 
     organize_oversized_concepts(output)
+    fold_unreviewed_interfaces(output)
+    fold_redundant_module_cards(output)
     return output
