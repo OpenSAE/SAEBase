@@ -338,10 +338,12 @@ def fold_unreviewed_interfaces(output: dict) -> None:
     Cross-tree evidence targets remain directly navigable.
     """
     from harness.visualization.evidence import CODE_TARGETS, TERM_TARGETS
+    from harness.visualization.build_language import REVIEWED_CODE
 
     by_id = {node["id"]: node for node in output["nodes"]}
     protected = set(CODE_TARGETS.values()) | set(TERM_TARGETS.values()) | set(KEY_METHODS)
     protected.update(SOURCE_REVIEWS)
+    protected.update(REVIEWED_CODE)
     # Public research actions and source paths are asserted by the bilingual
     # interface contract. Their exact evidence links remain independently
     # navigable even when neighboring generic helpers are consolidated.
@@ -513,6 +515,8 @@ def fold_redundant_module_cards(output: dict) -> None:
     source-backed concept/group, with no independently displayed child, may
     be folded. Referenced Knowledge evidence remains as individual Code nodes.
     """
+    from harness.visualization.build_language import REVIEWED_CODE
+
     source = json.loads((ROOT / "doc/knowledge/context_graph.json").read_text(encoding="utf-8"))
     knowledge_paths = {
         str(p).split(":", 1)[0]
@@ -531,7 +535,8 @@ def fold_redundant_module_cards(output: dict) -> None:
     for node in output["nodes"]:
         if node["kind"] != "module":
             continue
-        if node["id"] in SOURCE_REVIEWS or node.get("path") in knowledge_paths:
+        if (node["id"] in SOURCE_REVIEWS or node["id"] in REVIEWED_CODE
+                or node.get("path") in knowledge_paths):
             continue
         if "源码依据和调用参数可在节点的展开说明中查看" not in node.get("summary", ""):
             continue
