@@ -44,7 +44,7 @@ MODULES = {
         "估计 SAE 评测分数的置信区间", "重采样评测观测值并计算分数区间，刻画分数的统计波动范围。"
     ),
     "tasks/benchmark/reliability/discriminability.py": (
-        "衡量 SAE 指标的区分能力", "比较不同实验条件的指标分布，分析分数能否有效区分条件。"
+        "衡量 SAE 指标的区分能力", "比较各实验条件下的指标分布，测量分数对研究条件的区分程度。"
     ),
     "tasks/benchmark/backend/adapters/localization.py": (
         "接入 SAE 特征局部性评测", "连接局部性基准适配器并将测量结果整理为通用评测指标。"
