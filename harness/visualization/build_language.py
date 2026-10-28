@@ -301,6 +301,42 @@ REVIEWED_INTERFACES = json.loads(
 )["nodes"]
 
 REVIEWED_CODE = {
+    "code:class:saebase.registry:DatasetPlugin": (
+        "Define dataset plugin responsibilities",
+        "Bind dataset setup, task compatibility checks, and evaluation split notes in the shared registry.",
+    ),
+    "code:class:saebase.registry:TaskPlugin": (
+        "Register research task classes",
+        "Store a TaskModule class that the central registry can resolve for experiment execution.",
+    ),
+    "code:method:datasets.datamodule:SAEBaseDataModule.setup": (
+        "Initialize the configured dataset split",
+        "Look up the dataset plugin, verify task compatibility, and delegate initialization for the requested stage.",
+    ),
+    "code:module:datasets.artifacts": (
+        "Resolve versioned prompt artifact paths",
+        "Normalize behavior identities and construct locations for prompt records, manifests, and experiment reports.",
+    ),
+    "code:module:datasets.prompts": (
+        "Read prepared model-specific prompts",
+        "Resolve saved dataset and model prompt files and validate versioned records against their manifest.",
+    ),
+    "code:module:saebase.api.features": (
+        "Capture and modify SAE feature activations",
+        "Provide feature snapshots, latent code edits, and downstream output comparisons at selected activation hooks.",
+    ),
+    "code:module:saebase.api.model": (
+        "Adapt language models for activation interventions",
+        "Define activation sites, backend capabilities, and model interfaces used for capture and patching.",
+    ),
+    "code:module:saebase.runtime.train": (
+        "Run Hydra-configured SAE research tasks",
+        "Check training runtime and configuration, prepare output paths, and dispatch the registered task.",
+    ),
+    "code:module:tasks.sae_runtime": (
+        "Dispatch the seven SAE research operations",
+        "Check the selected operation and dataset/model context, run its task module, and save executable results.",
+    ),
     "code:module:tasks.generate.task": (
         "Register the generation-time feature steering task",
         "GenerateTask selects the generation operation; token edits and sequence comparison run in its implementation module.",
@@ -1228,6 +1264,13 @@ def build() -> str:
                     or "\ufffd" in value
                 ):
                     raise ValueError("Invalid English field: " + view + "/" + node_id + "/" + key)
+        # A punctuation-only change must never disguise an untranslated
+        # title repeated as its own explanatory summary.
+        for node_id, obj in nodes.items():
+            title_key = re.sub(r"[\\W_]+", "", obj["title"].casefold())
+            summary_key = re.sub(r"[\\W_]+", "", obj["summary"].casefold())
+            if title_key == summary_key:
+                raise ValueError("English title repeats summary: " + view + "/" + node_id)
         translated[view] = nodes
     for original, english in DOCS.items():
         if not (ROOT / original).is_file() or not (ROOT / english).is_file():
