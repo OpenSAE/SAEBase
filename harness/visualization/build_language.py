@@ -297,6 +297,22 @@ PARAMETER_CONTEXT = {
 # Stable reviewed descriptions for the most prominent SAEBase interfaces.
 # Add research-critical entries here only after inspecting the actual source.
 REVIEWED_CODE = {
+    "code:class:datasets.controlled_inputs:BinaryFactor": (
+        "Define a named binary experimental factor",
+        "Represent one controlled-input factor with exactly two distinct, nonempty string levels.",
+    ),
+    "code:class:datasets.controlled_inputs:ControlledInputState": (
+        "Represent one controlled prompt state",
+        "Store the binary factor mask, exact prompt, sample identity, and token readout position.",
+    ),
+    "code:class:datasets.controlled_inputs:ControlledInputDesign": (
+        "Construct a complete binary controlled-input design",
+        "Represent one prompt for each combination of independent binary factors, with ordered masks and traceable sample identities.",
+    ),
+    "code:class:datasets.controlled_inputs:ControlledInputCapture": (
+        "Record activations and provenance for a controlled-input design",
+        "Bundle collected sample records, collection statistics, and the saved controlled-input manifest.",
+    ),
     "code:function:saebase.registry:register_dataset": (
         "Register datasets with task eligibility checks",
         "Register a named dataset, its loader, the supported-task validation callback, "
@@ -493,11 +509,11 @@ def action_label(node: dict, name: str, path: str) -> str:
     if name == "canonicalize_behavior":
         return "Normalize experiment behavior labels for " + scope
     if name.startswith("from_") and owner:
-        return "Build " + owner + " from " + human(name[5:]).lower()
+        return "Build " + owner + " from " + human(name[5:])
     words = name.lstrip("_").split("_", 1)
     verb = VERBS.get(words[0].lower())
     if verb and len(words) > 1:
-        return verb + " " + human(words[1]).lower() + " for " + scope
+        return verb + " " + human(words[1]) + " for " + scope
     if verb:
         return verb + " " + scope
     # The Chinese source annotation supplies a semantic operation verb.
@@ -567,7 +583,7 @@ def evidence_action(node: dict, name: str, path: str) -> str:
     if chinese.startswith("为") and not name.startswith("attach_"):
         prefix = "Prepare"
     # Source symbol and module scope remain visible in the expanded Code panel.
-    subject = human(name).lower()
+    subject = human(name)
     if name in {"main", "__main__"}:
         subject = "the entry point"
     if name.endswith(("_path", "_dir", "_root")) and prefix in {"Process", "Handle"}:
