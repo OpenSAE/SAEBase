@@ -26,6 +26,8 @@ def audit(graphs: dict) -> dict:
         if edge["type"] == "contains":
             children[edge["source"]].append(edge["target"])
     summary_counts = Counter(normalize(n.get("summary", "")) for n in by_id.values())
+    template_by_kind = Counter()
+    repeated_by_kind = Counter()
     issues = defaultdict(list)
     for node in by_id.values():
         title = normalize(node.get("title"))
@@ -35,6 +37,7 @@ def audit(graphs: dict) -> dict:
             issues["duplicated_explanation"].append(node["id"])
         if summary.startswith("负责") and "源码依据和调用参数" in node.get("summary", ""):
             issues["template_summary"].append(node["id"])
+            template_by_kind[node.get("kind", "unknown")] += 1
         if title and summary and (title == summary or summary == "负责" + title):
             issues["tautological_purpose"].append(node["id"])
     for parent, ids in children.items():
@@ -47,6 +50,9 @@ def audit(graphs: dict) -> dict:
             for keys in texts.values():
                 if len(keys) > 1:
                     issues["repeated_sibling_" + field].append({"parent": parent, "members": keys})
+                    if field == "title":
+                        for key in keys:
+                            repeated_by_kind[by_id[key].get("kind", "unknown")] += 1
         parent_title = normalize(by_id.get(parent, {}).get("title"))
         parent_summary = normalize(by_id.get(parent, {}).get("summary"))
         for key in ids:
@@ -60,6 +66,8 @@ def audit(graphs: dict) -> dict:
     return {
         "code_nodes": len(by_id),
         "counts": {k: len(v) for k, v in issues.items()},
+        "template_by_kind": dict(template_by_kind),
+        "repeated_members_by_kind": dict(repeated_by_kind),
         "top_repeated_summaries": [
             {
                 "count": count,
