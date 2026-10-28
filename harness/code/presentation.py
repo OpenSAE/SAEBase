@@ -378,11 +378,6 @@ def readable_code_tree(graph: dict) -> dict:
                     "value": symbol,
                     "signature": node.get("signature", ""),
                 },
-                {
-                    "type": "text",
-                    "label": "功能说明",
-                    "value": KEY_METHODS.get(node["id"], summary),
-                },
             ]
             if node["id"] in KEY_METHODS:
                 node["summary"] = KEY_METHODS[node["id"]]
