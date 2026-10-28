@@ -37,6 +37,18 @@ MODULES = {
     "saebase/registry.py": ("科研组件注册", "注册和查询模型、数据集与 SAE 任务。"),
     "saebase/runtime/train.py": ("SAE 任务执行入口", "校验配置并分派已登记的研究任务。"),
     "tasks/sae_runtime.py": ("七类 SAE 任务公共入口", "核验模型与数据并调用对应任务实现。"),
+    "tasks/benchmark/analyze.py": (
+        "分析 SAE 基准实验结果", "汇总基准任务的实际评测记录，形成可追溯的结果分析。"
+    ),
+    "tasks/benchmark/reliability/bootstrap.py": (
+        "估计 SAE 评测分数的置信区间", "重采样评测观测值并计算分数区间，表示结果的不确定程度。"
+    ),
+    "tasks/benchmark/reliability/discriminability.py": (
+        "衡量 SAE 指标的区分能力", "比较不同实验条件的指标分布，分析分数能否有效区分条件。"
+    ),
+    "tasks/benchmark/backend/adapters/localization.py": (
+        "接入 SAE 特征局部性评测", "连接局部性基准适配器并将测量结果整理为通用评测指标。"
+    ),
 }
 CLASSES = {
     "SAEBaseDataModule": ("NLP 数据管理", "装配来自独立 Prompt 来源的训练与评测记录。"),
