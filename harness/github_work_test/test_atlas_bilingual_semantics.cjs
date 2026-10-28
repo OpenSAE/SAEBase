@@ -131,6 +131,18 @@ for (const node of data.code.nodes) {
       "Generic English Code title for " + node.id + ": " + node.title);
   }
 }
+function foldedSource(id) {
+  const parentId = data.code.source_api_index?.[id];
+  if(!parentId)return null;
+  const owner = data.code.nodes.find(n => n.id === parentId);
+  if(!owner)return null;
+  for(const block of owner.attributes || []) {
+    if(block.type !== "source_interfaces")continue;
+    const found = (block.members || []).find(member => member.id === id);
+    if(found)return found;
+  }
+  return null;
+}
 for (const [id, verb] of [
   ["code:function:datasets.CounterFact.CounterFact:filtered_json_path", "Locate"],
   ["code:function:saebase.benchmarks.metrics.reconstruction:loss_recovered", "Compute"],
@@ -138,9 +150,14 @@ for (const [id, verb] of [
   ["code:module:datasets.controlled_inputs", "Implement"]
 ]) {
   const node = data.code.nodes.find(n => n.id === id);
-  assert(node?.title.startsWith(verb + " "), id + " lost its Chinese source action");
+  if(node)assert(node.title.startsWith(verb + " "), id + " lost its reviewed action");
+  else {
+    const source = foldedSource(id);
+    assert(source && source.path && source.attributes?.length,
+      id + " lost its underlying source identity and interface");
+  }
 }
-// Every source-reviewed benchmark module must retain its scientific action.
+// Every source-reviewed benchmark module retains its separately verified action.
 for (const [id, verb] of [
   ["code:module:tasks.benchmark.analyze", "Analyze"],
   ["code:module:tasks.benchmark.reliability.bootstrap", "Estimate"],
@@ -153,10 +170,13 @@ for (const [id, verb] of [
   assert(node.summary && node.summary !== node.title + ".",
     id + " has no independent semantic summary");
 }
-const technicalCase = data.code.nodes.find(n =>
-  n.id === "code:function:datasets.CounterFact.CounterFact:filtered_json_path");
-assert(technicalCase?.title.includes("JSON"),
+const technicalCaseId = "code:function:datasets.CounterFact.CounterFact:filtered_json_path";
+const technicalCase = data.code.nodes.find(n => n.id === technicalCaseId);
+if(technicalCase)assert(technicalCase.title.includes("JSON"),
   "English Code title lowercased the JSON acronym");
+else assert(foldedSource(technicalCaseId)?.source_symbol === "filtered_json_path",
+  "Folded technical source identifier changed");
+
 localize("zh");
 
 assert.equal(counts.nodes, Object.values(original).reduce((n, t) => n + t.nodes.length, 0));
