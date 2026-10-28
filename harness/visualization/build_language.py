@@ -140,6 +140,37 @@ PARAMETERS = {
     "feature_ids": "Selected SAE feature indices.",
     "output": "Output artifact destination.",
     "argv": "Command-line arguments passed to the entry point.",
+    "K": "Number of SAE features selected for a coalition experiment.",
+    "M": "Number of coalition masks to sample and evaluate.",
+    "n_fit": "Number of sampled coalitions allocated to fitting.",
+    "readout_position": "Token position from which model logits are read; -1 selects the final token.",
+    "verify_replay": "Whether to check that replaying the unedited activation preserves the baseline logits.",
+    "require_affine_decode": "Whether to verify that selected SAE feature contributions decode additively.",
+    "identity": "Optional SAE checkpoint and activation-site identity metadata used for consistency checks.",
+    "p": "Sampling probability passed to the coalition generator.",
+}
+
+# These explanations are reviewed against the actual evaluate_sar implementation.
+# The key is a stable source symbol, not an English/Chinese sentence fragment.
+PARAMETER_CONTEXT = {
+    "evaluate_sar": {
+        "p": "Probability passed to the original SAR coalition sampler to control feature inclusion.",
+        "readout_position": "Token index for baseline and intervention logit readouts; -1 selects the last token.",
+        "verify_replay": "Checks that patching the captured, unedited activation reproduces baseline logits before evaluating coalitions.",
+        "identity": "Optional SAEIdentity metadata validated against the hook, layer and captured SAE dimensions; returned with the SAR result.",
+        "K": "Number of highest-absolute-activation SAE features selected for coalition analysis.",
+        "M": "Number of feature coalitions generated and evaluated with model patches.",
+        "n_fit": "Number of coalition samples assigned to fitting; the remaining samples are held out.",
+        "readout": "Function mapping the logits at the readout position to a single scalar response.",
+        "paper": "Original SAR paper module providing coalition sampling and the SAR estimator.",
+        "require_affine_decode": "Checks that ablating selected SAE features has additive effects on decoded activations.",
+        "site": "Activation hook and layer at which the SAE features are captured and edited.",
+        "model": "Model adapter used for activation capture and controlled logit evaluation.",
+        "sae": "Sparse autoencoder used to encode activations and decode feature edits.",
+        "prompt": "Optional text input to tokenize when explicit token IDs are not supplied.",
+        "tokens": "Optional pretokenized model input passed to the model adapter.",
+        "seed": "Random seed passed to the original SAR coalition sampler.",
+    }
 }
 
 
@@ -508,7 +539,16 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
     else:
         descendants = [by_id[c] for c in children.get(node["id"], []) if c in by_id]
         title = group_label(node, descendants, children, by_id)
-        summary = "Browse " + str(len(descendants)) + " source-backed child interfaces."
+        # A node's purpose is the supported operation, not the number of children.
+        # Derive its English explanation from the real source scope and title.
+        source_path = first_source_path(node["id"], children, by_id)
+        source_role = role(source_path) if source_path else "SAEBase research components"
+        if node["id"] == "code:root":
+            summary = "Navigate the implemented datasets, model adapters, SAE operations and shared research infrastructure."
+        elif node["id"].startswith("code:group:"):
+            summary = "Organize " + source_role + " by source-backed functional responsibilities."
+        else:
+            summary = "Group related " + source_role + " implementations within " + scope + "."
         reviewed_status = "source_hierarchy"
 
     interface = next(
@@ -641,6 +681,7 @@ def build() -> str:
         "docs": DOCS,
         "ui": UI,
         "parameter_meanings": PARAMETERS,
+        "parameter_context": PARAMETER_CONTEXT,
     }
     return (
         "/* Generated SAEBase-only English fields; do not edit by hand. */\n"
