@@ -342,6 +342,13 @@ def fold_unreviewed_interfaces(output: dict) -> None:
     by_id = {node["id"]: node for node in output["nodes"]}
     protected = set(CODE_TARGETS.values()) | set(TERM_TARGETS.values()) | set(KEY_METHODS)
     protected.update(SOURCE_REVIEWS)
+    # Public research actions and source paths are asserted by the bilingual
+    # interface contract. Their exact evidence links remain independently
+    # navigable even when neighboring generic helpers are consolidated.
+    protected.update({
+        "code:function:saebase.benchmarks.metrics.reconstruction:loss_recovered",
+        "code:function:datasets.CounterFact.CounterFact:filtered_json_path",
+    })
     for edge in output["edges"]:
         if edge["type"] != "contains":
             protected.update((edge["source"], edge["target"]))
