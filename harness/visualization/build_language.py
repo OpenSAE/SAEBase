@@ -143,79 +143,269 @@ PARAMETERS = {
 }
 
 
+# Stable reviewed descriptions for the most prominent SAEBase interfaces.
+# Add research-critical entries here only after inspecting the actual source.
+REVIEWED_CODE = {
+    "code:function:saebase.registry:register_dataset": (
+        "Register datasets with task eligibility checks",
+        "Register a named dataset, its loader, the supported-task validation callback, "
+        "and the evaluation split description in the shared registry.",
+    ),
+    "code:function:saebase.registry:register_model": (
+        "Register language models and compatibility rules",
+        "Store the model's constructor and compatibility checker under a registered name.",
+    ),
+    "code:function:saebase.registry:register_task": (
+        "Register a research task and its implementation",
+        "Bind a named research operation to its task implementation through the common registry.",
+    ),
+    "code:function:saebase.runner:run_task": (
+        "Dispatch a configured SAE research task",
+        "Select and execute the registered research task under the composed Hydra configuration.",
+    ),
+    "code:function:saebase.api.features:capture_features": (
+        "Capture model activations and encode SAE features",
+        "Read activations from a selected model site and encode the resulting sparse features.",
+    ),
+    "code:class:saebase.api.features:FeaturePatch": (
+        "Represent an SAE feature patch and its activation",
+        "Store the edited feature codes and corresponding model activation as one typed result.",
+    ),
+    "code:class:saebase.api.model:ActivationSite": (
+        "Identify the layer and hook used for activation capture",
+        "Represent a precise model activation site used by the adapter and SAE interfaces.",
+    ),
+    "code:class:saebase.api.model:ModelAdapter": (
+        "Adapt language models for activation reads and edits",
+        "Define the interface used to capture activations and evaluate edits for a selected model.",
+    ),
+    "code:function:models.gemma2_2b_base.model_task_dataset_compatibility:assert_compatible": (
+        "Check Gemma-2 2B compatibility with selected datasets and SAE tasks",
+        "Validate the selected research task, prompt source, and Gemma-2 2B model identity.",
+    ),
+}
+DATASET_NAMES = {
+    "BBH": "BIG-Bench Hard",
+    "CounterFact": "CounterFact",
+    "GreaterThan": "GreaterThan",
+    "IOI": "IOI",
+    "MMLUPro": "MMLU-Pro",
+    "SimpleCopying": "SimpleCopying",
+    "SubjectVerbAgreement": "Subject-Verb Agreement",
+}
+TASK_NAMES = {
+    "capture": "SAE activation capture",
+    "intervene": "teacher-forced SAE interventions",
+    "generate": "generation-time SAE steering",
+    "circuits": "circuit tracing",
+    "explain": "feature explanation",
+    "benchmark": "SAE benchmarking",
+    "train": "sparse autoencoder training",
+}
+MODULE_ACTIONS = {
+    "prepare": "Prepare inputs",
+    "tokenize": "Tokenize and filter prompts",
+    "registry": "Register and retrieve components",
+    "runner": "Dispatch registered operations",
+    "artifacts": "Manage versioned input artifacts",
+    "prompts": "Load and validate input prompts",
+    "contracts": "Validate interface contracts",
+    "schema": "Define and validate data records",
+    "results": "Store and inspect research results",
+    "loading": "Load validated model and SAE weights",
+    "experiment_paths": "Manage traceable experiment directories",
+}
+SOURCE_VERBS = (
+    "Load", "Read", "Return", "Build", "Construct", "Prepare", "Extract",
+    "Filter", "Calculate", "Compute", "Capture", "Decode", "Encode", "Generate",
+    "Validate", "Verify", "Compare", "Apply", "Record", "Save", "Write", "Run",
+    "Evaluate", "Configure", "Register", "Select", "Resolve", "Estimate",
+)
+SOURCE_REJECT = ("暂无", "请结合", "待审阅", "source-linked detail", "no verified")
+
+
 def human(identifier: str) -> str:
-    value = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", identifier)
-    return " ".join(x for x in re.split(r"[_\-\s]+", value) if x) or "component"
+    """Make source words readable while preserving technical abbreviations."""
+    value = re.sub(r"(?<=[A-Z])(?=[A-Z][a-z])", " ", identifier)
+    value = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", value)
+    parts = [word for word in re.split(r"[_\-\s]+", value.strip("_")) if word]
+    acronyms = {"sae", "llm", "api", "gpu", "cpu", "hf", "ioi", "rss", "sar",
+                "gpt", "kv", "nll", "id", "ids", "json", "yaml", "mmlu", "bbh"}
+    return " ".join(word.upper() if word.lower() in acronyms else word for word in parts) or "component"
 
 
 def role(path: str) -> str:
     for prefix, desc in ROLES:
         if path.startswith(prefix):
             return desc
-    return "project source interfaces"
+    return "research software interfaces"
+
+
+def domain(path: str) -> str:
+    parts = path.split("/")
+    if len(parts) >= 3 and parts[0] == "datasets":
+        return DATASET_NAMES.get(parts[1], human(parts[1])) + " examples"
+    if len(parts) >= 3 and parts[0] == "models":
+        name = parts[1]
+        return "Gemma-2 2B model" if name == "gemma2_2b_base" else human(name) + " model"
+    if len(parts) >= 3 and parts[0] == "tasks":
+        return TASK_NAMES.get(parts[1], human(parts[1]) + " research")
+    return role(path)
+
+
+def source_description(node: dict) -> str:
+    """Use source docstrings only where they are legible English evidence."""
+    value = str(node.get("technical_description") or "").strip()
+    if not value or CJK.search(value) or any(bad in value.lower() for bad in SOURCE_REJECT):
+        return ""
+    first = value.splitlines()[0].strip().strip(" *")
+    if len(first) < 18 or len(first) > 220 or "\ufffd" in first:
+        return ""
+    return first
+
+
+def action_label(node: dict, name: str, path: str) -> str:
+    scope = domain(path)
+    owner = ""
+    if node.get("kind") == "method":
+        owner = human(node["id"].rsplit(":", 1)[-1].rsplit(".", 1)[0])
+    if name == "to_dict":
+        return "Serialize " + (owner or scope) + " as a dictionary"
+    if name == "from_dict":
+        return "Reconstruct " + (owner or scope) + " from a dictionary"
+    if name == "__init__":
+        return "Initialize " + (owner or scope) + " state"
+    if name in {"default_data_dir", "data_dir"}:
+        return "Locate the default data directory for " + scope
+    if name == "assert_compatible":
+        return "Check task and dataset compatibility for " + scope
+    if name in {"n_states", "n_factors"}:
+        unit = "states" if name == "n_states" else "experimental factors"
+        return "Count " + unit + " in " + (owner or scope)
+    if name.startswith("from_") and owner:
+        return "Build " + owner + " from " + human(name[5:]).lower()
+    words = name.lstrip("_").split("_", 1)
+    verb = VERBS.get(words[0].lower())
+    if verb and len(words) > 1:
+        return verb + " " + human(words[1]).lower() + " for " + scope
+    if verb:
+        return verb + " " + scope
+    # An unrecognized symbol is described as a named interface, not assigned a
+    # guessed scientific effect.
+    return "Inspect " + human(name) + " interface for " + scope
+
+
+def group_label(node: dict, descendants: list[dict]) -> str:
+    node_id = node["id"]
+    if node_id == "code:root":
+        return "Explore SAEBase research implementations"
+    named = {
+        "code:group:datasets": "Browse prompt datasets and source preparation",
+        "code:group:models": "Browse language-model adapters and compatibility",
+        "code:group:saebase": "Browse SAEBase feature APIs, caches, and evaluation",
+        "code:group:tasks": "Browse SAE research tasks and execution",
+        "code:group:harness": "Browse research Harness and source verification",
+        "code:concrete:datasets": "Explore individual research datasets",
+        "code:concrete:models": "Explore individual language-model adapters",
+        "code:concrete:tasks": "Explore seven SAE research operations",
+    }
+    if node_id in named:
+        return named[node_id]
+    tokens = node_id.split(":")
+    if len(tokens) >= 4 and tokens[1] == "instance":
+        family = tokens[2]
+        label = human(tokens[3])
+        if family == "datasets":
+            return "Prepare and load " + DATASET_NAMES.get(tokens[3], label) + " prompts"
+        if family == "models":
+            return "Build and validate " + label + " language models"
+        if family == "tasks":
+            return "Execute " + TASK_NAMES.get(tokens[3], label) + " research operations"
+    selected = next((child for child in descendants if child.get("path")), {})
+    return "Browse " + domain(selected.get("path", "")) + " source interfaces"
 
 
 def make_code(node: dict, children: dict, by_id: dict) -> dict:
     kind = node.get("kind", "component")
     path = node.get("path") or node.get("source_path") or ""
     symbol = node.get("source_symbol") or ""
-    file_stem = path.rsplit("/", 1)[-1].removesuffix(".py")
-    name = symbol.rsplit(".", 1)[-1] if symbol else file_stem
-    context = role(path)
-    if kind in {"function", "method"}:
-        prefix = name.split("_", 1)[0].lower()
-        verb = VERBS.get(prefix)
-        label = (verb + " " + human(name[len(prefix) :].lstrip("_"))) if verb else human(name)
-        title = label.strip() + " · " + human(file_stem) + " (" + name + ")"
-        desc = (
-            "The Python "
-            + kind
-            + " "
-            + (symbol or name)
-            + " in "
-            + path
-            + " implements "
-            + context
-            + ". Its source signature, parameters, and return expressions are available below."
-        )
+    stem = path.rsplit("/", 1)[-1].removesuffix(".py")
+    name = symbol.rsplit(".", 1)[-1] if symbol else stem
+    scope = domain(path)
+    reviewed = REVIEWED_CODE.get(node["id"])
+    doc = source_description(node)
+    reviewed_status = "reviewed" if reviewed else ("source_docstring" if doc else "source_identity")
+    if reviewed:
+        title, summary = reviewed
+    elif kind in {"function", "method"}:
+        title = action_label(node, name, path)
+        if doc and len(doc) <= 120 and doc.split(" ", 1)[0] in SOURCE_VERBS:
+            title = doc.rstrip(".")
+        summary = doc or title + "."
     elif kind == "class":
-        title = human(name) + " · " + context
-        desc = (
-            "The class "
-            + name
-            + " in "
-            + path
-            + " implements "
-            + context
-            + ". Its declared fields and methods are available in the source details."
-        )
+        if name.endswith(("Config", "Cfg", "Options", "Spec")):
+            title = "Configure " + human(name) + " for " + scope
+        elif name.endswith(("Result", "Record", "Manifest", "Snapshot", "State")):
+            title = "Represent " + human(name) + " for " + scope
+        else:
+            title = "Provide " + human(name) + " for " + scope
+        summary = doc or title + "."
     elif kind == "module":
-        title = human(file_stem) + " · " + context
-        desc = (
-            "The module "
-            + path
-            + " implements "
-            + context
-            + ". Child nodes enumerate the actual Python definitions."
-        )
+        title = MODULE_ACTIONS.get(stem, "Read and execute " + human(stem) + " interfaces")
+        title += " for " + scope
+        if doc and len(doc) <= 120 and doc.split(" ", 1)[0] in SOURCE_VERBS:
+            title = doc.rstrip(".")
+        summary = doc or title + "."
     else:
         descendants = [by_id[c] for c in children.get(node["id"], []) if c in by_id]
-        first = next((x for x in descendants if x.get("path")), {})
-        category = role(path or first.get("path", ""))
-        title = category.capitalize() + " · " + human(node["id"].split(":")[-1])
-        desc = (
-            "This navigation group contains "
-            + str(len(descendants))
-            + " source-backed nodes associated with "
-            + category
-            + ". The child nodes retain their actual source identities."
-        )
+        title = group_label(node, descendants)
+        summary = "Browse " + str(len(descendants)) + " source-backed child interfaces."
+        reviewed_status = "source_hierarchy"
+
+    interface = next(
+        (item.get("interface") for item in node.get("attributes", [])
+         if item.get("type") == "interface" and item.get("interface")),
+        {},
+    )
+    args = [p.get("name", "") for p in interface.get("parameters", []) if p.get("name")]
+    returns = interface.get("returns") or {}
+    annotation = returns.get("annotation", "")
+    details = []
+    if args:
+        details.append("Declared inputs: " + ", ".join(args) + ".")
+    if annotation and annotation != "None":
+        details.append("Declared return type: " + annotation + ".")
+    if path:
+        details.append("Source: " + path + ".")
+    description = summary.rstrip(".") + "."
+    if details:
+        description += " " + " ".join(details)
     return {
         "title": title,
-        "summary": desc,
-        "description": desc,
-        "reader_explanation": desc,
+        "summary": summary,
+        "description": description,
+        "reader_explanation": description,
+        "translation_origin": reviewed_status,
     }
+
+
+def disambiguate_code_titles(nodes: dict, sources: dict) -> None:
+    """Prefer real subdomains for duplicate titles; never append raw symbols."""
+    duplicates = defaultdict(list)
+    for node_id, en in nodes.items():
+        duplicates[en["title"]].append(node_id)
+    for ids in duplicates.values():
+        if len(ids) == 1:
+            continue
+        for node_id in ids:
+            node = sources[node_id]
+            path = node.get("path") or node.get("source_path") or ""
+            section = human(path.rsplit("/", 1)[-1].removesuffix(".py"))
+            if node.get("kind") == "method":
+                section = human(node_id.rsplit(":", 1)[-1].rsplit(".", 1)[0])
+            nodes[node_id]["title"] += " in " + section
+    # A source location is unique even where duplicate methods share a name.
+    # Any remaining collisions are caught by stable IDs and the source panel.
 
 
 def build() -> str:
@@ -254,6 +444,7 @@ def build() -> str:
                     nodes[node["id"]] = {"title": title, "summary": summary, "description": summary}
         elif view == "code":
             nodes = {n["id"]: make_code(n, children, by_id) for n in graph["nodes"]}
+            disambiguate_code_titles(nodes, by_id)
         else:
             nodes = dict(trees["views"][view])
         if set(nodes) != set(by_id):
