@@ -44,7 +44,9 @@ for (const [view, tree] of Object.entries(graph)) {
       assert(!cjk.test(value) && !bad.test(value), "Invalid UTF-8 title or prose: " + node.id + "." + field);
     }
     if (view === "code" && ["module", "function", "class", "method"].includes(node.kind)) {
-      assert(fields.title.includes(" · "), "Code node title should include source context: " + node.id);
+      assert(!fields.title.includes(" · "), "Code title must be a readable action, not concatenated tokens: " + node.id);
+      assert(!/ in component$|^Source detail for /.test(fields.title),
+        "Code title must describe the real implementation: " + node.id);
       assert(node.path && fields.description.includes(node.path),
         "Code explanation must cite actual source: " + node.id);
     }

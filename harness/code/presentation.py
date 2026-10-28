@@ -230,7 +230,7 @@ CODE_ROLES = (
     ("intervene", "特征干预与生成", r"\b(?:interven(?:e|tion|tions)|edit(?:s|ing)?|patch(?:es|ing)?|steer(?:ing)?|generat(?:e|ion|ive|or)|forward|infer(?:ence)?)\b"),
     ("circuit", "电路追踪与归因", r"\b(?:circuits?|attribut(?:e|ion)|trac(?:e|ing|er)|gradients?|residuals?)\b"),
     ("explain", "解释与假设检验", r"\b(?:explain|explanations?|interpret(?:ation|er)?|hypothes(?:is|es))\b"),
-    ("evaluation", "指标、对照与评测", r"\b(?:benchmarks?|benchmarking|metrics?|evaluat(?:e|ion|ions)|scores?|assess(?:ment)?|loss(?:es)?|auroc|reports?|reporting|reliab(?:ility|le)|rank(?:ing)?|truth)\b"),
+    ("evaluation", "指标、对照与评测", r"\b(?:benchmarks?|benchmarking|metrics?|evaluat(?:e|ion|ions)|scores?|assess(?:ment)?|loss(?:es)?|auroc|reports?|reporting|reliab(?:ility|le)|rank(?:ing)?|reconstruct(?:ion|s|ed|ing)?|truth)\b"),
     ("training", "训练与参数更新", r"\b(?:train(?:ing|er)?|optim(?:ize|ization|izer)|schedul(?:er|e|ing)|backward|fit|epochs?|checkpoints?|learn(?:ing)?)\b"),
     ("data", "数据、产物与存储", r"\b(?:data(?:set|sets)?|prompts?|artifacts?|manifests?|shards?|store|files?|paths?|read|write|save|load|collect)\b"),
     ("contract", "约束、校验与配置", r"\b(?:validat(?:e|ion|or)|checks?|verif(?:y|ication)|guard|configs?|configuration|schema|contracts?|requires?|assert|policy)\b"),
