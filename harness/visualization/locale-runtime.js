@@ -61,9 +61,9 @@
       const linked = parent?.symbol_id && projection.nodes?.code?.[parent.symbol_id];
       if (linked?.title) return linked.title;
       if (parent?.interface?.name) return "Interface: " + parent.interface.name;
-      if (parent?.name) return "Source field: " + parent.name;
-      if (parent?.path) return "Source: " + parent.path;
-      return "Source detail for " + name;
+      if (parent?.name) return parent.name;
+      if (parent?.path) return parent.path;
+      return en.title;
     }
     if (key === "purpose" || key === "description" || key === "summary" ||
         key === "reader_explanation" || key === "technical_description") {
