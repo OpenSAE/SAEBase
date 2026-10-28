@@ -1139,8 +1139,8 @@
       content.setAttribute("aria-label",node.title+" 的完整解释与证据");
       const extraExplanation=plain(node.reader_explanation || "");
       if(extraExplanation &&
-          extraExplanation.replace(/\\s+/g,"") !==
-          plain(node.summary || "").replace(/\\s+/g,"")){
+          extraExplanation.replace(/\s+/g,"") !==
+          plain(node.summary || "").replace(/\s+/g,"")){
         const intro=attributeSection(content,"这个节点在做什么");
         intro.appendChild(el("p","node-attribute-text",extraExplanation));
       }
@@ -1618,8 +1618,8 @@
           partial:"Partial",implemented:"Implemented"})[n.status] || "Unknown"));
     area.appendChild(status);
     const extra=plain(n.reader_explanation || "");
-    if(extra && extra.replace(/\\s+/g,"") !==
-        plain(n.summary || "").replace(/\\s+/g,"")){
+    if(extra && extra.replace(/\s+/g,"") !==
+        plain(n.summary || "").replace(/\s+/g,"")){
       area.appendChild(el("p","detail-description",extra));
     }
     if(n.context_term_ids?.length){
