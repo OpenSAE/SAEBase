@@ -42,6 +42,22 @@ jobs:
           python harness/visualization/build_language.py
           python harness/visualization/build_language.py --check
           python harness/visualization/build_pages.py --check
+      - name: Audit functional Code Tree fanout
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+          text = Path("harness/visualization/data.js").read_text(encoding="utf-8")
+          graph = json.loads(text.split("window.OPENRESEARCH_ATLAS = ", 1)[1].strip().removesuffix(";"))
+          code = graph["code"]
+          parent_counts = Counter(e["source"] for e in code["edges"] if e["type"] == "contains")
+          excess = {k: v for k, v in parent_counts.items() if v > 20}
+          assert not excess, f"Code functional hierarchy exceeds 20 direct children: {excess}"
+          direct = parent_counts["code:group:saebase"]
+          assert 10 <= direct <= 20, f"Expected conceptual categories, got {direct}"
+          print("Code concept hierarchy accepted; root categories:", direct)
+          PY
       - name: Check interactive Atlas JavaScript
         run: |
           node --check harness/visualization/app.js
