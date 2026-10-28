@@ -9,6 +9,16 @@
     throw new Error("SAEBase Atlas locale and graph project identities do not agree");
   }
 
+  // Previous static snapshots can retain locale records for removed batch
+  // nodes. Only real, currently displayed Atlas IDs are part of a locale.
+  for (const [view, graph] of Object.entries(graphs)) {
+    const visible = new Set((graph.nodes || []).map(node => node.id));
+    const records = projection.nodes?.[view] || {};
+    for (const nodeId of Object.keys(records)) {
+      if (!visible.has(nodeId)) delete records[nodeId];
+    }
+  }
+
   const original = new WeakMap();
   const CJK = /[\u3400-\u9fff]/;
   const skip = new Set(["code", "signature", "annotation", "assignment",
