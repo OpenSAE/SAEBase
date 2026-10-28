@@ -140,6 +140,19 @@ for (const [id, verb] of [
   const node = data.code.nodes.find(n => n.id === id);
   assert(node?.title.startsWith(verb + " "), id + " lost its Chinese source action");
 }
+// Every source-reviewed benchmark module must retain its scientific action.
+for (const [id, verb] of [
+  ["code:module:tasks.benchmark.analyze", "Analyze"],
+  ["code:module:tasks.benchmark.reliability.bootstrap", "Estimate"],
+  ["code:module:tasks.benchmark.reliability.discriminability", "Measure"],
+  ["code:module:tasks.benchmark.backend.adapters.localization", "Integrate"]
+]) {
+  const node = data.code.nodes.find(n => n.id === id);
+  assert(node?.title.startsWith(verb + " "),
+    id + " lost its reviewed English research action");
+  assert(node.summary && node.summary !== node.title + ".",
+    id + " has no independent semantic summary");
+}
 const technicalCase = data.code.nodes.find(n =>
   n.id === "code:function:datasets.CounterFact.CounterFact:filtered_json_path");
 assert(technicalCase?.title.includes("JSON"),
