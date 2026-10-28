@@ -463,6 +463,7 @@ def group_label(node: dict, descendants: list[dict], children: dict, by_id: dict
         return "Browse " + domain(first.get("path") or source) + " source interfaces"
     return "Browse source-backed SAEBase component interfaces"
 
+
 def make_code(node: dict, children: dict, by_id: dict) -> dict:
     kind = node.get("kind", "component")
     path = node.get("path") or node.get("source_path") or ""
