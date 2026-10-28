@@ -996,6 +996,30 @@
         "term.sae",
         "term.sparse_autoencoder"
       ]
+    },
+    "code:method:saebase.interventions.engine:BatchEngine.run": {
+      "source_path": "saebase/interventions/engine.py",
+      "source_symbol": "run",
+      "zh_title": "分批执行 SAE 特征干预测量",
+      "zh_summary": "在计算预算内组织基线与编辑前向计算，处理微批重试，并写入可恢复的干预测量结果。",
+      "en_title": "Run batched SAE intervention measurements",
+      "en_summary": "Schedule baseline and edited model forwards within a run budget, retry microbatches, and save resumable intervention measurements.",
+      "context_term_ids": [
+        "term.sae",
+        "term.sae.intervene"
+      ]
+    },
+    "code:method:saebase.registry:TaskModule.run": {
+      "source_path": "saebase/registry.py",
+      "source_symbol": "run",
+      "zh_title": "定义 Hydra 科研任务的执行契约",
+      "zh_summary": "声明任务必须接收 DictConfig 配置并返回 EvaluationResult，具体计算由各注册任务实现。",
+      "en_title": "Define the Hydra research task execution contract",
+      "en_summary": "Declare the abstract task method that receives DictConfig and returns EvaluationResult, implemented by registered task modules.",
+      "context_term_ids": [
+        "term.task",
+        "term.hydra"
+      ]
     }
   }
 }
