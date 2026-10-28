@@ -134,12 +134,16 @@ for (const node of data.code.nodes) {
 for (const [id, verb] of [
   ["code:function:datasets.CounterFact.CounterFact:filtered_json_path", "Locate"],
   ["code:function:saebase.benchmarks.metrics.reconstruction:loss_recovered", "Compute"],
-  ["code:class:datasets.controlled_inputs:BinaryFactor", "Manage"],
+  ["code:class:datasets.controlled_inputs:BinaryFactor", "Define"],
   ["code:module:datasets.controlled_inputs", "Implement"]
 ]) {
   const node = data.code.nodes.find(n => n.id === id);
   assert(node?.title.startsWith(verb + " "), id + " lost its Chinese source action");
 }
+const technicalCase = data.code.nodes.find(n =>
+  n.id === "code:function:datasets.CounterFact.CounterFact:filtered_json_path");
+assert(technicalCase?.title.includes("JSON"),
+  "English Code title lowercased the JSON acronym");
 localize("zh");
 
 assert.equal(counts.nodes, Object.values(original).reduce((n, t) => n + t.nodes.length, 0));
