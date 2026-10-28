@@ -909,6 +909,26 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
         summary = node["english_summary"]
         doc = node["english_description"]
         reviewed_status = "context_grounded_concept"
+    elif kind == "module" and path.startswith("models/") and len(path.split("/")) == 3:
+        family, filename = path.split("/")[1:]
+        if filename == family + ".py":
+            title = "Load model specifications and checkpoint candidates"
+            summary = (
+                "Declare the BaseModelSpec, weight candidates, and model loading "
+                "entry points for the registered language model."
+            )
+        elif filename == "model_task_dataset_compatibility.py":
+            title = "Validate supported SAE tasks and prompt sources"
+            summary = (
+                "Check the model's registered task keys and allowable dataset "
+                "or prompt-source combinations against the request."
+            )
+        else:
+            title, summary = (
+                evidence_action(node, stem, path),
+                doc or "Expose source-defined model interfaces.",
+            )
+        reviewed_status = "source_checked_model_role"
     elif reviewed:
         title, summary = reviewed
     elif kind in {"function", "method"}:
