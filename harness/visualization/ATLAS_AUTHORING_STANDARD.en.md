@@ -91,3 +91,10 @@ All repository links resolve to the correct public project and actual file paths
 **Permitted:** original-language code comments explicitly labeled as verbatim source, English-only Markdown, unknown hardware measurements, and scientific questions remaining unverified.
 
 The acceptance report records exact repository commits, per-tree node counts, Chinese/English coverage, mapped documents, browser/CI evidence, both independent public URLs, and any remaining blockers. Implementation scripts and validators must link back to this document.
+
+## Concept-based Code Tree contract
+
+- Organize the `saebase/` modules into fifteen reviewed functional research domains and grounded subdomains. The authoritative catalog is `harness/code/atlas_concepts.json`; `harness/code/functional_taxonomy.py` validates membership and builds the hierarchy.
+- A concept node is an evidenced functional responsibility, not a source-range or count-based navigation placeholder. It must have a distinct purpose, valid Context term IDs, real Python source evidence, and reviewed Chinese/English titles and explanations. Missing, overlapping, empty, or duplicated classifications fail generation.
+- Each parent must have no more than **20 real direct children**, with **10 preferred**. Client-side pagination improves readability but cannot substitute for functional classification. Never invent conceptual nodes from line positions, alphabetical ranges, or Work Plan numbers.
+- Multiple real modules may support a single concept. Preserve their AST IDs, signatures, source paths, methods, and original implementation. New source modules require explicit Context-grounded membership before publication.
