@@ -344,6 +344,190 @@
       "zh_summary": "在验证批次启动时显示验证状态与当前 DataLoader 编号。",
       "en_title": "Update validation-batch progress context",
       "en_summary": "Set the displayed validation or sanity-check label and DataLoader index."
+    },
+    "code:module:saebase.research_lab.backend.acquire": {
+      "source_path": "saebase/research_lab/backend/acquire.py",
+      "source_symbol": "saebase/research_lab/backend/acquire.py",
+      "zh_title": "从指定版本导出研究数据源",
+      "zh_summary": "通过 CPU 流式导出十个来源的数据，并记录修订哈希与授权审阅状态。",
+      "en_title": "Export pinned research dataset sources",
+      "en_summary": "Stream source datasets on CPU and retain revision hashes and licensing review metadata."
+    },
+    "code:module:saebase.research_lab.backend.api": {
+      "source_path": "saebase/research_lab/backend/api.py",
+      "source_symbol": "saebase/research_lab/backend/api.py",
+      "zh_title": "提供 Research Lab 研究浏览与查询接口",
+      "zh_summary": "通过 FastAPI 暴露数据集、特征记录、实验报告及受控 GPU 作业入口。",
+      "en_title": "Serve Research Lab exploration APIs",
+      "en_summary": "Expose source-bound datasets, feature observations, reports, and explicitly gated job requests."
+    },
+    "code:module:saebase.research_lab.backend.auto_interp": {
+      "source_path": "saebase/research_lab/backend/auto_interp.py",
+      "source_symbol": "saebase/research_lab/backend/auto_interp.py",
+      "zh_title": "生成特征解释候选并验证留出数据",
+      "zh_summary": "接收研究者提供的生成器和预测器，输出带来源的解释假设及留出测试记录。",
+      "en_title": "Propose feature interpretations with held-out checks",
+      "en_summary": "Use researcher-supplied generator and predictor callbacks to test source-identified feature hypotheses."
+    },
+    "code:module:saebase.research_lab.backend.auto_interp_local": {
+      "source_path": "saebase/research_lab/backend/auto_interp_local.py",
+      "source_symbol": "saebase/research_lab/backend/auto_interp_local.py",
+      "zh_title": "使用本地模型执行 SAE 特征解释",
+      "zh_summary": "将已加载的指令模型接入特征解释流程，对真实激活样本计算留出预测。",
+      "en_title": "Interpret SAE features with a local model",
+      "en_summary": "Connect a local instruction model to source-identified feature examples and held-out scoring."
+    },
+    "code:module:saebase.research_lab.backend.controlled_designs": {
+      "source_path": "saebase/research_lab/backend/controlled_designs.py",
+      "source_symbol": "saebase/research_lab/backend/controlled_designs.py",
+      "zh_title": "构建六因素受控输入设计",
+      "zh_summary": "创建两套完整的六因素状态表，供局部性实验与数学对照使用。",
+      "en_title": "Construct six-factor controlled input designs",
+      "en_summary": "Generate complete factor-state grids and a mathematical control for localization experiments."
+    },
+    "code:module:saebase.research_lab.backend.core": {
+      "source_path": "saebase/research_lab/backend/core.py",
+      "source_symbol": "saebase/research_lab/backend/core.py",
+      "zh_title": "校验已发布研究证据的真实来源",
+      "zh_summary": "以只读方式读取已存档的观测，核对模型身份、内容哈希和结果协议。",
+      "en_title": "Validate provenance of published Research Lab evidence",
+      "en_summary": "Read archived observations and verify their source identity and integrity checks."
+    },
+    "code:module:saebase.research_lab.backend.corpus_lock": {
+      "source_path": "saebase/research_lab/backend/corpus_lock.py",
+      "source_symbol": "saebase/research_lab/backend/corpus_lock.py",
+      "zh_title": "固定研究语料的版本与样本摘要",
+      "zh_summary": "记录十个上游修订、每个来源的样本指纹和统一批次摘要。",
+      "en_title": "Lock corpus revisions and sample fingerprints",
+      "en_summary": "Bind upstream commits to deterministic sample digests and a redacted corpus audit record."
+    },
+    "code:module:saebase.research_lab.backend.explore": {
+      "source_path": "saebase/research_lab/backend/explore.py",
+      "source_symbol": "saebase/research_lab/backend/explore.py",
+      "zh_title": "探索实际 SAE 特征与 Token 轨迹",
+      "zh_summary": "读取带校验和的特征轨迹并组织模型 Token 与稀疏激活的对应视图。",
+      "en_title": "Explore recorded SAE features and token traces",
+      "en_summary": "Inspect checksum-bound token trajectories and feature activation observations."
+    },
+    "code:module:saebase.research_lab.backend.feature_store": {
+      "source_path": "saebase/research_lab/backend/feature_store.py",
+      "source_symbol": "saebase/research_lab/backend/feature_store.py",
+      "zh_title": "建立 SAE 特征检索的 SQLite 索引",
+      "zh_summary": "以经核验的真实测量记录构建只读检索数据库，支持大字典特征查询。",
+      "en_title": "Build the SQLite index for SAE feature browsing",
+      "en_summary": "Index checkpoint-verified observations for scalable read-only feature searches."
+    },
+    "code:module:saebase.research_lab.backend.ingest": {
+      "source_path": "saebase/research_lab/backend/ingest.py",
+      "source_symbol": "saebase/research_lab/backend/ingest.py",
+      "zh_title": "导入本地数据集与 SAE 测量记录",
+      "zh_summary": "校验已导出数据、样本身份和真实激活，并以结构化格式保存研究输入。",
+      "en_title": "Ingest exported datasets and SAE observations",
+      "en_summary": "Validate and persist locally exported samples and checkpoint-identified activation records."
+    },
+    "code:module:saebase.research_lab.backend.jobs": {
+      "source_path": "saebase/research_lab/backend/jobs.py",
+      "source_symbol": "saebase/research_lab/backend/jobs.py",
+      "zh_title": "维护可恢复的私有研究作业队列",
+      "zh_summary": "通过 SQLite 保存幂等作业、租期和重试状态，使用哈希引用私人输入。",
+      "en_title": "Maintain a durable private research job queue",
+      "en_summary": "Track idempotent job leases, retries, and private input references in SQLite."
+    },
+    "code:module:saebase.research_lab.backend.methods": {
+      "source_path": "saebase/research_lab/backend/methods.py",
+      "source_symbol": "saebase/research_lab/backend/methods.py",
+      "zh_title": "适配 SAR、RSS 与局部性评估器",
+      "zh_summary": "加载固定版本的原始研究实现，在已存档的真实测量上调用估计器。",
+      "en_title": "Adapt pinned SAR, RSS, and localization estimators",
+      "en_summary": "Invoke pinned original estimators against source-identified saved measurements."
+    },
+    "code:module:saebase.research_lab.backend.near_duplicates": {
+      "source_path": "saebase/research_lab/backend/near_duplicates.py",
+      "source_symbol": "saebase/research_lab/backend/near_duplicates.py",
+      "zh_title": "筛查研究 Prompt 的词汇近重复",
+      "zh_summary": "根据 Token 词组重合度计算候选样本之间的近重复分数与样本索引。",
+      "en_title": "Screen lexical near-duplicates among prompts",
+      "en_summary": "Compare token shingles and report overlap scores for candidate sample identities."
+    },
+    "code:module:saebase.research_lab.backend.plan": {
+      "source_path": "saebase/research_lab/backend/plan.py",
+      "source_symbol": "saebase/research_lab/backend/plan.py",
+      "zh_title": "编译 GPU 研究任务与资源需求",
+      "zh_summary": "依据数据与模型身份生成确定性的任务 Manifest，记录待执行作业及输入条件。",
+      "en_title": "Compile the GPU research execution manifest",
+      "en_summary": "Construct deterministic job plans from dataset identities and verified resource requirements."
+    },
+    "code:module:saebase.research_lab.backend.private_api": {
+      "source_path": "saebase/research_lab/backend/private_api.py",
+      "source_symbol": "saebase/research_lab/backend/private_api.py",
+      "zh_title": "保护私有实验作业的 API 边界",
+      "zh_summary": "核验操作员和 Worker 的访问凭据，为队列创建受权限保护的请求接口。",
+      "en_title": "Authorize private research job APIs",
+      "en_summary": "Validate separate operator and worker credentials before exposing private job requests."
+    },
+    "code:module:saebase.research_lab.backend.private_worker": {
+      "source_path": "saebase/research_lab/backend/private_worker.py",
+      "source_symbol": "saebase/research_lab/backend/private_worker.py",
+      "zh_title": "执行身份校验后的 SAE 私有干预作业",
+      "zh_summary": "在本地原始模型与 SAE 权重上运行获授权的教师强制编辑，返回结果身份摘要。",
+      "en_title": "Execute private, identity-bound SAE intervention jobs",
+      "en_summary": "Run approved teacher-forced feature edits with local weights and return result digests."
+    },
+    "code:module:saebase.research_lab.backend.publish": {
+      "source_path": "saebase/research_lab/backend/publish.py",
+      "source_symbol": "saebase/research_lab/backend/publish.py",
+      "zh_title": "发布带审批与版本身份的实验摘要",
+      "zh_summary": "核验公开授权、结果类型和来源协议后写入不可变研究报告。",
+      "en_title": "Publish reviewed immutable research summaries",
+      "en_summary": "Require explicit approval and provenance metadata before writing public result records."
+    },
+    "code:module:saebase.research_lab.backend.published_wp12": {
+      "source_path": "saebase/research_lab/backend/published_wp12.py",
+      "source_symbol": "saebase/research_lab/backend/published_wp12.py",
+      "zh_title": "读取已批准的历史工程验证记录",
+      "zh_summary": "按受控类别返回已发布的干预、基准、训练和电路验证产物。",
+      "en_title": "Read approved historical research evidence cards",
+      "en_summary": "Serve approved intervention, benchmark, training, and circuit artifacts by category."
+    },
+    "code:module:saebase.research_lab.backend.readouts": {
+      "source_path": "saebase/research_lab/backend/readouts.py",
+      "source_symbol": "saebase/research_lab/backend/readouts.py",
+      "zh_title": "校验完整序列评分与输入对齐",
+      "zh_summary": "核查逐 Token 概率、候选续写及输入锚点，汇总任务读出分数。",
+      "en_title": "Validate sequence readouts and input alignment",
+      "en_summary": "Check per-token log-probability records and aligned candidate continuation scores."
+    },
+    "code:module:saebase.research_lab.backend.source_audit": {
+      "source_path": "saebase/research_lab/backend/source_audit.py",
+      "source_symbol": "saebase/research_lab/backend/source_audit.py",
+      "zh_title": "审查多来源数据集的取样与身份",
+      "zh_summary": "按固定修订审核十个语料来源，导出样本哈希及输入审查结果。",
+      "en_title": "Audit source-pinned dataset sample batches",
+      "en_summary": "Verify sample identities and export redacted findings for ten upstream sources."
+    },
+    "code:module:saebase.research_lab.backend.transforms": {
+      "source_path": "saebase/research_lab/backend/transforms.py",
+      "source_symbol": "saebase/research_lab/backend/transforms.py",
+      "zh_title": "构建 RSS 特征响应的输入变体",
+      "zh_summary": "依据基础 Prompt 形成受控变换候选，并划分选择与留出实现。",
+      "en_title": "Construct controlled RSS prompt variants",
+      "en_summary": "Generate proposed prompt transformations and assign selection versus held-out variants."
+    },
+    "code:module:saebase.research_lab.backend.variant_audit": {
+      "source_path": "saebase/research_lab/backend/variant_audit.py",
+      "source_symbol": "saebase/research_lab/backend/variant_audit.py",
+      "zh_title": "核对 RSS 变体的数量与来源身份",
+      "zh_summary": "汇总每条基础 Prompt 的变换候选，并输出可核查的变体哈希统计。",
+      "en_title": "Audit RSS proposal counts and identities",
+      "en_summary": "Summarize generated variant hashes and identities for frozen prompt sources."
+    },
+    "code:module:saebase.research_lab.backend.wp15_records": {
+      "source_path": "saebase/research_lab/backend/wp15_records.py",
+      "source_symbol": "saebase/research_lab/backend/wp15_records.py",
+      "zh_title": "读取五类已测量研究结果卡片",
+      "zh_summary": "按基准、训练、生成、解释与电路类别读取已存档的数值记录。",
+      "en_title": "Read five categories of recorded research metrics",
+      "en_summary": "Load source-verified measurement cards for benchmark, training, generation, interpretation, and circuits."
     }
   }
 }
