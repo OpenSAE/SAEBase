@@ -487,7 +487,7 @@
       "id": "g.sae.sar_adapter",
       "type": "goal",
       "title": "适配 SAR 特征组合性评测",
-      "description": "代码方法：适配 SAR 特征组合性评测。依据位于 tasks/benchmark/integrations/sar.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "description": "针对选定 SAE 特征集合构造保留或消融的 Coalition，通过模型补丁收集标量响应，并调用原始 SAR 估计器评估组合性。",
       "status": "implemented",
       "evidence": [
         "tasks/benchmark/integrations/sar.py"
@@ -504,7 +504,7 @@
       "id": "g.sae.rss_adapter",
       "type": "goal",
       "title": "适配 RSS 特征响应评测",
-      "description": "代码方法：适配 RSS 特征响应评测。依据位于 tasks/benchmark/integrations/rss.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "description": "分别捕获干净 Prompt、选择变体与留出变体的 SAE 编码，记录特征响应方向和支持集，并调用原始 RSS 估计器评估稳定性。",
       "status": "implemented",
       "evidence": [
         "tasks/benchmark/integrations/rss.py"
