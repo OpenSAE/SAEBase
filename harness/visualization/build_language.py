@@ -216,10 +216,34 @@ MODULE_ACTIONS = {
     "experiment_paths": "Manage traceable experiment directories",
 }
 SOURCE_VERBS = (
-    "Load", "Read", "Return", "Build", "Construct", "Prepare", "Extract",
-    "Filter", "Calculate", "Compute", "Capture", "Decode", "Encode", "Generate",
-    "Validate", "Verify", "Compare", "Apply", "Record", "Save", "Write", "Run",
-    "Evaluate", "Configure", "Register", "Select", "Resolve", "Estimate",
+    "Load",
+    "Read",
+    "Return",
+    "Build",
+    "Construct",
+    "Prepare",
+    "Extract",
+    "Filter",
+    "Calculate",
+    "Compute",
+    "Capture",
+    "Decode",
+    "Encode",
+    "Generate",
+    "Validate",
+    "Verify",
+    "Compare",
+    "Apply",
+    "Record",
+    "Save",
+    "Write",
+    "Run",
+    "Evaluate",
+    "Configure",
+    "Register",
+    "Select",
+    "Resolve",
+    "Estimate",
 )
 SOURCE_REJECT = ("暂无", "请结合", "待审阅", "source-linked detail", "no verified")
 
@@ -229,9 +253,30 @@ def human(identifier: str) -> str:
     value = re.sub(r"(?<=[A-Z])(?=[A-Z][a-z])", " ", identifier)
     value = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", value)
     parts = [word for word in re.split(r"[_\-\s]+", value.strip("_")) if word]
-    acronyms = {"sae", "llm", "api", "gpu", "cpu", "hf", "ioi", "rss", "sar",
-                "gpt", "kv", "nll", "id", "ids", "json", "yaml", "mmlu", "bbh"}
-    return " ".join(word.upper() if word.lower() in acronyms else word for word in parts) or "component"
+    acronyms = {
+        "sae",
+        "llm",
+        "api",
+        "gpu",
+        "cpu",
+        "hf",
+        "ioi",
+        "rss",
+        "sar",
+        "gpt",
+        "kv",
+        "nll",
+        "id",
+        "ids",
+        "json",
+        "yaml",
+        "mmlu",
+        "bbh",
+    }
+    return (
+        " ".join(word.upper() if word.lower() in acronyms else word for word in parts)
+        or "component"
+    )
 
 
 def role(path: str) -> str:
@@ -363,8 +408,11 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
         reviewed_status = "source_hierarchy"
 
     interface = next(
-        (item.get("interface") for item in node.get("attributes", [])
-         if item.get("type") == "interface" and item.get("interface")),
+        (
+            item.get("interface")
+            for item in node.get("attributes", [])
+            if item.get("type") == "interface" and item.get("interface")
+        ),
         {},
     )
     args = [
