@@ -53,8 +53,22 @@ def test_saebase_concepts_are_meaningful_and_lossless() -> None:
         else:
             assert node["kind"] == "module", node_id
             seen_modules.append(node_id)
-    assert set(seen_modules) == source_modules
-    assert len(seen_modules) == len(source_modules), "Duplicated module assignment"
+    folded_modules = [
+        module["id"]
+        for node in visible["nodes"]
+        for attribute in node.get("attributes") or []
+        if attribute.get("type") == "source_modules"
+        for module in attribute.get("modules") or []
+        if module.get("path", "").startswith("saebase/")
+    ]
+    assert set(seen_modules) | set(folded_modules) == source_modules
+    assert len(seen_modules) + len(folded_modules) == len(source_modules), (
+        "Duplicated or missing module source membership"
+    )
+    assert all(
+        visible["source_interface_owners"].get(id_) in by_id
+        for id_ in folded_modules
+    )
     assert len(generated) >= 30
     assert not any(is_reexport_only(n) for n in visible["nodes"])
     assert sum(is_reexport_only(n) for n in source["nodes"]) >= 24
