@@ -30,7 +30,11 @@
     "保存的字段": "Stored field",
     "真实模型": "Actual model",
     "科研术语定义与源码依据": "Research terminology and source evidence",
-    "SAEBase Python 实现树": "SAEBase Python implementation tree"
+    "SAEBase Python 实现树": "SAEBase Python implementation tree",
+    "模块职责": "Module purpose", "完整模块": "Complete module source",
+    "类定义源码": "Class definition source",
+    "当前任务配置": "Current task configuration",
+    "配置文件来源": "Configuration file source"
   });
   window.SAEBASE_ATLAS_UI = labels;
 
@@ -43,6 +47,8 @@
   function translateString(value, key, parent, node, en) {
     if (!CJK.test(value) || skip.has(key)) return value;
     if (labels[value.trim()]) return labels[value.trim()];
+    const methodCount = value.match(/^类中全部方法 · (\d+) 个$/);
+    if (methodCount) return "Class methods (" + methodCount[1] + ")";
     const name = sourceName(node);
     if (key === "title" || key === "label") {
       if (parent?.interface?.name) return "Interface: " + parent.interface.name;
@@ -61,15 +67,14 @@
     }
     if (key === "meaning") {
       const field = parent?.name || "";
+      const owner = node?.source_symbol?.split(".").pop() || "";
+      const context = projection.parameter_context?.[owner];
+      if (field && context?.[field]) return context[field];
       if (field && projection.parameter_meanings[field])
         return projection.parameter_meanings[field];
-      if (field) {
-        const kind = parent?.annotation ? " (type " + parent.annotation + ")" : "";
-        return "The " + field + " value" + kind +
-          " is used by " + name + "; its behavior is defined in the source.";
-      }
-      return "Return value computed by " + name +
-        "; inspect the cited expression for exact behavior.";
+      // Do not fabricate semantics from an annotation or a source identifier.
+      // Unreviewed meanings are absent, while source signatures stay visible.
+      return "";
     }
     if (key === "value") return en.summary;
     if (key === "name" && parent?.path) return parent.path;
