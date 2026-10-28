@@ -917,20 +917,35 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
 
 # Source directory responsibilities, not ordinal or numbered navigation groups.
 SOURCE_AREA_NAMES = {
-    "cfg": "Hydra configuration", "extensions": "research extensions",
-    "api": "feature APIs", "sae": "SAE dictionaries", "store": "feature storage",
-    "runtime": "experiment execution", "benchmark": "SAE benchmarking",
-    "benchmarks": "SAE benchmarking", "metrics": "evaluation metrics",
-    "reliability": "statistical reliability", "integrations": "benchmark integration",
-    "backend": "execution backends", "adapters": "external adapters",
-    "training": "SAE training", "research_lab": "Research Lab",
-    "tools": "research verification", "generation": "text generation",
-    "vllm_backend": "vLLM generation", "data": "research data",
-    "saebase": "SAEBase infrastructure", "tasks": "SAE tasks",
-    "datasets": "prompt datasets", "models": "language models",
-    "capture": "activation capture", "intervene": "feature interventions",
-    "generate": "feature steering", "circuits": "circuit tracing",
-    "explain": "feature explanation", "train": "SAE training",
+    "cfg": "Hydra configuration",
+    "extensions": "research extensions",
+    "api": "feature APIs",
+    "sae": "SAE dictionaries",
+    "store": "feature storage",
+    "runtime": "experiment execution",
+    "benchmark": "SAE benchmarking",
+    "benchmarks": "SAE benchmarking",
+    "metrics": "evaluation metrics",
+    "reliability": "statistical reliability",
+    "integrations": "benchmark integration",
+    "backend": "execution backends",
+    "adapters": "external adapters",
+    "training": "SAE training",
+    "research_lab": "Research Lab",
+    "tools": "research verification",
+    "generation": "text generation",
+    "vllm_backend": "vLLM generation",
+    "data": "research data",
+    "saebase": "SAEBase infrastructure",
+    "tasks": "SAE tasks",
+    "datasets": "prompt datasets",
+    "models": "language models",
+    "capture": "activation capture",
+    "intervene": "feature interventions",
+    "generate": "feature steering",
+    "circuits": "circuit tracing",
+    "explain": "feature explanation",
+    "train": "SAE training",
 }
 
 
@@ -942,8 +957,7 @@ def source_responsibility(node: dict, depth: int = 1) -> str:
     if len(directories) <= 1:
         return human(segments[-1].removesuffix(".py")).lower() + " implementation"
     context = directories[-depth:]
-    words = [SOURCE_AREA_NAMES.get(item, human(item).lower() + " operations")
-             for item in context]
+    words = [SOURCE_AREA_NAMES.get(item, human(item).lower() + " operations") for item in context]
     return " and ".join(words)
 
 
@@ -960,8 +974,7 @@ def disambiguate_code_titles(nodes: dict, sources: dict) -> None:
         # navigation flattens those packages in a later release.
         qualifiers = {}
         for depth in range(1, 5):
-            qualifiers = {nid: source_responsibility(sources[nid], depth)
-                          for nid in ids}
+            qualifiers = {nid: source_responsibility(sources[nid], depth) for nid in ids}
             if len(set(qualifiers.values())) == len(ids):
                 break
         for node_id in ids:
