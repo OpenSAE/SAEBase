@@ -24,8 +24,8 @@ def similarity(left: str, right: str) -> float:
     a, b = normalized(left), normalized(right)
     if len(a) < 8 or len(b) < 8:
         return 0.0
-    x = {a[i:i + 2] for i in range(len(a) - 1)}
-    y = {b[i:i + 2] for i in range(len(b) - 1)}
+    x = {a[i : i + 2] for i in range(len(a) - 1)}
+    y = {b[i : i + 2] for i in range(len(b) - 1)}
     return len(x & y) / max(1, len(x | y))
 
 
@@ -78,33 +78,43 @@ def validate_all_trees(graphs: dict) -> dict:
             for id_ in members:
                 node = by_id.get(id_)
                 if node:
-                    groups[(normalized(node.get("title")), normalized(node.get("summary")))].append(id_)
+                    groups[(normalized(node.get("title")), normalized(node.get("summary")))].append(
+                        id_
+                    )
             for pair, ids in groups.items():
                 if len(ids) > 1:
                     hard.append((view, parent, "same sibling title and summary", ids))
                     counts["exact_duplicate_sibling_groups"] += 1
                     if len(examples["exact_duplicate_sibling_groups"]) < 60:
-                        examples["exact_duplicate_sibling_groups"].append({
-                            "parent": parent, "ids": ids,
-                        })
+                        examples["exact_duplicate_sibling_groups"].append(
+                            {
+                                "parent": parent,
+                                "ids": ids,
+                            }
+                        )
                     # One pair of identical text does not by itself prove
                     # equal scientific meaning; it is a consolidation candidate.
             for i, left_id in enumerate(members):
                 left = by_id.get(left_id)
                 if not left:
                     continue
-                for right_id in members[i + 1:]:
+                for right_id in members[i + 1 :]:
                     right = by_id.get(right_id)
                     if not right:
                         continue
                     score = similarity(left.get("summary", ""), right.get("summary", ""))
-                    if score >= 0.82 and normalized(left.get("summary")) != normalized(right.get("summary")):
+                    if score >= 0.82 and normalized(left.get("summary")) != normalized(
+                        right.get("summary")
+                    ):
                         counts["similar_sibling_purposes"] += 1
                         if len(examples["similar_sibling_purposes"]) < 12:
-                            examples["similar_sibling_purposes"].append({
-                                "parent": parent, "ids": [left_id, right_id],
-                                "score": round(score, 3),
-                            })
+                            examples["similar_sibling_purposes"].append(
+                                {
+                                    "parent": parent,
+                                    "ids": [left_id, right_id],
+                                    "score": round(score, 3),
+                                }
+                            )
         reports[view] = {
             "nodes": len(by_id),
             "counts": dict(counts),
@@ -120,5 +130,7 @@ if __name__ == "__main__":
 
     root = Path(__file__).resolve().parents[2]
     source = (root / "harness/visualization/data.js").read_text(encoding="utf-8")
-    graphs = json.loads(source.partition("window.OPENRESEARCH_ATLAS = ")[2].strip().removesuffix(";"))
+    graphs = json.loads(
+        source.partition("window.OPENRESEARCH_ATLAS = ")[2].strip().removesuffix(";")
+    )
     print("FIVE_TREE_SEMANTICS=" + json.dumps(validate_all_trees(graphs), ensure_ascii=False))
