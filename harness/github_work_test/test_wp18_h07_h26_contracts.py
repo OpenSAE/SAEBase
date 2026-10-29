@@ -52,21 +52,21 @@ def test_verifier_executes_correct_and_incorrect_candidate(tmp_path, monkeypatch
     monkeypatch.setattr(wp18_verify, "RUNS", tmp_path)
     source = sandbox / "implementation.py"
     source.write_text(
-        "def solve(payload):\\n"
-        "    paths = payload['paths']\\n"
-        "    if not isinstance(paths, list) or len(paths) != len(set(paths)):\\n"
-        "        raise ValueError('duplicate')\\n"
-        "    if any(not isinstance(x, str) or not x or x.startswith('/')\\n"
-        "           or any(p in ('', '.', '..') for p in x.split('/'))\\n"
-        "           for x in paths):\\n"
-        "        raise ValueError('bad path')\\n"
-        "    return {'paths': sorted(paths)}\\n",
+        "def solve(payload):\n"
+        "    paths = payload['paths']\n"
+        "    if not isinstance(paths, list) or len(paths) != len(set(paths)):\n"
+        "        raise ValueError('duplicate')\n"
+        "    if any(not isinstance(x, str) or not x or x.startswith('/')\n"
+        "           or any(p in ('', '.', '..') for p in x.split('/'))\n"
+        "           for x in paths):\n"
+        "        raise ValueError('bad path')\n"
+        "    return {'paths': sorted(paths)}\n",
         encoding="utf-8",
     )
     correct = wp18_verify.run_case("H07", sandbox)
     assert correct["failed"] == 0
     assert correct["passed"] >= 4
-    source.write_text("def solve(payload):\\n    return {'paths': []}\\n", encoding="utf-8")
+    source.write_text("def solve(payload):\n    return {'paths': []}\n", encoding="utf-8")
     faulty = wp18_verify.run_case("H07", sandbox)
     assert faulty["failed"] >= 2
     assert faulty["human_approved"] is False
@@ -77,8 +77,8 @@ def test_scope_audit_rejects_governance_and_old_run_changes(monkeypatch):
 
     def fake_run(*args, **kwargs):
         return types.SimpleNamespace(
-            stdout="A\\tharness/tests/wp18/runs/new-run/H07/implementation.py\\n"
-            "M\\tharness/contracts/catalog.json\\n"
+            stdout="A\tharness/tests/wp18/runs/new-run/H07/implementation.py\n"
+            "M\tharness/contracts/catalog.json\n"
         )
 
     monkeypatch.setattr(wp18_verify.subprocess, "run", fake_run)
