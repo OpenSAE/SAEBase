@@ -118,11 +118,15 @@ def test_shell_only_runs_scoped_pytest_not_governance_or_arbitrary_scripts():
         is None
     )
     assert hooks.gate("python3 -m pytest -p no:cacheprovider harness/tests/other_topic/test_sample.py") is None
+    assert hooks.gate("mkdir -p harness/tests/wp18/runs/example/H01") is None
     for command in (
         "python -m pytest -p no:cacheprovider -q harness/tests/../core/test_secrets.py",
         "python -m pytest -p no:cacheprovider -q harness/tests/wp18/acceptance/demo/H01/test_secret.py",
         "python -m pytest -q harness/github_work_test/test_atlas_semantic_audit.py",
         "mkdir -p novel_root",
+        "mkdir -p harness/tests/../../novel_root",
+        "mkdir -p harness/tests/wp18/acceptance/private",
+        "mkdir -p harness/tests/example && mkdir novel_root",
         "git clone https://example.com/project other_root",
         "python -c 'print(1)'",
     ):
