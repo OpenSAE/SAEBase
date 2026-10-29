@@ -1,0 +1,57 @@
+{
+  "positive": [
+    {
+      "input": {
+        "before": [
+          {
+            "id": "west",
+            "signature": "def west()"
+          }
+        ],
+        "after": [
+          {
+            "id": "west",
+            "signature": "def west(limit)"
+          },
+          {
+            "id": "east",
+            "signature": "def east()"
+          }
+        ]
+      },
+      "expected": {
+        "added": [
+          "east"
+        ],
+        "removed": [],
+        "changed": [
+          "west"
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "before": [
+          {
+            "id": "",
+            "signature": "x"
+          }
+        ],
+        "after": []
+      }
+    },
+    {
+      "input": {
+        "before": [],
+        "after": [
+          {
+            "id": "east",
+            "signature": 1
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "positive": [
+    {
+      "input": {
+        "project": "SAEBase",
+        "views": {
+          "core": {
+            "focus": "pile"
+          },
+          "environment": {
+            "focus": "meter"
+          }
+        },
+        "active": "core",
+        "next": "environment"
+      },
+      "expected": {
+        "active": "environment",
+        "views": {
+          "core": {
+            "focus": "pile"
+          },
+          "environment": {
+            "focus": "meter"
+          }
+        }
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "project": "saebase",
+        "views": {
+          "core": {
+            "focus": "pile"
+          }
+        },
+        "active": "core",
+        "next": "core"
+      }
+    },
+    {
+      "input": {
+        "project": "SAEBase",
+        "views": {
+          "core": {
+            "focus": ""
+          }
+        },
+        "active": "core",
+        "next": "core"
+      }
+    },
+    {
+      "input": {
+        "project": "SAEBase",
+        "views": {
+          "atlas": {
+            "focus": "pile"
+          }
+        },
+        "active": "atlas",
+        "next": "atlas"
+      }
+    }
+  ]
+}

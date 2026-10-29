@@ -1,0 +1,42 @@
+{
+  "positive": [
+    {
+      "input": {
+        "pred": [
+          5,
+          1
+        ],
+        "target": [
+          2,
+          1
+        ]
+      },
+      "expected": {
+        "n": 2,
+        "mae": 1.5
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "pred": [
+          NaN
+        ],
+        "target": [
+          0
+        ]
+      }
+    },
+    {
+      "input": {
+        "pred": [
+          "1"
+        ],
+        "target": [
+          1
+        ]
+      }
+    }
+  ]
+}

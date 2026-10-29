@@ -1,0 +1,54 @@
+{
+  "positive": [
+    {
+      "input": {
+        "tested_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "release_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "checks": {
+          "quality": "success",
+          "tests": "success"
+        },
+        "approved": true
+      },
+      "expected": {
+        "publish": true,
+        "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "tested_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "release_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "checks": {
+          "quality": "success",
+          "tests": "pending"
+        },
+        "approved": true
+      }
+    },
+    {
+      "input": {
+        "tested_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "release_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "checks": {
+          "quality": "skipped",
+          "tests": "success"
+        },
+        "approved": true
+      }
+    },
+    {
+      "input": {
+        "tested_sha": "abc",
+        "release_sha": "abc",
+        "checks": {
+          "quality": "success",
+          "tests": "success"
+        },
+        "approved": true
+      }
+    }
+  ]
+}

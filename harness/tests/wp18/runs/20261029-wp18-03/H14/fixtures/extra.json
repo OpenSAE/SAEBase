@@ -1,0 +1,54 @@
+{
+  "positive": [
+    {
+      "input": {
+        "revision": 4,
+        "drafts": {
+          "kite": "unchecked",
+          "nest": "deny"
+        },
+        "event": {
+          "id": "kite",
+          "decision": "approve",
+          "revision": 4
+        }
+      },
+      "expected": {
+        "revision": 5,
+        "drafts": {
+          "kite": "approve",
+          "nest": "deny"
+        },
+        "approved": false
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "revision": 4,
+        "drafts": {
+          "kite": "unchecked"
+        },
+        "event": {
+          "id": "missing",
+          "decision": "deny",
+          "revision": 4
+        }
+      }
+    },
+    {
+      "input": {
+        "revision": 4,
+        "drafts": {
+          "kite": "unchecked"
+        },
+        "event": {
+          "id": "kite",
+          "decision": "formal_approve",
+          "revision": 4
+        }
+      }
+    }
+  ]
+}

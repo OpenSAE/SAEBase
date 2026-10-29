@@ -1,0 +1,62 @@
+{
+  "positive": [
+    {
+      "input": {
+        "model": {
+          "id": "tiny",
+          "hidden_size": 4,
+          "layers": [
+            0
+          ]
+        },
+        "sae": {
+          "id": "hook0",
+          "model_id": "tiny",
+          "d_in": 4,
+          "layer": 0
+        }
+      },
+      "expected": {
+        "model": "tiny",
+        "sae": "hook0",
+        "layer": 0
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "model": {
+          "id": "tiny",
+          "hidden_size": 4,
+          "layers": [
+            0
+          ]
+        },
+        "sae": {
+          "id": "hook0",
+          "model_id": "other",
+          "d_in": 4,
+          "layer": 0
+        }
+      }
+    },
+    {
+      "input": {
+        "model": {
+          "id": "tiny",
+          "hidden_size": true,
+          "layers": [
+            0
+          ]
+        },
+        "sae": {
+          "id": "hook0",
+          "model_id": "tiny",
+          "d_in": 1,
+          "layer": 0
+        }
+      }
+    }
+  ]
+}

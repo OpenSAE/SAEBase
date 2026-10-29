@@ -1,0 +1,59 @@
+{
+  "positive": [
+    {
+      "input": {
+        "files": [
+          {
+            "path": "empty.bin",
+            "bytes": 0,
+            "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ]
+      },
+      "expected": {
+        "files": [
+          {
+            "path": "empty.bin",
+            "bytes": 0,
+            "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "files": [
+          {
+            "path": "empty.bin",
+            "bytes": 0,
+            "sha256": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "files": [
+          {
+            "path": "/tmp/empty.bin",
+            "bytes": 0,
+            "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "files": [
+          {
+            "path": "empty.bin",
+            "bytes": -1,
+            "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ]
+      }
+    }
+  ]
+}

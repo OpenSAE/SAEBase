@@ -1,0 +1,35 @@
+{
+  "positive": [
+    {
+      "input": {
+        "config": {
+          "dataset": "toy",
+          "seed": 0,
+          "model": "tiny"
+        }
+      },
+      "expected": {
+        "canonical": "{\"dataset\":\"toy\",\"model\":\"tiny\",\"seed\":0}"
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "config": {
+          "model": "tiny",
+          "dataset": "toy",
+          "seed": "0"
+        }
+      }
+    },
+    {
+      "input": {
+        "config": {
+          "model": "tiny",
+          "seed": 0
+        }
+      }
+    }
+  ]
+}

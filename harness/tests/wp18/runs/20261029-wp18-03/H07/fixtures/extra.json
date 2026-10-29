@@ -1,0 +1,49 @@
+{
+  "positive": [
+    {
+      "input": {
+        "paths": [
+          "notes/zeta.txt",
+          "notes/alpha.txt"
+        ]
+      },
+      "expected": {
+        "paths": [
+          "notes/alpha.txt",
+          "notes/zeta.txt"
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "paths": [
+          "notes\\zeta.txt"
+        ]
+      }
+    },
+    {
+      "input": {
+        "paths": [
+          "."
+        ]
+      }
+    },
+    {
+      "input": {
+        "paths": [
+          "notes/../zeta.txt"
+        ]
+      }
+    },
+    {
+      "input": {
+        "paths": [
+          "notes/zeta.txt"
+        ],
+        "extra": true
+      }
+    }
+  ]
+}
