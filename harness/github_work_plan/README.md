@@ -1,6 +1,6 @@
 ## Work Plan 19 · 200 个候选考试与验证器可信性
 
-[**WP19 — Harness 大规模考试与 Verification 可信性计划**](19_harness_large_scale_examination_and_verifier_assurance.md)：提出 H27–H226 共 200 道下一阶段候选考试，并明确冻结 Case Spec、可信 Reference、Mutation / Metamorphic / Differential / Stateful / Compositional / Multi-Agent 测试及长任务恢复。**仅为设计规划，尚未实现 200 道评分器，也不替代正在运行的 WP18。**
+[**WP19 — Harness 大规模考试与 Verification 可信性计划**](19_harness_large_scale_examination_and_verifier_assurance.md)：提出 H27–H226 共 200 道下一阶段候选考试，并明确冻结 Case Spec、可信 Reference、Mutation / Metamorphic / Differential / Stateful / Compositional / Multi-Agent 测试及长任务恢复。**P0 H27–H46 已有机器可执行的 20 题与 80 个公开样例；其余 H47–H226 仍为候选规划，不可当作已验收。WP18 独立进行。**
 
 ## New Work Plans · 预先声明 Contract
 

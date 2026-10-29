@@ -1,6 +1,6 @@
 # Work Plan 19 — SAEBase Harness 大规模考试与 Verification 可信性计划
 
-状态：**治理设计稿 v0.1，2026-10-29**。提出 H27–H226 共 200 道**尚未冻结、尚未执行的候选 Exam**及其验证器研发路线。它不改变 WP18 H01–H26 的既有 Contract、独立评审、失败记录和正在运行的任务，也**不授予**考试 Agent 修改 Harness 或验证代码的权限。
+状态：**分阶段实施 v0.2，2026-10-29**。提出 H27–H226 共 200 道 Exam，其中 **H27–H46 共 20 题已有冻结输入输出与受保护的可执行验证器**；H47–H226 共 180 题仍属 **PROPOSED**，尚未具备独立验收所需的 Oracle。它不改变 WP18 H01–H26 的既有 Contract、独立评审、失败记录和正在运行的任务，也**不授予**考试 Agent 修改 Harness 或验证代码的权限。
 
 依据：[WP18](18_harness_local_agent_examination_and_independent_acceptance.md)、[已发布的 Universal Contract Registry](../contracts/catalog.json)、[20 题执行规范](../contracts/wp18_cases.json)、[现有独立验证器](../contracts/wp18_verify.py)。本计划遵循奥卡姆剃刀原则，先复用现有 Contract 和 Verification；发现新的**跨任务**要求时才提出新 Contract，不能因单个 HW 失败就增加一套新术语。
 
@@ -10,7 +10,7 @@
 
 WP19 同时追求两种能力：**考试覆盖面**扩大到真实仓库的更多行为；**Verifier 检错能力**有证据地提高。题目数、测试数、Contract 数和真实验收能力必须分别统计。
 
-WP18 原有 H01–H26 可以继续执行；WP19 的 200 个 ID **只代表规划槽位**。治理维护者发布逐题冻结规范前，Agent 不能把本文件当作一份直接可执行的 200 题命令，不得声称它们已经具有 200 个参考实现或隐藏测验。
+WP18 原有 H01–H26 可以继续执行。WP19 只有 H27–H46 具备公开可执行 P0 验证，剩余 180 题仍是规划槽位。不得把只有描述的项目当作已拥有参考实现，也不得让考试 Agent 自行编写评分器。
 
 ## 1. 层次与不可变边界
 
@@ -24,6 +24,250 @@ WP18 原有 H01–H26 可以继续执行；WP19 的 200 个 ID **只代表规划
 五项 Always-on `CT-BASE/CT-SCOPE/CT-TRUTH/CT-CHECK/CT-TRACE` 继续适用。条件 Contract 优先复用现有的 Evidence、Privacy、Tree、Review、Locale、Context、AST、Environment、Determinism、Interface、Error、Data、Config、Resource、Release、Recovery、Namespace。题目可跨领域选择多个，但**不因题目数量增长而等量新增 Contract**。
 
 **必须认清安全边界**：Cursor Hooks、Python 子进程和 Git diff 检查不是 OS 级安全隔离。可信验证器必须来自固定的受信任治理提交，不能由候选 PR 提供；在资源上限、低权限、隔离文件系统和默认无网络的可丢弃环境执行不可信代码。GitHub required checks 与分支保护需要与工作树权限分离。Candidate 只给源代码、数据及交付，不得决定评分器内容、降低阈值、修改历史 Case 或人为批准自己。
+
+
+## 1.1 WP19 P0 已冻结的 20 道考试及 Contract 绑定
+
+所有未列入以下绑定的 H47–H226 都还不是 READY。需要在治理维护者独立 PR 中先完成指定行为、样例、Reference、用例生成与校验资格，才能继续开考。
+
+```harness-contracts-json
+{
+  "registry": "saebase.harness.contract_registry.v1",
+  "plan": [
+    "CT-ERROR"
+  ],
+  "cases": {
+    "H27": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H28": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H29": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H30": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H31": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H32": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H33": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H34": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H35": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H36": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H37": {
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ]
+    },
+    "H38": {
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ]
+    },
+    "H39": {
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ]
+    },
+    "H40": {
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ]
+    },
+    "H41": {
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ]
+    },
+    "H42": {
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ]
+    },
+    "H43": {
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ]
+    },
+    "H44": {
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ]
+    },
+    "H45": {
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ]
+    },
+    "H46": {
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ]
+    }
+  }
+}
+```
+
+**P0 正式冻结依据**：`harness/contracts/wp19_cases.json`（200 个编号的状态与唯一任务，其中 H27–H46 共 80 个正反样例）；独立 Python 参考 `harness/contracts/wp19_reference.py`；只读验收入口 `harness/contracts/wp19_verify.py`。执行侧每题 `harness/tests/wp19/runs/<run_id>/Hxx/implementation.py` 导出 `solve(payload: dict) -> dict`，非法输入抛出 `ValueError`，不能修改输入。此接口**只适用于 P0 已冻结的小型 CPU 题**；后续 Browser、Research 等真实任务应按自身系统界面制定验证，不强行统一。
+
+**P0 Agent 指令**：从最新 main 独立新分支、唯一 Run ID 开始，完成 H27–H46；每题独立源码、fixtures、pytest、Contract Receipt、unchecked candidate、报告。允许读取并调用公开验证器，禁止修改 `harness/contracts/`、`harness/github_work_test/`、`.github/`、`.cursor/`、历史 WP18/WP19 Run 和人工审阅。提交未合并 PR，独立 reviewer 用不同输入与真正隔离执行环境复验。**不要一次启动还未 READY 的 180 题。**
+
+**验证流程**：治理侧 `python -m harness.contracts.wp19_verify --check-spec` 检查已冻结 20 题/80 例与 Reference；Agent 可在允许目录下执行 `python -m harness.contracts.wp19_verify --case H27 --run-dir harness/tests/wp19/runs/<run_id>/H27`。CI 对 WP19 task PR 检查 diff，只接受新 Run 目录内新增文件，并执行 20 题公开测试。可见用例全部通过仅代表公开技术检查，通过与人类审批严格区分。
+
+**P0 Verification 资格边界**：参考函数对每题至少 2 正例、2 反例逐一验证；对明确的错误实现和合法实现做对照。正式高置信度资格还需独立 evaluator 的变形/Mutation/误报基线，故本批状态为 `READY_FOR_AGENT_EXERCISE`，而不是“已通过全部独立验收”。H47–H226 不接受 `--case` 调用。
 
 ## 2. 从候选 Exam 到真正可执行的规范
 
@@ -502,4 +746,4 @@ WP18 原有 H01–H26 可以继续执行；WP19 的 200 个 ID **只代表规划
 - [ ] 更新 Harness 后旧回归不退化，新数据能检验是否具备泛化效果。
 - [ ] 不得把规划阶段的 H27–H226 计为已经验证或已经交付的 200 个 HW。
 
-**本 WP19 的当前完成条件**仅为：把 200 个明确主题、分批冻结要求、六种测试技术、Verifier 自检、长期测试和独立责任边界作为正式规划写入仓库。实现 200 个可执行考题、生成器和 Reference 属于后续独立治理任务；WP18 继续运行，不受本次规划影响。
+**本 WP19 当前已完成：200 个命名主题，20 个 P0 公开可执行任务（80 个正反用例）、可核对的 Reference 和验证入口，以及持续冻结其余 180 题的治理路线。其余 180 题的有效独立 Oracle 和大规模长期测试尚未实现，不能冒充已完成；WP18 保持原独立验收。
