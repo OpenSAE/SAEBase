@@ -3,11 +3,11 @@
 This intentionally cannot return an exam PASS. Reviewer-owned executable
 oracles must be implemented and qualified before any case becomes READY.
 """
+
 from __future__ import annotations
 
 import json
-import re
-from pathlib import Path, PurePosixPath
+from pathlib import PurePosixPath
 
 from harness.contracts import registry
 
@@ -34,7 +34,10 @@ def validate(data: dict | None = None) -> dict:
     cases = spec.get("cases")
     if not isinstance(cases, list) or [c.get("id") for c in cases] != CASE_IDS:
         raise ValueError("WP20 must declare exactly X01-X20 in order")
-    if spec.get("status") != "SPEC_REVIEWED" or spec.get("execution_contract", {}).get("formal_approval") != "reviewer only":
+    if (
+        spec.get("status") != "SPEC_REVIEWED"
+        or spec.get("execution_contract", {}).get("formal_approval") != "reviewer only"
+    ):
         raise ValueError("WP20 is a design only, not independent acceptance")
     groups = {c["group"] for c in cases}
     if groups != CASE_GROUPS or any(sum(c["group"] == g for c in cases) != 5 for g in CASE_GROUPS):
@@ -68,7 +71,9 @@ def validate(data: dict | None = None) -> dict:
         if not isinstance(refs, list) or len(refs) < 2 or len(refs) != len(set(refs)):
             raise ValueError(f"{case['id']} needs multiple real code references")
         for ref in refs:
-            if not isinstance(ref, str) or not ref.startswith(("harness/", "saebase/", ".github/", ".cursor/")):
+            if not isinstance(ref, str) or not ref.startswith(
+                ("harness/", "saebase/", ".github/", ".cursor/")
+            ):
                 raise ValueError("Untrusted source reference")
             if ref.startswith("/") or ".." in PurePosixPath(ref).parts or "\\" in ref:
                 raise ValueError("Noncanonical source reference")

@@ -1,4 +1,5 @@
 """WP20 design validation: no false READY claims, all contracts source-backed."""
+
 from __future__ import annotations
 
 import copy
