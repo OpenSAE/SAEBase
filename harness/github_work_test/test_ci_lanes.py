@@ -40,14 +40,17 @@ def workflow(name: str) -> dict:
 
 def test_only_essential_ci_and_pinned_research_run_on_pull_requests():
     paths = sorted(WORKFLOWS.glob("*.yml"))
-    assert len(paths) == 22  # Add independent SAEBase Atlas snapshot workflow
+    assert len(paths) == 23  # Includes trusted-base WP19 examination PR scope check
     atlas = workflow("saebase-atlas-snapshot.yml")
     assert set(atlas["on"]) == {"push", "workflow_dispatch"}
     assert set(atlas["on"]["push"]["branches"]) == {
         "main", "fix/atlas-project-isolation-20261027"
     }
     auto = {path.name for path in paths if "pull_request" in workflow(path.name)["on"]}
-    assert auto == {"ci.yml", "research-regression.yml"}
+    assert auto == {"ci.yml", "research-regression.yml", "wp19-trusted-scope.yml"}
+    trusted = workflow("wp19-trusted-scope.yml")
+    assert set(trusted["on"]) == {"pull_request_target"}
+    assert trusted["jobs"]["trusted-scope"]["permissions"]["contents"] == "read"
     for name in MANUAL:
         assert set(workflow(name)["on"]) == {"workflow_dispatch"}, name
 
