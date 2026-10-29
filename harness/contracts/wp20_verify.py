@@ -115,7 +115,10 @@ def _candidate_source(candidate):
     for py_file in candidate.rglob("*.py"):
         if py_file.is_symlink():
             raise ValueError("Symlinked Python module in candidate")
-        body = ast.parse(py_file.read_text(encoding="utf-8"))
+        try:
+            body = ast.parse(py_file.read_text(encoding="utf-8"))
+        except SyntaxError as exc:
+            raise ValueError("Candidate contains invalid Python") from exc
         for node in ast.walk(body):
             if isinstance(node, ast.ImportFrom) and node.module and node.module.startswith(banned):
                 raise ValueError("Candidate imports official reference")
