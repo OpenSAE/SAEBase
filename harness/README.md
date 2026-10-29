@@ -30,7 +30,7 @@ Research Lab、Dataset、Model、Task 及通用 SAE 接口均由 SAEBase 仓库�
 
 ```bash
 python .cursor/hooks/validate_repo.py --full
-python -m pytest -q tests/test_harness_migration.py tests/test_openresearch_integration.py
+python -m pytest -q harness/github_work_test/test_harness_migration.py harness/github_work_test/test_openresearch_integration.py
 python -m saebase.runtime.train --cfg job
 python harness/core/validate.py
 python harness/knowledge/validate.py

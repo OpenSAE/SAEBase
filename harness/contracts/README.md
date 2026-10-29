@@ -15,8 +15,8 @@ Harness 的通用 Contract **在任务出现之前**定义于 [catalog.json](cat
 `catalog.json` 是规范化注册表。只读选择器：
 
 ```bash
-yython -m harness.contracts.registry list
-yython -m harness.contracts.registry check --plan harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md
+python -m harness.contracts.registry list
+python -m harness.contracts.registry check --plan harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md
 python -m harness.contracts.registry resolve --plan harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md --case H04
 ```
 
@@ -55,3 +55,9 @@ python -m harness.contracts.registry resolve --plan harness/github_work_plan/18_
 - `ENV_BLOCKED`：权限、依赖、设备或文件系统限制使任务不能执行。
 
 修复责任在 Harness 治理维护者；测试 Agent 只按当前规则执行并提交可观察证据。验收阶段保持原始 Agent 分支不变，独立评审在单独分支验证。下一轮使用新的同类任务检查改进的泛化能力，而非仅要求旧失败变绿。
+
+## 轻量 Task IO 审计及独立 Acceptance
+
+`selection.audit_selection(contract_ids, task_signals)` 只核对明确声明的输入、输出和操作信号（例如 `source_reference`、`sensitive_output`、`tree_nodes`、`bilingual_fields`），不猜测自然语言的隐含意思。未知信号停下报告 `CONTRACT_GAP`，遗漏适用合同标记 `SELECTION_GAP`。Work Plan 原有 Contract binding 不变，历史 Work Plan 不要求迁移。
+
+治理层 `python -m harness.contracts.acceptance --plan <plan> --case <case> --receipt <run/contract_receipt.json> --evaluator <acceptance/evaluation.json>` 读取独立评审者写在受保护 `acceptance/` 的记录，核对真实输出、负面测试状态、source_verified 和既有 Invariants。该 gate 不运行 agent 代码，不相信 agent 自评，不提供审批；成功仅表示技术检查完成、**仍需人类审阅**。评审者须在隔离环境自己运行测试、检查 Git diff 和 AST，才能写上述记录。Hooks 不是 OS 沙箱。
