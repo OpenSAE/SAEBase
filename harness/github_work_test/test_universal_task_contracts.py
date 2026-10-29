@@ -245,3 +245,47 @@ def test_cursor_shell_gate_allows_only_read_only_registry_queries():
         module.gate("python -m harness.contracts.registry resolve --plan ../../other.md --case H04")
         is not None
     )
+
+
+def test_work_order_can_bind_prior_contracts_without_breaking_legacy(tmp_path, monkeypatch):
+    path = registry.ROOT / ".cursor/skills/workflow/run-work-order/scripts/validate_work_order.py"
+    spec = importlib.util.spec_from_file_location("prior_work_order_validator", path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    monkeypatch.setattr(module, "ROOT", tmp_path)
+    orders = tmp_path / ".cursor/work_orders"
+    orders.mkdir(parents=True)
+    monkeypatch.setattr(module, "ORDERS", orders)
+    for rel, field in (
+        ("harness/core/project_graph.json", "nodes"),
+        ("doc/knowledge/context_graph.json", "nodes"),
+        ("doc/knowledge/glossary.json", "terms"),
+    ):
+        dest = tmp_path / rel
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(json.dumps({field: []}), encoding="utf-8")
+    selected = registry.resolve(PLAN, "H04")["contract_ids"]
+    order = {
+        "version": 3, "id": "WP18-H04", "status": "ready",
+        "goal": "Check synthetic environment formatting without production writes",
+        "activation": {key: False for key in module.MODULES},
+        "context": {
+            "doc": {"required": [], "optional": []},
+            "core_ids": [], "knowledge_ids": [], "term_ids": [],
+            "harness": {"read_only": []}, "unlisted": "deny",
+        },
+        "contract_binding": {"plan": PLAN, "case": "H04", "contract_ids": selected},
+    }
+    file = orders / "WP18-H04.yaml"
+    import yaml
+
+    file.write_text(yaml.safe_dump(order), encoding="utf-8")
+    assert module.validate(file)["contracts"] == len(selected)
+    order["contract_binding"]["contract_ids"] = selected[:-1]
+    file.write_text(yaml.safe_dump(order), encoding="utf-8")
+    with pytest.raises(module.InvalidOrder):
+        module.validate(file)
+    del order["contract_binding"]
+    file.write_text(yaml.safe_dump(order), encoding="utf-8")
+    assert module.validate(file)["contracts"] == "legacy_unbound"
