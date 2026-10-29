@@ -6,7 +6,7 @@ checks it with source changes and actual execution logs.
 from __future__ import annotations
 
 import json
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 
 from harness.contracts.registry import ContractError, ROOT, catalog, resolve
 
@@ -51,7 +51,6 @@ def validate_receipt(record: dict, *, expected: list[str]) -> dict:
     for relative in record["edited_paths"]:
         if not isinstance(relative, str) or relative.startswith("/") or "\\" in relative:
             raise ContractError("Invalid edited path")
-        parts = PurePosixPath(relative).parts
         if any(x in ("..", ".") for x in relative.split("/")):
             raise ContractError("Edited path traversal")
         if not relative.startswith("harness/tests/"):
