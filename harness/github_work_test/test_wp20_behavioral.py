@@ -123,9 +123,7 @@ def test_long_horizon_replays_nine_events_with_two_distinct_failures():
 def test_reference_import_via_helper_module_is_blocked(tmp_path):
     path = tmp_path / "new-run" / "X01"
     (path / "src").mkdir(parents=True)
-    (path / "implementation.py").write_text(
-        "from src.logic import run\n", encoding="utf-8"
-    )
+    (path / "implementation.py").write_text("from src.logic import run\n", encoding="utf-8")
     (path / "src" / "logic.py").write_text(
         "from harness.contracts.wp20_reference_a import x01\n"
         "def run(payload, workdir):\n    return x01(payload, workdir)\n",
@@ -138,9 +136,7 @@ def test_reference_import_via_helper_module_is_blocked(tmp_path):
 def test_independent_multimodule_auroc_average_precision_candidate_passes(tmp_path, monkeypatch):
     case = tmp_path / "fresh-run" / "X11"
     (case / "src").mkdir(parents=True)
-    (case / "implementation.py").write_text(
-        "from src.metrics import run\n", encoding="utf-8"
-    )
+    (case / "implementation.py").write_text("from src.metrics import run\n", encoding="utf-8")
     (case / "src" / "metrics.py").write_text(
         """def run(payload, workdir):
     labels = payload['labels']
