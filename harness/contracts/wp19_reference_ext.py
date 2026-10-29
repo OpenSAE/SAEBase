@@ -359,6 +359,10 @@ def solve(case, payload, spec):
         or not isinstance(spec.get("operator"), str)
     ):
         raise ValueError("Unqualified case")
-    if not _valid(spec["operator"], payload["subject"]):
-        raise ValueError("Contract violated")
+    try:
+        valid = _valid(spec["operator"], payload["subject"])
+    except (TypeError, KeyError, ValueError, OverflowError, ZeroDivisionError, RecursionError):
+        valid = False
+    if not valid:
+        raise ValueError("Contract violated") from None
     return {"accepted": True}
