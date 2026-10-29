@@ -1,0 +1,29 @@
+{
+  "synthetic": true,
+  "nodes": [
+    {
+      "id": "node.left",
+      "term_ids": ["term.left"],
+      "source_evidence": "fixtures/left.md:1"
+    },
+    {
+      "id": "node.right",
+      "term_ids": ["term.right"],
+      "source_evidence": "fixtures/right.md:1"
+    }
+  ],
+  "glossary": [
+    {
+      "id": "term.left",
+      "related_node_ids": ["node.left"],
+      "aliases": ["sae"],
+      "source_evidence": "fixtures/left.md:2"
+    },
+    {
+      "id": "term.right",
+      "related_node_ids": ["node.right"],
+      "aliases": ["sae"],
+      "source_evidence": "fixtures/right.md:2"
+    }
+  ]
+}

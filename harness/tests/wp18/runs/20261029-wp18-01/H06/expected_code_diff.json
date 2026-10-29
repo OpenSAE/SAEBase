@@ -1,0 +1,153 @@
+{
+  "added_ids": [
+    "code:class:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:LocaleAuditError",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_field",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_norm",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_record",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_symbols",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_text",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:audit_overlay",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation:_load",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation:_records",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation:test_candidate_binds_real_ast",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation:test_each_defect_is_detected_not_fixed",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation:test_good_record_is_clean_and_symbols_stay",
+    "code:module:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation",
+    "code:module:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation"
+  ],
+  "removed_ids": [],
+  "changed": [],
+  "edges_added": [
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_field",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_norm",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_field",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_text",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_record",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_field",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_record",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_norm",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_record",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_symbols",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_record",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_text",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_symbols",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_text",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:audit_overlay",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_record",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation:test_each_defect_is_detected_not_fixed",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation:test_each_defect_is_detected_not_fixed",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation:_records",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation:test_good_record_is_clean_and_symbols_stay",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation:test_good_record_is_clean_and_symbols_stay",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation:_records",
+      "type": "calls"
+    },
+    {
+      "source": "code:group:harness",
+      "target": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:harness",
+      "target": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation",
+      "target": "code:class:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:LocaleAuditError",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_field",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_norm",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_record",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_symbols",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:_text",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.implementation:audit_overlay",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation:_load",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation:_records",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation:test_candidate_binds_real_ast",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation:test_each_defect_is_detected_not_fixed",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H06.test_implementation:test_good_record_is_clean_and_symbols_stay",
+      "type": "contains"
+    }
+  ],
+  "edges_removed": []
+}

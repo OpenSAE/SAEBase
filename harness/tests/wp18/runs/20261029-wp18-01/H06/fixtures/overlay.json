@@ -1,0 +1,73 @@
+[
+  {
+    "synthetic": true,
+    "id": "code:function:demo:good",
+    "project": "SAEBase",
+    "signature": "def index_files(root)",
+    "path": "harness/tests/wp18/fixture.py",
+    "title": {"zh": "显式文件摘要", "en": "Explicit file digest"},
+    "summary": {"zh": "只对点名的相对路径计算 sha256 和字节数。", "en": "Hashes only the relative paths the caller listed."},
+    "description": {"zh": "重复路径和根外软链接会拒绝。", "en": "Duplicate paths and links that leave the root are rejected."}
+  },
+  {
+    "synthetic": true,
+    "id": "code:function:demo:missing",
+    "project": "SAEBase",
+    "signature": "def diff_trees(before, after)",
+    "path": "harness/tests/wp18/fixture.py",
+    "title": {"zh": "结构差异", "en": "Structural diff"},
+    "summary": {"zh": "按 node_id 比较两份测验树。", "en": "Compares two exam trees by node_id."},
+    "description": {"zh": "重排不算变化。", "en": ""}
+  },
+  {
+    "synthetic": true,
+    "id": "code:function:demo:period",
+    "project": "SAEBase",
+    "signature": "def check_context_links(bundle)",
+    "path": "harness/tests/wp18/fixture.py",
+    "title": {"zh": "引用核对", "en": "Link check"},
+    "summary": {"zh": "核对术语和反向边。", "en": "Link check."},
+    "description": {"zh": "只产生建议。", "en": "Emits suggestions without writing the glossary."}
+  },
+  {
+    "synthetic": true,
+    "id": "code:function:demo:placeholder",
+    "project": "SAEBase",
+    "signature": "def normalize_environment(record)",
+    "path": "harness/tests/wp18/fixture.py",
+    "title": {"zh": "环境概述", "en": "Environment summary"},
+    "summary": {"zh": "规范化合成设备记录。", "en": "English translation unavailable"},
+    "description": {"zh": "缺字段为 unknown。", "en": "Missing fields stay unknown."}
+  },
+  {
+    "synthetic": true,
+    "id": "code:function:demo:mojibake",
+    "project": "SAEBase",
+    "signature": "def build_queue(graph, scope)",
+    "path": "harness/tests/wp18/fixture.py",
+    "title": {"zh": "审阅队列", "en": "Review queue \ufffd"},
+    "summary": {"zh": "按兄弟顺序做深度优先。", "en": "Depth-first order uses sibling order."},
+    "description": {"zh": "草稿不是批准。", "en": "Drafts are not approvals."}
+  },
+  {
+    "synthetic": true,
+    "id": "code:function:demo:project",
+    "project": "OpenResearch",
+    "signature": "def audit_overlay(records)",
+    "path": "harness/tests/wp18/fixture.py",
+    "title": {"zh": "双语审计", "en": "Locale audit"},
+    "summary": {"zh": "检查中英覆盖层是否对齐。", "en": "Checks whether the zh and en overlays share ids."},
+    "description": {"zh": "不写翻译表。", "en": "Does not edit the translation tables."}
+  },
+  {
+    "synthetic": true,
+    "id": "code:function:demo:symbol",
+    "project": "SAEBase",
+    "signature": "def index_files(root)",
+    "localized_signature": "定义 index_files(根)",
+    "path": "harness/tests/wp18/fixture.py",
+    "title": {"zh": "文件摘要", "en": "File digest"},
+    "summary": {"zh": "计算摘要。", "en": "Computes index files for the caller."},
+    "description": {"zh": "路径必须相对。", "en": "Paths stay relative."}
+  }
+]

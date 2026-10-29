@@ -1,0 +1,11 @@
+{
+  "synthetic": true,
+  "nodes": [
+    {"id": "root", "parent_id": null, "order": 0, "tree_id": "main", "name": "middle"},
+    {"id": "z-child", "parent_id": "root", "order": 0, "tree_id": "main", "name": "zeta"},
+    {"id": "a-child", "parent_id": "root", "order": 1, "tree_id": "main", "name": "alpha"},
+    {"id": "z-grand", "parent_id": "z-child", "order": 0, "tree_id": "main", "name": "grand"},
+    {"id": "wp-02", "parent_id": null, "order": 1, "tree_id": "other", "name": "plan-two"},
+    {"id": "wp-01", "parent_id": null, "order": 2, "tree_id": "other", "name": "plan-one"}
+  ]
+}

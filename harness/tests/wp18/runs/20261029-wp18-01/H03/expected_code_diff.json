@@ -1,0 +1,154 @@
+{
+  "added_ids": [
+    "code:class:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:ContextLinkError",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_aliases",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_citations",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_nodes",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_suggestions",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_terms",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:check_context_links",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:_fixture",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:_load",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:test_broken_links_are_specific",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:test_candidate_binds_real_ast",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:test_consistent_bundle_has_no_diagnostics",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:test_synonym_is_not_promoted",
+    "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation",
+    "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation"
+  ],
+  "removed_ids": [],
+  "changed": [],
+  "edges_added": [
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:check_context_links",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_aliases",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:check_context_links",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_citations",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:check_context_links",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_nodes",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:check_context_links",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_suggestions",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:check_context_links",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_terms",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:test_broken_links_are_specific",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:_fixture",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:test_broken_links_are_specific",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:test_consistent_bundle_has_no_diagnostics",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:_fixture",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:test_consistent_bundle_has_no_diagnostics",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:test_synonym_is_not_promoted",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:_fixture",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:test_synonym_is_not_promoted",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:group:harness",
+      "target": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:harness",
+      "target": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation",
+      "target": "code:class:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:ContextLinkError",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_aliases",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_citations",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_nodes",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_suggestions",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_terms",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:check_context_links",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:_fixture",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:_load",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:test_broken_links_are_specific",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:test_candidate_binds_real_ast",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:test_consistent_bundle_has_no_diagnostics",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.test_implementation:test_synonym_is_not_promoted",
+      "type": "contains"
+    }
+  ],
+  "edges_removed": []
+}

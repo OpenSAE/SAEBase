@@ -1,0 +1,9 @@
+{
+  "synthetic": true,
+  "nodes": [
+    {"id": "code:module:demo", "signature": ""}
+  ],
+  "edges": [
+    {"source": "code:module:demo", "type": "contains", "target": "code:function:missing"}
+  ]
+}

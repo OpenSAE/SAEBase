@@ -1,0 +1,195 @@
+{
+  "added_ids": [
+    "code:class:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:ReviewBoundaryError",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:_dfs",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:_forest",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:_validate_graph",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:build_queue",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:draft_decision",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:empty_state",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:next_unchecked",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:previous_unchecked",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:reject_formal_approval",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:serialize_drafts",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:undo_draft",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:_graph",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:_load",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:test_candidate_binds_real_ast",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:test_dfs_uses_sibling_order_not_names",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:test_filter_keeps_drafts_and_parent_is_independent",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:test_formal_approval_is_refused",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:test_undo_returns_to_unchecked_not_approve",
+    "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+    "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation"
+  ],
+  "removed_ids": [],
+  "changed": [],
+  "edges_added": [
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:_forest",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:_dfs",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:build_queue",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:_dfs",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:build_queue",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:_forest",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:build_queue",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:_validate_graph",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:undo_draft",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:draft_decision",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:test_dfs_uses_sibling_order_not_names",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:_graph",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:test_dfs_uses_sibling_order_not_names",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:test_filter_keeps_drafts_and_parent_is_independent",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:_graph",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:test_filter_keeps_drafts_and_parent_is_independent",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:test_formal_approval_is_refused",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:test_undo_returns_to_unchecked_not_approve",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:_graph",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:test_undo_returns_to_unchecked_not_approve",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:group:harness",
+      "target": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:harness",
+      "target": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "target": "code:class:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:ReviewBoundaryError",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:_dfs",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:_forest",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:_validate_graph",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:build_queue",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:draft_decision",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:empty_state",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:next_unchecked",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:previous_unchecked",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:reject_formal_approval",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:serialize_drafts",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:undo_draft",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:_graph",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:_load",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:test_candidate_binds_real_ast",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:test_dfs_uses_sibling_order_not_names",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:test_filter_keeps_drafts_and_parent_is_independent",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:test_formal_approval_is_refused",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.test_implementation:test_undo_returns_to_unchecked_not_approve",
+      "type": "contains"
+    }
+  ],
+  "edges_removed": []
+}

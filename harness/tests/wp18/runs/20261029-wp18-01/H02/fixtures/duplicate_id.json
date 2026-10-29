@@ -1,0 +1,8 @@
+{
+  "synthetic": true,
+  "nodes": [
+    {"id": "code:function:demo:alpha", "signature": "def alpha()"},
+    {"id": "code:function:demo:alpha", "signature": "def alpha(x: int)"}
+  ],
+  "edges": []
+}

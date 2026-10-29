@@ -1,0 +1,98 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-01",
+  "case_id": "H01",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "8018a2cd7dc0a8a7035e860fcaaaf17a18f9f07f",
+  "source_content_sha256": "6d366bb8fc0f351711e4754fb41ad44cbba8d6ae0b41c1eaf0cc3df9c53f5d46",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-01.H01.implementation:EvidenceIndexError",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H01.implementation",
+      "title": {
+        "zh": "证据索引错误",
+        "en": "Evidence index error"
+      },
+      "summary": {
+        "zh": "调用方必须接住的拒绝；抛出它并不表示文件内容已被读取。",
+        "en": "Raised when a listed path is refused. Raising it does not mean the file was read."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H01/implementation.py",
+      "line": 9,
+      "signature": "class EvidenceIndexError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H01/implementation.py:9"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H01.implementation:index_files",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H01.implementation",
+      "title": {
+        "zh": "显式文件摘要",
+        "en": "Explicit file digest"
+      },
+      "summary": {
+        "zh": "只对调用方给出的相对路径计算 sha256 和字节数，并按路径排序。",
+        "en": "Hashes and sizes only the relative paths the caller named, then sorts by path."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H01/implementation.py",
+      "line": 13,
+      "signature": "def index_files(root: str | Path, relative_paths: list[str]) -> list[dict[str, object]]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H01/implementation.py:13"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H01.implementation:_require_relative",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H01.implementation",
+      "title": {
+        "zh": "相对路径句法",
+        "en": "Relative path syntax"
+      },
+      "summary": {
+        "zh": "在接触文件系统之前拒绝绝对路径、空段和父目录跳转。",
+        "en": "Rejects absolute paths, empty segments, and parent traversal before any filesystem access."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H01/implementation.py",
+      "line": 40,
+      "signature": "def _require_relative(raw: object) -> str",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H01/implementation.py:40"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H01.implementation:_resolve_inside",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H01.implementation",
+      "title": {
+        "zh": "根内软链接",
+        "en": "In-root symlink check"
+      },
+      "summary": {
+        "zh": "逐段查看软链接，真实目标离开给定根目录时停止。",
+        "en": "Walks each symlink and stops when its real target leaves the given root."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H01/implementation.py",
+      "line": 52,
+      "signature": "def _resolve_inside(base: Path, rel: str) -> Path",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H01/implementation.py:52"
+      ]
+    }
+  ],
+  "unresolved": [
+    "No Context term is defined for this exam-only index."
+  ]
+}

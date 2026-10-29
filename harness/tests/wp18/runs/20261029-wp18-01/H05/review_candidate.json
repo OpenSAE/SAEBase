@@ -1,0 +1,266 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-01",
+  "case_id": "H05",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "8018a2cd7dc0a8a7035e860fcaaaf17a18f9f07f",
+  "source_content_sha256": "abb5ff8b56c8682cfee76778446f86ea1f0597ec6c5bb53b37012f3c186cce40",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:ReviewBoundaryError",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "title": {
+        "zh": "审阅边界",
+        "en": "Review boundary"
+      },
+      "summary": {
+        "zh": "图不合法，或调用方试图把草稿写成正式批准时抛出。",
+        "en": "Raised for an invalid graph or for an attempt to turn a draft into a formal approval."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py",
+      "line": 8,
+      "signature": "class ReviewBoundaryError(RuntimeError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py:8"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:build_queue",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "title": {
+        "zh": "DFS 审阅队列",
+        "en": "DFS review queue"
+      },
+      "summary": {
+        "zh": "按兄弟 order 做深度优先，支持 all、tree、parent 和 node 四种范围。",
+        "en": "Depth-first order follows sibling order for all, tree, parent, and node scopes."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py",
+      "line": 12,
+      "signature": "def build_queue(graph: dict, scope: dict) -> list[str]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py:12"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:empty_state",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "title": {
+        "zh": "空白草稿",
+        "en": "Empty drafts"
+      },
+      "summary": {
+        "zh": "每个节点单独从 unchecked 开始，正式批准标志为 false。",
+        "en": "Starts every node at unchecked with the formal-approval flag false."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py",
+      "line": 31,
+      "signature": "def empty_state(node_ids: list[str]) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py:31"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:draft_decision",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "title": {
+        "zh": "本地草稿",
+        "en": "Local draft"
+      },
+      "summary": {
+        "zh": "只改被点名的节点，父节点状态保持原样，且不打开写入端点。",
+        "en": "Changes only the named node, leaves its parent untouched, and opens no write endpoint."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py",
+      "line": 39,
+      "signature": "def draft_decision(state: dict, node_id: str, draft: str) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py:39"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:undo_draft",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "title": {
+        "zh": "草稿撤销",
+        "en": "Draft undo"
+      },
+      "summary": {
+        "zh": "把该节点退回 unchecked，不会把否决自动改成通过。",
+        "en": "Returns that node to unchecked and does not convert a denial into an approval."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py",
+      "line": 51,
+      "signature": "def undo_draft(state: dict, node_id: str) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py:51"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:next_unchecked",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "title": {
+        "zh": "下一个未审",
+        "en": "Next unchecked"
+      },
+      "summary": {
+        "zh": "在当前队列下标之后寻找仍为 unchecked 的位置。",
+        "en": "Finds the next queue index whose draft is still unchecked."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py",
+      "line": 56,
+      "signature": "def next_unchecked(queue: list[str], state: dict, cursor: int) -> int | None",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py:56"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:previous_unchecked",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "title": {
+        "zh": "上一个未审",
+        "en": "Previous unchecked"
+      },
+      "summary": {
+        "zh": "在当前队列下标之前寻找仍为 unchecked 的位置。",
+        "en": "Finds the previous queue index whose draft is still unchecked."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py",
+      "line": 64,
+      "signature": "def previous_unchecked(queue: list[str], state: dict, cursor: int) -> int | None",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py:64"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:serialize_drafts",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "title": {
+        "zh": "草稿序列化",
+        "en": "Draft serialization"
+      },
+      "summary": {
+        "zh": "导出草稿副本，并写明不存在人类批准端点。",
+        "en": "Exports a copy of the drafts and records that no human-approval endpoint exists."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py",
+      "line": 72,
+      "signature": "def serialize_drafts(state: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py:72"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:reject_formal_approval",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "title": {
+        "zh": "拒绝正式批准",
+        "en": "Refuse formal approval"
+      },
+      "summary": {
+        "zh": "固定失败，用来表明本模块不能代替人类 Approve。",
+        "en": "Always fails, stating that this module cannot stand in for a human Approve."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py",
+      "line": 81,
+      "signature": "def reject_formal_approval() -> None",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py:81"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:_validate_graph",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "title": {
+        "zh": "图合法性",
+        "en": "Graph validity"
+      },
+      "summary": {
+        "zh": "要求 synthetic 标记、唯一 ID、存在的父节点，以及没有父子环。",
+        "en": "Requires a synthetic mark, unique ids, existing parents, and no parent cycle."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py",
+      "line": 86,
+      "signature": "def _validate_graph(graph: dict) -> list[dict]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py:86"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:_forest",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "title": {
+        "zh": "多根深度优先",
+        "en": "Multi-root depth first"
+      },
+      "summary": {
+        "zh": "所选集合里的根按 order 排序后，依次展开各自的子树。",
+        "en": "Sorts roots inside the selected set by order, then expands each subtree."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py",
+      "line": 117,
+      "signature": "def _forest(nodes: list[dict]) -> list[str]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py:117"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation:_dfs",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H05.implementation",
+      "title": {
+        "zh": "子树展开",
+        "en": "Subtree expansion"
+      },
+      "summary": {
+        "zh": "先放入当前节点，再按 order 展开子节点。",
+        "en": "Emits the current node, then expands children by order."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py",
+      "line": 128,
+      "signature": "def _dfs(nodes: list[dict], node_id: str) -> list[str]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H05/implementation.py:128"
+      ]
+    }
+  ],
+  "unresolved": [
+    "Draft statuses are not human Approve decisions and were not written to a review service."
+  ]
+}
