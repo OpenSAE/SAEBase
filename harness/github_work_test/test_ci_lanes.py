@@ -50,7 +50,7 @@ def test_only_essential_ci_and_pinned_research_run_on_pull_requests():
     assert auto == {"ci.yml", "research-regression.yml"}
     trusted = workflow("wp19-trusted-scope.yml")
     assert set(trusted["on"]) == {"pull_request_target"}
-    assert trusted["jobs"]["trusted-scope"]["permissions"]["contents"] == "read"
+    assert trusted["permissions"]["contents"] == "read"
     for name in MANUAL:
         assert set(workflow(name)["on"]) == {"workflow_dispatch"}, name
 
