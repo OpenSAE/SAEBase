@@ -1,0 +1,11 @@
+{
+  "synthetic": true,
+  "gpu": "",
+  "device_name": "bench-card",
+  "token": "SURFACE-TOKEN-41",
+  "nested": {
+    "secret": "NESTED-SECRET-41",
+    "path": "/home/bench/hidden"
+  },
+  "note": "nvidia-smi was absent from this fixture"
+}

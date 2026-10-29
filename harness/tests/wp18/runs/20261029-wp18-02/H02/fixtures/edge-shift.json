@@ -1,0 +1,13 @@
+{
+  "synthetic": true,
+  "nodes": [
+    {"id": "code:module:exam.packet", "signature": "", "project": "SAEBase"},
+    {"id": "code:function:exam.packet:north_span", "signature": "def north_span()", "project": "SAEBase"},
+    {"id": "code:function:exam.packet:south_span", "signature": "def south_span()", "project": "SAEBase"},
+    {"id": "code:function:exam.packet:west_span", "signature": "def west_span()", "project": "SAEBase"}
+  ],
+  "edges": [
+    {"source": "code:module:exam.packet", "type": "contains", "target": "code:function:exam.packet:north_span"},
+    {"source": "code:module:exam.packet", "type": "contains", "target": "code:function:exam.packet:west_span"}
+  ]
+}

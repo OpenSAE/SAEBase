@@ -1,0 +1,23 @@
+{
+  "synthetic": true,
+  "nodes": [
+    {
+      "id": "exam.node.span",
+      "term_ids": ["exam.term.missing"],
+      "source_evidence": "not a ref"
+    },
+    {
+      "id": "exam.node.other",
+      "term_ids": ["exam.term.span"],
+      "source_evidence": "sources/missing-note.md:1"
+    }
+  ],
+  "glossary": [
+    {
+      "id": "exam.term.span",
+      "related_node_ids": ["exam.node.absent"],
+      "aliases": ["span label"],
+      "source_evidence": "../secret.md:1"
+    }
+  ]
+}
