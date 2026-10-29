@@ -203,7 +203,9 @@ def verify_case(case, candidate):
                         received.get("ok") is expected["ok"]
                         and received.get("kind") == expected["kind"]
                         and (
-                            _matching_x18(observed, expected["output"], received.get("git_evidence"))
+                            _matching_x18(
+                                observed, expected["output"], received.get("git_evidence")
+                            )
                             if case == "X18" and expected["ok"]
                             else observed == expected["output"]
                         )

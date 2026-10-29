@@ -44,6 +44,7 @@ def main():
             ).hexdigest()
     evidence = None
     if (workdir / ".git").is_dir():
+
         def git(*args):
             result = subprocess.run(
                 ["git", "-C", str(workdir), *args],

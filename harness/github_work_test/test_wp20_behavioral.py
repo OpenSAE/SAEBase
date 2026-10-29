@@ -210,9 +210,8 @@ def test_git_verdict_uses_actual_branch_ancestry_not_identical_commit_timestamps
     expected = sample["output"]
     observed = deepcopy(expected)
     changes = {
-        key: f"{i:040x}" for i, key in enumerate(
-            ("base_sha", "head_a_sha", "head_b_sha", "merge_sha"), start=1
-        )
+        key: f"{i:040x}"
+        for i, key in enumerate(("base_sha", "head_a_sha", "head_b_sha", "merge_sha"), start=1)
     }
     observed.update(changes)
     observed["merge_parents"] = [changes["head_b_sha"], changes["head_a_sha"]]
