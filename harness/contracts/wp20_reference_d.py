@@ -3,6 +3,7 @@
 from __future__ import annotations
 import hashlib
 import io
+import os
 from pathlib import Path
 import subprocess
 import tarfile
@@ -89,7 +90,7 @@ def _git(root, *args):
         check=False,
         timeout=5,
         env={
-            "PATH": "/usr/bin:/bin",
+            "PATH": os.environ.get("PATH", ""),
             "HOME": str(root),
             "GIT_CONFIG_NOSYSTEM": "1",
             "GIT_AUTHOR_DATE": "2001-01-01T00:00:00+0000",
@@ -139,7 +140,7 @@ def x18(p, root):
         timeout=5,
         check=False,
         env={
-            "PATH": "/usr/bin:/bin",
+            "PATH": os.environ.get("PATH", ""),
             "HOME": str(root),
             "GIT_CONFIG_NOSYSTEM": "1",
             "GIT_AUTHOR_DATE": "2001-01-01T00:00:00+0000",
