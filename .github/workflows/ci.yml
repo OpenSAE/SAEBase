@@ -76,6 +76,8 @@ jobs:
         run: |
           python -m harness.contracts.registry check --plan harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md
           python -m pytest -q harness/github_work_test/test_universal_task_contracts.py harness/github_work_test/test_contract_acceptance.py
+      - name: Reviewer-only WP18 round two independent acceptance tests
+        run: python -m pytest -q harness/github_work_test/test_wp18_round2_independent.py
       - name: Upload full Atlas duplicate inventory
         uses: actions/upload-artifact@v4
         with:
