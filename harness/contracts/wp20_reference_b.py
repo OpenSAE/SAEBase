@@ -50,7 +50,7 @@ def x06(p, root):
     chosen = [indexed[k] for k in sorted(p["selected"])]
     predictions = [{"id": r["id"], "score": r["score"], "label": r["label"]} for r in chosen]
     return {
-        "manifest": {"sha256": sha(records), "count": len(records)},
+        "manifest": {"sha256": sha(sorted(records, key=lambda r: r["id"])), "count": len(records)},
         "splits": splits,
         "predictions": predictions,
         "coverage": {

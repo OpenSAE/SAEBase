@@ -97,3 +97,13 @@ def test_scope_denies_edits_to_verifier(monkeypatch):
         ),
     )
     assert grader.audit_scope("a" * 40) == ["harness/contracts/wp20_verify.py"]
+
+
+def test_data_manifest_and_coverage_invariant_under_sample_permutation():
+    source = grader.load_scenarios()["cases"]["X06"][0]["input"]
+    moved = dict(source)
+    moved["records"] = list(reversed(source["records"]))
+    original = grader._reference("X06", source)
+    changed = grader._reference("X06", moved)
+    assert original["ok"] and changed["ok"]
+    assert original["output"] == changed["output"]
