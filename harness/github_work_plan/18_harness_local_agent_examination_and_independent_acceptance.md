@@ -1,6 +1,6 @@
 # Work Plan 18 — Harness 本地 Agent 测验与独立验收
 
-状态：**Contract Registry v1 已启用；新一轮 WP18 测验尚未执行**。本文件只定义测验，不代表六题已执行或通过。 
+状态：**Contract Registry v1 与轻量 Contract Selection / Independent Acceptance Gate 已启用；新版 WP18 新一轮测验尚未执行**。本文件只定义测验，不代表六题已执行或通过。 
 范围：Harness 的 Rules、Skills、Hooks、Work Order、Agent Flow、AST / Tree、Context、环境事实、Atlas 交互与双语。**不测 SAE 算法、模型、GPU、权重或科研功能。**
 
 
@@ -103,6 +103,14 @@ Harness 的通用合同**预先定义于** `harness/contracts/catalog.json`。�
 | H06 | `CT-LOCALE`, `CT-AST`, `CT-INTERFACE` | 中英文双向完整性与源码不变 |
 
 执行前在允许的只读 Contract 解析器中进行 `resolve`，以当次 `case` 的完整 `contract_ids` 作为实现与自测的固定依据。未知 Contract、无法覆盖任务 tags、目录外计划或非法 JSON 时停止并报告，不自行放宽。具体负面测试数据仍由独立验收方持有；不是为了复现旧版 H03–H06 再把测试答案写回题目。
+
+### 0.1 新版预检及独立验收（必须分离）
+
+执行 Agent 根据本题的真实输入、输出和操作填报最小 `task_signals`，使用 `harness/contracts/selection.py` 检查是否漏选明显必要的 Contract；只能使用 Catalog 内已有 ID。选定合同不足时提交 `SELECTION_GAP` 并停止扩权，不能为通过测试修改 Catalog。既有历史 Work Plans 无须迁移。
+
+独立验收人员根据实际行为**重新**确定同一组信号，而不是照抄 Agent 的声明，并在受保护的 `acceptance/<run_id>/<case>/evaluation.json` 记录 `schema: saebase.harness.independent_evaluation.v1`、`case_id`、`task_signals`、`source_verified`、`tests: [{name, passed}]` 和 `artifacts: [{kind, payload}]`。可识别的 artifact kind 为 `source_reference`、`structured_output`、`tree`、`bilingual_record`。运行 `python -m harness.contracts.acceptance --plan ... --case ... --receipt ... --evaluator ...` 合并核对来源、敏感输出、Tree 身份、双语、测试和 Contract 覆盖。此工具**不**执行被测代码、不代替独立负面测试，也不能给出人工 Approve；成功状态只能为 `TECHNICAL_CHECKS_PASSED_NEEDS_HUMAN_REVIEW`。
+
+**新一轮考试必须创建新 Run ID 和内容不同的 synthetic fixtures**；不能改写旧的 `20261029-wp18-01`、旧独立验收 PR #81、Catalog、Invariants 或评分标准以获得 PASS。测试 Agent 仍只写自己的 `harness/tests/wp18/runs/` 子目录。评审方的验收记录不属于 Agent 交付。
 
 ## 1. 人类只需一句话
 

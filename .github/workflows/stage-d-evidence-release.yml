@@ -40,9 +40,9 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$RUN_SHA"
-          python scripts/stage_d_archive.py --check
-          python scripts/stage_d_archive.py --build --output-dir dist/stage-d-evidence
-          python scripts/stage_d_archive.py --verify-bundle dist/stage-d-evidence/stage-d-evidence-20261016-compact.tar.gz
+          python saebase/tools/stage_d_archive.py --check
+          python saebase/tools/stage_d_archive.py --build --output-dir dist/stage-d-evidence
+          python saebase/tools/stage_d_archive.py --verify-bundle dist/stage-d-evidence/stage-d-evidence-20261016-compact.tar.gz
           (cd dist/stage-d-evidence && sha256sum -c SHA256SUMS)
       - name: Publish immutable evidence tag and four GitHub Release assets
         shell: bash
@@ -70,6 +70,6 @@ jobs:
             dist/stage-d-evidence/SHA256SUMS \
             --repo "$REPO" --verify-tag \
             --title "Stage D compact verification evidence (48 sites)" \
-            --notes-file docs/stage-d-evidence-archive.md \
+            --notes-file harness/github_development_doc/stage-d-evidence-archive.md \
             --latest=false
           gh release view "$TAG" --repo "$REPO" --json url,tagName,assets
