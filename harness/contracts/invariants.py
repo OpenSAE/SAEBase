@@ -200,7 +200,9 @@ def localization_defects(record: dict, *, required=("zh", "en")) -> list[str]:
         title = title_field.get(lang, "") if isinstance(title_field, dict) else ""
         summary = summary_field.get(lang, "") if isinstance(summary_field, dict) else ""
         if isinstance(title, str) and isinstance(summary, str) and title and summary:
-            norm = lambda value: "".join(c.casefold() for c in value if c.isalnum())
+            def norm(value: str) -> str:
+                return "".join(c.casefold() for c in value if c.isalnum())
+
             if norm(title) == norm(summary):
                 defects.append(f"summary.{lang}:tautology")
     if "localized_signature" in record and record.get("localized_signature") != record.get("signature"):
