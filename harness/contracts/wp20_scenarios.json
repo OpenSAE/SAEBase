@@ -1,0 +1,2030 @@
+{
+  "schema": "saebase.wp20.behavioral_scenarios.v1",
+  "version": "1.0.0",
+  "behavior": "reference-backed, real arithmetic/files/state/Git; two positives and two negatives per case",
+  "cases": {
+    "X01": [
+      {
+        "id": "positive_a",
+        "input": {
+          "before": "def a(x):\n    return x\n",
+          "after": "def a(x, y=1):\n    return x+y\ndef b():\n    return 0\n"
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "before": "def old():\n    return 1\n",
+          "after": "def renamed():\n    return 1\n"
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "before": "def a(:\n",
+          "after": "def a():\n    return 1\n"
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "before": "def ok(): pass\n",
+          "after": 4
+        },
+        "valid": false
+      }
+    ],
+    "X02": [
+      {
+        "id": "positive_a",
+        "input": {
+          "nodes": [
+            {
+              "id": "n",
+              "terms": [
+                "t"
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "id": "t",
+              "nodes": [
+                "n"
+              ],
+              "zh": "单词",
+              "en": "Term"
+            }
+          ],
+          "update": {
+            "term": "t",
+            "node": "n"
+          }
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "nodes": [
+            {
+              "id": "a",
+              "terms": [
+                "t"
+              ]
+            },
+            {
+              "id": "b",
+              "terms": [
+                "t"
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "id": "t",
+              "nodes": [
+                "a",
+                "b"
+              ],
+              "zh": "概念",
+              "en": "Concept"
+            }
+          ],
+          "update": {
+            "term": "t",
+            "node": "a"
+          }
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "nodes": [
+            {
+              "id": "n",
+              "terms": [
+                "t"
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "id": "t",
+              "nodes": [],
+              "zh": "单词",
+              "en": "Term"
+            }
+          ],
+          "update": {
+            "term": "t",
+            "node": "n"
+          }
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "nodes": [
+            {
+              "id": "n",
+              "terms": [
+                "t"
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "id": "t",
+              "nodes": [
+                "n"
+              ],
+              "zh": "中文翻译不可用",
+              "en": "Term"
+            }
+          ],
+          "update": {
+            "term": "t",
+            "node": "n"
+          }
+        },
+        "valid": false
+      }
+    ],
+    "X03": [
+      {
+        "id": "positive_a",
+        "input": {
+          "trees": {
+            "core": [
+              "c"
+            ],
+            "knowledge": [
+              "k"
+            ],
+            "code": [
+              "z"
+            ],
+            "environment": [
+              "e"
+            ],
+            "context": [
+              "t"
+            ]
+          },
+          "events": [
+            {
+              "op": "focus",
+              "tree": "code",
+              "id": "z"
+            },
+            {
+              "op": "switch",
+              "tree": "code"
+            },
+            {
+              "op": "language",
+              "value": "zh"
+            },
+            {
+              "op": "review",
+              "tree": "code",
+              "id": "z",
+              "revision": 0,
+              "decision": "deny"
+            },
+            {
+              "op": "review",
+              "tree": "code",
+              "id": "z",
+              "revision": 1,
+              "decision": "unchecked"
+            }
+          ]
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "trees": {
+            "core": [
+              "c"
+            ],
+            "knowledge": [
+              "k"
+            ],
+            "code": [
+              "z"
+            ],
+            "environment": [
+              "e"
+            ],
+            "context": [
+              "t"
+            ]
+          },
+          "events": [
+            {
+              "op": "focus",
+              "tree": "core",
+              "id": "c"
+            },
+            {
+              "op": "toggle",
+              "tree": "core",
+              "id": "c"
+            },
+            {
+              "op": "switch",
+              "tree": "knowledge"
+            },
+            {
+              "op": "focus",
+              "id": "k"
+            }
+          ]
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "trees": {
+            "core": [
+              "c"
+            ],
+            "knowledge": [
+              "k"
+            ],
+            "code": [
+              "z"
+            ],
+            "environment": [
+              "e"
+            ],
+            "context": [
+              "t"
+            ]
+          },
+          "events": [
+            {
+              "op": "focus",
+              "tree": "code",
+              "id": "absent"
+            }
+          ]
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "trees": {
+            "core": [
+              "c"
+            ],
+            "knowledge": [
+              "k"
+            ],
+            "code": [
+              "z"
+            ],
+            "environment": [
+              "e"
+            ],
+            "context": [
+              "t"
+            ]
+          },
+          "events": [
+            {
+              "op": "review",
+              "tree": "code",
+              "id": "z",
+              "revision": 4,
+              "decision": "approve"
+            }
+          ]
+        },
+        "valid": false
+      }
+    ],
+    "X04": [
+      {
+        "id": "positive_a",
+        "input": {
+          "observed": [
+            {
+              "id": "a",
+              "command": "python -m pytest",
+              "exit": 0
+            }
+          ],
+          "receipt": [
+            {
+              "id": "a",
+              "command": "python -m pytest",
+              "exit": 0
+            }
+          ],
+          "files": [
+            {
+              "name": "one.txt",
+              "content": "a",
+              "sha": "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb"
+            }
+          ]
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "observed": [
+            {
+              "id": "a",
+              "command": "python -m pytest",
+              "exit": 0
+            },
+            {
+              "id": "b",
+              "command": "git diff",
+              "exit": 0
+            }
+          ],
+          "receipt": [
+            {
+              "id": "a",
+              "command": "python -m pytest",
+              "exit": 0
+            },
+            {
+              "id": "b",
+              "command": "git diff",
+              "exit": 0
+            }
+          ],
+          "files": []
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "observed": [
+            {
+              "id": "a",
+              "command": "python -m pytest",
+              "exit": 1
+            }
+          ],
+          "receipt": [
+            {
+              "id": "a",
+              "command": "python -m pytest",
+              "exit": 0
+            }
+          ],
+          "files": []
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "observed": [
+            {
+              "id": "a",
+              "command": "python -m pytest",
+              "exit": 0
+            }
+          ],
+          "receipt": [
+            {
+              "id": "a",
+              "command": "token=rawsecret",
+              "exit": 0
+            }
+          ],
+          "files": []
+        },
+        "valid": false
+      }
+    ],
+    "X05": [
+      {
+        "id": "positive_a",
+        "input": {
+          "allowed": "workspace",
+          "operations": [
+            {
+              "op": "write",
+              "path": "a.txt",
+              "text": "one"
+            },
+            {
+              "op": "write",
+              "path": "nested/b.txt",
+              "text": "two"
+            }
+          ]
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "allowed": "workspace",
+          "operations": [
+            {
+              "op": "write",
+              "path": "report/output.json",
+              "text": "{}"
+            }
+          ]
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "allowed": "workspace",
+          "operations": [
+            {
+              "op": "write",
+              "path": "../escape",
+              "text": "BAD"
+            }
+          ]
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "allowed": "workspace",
+          "operations": [
+            {
+              "op": "write",
+              "path": "C:/private.txt",
+              "text": "BAD"
+            }
+          ]
+        },
+        "valid": false
+      }
+    ],
+    "X06": [
+      {
+        "id": "positive_a",
+        "input": {
+          "records": [
+            {
+              "id": "a",
+              "split": "train",
+              "label": 1,
+              "score": 0.8
+            },
+            {
+              "id": "b",
+              "split": "val",
+              "label": 0,
+              "score": 0.2
+            },
+            {
+              "id": "c",
+              "split": "test",
+              "label": 1,
+              "score": 0.9
+            }
+          ],
+          "selected": [
+            "a",
+            "c"
+          ]
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "records": [
+            {
+              "id": "a",
+              "split": "train",
+              "label": 1,
+              "score": 0.8
+            },
+            {
+              "id": "b",
+              "split": "val",
+              "label": 0,
+              "score": 0.2
+            },
+            {
+              "id": "c",
+              "split": "test",
+              "label": 1,
+              "score": 0.9
+            }
+          ],
+          "selected": [
+            "b"
+          ]
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "records": [
+            {
+              "id": "a",
+              "split": "train",
+              "label": 1,
+              "score": 0.8
+            },
+            {
+              "id": "b",
+              "split": "val",
+              "label": 0,
+              "score": 0.2
+            },
+            {
+              "id": "c",
+              "split": "test",
+              "label": 1,
+              "score": 0.9
+            },
+            {
+              "id": "a",
+              "split": "train",
+              "label": 1,
+              "score": 0.8
+            }
+          ],
+          "selected": [
+            "a"
+          ]
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "records": [
+            {
+              "id": "a",
+              "split": "train",
+              "label": 1,
+              "score": 0.8
+            },
+            {
+              "id": "b",
+              "split": "val",
+              "label": 0,
+              "score": 0.2
+            },
+            {
+              "id": "c",
+              "split": "test",
+              "label": 1,
+              "score": 0.9
+            }
+          ],
+          "selected": [
+            "missing"
+          ]
+        },
+        "valid": false
+      }
+    ],
+    "X07": [
+      {
+        "id": "positive_a",
+        "input": {
+          "model": {
+            "id": "tiny",
+            "width": 2,
+            "layers": [
+              0,
+              1
+            ],
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "tokenizer": "fixed"
+          },
+          "sae": {
+            "id": "sae",
+            "model_id": "tiny",
+            "d_in": 2,
+            "layer": 1
+          },
+          "tokens": [
+            {
+              "id": "tok2",
+              "activation": [
+                1,
+                2
+              ]
+            },
+            {
+              "id": "tok1",
+              "activation": [
+                3,
+                4
+              ]
+            }
+          ],
+          "batch_size": 2
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "model": {
+            "id": "tiny",
+            "width": 2,
+            "layers": [
+              0,
+              1
+            ],
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "tokenizer": "fixed"
+          },
+          "sae": {
+            "id": "sae",
+            "model_id": "tiny",
+            "d_in": 2,
+            "layer": 1
+          },
+          "tokens": [
+            {
+              "id": "t",
+              "activation": [
+                0,
+                -1
+              ]
+            }
+          ],
+          "batch_size": 1
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "model": {
+            "id": "tiny",
+            "width": 2,
+            "layers": [
+              0,
+              1
+            ],
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "tokenizer": "fixed"
+          },
+          "sae": {
+            "id": "sae",
+            "model_id": "tiny",
+            "d_in": 3,
+            "layer": 1
+          },
+          "tokens": [],
+          "batch_size": 1
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "model": {
+            "id": "tiny",
+            "width": 2,
+            "layers": [
+              0,
+              1
+            ],
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "tokenizer": "fixed"
+          },
+          "sae": {
+            "id": "sae",
+            "model_id": "tiny",
+            "d_in": 2,
+            "layer": 1
+          },
+          "tokens": [
+            {
+              "id": "t",
+              "activation": [
+                1,
+                2,
+                3
+              ]
+            }
+          ],
+          "batch_size": 1
+        },
+        "valid": false
+      }
+    ],
+    "X08": [
+      {
+        "id": "positive_a",
+        "input": {
+          "samples": [
+            {
+              "id": "a",
+              "vector": [
+                1,
+                2
+              ]
+            },
+            {
+              "id": "b",
+              "vector": [
+                2,
+                0
+              ]
+            }
+          ],
+          "encoder": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "decoder": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "k": 1
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "samples": [
+            {
+              "id": "a",
+              "vector": [
+                1,
+                2
+              ]
+            },
+            {
+              "id": "b",
+              "vector": [
+                2,
+                0
+              ]
+            }
+          ],
+          "encoder": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "decoder": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "k": 2
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "samples": [
+            {
+              "id": "a",
+              "vector": [
+                1,
+                2
+              ]
+            },
+            {
+              "id": "b",
+              "vector": [
+                2,
+                0
+              ]
+            }
+          ],
+          "encoder": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "decoder": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "k": 3
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "samples": [
+            {
+              "id": "a",
+              "vector": [
+                1,
+                2,
+                3
+              ]
+            }
+          ],
+          "encoder": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "decoder": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "k": 1
+        },
+        "valid": false
+      }
+    ],
+    "X09": [
+      {
+        "id": "positive_a",
+        "input": {
+          "activations": [
+            {
+              "id": "a",
+              "features": [
+                1,
+                2,
+                3
+              ]
+            },
+            {
+              "id": "b",
+              "features": [
+                0,
+                -2,
+                1
+              ]
+            }
+          ],
+          "steps": [
+            {
+              "sample": "a",
+              "feature": 0,
+              "op": "ablate"
+            },
+            {
+              "sample": "a",
+              "feature": 1,
+              "op": "scale",
+              "value": 2
+            },
+            {
+              "sample": "b",
+              "feature": 1,
+              "op": "add",
+              "value": 4
+            }
+          ],
+          "mode": "teacher_forced"
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "activations": [
+            {
+              "id": "a",
+              "features": [
+                1,
+                2,
+                3
+              ]
+            },
+            {
+              "id": "b",
+              "features": [
+                0,
+                -2,
+                1
+              ]
+            }
+          ],
+          "steps": [
+            {
+              "sample": "b",
+              "feature": 1,
+              "op": "clamp",
+              "low": 0,
+              "high": 2
+            }
+          ],
+          "mode": "generation"
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "activations": [
+            {
+              "id": "a",
+              "features": [
+                1,
+                2,
+                3
+              ]
+            },
+            {
+              "id": "b",
+              "features": [
+                0,
+                -2,
+                1
+              ]
+            }
+          ],
+          "steps": [
+            {
+              "sample": "missing",
+              "feature": 0,
+              "op": "ablate"
+            }
+          ],
+          "mode": "teacher_forced"
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "activations": [
+            {
+              "id": "a",
+              "features": [
+                1,
+                2,
+                3
+              ]
+            },
+            {
+              "id": "b",
+              "features": [
+                0,
+                -2,
+                1
+              ]
+            }
+          ],
+          "steps": [
+            {
+              "sample": "a",
+              "feature": 5,
+              "op": "ablate"
+            }
+          ],
+          "mode": "teacher_forced"
+        },
+        "valid": false
+      }
+    ],
+    "X10": [
+      {
+        "id": "positive_a",
+        "input": {
+          "tokens": [
+            {
+              "id": "t1",
+              "activations": [
+                1,
+                4,
+                2
+              ]
+            },
+            {
+              "id": "t2",
+              "activations": [
+                3,
+                0,
+                3
+              ]
+            }
+          ],
+          "features": 3,
+          "topk": 2
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "tokens": [
+            {
+              "id": "x",
+              "activations": [
+                0,
+                1
+              ]
+            }
+          ],
+          "features": 2,
+          "topk": 1
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "tokens": [
+            {
+              "id": "t",
+              "activations": [
+                1,
+                2,
+                3
+              ]
+            }
+          ],
+          "features": 2,
+          "topk": 1
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "tokens": [
+            {
+              "id": "t",
+              "activations": [
+                1
+              ]
+            },
+            {
+              "id": "t",
+              "activations": [
+                2
+              ]
+            }
+          ],
+          "features": 1,
+          "topk": 1
+        },
+        "valid": false
+      }
+    ],
+    "X11": [
+      {
+        "id": "positive_a",
+        "input": {
+          "labels": [
+            1,
+            0
+          ],
+          "scores": [
+            0.9,
+            0.1
+          ],
+          "threshold": 0.5
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "labels": [
+            1,
+            0,
+            1,
+            0
+          ],
+          "scores": [
+            0.5,
+            0.5,
+            0.8,
+            0.2
+          ],
+          "threshold": 0.5
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "labels": [
+            1,
+            1
+          ],
+          "scores": [
+            0.5,
+            0.8
+          ],
+          "threshold": 0.5
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "labels": [
+            1,
+            0
+          ],
+          "scores": [
+            0.8
+          ],
+          "threshold": 0.5
+        },
+        "valid": false
+      }
+    ],
+    "X12": [
+      {
+        "id": "positive_a",
+        "input": {
+          "groups": [
+            {
+              "id": "a",
+              "values": [
+                1,
+                3
+              ]
+            },
+            {
+              "id": "b",
+              "values": [
+                2,
+                4
+              ]
+            }
+          ],
+          "seed": 17,
+          "draws": 8
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "groups": [
+            {
+              "id": "x",
+              "values": [
+                5
+              ]
+            },
+            {
+              "id": "y",
+              "values": [
+                7
+              ]
+            }
+          ],
+          "seed": 0,
+          "draws": 6
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "groups": [
+            {
+              "id": "a",
+              "values": [
+                1,
+                3
+              ]
+            },
+            {
+              "id": "b",
+              "values": [
+                2,
+                4
+              ]
+            }
+          ],
+          "seed": "x",
+          "draws": 8
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "groups": [],
+          "seed": 1,
+          "draws": 2
+        },
+        "valid": false
+      }
+    ],
+    "X13": [
+      {
+        "id": "positive_a",
+        "input": {
+          "adapters": [
+            {
+              "id": "A",
+              "rows": [
+                {
+                  "id": "a",
+                  "status": "success",
+                  "value": 1
+                },
+                {
+                  "id": "b",
+                  "status": "success",
+                  "value": 3
+                }
+              ]
+            },
+            {
+              "id": "B",
+              "rows": [
+                {
+                  "id": "c",
+                  "status": "success",
+                  "value": 5
+                },
+                {
+                  "id": "d",
+                  "status": "failed"
+                }
+              ]
+            }
+          ]
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "adapters": [
+            {
+              "id": "one",
+              "rows": [
+                {
+                  "id": "x",
+                  "status": "success",
+                  "value": 4
+                }
+              ]
+            }
+          ]
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "adapters": [
+            {
+              "id": "A",
+              "rows": [
+                {
+                  "id": "x",
+                  "status": "success",
+                  "value": 1
+                },
+                {
+                  "id": "x",
+                  "status": "success",
+                  "value": 2
+                }
+              ]
+            }
+          ]
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "adapters": [
+            {
+              "id": "A",
+              "rows": [
+                {
+                  "id": "x",
+                  "status": "unknown",
+                  "value": 1
+                }
+              ]
+            }
+          ]
+        },
+        "valid": false
+      }
+    ],
+    "X14": [
+      {
+        "id": "positive_a",
+        "input": {
+          "base": {
+            "model": "m",
+            "dataset": "d",
+            "seed": 7
+          },
+          "overrides": {
+            "seed": 10
+          },
+          "models": [
+            "m"
+          ],
+          "datasets": [
+            "d"
+          ],
+          "budget": 2
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "base": {
+            "model": "m",
+            "dataset": "d",
+            "seed": 7
+          },
+          "overrides": {},
+          "models": [
+            "m"
+          ],
+          "datasets": [
+            "d"
+          ],
+          "budget": 0
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "base": {
+            "model": "m",
+            "dataset": "d",
+            "seed": 7
+          },
+          "overrides": {
+            "model": "other"
+          },
+          "models": [
+            "m"
+          ],
+          "datasets": [
+            "d"
+          ],
+          "budget": 2
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "base": {
+            "model": "m",
+            "dataset": "d",
+            "seed": 7
+          },
+          "overrides": {
+            "seed": 10
+          },
+          "models": [
+            "m"
+          ],
+          "datasets": [
+            "d"
+          ],
+          "budget": 5
+        },
+        "valid": false
+      }
+    ],
+    "X15": [
+      {
+        "id": "positive_a",
+        "input": {
+          "identity": {
+            "run": "r",
+            "seed": 7,
+            "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "data_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "stages": [
+            {
+              "id": "a",
+              "value": 1
+            },
+            {
+              "id": "b",
+              "value": 2
+            },
+            {
+              "id": "c",
+              "value": 3
+            }
+          ],
+          "interrupt_after": 1,
+          "resume_identity": {
+            "run": "r",
+            "seed": 7,
+            "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "data_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "identity": {
+            "run": "r",
+            "seed": 7,
+            "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "data_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "stages": [
+            {
+              "id": "a",
+              "value": 1
+            },
+            {
+              "id": "b",
+              "value": 2
+            },
+            {
+              "id": "c",
+              "value": 3
+            }
+          ],
+          "interrupt_after": 3,
+          "resume_identity": {
+            "run": "r",
+            "seed": 7,
+            "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "data_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "identity": {
+            "run": "r",
+            "seed": 7,
+            "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "data_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "stages": [
+            {
+              "id": "a",
+              "value": 1
+            },
+            {
+              "id": "b",
+              "value": 2
+            },
+            {
+              "id": "c",
+              "value": 3
+            }
+          ],
+          "interrupt_after": 1,
+          "resume_identity": {
+            "run": "r",
+            "seed": 8,
+            "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "data_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "identity": {
+            "run": "r",
+            "seed": 7,
+            "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "data_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "stages": [
+            {
+              "id": "a",
+              "value": 1
+            },
+            {
+              "id": "b",
+              "value": 2
+            },
+            {
+              "id": "c",
+              "value": 3
+            }
+          ],
+          "interrupt_after": 5,
+          "resume_identity": {
+            "run": "r",
+            "seed": 7,
+            "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "data_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        "valid": false
+      }
+    ],
+    "X16": [
+      {
+        "id": "positive_a",
+        "input": {
+          "files": {
+            "a.txt": "hello",
+            "dir/b.txt": "bye"
+          },
+          "corrupt": false
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "files": {
+            "one": "x"
+          },
+          "corrupt": false
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "files": {
+            "../secret": "bad"
+          },
+          "corrupt": false
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "files": {
+            "safe": "hello"
+          },
+          "corrupt": true
+        },
+        "valid": false
+      }
+    ],
+    "X17": [
+      {
+        "id": "positive_a",
+        "input": {
+          "source_sha": "cccccccccccccccccccccccccccccccccccccccc",
+          "checks": [
+            {
+              "id": "quality",
+              "source_sha": "cccccccccccccccccccccccccccccccccccccccc",
+              "state": "success"
+            },
+            {
+              "id": "tests",
+              "source_sha": "cccccccccccccccccccccccccccccccccccccccc",
+              "state": "success"
+            }
+          ],
+          "required": [
+            "quality",
+            "tests"
+          ],
+          "reviewer": "trusted-human"
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "source_sha": "cccccccccccccccccccccccccccccccccccccccc",
+          "checks": [
+            {
+              "id": "tests",
+              "source_sha": "cccccccccccccccccccccccccccccccccccccccc",
+              "state": "success"
+            }
+          ],
+          "required": [
+            "tests"
+          ],
+          "reviewer": "trusted-human"
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "source_sha": "cccccccccccccccccccccccccccccccccccccccc",
+          "checks": [
+            {
+              "id": "tests",
+              "source_sha": "cccccccccccccccccccccccccccccccccccccccc",
+              "state": "pending"
+            }
+          ],
+          "required": [
+            "tests"
+          ],
+          "reviewer": "trusted-human"
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "source_sha": "cccccccccccccccccccccccccccccccccccccccc",
+          "checks": [
+            {
+              "id": "tests",
+              "source_sha": "cccccccccccccccccccccccccccccccccccccccc",
+              "state": "success"
+            }
+          ],
+          "required": [
+            "tests"
+          ],
+          "reviewer": "agent"
+        },
+        "valid": false
+      }
+    ],
+    "X18": [
+      {
+        "id": "positive_a",
+        "input": {
+          "base": "def f():\n    return 1\n",
+          "a": "def f():\n    return 2\n",
+          "b": "def f():\n    return 3\n",
+          "rebase_b": "HEAD_AFTER_A"
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "base": "x=0\n",
+          "a": "x=1\n",
+          "b": "x=2\n",
+          "rebase_b": "HEAD_AFTER_A"
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "base": "x=0\n",
+          "a": "x=1\n",
+          "b": "x=2\n",
+          "rebase_b": "BASE"
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "base": "x=0\n",
+          "a": "x=0\n",
+          "b": "x=1\n",
+          "rebase_b": "HEAD_AFTER_A"
+        },
+        "valid": false
+      }
+    ],
+    "X19": [
+      {
+        "id": "positive_a",
+        "input": {
+          "samples": [
+            {
+              "id": "a",
+              "vector": [
+                1,
+                2
+              ]
+            },
+            {
+              "id": "b",
+              "vector": [
+                2,
+                1
+              ]
+            }
+          ],
+          "encoder": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "decoder": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "ablate": 0
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "samples": [
+            {
+              "id": "a",
+              "vector": [
+                1,
+                2
+              ]
+            },
+            {
+              "id": "b",
+              "vector": [
+                2,
+                1
+              ]
+            }
+          ],
+          "encoder": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "decoder": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "ablate": 1
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "samples": [
+            {
+              "id": "a",
+              "vector": [
+                1,
+                2
+              ]
+            },
+            {
+              "id": "b",
+              "vector": [
+                2,
+                1
+              ]
+            }
+          ],
+          "encoder": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "decoder": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "ablate": 3
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "samples": [],
+          "encoder": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "decoder": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "ablate": 0
+        },
+        "valid": false
+      }
+    ],
+    "X20": [
+      {
+        "id": "positive_a",
+        "input": {
+          "initial": {
+            "revision": 0,
+            "source_sha": "initial",
+            "owner": "agent-a",
+            "status": "active"
+          },
+          "events": [
+            {
+              "op": "handoff",
+              "from": "agent-a",
+              "to": "agent-b"
+            },
+            {
+              "op": "fail",
+              "reason": "synthetic conflict"
+            },
+            {
+              "op": "resume",
+              "revision": 1,
+              "owner": "agent-b"
+            },
+            {
+              "op": "change",
+              "actor": "trusted-human",
+              "expected": 1,
+              "source_sha": "revised"
+            },
+            {
+              "op": "review",
+              "actor": "trusted-human",
+              "source_sha": "revised"
+            }
+          ]
+        },
+        "valid": true
+      },
+      {
+        "id": "positive_b",
+        "input": {
+          "initial": {
+            "revision": 0,
+            "source_sha": "initial",
+            "owner": "agent-a",
+            "status": "active"
+          },
+          "events": [
+            {
+              "op": "fail",
+              "reason": "timeout"
+            },
+            {
+              "op": "resume",
+              "revision": 0,
+              "owner": "agent-a"
+            },
+            {
+              "op": "review",
+              "actor": "trusted-human",
+              "source_sha": "initial"
+            }
+          ]
+        },
+        "valid": true
+      },
+      {
+        "id": "negative_a",
+        "input": {
+          "initial": {
+            "revision": 0,
+            "source_sha": "initial",
+            "owner": "agent-a",
+            "status": "active"
+          },
+          "events": [
+            {
+              "op": "handoff",
+              "from": "other",
+              "to": "agent-b"
+            }
+          ]
+        },
+        "valid": false
+      },
+      {
+        "id": "negative_b",
+        "input": {
+          "initial": {
+            "revision": 0,
+            "source_sha": "initial",
+            "owner": "agent-a",
+            "status": "active"
+          },
+          "events": [
+            {
+              "op": "change",
+              "actor": "agent-a",
+              "expected": 0,
+              "source_sha": "evil"
+            }
+          ]
+        },
+        "valid": false
+      }
+    ]
+  }
+}
