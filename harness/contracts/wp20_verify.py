@@ -47,8 +47,11 @@ def _tree(root):
 
 def _reference(case, payload):
     with tempfile.TemporaryDirectory(prefix="wp20-ref-") as wd:
-        result = CASES[case](payload, Path(wd))
-        return {"output": result, "files": _tree(wd)}
+        try:
+            result = CASES[case](payload, Path(wd))
+        except ValueError:
+            return {"ok": False, "kind": "ValueError", "output": None, "files": _tree(wd)}
+        return {"ok": True, "kind": None, "output": result, "files": _tree(wd)}
 
 
 def load_scenarios():
@@ -76,14 +79,11 @@ def check_spec():
         if len({row["id"] for row in tests}) != len(tests):
             raise ValueError("Duplicate scenario")
         for row in tests:
-            try:
-                observed = _reference(case, row["input"])
-            except ValueError:
-                if row["valid"]:
-                    raise ValueError(f"Reference rejected valid {case}/{row['id']}") from None
-            else:
-                if not row["valid"] or not isinstance(observed["output"], dict):
-                    raise ValueError(f"Reference accepted invalid {case}/{row['id']}")
+            observed = _reference(case, row["input"])
+            if observed["ok"] is not row["valid"]:
+                raise ValueError(f"Reference outcome mismatch {case}/{row['id']}")
+            if row["valid"] and not isinstance(observed["output"], dict):
+                raise ValueError(f"Reference returned invalid output {case}/{row['id']}")
             checked += 1
     return {"cases": len(READY), "scenarios": checked, "status": "VERIFIER_QUALIFIED",
             "human_approval": False}
@@ -113,9 +113,7 @@ def verify_case(case, candidate):
     source = _candidate_source(candidate)
     output = []
     for row in load_scenarios()["cases"][case]:
-        expected = None
-        if row["valid"]:
-            expected = _reference(case, row["input"])
+        expected = _reference(case, row["input"])
         with tempfile.TemporaryDirectory(prefix="wp20-candidate-") as wd:
             env = {"PATH": os.environ.get("PATH", ""), "HOME": wd,
                    "PYTHONPATH": str(ROOT), "PYTHONDONTWRITEBYTECODE": "1",
@@ -130,10 +128,10 @@ def verify_case(case, candidate):
                 observed = received.get("output")
                 passed = (
                     p.returncode == 0 and received.get("mutated") is False and
-                    ((row["valid"] and received.get("ok") is True and
-                      observed == expected["output"] and received.get("files") == expected["files"])
-                     or (not row["valid"] and received.get("ok") is False and
-                         received.get("kind") == "ValueError" and received.get("files") == {}))
+                    (received.get("ok") is expected["ok"] and
+                     received.get("kind") == expected["kind"] and
+                     observed == expected["output"] and
+                     received.get("files") == expected["files"])
                 )
             except (ValueError, subprocess.TimeoutExpired, json.JSONDecodeError):
                 passed = False
