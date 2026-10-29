@@ -131,6 +131,8 @@ def test_shell_only_runs_scoped_pytest_not_governance_or_arbitrary_scripts():
         "mkdir -p novel_root",
         "mkdir -p harness/tests/../../novel_root",
         "mkdir -p harness/tests/wp18/acceptance/private",
+        "mkdir -p harness/tests/wp18/acceptance",
+        "mkdir -p harness/tests/./wp18/acceptance",
         "mkdir -p harness/tests/example && mkdir novel_root",
         "git clone https://example.com/project other_root",
         "python -c 'print(1)'",
