@@ -61,3 +61,14 @@ python -m harness.contracts.registry resolve --plan harness/github_work_plan/18_
 `selection.audit_selection(contract_ids, task_signals)` 只核对明确声明的输入、输出和操作信号（例如 `source_reference`、`sensitive_output`、`tree_nodes`、`bilingual_fields`），不猜测自然语言的隐含意思。未知信号停下报告 `CONTRACT_GAP`，遗漏适用合同标记 `SELECTION_GAP`。Work Plan 原有 Contract binding 不变，历史 Work Plan 不要求迁移。
 
 治理层 `python -m harness.contracts.acceptance --plan <plan> --case <case> --receipt <run/contract_receipt.json> --evaluator <acceptance/evaluation.json>` 读取独立评审者写在受保护 `acceptance/` 的记录，核对真实输出、负面测试状态、source_verified 和既有 Invariants。该 gate 不运行 agent 代码，不相信 agent 自评，不提供审批；成功仅表示技术检查完成、**仍需人类审阅**。评审者须在隔离环境自己运行测试、检查 Git diff 和 AST，才能写上述记录。Hooks 不是 OS 沙箱。
+
+## WP18 H07–H26 · 先验规范与可执行 Verification
+
+2026-10-29 治理更新：`catalog.json` v1.1 新增六个跨任务 Contract：`CT-DATA`、`CT-CONFIG`、`CT-RESOURCE`、`CT-RELEASE`、`CT-RECOVERY`、`CT-NAMESPACE`，历史 Work Plan 的兼容性保持不变。新 20 题不是 20 个临时 Contract，而是引用固定的现有/新增通用 ID。
+
+- `wp18_cases.json`：20 个任务的目标、规则、选择 tags、signals、测试数据与预期结果，当前冻结 86 个正/反验证用例。
+- `wp18_verify.py`：按 Work Plan 解析并验证每题所选 Contract，复核实际 `solve(payload)` 的结果/拒绝、输入不变性、稳定输出和超时；并在考试 PR 中进行真实 diff 的治理范围审计。
+- `wp18_worker.py`：隔离子进程接口，输出结构化结果，不打印候选异常中的敏感值；子进程不是安全沙箱。
+- `harness/github_work_test/test_wp18_h07_h26_contracts.py`：独立回归，确保 20 个任务、全部合同绑定和验证器存在且有效。
+
+Agent 可 **读取** 上述全部资料。只可新增自己的 `harness/tests/wp18/runs/<run_id>/<case>/`，不能编辑任何规范、验证或治理源码。独立 CI 从实际 PR diff 检查修改范围，并实际执行新 HW 的可见验证；另由独立评审运行不同输入与人工审阅。失败先归因，不给任务 Agent 放宽验证标准的权限。

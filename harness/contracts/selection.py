@@ -16,6 +16,12 @@ SIGNALS = {
     "glossary_terms": "CT-CONTEXT",
     "source_ast": "CT-AST",
     "environment_observation": "CT-ENV",
+    "dataset_manifest": "CT-DATA",
+    "config_metadata": "CT-CONFIG",
+    "resource_budget": "CT-RESOURCE",
+    "release_gate": "CT-RELEASE",
+    "resume_receipt": "CT-RECOVERY",
+    "namespace_paths": "CT-NAMESPACE",
 }
 
 

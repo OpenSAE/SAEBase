@@ -106,6 +106,30 @@ def gate(command, plan_id=None):
         except (ValueError, IndexError):
             pass
         return "Unapproved Contract Registry command"
+    # Read-only frozen verification entry point, with a single case-bound sandbox.
+    if re.match(r"^(?:python|python3) -m harness\\.contracts\\.wp18_verify(?: |$)", command):
+        try:
+            args = shlex.split(command)
+            if args[:3] not in (
+                ["python", "-m", "harness.contracts.wp18_verify"],
+                ["python3", "-m", "harness.contracts.wp18_verify"],
+            ):
+                return "Malformed WP18 verifier command"
+            if args[3:] == ["--check-spec"]:
+                return None
+            if len(args) == 7 and args[3] == "--case" and args[5] == "--run-dir":
+                case = args[4]
+                target = args[6]
+                if re.fullmatch(r"H(?:0[7-9]|1[0-9]|2[0-6])", case) and re.fullmatch(
+                    r"harness/tests/wp18/runs/[A-Za-z0-9][A-Za-z0-9_-]{3,63}/" + case,
+                    target,
+                ):
+                    dest = (ROOT / target).resolve()
+                    if dest.is_relative_to((ROOT / "harness/tests/wp18/runs").resolve()):
+                        return None
+        except (IndexError, ValueError, OSError):
+            pass
+        return "Only exact read-only WP18 case verification is permitted"
     # Do not grant arbitrary shell execution just because a command mentions
     # harness/tests. Only the single-purpose, path-checked pytest form is free.
     if HARNESS_PYTEST.fullmatch(command):

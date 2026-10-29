@@ -29,7 +29,7 @@ def test_catalog_has_a_closed_and_versioned_vocabulary():
 
 def test_wp18_all_cases_bind_predeclared_contracts():
     plan = registry.validate_plan(PLAN)
-    assert set(plan["cases"]) == {"H01", "H02", "H03", "H04", "H05", "H06"}
+    assert {"H01", "H02", "H03", "H04", "H05", "H06"} <= set(plan["cases"])
     required = {
         "H01": "CT-EVIDENCE",
         "H02": "CT-STRUCT",
