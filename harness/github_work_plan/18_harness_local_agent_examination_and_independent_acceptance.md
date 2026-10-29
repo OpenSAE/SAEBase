@@ -1,6 +1,6 @@
 # Work Plan 18 — Harness 本地 Agent 测验与独立验收
 
-状态：**READY FOR TEST-SANDBOX（待治理 PR 合并生效）**。本文件只定义测验，不代表六题已执行或通过。 
+状态：**Contract Registry v1 已启用；新一轮 WP18 测验尚未执行**。本文件只定义测验，不代表六题已执行或通过。 
 范围：Harness 的 Rules、Skills、Hooks、Work Order、Agent Flow、AST / Tree、Context、环境事实、Atlas 交互与双语。**不测 SAE 算法、模型、GPU、权重或科研功能。**
 
 
