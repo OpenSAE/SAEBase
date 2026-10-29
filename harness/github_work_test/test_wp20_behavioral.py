@@ -1,8 +1,6 @@
 """Trusted WP20 grader calibration: all cases, real outputs and known bad implementations."""
 from __future__ import annotations
 
-import json
-from pathlib import Path
 
 import pytest
 from harness.contracts import wp20_verify as grader

@@ -7,7 +7,7 @@ from pathlib import Path
 import subprocess
 import tarfile
 
-from harness.contracts.wp20_reference_b import dot, sha, serial
+from harness.contracts.wp20_reference_b import dot
 
 
 def x16(p, root):
