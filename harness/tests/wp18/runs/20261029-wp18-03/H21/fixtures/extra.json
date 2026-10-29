@@ -1,0 +1,43 @@
+{
+  "positive": [
+    {
+      "input": {
+        "modules": [
+          "saebase.registry",
+          "datasets.ioi",
+          "tasks.capture"
+        ]
+      },
+      "expected": {
+        "modules": [
+          "datasets.ioi",
+          "saebase.registry",
+          "tasks.capture"
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "modules": [
+          "tasks.nlp.tag"
+        ]
+      }
+    },
+    {
+      "input": {
+        "modules": [
+          "models.gemma.extra"
+        ]
+      }
+    },
+    {
+      "input": {
+        "modules": [
+          ""
+        ]
+      }
+    }
+  ]
+}

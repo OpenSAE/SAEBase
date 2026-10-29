@@ -1,0 +1,79 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-03",
+  "case_id": "H22",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "071cfcc4556173333de8e8da0ebdfa08da8b28f7",
+  "source_content_sha256": "027e0179bc67e924817bc94cbe0288a1fc28b007a60c458bc6148576d1e72640",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-03.H22.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H22.implementation",
+      "title": {
+        "zh": "调度拒绝",
+        "en": "Schedule rejection"
+      },
+      "summary": {
+        "zh": "缺依赖、重复 job 或环都会拒绝，不输出半截顺序。",
+        "en": "Missing dependencies, duplicate jobs, and cycles are rejected. No partial order is returned."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H22/implementation.py",
+      "line": 6,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H22/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H22.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H22.implementation",
+      "title": {
+        "zh": "调度入口",
+        "en": "Schedule entry"
+      },
+      "summary": {
+        "zh": "对 jobs 做稳定拓扑排序。",
+        "en": "Produces a stable topological order for jobs."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H22/implementation.py",
+      "line": 10,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H22/implementation.py:10"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H22.implementation:_schedule",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H22.implementation",
+      "title": {
+        "zh": "拓扑顺序",
+        "en": "Topological order"
+      },
+      "summary": {
+        "zh": "同一批就绪任务按 id 排序，依赖必须来自同一张图。",
+        "en": "Sorts jobs that become ready together by id. Dependencies must belong to the same graph."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H22/implementation.py",
+      "line": 17,
+      "signature": "def _schedule(values: object) -> list[str]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H22/implementation.py:17"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; harness/code/build.py was not run to produce Observed",
+    "independent acceptance was not run",
+    "nodes remain unchecked"
+  ]
+}

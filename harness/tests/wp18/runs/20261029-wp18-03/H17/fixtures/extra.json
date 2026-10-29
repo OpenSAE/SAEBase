@@ -1,0 +1,73 @@
+{
+  "positive": [
+    {
+      "input": {
+        "splits": {
+          "train": [
+            "s",
+            "r"
+          ],
+          "val": [
+            "q"
+          ],
+          "test": [
+            "p"
+          ]
+        }
+      },
+      "expected": {
+        "counts": {
+          "train": 2,
+          "val": 1,
+          "test": 1
+        },
+        "ids": {
+          "train": [
+            "r",
+            "s"
+          ],
+          "val": [
+            "q"
+          ],
+          "test": [
+            "p"
+          ]
+        }
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "splits": {
+          "train": [
+            "p"
+          ],
+          "val": [],
+          "test": [
+            "p"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "splits": {
+          "train": [
+            ""
+          ],
+          "val": [],
+          "test": []
+        }
+      }
+    },
+    {
+      "input": {
+        "splits": {
+          "train": [],
+          "val": []
+        }
+      }
+    }
+  ]
+}

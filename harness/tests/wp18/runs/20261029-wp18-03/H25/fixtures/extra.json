@@ -1,0 +1,66 @@
+{
+  "positive": [
+    {
+      "input": {
+        "items": [
+          {
+            "id": "c",
+            "value": 3
+          },
+          {
+            "id": "a",
+            "value": 1
+          },
+          {
+            "id": "b",
+            "value": 2
+          }
+        ]
+      },
+      "expected": {
+        "items": [
+          {
+            "id": "a",
+            "value": 1
+          },
+          {
+            "id": "b",
+            "value": 2
+          },
+          {
+            "id": "c",
+            "value": 3
+          }
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "items": [
+          {
+            "id": "a",
+            "value": 1
+          },
+          {
+            "id": "a",
+            "value": 1
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "items": [
+          {
+            "id": "a",
+            "value": {
+              "nested": 1
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

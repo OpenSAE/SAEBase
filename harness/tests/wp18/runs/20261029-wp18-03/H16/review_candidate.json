@@ -1,0 +1,79 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-03",
+  "case_id": "H16",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "071cfcc4556173333de8e8da0ebdfa08da8b28f7",
+  "source_content_sha256": "dffc2d98efb5ef8c2dfa2675a60d6c7453d1e587357d78dc2bc5c5a453f05a76",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-03.H16.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H16.implementation",
+      "title": {
+        "zh": "清单拒绝",
+        "en": "Manifest rejection"
+      },
+      "summary": {
+        "zh": "路径、长度、摘要或重复项不合法时拒绝，且不读取真实文件。",
+        "en": "Rejects an illegal path, size, digest, or duplicate. It does not read a real file."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H16/implementation.py",
+      "line": 10,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H16/implementation.py:10"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H16.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H16.implementation",
+      "title": {
+        "zh": "清单排序",
+        "en": "Manifest ordering"
+      },
+      "summary": {
+        "zh": "核对每一行后按相对路径排序返回。",
+        "en": "Validates every row and returns them sorted by relative path."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H16/implementation.py",
+      "line": 14,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H16/implementation.py:14"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H16.implementation:_file_row",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H16.implementation",
+      "title": {
+        "zh": "清单一行",
+        "en": "One manifest row"
+      },
+      "summary": {
+        "zh": "要求相对路径、非负字节数和 64 位小写 sha256。",
+        "en": "Requires a relative path, a nonnegative byte count, and a 64-character lowercase sha256."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H16/implementation.py",
+      "line": 34,
+      "signature": "def _file_row(row: object) -> dict[str, object]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H16/implementation.py:34"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; harness/code/build.py was not run to produce Observed",
+    "independent acceptance was not run",
+    "nodes remain unchecked"
+  ]
+}
