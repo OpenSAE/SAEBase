@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from harness.contracts import wp19_reference, wp19_verify
+from harness.contracts import wp19_reference, wp19_reference_ext, wp19_verify
 
 
 def test_twenty_cases_and_all_200_distinct_ids():
     state = wp19_verify.check_spec()
-    assert state == {"cases": 200, "ready": 20, "proposed": 180, "checks": 80}
+    assert state == {"cases": 200, "ready": 200, "proposed": 0, "checks": 800}
 
 
 def test_known_bad_candidate_cannot_fake_a_correct_verdict(tmp_path, monkeypatch):
@@ -34,11 +34,11 @@ def test_known_bad_candidate_cannot_fake_a_correct_verdict(tmp_path, monkeypatch
 
 
 def test_unqualified_case_rejected(tmp_path):
-    for case in ("H47", "H100", "H226"):
+    for case in ("H26", "H227", "H999"):
         try:
             wp19_verify.verify_case(case, tmp_path)
         except ValueError as exc:
-            assert "proposal" in str(exc)
+            assert "outside ready" in str(exc)
         else:
             raise AssertionError(case)
 
@@ -50,7 +50,7 @@ def test_reference_consistent_with_frozen_positive_and_negative_cases():
             continue
         for row in case["checks"]:
             try:
-                actual = wp19_reference.solve(case["id"], row["input"])
+                actual = (wp19_reference.solve(case["id"], row["input"]) if int(case["id"][1:]) <= 46 else wp19_reference_ext.solve(case["id"], row["input"], case))
             except ValueError:
                 assert row.get("reject") is True
             else:
@@ -109,7 +109,7 @@ def test_wp19_independent_acceptance_is_not_agent_writable():
 def test_every_ready_case_rejects_a_constant_wrong_implementation(tmp_path, monkeypatch):
     monkeypatch.setattr(wp19_verify, "RUNS", tmp_path)
     ready = [row for row in wp19_verify.load_spec()["cases"] if row["status"] == "READY"]
-    assert len(ready) == 20
+    assert len(ready) == 200
     for row in ready:
         run = tmp_path / "mutant-run" / row["id"]
         run.mkdir(parents=True)
@@ -120,3 +120,26 @@ def test_every_ready_case_rejects_a_constant_wrong_implementation(tmp_path, monk
         verdict = wp19_verify.verify_case(row["id"], run)
         assert verdict["failed"] >= 2, row["id"]
         assert verdict["human_approval"] is False
+
+
+def test_all_180_new_cases_have_distinct_semantic_metadata():
+    cases = wp19_verify.load_spec()["cases"][20:]
+    assert len(cases) == 180
+    assert all(c["operator"] and c["title"] and c["requirement"] for c in cases)
+    assert len({c["id"] for c in cases}) == 180
+    assert len({(c["title"], c["requirement"]) for c in cases}) == 180
+
+
+def test_two_good_and_two_negative_per_new_case():
+    cases = wp19_verify.load_spec()["cases"][20:]
+    for case in cases:
+        assert len(case["checks"]) == 4
+        assert sum("expected" in row for row in case["checks"]) == 2
+        assert sum(row.get("reject") is True for row in case["checks"]) == 2
+        for row in case["checks"]:
+            try:
+                result = wp19_reference_ext.solve(case["id"], row["input"], case)
+            except ValueError:
+                assert row.get("reject") is True, (case["id"], row["name"])
+            else:
+                assert row["expected"] == result, (case["id"], row["name"])
