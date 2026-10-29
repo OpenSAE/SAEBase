@@ -176,3 +176,27 @@ def test_independent_multimodule_auroc_average_precision_candidate_passes(tmp_pa
     assert result["passed"] == 4
     assert result["failed"] == 0
     assert result["human_approved"] is False
+
+
+def test_failed_scenario_accepts_fail_fast_without_forced_partial_artifacts(tmp_path, monkeypatch):
+    case = tmp_path / "fresh-run" / "X18"
+    case.mkdir(parents=True)
+    (case / "implementation.py").write_text(
+        "def run(payload, workdir):\n    raise ValueError('fail-fast')\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(grader, "RUNS", tmp_path)
+    result = grader.verify_case("X18", case)
+    assert result["passed"] == 2
+    assert result["failed"] == 2
+    assert not result["human_approved"]
+
+
+def test_empty_exam_scan_does_not_report_pass(tmp_path, monkeypatch, capsys):
+    import json
+    import sys
+
+    monkeypatch.setattr(grader, "RUNS", tmp_path)
+    monkeypatch.setattr(sys, "argv", ["wp20_verify", "--scan"])
+    assert grader.main() == 1
+    assert json.loads(capsys.readouterr().out)["status"] == "BLOCKED"

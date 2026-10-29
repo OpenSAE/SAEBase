@@ -176,7 +176,15 @@ def verify_case(case, candidate):
                         received.get("ok") is expected["ok"]
                         and received.get("kind") == expected["kind"]
                         and observed == expected["output"]
-                        and received.get("files") == expected["files"]
+                        and (
+                            received.get("files") == expected["files"]
+                            if expected["ok"]
+                            else isinstance(received.get("files"), dict)
+                            and all(
+                                name in expected["files"]
+                                for name in received["files"]
+                            )
+                        )
                     )
                 )
             except (ValueError, subprocess.TimeoutExpired, json.JSONDecodeError):
@@ -250,6 +258,8 @@ def main():
                             result["cases"].append({"case": c, "failed": 1, "missing": True})
         elif not args.check_spec and not args.base:
             raise ValueError("Select --check-spec, --case, --scan, or --base")
+        if args.scan and not result.get("cases"):
+            raise ValueError("No WP20 exam runs submitted; empty scan is not PASS")
         result["status"] = (
             "FAIL"
             if result.get("unauthorized_changes")
