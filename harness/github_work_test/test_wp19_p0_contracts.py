@@ -114,8 +114,7 @@ def test_every_ready_case_rejects_a_constant_wrong_implementation(tmp_path, monk
         run = tmp_path / "mutant-run" / row["id"]
         run.mkdir(parents=True)
         (run / "implementation.py").write_text(
-            "def solve(payload):\n"
-            "    return {'mutant': True}\n",
+            "def solve(payload):\n    return {'mutant': True}\n",
             encoding="utf-8",
         )
         verdict = wp19_verify.verify_case(row["id"], run)
