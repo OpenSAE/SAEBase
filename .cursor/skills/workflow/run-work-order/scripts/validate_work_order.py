@@ -44,7 +44,7 @@ def reference(value, kind, check_exists=True):
     prefixes = (
         ("doc/knowledge/", "doc/code/")
         if kind == "doc"
-        else ("harness/github_harness/github_work_plan/",)
+        else ("harness/github_work_plan/",)
     )
     demand(any(value.startswith(p) for p in prefixes), f"Reference is outside {kind}: {value}")
     dest = (ROOT / value).resolve(strict=False)
