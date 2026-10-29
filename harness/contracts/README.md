@@ -1,0 +1,57 @@
+# Universal Task Contracts · SAEBase Harness v1
+
+Harness 的通用 Contract **在任务出现之前**定义于 [catalog.json](catalog.json)，由治理维护者版本化；任务 Agent 和 Work Plan 只能选择已有 ID，不能在任务中临时修改、弱化或重新定义合同。它不是针对 WP18 六个例子的解题脚本，也不保证预见世上每种算法的专属正确性条件；它覆盖任意任务都需要考虑的**跨任务约束类别**，具体算法的确定性输入输出仍由 Work Plan 声明。
+
+## 合同层级和原则
+
+1. **Always-on**：`CT-BASE`、`CT-SCOPE`、`CT-TRUTH`、`CT-CHECK`、`CT-TRACE`。任何任务都继承，Work Plan 不能取消。
+2. **Conditional**：证据 `CT-EVIDENCE`、隐私 `CT-PRIVACY`、树结构 `CT-STRUCT`、审阅 `CT-REVIEW`、双语 `CT-LOCALE`、知识 `CT-CONTEXT`、AST `CT-AST`、环境 `CT-ENV`、确定性 `CT-DETERMINISM`、接口 `CT-INTERFACE`、错误语义 `CT-ERROR`。
+3. **Work Plan binding**：每个 Work Plan 明确引用固定 ID；每个 CASE 再声明 task tags 和对应合同 ID。解析器拒绝未知 ID、缺少覆盖、重复 ID、越权 Work Plan 路径。合同列表由机器生成并用于实施前检查与独立验收，不能让 Agent 自己改变裁判标准。
+4. **不可放宽**：局部要求可以比目录更严格，不能把 Always-on 或已选 Contract 改弱。如发现目录缺陷，提交治理建议，只有可信维护者修改 catalog/validator 和对应独立测试。
+5. **未知新任务**：人类仍可直接说“测 Harness 的 X”。Agent 先从**现成 tags**选择合同，落在 `harness/tests/` 做隔离测试并记录选择；这不是正式产品授权。需正式 Work Plan 的任务，治理方再把 tag/ID 写入受保护的 Work Plan 文件。无合适的 Contract 时报告 `CONTRACT_GAP`，不能默默自创或跳过。
+
+## 输入合同和实际验证
+
+`catalog.json` 是规范化注册表。只读选择器：
+
+```bash
+yython -m harness.contracts.registry list
+yython -m harness.contracts.registry check --plan harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md
+python -m harness.contracts.registry resolve --plan harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md --case H04
+```
+
+对于自定义测试，按 `catalog.json` 的固定 tags 选择 `CT-` ID；不能改变目录。独立工具 `harness/contracts/invariants.py` 提供可复用来源验证、完整结构脱敏、Tree 身份和中英完整性检查的参考实现，属于**治理层**，不让被测 Agent 为通过测验而编辑。
+
+`harness/contracts/trace.py` 可检查每个 Run 的 `contract_receipt.json` 中 ID、版本、文件范围与动作记录的结构完整性。Receipt 不会自动证明命令真的运行、文件真的被读取、Agent 看过所有内容或人类已批准；验收者须另外核对 Git diff、真实 AST、CI 日志及审批事件。
+
+## Work Plan 声明（放在具体 Work Plan 中）
+
+下面是格式示例，**不是另一个合同目录**：
+
+```harness-contracts-json
+{
+  "registry": "saebase.harness.contract_registry.v1",
+  "plan": ["CT-ERROR"],
+  "cases": {
+    "H01": {
+      "tags": ["evidence", "interface"],
+      "contracts": ["CT-EVIDENCE", "CT-INTERFACE"]
+    }
+  }
+}
+```
+
+选项 `plan` 是全计划共同附加合同，`cases` 为逐任务清单。无论省略与否，5 个 always-on 始终由解析器补齐。读入顺序：全局常驻 Rule → Work Plan 声明 → 此 CASE 的 `resolve` 输出 → 最小必要业务 Context → 代码及测试。不要递归加载整个 Core、Knowledge、Glossary。
+
+## Execution Trace / Failure Attribution
+
+每个测试 Run 写 `contract_receipt.json`，至少包含 schema、contract_ids、registry_version、case_id、context_paths、edited_paths、commands（argv+exit_code）、unresolved。可选记录 source SHA、Context ID、工具拒绝/失败原因，但不要求或保存 Agent 私有推理。独立验收记录：
+
+- `CONTRACT_GAP`：确有适用的约束，现有合同目录没有表达。
+- `SELECTION_GAP`：目录已定义但 Work Plan 未引用/Agent 未加载。
+- `IMPLEMENTATION_ERROR`：规范明确且可见，Agent 实现仍违反。
+- `ENFORCEMENT_GAP`：Agent 产出错误但自动校验未阻止或标记。
+- `EVALUATOR_SCOPE_GAP`：评审新加的检查超出原冻结合同。
+- `ENV_BLOCKED`：权限、依赖、设备或文件系统限制使任务不能执行。
+
+修复责任在 Harness 治理维护者；测试 Agent 只按当前规则执行并提交可观察证据。验收阶段保持原始 Agent 分支不变，独立评审在单独分支验证。下一轮使用新的同类任务检查改进的泛化能力，而非仅要求旧失败变绿。

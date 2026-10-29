@@ -77,7 +77,24 @@ def validate(path, template=False):
     )
     demand(path.is_file(), "Work Order not found: " + str(path))
     order = yaml.safe_load(path.read_text(encoding="utf-8"))
-    keys(order, {"version", "id", "status", "goal", "activation", "context"}, "Work Order")
+    regular = {"version", "id", "status", "goal", "activation", "context"}
+    demand(isinstance(order, dict), "Work Order must be a mapping")
+    if "contract_binding" in order:
+        keys(order, regular | {"contract_binding"}, "Work Order")
+        binding = keys(order["contract_binding"], {"plan", "case", "contract_ids"}, "contract_binding")
+        sys.path.insert(0, str(ROOT))
+        from harness.contracts.registry import ContractError, resolve
+
+        try:
+            selection = resolve(binding["plan"], binding["case"])
+        except (ContractError, TypeError, OSError) as exc:
+            raise InvalidOrder("Invalid Contract Registry binding: " + str(exc)) from exc
+        demand(binding["contract_ids"] == selection["contract_ids"],
+               "Work Order contract IDs must match the predeclared Work Plan")
+    else:
+        # Historical v3 Work Orders remain parseable but do not claim to
+        # have selected or passed universal task contract validation.
+        keys(order, regular, "Work Order")
     demand(type(order["version"]) is int and order["version"] == 3, "Work Order v3 required")
     demand(
         order["status"] == ("template" if template else "ready"),
@@ -138,6 +155,10 @@ def validate(path, template=False):
     for field, values in sets.items():
         result[field] = len(values)
     result["modules"] = sum(activation.values())
+    result["contracts"] = (
+        len(order["contract_binding"]["contract_ids"])
+        if "contract_binding" in order else "legacy_unbound"
+    )
     return result
 
 

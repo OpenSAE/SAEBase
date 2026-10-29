@@ -19,6 +19,15 @@ alwaysApply: true
 - 任何任务 Agent 都不得新建项目根一级目录，唯一允许的**新目录名**为 `experiments/` 与 `tests/`，二者亦需符合各自任务授权；Harness 测试优先放现有 `harness/tests/`，禁止任意新增 `utils/`、`scripts/`、`results/` 等根目录。
 - Code、Knowledge、Context 和 Environment 只能按任务范围选择读取；Core 默认受保护。
 
+# Universal Task Contracts（所有任务必须遵守）
+
+- **先遵守已有合同，再执行任务**：`harness/contracts/catalog.json` 提前定义全局 Always-on 与各类型 Conditional Contract，**任何本地 Agent / 工作单不得在任务中重新定义或放宽合同**。
+- 新建 Work Plan 必须显式列出适用的 Contract ID 和任务 tags；可使用 `python -m harness.contracts.registry check/resolve` 核验，普通 Harness 测验 H01–H06 直接按 WP18 已选 ID 工作。未知类型使用已有 tag 组合，缺少合同时提交 `CONTRACT_GAP`，不能静默跳过。
+- Agent 在编码前用已解析 Contract 导出输入/输出、无效输入、负面用例、来源等级、结构不变量，且只加载实际所需的 Context；不要求人类输入 CLI 命令。
+- 测验报告另附 `contract_receipt.json` 的可观察执行记录：所选合同、真实阅读文件、代码修改、实际测试命令/退出码及未验证项。不可用推断代替日志，不要求 Agent 记录私人推理。
+- 通用 Evidence / Privacy / Tree / Localization 参考验证器属于**治理只读源** `harness/contracts/invariants.py`；Agent 不得为通过考试更改它，Harness 维护者负责修复。
+- 只有可观察的 source diff、测试/来源验证与独立审阅可以提升证据级别；Agent 自测不会自动成为外部验收通过。
+
 # Agent Flow
 
 - 外部 Work Plan 须先进行结构审计与人类预审，再授权精确文件范围与命令。

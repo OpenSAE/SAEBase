@@ -67,6 +67,45 @@ def gate(command, plan_id=None):
         return "Shell directory creation is only allowed inside harness/tests/"
     if DANGEROUS.search(command):
         return "High-risk shell operation is not permitted to task agents"
+    # This is a read-only, path-bound contract resolution interface.
+    # It is never a production authorization or a general-purpose Python shell.
+    if re.match(r"^(?:python|python3) -m harness\.contracts\.registry(?: |$)", command):
+        try:
+            args = shlex.split(command)
+            prefix = args[:3]
+            if prefix not in (
+                ["python", "-m", "harness.contracts.registry"],
+                ["python3", "-m", "harness.contracts.registry"],
+            ):
+                return "Malformed Contract Registry command"
+            if args[3:] == ["list"]:
+                return None
+            if len(args) == 6 and args[3:5] == ["select", "--tags"]:
+                tags = args[5]
+                if re.fullmatch(r"[a-z]+(?:,[a-z]+)*", tags):
+                    return None
+                return "Unrecognized Contract task tag expression"
+            if len(args) not in (6, 8) or args[4] != "--plan":
+                return "Contract Registry command must name exact plan and optional case"
+            if args[3] not in ("check", "resolve"):
+                return "Only read-only Contract Registry actions are permitted"
+            plan = args[5]
+            if not re.fullmatch(
+                r"harness/github_work_plan/[A-Za-z0-9_-]+\.md", plan
+            ):
+                return "Invalid Work Plan reference for contract selection"
+            if args[3] == "check" and len(args) == 6:
+                return None
+            if (
+                args[3] == "resolve"
+                and len(args) == 8
+                and args[6] == "--case"
+                and re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]{1,63}", args[7])
+            ):
+                return None
+        except (ValueError, IndexError):
+            pass
+        return "Unapproved Contract Registry command"
     # Do not grant arbitrary shell execution just because a command mentions
     # harness/tests. Only the single-purpose, path-checked pytest form is free.
     if HARNESS_PYTEST.fullmatch(command):

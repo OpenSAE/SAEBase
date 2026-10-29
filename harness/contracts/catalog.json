@@ -1,0 +1,300 @@
+{
+  "schema": "saebase.harness.contract_registry.v1",
+  "version": "1.0.0",
+  "project": "SAEBase",
+  "policy": "Closed vocabulary of reusable, task-agnostic obligations. Existing contracts are never silently weakened for a task; work plans select IDs and can add stricter conditions. New universal contracts require a separate governance change.",
+  "required_always": [
+    "CT-BASE",
+    "CT-SCOPE",
+    "CT-TRUTH",
+    "CT-CHECK",
+    "CT-TRACE"
+  ],
+  "task_tags": [
+    "evidence",
+    "privacy",
+    "tree",
+    "review",
+    "localization",
+    "context",
+    "code",
+    "environment",
+    "determinism",
+    "interface",
+    "validation"
+  ],
+  "contracts": [
+    {
+      "id": "CT-BASE",
+      "enforcement": "always",
+      "title": "All tasks",
+      "tags": [
+        "scope"
+      ],
+      "requirements": [
+        "Declare the actual task goal, authorized outputs, affected paths and prohibited work before editing.",
+        "Use the selected workplan as task authority; drafts are never execution approval.",
+        "Report unsupported assumptions as unresolved rather than silently expanding scope."
+      ],
+      "negative_examples": [
+        "Unauthorized production edit",
+        "Unknown task treated as unlimited permission"
+      ]
+    },
+    {
+      "id": "CT-SCOPE",
+      "enforcement": "always",
+      "title": "Workspace and boundaries",
+      "tags": [
+        "scope"
+      ],
+      "requirements": [
+        "Do not create unapproved top-level directories or edit governance/authority files without a trusted separate approval.",
+        "Place temporary Harness exercise sources and reports under harness/tests/<topic>/<run>/<case>.",
+        "Keep evaluator-only acceptance outputs read-only and preserve previous run results."
+      ],
+      "negative_examples": [
+        "Accidental new top-level directory",
+        "A sandbox result written to the authority graph"
+      ]
+    },
+    {
+      "id": "CT-TRUTH",
+      "enforcement": "always",
+      "title": "Claims and evidence",
+      "tags": [
+        "evidence"
+      ],
+      "requirements": [
+        "Distinguish planned, implemented, self-tested, externally verified and approved states.",
+        "Never report a synthetic observation as a machine measurement or an expected diff as observed AST.",
+        "Preserve failures and report unexecuted checks explicitly."
+      ],
+      "negative_examples": [
+        "Selfcheck PASS claimed as external acceptance",
+        "Missing source represented as verified"
+      ]
+    },
+    {
+      "id": "CT-CHECK",
+      "enforcement": "always",
+      "title": "Verification design",
+      "tags": [
+        "validation"
+      ],
+      "requirements": [
+        "Before implementing, derive valid inputs, invalid inputs, boundaries and behavior invariants from selected contracts.",
+        "Choose at least one negative case per relevant input dimension; never modify hidden tests to pass.",
+        "Keep evaluator findings separate from new requirements; do not retrofit a grading contract after seeing implementation."
+      ],
+      "negative_examples": [
+        "Only happy-path fixture tests",
+        "Known bad input accepted silently"
+      ]
+    },
+    {
+      "id": "CT-TRACE",
+      "enforcement": "always",
+      "title": "Observable execution",
+      "tags": [
+        "trace"
+      ],
+      "requirements": [
+        "Record selected contract IDs, actual source/context IDs, source/commit identity when available, edited files and commands/status.",
+        "Distinguish what was not available from what was examined and confirmed.",
+        "Do not output chain-of-thought, credentials, environment secrets or entire unrelated context."
+      ],
+      "negative_examples": [
+        "Missing contract selection",
+        "Untested operation reported as executed"
+      ]
+    },
+    {
+      "id": "CT-ERROR",
+      "enforcement": "conditional",
+      "title": "Unsupported input and failure semantics",
+      "tags": [
+        "validation"
+      ],
+      "requirements": [
+        "Define unsupported, missing, duplicate and malformed inputs; reject or diagnose deterministically.",
+        "No unsupported input may become a fabricated node, measurement, authority claim or success.",
+        "Unknown is not equivalent to false/none/absent unless the contract says so."
+      ],
+      "negative_examples": [
+        "Missing node silently created",
+        "Unsupported nested value passed through"
+      ]
+    },
+    {
+      "id": "CT-EVIDENCE",
+      "enforcement": "conditional",
+      "title": "Source and provenance",
+      "tags": [
+        "evidence"
+      ],
+      "requirements": [
+        "Separate syntactic reference validation, containment, existence, version identity and content/line resolution.",
+        "Use repo-relative canonical references; reject traversal, symlink escape, bad line number and unauthorized absolute paths when source locations are validated.",
+        "If a source is not actually resolved, label it unresolved; path-shaped strings alone never prove provenance."
+      ],
+      "negative_examples": [
+        "../private.py:1 accepted as verified",
+        "Nonexistent source counted as confirmed"
+      ]
+    },
+    {
+      "id": "CT-PRIVACY",
+      "enforcement": "conditional",
+      "title": "Structured data redaction",
+      "tags": [
+        "privacy"
+      ],
+      "requirements": [
+        "Treat output serialization boundaries as sensitive; inspect all accepted nesting levels in dicts/lists and nested records.",
+        "If complete inspection is impossible, reject unsupported values rather than passing them through.",
+        "Inspect exception/log/report output as well as direct return values; label redacted content without revealing it."
+      ],
+      "negative_examples": [
+        "Nested token leaked",
+        "Absolute private path survives serialization"
+      ]
+    },
+    {
+      "id": "CT-STRUCT",
+      "enforcement": "conditional",
+      "title": "Tree identity and topology",
+      "tags": [
+        "tree"
+      ],
+      "requirements": [
+        "Tree node IDs and parent/edge references must resolve within the permitted graph; cycles and cross-tree mistakes are rejected.",
+        "All/Tree/Parent/Node scopes use the same identity invariant before navigation and never invent missing nodes.",
+        "Graph generation must preserve genuine source identity and report compaction/aliases without losing APIs."
+      ],
+      "negative_examples": [
+        "Unknown parent inserted into DFS output",
+        "Tree filter silently crosses project boundary"
+      ]
+    },
+    {
+      "id": "CT-REVIEW",
+      "enforcement": "conditional",
+      "title": "Review authority",
+      "tags": [
+        "review"
+      ],
+      "requirements": [
+        "Unchecked/draft decisions are never formal Approve; only trusted human review can change authority state.",
+        "Review states are node-local; parent/child or previous run must not inherit approvals.",
+        "Preserve source SHA, revision and actor boundaries; conflicts are errors and not successful writes."
+      ],
+      "negative_examples": [
+        "Draft approval promoted to verified",
+        "Stale review overwrites newer decision"
+      ]
+    },
+    {
+      "id": "CT-LOCALE",
+      "enforcement": "conditional",
+      "title": "Bilingual Atlas metadata",
+      "tags": [
+        "localization"
+      ],
+      "requirements": [
+        "For required localized fields, inspect both zh and en; missing either language is a completeness defect.",
+        "Keep source IDs, signatures, paths and technical tokens stable and unlocalized.",
+        "Reject unresolved English placeholders, corrupted text and near-identical title/summary purpose; do not fabricate translations."
+      ],
+      "negative_examples": [
+        "Only English checked while Chinese missing",
+        "Signature localized or lost"
+      ]
+    },
+    {
+      "id": "CT-CONTEXT",
+      "enforcement": "conditional",
+      "title": "Knowledge / glossary references",
+      "tags": [
+        "context"
+      ],
+      "requirements": [
+        "Use canonical existing term IDs; validate forward and backward links and evidence provenance.",
+        "Do not invent a scientific term or claim based on a function name.",
+        "Missing concepts should be an unresolved proposal until human review, not automatic authority changes."
+      ],
+      "negative_examples": [
+        "Term links silently point to absent node",
+        "New glossary definition invented from symbol"
+      ]
+    },
+    {
+      "id": "CT-AST",
+      "enforcement": "conditional",
+      "title": "Code Tree derivation",
+      "tags": [
+        "code"
+      ],
+      "requirements": [
+        "Expected code changes are a prediction; Observed changes must come from fresh source AST.",
+        "Preserve node ID, signature, line and true parent/call edges; do not replace real interface data with guessed cards.",
+        "Test-only source code belongs to test view/proposal, not product scientific capability."
+      ],
+      "negative_examples": [
+        "Expected diff asserted as Observed",
+        "Source location missing from candidate"
+      ]
+    },
+    {
+      "id": "CT-ENV",
+      "enforcement": "conditional",
+      "title": "Environment and experiment truth",
+      "tags": [
+        "environment"
+      ],
+      "requirements": [
+        "Unknown observations remain unknown; lack of a detector run never proves a device absent.",
+        "Mark synthetic fixtures explicitly; do not relabel them as physical measurements.",
+        "No GPU, model, network, credentials or production experiment execution without task-specific authorization."
+      ],
+      "negative_examples": [
+        "No nvidia-smi => no GPU",
+        "Synthetic device data described as measured"
+      ]
+    },
+    {
+      "id": "CT-DETERMINISM",
+      "enforcement": "conditional",
+      "title": "Deterministic outputs",
+      "tags": [
+        "determinism"
+      ],
+      "requirements": [
+        "Stable input and source identity must give stable ordering and outputs.",
+        "Sort sets/edges/nodes by declared canonical keys; avoid unstable system enumeration.",
+        "Retain error and success receipts with exit codes; no hidden overwrite of older runs."
+      ],
+      "negative_examples": [
+        "Same input produces unordered diff",
+        "Prior run overwritten"
+      ]
+    },
+    {
+      "id": "CT-INTERFACE",
+      "enforcement": "conditional",
+      "title": "Public or file-output interface",
+      "tags": [
+        "interface"
+      ],
+      "requirements": [
+        "Specify input/output schema, types and admitted recursion depth before implementation.",
+        "Validate all accepted containers or explicitly reject unsupported structures; never rely on one fixture shape.",
+        "Failure and partial-result behavior must be unambiguous and externally testable."
+      ],
+      "negative_examples": [
+        "Unexpected nested dict silently echoed",
+        "Wrong data type coerced to a successful result"
+      ]
+    }
+  ]
+}
