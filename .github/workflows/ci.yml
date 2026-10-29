@@ -97,6 +97,11 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: python -m harness.contracts.wp19_verify --base "$BASE_SHA" --scan
+      - name: Validate WP20 staged exam design (not executable grading)
+        run: |
+          python -m harness.contracts.registry check --plan harness/github_work_plan/20_integrated_multistage_harness_exams.md
+          python -m harness.contracts.wp20_design_validate
+          python -m pytest -q harness/github_work_test/test_wp20_design.py
       - name: Upload full Atlas duplicate inventory
         uses: actions/upload-artifact@v4
         with:

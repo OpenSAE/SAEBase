@@ -1,3 +1,7 @@
+## Work Plan 20 · 中大型多阶段 Harness 集成考试
+
+[**WP20 — 20 道中大型集成题及独立验收设计**](20_integrated_multistage_harness_exams.md)：X01–X20 涉及真实 AST/Tree/Knowledge、SAE 编码/干预、AUROC/AP/Bootstrap、Checkpoint、文件原子性、CI 发布、并发与长时程重放。每题有模块来源、明确操作阶段、正反例与独立验收目标；配套 [机器可读设计](../contracts/wp20_cases.json)。**目前仅 SPEC_REVIEWED，尚未提供可通过的独立行为 grader，也不应直接给 Agent 宣布开考**。历史 WP19 的 200 个微型合成任务继续保留。
+
 ## Work Plan 19 · 200 个候选考试与验证器可信性
 
 [**WP19 — Harness 大规模考试与 Verification 可信性计划**](19_harness_large_scale_examination_and_verifier_assurance.md)：提出 H27–H226 共 200 道下一阶段候选考试，并明确冻结 Case Spec、可信 Reference、Mutation / Metamorphic / Differential / Stateful / Compositional / Multi-Agent 测试及长任务恢复。**200 道微型合成验证题均已可执行，提供 800 个公开正反例；不等于真实科研功能或系统集成已通过独立验收。WP18 独立进行。**

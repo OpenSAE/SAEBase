@@ -1,0 +1,1406 @@
+{
+  "schema": "saebase.wp20.integrated_exam_design.v1",
+  "version": "0.1.0",
+  "status": "SPEC_REVIEWED",
+  "purpose": "20 multi-stage real-behavior exercises; no executable independent graders claimed",
+  "source_repo": "OpenSAE/SAEBase",
+  "execution_contract": {
+    "case_root": "harness/tests/wp20/runs/<run_id>/<case_id>/",
+    "write_scope": "only new case sandbox files",
+    "evaluation": "trusted reviewer independently builds and runs integration oracle before READY",
+    "isolation": "No GPU, no network, no production file writes; disposable temp directories and no credentials",
+    "allowed_read": "source_refs plus necessary documented dependencies under the same repository",
+    "baseline": "fixed main SHA recorded per run",
+    "formal_approval": "reviewer only",
+    "required_deliverables": [
+      "src/ (2+ cooperating modules when functionally meaningful)",
+      "tests/ (unit plus integration)",
+      "fixtures/ (at least two valid and two invalid scenarios)",
+      "output_manifest.json",
+      "contract_receipt.json",
+      "run_trace.json",
+      "review_candidate.json (unchecked)",
+      "report.md"
+    ]
+  },
+  "cases": [
+    {
+      "id": "X01",
+      "group": "Harness and Atlas",
+      "title": "真实源码变更到 Code Tree 与候选 Diff",
+      "goal": "以隔离 synthetic Python 模块的两次修改为输入，生成真实 AST 身份、Tree 更新和可审阅的来源证据。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "harness/code/build.py",
+        "harness/code/diff.py",
+        "harness/code/interfaces.py",
+        "harness/core/agent_proposal_review.py"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "读取基线源码并建立确定性 AST 接口表"
+        },
+        {
+          "number": 2,
+          "behavior": "应用一次函数改名与一次参数变化并重新构建"
+        },
+        {
+          "number": 3,
+          "behavior": "生成结构 Diff、来源行号与 unchecked 候选 Tree"
+        },
+        {
+          "number": 4,
+          "behavior": "核对 Expected/Observed 与哈希、保留无法静态证明的 calls"
+        }
+      ],
+      "positive_cases": [
+        "相同函数只调整空行时稳定身份与职责不变",
+        "函数改名加默认参数变化时旧 ID、新 ID、签名差异均有来源"
+      ],
+      "negative_cases": [
+        "源码真实函数被遗漏但候选仍报告 complete",
+        "虚构动态调用边或在无来源时标 verified"
+      ],
+      "metamorphic": "源码只是重排行号而不改变语义时，能力集合及稳定映射应保持一致，行号证据必须更新。",
+      "contracts": [
+        "CT-AST",
+        "CT-STRUCT",
+        "CT-EVIDENCE",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ],
+      "tags": [
+        "code",
+        "tree",
+        "evidence",
+        "determinism",
+        "interface"
+      ],
+      "oracle_plan": "用 Python ast 从两份可信 fixture 重新抽取函数、签名与父边；比较集合与节点路径；人工抽查语义标题。",
+      "required_outputs": [
+        "before_ast.json",
+        "after_ast.json",
+        "observed_diff.json",
+        "review_candidate.json",
+        "provenance.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X02",
+      "group": "Harness and Atlas",
+      "title": "Glossary 同步、双向链接与中英 Overlay",
+      "goal": "对包含六个节点的知识结构执行术语新增、修改、双向映射和中英本地化同步。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "harness/knowledge/terms.py",
+        "harness/knowledge/validate.py",
+        "harness/visualization/build_language.py",
+        "harness/visualization/language.py"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "载入节点、canonical term 和关联证据"
+        },
+        {
+          "number": 2,
+          "behavior": "加入新术语并修正两处双向关系"
+        },
+        {
+          "number": 3,
+          "behavior": "构造 zh/en Overlay，保持代码符号与源 ID"
+        },
+        {
+          "number": 4,
+          "behavior": "输出冲突、缺失翻译与受影响节点清单"
+        }
+      ],
+      "positive_cases": [
+        "新增 term 关联两个真实节点，正向和反向边完全一致",
+        "修改一个术语描述只改变实际依赖它的 Knowledge 节点"
+      ],
+      "negative_cases": [
+        "term 缺失或重复仍被标记有效",
+        "English translation unavailable 或中文占位被视为完整翻译"
+      ],
+      "metamorphic": "调整无关节点的展示顺序，不改变术语 ID、双向关系和翻译覆盖率分母。",
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-LOCALE",
+        "CT-STRUCT",
+        "CT-INTERFACE"
+      ],
+      "tags": [
+        "context",
+        "evidence",
+        "localization",
+        "tree",
+        "interface"
+      ],
+      "oracle_plan": "从固定术语图独立重建反向索引，检查覆盖率和双语字段，保留语义争议以供人审。",
+      "required_outputs": [
+        "terms.json",
+        "nodes.json",
+        "locale_zh.json",
+        "locale_en.json",
+        "impact_report.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X03",
+      "group": "Harness and Atlas",
+      "title": "Atlas 五树切换与审阅会话状态恢复",
+      "goal": "在独立的五树小图上完成语言切换、节点聚焦、审核、撤销和重新加载。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "harness/visualization/app.js",
+        "harness/visualization/atlas-structure.js",
+        "harness/core/agent_proposal_review.py"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "为 Core/Knowledge/Code/Environment/Context 初始化独立焦点与展开状态"
+        },
+        {
+          "number": 2,
+          "behavior": "连续执行树切换及中英切换并保留每棵树状态"
+        },
+        {
+          "number": 3,
+          "behavior": "执行 unchecked→deny→undo 的可信草稿事件"
+        },
+        {
+          "number": 4,
+          "behavior": "序列化状态并在新进程恢复后重放验证"
+        }
+      ],
+      "positive_cases": [
+        "在 Code 中选中节点后切到 Core 再返回，Code 的焦点及展开集合不变",
+        "撤销仅复位本 Tree 的目标节点且 review revision 递增"
+      ],
+      "negative_cases": [
+        "不存在的节点/Tree 被静默转换成空队列",
+        "一个 Tree 的批准结果感染另一 Tree 的同名节点"
+      ],
+      "metamorphic": "改变 UI 语言时，所有节点 ID、焦点、审核状态和图关系应完全保持。",
+      "contracts": [
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-LOCALE",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ],
+      "tags": [
+        "tree",
+        "review",
+        "localization",
+        "determinism",
+        "interface"
+      ],
+      "oracle_plan": "以治理方状态机参考重新执行事件日志，逐事件比较状态；任何正式 Approve 只能由模拟受信任 reviewer 签发。",
+      "required_outputs": [
+        "event_log.json",
+        "state_before.json",
+        "state_after.json",
+        "replay.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X04",
+      "group": "Harness and Atlas",
+      "title": "可信命令日志、Receipt 与独立 PR 决策",
+      "goal": "将合成命令执行日志、文件 Diff、源码哈希和 Contract Receipt 组合成一次不可伪造的技术验收。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "harness/contracts/trace.py",
+        "harness/contracts/acceptance.py",
+        "harness/contracts/compliance.py",
+        "harness/core/agent_flow.py"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "解析工作单、适用 Contract 与独立运行身份"
+        },
+        {
+          "number": 2,
+          "behavior": "收集真实模拟 runner 日志及 Git diff"
+        },
+        {
+          "number": 3,
+          "behavior": "对 Receipt、输出路径、来源 SHA 和命令退出码逐项对账"
+        },
+        {
+          "number": 4,
+          "behavior": "给出技术状态及人工审批仍需独立完成的证据"
+        }
+      ],
+      "positive_cases": [
+        "成功案例所有声明变更与观察日志完全一致",
+        "某命令失败后保留原退出码及可恢复的新 Run 记录"
+      ],
+      "negative_cases": [
+        "没有真实执行就通过自行生成 exit_code=0 获得通过",
+        "selfcheck PASS 被提升成 human_approved"
+      ],
+      "metamorphic": "重新排列相互独立的日志行不应改变覆盖关系，但必须保留真实时间与因果证据。",
+      "contracts": [
+        "CT-TRACE",
+        "CT-EVIDENCE",
+        "CT-SCOPE",
+        "CT-REVIEW",
+        "CT-PRIVACY"
+      ],
+      "tags": [
+        "evidence",
+        "review",
+        "privacy"
+      ],
+      "oracle_plan": "独立 runner 产生受保护的退出码/文件集合；对比 Receipt、SHA 与真实变更；禁止从候选的 PASS.json 取结论。",
+      "required_outputs": [
+        "receipt.json",
+        "command_trace.json",
+        "git_diff.json",
+        "technical_verdict.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X05",
+      "group": "Harness and Atlas",
+      "title": "跨工具读写授权与路径绕过检测",
+      "goal": "在临时目录模拟 Agent 使用文件 API、Shell、重定向、重命名和子代理传递工作区权限。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        ".cursor/hooks/guard_paths.py",
+        ".cursor/hooks/guard_shell.py",
+        "harness/contracts/selection.py",
+        "harness/contracts/compliance.py"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "冻结仅允许写入的工作区根与读取列表"
+        },
+        {
+          "number": 2,
+          "behavior": "分别用 API、shell 和 rename 执行合法同源写入"
+        },
+        {
+          "number": 3,
+          "behavior": "注入 ../、绝对路径、软链接、重定向和委托越权"
+        },
+        {
+          "number": 4,
+          "behavior": "生成被拒绝请求及实际文件系统的无副作用证明"
+        }
+      ],
+      "positive_cases": [
+        "工作区中的正常文件新建、读取与原子修改成功",
+        "合法的只读 Contract 查询成功，结果不会提升为写权限"
+      ],
+      "negative_cases": [
+        "通过符号链接或间接命令写进治理文件",
+        "子代理将受限权限升为可修改独立评分器"
+      ],
+      "metamorphic": "等价合法相对路径经规范化保持授权决定；逃逸路径无论由哪种操作提交均须拒绝。",
+      "contracts": [
+        "CT-SCOPE",
+        "CT-PRIVACY",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ],
+      "tags": [
+        "privacy",
+        "evidence",
+        "interface"
+      ],
+      "oracle_plan": "用独立的只读文件快照+OS 限权临时目录对比副作用；仅模拟攻击数据，严禁对真实仓库执行破坏测试。",
+      "required_outputs": [
+        "attempts.json",
+        "denials.json",
+        "filesystem_before.json",
+        "filesystem_after.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X06",
+      "group": "Scientific data and SAE",
+      "title": "数据 Manifest 到分割、抽样与报告的完整流水线",
+      "goal": "从小型合成 prompt 数据集建立身份、哈希、train/val/test 分割和可重复的测试报告。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "saebase/data/prompt_schema.py",
+        "saebase/data/prompt_store.py",
+        "saebase/data/artifact_layout.py",
+        "saebase/benchmarks/schema.py"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "读取 8 个稳定样本、prompt 与 label 的组合"
+        },
+        {
+          "number": 2,
+          "behavior": "验证 Manifest 并生成无交集分割"
+        },
+        {
+          "number": 3,
+          "behavior": "选择少量目标样本运行 CPU 假模型评分"
+        },
+        {
+          "number": 4,
+          "behavior": "报告实际覆盖数、样本身份与结果溯源"
+        }
+      ],
+      "positive_cases": [
+        "8 个样本无损划分，train/val/test 计数守恒",
+        "更换输入顺序后，按 ID 规范化的分割和汇总不变"
+      ],
+      "negative_cases": [
+        "相同 sample_id 在 train 和 test 同时出现",
+        "只评估 3 个样本却报告全量 8 个"
+      ],
+      "metamorphic": "重排原文件和批次，不改变基于样本 ID 的结果、Manifest SHA 与覆盖率。",
+      "contracts": [
+        "CT-DATA",
+        "CT-EVIDENCE",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ],
+      "tags": [
+        "data",
+        "evidence",
+        "determinism",
+        "interface"
+      ],
+      "oracle_plan": "独立 reference 以样本 ID 集合重建分割、逐项哈希及汇总；计数差异/漏报为硬失败。",
+      "required_outputs": [
+        "source_manifest.json",
+        "splits.json",
+        "predictions.json",
+        "coverage_report.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X07",
+      "group": "Scientific data and SAE",
+      "title": "Model 与 SAE 身份校验、Activation 缓存与重放",
+      "goal": "在 tiny CPU 模型替身上保存激活、SAE 信息、token 对齐及可重放缓存。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "saebase/sae/loading.py",
+        "saebase/sae/contracts.py",
+        "saebase/store/identity.py",
+        "saebase/store/shards.py"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "建立 model_id、SAE ID、hook 层、tokenizer 与 checkpoint 的显式身份"
+        },
+        {
+          "number": 2,
+          "behavior": "产生两批 tiny Activation 并规范化样本和 token ID"
+        },
+        {
+          "number": 3,
+          "behavior": "按身份写入缓存与 Manifest"
+        },
+        {
+          "number": 4,
+          "behavior": "从缓存重放并对比原生生成激活的形状与数值"
+        }
+      ],
+      "positive_cases": [
+        "同一身份、seed、输入重放得到逐 token 一致的 Activation",
+        "两批顺序重排后以 sample ID 恢复与原顺序对应的结果"
+      ],
+      "negative_cases": [
+        "换 model SHA 或 layer 仍错误命中缓存",
+        "SAE d_in 与 model hidden 不符却继续读取"
+      ],
+      "metamorphic": "改变 batch 划分但保持输入身份时，规范化后的激活数值及模型标识相同。",
+      "contracts": [
+        "CT-DATA",
+        "CT-CONFIG",
+        "CT-EVIDENCE",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ],
+      "tags": [
+        "data",
+        "config",
+        "evidence",
+        "determinism",
+        "interface"
+      ],
+      "oracle_plan": "使用独立 NumPy 小数组构造确定性 Activation；重算缓存 SHA、逐 token 比对；无模型权重下载。",
+      "required_outputs": [
+        "identities.json",
+        "activation_shards.json",
+        "cache_manifest.json",
+        "replay_diff.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X08",
+      "group": "Scientific data and SAE",
+      "title": "Tiny SAE 编码、解码、TopK 与批量等价性",
+      "goal": "使用固定小矩阵实现批处理 SAE 编码解码，检查稀疏约束、TopK 并列和数值误差。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "saebase/sae/sparsify_adapter.py",
+        "saebase/sae/task.py",
+        "saebase/benchmarks/metrics"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "定义 d_in=3、d_sae=5 的小型编码器和解码器矩阵"
+        },
+        {
+          "number": 2,
+          "behavior": "对 4 个小输入计算 dense 与 TopK 稀疏激活"
+        },
+        {
+          "number": 3,
+          "behavior": "解码还原并计算每样本重构误差"
+        },
+        {
+          "number": 4,
+          "behavior": "跨不同 batch 大小验证逐样本数值和特征 ID 稳定"
+        }
+      ],
+      "positive_cases": [
+        "固定矩阵输入手算 1 个编码与解码结果符合容差",
+        "相同分数并列时按照预定义 feature ID 次序选择 TopK"
+      ],
+      "negative_cases": [
+        "TopK 允许超过 feature count 或负 K",
+        "只更改 batch size 就改变同一输入的激活或误差"
+      ],
+      "metamorphic": "样本顺序重排后按 ID 对齐的结果完全一致；k=d_sae 与全保留的编码一致。",
+      "contracts": [
+        "CT-DATA",
+        "CT-CONFIG",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ],
+      "tags": [
+        "data",
+        "config",
+        "determinism",
+        "interface"
+      ],
+      "oracle_plan": "独立矩阵乘法 reference（NumPy 或手算）逐元素比较，检查 TopK identity 和完整分母。",
+      "required_outputs": [
+        "tiny_weights.json",
+        "encoded.json",
+        "decoded.json",
+        "reconstruction.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X09",
+      "group": "Scientific data and SAE",
+      "title": "多 Feature 干预链、撤销及生成模式隔离",
+      "goal": "执行 Ablation、Scale、Add、Clamp 的有序组合，验证回滚、共享状态清理和 teacher-forced/generation 的明确区分。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "saebase/interventions/operators.py",
+        "saebase/interventions/engine.py",
+        "saebase/interventions/specs.py",
+        "saebase/interventions/results.py"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "创建含负值和零激活的 5 维 tiny 特征向量"
+        },
+        {
+          "number": 2,
+          "behavior": "在 token/layer 上按给定次序执行四种干预"
+        },
+        {
+          "number": 3,
+          "behavior": "保存每步 before/after 的特征集合和最终数值"
+        },
+        {
+          "number": 4,
+          "behavior": "撤销所有干预并在不同请求模式重放以检查无残留"
+        }
+      ],
+      "positive_cases": [
+        "只在目标 token 和 feature 上改变数值，其他位置 bitwise 相同",
+        "取消干预后 baseline 恢复，下一请求不继承任何 hook"
+      ],
+      "negative_cases": [
+        "未知 feature ID 被接受且污染其他特征",
+        "Scale→Add 与 Add→Scale 被错误视为可交换"
+      ],
+      "metamorphic": "对无操作 scale=1、add=0 的输入，生成结果应与 baseline 完全一致。",
+      "contracts": [
+        "CT-CONFIG",
+        "CT-DATA",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ],
+      "tags": [
+        "config",
+        "data",
+        "determinism",
+        "interface"
+      ],
+      "oracle_plan": "独立逐步数组 reference 比对每个中间状态及 rollback；禁止把整段效果简化成单个布尔判断。",
+      "required_outputs": [
+        "steps.json",
+        "before_after.json",
+        "rollback.json",
+        "mode_audit.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X10",
+      "group": "Scientific data and SAE",
+      "title": "特征证据、Token 位置与组件归因",
+      "goal": "从 tiny activation/feature trace 生成可追溯的 Top Feature 解释表及跨组件关联。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "saebase/api/features.py",
+        "saebase/api/component_analysis.py",
+        "saebase/sae/coverage.py",
+        "saebase/store/collect.py"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "构造 6 个 token × 4 个 feature 的合成激活表"
+        },
+        {
+          "number": 2,
+          "behavior": "按指定 token 范围和 feature ID 提取证据"
+        },
+        {
+          "number": 3,
+          "behavior": "生成 Top Feature 排名与来源 token 对应关系"
+        },
+        {
+          "number": 4,
+          "behavior": "对不存在位置或来源缺口输出明确 unresolved"
+        }
+      ],
+      "positive_cases": [
+        "相同激活分数的 feature 排序稳定且来源 token 正确",
+        "只改变无关 feature 不影响目标 feature 的来源链"
+      ],
+      "negative_cases": [
+        "缺失 token 被补成有证据的特征",
+        "top feature 标注来源位置与原数据索引不一致"
+      ],
+      "metamorphic": "输入的无关 token 被插入时，按稳定 token ID 选择的证据必须保持。",
+      "contracts": [
+        "CT-DATA",
+        "CT-EVIDENCE",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ],
+      "tags": [
+        "data",
+        "evidence",
+        "determinism",
+        "interface"
+      ],
+      "oracle_plan": "独立从原始激活矩阵计算排名与 token 映射；任何没有原始记录支持的解释标 unresolved。",
+      "required_outputs": [
+        "trace.json",
+        "feature_table.json",
+        "token_evidence.json",
+        "unresolved.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X11",
+      "group": "Evaluation and reliability",
+      "title": "AUROC、AUPRC、Recall 的端到端指标引擎",
+      "goal": "对真实标签和预测分数计算三项指标，明确并列分数、缺失类别和阈值规则。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "saebase/benchmarks/metrics",
+        "saebase/benchmarks/report.py",
+        "saebase/benchmarks/schema.py"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "载入含正负样本及重复分数的二分类评估集"
+        },
+        {
+          "number": 2,
+          "behavior": "计算完整 AUROC、Average Precision 口径 AUPRC 和阈值 Recall"
+        },
+        {
+          "number": 3,
+          "behavior": "报告每个指标所用分母、阈值、样本 ID"
+        },
+        {
+          "number": 4,
+          "behavior": "对零正类等未定义指标进行显式标记与来源记录"
+        }
+      ],
+      "positive_cases": [
+        "标签 [1,0]、分数 [0.9,0.1] 对应 AUROC=1、AP=1",
+        "标签 [1,0]、分数 [0.1,0.9] 对应 AUROC=0、AP=0.5"
+      ],
+      "negative_cases": [
+        "只检查输入分数是否排序便返回所谓 AUROC",
+        "没有正类仍无说明地报告 AUPRC=1 或 Recall=0"
+      ],
+      "metamorphic": "保持标签与分数配对后整体重排，AUROC/AP/Recall 均不变；单调递增分数变换不改变 AUROC。",
+      "contracts": [
+        "CT-DATA",
+        "CT-CONFIG",
+        "CT-ERROR",
+        "CT-DETERMINISM"
+      ],
+      "tags": [
+        "data",
+        "config",
+        "validation",
+        "determinism"
+      ],
+      "oracle_plan": "用 pairwise ranking 手算 AUROC，并用 independent PR stair-step average precision 计算 AP；比较参考库须固定积分口径。",
+      "required_outputs": [
+        "observations.json",
+        "metrics.json",
+        "thresholds.json",
+        "undefined_cases.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X12",
+      "group": "Evaluation and reliability",
+      "title": "Bootstrap、负控制与区间估计重放",
+      "goal": "在少量成组样本中执行固定 seed 的 Bootstrap 和一种明确负控制，输出可重放的不确定性报告。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "saebase/reliability/bootstrap.py",
+        "saebase/reliability/resampling.py",
+        "saebase/reliability/controls.py",
+        "saebase/reliability/report.py"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "选定 6 个分组观测与明确重采样单位"
+        },
+        {
+          "number": 2,
+          "behavior": "使用固定 seed 重抽样 20 次生成统计量"
+        },
+        {
+          "number": 3,
+          "behavior": "应用打乱标签的负控制并保持样本组关系"
+        },
+        {
+          "number": 4,
+          "behavior": "输出点估计、分位数区间、seed 和每轮索引"
+        }
+      ],
+      "positive_cases": [
+        "固定 seed 和固定输入两次执行产生相同索引序列与置信区间",
+        "按组抽样时完整同组观测一同出现，不混用个体独立抽样"
+      ],
+      "negative_cases": [
+        "在样本数量为零时伪造合法置信区间",
+        "对负控制重用原始未打乱数据却宣称打乱"
+      ],
+      "metamorphic": "在固定抽样索引下改变无关记录顺序，统计量保持一致；seed 变化需记录并可重放。",
+      "contracts": [
+        "CT-DATA",
+        "CT-DETERMINISM",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ],
+      "tags": [
+        "data",
+        "determinism",
+        "evidence",
+        "interface"
+      ],
+      "oracle_plan": "治理方提供固定 indices 的独立 resampling reference；比较每次抽样 ID、分位数和负控制有效性。",
+      "required_outputs": [
+        "resample_indices.json",
+        "replicates.json",
+        "controls.json",
+        "intervals.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X13",
+      "group": "Evaluation and reliability",
+      "title": "Benchmark 适配器到汇总报告的多任务一致性",
+      "goal": "汇合两个 tiny Benchmark Adapter 的不同输出，统一样本权重、失败状态与指标报告。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "saebase/benchmarks/adapters",
+        "saebase/benchmarks/runner.py",
+        "saebase/benchmarks/registry.py",
+        "saebase/benchmarks/report.py"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "定义两个具有不同指标和样本数量的合成 adapter"
+        },
+        {
+          "number": 2,
+          "behavior": "调用 registry 与 planner 执行 CPU tiny evaluations"
+        },
+        {
+          "number": 3,
+          "behavior": "标准化结果、失败/缺失和分母信息"
+        },
+        {
+          "number": 4,
+          "behavior": "聚合跨 adapter 报告并核对来源哈希"
+        }
+      ],
+      "positive_cases": [
+        "样本数 2 和 6 的均值按样本数而不是简单平均批均值",
+        "一个 adapter 失败时其缺失指标不被填 0 也不改另一 adapter"
+      ],
+      "negative_cases": [
+        "Adapter 输出重复 sample ID 被默默合并",
+        "报告数值无法追溯回原始每样本结果"
+      ],
+      "metamorphic": "改变 adapter 执行顺序不应改变统计结果或输出 ID。",
+      "contracts": [
+        "CT-DATA",
+        "CT-DETERMINISM",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ],
+      "tags": [
+        "data",
+        "determinism",
+        "evidence",
+        "interface"
+      ],
+      "oracle_plan": "独立重算每样本指标加权汇总；不同 adapter 的错误状态与来源证据逐条校验。",
+      "required_outputs": [
+        "adapter_results.json",
+        "normalized_results.json",
+        "aggregate_report.json",
+        "adapter_trace.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X14",
+      "group": "Evaluation and reliability",
+      "title": "Hydra 组合配置到 CPU Dry-run 与 Receipt",
+      "goal": "从多组模型、数据与任务配置生成少量允许的运行计划，验证覆盖优先级与最终执行证据。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "saebase/runtime/train.py",
+        "saebase/runtime/experiment_paths.py",
+        "saebase/runner.py",
+        "saebase/registry.py"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "加载两个小型配置组并解析覆盖顺序"
+        },
+        {
+          "number": 2,
+          "behavior": "在明确允许矩阵内生成至多 4 个 dry-run job"
+        },
+        {
+          "number": 3,
+          "behavior": "为每个 job 计算稳定配置身份、预算与输出目录"
+        },
+        {
+          "number": 4,
+          "behavior": "模拟执行与失败，收集最终 resolved config 和 Receipt"
+        }
+      ],
+      "positive_cases": [
+        "同一 resolved config 与 seed 产生稳定配置摘要和路径",
+        "覆盖 config 改变后仅受影响 job SHA 发生改变"
+      ],
+      "negative_cases": [
+        "未知 task 或 model 与 dataset 不兼容时仍启动运行",
+        "Receipt 记录的配置与实际 resolved 配置不同"
+      ],
+      "metamorphic": "重排同一配置 dict 的键序，不改变 canonical JSON 或配置身份。",
+      "contracts": [
+        "CT-CONFIG",
+        "CT-DATA",
+        "CT-DETERMINISM",
+        "CT-TRACE",
+        "CT-RESOURCE"
+      ],
+      "tags": [
+        "config",
+        "data",
+        "determinism",
+        "resource"
+      ],
+      "oracle_plan": "独立合成 config 的规范化 reference，比较 dry-run job 及 Receipt，不加载真实模型。",
+      "required_outputs": [
+        "resolved_config.json",
+        "jobs.json",
+        "receipts.json",
+        "execution_report.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X15",
+      "group": "Evaluation and reliability",
+      "title": "断点中断、Checkpoint 校验与幂等恢复",
+      "goal": "以三步可中断 CPU pipeline 模拟运行崩溃、恢复和重复执行，保证结果一致与历史不可变。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "saebase/runtime/experiment_paths.py",
+        "saebase/runtime/summary_log.py",
+        "saebase/store/shards.py",
+        "saebase/reliability/runner.py"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "生成具有 run/config/data/seed 身份的输入和 checkpoint"
+        },
+        {
+          "number": 2,
+          "behavior": "完成第一阶段后触发模拟异常并持久化部分结果"
+        },
+        {
+          "number": 3,
+          "behavior": "校验 checkpoint 的身份后仅继续剩余阶段"
+        },
+        {
+          "number": 4,
+          "behavior": "重复恢复并对比最终产物与一次成功运行的等价性"
+        }
+      ],
+      "positive_cases": [
+        "同一身份恢复后结果与不中断运行一致，失败记录留存",
+        "对同一 run 重复恢复不重复写结果、旧记录 SHA 不变"
+      ],
+      "negative_cases": [
+        "不同数据 SHA 的 checkpoint 被接受恢复",
+        "中断时留下被标记 completed 的半写入结果"
+      ],
+      "metamorphic": "调整中断点但保持数据身份、种子和实际步骤，最终结果与不间断执行等价。",
+      "contracts": [
+        "CT-RECOVERY",
+        "CT-DATA",
+        "CT-EVIDENCE",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ],
+      "tags": [
+        "recovery",
+        "data",
+        "evidence",
+        "determinism",
+        "interface"
+      ],
+      "oracle_plan": "独立状态机对照每一步、文件哈希和重试幂等性；按故障注入点重放。",
+      "required_outputs": [
+        "checkpoint.json",
+        "events.json",
+        "final_artifacts.json",
+        "resume_audit.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X16",
+      "group": "Release and multi-agent",
+      "title": "安全归档、解包与原子提交",
+      "goal": "在临时文件系统中生成归档，注入损坏和越界成员，验证任何失败不得污染正式目录。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "saebase/tools/stage_d_archive.py",
+        "saebase/release/gates.py",
+        "saebase/tools/verify_distribution.py"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "构建三个 tiny 产物及完整 Manifest"
+        },
+        {
+          "number": 2,
+          "behavior": "在受保护临时目录创建归档并验 SHA"
+        },
+        {
+          "number": 3,
+          "behavior": "模拟压缩过程与解包阶段的故障/非法条目"
+        },
+        {
+          "number": 4,
+          "behavior": "通过验证后原子提交，失败则恢复原始快照"
+        }
+      ],
+      "positive_cases": [
+        "正常归档独立解包后字节 SHA 与原始文件完全相等",
+        "模拟写入失败后正式目录字节不变且临时文件清理"
+      ],
+      "negative_cases": [
+        "tar 条目 '../secret' 通过归档解包逃逸",
+        "归档损坏时仍将阶段标记 published"
+      ],
+      "metamorphic": "改变归档成员顺序不改变解包后的规范化 Manifest 与文件字节集合。",
+      "contracts": [
+        "CT-EVIDENCE",
+        "CT-RECOVERY",
+        "CT-SCOPE",
+        "CT-PRIVACY"
+      ],
+      "tags": [
+        "evidence",
+        "recovery",
+        "privacy"
+      ],
+      "oracle_plan": "治理方在 disposable temp dir 上注入失败，比较逐字节快照与路径集合，永不操作真实发布目录。",
+      "required_outputs": [
+        "archive_manifest.json",
+        "extract_report.json",
+        "fault_trace.json",
+        "filesystem_snapshot.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X17",
+      "group": "Release and multi-agent",
+      "title": "源码 SHA、CI 状态与人工审核的发布门禁",
+      "goal": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "saebase/release/gates.py",
+        "saebase/release/planner.py",
+        "saebase/release/runner.py",
+        ".github/workflows/ci.yml"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "构建 required-check DAG 与待发布源码身份"
+        },
+        {
+          "number": 2,
+          "behavior": "插入 success、failure、skipped、pending 以及旧 SHA 的状态"
+        },
+        {
+          "number": 3,
+          "behavior": "添加可信 reviewer 的模拟批准收据"
+        },
+        {
+          "number": 4,
+          "behavior": "重新计算可发布决议并检查不可变 tag 与完整审计"
+        }
+      ],
+      "positive_cases": [
+        "所有 required checks 在当前 SHA success 且受信任批准时可产生模拟 RELEASE_READY",
+        "新提交产生后，之前的成功检查不允许继续用于新 SHA"
+      ],
+      "negative_cases": [
+        "skipped/pending 被错误视为 success",
+        "自称 approved 的 Agent JSON 使真实 release 被执行"
+      ],
+      "metamorphic": "添加非 required 且成功的检查不会使缺失的 required check 获得通过。",
+      "contracts": [
+        "CT-RELEASE",
+        "CT-EVIDENCE",
+        "CT-REVIEW",
+        "CT-TRACE",
+        "CT-DETERMINISM"
+      ],
+      "tags": [
+        "release",
+        "evidence",
+        "review",
+        "determinism"
+      ],
+      "oracle_plan": "治理方按当前 SHA 和 required-check ID 集合计算发布状态；不允许实际 GitHub 发布、tag 或外网。",
+      "required_outputs": [
+        "check_graph.json",
+        "approvals.json",
+        "release_decision.json",
+        "audit.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X18",
+      "group": "Release and multi-agent",
+      "title": "双 Agent 并发提交、冲突检测与安全合并",
+      "goal": "在临时 Git 仓库使用两个模拟执行者同时修改同一函数，重放提交顺序与显式冲突处理。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "harness/core/agent_flow.py",
+        "harness/core/agent_apply.py",
+        "harness/code/diff.py",
+        "harness/contracts/trace.py"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "创建 2 文件的 tiny Git 基线与两个 Agent 的独立授权"
+        },
+        {
+          "number": 2,
+          "behavior": "Agent A、B 从相同 SHA 修改有重叠的函数区域"
+        },
+        {
+          "number": 3,
+          "behavior": "A 提交后 B 在 expected SHA 失败并获取新源码"
+        },
+        {
+          "number": 4,
+          "behavior": "B 依据允许的变更重新应用、解决冲突并生成新验收记录"
+        }
+      ],
+      "positive_cases": [
+        "不冲突的两处修改最终都可保留，且 history 包含双方来源",
+        "真正重叠的冲突必须进入明确 RESOLUTION_REQUIRED 而不是直接覆盖"
+      ],
+      "negative_cases": [
+        "B 使用旧 SHA 直接 force 更新分支",
+        "双方 Agent 的自评互相当作人类审核"
+      ],
+      "metamorphic": "交换 A/B 执行先后，对无冲突的修改得到语义等价结果；存在冲突时保留双方提案记录。",
+      "contracts": [
+        "CT-RECOVERY",
+        "CT-REVIEW",
+        "CT-TRACE",
+        "CT-SCOPE",
+        "CT-AST"
+      ],
+      "tags": [
+        "recovery",
+        "review",
+        "code"
+      ],
+      "oracle_plan": "独立临时 Git repo 构造 expected SHA CAS，重算最终 AST 与作者归属，查强推及历史覆盖。",
+      "required_outputs": [
+        "base_commit.json",
+        "agent_events.json",
+        "merge_result.json",
+        "conflict_report.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X19",
+      "group": "Release and multi-agent",
+      "title": "微型端到端 SAE 研究工作流",
+      "goal": "将数据、激活、tiny SAE 编码、Feature 干预、指标评估与报告联系成一条真实 CPU 合成流水线。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "saebase/data/prompt_schema.py",
+        "saebase/sae/task.py",
+        "saebase/interventions/engine.py",
+        "saebase/benchmarks/runner.py",
+        "saebase/results.py"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "生成含 4 条样本的 synthetic 数据与确定性的 tiny model activation"
+        },
+        {
+          "number": 2,
+          "behavior": "进行 SAE 编码和 TopK，再保存真实 feature ID"
+        },
+        {
+          "number": 3,
+          "behavior": "对一个目标 feature 执行 Ablation 并重算预测输出"
+        },
+        {
+          "number": 4,
+          "behavior": "计算 before/after 指标、来源与干预差异并形成报告"
+        }
+      ],
+      "positive_cases": [
+        "无操作干预后输出与 baseline 完全相同",
+        "Ablation 对至少一个特征产生可核验的非零预测差异且非目标 token 保持"
+      ],
+      "negative_cases": [
+        "报告说发生干预但实际特征和输出均未改变",
+        "指标分母与有效样本集不一致或来源身份丢失"
+      ],
+      "metamorphic": "batch 1 与 batch 4 的结果在稳定 sample ID 对齐后相同；同一 seed 可重现完整证据链。",
+      "contracts": [
+        "CT-DATA",
+        "CT-CONFIG",
+        "CT-EVIDENCE",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ],
+      "tags": [
+        "data",
+        "config",
+        "evidence",
+        "determinism",
+        "interface"
+      ],
+      "oracle_plan": "独立 tiny 数学 pipeline 逐阶段比较编码、干预与指标；误差/身份必须守恒，不接受截图作为数值证明。",
+      "required_outputs": [
+        "dataset.json",
+        "activation.json",
+        "encoded.json",
+        "interventions.json",
+        "metrics.json",
+        "provenance.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    },
+    {
+      "id": "X20",
+      "group": "Release and multi-agent",
+      "title": "长时程交接、需求变更、中断恢复及终局审阅",
+      "goal": "以 8–10 个预先定义的事件组成完整 workflow，包含多 Agent 交接、需求修订、两次失败注入和最后的候选 Tree 审阅。",
+      "status": "SPEC_REVIEWED",
+      "oracle_status": "NOT_IMPLEMENTED",
+      "source_refs": [
+        "harness/core/agent_flow.py",
+        "harness/core/agent_proposal_review.py",
+        "harness/contracts/acceptance.py",
+        "harness/core/github_review.py"
+      ],
+      "stages": [
+        {
+          "number": 1,
+          "behavior": "A 领取受限工作单并完成第一段任务及可信记录"
+        },
+        {
+          "number": 2,
+          "behavior": "治理方发布带 revision 的小需求变化，B 依据新工作单接手"
+        },
+        {
+          "number": 3,
+          "behavior": "制造一次提交冲突与一次模拟中断，执行恢复与受限重试"
+        },
+        {
+          "number": 4,
+          "behavior": "生成多阶段 Trace、Expected/Observed Diff、候选 Tree 并进行可信技术审查"
+        }
+      ],
+      "positive_cases": [
+        "需求更新后保留先前有效不变量且 B 不继承 A 的扩大权限",
+        "恢复后的最终 Artifact 与标准事件轨迹等价，历史失败不被抹去"
+      ],
+      "negative_cases": [
+        "旧审批继承到新源码 SHA 或其他 Agent",
+        "最终全部测试绿但任一阶段出现未授权写仍然被判 PASS"
+      ],
+      "metamorphic": "无冲突的两个执行者次序对换，不影响最终 Artifact；任何额外状态变化都必须进入事件日志。",
+      "contracts": [
+        "CT-REVIEW",
+        "CT-RECOVERY",
+        "CT-TRACE",
+        "CT-EVIDENCE",
+        "CT-STRUCT",
+        "CT-DETERMINISM"
+      ],
+      "tags": [
+        "review",
+        "recovery",
+        "evidence",
+        "tree",
+        "determinism"
+      ],
+      "oracle_plan": "独立 reviewer 用固定事件机重放每个状态；对原始 Git diff、权限日志、所有中间状态逐步验收，而不只看最终文件。",
+      "required_outputs": [
+        "work_order.json",
+        "events.json",
+        "checkpoint.json",
+        "final_diff.json",
+        "candidate_tree.json",
+        "verdict_inputs.json"
+      ],
+      "resource_budget": {
+        "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",
+        "device": "CPU",
+        "network": false,
+        "gpu": false,
+        "wall_seconds": 120,
+        "memory_mb": 1024
+      }
+    }
+  ]
+}
