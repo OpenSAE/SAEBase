@@ -1,4 +1,5 @@
 """Small deterministic audit of task declarations; no AI classifier or inferred permissions."""
+
 from __future__ import annotations
 
 from harness.contracts.registry import ContractError
@@ -16,6 +17,8 @@ SIGNALS = {
     "source_ast": "CT-AST",
     "environment_observation": "CT-ENV",
 }
+
+
 def audit_selection(selected: list[str], declared_signals: list[str]) -> list[str]:
     """Return missing mandatory contracts from explicit structured IO/operation signals.
 

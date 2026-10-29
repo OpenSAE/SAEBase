@@ -1,4 +1,5 @@
 """Independent WP18 acceptance gate; never grants human approval or production authority."""
+
 from __future__ import annotations
 
 import argparse
@@ -10,6 +11,7 @@ from harness.contracts.selection import audit_selection
 
 ROOT = registry.ROOT
 ACCEPTANCE = ROOT / "harness/tests/wp18/acceptance"
+
 
 def review(*, plan: str, case: str, receipt_path: Path, evaluator_path: Path) -> dict:
     """Evaluator-controlled records are kept in the protected acceptance subtree."""
@@ -23,7 +25,10 @@ def review(*, plan: str, case: str, receipt_path: Path, evaluator_path: Path) ->
         raise registry.ContractError("Candidate receipt must be in a WP18 run")
     receipt = trace.check_receipt_file(receipt_path, plan=plan, case=case)
     issues = []
-    if record.get("case_id") != case or record.get("schema") != "saebase.harness.independent_evaluation.v1":
+    if (
+        record.get("case_id") != case
+        or record.get("schema") != "saebase.harness.independent_evaluation.v1"
+    ):
         issues.append("Invalid independent evaluation identity")
     signals = record.get("task_signals")
     if not isinstance(signals, list):
@@ -36,9 +41,13 @@ def review(*, plan: str, case: str, receipt_path: Path, evaluator_path: Path) ->
         except registry.ContractError as exc:
             issues.append(str(exc))
     tests = record.get("tests")
-    if not isinstance(tests, list) or not tests or not all(
-        isinstance(t, dict) and isinstance(t.get("name"), str)
-        and type(t.get("passed")) is bool for t in tests
+    if (
+        not isinstance(tests, list)
+        or not tests
+        or not all(
+            isinstance(t, dict) and isinstance(t.get("name"), str) and type(t.get("passed")) is bool
+            for t in tests
+        )
     ):
         issues.append("Missing independent positive/negative test results")
     elif any(not t["passed"] for t in tests):
@@ -77,6 +86,7 @@ def review(*, plan: str, case: str, receipt_path: Path, evaluator_path: Path) ->
         "human_approval": False,
     }
 
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--plan", required=True)
@@ -85,11 +95,19 @@ def main() -> int:
     parser.add_argument("--evaluator", type=Path, required=True)
     args = parser.parse_args()
     try:
-        verdict = review(plan=args.plan, case=args.case, receipt_path=args.receipt, evaluator_path=args.evaluator)
+        verdict = review(
+            plan=args.plan, case=args.case, receipt_path=args.receipt, evaluator_path=args.evaluator
+        )
     except (registry.ContractError, ValueError, OSError, TypeError) as exc:
-        verdict = {"case": args.case, "status": "BLOCKED", "issues": [str(exc)], "human_approval": False}
+        verdict = {
+            "case": args.case,
+            "status": "BLOCKED",
+            "issues": [str(exc)],
+            "human_approval": False,
+        }
     print(json.dumps(verdict, ensure_ascii=False, indent=2))
     return 0 if verdict["status"] == "TECHNICAL_CHECKS_PASSED_NEEDS_HUMAN_REVIEW" else 1
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
