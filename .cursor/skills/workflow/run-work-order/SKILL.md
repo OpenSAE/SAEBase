@@ -5,6 +5,9 @@ description: 用户指定 OpenResearch Work Order，或需要选择 Core、科�
 
 # 执行 Work Order v3
 
+**通用 Contract 是先验约束，不是执行者根据代码临时补写的测试答案。** 正式任务应在 Work Plan 声明并绑定 Contract ID，使用 `harness/contracts/registry.py` 的只读解析器核对；新 Work Order 可携带 `contract_binding` 与选择的 ID。原有不包含绑定的旧 Work Order 保持兼容，但标注为 legacy，不能声称其 Contract 选择已经验证。
+
+
 1. 只读取用户点名的 `.cursor/work_orders/<ID>.yaml`，运行 `python .cursor/skills/workflow/run-work-order/scripts/validate_work_order.py <ID>`。未成功验证，不按该工单执行。
 2. 区分两个不同的结构：`core_ids` 描述**项目架构/研发管理**，通过 `python harness/core/select.py <IDs>` 获取；`knowledge_ids` 描述 **LLM SAE 研究问题与源码依据**，通过 `harness/knowledge/select.py <IDs>` 按需读取。
 3. 读取 `context.doc.required`；`optional` 文件仅在当前任务需要时读取。涉及科学概念必须服从 `doc/knowledge/glossary.json` 和 `foundations/`；不得重新发明同义术语。
@@ -16,6 +19,10 @@ description: 用户指定 OpenResearch Work Order，或需要选择 Core、科�
 9. 最终报告列出：已激活模块、使用的 Core/Knowledge/Term ID、实际阅读的文件、修改前后 Code Tree 差异、已执行的测试与尚未验证的科研结论。GitHub commit 本身不会自动唤醒本地 Cursor。
 
 ## Harness 测验的最简入口
+
+在写测试实现之前，先按 WP18 为当前 CASE 解析已有合同（全局 Always-on + 本题 Conditional），从中派生输入约束与正反测试。解析输出是固定规则，Agent **不能**修改 Work Plan/Registry/治理验证器。不要求人类输入任何命令。
+运行产生 `contract_receipt.json`，记录选择的 IDs、实际阅读文件、编辑路径、测试命令/退出码和 unresolved。它属于自述证据，独立验收者再与仓库及执行日志对照。
+
 
 当人类在 Cursor Agent 模式里明确输入“测试 Harness H01”、“测试 Harness 的审阅队列”等自然语言指令，或“测 WP18 H01”，Agent 可直接在 `harness/tests/` 的本次独立测试空间中编写模拟功能、测试、候选 Tree 和报告，并运行仅针对该空间的 pytest。**不需要**人类输入 Bash、检查路径白名单或创建 Agent Flow。可以自由接受人类指定的任何 Harness 测试主题，不局限于 WP18 六题；未知主题先根据职责选一个可读的短名称。
 
