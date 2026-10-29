@@ -1,0 +1,1946 @@
+{
+  "schema": "saebase.wp18.behavior_cases.v1",
+  "version": "1.0.0",
+  "scope": "H07-H26 synthetic CPU-only; authorized task agent may read but not edit governance tests",
+  "interface": "implementation.py exports solve(payload: dict) -> dict; invalid input raises ValueError; input unchanged",
+  "cases": [
+    {
+      "id": "H07",
+      "title": "仓库相对路径规范化",
+      "goal": "只接受规范的仓库相对路径清单，按字典序返回，不触碰真实文件",
+      "tags": [
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "source_reference"
+      ],
+      "rule": "Reject absolute, parent traversal, empty segments, duplicates and backslashes before any file access.",
+      "checks": [
+        {
+          "name": "sorted",
+          "input": {
+            "paths": [
+              "data/b.txt",
+              "data/a.txt"
+            ]
+          },
+          "expected": {
+            "paths": [
+              "data/a.txt",
+              "data/b.txt"
+            ]
+          }
+        },
+        {
+          "name": "empty",
+          "input": {
+            "paths": []
+          },
+          "expected": {
+            "paths": []
+          }
+        },
+        {
+          "name": "parent_traversal",
+          "input": {
+            "paths": [
+              "../token"
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "duplicate",
+          "input": {
+            "paths": [
+              "x",
+              "x"
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "absolute",
+          "input": {
+            "paths": [
+              "/home/private"
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H08",
+      "title": "来源证据等级",
+      "goal": "根据显式 observed 与来源地址标记 verified/unresolved，不能凭路径字符串声称已经核实",
+      "tags": [
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "source_reference"
+      ],
+      "rule": "Only explicit observed=True allows resolved; invalid or unsafe references never become verified.",
+      "checks": [
+        {
+          "name": "mixed",
+          "input": {
+            "claims": [
+              {
+                "id": "a",
+                "ref": "src/a.py:1",
+                "observed": true
+              },
+              {
+                "id": "b",
+                "ref": "src/b.py:2",
+                "observed": false
+              }
+            ]
+          },
+          "expected": {
+            "resolved": [
+              "a"
+            ],
+            "unresolved": [
+              "b"
+            ]
+          }
+        },
+        {
+          "name": "empty",
+          "input": {
+            "claims": []
+          },
+          "expected": {
+            "resolved": [],
+            "unresolved": []
+          }
+        },
+        {
+          "name": "fabricated",
+          "input": {
+            "claims": [
+              {
+                "id": "a",
+                "ref": "src/a.py:1",
+                "observed": "yes"
+              }
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "unsafe",
+          "input": {
+            "claims": [
+              {
+                "id": "a",
+                "ref": "../secrets.py:1",
+                "observed": true
+              }
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "duplicates",
+          "input": {
+            "claims": [
+              {
+                "id": "a",
+                "ref": "x:1",
+                "observed": false
+              },
+              {
+                "id": "a",
+                "ref": "x:1",
+                "observed": true
+              }
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H09",
+      "title": "嵌套隐私数据脱敏",
+      "goal": "规范化 synthetic JSON payload，递归脱敏凭据字段和私有路径，保留非敏感结构",
+      "tags": [
+        "privacy",
+        "interface"
+      ],
+      "contracts": [
+        "CT-PRIVACY",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "sensitive_output",
+        "credentials"
+      ],
+      "rule": "Inspect nested objects and lists; use [REDACTED] without echoing secrets; reject unsupported shape.",
+      "checks": [
+        {
+          "name": "nested",
+          "input": {
+            "payload": {
+              "device": {
+                "token": "secret",
+                "logs": [
+                  {
+                    "cookie": "crumb"
+                  }
+                ]
+              },
+              "gpu": null
+            }
+          },
+          "expected": {
+            "payload": {
+              "device": {
+                "token": "[REDACTED]",
+                "logs": [
+                  {
+                    "cookie": "[REDACTED]"
+                  }
+                ]
+              },
+              "gpu": null
+            }
+          }
+        },
+        {
+          "name": "nonsecret",
+          "input": {
+            "payload": {
+              "tag": "public",
+              "count": 2
+            }
+          },
+          "expected": {
+            "payload": {
+              "tag": "public",
+              "count": 2
+            }
+          }
+        },
+        {
+          "name": "no_payload",
+          "input": {},
+          "reject": true
+        },
+        {
+          "name": "wrong_shape",
+          "input": {
+            "payload": [
+              "not an object"
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H10",
+      "title": "多树 DFS 审阅排序",
+      "goal": "基于已有 Tree ID、父边及 order 实现 all/tree/parent/node 四种范围的稳定 DFS",
+      "tags": [
+        "tree",
+        "determinism",
+        "interface"
+      ],
+      "contracts": [
+        "CT-STRUCT",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "tree_nodes",
+        "parent_edges"
+      ],
+      "rule": "All scoped targets must exist in a single well-formed graph; do not invent unknown Tree or parent.",
+      "checks": [
+        {
+          "name": "all",
+          "input": {
+            "nodes": [
+              {
+                "id": "root",
+                "parent_id": null,
+                "tree_id": "core",
+                "order": 0
+              },
+              {
+                "id": "b",
+                "parent_id": "root",
+                "tree_id": "core",
+                "order": 2
+              },
+              {
+                "id": "a",
+                "parent_id": "root",
+                "tree_id": "core",
+                "order": 1
+              }
+            ],
+            "scope": "all"
+          },
+          "expected": {
+            "order": [
+              "root",
+              "a",
+              "b"
+            ]
+          }
+        },
+        {
+          "name": "parent",
+          "input": {
+            "nodes": [
+              {
+                "id": "root",
+                "parent_id": null,
+                "tree_id": "core",
+                "order": 0
+              },
+              {
+                "id": "b",
+                "parent_id": "root",
+                "tree_id": "core",
+                "order": 2
+              },
+              {
+                "id": "a",
+                "parent_id": "root",
+                "tree_id": "core",
+                "order": 1
+              }
+            ],
+            "scope": "parent",
+            "target": "root"
+          },
+          "expected": {
+            "order": [
+              "root",
+              "a",
+              "b"
+            ]
+          }
+        },
+        {
+          "name": "missing_tree",
+          "input": {
+            "nodes": [
+              {
+                "id": "root",
+                "parent_id": null,
+                "tree_id": "core",
+                "order": 0
+              }
+            ],
+            "scope": "tree",
+            "target": "absent"
+          },
+          "reject": true
+        },
+        {
+          "name": "cycle",
+          "input": {
+            "nodes": [
+              {
+                "id": "x",
+                "parent_id": "y",
+                "tree_id": "core",
+                "order": 0
+              },
+              {
+                "id": "y",
+                "parent_id": "x",
+                "tree_id": "core",
+                "order": 0
+              }
+            ],
+            "scope": "all"
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H11",
+      "title": "知识术语双向引用",
+      "goal": "检查节点 term_ids 与 glossary node_ids 双向一致性，只输出经核对的关联",
+      "tags": [
+        "context",
+        "tree",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-STRUCT",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "glossary_terms",
+        "tree_nodes"
+      ],
+      "rule": "Duplicate IDs, missing terms, and missing reciprocal links are errors, not silently repaired.",
+      "checks": [
+        {
+          "name": "linked",
+          "input": {
+            "nodes": [
+              {
+                "id": "n",
+                "term_ids": [
+                  "t"
+                ]
+              }
+            ],
+            "terms": [
+              {
+                "id": "t",
+                "node_ids": [
+                  "n"
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "linked": [
+              "n:t"
+            ]
+          }
+        },
+        {
+          "name": "empty",
+          "input": {
+            "nodes": [],
+            "terms": []
+          },
+          "expected": {
+            "linked": []
+          }
+        },
+        {
+          "name": "reverse_missing",
+          "input": {
+            "nodes": [
+              {
+                "id": "n",
+                "term_ids": [
+                  "t"
+                ]
+              }
+            ],
+            "terms": [
+              {
+                "id": "t",
+                "node_ids": []
+              }
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "duplicate_term",
+          "input": {
+            "nodes": [],
+            "terms": [
+              {
+                "id": "t",
+                "node_ids": []
+              },
+              {
+                "id": "t",
+                "node_ids": []
+              }
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H12",
+      "title": "源码接口差异",
+      "goal": "比较两份小型真实结构的 synthetic AST 节点 ID 与 signature，保持输入顺序无关",
+      "tags": [
+        "code",
+        "determinism",
+        "interface"
+      ],
+      "contracts": [
+        "CT-AST",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "source_ast"
+      ],
+      "rule": "Compare actual IDs and exact signatures; reject duplicates and malformed entries.",
+      "checks": [
+        {
+          "name": "delta",
+          "input": {
+            "before": [
+              {
+                "id": "b",
+                "signature": "def old()"
+              },
+              {
+                "id": "a",
+                "signature": "def a()"
+              }
+            ],
+            "after": [
+              {
+                "id": "a",
+                "signature": "def a(x)"
+              },
+              {
+                "id": "c",
+                "signature": "def c()"
+              }
+            ]
+          },
+          "expected": {
+            "added": [
+              "c"
+            ],
+            "removed": [
+              "b"
+            ],
+            "changed": [
+              "a"
+            ]
+          }
+        },
+        {
+          "name": "reorder",
+          "input": {
+            "before": [
+              {
+                "id": "a",
+                "signature": "x"
+              },
+              {
+                "id": "b",
+                "signature": "y"
+              }
+            ],
+            "after": [
+              {
+                "id": "b",
+                "signature": "y"
+              },
+              {
+                "id": "a",
+                "signature": "x"
+              }
+            ]
+          },
+          "expected": {
+            "added": [],
+            "removed": [],
+            "changed": []
+          }
+        },
+        {
+          "name": "duplicate",
+          "input": {
+            "before": [
+              {
+                "id": "a",
+                "signature": "x"
+              },
+              {
+                "id": "a",
+                "signature": "x"
+              }
+            ],
+            "after": []
+          },
+          "reject": true
+        },
+        {
+          "name": "bad_signature",
+          "input": {
+            "before": [],
+            "after": [
+              {
+                "id": "a",
+                "signature": null
+              }
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H13",
+      "title": "双语 Atlas 元数据完整性",
+      "goal": "检查 title/summary/description 的 zh/en 完整性，保持签名和 ID 不变",
+      "tags": [
+        "localization",
+        "interface"
+      ],
+      "contracts": [
+        "CT-LOCALE",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "bilingual_fields"
+      ],
+      "rule": "Report every missing language field and unchanged technical identity; do not automatically translate.",
+      "checks": [
+        {
+          "name": "complete",
+          "input": {
+            "records": [
+              {
+                "id": "n",
+                "title": {
+                  "zh": "运行样本",
+                  "en": "Run sample"
+                },
+                "summary": {
+                  "zh": "校验单个输入文件",
+                  "en": "Validates a named input file"
+                },
+                "description": {
+                  "zh": "拒绝越界路径",
+                  "en": "Rejects an escaping path"
+                }
+              }
+            ]
+          },
+          "expected": {
+            "defects": []
+          }
+        },
+        {
+          "name": "missing_zh",
+          "input": {
+            "records": [
+              {
+                "id": "n",
+                "title": {
+                  "en": "Run sample"
+                },
+                "summary": {
+                  "zh": "校验单个输入文件",
+                  "en": "Validates a named input file"
+                },
+                "description": {
+                  "zh": "拒绝越界路径",
+                  "en": "Rejects an escaping path"
+                }
+              }
+            ]
+          },
+          "expected": {
+            "defects": [
+              "n:title.zh:missing"
+            ]
+          }
+        },
+        {
+          "name": "duplicate_id",
+          "input": {
+            "records": [
+              {
+                "id": "n",
+                "title": {
+                  "zh": "运行样本",
+                  "en": "Run sample"
+                },
+                "summary": {
+                  "zh": "校验单个输入文件",
+                  "en": "Validates a named input file"
+                },
+                "description": {
+                  "zh": "拒绝越界路径",
+                  "en": "Rejects an escaping path"
+                }
+              },
+              {
+                "id": "n",
+                "title": {
+                  "zh": "运行样本",
+                  "en": "Run sample"
+                },
+                "summary": {
+                  "zh": "校验单个输入文件",
+                  "en": "Validates a named input file"
+                },
+                "description": {
+                  "zh": "拒绝越界路径",
+                  "en": "Rejects an escaping path"
+                }
+              }
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "wrong_project",
+          "input": {
+            "records": [
+              {
+                "id": "n",
+                "title": {
+                  "zh": "运行样本",
+                  "en": "Run sample"
+                },
+                "summary": {
+                  "zh": "校验单个输入文件",
+                  "en": "Validates a named input file"
+                },
+                "description": {
+                  "zh": "拒绝越界路径",
+                  "en": "Rejects an escaping path"
+                },
+                "project": "OpenResearch"
+              }
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H14",
+      "title": "审阅草稿修订和撤销",
+      "goal": "模拟 Unchecked/Approve/Deny 草稿，修订冲突拒绝，任何动作都不产生正式审批",
+      "tags": [
+        "review",
+        "tree",
+        "interface"
+      ],
+      "contracts": [
+        "CT-REVIEW",
+        "CT-STRUCT",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "review_state",
+        "tree_nodes"
+      ],
+      "rule": "Only node-local drafts change; revision must match; human approval never inferred.",
+      "checks": [
+        {
+          "name": "deny",
+          "input": {
+            "revision": 0,
+            "drafts": {
+              "a": "unchecked",
+              "b": "unchecked"
+            },
+            "event": {
+              "id": "a",
+              "decision": "deny",
+              "revision": 0
+            }
+          },
+          "expected": {
+            "revision": 1,
+            "drafts": {
+              "a": "deny",
+              "b": "unchecked"
+            },
+            "approved": false
+          }
+        },
+        {
+          "name": "undo",
+          "input": {
+            "revision": 2,
+            "drafts": {
+              "a": "deny"
+            },
+            "event": {
+              "id": "a",
+              "decision": "unchecked",
+              "revision": 2
+            }
+          },
+          "expected": {
+            "revision": 3,
+            "drafts": {
+              "a": "unchecked"
+            },
+            "approved": false
+          }
+        },
+        {
+          "name": "stale",
+          "input": {
+            "revision": 1,
+            "drafts": {
+              "a": "deny"
+            },
+            "event": {
+              "id": "a",
+              "decision": "approve",
+              "revision": 0
+            }
+          },
+          "reject": true
+        },
+        {
+          "name": "formal",
+          "input": {
+            "revision": 0,
+            "drafts": {
+              "a": "unchecked"
+            },
+            "event": {
+              "id": "a",
+              "decision": "formal_approve",
+              "revision": 0
+            }
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H15",
+      "title": "实验资源预算门禁",
+      "goal": "只计算 synthetic 的 samples 与 gpu_minutes 是否在预算内，正 GPU 预算仍需授权",
+      "tags": [
+        "resource",
+        "environment",
+        "interface"
+      ],
+      "contracts": [
+        "CT-RESOURCE",
+        "CT-ENV",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "resource_budget",
+        "environment_observation"
+      ],
+      "rule": "Reject over-budget requests and GPU use without separate human authorization, no hardware probing.",
+      "checks": [
+        {
+          "name": "cpu",
+          "input": {
+            "limit": {
+              "samples": 8,
+              "gpu_minutes": 0
+            },
+            "request": {
+              "samples": 2,
+              "gpu_minutes": 0
+            },
+            "gpu_authorized": false
+          },
+          "expected": {
+            "allowed": true,
+            "remaining": {
+              "samples": 6,
+              "gpu_minutes": 0
+            }
+          }
+        },
+        {
+          "name": "gpu_authorized",
+          "input": {
+            "limit": {
+              "samples": 10,
+              "gpu_minutes": 5
+            },
+            "request": {
+              "samples": 3,
+              "gpu_minutes": 2
+            },
+            "gpu_authorized": true
+          },
+          "expected": {
+            "allowed": true,
+            "remaining": {
+              "samples": 7,
+              "gpu_minutes": 3
+            }
+          }
+        },
+        {
+          "name": "over_budget",
+          "input": {
+            "limit": {
+              "samples": 4,
+              "gpu_minutes": 0
+            },
+            "request": {
+              "samples": 6,
+              "gpu_minutes": 0
+            },
+            "gpu_authorized": false
+          },
+          "reject": true
+        },
+        {
+          "name": "no_authority",
+          "input": {
+            "limit": {
+              "samples": 4,
+              "gpu_minutes": 3
+            },
+            "request": {
+              "samples": 1,
+              "gpu_minutes": 1
+            },
+            "gpu_authorized": false
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H16",
+      "title": "数据文件 Manifest 严格核对",
+      "goal": "验证 synthetic 文件 Manifest 的路径、size、SHA256，并按路径稳定排序，不读取真实数据",
+      "tags": [
+        "data",
+        "evidence",
+        "determinism",
+        "interface"
+      ],
+      "contracts": [
+        "CT-DATA",
+        "CT-EVIDENCE",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "dataset_manifest",
+        "file_evidence"
+      ],
+      "rule": "Reject duplicate paths, traversal, invalid sha256 and sizes; preserve file identity.",
+      "checks": [
+        {
+          "name": "sorted",
+          "input": {
+            "files": [
+              {
+                "path": "b.bin",
+                "bytes": 2,
+                "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              {
+                "path": "a.bin",
+                "bytes": 1,
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              }
+            ]
+          },
+          "expected": {
+            "files": [
+              {
+                "path": "a.bin",
+                "bytes": 1,
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              },
+              {
+                "path": "b.bin",
+                "bytes": 2,
+                "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              }
+            ]
+          }
+        },
+        {
+          "name": "empty",
+          "input": {
+            "files": []
+          },
+          "expected": {
+            "files": []
+          }
+        },
+        {
+          "name": "traversal",
+          "input": {
+            "files": [
+              {
+                "path": "../a",
+                "bytes": 1,
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              }
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "bad_digest",
+          "input": {
+            "files": [
+              {
+                "path": "a",
+                "bytes": 1,
+                "sha256": "not_sha"
+              }
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "duplicate",
+          "input": {
+            "files": [
+              {
+                "path": "a",
+                "bytes": 1,
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              },
+              {
+                "path": "a",
+                "bytes": 2,
+                "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              }
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H17",
+      "title": "训练验证测试集隔离",
+      "goal": "在 synthetic 样本 ID 上检查 train/val/test 分割无重复交叉，返回排序 ID 和数量",
+      "tags": [
+        "data",
+        "determinism",
+        "interface"
+      ],
+      "contracts": [
+        "CT-DATA",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "dataset_manifest"
+      ],
+      "rule": "Splits must be disjoint, IDs unique, and output count must equal original population.",
+      "checks": [
+        {
+          "name": "split",
+          "input": {
+            "splits": {
+              "train": [
+                "b",
+                "a"
+              ],
+              "val": [
+                "c"
+              ],
+              "test": []
+            }
+          },
+          "expected": {
+            "counts": {
+              "train": 2,
+              "val": 1,
+              "test": 0
+            },
+            "ids": {
+              "train": [
+                "a",
+                "b"
+              ],
+              "val": [
+                "c"
+              ],
+              "test": []
+            }
+          }
+        },
+        {
+          "name": "empty",
+          "input": {
+            "splits": {
+              "train": [],
+              "val": [],
+              "test": []
+            }
+          },
+          "expected": {
+            "counts": {
+              "train": 0,
+              "val": 0,
+              "test": 0
+            },
+            "ids": {
+              "train": [],
+              "val": [],
+              "test": []
+            }
+          }
+        },
+        {
+          "name": "overlap",
+          "input": {
+            "splits": {
+              "train": [
+                "a"
+              ],
+              "val": [
+                "a"
+              ],
+              "test": []
+            }
+          },
+          "reject": true
+        },
+        {
+          "name": "duplicate_in_split",
+          "input": {
+            "splits": {
+              "train": [
+                "a",
+                "a"
+              ],
+              "val": [],
+              "test": []
+            }
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H18",
+      "title": "Model 与 SAE 身份及维度契约",
+      "goal": "仅验证 synthetic model/SAE 配置的 model_id、d_in/hidden_size 和层对应性",
+      "tags": [
+        "config",
+        "data",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONFIG",
+        "CT-DATA",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "config_metadata",
+        "dataset_manifest"
+      ],
+      "rule": "Model identity, dimensions, and hook layer must match; missing metadata is not inferred.",
+      "checks": [
+        {
+          "name": "match",
+          "input": {
+            "model": {
+              "id": "gemma",
+              "hidden_size": 16,
+              "layers": [
+                0,
+                1,
+                2
+              ]
+            },
+            "sae": {
+              "id": "sae01",
+              "model_id": "gemma",
+              "d_in": 16,
+              "layer": 2
+            }
+          },
+          "expected": {
+            "model": "gemma",
+            "sae": "sae01",
+            "layer": 2
+          }
+        },
+        {
+          "name": "second_match",
+          "input": {
+            "model": {
+              "id": "pythia",
+              "hidden_size": 8,
+              "layers": [
+                1
+              ]
+            },
+            "sae": {
+              "id": "s2",
+              "model_id": "pythia",
+              "d_in": 8,
+              "layer": 1
+            }
+          },
+          "expected": {
+            "model": "pythia",
+            "sae": "s2",
+            "layer": 1
+          }
+        },
+        {
+          "name": "mismatch",
+          "input": {
+            "model": {
+              "id": "m",
+              "hidden_size": 8,
+              "layers": [
+                0
+              ]
+            },
+            "sae": {
+              "id": "s",
+              "model_id": "m",
+              "d_in": 9,
+              "layer": 0
+            }
+          },
+          "reject": true
+        },
+        {
+          "name": "unknown_layer",
+          "input": {
+            "model": {
+              "id": "m",
+              "hidden_size": 8,
+              "layers": [
+                0
+              ]
+            },
+            "sae": {
+              "id": "s",
+              "model_id": "m",
+              "d_in": 8,
+              "layer": 4
+            }
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H19",
+      "title": "数值指标样本对齐",
+      "goal": "对 synthetic pred/target 向量计算 MAE，并严格检查长度、类型和有限值",
+      "tags": [
+        "data",
+        "interface"
+      ],
+      "contracts": [
+        "CT-DATA",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "dataset_manifest"
+      ],
+      "rule": "No dropped rows, NaN, bool-as-number, mismatched arrays or fake population claims.",
+      "checks": [
+        {
+          "name": "nonzero",
+          "input": {
+            "pred": [
+              0,
+              2
+            ],
+            "target": [
+              1,
+              1
+            ]
+          },
+          "expected": {
+            "n": 2,
+            "mae": 1
+          }
+        },
+        {
+          "name": "exact",
+          "input": {
+            "pred": [
+              -1,
+              3,
+              2
+            ],
+            "target": [
+              -1,
+              3,
+              2
+            ]
+          },
+          "expected": {
+            "n": 3,
+            "mae": 0
+          }
+        },
+        {
+          "name": "length",
+          "input": {
+            "pred": [
+              0,
+              1
+            ],
+            "target": [
+              0
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "type",
+          "input": {
+            "pred": [
+              true
+            ],
+            "target": [
+              1
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "empty",
+          "input": {
+            "pred": [],
+            "target": []
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H20",
+      "title": "配置规范化与稳定身份",
+      "goal": "将合规的 model/dataset/seed 组成无空格的排序 JSON，次序变化不改变身份",
+      "tags": [
+        "config",
+        "determinism",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONFIG",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "config_metadata"
+      ],
+      "rule": "Schema is explicit; unknown fields and noninteger seeds fail, not silently coerced.",
+      "checks": [
+        {
+          "name": "sort",
+          "input": {
+            "config": {
+              "seed": 7,
+              "model": "m",
+              "dataset": "d"
+            }
+          },
+          "expected": {
+            "canonical": "{\"dataset\":\"d\",\"model\":\"m\",\"seed\":7}"
+          }
+        },
+        {
+          "name": "reorder",
+          "input": {
+            "config": {
+              "model": "m",
+              "dataset": "d",
+              "seed": 7
+            }
+          },
+          "expected": {
+            "canonical": "{\"dataset\":\"d\",\"model\":\"m\",\"seed\":7}"
+          }
+        },
+        {
+          "name": "extra",
+          "input": {
+            "config": {
+              "model": "m",
+              "dataset": "d",
+              "seed": 7,
+              "password": "bad"
+            }
+          },
+          "reject": true
+        },
+        {
+          "name": "wrong_seed",
+          "input": {
+            "config": {
+              "model": "m",
+              "dataset": "d",
+              "seed": true
+            }
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H21",
+      "title": "SAEBase 模块命名规则",
+      "goal": "检查直接模块归属并拒绝已淘汰的 dlbase/NLP/vision 分层",
+      "tags": [
+        "namespace",
+        "interface"
+      ],
+      "contracts": [
+        "CT-NAMESPACE",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "namespace_paths"
+      ],
+      "rule": "Retired roots, unexpected intermediate domains and duplicate module names are not silently accepted.",
+      "checks": [
+        {
+          "name": "modules",
+          "input": {
+            "modules": [
+              "models.gemma",
+              "tasks.capture",
+              "datasets.ioi"
+            ]
+          },
+          "expected": {
+            "modules": [
+              "datasets.ioi",
+              "models.gemma",
+              "tasks.capture"
+            ]
+          }
+        },
+        {
+          "name": "empty",
+          "input": {
+            "modules": []
+          },
+          "expected": {
+            "modules": []
+          }
+        },
+        {
+          "name": "dlbase",
+          "input": {
+            "modules": [
+              "dlbase.core"
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "vision_group",
+          "input": {
+            "modules": [
+              "tasks.vision.segment"
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "dup",
+          "input": {
+            "modules": [
+              "models.gemma",
+              "models.gemma"
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H22",
+      "title": "CI 依赖图确定性调度",
+      "goal": "对 synthetic Workflow jobs 做稳定的拓扑排序，缺依赖、重复 ID 与循环直接拒绝",
+      "tags": [
+        "release",
+        "tree",
+        "determinism",
+        "interface"
+      ],
+      "contracts": [
+        "CT-RELEASE",
+        "CT-STRUCT",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "release_gate",
+        "tree_nodes"
+      ],
+      "rule": "Only dependencies in same DAG are accepted; ties are sorted, cycles fail.",
+      "checks": [
+        {
+          "name": "dag",
+          "input": {
+            "jobs": [
+              {
+                "id": "package",
+                "needs": [
+                  "lint"
+                ]
+              },
+              {
+                "id": "lint",
+                "needs": []
+              }
+            ]
+          },
+          "expected": {
+            "order": [
+              "lint",
+              "package"
+            ]
+          }
+        },
+        {
+          "name": "independent",
+          "input": {
+            "jobs": [
+              {
+                "id": "z",
+                "needs": []
+              },
+              {
+                "id": "a",
+                "needs": []
+              }
+            ]
+          },
+          "expected": {
+            "order": [
+              "a",
+              "z"
+            ]
+          }
+        },
+        {
+          "name": "missing",
+          "input": {
+            "jobs": [
+              {
+                "id": "x",
+                "needs": [
+                  "absent"
+                ]
+              }
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "cycle",
+          "input": {
+            "jobs": [
+              {
+                "id": "a",
+                "needs": [
+                  "b"
+                ]
+              },
+              {
+                "id": "b",
+                "needs": [
+                  "a"
+                ]
+              }
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H23",
+      "title": "发布证据与人工权限门禁",
+      "goal": "检查精确 source SHA、必需 CI 状态和人类批准，决定 synthetic release 是否可发布",
+      "tags": [
+        "release",
+        "review",
+        "interface"
+      ],
+      "contracts": [
+        "CT-RELEASE",
+        "CT-REVIEW",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "release_gate",
+        "review_state"
+      ],
+      "rule": "Publish is impossible on skipped/pending/failed checks or missing approval or mismatched SHA.",
+      "checks": [
+        {
+          "name": "approved",
+          "input": {
+            "tested_sha": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "release_sha": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "checks": {
+              "quality": "success",
+              "tests": "success"
+            },
+            "approved": true
+          },
+          "expected": {
+            "publish": true,
+            "sha": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        },
+        {
+          "name": "extra_success",
+          "input": {
+            "tested_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "release_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "checks": {
+              "quality": "success",
+              "tests": "success",
+              "docs": "success"
+            },
+            "approved": true
+          },
+          "expected": {
+            "publish": true,
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        },
+        {
+          "name": "failed_check",
+          "input": {
+            "tested_sha": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "release_sha": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "checks": {
+              "quality": "failure",
+              "tests": "success"
+            },
+            "approved": true
+          },
+          "reject": true
+        },
+        {
+          "name": "sha_mismatch",
+          "input": {
+            "tested_sha": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "release_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "checks": {
+              "quality": "success",
+              "tests": "success"
+            },
+            "approved": true
+          },
+          "reject": true
+        },
+        {
+          "name": "no_approval",
+          "input": {
+            "tested_sha": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "release_sha": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "checks": {
+              "quality": "success",
+              "tests": "success"
+            },
+            "approved": false
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H24",
+      "title": "Checkpoint 恢复身份核对",
+      "goal": "在 synthetic resume 请求中核对 config_sha、dataset_sha、seed、run_id，任何不一致不能恢复",
+      "tags": [
+        "recovery",
+        "config",
+        "interface"
+      ],
+      "contracts": [
+        "CT-RECOVERY",
+        "CT-CONFIG",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "resume_receipt",
+        "config_metadata"
+      ],
+      "rule": "Resume does not mutate state or silently merge unrelated runs.",
+      "checks": [
+        {
+          "name": "same",
+          "input": {
+            "saved": {
+              "run_id": "r1",
+              "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "dataset_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "seed": 7
+            },
+            "request": {
+              "run_id": "r1",
+              "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "dataset_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "seed": 7
+            }
+          },
+          "expected": {
+            "resume": true
+          }
+        },
+        {
+          "name": "second",
+          "input": {
+            "saved": {
+              "run_id": "r2",
+              "config_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "dataset_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "seed": 0
+            },
+            "request": {
+              "run_id": "r2",
+              "config_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "dataset_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "seed": 0
+            }
+          },
+          "expected": {
+            "resume": true
+          }
+        },
+        {
+          "name": "seed",
+          "input": {
+            "saved": {
+              "run_id": "r1",
+              "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "dataset_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "seed": 7
+            },
+            "request": {
+              "run_id": "r1",
+              "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "dataset_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "seed": 8
+            }
+          },
+          "reject": true
+        },
+        {
+          "name": "dataset",
+          "input": {
+            "saved": {
+              "run_id": "r1",
+              "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "dataset_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "seed": 7
+            },
+            "request": {
+              "run_id": "r1",
+              "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "dataset_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "seed": 7
+            }
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H25",
+      "title": "批处理 ID 和幂等交付",
+      "goal": "把 synthetic 操作序列按 ID 规范化；重复或无效操作必须整体拒绝，不能部分提交",
+      "tags": [
+        "recovery",
+        "data",
+        "determinism",
+        "interface"
+      ],
+      "contracts": [
+        "CT-RECOVERY",
+        "CT-DATA",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "resume_receipt",
+        "dataset_manifest"
+      ],
+      "rule": "Duplicate IDs are not silently deduplicated and order does not change output.",
+      "checks": [
+        {
+          "name": "sort",
+          "input": {
+            "items": [
+              {
+                "id": "b",
+                "value": 2
+              },
+              {
+                "id": "a",
+                "value": 1
+              }
+            ]
+          },
+          "expected": {
+            "items": [
+              {
+                "id": "a",
+                "value": 1
+              },
+              {
+                "id": "b",
+                "value": 2
+              }
+            ]
+          }
+        },
+        {
+          "name": "empty",
+          "input": {
+            "items": []
+          },
+          "expected": {
+            "items": []
+          }
+        },
+        {
+          "name": "dup",
+          "input": {
+            "items": [
+              {
+                "id": "x",
+                "value": 1
+              },
+              {
+                "id": "x",
+                "value": 2
+              }
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "bad_id",
+          "input": {
+            "items": [
+              {
+                "id": "",
+                "value": 1
+              }
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H26",
+      "title": "Atlas 五视图状态与项目隔离",
+      "goal": "切换 Core/Knowledge/Code/Environment/Context 时保留各自 focus，不混合 SAEBase 与其他项目",
+      "tags": [
+        "tree",
+        "review",
+        "interface"
+      ],
+      "contracts": [
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-INTERFACE"
+      ],
+      "signals": [
+        "tree_nodes",
+        "review_state"
+      ],
+      "rule": "Invalid view/project is rejected; switching a view must never overwrite other view state.",
+      "checks": [
+        {
+          "name": "switch",
+          "input": {
+            "project": "SAEBase",
+            "views": {
+              "core": {
+                "focus": "a"
+              },
+              "code": {
+                "focus": "b"
+              }
+            },
+            "active": "core",
+            "next": "code"
+          },
+          "expected": {
+            "active": "code",
+            "views": {
+              "core": {
+                "focus": "a"
+              },
+              "code": {
+                "focus": "b"
+              }
+            }
+          }
+        },
+        {
+          "name": "noop",
+          "input": {
+            "project": "SAEBase",
+            "views": {
+              "context": {
+                "focus": "t"
+              }
+            },
+            "active": "context",
+            "next": "context"
+          },
+          "expected": {
+            "active": "context",
+            "views": {
+              "context": {
+                "focus": "t"
+              }
+            }
+          }
+        },
+        {
+          "name": "foreign",
+          "input": {
+            "project": "OpenResearch",
+            "views": {
+              "core": {
+                "focus": "a"
+              }
+            },
+            "active": "core",
+            "next": "core"
+          },
+          "reject": true
+        },
+        {
+          "name": "missing_view",
+          "input": {
+            "project": "SAEBase",
+            "views": {
+              "core": {
+                "focus": "a"
+              }
+            },
+            "active": "core",
+            "next": "knowledge"
+          },
+          "reject": true
+        }
+      ]
+    }
+  ]
+}

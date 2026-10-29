@@ -1,6 +1,6 @@
 {
   "schema": "saebase.harness.contract_registry.v1",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "project": "SAEBase",
   "policy": "Closed vocabulary of reusable, task-agnostic obligations. Existing contracts are never silently weakened for a task; work plans select IDs and can add stricter conditions. New universal contracts require a separate governance change.",
   "required_always": [
@@ -21,7 +21,13 @@
     "environment",
     "determinism",
     "interface",
-    "validation"
+    "validation",
+    "data",
+    "config",
+    "resource",
+    "release",
+    "recovery",
+    "namespace"
   ],
   "contracts": [
     {
@@ -294,6 +300,108 @@
       "negative_examples": [
         "Unexpected nested dict silently echoed",
         "Wrong data type coerced to a successful result"
+      ]
+    },
+    {
+      "id": "CT-DATA",
+      "enforcement": "conditional",
+      "title": "Data identity and small fixture integrity",
+      "tags": [
+        "data"
+      ],
+      "requirements": [
+        "Dataset/sample IDs and split memberships are unique; reject overlapping splits and silent sample replacement.",
+        "Preserve input population, provenance and stable identity. Synthetic tests never establish real-data coverage.",
+        "Do not claim complete dataset evaluation from a reduced fixture."
+      ],
+      "negative_examples": [
+        "Sample copied into train and evaluation",
+        "Fixture sample count presented as full run"
+      ]
+    },
+    {
+      "id": "CT-CONFIG",
+      "enforcement": "conditional",
+      "title": "Explicit config and stable reproduction",
+      "tags": [
+        "config"
+      ],
+      "requirements": [
+        "Validate required configuration fields, types and allowed names before use.",
+        "Reordering equivalent mapping keys must not change canonicalized configuration identity.",
+        "Do not mutate a config or silently invent defaults for unknown fields."
+      ],
+      "negative_examples": [
+        "Unknown seed coerced to valid integer",
+        "Config source changed without receipt"
+      ]
+    },
+    {
+      "id": "CT-RESOURCE",
+      "enforcement": "conditional",
+      "title": "Resource budgets and execution authorization",
+      "tags": [
+        "resource"
+      ],
+      "requirements": [
+        "Check explicit nonnegative budgets for samples/time/memory before work.",
+        "Positive GPU or network budget does not itself grant execution permission; separately require applicable authorization.",
+        "Failure to detect a device or measure consumption is unknown, never proof of zero use."
+      ],
+      "negative_examples": [
+        "GPU task run without permission",
+        "Unbounded sample sweep started from a small fixture"
+      ]
+    },
+    {
+      "id": "CT-RELEASE",
+      "enforcement": "conditional",
+      "title": "CI and release provenance",
+      "tags": [
+        "release"
+      ],
+      "requirements": [
+        "A publish decision requires exact tested source identity, completed required checks and human release authority.",
+        "Missing, skipped or failed required gates cannot be silently counted as success.",
+        "Never publish assets or change release tags from a sandbox or by task-agent self-approval."
+      ],
+      "negative_examples": [
+        "Pending CI treated as success",
+        "Unreviewed artifact promoted to public release"
+      ]
+    },
+    {
+      "id": "CT-RECOVERY",
+      "enforcement": "conditional",
+      "title": "Safe resume, idempotence and duplicate handling",
+      "tags": [
+        "recovery"
+      ],
+      "requirements": [
+        "Resume only when run/config/dataset/seed identity matches the recorded state.",
+        "Duplicate or conflicting operations must be rejected or handled deterministically without a partial commit.",
+        "Historical results and failed traces are immutable; a new attempt receives a distinct run ID."
+      ],
+      "negative_examples": [
+        "Checkpoint resumed across different dataset",
+        "Duplicate request overwrites previous result"
+      ]
+    },
+    {
+      "id": "CT-NAMESPACE",
+      "enforcement": "conditional",
+      "title": "Repository module ownership",
+      "tags": [
+        "namespace"
+      ],
+      "requirements": [
+        "Preserve canonical top-level datasets/, models/, tasks/, saebase/, conf/, and harness/ responsibilities.",
+        "Do not introduce retired dlbase, NLP/vision intermediate domains or arbitrary root utility directories.",
+        "Reject ambiguous or colliding module IDs instead of inventing redirect aliases."
+      ],
+      "negative_examples": [
+        "Retired dlbase import presented as canonical",
+        "New tasks/vision/ grouping introduced"
       ]
     }
   ]
