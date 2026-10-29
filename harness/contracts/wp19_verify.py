@@ -18,7 +18,6 @@ import tempfile
 from pathlib import Path
 
 from harness.contracts import registry, wp19_reference
-from harness.contracts.selection import audit_selection
 
 ROOT = registry.ROOT
 PLAN = "harness/github_work_plan/19_harness_large_scale_examination_and_verifier_assurance.md"
@@ -109,13 +108,14 @@ def verify_case(case_id: str, path: Path) -> dict:
     try:
         nodes = ast.walk(ast.parse(source.read_text(encoding="utf-8")))
         for node in nodes:
-            if isinstance(node, ast.ImportFrom) and node.module and node.module.startswith(
-                "harness.contracts.wp19_reference"
+            if (
+                isinstance(node, ast.ImportFrom)
+                and node.module
+                and node.module.startswith("harness.contracts.wp19_reference")
             ):
                 raise ValueError("Candidate imports governance reference oracle")
             if isinstance(node, ast.Import) and any(
-                alias.name.startswith("harness.contracts.wp19_reference")
-                for alias in node.names
+                alias.name.startswith("harness.contracts.wp19_reference") for alias in node.names
             ):
                 raise ValueError("Candidate imports governance reference oracle")
     except (UnicodeError, SyntaxError) as exc:

@@ -87,11 +87,20 @@ def test_wp19_independent_acceptance_is_not_agent_writable():
     spec.loader.exec_module(hook)
     assert hook.gate("mkdir -p harness/tests/wp19/acceptance") is not None
     assert hook.gate("mkdir -p harness/tests/wp19/acceptance/new-run") is not None
-    assert hook.gate("python -m pytest -p no:cacheprovider -q harness/tests/wp19/acceptance/test.py") is not None
+    assert (
+        hook.gate("python -m pytest -p no:cacheprovider -q harness/tests/wp19/acceptance/test.py")
+        is not None
+    )
     assert hook.gate("python -m harness.contracts.wp19_verify --check-spec") is None
-    assert hook.gate(
-        "python -m harness.contracts.wp19_verify --case H27 --run-dir harness/tests/wp19/runs/new-run/H27"
-    ) is None
-    assert hook.gate(
-        "python -m harness.contracts.wp19_verify --case H47 --run-dir harness/tests/wp19/runs/new-run/H47"
-    ) is not None
+    assert (
+        hook.gate(
+            "python -m harness.contracts.wp19_verify --case H27 --run-dir harness/tests/wp19/runs/new-run/H27"
+        )
+        is None
+    )
+    assert (
+        hook.gate(
+            "python -m harness.contracts.wp19_verify --case H47 --run-dir harness/tests/wp19/runs/new-run/H47"
+        )
+        is not None
+    )
