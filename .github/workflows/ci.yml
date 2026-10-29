@@ -27,6 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
@@ -76,6 +78,15 @@ jobs:
         run: |
           python -m harness.contracts.registry check --plan harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md
           python -m pytest -q harness/github_work_test/test_universal_task_contracts.py harness/github_work_test/test_contract_acceptance.py
+      - name: Verify twenty predeclared WP18 contracts and reviewer checks
+        run: |
+          python -m harness.contracts.wp18_verify --check-spec
+          python -m pytest -q harness/github_work_test/test_wp18_h07_h26_contracts.py
+      - name: Enforce WP18 task PR scope and check candidate behavior
+        if: ${{ github.event_name == 'pull_request' && startsWith(github.head_ref, 'wp18/') }}
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: python -m harness.contracts.wp18_verify --base "$BASE_SHA" --scan
       - name: Upload full Atlas duplicate inventory
         uses: actions/upload-artifact@v4
         with:

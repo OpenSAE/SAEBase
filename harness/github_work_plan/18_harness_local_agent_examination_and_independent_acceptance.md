@@ -1,6 +1,6 @@
 # Work Plan 18 — Harness 本地 Agent 测验与独立验收
 
-状态：**Contract Registry v1 与轻量 Contract Selection / Independent Acceptance Gate 已启用；新版 WP18 新一轮测验尚未执行**。本文件只定义测验，不代表六题已执行或通过。 
+状态：**Universal Contract Registry v1.1、H07–H26 20 题规范和独立预声明验证器已启用；新 20 题尚未进行 Agent 独立验收**。历史 H01–H06 的试卷与反馈保持独立，不因此获得 PASS。 
 范围：Harness 的 Rules、Skills、Hooks、Work Order、Agent Flow、AST / Tree、Context、环境事实、Atlas 交互与双语。**不测 SAE 算法、模型、GPU、权重或科研功能。**
 
 
@@ -207,7 +207,49 @@ harness/
 | **H05 人类审阅 DFS 队列** | 在模拟图中实现 DFS 顺序、All/Tree/Parent/Node 筛选及本地草稿撤销 | 不按名称/Work Plan 排；撤销不隐性批准；父子状态独立 | 不能提供绕过人类 Approve 的正式写入接口 |
 | **H06 双语数据审计** | 检测模拟 zh/en Overlay 的缺项、乱码、同义模板、项目 ID 错误及技术符号误译 | 英文空字段、`English translation unavailable`、标题≈摘要必须报错；代码签名原样 | 双语候选字段准确且不捏造源语义 |
 
-人类可要求修改题目内容或新增其他 Hxx 小题；Agent 按同一目录、权限与审阅规则实现，不需要人类手工改脚本/Work Order。
+历史 H01–H06 的合同不因新增题目被更改。人类可要求另行提议题目内容或新增其他 Hxx 小题；Agent 按同一目录、权限与审阅规则实现，不需要人类手工改脚本/Work Order。
+
+## 5.1 本轮新增二十个动手题（H07–H26）
+
+这二十个 HW 是 **本次新增**，不替换旧 H01–H06，也不把 20 个不同目标合成一个大函数。20 题必须执行真实 Python 行为，全部只用最小 synthetic CPU 数据；不联网、不请求 GPU、不下载模型或泄露个人环境。
+
+权威、冻结的任务规格：[`harness/contracts/wp18_cases.json`](../contracts/wp18_cases.json)。每题的 `goal`、`rule`、`signals`、`checks` 已经事先写定，包含可执行的正确输出和非法输入。下面是索引，详细的 JSON 规范优先于表格摘要；任何测试 Agent 不得改两者来通过测验。
+
+| 题号 | 任务 | 额外 Contract（自动叠加 5 个 Always-on 和 CT-ERROR） | 公共验证数 |
+| --- | --- | --- | ---: |
+| H07 | 仓库相对路径规范化 | `CT-EVIDENCE`, `CT-INTERFACE` | 5 |
+| H08 | 来源证据等级 | `CT-EVIDENCE`, `CT-INTERFACE` | 5 |
+| H09 | 嵌套隐私数据脱敏 | `CT-PRIVACY`, `CT-INTERFACE` | 4 |
+| H10 | 多树 DFS 审阅排序 | `CT-STRUCT`, `CT-DETERMINISM`, `CT-INTERFACE` | 4 |
+| H11 | 知识术语双向引用 | `CT-CONTEXT`, `CT-STRUCT`, `CT-INTERFACE` | 4 |
+| H12 | 源码接口差异 | `CT-AST`, `CT-DETERMINISM`, `CT-INTERFACE` | 4 |
+| H13 | 双语 Atlas 元数据完整性 | `CT-LOCALE`, `CT-INTERFACE` | 4 |
+| H14 | 审阅草稿修订和撤销 | `CT-REVIEW`, `CT-STRUCT`, `CT-INTERFACE` | 4 |
+| H15 | 实验资源预算门禁 | `CT-RESOURCE`, `CT-ENV`, `CT-INTERFACE` | 4 |
+| H16 | 数据文件 Manifest 严格核对 | `CT-DATA`, `CT-EVIDENCE`, `CT-DETERMINISM`, `CT-INTERFACE` | 5 |
+| H17 | 训练验证测试集隔离 | `CT-DATA`, `CT-DETERMINISM`, `CT-INTERFACE` | 4 |
+| H18 | Model 与 SAE 身份及维度契约 | `CT-CONFIG`, `CT-DATA`, `CT-INTERFACE` | 4 |
+| H19 | 数值指标样本对齐 | `CT-DATA`, `CT-INTERFACE` | 5 |
+| H20 | 配置规范化与稳定身份 | `CT-CONFIG`, `CT-DETERMINISM`, `CT-INTERFACE` | 4 |
+| H21 | SAEBase 模块命名规则 | `CT-NAMESPACE`, `CT-INTERFACE` | 5 |
+| H22 | CI 依赖图确定性调度 | `CT-RELEASE`, `CT-STRUCT`, `CT-DETERMINISM`, `CT-INTERFACE` | 4 |
+| H23 | 发布证据与人工权限门禁 | `CT-RELEASE`, `CT-REVIEW`, `CT-INTERFACE` | 5 |
+| H24 | Checkpoint 恢复身份核对 | `CT-RECOVERY`, `CT-CONFIG`, `CT-INTERFACE` | 4 |
+| H25 | 批处理 ID 和幂等交付 | `CT-RECOVERY`, `CT-DATA`, `CT-DETERMINISM`, `CT-INTERFACE` | 4 |
+| H26 | Atlas 五视图状态与项目隔离 | `CT-STRUCT`, `CT-REVIEW`, `CT-INTERFACE` | 4 |
+
+**固定的任务接口**：在 `harness/tests/wp18/runs/<new_run_id>/Hxx/implementation.py` 中实现 `solve(payload: dict) -> dict`，合法输入只返回 JSON 可序列化的 dict；非法输入明确抛出 `ValueError`；不得修改输入对象。每题仍交自己的 `test_implementation.py`、最小 fixtures、`contract_receipt.json`、`selfcheck.json`、`expected_code_diff.json`、`review_candidate.json` 和 `report.md`。并且所有候选节点必须对应这次真实源码的 AST、保留中英文本和 `unchecked`。代码需先通过 Ruff lint 与 format。
+
+**验证程序先于实现存在**：`harness/contracts/wp18_verify.py` 和 `harness/contracts/wp18_worker.py` 由可信治理维护者拥有，固定用例由 `wp18_cases.json` 提供；考生可以读取它们及执行 `--check-spec` 和受限的 `--case ... --run-dir ...` 命令，但**绝对不能修改**它们、`catalog.json`、`selection.py`、`invariants.py`、`harness/github_work_test/`、Rules、Hooks 或 `.github/`。执行结果保存在考试 Run 并如实记录，不能称为独立审批。独立评审方必须用不同输入复验，保留失败日志；新增要求只能走治理版本更新，不能事后更改冻结用例并归咎 Agent。
+
+**使用方法**（人类只需说“执行 WP18 H07–H26”）：
+
+1. Agent 在新分支从最新 main 开始，按顺序解析各 CASE 既有 Contract IDs，逐题在各自文件夹实现和自测。每题用 `wp18_cases.json` 核对预声明输出，也可以自行补充更多正反例，但不改官方样例和验证程序。
+2. Agent 可以只读运行 `python -m harness.contracts.wp18_verify --check-spec`，或在受控工作区运行 `python -m harness.contracts.wp18_verify --case H07 --run-dir harness/tests/wp18/runs/<run_id>/H07` 观察公开验证结果。不要试图对失败题修改 verifier。
+3. 任务分支以 `wp18/` 开头。GitHub CI 对这类 PR 检查实际 diff，仅允许**新增** `harness/tests/wp18/runs/<run_id>/<case>/` 的考试文件；不允许更改旧 Run、治理文件、独立验收文件或产品源码，并自动复核实际提交的 H07–H26 实现。
+4. 全部任务交付后提交 PR，不合并；人工或独立 reviewer 在隔离环境核对来源、Expected/Observed AST、Receipt、完整 U01–U12 和额外独立用例。任何一个受保护目录被改写均为硬失败。
+
+**验证边界**：当前提供 20 个已定义任务、86 个公开可执行检查，并不意味着能够穷举所有输入。运行代码必须放在低权限、可丢弃 reviewer 环境；Cursor Hooks 和 subprocess 超时不是系统级沙箱。Verifier 的输出只给出技术通过/失败，不给科学结论或人类 Approve。
 
 ## 6. 12 组独立验收面
 
@@ -233,7 +275,7 @@ harness/
 Agent 提交后，评审者在隔离工作树或受控验收进程：
 
 1. 核对仓库基线、每个 CASE 的真实修改文件，任何项目根一级目录变化都先单独检查；禁止未经授权的新顶层目录。
-2. 运行受保护的 Hook、Work Order、Agent Flow、Tree/双语测试，以及 H01–H06 的独立正反例，不用 Agent 的绿色自测代替。
+2. 运行受保护的 Hook、Work Order、Agent Flow、Tree/双语测试，以及 H01–H06 的独立正反例，以及 H07–H26 已冻结验证和新的不同输入复验，不用 Agent 的绿色自测代替。
 3. 使用 `harness/code/build.py --include-harness` 从当前真实源码提取 Code Tree，调用 `harness/code/diff.py` 对照 Expected Diff，确认真实 ID/line/signature/edge/source 及候选 Context 引用。
 4. 查看候选 `review_candidate.json`，在独立的 Atlas 审阅副本里逐节点作出 Approve / Deny / Unchecked；**Approve 只是允许节点/位置**，不表示科研功能已验证。
 5. 写入 `acceptance/<run_id>/<case>/observed_code_diff.json`、`scope_audit.json`、`harness_tests.json`、`review_decisions.json`、`verdict.md`。考生不允许修改这些文件或自行评分。
@@ -248,4 +290,4 @@ Agent 提交后，评审者在隔离工作树或受控验收进程：
 
 **Harness 改进闭环**：任务 Agent 按当前既有 Harness 执行并暴露问题；独立验收者保留失败记录、识别是否为合同/选择/执行/验证/验收范围问题；Harness 维护者更新通用 Catalog、选择规则、统一验证器或权限边界；随后用**新的同类但内容不同的任务**测试能否泛化。旧错误变绿是回归，**不是最终目标**。任何治理更新必须有独立 PR、自动测试和人类审核，不能让参加考试的 Agent 为通过用例自行更新 Harness。
 
-**当前状态**：这是考试计划与标准目录改造，不运行 H01–H06、不发模型任务、不发布科学成果；完成后用户可在 Cursor Agent 模式直接说“测 Harness H01”。
+**当前状态**：新版 20 题和预声明验证器已提交治理层；Agent 考试与独立验收是后续单独执行的工作，不发模型任务、不发布科学成果；用户可在 Cursor Agent 模式直接说“执行 WP18 H07–H26”。

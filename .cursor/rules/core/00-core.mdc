@@ -33,3 +33,5 @@ alwaysApply: true
 - 外部 Work Plan 须先进行结构审计与人类预审，再授权精确文件范围与命令。
 - Agent 不得伪造批准、扩大作用域或把局部测试标成完整科学验收。
 - 未得到用户对新范围的直接批准前，所有其他节点、源码和知识状态保持不变。
+
+- WP18 H07–H26 已在治理侧预声明 20 种不同 Repo 场景的合同、测试接口和验证器；考试 Agent 可读 `harness/contracts/wp18_cases.json` 与 `wp18_verify.py`，只在新的 `harness/tests/wp18/runs/` 中实现 `solve(payload)`，不得修改任何评分器/验证程序/Contracts 或历史试卷。CI 的 task PR diff gate 与独立 reviewer 的负面测试才是外部验收，不是 Agent 自评。

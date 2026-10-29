@@ -7,7 +7,7 @@
 你可以在 Cursor Agent 模式输入：
 
 - **“测 Harness H01”**：只跑一个小题。
-- **“测 WP18 H01–H06”**：六题顺序执行，每题独立目录，不在当前代码上相互覆盖。
+- **“测 WP18 H01–H06”**：历史六题各在独立目录执行。\n- **“执行 WP18 H07–H26”**：执行新增二十题，预先选定 Contract、按冻结验证程序检查，每题独立目录，不覆盖旧 Run。
 - **“测试 Harness 的 X 功能”**：用户定定义新题，Agent 定己归纳一个具体测试目标和可核查的预期行为；仍只能修改本目录。
 - **“停止 WP18”**：不再写文件，汇报当前结果和剩余工作。
 - **“查看 WP18 交付”**：列出已有 Run 和报告路径。
@@ -16,11 +16,11 @@
 
 ## 每次运行结构
 
-**新增必选步骤**：WP18 已在 Work Plan 中声明 H01–H06 的固定 Contract ID。执行 CASE 前由 Agent 解析 `harness/contracts/catalog.json` 的 Always-on 与当前任务选择；写 `contract_receipt.json` 到该 CASE 目录。不要让人类查 Bash 或 YAML；缺少合同/违反合同只能报告，不得改治理目录。自定义测试只可从同一目录选择适用 tags，并在收据注明选择依据。
+**新增必选步骤**：WP18 已在 Work Plan 中声明 H01–H26 的固定 Contract ID。执行 CASE 前由 Agent 解析 `harness/contracts/catalog.json` 的 Always-on 与当前任务选择；写 `contract_receipt.json` 到该 CASE 目录。不要让人类查 Bash 或 YAML；缺少合同/违反合同只能报告，不得改治理目录。自定义测试只可从同一目录选择适用 tags，并在收据注明选择依据。
 
 
 
-每次新 Run 使用 `runs/<run_id>/<case>/`。短 `run_id` 可以来自日期加流水号，也可使用用户指定名称；须避免覆盖现有 Run。CASE 使用 `H01`–`H06` 或其他简短稳定名称；每题内部必须有 `implementation.py`、`test_implementation.py`、`review_candidate.json`、`expected_code_diff.json`、`selfcheck.json`、`contract_receipt.json`、`report.md`。必要的小型 fixture 放 `fixtures/`；不把每次运行都放到项目根目录。
+每次新 Run 使用 `runs/<run_id>/<case>/`。短 `run_id` 可以来自日期加流水号，也可使用用户指定名称；须避免覆盖现有 Run。CASE 使用 `H01`–`H26` 或其他简短稳定名称；每题内部必须有 `implementation.py`、`test_implementation.py`、`review_candidate.json`、`expected_code_diff.json`、`selfcheck.json`、`contract_receipt.json`、`report.md`。必要的小型 fixture 放 `fixtures/`；不把每次运行都放到项目根目录。
 
 - Agent 可直接实现测试功能并运行仅针对本 Run 的 `python -m pytest -p no:cacheprovider -q harness/tests/wp18/runs/<run_id>/<case>/test_implementation.py`。
 - Agent 必须在候选树中使用真实源文件、源码 ID、行号与签名。未确认的 Context 关联留空或标 unresolved；状态保留 unchecked，不能宣称树已通过人工审阅。
@@ -28,3 +28,7 @@
 - 验收者对照不同 Run、真实 AST、Rules、Context、翻译、权限及 UI，另行写 `acceptance/`，考生对它只有只读权限。
 
 所有工具和文件路径沿用 `harness/tests/README.md`，不得替代正式 `.cursor` Hooks 或制作同名治理替身。CI / hidden evaluator 可以补充测试，但考生不可删除或更改外部测试来使自己通过。
+
+## H07–H26 冻结验证程序
+
+新增 20 题的每个 `implementation.py` 统一暴露 `solve(payload: dict) -> dict`，非法输入抛 `ValueError`。按 `harness/contracts/wp18_cases.json` 的预先定义实现，不从历史 H03–H06 的答案复制。验证器位于治理拥有的 `harness/contracts/wp18_verify.py`，可读、可在受限命令下运行，但绝不能编辑；CI 额外拒绝考试 PR 修改任何旧运行、评分器、规则或权威文件。所有合成样本可用最少数据；无 GPU 和外网授权。最终独立验收另用未写入公开验证数据的输入运行。
