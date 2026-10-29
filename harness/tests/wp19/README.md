@@ -7,3 +7,5 @@
 P0 接口为 `solve(payload: dict) -> dict`；非法输入抛 `ValueError`，输入对象不修改。例子可读，可用 `python -m harness.contracts.wp19_verify --case H27 --run-dir harness/tests/wp19/runs/<run_id>/H27` 检验。合法的 `--check-spec` 不运行候选实现。独立 reviewer 仍需用**不同数据**验证，并从可信治理 commit 调用评分器，不接受候选分支中的同名评审程序。
 
 这套 Hooks 是工具级防护，不是任意代码运行的 OS 沙箱。考试分支只提交 sandbox 新增文件，不自合并。真正环境、模型或 GPU 任务必须单独授权。
+
+**可信范围检查**：`.github/workflows/wp19-trusted-scope.yml` 使用 `pull_request_target` 在**基线** checkout 上读取候选文件差异，绝不执行候选 Python；候选修改 CI/评分器也不能改这个基线版本的检查。不过必须由仓库维护者在 GitHub 分支规则中将 `trusted-scope` 设为必需状态检查、禁止没有可信审阅的绕过/直接 push，且在真正运行不可信程序前使用 OS 级隔离，才能形成可靠的强边界。未配置分支保护时只能称已配置工具检查，不能称绝对不可绕过。

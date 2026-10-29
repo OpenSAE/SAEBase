@@ -123,11 +123,13 @@ def verify_case(case_id: str, path: Path) -> dict:
     }
 
 
-def audit_scope(base_sha: str) -> list[str]:
+def audit_scope(base_sha: str, head_sha: str = "HEAD") -> list[str]:
     if not re.fullmatch(r"[0-9a-f]{40}", base_sha):
         raise ValueError("Exact base commit SHA required")
+    if head_sha != "HEAD" and not re.fullmatch(r"[0-9a-f]{40}", head_sha):
+        raise ValueError("Exact candidate SHA required")
     proc = subprocess.run(
-        ["git", "diff", "--name-status", "--no-renames", base_sha, "HEAD"],
+        ["git", "diff", "--name-status", "--no-renames", base_sha, head_sha],
         cwd=ROOT, capture_output=True, text=True, check=True,
     )
     bad = []
@@ -173,11 +175,14 @@ def main() -> int:
     parser.add_argument("--run-dir", type=Path)
     parser.add_argument("--scan", action="store_true")
     parser.add_argument("--base")
+    parser.add_argument("--head-sha")
     args = parser.parse_args()
     try:
         result: dict = {"spec": check_spec()}
+        if args.head_sha and not args.base:
+            raise ValueError("--head-sha requires --base")
         if args.base:
-            result["unauthorized_changes"] = audit_scope(args.base)
+            result["unauthorized_changes"] = audit_scope(args.base, args.head_sha or "HEAD")
         if args.case:
             if args.run_dir is None:
                 raise ValueError("Required --run-dir")
