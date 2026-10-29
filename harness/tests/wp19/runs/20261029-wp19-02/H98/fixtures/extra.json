@@ -1,0 +1,50 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "left": [
+            "a",
+            "b"
+          ],
+          "right": [
+            "b",
+            "a"
+          ]
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "left": [
+            "a"
+          ],
+          "right": [
+            "b"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "left": [
+            "a",
+            "b"
+          ],
+          "right": [
+            "b",
+            "a"
+          ]
+        },
+        "extra": true
+      }
+    }
+  ]
+}

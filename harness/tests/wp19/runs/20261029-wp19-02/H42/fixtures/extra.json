@@ -1,0 +1,49 @@
+{
+  "positive": [
+    {
+      "input": {
+        "project": "SAEBase",
+        "objects": [
+          {
+            "id": "beta",
+            "project": "SAEBase"
+          },
+          {
+            "id": "alpha",
+            "project": "SAEBase"
+          }
+        ]
+      },
+      "expected": {
+        "ids": [
+          "alpha",
+          "beta"
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "project": "OpenResearch",
+        "objects": [
+          {
+            "id": "alpha",
+            "project": "SAEBase"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "project": "SAEBase",
+        "objects": [
+          {
+            "id": "",
+            "project": "SAEBase"
+          }
+        ]
+      }
+    }
+  ]
+}

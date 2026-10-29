@@ -1,0 +1,34 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "limit": 10,
+          "used": 4
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "limit": 10,
+          "used": 11
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "limit": 10,
+          "used": 4
+        },
+        "extra": true
+      }
+    }
+  ]
+}

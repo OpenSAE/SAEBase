@@ -1,0 +1,46 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "train": [
+            "a"
+          ],
+          "test": [
+            "b"
+          ]
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "train": [
+            "a"
+          ],
+          "test": [
+            "a"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "train": [
+            "a"
+          ],
+          "test": [
+            "b"
+          ]
+        },
+        "extra": true
+      }
+    }
+  ]
+}

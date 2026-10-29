@@ -1,0 +1,31 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "path": "datasets/note.txt"
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "path": ".github/workflows/ci.yml"
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "path": "datasets/note.txt"
+        },
+        "extra": true
+      }
+    }
+  ]
+}

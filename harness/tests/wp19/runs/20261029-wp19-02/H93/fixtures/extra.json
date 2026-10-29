@@ -1,0 +1,57 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "nodes": [
+            "a",
+            "b"
+          ],
+          "edges": [
+            [
+              "a",
+              "b"
+            ]
+          ]
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "nodes": [
+            "a"
+          ],
+          "edges": [
+            [
+              "a",
+              "z"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "nodes": [
+            "a",
+            "b"
+          ],
+          "edges": [
+            [
+              "a",
+              "b"
+            ]
+          ]
+        },
+        "extra": true
+      }
+    }
+  ]
+}

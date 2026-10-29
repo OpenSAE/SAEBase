@@ -1,0 +1,42 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "nodes": [
+            "a",
+            "b"
+          ],
+          "target": "a"
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "nodes": [
+            "a"
+          ],
+          "target": "z"
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "nodes": [
+            "a",
+            "b"
+          ],
+          "target": "a"
+        },
+        "extra": true
+      }
+    }
+  ]
+}

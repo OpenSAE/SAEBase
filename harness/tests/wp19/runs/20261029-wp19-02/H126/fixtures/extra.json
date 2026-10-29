@@ -1,0 +1,46 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "before": {
+            "id": "a"
+          },
+          "after": {
+            "id": "a"
+          }
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "before": {
+            "id": "a"
+          },
+          "after": {
+            "id": "b"
+          }
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "before": {
+            "id": "a"
+          },
+          "after": {
+            "id": "a"
+          }
+        },
+        "extra": true
+      }
+    }
+  ]
+}

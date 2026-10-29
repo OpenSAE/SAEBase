@@ -1,0 +1,34 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "gpu_minutes": 2,
+          "authorized": true
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "gpu_minutes": true,
+          "authorized": true
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "gpu_minutes": 2,
+          "authorized": true
+        },
+        "extra": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "resolved": true,
+          "exists": true
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "resolved": true,
+          "exists": false
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "resolved": true,
+          "exists": true
+        },
+        "extra": true
+      }
+    }
+  ]
+}

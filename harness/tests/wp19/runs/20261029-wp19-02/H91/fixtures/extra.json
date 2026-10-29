@@ -1,0 +1,70 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "nodes": [
+            "a",
+            "b"
+          ],
+          "edges": [
+            [
+              "a",
+              "b"
+            ]
+          ],
+          "order": [
+            "a",
+            "b"
+          ]
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "nodes": [
+            "a",
+            "b"
+          ],
+          "edges": [
+            [
+              "a",
+              "b"
+            ]
+          ],
+          "order": [
+            "b",
+            "a"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "nodes": [
+            "a",
+            "b"
+          ],
+          "edges": [
+            [
+              "a",
+              "b"
+            ]
+          ],
+          "order": [
+            "a",
+            "b"
+          ]
+        },
+        "extra": true
+      }
+    }
+  ]
+}

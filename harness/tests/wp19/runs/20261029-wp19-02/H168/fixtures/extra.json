@@ -1,0 +1,40 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "order": [
+            "a",
+            "b"
+          ]
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "order": [
+            "b",
+            "a"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "order": [
+            "a",
+            "b"
+          ]
+        },
+        "extra": true
+      }
+    }
+  ]
+}

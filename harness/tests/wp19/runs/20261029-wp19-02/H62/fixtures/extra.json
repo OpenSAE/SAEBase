@@ -1,0 +1,39 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "record": {
+            "token": "[REDACTED]",
+            "value": "safe"
+          }
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "record": {
+            "token": "SENSITIVE"
+          }
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "record": {
+            "token": "[REDACTED]",
+            "value": "safe"
+          }
+        },
+        "extra": true
+      }
+    }
+  ]
+}

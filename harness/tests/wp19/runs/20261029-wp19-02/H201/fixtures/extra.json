@@ -1,0 +1,39 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "members": [
+            "a.txt",
+            "b/c"
+          ]
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "members": [
+            "../secret"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "members": [
+            "a.txt",
+            "b/c"
+          ]
+        },
+        "extra": true
+      }
+    }
+  ]
+}

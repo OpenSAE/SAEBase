@@ -1,0 +1,40 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "command": "python -m pytest",
+          "allowlist": [
+            "python -m pytest"
+          ]
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "command": "sudo rm",
+          "allowlist": [
+            "git status"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "command": "python -m pytest",
+          "allowlist": [
+            "python -m pytest"
+          ]
+        },
+        "extra": true
+      }
+    }
+  ]
+}
