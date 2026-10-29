@@ -39,15 +39,19 @@ def test_archive_is_actually_written_and_read():
     assert result["output"]["verified"] is True
 
 
-def test_git_has_real_commits_and_unique_parents():
-    p = {"base": "x=0\n", "a": "x=1\n", "b": "x=2\n", "rebase_b": "HEAD_AFTER_A"}
-    r = grader._reference("X18", p)
-    assert r["ok"], r
-    out = r["output"]
-    assert out["commits"] == 3
-    assert len({out["base_sha"], out["head_a_sha"], out["head_b_sha"]}) == 3
-    assert out["source"] == "x=2\n"
-    assert "module.py" in r["files"]
+def test_git_has_real_branches_conflict_resolution_and_parents():
+    good = grader._reference("X18", grader.load_scenarios()["cases"]["X18"][0]["input"])
+    assert good["ok"], good
+    out = good["output"]
+    assert out["commits"] == 4
+    assert out["conflicted"] is True
+    assert len({out["base_sha"], out["head_a_sha"], out["head_b_sha"], out["merge_sha"]}) == 4
+    assert set(out["merge_parents"]) == {out["head_a_sha"], out["head_b_sha"]}
+    assert out["source"] == "def f():\\n    return 4\\n"
+    assert "module.py" in good["files"]
+    automatic = grader._reference("X18", grader.load_scenarios()["cases"]["X18"][1]["input"])
+    assert automatic["ok"], automatic
+    assert automatic["output"]["conflicted"] is False
 
 
 @pytest.mark.parametrize("case", sorted(grader.READY))

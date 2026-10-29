@@ -102,38 +102,72 @@ def _git(root, *args):
 
 
 def x18(p, root):
-    if set(p) != {"base", "a", "b", "rebase_b"}:
+    """Two independently committed agents, with real Git merge and CAS validation."""
+    if set(p) != {"base", "a", "b", "resolution", "resume_from"}:
         raise ValueError("schema")
     root = Path(root)
     _git(root, "init")
     _git(root, "config", "user.email", "exam@example.invalid")
     _git(root, "config", "user.name", "Synthetic Exam")
     target = root / "module.py"
+    if not all(isinstance(p[k], str) for k in ("base", "a", "b")):
+        raise ValueError("invalid source")
     target.write_text(p["base"], encoding="utf-8")
     _git(root, "add", "module.py")
     _git(root, "commit", "-m", "base")
     base = _git(root, "rev-parse", "HEAD")
-    if not isinstance(p["a"], str) or not isinstance(p["b"], str):
-        raise ValueError("edits")
+    _git(root, "switch", "-c", "agent-a")
     target.write_text(p["a"], encoding="utf-8")
     _git(root, "add", "module.py")
+    if p["a"] == p["base"]:
+        raise ValueError("agent A made no change")
     _git(root, "commit", "-m", "agent-a")
     head_a = _git(root, "rev-parse", "HEAD")
-    if head_a == base:
-        raise ValueError("no change from A")
-    if p["rebase_b"] != "HEAD_AFTER_A":
-        raise ValueError("stale B expected SHA")
+    _git(root, "switch", "-c", "agent-b", base)
     target.write_text(p["b"], encoding="utf-8")
     _git(root, "add", "module.py")
-    _git(root, "commit", "-m", "agent-b-after-rebase")
+    if p["b"] == p["base"]:
+        raise ValueError("agent B made no change")
+    _git(root, "commit", "-m", "agent-b")
     head_b = _git(root, "rev-parse", "HEAD")
+    if p["resume_from"] != "HEAD_AFTER_A":
+        raise ValueError("stale continuation")
+    merged = subprocess.run(
+        ["git", "-C", str(root), "merge", "--no-ff", "agent-a", "-m", "merge"],
+        capture_output=True,
+        text=True,
+        timeout=5,
+        check=False,
+        env={
+            "PATH": "/usr/bin:/bin",
+            "HOME": str(root),
+            "GIT_CONFIG_NOSYSTEM": "1",
+            "GIT_AUTHOR_DATE": "2001-01-01T00:00:00+0000",
+            "GIT_COMMITTER_DATE": "2001-01-01T00:00:00+0000",
+        },
+    )
+    conflicted = merged.returncode != 0
+    if conflicted:
+        if not isinstance(p["resolution"], str) or not p["resolution"]:
+            raise ValueError("RESOLUTION_REQUIRED")
+        target.write_text(p["resolution"], encoding="utf-8")
+        _git(root, "add", "module.py")
+        _git(root, "commit", "-m", "resolved-conflict")
+    elif p["resolution"] is not None:
+        raise ValueError("Unexpected manual resolution without conflict")
+    merged_head = _git(root, "rev-parse", "HEAD")
+    parents = _git(root, "rev-list", "--parents", "-n", "1", "HEAD").split()
+    if set(parents[1:]) != {head_a, head_b}:
+        raise ValueError("Merge parents missing")
     return {
         "base_sha": base,
         "head_a_sha": head_a,
         "head_b_sha": head_b,
-        "commits": 3,
+        "merge_sha": merged_head,
+        "merge_parents": parents[1:],
+        "commits": int(_git(root, "rev-list", "--count", "--all")),
+        "conflicted": conflicted,
         "source": target.read_text(encoding="utf-8"),
-        "history": ["base", "agent-a", "agent-b-after-rebase"],
     }
 
 

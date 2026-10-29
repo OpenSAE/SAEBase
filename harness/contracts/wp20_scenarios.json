@@ -1720,43 +1720,47 @@
     "X18": [
       {
         "id": "positive_a",
+        "valid": true,
         "input": {
           "base": "def f():\n    return 1\n",
           "a": "def f():\n    return 2\n",
           "b": "def f():\n    return 3\n",
-          "rebase_b": "HEAD_AFTER_A"
-        },
-        "valid": true
+          "resolution": "def f():\n    return 4\n",
+          "resume_from": "HEAD_AFTER_A"
+        }
       },
       {
         "id": "positive_b",
+        "valid": true,
         "input": {
-          "base": "x=0\n",
-          "a": "x=1\n",
-          "b": "x=2\n",
-          "rebase_b": "HEAD_AFTER_A"
-        },
-        "valid": true
+          "base": "def a():\n    return 0\n\n\n\n\ndef b():\n    return 0\n",
+          "a": "def a():\n    return 1\n\n\n\n\ndef b():\n    return 0\n",
+          "b": "def a():\n    return 0\n\n\n\n\ndef b():\n    return 2\n",
+          "resolution": null,
+          "resume_from": "HEAD_AFTER_A"
+        }
       },
       {
         "id": "negative_a",
+        "valid": false,
         "input": {
-          "base": "x=0\n",
-          "a": "x=1\n",
-          "b": "x=2\n",
-          "rebase_b": "BASE"
-        },
-        "valid": false
+          "base": "def f():\n    return 1\n",
+          "a": "def f():\n    return 2\n",
+          "b": "def f():\n    return 3\n",
+          "resolution": null,
+          "resume_from": "HEAD_AFTER_A"
+        }
       },
       {
         "id": "negative_b",
+        "valid": false,
         "input": {
-          "base": "x=0\n",
-          "a": "x=0\n",
-          "b": "x=1\n",
-          "rebase_b": "HEAD_AFTER_A"
-        },
-        "valid": false
+          "base": "def f():\n    return 1\n",
+          "a": "def f():\n    return 2\n",
+          "b": "def f():\n    return 3\n",
+          "resolution": "def f():\n    return 4\n",
+          "resume_from": "OLD_BASE"
+        }
       }
     ],
     "X19": [
