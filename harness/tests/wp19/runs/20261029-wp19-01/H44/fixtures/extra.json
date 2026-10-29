@@ -1,0 +1,29 @@
+{
+  "positive": [
+    {
+      "input": {
+        "comment": "",
+        "actual": "code"
+      },
+      "expected": {
+        "authoritative": "code",
+        "disagreement": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "comment": "x",
+        "actual": null
+      }
+    },
+    {
+      "input": {
+        "comment": "x",
+        "actual": "y",
+        "extra": 1
+      }
+    }
+  ]
+}

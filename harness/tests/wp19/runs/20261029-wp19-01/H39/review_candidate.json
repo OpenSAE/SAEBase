@@ -1,0 +1,80 @@
+{
+  "schema": "saebase.wp19.review_candidate.v1",
+  "run_id": "20261029-wp19-01",
+  "case_id": "H39",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "e94da4dc3ec73c4e93ac99a01ce159e94ac2bfb2",
+  "source_content_sha256": "ee2da8b5c727c146cba65d69b0073f5206ebd0a6c09616b937805b7fb63f0f14",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp19.runs.20261029-wp19-01.H39.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H39.implementation",
+      "title": {
+        "zh": "许可拒绝",
+        "en": "Permission refusal"
+      },
+      "summary": {
+        "zh": "引用不在允许集合内或编号重复时抛出。",
+        "en": "Raised when a reference is outside the allowed set or an id is duplicated."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H39/implementation.py",
+      "line": 6,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H39/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H39.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H39.implementation",
+      "title": {
+        "zh": "许可核对",
+        "en": "Permission check"
+      },
+      "summary": {
+        "zh": "只把允许集合内的引用标成 verified。",
+        "en": "Marks a reference verified only when it belongs to the allowed set."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H39/implementation.py",
+      "line": 10,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H39/implementation.py:10"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H39.implementation:_ids",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H39.implementation",
+      "title": {
+        "zh": "引用编号",
+        "en": "Reference ids"
+      },
+      "summary": {
+        "zh": "接受唯一非空字符串。",
+        "en": "Accepts unique nonempty strings."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H39/implementation.py",
+      "line": 21,
+      "signature": "def _ids(values: object) -> list[str]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H39/implementation.py:21"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; Observed AST was not rebuilt",
+    "independent acceptance was not run",
+    "nodes remain unchecked",
+    "H47-H226 remain PROPOSED and were not implemented"
+  ]
+}

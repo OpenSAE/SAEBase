@@ -1,0 +1,28 @@
+{
+  "positive": [
+    {
+      "input": {
+        "expected": "exam",
+        "observed": "exam"
+      },
+      "expected": {
+        "matched": true,
+        "version": "exam"
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "expected": "",
+        "observed": ""
+      }
+    },
+    {
+      "input": {
+        "expected": "exam",
+        "observed": "Exam"
+      }
+    }
+  ]
+}

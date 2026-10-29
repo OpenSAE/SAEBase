@@ -1,0 +1,27 @@
+{
+  "positive": [
+    {
+      "input": {
+        "expected_sha": "cccccccccccccccccccccccccccccccccccccccc",
+        "observed_sha": "cccccccccccccccccccccccccccccccccccccccc"
+      },
+      "expected": {
+        "matched": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "expected_sha": "cccccccccccccccccccccccccccccccccccccccc",
+        "observed_sha": "dddddddddddddddddddddddddddddddddddddddd"
+      }
+    },
+    {
+      "input": {
+        "expected_sha": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+        "observed_sha": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC"
+      }
+    }
+  ]
+}

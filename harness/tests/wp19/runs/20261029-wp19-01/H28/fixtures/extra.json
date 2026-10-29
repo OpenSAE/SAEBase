@@ -1,0 +1,27 @@
+{
+  "positive": [
+    {
+      "input": {
+        "global_min": 0,
+        "local_min": 1
+      },
+      "expected": {
+        "minimum": 1
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "global_min": 0,
+        "local_min": -1
+      }
+    },
+    {
+      "input": {
+        "global_min": 1,
+        "local_min": true
+      }
+    }
+  ]
+}

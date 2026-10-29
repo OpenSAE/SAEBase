@@ -1,0 +1,31 @@
+{
+  "positive": [
+    {
+      "input": {
+        "binding": [
+          "CT-REVIEW",
+          "CT-STRUCT"
+        ]
+      },
+      "expected": {
+        "status": "bound",
+        "verified": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "binding": [
+          "CT-REVIEW",
+          "CT-REVIEW"
+        ]
+      }
+    },
+    {
+      "input": {
+        "binding": false
+      }
+    }
+  ]
+}
