@@ -1,4 +1,5 @@
 """Independent checks for predeclared, reusable Harness contract obligations."""
+
 from __future__ import annotations
 
 import importlib.util
@@ -17,7 +18,11 @@ def test_catalog_has_a_closed_and_versioned_vocabulary():
     ids = {item["id"] for item in catalog["contracts"]}
     assert len(ids) >= 14
     assert set(catalog["required_always"]) == {
-        "CT-BASE", "CT-SCOPE", "CT-TRUTH", "CT-CHECK", "CT-TRACE"
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
     }
     assert all(item["requirements"] for item in catalog["contracts"])
     assert all(item["negative_examples"] for item in catalog["contracts"])
@@ -94,8 +99,15 @@ def test_reference_validation_is_tiered_and_safe(tmp_path):
 
 @pytest.mark.parametrize(
     "reference",
-    ("../secret.py:1", "/private/file.py:1", "x.py:0", "x.py:-2",
-     "./x.py:1", "x//y.py:1", "x.py:not-a-line"),
+    (
+        "../secret.py:1",
+        "/private/file.py:1",
+        "x.py:0",
+        "x.py:-2",
+        "./x.py:1",
+        "x//y.py:1",
+        "x.py:not-a-line",
+    ),
 )
 def test_reference_does_not_confuse_path_syntax_with_verified_source(tmp_path, reference):
     with pytest.raises(invariants.InvariantError):
@@ -114,9 +126,14 @@ def test_evidence_symlink_escape_and_missing_line(tmp_path):
 
 
 def test_recursive_redaction_covers_dict_list_values_and_unknown_types():
-    source = {"synthetic": True, "device": {"token": "SECRET-DO-NOT-LOG",
-              "events": [{"private_key": "SUPERSECRET"},
-                         {"home": "/Users/researcher/private"}]}, "gpu": None}
+    source = {
+        "synthetic": True,
+        "device": {
+            "token": "SECRET-DO-NOT-LOG",
+            "events": [{"private_key": "SUPERSECRET"}, {"home": "/Users/researcher/private"}],
+        },
+        "gpu": None,
+    }
     cleaned, redactions = invariants.redact_structure(source)
     payload = json.dumps(cleaned)
     assert "SECRET-DO-NOT-LOG" not in payload
@@ -135,8 +152,12 @@ def test_redaction_never_silently_passes_unsupported_depth():
 
 
 def test_tree_scope_rejects_absent_parent_without_fabricating_id():
-    g = {"nodes": [{"id": "root", "parent_id": None, "tree_id": "code", "order": 0},
-                   {"id": "child", "parent_id": "root", "tree_id": "code", "order": 2}]}
+    g = {
+        "nodes": [
+            {"id": "root", "parent_id": None, "tree_id": "code", "order": 0},
+            {"id": "child", "parent_id": "root", "tree_id": "code", "order": 2},
+        ]
+    }
     assert invariants.validated_dfs(g) == ["root", "child"]
     assert invariants.validated_dfs(g, scope="parent", target="root") == ["root", "child"]
     assert invariants.validated_dfs(g, scope="node", target="child") == ["child"]
@@ -150,13 +171,18 @@ def test_tree_rejects_unknown_parent_cycle_and_cross_tree():
     with pytest.raises(invariants.InvariantError):
         invariants.validated_dfs({"nodes": [{"id": "a", "parent_id": "missing"}]})
     with pytest.raises(invariants.InvariantError):
-        invariants.validated_dfs({"nodes": [
-            {"id": "a", "parent_id": "b"}, {"id": "b", "parent_id": "a"}
-        ]})
+        invariants.validated_dfs(
+            {"nodes": [{"id": "a", "parent_id": "b"}, {"id": "b", "parent_id": "a"}]}
+        )
     with pytest.raises(invariants.InvariantError):
-        invariants.validated_dfs({"nodes": [
-            {"id": "a", "tree_id": "code"}, {"id": "b", "parent_id": "a", "tree_id": "context"}
-        ]})
+        invariants.validated_dfs(
+            {
+                "nodes": [
+                    {"id": "a", "tree_id": "code"},
+                    {"id": "b", "parent_id": "a", "tree_id": "context"},
+                ]
+            }
+        )
 
 
 def test_localization_inspects_both_languages_and_stable_signature():
@@ -188,9 +214,7 @@ def test_contract_receipt_does_not_self_certify_execution():
         "contract_ids": selected["contract_ids"],
         "case_id": "H04",
         "context_paths": [],
-        "edited_paths": [
-            "harness/tests/wp18/runs/example/H04/implementation.py"
-        ],
+        "edited_paths": ["harness/tests/wp18/runs/example/H04/implementation.py"],
         "commands": [{"argv": ["python", "-m", "pytest"], "exit_code": 0}],
         "unresolved": [],
     }
@@ -210,12 +234,15 @@ def test_cursor_shell_gate_allows_only_read_only_registry_queries():
     query = "python -m harness.contracts.registry resolve --plan " + PLAN + " --case H04"
     assert module.gate(query) is None
     assert module.gate("python -m harness.contracts.registry list") is None
-    assert module.gate("python -m harness.contracts.registry select --tags privacy,interface") is None
+    assert (
+        module.gate("python -m harness.contracts.registry select --tags privacy,interface") is None
+    )
     assert set(registry.select_tags(["privacy", "interface"])["contract_ids"]) == set(
         trace.ad_hoc_selection(["privacy", "interface"])
     )
     assert module.gate("python -m harness.contracts.registry check --plan " + PLAN) is None
     assert module.gate(query + " && touch owned.py") is not None
-    assert module.gate(
-        "python -m harness.contracts.registry resolve --plan ../../other.md --case H04"
-    ) is not None
+    assert (
+        module.gate("python -m harness.contracts.registry resolve --plan ../../other.md --case H04")
+        is not None
+    )
