@@ -1,0 +1,45 @@
+{
+  "positive": [
+    {
+      "input": {
+        "rules": [
+          {
+            "path": "alpha",
+            "allow": false
+          },
+          {
+            "path": "alpha",
+            "allow": false
+          },
+          {
+            "path": "beta",
+            "allow": true
+          }
+        ]
+      },
+      "expected": {
+        "conflicts": []
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "rules": [
+          {
+            "path": "alpha",
+            "allow": null
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "rules": {
+          "path": "alpha",
+          "allow": true
+        }
+      }
+    }
+  ]
+}

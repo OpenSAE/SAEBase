@@ -1,0 +1,37 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "done": 2,
+          "total": 4,
+          "coverage": 0.5
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "done": 2,
+          "total": 4,
+          "coverage": 1
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "done": 2,
+          "total": 4,
+          "coverage": 0.5
+        },
+        "extra": true
+      }
+    }
+  ]
+}

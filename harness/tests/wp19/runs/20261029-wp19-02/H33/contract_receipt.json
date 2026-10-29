@@ -1,0 +1,88 @@
+{
+  "schema": "saebase.harness.contract_receipt.v1",
+  "registry_version": "1.1.0",
+  "case_id": "H33",
+  "contract_ids": [
+    "CT-BASE",
+    "CT-SCOPE",
+    "CT-TRUTH",
+    "CT-CHECK",
+    "CT-TRACE",
+    "CT-ERROR",
+    "CT-INTERFACE"
+  ],
+  "task_signals": [],
+  "selection_audit": [],
+  "context_paths": [
+    ".cursor/hooks/guard_shell.py",
+    ".cursor/skills/workflow/run-work-order/SKILL.md",
+    "harness/contracts/README.md",
+    "harness/contracts/catalog.json",
+    "harness/contracts/selection.py",
+    "harness/contracts/trace.py",
+    "harness/contracts/wp19_cases.json",
+    "harness/contracts/wp19_reference.py",
+    "harness/contracts/wp19_reference_ext.py",
+    "harness/contracts/wp19_verify.py",
+    "harness/github_work_plan/19_harness_large_scale_examination_and_verifier_assurance.md",
+    "harness/github_work_test/test_wp19_p0_contracts.py",
+    "harness/tests/wp19/README.md"
+  ],
+  "edited_paths": [
+    "harness/tests/wp19/runs/20261029-wp19-02/H33/expected_code_diff.json",
+    "harness/tests/wp19/runs/20261029-wp19-02/H33/fixtures/extra.json",
+    "harness/tests/wp19/runs/20261029-wp19-02/H33/implementation.py",
+    "harness/tests/wp19/runs/20261029-wp19-02/H33/review_candidate.json",
+    "harness/tests/wp19/runs/20261029-wp19-02/H33/test_implementation.py",
+    "harness/tests/wp19/runs/20261029-wp19-02/H33/selfcheck.json",
+    "harness/tests/wp19/runs/20261029-wp19-02/H33/contract_receipt.json",
+    "harness/tests/wp19/runs/20261029-wp19-02/H33/report.md"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "-m",
+        "harness.contracts.registry",
+        "resolve",
+        "--plan",
+        "harness/github_work_plan/19_harness_large_scale_examination_and_verifier_assurance.md",
+        "--case",
+        "H33"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "-m",
+        "pytest",
+        "-p",
+        "no:cacheprovider",
+        "-q",
+        "harness/tests/wp19/runs/20261029-wp19-02/H33/test_implementation.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "-m",
+        "harness.contracts.wp19_verify",
+        "--case",
+        "H33",
+        "--run-dir",
+        "harness/tests/wp19/runs/20261029-wp19-02/H33"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "unresolved": [
+    "head_sha is unavailable until the delivery commit exists",
+    "expected_code_diff is a prediction; Observed AST was not rebuilt",
+    "independent acceptance was not run",
+    "verifier human_approval is false"
+  ],
+  "source_sha": "1cf93b220534d76930ef8b83133f9a033291d3f9",
+  "head_sha": "unavailable"
+}

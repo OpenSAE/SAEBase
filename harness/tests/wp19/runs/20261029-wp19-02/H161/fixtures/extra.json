@@ -1,0 +1,61 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "before": [
+            2,
+            3
+          ],
+          "after": [
+            0,
+            3
+          ],
+          "index": 0,
+          "mode": "ablate",
+          "delta": 0
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "before": [
+            2,
+            3
+          ],
+          "after": [
+            2,
+            3
+          ],
+          "index": 0,
+          "mode": "ablate",
+          "delta": 0
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "before": [
+            2,
+            3
+          ],
+          "after": [
+            0,
+            3
+          ],
+          "index": 0,
+          "mode": "ablate",
+          "delta": 0
+        },
+        "extra": true
+      }
+    }
+  ]
+}

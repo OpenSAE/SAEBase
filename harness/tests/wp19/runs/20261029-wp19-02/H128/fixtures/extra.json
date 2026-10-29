@@ -1,0 +1,40 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "ids": [
+            "p",
+            "q"
+          ]
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "ids": [
+            "p",
+            ""
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "ids": [
+            "p",
+            "q"
+          ]
+        },
+        "extra": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "approved": true,
+          "actor": "human"
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "approved": true,
+          "actor": "agent"
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "approved": true,
+          "actor": "human"
+        },
+        "extra": true
+      }
+    }
+  ]
+}

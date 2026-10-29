@@ -1,0 +1,46 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "files": [
+            {
+              "id": "a",
+              "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "files": [
+            {
+              "id": "a",
+              "sha": "bad"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "files": [
+            {
+              "id": "a",
+              "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          ]
+        },
+        "extra": true
+      }
+    }
+  ]
+}

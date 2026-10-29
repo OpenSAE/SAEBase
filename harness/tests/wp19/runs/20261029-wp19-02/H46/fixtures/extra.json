@@ -1,0 +1,38 @@
+{
+  "positive": [
+    {
+      "input": {
+        "claimed": [
+          "p",
+          "q"
+        ],
+        "observed": [
+          "q"
+        ]
+      },
+      "expected": {
+        "unverified": [
+          "p"
+        ],
+        "unclaimed": []
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "claimed": [
+          "p",
+          ""
+        ],
+        "observed": []
+      }
+    },
+    {
+      "input": {
+        "claimed": null,
+        "observed": []
+      }
+    }
+  ]
+}

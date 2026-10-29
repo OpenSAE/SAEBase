@@ -1,0 +1,34 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "observed": false,
+          "synthetic": true
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "observed": true,
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "observed": false,
+          "synthetic": true
+        },
+        "extra": true
+      }
+    }
+  ]
+}

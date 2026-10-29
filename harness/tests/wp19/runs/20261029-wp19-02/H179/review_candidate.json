@@ -1,0 +1,79 @@
+{
+  "schema": "saebase.wp19.review_candidate.v1",
+  "run_id": "20261029-wp19-02",
+  "case_id": "H179",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "1cf93b220534d76930ef8b83133f9a033291d3f9",
+  "source_content_sha256": "8c5b124afae407e601aa3df4e1cf8771ce9efac94fccd0c411ca22bf189adc12",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp19.runs.20261029-wp19-02.H179.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H179.implementation",
+      "title": {
+        "zh": "H179 拒绝",
+        "en": "H179 refusal"
+      },
+      "summary": {
+        "zh": "非法输入或违反冻结不变量时抛出。",
+        "en": "Raised when the input is illegal or violates the frozen invariant."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H179/implementation.py",
+      "line": 6,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H179/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-02.H179.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H179.implementation",
+      "title": {
+        "zh": "seed 来源",
+        "en": "version entry"
+      },
+      "summary": {
+        "zh": "记录训练/采样/评估种子",
+        "en": "Implements the frozen version contract for H179."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H179/implementation.py",
+      "line": 10,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H179/implementation.py:10"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-02.H179.implementation:_ok",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H179.implementation",
+      "title": {
+        "zh": "约束判定",
+        "en": "Invariant check"
+      },
+      "summary": {
+        "zh": "只判断当前 operator 对应的合成约束是否成立。",
+        "en": "Returns whether the version invariant holds for this subject."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H179/implementation.py",
+      "line": 23,
+      "signature": "def _ok(subject: object) -> bool",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H179/implementation.py:23"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; Observed AST was not rebuilt",
+    "independent acceptance was not run",
+    "nodes remain unchecked"
+  ]
+}

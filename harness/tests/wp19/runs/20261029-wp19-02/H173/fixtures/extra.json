@@ -1,0 +1,39 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "values": [
+            0.5,
+            -2
+          ]
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "values": [
+            NaN
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "values": [
+            0.5,
+            -2
+          ]
+        },
+        "extra": true
+      }
+    }
+  ]
+}

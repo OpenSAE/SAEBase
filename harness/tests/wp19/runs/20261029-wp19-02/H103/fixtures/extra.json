@@ -1,0 +1,34 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "before": "v1",
+          "after": "v2"
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "before": "v1",
+          "after": "v1"
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "before": "v1",
+          "after": "v2"
+        },
+        "extra": true
+      }
+    }
+  ]
+}

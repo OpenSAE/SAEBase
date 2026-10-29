@@ -1,0 +1,100 @@
+{
+  "schema": "saebase.wp19.review_candidate.v1",
+  "run_id": "20261029-wp19-02",
+  "case_id": "H199",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "1cf93b220534d76930ef8b83133f9a033291d3f9",
+  "source_content_sha256": "bf33ba5acf6d0c9604902bd670492575cd2938de8fd13126d1b89d411394237a",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp19.runs.20261029-wp19-02.H199.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H199.implementation",
+      "title": {
+        "zh": "H199 拒绝",
+        "en": "H199 refusal"
+      },
+      "summary": {
+        "zh": "非法输入或违反冻结不变量时抛出。",
+        "en": "Raised when the input is illegal or violates the frozen invariant."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H199/implementation.py",
+      "line": 7,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H199/implementation.py:7"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-02.H199.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H199.implementation",
+      "title": {
+        "zh": "Manifest 完整性",
+        "en": "manifest entry"
+      },
+      "summary": {
+        "zh": "多/少条目都报错",
+        "en": "Implements the frozen manifest contract for H199."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H199/implementation.py",
+      "line": 11,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H199/implementation.py:11"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-02.H199.implementation:_ok",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H199.implementation",
+      "title": {
+        "zh": "约束判定",
+        "en": "Invariant check"
+      },
+      "summary": {
+        "zh": "只判断当前 operator 对应的合成约束是否成立。",
+        "en": "Returns whether the manifest invariant holds for this subject."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H199/implementation.py",
+      "line": 24,
+      "signature": "def _ok(subject: object) -> bool",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H199/implementation.py:24"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-02.H199.implementation:_manifest_ok",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H199.implementation",
+      "title": {
+        "zh": "清单检查",
+        "en": "Manifest check"
+      },
+      "summary": {
+        "zh": "核对文件 id 与 sha256。",
+        "en": "Checks file ids and sha256 digests."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H199/implementation.py",
+      "line": 32,
+      "signature": "def _manifest_ok(files: object) -> bool",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H199/implementation.py:32"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; Observed AST was not rebuilt",
+    "independent acceptance was not run",
+    "nodes remain unchecked"
+  ]
+}

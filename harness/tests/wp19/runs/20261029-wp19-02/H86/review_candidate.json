@@ -1,0 +1,100 @@
+{
+  "schema": "saebase.wp19.review_candidate.v1",
+  "run_id": "20261029-wp19-02",
+  "case_id": "H86",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "1cf93b220534d76930ef8b83133f9a033291d3f9",
+  "source_content_sha256": "c9b6baa264cd2404950a5e22c5b2e87d7c38b50698aa36457f3c372701ca59ef",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp19.runs.20261029-wp19-02.H86.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H86.implementation",
+      "title": {
+        "zh": "H86 拒绝",
+        "en": "H86 refusal"
+      },
+      "summary": {
+        "zh": "非法输入或违反冻结不变量时抛出。",
+        "en": "Raised when the input is illegal or violates the frozen invariant."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H86/implementation.py",
+      "line": 6,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H86/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-02.H86.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H86.implementation",
+      "title": {
+        "zh": "接口语义压缩",
+        "en": "pairing entry"
+      },
+      "summary": {
+        "zh": "展示合并不丢失真实 API 映射",
+        "en": "Implements the frozen pairing contract for H86."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H86/implementation.py",
+      "line": 10,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H86/implementation.py:10"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-02.H86.implementation:_ok",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H86.implementation",
+      "title": {
+        "zh": "约束判定",
+        "en": "Invariant check"
+      },
+      "summary": {
+        "zh": "只判断当前 operator 对应的合成约束是否成立。",
+        "en": "Returns whether the pairing invariant holds for this subject."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H86/implementation.py",
+      "line": 23,
+      "signature": "def _ok(subject: object) -> bool",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H86/implementation.py:23"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-02.H86.implementation:_unique",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H86.implementation",
+      "title": {
+        "zh": "唯一列表",
+        "en": "Unique list"
+      },
+      "summary": {
+        "zh": "要求字符串列表无空值、无重复。",
+        "en": "Requires a list of nonempty unique strings."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H86/implementation.py",
+      "line": 31,
+      "signature": "def _unique(values: object) -> bool",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H86/implementation.py:31"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; Observed AST was not rebuilt",
+    "independent acceptance was not run",
+    "nodes remain unchecked"
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "commands": [
+    "/usr/bin/python3 -m harness.contracts.registry resolve --plan harness/github_work_plan/19_harness_large_scale_examination_and_verifier_assurance.md --case H210",
+    "/usr/bin/python3 -m pytest -p no:cacheprovider -q harness/tests/wp19/runs/20261029-wp19-02/H210/test_implementation.py",
+    "/usr/bin/python3 -m harness.contracts.wp19_verify --case H210 --run-dir harness/tests/wp19/runs/20261029-wp19-02/H210"
+  ],
+  "exit_codes": [
+    0,
+    0,
+    0
+  ],
+  "tests_passed": 7,
+  "tests_failed": 0,
+  "not_run": [
+    "python harness/code/build.py --include-harness",
+    "python harness/code/diff.py",
+    "independent inputs outside wp19_cases.json public checks",
+    "harness/tests/wp19/acceptance/",
+    "python -m harness.contracts.acceptance"
+  ],
+  "verifier": {
+    "status": "PASS",
+    "passed": 4,
+    "failed": 0,
+    "human_approval": false,
+    "checks": [
+      {
+        "name": "valid_a",
+        "passed": true
+      },
+      {
+        "name": "valid_b",
+        "passed": true
+      },
+      {
+        "name": "invalid_a",
+        "passed": true
+      },
+      {
+        "name": "invalid_b",
+        "passed": true
+      }
+    ]
+  },
+  "observed_failures": [
+    {
+      "command": "python3 -m pytest -p no:cacheprovider -q harness/tests/wp19/runs/20261029-wp19-02",
+      "exit_code": 2,
+      "observed": "pytest stops during collection with import file mismatch because every case uses the required filename test_implementation.py",
+      "followed_by": "The same tests were run one case file at a time and those commands exited 0"
+    }
+  ]
+}

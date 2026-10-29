@@ -1,0 +1,46 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "first": {
+            "value": 2
+          },
+          "retry": {
+            "value": 2
+          }
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "first": {
+            "value": 2
+          },
+          "retry": {
+            "value": 3
+          }
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "first": {
+            "value": 2
+          },
+          "retry": {
+            "value": 2
+          }
+        },
+        "extra": true
+      }
+    }
+  ]
+}

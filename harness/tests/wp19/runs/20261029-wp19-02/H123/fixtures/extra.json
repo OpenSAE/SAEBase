@@ -1,0 +1,37 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "previous": "unchecked",
+          "next": "approve",
+          "authorized": true
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "previous": "unchecked",
+          "next": "approve",
+          "authorized": false
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "previous": "unchecked",
+          "next": "approve",
+          "authorized": true
+        },
+        "extra": true
+      }
+    }
+  ]
+}

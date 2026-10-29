@@ -1,0 +1,121 @@
+{
+  "schema": "saebase.wp19.review_candidate.v1",
+  "run_id": "20261029-wp19-02",
+  "case_id": "H155",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "1cf93b220534d76930ef8b83133f9a033291d3f9",
+  "source_content_sha256": "45e856718575c65cee31c22bda3ede1f6020aa84d6554c31c106f062d6ba611c",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp19.runs.20261029-wp19-02.H155.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H155.implementation",
+      "title": {
+        "zh": "H155 拒绝",
+        "en": "H155 refusal"
+      },
+      "summary": {
+        "zh": "非法输入或违反冻结不变量时抛出。",
+        "en": "Raised when the input is illegal or violates the frozen invariant."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H155/implementation.py",
+      "line": 7,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H155/implementation.py:7"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-02.H155.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H155.implementation",
+      "title": {
+        "zh": "不匹配矩阵维度",
+        "en": "matrix entry"
+      },
+      "summary": {
+        "zh": "操作前正确失败",
+        "en": "Implements the frozen matrix contract for H155."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H155/implementation.py",
+      "line": 11,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H155/implementation.py:11"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-02.H155.implementation:_ok",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H155.implementation",
+      "title": {
+        "zh": "约束判定",
+        "en": "Invariant check"
+      },
+      "summary": {
+        "zh": "只判断当前 operator 对应的合成约束是否成立。",
+        "en": "Returns whether the matrix invariant holds for this subject."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H155/implementation.py",
+      "line": 24,
+      "signature": "def _ok(subject: object) -> bool",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H155/implementation.py:24"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-02.H155.implementation:_finite",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H155.implementation",
+      "title": {
+        "zh": "有限数值",
+        "en": "Finite number"
+      },
+      "summary": {
+        "zh": "只把真正的有限 int/float 当作数字。",
+        "en": "Treats only a finite int or float as a number."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H155/implementation.py",
+      "line": 29,
+      "signature": "def _finite(value: object) -> bool",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H155/implementation.py:29"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-02.H155.implementation:_matrix_ok",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H155.implementation",
+      "title": {
+        "zh": "矩阵形状",
+        "en": "Matrix shape"
+      },
+      "summary": {
+        "zh": "检查两个矩阵能否相乘。",
+        "en": "Checks whether two matrices can be multiplied."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H155/implementation.py",
+      "line": 33,
+      "signature": "def _matrix_ok(left: object, right: object) -> bool",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H155/implementation.py:33"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; Observed AST was not rebuilt",
+    "independent acceptance was not run",
+    "nodes remain unchecked"
+  ]
+}

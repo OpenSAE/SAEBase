@@ -1,0 +1,79 @@
+{
+  "schema": "saebase.wp19.review_candidate.v1",
+  "run_id": "20261029-wp19-02",
+  "case_id": "H32",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "1cf93b220534d76930ef8b83133f9a033291d3f9",
+  "source_content_sha256": "7566b077b73e32bf55f733acc45507e187b9517947b4cab842794e67c03e50a4",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp19.runs.20261029-wp19-02.H32.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H32.implementation",
+      "title": {
+        "zh": "H32 拒绝",
+        "en": "H32 refusal"
+      },
+      "summary": {
+        "zh": "非法输入或违反冻结不变量时抛出。",
+        "en": "Raised when the input is illegal or violates the frozen invariant."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H32/implementation.py",
+      "line": 32,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H32/implementation.py:32"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-02.H32.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H32.implementation",
+      "title": {
+        "zh": "复合任务并集",
+        "en": "Task entry"
+      },
+      "summary": {
+        "zh": "多领域合同无遗漏、无重复",
+        "en": "Implements the frozen solve contract for H32."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H32/implementation.py",
+      "line": 36,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H32/implementation.py:36"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-02.H32.implementation:_ids",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H32.implementation",
+      "title": {
+        "zh": "编号检查",
+        "en": "Id check"
+      },
+      "summary": {
+        "zh": "核对唯一非空编号。",
+        "en": "Checks unique nonempty identifiers."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H32/implementation.py",
+      "line": 51,
+      "signature": "def _ids(values: list[object]) -> list[str]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H32/implementation.py:51"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; Observed AST was not rebuilt",
+    "independent acceptance was not run",
+    "nodes remain unchecked"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "source": "rev-9",
+          "cache_source": "rev-9"
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "source": "",
+          "cache_source": ""
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "source": "rev-9",
+          "cache_source": "rev-9"
+        },
+        "extra": true
+      }
+    }
+  ]
+}

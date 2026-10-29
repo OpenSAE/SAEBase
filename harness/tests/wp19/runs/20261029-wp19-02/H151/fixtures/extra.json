@@ -1,0 +1,58 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "scores": [
+            2,
+            1,
+            3
+          ],
+          "k": 2,
+          "chosen": [
+            2,
+            0
+          ]
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "scores": [
+            2,
+            1,
+            3
+          ],
+          "k": 2,
+          "chosen": [
+            0,
+            2
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "scores": [
+            2,
+            1,
+            3
+          ],
+          "k": 2,
+          "chosen": [
+            2,
+            0
+          ]
+        },
+        "extra": true
+      }
+    }
+  ]
+}

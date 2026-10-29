@@ -1,0 +1,31 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "path": "models/tiny.py"
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "path": "/tmp/x"
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "path": "models/tiny.py"
+        },
+        "extra": true
+      }
+    }
+  ]
+}

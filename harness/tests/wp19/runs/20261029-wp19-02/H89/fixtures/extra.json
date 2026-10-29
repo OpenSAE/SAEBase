@@ -1,0 +1,54 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "nodes": [
+            {
+              "id": "r",
+              "parent": null
+            },
+            {
+              "id": "a",
+              "parent": "r"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "nodes": [
+            {
+              "id": "a",
+              "parent": "absent"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "nodes": [
+            {
+              "id": "r",
+              "parent": null
+            },
+            {
+              "id": "a",
+              "parent": "r"
+            }
+          ]
+        },
+        "extra": true
+      }
+    }
+  ]
+}

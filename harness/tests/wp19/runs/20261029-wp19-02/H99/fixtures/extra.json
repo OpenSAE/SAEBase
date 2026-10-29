@@ -1,0 +1,56 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "forward": {
+            "a": [
+              "t"
+            ]
+          },
+          "backward": {
+            "t": [
+              "a"
+            ]
+          }
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "forward": {
+            "a": [
+              "t"
+            ]
+          },
+          "backward": {
+            "t": []
+          }
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "forward": {
+            "a": [
+              "t"
+            ]
+          },
+          "backward": {
+            "t": [
+              "a"
+            ]
+          }
+        },
+        "extra": true
+      }
+    }
+  ]
+}

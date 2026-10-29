@@ -1,0 +1,49 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "required": [
+            "k"
+          ],
+          "record": {
+            "k": 0,
+            "extra": 1
+          }
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "required": [
+            "k",
+            "k"
+          ],
+          "record": {
+            "k": 0
+          }
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "required": [
+            "k"
+          ],
+          "record": {
+            "k": 0,
+            "extra": 1
+          }
+        },
+        "extra": true
+      }
+    }
+  ]
+}

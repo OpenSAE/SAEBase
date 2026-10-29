@@ -1,0 +1,79 @@
+{
+  "schema": "saebase.wp19.review_candidate.v1",
+  "run_id": "20261029-wp19-02",
+  "case_id": "H31",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "1cf93b220534d76930ef8b83133f9a033291d3f9",
+  "source_content_sha256": "ade9889ac2a61e5452fccc82fde5074e4cce91e88ced6c09b4a34bbb58d75a96",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp19.runs.20261029-wp19-02.H31.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H31.implementation",
+      "title": {
+        "zh": "H31 拒绝",
+        "en": "H31 refusal"
+      },
+      "summary": {
+        "zh": "非法输入或违反冻结不变量时抛出。",
+        "en": "Raised when the input is illegal or violates the frozen invariant."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H31/implementation.py",
+      "line": 50,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H31/implementation.py:50"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-02.H31.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H31.implementation",
+      "title": {
+        "zh": "漏选领域合同",
+        "en": "Task entry"
+      },
+      "summary": {
+        "zh": "结构化 IO 触发 SELECTION_GAP",
+        "en": "Implements the frozen solve contract for H31."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H31/implementation.py",
+      "line": 54,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H31/implementation.py:54"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-02.H31.implementation:_words",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-02.H31.implementation",
+      "title": {
+        "zh": "封闭词表",
+        "en": "Closed vocabulary"
+      },
+      "summary": {
+        "zh": "只接受词表中的唯一名称。",
+        "en": "Accepts only unique names from a closed vocabulary."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-02/H31/implementation.py",
+      "line": 63,
+      "signature": "def _words(values: object, known: set[str]) -> list[str]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-02/H31/implementation.py:63"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; Observed AST was not rebuilt",
+    "independent acceptance was not run",
+    "nodes remain unchecked"
+  ]
+}

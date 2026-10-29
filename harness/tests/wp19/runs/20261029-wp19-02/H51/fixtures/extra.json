@@ -1,0 +1,42 @@
+{
+  "positive": [
+    {
+      "input": {
+        "subject": {
+          "scope": [
+            "tasks/",
+            "models/"
+          ],
+          "path": "tasks/train.py"
+        }
+      },
+      "expected": {
+        "accepted": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "subject": {
+          "scope": [
+            "tasks/"
+          ],
+          "path": "models/gemma.py"
+        }
+      }
+    },
+    {
+      "input": {
+        "subject": {
+          "scope": [
+            "tasks/",
+            "models/"
+          ],
+          "path": "tasks/train.py"
+        },
+        "extra": true
+      }
+    }
+  ]
+}
