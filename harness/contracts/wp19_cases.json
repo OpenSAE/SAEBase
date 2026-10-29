@@ -1,0 +1,2617 @@
+{
+  "schema": "saebase.wp19.case_catalog.v1",
+  "version": "0.1.0",
+  "governance": "Specification of exactly 200 slots; only READY cases have executable frozen behavior",
+  "ready_cases": 20,
+  "case_count": 200,
+  "ready_case_range": "H27-H46",
+  "oracle": "harness/contracts/wp19_reference.py",
+  "cases": [
+    {
+      "id": "H27",
+      "title": "Always-on 不可取消",
+      "requirement": "省略或覆盖仍须继承五项基础合同",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "one",
+          "input": {
+            "selected": [
+              "CT-PRIVACY"
+            ]
+          },
+          "expected": {
+            "contracts": [
+              "CT-BASE",
+              "CT-CHECK",
+              "CT-PRIVACY",
+              "CT-SCOPE",
+              "CT-TRACE",
+              "CT-TRUTH"
+            ]
+          }
+        },
+        {
+          "name": "none",
+          "input": {
+            "selected": []
+          },
+          "expected": {
+            "contracts": [
+              "CT-BASE",
+              "CT-CHECK",
+              "CT-SCOPE",
+              "CT-TRACE",
+              "CT-TRUTH"
+            ]
+          }
+        },
+        {
+          "name": "unknown",
+          "input": {
+            "selected": [
+              "CT-NOT-REGISTERED"
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "duplicate",
+          "input": {
+            "selected": [
+              "CT-PRIVACY",
+              "CT-PRIVACY"
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H28",
+      "title": "合同不可弱化",
+      "requirement": "Case 要求低于已选 Contract 时拒绝",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "equal",
+          "input": {
+            "global_min": 3,
+            "local_min": 3
+          },
+          "expected": {
+            "minimum": 3
+          }
+        },
+        {
+          "name": "stricter",
+          "input": {
+            "global_min": 2,
+            "local_min": 7
+          },
+          "expected": {
+            "minimum": 7
+          }
+        },
+        {
+          "name": "weaken",
+          "input": {
+            "global_min": 5,
+            "local_min": 4
+          },
+          "reject": true
+        },
+        {
+          "name": "bool",
+          "input": {
+            "global_min": true,
+            "local_min": 3
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H29",
+      "title": "未知 CT ID",
+      "requirement": "拒绝未注册 ID",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "sorted",
+          "input": {
+            "ids": [
+              "CT-SCOPE",
+              "CT-BASE"
+            ]
+          },
+          "expected": {
+            "ids": [
+              "CT-BASE",
+              "CT-SCOPE"
+            ]
+          }
+        },
+        {
+          "name": "empty",
+          "input": {
+            "ids": []
+          },
+          "expected": {
+            "ids": []
+          }
+        },
+        {
+          "name": "unknown",
+          "input": {
+            "ids": [
+              "CT-FOREIGN"
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "duplicates",
+          "input": {
+            "ids": [
+              "CT-BASE",
+              "CT-BASE"
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H30",
+      "title": "版本不一致",
+      "requirement": "Receipt 与冻结 Registry SHA 不一致",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "matched",
+          "input": {
+            "expected": "1.1.0",
+            "observed": "1.1.0"
+          },
+          "expected": {
+            "matched": true,
+            "version": "1.1.0"
+          }
+        },
+        {
+          "name": "another",
+          "input": {
+            "expected": "2.0",
+            "observed": "2.0"
+          },
+          "expected": {
+            "matched": true,
+            "version": "2.0"
+          }
+        },
+        {
+          "name": "stale",
+          "input": {
+            "expected": "1.1.0",
+            "observed": "1.0.0"
+          },
+          "reject": true
+        },
+        {
+          "name": "wrong_type",
+          "input": {
+            "expected": 1,
+            "observed": 1
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H31",
+      "title": "漏选领域合同",
+      "requirement": "结构化 IO 触发 SELECTION_GAP",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "missing",
+          "input": {
+            "selected": [
+              "CT-BASE"
+            ],
+            "signals": [
+              "sensitive_output"
+            ]
+          },
+          "expected": {
+            "missing": [
+              "CT-PRIVACY"
+            ]
+          }
+        },
+        {
+          "name": "covered",
+          "input": {
+            "selected": [
+              "CT-PRIVACY"
+            ],
+            "signals": [
+              "sensitive_output"
+            ]
+          },
+          "expected": {
+            "missing": []
+          }
+        },
+        {
+          "name": "unknown_signal",
+          "input": {
+            "selected": [
+              "CT-BASE"
+            ],
+            "signals": [
+              "unlisted"
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "duplicate_signal",
+          "input": {
+            "selected": [
+              "CT-PRIVACY"
+            ],
+            "signals": [
+              "credentials",
+              "credentials"
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H32",
+      "title": "复合任务并集",
+      "requirement": "多领域合同无遗漏、无重复",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "merge",
+          "input": {
+            "groups": [
+              [
+                "CT-PRIVACY"
+              ],
+              [
+                "CT-STRUCT"
+              ]
+            ]
+          },
+          "expected": {
+            "contracts": [
+              "CT-BASE",
+              "CT-CHECK",
+              "CT-PRIVACY",
+              "CT-SCOPE",
+              "CT-STRUCT",
+              "CT-TRACE",
+              "CT-TRUTH"
+            ]
+          }
+        },
+        {
+          "name": "no_groups",
+          "input": {
+            "groups": []
+          },
+          "expected": {
+            "contracts": [
+              "CT-BASE",
+              "CT-CHECK",
+              "CT-SCOPE",
+              "CT-TRACE",
+              "CT-TRUTH"
+            ]
+          }
+        },
+        {
+          "name": "bad_group",
+          "input": {
+            "groups": [
+              [
+                "CT-MISSING"
+              ]
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "bad_shape",
+          "input": {
+            "groups": [
+              "CT-PRIVACY"
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H33",
+      "title": "历史计划兼容",
+      "requirement": "旧计划保持 legacy，不假报新版验收",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "legacy",
+          "input": {
+            "binding": null
+          },
+          "expected": {
+            "status": "legacy_unbound",
+            "verified": false
+          }
+        },
+        {
+          "name": "bound",
+          "input": {
+            "binding": [
+              "CT-PRIVACY"
+            ]
+          },
+          "expected": {
+            "status": "bound",
+            "verified": true
+          }
+        },
+        {
+          "name": "empty_binding",
+          "input": {
+            "binding": []
+          },
+          "reject": true
+        },
+        {
+          "name": "unknown_id",
+          "input": {
+            "binding": [
+              "CT-MISSING"
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H34",
+      "title": "选择不等于授权",
+      "requirement": "选中 CT 不解锁受保护写路径",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "sandbox",
+          "input": {
+            "action": "sandbox_write",
+            "authorized": false
+          },
+          "expected": {
+            "allowed": true
+          }
+        },
+        {
+          "name": "protected",
+          "input": {
+            "action": "governance_write",
+            "authorized": true
+          },
+          "expected": {
+            "allowed": false
+          }
+        },
+        {
+          "name": "invalid_action",
+          "input": {
+            "action": "publish",
+            "authorized": true
+          },
+          "reject": true
+        },
+        {
+          "name": "invalid_authority",
+          "input": {
+            "action": "governance_write",
+            "authorized": "yes"
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H35",
+      "title": "多计划相互冲突",
+      "requirement": "权限矛盾时停下且报告冲突",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "conflict",
+          "input": {
+            "rules": [
+              {
+                "path": "x",
+                "allow": true
+              },
+              {
+                "path": "x",
+                "allow": false
+              }
+            ]
+          },
+          "expected": {
+            "conflicts": [
+              "x"
+            ]
+          }
+        },
+        {
+          "name": "consistent",
+          "input": {
+            "rules": [
+              {
+                "path": "x",
+                "allow": true
+              },
+              {
+                "path": "y",
+                "allow": false
+              }
+            ]
+          },
+          "expected": {
+            "conflicts": []
+          }
+        },
+        {
+          "name": "wrong_boolean",
+          "input": {
+            "rules": [
+              {
+                "path": "x",
+                "allow": 1
+              }
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "empty_path",
+          "input": {
+            "rules": [
+              {
+                "path": "",
+                "allow": false
+              }
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H36",
+      "title": "目录升级回归",
+      "requirement": "已冻结旧行为不能被静默改写",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "compatible",
+          "input": {
+            "old": [
+              "CT-BASE"
+            ],
+            "new": [
+              "CT-BASE",
+              "CT-SCOPE",
+              "CT-TRUTH",
+              "CT-CHECK",
+              "CT-TRACE"
+            ]
+          },
+          "expected": {
+            "compatible": true
+          }
+        },
+        {
+          "name": "extra",
+          "input": {
+            "old": [
+              "CT-BASE",
+              "CT-SCOPE",
+              "CT-TRUTH",
+              "CT-CHECK",
+              "CT-TRACE"
+            ],
+            "new": [
+              "CT-BASE",
+              "CT-SCOPE",
+              "CT-TRUTH",
+              "CT-CHECK",
+              "CT-TRACE",
+              "CT-PRIVACY"
+            ]
+          },
+          "expected": {
+            "compatible": true
+          }
+        },
+        {
+          "name": "drop",
+          "input": {
+            "old": [
+              "CT-BASE",
+              "CT-SCOPE",
+              "CT-TRUTH",
+              "CT-CHECK",
+              "CT-TRACE",
+              "CT-PRIVACY"
+            ],
+            "new": [
+              "CT-BASE",
+              "CT-SCOPE",
+              "CT-TRUTH",
+              "CT-CHECK",
+              "CT-TRACE"
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "no_basics",
+          "input": {
+            "old": [
+              "CT-BASE"
+            ],
+            "new": [
+              "CT-BASE"
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H37",
+      "title": "最小 Context",
+      "requirement": "只获取任务需要的对象",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "exact",
+          "input": {
+            "required": [
+              "a",
+              "b"
+            ],
+            "read": [
+              "b",
+              "a"
+            ]
+          },
+          "expected": {
+            "selected": [
+              "a",
+              "b"
+            ]
+          }
+        },
+        {
+          "name": "empty",
+          "input": {
+            "required": [],
+            "read": []
+          },
+          "expected": {
+            "selected": []
+          }
+        },
+        {
+          "name": "extra",
+          "input": {
+            "required": [
+              "a"
+            ],
+            "read": [
+              "a",
+              "b"
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "missing",
+          "input": {
+            "required": [
+              "a"
+            ],
+            "read": []
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H38",
+      "title": "Core 读取边界",
+      "requirement": "不可为方便读完整治理树",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "allowed",
+          "input": {
+            "paths": [
+              "tasks/train.py",
+              "datasets/a.py"
+            ]
+          },
+          "expected": {
+            "allowed": [
+              "datasets/a.py",
+              "tasks/train.py"
+            ]
+          }
+        },
+        {
+          "name": "empty",
+          "input": {
+            "paths": []
+          },
+          "expected": {
+            "allowed": []
+          }
+        },
+        {
+          "name": "core",
+          "input": {
+            "paths": [
+              "harness/core/private.py"
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "traversal",
+          "input": {
+            "paths": [
+              "../private"
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H39",
+      "title": "未授权来源",
+      "requirement": "存在的路径不代表已获读取许可",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "match",
+          "input": {
+            "allowed": [
+              "a",
+              "b"
+            ],
+            "refs": [
+              "b"
+            ]
+          },
+          "expected": {
+            "verified": [
+              "b"
+            ]
+          }
+        },
+        {
+          "name": "empty",
+          "input": {
+            "allowed": [
+              "a"
+            ],
+            "refs": []
+          },
+          "expected": {
+            "verified": []
+          }
+        },
+        {
+          "name": "outside",
+          "input": {
+            "allowed": [
+              "a"
+            ],
+            "refs": [
+              "b"
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "duplicate",
+          "input": {
+            "allowed": [
+              "a"
+            ],
+            "refs": [
+              "a",
+              "a"
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H40",
+      "title": "陈旧来源 SHA",
+      "requirement": "上下文与实际 checkout 不一致须标注",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "matched",
+          "input": {
+            "expected_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "observed_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "expected": {
+            "matched": true
+          }
+        },
+        {
+          "name": "second",
+          "input": {
+            "expected_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "observed_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "expected": {
+            "matched": true
+          }
+        },
+        {
+          "name": "stale",
+          "input": {
+            "expected_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "observed_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "reject": true
+        },
+        {
+          "name": "malformed",
+          "input": {
+            "expected_sha": "bad",
+            "observed_sha": "bad"
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H41",
+      "title": "未知 Context ID",
+      "requirement": "不得编造对象",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "known_unknown",
+          "input": {
+            "known": [
+              "a",
+              "b"
+            ],
+            "references": [
+              "a",
+              "c"
+            ]
+          },
+          "expected": {
+            "resolved": [
+              "a"
+            ],
+            "unresolved": [
+              "c"
+            ]
+          }
+        },
+        {
+          "name": "none",
+          "input": {
+            "known": [],
+            "references": []
+          },
+          "expected": {
+            "resolved": [],
+            "unresolved": []
+          }
+        },
+        {
+          "name": "duplicate_known",
+          "input": {
+            "known": [
+              "a",
+              "a"
+            ],
+            "references": []
+          },
+          "reject": true
+        },
+        {
+          "name": "bad_ref",
+          "input": {
+            "known": [],
+            "references": [
+              3
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H42",
+      "title": "跨项目同名实体",
+      "requirement": "SAEBase 与其他项目不串用",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "same",
+          "input": {
+            "project": "SAEBase",
+            "objects": [
+              {
+                "id": "a",
+                "project": "SAEBase"
+              }
+            ]
+          },
+          "expected": {
+            "ids": [
+              "a"
+            ]
+          }
+        },
+        {
+          "name": "empty",
+          "input": {
+            "project": "SAEBase",
+            "objects": []
+          },
+          "expected": {
+            "ids": []
+          }
+        },
+        {
+          "name": "foreign",
+          "input": {
+            "project": "SAEBase",
+            "objects": [
+              {
+                "id": "a",
+                "project": "Other"
+              }
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "dup",
+          "input": {
+            "project": "SAEBase",
+            "objects": [
+              {
+                "id": "a",
+                "project": "SAEBase"
+              },
+              {
+                "id": "a",
+                "project": "SAEBase"
+              }
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H43",
+      "title": "来源内容冲突",
+      "requirement": "保留冲突和两个引用",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "conflict",
+          "input": {
+            "claims": [
+              {
+                "source": "A",
+                "value": "x"
+              },
+              {
+                "source": "B",
+                "value": "y"
+              }
+            ]
+          },
+          "expected": {
+            "status": "conflict",
+            "sources": [
+              "A",
+              "B"
+            ]
+          }
+        },
+        {
+          "name": "agree",
+          "input": {
+            "claims": [
+              {
+                "source": "B",
+                "value": "x"
+              },
+              {
+                "source": "A",
+                "value": "x"
+              }
+            ]
+          },
+          "expected": {
+            "status": "consistent",
+            "sources": [
+              "A",
+              "B"
+            ]
+          }
+        },
+        {
+          "name": "same_source",
+          "input": {
+            "claims": [
+              {
+                "source": "A",
+                "value": "x"
+              },
+              {
+                "source": "A",
+                "value": "y"
+              }
+            ]
+          },
+          "reject": true
+        },
+        {
+          "name": "only_one",
+          "input": {
+            "claims": [
+              {
+                "source": "A",
+                "value": "x"
+              }
+            ]
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H44",
+      "title": "注释与代码冲突",
+      "requirement": "实际行为不能被过时注释覆盖",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "disagreement",
+          "input": {
+            "comment": "old",
+            "actual": "new"
+          },
+          "expected": {
+            "authoritative": "new",
+            "disagreement": true
+          }
+        },
+        {
+          "name": "same",
+          "input": {
+            "comment": "same",
+            "actual": "same"
+          },
+          "expected": {
+            "authoritative": "same",
+            "disagreement": false
+          }
+        },
+        {
+          "name": "type",
+          "input": {
+            "comment": 4,
+            "actual": "x"
+          },
+          "reject": true
+        },
+        {
+          "name": "missing",
+          "input": {
+            "comment": "x"
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H45",
+      "title": "无法解析的来源",
+      "requirement": "unresolved 不变 verified",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "missing",
+          "input": {
+            "path": "src/a.py",
+            "exists": false
+          },
+          "expected": {
+            "status": "unresolved"
+          }
+        },
+        {
+          "name": "observed",
+          "input": {
+            "path": "src/a.py",
+            "exists": true
+          },
+          "expected": {
+            "status": "resolved"
+          }
+        },
+        {
+          "name": "missing_key",
+          "input": {
+            "path": "src/a.py"
+          },
+          "reject": true
+        },
+        {
+          "name": "bad_exists",
+          "input": {
+            "path": "x",
+            "exists": "yes"
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H46",
+      "title": "来源收据",
+      "requirement": "申报已读与独立访问证据对应",
+      "status": "READY",
+      "interface": "solve(payload: dict) -> dict; ValueError on rejected input; no input mutation",
+      "tags": [
+        "context",
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ],
+      "checks": [
+        {
+          "name": "all_claimed",
+          "input": {
+            "claimed": [
+              "b",
+              "a"
+            ],
+            "observed": [
+              "a",
+              "b"
+            ]
+          },
+          "expected": {
+            "unverified": [],
+            "unclaimed": []
+          }
+        },
+        {
+          "name": "difference",
+          "input": {
+            "claimed": [
+              "a"
+            ],
+            "observed": [
+              "b"
+            ]
+          },
+          "expected": {
+            "unverified": [
+              "a"
+            ],
+            "unclaimed": [
+              "b"
+            ]
+          }
+        },
+        {
+          "name": "duplicates",
+          "input": {
+            "claimed": [
+              "a",
+              "a"
+            ],
+            "observed": []
+          },
+          "reject": true
+        },
+        {
+          "name": "wrong_type",
+          "input": {
+            "claimed": 42,
+            "observed": []
+          },
+          "reject": true
+        }
+      ]
+    },
+    {
+      "id": "H47",
+      "title": "父目录逃逸",
+      "requirement": "拒绝 ../ 与路径规范化逃逸",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H48",
+      "title": "软链接逃逸",
+      "requirement": "路径中间段外链也拒绝",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H49",
+      "title": "绝对路径写入",
+      "requirement": "不允许绕过 workspace",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H50",
+      "title": "非法根目录",
+      "requirement": "未经许可不新建顶层 utils/scripts",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H51",
+      "title": "重命名/移动越界",
+      "requirement": "来源和目的地都受同一权限检查",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H52",
+      "title": "修改验收目录",
+      "requirement": "acceptance 写入被拒绝",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H53",
+      "title": "修改 Contract",
+      "requirement": "catalog 和 verifier 只能治理方改",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H54",
+      "title": "Shell 间接写入",
+      "requirement": "管道、重定向、子进程不得越权",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H55",
+      "title": "Subagent 扩权",
+      "requirement": "委托任务不得增加权限",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H56",
+      "title": "跨 Run 复用授权",
+      "requirement": "旧审批不解锁新任务",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H57",
+      "title": "命令未执行却报告成功",
+      "requirement": "无可信执行日志不得标 PASS",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H58",
+      "title": "伪造退出码",
+      "requirement": "Receipt 对照独立 runner",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H59",
+      "title": "源码哈希错误",
+      "requirement": "原文件内容哈希须一致",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H60",
+      "title": "synthetic 冒充测量",
+      "requirement": "未探测设备保持未观测",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H61",
+      "title": "申报文件范围不全",
+      "requirement": "edited_paths 覆盖真实 diff",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H62",
+      "title": "异常日志泄密",
+      "requirement": "stderr 与返回值同级脱敏",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H63",
+      "title": "失败记录丢失",
+      "requirement": "新一轮不得覆盖旧失败",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H64",
+      "title": "重复 Run ID",
+      "requirement": "拒绝覆盖历史目录",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H65",
+      "title": "Expected 当 Observed",
+      "requirement": "必须重新从真实 AST 生成",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H66",
+      "title": "自测冒充外部验收",
+      "requirement": "自测不能置 human approval",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H67",
+      "title": "考试 PR 修改验证源码",
+      "requirement": "真实 diff 门禁必须拒绝",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H68",
+      "title": "CI 工作流被改",
+      "requirement": "PR 不得跳过 required check",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H69",
+      "title": "删除失败测试",
+      "requirement": "减少断言不可骗取独立 PASS",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H70",
+      "title": "替换公开 fixture",
+      "requirement": "改变已冻结 oracle 被发现",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H71",
+      "title": "偷偷改验收阈值",
+      "requirement": "不允许随考生实现降低标准",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H72",
+      "title": "伪造人工批准",
+      "requirement": "不信任候选 JSON 的 approved",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H73",
+      "title": "伪造 PASS 报告",
+      "requirement": "日志/source SHA 与报告交叉核验",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H74",
+      "title": "读取或覆盖保密样本",
+      "requirement": "独立 reviewer 数据隔离",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H75",
+      "title": "跳过验收入口",
+      "requirement": "只跑自测不能算独立完成",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H76",
+      "title": "交付不完整",
+      "requirement": "只做部分必需 Case 整轮不能过",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H77",
+      "title": "节点稳定 ID",
+      "requirement": "源码行号重排不伪造新能力",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H78",
+      "title": "函数更名",
+      "requirement": "旧 ID 退出，新 ID 出现",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H79",
+      "title": "模块移动",
+      "requirement": "真实路径与身份迁移对应",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H80",
+      "title": "嵌套函数",
+      "requirement": "不同作用域同名不合并",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H81",
+      "title": "继承关系",
+      "requirement": "不能凭猜测建立 inherits",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H82",
+      "title": "装饰器与签名",
+      "requirement": "保留实际签名位置",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H83",
+      "title": "异步函数",
+      "requirement": "AsyncFunctionDef 不遗漏",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H84",
+      "title": "动态调用",
+      "requirement": "不确定调用标 unresolved",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H85",
+      "title": "参数变化",
+      "requirement": "签名 Diff 与源码一致",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H86",
+      "title": "接口语义压缩",
+      "requirement": "展示合并不丢失真实 API 映射",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H87",
+      "title": "父子环",
+      "requirement": "发现环并拒绝",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H88",
+      "title": "重复节点 ID",
+      "requirement": "不能静默用后者覆盖前者",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H89",
+      "title": "未知父节点",
+      "requirement": "不能自动创造缺失父级",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H90",
+      "title": "跨 Tree 父边",
+      "requirement": "Code/Core 等不能错连",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H91",
+      "title": "DFS 与 order",
+      "requirement": "兄弟稳定排序",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H92",
+      "title": "折叠与展开",
+      "requirement": "不会丢来源身份",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H93",
+      "title": "子树迁移",
+      "requirement": "只更新必要边",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H94",
+      "title": "语义近重复",
+      "requirement": "提出候选重复诊断而非盲合并",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H95",
+      "title": "伪导航分组",
+      "requirement": "禁止纯计数组产生虚假知识节点",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H96",
+      "title": "分支层级阈值",
+      "requirement": "引用当前治理阈值，不能用伪分组规避",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H97",
+      "title": "术语唯一",
+      "requirement": "canonical ID 不能重复",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H98",
+      "title": "别名歧义",
+      "requirement": "不同术语共享 alias 要报告",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H99",
+      "title": "正反链接",
+      "requirement": "term_ids 与关联节点一致",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H100",
+      "title": "缺失术语",
+      "requirement": "unresolved 不变新科学概念",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H101",
+      "title": "来源为空",
+      "requirement": "不能标为 verified",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H102",
+      "title": "论文引文错误",
+      "requirement": "无真实页/行不得捏造",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H103",
+      "title": "科研定义冲突",
+      "requirement": "存证并留人审",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H104",
+      "title": "术语版本变化",
+      "requirement": "旧定义与引用可追溯",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H105",
+      "title": "循环依赖定义",
+      "requirement": "诊断，不作为证明",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H106",
+      "title": "修改影响范围",
+      "requirement": "只波及真实依赖节点",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H107",
+      "title": "缺中文/英文",
+      "requirement": "必需字段任意缺失报错",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H108",
+      "title": "符号下划线误译",
+      "requirement": "技术 token 原样保留",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H109",
+      "title": "标题摘要重复",
+      "requirement": "同义模板提出诊断",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H110",
+      "title": "参数名被翻译",
+      "requirement": "不改源 signature",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H111",
+      "title": "本地化签名差异",
+      "requirement": "localized_signature 等于源码",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H112",
+      "title": "Unicode 损坏",
+      "requirement": "U+FFFD 不可当完整翻译",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H113",
+      "title": "英语占位句",
+      "requirement": "unavailable 不算有效文本",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H114",
+      "title": "中英文含义偏移",
+      "requirement": "可证偏差诊断，其余人审",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H115",
+      "title": "翻译覆盖率",
+      "requirement": "分母必须是全部源节点",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H116",
+      "title": "语言切换状态",
+      "requirement": "切换不改变 ID/focus/review",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H117",
+      "title": "Unchecked 起点",
+      "requirement": "新节点不继承批准",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H118",
+      "title": "Approve/Deny/Undo",
+      "requirement": "合法转换与可信 actor",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H119",
+      "title": "过期修订",
+      "requirement": "revision 不符拒绝",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H120",
+      "title": "父子审阅独立",
+      "requirement": "子项否决不修改父项",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H121",
+      "title": "无可信 Reviewer",
+      "requirement": "Agent 草稿不能正式批准",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H122",
+      "title": "重复批准事件",
+      "requirement": "幂等或冲突而非双计数",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H123",
+      "title": "撤销后重审",
+      "requirement": "Undo 返回 unchecked",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H124",
+      "title": "源 SHA 变化",
+      "requirement": "旧 approval 自动失效或阻止复用",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H125",
+      "title": "五树审核隔离",
+      "requirement": "跨树同名决策不串扰",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H126",
+      "title": "审阅历史保留",
+      "requirement": "记录不可无声覆盖",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H127",
+      "title": "文件 Manifest",
+      "requirement": "文件名大小哈希一致",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H128",
+      "title": "样本 ID 唯一",
+      "requirement": "重复样本身份拒绝",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H129",
+      "title": "train/val/test 泄漏",
+      "requirement": "split 交集为空",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H130",
+      "title": "样本集合重排",
+      "requirement": "无序集操作结果不变",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H131",
+      "title": "标签对齐",
+      "requirement": "重排后标签仍跟原样本",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H132",
+      "title": "内容重复",
+      "requirement": "去重规则明确并保留分母",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H133",
+      "title": "数据集版本",
+      "requirement": "相同名字不同 SHA 不复用缓存",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H134",
+      "title": "跨模态配对",
+      "requirement": "明确 ID 而非自然顺序",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H135",
+      "title": "输入样本缺失",
+      "requirement": "保留 missing/filter 区别",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H136",
+      "title": "子集说成全量",
+      "requirement": "必须报告实际样本覆盖",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H137",
+      "title": "Model ID 绑定",
+      "requirement": "ID 与 checkpoint 来源一致",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H138",
+      "title": "SAE ID 绑定",
+      "requirement": "不同 SAE checkpoint 不互换",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H139",
+      "title": "hidden_size 对 d_in",
+      "requirement": "维度不匹配拒绝",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H140",
+      "title": "Layer 与 Hook",
+      "requirement": "只接受存在的目标层",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H141",
+      "title": "Tokenizer 身份",
+      "requirement": "tokenization 与激活必须对应",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H142",
+      "title": "Checkpoint SHA",
+      "requirement": "错误权重不能标成已恢复",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H143",
+      "title": "模型版本",
+      "requirement": "版本变更须缓存失效",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H144",
+      "title": "dtype 不兼容",
+      "requirement": "禁止隐式危险转换",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H145",
+      "title": "量化配置",
+      "requirement": "不能把量化结果报为 full precision",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H146",
+      "title": "权重缺失",
+      "requirement": "明确 BLOCKED，不伪造结果",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H147",
+      "title": "Activation shape",
+      "requirement": "batch/seq/hidden 对齐",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H148",
+      "title": "多 batch 重组",
+      "requirement": "样本身份和结果一致",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H149",
+      "title": "token 读取位置",
+      "requirement": "绝对/相对索引边界正确",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H150",
+      "title": "Encode/Decode",
+      "requirement": "线性 SAE 形状和数值符合参考",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H151",
+      "title": "TopK 并列值",
+      "requirement": "固定 tie-break",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H152",
+      "title": "feature 排序",
+      "requirement": "ID 和激活不被错配",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H153",
+      "title": "零向量",
+      "requirement": "处理数学边界",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H154",
+      "title": "Feature ID 越界",
+      "requirement": "负数/超界拒绝",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H155",
+      "title": "不匹配矩阵维度",
+      "requirement": "操作前正确失败",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H156",
+      "title": "Activation cache",
+      "requirement": "model/layer/token/sample 变化会失效",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H157",
+      "title": "Ablation",
+      "requirement": "只清零选中特征",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H158",
+      "title": "Scale",
+      "requirement": "按声明因子缩放",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H159",
+      "title": "Add",
+      "requirement": "只改变选中 feature",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H160",
+      "title": "Clamp",
+      "requirement": "含负值边界",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H161",
+      "title": "多 Feature 顺序",
+      "requirement": "非交换操作保留顺序",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H162",
+      "title": "指定层干预",
+      "requirement": "其他层/token 不被污染",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H163",
+      "title": "恢复 Baseline",
+      "requirement": "移除干预后状态复位",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H164",
+      "title": "恒等干预",
+      "requirement": "scale=1/add=0 与基线一致",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H165",
+      "title": "teacher-forced/generation",
+      "requirement": "不得把两种模式结果混称",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H166",
+      "title": "跨请求隔离",
+      "requirement": "上次干预不影响下次",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H167",
+      "title": "MAE/MSE",
+      "requirement": "严格按样本配对",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H168",
+      "title": "AUROC",
+      "requirement": "并列分数及正负排序",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H169",
+      "title": "AUPRC",
+      "requirement": "显式 PR 积分约定",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H170",
+      "title": "Recall",
+      "requirement": "阈值/top-k/TP/FN 定义正确",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H171",
+      "title": "加权指标",
+      "requirement": "权重与样本保持身份",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H172",
+      "title": "零分母",
+      "requirement": "显式 undefined 或异常",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H173",
+      "title": "NaN/Inf 与 bool",
+      "requirement": "不允许污染统计",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H174",
+      "title": "分批聚合",
+      "requirement": "不同 batch size 正确加权",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H175",
+      "title": "Bootstrap 随机性",
+      "requirement": "seed 与抽样单元可复现",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H176",
+      "title": "报告数字一致",
+      "requirement": "原始输入可重算结果",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H177",
+      "title": "Hydra 合成",
+      "requirement": "相同配置产出相同 job",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H178",
+      "title": "未知配置键",
+      "requirement": "必须拒绝",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H179",
+      "title": "seed 来源",
+      "requirement": "记录训练/采样/评估种子",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H180",
+      "title": "配置覆盖优先级",
+      "requirement": "CLI/default 符合预声明优先级",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H181",
+      "title": "config SHA",
+      "requirement": "canonical config 与 Receipt 一致",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H182",
+      "title": "非法 CLI 参数",
+      "requirement": "禁止启动错误任务",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H183",
+      "title": "配置组合",
+      "requirement": "model/dataset/task 允许矩阵",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H184",
+      "title": "默认配置升级",
+      "requirement": "变化需记录版本",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H185",
+      "title": "历史配置",
+      "requirement": "不兼容不得静默导入",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H186",
+      "title": "实际与报告配置",
+      "requirement": "运行的 resolved 与收据一致",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H187",
+      "title": "CPU 样本预算",
+      "requirement": "超过上限不能启动",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H188",
+      "title": "GPU 时间预算",
+      "requirement": "预算不能替代授权",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H189",
+      "title": "GPU 权限",
+      "requirement": "机器存在 GPU 不等于可用",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H190",
+      "title": "外网访问",
+      "requirement": "未经批准不可下载",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H191",
+      "title": "模拟 OOM",
+      "requirement": "失败保留事实",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H192",
+      "title": "中途进程中断",
+      "requirement": "partial 数据保留",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H193",
+      "title": "Timeout",
+      "requirement": "明确终止并记录",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H194",
+      "title": "设备探测失败",
+      "requirement": "unknown 不等于无设备",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H195",
+      "title": "缺依赖包",
+      "requirement": "环境 BLOCKED 与 bug 分开",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H196",
+      "title": "部分结果覆盖率",
+      "requirement": "不能称全量通过",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H197",
+      "title": "文件原子写",
+      "requirement": "失败不留伪完成文件",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H198",
+      "title": "内容 SHA",
+      "requirement": "单字节损坏必检测",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H199",
+      "title": "Manifest 完整性",
+      "requirement": "多/少条目都报错",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H200",
+      "title": "部分上传",
+      "requirement": "不能标为已发布",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H201",
+      "title": "损坏 Archive",
+      "requirement": "不能复用",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H202",
+      "title": "Tar 路径穿越",
+      "requirement": "绝对/父目录/外链拒绝",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H203",
+      "title": "重复结果 ID",
+      "requirement": "内容冲突不覆盖",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H204",
+      "title": "历史 Run 不可变",
+      "requirement": "不能写旧记录",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H205",
+      "title": "打包与解包双向检查",
+      "requirement": "不能只验证打包成功",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H206",
+      "title": "Raw/compact 区分",
+      "requirement": "摘要不冒充原始记录",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H207",
+      "title": "Required 检查齐全",
+      "requirement": "缺任一不得发布",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H208",
+      "title": "Skipped 与 Pending",
+      "requirement": "均不是必需检查 Success",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H209",
+      "title": "过期 CI",
+      "requirement": "结果绑定旧 SHA 不适用",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H210",
+      "title": "发布 tag SHA",
+      "requirement": "必须匹配经测试源码",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H211",
+      "title": "不可变 Release Tag",
+      "requirement": "不覆写已发布证据",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H212",
+      "title": "可信发布批准",
+      "requirement": "Agent 自批无效",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H213",
+      "title": "Python 版本矩阵",
+      "requirement": "未执行 lane 不可宣称兼容",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H214",
+      "title": "依赖锁定",
+      "requirement": "wheel 与安装依赖一致",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H215",
+      "title": "构建可重现",
+      "requirement": "按治理声明的构建准则比较",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H216",
+      "title": "发布后回归",
+      "requirement": "dispatch green 不是部署实证",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H217",
+      "title": "同文件并发编辑",
+      "requirement": "冲突保留并重新合并",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H218",
+      "title": "重复任务分配",
+      "requirement": "run 身份隔离",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H219",
+      "title": "提交 SHA 租约",
+      "requirement": "过期头部不能覆盖更新",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H220",
+      "title": "旧分支重新同步",
+      "requirement": "先校验新约束",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H221",
+      "title": "交接上下文缺失",
+      "requirement": "未经核实进度不能采信",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H222",
+      "title": "多 Agent 互批",
+      "requirement": "不等于人类 Approve",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H223",
+      "title": "失败后幂等重试",
+      "requirement": "不复制成果/覆盖错误",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H224",
+      "title": "中断恢复",
+      "requirement": "校验计划、seed、源码、数据",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H225",
+      "title": "PR 注释指令注入",
+      "requirement": "不升级为授权命令",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    },
+    {
+      "id": "H226",
+      "title": "跨任务缓存污染",
+      "requirement": "旧任务证据不算新任务证明",
+      "status": "PROPOSED",
+      "pending": "Case-specific IO, independent oracle, verifier qualification, and governance binding are not yet frozen"
+    }
+  ]
+}
