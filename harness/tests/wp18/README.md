@@ -1,6 +1,6 @@
 # WP18 · 本地 Agent Harness 测验工作区
 
-权威考题与验收细则：[`harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md`](../../../github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md)。本目录的测验运行不改变生产 Harness。
+权威考题与验收细则：[`harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md`](../../github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md)。本目录的测验运行不改变生产 Harness。
 
 ## 一句话开考
 
