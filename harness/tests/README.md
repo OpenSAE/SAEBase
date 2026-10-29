@@ -2,6 +2,10 @@
 
 这个目录仅用于 **Harness 的设计/执行/规则/AST/Tree/Atlas/双语/审核流程** 等测试，不测试 SAE 的模型、算法、GPU 或 Research Lab 产品功能。
 
+## 通用 Contract
+
+测试任务必须遵守预先定义在 `harness/contracts/catalog.json` 的通用合同，Work Plan 指明各 CASE 使用的 Conditional IDs。Agent 不得为通过 H03–H06 而修改规则，只在新 Run 中交可观察的 `contract_receipt.json`，独立验收用真实源码、日志及新任务确认改进能泛化。
+
 ## 测试入口
 
 人在 Cursor **Agent** 模式直接用自然语言发出测试指令，例如“测试 Harness H01”、“测试 Harness 的 Context 引用规则”、“运行 WP18 全部六题”。不需要确认 Bash、SHA、逐文件权限表或手动生成 Work Order。Agent 自行安排、测试并把交付位置告诉人类。
@@ -16,6 +20,7 @@
 - `harness/tests/wp18/runs/<run_id>/<case>/fixtures/`：只包含小型合成测试数据，须标记 synthetic。
 - `harness/tests/wp18/runs/<run_id>/<case>/review_candidate.json`：供人审阅的 Code/Context/Environment 候选 Tree，provisional、unchecked。
 - `harness/tests/wp18/runs/<run_id>/<case>/expected_code_diff.json`：Agent 对新增/修改/删除 AST 的预测。
+- `harness/tests/wp18/runs/<run_id>/<case>/contract_receipt.json`：实际选择的预声明合同及 Context/编辑/命令证据，不是最终评分。
 - `harness/tests/wp18/runs/<run_id>/<case>/selfcheck.json`：命令、退出码、真实测试状态和失败。
 - `harness/tests/wp18/runs/<run_id>/<case>/report.md`：一页式总结、证据链接、未验证项。
 - `harness/tests/wp18/acceptance/<run_id>/<case>/`：独立验收者写入的 observed diff、scope audit、隐藏测试、审阅结论。**考生不可修改。**
