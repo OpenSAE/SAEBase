@@ -64,7 +64,9 @@ def test_governance_and_independent_review_are_denied(tmp_path, monkeypatch, pat
     assert hooks.gate("write_file", {"file_path": path}, active=None) is not None
 
 
-@pytest.mark.parametrize("path", ["utils/helper.py", "outputs/report.json", "scripts/test.py", "custom_tests/unit.py"])
+@pytest.mark.parametrize(
+    "path", ["utils/helper.py", "outputs/report.json", "scripts/test.py", "custom_tests/unit.py"]
+)
 def test_unknown_new_root_directory_is_denied_even_when_named(tmp_path, monkeypatch, path):
     hooks = prepare_root(tmp_path, monkeypatch)
     assert "top-level" in hooks.gate("write_file", {"file_path": path}, active=None)
@@ -87,7 +89,12 @@ def test_root_files_and_mixed_scope_are_denied(tmp_path, monkeypatch):
     assert hooks.gate("write_file", {"file_path": "new_root_file.py"}, active=None)
     assert hooks.gate(
         "write_file",
-        {"files": [{"file_path": "harness/tests/wp18/runs/x/H01/implementation.py"}, {"file_path": "harness/core/agent_flow.py"}]},
+        {
+            "files": [
+                {"file_path": "harness/tests/wp18/runs/x/H01/implementation.py"},
+                {"file_path": "harness/core/agent_flow.py"},
+            ]
+        },
         active=None,
     )
 
@@ -99,12 +106,17 @@ def test_symlink_escape_and_parent_traversal_are_denied(tmp_path, monkeypatch):
     (tmp_path / "harness" / "tests").mkdir()
     (tmp_path / "harness" / "tests" / "escape").symlink_to(external, target_is_directory=True)
     assert hooks.gate("write_file", {"file_path": "harness/tests/escape/file.py"}, active=None)
-    assert hooks.gate("write_file", {"file_path": "harness/tests/../core/agent_flow.py"}, active=None)
+    assert hooks.gate(
+        "write_file", {"file_path": "harness/tests/../core/agent_flow.py"}, active=None
+    )
 
 
 def test_shell_only_runs_scoped_pytest_not_governance_or_arbitrary_scripts():
     hooks = load_hook("guard_shell")
-    assert hooks.gate("python -m pytest -q harness/tests/wp18/runs/demo/H01/test_implementation.py") is None
+    assert (
+        hooks.gate("python -m pytest -q harness/tests/wp18/runs/demo/H01/test_implementation.py")
+        is None
+    )
     assert hooks.gate("python3 -m pytest harness/tests/other_topic/test_sample.py") is None
     for command in (
         "python -m pytest -q harness/tests/../core/test_secrets.py",
@@ -125,21 +137,37 @@ def test_work_order_harness_reference_uses_real_repository_path(tmp_path, monkey
     spec.loader.exec_module(module)
     monkeypatch.setattr(module, "ROOT", tmp_path)
     (tmp_path / "harness/github_work_plan").mkdir(parents=True)
-    correct = "harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md"
+    correct = (
+        "harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md"
+    )
     assert module.reference(correct, "harness", check_exists=False) == correct
     with pytest.raises(module.InvalidOrder):
-        module.reference("harness/github_harness/github_work_plan/18.md", "harness", check_exists=False)
+        module.reference(
+            "harness/github_harness/github_work_plan/18.md", "harness", check_exists=False
+        )
 
 
 def test_tracked_repository_has_only_approved_top_level_directories():
     # This checks committed code, in addition to the interactive edit gate.
     approved = {
-        ".cursor", ".github", "conf", "datasets", "doc", "harness",
-        "models", "saebase", "tasks", "experiments", "tests",
+        ".cursor",
+        ".github",
+        "conf",
+        "datasets",
+        "doc",
+        "harness",
+        "models",
+        "saebase",
+        "tasks",
+        "experiments",
+        "tests",
     }
     tree = subprocess.run(
         ["git", "ls-tree", "-d", "--name-only", "HEAD"],
-        cwd=ROOT, capture_output=True, text=True, check=True,
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
     )
     observed = set(tree.stdout.splitlines())
     assert observed <= approved, "Unexpected project root directory: " + repr(
