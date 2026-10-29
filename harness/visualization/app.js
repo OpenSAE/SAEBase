@@ -938,23 +938,30 @@
     }
     return lines;
   }
+  function densityMode() {
+    return config.zoom <= .80 ? "compact" : config.zoom >= 1.16 ? "detail" : "standard";
+  }
   function measure(node, focused) {
-    // Pending/approved/denied nodes use the SAME size and expansion rules
-    // as source-backed Atlas nodes. Status affects only their colors.
-    const expanded = config.expandedAttributes.has(node.id);
-    const w = expanded ? 525 : 330;
-    const title = wrap(node.title || node.id, w - 45, 14.2, 3);
-    const body = wrap(node.summary || node.description, w - 42, 11.8, 4);
-    const base = Math.max(108, 22 + title.length * 19
-      + (body.length ? 10 + body.length * 17 : 0) + 18);
+    const density=densityMode();
+    const expanded=config.expandedAttributes.has(node.id);
+    const w=expanded?525:density==="compact"?278:density==="detail"?336:310;
+    const title=wrap(node.title||node.id,w-45,density==="compact"?16:14.2,3);
+    const body=density==="compact"&&!expanded?[]:
+      wrap(node.summary||node.description,w-42,12,density==="detail"?5:expanded?4:2);
+    const context=density==="detail"&&!expanded?
+      wrap((node.context_term_ids||[]).slice(0,3).map(id=>
+        DATA.context?.nodes?.find(term=>term.id===id)?.title
+      ).filter(Boolean).join(" · "),w-42,11,1):[];
+    const base=Math.max(density==="compact"?86:98,22+title.length*19+
+      (body.length?10+body.length*17:0)+(context.length?8+context.length*17:0)+18);
     const isClass=(node.attributes||[]).some(x=>x.type==="class_methods");
     const count=(node.attributes||[]).length;
-    const terms = (node.context_term_ids || []).length;
-    const extraH = expanded ? Math.min(760, Math.max(340, 170 + terms * 65 +
-      Math.min(count, 5) * 46 + (isClass ? 180 : 0))) : 0;
-    return { w, h:base + extraH, title, body, baseH:base,
-      extraH, expanded };
+    const terms=(node.context_term_ids||[]).length;
+    const extraH=expanded?Math.min(760,Math.max(340,170+terms*65+
+      Math.min(count,5)*46+(isClass?180:0))):0;
+    return {w,h:base+extraH,title,body,context,baseH:base,extraH,expanded};
   }
+
   function visibleOverview() {
     const needed = new Set();
     if (config.query.trim()) {
@@ -979,7 +986,7 @@
     const visible = visibleOverview();
     const allowed = new Set(visible.map(v => v.id));
     const sizes = new Map(), blocks = new Map(), positions = new Map();
-    const VERTICAL_GAP = 24, HORIZONTAL_GAP = 72, ORIGIN_X = 36;
+    const VERTICAL_GAP = 18, HORIZONTAL_GAP = 48, ORIGIN_X = 36;
     const columnWidths=new Map();
     for(const entry of visible){
       const width=measure(byId.get(entry.id),false).w;
@@ -1033,11 +1040,11 @@
       .filter(key => !ancestorsShown.includes(key) && !kids.includes(key));
     const ids = [...ancestorsShown, id, ...kids, ...peerIds];
     const positions = new Map();
-    const horizontalGap = 72, xStart = 36;
+    const horizontalGap = 48, xStart = 36;
     const focusSize = measure(byId.get(id), true);
     const childSizes = kids.map(k => measure(byId.get(k), false));
     const childTotal = childSizes.reduce((sum, s) => sum + s.h, 0)
-      + Math.max(0, childSizes.length - 1) * 20;
+      + Math.max(0, childSizes.length - 1) * 18;
     const center = 38 + Math.max(focusSize.h, childTotal) / 2;
     const depthOffset = ancestorsShown.length;
     const ancestorSizes=ancestorsShown.map(key=>measure(byId.get(key),false));
@@ -1111,7 +1118,7 @@
   }
   function drawCard(node, p, layer, positions, focus) {
     const k = kind(node), chosen = node.id === config.focusId;
-    const classes = ["graph-node", "node-" + k, chosen ? "node-selected" : "",
+    const classes = ["graph-node", "node-" + k, "density-" + densityMode(), chosen ? "node-selected" : "",
       p.expanded ? "node-expanded" : "",
       p.role === "sibling-preview" ? "node-sibling-preview" : "",
       config.diff && config.view === "code" &&
@@ -1157,6 +1164,10 @@
     if (p.body.length) {
       const contentY=top+p.title.length*19+7;
       textLines(card,p.body,titleX,contentY,17,"node-description");
+    }
+    if(p.context?.length) {
+      const cy=top+p.title.length*19+7+(p.body.length?p.body.length*17+9:0);
+      textLines(card,p.context,titleX,cy,17,"node-context-preview");
     }
     const onOpen = () => navigate(node.id,config.view,false,{toggle:true});
     if(p.expanded){
@@ -1260,6 +1271,7 @@
       toggle.appendChild(svg("text",{
         x:20,y:p.h-13
       },p.expanded ? "收起节点属性" :
+         densityMode() === "compact" ? "查看详情" :
          shortFunction ? "查看功能说明与源码依据" :
          "展开节点说明与依据"));
       const show = event => {
@@ -1311,6 +1323,7 @@
     const lines = svg("g", { class: "edges" });
     const cards = svg("g", { class: "cards" });
     const position = layout.positions;
+    const focusPath=new Set(config.mode==="focus"&&config.focusId?ancestors(config.focusId):[]);
     function link(source, target) {
       const a = position.get(source), b = position.get(target);
       if (!a || !b) return;
@@ -1319,7 +1332,7 @@
       if (x2 <= x1) return;
       const mid = (x1 + x2) / 2;
       lines.appendChild(svg("path", {
-        class: "edge-main",
+        class: "edge-main"+(focusPath.has(target)?" is-current-path":""),
         d: "M " + x1 + " " + y1 + " C " + mid + " " + y1 +
           ", " + mid + " " + y2 + ", " + x2 + " " + y2
       }));
@@ -1376,7 +1389,7 @@
     const h = Number(v.clientHeight) || 630;
     const { width, height } = config.scene;
     const a = (w - 56) / width, b = (h - 48) / height;
-    return Math.max(0.82, Math.min(1, a, b));
+    return Math.max(0.55, Math.min(1, a, b));
   }
   function centerSelected() {
     const v = $("canvasWrap");
@@ -1396,6 +1409,17 @@
     drawing.setAttribute("width", Math.round(config.scene.width * config.zoom));
     drawing.setAttribute("height", Math.round(config.scene.height * config.zoom));
     $("zoomValue").textContent = Math.round(config.zoom * 100) + "%";
+  }
+  function changeZoom(next) {
+    const v=$("canvasWrap"),oldZoom=config.zoom||1;
+    const anchorX=(v.scrollLeft+v.clientWidth/2)/oldZoom;
+    const anchorY=(v.scrollTop+v.clientHeight/2)/oldZoom;
+    config.zoom=Math.min(1.8,Math.max(.55,Math.round(next*100)/100));
+    config.zoomInitialized=true;
+    render(false,true);
+    if(config.mode==="focus"&&config.focusId)centerSelected();
+    else v.scrollTo?.({left:Math.max(0,anchorX*config.zoom-v.clientWidth/2),
+      top:Math.max(0,anchorY*config.zoom-v.clientHeight/2),behavior:"auto"});
   }
   function rowButton(id, label, indent) {
     const button = el("button", "outline-item" +
@@ -1909,17 +1933,9 @@
       config.expanded = new Set(byId.keys());
       render(true);
     });
-    $("fit").addEventListener("click", () => {
-      config.zoom = fitZoom(); config.zoomInitialized = true; render(false);
-    });
-    $("zoomIn").addEventListener("click", () => {
-      config.zoom = Math.min(1.8, Math.round((config.zoom + 0.15) * 100) / 100);
-      render(false);
-    });
-    $("zoomOut").addEventListener("click", () => {
-      config.zoom = Math.max(0.45, Math.round((config.zoom - 0.15) * 100) / 100);
-      render(false);
-    });
+    $("fit").addEventListener("click", () => changeZoom(fitZoom()));
+    $("zoomIn").addEventListener("click", () => changeZoom(config.zoom + .15));
+    $("zoomOut").addEventListener("click", () => changeZoom(config.zoom - .15));
     $("diffFile").addEventListener("change", async event => {
       const file = event.target.files?.[0];
       if (!file) return;
