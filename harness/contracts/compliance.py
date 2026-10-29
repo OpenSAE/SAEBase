@@ -18,7 +18,7 @@ _ALLOWED_ARTIFACTS = {"relative_path", "structured_output", "bilingual_record", 
 
 def canonical_relative_path(value: str) -> str:
     """Require an unambiguous repository-relative path on every OS."""
-    if not isinstance(value, str) or not value or "\\u0000" in value:
+    if not isinstance(value, str) or not value or chr(0) in value:
         raise invariants.InvariantError("Invalid relative path")
     if value.startswith(("/", "~")) or "\\" in value or _WINDOWS_DRIVE.match(value):
         raise invariants.InvariantError("Absolute or platform-specific path")
