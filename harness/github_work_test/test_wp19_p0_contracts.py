@@ -102,6 +102,12 @@ def test_wp19_independent_acceptance_is_not_agent_writable():
         hook.gate(
             "python -m harness.contracts.wp19_verify --case H47 --run-dir harness/tests/wp19/runs/new-run/H47"
         )
+        is None
+    )
+    assert (
+        hook.gate(
+            "python -m harness.contracts.wp19_verify --case H227 --run-dir harness/tests/wp19/runs/new-run/H227"
+        )
         is not None
     )
 
