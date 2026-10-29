@@ -1,0 +1,65 @@
+[
+  {
+    "id": "positive_a",
+    "input": {
+      "labels": [
+        1,
+        0
+      ],
+      "scores": [
+        0.9,
+        0.1
+      ],
+      "threshold": 0.5
+    },
+    "valid": true
+  },
+  {
+    "id": "positive_b",
+    "input": {
+      "labels": [
+        1,
+        0,
+        1,
+        0
+      ],
+      "scores": [
+        0.5,
+        0.5,
+        0.8,
+        0.2
+      ],
+      "threshold": 0.5
+    },
+    "valid": true
+  },
+  {
+    "id": "negative_a",
+    "input": {
+      "labels": [
+        1,
+        1
+      ],
+      "scores": [
+        0.5,
+        0.8
+      ],
+      "threshold": 0.5
+    },
+    "valid": false
+  },
+  {
+    "id": "negative_b",
+    "input": {
+      "labels": [
+        1,
+        0
+      ],
+      "scores": [
+        0.8
+      ],
+      "threshold": 0.5
+    },
+    "valid": false
+  }
+]

@@ -1,0 +1,31 @@
+{
+  "schema": "saebase.wp20.run_trace.v1",
+  "case_id": "X12",
+  "run_id": "20261029-wp20-01",
+  "stages": [
+    {
+      "number": 1,
+      "behavior": "选定 6 个分组观测与明确重采样单位",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 2,
+      "behavior": "使用固定 seed 重抽样 20 次生成统计量",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 3,
+      "behavior": "应用打乱标签的负控制并保持样本组关系",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 4,
+      "behavior": "输出点估计、分位数区间、seed 和每轮索引",
+      "status": "implemented_in_candidate"
+    }
+  ],
+  "notes": [
+    "Trace records candidate stage intent; it is not an independent verdict.",
+    "Official comparison is performed by harness.contracts.wp20_verify."
+  ]
+}

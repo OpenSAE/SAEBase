@@ -1,0 +1,159 @@
+[
+  {
+    "id": "positive_a",
+    "input": {
+      "trees": {
+        "core": [
+          "c"
+        ],
+        "knowledge": [
+          "k"
+        ],
+        "code": [
+          "z"
+        ],
+        "environment": [
+          "e"
+        ],
+        "context": [
+          "t"
+        ]
+      },
+      "events": [
+        {
+          "op": "focus",
+          "tree": "code",
+          "id": "z"
+        },
+        {
+          "op": "switch",
+          "tree": "code"
+        },
+        {
+          "op": "language",
+          "value": "zh"
+        },
+        {
+          "op": "review",
+          "tree": "code",
+          "id": "z",
+          "revision": 0,
+          "decision": "deny"
+        },
+        {
+          "op": "review",
+          "tree": "code",
+          "id": "z",
+          "revision": 1,
+          "decision": "unchecked"
+        }
+      ]
+    },
+    "valid": true
+  },
+  {
+    "id": "positive_b",
+    "input": {
+      "trees": {
+        "core": [
+          "c"
+        ],
+        "knowledge": [
+          "k"
+        ],
+        "code": [
+          "z"
+        ],
+        "environment": [
+          "e"
+        ],
+        "context": [
+          "t"
+        ]
+      },
+      "events": [
+        {
+          "op": "focus",
+          "tree": "core",
+          "id": "c"
+        },
+        {
+          "op": "toggle",
+          "tree": "core",
+          "id": "c"
+        },
+        {
+          "op": "switch",
+          "tree": "knowledge"
+        },
+        {
+          "op": "focus",
+          "id": "k"
+        }
+      ]
+    },
+    "valid": true
+  },
+  {
+    "id": "negative_a",
+    "input": {
+      "trees": {
+        "core": [
+          "c"
+        ],
+        "knowledge": [
+          "k"
+        ],
+        "code": [
+          "z"
+        ],
+        "environment": [
+          "e"
+        ],
+        "context": [
+          "t"
+        ]
+      },
+      "events": [
+        {
+          "op": "focus",
+          "tree": "code",
+          "id": "absent"
+        }
+      ]
+    },
+    "valid": false
+  },
+  {
+    "id": "negative_b",
+    "input": {
+      "trees": {
+        "core": [
+          "c"
+        ],
+        "knowledge": [
+          "k"
+        ],
+        "code": [
+          "z"
+        ],
+        "environment": [
+          "e"
+        ],
+        "context": [
+          "t"
+        ]
+      },
+      "events": [
+        {
+          "op": "review",
+          "tree": "code",
+          "id": "z",
+          "revision": 4,
+          "decision": "approve"
+        }
+      ]
+    },
+    "valid": false
+  }
+]

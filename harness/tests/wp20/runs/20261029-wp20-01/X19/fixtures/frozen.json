@@ -1,0 +1,159 @@
+[
+  {
+    "id": "positive_a",
+    "input": {
+      "samples": [
+        {
+          "id": "a",
+          "vector": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "b",
+          "vector": [
+            2,
+            1
+          ]
+        }
+      ],
+      "encoder": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "decoder": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "ablate": 0
+    },
+    "valid": true
+  },
+  {
+    "id": "positive_b",
+    "input": {
+      "samples": [
+        {
+          "id": "a",
+          "vector": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "b",
+          "vector": [
+            2,
+            1
+          ]
+        }
+      ],
+      "encoder": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "decoder": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "ablate": 1
+    },
+    "valid": true
+  },
+  {
+    "id": "negative_a",
+    "input": {
+      "samples": [
+        {
+          "id": "a",
+          "vector": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "b",
+          "vector": [
+            2,
+            1
+          ]
+        }
+      ],
+      "encoder": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "decoder": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "ablate": 3
+    },
+    "valid": false
+  },
+  {
+    "id": "negative_b",
+    "input": {
+      "samples": [],
+      "encoder": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "decoder": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "ablate": 0
+    },
+    "valid": false
+  }
+]

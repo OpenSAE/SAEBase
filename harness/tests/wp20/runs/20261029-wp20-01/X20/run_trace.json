@@ -1,0 +1,31 @@
+{
+  "schema": "saebase.wp20.run_trace.v1",
+  "case_id": "X20",
+  "run_id": "20261029-wp20-01",
+  "stages": [
+    {
+      "number": 1,
+      "behavior": "A 领取受限工作单并完成第一段任务及可信记录",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 2,
+      "behavior": "治理方发布带 revision 的小需求变化，B 依据新工作单接手",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 3,
+      "behavior": "制造一次提交冲突与一次模拟中断，执行恢复与受限重试",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 4,
+      "behavior": "生成多阶段 Trace、Expected/Observed Diff、候选 Tree 并进行可信技术审查",
+      "status": "implemented_in_candidate"
+    }
+  ],
+  "notes": [
+    "Trace records candidate stage intent; it is not an independent verdict.",
+    "Official comparison is performed by harness.contracts.wp20_verify."
+  ]
+}

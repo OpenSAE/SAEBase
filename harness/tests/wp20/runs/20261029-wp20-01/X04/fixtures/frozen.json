@@ -1,0 +1,102 @@
+[
+  {
+    "id": "positive_a",
+    "input": {
+      "observed": [
+        {
+          "id": "a",
+          "command": "python -m pytest",
+          "exit": 0
+        }
+      ],
+      "receipt": [
+        {
+          "id": "a",
+          "command": "python -m pytest",
+          "exit": 0
+        }
+      ],
+      "files": [
+        {
+          "name": "one.txt",
+          "content": "a",
+          "sha": "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb"
+        }
+      ]
+    },
+    "valid": true
+  },
+  {
+    "id": "positive_b",
+    "input": {
+      "observed": [
+        {
+          "id": "a",
+          "command": "python -m pytest",
+          "exit": 0
+        },
+        {
+          "id": "b",
+          "command": "git diff",
+          "exit": 0
+        }
+      ],
+      "receipt": [
+        {
+          "id": "a",
+          "command": "python -m pytest",
+          "exit": 0
+        },
+        {
+          "id": "b",
+          "command": "git diff",
+          "exit": 0
+        }
+      ],
+      "files": []
+    },
+    "valid": true
+  },
+  {
+    "id": "negative_a",
+    "input": {
+      "observed": [
+        {
+          "id": "a",
+          "command": "python -m pytest",
+          "exit": 1
+        }
+      ],
+      "receipt": [
+        {
+          "id": "a",
+          "command": "python -m pytest",
+          "exit": 0
+        }
+      ],
+      "files": []
+    },
+    "valid": false
+  },
+  {
+    "id": "negative_b",
+    "input": {
+      "observed": [
+        {
+          "id": "a",
+          "command": "python -m pytest",
+          "exit": 0
+        }
+      ],
+      "receipt": [
+        {
+          "id": "a",
+          "command": "token=rawsecret",
+          "exit": 0
+        }
+      ],
+      "files": []
+    },
+    "valid": false
+  }
+]

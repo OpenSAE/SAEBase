@@ -1,0 +1,28 @@
+[
+  {
+    "id": "extra_empty",
+    "valid": false,
+    "input": {}
+  },
+  {
+    "id": "extra_unknown_key",
+    "valid": false,
+    "input": {
+      "unexpected": true
+    }
+  },
+  {
+    "id": "extra_escape",
+    "valid": false,
+    "input": {
+      "allowed": "workspace",
+      "operations": [
+        {
+          "op": "write",
+          "path": "../secret.txt",
+          "text": "x"
+        }
+      ]
+    }
+  }
+]

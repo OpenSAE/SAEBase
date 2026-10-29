@@ -1,0 +1,347 @@
+{
+  "schema": "saebase.wp20.review_candidate.v1",
+  "run_id": "20261029-wp20-01",
+  "case_id": "X17",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "df9b8bb68789690e1634089a22c1513f06ac8619",
+  "status": "unchecked",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:implementation.py:InputError",
+      "parent_id": "code:module:implementation",
+      "title": {
+        "zh": "X17 InputError",
+        "en": "X17 InputError"
+      },
+      "summary": {
+        "zh": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。",
+        "en": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。"
+      },
+      "path": "harness/tests/wp20/runs/20261029-wp20-01/X17/implementation.py",
+      "line": 8,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp20/runs/20261029-wp20-01/X17/implementation.py:8"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:implementation.py:run",
+      "parent_id": "code:module:implementation",
+      "title": {
+        "zh": "X17 run",
+        "en": "X17 run"
+      },
+      "summary": {
+        "zh": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。",
+        "en": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。"
+      },
+      "path": "harness/tests/wp20/runs/20261029-wp20-01/X17/implementation.py",
+      "line": 12,
+      "signature": "def run(payload",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp20/runs/20261029-wp20-01/X17/implementation.py:12"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:src.pipeline.py:execute",
+      "parent_id": "code:module:src.pipeline",
+      "title": {
+        "zh": "X17 execute",
+        "en": "X17 execute"
+      },
+      "summary": {
+        "zh": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。",
+        "en": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。"
+      },
+      "path": "harness/tests/wp20/runs/20261029-wp20-01/X17/src/pipeline.py",
+      "line": 8,
+      "signature": "def execute(payload, workdir",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp20/runs/20261029-wp20-01/X17/src/pipeline.py:8"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:src.schema.py:require_keys",
+      "parent_id": "code:module:src.schema",
+      "title": {
+        "zh": "X17 require_keys",
+        "en": "X17 require_keys"
+      },
+      "summary": {
+        "zh": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。",
+        "en": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。"
+      },
+      "path": "harness/tests/wp20/runs/20261029-wp20-01/X17/src/schema.py",
+      "line": 8,
+      "signature": "def require_keys(payload, keys)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp20/runs/20261029-wp20-01/X17/src/schema.py:8"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:src.schema.py:unique",
+      "parent_id": "code:module:src.schema",
+      "title": {
+        "zh": "X17 unique",
+        "en": "X17 unique"
+      },
+      "summary": {
+        "zh": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。",
+        "en": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。"
+      },
+      "path": "harness/tests/wp20/runs/20261029-wp20-01/X17/src/schema.py",
+      "line": 13,
+      "signature": "def unique(values)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp20/runs/20261029-wp20-01/X17/src/schema.py:13"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:src.schema.py:finite",
+      "parent_id": "code:module:src.schema",
+      "title": {
+        "zh": "X17 finite",
+        "en": "X17 finite"
+      },
+      "summary": {
+        "zh": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。",
+        "en": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。"
+      },
+      "path": "harness/tests/wp20/runs/20261029-wp20-01/X17/src/schema.py",
+      "line": 18,
+      "signature": "def finite(value)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp20/runs/20261029-wp20-01/X17/src/schema.py:18"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:src.schema.py:digest",
+      "parent_id": "code:module:src.schema",
+      "title": {
+        "zh": "X17 digest",
+        "en": "X17 digest"
+      },
+      "summary": {
+        "zh": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。",
+        "en": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。"
+      },
+      "path": "harness/tests/wp20/runs/20261029-wp20-01/X17/src/schema.py",
+      "line": 22,
+      "signature": "def digest(text)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp20/runs/20261029-wp20-01/X17/src/schema.py:22"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:src.schema.py:serial",
+      "parent_id": "code:module:src.schema",
+      "title": {
+        "zh": "X17 serial",
+        "en": "X17 serial"
+      },
+      "summary": {
+        "zh": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。",
+        "en": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。"
+      },
+      "path": "harness/tests/wp20/runs/20261029-wp20-01/X17/src/schema.py",
+      "line": 26,
+      "signature": "def serial(value)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp20/runs/20261029-wp20-01/X17/src/schema.py:26"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:src.schema.py:sha",
+      "parent_id": "code:module:src.schema",
+      "title": {
+        "zh": "X17 sha",
+        "en": "X17 sha"
+      },
+      "summary": {
+        "zh": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。",
+        "en": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。"
+      },
+      "path": "harness/tests/wp20/runs/20261029-wp20-01/X17/src/schema.py",
+      "line": 30,
+      "signature": "def sha(value)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp20/runs/20261029-wp20-01/X17/src/schema.py:30"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:src.schema.py:dot",
+      "parent_id": "code:module:src.schema",
+      "title": {
+        "zh": "X17 dot",
+        "en": "X17 dot"
+      },
+      "summary": {
+        "zh": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。",
+        "en": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。"
+      },
+      "path": "harness/tests/wp20/runs/20261029-wp20-01/X17/src/schema.py",
+      "line": 34,
+      "signature": "def dot(left, right)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp20/runs/20261029-wp20-01/X17/src/schema.py:34"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:tests.test_x17_release_gate.py:_load",
+      "parent_id": "code:module:tests.test_x17_release_gate",
+      "title": {
+        "zh": "X17 _load",
+        "en": "X17 _load"
+      },
+      "summary": {
+        "zh": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。",
+        "en": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。"
+      },
+      "path": "harness/tests/wp20/runs/20261029-wp20-01/X17/tests/test_x17_release_gate.py",
+      "line": 16,
+      "signature": "def _load()",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp20/runs/20261029-wp20-01/X17/tests/test_x17_release_gate.py:16"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:tests.test_x17_release_gate.py:_payload",
+      "parent_id": "code:module:tests.test_x17_release_gate",
+      "title": {
+        "zh": "X17 _payload",
+        "en": "X17 _payload"
+      },
+      "summary": {
+        "zh": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。",
+        "en": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。"
+      },
+      "path": "harness/tests/wp20/runs/20261029-wp20-01/X17/tests/test_x17_release_gate.py",
+      "line": 29,
+      "signature": "def _payload(row)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp20/runs/20261029-wp20-01/X17/tests/test_x17_release_gate.py:29"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:tests.test_x17_release_gate.py:test_frozen_scenarios",
+      "parent_id": "code:module:tests.test_x17_release_gate",
+      "title": {
+        "zh": "X17 test_frozen_scenarios",
+        "en": "X17 test_frozen_scenarios"
+      },
+      "summary": {
+        "zh": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。",
+        "en": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。"
+      },
+      "path": "harness/tests/wp20/runs/20261029-wp20-01/X17/tests/test_x17_release_gate.py",
+      "line": 34,
+      "signature": "@pytest.mark.parametrize('row', FROZEN, ids=lambda row",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp20/runs/20261029-wp20-01/X17/tests/test_x17_release_gate.py:34"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:tests.test_x17_release_gate.py:test_extra_boundary_scenarios",
+      "parent_id": "code:module:tests.test_x17_release_gate",
+      "title": {
+        "zh": "X17 test_extra_boundary_scenarios",
+        "en": "X17 test_extra_boundary_scenarios"
+      },
+      "summary": {
+        "zh": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。",
+        "en": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。"
+      },
+      "path": "harness/tests/wp20/runs/20261029-wp20-01/X17/tests/test_x17_release_gate.py",
+      "line": 50,
+      "signature": "@pytest.mark.parametrize('row', EXTRA, ids=lambda row",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp20/runs/20261029-wp20-01/X17/tests/test_x17_release_gate.py:50"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:tests.test_x17_release_gate.py:test_non_object_payload_is_rejected",
+      "parent_id": "code:module:tests.test_x17_release_gate",
+      "title": {
+        "zh": "X17 test_non_object_payload_is_rejected",
+        "en": "X17 test_non_object_payload_is_rejected"
+      },
+      "summary": {
+        "zh": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。",
+        "en": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。"
+      },
+      "path": "harness/tests/wp20/runs/20261029-wp20-01/X17/tests/test_x17_release_gate.py",
+      "line": 64,
+      "signature": "def test_non_object_payload_is_rejected(tmp_path)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp20/runs/20261029-wp20-01/X17/tests/test_x17_release_gate.py:64"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:tests.test_x17_release_gate.py:test_public_reference_is_not_imported",
+      "parent_id": "code:module:tests.test_x17_release_gate",
+      "title": {
+        "zh": "X17 test_public_reference_is_not_imported",
+        "en": "X17 test_public_reference_is_not_imported"
+      },
+      "summary": {
+        "zh": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。",
+        "en": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。"
+      },
+      "path": "harness/tests/wp20/runs/20261029-wp20-01/X17/tests/test_x17_release_gate.py",
+      "line": 70,
+      "signature": "def test_public_reference_is_not_imported()",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp20/runs/20261029-wp20-01/X17/tests/test_x17_release_gate.py:70"
+      ]
+    }
+  ]
+}

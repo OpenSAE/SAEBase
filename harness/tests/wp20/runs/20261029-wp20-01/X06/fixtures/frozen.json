@@ -1,0 +1,125 @@
+[
+  {
+    "id": "positive_a",
+    "input": {
+      "records": [
+        {
+          "id": "a",
+          "split": "train",
+          "label": 1,
+          "score": 0.8
+        },
+        {
+          "id": "b",
+          "split": "val",
+          "label": 0,
+          "score": 0.2
+        },
+        {
+          "id": "c",
+          "split": "test",
+          "label": 1,
+          "score": 0.9
+        }
+      ],
+      "selected": [
+        "a",
+        "c"
+      ]
+    },
+    "valid": true
+  },
+  {
+    "id": "positive_b",
+    "input": {
+      "records": [
+        {
+          "id": "a",
+          "split": "train",
+          "label": 1,
+          "score": 0.8
+        },
+        {
+          "id": "b",
+          "split": "val",
+          "label": 0,
+          "score": 0.2
+        },
+        {
+          "id": "c",
+          "split": "test",
+          "label": 1,
+          "score": 0.9
+        }
+      ],
+      "selected": [
+        "b"
+      ]
+    },
+    "valid": true
+  },
+  {
+    "id": "negative_a",
+    "input": {
+      "records": [
+        {
+          "id": "a",
+          "split": "train",
+          "label": 1,
+          "score": 0.8
+        },
+        {
+          "id": "b",
+          "split": "val",
+          "label": 0,
+          "score": 0.2
+        },
+        {
+          "id": "c",
+          "split": "test",
+          "label": 1,
+          "score": 0.9
+        },
+        {
+          "id": "a",
+          "split": "train",
+          "label": 1,
+          "score": 0.8
+        }
+      ],
+      "selected": [
+        "a"
+      ]
+    },
+    "valid": false
+  },
+  {
+    "id": "negative_b",
+    "input": {
+      "records": [
+        {
+          "id": "a",
+          "split": "train",
+          "label": 1,
+          "score": 0.8
+        },
+        {
+          "id": "b",
+          "split": "val",
+          "label": 0,
+          "score": 0.2
+        },
+        {
+          "id": "c",
+          "split": "test",
+          "label": 1,
+          "score": 0.9
+        }
+      ],
+      "selected": [
+        "missing"
+      ]
+    },
+    "valid": false
+  }
+]

@@ -1,0 +1,119 @@
+[
+  {
+    "id": "positive_a",
+    "input": {
+      "nodes": [
+        {
+          "id": "n",
+          "terms": [
+            "t"
+          ]
+        }
+      ],
+      "terms": [
+        {
+          "id": "t",
+          "nodes": [
+            "n"
+          ],
+          "zh": "单词",
+          "en": "Term"
+        }
+      ],
+      "update": {
+        "term": "t",
+        "node": "n"
+      }
+    },
+    "valid": true
+  },
+  {
+    "id": "positive_b",
+    "input": {
+      "nodes": [
+        {
+          "id": "a",
+          "terms": [
+            "t"
+          ]
+        },
+        {
+          "id": "b",
+          "terms": [
+            "t"
+          ]
+        }
+      ],
+      "terms": [
+        {
+          "id": "t",
+          "nodes": [
+            "a",
+            "b"
+          ],
+          "zh": "概念",
+          "en": "Concept"
+        }
+      ],
+      "update": {
+        "term": "t",
+        "node": "a"
+      }
+    },
+    "valid": true
+  },
+  {
+    "id": "negative_a",
+    "input": {
+      "nodes": [
+        {
+          "id": "n",
+          "terms": [
+            "t"
+          ]
+        }
+      ],
+      "terms": [
+        {
+          "id": "t",
+          "nodes": [],
+          "zh": "单词",
+          "en": "Term"
+        }
+      ],
+      "update": {
+        "term": "t",
+        "node": "n"
+      }
+    },
+    "valid": false
+  },
+  {
+    "id": "negative_b",
+    "input": {
+      "nodes": [
+        {
+          "id": "n",
+          "terms": [
+            "t"
+          ]
+        }
+      ],
+      "terms": [
+        {
+          "id": "t",
+          "nodes": [
+            "n"
+          ],
+          "zh": "中文翻译不可用",
+          "en": "Term"
+        }
+      ],
+      "update": {
+        "term": "t",
+        "node": "n"
+      }
+    },
+    "valid": false
+  }
+]

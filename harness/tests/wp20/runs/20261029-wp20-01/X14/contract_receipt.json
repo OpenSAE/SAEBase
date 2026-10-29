@@ -1,0 +1,88 @@
+{
+  "schema": "saebase.harness.contract_receipt.v1",
+  "registry_version": "1.1.0",
+  "case_id": "X14",
+  "contract_ids": [
+    "CT-BASE",
+    "CT-SCOPE",
+    "CT-TRUTH",
+    "CT-CHECK",
+    "CT-TRACE",
+    "CT-ERROR",
+    "CT-CONFIG",
+    "CT-DATA",
+    "CT-DETERMINISM",
+    "CT-RESOURCE"
+  ],
+  "task_signals": [],
+  "selection_audit": [],
+  "context_paths": [
+    "harness/github_work_plan/20_integrated_multistage_harness_exams.md",
+    "harness/contracts/wp20_cases.json",
+    "harness/contracts/wp20_scenarios.json",
+    "harness/contracts/wp20_verify.py",
+    "harness/tests/wp20/README.md"
+  ],
+  "edited_paths": [
+    "harness/tests/wp20/runs/20261029-wp20-01/X14/contract_receipt.json",
+    "harness/tests/wp20/runs/20261029-wp20-01/X14/fixtures/extra.json",
+    "harness/tests/wp20/runs/20261029-wp20-01/X14/fixtures/frozen.json",
+    "harness/tests/wp20/runs/20261029-wp20-01/X14/implementation.py",
+    "harness/tests/wp20/runs/20261029-wp20-01/X14/output_manifest.json",
+    "harness/tests/wp20/runs/20261029-wp20-01/X14/report.md",
+    "harness/tests/wp20/runs/20261029-wp20-01/X14/review_candidate.json",
+    "harness/tests/wp20/runs/20261029-wp20-01/X14/run_trace.json",
+    "harness/tests/wp20/runs/20261029-wp20-01/X14/selfcheck.json",
+    "harness/tests/wp20/runs/20261029-wp20-01/X14/src/__init__.py",
+    "harness/tests/wp20/runs/20261029-wp20-01/X14/src/pipeline.py",
+    "harness/tests/wp20/runs/20261029-wp20-01/X14/src/schema.py",
+    "harness/tests/wp20/runs/20261029-wp20-01/X14/tests/test_x14_hydra_dryrun.py"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "-m",
+        "harness.contracts.registry",
+        "resolve",
+        "--plan",
+        "harness/github_work_plan/20_integrated_multistage_harness_exams.md",
+        "--case",
+        "X14"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "-m",
+        "pytest",
+        "-p",
+        "no:cacheprovider",
+        "-q",
+        "harness/tests/wp20/runs/20261029-wp20-01/X14/tests/test_x14_hydra_dryrun.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "-m",
+        "harness.contracts.wp20_verify",
+        "--case",
+        "X14",
+        "--run-dir",
+        "harness/tests/wp20/runs/20261029-wp20-01/X14"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "unresolved": [
+    "head_sha is unavailable until the delivery commit exists",
+    "independent acceptance was not run",
+    "verifier human_approved remains false",
+    "Observed AST was not rebuilt by an independent reviewer"
+  ],
+  "source_sha": "df9b8bb68789690e1634089a22c1513f06ac8619",
+  "head_sha": "unavailable"
+}

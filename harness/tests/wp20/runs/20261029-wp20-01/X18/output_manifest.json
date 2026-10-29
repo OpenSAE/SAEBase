@@ -1,0 +1,59 @@
+{
+  "schema": "saebase.wp20.output_manifest.v1",
+  "case_id": "X18",
+  "run_id": "20261029-wp20-01",
+  "files": {
+    "contract_receipt.json": {
+      "sha256": "775f92c5b12b42072057c687fbb03d67cc9a4d66de73a94f32512d40e1b6c354",
+      "bytes": 2660
+    },
+    "fixtures/extra.json": {
+      "sha256": "89950f4c2c18aa0d7f059a74c6ad0a5a4f0d2f3445356bb3253640d01e0aae44",
+      "bytes": 179
+    },
+    "fixtures/frozen.json": {
+      "sha256": "f6cfaa31a8543d8f3ec4f6ca0051aa5993ca7304dc5abeacbb8ac9dd236b41df",
+      "bytes": 1161
+    },
+    "implementation.py": {
+      "sha256": "ddf4b8d58718cc6d0f393742b0a98608b7b7315a38c35fbeaa9a1b7418ce16f4",
+      "bytes": 484
+    },
+    "output_manifest.json": {
+      "sha256": "faa31fc04047638db901c5c06dc635a3c05f55486bccc5c448f5268f6b6c34b1",
+      "bytes": 1911
+    },
+    "report.md": {
+      "sha256": "ba4e8c64241fe31549548dea2c814ef7058ff2f55c9d377e67cb2a40ee599cfa",
+      "bytes": 1937
+    },
+    "review_candidate.json": {
+      "sha256": "a39769373dd4fe4ff975063f13ee8bd0fdcd86ad52faafbbe1a521d6050bc66a",
+      "bytes": 14689
+    },
+    "run_trace.json": {
+      "sha256": "409a76feef0d72fbb01fce8a05a004483e54295b095ef1bb13fc9cea3a55abc4",
+      "bytes": 922
+    },
+    "selfcheck.json": {
+      "sha256": "6b5f7df658a7a292b0500f94c5df23de8ffe59a645174a48fbc09cb8f79308a4",
+      "bytes": 2386
+    },
+    "src/__init__.py": {
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    "src/pipeline.py": {
+      "sha256": "55468be329d3f0a42879888f2ed167bf0d3e6afad151032aacdc893d962926e8",
+      "bytes": 3491
+    },
+    "src/schema.py": {
+      "sha256": "018cbcc769a2147e9f527efbf20ab57a3fc7ba60917b95ec2e653433c0100c86",
+      "bytes": 842
+    },
+    "tests/test_x18_git_merge.py": {
+      "sha256": "31e72a76c164edbabf9a194e9424c7a107e1abfccf0d40888c496af248d73a51",
+      "bytes": 2677
+    }
+  }
+}

@@ -1,0 +1,43 @@
+[
+  {
+    "id": "positive_a",
+    "input": {
+      "files": {
+        "a.txt": "hello",
+        "dir/b.txt": "bye"
+      },
+      "corrupt": false
+    },
+    "valid": true
+  },
+  {
+    "id": "positive_b",
+    "input": {
+      "files": {
+        "one": "x"
+      },
+      "corrupt": false
+    },
+    "valid": true
+  },
+  {
+    "id": "negative_a",
+    "input": {
+      "files": {
+        "../secret": "bad"
+      },
+      "corrupt": false
+    },
+    "valid": false
+  },
+  {
+    "id": "negative_b",
+    "input": {
+      "files": {
+        "safe": "hello"
+      },
+      "corrupt": true
+    },
+    "valid": false
+  }
+]

@@ -1,0 +1,64 @@
+{
+  "schema": "saebase.wp20.selfcheck.v1",
+  "case_id": "X18",
+  "run_id": "20261029-wp20-01",
+  "commands": [
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "-m",
+        "harness.contracts.registry",
+        "resolve",
+        "--plan",
+        "harness/github_work_plan/20_integrated_multistage_harness_exams.md",
+        "--case",
+        "X18"
+      ],
+      "exit_code": 0,
+      "stdout_tail": " fresh source AST.\",\n        \"Preserve node ID, signature, line and true parent/call edges; do not replace real interface data with guessed cards.\",\n        \"Test-only source code belongs to test view/proposal, not product scientific capability.\"\n      ],\n      \"negative_examples\": [\n        \"Expected diff asserted as Observed\",\n        \"Source location missing from candidate\"\n      ]\n    }\n  ]\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "-m",
+        "pytest",
+        "-p",
+        "no:cacheprovider",
+        "-q",
+        "harness/tests/wp20/runs/20261029-wp20-01/X18/tests/test_x18_git_merge.py"
+      ],
+      "exit_code": 0,
+      "stdout_tail": "........                                                                 [100%]\n8 passed in 0.08s\n",
+      "stderr_tail": ""
+    },
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "-m",
+        "harness.contracts.wp20_verify",
+        "--case",
+        "X18",
+        "--run-dir",
+        "harness/tests/wp20/runs/20261029-wp20-01/X18"
+      ],
+      "exit_code": 0,
+      "stdout_tail": "true\n        },\n        {\n          \"scenario\": \"positive_b\",\n          \"passed\": true\n        },\n        {\n          \"scenario\": \"negative_a\",\n          \"passed\": true\n        },\n        {\n          \"scenario\": \"negative_b\",\n          \"passed\": true\n        }\n      ],\n      \"passed\": 4,\n      \"failed\": 0,\n      \"technical_only\": true,\n      \"human_approved\": false\n    }\n  ],\n  \"status\": \"PASS\"\n}\n",
+      "stderr_tail": ""
+    }
+  ],
+  "whole_run_pytest": {
+    "argv": [
+      "/usr/bin/python3",
+      "-m",
+      "pytest",
+      "-p",
+      "no:cacheprovider",
+      "-q",
+      "harness/tests/wp20/runs/20261029-wp20-01"
+    ],
+    "note": "unique test module names; implementation loaded per case via importlib"
+  },
+  "human_approved": false,
+  "independent_acceptance": false
+}

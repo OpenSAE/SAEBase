@@ -1,0 +1,31 @@
+{
+  "schema": "saebase.wp20.run_trace.v1",
+  "case_id": "X06",
+  "run_id": "20261029-wp20-01",
+  "stages": [
+    {
+      "number": 1,
+      "behavior": "读取 8 个稳定样本、prompt 与 label 的组合",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 2,
+      "behavior": "验证 Manifest 并生成无交集分割",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 3,
+      "behavior": "选择少量目标样本运行 CPU 假模型评分",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 4,
+      "behavior": "报告实际覆盖数、样本身份与结果溯源",
+      "status": "implemented_in_candidate"
+    }
+  ],
+  "notes": [
+    "Trace records candidate stage intent; it is not an independent verdict.",
+    "Official comparison is performed by harness.contracts.wp20_verify."
+  ]
+}

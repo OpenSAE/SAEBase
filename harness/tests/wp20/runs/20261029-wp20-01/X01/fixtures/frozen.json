@@ -1,0 +1,34 @@
+[
+  {
+    "id": "positive_a",
+    "input": {
+      "before": "def a(x):\n    return x\n",
+      "after": "def a(x, y=1):\n    return x+y\ndef b():\n    return 0\n"
+    },
+    "valid": true
+  },
+  {
+    "id": "positive_b",
+    "input": {
+      "before": "def old():\n    return 1\n",
+      "after": "def renamed():\n    return 1\n"
+    },
+    "valid": true
+  },
+  {
+    "id": "negative_a",
+    "input": {
+      "before": "def a(:\n",
+      "after": "def a():\n    return 1\n"
+    },
+    "valid": false
+  },
+  {
+    "id": "negative_b",
+    "input": {
+      "before": "def ok(): pass\n",
+      "after": 4
+    },
+    "valid": false
+  }
+]

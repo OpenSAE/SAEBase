@@ -1,0 +1,31 @@
+{
+  "schema": "saebase.wp20.run_trace.v1",
+  "case_id": "X17",
+  "run_id": "20261029-wp20-01",
+  "stages": [
+    {
+      "number": 1,
+      "behavior": "构建 required-check DAG 与待发布源码身份",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 2,
+      "behavior": "插入 success、failure、skipped、pending 以及旧 SHA 的状态",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 3,
+      "behavior": "添加可信 reviewer 的模拟批准收据",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 4,
+      "behavior": "重新计算可发布决议并检查不可变 tag 与完整审计",
+      "status": "implemented_in_candidate"
+    }
+  ],
+  "notes": [
+    "Trace records candidate stage intent; it is not an independent verdict.",
+    "Official comparison is performed by harness.contracts.wp20_verify."
+  ]
+}

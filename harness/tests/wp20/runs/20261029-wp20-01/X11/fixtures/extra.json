@@ -1,0 +1,29 @@
+[
+  {
+    "id": "extra_empty",
+    "valid": false,
+    "input": {}
+  },
+  {
+    "id": "extra_unknown_key",
+    "valid": false,
+    "input": {
+      "unexpected": true
+    }
+  },
+  {
+    "id": "extra_single_class",
+    "valid": false,
+    "input": {
+      "labels": [
+        1,
+        1
+      ],
+      "scores": [
+        0.9,
+        0.2
+      ],
+      "threshold": 0.5
+    }
+  }
+]

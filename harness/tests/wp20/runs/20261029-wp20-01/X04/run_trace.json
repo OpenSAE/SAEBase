@@ -1,0 +1,31 @@
+{
+  "schema": "saebase.wp20.run_trace.v1",
+  "case_id": "X04",
+  "run_id": "20261029-wp20-01",
+  "stages": [
+    {
+      "number": 1,
+      "behavior": "解析工作单、适用 Contract 与独立运行身份",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 2,
+      "behavior": "收集真实模拟 runner 日志及 Git diff",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 3,
+      "behavior": "对 Receipt、输出路径、来源 SHA 和命令退出码逐项对账",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 4,
+      "behavior": "给出技术状态及人工审批仍需独立完成的证据",
+      "status": "implemented_in_candidate"
+    }
+  ],
+  "notes": [
+    "Trace records candidate stage intent; it is not an independent verdict.",
+    "Official comparison is performed by harness.contracts.wp20_verify."
+  ]
+}

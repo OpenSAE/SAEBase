@@ -1,0 +1,98 @@
+[
+  {
+    "id": "positive_a",
+    "input": {
+      "adapters": [
+        {
+          "id": "A",
+          "rows": [
+            {
+              "id": "a",
+              "status": "success",
+              "value": 1
+            },
+            {
+              "id": "b",
+              "status": "success",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "id": "B",
+          "rows": [
+            {
+              "id": "c",
+              "status": "success",
+              "value": 5
+            },
+            {
+              "id": "d",
+              "status": "failed"
+            }
+          ]
+        }
+      ]
+    },
+    "valid": true
+  },
+  {
+    "id": "positive_b",
+    "input": {
+      "adapters": [
+        {
+          "id": "one",
+          "rows": [
+            {
+              "id": "x",
+              "status": "success",
+              "value": 4
+            }
+          ]
+        }
+      ]
+    },
+    "valid": true
+  },
+  {
+    "id": "negative_a",
+    "input": {
+      "adapters": [
+        {
+          "id": "A",
+          "rows": [
+            {
+              "id": "x",
+              "status": "success",
+              "value": 1
+            },
+            {
+              "id": "x",
+              "status": "success",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "valid": false
+  },
+  {
+    "id": "negative_b",
+    "input": {
+      "adapters": [
+        {
+          "id": "A",
+          "rows": [
+            {
+              "id": "x",
+              "status": "unknown",
+              "value": 1
+            }
+          ]
+        }
+      ]
+    },
+    "valid": false
+  }
+]
