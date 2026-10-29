@@ -1,0 +1,130 @@
+[
+  {
+    "id": "positive_a",
+    "input": {
+      "model": {
+        "id": "tiny",
+        "width": 2,
+        "layers": [
+          0,
+          1
+        ],
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tokenizer": "fixed"
+      },
+      "sae": {
+        "id": "sae",
+        "model_id": "tiny",
+        "d_in": 2,
+        "layer": 1
+      },
+      "tokens": [
+        {
+          "id": "tok2",
+          "activation": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "tok1",
+          "activation": [
+            3,
+            4
+          ]
+        }
+      ],
+      "batch_size": 2
+    },
+    "valid": true
+  },
+  {
+    "id": "positive_b",
+    "input": {
+      "model": {
+        "id": "tiny",
+        "width": 2,
+        "layers": [
+          0,
+          1
+        ],
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tokenizer": "fixed"
+      },
+      "sae": {
+        "id": "sae",
+        "model_id": "tiny",
+        "d_in": 2,
+        "layer": 1
+      },
+      "tokens": [
+        {
+          "id": "t",
+          "activation": [
+            0,
+            -1
+          ]
+        }
+      ],
+      "batch_size": 1
+    },
+    "valid": true
+  },
+  {
+    "id": "negative_a",
+    "input": {
+      "model": {
+        "id": "tiny",
+        "width": 2,
+        "layers": [
+          0,
+          1
+        ],
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tokenizer": "fixed"
+      },
+      "sae": {
+        "id": "sae",
+        "model_id": "tiny",
+        "d_in": 3,
+        "layer": 1
+      },
+      "tokens": [],
+      "batch_size": 1
+    },
+    "valid": false
+  },
+  {
+    "id": "negative_b",
+    "input": {
+      "model": {
+        "id": "tiny",
+        "width": 2,
+        "layers": [
+          0,
+          1
+        ],
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tokenizer": "fixed"
+      },
+      "sae": {
+        "id": "sae",
+        "model_id": "tiny",
+        "d_in": 2,
+        "layer": 1
+      },
+      "tokens": [
+        {
+          "id": "t",
+          "activation": [
+            1,
+            2,
+            3
+          ]
+        }
+      ],
+      "batch_size": 1
+    },
+    "valid": false
+  }
+]

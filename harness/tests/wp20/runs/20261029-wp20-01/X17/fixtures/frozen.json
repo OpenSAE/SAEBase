@@ -1,0 +1,80 @@
+[
+  {
+    "id": "positive_a",
+    "input": {
+      "source_sha": "cccccccccccccccccccccccccccccccccccccccc",
+      "checks": [
+        {
+          "id": "quality",
+          "source_sha": "cccccccccccccccccccccccccccccccccccccccc",
+          "state": "success"
+        },
+        {
+          "id": "tests",
+          "source_sha": "cccccccccccccccccccccccccccccccccccccccc",
+          "state": "success"
+        }
+      ],
+      "required": [
+        "quality",
+        "tests"
+      ],
+      "reviewer": "trusted-human"
+    },
+    "valid": true
+  },
+  {
+    "id": "positive_b",
+    "input": {
+      "source_sha": "cccccccccccccccccccccccccccccccccccccccc",
+      "checks": [
+        {
+          "id": "tests",
+          "source_sha": "cccccccccccccccccccccccccccccccccccccccc",
+          "state": "success"
+        }
+      ],
+      "required": [
+        "tests"
+      ],
+      "reviewer": "trusted-human"
+    },
+    "valid": true
+  },
+  {
+    "id": "negative_a",
+    "input": {
+      "source_sha": "cccccccccccccccccccccccccccccccccccccccc",
+      "checks": [
+        {
+          "id": "tests",
+          "source_sha": "cccccccccccccccccccccccccccccccccccccccc",
+          "state": "pending"
+        }
+      ],
+      "required": [
+        "tests"
+      ],
+      "reviewer": "trusted-human"
+    },
+    "valid": false
+  },
+  {
+    "id": "negative_b",
+    "input": {
+      "source_sha": "cccccccccccccccccccccccccccccccccccccccc",
+      "checks": [
+        {
+          "id": "tests",
+          "source_sha": "cccccccccccccccccccccccccccccccccccccccc",
+          "state": "success"
+        }
+      ],
+      "required": [
+        "tests"
+      ],
+      "reviewer": "agent"
+    },
+    "valid": false
+  }
+]

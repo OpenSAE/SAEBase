@@ -1,0 +1,14 @@
+[
+  {
+    "id": "extra_empty",
+    "valid": false,
+    "input": {}
+  },
+  {
+    "id": "extra_unknown_key",
+    "valid": false,
+    "input": {
+      "unexpected": true
+    }
+  }
+]

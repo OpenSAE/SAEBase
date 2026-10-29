@@ -1,0 +1,81 @@
+[
+  {
+    "id": "positive_a",
+    "input": {
+      "groups": [
+        {
+          "id": "a",
+          "values": [
+            1,
+            3
+          ]
+        },
+        {
+          "id": "b",
+          "values": [
+            2,
+            4
+          ]
+        }
+      ],
+      "seed": 17,
+      "draws": 8
+    },
+    "valid": true
+  },
+  {
+    "id": "positive_b",
+    "input": {
+      "groups": [
+        {
+          "id": "x",
+          "values": [
+            5
+          ]
+        },
+        {
+          "id": "y",
+          "values": [
+            7
+          ]
+        }
+      ],
+      "seed": 0,
+      "draws": 6
+    },
+    "valid": true
+  },
+  {
+    "id": "negative_a",
+    "input": {
+      "groups": [
+        {
+          "id": "a",
+          "values": [
+            1,
+            3
+          ]
+        },
+        {
+          "id": "b",
+          "values": [
+            2,
+            4
+          ]
+        }
+      ],
+      "seed": "x",
+      "draws": 8
+    },
+    "valid": false
+  },
+  {
+    "id": "negative_b",
+    "input": {
+      "groups": [],
+      "seed": 1,
+      "draws": 2
+    },
+    "valid": false
+  }
+]

@@ -1,0 +1,63 @@
+[
+  {
+    "id": "positive_a",
+    "input": {
+      "allowed": "workspace",
+      "operations": [
+        {
+          "op": "write",
+          "path": "a.txt",
+          "text": "one"
+        },
+        {
+          "op": "write",
+          "path": "nested/b.txt",
+          "text": "two"
+        }
+      ]
+    },
+    "valid": true
+  },
+  {
+    "id": "positive_b",
+    "input": {
+      "allowed": "workspace",
+      "operations": [
+        {
+          "op": "write",
+          "path": "report/output.json",
+          "text": "{}"
+        }
+      ]
+    },
+    "valid": true
+  },
+  {
+    "id": "negative_a",
+    "input": {
+      "allowed": "workspace",
+      "operations": [
+        {
+          "op": "write",
+          "path": "../escape",
+          "text": "BAD"
+        }
+      ]
+    },
+    "valid": false
+  },
+  {
+    "id": "negative_b",
+    "input": {
+      "allowed": "workspace",
+      "operations": [
+        {
+          "op": "write",
+          "path": "C:/private.txt",
+          "text": "BAD"
+        }
+      ]
+    },
+    "valid": false
+  }
+]

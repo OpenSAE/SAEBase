@@ -1,0 +1,31 @@
+{
+  "schema": "saebase.wp20.run_trace.v1",
+  "case_id": "X02",
+  "run_id": "20261029-wp20-01",
+  "stages": [
+    {
+      "number": 1,
+      "behavior": "载入节点、canonical term 和关联证据",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 2,
+      "behavior": "加入新术语并修正两处双向关系",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 3,
+      "behavior": "构造 zh/en Overlay，保持代码符号与源 ID",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 4,
+      "behavior": "输出冲突、缺失翻译与受影响节点清单",
+      "status": "implemented_in_candidate"
+    }
+  ],
+  "notes": [
+    "Trace records candidate stage intent; it is not an independent verdict.",
+    "Official comparison is performed by harness.contracts.wp20_verify."
+  ]
+}

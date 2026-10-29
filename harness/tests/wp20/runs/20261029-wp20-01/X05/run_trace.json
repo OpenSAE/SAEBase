@@ -1,0 +1,31 @@
+{
+  "schema": "saebase.wp20.run_trace.v1",
+  "case_id": "X05",
+  "run_id": "20261029-wp20-01",
+  "stages": [
+    {
+      "number": 1,
+      "behavior": "冻结仅允许写入的工作区根与读取列表",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 2,
+      "behavior": "分别用 API、shell 和 rename 执行合法同源写入",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 3,
+      "behavior": "注入 ../、绝对路径、软链接、重定向和委托越权",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 4,
+      "behavior": "生成被拒绝请求及实际文件系统的无副作用证明",
+      "status": "implemented_in_candidate"
+    }
+  ],
+  "notes": [
+    "Trace records candidate stage intent; it is not an independent verdict.",
+    "Official comparison is performed by harness.contracts.wp20_verify."
+  ]
+}

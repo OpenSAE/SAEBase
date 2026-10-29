@@ -1,0 +1,153 @@
+[
+  {
+    "id": "positive_a",
+    "input": {
+      "initial": {
+        "revision": 0,
+        "source_sha": "initial",
+        "owner": "agent-a",
+        "status": "active"
+      },
+      "events": [
+        {
+          "op": "handoff",
+          "from": "agent-a",
+          "to": "agent-b"
+        },
+        {
+          "op": "fail",
+          "reason": "synthetic conflict"
+        },
+        {
+          "op": "resume",
+          "revision": 1,
+          "owner": "agent-b"
+        },
+        {
+          "op": "change",
+          "actor": "trusted-human",
+          "expected": 1,
+          "source_sha": "revised"
+        },
+        {
+          "op": "fail",
+          "reason": "synthetic timeout"
+        },
+        {
+          "op": "resume",
+          "revision": 2,
+          "owner": "agent-b"
+        },
+        {
+          "op": "handoff",
+          "from": "agent-b",
+          "to": "agent-c"
+        },
+        {
+          "op": "change",
+          "actor": "trusted-human",
+          "expected": 3,
+          "source_sha": "final"
+        },
+        {
+          "op": "review",
+          "actor": "trusted-human",
+          "source_sha": "final"
+        }
+      ]
+    },
+    "valid": true
+  },
+  {
+    "id": "positive_b",
+    "input": {
+      "initial": {
+        "revision": 0,
+        "source_sha": "initial",
+        "owner": "agent-a",
+        "status": "active"
+      },
+      "events": [
+        {
+          "op": "fail",
+          "reason": "first failure"
+        },
+        {
+          "op": "resume",
+          "revision": 0,
+          "owner": "agent-a"
+        },
+        {
+          "op": "handoff",
+          "from": "agent-a",
+          "to": "agent-b"
+        },
+        {
+          "op": "change",
+          "actor": "trusted-human",
+          "expected": 1,
+          "source_sha": "v2"
+        },
+        {
+          "op": "fail",
+          "reason": "second failure"
+        },
+        {
+          "op": "resume",
+          "revision": 2,
+          "owner": "agent-b"
+        },
+        {
+          "op": "handoff",
+          "from": "agent-b",
+          "to": "agent-a"
+        },
+        {
+          "op": "review",
+          "actor": "trusted-human",
+          "source_sha": "v2"
+        }
+      ]
+    },
+    "valid": true
+  },
+  {
+    "id": "negative_a",
+    "input": {
+      "initial": {
+        "revision": 0,
+        "source_sha": "initial",
+        "owner": "agent-a",
+        "status": "active"
+      },
+      "events": [
+        {
+          "op": "handoff",
+          "from": "other",
+          "to": "agent-b"
+        }
+      ]
+    },
+    "valid": false
+  },
+  {
+    "id": "negative_b",
+    "input": {
+      "initial": {
+        "revision": 0,
+        "source_sha": "initial",
+        "owner": "agent-a",
+        "status": "active"
+      },
+      "events": [
+        {
+          "op": "change",
+          "actor": "agent-a",
+          "expected": 0,
+          "source_sha": "evil"
+        }
+      ]
+    },
+    "valid": false
+  }
+]

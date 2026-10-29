@@ -1,0 +1,144 @@
+[
+  {
+    "id": "positive_a",
+    "input": {
+      "activations": [
+        {
+          "id": "a",
+          "features": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "id": "b",
+          "features": [
+            0,
+            -2,
+            1
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "sample": "a",
+          "feature": 0,
+          "op": "ablate"
+        },
+        {
+          "sample": "a",
+          "feature": 1,
+          "op": "scale",
+          "value": 2
+        },
+        {
+          "sample": "b",
+          "feature": 1,
+          "op": "add",
+          "value": 4
+        }
+      ],
+      "mode": "teacher_forced"
+    },
+    "valid": true
+  },
+  {
+    "id": "positive_b",
+    "input": {
+      "activations": [
+        {
+          "id": "a",
+          "features": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "id": "b",
+          "features": [
+            0,
+            -2,
+            1
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "sample": "b",
+          "feature": 1,
+          "op": "clamp",
+          "low": 0,
+          "high": 2
+        }
+      ],
+      "mode": "generation"
+    },
+    "valid": true
+  },
+  {
+    "id": "negative_a",
+    "input": {
+      "activations": [
+        {
+          "id": "a",
+          "features": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "id": "b",
+          "features": [
+            0,
+            -2,
+            1
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "sample": "missing",
+          "feature": 0,
+          "op": "ablate"
+        }
+      ],
+      "mode": "teacher_forced"
+    },
+    "valid": false
+  },
+  {
+    "id": "negative_b",
+    "input": {
+      "activations": [
+        {
+          "id": "a",
+          "features": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "id": "b",
+          "features": [
+            0,
+            -2,
+            1
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "sample": "a",
+          "feature": 5,
+          "op": "ablate"
+        }
+      ],
+      "mode": "teacher_forced"
+    },
+    "valid": false
+  }
+]

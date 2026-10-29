@@ -1,0 +1,168 @@
+[
+  {
+    "id": "positive_a",
+    "input": {
+      "samples": [
+        {
+          "id": "a",
+          "vector": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "b",
+          "vector": [
+            2,
+            0
+          ]
+        }
+      ],
+      "encoder": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "decoder": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "k": 1
+    },
+    "valid": true
+  },
+  {
+    "id": "positive_b",
+    "input": {
+      "samples": [
+        {
+          "id": "a",
+          "vector": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "b",
+          "vector": [
+            2,
+            0
+          ]
+        }
+      ],
+      "encoder": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "decoder": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "k": 2
+    },
+    "valid": true
+  },
+  {
+    "id": "negative_a",
+    "input": {
+      "samples": [
+        {
+          "id": "a",
+          "vector": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "b",
+          "vector": [
+            2,
+            0
+          ]
+        }
+      ],
+      "encoder": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "decoder": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "k": 3
+    },
+    "valid": false
+  },
+  {
+    "id": "negative_b",
+    "input": {
+      "samples": [
+        {
+          "id": "a",
+          "vector": [
+            1,
+            2,
+            3
+          ]
+        }
+      ],
+      "encoder": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "decoder": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "k": 1
+    },
+    "valid": false
+  }
+]

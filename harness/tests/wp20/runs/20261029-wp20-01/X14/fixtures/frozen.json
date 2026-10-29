@@ -1,0 +1,84 @@
+[
+  {
+    "id": "positive_a",
+    "input": {
+      "base": {
+        "model": "m",
+        "dataset": "d",
+        "seed": 7
+      },
+      "overrides": {
+        "seed": 10
+      },
+      "models": [
+        "m"
+      ],
+      "datasets": [
+        "d"
+      ],
+      "budget": 2
+    },
+    "valid": true
+  },
+  {
+    "id": "positive_b",
+    "input": {
+      "base": {
+        "model": "m",
+        "dataset": "d",
+        "seed": 7
+      },
+      "overrides": {},
+      "models": [
+        "m"
+      ],
+      "datasets": [
+        "d"
+      ],
+      "budget": 0
+    },
+    "valid": true
+  },
+  {
+    "id": "negative_a",
+    "input": {
+      "base": {
+        "model": "m",
+        "dataset": "d",
+        "seed": 7
+      },
+      "overrides": {
+        "model": "other"
+      },
+      "models": [
+        "m"
+      ],
+      "datasets": [
+        "d"
+      ],
+      "budget": 2
+    },
+    "valid": false
+  },
+  {
+    "id": "negative_b",
+    "input": {
+      "base": {
+        "model": "m",
+        "dataset": "d",
+        "seed": 7
+      },
+      "overrides": {
+        "seed": 10
+      },
+      "models": [
+        "m"
+      ],
+      "datasets": [
+        "d"
+      ],
+      "budget": 5
+    },
+    "valid": false
+  }
+]

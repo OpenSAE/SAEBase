@@ -1,0 +1,31 @@
+{
+  "schema": "saebase.wp20.run_trace.v1",
+  "case_id": "X18",
+  "run_id": "20261029-wp20-01",
+  "stages": [
+    {
+      "number": 1,
+      "behavior": "创建 2 文件的 tiny Git 基线与两个 Agent 的独立授权",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 2,
+      "behavior": "Agent A、B 从相同 SHA 修改有重叠的函数区域",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 3,
+      "behavior": "A 提交后 B 在 expected SHA 失败并获取新源码",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 4,
+      "behavior": "B 依据允许的变更重新应用、解决冲突并生成新验收记录",
+      "status": "implemented_in_candidate"
+    }
+  ],
+  "notes": [
+    "Trace records candidate stage intent; it is not an independent verdict.",
+    "Official comparison is performed by harness.contracts.wp20_verify."
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "saebase.wp20.run_trace.v1",
+  "case_id": "X13",
+  "run_id": "20261029-wp20-01",
+  "stages": [
+    {
+      "number": 1,
+      "behavior": "定义两个具有不同指标和样本数量的合成 adapter",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 2,
+      "behavior": "调用 registry 与 planner 执行 CPU tiny evaluations",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 3,
+      "behavior": "标准化结果、失败/缺失和分母信息",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 4,
+      "behavior": "聚合跨 adapter 报告并核对来源哈希",
+      "status": "implemented_in_candidate"
+    }
+  ],
+  "notes": [
+    "Trace records candidate stage intent; it is not an independent verdict.",
+    "Official comparison is performed by harness.contracts.wp20_verify."
+  ]
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "id": "extra_empty",
+    "valid": false,
+    "input": {}
+  },
+  {
+    "id": "extra_unknown_key",
+    "valid": false,
+    "input": {
+      "unexpected": true
+    }
+  },
+  {
+    "id": "extra_whitespace_only",
+    "valid": true,
+    "input": {
+      "before": "def keep(x):\n    return x\n",
+      "after": "def keep(x):\n\n    return x\n"
+    }
+  }
+]

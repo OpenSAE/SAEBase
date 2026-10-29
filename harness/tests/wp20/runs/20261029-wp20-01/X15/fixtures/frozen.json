@@ -1,0 +1,134 @@
+[
+  {
+    "id": "positive_a",
+    "input": {
+      "identity": {
+        "run": "r",
+        "seed": 7,
+        "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "data_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "stages": [
+        {
+          "id": "a",
+          "value": 1
+        },
+        {
+          "id": "b",
+          "value": 2
+        },
+        {
+          "id": "c",
+          "value": 3
+        }
+      ],
+      "interrupt_after": 1,
+      "resume_identity": {
+        "run": "r",
+        "seed": 7,
+        "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "data_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+    },
+    "valid": true
+  },
+  {
+    "id": "positive_b",
+    "input": {
+      "identity": {
+        "run": "r",
+        "seed": 7,
+        "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "data_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "stages": [
+        {
+          "id": "a",
+          "value": 1
+        },
+        {
+          "id": "b",
+          "value": 2
+        },
+        {
+          "id": "c",
+          "value": 3
+        }
+      ],
+      "interrupt_after": 3,
+      "resume_identity": {
+        "run": "r",
+        "seed": 7,
+        "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "data_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+    },
+    "valid": true
+  },
+  {
+    "id": "negative_a",
+    "input": {
+      "identity": {
+        "run": "r",
+        "seed": 7,
+        "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "data_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "stages": [
+        {
+          "id": "a",
+          "value": 1
+        },
+        {
+          "id": "b",
+          "value": 2
+        },
+        {
+          "id": "c",
+          "value": 3
+        }
+      ],
+      "interrupt_after": 1,
+      "resume_identity": {
+        "run": "r",
+        "seed": 8,
+        "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "data_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+    },
+    "valid": false
+  },
+  {
+    "id": "negative_b",
+    "input": {
+      "identity": {
+        "run": "r",
+        "seed": 7,
+        "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "data_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "stages": [
+        {
+          "id": "a",
+          "value": 1
+        },
+        {
+          "id": "b",
+          "value": 2
+        },
+        {
+          "id": "c",
+          "value": 3
+        }
+      ],
+      "interrupt_after": 5,
+      "resume_identity": {
+        "run": "r",
+        "seed": 7,
+        "config_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "data_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+    },
+    "valid": false
+  }
+]

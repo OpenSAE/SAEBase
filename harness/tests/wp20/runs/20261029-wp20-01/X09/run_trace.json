@@ -1,0 +1,31 @@
+{
+  "schema": "saebase.wp20.run_trace.v1",
+  "case_id": "X09",
+  "run_id": "20261029-wp20-01",
+  "stages": [
+    {
+      "number": 1,
+      "behavior": "创建含负值和零激活的 5 维 tiny 特征向量",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 2,
+      "behavior": "在 token/layer 上按给定次序执行四种干预",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 3,
+      "behavior": "保存每步 before/after 的特征集合和最终数值",
+      "status": "implemented_in_candidate"
+    },
+    {
+      "number": 4,
+      "behavior": "撤销所有干预并在不同请求模式重放以检查无残留",
+      "status": "implemented_in_candidate"
+    }
+  ],
+  "notes": [
+    "Trace records candidate stage intent; it is not an independent verdict.",
+    "Official comparison is performed by harness.contracts.wp20_verify."
+  ]
+}

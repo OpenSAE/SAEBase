@@ -1,0 +1,59 @@
+{
+  "schema": "saebase.wp20.output_manifest.v1",
+  "case_id": "X11",
+  "run_id": "20261029-wp20-01",
+  "files": {
+    "contract_receipt.json": {
+      "sha256": "40668080623860e0ca34bcef9849038f82de383a4a7e8bccc3e6376d4d2c4fe6",
+      "bytes": 2672
+    },
+    "fixtures/extra.json": {
+      "sha256": "262417127ef1ba3055077a25619ed5712878589eb0009d1c9a1d01fd0dabce44",
+      "bytes": 384
+    },
+    "fixtures/frozen.json": {
+      "sha256": "e641328bea413755d324ad6f69051f77809c2109090aabc0807aa5ac8ff7bf69",
+      "bytes": 824
+    },
+    "implementation.py": {
+      "sha256": "ddf4b8d58718cc6d0f393742b0a98608b7b7315a38c35fbeaa9a1b7418ce16f4",
+      "bytes": 484
+    },
+    "output_manifest.json": {
+      "sha256": "44afd7648e139f008966f9e8945bd80f04313b05ac55cafee1bd67e8c6e50fce",
+      "bytes": 1914
+    },
+    "report.md": {
+      "sha256": "c8214f052c0992883fcd1d423632b2ee0d10bf504a7f18e75b02adb5ad50ddde",
+      "bytes": 1922
+    },
+    "review_candidate.json": {
+      "sha256": "47edb1bf373a3cd594d584f300f3f20710d045d857344b5dfb563ad674ed2105",
+      "bytes": 13529
+    },
+    "run_trace.json": {
+      "sha256": "0cc9a3fef6024c1c3a13447352b4a0b04e8ca7dbee4e108712f7db0292839fd7",
+      "bytes": 911
+    },
+    "selfcheck.json": {
+      "sha256": "50251e67fe62cfa134a8f14f18ff0ae0e4d37a97a38e8a0f522ae2ccb5cfe429",
+      "bytes": 2390
+    },
+    "src/__init__.py": {
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    "src/pipeline.py": {
+      "sha256": "b059a99e28f84e3913b925e884db6ec418ad1f56f2d7435bf6f16aa8a443b6a3",
+      "bytes": 2096
+    },
+    "src/schema.py": {
+      "sha256": "018cbcc769a2147e9f527efbf20ab57a3fc7ba60917b95ec2e653433c0100c86",
+      "bytes": 842
+    },
+    "tests/test_x11_metric_engine.py": {
+      "sha256": "31e72a76c164edbabf9a194e9424c7a107e1abfccf0d40888c496af248d73a51",
+      "bytes": 2677
+    }
+  }
+}
