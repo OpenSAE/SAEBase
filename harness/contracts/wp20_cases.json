@@ -902,7 +902,8 @@
       "required_outputs": [
         "adapter_results.json",
         "normalized_results.json",
-        "aggregate_report.json"
+        "aggregate_report.json",
+        "adapter_trace.json"
       ],
       "resource_budget": {
         "fixture": "Synthetic, 2-12 records or 2-12 tiny graph nodes",

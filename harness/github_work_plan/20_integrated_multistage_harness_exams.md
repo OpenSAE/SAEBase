@@ -690,7 +690,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **独立参考依据**：独立重算每样本指标加权汇总；不同 adapter 的错误状态与来源证据逐条校验。
 
-**交付的关键产物**：`adapter_results.json`、`normalized_results.json`、`aggregate_report.json`。
+**交付的关键产物**：`adapter_results.json`、`normalized_results.json`、`aggregate_report.json`、`adapter_trace.json`。
 
 **条件 Contract**：`CT-DATA`、`CT-DETERMINISM`、`CT-EVIDENCE`、`CT-INTERFACE`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
 
