@@ -210,6 +210,10 @@ def test_cursor_shell_gate_allows_only_read_only_registry_queries():
     query = "python -m harness.contracts.registry resolve --plan " + PLAN + " --case H04"
     assert module.gate(query) is None
     assert module.gate("python -m harness.contracts.registry list") is None
+    assert module.gate("python -m harness.contracts.registry select --tags privacy,interface") is None
+    assert set(registry.select_tags(["privacy", "interface"])["contract_ids"]) == set(
+        trace.ad_hoc_selection(["privacy", "interface"])
+    )
     assert module.gate("python -m harness.contracts.registry check --plan " + PLAN) is None
     assert module.gate(query + " && touch owned.py") is not None
     assert module.gate(
