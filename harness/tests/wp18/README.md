@@ -18,7 +18,7 @@
 
 每次新 Run 使用 `runs/<run_id>/<case>/`。短 `run_id` 可以来自日期加流水号，也可使用用户指定名称；须避免覆盖现有 Run。CASE 使用 `H01`–`H06` 或其他简短稳定名称；每题内部必须有 `implementation.py`、`test_implementation.py`、`review_candidate.json`、`expected_code_diff.json`、`selfcheck.json`、`report.md`。必要的小型 fixture 放 `fixtures/`；不把每次运行都放到项目根目录。
 
-- Agent 可直接实现测试功能并运行仅针对本 Run 的 `python -m pytest -q harness/tests/wp18/runs/<run_id>/<case>/test_implementation.py`。
+- Agent 可直接实现测试功能并运行仅针对本 Run 的 `python -m pytest -p no:cacheprovider -q harness/tests/wp18/runs/<run_id>/<case>/test_implementation.py`。
 - Agent 必须在候选树中使用真实源文件、源码 ID、行号与签名。未确认的 Context 关联留空或标 unresolved；状态保留 unchecked，不能宣称树已通过人工审阅。
 - Agent 提供清楚的完成摘要：做了什么、测试命令结果、哪些文件、哪些未通过、人工应审核什么。报告等于提交测验证据，不是独立验收。
 - 验收者对照不同 Run、真实 AST、Rules、Context、翻译、权限及 UI，另行写 `acceptance/`，考生对它只有只读权限。
