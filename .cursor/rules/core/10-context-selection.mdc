@@ -5,6 +5,12 @@ alwaysApply: true
 
 # Context Selection · Core 与科研 Knowledge 分离
 
+- 先根据当前 Work Plan 选定的 `Contract IDs` / task tags 读取 `harness/contracts/catalog.json` 的**相关条目**（Always-on 始终生效），再选取少量关联业务 Context。规则约束不依赖 Agent 是否恰好记得之前一次的失败例子。
+- WP18 H01–H06 在 `harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md` 有预声明绑定；不得为测试通过改 ID。用户自定义 Harness 测试可在受控测试 sandbox 内选择 catalog 既有 tags，并在本次 Run 收据中如实记录。
+- 未能解析必要 Contract、相关 Context 权威来源不可访问、或合同和用户范围冲突，应报告 `CONTRACT_GAP` / `SELECTION_GAP` / `BLOCKED`，不得自行修改治理 Registry。
+
+
+
 - `harness/core/project_graph.json` 是全项目架构、管理和设计树（Core），`doc/knowledge/context_graph.json` 是 SAE 的科研知识与证据树（Knowledge），两者按明确 ID 按需读取。
 - `doc/knowledge/glossary.json` 是科研术语的**唯一结构化字典**；Knowledge 节点只能使用已定义的 `term_ids`，新增术语先补定义/证据/背景说明再入树。
 - `doc/code/code_tree.json` 是真实 AST 派生快照；`doc/code/code_annotations.json` 中 `core_ids` 和 `context_ids` 必须分别引用 Core 和 Knowledge，不能未经验证从名字生成研究结论。
