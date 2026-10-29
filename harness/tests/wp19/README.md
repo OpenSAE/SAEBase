@@ -1,11 +1,9 @@
-# WP19 · H27–H226 考试工作区
+# WP19 · 200 道 CPU 合成不变量 Exam（H27–H226）
 
-当前 P0 只开放 **H27–H46**；其余 180 题状态 `PROPOSED`。请阅读 [WP19](../../github_work_plan/19_harness_large_scale_examination_and_verifier_assurance.md) 和治理层 [WP19 case catalog](../../contracts/wp19_cases.json)。
+全部 200 题已经预先冻结公开输入、输出、有效/无效样例及只读评分入口，合计 800 个检查。H47–H226 实现的是对应主题的**合成约束检查**，不是对真实产品科研/浏览器/多 Agent 场景的端到端认证。
 
-考生读取但不修改 `harness/contracts/wp19_reference.py`、`wp19_verify.py`、`wp19_cases.json`、`catalog.json` 或独立评分；不修改 WP18 的历史考试。每题只在新的 `harness/tests/wp19/runs/<run_id>/Hxx/` 中写 `implementation.py`、`test_implementation.py`、小型 fixtures、`contract_receipt.json`、`selfcheck.json`、`review_candidate.json`、`expected_code_diff.json`、`report.md`。所有候选 Tree 节点仍为 unchecked，测试成功不构成批准。
+参见 [WP19](../../github_work_plan/19_harness_large_scale_examination_and_verifier_assurance.md)、[全部规范](../../contracts/wp19_cases.json)、[初始参考](../../contracts/wp19_reference.py)、[新增共享不变量参考](../../contracts/wp19_reference_ext.py)。
 
-P0 接口为 `solve(payload: dict) -> dict`；非法输入抛 `ValueError`，输入对象不修改。例子可读，可用 `python -m harness.contracts.wp19_verify --case H27 --run-dir harness/tests/wp19/runs/<run_id>/H27` 检验。合法的 `--check-spec` 不运行候选实现。独立 reviewer 仍需用**不同数据**验证，并从可信治理 commit 调用评分器，不接受候选分支中的同名评审程序。
+考试 Agent 从最新 main 创建唯一 Run，按 10–20 题分批实现每题的 `solve(payload: dict) -> dict`。合法输入返回冻结预期输出，非法输入抛出 `ValueError`，输入对象不被修改。逐题在 `harness/tests/wp19/runs/<run_id>/Hxx/` 提交实现、pytest、fixtures、Contract Receipt、selfcheck、候选 unchecked Tree、expected diff 和报告。
 
-这套 Hooks 是工具级防护，不是任意代码运行的 OS 沙箱。考试分支只提交 sandbox 新增文件，不自合并。真正环境、模型或 GPU 任务必须单独授权。
-
-**可信范围检查**：`.github/workflows/wp19-trusted-scope.yml` 使用 `pull_request_target` 在**基线** checkout 上读取候选文件差异，绝不执行候选 Python；候选修改 CI/评分器也不能改这个基线版本的检查。不过必须由仓库维护者在 GitHub 分支规则中将 `trusted-scope` 设为必需状态检查、禁止没有可信审阅的绕过/直接 push，且在真正运行不可信程序前使用 OS 级隔离，才能形成可靠的强边界。未配置分支保护时只能称已配置工具检查，不能称绝对不可绕过。
+允许只读使用 `python -m harness.contracts.wp19_verify --check-spec` 和 `python -m harness.contracts.wp19_verify --case H47 --run-dir harness/tests/wp19/runs/<run_id>/H47`。**禁止**修改 `harness/contracts/`、`.cursor/`、`.github/`、评分器、冻结样例、历史 Run、WP18、独立 reviewer 记录或正式源码。Agent 只能自测，不得自批或自行合并。独立审查者使用可信治理基线和不同输入复验，运行候选代码需低权限沙箱；Hooks / subprocess / CI 不能代替 OS 隔离。

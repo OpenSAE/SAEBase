@@ -87,12 +87,12 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: python -m harness.contracts.wp18_verify --base "$BASE_SHA" --scan
-      - name: Verify WP19 frozen P0 contracts and twenty case reference
+      - name: Verify WP19 frozen 200 synthetic cases and reference
         run: |
           python -m harness.contracts.registry check --plan harness/github_work_plan/19_harness_large_scale_examination_and_verifier_assurance.md
           python -m harness.contracts.wp19_verify --check-spec
           python -m pytest -q harness/github_work_test/test_compliance_regression.py harness/github_work_test/test_wp19_p0_contracts.py
-      - name: Reject WP19 task governance edits and test submitted P0 cases
+      - name: Reject WP19 governance edits and test submitted 200 cases
         if: ${{ github.event_name == 'pull_request' && startsWith(github.head_ref, 'wp19/') }}
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}

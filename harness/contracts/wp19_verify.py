@@ -1,7 +1,7 @@
 """WP19 staged, versioned, governance-owned executable examination gate.
 
-Only H27-H46 are qualified. H47-H226 are visible proposals and MUST NOT
-return a pass or accept a candidate until independently frozen and qualified.
+H27-H226 have frozen public synthetic contract-checking cases. These
+check domain invariants, not product-level integration or scientific results.
 Candidate execution is untrusted; use a restricted disposable reviewer host.
 """
 
@@ -17,14 +17,14 @@ import sys
 import tempfile
 from pathlib import Path
 
-from harness.contracts import registry, wp19_reference
+from harness.contracts import registry, wp19_reference, wp19_reference_ext
 
 ROOT = registry.ROOT
 PLAN = "harness/github_work_plan/19_harness_large_scale_examination_and_verifier_assurance.md"
 SPEC = ROOT / "harness/contracts/wp19_cases.json"
 RUNS = ROOT / "harness/tests/wp19/runs"
 RUN_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{3,63}$")
-READY = {f"H{i}" for i in range(27, 47)}
+READY = {f"H{i}" for i in range(27, 227)}
 ALL = {f"H{i}" for i in range(27, 227)}
 
 
@@ -43,7 +43,7 @@ def check_spec() -> dict:
         raise ValueError("WP19 case IDs/schema incomplete")
     ready = {x["id"] for x in cases if x.get("status") == "READY"}
     if ready != READY:
-        raise ValueError("Only reviewed P0 cases can be marked READY")
+        raise ValueError("All 200 frozen case IDs must be READY")
     checks = 0
     for case in cases:
         if case["id"] not in ready:
@@ -72,7 +72,11 @@ def check_spec() -> dict:
             if ("expected" in item) == (item.get("reject") is True):
                 raise ValueError("Ambiguous expected outcome")
             try:
-                observed = wp19_reference.solve(case_id, item["input"])
+                observed = (
+                    wp19_reference.solve(case_id, item["input"])
+                    if int(case_id[1:]) <= 46
+                    else wp19_reference_ext.solve(case_id, item["input"], case)
+                )
             except ValueError:
                 if item.get("reject") is not True:
                     raise ValueError(
@@ -94,7 +98,7 @@ def check_spec() -> dict:
 
 def verify_case(case_id: str, path: Path) -> dict:
     if case_id not in READY:
-        raise ValueError("Case is only a proposal, not READY")
+        raise ValueError("Case ID is outside ready WP19 range")
     if path.name != case_id or not RUN_ID.fullmatch(path.parent.name):
         raise ValueError("Case directory and run ID mismatch")
     path = path.resolve(strict=True)

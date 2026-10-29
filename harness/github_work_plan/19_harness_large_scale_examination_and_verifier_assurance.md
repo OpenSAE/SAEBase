@@ -1,6 +1,6 @@
 # Work Plan 19 — SAEBase Harness 大规模考试与 Verification 可信性计划
 
-状态：**分阶段实施 v0.2，2026-10-29**。提出 H27–H226 共 200 道 Exam，其中 **H27–H46 共 20 题已有冻结输入输出与受保护的可执行验证器**；H47–H226 共 180 题仍属 **PROPOSED**，尚未具备独立验收所需的 Oracle。它不改变 WP18 H01–H26 的既有 Contract、独立评审、失败记录和正在运行的任务，也**不授予**考试 Agent 修改 Harness 或验证代码的权限。
+状态：**200 道合成不变量 Exam v1.0，2026-10-29**。H27–H226 共 200 题已有固定 CPU 合成输入输出与机器可执行检查。H27–H46 维持原始参考行为；H47–H226 将 180 个主题各自落实为可运行的微型不变量检测任务，复用 43 种共享验证算子。**这不是 200 个真实产品集成测试，也不代表 GPU、科研结果、长时程及真实多代理操作已验证。**
 
 依据：[WP18](18_harness_local_agent_examination_and_independent_acceptance.md)、[已发布的 Universal Contract Registry](../contracts/catalog.json)、[20 题执行规范](../contracts/wp18_cases.json)、[现有独立验证器](../contracts/wp18_verify.py)。本计划遵循奥卡姆剃刀原则，先复用现有 Contract 和 Verification；发现新的**跨任务**要求时才提出新 Contract，不能因单个 HW 失败就增加一套新术语。
 
@@ -10,7 +10,7 @@
 
 WP19 同时追求两种能力：**考试覆盖面**扩大到真实仓库的更多行为；**Verifier 检错能力**有证据地提高。题目数、测试数、Contract 数和真实验收能力必须分别统计。
 
-WP18 原有 H01–H26 可以继续执行。WP19 只有 H27–H46 具备公开可执行 P0 验证，剩余 180 题仍是规划槽位。不得把只有描述的项目当作已拥有参考实现，也不得让考试 Agent 自行编写评分器。
+WP18 原有 H01–H26 可以继续执行。WP19 现在 200 个编号均可进行合成约束考试。新增 180 道题均限定为按该题标题及 operator 提供的微型规范检查，**不替代生产 SAEBase 的端到端行为验收**。
 
 ## 1. 层次与不可变边界
 
@@ -26,9 +26,9 @@ WP18 原有 H01–H26 可以继续执行。WP19 只有 H27–H46 具备公开可
 **必须认清安全边界**：Cursor Hooks、Python 子进程和 Git diff 检查不是 OS 级安全隔离。可信验证器必须来自固定的受信任治理提交，不能由候选 PR 提供；在资源上限、低权限、隔离文件系统和默认无网络的可丢弃环境执行不可信代码。GitHub required checks 与分支保护需要与工作树权限分离。Candidate 只给源代码、数据及交付，不得决定评分器内容、降低阈值、修改历史 Case 或人为批准自己。
 
 
-## 1.1 WP19 P0 已冻结的 20 道考试及 Contract 绑定
+## 1.1 H27–H226 全部 200 道合成 Exam 的 Contract 绑定
 
-所有未列入以下绑定的 H47–H226 都还不是 READY。需要在治理维护者独立 PR 中先完成指定行为、样例、Reference、用例生成与校验资格，才能继续开考。
+所有 200 题均已绑定既有 Contract。H47–H226 的 READY 仅表示对应合成不变量输入输出与微型参考算子已实现，不表示真实产品级功能完整覆盖。
 
 ```harness-contracts-json
 {
@@ -256,18 +256,1818 @@ WP18 原有 H01–H26 可以继续执行。WP19 只有 H27–H46 具备公开可
         "CT-EVIDENCE",
         "CT-INTERFACE"
       ]
+    },
+    "H47": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H48": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H49": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H50": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H51": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H52": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H53": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H54": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H55": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H56": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H57": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H58": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H59": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H60": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H61": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H62": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H63": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H64": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H65": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H66": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H67": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H68": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H69": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H70": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H71": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H72": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H73": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H74": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H75": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H76": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H77": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H78": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H79": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H80": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H81": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H82": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H83": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H84": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H85": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H86": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H87": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H88": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H89": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H90": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H91": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H92": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H93": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H94": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H95": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H96": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H97": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H98": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H99": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H100": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H101": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H102": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H103": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H104": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H105": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H106": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H107": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H108": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H109": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H110": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H111": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H112": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H113": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H114": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H115": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H116": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H117": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H118": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H119": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H120": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H121": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H122": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H123": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H124": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H125": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H126": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H127": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H128": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H129": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H130": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H131": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H132": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H133": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H134": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H135": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H136": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H137": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H138": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H139": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H140": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H141": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H142": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H143": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H144": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H145": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H146": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H147": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H148": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H149": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H150": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H151": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H152": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H153": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H154": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H155": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H156": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H157": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H158": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H159": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H160": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H161": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H162": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H163": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H164": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H165": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H166": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H167": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H168": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H169": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H170": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H171": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H172": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H173": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H174": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H175": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H176": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H177": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H178": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H179": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H180": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H181": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H182": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H183": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H184": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H185": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H186": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H187": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H188": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H189": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H190": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H191": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H192": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H193": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H194": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H195": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H196": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H197": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H198": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H199": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H200": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H201": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H202": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H203": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H204": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H205": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H206": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H207": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H208": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H209": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H210": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H211": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H212": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H213": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H214": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H215": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H216": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H217": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H218": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H219": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H220": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H221": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H222": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H223": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H224": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H225": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
+    },
+    "H226": {
+      "tags": [
+        "validation",
+        "interface"
+      ],
+      "contracts": [
+        "CT-ERROR",
+        "CT-INTERFACE"
+      ]
     }
   }
 }
 ```
 
-**P0 正式冻结依据**：`harness/contracts/wp19_cases.json`（200 个编号的状态与唯一任务，其中 H27–H46 共 80 个正反样例）；独立 Python 参考 `harness/contracts/wp19_reference.py`；只读验收入口 `harness/contracts/wp19_verify.py`。执行侧每题 `harness/tests/wp19/runs/<run_id>/Hxx/implementation.py` 导出 `solve(payload: dict) -> dict`，非法输入抛出 `ValueError`，不能修改输入。此接口**只适用于 P0 已冻结的小型 CPU 题**；后续 Browser、Research 等真实任务应按自身系统界面制定验证，不强行统一。
+**合成 Exam 规范**：`harness/contracts/wp19_cases.json`（200 题、800 个公开正反样例）；独立 Python 参考 `harness/contracts/wp19_reference.py` 与 `harness/contracts/wp19_reference_ext.py`；只读验收入口 `harness/contracts/wp19_verify.py`。执行侧每题 `harness/tests/wp19/runs/<run_id>/Hxx/implementation.py` 导出 `solve(payload: dict) -> dict`，非法输入抛出 `ValueError`，不能修改输入。此接口适用于此批**全部 200 道小型 CPU 合成题**；后续 Browser、Research 等真实任务应按自身系统界面制定验证，不强行统一。
 
-**P0 Agent 指令**：从最新 main 独立新分支、唯一 Run ID 开始，完成 H27–H46；每题独立源码、fixtures、pytest、Contract Receipt、unchecked candidate、报告。允许读取并调用公开验证器，禁止修改 `harness/contracts/`、`harness/github_work_test/`、`.github/`、`.cursor/`、历史 WP18/WP19 Run 和人工审阅。提交未合并 PR，独立 reviewer 用不同输入与真正隔离执行环境复验。**不要一次启动还未 READY 的 180 题。**
+**全量合成 Exam Agent 指令**：从最新 main 独立新分支、唯一 Run ID 开始，分批完成 H27–H226；每题独立源码、fixtures、pytest、Contract Receipt、unchecked candidate、报告。允许读取并调用公开验证器，禁止修改 `harness/contracts/`、`harness/github_work_test/`、`.github/`、`.cursor/`、历史 WP18/WP19 Run 和人工审阅。提交未合并 PR，独立 reviewer 用不同输入与真正隔离执行环境复验。**全部 200 题已拥有合成约束样例，但应按 10–20 题分批执行，不得无限并发。**
 
-**验证流程**：治理侧 `python -m harness.contracts.wp19_verify --check-spec` 检查已冻结 20 题/80 例与 Reference；Agent 可在允许目录下执行 `python -m harness.contracts.wp19_verify --case H27 --run-dir harness/tests/wp19/runs/<run_id>/H27`。CI 对 WP19 task PR 检查 diff，只接受新 Run 目录内新增文件，并执行 20 题公开测试。可见用例全部通过仅代表公开技术检查，通过与人类审批严格区分。
+**验证流程**：治理侧 `python -m harness.contracts.wp19_verify --check-spec` 检查已冻结 200 题/800 例与 Reference；Agent 可在允许目录下执行 `python -m harness.contracts.wp19_verify --case H27 --run-dir harness/tests/wp19/runs/<run_id>/H27`。CI 对 WP19 task PR 检查 diff，只接受新 Run 目录内新增文件，并执行全部 200 题公开测试。可见用例全部通过仅代表公开技术检查，通过与人类审批严格区分。
 
-**P0 Verification 资格边界**：参考函数对每题至少 2 正例、2 反例逐一验证；对明确的错误实现和合法实现做对照。正式高置信度资格还需独立 evaluator 的变形/Mutation/误报基线，故本批状态为 `READY_FOR_AGENT_EXERCISE`，而不是“已通过全部独立验收”。H47–H226 不接受 `--case` 调用。
+**全量 Verification 资格边界**：每道题都有至少两个有效输入和两个非法输入，且错误实现必须在独立测试中被检测。H47–H226 是各自语义主题的合成不变量检查，并非对应真实产品模块的完整集成验收。高置信度的泛化验证仍需要独立评审的新输入、变形/Mutation/误报测试。`--case` 现在允许 H27–H226，其余编号一律拒绝。
 
 ## 2. 从候选 Exam 到真正可执行的规范
 
@@ -733,7 +2533,7 @@ WP18 原有 H01–H26 可以继续执行。WP19 只有 H27–H46 具备公开可
 | P3 流程与长任务 | H177–H226 分批 | 资源、CLI、Artifact、CI、并发与状态恢复 | 先模拟，再按另行预算授权升规模 |
 | P4 持续扩大 | 已冻结 Contract 所有适用面 | 不同 seed、pairwise、变形关系和错误注入，目标数千个有效检查 | 提供测试去重、真实行为维度覆盖和失败归因 |
 
-这不是一次性要求一个 Agent 做完 200 题。治理方每批只承诺已准备好的若干题，**小数据优先**，严格预算，连续系统性失败时停止后续无意义运算，保留可复现的最小失败例。
+无需一次性执行全部 200 题。每批 10–20 题，逐批保留真实日志和失败；对真实产品集成工作仍需治理方分别冻结规范，**小数据优先**，严格预算，连续系统性失败时停止后续无意义运算，保留可复现的最小失败例。
 
 ### 每批 Definition of Done
 
@@ -744,6 +2544,15 @@ WP18 原有 H01–H26 可以继续执行。WP19 只有 H27–H46 具备公开可
 - [ ] 独立评审按固定源/规范/seed/预算运行；原始日志、Git diff、Receipt、AST 可核对。
 - [ ] PASS/FAIL/BLOCKED/INCONCLUSIVE 分开，错误归因有证据。
 - [ ] 更新 Harness 后旧回归不退化，新数据能检验是否具备泛化效果。
-- [ ] 不得把规划阶段的 H27–H226 计为已经验证或已经交付的 200 个 HW。
+- [ ] 200 道合成 Exam 与产品级集成、科学结果、长时程多代理验证分别报告，不得互相冒充。
 
-**本 WP19 当前已完成：200 个命名主题，20 个 P0 公开可执行任务（80 个正反用例）、可核对的 Reference 和验证入口，以及持续冻结其余 180 题的治理路线。其余 180 题的有效独立 Oracle 和大规模长期测试尚未实现，不能冒充已完成；WP18 保持原独立验收。**
+**本 WP19 合成考试交付**：200 道题全部有固定输入输出、800 个公开正反例和可执行 Reference；其中新 180 题复用 43 种明确实现的合成不变量算子。实际 SAEBase 产品、GPU 实验、多 Agent 长期工作流仍须独立集成测试，不能将这些 CPU 合成题的通过解释为这些功能的正确性。WP18 旧记录保持不变。
+
+
+## 9. 已启用的 200 道合成考试及边界
+
+- H27–H226：200 道拥有冻结输入输出、明确合法/非法输入的微型验证题；合计 800 个公开正反例。
+- H47–H226 使用 `harness/contracts/wp19_reference_ext.py` 的 43 种参数化参考验证算子。参考算子复用是为了保持简洁，不应谎称它们已经完成 180 个真实系统组件的独立集成测试。
+- 统一评分入口 `python -m harness.contracts.wp19_verify --check-spec` 和 `--case Hxx --run-dir harness/tests/wp19/runs/<run_id>/Hxx`；全部 200 题在 `--scan` 中要求完整交付。
+- 新的任务必须按 10–20 题分批、保留失败和真执行证据；公开自测不等于独立 reviewer、正式批准或科研结果。
+- 治理者继续使用新的不同输入与 mutation/状态组合测试扩充深层能力验证。长期多代理、浏览器或 GPU 验证仍属于后续独立集成阶段。
