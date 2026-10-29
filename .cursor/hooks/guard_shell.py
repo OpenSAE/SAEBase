@@ -20,6 +20,13 @@ DANGEROUS = re.compile(
     r"|\b(?:sudo|nohup|disown)\b|\brm\s+-[a-z]*r[a-z]*f\b"
     r"|\b(?:curl|wget)\b.{0,120}\|\s*(?:sh|bash))"
 )
+# A normal request such as "测 Harness H01" may run pytest inside the
+# dedicated Harness test sandbox without formal Agent Flow authorization.
+# Other command families still require exact signed-off commands.
+HARNESS_PYTEST = re.compile(
+    r"^(?:python|python3) -m pytest (?:-q )?harness/tests/"
+    r"[A-Za-z0-9_./:-]+(?: -q)?$"
+)
 SAFE_COMMANDS = [
     re.compile(r"^(?:git)\s+(?:status|diff|log|show|rev-parse)(?:\s+[^;&|<>]*)?$"),
     re.compile(r"^(?:ls|pwd|rg|grep|find)\b[^;&|<>]*$"),
@@ -39,6 +46,17 @@ def gate(command, plan_id=None):
     command = command.strip()
     if DANGEROUS.search(command):
         return "High-risk shell operation is not permitted to task agents"
+    # Do not grant arbitrary shell execution just because a command mentions
+    # harness/tests. Only the single-purpose, path-checked pytest form is free.
+    if HARNESS_PYTEST.fullmatch(command):
+        try:
+            tokens = shlex.split(command)
+            target = next(x for x in tokens if x.startswith("harness/tests/"))
+            if ".." in target.split("/") or target.startswith("harness/tests//"):
+                return "Test path traversal forbidden"
+        except (ValueError, StopIteration):
+            return "Malformed Harness test command"
+        return None
     if GOVERNANCE.search(command) and "harness.core.agent_flow" not in command:
         return "Core/Harness governance sources are shielded from task shell access"
     if any(pattern.fullmatch(command) for pattern in SAFE_COMMANDS):
