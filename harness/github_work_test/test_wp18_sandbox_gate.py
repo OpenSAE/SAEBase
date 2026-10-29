@@ -6,6 +6,7 @@ These checks belong to independent governance, not writable exam submissions.
 from __future__ import annotations
 
 import importlib.util
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -128,3 +129,19 @@ def test_work_order_harness_reference_uses_real_repository_path(tmp_path, monkey
     assert module.reference(correct, "harness", check_exists=False) == correct
     with pytest.raises(module.InvalidOrder):
         module.reference("harness/github_harness/github_work_plan/18.md", "harness", check_exists=False)
+
+
+def test_tracked_repository_has_only_approved_top_level_directories():
+    # This checks committed code, in addition to the interactive edit gate.
+    approved = {
+        ".cursor", ".github", "conf", "datasets", "doc", "harness",
+        "models", "saebase", "tasks", "experiments", "tests",
+    }
+    tree = subprocess.run(
+        ["git", "ls-tree", "-d", "--name-only", "HEAD"],
+        cwd=ROOT, capture_output=True, text=True, check=True,
+    )
+    observed = set(tree.stdout.splitlines())
+    assert observed <= approved, "Unexpected project root directory: " + repr(
+        sorted(observed - approved)
+    )
