@@ -1,6 +1,6 @@
 # Work Plan 20 · 中大型多阶段集成考试与可信验收设计
 
-状态：**SPEC_REVIEWED / DESIGN ONLY，2026-10-29**。本计划新增 X01–X20 共 20 道中大型任务，每道涉及至少三个阶段、多个实际模块边界、正反例、状态变化或变形关系，且已预先选定 Contract。**当前只完成任务设计和规范校验，并未实施 20 个独立行为 Oracle，不应把这些题标为 READY 或直接启动考试 Agent。**
+状态：**READY FOR INDEPENDENT CPU BEHAVIOR EXAM，2026-10-29**。X01–X20 已预先选定 Contract，交付了 20 个不同的真实行为参考、80 组冻结正反例、只读统一验证器，以及校准验证器的错误实现测试。**READY 只允许隔离合成考试，不代表生产模块完整集成通过或人类批准。**
 
 承接 [WP18](18_harness_local_agent_examination_and_independent_acceptance.md) 与 [WP19](19_harness_large_scale_examination_and_verifier_assurance.md)，转向**真实行为、跨模块集成和长时程执行**。WP19 的 200 道小型合成考试作为已保存的历史基线，不重复计为 WP20 的完成成果。全部 X 系列题目以 `harness/contracts/wp20_cases.json` 为机器可读权威设计，以下内容便于人类和本地执行者理解；具体案例允许的数据范围、验证资源与产物清单以该 JSON 和本文件一致的定义为准。
 
@@ -24,26 +24,26 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 | 题号 | 跨模块任务 | 阶段数 | 条件 Contract 数 | 当前状态 |
 | --- | --- | ---: | ---: | --- |
-| X01 | 真实源码变更到 Code Tree 与候选 Diff | 4 | 5 | SPEC_REVIEWED |
-| X02 | Glossary 同步、双向链接与中英 Overlay | 4 | 5 | SPEC_REVIEWED |
-| X03 | Atlas 五树切换与审阅会话状态恢复 | 4 | 5 | SPEC_REVIEWED |
-| X04 | 可信命令日志、Receipt 与独立 PR 决策 | 4 | 5 | SPEC_REVIEWED |
-| X05 | 跨工具读写授权与路径绕过检测 | 4 | 4 | SPEC_REVIEWED |
-| X06 | 数据 Manifest 到分割、抽样与报告的完整流水线 | 4 | 4 | SPEC_REVIEWED |
-| X07 | Model 与 SAE 身份校验、Activation 缓存与重放 | 4 | 5 | SPEC_REVIEWED |
-| X08 | Tiny SAE 编码、解码、TopK 与批量等价性 | 4 | 4 | SPEC_REVIEWED |
-| X09 | 多 Feature 干预链、撤销及生成模式隔离 | 4 | 4 | SPEC_REVIEWED |
-| X10 | 特征证据、Token 位置与组件归因 | 4 | 4 | SPEC_REVIEWED |
-| X11 | AUROC、AUPRC、Recall 的端到端指标引擎 | 4 | 4 | SPEC_REVIEWED |
-| X12 | Bootstrap、负控制与区间估计重放 | 4 | 4 | SPEC_REVIEWED |
-| X13 | Benchmark 适配器到汇总报告的多任务一致性 | 4 | 4 | SPEC_REVIEWED |
-| X14 | Hydra 组合配置到 CPU Dry-run 与 Receipt | 4 | 5 | SPEC_REVIEWED |
-| X15 | 断点中断、Checkpoint 校验与幂等恢复 | 4 | 5 | SPEC_REVIEWED |
-| X16 | 安全归档、解包与原子提交 | 4 | 4 | SPEC_REVIEWED |
-| X17 | 源码 SHA、CI 状态与人工审核的发布门禁 | 4 | 5 | SPEC_REVIEWED |
-| X18 | 双 Agent 并发提交、冲突检测与安全合并 | 4 | 5 | SPEC_REVIEWED |
-| X19 | 微型端到端 SAE 研究工作流 | 4 | 5 | SPEC_REVIEWED |
-| X20 | 长时程交接、需求变更、中断恢复及终局审阅 | 4 | 6 | SPEC_REVIEWED |
+| X01 | 真实源码变更到 Code Tree 与候选 Diff | 4 | 5 | READY |
+| X02 | Glossary 同步、双向链接与中英 Overlay | 4 | 5 | READY |
+| X03 | Atlas 五树切换与审阅会话状态恢复 | 4 | 5 | READY |
+| X04 | 可信命令日志、Receipt 与独立 PR 决策 | 4 | 5 | READY |
+| X05 | 跨工具读写授权与路径绕过检测 | 4 | 4 | READY |
+| X06 | 数据 Manifest 到分割、抽样与报告的完整流水线 | 4 | 4 | READY |
+| X07 | Model 与 SAE 身份校验、Activation 缓存与重放 | 4 | 5 | READY |
+| X08 | Tiny SAE 编码、解码、TopK 与批量等价性 | 4 | 4 | READY |
+| X09 | 多 Feature 干预链、撤销及生成模式隔离 | 4 | 4 | READY |
+| X10 | 特征证据、Token 位置与组件归因 | 4 | 4 | READY |
+| X11 | AUROC、AUPRC、Recall 的端到端指标引擎 | 4 | 4 | READY |
+| X12 | Bootstrap、负控制与区间估计重放 | 4 | 4 | READY |
+| X13 | Benchmark 适配器到汇总报告的多任务一致性 | 4 | 4 | READY |
+| X14 | Hydra 组合配置到 CPU Dry-run 与 Receipt | 4 | 5 | READY |
+| X15 | 断点中断、Checkpoint 校验与幂等恢复 | 4 | 5 | READY |
+| X16 | 安全归档、解包与原子提交 | 4 | 4 | READY |
+| X17 | 源码 SHA、CI 状态与人工审核的发布门禁 | 4 | 5 | READY |
+| X18 | 双 Agent 并发提交、冲突检测与安全合并 | 4 | 5 | READY |
+| X19 | 微型端到端 SAE 研究工作流 | 4 | 5 | READY |
+| X20 | 长时程交接、需求变更、中断恢复及终局审阅 | 4 | 6 | READY |
 
 四组各五题。正式运行时按 2–4 题小批次组织，优先从 X01、X06、X11、X16 这类具有明确参考行为的任务开始，先验证独立 grader 自身，再逐批让 Agent 执行。
 
@@ -357,7 +357,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 }
 ```
 
-**角色和状态**：`SPEC_REVIEWED → FROZEN → VERIFIER_QUALIFIED → READY → AGENT_SUBMITTED → INDEPENDENT_EVALUATED`。本轮全部 20 题停在 `SPEC_REVIEWED`。治理者确认规则完整并实现、校准 Reference 后才可以在新版本中升状态。Agent 不能私自把计划题目变成 READY。
+**角色和状态**：`SPEC_REVIEWED → FROZEN → VERIFIER_QUALIFIED → READY → AGENT_SUBMITTED → INDEPENDENT_EVALUATED`。本版二十题经参考行为、正反例和错误实现校准后进入 `READY`。Agent 交付仍需可信 reviewer 用不同数据复验；不可改评分基线。
 
 独立验证器开发需提供：一份经确认的正确参考实现、至少两类明确不同的错误实现、合法场景误报控制、异常/恢复状态检查、基于源码或实际产物的证据核验。每个题目都要证明原来的目标确实被考到，例如 X11 要输出真正的 AUROC/AP/Recall 数值，而不是把排序或比例检查重新命名为这些指标。
 
@@ -386,7 +386,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`before_ast.json`、`after_ast.json`、`observed_diff.json`、`review_candidate.json`、`provenance.json`。
 
-**条件 Contract**：`CT-AST`、`CT-STRUCT`、`CT-EVIDENCE`、`CT-DETERMINISM`、`CT-INTERFACE`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-AST`、`CT-STRUCT`、`CT-EVIDENCE`、`CT-DETERMINISM`、`CT-INTERFACE`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 ### X02 · Glossary 同步、双向链接与中英 Overlay
 
@@ -411,7 +411,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`terms.json`、`nodes.json`、`locale_zh.json`、`locale_en.json`、`impact_report.json`。
 
-**条件 Contract**：`CT-CONTEXT`、`CT-EVIDENCE`、`CT-LOCALE`、`CT-STRUCT`、`CT-INTERFACE`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-CONTEXT`、`CT-EVIDENCE`、`CT-LOCALE`、`CT-STRUCT`、`CT-INTERFACE`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 ### X03 · Atlas 五树切换与审阅会话状态恢复
 
@@ -436,7 +436,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`event_log.json`、`state_before.json`、`state_after.json`、`replay.json`。
 
-**条件 Contract**：`CT-STRUCT`、`CT-REVIEW`、`CT-LOCALE`、`CT-DETERMINISM`、`CT-INTERFACE`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-STRUCT`、`CT-REVIEW`、`CT-LOCALE`、`CT-DETERMINISM`、`CT-INTERFACE`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 ### X04 · 可信命令日志、Receipt 与独立 PR 决策
 
@@ -461,7 +461,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`receipt.json`、`command_trace.json`、`git_diff.json`、`technical_verdict.json`。
 
-**条件 Contract**：`CT-TRACE`、`CT-EVIDENCE`、`CT-SCOPE`、`CT-REVIEW`、`CT-PRIVACY`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-TRACE`、`CT-EVIDENCE`、`CT-SCOPE`、`CT-REVIEW`、`CT-PRIVACY`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 ### X05 · 跨工具读写授权与路径绕过检测
 
@@ -486,7 +486,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`attempts.json`、`denials.json`、`filesystem_before.json`、`filesystem_after.json`。
 
-**条件 Contract**：`CT-SCOPE`、`CT-PRIVACY`、`CT-EVIDENCE`、`CT-INTERFACE`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-SCOPE`、`CT-PRIVACY`、`CT-EVIDENCE`、`CT-INTERFACE`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 
 ## 4. 数据、SAE 与特征操作
@@ -514,7 +514,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`source_manifest.json`、`splits.json`、`predictions.json`、`coverage_report.json`。
 
-**条件 Contract**：`CT-DATA`、`CT-EVIDENCE`、`CT-DETERMINISM`、`CT-INTERFACE`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-DATA`、`CT-EVIDENCE`、`CT-DETERMINISM`、`CT-INTERFACE`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 ### X07 · Model 与 SAE 身份校验、Activation 缓存与重放
 
@@ -539,7 +539,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`identities.json`、`activation_shards.json`、`cache_manifest.json`、`replay_diff.json`。
 
-**条件 Contract**：`CT-DATA`、`CT-CONFIG`、`CT-EVIDENCE`、`CT-DETERMINISM`、`CT-INTERFACE`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-DATA`、`CT-CONFIG`、`CT-EVIDENCE`、`CT-DETERMINISM`、`CT-INTERFACE`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 ### X08 · Tiny SAE 编码、解码、TopK 与批量等价性
 
@@ -564,7 +564,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`tiny_weights.json`、`encoded.json`、`decoded.json`、`reconstruction.json`。
 
-**条件 Contract**：`CT-DATA`、`CT-CONFIG`、`CT-DETERMINISM`、`CT-INTERFACE`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-DATA`、`CT-CONFIG`、`CT-DETERMINISM`、`CT-INTERFACE`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 ### X09 · 多 Feature 干预链、撤销及生成模式隔离
 
@@ -589,7 +589,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`steps.json`、`before_after.json`、`rollback.json`、`mode_audit.json`。
 
-**条件 Contract**：`CT-CONFIG`、`CT-DATA`、`CT-DETERMINISM`、`CT-INTERFACE`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-CONFIG`、`CT-DATA`、`CT-DETERMINISM`、`CT-INTERFACE`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 ### X10 · 特征证据、Token 位置与组件归因
 
@@ -614,7 +614,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`trace.json`、`feature_table.json`、`token_evidence.json`、`unresolved.json`。
 
-**条件 Contract**：`CT-DATA`、`CT-EVIDENCE`、`CT-DETERMINISM`、`CT-INTERFACE`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-DATA`、`CT-EVIDENCE`、`CT-DETERMINISM`、`CT-INTERFACE`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 
 ## 5. 指标、实验与可复现性
@@ -642,7 +642,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`observations.json`、`metrics.json`、`thresholds.json`、`undefined_cases.json`。
 
-**条件 Contract**：`CT-DATA`、`CT-CONFIG`、`CT-ERROR`、`CT-DETERMINISM`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-DATA`、`CT-CONFIG`、`CT-ERROR`、`CT-DETERMINISM`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 ### X12 · Bootstrap、负控制与区间估计重放
 
@@ -667,7 +667,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`resample_indices.json`、`replicates.json`、`controls.json`、`intervals.json`。
 
-**条件 Contract**：`CT-DATA`、`CT-DETERMINISM`、`CT-EVIDENCE`、`CT-INTERFACE`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-DATA`、`CT-DETERMINISM`、`CT-EVIDENCE`、`CT-INTERFACE`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 ### X13 · Benchmark 适配器到汇总报告的多任务一致性
 
@@ -692,7 +692,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`adapter_results.json`、`normalized_results.json`、`aggregate_report.json`、`adapter_trace.json`。
 
-**条件 Contract**：`CT-DATA`、`CT-DETERMINISM`、`CT-EVIDENCE`、`CT-INTERFACE`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-DATA`、`CT-DETERMINISM`、`CT-EVIDENCE`、`CT-INTERFACE`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 ### X14 · Hydra 组合配置到 CPU Dry-run 与 Receipt
 
@@ -717,7 +717,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`resolved_config.json`、`jobs.json`、`receipts.json`、`execution_report.json`。
 
-**条件 Contract**：`CT-CONFIG`、`CT-DATA`、`CT-DETERMINISM`、`CT-TRACE`、`CT-RESOURCE`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-CONFIG`、`CT-DATA`、`CT-DETERMINISM`、`CT-TRACE`、`CT-RESOURCE`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 ### X15 · 断点中断、Checkpoint 校验与幂等恢复
 
@@ -742,7 +742,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`checkpoint.json`、`events.json`、`final_artifacts.json`、`resume_audit.json`。
 
-**条件 Contract**：`CT-RECOVERY`、`CT-DATA`、`CT-EVIDENCE`、`CT-DETERMINISM`、`CT-INTERFACE`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-RECOVERY`、`CT-DATA`、`CT-EVIDENCE`、`CT-DETERMINISM`、`CT-INTERFACE`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 
 ## 6. 发布、并发与长时程协作
@@ -770,7 +770,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`archive_manifest.json`、`extract_report.json`、`fault_trace.json`、`filesystem_snapshot.json`。
 
-**条件 Contract**：`CT-EVIDENCE`、`CT-RECOVERY`、`CT-SCOPE`、`CT-PRIVACY`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-EVIDENCE`、`CT-RECOVERY`、`CT-SCOPE`、`CT-PRIVACY`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 ### X17 · 源码 SHA、CI 状态与人工审核的发布门禁
 
@@ -795,7 +795,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`check_graph.json`、`approvals.json`、`release_decision.json`、`audit.json`。
 
-**条件 Contract**：`CT-RELEASE`、`CT-EVIDENCE`、`CT-REVIEW`、`CT-TRACE`、`CT-DETERMINISM`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-RELEASE`、`CT-EVIDENCE`、`CT-REVIEW`、`CT-TRACE`、`CT-DETERMINISM`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 ### X18 · 双 Agent 并发提交、冲突检测与安全合并
 
@@ -820,7 +820,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`base_commit.json`、`agent_events.json`、`merge_result.json`、`conflict_report.json`。
 
-**条件 Contract**：`CT-RECOVERY`、`CT-REVIEW`、`CT-TRACE`、`CT-SCOPE`、`CT-AST`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-RECOVERY`、`CT-REVIEW`、`CT-TRACE`、`CT-SCOPE`、`CT-AST`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 ### X19 · 微型端到端 SAE 研究工作流
 
@@ -845,7 +845,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`dataset.json`、`activation.json`、`encoded.json`、`interventions.json`、`metrics.json`、`provenance.json`。
 
-**条件 Contract**：`CT-DATA`、`CT-CONFIG`、`CT-EVIDENCE`、`CT-DETERMINISM`、`CT-INTERFACE`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-DATA`、`CT-CONFIG`、`CT-EVIDENCE`、`CT-DETERMINISM`、`CT-INTERFACE`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 ### X20 · 长时程交接、需求变更、中断恢复及终局审阅
 
@@ -870,7 +870,7 @@ WP19 的实践证明，Agent 可以很好地完成清晰的合成判断，但仅
 
 **交付的关键产物**：`work_order.json`、`events.json`、`checkpoint.json`、`final_diff.json`、`candidate_tree.json`、`verdict_inputs.json`。
 
-**条件 Contract**：`CT-REVIEW`、`CT-RECOVERY`、`CT-TRACE`、`CT-EVIDENCE`、`CT-STRUCT`、`CT-DETERMINISM`。状态为 `SPEC_REVIEWED`；独立 Oracle 尚需实现和校准。
+**条件 Contract**：`CT-REVIEW`、`CT-RECOVERY`、`CT-TRACE`、`CT-EVIDENCE`、`CT-STRUCT`、`CT-DETERMINISM`。状态为 `READY`；已有受保护行为参考及冻结正反输入，考试 Agent 仅可编辑新 Case sandbox。
 
 
 ## 7. WP20 统一运行、收据和候选 Tree 要求
@@ -905,6 +905,14 @@ WP19 在一次性收集所有同名 `test_implementation.py` 时曾出现 pytest
 4. 在 CI 中运行规范完整性、参考正确性、已知错误必须被发现、合法变化误报、scope gate 与资源限制。受信任 `main` 的 grader 决定行为结果，考生工作区只能提交候选。
 5. 仅对完成以上条件的 Case 标记 `READY`，按小批次开放给本地 Agent。最终人工审阅、正式 Atlas 更新或产品发布必须另行批准。
 
-**本轮 Definition of Done**：20 道有不同真实目标的任务、20 个预声明 Contract 绑定、模块依据、完整操作链、正反例、变形检查、独立 Oracle 设计和资源边界已经提交并经过规范一致性检查。它不是“20 题全部已经可以自动评分”的宣称。
+**本轮 Definition of Done**：X01–X20 有实际行为参考、80 组冻结正反例、全输出和文件副作用 SHA 比对、公开 grader、错误候选检测、Scope 保护及 CI。允许合成集成考试；真实模型、生产组件、外网发布和正式审批仍需另外验证。
 
 **下一阶段的评估目标**：能否让同一个 Agent 在连续的来源读取、代码生成、执行、失败恢复及证据审查中，持续遵守跨步骤 Contract。通过率、验证器错误检出能力与历史回归应分开记录。
+
+## 9. 可执行考试接口及独立权限
+
+- 可信场景：`harness/contracts/wp20_scenarios.json`，X01–X20 各有两组有效输入和两组无效输入。
+- 参考程序：`harness/contracts/wp20_reference_a.py` 至 `wp20_reference_d.py`，实际执行 AST、双向术语图、状态重放、文件、SAE 运算、AUROC/AP、Bootstrap、归档及临时 Git 等行为。
+- 只读验证入口：`python -m harness.contracts.wp20_verify --check-spec`；考生可以在受限环境运行 `python -m harness.contracts.wp20_verify --case X01 --run-dir harness/tests/wp20/runs/<run_id>/X01`。技术检查逐项比较结果和真实文件副作用。
+- Agent 入口：`implementation.py` 定义 `run(payload: dict, workdir: Path) -> dict`，需要时使用自己新建的 `src/` 下多个合作模块。禁止以布尔标记代替真实多阶段结果。
+- 可信评分器来自固定治理基线；必须在独立、限权、无凭据、无网络的可丢弃 OS 环境运行不可信候选 Python。普通 CI 的规范检查不能代替 OS 沙箱，也不代替人类审核。考生不能修改参考、冻结用例、评分、CI、Hooks 或历史记录。

@@ -1,7 +1,7 @@
-"""Check WP20 task design and predeclared contract binding, not candidate correctness.
+"""Validate WP20 staged design, frozen behavior references and prior contracts.
 
-This intentionally cannot return an exam PASS. Reviewer-owned executable
-oracles must be implemented and qualified before any case becomes READY.
+This checks machine-readable design, not the student's submitted behavior. The
+behavioral verifier independently validates frozen scenarios and candidates.
 """
 
 from __future__ import annotations
@@ -35,10 +35,10 @@ def validate(data: dict | None = None) -> dict:
     if not isinstance(cases, list) or [c.get("id") for c in cases] != CASE_IDS:
         raise ValueError("WP20 must declare exactly X01-X20 in order")
     if (
-        spec.get("status") != "SPEC_REVIEWED"
+        spec.get("status") != "READY"
         or spec.get("execution_contract", {}).get("formal_approval") != "reviewer only"
     ):
-        raise ValueError("WP20 is a design only, not independent acceptance")
+        raise ValueError("WP20 requires reviewer-owned READY design")
     groups = {c["group"] for c in cases}
     if groups != CASE_GROUPS or any(sum(c["group"] == g for c in cases) != 5 for g in CASE_GROUPS):
         raise ValueError("Expected four distinct groups of five exams")
@@ -48,8 +48,8 @@ def validate(data: dict | None = None) -> dict:
         raise ValueError("Duplicate exam objective")
     checked_sources = 0
     for case in cases:
-        if case.get("status") != "SPEC_REVIEWED" or case.get("oracle_status") != "NOT_IMPLEMENTED":
-            raise ValueError(f"{case['id']} incorrectly claims an executable verifier")
+        if case.get("status") != "READY" or case.get("oracle_status") != "QUALIFIED":
+            raise ValueError(f"{case['id']} missing qualified reference")
         expected = registry.resolve(PLAN, case["id"])
         if expected["tags"] != case["tags"] or set(expected["contract_ids"]) != set(
             registry.catalog()["required_always"] + ["CT-ERROR"] + case["contracts"]
@@ -104,7 +104,7 @@ def validate(data: dict | None = None) -> dict:
         "stage_count": sum(len(c["stages"]) for c in cases),
         "normal_scenarios": sum(len(c["positive_cases"]) for c in cases),
         "negative_scenarios": sum(len(c["negative_cases"]) for c in cases),
-        "status": "SPEC_REVIEWED_ONLY_NOT_READY",
+        "status": "READY_FOR_BEHAVIORAL_EXERCISE",
     }
 
 
