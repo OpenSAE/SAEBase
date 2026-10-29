@@ -26,7 +26,7 @@ WP18 原有 H01–H26 可以继续执行。WP19 现在 200 个编号均可进行
 **必须认清安全边界**：Cursor Hooks、Python 子进程和 Git diff 检查不是 OS 级安全隔离。可信验证器必须来自固定的受信任治理提交，不能由候选 PR 提供；在资源上限、低权限、隔离文件系统和默认无网络的可丢弃环境执行不可信代码。GitHub required checks 与分支保护需要与工作树权限分离。Candidate 只给源代码、数据及交付，不得决定评分器内容、降低阈值、修改历史 Case 或人为批准自己。
 
 
-## 1.1 WP19 P0 已冻结的 20 道考试及 Contract 绑定
+## 1.1 H27–H226 全部 200 道合成 Exam 的 Contract 绑定
 
 所有 200 题均已绑定既有 Contract。H47–H226 的 READY 仅表示对应合成不变量输入输出与微型参考算子已实现，不表示真实产品级功能完整覆盖。
 
@@ -2061,13 +2061,13 @@ WP18 原有 H01–H26 可以继续执行。WP19 现在 200 个编号均可进行
 }
 ```
 
-**P0 正式冻结依据**：`harness/contracts/wp19_cases.json`（200 个编号的状态与唯一任务，其中 H27–H46 共 80 个正反样例）；独立 Python 参考 `harness/contracts/wp19_reference.py`；只读验收入口 `harness/contracts/wp19_verify.py`。执行侧每题 `harness/tests/wp19/runs/<run_id>/Hxx/implementation.py` 导出 `solve(payload: dict) -> dict`，非法输入抛出 `ValueError`，不能修改输入。此接口**只适用于 P0 已冻结的小型 CPU 题**；后续 Browser、Research 等真实任务应按自身系统界面制定验证，不强行统一。
+**合成 Exam 规范**：`harness/contracts/wp19_cases.json`（200 题、800 个公开正反样例）；独立 Python 参考 `harness/contracts/wp19_reference.py` 与 `harness/contracts/wp19_reference_ext.py`；只读验收入口 `harness/contracts/wp19_verify.py`。执行侧每题 `harness/tests/wp19/runs/<run_id>/Hxx/implementation.py` 导出 `solve(payload: dict) -> dict`，非法输入抛出 `ValueError`，不能修改输入。此接口适用于此批**全部 200 道小型 CPU 合成题**；后续 Browser、Research 等真实任务应按自身系统界面制定验证，不强行统一。
 
-**P0 Agent 指令**：从最新 main 独立新分支、唯一 Run ID 开始，完成 H27–H46；每题独立源码、fixtures、pytest、Contract Receipt、unchecked candidate、报告。允许读取并调用公开验证器，禁止修改 `harness/contracts/`、`harness/github_work_test/`、`.github/`、`.cursor/`、历史 WP18/WP19 Run 和人工审阅。提交未合并 PR，独立 reviewer 用不同输入与真正隔离执行环境复验。**不要一次启动还未 READY 的 180 题。**
+**全量合成 Exam Agent 指令**：从最新 main 独立新分支、唯一 Run ID 开始，分批完成 H27–H226；每题独立源码、fixtures、pytest、Contract Receipt、unchecked candidate、报告。允许读取并调用公开验证器，禁止修改 `harness/contracts/`、`harness/github_work_test/`、`.github/`、`.cursor/`、历史 WP18/WP19 Run 和人工审阅。提交未合并 PR，独立 reviewer 用不同输入与真正隔离执行环境复验。**全部 200 题已拥有合成约束样例，但应按 10–20 题分批执行，不得无限并发。**
 
-**验证流程**：治理侧 `python -m harness.contracts.wp19_verify --check-spec` 检查已冻结 20 题/80 例与 Reference；Agent 可在允许目录下执行 `python -m harness.contracts.wp19_verify --case H27 --run-dir harness/tests/wp19/runs/<run_id>/H27`。CI 对 WP19 task PR 检查 diff，只接受新 Run 目录内新增文件，并执行 20 题公开测试。可见用例全部通过仅代表公开技术检查，通过与人类审批严格区分。
+**验证流程**：治理侧 `python -m harness.contracts.wp19_verify --check-spec` 检查已冻结 200 题/800 例与 Reference；Agent 可在允许目录下执行 `python -m harness.contracts.wp19_verify --case H27 --run-dir harness/tests/wp19/runs/<run_id>/H27`。CI 对 WP19 task PR 检查 diff，只接受新 Run 目录内新增文件，并执行全部 200 题公开测试。可见用例全部通过仅代表公开技术检查，通过与人类审批严格区分。
 
-**P0 Verification 资格边界**：参考函数对每题至少 2 正例、2 反例逐一验证；对明确的错误实现和合法实现做对照。正式高置信度资格还需独立 evaluator 的变形/Mutation/误报基线，故本批状态为 `READY_FOR_AGENT_EXERCISE`，而不是“已通过全部独立验收”。H47–H226 不接受 `--case` 调用。
+**全量 Verification 资格边界**：每道题都有至少两个有效输入和两个非法输入，且错误实现必须在独立测试中被检测。H47–H226 是各自语义主题的合成不变量检查，并非对应真实产品模块的完整集成验收。高置信度的泛化验证仍需要独立评审的新输入、变形/Mutation/误报测试。`--case` 现在允许 H27–H226，其余编号一律拒绝。
 
 ## 2. 从候选 Exam 到真正可执行的规范
 
@@ -2533,7 +2533,7 @@ WP18 原有 H01–H26 可以继续执行。WP19 现在 200 个编号均可进行
 | P3 流程与长任务 | H177–H226 分批 | 资源、CLI、Artifact、CI、并发与状态恢复 | 先模拟，再按另行预算授权升规模 |
 | P4 持续扩大 | 已冻结 Contract 所有适用面 | 不同 seed、pairwise、变形关系和错误注入，目标数千个有效检查 | 提供测试去重、真实行为维度覆盖和失败归因 |
 
-这不是一次性要求一个 Agent 做完 200 题。治理方每批只承诺已准备好的若干题，**小数据优先**，严格预算，连续系统性失败时停止后续无意义运算，保留可复现的最小失败例。
+无需一次性执行全部 200 题。每批 10–20 题，逐批保留真实日志和失败；对真实产品集成工作仍需治理方分别冻结规范，**小数据优先**，严格预算，连续系统性失败时停止后续无意义运算，保留可复现的最小失败例。
 
 ### 每批 Definition of Done
 
@@ -2544,9 +2544,9 @@ WP18 原有 H01–H26 可以继续执行。WP19 现在 200 个编号均可进行
 - [ ] 独立评审按固定源/规范/seed/预算运行；原始日志、Git diff、Receipt、AST 可核对。
 - [ ] PASS/FAIL/BLOCKED/INCONCLUSIVE 分开，错误归因有证据。
 - [ ] 更新 Harness 后旧回归不退化，新数据能检验是否具备泛化效果。
-- [ ] 不得把规划阶段的 H27–H226 计为已经验证或已经交付的 200 个 HW。
+- [ ] 200 道合成 Exam 与产品级集成、科学结果、长时程多代理验证分别报告，不得互相冒充。
 
-**本 WP19 当前已完成：200 个命名主题，20 个 P0 公开可执行任务（80 个正反用例）、可核对的 Reference 和验证入口，以及持续冻结其余 180 题的治理路线。其余 180 题的有效独立 Oracle 和大规模长期测试尚未实现，不能冒充已完成；WP18 保持原独立验收。**
+**本 WP19 合成考试交付**：200 道题全部有固定输入输出、800 个公开正反例和可执行 Reference；其中新 180 题复用 43 种明确实现的合成不变量算子。实际 SAEBase 产品、GPU 实验、多 Agent 长期工作流仍须独立集成测试，不能将这些 CPU 合成题的通过解释为这些功能的正确性。WP18 旧记录保持不变。**
 
 
 ## 9. 已启用的 200 道合成考试及边界
