@@ -1,0 +1,117 @@
+/* Atlas Visual 2.0. Presentation layer only. Status meanings remain in app.js. */
+:root{color-scheme:dark;--ink:#f1f2f3;--muted:#a2a5aa;--line:#2a2c2f;--panel:#101113;--paper:#030405;--surface:#08090a;--focus:#f2f3f4}
+html,body{background:#030405;color:#f1f2f3}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI","Noto Sans SC",sans-serif}
+.app{max-width:none;background:#030405}
+.topbar{min-height:65px;padding:0 25px;background:#050607;border-color:#242629;gap:20px}
+.brand{font-size:17px;letter-spacing:-.45px;color:#f7f7f7}.brand-mark{font-size:19px}.brand-light{color:#999da1}
+.tabs{gap:23px}.tab{font-size:13px;padding:22px 2px 20px;color:#a5a8ac}.tab.active{color:#fff;border-bottom-color:#f5f6f7}.tab:hover{color:#fff}
+.guide-link{font-size:12px;color:#aaadb0;border-color:#484b50}
+.atlas-language-switch{margin-left:6px;background:#111215;border:1px solid #303237;box-shadow:none;border-radius:8px;padding:2px}
+.atlas-language-switch button{color:#acb0b3;font-size:12px;min-height:30px;padding:5px 10px;font-weight:560}
+.atlas-language-switch button.active{color:#f8f8f8;background:#2b2d30;box-shadow:none}
+.atlas-language-switch button:focus-visible{outline-color:#d9dce0}
+.toolbar{height:55px;padding:7px 22px;background:#070809;border-color:#25272a}
+.overview-back{background:#151719;border:1px solid #35383b;color:#d5d7d9;border-radius:7px;padding:7px 10px;font-size:12px}
+.overview-back:hover{background:#25272a}
+.crumb-current{color:#f0f1f2;font-size:13px}.crumb-link{color:#999da2;font-size:12px}.crumb-link:hover{color:#f0f1f2}
+.crumb-divider,.crumb-ellipsis{color:#62666a}
+.search-box{width:205px;height:34px;border-color:#373a3d;background:#101113;border-radius:8px;color:#a9adb0}
+.search-box:focus-within{border-color:#81868b}.search-box input{color:#f0f1f2;font-size:12px}.search-box input::placeholder{color:#81868a}
+.search-symbol{color:#a1a5a9}
+.icon-button{height:32px;min-width:32px;color:#bcc0c2;font-size:12px;font-weight:580}
+.icon-button:hover:not(:disabled){background:#222426;color:#fff}
+.toolbar-separator{background:#343639}.zoom-value{color:#bcbfc3;font-size:12px;min-width:42px}
+.child-pager{color:#afb2b5}.child-pager button{border-color:#3d4043;background:#17191b;color:#e0e1e3}
+.child-pager button:hover:not(:disabled){background:#292c2e}
+/* Subtle static stars, no custom canvas loop and no continuous animation. */
+.canvas-wrap,.canvas-wrap.in-focus{background-color:#030405;background-image:
+radial-gradient(circle at 12% 20%,#ffffff50 0 .7px,transparent 1px),
+radial-gradient(circle at 75% 65%,#ffffff45 0 .7px,transparent 1px),
+radial-gradient(circle at 42% 89%,#ffffff32 0 .7px,transparent 1px),
+radial-gradient(circle at 93% 32%,#ffffff40 0 .7px,transparent 1px),
+radial-gradient(circle at 54% 45%,#ffffff22 0 1px,transparent 1.3px),
+radial-gradient(ellipse at 50% 48%,#22262b23,transparent 65%);
+background-size:401px 331px,593px 389px,487px 463px,659px 509px,283px 251px,100% 100%;
+scrollbar-color:#44484c #0c0d0f}
+.canvas-foot{background:#070809;border-color:#25272a;color:#8f9398}.import-diff{color:#bfc3c6}
+.status-legend{background:#111214ef;border-color:#393c40;box-shadow:0 8px 24px #0008;backdrop-filter:blur(14px)}
+.legend-item{color:#c0c3c6;font-size:11px}.legend-swatch{border-radius:3px}
+.sidebar,.detail{background:#111214fa;border:1px solid #373a3e;box-shadow:0 16px 48px #000a;backdrop-filter:blur(16px)}
+.drawer-top{color:#eef0f1;border-color:#34373a}.drawer-top button{color:#c5c9cc}
+.outline-item{color:#bfc3c6}.outline-item:hover{background:#25272b}.outline-item.selected{background:#303337;color:#fff}
+.detail-title{color:#f0f2f3}.detail-description,.context-section p,.context-link{color:#c1c5c7}
+.detail-status,.context-section h4{color:#a7abaf}.context-section,.context-link{border-color:#36393d}
+.context-link:hover{color:#fff}.signature{background:#202226;color:#e0e3e5}
+.edge-main{stroke:#42454a;stroke-width:1.5}.edge-main.is-current-path{stroke:#b8bdc1;stroke-width:1.9}
+.edge-sibling{stroke:#676d72;opacity:.6}
+/* SVG card fills are intentionally uniform: status is the existing left stripe. */
+#diagram .graph-node .node-surface{fill:#111214;stroke:#44474a;stroke-width:1.1;filter:drop-shadow(0 5px 12px #0007)}
+#diagram .graph-node:hover .node-surface{fill:#191b1d;stroke:#898e92;stroke-width:1.5;filter:drop-shadow(0 9px 17px #0009)}
+#diagram .graph-node.node-selected .node-surface{fill:#1a1b1e;stroke:#c6cacd;stroke-width:1.9;filter:drop-shadow(0 10px 19px #000a)}
+#diagram .graph-node.node-expanded .node-surface{fill:#17191b}
+#diagram .graph-node[data-review="unchecked"] .node-surface{stroke:#8255b5}
+#diagram .graph-node[data-review="approved"] .node-surface{stroke:#bb4656}
+#diagram .graph-node[data-review="denied"] .node-surface{stroke:#78818b}
+#diagram .graph-node .node-title{fill:#f5f6f6;font-size:14.2px;font-weight:660}
+#diagram .graph-node.density-compact .node-title{font-size:16px}
+#diagram .graph-node .node-description{fill:#b9bdc0;font-size:12px}
+#diagram .graph-node .node-context-preview{fill:#a2a9ae;font-size:11px}
+#diagram .graph-node .child-count rect{fill:#292c2e;stroke:#484c4f;stroke-width:.7}
+#diagram .graph-node .child-count:hover rect{fill:#34383b}
+#diagram .graph-node .child-count text{fill:#e5e7e8}
+#diagram .graph-node .attribute-trigger .attr-hit{fill:#202225;stroke:#404347;stroke-width:.8}
+#diagram .graph-node .attribute-trigger:hover .attr-hit{fill:#303337;stroke:#92979b}
+#diagram .graph-node .attribute-trigger text{fill:#d4d8da}
+#diagram .graph-node .node-attributes-inner{background:#151719;color:#e0e2e4;border-color:#383c40;scrollbar-color:#484d50 #151719}
+#diagram .graph-node .node-attribute-section,#diagram .graph-node .node-parameter-row,
+#diagram .graph-node .node-method-details,#diagram .graph-node .node-field-row,
+#diagram .graph-node .node-term-row,#diagram .graph-node .attribute-diagram{border-color:#393d41}
+#diagram .graph-node .node-attribute-heading,#diagram .graph-node .node-parameter-name{color:#d1d4d6;fill:#d1d4d6}
+#diagram .graph-node .node-attribute-text,#diagram .graph-node .node-parameter-meaning,
+#diagram .graph-node .node-term-definition{color:#c8cdd0}
+#diagram .graph-node .node-attribute-note,#diagram .graph-node .node-parameter-extra,
+#diagram .graph-node .node-field-assignment{color:#a6abb0}
+#diagram .graph-node .node-attribute-code,#diagram .graph-node .node-attribute-signature,
+#diagram .graph-node .node-attribute-formula,#diagram .graph-node .node-method-summary,
+#diagram .graph-node .node-method-details,#diagram .graph-node .node-method-details[open]>.node-method-summary{background:#222528;color:#e1e3e5}
+#diagram .graph-node .node-term-link,#diagram .graph-node .node-attribute-link{color:#e0e4e6;fill:#e0e4e6;text-decoration-color:#878b8f}
+#diagram .graph-node .node-method-summary:hover{background:#313438}
+#diagram .graph-node .attribute-diagram{background:#1a1d1f}
+#diagram .graph-node .attribute-diagram text{fill:#e2e5e7}
+#diagram .graph-node .attribute-diagram .diagram-box{fill:#24272a;stroke:#6c7276}
+#diagram .graph-node .attribute-diagram .diagram-edge{stroke:#b0b5ba}
+#diagram .graph-node .attribute-diagram .diagram-sum{fill:#363a3e;stroke:#a9afb5}
+.canvas-wrap.in-focus .graph-node:not(.node-selected):not(.node-sibling-preview){opacity:.76}
+.canvas-wrap.in-focus .graph-node.node-sibling-preview{opacity:.43;filter:none}
+/* Review colors retain red/gray/purple decisions. Only control chrome is dark. */
+.atlas-review-bar{background:#111214f7;border-color:#3b3e41;box-shadow:0 12px 42px #000b}
+.atlas-review-bar .review-count{color:#f5f6f7}
+.atlas-review-bar .review-message,.review-count-chip{color:#bfc4c7}
+.atlas-review-bar .review-filter,.atlas-review-bar .review-arrow,
+.atlas-review-bar .review-nav .review-skip,.atlas-review-bar .review-approve,
+.atlas-review-bar .review-deny,.atlas-review-bar .review-unchecked,
+.atlas-review-bar .review-export{background:#25272a;color:#dce0e3;border-color:#45494c}
+.atlas-review-bar .review-approve{color:#e5a9b0}
+.atlas-review-bar .review-deny{color:#c2c7cb}
+.atlas-review-bar .review-unchecked,.atlas-review-bar .review-nav .review-skip{color:#c4aaed}
+.atlas-review-bar .review-filter-caret{color:#b8bdc1}
+.review-menu{background:#181a1c;color:#e1e4e6;border-color:#45494d;box-shadow:0 17px 45px #000b}
+.review-category-row:hover{background:#292c2f}
+.atlas-review-bar .review-category-choice{color:#d0d4d7}
+.atlas-review-bar .review-category-choice[aria-selected=true]{color:#fff}
+.review-ring-center{background:#202225;color:#eff0f1}
+.atlas-review-bar button:not(:disabled):hover{filter:brightness(1.12)}
+button:focus-visible,a:focus-visible,input:focus-visible,.graph-node:focus-visible{outline-color:#c1c8ce}
+@media(max-width:1120px){
+.topbar{padding:0 15px;gap:13px}.tabs{gap:13px}.tab{font-size:12.5px}
+.toolbar{padding:7px 12px}.search-box{width:160px}}
+@media(max-width:730px){
+.topbar{min-height:74px;padding:8px 12px 4px}.brand{font-size:15px}
+.tabs{gap:19px}.tab{font-size:12px;padding:10px 1px 9px}
+.toolbar{min-height:80px;height:auto;padding:7px 10px}
+.search-box{width:min(39vw,165px)}.icon-button{height:31px;min-width:28px;padding:3px 5px}
+.detail{left:8px;right:8px;width:auto}.status-legend{gap:8px;padding:7px 9px}
+.legend-item{font-size:10px}}
+@media(prefers-reduced-motion:reduce){
+.canvas-wrap,.graph-node,.canvas-wrap.in-focus .graph-node{animation:none;transition:none}}
