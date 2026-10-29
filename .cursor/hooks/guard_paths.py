@@ -79,7 +79,7 @@ def gate(tool, payload, active=None):
             if rel.startswith(HARNESS_TEST_SANDBOX):
                 # The acceptance ledger and test instructions are owned by
                 # governance/independent reviewers, not the task agent.
-                if rel in ("harness/tests/README.md", "harness/tests/wp18/README.md", "harness/tests/wp19/README.md") or rel.startswith(
+                if rel in ("harness/tests/README.md", "harness/tests/wp18/README.md", "harness/tests/wp19/README.md") or rel in ("harness/tests/wp18/acceptance", "harness/tests/wp19/acceptance") or rel.startswith(
                     ("harness/tests/wp18/acceptance/", "harness/tests/wp19/acceptance/")
                 ):
                     return "Harness test instructions and independent acceptance are read-only"
