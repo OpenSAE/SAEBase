@@ -1,0 +1,18 @@
+{
+  "synthetic": true,
+  "nodes": [
+    {
+      "id": "node.capture",
+      "term_ids": ["term.activation_site"],
+      "source_evidence": "fixtures/spec.md:3"
+    }
+  ],
+  "glossary": [
+    {
+      "id": "term.activation_site",
+      "related_node_ids": ["node.capture"],
+      "aliases": ["activation site"],
+      "source_evidence": "fixtures/glossary.md:2"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "synthetic": true,
+  "gpu": "",
+  "device_name": "exam-fixture",
+  "token": "sekret-token-value",
+  "secret": "sekret-secret-value",
+  "path": "/home/researcher/private/project",
+  "note": "nvidia-smi was not on PATH"
+}

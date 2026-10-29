@@ -1,0 +1,119 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-01",
+  "case_id": "H04",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "8018a2cd7dc0a8a7035e860fcaaaf17a18f9f07f",
+  "source_content_sha256": "aa1148bf91e619b5853a2ef25a2a2e31a50f7ed2ff741a4e179f818824118640",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-01.H04.implementation:EnvironmentRecordError",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H04.implementation",
+      "title": {
+        "zh": "非合成设备记录",
+        "en": "Non-synthetic device record"
+      },
+      "summary": {
+        "zh": "没有 synthetic true 的记录会被拒绝，避免把未探测机器写进概述。",
+        "en": "Records without synthetic true are rejected so an unprobed machine is not summarized."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H04/implementation.py",
+      "line": 6,
+      "signature": "class EnvironmentRecordError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H04/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H04.implementation:normalize_environment",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H04.implementation",
+      "title": {
+        "zh": "合成环境概述",
+        "en": "Synthetic environment summary"
+      },
+      "summary": {
+        "zh": "输出 unknown、脱敏字段名和“不是实测”的说明，不调用 GPU 探针。",
+        "en": "Emits unknown values, redacted field names, and an explicit not-observed note without probing a GPU."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H04/implementation.py",
+      "line": 14,
+      "signature": "def normalize_environment(record: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H04/implementation.py:14"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H04.implementation:_secret",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H04.implementation",
+      "title": {
+        "zh": "密钥与路径识别",
+        "en": "Secret and path detection"
+      },
+      "summary": {
+        "zh": "按字段名和绝对路径形状决定哪些值不能进入概述。",
+        "en": "Uses field names and absolute-path shape to decide which values stay out of the summary."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H04/implementation.py",
+      "line": 47,
+      "signature": "def _secret(key: str, value: object) -> bool",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H04/implementation.py:47"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H04.implementation:_public_value",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H04.implementation",
+      "title": {
+        "zh": "公开字段取值",
+        "en": "Public field value"
+      },
+      "summary": {
+        "zh": "空值和 nvidia-smi 字样都写成 unknown，不用它们推断没有 GPU。",
+        "en": "Turns empty values and nvidia-smi wording into unknown instead of inferring that no GPU exists."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H04/implementation.py",
+      "line": 57,
+      "signature": "def _public_value(key: str, value: object) -> object",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H04/implementation.py:57"
+      ]
+    },
+    {
+      "view": "environment",
+      "operation": "add",
+      "node_id": "environment:synthetic:wp18:20261029-wp18-01:H04",
+      "parent_id": "environment:synthetic-root",
+      "title": {
+        "zh": "合成设备概述",
+        "en": "Synthetic device summary"
+      },
+      "summary": {
+        "zh": "这份测验记录没有探测硬件；密钥和私有路径只留下字段名。",
+        "en": "This exam record probed no hardware; secrets and private paths remain as field names only."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H04/fixtures/device.json",
+      "line": 1,
+      "signature": "synthetic: true",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H04/fixtures/device.json"
+      ]
+    }
+  ],
+  "unresolved": [
+    "The environment candidate is synthetic and is not an authority environment-tree record."
+  ]
+}

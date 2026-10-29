@@ -1,0 +1,23 @@
+{
+  "synthetic": true,
+  "nodes": [
+    {
+      "id": "node.capture",
+      "term_ids": ["term.missing"],
+      "source_evidence": "not a location"
+    },
+    {
+      "id": "node.other",
+      "term_ids": ["term.activation_site"],
+      "source_evidence": "fixtures/spec.md:4"
+    }
+  ],
+  "glossary": [
+    {
+      "id": "term.activation_site",
+      "related_node_ids": ["node.absent"],
+      "aliases": ["activation site"],
+      "source_evidence": ""
+    }
+  ]
+}

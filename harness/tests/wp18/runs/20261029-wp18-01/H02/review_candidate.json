@@ -1,0 +1,98 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-01",
+  "case_id": "H02",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "8018a2cd7dc0a8a7035e860fcaaaf17a18f9f07f",
+  "source_content_sha256": "6d21262a1f66f233cdc47145191b831c9abf936f2970f4fff150d9c18c618700",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-01.H02.implementation:TreeDiffError",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H02.implementation",
+      "title": {
+        "zh": "测验树不合法",
+        "en": "Invalid exam tree"
+      },
+      "summary": {
+        "zh": "重复 ID、未知端点或规定以外的关系会使比较中止。",
+        "en": "Duplicate ids, unknown endpoints, or unknown relations abort the comparison."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H02/implementation.py",
+      "line": 6,
+      "signature": "class TreeDiffError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H02/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H02.implementation:diff_trees",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H02.implementation",
+      "title": {
+        "zh": "结构差异",
+        "en": "Structural diff"
+      },
+      "summary": {
+        "zh": "按稳定 node_id 列出新增、删除、签名变化和边变化，忽略排列顺序。",
+        "en": "Lists added, removed, signature, and edge changes by stable node id, ignoring order."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H02/implementation.py",
+      "line": 13,
+      "signature": "def diff_trees(before: dict, after: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H02/implementation.py:13"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H02.implementation:_validate",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H02.implementation",
+      "title": {
+        "zh": "树合法性",
+        "en": "Tree validity"
+      },
+      "summary": {
+        "zh": "确认每条边的两端都存在，并且关系属于 contains、calls、imports 或 inherits。",
+        "en": "Checks that every edge endpoint exists and the relation is contains, calls, imports, or inherits."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H02/implementation.py",
+      "line": 35,
+      "signature": "def _validate(tree: dict) -> tuple[dict[str, str], set[tuple[str, str, str]]]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H02/implementation.py:35"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H02.implementation:_pack",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H02.implementation",
+      "title": {
+        "zh": "边的稳定序",
+        "en": "Stable edge order"
+      },
+      "summary": {
+        "zh": "把边集合排成可重复比较的 source、type、target 记录。",
+        "en": "Sorts edge triples into comparable source, type, and target records."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H02/implementation.py",
+      "line": 70,
+      "signature": "def _pack(triples: set[tuple[str, str, str]]) -> list[dict[str, str]]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H02/implementation.py:70"
+      ]
+    }
+  ],
+  "unresolved": [
+    "The compared JSON is a fixture, not doc/code/code_tree.json."
+  ]
+}

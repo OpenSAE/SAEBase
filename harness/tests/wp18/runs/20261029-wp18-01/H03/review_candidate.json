@@ -1,0 +1,161 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-01",
+  "case_id": "H03",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "8018a2cd7dc0a8a7035e860fcaaaf17a18f9f07f",
+  "source_content_sha256": "95bf660f8e074bb552623de66dfebc45f54b838b854d9a304017cea342e15739",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:ContextLinkError",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation",
+      "title": {
+        "zh": "引用包无法检查",
+        "en": "Unreadable link bundle"
+      },
+      "summary": {
+        "zh": "数据包不是带 synthetic 标记的节点和术语列表时，检查不会开始。",
+        "en": "Checking does not start unless the bundle is a synthetic node and glossary list."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H03/implementation.py",
+      "line": 8,
+      "signature": "class ContextLinkError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H03/implementation.py:8"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:check_context_links",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation",
+      "title": {
+        "zh": "术语引用核对",
+        "en": "Term link check"
+      },
+      "summary": {
+        "zh": "报告缺失术语、反向不一致和重复定义，并把建议标成尚未执行。",
+        "en": "Reports missing terms, reverse mismatches, and duplicate definitions, and marks suggestions unapplied."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H03/implementation.py",
+      "line": 15,
+      "signature": "def check_context_links(bundle: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H03/implementation.py:15"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_nodes",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation",
+      "title": {
+        "zh": "节点引用收集",
+        "en": "Node citation collection"
+      },
+      "summary": {
+        "zh": "记录每个节点的 term_ids 和 source_evidence，重复节点 ID 另记诊断。",
+        "en": "Records each node's term ids and source evidence, and diagnoses duplicate node ids."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H03/implementation.py",
+      "line": 40,
+      "signature": "def _nodes(nodes: list, diagnostics: list[dict[str, str]]) -> tuple[set[str], dict[str, list[str]], dict[str, str]]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H03/implementation.py:40"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_terms",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation",
+      "title": {
+        "zh": "术语定义收集",
+        "en": "Glossary entry collection"
+      },
+      "summary": {
+        "zh": "保留第一次出现的术语 ID；再次出现只报重复，不覆盖原定义。",
+        "en": "Keeps the first glossary id and reports a later copy instead of overwriting it."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H03/implementation.py",
+      "line": 60,
+      "signature": "def _terms(glossary: list, diagnostics: list[dict[str, str]]) -> tuple[dict[str, dict], list[tuple[str, str]]]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H03/implementation.py:60"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_aliases",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation",
+      "title": {
+        "zh": "同义词占用",
+        "en": "Alias collision"
+      },
+      "summary": {
+        "zh": "两个术语共用别名时只报告冲突，不合并成新的权威术语。",
+        "en": "Reports a shared alias without merging the two terms into a new authority entry."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H03/implementation.py",
+      "line": 85,
+      "signature": "def _aliases(aliases: list[tuple[str, str]], diagnostics: list[dict[str, str]]) -> None",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H03/implementation.py:85"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_citations",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation",
+      "title": {
+        "zh": "双向引用",
+        "en": "Both-direction citations"
+      },
+      "summary": {
+        "zh": "节点指向术语、术语指向节点，以及证据能否定位到路径和行号，分开检查。",
+        "en": "Checks node-to-term links, term-to-node links, and whether evidence names a path and line."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H03/implementation.py",
+      "line": 99,
+      "signature": "def _citations(node_ids: set[str], node_terms: dict[str, list[str]], node_evidence: dict[str, str], terms: dict[str, dict], diagnostics: list[dict[str, str]]) -> None",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H03/implementation.py:99"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation:_suggestions",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-01.H03.implementation",
+      "title": {
+        "zh": "未执行建议",
+        "en": "Unapplied suggestions"
+      },
+      "summary": {
+        "zh": "把诊断译成给人看的动作，applied 固定为 false。",
+        "en": "Turns diagnostics into human-facing actions with applied fixed at false."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-01/H03/implementation.py",
+      "line": 140,
+      "signature": "def _suggestions(diagnostics: list[dict[str, str]]) -> list[dict[str, str]]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-01/H03/implementation.py:140"
+      ]
+    }
+  ],
+  "unresolved": [
+    "Synonym collisions are reported and are not new glossary terms."
+  ]
+}
