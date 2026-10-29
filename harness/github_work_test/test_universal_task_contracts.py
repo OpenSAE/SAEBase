@@ -267,13 +267,18 @@ def test_work_order_can_bind_prior_contracts_without_breaking_legacy(tmp_path, m
         dest.write_text(json.dumps({field: []}), encoding="utf-8")
     selected = registry.resolve(PLAN, "H04")["contract_ids"]
     order = {
-        "version": 3, "id": "WP18-H04", "status": "ready",
+        "version": 3,
+        "id": "WP18-H04",
+        "status": "ready",
         "goal": "Check synthetic environment formatting without production writes",
         "activation": {key: False for key in module.MODULES},
         "context": {
             "doc": {"required": [], "optional": []},
-            "core_ids": [], "knowledge_ids": [], "term_ids": [],
-            "harness": {"read_only": []}, "unlisted": "deny",
+            "core_ids": [],
+            "knowledge_ids": [],
+            "term_ids": [],
+            "harness": {"read_only": []},
+            "unlisted": "deny",
         },
         "contract_binding": {"plan": PLAN, "case": "H04", "contract_ids": selected},
     }
