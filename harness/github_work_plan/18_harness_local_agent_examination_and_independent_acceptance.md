@@ -64,7 +64,7 @@ harness/
 | 正式 Harness 治理代码 | `请修正式 Harness 的 [具体问题]` | 只在 sandbox 复现并提出治理 PR 需求；不能从测试指令获得写权限 | **需要可信维护者的单独治理审批** |
 | 独立评分 / 权威 Tree | `验收 WP18` | 只有外部评审者在独立环境对源码和证据执行判分；任务 Agent 只交材料 | **人类或独立评审者执行** |
 
-当前 `.cursor/hooks/guard_paths.py` 对 `harness/tests/` 给予限定的测试空间例外，**不**开放 `harness/core/`、`harness/code/`、`harness/visualization/`、`.cursor/`、`.github/` 或 `saebase/runtime/`。`guard_shell.py` 仅放行安全格式的 `python -m pytest -q harness/tests/...`，其他写命令仍走既有 Agent Flow。Work Order 规则及 Skill 的路径应对齐仓库实际位置；测试空间不要求 Work Order v3，正式任务继续使用原有审核机制。
+当前 `.cursor/hooks/guard_paths.py` 对 `harness/tests/` 给予限定的测试空间例外，**不**开放 `harness/core/`、`harness/code/`、`harness/visualization/`、`.cursor/`、`.github/` 或 `saebase/runtime/`。`guard_shell.py` 仅放行安全格式的 `python -m pytest -p no:cacheprovider -q harness/tests/...`，其他写命令仍走既有 Agent Flow。Work Order 规则及 Skill 的路径应对齐仓库实际位置；测试空间不要求 Work Order v3，正式任务继续使用原有审核机制。
 
 **安全边界说明**：Cursor Hooks 是尽力而为的工具约束，不是 OS 文件系统沙箱。若要防御不可信本地程序执行任意代码，应在低权限容器或限定文件系统权限的 worktree 进行；不可以把 Hook 检测说成不可绕过的安全保证。独立验收还应使用 `git diff` 检查根目录、保护路径及伪造判分。
 
