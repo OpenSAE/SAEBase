@@ -4,6 +4,7 @@ Governance-owned: task agents must not modify these functions to make an exam
 pass. They are usable for independent negative tests, never a replacement for
 human approval or a full security sandbox.
 """
+
 from __future__ import annotations
 
 import re
@@ -42,7 +43,9 @@ def reference_location(text: str, root: Path, *, resolve: bool = True) -> dict[s
     relative, line_text = match.groups()
     path = PurePosixPath(relative)
     if (
-        path.is_absolute() or "\\" in relative or relative.startswith("/")
+        path.is_absolute()
+        or "\\" in relative
+        or relative.startswith("/")
         or any(part in ("", ".", "..") for part in relative.split("/"))
         or path.as_posix() != relative
     ):
@@ -95,8 +98,7 @@ def redact_structure(value: Any, *, max_depth: int = 24) -> tuple[Any, list[str]
                     result[key] = clean(current[key], location, depth + 1)
             return result
         if isinstance(current, (list, tuple)):
-            return [clean(item, f"{key_path}[{i}]", depth + 1)
-                    for i, item in enumerate(current)]
+            return [clean(item, f"{key_path}[{i}]", depth + 1) for i, item in enumerate(current)]
         if isinstance(current, str):
             if _PRIVATE_VALUE.search(current) or current.startswith(("/", "~")):
                 redactions.append(key_path)
@@ -114,8 +116,10 @@ def validated_dfs(graph: dict, *, scope: str = "all", target: str | None = None)
     if not isinstance(graph, dict) or not isinstance(graph.get("nodes"), list):
         raise InvariantError("Graph requires nodes list")
     rows = graph["nodes"]
-    if any(not isinstance(row, dict) or not isinstance(row.get("id"), str)
-           or not row["id"] for row in rows):
+    if any(
+        not isinstance(row, dict) or not isinstance(row.get("id"), str) or not row["id"]
+        for row in rows
+    ):
         raise InvariantError("Invalid graph node")
     nodes = {row["id"]: row for row in rows}
     if len(nodes) != len(rows):
@@ -139,9 +143,7 @@ def validated_dfs(graph: dict, *, scope: str = "all", target: str | None = None)
     if scope in ("node", "parent") and target not in nodes:
         raise InvariantError("Review target does not exist")
     if scope == "tree":
-        if not isinstance(target, str) or not any(
-            row.get("tree_id") == target for row in rows
-        ):
+        if not isinstance(target, str) or not any(row.get("tree_id") == target for row in rows):
             raise InvariantError("Unknown tree")
         selected = {id_ for id_, row in nodes.items() if row.get("tree_id") == target}
     elif scope in ("parent", "node"):
@@ -170,8 +172,7 @@ def validated_dfs(graph: dict, *, scope: str = "all", target: str | None = None)
     if scope in ("node", "parent"):
         visit(target)
     else:
-        roots = [id_ for id_ in selected
-                 if nodes[id_].get("parent_id") not in selected]
+        roots = [id_ for id_ in selected if nodes[id_].get("parent_id") not in selected]
         roots.sort(key=lambda id_: (nodes[id_].get("order", 0), id_))
         for root in roots:
             visit(root)
@@ -200,11 +201,14 @@ def localization_defects(record: dict, *, required=("zh", "en")) -> list[str]:
         title = title_field.get(lang, "") if isinstance(title_field, dict) else ""
         summary = summary_field.get(lang, "") if isinstance(summary_field, dict) else ""
         if isinstance(title, str) and isinstance(summary, str) and title and summary:
+
             def norm(value: str) -> str:
                 return "".join(c.casefold() for c in value if c.isalnum())
 
             if norm(title) == norm(summary):
                 defects.append(f"summary.{lang}:tautology")
-    if "localized_signature" in record and record.get("localized_signature") != record.get("signature"):
+    if "localized_signature" in record and record.get("localized_signature") != record.get(
+        "signature"
+    ):
         defects.append("signature:changed")
     return defects
