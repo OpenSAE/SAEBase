@@ -88,6 +88,240 @@ Harness 的通用合同**预先定义于** `harness/contracts/catalog.json`。�
         "CT-AST",
         "CT-INTERFACE"
       ]
+    },
+    "H07": {
+      "tags": [
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ]
+    },
+    "H08": {
+      "tags": [
+        "evidence",
+        "interface"
+      ],
+      "contracts": [
+        "CT-EVIDENCE",
+        "CT-INTERFACE"
+      ]
+    },
+    "H09": {
+      "tags": [
+        "privacy",
+        "interface"
+      ],
+      "contracts": [
+        "CT-PRIVACY",
+        "CT-INTERFACE"
+      ]
+    },
+    "H10": {
+      "tags": [
+        "tree",
+        "determinism",
+        "interface"
+      ],
+      "contracts": [
+        "CT-STRUCT",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ]
+    },
+    "H11": {
+      "tags": [
+        "context",
+        "tree",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONTEXT",
+        "CT-STRUCT",
+        "CT-INTERFACE"
+      ]
+    },
+    "H12": {
+      "tags": [
+        "code",
+        "determinism",
+        "interface"
+      ],
+      "contracts": [
+        "CT-AST",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ]
+    },
+    "H13": {
+      "tags": [
+        "localization",
+        "interface"
+      ],
+      "contracts": [
+        "CT-LOCALE",
+        "CT-INTERFACE"
+      ]
+    },
+    "H14": {
+      "tags": [
+        "review",
+        "tree",
+        "interface"
+      ],
+      "contracts": [
+        "CT-REVIEW",
+        "CT-STRUCT",
+        "CT-INTERFACE"
+      ]
+    },
+    "H15": {
+      "tags": [
+        "resource",
+        "environment",
+        "interface"
+      ],
+      "contracts": [
+        "CT-RESOURCE",
+        "CT-ENV",
+        "CT-INTERFACE"
+      ]
+    },
+    "H16": {
+      "tags": [
+        "data",
+        "evidence",
+        "determinism",
+        "interface"
+      ],
+      "contracts": [
+        "CT-DATA",
+        "CT-EVIDENCE",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ]
+    },
+    "H17": {
+      "tags": [
+        "data",
+        "determinism",
+        "interface"
+      ],
+      "contracts": [
+        "CT-DATA",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ]
+    },
+    "H18": {
+      "tags": [
+        "config",
+        "data",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONFIG",
+        "CT-DATA",
+        "CT-INTERFACE"
+      ]
+    },
+    "H19": {
+      "tags": [
+        "data",
+        "interface"
+      ],
+      "contracts": [
+        "CT-DATA",
+        "CT-INTERFACE"
+      ]
+    },
+    "H20": {
+      "tags": [
+        "config",
+        "determinism",
+        "interface"
+      ],
+      "contracts": [
+        "CT-CONFIG",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ]
+    },
+    "H21": {
+      "tags": [
+        "namespace",
+        "interface"
+      ],
+      "contracts": [
+        "CT-NAMESPACE",
+        "CT-INTERFACE"
+      ]
+    },
+    "H22": {
+      "tags": [
+        "release",
+        "tree",
+        "determinism",
+        "interface"
+      ],
+      "contracts": [
+        "CT-RELEASE",
+        "CT-STRUCT",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ]
+    },
+    "H23": {
+      "tags": [
+        "release",
+        "review",
+        "interface"
+      ],
+      "contracts": [
+        "CT-RELEASE",
+        "CT-REVIEW",
+        "CT-INTERFACE"
+      ]
+    },
+    "H24": {
+      "tags": [
+        "recovery",
+        "config",
+        "interface"
+      ],
+      "contracts": [
+        "CT-RECOVERY",
+        "CT-CONFIG",
+        "CT-INTERFACE"
+      ]
+    },
+    "H25": {
+      "tags": [
+        "recovery",
+        "data",
+        "determinism",
+        "interface"
+      ],
+      "contracts": [
+        "CT-RECOVERY",
+        "CT-DATA",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ]
+    },
+    "H26": {
+      "tags": [
+        "tree",
+        "review",
+        "interface"
+      ],
+      "contracts": [
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-INTERFACE"
+      ]
     }
   }
 }

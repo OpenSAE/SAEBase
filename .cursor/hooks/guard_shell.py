@@ -117,9 +117,9 @@ def gate(command, plan_id=None):
                 return "Malformed WP18 verifier command"
             if args[3:] == ["--check-spec"]:
                 return None
-            if len(args) == 8 and args[3] == "--case" and args[5] == "--run-dir":
+            if len(args) == 7 and args[3] == "--case" and args[5] == "--run-dir":
                 case = args[4]
-                target = args[7]
+                target = args[6]
                 if re.fullmatch(r"H(?:0[7-9]|1[0-9]|2[0-6])", case) and re.fullmatch(
                     r"harness/tests/wp18/runs/[A-Za-z0-9][A-Za-z0-9_-]{3,63}/" + case,
                     target,
