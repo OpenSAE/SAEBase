@@ -45,11 +45,25 @@ def gate(command, plan_id=None):
     if not isinstance(command, str) or not command.strip():
         return "Unknown shell command"
     command = command.strip()
-    # Agents never create directories via unreviewed shell commands. A scoped
-    # editor may create files under harness/tests/; trusted setup tooling owns
-    # root directories and production experiment output paths.
+    # Allow only mkdir -p inside the isolated Harness test directory.
+    # Ordinary new project-root directories and production output paths
+    # remain blocked, even when an Agent Flow lists a shell command.
     if re.match(r"(?i)^(?:mkdir\\b|install\\s+-d\\b|git\\s+clone\\b)", command):
-        return "Shell directory creation is not delegated to task agents"
+        try:
+            args = shlex.split(command)
+            if len(args) == 3 and args[:2] == ["mkdir", "-p"]:
+                candidate = args[2]
+                if not candidate.startswith("harness/tests/") or ".." in candidate.split("/"):
+                    return "New project-root directories are forbidden"
+                resolved = (ROOT / candidate).resolve()
+                if not resolved.is_relative_to((ROOT / "harness/tests").resolve()):
+                    return "Directory creation escapes the Harness test sandbox"
+                if candidate.startswith("harness/tests/wp18/acceptance/"):
+                    return "Independent acceptance is read-only"
+                return None
+        except (ValueError, OSError):
+            pass
+        return "Shell directory creation is only allowed inside harness/tests/"
     if DANGEROUS.search(command):
         return "High-risk shell operation is not permitted to task agents"
     # Do not grant arbitrary shell execution just because a command mentions
