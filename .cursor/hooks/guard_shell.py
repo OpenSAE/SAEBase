@@ -20,11 +20,12 @@ DANGEROUS = re.compile(
     r"|\b(?:sudo|nohup|disown)\b|\brm\s+-[a-z]*r[a-z]*f\b"
     r"|\b(?:curl|wget)\b.{0,120}\|\s*(?:sh|bash))"
 )
-# A normal request such as "测 Harness H01" may run pytest inside the
+# A normal request such as "测 Harness H01" may run pytest with root cache
+# creation disabled inside the
 # dedicated Harness test sandbox without formal Agent Flow authorization.
 # Other command families still require exact signed-off commands.
 HARNESS_PYTEST = re.compile(
-    r"^(?:python|python3) -m pytest (?:-q )?harness/tests/"
+    r"^(?:python|python3) -m pytest -p no:cacheprovider (?:-q )?harness/tests/"
     r"[A-Za-z0-9_./:-]+(?: -q)?$"
 )
 SAFE_COMMANDS = [
