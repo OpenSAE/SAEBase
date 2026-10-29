@@ -1,3 +1,7 @@
+## Work Plan 19 · 200 个候选考试与验证器可信性
+
+[**WP19 — Harness 大规模考试与 Verification 可信性计划**](19_harness_large_scale_examination_and_verifier_assurance.md)：提出 H27–H226 共 200 道下一阶段候选考试，并明确冻结 Case Spec、可信 Reference、Mutation / Metamorphic / Differential / Stateful / Compositional / Multi-Agent 测试及长任务恢复。**仅为设计规划，尚未实现 200 道评分器，也不替代正在运行的 WP18。**
+
 ## New Work Plans · 预先声明 Contract
 
 新建 Work Plan 时，先从 [通用 Contract Registry](../contracts/README.md) 选择现有 `CT-` ID，在 Work Plan 的 `harness-contracts-json` 声明中逐 CASE 绑定 tags 和合同。Always-on 自动继承，不能取消；未知新任务先从固定 tags 选择，并把选择结果写入测试 Run 收据。**不允许为了通过一次考试临时重定义 Contract 或让本地 Agent 修改治理目录。** 历史 Work Plan 未迁移声明的只能算 legacy，不能声称已经完成 Contract 验证。
