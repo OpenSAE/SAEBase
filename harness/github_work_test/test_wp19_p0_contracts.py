@@ -104,3 +104,20 @@ def test_wp19_independent_acceptance_is_not_agent_writable():
         )
         is not None
     )
+
+
+def test_every_ready_case_rejects_a_constant_wrong_implementation(tmp_path, monkeypatch):
+    monkeypatch.setattr(wp19_verify, "RUNS", tmp_path)
+    ready = [row for row in wp19_verify.load_spec()["cases"] if row["status"] == "READY"]
+    assert len(ready) == 20
+    for row in ready:
+        run = tmp_path / "mutant-run" / row["id"]
+        run.mkdir(parents=True)
+        (run / "implementation.py").write_text(
+            "def solve(payload):\n"
+            "    return {'mutant': True}\n",
+            encoding="utf-8",
+        )
+        verdict = wp19_verify.verify_case(row["id"], run)
+        assert verdict["failed"] >= 2, row["id"]
+        assert verdict["human_approval"] is False
