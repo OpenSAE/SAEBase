@@ -20,8 +20,12 @@ def x01(p, root):
     def parse(src):
         if not isinstance(src, str):
             raise ValueError("source")
+        try:
+            tree = ast.parse(src)
+        except SyntaxError as exc:
+            raise ValueError("Invalid Python source") from exc
         return {n.name: {"signature": ast.unparse(n.args), "line": n.lineno}
-                for n in ast.parse(src).body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
+                for n in tree.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
     before, after = parse(p["before"]), parse(p["after"])
     return {"before": before, "after": after,
             "diff": {"added": sorted(after.keys() - before.keys()),
