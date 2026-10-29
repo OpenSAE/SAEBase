@@ -129,6 +129,33 @@ def _candidate_source(candidate):
     return source
 
 
+def _matching_x18(observed, expected, git_evidence):
+    """Validate semantic Git DAG instead of requiring identical commit timestamps."""
+    if not isinstance(observed, dict) or not isinstance(git_evidence, dict):
+        return False
+    sha_keys = {"base_sha", "head_a_sha", "head_b_sha", "merge_sha", "merge_parents"}
+    if {key: value for key, value in observed.items() if key not in sha_keys} != {
+        key: value for key, value in expected.items() if key not in sha_keys
+    }:
+        return False
+    for name in ("base_sha", "head_a_sha", "head_b_sha", "merge_sha"):
+        sha = observed.get(name)
+        if not isinstance(sha, str) or re.fullmatch(r"[0-9a-f]{40}", sha) is None:
+            return False
+        if sha != git_evidence.get(name):
+            return False
+    if len({observed[name] for name in ("base_sha", "head_a_sha", "head_b_sha", "merge_sha")}) != 4:
+        return False
+    parents = observed.get("merge_parents")
+    return (
+        isinstance(parents, list)
+        and set(parents) == {observed["head_a_sha"], observed["head_b_sha"]}
+        and parents == git_evidence.get("merge_parents")
+        and observed["commits"] == git_evidence.get("commits")
+        and git_evidence.get("clean") is True
+    )
+
+
 def verify_case(case, candidate):
     if case not in READY:
         raise ValueError("Unqualified case")
@@ -175,7 +202,11 @@ def verify_case(case, candidate):
                     and (
                         received.get("ok") is expected["ok"]
                         and received.get("kind") == expected["kind"]
-                        and observed == expected["output"]
+                        and (
+                            _matching_x18(observed, expected["output"], received.get("git_evidence"))
+                            if case == "X18" and expected["ok"]
+                            else observed == expected["output"]
+                        )
                         and (
                             received.get("files") == expected["files"]
                             if expected["ok"]

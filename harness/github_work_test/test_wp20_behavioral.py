@@ -200,3 +200,27 @@ def test_empty_exam_scan_does_not_report_pass(tmp_path, monkeypatch, capsys):
     monkeypatch.setattr(sys, "argv", ["wp20_verify", "--scan"])
     assert grader.main() == 1
     assert json.loads(capsys.readouterr().out)["status"] == "BLOCKED"
+
+
+def test_git_verdict_uses_actual_branch_ancestry_not_identical_commit_timestamps():
+    from copy import deepcopy
+
+    sample = grader._reference("X18", grader.load_scenarios()["cases"]["X18"][0]["input"])
+    assert sample["ok"]
+    expected = sample["output"]
+    observed = deepcopy(expected)
+    changes = {
+        key: f"{i:040x}" for i, key in enumerate(
+            ("base_sha", "head_a_sha", "head_b_sha", "merge_sha"), start=1
+        )
+    }
+    observed.update(changes)
+    observed["merge_parents"] = [changes["head_b_sha"], changes["head_a_sha"]]
+    evidence = dict(changes)
+    evidence["merge_parents"] = observed["merge_parents"]
+    evidence["commits"] = observed["commits"]
+    evidence["clean"] = True
+    assert grader._matching_x18(observed, expected, evidence)
+    bad = deepcopy(evidence)
+    bad["merge_parents"] = [changes["head_a_sha"]]
+    assert not grader._matching_x18(observed, expected, bad)
