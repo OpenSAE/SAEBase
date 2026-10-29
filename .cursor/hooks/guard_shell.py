@@ -80,6 +80,11 @@ def gate(command, plan_id=None):
                 return "Malformed Contract Registry command"
             if args[3:] == ["list"]:
                 return None
+            if len(args) == 6 and args[3:5] == ["select", "--tags"]:
+                tags = args[5]
+                if re.fullmatch(r"[a-z]+(?:,[a-z]+)*", tags):
+                    return None
+                return "Unrecognized Contract task tag expression"
             if len(args) not in (6, 8) or args[4] != "--plan":
                 return "Contract Registry command must name exact plan and optional case"
             if args[3] not in ("check", "resolve"):
