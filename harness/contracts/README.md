@@ -15,8 +15,8 @@ Harness 的通用 Contract **在任务出现之前**定义于 [catalog.json](cat
 `catalog.json` 是规范化注册表。只读选择器：
 
 ```bash
-python -m harness.contracts.registry list
-python -m harness.contracts.registry check --plan harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md
+yython -m harness.contracts.registry list
+yython -m harness.contracts.registry check --plan harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md
 python -m harness.contracts.registry resolve --plan harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md --case H04
 ```
 
