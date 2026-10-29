@@ -17,8 +17,12 @@ def test_known_bad_candidate_cannot_fake_a_correct_verdict(tmp_path, monkeypatch
     source = run / "implementation.py"
     source.write_text(
         "def solve(payload):\n"
-        "    from harness.contracts.wp19_reference import solve as reference\n"
-        "    return reference('H27', payload)\n",
+        "    from harness.contracts import registry\\n"
+        "    selected = payload['selected']\\n"
+        "    known = {r['id'] for r in registry.catalog()['contracts']}\\n"
+        "    if not isinstance(selected, list) or any(not isinstance(x, str) or x not in known for x in selected) or len(set(selected)) != len(selected):\\n"
+        "        raise ValueError('bad input')\\n"
+        "    return {'contracts': sorted(set(registry.catalog()['required_always']) | set(selected))}\\n",
         encoding="utf-8",
     )
     clean = wp19_verify.verify_case("H27", run)
@@ -51,3 +55,21 @@ def test_reference_consistent_with_frozen_positive_and_negative_cases():
                 assert row.get("reject") is True
             else:
                 assert actual == row["expected"]
+
+
+def test_candidate_direct_reference_import_is_rejected(tmp_path, monkeypatch):
+    run = tmp_path / "fresh-run" / "H27"
+    run.mkdir(parents=True)
+    monkeypatch.setattr(wp19_verify, "RUNS", tmp_path)
+    (run / "implementation.py").write_text(
+        "from harness.contracts.wp19_reference import solve as oracle\\n"
+        "def solve(payload):\\n"
+        "    return oracle('H27', payload)\\n",
+        encoding="utf-8",
+    )
+    try:
+        wp19_verify.verify_case("H27", run)
+    except ValueError as exc:
+        assert "reference oracle" in str(exc)
+    else:
+        raise AssertionError("Official reference was callable as candidate solution")

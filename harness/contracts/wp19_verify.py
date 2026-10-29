@@ -8,6 +8,7 @@ Candidate execution is untrusted; use a restricted disposable reviewer host.
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import os
 import re
@@ -91,6 +92,23 @@ def verify_case(case_id: str, path: Path) -> dict:
     source = path / "implementation.py"
     if not source.is_file() or source.is_symlink():
         raise ValueError("Missing or symlinked implementation.py")
+    # A task solution cannot delegate its implementation to the official
+    # reference oracle. Public reference may be read but not re-exported.
+    try:
+        nodes = ast.walk(ast.parse(source.read_text(encoding="utf-8")))
+        for node in nodes:
+            if isinstance(node, ast.ImportFrom) and node.module and node.module.startswith(
+                "harness.contracts.wp19_reference"
+            ):
+                raise ValueError("Candidate imports governance reference oracle")
+            if isinstance(node, ast.Import) and any(
+                alias.name.startswith("harness.contracts.wp19_reference")
+                for alias in node.names
+            ):
+                raise ValueError("Candidate imports governance reference oracle")
+    except (UnicodeError, SyntaxError) as exc:
+        raise ValueError("Candidate source is invalid") from exc
+
     case = next(c for c in load_spec()["cases"] if c["id"] == case_id)
     outcomes = []
     for trial in case["checks"]:
