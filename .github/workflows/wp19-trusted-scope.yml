@@ -1,0 +1,33 @@
+name: WP19 Trusted Candidate Scope
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  trusted-scope:
+    if: ${{ startsWith(github.event.pull_request.head.ref, 'wp19/') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out trusted base, never candidate code
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Inspect candidate diff as data only
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "refs/pull/${PR_NUMBER}/head"
+          observed="$(git rev-parse FETCH_HEAD)"
+          test "$observed" = "$HEAD_SHA"
+          python -m harness.contracts.wp19_verify --base "$BASE_SHA" --head-sha "$HEAD_SHA"

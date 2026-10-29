@@ -72,3 +72,7 @@ python -m harness.contracts.registry resolve --plan harness/github_work_plan/18_
 - `harness/github_work_test/test_wp18_h07_h26_contracts.py`：独立回归，确保 20 个任务、全部合同绑定和验证器存在且有效。
 
 Agent 可 **读取** 上述全部资料。只可新增自己的 `harness/tests/wp18/runs/<run_id>/<case>/`，不能编辑任何规范、验证或治理源码。独立 CI 从实际 PR diff 检查修改范围，并实际执行新 HW 的可见验证；另由独立评审运行不同输入与人工审阅。失败先归因，不给任务 Agent 放宽验证标准的权限。
+
+## Independent output compliance (WP18 round-three follow-up)
+
+`harness/contracts/compliance.py` now validates **externally collected outputs**, not just Agent claims: canonical relative paths across OSes, non-finite numbers in derived JSON results, privacy over nested records/values, and bilingual metadata via existing `invariants`. The independent `acceptance.py` calls this common checker in addition to the existing receipt, identity and behavioral-test evidence. Older frozen test scores and submitted Agent branches remain unchanged; reviewer PR #89 retains the failure evidence. This check cannot replace executing independent negative tests or OS sandboxing.

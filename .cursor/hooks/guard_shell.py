@@ -58,9 +58,10 @@ def gate(command, plan_id=None):
                 resolved = (ROOT / candidate).resolve()
                 if not resolved.is_relative_to((ROOT / "harness/tests").resolve()):
                     return "Directory creation escapes the Harness test sandbox"
-                acceptance = (ROOT / "harness/tests/wp18/acceptance").resolve()
-                if resolved == acceptance or resolved.is_relative_to(acceptance):
-                    return "Independent acceptance is read-only"
+                for protected in ("wp18", "wp19"):
+                    acceptance = (ROOT / "harness/tests" / protected / "acceptance").resolve()
+                    if resolved == acceptance or resolved.is_relative_to(acceptance):
+                        return "Independent acceptance is read-only"
                 return None
         except (ValueError, OSError):
             pass
@@ -130,6 +131,30 @@ def gate(command, plan_id=None):
         except (IndexError, ValueError, OSError):
             pass
         return "Only exact read-only WP18 case verification is permitted"
+    if re.match(r"^(?:python|python3) -m harness\.contracts\.wp19_verify(?: |$)", command):
+        try:
+            args = shlex.split(command)
+            if args[:3] not in (
+                ["python", "-m", "harness.contracts.wp19_verify"],
+                ["python3", "-m", "harness.contracts.wp19_verify"],
+            ):
+                return "Malformed WP19 verifier command"
+            if args[3:] == ["--check-spec"]:
+                return None
+            if len(args) == 7 and args[3] == "--case" and args[5] == "--run-dir":
+                case = args[4]
+                target = args[6]
+                if re.fullmatch(r"H(?:2[7-9]|3[0-9]|4[0-6])", case) and re.fullmatch(
+                    r"harness/tests/wp19/runs/[A-Za-z0-9][A-Za-z0-9_-]{3,63}/" + case,
+                    target,
+                ):
+                    resolved = (ROOT / target).resolve()
+                    if resolved.is_relative_to((ROOT / "harness/tests/wp19/runs").resolve()):
+                        return None
+        except (ValueError, OSError, IndexError):
+            pass
+        return "Only READY WP19 case checks are allowed"
+
     # Do not grant arbitrary shell execution just because a command mentions
     # harness/tests. Only the single-purpose, path-checked pytest form is free.
     if HARNESS_PYTEST.fullmatch(command):
@@ -138,7 +163,7 @@ def gate(command, plan_id=None):
             target = next(x for x in tokens if x.startswith("harness/tests/"))
             if ".." in target.split("/") or target.startswith("harness/tests//"):
                 return "Test path traversal forbidden"
-            if target.startswith("harness/tests/wp18/acceptance/"):
+            if target.startswith(("harness/tests/wp18/acceptance/", "harness/tests/wp19/acceptance/")):
                 return "Independent acceptance tests are not runnable by the task agent"
         except (ValueError, StopIteration):
             return "Malformed Harness test command"

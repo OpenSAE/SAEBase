@@ -40,3 +40,7 @@
 Agent 负责实现、执行可见自测、报告事实，不能宣布最终验收 PASS，也不能改 `acceptance/` 或由自己批准节点。独立验收者重新生成真实 Tree、运行隐藏反例、逐项审批并签署最终结论。Hooks 只是工具级保护，不是 OS 级沙箱；需要绝对防护时，使用独立容器或低权限工作树加只读治理层。
 
 新版 WP18 使用已有 Contract Registry、`harness/contracts/selection.py` 和治理方单独运行的 `harness/contracts/acceptance.py`。Agent 仅声明已选合同与结构化任务 IO；独立验收方从实际输入输出重新确认信号，运行隐藏正反例，提交 `acceptance/.../evaluation.json` 并执行 Gate。考试不得修改独立验收器或复用旧 Run。
+
+## WP19 考试授权
+
+WP19 目前仅 H27–H46 具有冻结的 CPU 行为规范、80 个公开用例及治理层评分器。考试 Agent 可在 `harness/tests/wp19/runs/<run_id>/Hxx/` 下新建实现、自测和报告，不能改 `harness/tests/wp19/README.md`、`acceptance/`、`harness/contracts/` 或其他治理文件。H47–H226 暂不开放，不得以规划文字冒充可执行验证。运行 untrusted 候选代码需要低权限 reviewer 环境。
