@@ -1,0 +1,79 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-03",
+  "case_id": "H14",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "071cfcc4556173333de8e8da0ebdfa08da8b28f7",
+  "source_content_sha256": "e4fec83cc049cac892cec17d8878830e4636142264af137df13a8accb21140b1",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-03.H14.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H14.implementation",
+      "title": {
+        "zh": "草稿拒绝",
+        "en": "Draft rejection"
+      },
+      "summary": {
+        "zh": "过期修订、未知节点或正式批准请求都会拒绝。",
+        "en": "Stale revisions, unknown nodes, and formal-approval requests are rejected."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H14/implementation.py",
+      "line": 8,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H14/implementation.py:8"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H14.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H14.implementation",
+      "title": {
+        "zh": "局部草稿",
+        "en": "Local draft"
+      },
+      "summary": {
+        "zh": "只改事件点名的节点，修订号加一，approved 保持 false。",
+        "en": "Changes only the named node, increments revision, and keeps approved false."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H14/implementation.py",
+      "line": 12,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H14/implementation.py:12"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H14.implementation:_event",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H14.implementation",
+      "title": {
+        "zh": "草稿事件",
+        "en": "Draft event"
+      },
+      "summary": {
+        "zh": "只接受 unchecked、approve、deny 三种局部决定。",
+        "en": "Accepts only the local decisions unchecked, approve, and deny."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H14/implementation.py",
+      "line": 35,
+      "signature": "def _event(event: object) -> tuple[str, str, int]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H14/implementation.py:35"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; harness/code/build.py was not run to produce Observed",
+    "independent acceptance was not run",
+    "nodes remain unchecked"
+  ]
+}

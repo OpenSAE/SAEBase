@@ -1,0 +1,89 @@
+{
+  "added_ids": [
+    "code:class:harness.tests.wp18.runs.20261029-wp18-03.H09.implementation:InputError",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.implementation:_redact",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.implementation:solve",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation:_frozen",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation:_load",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation:test_candidate_matches_implementation_ast",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation:test_extra_fixture_keeps_input",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation:test_frozen_check",
+    "code:module:harness.tests.wp18.runs.20261029-wp18-03.H09.implementation",
+    "code:module:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation"
+  ],
+  "removed_ids": [],
+  "changed": [],
+  "edges_added": [
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.implementation:solve",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.implementation:_redact",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation:test_extra_fixture_keeps_input",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation:test_frozen_check",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation:_frozen",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation:test_frozen_check",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:group:harness",
+      "target": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H09.implementation",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:harness",
+      "target": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H09.implementation",
+      "target": "code:class:harness.tests.wp18.runs.20261029-wp18-03.H09.implementation:InputError",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H09.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.implementation:_redact",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H09.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.implementation:solve",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation:_frozen",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation:_load",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation:test_candidate_matches_implementation_ast",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation:test_extra_fixture_keeps_input",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H09.test_implementation:test_frozen_check",
+      "type": "contains"
+    }
+  ],
+  "edges_removed": []
+}

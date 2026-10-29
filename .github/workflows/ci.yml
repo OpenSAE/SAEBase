@@ -87,6 +87,8 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: python -m harness.contracts.wp18_verify --base "$BASE_SHA" --scan
+      - name: Independent WP18 H07-H26 adversarial behavior (reviewer-only)
+        run: python -m pytest -q harness/github_work_test/test_wp18_h07_h26_independent.py
       - name: Upload full Atlas duplicate inventory
         uses: actions/upload-artifact@v4
         with:

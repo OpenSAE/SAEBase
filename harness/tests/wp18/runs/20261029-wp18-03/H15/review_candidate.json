@@ -1,0 +1,79 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-03",
+  "case_id": "H15",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "071cfcc4556173333de8e8da0ebdfa08da8b28f7",
+  "source_content_sha256": "ac5399acaca2f94d551409a40edf16e365a77c6cfe1700dcf796ecffefb294a6",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-03.H15.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H15.implementation",
+      "title": {
+        "zh": "预算拒绝",
+        "en": "Budget rejection"
+      },
+      "summary": {
+        "zh": "超预算、负值或未经授权的 GPU 请求被拒绝，且不探测本机。",
+        "en": "Over-budget, negative, or unauthorized GPU requests are rejected. The machine is not probed."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H15/implementation.py",
+      "line": 6,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H15/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H15.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H15.implementation",
+      "title": {
+        "zh": "预算差额",
+        "en": "Budget remainder"
+      },
+      "summary": {
+        "zh": "在请求不超过上限时返回剩余 samples 和 gpu_minutes。",
+        "en": "Returns the remaining samples and gpu_minutes when the request fits the limit."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H15/implementation.py",
+      "line": 10,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H15/implementation.py:10"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H15.implementation:_budget",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H15.implementation",
+      "title": {
+        "zh": "非负整数",
+        "en": "Nonnegative integers"
+      },
+      "summary": {
+        "zh": "samples 和 gpu_minutes 必须是非负整数，布尔值不算整数。",
+        "en": "samples and gpu_minutes must be nonnegative integers. A boolean is not an integer here."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H15/implementation.py",
+      "line": 31,
+      "signature": "def _budget(value: object) -> dict[str, int]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H15/implementation.py:31"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; harness/code/build.py was not run to produce Observed",
+    "independent acceptance was not run",
+    "nodes remain unchecked"
+  ]
+}

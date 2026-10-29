@@ -1,0 +1,63 @@
+{
+  "positive": [
+    {
+      "input": {
+        "claims": [
+          {
+            "id": "c",
+            "ref": "notes/c.py:4",
+            "observed": false
+          },
+          {
+            "id": "a",
+            "ref": "notes/a.py:2",
+            "observed": true
+          }
+        ]
+      },
+      "expected": {
+        "resolved": [
+          "a"
+        ],
+        "unresolved": [
+          "c"
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "claims": [
+          {
+            "id": "a",
+            "ref": "notes/a.py:0",
+            "observed": true
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "claims": [
+          {
+            "id": "a",
+            "ref": "/notes/a.py:1",
+            "observed": true
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "claims": [
+          {
+            "id": "a",
+            "ref": "notes/a.py:1",
+            "observed": 1
+          }
+        ]
+      }
+    }
+  ]
+}

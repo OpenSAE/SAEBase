@@ -1,0 +1,79 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-03",
+  "case_id": "H21",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "071cfcc4556173333de8e8da0ebdfa08da8b28f7",
+  "source_content_sha256": "5d8aa93dd277f718c77ab85564d0f47677d2b66720399af799b8d5c9bf5e4f42",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-03.H21.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H21.implementation",
+      "title": {
+        "zh": "模块名拒绝",
+        "en": "Module-name rejection"
+      },
+      "summary": {
+        "zh": "退役根目录、中间领域层或重复模块名被拒绝。",
+        "en": "Retired roots, intermediate domain layers, and duplicate module names are rejected."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H21/implementation.py",
+      "line": 11,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H21/implementation.py:11"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H21.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H21.implementation",
+      "title": {
+        "zh": "模块名排序",
+        "en": "Module-name order"
+      },
+      "summary": {
+        "zh": "检查后按字典序返回模块名。",
+        "en": "Validates module names and returns them in dictionary order."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H21/implementation.py",
+      "line": 15,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H21/implementation.py:15"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H21.implementation:_module_name",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H21.implementation",
+      "title": {
+        "zh": "两段模块名",
+        "en": "Two-segment module name"
+      },
+      "summary": {
+        "zh": "只允许 datasets、models、tasks、saebase、conf、harness 加上一个模块段。",
+        "en": "Allows only datasets, models, tasks, saebase, conf, or harness plus one module segment."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H21/implementation.py",
+      "line": 33,
+      "signature": "def _module_name(value: object) -> str",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H21/implementation.py:33"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; harness/code/build.py was not run to produce Observed",
+    "independent acceptance was not run",
+    "nodes remain unchecked"
+  ]
+}
