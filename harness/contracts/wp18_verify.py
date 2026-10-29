@@ -186,10 +186,23 @@ def scan() -> list[dict]:
     for run in sorted(RUNS.iterdir()):
         if not run.is_dir() or not RUN_ID.fullmatch(run.name):
             continue
-        for case in sorted(REQUIRED):
-            target = run / case
-            if target.is_dir():
-                results.append(run_case(case, target))
+        present = {case for case in REQUIRED if (run / case).is_dir()}
+        for case in sorted(present):
+            results.append(run_case(case, run / case))
+        # An exam run claiming new H07-H26 coverage cannot be marked PASS
+        # while silently omitting any of its twenty contracted tasks.
+        if present:
+            for case in sorted(REQUIRED - present):
+                results.append(
+                    {
+                        "case": case,
+                        "checks": [{"name": "missing_case", "passed": False}],
+                        "passed": 0,
+                        "failed": 1,
+                        "technical_only": True,
+                        "human_approved": False,
+                    }
+                )
     return results
 
 

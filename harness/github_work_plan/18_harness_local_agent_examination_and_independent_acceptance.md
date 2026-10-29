@@ -480,7 +480,7 @@ harness/
 
 1. Agent 在新分支从最新 main 开始，按顺序解析各 CASE 既有 Contract IDs，逐题在各自文件夹实现和自测。每题用 `wp18_cases.json` 核对预声明输出，也可以自行补充更多正反例，但不改官方样例和验证程序。
 2. Agent 可以只读运行 `python -m harness.contracts.wp18_verify --check-spec`，或在受控工作区运行 `python -m harness.contracts.wp18_verify --case H07 --run-dir harness/tests/wp18/runs/<run_id>/H07` 观察公开验证结果。不要试图对失败题修改 verifier。
-3. 任务分支以 `wp18/` 开头。GitHub CI 对这类 PR 检查实际 diff，仅允许**新增** `harness/tests/wp18/runs/<run_id>/<case>/` 的考试文件；不允许更改旧 Run、治理文件、独立验收文件或产品源码，并自动复核实际提交的 H07–H26 实现。
+3. 任务分支以 `wp18/` 开头。GitHub CI 对这类 PR 检查实际 diff，仅允许**新增** `harness/tests/wp18/runs/<run_id>/<case>/` 的考试文件；不允许更改旧 Run、治理文件、独立验收文件或产品源码，并自动复核实际提交的 H07–H26 实现；若新 HW Run 只有部分题目，即使已有题目全部通过也不能判整轮通过。
 4. 全部任务交付后提交 PR，不合并；人工或独立 reviewer 在隔离环境核对来源、Expected/Observed AST、Receipt、完整 U01–U12 和额外独立用例。任何一个受保护目录被改写均为硬失败。
 
 **验证边界**：当前提供 20 个已定义任务、86 个公开可执行检查，并不意味着能够穷举所有输入。运行代码必须放在低权限、可丢弃 reviewer 环境；Cursor Hooks 和 subprocess 超时不是系统级沙箱。Verifier 的输出只给出技术通过/失败，不给科学结论或人类 Approve。
