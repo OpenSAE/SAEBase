@@ -15,15 +15,22 @@ def test_windows_paths_and_parent_escape_rejected(tmp_path):
 
 
 def test_nested_secret_names_and_token_values_detected(tmp_path):
-    payload = {"nested": {"privateKey": "SYNTHETIC", "sessionToken": "SYNTHETIC"}, "message": "token=SYNTHETIC"}
+    payload = {
+        "nested": {"privateKey": "SYNTHETIC", "sessionToken": "SYNTHETIC"},
+        "message": "token=SYNTHETIC",
+    }
     issues = compliance.audit_artifacts(
         ["CT-PRIVACY"], [{"kind": "structured_output", "payload": payload}], tmp_path
     )
     assert issues and issues[0].startswith("0:structured_output")
-    assert compliance.audit_artifacts(
-        ["CT-PRIVACY"], [{"kind": "structured_output", "payload": {"gpu": None, "tag": "safe"}}],
-        tmp_path,
-    ) == []
+    assert (
+        compliance.audit_artifacts(
+            ["CT-PRIVACY"],
+            [{"kind": "structured_output", "payload": {"gpu": None, "tag": "safe"}}],
+            tmp_path,
+        )
+        == []
+    )
 
 
 def test_chinese_placeholder_is_caught_by_existing_locale_contract(tmp_path):
@@ -43,9 +50,12 @@ def test_finite_inputs_do_not_imply_finite_results(tmp_path):
     assert compliance.audit_artifacts(
         ["CT-DATA"], [{"kind": "numeric_output", "payload": {"mae": result}}], tmp_path
     )
-    assert compliance.audit_artifacts(
-        ["CT-DATA"], [{"kind": "numeric_output", "payload": {"mae": 0.25}}], tmp_path
-    ) == []
+    assert (
+        compliance.audit_artifacts(
+            ["CT-DATA"], [{"kind": "numeric_output", "payload": {"mae": 0.25}}], tmp_path
+        )
+        == []
+    )
 
 
 def test_bad_artifact_and_symlink_escape_fail_closed(tmp_path):

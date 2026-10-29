@@ -62,7 +62,10 @@ def check_spec() -> dict:
         scenarios = case.get("checks")
         if not isinstance(scenarios, list) or len(scenarios) < 4:
             raise ValueError("Insufficient checks")
-        if sum("expected" in s for s in scenarios) < 2 or sum(s.get("reject") is True for s in scenarios) < 2:
+        if (
+            sum("expected" in s for s in scenarios) < 2
+            or sum(s.get("reject") is True for s in scenarios) < 2
+        ):
             raise ValueError("Need at least two positive and negative examples")
         for item in scenarios:
             if not isinstance(item.get("input"), dict):
@@ -73,12 +76,21 @@ def check_spec() -> dict:
                 observed = wp19_reference.solve(case_id, item["input"])
             except ValueError:
                 if item.get("reject") is not True:
-                    raise ValueError(f"Reference rejected positive {case_id}/{item['name']}") from None
+                    raise ValueError(
+                        f"Reference rejected positive {case_id}/{item['name']}"
+                    ) from None
             else:
                 if item.get("reject") or observed != item["expected"]:
-                    raise ValueError(f"Reference disagrees with frozen spec {case_id}/{item['name']}")
+                    raise ValueError(
+                        f"Reference disagrees with frozen spec {case_id}/{item['name']}"
+                    )
             checks += 1
-    return {"cases": len(cases), "ready": len(ready), "proposed": len(cases)-len(ready), "checks": checks}
+    return {
+        "cases": len(cases),
+        "ready": len(ready),
+        "proposed": len(cases) - len(ready),
+        "checks": checks,
+    }
 
 
 def verify_case(case_id: str, path: Path) -> dict:
@@ -114,30 +126,51 @@ def verify_case(case_id: str, path: Path) -> dict:
     for trial in case["checks"]:
         with tempfile.TemporaryDirectory(prefix="wp19-review-") as tmp:
             env = {
-                "PATH": os.environ.get("PATH", ""), "HOME": tmp,
-                "PYTHONPATH": str(ROOT), "PYTHONDONTWRITEBYTECODE": "1",
+                "PATH": os.environ.get("PATH", ""),
+                "HOME": tmp,
+                "PYTHONPATH": str(ROOT),
+                "PYTHONDONTWRITEBYTECODE": "1",
             }
             try:
                 proc = subprocess.run(
-                    [sys.executable, "-B", str(ROOT / "harness/contracts/wp18_worker.py"), str(source)],
+                    [
+                        sys.executable,
+                        "-B",
+                        str(ROOT / "harness/contracts/wp18_worker.py"),
+                        str(source),
+                    ],
                     input=json.dumps(trial["input"], allow_nan=False),
-                    text=True, capture_output=True, cwd=tmp, env=env, timeout=6,
+                    text=True,
+                    capture_output=True,
+                    cwd=tmp,
+                    env=env,
+                    timeout=6,
                     check=False,
                 )
                 result = json.loads(proc.stdout)
                 if proc.returncode != 0 or not isinstance(result, dict):
                     passed = False
                 elif trial.get("reject") is True:
-                    passed = (result.get("ok") is False and result.get("kind") == "ValueError" and result.get("mutated") is False)
+                    passed = (
+                        result.get("ok") is False
+                        and result.get("kind") == "ValueError"
+                        and result.get("mutated") is False
+                    )
                 else:
-                    passed = (result.get("ok") is True and result.get("mutated") is False and result.get("output") == trial["expected"])
+                    passed = (
+                        result.get("ok") is True
+                        and result.get("mutated") is False
+                        and result.get("output") == trial["expected"]
+                    )
             except (subprocess.TimeoutExpired, json.JSONDecodeError, ValueError):
                 passed = False
             outcomes.append({"name": trial["name"], "passed": bool(passed)})
     return {
-        "case": case_id, "passed": sum(x["passed"] for x in outcomes),
+        "case": case_id,
+        "passed": sum(x["passed"] for x in outcomes),
         "failed": sum(not x["passed"] for x in outcomes),
-        "checks": outcomes, "human_approval": False,
+        "checks": outcomes,
+        "human_approval": False,
     }
 
 
@@ -148,14 +181,18 @@ def audit_scope(base_sha: str, head_sha: str = "HEAD") -> list[str]:
         raise ValueError("Exact candidate SHA required")
     proc = subprocess.run(
         ["git", "diff", "--name-status", "--no-renames", base_sha, head_sha],
-        cwd=ROOT, capture_output=True, text=True, check=True,
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
     )
     bad = []
     for row in proc.stdout.splitlines():
         status, path = row.split("\t", 1)
         parts = Path(path).parts
         allowed = (
-            status == "A" and len(parts) >= 7
+            status == "A"
+            and len(parts) >= 7
             and parts[:4] == ("harness", "tests", "wp19", "runs")
             and bool(RUN_ID.fullmatch(parts[4]))
             and parts[5] in READY
@@ -209,7 +246,9 @@ def main() -> int:
             result["runs"] = scan()
         elif not args.base and not args.check_spec:
             raise ValueError("Select --check-spec or a case or --scan")
-        fail = bool(result.get("unauthorized_changes")) or any(x["failed"] for x in result.get("runs", []))
+        fail = bool(result.get("unauthorized_changes")) or any(
+            x["failed"] for x in result.get("runs", [])
+        )
         result["status"] = "FAIL" if fail else "PASS"
     except (ValueError, OSError, KeyError, subprocess.CalledProcessError) as exc:
         result = {"status": "BLOCKED", "reason": str(exc)}

@@ -13,7 +13,14 @@ from pathlib import Path, PurePosixPath
 from harness.contracts import invariants
 
 _WINDOWS_DRIVE = re.compile(r"^[A-Za-z]:")
-_ALLOWED_ARTIFACTS = {"source_reference", "relative_path", "structured_output", "bilingual_record", "tree", "numeric_output"}
+_ALLOWED_ARTIFACTS = {
+    "source_reference",
+    "relative_path",
+    "structured_output",
+    "bilingual_record",
+    "tree",
+    "numeric_output",
+}
 
 
 def canonical_relative_path(value: str) -> str:
@@ -31,6 +38,7 @@ def canonical_relative_path(value: str) -> str:
 
 def finite_json(value: object, *, max_depth: int = 24) -> None:
     """Reject non-finite *results* as well as non-finite input numbers."""
+
     def visit(v: object, depth: int) -> None:
         if depth > max_depth:
             raise invariants.InvariantError("Numeric structure too deep")
@@ -51,6 +59,7 @@ def finite_json(value: object, *, max_depth: int = 24) -> None:
                 visit(x, depth + 1)
             return
         raise invariants.InvariantError("Unsupported JSON value")
+
     visit(value, 0)
 
 

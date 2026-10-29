@@ -74,7 +74,10 @@ def solve(case: str, payload: dict) -> dict:
         return {"status": "bound", "verified": True}
     if case == "H34":
         p = req(payload, {"action", "authorized"})
-        if p["action"] not in ("sandbox_write", "governance_write") or type(p["authorized"]) is not bool:
+        if (
+            p["action"] not in ("sandbox_write", "governance_write")
+            or type(p["authorized"]) is not bool
+        ):
             raise ValueError("authorization")
         return {"allowed": p["action"] == "sandbox_write"}
     if case == "H35":
@@ -84,7 +87,13 @@ def solve(case: str, payload: dict) -> dict:
             raise ValueError("rules")
         by_path: dict[str, set[bool]] = {}
         for r in rows:
-            if not isinstance(r, dict) or set(r) != {"path", "allow"} or not isinstance(r["path"], str) or not r["path"] or type(r["allow"]) is not bool:
+            if (
+                not isinstance(r, dict)
+                or set(r) != {"path", "allow"}
+                or not isinstance(r["path"], str)
+                or not r["path"]
+                or type(r["allow"]) is not bool
+            ):
                 raise ValueError("rule")
             by_path.setdefault(r["path"], set()).add(r["allow"])
         return {"conflicts": sorted(k for k, v in by_path.items() if len(v) > 1)}
@@ -103,7 +112,12 @@ def solve(case: str, payload: dict) -> dict:
     if case == "H38":
         p = req(payload, {"paths"})
         paths = words(p["paths"])
-        if any(path.startswith((".cursor/", ".github/", "harness/core/", "harness/contracts/")) or ".." in path.split("/") or path.startswith("/") for path in paths):
+        if any(
+            path.startswith((".cursor/", ".github/", "harness/core/", "harness/contracts/"))
+            or ".." in path.split("/")
+            or path.startswith("/")
+            for path in paths
+        ):
             raise ValueError("governance")
         return {"allowed": sorted(paths)}
     if case == "H39":
@@ -131,18 +145,40 @@ def solve(case: str, payload: dict) -> dict:
             raise ValueError("project")
         ids: list[str] = []
         for item in p["objects"]:
-            if not isinstance(item, dict) or set(item) != {"id", "project"} or item["project"] != "SAEBase" or not isinstance(item["id"], str) or not item["id"] or item["id"] in ids:
+            if (
+                not isinstance(item, dict)
+                or set(item) != {"id", "project"}
+                or item["project"] != "SAEBase"
+                or not isinstance(item["id"], str)
+                or not item["id"]
+                or item["id"] in ids
+            ):
                 raise ValueError("cross_project")
             ids.append(item["id"])
         return {"ids": sorted(ids)}
     if case == "H43":
         p = req(payload, {"claims"})
         claims = p["claims"]
-        if not isinstance(claims, list) or len(claims) != 2 or any(not isinstance(x, dict) or set(x) != {"source", "value"} for x in claims):
+        if (
+            not isinstance(claims, list)
+            or len(claims) != 2
+            or any(not isinstance(x, dict) or set(x) != {"source", "value"} for x in claims)
+        ):
             raise ValueError("claims")
-        if any(not isinstance(x["source"], str) or not x["source"] or not isinstance(x["value"], str) for x in claims) or claims[0]["source"] == claims[1]["source"]:
+        if (
+            any(
+                not isinstance(x["source"], str)
+                or not x["source"]
+                or not isinstance(x["value"], str)
+                for x in claims
+            )
+            or claims[0]["source"] == claims[1]["source"]
+        ):
             raise ValueError("sources")
-        return {"status": "conflict" if claims[0]["value"] != claims[1]["value"] else "consistent", "sources": sorted(x["source"] for x in claims)}
+        return {
+            "status": "conflict" if claims[0]["value"] != claims[1]["value"] else "consistent",
+            "sources": sorted(x["source"] for x in claims),
+        }
     if case == "H44":
         p = req(payload, {"comment", "actual"})
         if not all(isinstance(p[x], str) for x in p):
