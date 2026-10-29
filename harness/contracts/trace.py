@@ -3,6 +3,7 @@
 A receipt cannot independently prove that a tool ran; the evaluator cross-
 checks it with source changes and actual execution logs.
 """
+
 from __future__ import annotations
 
 import json
@@ -17,7 +18,10 @@ def ad_hoc_selection(tags: list[str]) -> list[str]:
 
 
 def validate_receipt(record: dict, *, expected: list[str]) -> dict:
-    if not isinstance(record, dict) or record.get("schema") != "saebase.harness.contract_receipt.v1":
+    if (
+        not isinstance(record, dict)
+        or record.get("schema") != "saebase.harness.contract_receipt.v1"
+    ):
         raise ContractError("Invalid receipt schema")
     if record.get("registry_version") != catalog()["version"]:
         raise ContractError("Contract registry version mismatch")
@@ -35,9 +39,11 @@ def validate_receipt(record: dict, *, expected: list[str]) -> dict:
     for command in record["commands"]:
         if not isinstance(command, dict) or set(command) != {"argv", "exit_code"}:
             raise ContractError("Command must record argv and exit code")
-        if not isinstance(command["argv"], list) or not all(
-            isinstance(x, str) for x in command["argv"]
-        ) or not isinstance(command["exit_code"], int):
+        if (
+            not isinstance(command["argv"], list)
+            or not all(isinstance(x, str) for x in command["argv"])
+            or not isinstance(command["exit_code"], int)
+        ):
             raise ContractError("Invalid command receipt")
     for relative in record["edited_paths"]:
         if not isinstance(relative, str) or relative.startswith("/") or "\\" in relative:
@@ -47,18 +53,24 @@ def validate_receipt(record: dict, *, expected: list[str]) -> dict:
         if not relative.startswith("harness/tests/"):
             raise ContractError("Exam receipt edits outside its test sandbox")
         if relative.startswith("harness/tests/wp18/acceptance/") or relative in (
-            "harness/tests/README.md", "harness/tests/wp18/README.md"
+            "harness/tests/README.md",
+            "harness/tests/wp18/README.md",
         ):
             raise ContractError("Exam receipt cannot edit independent authority")
-        if not (ROOT / relative).resolve(strict=False).is_relative_to(
-            (ROOT / "harness/tests").resolve(strict=False)
+        if (
+            not (ROOT / relative)
+            .resolve(strict=False)
+            .is_relative_to((ROOT / "harness/tests").resolve(strict=False))
         ):
             raise ContractError("Edited path escapes test sandbox")
-    return {"case_id": record["case_id"], "contract_count": len(expected),
-            "declared_edits": len(record["edited_paths"]),
-            "declared_commands": len(record["commands"]),
-            "unresolved": len(record["unresolved"]),
-            "verified_execution": False}
+    return {
+        "case_id": record["case_id"],
+        "contract_count": len(expected),
+        "declared_edits": len(record["edited_paths"]),
+        "declared_commands": len(record["commands"]),
+        "unresolved": len(record["unresolved"]),
+        "verified_execution": False,
+    }
 
 
 def check_receipt_file(path: Path, *, plan: str, case: str) -> dict:
