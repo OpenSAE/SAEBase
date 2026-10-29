@@ -44,6 +44,11 @@ def gate(command, plan_id=None):
     if not isinstance(command, str) or not command.strip():
         return "Unknown shell command"
     command = command.strip()
+    # Agents never create directories via unreviewed shell commands. A scoped
+    # editor may create files under harness/tests/; trusted setup tooling owns
+    # root directories and production experiment output paths.
+    if re.match(r"(?i)^(?:mkdir\\b|install\\s+-d\\b|git\\s+clone\\b)", command):
+        return "Shell directory creation is not delegated to task agents"
     if DANGEROUS.search(command):
         return "High-risk shell operation is not permitted to task agents"
     # Do not grant arbitrary shell execution just because a command mentions
@@ -54,6 +59,8 @@ def gate(command, plan_id=None):
             target = next(x for x in tokens if x.startswith("harness/tests/"))
             if ".." in target.split("/") or target.startswith("harness/tests//"):
                 return "Test path traversal forbidden"
+            if target.startswith("harness/tests/wp18/acceptance/"):
+                return "Independent acceptance tests are not runnable by the task agent"
         except (ValueError, StopIteration):
             return "Malformed Harness test command"
         return None
