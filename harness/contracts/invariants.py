@@ -195,8 +195,10 @@ def localization_defects(record: dict, *, required=("zh", "en")) -> list[str]:
             elif "\ufffd" in text or any(p in text.lower() for p in _PLACEHOLDERS):
                 defects.append(f"{field}.{lang}:untranslated")
     for lang in required:
-        title = (record.get("title") or {}).get(lang, "")
-        summary = (record.get("summary") or {}).get(lang, "")
+        title_field = record.get("title")
+        summary_field = record.get("summary")
+        title = title_field.get(lang, "") if isinstance(title_field, dict) else ""
+        summary = summary_field.get(lang, "") if isinstance(summary_field, dict) else ""
         if isinstance(title, str) and isinstance(summary, str) and title and summary:
             norm = lambda value: "".join(c.casefold() for c in value if c.isalnum())
             if norm(title) == norm(summary):
