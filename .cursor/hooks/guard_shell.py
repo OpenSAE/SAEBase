@@ -58,7 +58,8 @@ def gate(command, plan_id=None):
                 resolved = (ROOT / candidate).resolve()
                 if not resolved.is_relative_to((ROOT / "harness/tests").resolve()):
                     return "Directory creation escapes the Harness test sandbox"
-                if candidate.startswith("harness/tests/wp18/acceptance/"):
+                acceptance = (ROOT / "harness/tests/wp18/acceptance").resolve()
+                if resolved == acceptance or resolved.is_relative_to(acceptance):
                     return "Independent acceptance is read-only"
                 return None
         except (ValueError, OSError):
