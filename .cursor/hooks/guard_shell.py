@@ -48,7 +48,7 @@ def gate(command, plan_id=None):
     # Allow only mkdir -p inside the isolated Harness test directory.
     # Ordinary new project-root directories and production output paths
     # remain blocked, even when an Agent Flow lists a shell command.
-    if re.match(r"(?i)^(?:mkdir\\b|install\\s+-d\\b|git\\s+clone\\b)", command):
+    if re.match(r"(?i)^(?:mkdir\b|install\s+-d\b|git\s+clone\b)", command):
         try:
             args = shlex.split(command)
             if len(args) == 3 and args[:2] == ["mkdir", "-p"]:
