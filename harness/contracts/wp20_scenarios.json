@@ -1954,9 +1954,29 @@
               "source_sha": "revised"
             },
             {
+              "op": "fail",
+              "reason": "synthetic timeout"
+            },
+            {
+              "op": "resume",
+              "revision": 2,
+              "owner": "agent-b"
+            },
+            {
+              "op": "handoff",
+              "from": "agent-b",
+              "to": "agent-c"
+            },
+            {
+              "op": "change",
+              "actor": "trusted-human",
+              "expected": 3,
+              "source_sha": "final"
+            },
+            {
               "op": "review",
               "actor": "trusted-human",
-              "source_sha": "revised"
+              "source_sha": "final"
             }
           ]
         },
@@ -1974,7 +1994,7 @@
           "events": [
             {
               "op": "fail",
-              "reason": "timeout"
+              "reason": "first failure"
             },
             {
               "op": "resume",
@@ -1982,9 +2002,34 @@
               "owner": "agent-a"
             },
             {
+              "op": "handoff",
+              "from": "agent-a",
+              "to": "agent-b"
+            },
+            {
+              "op": "change",
+              "actor": "trusted-human",
+              "expected": 1,
+              "source_sha": "v2"
+            },
+            {
+              "op": "fail",
+              "reason": "second failure"
+            },
+            {
+              "op": "resume",
+              "revision": 2,
+              "owner": "agent-b"
+            },
+            {
+              "op": "handoff",
+              "from": "agent-b",
+              "to": "agent-a"
+            },
+            {
               "op": "review",
               "actor": "trusted-human",
-              "source_sha": "initial"
+              "source_sha": "v2"
             }
           ]
         },

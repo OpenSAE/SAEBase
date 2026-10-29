@@ -107,3 +107,14 @@ def test_data_manifest_and_coverage_invariant_under_sample_permutation():
     changed = grader._reference("X06", moved)
     assert original["ok"] and changed["ok"]
     assert original["output"] == changed["output"]
+
+
+def test_long_horizon_replays_nine_events_with_two_distinct_failures():
+    rows = grader.load_scenarios()["cases"]["X20"]
+    assert all(len(row["input"]["events"]) >= 8 for row in rows[:2])
+    for row in rows[:2]:
+        result = grader._reference("X20", row["input"])
+        assert result["ok"]
+        assert result["output"]["count"] >= 8
+        assert len(result["output"]["failures"]) == 2
+        assert result["output"]["final"]["status"] == "reviewed"
