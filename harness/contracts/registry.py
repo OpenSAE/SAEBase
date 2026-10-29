@@ -123,6 +123,27 @@ def resolve(relative: str, case: str) -> dict:
     }
 
 
+
+def select_tags(tags: list[str]) -> dict:
+    """Resolve an arbitrary sandbox task from the same prior catalog.
+
+    Selection is not production authorization; binding permanent work
+    requires a governance-owned Work Plan declaration.
+    """
+    data = catalog()
+    if not isinstance(tags, list) or not tags or len(set(tags)) != len(tags):
+        raise ContractError("Custom task needs unique predeclared tags")
+    if not all(isinstance(tag, str) for tag in tags) or not set(tags) <= set(data["task_tags"]):
+        raise ContractError("Unknown custom task tag")
+    selected = list(data["required_always"])
+    for item in data["contracts"]:
+        if item["enforcement"] == "conditional" and set(item["tags"]) & set(tags):
+            selected.append(item["id"])
+    return {"schema": "saebase.harness.selected_contracts.v1",
+            "registry_version": data["version"], "case": "CUSTOM",
+            "tags": tags, "contract_ids": list(dict.fromkeys(selected))}
+
+
 def validate_plan(relative: str) -> dict:
     obj = declaration(relative)
     resolved = {case: resolve(relative, case) for case in obj["cases"]}
@@ -138,6 +159,8 @@ def main() -> int:
     show = commands.add_parser("resolve")
     show.add_argument("--plan", required=True)
     show.add_argument("--case", required=True)
+    custom = commands.add_parser("select")
+    custom.add_argument("--tags", required=True, help="Comma-separated predeclared tags")
     commands.add_parser("list")
     args = parser.parse_args()
     try:
@@ -146,6 +169,8 @@ def main() -> int:
                       "contract_ids": [r["id"] for r in catalog()["contracts"]]}
         elif args.command == "check":
             result = validate_plan(args.plan)
+        elif args.command == "select":
+            result = select_tags(args.tags.split(","))
         else:
             result = resolve(args.plan, args.case)
         print(json.dumps(result, ensure_ascii=False, indent=2))
