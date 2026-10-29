@@ -133,3 +133,50 @@ def test_reference_import_via_helper_module_is_blocked(tmp_path):
     )
     with pytest.raises(ValueError, match="official reference"):
         grader._candidate_source(path)
+
+
+def test_independent_multimodule_auroc_average_precision_candidate_passes(tmp_path, monkeypatch):
+    case = tmp_path / "fresh-run" / "X11"
+    (case / "src").mkdir(parents=True)
+    (case / "implementation.py").write_text(
+        "from src.metrics import run\n", encoding="utf-8"
+    )
+    (case / "src" / "metrics.py").write_text(
+        """def run(payload, workdir):
+    labels = payload['labels']
+    scores = payload['scores']
+    threshold = payload['threshold']
+    if not labels or len(labels) != len(scores):
+        raise ValueError('shape')
+    if any(type(x) is not int or x not in (0, 1) for x in labels):
+        raise ValueError('labels')
+    positives = [s for s, y in zip(scores, labels) if y == 1]
+    negatives = [s for s, y in zip(scores, labels) if y == 0]
+    if not positives or not negatives:
+        raise ValueError('classes')
+    auc = sum(1 if a > b else .5 if a == b else 0
+              for a in positives for b in negatives) / (len(positives)*len(negatives))
+    tp = fp = 0
+    ap = old_recall = 0
+    curve = []
+    for score in sorted(set(scores), reverse=True):
+        rows = [y for s, y in zip(scores, labels) if s == score]
+        tp += sum(rows)
+        fp += len(rows) - sum(rows)
+        recall = tp / len(positives)
+        precision = tp / (tp + fp)
+        ap += (recall - old_recall) * precision
+        old_recall = recall
+        curve.append({'score':score,'tp':tp,'fp':fp,'precision':precision,'recall':recall})
+    positive_above = sum(y and s >= threshold for y, s in zip(labels, scores))
+    return {'n':len(labels), 'auc':auc, 'average_precision':ap,
+            'recall':positive_above/len(positives), 'threshold':threshold,
+            'curve':curve}
+""",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(grader, "RUNS", tmp_path)
+    result = grader.verify_case("X11", case)
+    assert result["passed"] == 4
+    assert result["failed"] == 0
+    assert result["human_approved"] is False
