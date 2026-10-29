@@ -118,3 +118,18 @@ def test_long_horizon_replays_nine_events_with_two_distinct_failures():
         assert result["output"]["count"] >= 8
         assert len(result["output"]["failures"]) == 2
         assert result["output"]["final"]["status"] == "reviewed"
+
+
+def test_reference_import_via_helper_module_is_blocked(tmp_path):
+    path = tmp_path / "new-run" / "X01"
+    (path / "src").mkdir(parents=True)
+    (path / "implementation.py").write_text(
+        "from src.logic import run\n", encoding="utf-8"
+    )
+    (path / "src" / "logic.py").write_text(
+        "from harness.contracts.wp20_reference_a import x01\n"
+        "def run(payload, workdir):\n    return x01(payload, workdir)\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="official reference"):
+        grader._candidate_source(path)

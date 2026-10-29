@@ -111,13 +111,18 @@ def _candidate_source(candidate):
     source = candidate / "implementation.py"
     if not source.is_file() or source.is_symlink():
         raise ValueError("Candidate implementation missing or symlinked")
-    body = ast.parse(source.read_text(encoding="utf-8"))
     banned = "harness.contracts.wp20_reference"
-    for node in ast.walk(body):
-        if isinstance(node, ast.ImportFrom) and node.module and node.module.startswith(banned):
-            raise ValueError("Candidate imports official reference")
-        if isinstance(node, ast.Import) and any(a.name.startswith(banned) for a in node.names):
-            raise ValueError("Candidate imports official reference")
+    for py_file in candidate.rglob("*.py"):
+        if py_file.is_symlink():
+            raise ValueError("Symlinked Python module in candidate")
+        body = ast.parse(py_file.read_text(encoding="utf-8"))
+        for node in ast.walk(body):
+            if isinstance(node, ast.ImportFrom) and node.module and node.module.startswith(banned):
+                raise ValueError("Candidate imports official reference")
+            if isinstance(node, ast.Import) and any(
+                alias.name.startswith(banned) for alias in node.names
+            ):
+                raise ValueError("Candidate imports official reference")
     return source
 
 

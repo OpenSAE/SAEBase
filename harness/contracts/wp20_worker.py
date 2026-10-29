@@ -15,6 +15,7 @@ def main():
     original = copy.deepcopy(payload)
     workdir = Path.cwd()
     try:
+        sys.path.insert(0, str(source.parent))
         spec = importlib.util.spec_from_file_location("candidate_wp20", source)
         if not spec or not spec.loader:
             raise ValueError("Candidate unavailable")
