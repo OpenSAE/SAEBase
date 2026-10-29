@@ -1,4 +1,4 @@
-name: WP19 Trusted Candidate Scope
+name: WP19 and WP20 Trusted Candidate Scope
 
 on:
   pull_request_target:
@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   trusted-scope:
-    if: ${{ startsWith(github.event.pull_request.head.ref, 'wp19/') }}
+    if: ${{ startsWith(github.event.pull_request.head.ref, 'wp19/') || startsWith(github.event.pull_request.head.ref, 'wp20/') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -25,9 +25,14 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
           set -euo pipefail
           git fetch --no-tags origin "refs/pull/${PR_NUMBER}/head"
           observed="$(git rev-parse FETCH_HEAD)"
           test "$observed" = "$HEAD_SHA"
-          python -m harness.contracts.wp19_verify --base "$BASE_SHA" --head-sha "$HEAD_SHA"
+          case "$HEAD_BRANCH" in
+            wp19/*) python -m harness.contracts.wp19_verify --base "$BASE_SHA" --head-sha "$HEAD_SHA" ;;
+            wp20/*) python -m harness.contracts.wp20_verify --base "$BASE_SHA" --head-sha "$HEAD_SHA" ;;
+            *) exit 1 ;;
+          esac
