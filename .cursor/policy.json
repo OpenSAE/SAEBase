@@ -11,7 +11,8 @@
     "saebase",
     "tasks",
     "tests",
-    "datasets"
+    "datasets",
+    "experiments"
   ],
   "approved_files": [
     ".cursorignore",

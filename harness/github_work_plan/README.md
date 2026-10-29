@@ -1,6 +1,6 @@
 ## Harness-only local Agent examination — WP18
 
-[**WP18 — Harness 测验与独立验收**](18_harness_local_agent_examination_and_independent_acceptance.md)：针对 Cursor Rules、Skills、Hooks、Agent Flow、Work Order、Code/Context/Environment 与 Atlas 五棵树的测试计划。包含 12 组单元/负面验证、6 个需要在隔离分支中真实修改代码的小任务、候选 Tree 交付要求及独立评审评分门槛。**当前 PRE-FLIGHT BLOCKED，尚无可用的可信人类授权入口，未授权本地 Agent 执行；不涉及 SAE 科研功能，也不取代 WP15–WP17。** [开考前缺陷登记及门禁操作手册](18_harness_exam_preflight_defects_and_gate_runbook.md)。
+[**WP18 — Harness 测验与独立验收**](18_harness_local_agent_examination_and_independent_acceptance.md)：针对 Cursor Rules、Skills、Hooks、Agent Flow、Work Order、Code/Context/Environment 与 Atlas 五棵树的测试计划。包含 12 组单元/负面验证、6 个需要在隔离分支中真实修改代码的小任务、候选 Tree 交付要求及独立评审评分门槛。**本次治理 PR 合并后，Harness 测验可通过 Cursor Agent 模式自然语言直接启动，产物统一放在 `harness/tests/`；正式治理代码仍需独立审批。当前尚未执行 H01–H06；不涉及 SAE 科研功能，也不取代 WP15–WP17。** [开考前缺陷登记及门禁操作手册](18_harness_exam_preflight_defects_and_gate_runbook.md)。
 
 ## Current product execution — WP17
 

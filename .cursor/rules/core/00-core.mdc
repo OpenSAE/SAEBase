@@ -15,6 +15,8 @@ alwaysApply: true
 - 辅助工具在 `saebase/tools/`，测试在 `tests/` 与 Research Lab 的测试目录，开发文档与历史 Work Plans 在 `harness/`。
 - 执行需先检查数据路径、GPU 预算、覆写风险和运行许可。训练结果与科研结论需要实际证据和独立验证。
 - 修改后运行与范围相称的回归、构建和文档验证，准确报告未执行项目；新增 Markdown 文档原则上使用中文。
+- 用户在 Agent 模式以自然语言指定 Harness 测验时，在 `harness/tests/` 内按 `harness/tests/README.md` 实现和自测，不强制人工填写 Bash、Work Order 或逐文件审批；独立验收方负责最终验收。这个例外只属于测验工作区，不授予生产 Harness / Core / Hooks / Rules 修改权限。
+- 任何任务 Agent 都不得新建项目根一级目录，唯一允许的**新目录名**为 `experiments/` 与 `tests/`，二者亦需符合各自任务授权；Harness 测试优先放现有 `harness/tests/`，禁止任意新增 `utils/`、`scripts/`、`results/` 等根目录。
 - Code、Knowledge、Context 和 Environment 只能按任务范围选择读取；Core 默认受保护。
 
 # Agent Flow

@@ -20,6 +20,14 @@ DANGEROUS = re.compile(
     r"|\b(?:sudo|nohup|disown)\b|\brm\s+-[a-z]*r[a-z]*f\b"
     r"|\b(?:curl|wget)\b.{0,120}\|\s*(?:sh|bash))"
 )
+# A normal request such as "测 Harness H01" may run pytest with root cache
+# creation disabled inside the
+# dedicated Harness test sandbox without formal Agent Flow authorization.
+# Other command families still require exact signed-off commands.
+HARNESS_PYTEST = re.compile(
+    r"^(?:python|python3) -m pytest -p no:cacheprovider (?:-q )?harness/tests/"
+    r"[A-Za-z0-9_./:-]+(?: -q)?$"
+)
 SAFE_COMMANDS = [
     re.compile(r"^(?:git)\s+(?:status|diff|log|show|rev-parse)(?:\s+[^;&|<>]*)?$"),
     re.compile(r"^(?:ls|pwd|rg|grep|find)\b[^;&|<>]*$"),
@@ -37,8 +45,41 @@ def gate(command, plan_id=None):
     if not isinstance(command, str) or not command.strip():
         return "Unknown shell command"
     command = command.strip()
+    # Allow only mkdir -p inside the isolated Harness test directory.
+    # Ordinary new project-root directories and production output paths
+    # remain blocked, even when an Agent Flow lists a shell command.
+    if re.match(r"(?i)^(?:mkdir\b|install\s+-d\b|git\s+clone\b)", command):
+        try:
+            args = shlex.split(command)
+            if len(args) == 3 and args[:2] == ["mkdir", "-p"]:
+                candidate = args[2]
+                if not candidate.startswith("harness/tests/") or ".." in candidate.split("/"):
+                    return "New project-root directories are forbidden"
+                resolved = (ROOT / candidate).resolve()
+                if not resolved.is_relative_to((ROOT / "harness/tests").resolve()):
+                    return "Directory creation escapes the Harness test sandbox"
+                acceptance = (ROOT / "harness/tests/wp18/acceptance").resolve()
+                if resolved == acceptance or resolved.is_relative_to(acceptance):
+                    return "Independent acceptance is read-only"
+                return None
+        except (ValueError, OSError):
+            pass
+        return "Shell directory creation is only allowed inside harness/tests/"
     if DANGEROUS.search(command):
         return "High-risk shell operation is not permitted to task agents"
+    # Do not grant arbitrary shell execution just because a command mentions
+    # harness/tests. Only the single-purpose, path-checked pytest form is free.
+    if HARNESS_PYTEST.fullmatch(command):
+        try:
+            tokens = shlex.split(command)
+            target = next(x for x in tokens if x.startswith("harness/tests/"))
+            if ".." in target.split("/") or target.startswith("harness/tests//"):
+                return "Test path traversal forbidden"
+            if target.startswith("harness/tests/wp18/acceptance/"):
+                return "Independent acceptance tests are not runnable by the task agent"
+        except (ValueError, StopIteration):
+            return "Malformed Harness test command"
+        return None
     if GOVERNANCE.search(command) and "harness.core.agent_flow" not in command:
         return "Core/Harness governance sources are shielded from task shell access"
     if any(pattern.fullmatch(command) for pattern in SAFE_COMMANDS):

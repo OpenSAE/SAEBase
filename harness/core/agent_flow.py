@@ -25,6 +25,7 @@ EDITABLE = (
     "doc/knowledge/",
     "doc/code/",
     "tests/",
+    "experiments/",
     "saebase/tools/",
 )
 AUTHORITY = {

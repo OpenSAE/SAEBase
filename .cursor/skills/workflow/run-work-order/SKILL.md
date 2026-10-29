@@ -5,7 +5,7 @@ description: 用户指定 OpenResearch Work Order，或需要选择 Core、科�
 
 # 执行 Work Order v3
 
-1. 只读取用户点名的 `.cursor/work_orders/<ID>.yaml`，运行 `python .cursor/skills/workflow/run-work-order/saebase/tools/validate_work_order.py <ID>`。未成功验证，不按该工单执行。
+1. 只读取用户点名的 `.cursor/work_orders/<ID>.yaml`，运行 `python .cursor/skills/workflow/run-work-order/scripts/validate_work_order.py <ID>`。未成功验证，不按该工单执行。
 2. 区分两个不同的结构：`core_ids` 描述**项目架构/研发管理**，通过 `python harness/core/select.py <IDs>` 获取；`knowledge_ids` 描述 **LLM SAE 研究问题与源码依据**，通过 `harness/knowledge/select.py <IDs>` 按需读取。
 3. 读取 `context.doc.required`；`optional` 文件仅在当前任务需要时读取。涉及科学概念必须服从 `doc/knowledge/glossary.json` 和 `foundations/`；不得重新发明同义术语。
 4. 仅执行显式 `activation.<module>=true` 的功能：`core`、`code`、`knowledge`、`experiments`、`transfer`、`environment`。否则不主动遍历该目录。参考区 `harness/github_work_plan/` 只能按 `context.harness.read_only` 中的具体文件只读参考。
@@ -14,6 +14,14 @@ description: 用户指定 OpenResearch Work Order，或需要选择 Core、科�
 7. `activation.core=true` 允许读指定项目设计目标并报告状态变化提案；不要把 Core 的工程里程碑标记为科研成果。
 8. 实验运行遵守 `saebase/runtime/experiment_paths.py`，成果报告参考已有 Knowledge ID；Environment 仅采集本机真实信息，Transfer 默认 dry-run，均不得擅自超出任务预算。
 9. 最终报告列出：已激活模块、使用的 Core/Knowledge/Term ID、实际阅读的文件、修改前后 Code Tree 差异、已执行的测试与尚未验证的科研结论。GitHub commit 本身不会自动唤醒本地 Cursor。
+
+## Harness 测验的最简入口
+
+当人类在 Cursor Agent 模式里明确输入“测试 Harness H01”、“测试 Harness 的审阅队列”等自然语言指令，或“测 WP18 H01”，Agent 可直接在 `harness/tests/` 的本次独立测试空间中编写模拟功能、测试、候选 Tree 和报告，并运行仅针对该空间的 pytest。**不需要**人类输入 Bash、检查路径白名单或创建 Agent Flow。可以自由接受人类指定的任何 Harness 测试主题，不局限于 WP18 六题；未知主题先根据职责选一个可读的短名称。
+
+只能修改 `harness/tests/`，不得借此修改 `harness/core/`、`harness/visualization/`、`.cursor/`、`.github/`、Runtime 或正式 Core/Knowledge/Code/Context 权威图。预览的 Tree 是待审提案，独立验收方从实际源码/fixture 另行验证。
+
+如任务必须修改受保护的正式实现，停止在测试 sandbox，输出清晰的治理变更建议，交由独立维护者审批；人类如需批准正式修改，走正式 Agent Flow，不可把聊天中的普通测验指令伪作 `authorize`。
 
 ## Reviewed Agent Flow (外部 GitHub Work Plan)
 

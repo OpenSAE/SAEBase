@@ -24,6 +24,10 @@ PATH_FIELDS = {
     "file",
 }
 EDIT_WORDS = ("write", "edit", "delete", "patch", "move", "rename", "create", "replace")
+# Test-only writes are restricted to this sandbox and never imply permission
+# to modify the Harness governance implementation or real research records.
+HARNESS_TEST_SANDBOX = "harness/tests/"
+NEW_TOP_LEVEL_DIRS = {"experiments", "tests"}
 
 
 def candidate_paths(value):
@@ -55,27 +59,43 @@ def gate(tool, payload, active=None):
     if not paths:
         return "Mutation tool supplies no auditable file paths"
     plan_id = active if active is not None else os.environ.get("OPENRESEARCH_ACTIVE_AGENT_FLOW")
-    if not plan_id:
-        return "Agent edits require a human-authorized Agent Flow and explicit file scope"
     try:
         from harness.core.agent_flow import load, scope
 
-        plan = load(plan_id)
+        plan = None
         for path in paths:
             candidate = pathlib.Path(path)
             resolved = (candidate if candidate.is_absolute() else ROOT / candidate).resolve()
             if not resolved.is_relative_to(ROOT):
                 return "Agent path escapes repository root"
+            if ".." in candidate.parts:
+                return "Parent traversal is forbidden in task edit paths"
             rel = resolved.relative_to(ROOT).as_posix()
+            parts = resolved.relative_to(ROOT).parts
+            if len(parts) < 2:
+                return "Task agents cannot create or edit root-level entries"
+            if parts[0] not in NEW_TOP_LEVEL_DIRS and not (ROOT / parts[0]).is_dir():
+                return "New top-level directories are forbidden except experiments/ and tests/"
+            if rel.startswith(HARNESS_TEST_SANDBOX):
+                # The acceptance ledger and test instructions are owned by
+                # governance/independent reviewers, not the task agent.
+                if rel in ("harness/tests/README.md", "harness/tests/wp18/README.md") or rel.startswith(
+                    "harness/tests/wp18/acceptance/"
+                ):
+                    return "Harness test instructions and independent acceptance are read-only"
+                # A test exercise may create code, fixtures, reports and
+                # candidate trees here without exposing governance files.
+                continue
             if rel.startswith((".cursor/", "harness/", ".github/")):
                 return "Harness/Core and execution rules are never editable by task agents"
             if rel == "saebase/runtime" or rel.startswith("saebase/runtime/"):
                 return "SAEBase Runtime requires separate architecture governance"
-            if (
-                len(resolved.relative_to(ROOT).parts) == 1
-                or resolved.relative_to(ROOT).parts[0] not in POLICY["approved_roots"]
-            ):
+            if parts[0] not in POLICY["approved_roots"] and parts[0] not in NEW_TOP_LEVEL_DIRS:
                 return "No unscoped root entries are editable"
+            if not plan_id:
+                return "Non-test edits require a human-authorized Agent Flow"
+            if plan is None:
+                plan = load(plan_id)
             scope(plan, [rel])
     except Exception as exc:
         return "Failed human-approved path authorization: " + str(exc)
