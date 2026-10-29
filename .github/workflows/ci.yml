@@ -70,6 +70,8 @@ jobs:
           python harness/code/audit_semantics.py --output atlas-semantic-audit.json --check
           python -m pip install -q pytest
           python -m pytest -q harness/github_work_test/test_atlas_semantic_audit.py harness/github_work_test/test_atlas_semantic_projection.py
+      - name: Verify Harness WP18 sandbox and root-directory guardrails
+        run: python -m pytest -q harness/github_work_test/test_wp18_sandbox_gate.py
       - name: Upload full Atlas duplicate inventory
         uses: actions/upload-artifact@v4
         with:
