@@ -211,10 +211,7 @@ def verify_case(case, candidate):
                             received.get("files") == expected["files"]
                             if expected["ok"]
                             else isinstance(received.get("files"), dict)
-                            and all(
-                                name in expected["files"]
-                                for name in received["files"]
-                            )
+                            and all(name in expected["files"] for name in received["files"])
                         )
                     )
                 )
