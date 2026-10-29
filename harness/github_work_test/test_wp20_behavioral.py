@@ -1,0 +1,87 @@
+"""Trusted WP20 grader calibration: all cases, real outputs and known bad implementations."""
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pytest
+from harness.contracts import wp20_verify as grader
+
+FIXTURES = grader.load_scenarios()["cases"]
+ALL = [(case, row) for case in sorted(FIXTURES) for row in FIXTURES[case]]
+
+
+@pytest.mark.parametrize(("case","scenario"), ALL, ids=lambda x: str(x)[:60])
+def test_reference_matches_frozen_positive_and_negative_cases(case, scenario):
+    result = grader._reference(case, scenario["input"])
+    assert result["ok"] is scenario["valid"], (case, scenario["id"])
+    assert isinstance(result["files"], dict)
+    if scenario["valid"]:
+        assert result["kind"] is None
+        assert isinstance(result["output"], dict)
+        assert result["output"] not in ({"accepted": True}, {"ok": True})
+    else:
+        assert result["kind"] == "ValueError"
+        assert result["output"] is None
+
+
+def test_auc_average_precision_hand_calculation():
+    good = grader._reference("X11", {"labels":[1,0],"scores":[0.9,0.1],"threshold":0.5})
+    bad = grader._reference("X11", {"labels":[1,0],"scores":[0.1,0.9],"threshold":0.5})
+    assert good["output"]["auc"] == 1 and good["output"]["average_precision"] == 1
+    assert bad["output"]["auc"] == 0 and bad["output"]["average_precision"] == 0.5
+
+
+def test_archive_is_actually_written_and_read():
+    result = grader._reference("X16", {"files":{"a.txt":"hello"},"corrupt":False})
+    assert result["ok"]
+    assert "bundle.tar" in result["files"]
+    assert "extract/a.txt" in result["files"]
+    assert result["output"]["verified"] is True
+
+
+def test_git_has_real_commits_and_unique_parents():
+    p={"base":"x=0\n","a":"x=1\n","b":"x=2\n","rebase_b":"HEAD_AFTER_A"}
+    r=grader._reference("X18", p)
+    assert r["ok"], r
+    out=r["output"]
+    assert out["commits"]==3
+    assert len({out["base_sha"],out["head_a_sha"],out["head_b_sha"]})==3
+    assert out["source"]=="x=2\n"
+    assert "module.py" in r["files"]
+
+
+@pytest.mark.parametrize("case", sorted(grader.READY))
+def test_reviewer_gate_kills_constant_and_reject_all_mutants(case, tmp_path, monkeypatch):
+    path = tmp_path/"new-run"/case
+    path.mkdir(parents=True)
+    source = path/"implementation.py"
+    source.write_text("def run(payload, workdir):\n    return {'accepted': True}\n", encoding="utf-8")
+    monkeypatch.setattr(grader,"RUNS",tmp_path)
+    wrong=grader.verify_case(case,path)
+    assert wrong["failed"] >= 2, case
+    source.write_text("def run(payload, workdir):\n    raise ValueError('always reject')\n", encoding="utf-8")
+    rejecting=grader.verify_case(case,path)
+    assert rejecting["failed"] >= 2, case
+    assert not wrong["human_approved"] and not rejecting["human_approved"]
+
+
+def test_reference_import_bypass_is_blocked(tmp_path):
+    path=tmp_path/"new-run"/"X01"
+    path.mkdir(parents=True)
+    (path/"implementation.py").write_text(
+        "from harness.contracts.wp20_reference_a import x01\n"
+        "def run(payload, workdir):\n    return x01(payload, workdir)\n",
+        encoding="utf-8")
+    with pytest.raises(ValueError,match="official reference"):
+        grader._candidate_source(path)
+
+
+def test_scope_denies_edits_to_verifier(monkeypatch):
+    import types
+
+    monkeypatch.setattr(grader.subprocess, "run", lambda *a,**kw: types.SimpleNamespace(
+        stdout="A\tharness/tests/wp20/runs/fresh-run/X01/implementation.py\n"
+               "M\tharness/contracts/wp20_verify.py\n"
+    ))
+    assert grader.audit_scope("a"*40)==["harness/contracts/wp20_verify.py"]
