@@ -3,6 +3,7 @@
 Work plans only reference stable contract IDs; they must not redefine or
 silently waive global invariants. This module is read-only and stdlib-only.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -34,28 +35,36 @@ def catalog() -> dict:
     ids = [row["id"] for row in rows]
     _need(len(set(ids)) == len(ids), "Duplicate contract ID")
     for row in rows:
-        _need(re.fullmatch(r"CT-[A-Z][A-Z0-9-]*", row["id"]) is not None,
-              "Invalid contract ID")
+        _need(re.fullmatch(r"CT-[A-Z][A-Z0-9-]*", row["id"]) is not None, "Invalid contract ID")
         _need(row["enforcement"] in {"always", "conditional"}, "Invalid enforcement")
-        _need(isinstance(row["requirements"], list) and bool(row["requirements"]),
-              "Contract without executable obligations")
+        _need(
+            isinstance(row["requirements"], list) and bool(row["requirements"]),
+            "Contract without executable obligations",
+        )
     always = data["required_always"]
-    _need(len(set(always)) == len(always) and set(always) ==
-          {row["id"] for row in rows if row["enforcement"] == "always"},
-          "Always-on contracts are inconsistent")
-    _need(len(set(data["task_tags"])) == len(data["task_tags"]),
-          "Duplicate category tag")
+    _need(
+        len(set(always)) == len(always)
+        and set(always) == {row["id"] for row in rows if row["enforcement"] == "always"},
+        "Always-on contracts are inconsistent",
+    )
+    _need(len(set(data["task_tags"])) == len(data["task_tags"]), "Duplicate category tag")
     return data
 
 
 def plan_path(relative: str) -> Path:
-    _need(isinstance(relative, str) and relative.endswith(".md") and "\\" not in relative,
-          "Expected a repository-relative Markdown Work Plan")
-    _need(not relative.startswith("/") and ".." not in PurePosixPath(relative).parts,
-          "Unsafe Work Plan path")
+    _need(
+        isinstance(relative, str) and relative.endswith(".md") and "\\" not in relative,
+        "Expected a repository-relative Markdown Work Plan",
+    )
+    _need(
+        not relative.startswith("/") and ".." not in PurePosixPath(relative).parts,
+        "Unsafe Work Plan path",
+    )
     path = (ROOT / relative).resolve()
-    _need(path.is_relative_to(PLAN_ROOT.resolve()) and path.is_file(),
-          "Work Plan is missing or outside the approved plan directory")
+    _need(
+        path.is_relative_to(PLAN_ROOT.resolve()) and path.is_file(),
+        "Work Plan is missing or outside the approved plan directory",
+    )
     return path
 
 
@@ -67,20 +76,25 @@ def declaration(relative: str) -> dict:
         obj = json.loads(matches[0])
     except json.JSONDecodeError as exc:
         raise ContractError("Invalid contract declaration JSON") from exc
-    _need(isinstance(obj, dict) and set(obj) == {"registry", "plan", "cases"},
-          "Invalid declaration fields")
+    _need(
+        isinstance(obj, dict) and set(obj) == {"registry", "plan", "cases"},
+        "Invalid declaration fields",
+    )
     _need(obj["registry"] == catalog()["schema"], "Wrong contract registry")
-    _need(isinstance(obj["cases"], dict) and bool(obj["cases"]),
-          "Work Plan must declare each case")
+    _need(isinstance(obj["cases"], dict) and bool(obj["cases"]), "Work Plan must declare each case")
     return obj
 
 
 def _ids(value: object, known: set[str], label: str) -> list[str]:
-    _need(isinstance(value, list) and bool(value) and
-          all(isinstance(v, str) for v in value), label + " must list contract IDs")
+    _need(
+        isinstance(value, list) and bool(value) and all(isinstance(v, str) for v in value),
+        label + " must list contract IDs",
+    )
     _need(len(set(value)) == len(value), "Duplicate contract: " + label)
-    _need(set(value) <= known, "Unknown contract ID in " + label + ": " +
-          repr(sorted(set(value) - known)))
+    _need(
+        set(value) <= known,
+        "Unknown contract ID in " + label + ": " + repr(sorted(set(value) - known)),
+    )
     return list(value)
 
 
@@ -93,20 +107,31 @@ def resolve(relative: str, case: str) -> dict:
     _need(case in selection["cases"], "Case was not declared in the Work Plan")
     plan_ids = _ids(selection["plan"], set(known), "plan")
     row = selection["cases"][case]
-    _need(isinstance(row, dict) and set(row) == {"tags", "contracts"},
-          "A case must explicitly declare tags and contracts")
+    _need(
+        isinstance(row, dict) and set(row) == {"tags", "contracts"},
+        "A case must explicitly declare tags and contracts",
+    )
     tags = row["tags"]
-    _need(isinstance(tags, list) and bool(tags) and
-          all(isinstance(x, str) for x in tags) and len(set(tags)) == len(tags) and
-          set(tags) <= set(data["task_tags"]), "Invalid or undeclared task tags")
+    _need(
+        isinstance(tags, list)
+        and bool(tags)
+        and all(isinstance(x, str) for x in tags)
+        and len(set(tags)) == len(tags)
+        and set(tags) <= set(data["task_tags"]),
+        "Invalid or undeclared task tags",
+    )
     case_ids = _ids(row["contracts"], set(known), case)
     selected = list(dict.fromkeys(data["required_always"] + plan_ids + case_ids))
     for tag in tags:
         # Each declared applicable tag needs an explicitly selected
         # conditional contract with this tag, not only a global generic rule.
-        _need(any(known[ident]["enforcement"] == "conditional" and
-                  tag in known[ident]["tags"] for ident in selected),
-              "No specific contract covers tag: " + tag)
+        _need(
+            any(
+                known[ident]["enforcement"] == "conditional" and tag in known[ident]["tags"]
+                for ident in selected
+            ),
+            "No specific contract covers tag: " + tag,
+        )
     return {
         "schema": "saebase.harness.selected_contracts.v1",
         "registry_version": data["version"],
@@ -115,13 +140,15 @@ def resolve(relative: str, case: str) -> dict:
         "tags": tags,
         "contract_ids": selected,
         "requirements": [
-            {"id": ident, "title": known[ident]["title"],
-             "requirements": known[ident]["requirements"],
-             "negative_examples": known[ident]["negative_examples"]}
+            {
+                "id": ident,
+                "title": known[ident]["title"],
+                "requirements": known[ident]["requirements"],
+                "negative_examples": known[ident]["negative_examples"],
+            }
             for ident in selected
         ],
     }
-
 
 
 def select_tags(tags: list[str]) -> dict:
@@ -139,16 +166,23 @@ def select_tags(tags: list[str]) -> dict:
     for item in data["contracts"]:
         if item["enforcement"] == "conditional" and set(item["tags"]) & set(tags):
             selected.append(item["id"])
-    return {"schema": "saebase.harness.selected_contracts.v1",
-            "registry_version": data["version"], "case": "CUSTOM",
-            "tags": tags, "contract_ids": list(dict.fromkeys(selected))}
+    return {
+        "schema": "saebase.harness.selected_contracts.v1",
+        "registry_version": data["version"],
+        "case": "CUSTOM",
+        "tags": tags,
+        "contract_ids": list(dict.fromkeys(selected)),
+    }
 
 
 def validate_plan(relative: str) -> dict:
     obj = declaration(relative)
     resolved = {case: resolve(relative, case) for case in obj["cases"]}
-    return {"plan": relative, "cases": sorted(resolved),
-            "case_contracts": {k: v["contract_ids"] for k, v in resolved.items()}}
+    return {
+        "plan": relative,
+        "cases": sorted(resolved),
+        "case_contracts": {k: v["contract_ids"] for k, v in resolved.items()},
+    }
 
 
 def main() -> int:
@@ -165,8 +199,10 @@ def main() -> int:
     args = parser.parse_args()
     try:
         if args.command == "list":
-            result = {"version": catalog()["version"],
-                      "contract_ids": [r["id"] for r in catalog()["contracts"]]}
+            result = {
+                "version": catalog()["version"],
+                "contract_ids": [r["id"] for r in catalog()["contracts"]],
+            }
         elif args.command == "check":
             result = validate_plan(args.plan)
         elif args.command == "select":
