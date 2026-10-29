@@ -3,6 +3,107 @@
 状态：**READY FOR TEST-SANDBOX（待治理 PR 合并生效）**。本文件只定义测验，不代表六题已执行或通过。 
 范围：Harness 的 Rules、Skills、Hooks、Work Order、Agent Flow、AST / Tree、Context、环境事实、Atlas 交互与双语。**不测 SAE 算法、模型、GPU、权重或科研功能。**
 
+
+## 0. Universal Contract Registry · 开始前必须解析
+
+Harness 的通用合同**预先定义于** `harness/contracts/catalog.json`。本 Work Plan 只能通过以下声明引用已有 ID；不得临时创建任务专属合同或覆盖全局条件。5 个 Always-on Contract 由解析器自动加入，`CT-ERROR` 为本计划的共同要求。新增其他任务时，先选择适用 tags 和对应 ID，提交合格的 Work Plan 声明，再执行。
+
+```harness-contracts-json
+{
+  "registry": "saebase.harness.contract_registry.v1",
+  "plan": [
+    "CT-ERROR"
+  ],
+  "cases": {
+    "H01": {
+      "tags": [
+        "evidence",
+        "determinism",
+        "interface"
+      ],
+      "contracts": [
+        "CT-EVIDENCE",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ]
+    },
+    "H02": {
+      "tags": [
+        "tree",
+        "code",
+        "determinism",
+        "interface"
+      ],
+      "contracts": [
+        "CT-STRUCT",
+        "CT-AST",
+        "CT-DETERMINISM",
+        "CT-INTERFACE"
+      ]
+    },
+    "H03": {
+      "tags": [
+        "evidence",
+        "context",
+        "interface"
+      ],
+      "contracts": [
+        "CT-EVIDENCE",
+        "CT-CONTEXT",
+        "CT-INTERFACE"
+      ]
+    },
+    "H04": {
+      "tags": [
+        "privacy",
+        "environment",
+        "interface"
+      ],
+      "contracts": [
+        "CT-PRIVACY",
+        "CT-ENV",
+        "CT-INTERFACE"
+      ]
+    },
+    "H05": {
+      "tags": [
+        "tree",
+        "review",
+        "interface"
+      ],
+      "contracts": [
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-INTERFACE"
+      ]
+    },
+    "H06": {
+      "tags": [
+        "localization",
+        "code",
+        "interface"
+      ],
+      "contracts": [
+        "CT-LOCALE",
+        "CT-AST",
+        "CT-INTERFACE"
+      ]
+    }
+  }
+}
+```
+
+| Case | 本题额外 Contract | 为什么适用 |
+| --- | --- | --- |
+| H01 | `CT-EVIDENCE`, `CT-DETERMINISM`, `CT-INTERFACE` | 文件证据、确定性和输入接口 |
+| H02 | `CT-STRUCT`, `CT-AST`, `CT-DETERMINISM`, `CT-INTERFACE` | Code Tree 结构与实际 AST |
+| H03 | `CT-EVIDENCE`, `CT-CONTEXT`, `CT-INTERFACE` | 双向 Context 引用及来源核实 |
+| H04 | `CT-PRIVACY`, `CT-ENV`, `CT-INTERFACE` | 完整数据结构脱敏与合成事实 |
+| H05 | `CT-STRUCT`, `CT-REVIEW`, `CT-INTERFACE` | Tree 身份不变量与审阅权限 |
+| H06 | `CT-LOCALE`, `CT-AST`, `CT-INTERFACE` | 中英文双向完整性与源码不变 |
+
+执行前在允许的只读 Contract 解析器中进行 `resolve`，以当次 `case` 的完整 `contract_ids` 作为实现与自测的固定依据。未知 Contract、无法覆盖任务 tags、目录外计划或非法 JSON 时停止并报告，不自行放宽。具体负面测试数据仍由独立验收方持有；不是为了复现旧版 H03–H06 再把测试答案写回题目。
+
 ## 1. 人类只需一句话
 
 在 Cursor **Agent 模式**给本地 Agent 发送以下任意自然语言指令即可：
@@ -75,8 +176,9 @@ harness/
 3. **写真实小功能**：必须有 `implementation.py` 的真实 Python 行为，配套 `test_implementation.py` 与 fixture。禁止仅通过手写 `review_candidate.json` 或改测试断言冒充实现。
 4. **执行可见自测**：仅运行本题相关的 pytest，生成 `selfcheck.json`，包含命令、退出码、通过/失败数、关键输入及未运行项；不要更改独立评价器。
 5. **产出人审候选 Tree**：从自己写出的实际 AST 提取合法节点 ID、源码路径、行号、签名、中文/英文简明标题、不同信息量的摘要与 evidence，`provisional: true`、`status: unchecked`。未知的 Context/Knowledge 关系要写 unresolved，不凭函数名编造科学概念。
-6. **Expected / Observed 分离**：Agent 交 `expected_code_diff.json` 只是预测。独立评审者用 `harness/code/build.py --include-harness` 在可丢弃环境中生成真实 AST 树，对照实际差异和源文件；生产 `doc/code/code_tree.json` 永不由考生编辑。
-7. **报告并停止**：`report.md` 列出任务、文件路径、源码证据、所有自测结果、拒绝/阻塞原因、供人工审阅的节点；只能称“实现完成 / 本地自测结果”，不可称“独立验收 PASS”或“节点已批准”。
+6. **Contract Receipt**：每个 `case` 在自己的 Run 下记录 `contract_receipt.json`，包含选择的 Contract IDs、版本、实际阅读路径、源 SHA 或明确的 unavailable、已经执行的命令与退出码；不得声称未发生的读取或验证。由独立验收方核对该收据是否与解析器结果一致。
+7. **Expected / Observed 分离**：Agent 交 `expected_code_diff.json` 只是预测。独立评审者用 `harness/code/build.py --include-harness` 在可丢弃环境中生成真实 AST 树，对照实际差异和源文件；生产 `doc/code/code_tree.json` 永不由考生编辑。
+8. **报告并停止**：`report.md` 列出任务、文件路径、源码证据、所有自测结果、拒绝/阻塞原因、供人工审阅的节点；只能称“实现完成 / 本地自测结果”，不可称“独立验收 PASS”或“节点已批准”。
 
 ### 4.1 Candidate Tree 与评审记录 schema
 
