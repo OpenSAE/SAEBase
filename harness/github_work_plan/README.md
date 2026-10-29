@@ -2,6 +2,8 @@
 
 [**WP20 — 20 道中大型集成题及独立验收设计**](20_integrated_multistage_harness_exams.md)：X01–X20 涉及真实 AST/Tree/Knowledge、SAE 编码/干预、AUROC/AP/Bootstrap、Checkpoint、文件原子性、CI 发布、并发与长时程重放。每题有模块来源、明确操作阶段、正反例与独立验收目标；配套 [机器可读设计](../contracts/wp20_cases.json)。**X01–X20 已有实际行为 Reference、80 组冻结正反例、独立 grader 与错误实现校准，现在可在隔离环境开展考试；产品级完整集成和人工审核仍是后续独立工作。**历史 WP19 的 200 个微型合成任务继续保留。
 
+**WP20 阶段结项（2026-10-29）**：[考试结果、证据等级与下一阶段边界](20_exam_phase_closeout_20261029.md)。20 题考生提交已通过 [PR #96](https://github.com/OpenSAE/SAEBase/pull/96) 归档至 `main`。公开行为自测记录为 80/80；本阶段验证的是 Harness 内受控 CPU 合成考试，不代表真实 SAEBase 环境集成验收。
+
 ## Work Plan 19 · 200 个候选考试与验证器可信性
 
 [**WP19 — Harness 大规模考试与 Verification 可信性计划**](19_harness_large_scale_examination_and_verifier_assurance.md)：提出 H27–H226 共 200 道下一阶段候选考试，并明确冻结 Case Spec、可信 Reference、Mutation / Metamorphic / Differential / Stateful / Compositional / Multi-Agent 测试及长任务恢复。**200 道微型合成验证题均已可执行，提供 800 个公开正反例；不等于真实科研功能或系统集成已通过独立验收。WP18 独立进行。**
