@@ -1,0 +1,11 @@
+{
+  "synthetic": true,
+  "nodes": [
+    {"id": "pile", "parent_id": null, "order": 0, "tree_id": "yard", "name": "middle"},
+    {"id": "kite", "parent_id": "pile", "order": 0, "tree_id": "yard", "name": "zeta"},
+    {"id": "ember", "parent_id": "pile", "order": 1, "tree_id": "yard", "name": "alpha"},
+    {"id": "nest", "parent_id": "kite", "order": 0, "tree_id": "yard", "name": "inner"},
+    {"id": "slip-b", "parent_id": null, "order": 1, "tree_id": "lane", "name": "bee"},
+    {"id": "slip-a", "parent_id": null, "order": 2, "tree_id": "lane", "name": "ay"}
+  ]
+}

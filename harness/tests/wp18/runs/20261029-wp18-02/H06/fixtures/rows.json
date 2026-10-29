@@ -1,0 +1,83 @@
+[
+  {
+    "synthetic": true,
+    "id": "code:function:exam.packet:clean_row",
+    "project": "SAEBase",
+    "signature": "def north_span()",
+    "path": "harness/tests/wp18/exam_packet.py",
+    "title": {"zh": "北向片段", "en": "North span"},
+    "summary": {"zh": "只描述调用方点名的那一段输入。", "en": "Describes only the span the caller named."},
+    "description": {"zh": "不会补写缺失译文。", "en": "Does not invent a missing translation."}
+  },
+  {
+    "synthetic": true,
+    "id": "code:function:exam.packet:missing_en",
+    "project": "SAEBase",
+    "signature": "def south_span()",
+    "path": "harness/tests/wp18/exam_packet.py",
+    "title": {"zh": "南向片段", "en": "South span"},
+    "summary": {"zh": "比较两份测验树。", "en": "Compares two exam trees."},
+    "description": {"zh": "重排不算变化。", "en": ""}
+  },
+  {
+    "synthetic": true,
+    "id": "code:function:exam.packet:missing_zh",
+    "project": "SAEBase",
+    "signature": "def west_span()",
+    "path": "harness/tests/wp18/exam_packet.py",
+    "title": {"zh": "", "en": "West span"},
+    "summary": {"zh": "核对引用是否双向。", "en": "Checks that citations point both ways."},
+    "description": {"zh": "建议不会自动执行。", "en": "Suggestions are not applied."}
+  },
+  {
+    "synthetic": true,
+    "id": "code:function:exam.packet:period_row",
+    "project": "SAEBase",
+    "signature": "def audit_term_links(bundle, evidence_root)",
+    "path": "harness/tests/wp18/exam_packet.py",
+    "title": {"zh": "引用核对", "en": "Link check"},
+    "summary": {"zh": "引用核对。", "en": "Link check."},
+    "description": {"zh": "只产生建议。", "en": "Emits suggestions without writing a glossary."}
+  },
+  {
+    "synthetic": true,
+    "id": "code:function:exam.packet:placeholder_row",
+    "project": "SAEBase",
+    "signature": "def normalize_environment(record)",
+    "path": "harness/tests/wp18/exam_packet.py",
+    "title": {"zh": "环境概述", "en": "Environment summary"},
+    "summary": {"zh": "规范化合成设备记录。", "en": "English translation unavailable"},
+    "description": {"zh": "缺字段保持 unknown。", "en": "Missing fields stay unknown."}
+  },
+  {
+    "synthetic": true,
+    "id": "code:function:exam.packet:broken_row",
+    "project": "SAEBase",
+    "signature": "def queue_nodes(graph, scope)",
+    "path": "harness/tests/wp18/exam_packet.py",
+    "title": {"zh": "审阅队列", "en": "Review queue \ufffd"},
+    "summary": {"zh": "按兄弟顺序做深度优先。", "en": "Depth-first order follows sibling order."},
+    "description": {"zh": "草稿不是批准。", "en": "Drafts are not approvals."}
+  },
+  {
+    "synthetic": true,
+    "id": "code:function:exam.packet:foreign_row",
+    "project": "OpenResearch",
+    "signature": "def review_locale_rows(rows)",
+    "path": "harness/tests/wp18/exam_packet.py",
+    "title": {"zh": "双语审计", "en": "Locale audit"},
+    "summary": {"zh": "检查中英覆盖层是否对齐。", "en": "Checks whether the zh and en rows share ids."},
+    "description": {"zh": "不写翻译表。", "en": "Does not edit the translation tables."}
+  },
+  {
+    "synthetic": true,
+    "id": "code:function:exam.packet:spaced_row",
+    "project": "SAEBase",
+    "signature": "def north_span()",
+    "localized_signature": "定义 north_span()",
+    "path": "harness/tests/wp18/exam_packet.py",
+    "title": {"zh": "片段摘要", "en": "Span digest"},
+    "summary": {"zh": "计算摘要。", "en": "Computes north span for the caller."},
+    "description": {"zh": "路径必须相对。", "en": "Paths stay relative."}
+  }
+]

@@ -1,0 +1,119 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-02",
+  "case_id": "H02",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "95e42deb2994b9a08e56ed14417ac3eb12ae3cbb",
+  "source_content_sha256": "e1e797e7c53d9d096433021e5f4d779c71841d8ff6efec120ebeb9aa1dbe7f5d",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:TreeShapeError",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation",
+      "title": {
+        "zh": "树形拒绝",
+        "en": "Tree shape refusal"
+      },
+      "summary": {
+        "zh": "身份、端点或关系不合法时比较不会开始，也不会补一个新节点。",
+        "en": "Comparison does not start, and no node is invented, when identity, an endpoint, or a relation is illegal."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H02/implementation.py",
+      "line": 6,
+      "signature": "class TreeShapeError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H02/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:compare_code_trees",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation",
+      "title": {
+        "zh": "代码树比较",
+        "en": "Code-tree comparison"
+      },
+      "summary": {
+        "zh": "按稳定 node_id 列出新增、删除、签名变化和边变化，忽略排列顺序。",
+        "en": "Lists added, removed, signature, and edge changes by stable node id, ignoring order."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H02/implementation.py",
+      "line": 13,
+      "signature": "def compare_code_trees(before: dict, after: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H02/implementation.py:13"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:_accept_tree",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation",
+      "title": {
+        "zh": "树合法性",
+        "en": "Tree acceptance"
+      },
+      "summary": {
+        "zh": "确认项目是 SAEBase、端点存在、关系合法，并且 contains 边没有环。",
+        "en": "Checks the project is SAEBase, endpoints exist, relations are legal, and contains edges have no cycle."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H02/implementation.py",
+      "line": 35,
+      "signature": "def _accept_tree(tree: dict) -> tuple[dict[str, str], set[tuple[str, str, str]]]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H02/implementation.py:35"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:_contains_cycle",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation",
+      "title": {
+        "zh": "包含边环检测",
+        "en": "Contains-cycle check"
+      },
+      "summary": {
+        "zh": "只沿已有 contains 边查找环，不把缺失端点放进结果。",
+        "en": "Looks for a cycle along existing contains edges and does not add a missing endpoint."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H02/implementation.py",
+      "line": 79,
+      "signature": "def _contains_cycle(children: dict[str, list[str]]) -> bool",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H02/implementation.py:79"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:_edge_rows",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation",
+      "title": {
+        "zh": "边的稳定序",
+        "en": "Stable edge rows"
+      },
+      "summary": {
+        "zh": "把边集合排成可重复比较的 source、type、target 记录。",
+        "en": "Sorts edge triples into comparable source, type, and target records."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H02/implementation.py",
+      "line": 100,
+      "signature": "def _edge_rows(triples: set[tuple[str, str, str]]) -> list[dict[str, str]]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H02/implementation.py:100"
+      ]
+    }
+  ],
+  "unresolved": [
+    "The compared JSON is a fixture, not doc/code/code_tree.json."
+  ]
+}
