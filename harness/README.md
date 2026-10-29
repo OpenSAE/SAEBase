@@ -6,6 +6,8 @@ Research Lab、Dataset、Model、Task 及通用 SAE 接口均由 SAEBase 仓库�
 | 模块 | 作用 |
 | --- | --- |
 | `core/` | 项目结构、Agent Flow 与审批 |
+| `contracts/` | 先验通用 Task Contracts、解析器、验证不变量及执行收据 |
+| `tests/` | Harness 本地 Agent 测验运行、候选 Tree、独立验收分离 |
 | `knowledge/` | 科研知识、来源与 Context 关联 |
 | `code/` | 真实 Python AST、接口说明和差异 |
 | `experiments/` | 产物路径、配置与来源验证 |
