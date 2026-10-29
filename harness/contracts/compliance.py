@@ -13,7 +13,7 @@ from pathlib import Path, PurePosixPath
 from harness.contracts import invariants
 
 _WINDOWS_DRIVE = re.compile(r"^[A-Za-z]:")
-_ALLOWED_ARTIFACTS = {"relative_path", "structured_output", "bilingual_record", "tree", "numeric_output"}
+_ALLOWED_ARTIFACTS = {"source_reference", "relative_path", "structured_output", "bilingual_record", "tree", "numeric_output"}
 
 
 def canonical_relative_path(value: str) -> str:
@@ -75,6 +75,8 @@ def audit_artifacts(contract_ids: list[str], artifacts: list[dict], root: Path) 
             continue
         try:
             finite_json(value)
+            if kind == "source_reference" and "CT-EVIDENCE" in contract_ids:
+                invariants.reference_location(value, root)
             if kind == "relative_path" and "CT-EVIDENCE" in contract_ids:
                 canonical_relative_path(value)
                 if not (root.resolve() / value).resolve().is_relative_to(root.resolve()):

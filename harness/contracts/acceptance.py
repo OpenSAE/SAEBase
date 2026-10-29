@@ -6,7 +6,7 @@ import argparse
 import json
 from pathlib import Path
 
-from harness.contracts import invariants, registry, trace
+from harness.contracts import compliance, invariants, registry, trace
 from harness.contracts.selection import audit_selection
 
 ROOT = registry.ROOT
@@ -74,10 +74,16 @@ def review(*, plan: str, case: str, receipt_path: Path, evaluator_path: Path) ->
                 elif kind == "bilingual_record":
                     defects = invariants.localization_defects(payload)
                     issues.extend(f"Artifact {i}: {x}" for x in defects)
+                elif kind == "numeric_output":
+                    compliance.finite_json(payload)
+                elif kind == "relative_path":
+                    compliance.canonical_relative_path(payload)
                 else:
                     issues.append(f"Unsupported artifact kind at {i}")
             except (ValueError, OSError, TypeError) as exc:
                 issues.append(f"Artifact {i}: {exc}")
+    if isinstance(artifacts, list):
+        issues.extend(compliance.audit_artifacts(selected["contract_ids"], artifacts, ROOT))
     return {
         "case": case,
         "status": "FAIL" if issues else "TECHNICAL_CHECKS_PASSED_NEEDS_HUMAN_REVIEW",
