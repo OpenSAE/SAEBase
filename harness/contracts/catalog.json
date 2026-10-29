@@ -21,9 +21,7 @@
     "environment",
     "determinism",
     "interface",
-    "validation",
-    "trace",
-    "scope"
+    "validation"
   ],
   "contracts": [
     {
