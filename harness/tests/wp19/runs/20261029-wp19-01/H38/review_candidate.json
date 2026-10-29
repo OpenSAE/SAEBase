@@ -1,0 +1,80 @@
+{
+  "schema": "saebase.wp19.review_candidate.v1",
+  "run_id": "20261029-wp19-01",
+  "case_id": "H38",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "e94da4dc3ec73c4e93ac99a01ce159e94ac2bfb2",
+  "source_content_sha256": "bb95be9fd858a7d2142c20d6edb545d2c5bf83ba63db10c4998fe8676c957971",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp19.runs.20261029-wp19-01.H38.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H38.implementation",
+      "title": {
+        "zh": "路径拒绝",
+        "en": "Path refusal"
+      },
+      "summary": {
+        "zh": "治理前缀、父目录跳转或绝对路径被拒绝。",
+        "en": "Governance prefixes, parent traversal, and absolute paths are rejected."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H38/implementation.py",
+      "line": 8,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H38/implementation.py:8"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H38.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H38.implementation",
+      "title": {
+        "zh": "允许路径",
+        "en": "Allowed paths"
+      },
+      "summary": {
+        "zh": "返回排序后的仓库相对路径。",
+        "en": "Returns the allowed repository-relative paths in sorted order."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H38/implementation.py",
+      "line": 12,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H38/implementation.py:12"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H38.implementation:_paths",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H38.implementation",
+      "title": {
+        "zh": "路径句法",
+        "en": "Path syntax"
+      },
+      "summary": {
+        "zh": "在任何文件访问前检查前缀和路径段。",
+        "en": "Checks prefixes and path segments before any file access."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H38/implementation.py",
+      "line": 19,
+      "signature": "def _paths(values: object) -> list[str]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H38/implementation.py:19"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; Observed AST was not rebuilt",
+    "independent acceptance was not run",
+    "nodes remain unchecked",
+    "H47-H226 remain PROPOSED and were not implemented"
+  ]
+}

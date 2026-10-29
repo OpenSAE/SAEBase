@@ -1,0 +1,80 @@
+{
+  "schema": "saebase.wp19.review_candidate.v1",
+  "run_id": "20261029-wp19-01",
+  "case_id": "H32",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "e94da4dc3ec73c4e93ac99a01ce159e94ac2bfb2",
+  "source_content_sha256": "7566b077b73e32bf55f733acc45507e187b9517947b4cab842794e67c03e50a4",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp19.runs.20261029-wp19-01.H32.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H32.implementation",
+      "title": {
+        "zh": "分组拒绝",
+        "en": "Group refusal"
+      },
+      "summary": {
+        "zh": "某一组不是已注册唯一编号列表时抛出。",
+        "en": "Raised when a group is not a unique list of registered ids."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H32/implementation.py",
+      "line": 32,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H32/implementation.py:32"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H32.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H32.implementation",
+      "title": {
+        "zh": "分组并集",
+        "en": "Group union"
+      },
+      "summary": {
+        "zh": "把各组与常驻合同合并成无重复排序列表。",
+        "en": "Merges every group with the always-on contracts into a unique sorted list."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H32/implementation.py",
+      "line": 36,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H32/implementation.py:36"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H32.implementation:_ids",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H32.implementation",
+      "title": {
+        "zh": "组内编号",
+        "en": "Ids in one group"
+      },
+      "summary": {
+        "zh": "拒绝一组内部的未知或重复编号。",
+        "en": "Rejects an unknown or duplicated id inside one group."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H32/implementation.py",
+      "line": 51,
+      "signature": "def _ids(values: list[object]) -> list[str]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H32/implementation.py:51"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; Observed AST was not rebuilt",
+    "independent acceptance was not run",
+    "nodes remain unchecked",
+    "H47-H226 remain PROPOSED and were not implemented"
+  ]
+}

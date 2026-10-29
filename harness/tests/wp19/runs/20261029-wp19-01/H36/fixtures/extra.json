@@ -1,0 +1,47 @@
+{
+  "positive": [
+    {
+      "input": {
+        "old": [],
+        "new": [
+          "CT-TRACE",
+          "CT-TRUTH",
+          "CT-CHECK",
+          "CT-SCOPE",
+          "CT-BASE",
+          "CT-ERROR"
+        ]
+      },
+      "expected": {
+        "compatible": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "old": [
+          "CT-ERROR"
+        ],
+        "new": [
+          "CT-BASE",
+          "CT-SCOPE",
+          "CT-TRUTH",
+          "CT-CHECK",
+          "CT-TRACE"
+        ]
+      }
+    },
+    {
+      "input": {
+        "old": [
+          "CT-BASE"
+        ],
+        "new": [
+          "CT-BASE",
+          "CT-UNKNOWN"
+        ]
+      }
+    }
+  ]
+}

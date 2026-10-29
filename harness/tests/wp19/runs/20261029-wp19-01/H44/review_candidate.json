@@ -1,0 +1,59 @@
+{
+  "schema": "saebase.wp19.review_candidate.v1",
+  "run_id": "20261029-wp19-01",
+  "case_id": "H44",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "e94da4dc3ec73c4e93ac99a01ce159e94ac2bfb2",
+  "source_content_sha256": "d7a40f5952a1d298c11e7e9accc21d16bd47077b157abecb52c01a7510bbd919",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp19.runs.20261029-wp19-01.H44.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H44.implementation",
+      "title": {
+        "zh": "注释拒绝",
+        "en": "Comment refusal"
+      },
+      "summary": {
+        "zh": "注释或实际文本缺失或不是字符串时抛出。",
+        "en": "Raised when comment or actual is missing or is not a string."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H44/implementation.py",
+      "line": 6,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H44/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H44.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H44.implementation",
+      "title": {
+        "zh": "实际优先",
+        "en": "Actual wins"
+      },
+      "summary": {
+        "zh": "以实际文本为准，并报告它是否与注释不同。",
+        "en": "Treats the actual text as authoritative and reports whether it disagrees with the comment."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H44/implementation.py",
+      "line": 10,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H44/implementation.py:10"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; Observed AST was not rebuilt",
+    "independent acceptance was not run",
+    "nodes remain unchecked",
+    "H47-H226 remain PROPOSED and were not implemented"
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "schema": "saebase.wp19.review_candidate.v1",
+  "run_id": "20261029-wp19-01",
+  "case_id": "H43",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "e94da4dc3ec73c4e93ac99a01ce159e94ac2bfb2",
+  "source_content_sha256": "78d9cc98bd39cfdc1eab675e441d7b5329ac16355b2c54398004ba6e53138f3c",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp19.runs.20261029-wp19-01.H43.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H43.implementation",
+      "title": {
+        "zh": "声明拒绝",
+        "en": "Claim refusal"
+      },
+      "summary": {
+        "zh": "不是两个不同来源的声明时抛出。",
+        "en": "Raised unless there are exactly two claims from two different sources."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H43/implementation.py",
+      "line": 6,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H43/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H43.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H43.implementation",
+      "title": {
+        "zh": "来源冲突",
+        "en": "Source conflict"
+      },
+      "summary": {
+        "zh": "保留两个来源，并标明冲突或一致。",
+        "en": "Keeps both sources and reports conflict or consistent."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H43/implementation.py",
+      "line": 10,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H43/implementation.py:10"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H43.implementation:_claim",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H43.implementation",
+      "title": {
+        "zh": "单条声明",
+        "en": "One claim"
+      },
+      "summary": {
+        "zh": "读取一个来源名和一个字符串值。",
+        "en": "Reads one source name and one string value."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H43/implementation.py",
+      "line": 25,
+      "signature": "def _claim(claim: object) -> tuple[str, str]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H43/implementation.py:25"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; Observed AST was not rebuilt",
+    "independent acceptance was not run",
+    "nodes remain unchecked",
+    "H47-H226 remain PROPOSED and were not implemented"
+  ]
+}

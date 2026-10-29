@@ -1,0 +1,44 @@
+{
+  "positive": [
+    {
+      "input": {
+        "allowed": [
+          "north",
+          "south"
+        ],
+        "refs": [
+          "south",
+          "north"
+        ]
+      },
+      "expected": {
+        "verified": [
+          "north",
+          "south"
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "allowed": [
+          "north"
+        ],
+        "refs": [
+          "north",
+          "south"
+        ]
+      }
+    },
+    {
+      "input": {
+        "allowed": [
+          "north",
+          "north"
+        ],
+        "refs": []
+      }
+    }
+  ]
+}
