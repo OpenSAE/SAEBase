@@ -1,0 +1,11 @@
+{
+  "synthetic": true,
+  "nodes": [
+    {"id": "code:function:exam.packet:north_span", "signature": "def north_span()", "project": "SAEBase"},
+    {"id": "code:function:exam.packet:south_span", "signature": "def south_span()", "project": "SAEBase"}
+  ],
+  "edges": [
+    {"source": "code:function:exam.packet:north_span", "type": "contains", "target": "code:function:exam.packet:south_span"},
+    {"source": "code:function:exam.packet:south_span", "type": "contains", "target": "code:function:exam.packet:north_span"}
+  ]
+}

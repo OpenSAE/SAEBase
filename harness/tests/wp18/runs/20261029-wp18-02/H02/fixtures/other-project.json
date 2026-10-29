@@ -1,0 +1,7 @@
+{
+  "synthetic": true,
+  "nodes": [
+    {"id": "code:function:foreign.packet:other", "signature": "def other()", "project": "OpenResearch"}
+  ],
+  "edges": []
+}

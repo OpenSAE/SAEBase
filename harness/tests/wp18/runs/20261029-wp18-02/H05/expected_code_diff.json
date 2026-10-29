@@ -1,0 +1,189 @@
+{
+  "added_ids": [
+    "code:class:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:ReviewConflict",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:_check_graph",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:_roots",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:_walk_down",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:begin_drafts",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:export_drafts",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:neighbor_unchecked",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:queue_nodes",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:refuse_authority_write",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:undo_draft",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:write_draft",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:_graph",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:_load",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:test_candidate_matches_ast",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:test_cross_tree_and_authority_are_refused",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:test_drafts_are_local_and_stale_revision_conflicts",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:test_order_follows_sibling_order",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:test_unknown_node_is_not_invented",
+    "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation",
+    "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation"
+  ],
+  "removed_ids": [],
+  "changed": [],
+  "edges_added": [
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:_roots",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:_walk_down",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:queue_nodes",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:_check_graph",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:queue_nodes",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:_roots",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:queue_nodes",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:_walk_down",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:undo_draft",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:write_draft",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:test_cross_tree_and_authority_are_refused",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:test_drafts_are_local_and_stale_revision_conflicts",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:_graph",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:test_drafts_are_local_and_stale_revision_conflicts",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:test_order_follows_sibling_order",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:_graph",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:test_order_follows_sibling_order",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:test_unknown_node_is_not_invented",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:_graph",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:test_unknown_node_is_not_invented",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:group:harness",
+      "target": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:harness",
+      "target": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation",
+      "target": "code:class:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:ReviewConflict",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:_check_graph",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:_roots",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:_walk_down",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:begin_drafts",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:export_drafts",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:neighbor_unchecked",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:queue_nodes",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:refuse_authority_write",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:undo_draft",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.implementation:write_draft",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:_graph",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:_load",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:test_candidate_matches_ast",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:test_cross_tree_and_authority_are_refused",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:test_drafts_are_local_and_stale_revision_conflicts",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:test_order_follows_sibling_order",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H05.test_implementation:test_unknown_node_is_not_invented",
+      "type": "contains"
+    }
+  ],
+  "edges_removed": []
+}

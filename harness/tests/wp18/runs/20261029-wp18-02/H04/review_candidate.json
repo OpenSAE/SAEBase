@@ -1,0 +1,161 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-02",
+  "case_id": "H04",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "95e42deb2994b9a08e56ed14417ac3eb12ae3cbb",
+  "source_content_sha256": "7a80dac61cbcd727de36540b6f83acea59468223a45aac9fe7345914fee3bd4e",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:EnvironmentRefusal",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation",
+      "title": {
+        "zh": "环境记录拒绝",
+        "en": "Environment refusal"
+      },
+      "summary": {
+        "zh": "类型或深度无法完整检查时整份拒绝，不返回带原值的部分结果。",
+        "en": "Rejects the whole record when a type or depth cannot be inspected, instead of returning a partial copy."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H04/implementation.py",
+      "line": 6,
+      "signature": "class EnvironmentRefusal(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H04/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:normalize_environment",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation",
+      "title": {
+        "zh": "合成环境概述",
+        "en": "Synthetic environment summary"
+      },
+      "summary": {
+        "zh": "输出 unknown、脱敏标记和未观测说明，不调用 GPU 探针。",
+        "en": "Emits unknown values, redaction markers, and a not-observed note without probing a GPU."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H04/implementation.py",
+      "line": 14,
+      "signature": "def normalize_environment(record: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H04/implementation.py:14"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_walk",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation",
+      "title": {
+        "zh": "嵌套检查",
+        "en": "Nested inspection"
+      },
+      "summary": {
+        "zh": "展开字典和列表，密钥槽位和绝对路径换成不含原值的标记。",
+        "en": "Walks dicts and lists, replacing secret slots and absolute paths with markers that omit the original value."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H04/implementation.py",
+      "line": 44,
+      "signature": "def _walk(value: object, depth: int, trail: str, redacted: list[str]) -> object",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H04/implementation.py:44"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_sensitive_key",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation",
+      "title": {
+        "zh": "敏感字段名",
+        "en": "Sensitive field name"
+      },
+      "summary": {
+        "zh": "按字段名判断密钥和私有路径槽位，不读取字段以外的机器信息。",
+        "en": "Decides secret and private-path slots from the field name without reading machine information."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H04/implementation.py",
+      "line": 69,
+      "signature": "def _sensitive_key(key: str) -> bool",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H04/implementation.py:69"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_private_text",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation",
+      "title": {
+        "zh": "绝对路径文本",
+        "en": "Absolute path text"
+      },
+      "summary": {
+        "zh": "普通字段里的绝对路径字符串同样视为不可进入结果的值。",
+        "en": "Treats an absolute-path string in an ordinary field as a value that must not enter the result."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H04/implementation.py",
+      "line": 74,
+      "signature": "def _private_text(value: object) -> bool",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H04/implementation.py:74"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_public_text",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation",
+      "title": {
+        "zh": "可公开文本",
+        "en": "Public text"
+      },
+      "summary": {
+        "zh": "空字符串和探针字样写成 unknown，不用它们推断没有 GPU。",
+        "en": "Turns an empty string or probe wording into unknown instead of inferring that no GPU exists."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H04/implementation.py",
+      "line": 79,
+      "signature": "def _public_text(value: str) -> str",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H04/implementation.py:79"
+      ]
+    },
+    {
+      "view": "environment",
+      "operation": "add",
+      "node_id": "environment:synthetic:wp18:20261029-wp18-02:H04",
+      "parent_id": "environment:synthetic-root",
+      "title": {
+        "zh": "合成设备概述",
+        "en": "Synthetic device summary"
+      },
+      "summary": {
+        "zh": "这份测验记录没有探测硬件；嵌套密钥和私有路径只留下脱敏标记。",
+        "en": "This exam record probed no hardware; nested secrets and private paths remain only as redaction markers."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H04/fixtures/device.json",
+      "line": 1,
+      "signature": "synthetic: true",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H04/fixtures/device.json"
+      ]
+    }
+  ],
+  "unresolved": [
+    "The environment candidate is synthetic and is not an authority environment-tree record."
+  ]
+}

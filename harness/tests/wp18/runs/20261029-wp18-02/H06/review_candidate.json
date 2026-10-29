@@ -1,0 +1,161 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-02",
+  "case_id": "H06",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "95e42deb2994b9a08e56ed14417ac3eb12ae3cbb",
+  "source_content_sha256": "82ea3bfc802463b4bfc2caab522319c6b7cccbfe4e1ff78f4d015e5892eca4f6",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-02.H06.implementation:LocaleRowError",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H06.implementation",
+      "title": {
+        "zh": "覆盖层拒绝",
+        "en": "Locale row refusal"
+      },
+      "summary": {
+        "zh": "记录缺少 synthetic、稳定 ID、签名或路径时，审计不会开始。",
+        "en": "Auditing does not start when a row lacks synthetic, a stable id, a signature, or a path."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H06/implementation.py",
+      "line": 8,
+      "signature": "class LocaleRowError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H06/implementation.py:8"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H06.implementation:review_locale_rows",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H06.implementation",
+      "title": {
+        "zh": "双语行审计",
+        "en": "Bilingual row audit"
+      },
+      "summary": {
+        "zh": "列出检测到的问题，fixed 保持为空，表示翻译表没有被修改。",
+        "en": "Lists detected problems and keeps fixed empty, meaning the translation tables were not edited."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H06/implementation.py",
+      "line": 20,
+      "signature": "def review_locale_rows(rows: list[dict]) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H06/implementation.py:20"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H06.implementation:_one_row",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H06.implementation",
+      "title": {
+        "zh": "单行检查",
+        "en": "One-row check"
+      },
+      "summary": {
+        "zh": "分开检查项目 ID、本地化签名，以及中英标题是否只在复述摘要。",
+        "en": "Separately checks the project id, a localized signature, and whether a title restates its summary."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H06/implementation.py",
+      "line": 52,
+      "signature": "def _one_row(row: dict, detected: list[dict[str, str]]) -> None",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H06/implementation.py:52"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H06.implementation:_language_field",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H06.implementation",
+      "title": {
+        "zh": "中英字段完整性",
+        "en": "Language-field completeness"
+      },
+      "summary": {
+        "zh": "中文或英文缺失、英文占位句和 U+FFFD 各记一条，不回填译文。",
+        "en": "Records missing Chinese or English, an English placeholder, and U+FFFD without filling in a translation."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H06/implementation.py",
+      "line": 70,
+      "signature": "def _language_field(row: dict, name: str, detected: list[dict[str, str]]) -> None",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H06/implementation.py:70"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H06.implementation:_spaced_symbols",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H06.implementation",
+      "title": {
+        "zh": "符号是否被拆开",
+        "en": "Spaced-symbol check"
+      },
+      "summary": {
+        "zh": "签名中的下划线标识若只在英文散文里变成空格短语，就记为误译。",
+        "en": "Flags an underscored signature token that appears in English prose only as a spaced phrase."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H06/implementation.py",
+      "line": 85,
+      "signature": "def _spaced_symbols(row: dict, detected: list[dict[str, str]]) -> None",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H06/implementation.py:85"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H06.implementation:_phrase",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H06.implementation",
+      "title": {
+        "zh": "读取中英文本",
+        "en": "Read localized text"
+      },
+      "summary": {
+        "zh": "字段缺失或类型不对时返回空字符串，不生成替代译文。",
+        "en": "Returns an empty string when a localized field is missing or has the wrong type, without inventing text."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H06/implementation.py",
+      "line": 96,
+      "signature": "def _phrase(value: object, lang: str) -> str",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H06/implementation.py:96"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H06.implementation:_compact",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H06.implementation",
+      "title": {
+        "zh": "标题摘要归一",
+        "en": "Title and summary compaction"
+      },
+      "summary": {
+        "zh": "去掉大小写和标点，用来识别只多了一个句号的复述。",
+        "en": "Drops case and punctuation so a summary that only adds a period still matches the title."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-02/H06/implementation.py",
+      "line": 104,
+      "signature": "def _compact(text: str) -> str",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-02/H06/implementation.py:104"
+      ]
+    }
+  ],
+  "unresolved": [
+    "Detected locale problems were not applied to authority translation tables."
+  ]
+}

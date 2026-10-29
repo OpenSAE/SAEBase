@@ -1,0 +1,29 @@
+{
+  "synthetic": true,
+  "nodes": [
+    {
+      "id": "exam.node.left",
+      "term_ids": ["exam.term.left"],
+      "source_evidence": "sources/left-note.md:1"
+    },
+    {
+      "id": "exam.node.right",
+      "term_ids": ["exam.term.right"],
+      "source_evidence": "sources/right-note.md:1"
+    }
+  ],
+  "glossary": [
+    {
+      "id": "exam.term.left",
+      "related_node_ids": ["exam.node.left"],
+      "aliases": ["span-word"],
+      "source_evidence": "sources/left-note.md:1"
+    },
+    {
+      "id": "exam.term.right",
+      "related_node_ids": ["exam.node.right"],
+      "aliases": ["span-word"],
+      "source_evidence": "sources/right-note.md:1"
+    }
+  ]
+}
