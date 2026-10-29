@@ -78,6 +78,7 @@ def validate(path, template=False):
     demand(path.is_file(), "Work Order not found: " + str(path))
     order = yaml.safe_load(path.read_text(encoding="utf-8"))
     regular = {"version", "id", "status", "goal", "activation", "context"}
+    demand(isinstance(order, dict), "Work Order must be a mapping")
     if "contract_binding" in order:
         keys(order, regular | {"contract_binding"}, "Work Order")
         binding = keys(order["contract_binding"], {"plan", "case", "contract_ids"}, "contract_binding")
