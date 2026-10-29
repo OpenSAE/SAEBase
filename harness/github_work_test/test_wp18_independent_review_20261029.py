@@ -9,6 +9,8 @@ import ast
 import hashlib
 import importlib.util
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -200,3 +202,26 @@ def test_h06_reports_missing_chinese_content_as_bilingual_gap():
         and d["field"] in ("title", "summary", "description")
         for d in out["detected"]
     ), ("H06 accepted a non-bilingual overlay with no Chinese fields", out)
+
+
+@pytest.mark.parametrize("case", CASES)
+def test_replay_agent_selftests_independently(case):
+    target = RUN / case / "test_implementation.py"
+    completed = subprocess.run(
+        [
+            sys.executable, "-m", "pytest", "-p", "no:cacheprovider",
+            "-q", str(target.relative_to(ROOT)),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=45,
+        check=False,
+    )
+    record = read(case, "selfcheck.json")
+    assert completed.returncode == 0, (
+        case, completed.stdout[-2000:], completed.stderr[-1000:]
+    )
+    assert f'{record["tests_passed"]} passed' in completed.stdout, (
+        case, completed.stdout, record
+    )
