@@ -1,7 +1,7 @@
 {
   "schema": "saebase.wp20.integrated_exam_design.v1",
-  "version": "0.1.0",
-  "status": "SPEC_REVIEWED",
+  "version": "1.0.0",
+  "status": "READY",
   "purpose": "20 multi-stage real-behavior exercises; no executable independent graders claimed",
   "source_repo": "OpenSAE/SAEBase",
   "execution_contract": {
@@ -21,7 +21,11 @@
       "run_trace.json",
       "review_candidate.json (unchecked)",
       "report.md"
-    ]
+    ],
+    "entrypoint": "run(payload: dict, workdir: pathlib.Path) -> dict",
+    "scenarios": "harness/contracts/wp20_scenarios.json",
+    "reviewer_verifier": "harness/contracts/wp20_verify.py",
+    "qualification_scope": "Tiny deterministic source-backed, arithmetic, file, Git and stateful reference behaviors; NOT production component E2E approval"
   },
   "cases": [
     {
@@ -29,8 +33,8 @@
       "group": "Harness and Atlas",
       "title": "真实源码变更到 Code Tree 与候选 Diff",
       "goal": "以隔离 synthetic Python 模块的两次修改为输入，生成真实 AST 身份、Tree 更新和可审阅的来源证据。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "harness/code/build.py",
         "harness/code/diff.py",
@@ -93,15 +97,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_a.py"
     },
     {
       "id": "X02",
       "group": "Harness and Atlas",
       "title": "Glossary 同步、双向链接与中英 Overlay",
       "goal": "对包含六个节点的知识结构执行术语新增、修改、双向映射和中英本地化同步。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "harness/knowledge/terms.py",
         "harness/knowledge/validate.py",
@@ -164,15 +170,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_a.py"
     },
     {
       "id": "X03",
       "group": "Harness and Atlas",
       "title": "Atlas 五树切换与审阅会话状态恢复",
       "goal": "在独立的五树小图上完成语言切换、节点聚焦、审核、撤销和重新加载。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "harness/visualization/app.js",
         "harness/visualization/atlas-structure.js",
@@ -233,15 +241,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_a.py"
     },
     {
       "id": "X04",
       "group": "Harness and Atlas",
       "title": "可信命令日志、Receipt 与独立 PR 决策",
       "goal": "将合成命令执行日志、文件 Diff、源码哈希和 Contract Receipt 组合成一次不可伪造的技术验收。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "harness/contracts/trace.py",
         "harness/contracts/acceptance.py",
@@ -301,15 +311,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_a.py"
     },
     {
       "id": "X05",
       "group": "Harness and Atlas",
       "title": "跨工具读写授权与路径绕过检测",
       "goal": "在临时目录模拟 Agent 使用文件 API、Shell、重定向、重命名和子代理传递工作区权限。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         ".cursor/hooks/guard_paths.py",
         ".cursor/hooks/guard_shell.py",
@@ -368,15 +380,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_a.py"
     },
     {
       "id": "X06",
       "group": "Scientific data and SAE",
       "title": "数据 Manifest 到分割、抽样与报告的完整流水线",
       "goal": "从小型合成 prompt 数据集建立身份、哈希、train/val/test 分割和可重复的测试报告。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "saebase/data/prompt_schema.py",
         "saebase/data/prompt_store.py",
@@ -436,15 +450,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_b.py"
     },
     {
       "id": "X07",
       "group": "Scientific data and SAE",
       "title": "Model 与 SAE 身份校验、Activation 缓存与重放",
       "goal": "在 tiny CPU 模型替身上保存激活、SAE 信息、token 对齐及可重放缓存。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "saebase/sae/loading.py",
         "saebase/sae/contracts.py",
@@ -506,15 +522,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_b.py"
     },
     {
       "id": "X08",
       "group": "Scientific data and SAE",
       "title": "Tiny SAE 编码、解码、TopK 与批量等价性",
       "goal": "使用固定小矩阵实现批处理 SAE 编码解码，检查稀疏约束、TopK 并列和数值误差。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "saebase/sae/sparsify_adapter.py",
         "saebase/sae/task.py",
@@ -573,15 +591,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_b.py"
     },
     {
       "id": "X09",
       "group": "Scientific data and SAE",
       "title": "多 Feature 干预链、撤销及生成模式隔离",
       "goal": "执行 Ablation、Scale、Add、Clamp 的有序组合，验证回滚、共享状态清理和 teacher-forced/generation 的明确区分。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "saebase/interventions/operators.py",
         "saebase/interventions/engine.py",
@@ -641,15 +661,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_b.py"
     },
     {
       "id": "X10",
       "group": "Scientific data and SAE",
       "title": "特征证据、Token 位置与组件归因",
       "goal": "从 tiny activation/feature trace 生成可追溯的 Top Feature 解释表及跨组件关联。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "saebase/api/features.py",
         "saebase/api/component_analysis.py",
@@ -709,15 +731,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_b.py"
     },
     {
       "id": "X11",
       "group": "Evaluation and reliability",
       "title": "AUROC、AUPRC、Recall 的端到端指标引擎",
       "goal": "对真实标签和预测分数计算三项指标，明确并列分数、缺失类别和阈值规则。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "saebase/benchmarks/metrics",
         "saebase/benchmarks/report.py",
@@ -776,15 +800,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_c.py"
     },
     {
       "id": "X12",
       "group": "Evaluation and reliability",
       "title": "Bootstrap、负控制与区间估计重放",
       "goal": "在少量成组样本中执行固定 seed 的 Bootstrap 和一种明确负控制，输出可重放的不确定性报告。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "saebase/reliability/bootstrap.py",
         "saebase/reliability/resampling.py",
@@ -844,15 +870,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_c.py"
     },
     {
       "id": "X13",
       "group": "Evaluation and reliability",
       "title": "Benchmark 适配器到汇总报告的多任务一致性",
       "goal": "汇合两个 tiny Benchmark Adapter 的不同输出，统一样本权重、失败状态与指标报告。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "saebase/benchmarks/adapters",
         "saebase/benchmarks/runner.py",
@@ -912,15 +940,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_c.py"
     },
     {
       "id": "X14",
       "group": "Evaluation and reliability",
       "title": "Hydra 组合配置到 CPU Dry-run 与 Receipt",
       "goal": "从多组模型、数据与任务配置生成少量允许的运行计划，验证覆盖优先级与最终执行证据。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "saebase/runtime/train.py",
         "saebase/runtime/experiment_paths.py",
@@ -981,15 +1011,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_c.py"
     },
     {
       "id": "X15",
       "group": "Evaluation and reliability",
       "title": "断点中断、Checkpoint 校验与幂等恢复",
       "goal": "以三步可中断 CPU pipeline 模拟运行崩溃、恢复和重复执行，保证结果一致与历史不可变。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "saebase/runtime/experiment_paths.py",
         "saebase/runtime/summary_log.py",
@@ -1051,15 +1083,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_c.py"
     },
     {
       "id": "X16",
       "group": "Release and multi-agent",
       "title": "安全归档、解包与原子提交",
       "goal": "在临时文件系统中生成归档，注入损坏和越界成员，验证任何失败不得污染正式目录。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "saebase/tools/stage_d_archive.py",
         "saebase/release/gates.py",
@@ -1117,15 +1151,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_d.py"
     },
     {
       "id": "X17",
       "group": "Release and multi-agent",
       "title": "源码 SHA、CI 状态与人工审核的发布门禁",
       "goal": "模拟多条 CI 检查的依赖、不同源码 SHA、人工批准状态及变更后重新评估发布资格。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "saebase/release/gates.py",
         "saebase/release/planner.py",
@@ -1186,15 +1222,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_d.py"
     },
     {
       "id": "X18",
       "group": "Release and multi-agent",
       "title": "双 Agent 并发提交、冲突检测与安全合并",
       "goal": "在临时 Git 仓库使用两个模拟执行者同时修改同一函数，重放提交顺序与显式冲突处理。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "harness/core/agent_flow.py",
         "harness/core/agent_apply.py",
@@ -1254,15 +1292,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_d.py"
     },
     {
       "id": "X19",
       "group": "Release and multi-agent",
       "title": "微型端到端 SAE 研究工作流",
       "goal": "将数据、激活、tiny SAE 编码、Feature 干预、指标评估与报告联系成一条真实 CPU 合成流水线。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "saebase/data/prompt_schema.py",
         "saebase/sae/task.py",
@@ -1327,15 +1367,17 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_d.py"
     },
     {
       "id": "X20",
       "group": "Release and multi-agent",
       "title": "长时程交接、需求变更、中断恢复及终局审阅",
       "goal": "以 8–10 个预先定义的事件组成完整 workflow，包含多 Agent 交接、需求修订、两次失败注入和最后的候选 Tree 审阅。",
-      "status": "SPEC_REVIEWED",
-      "oracle_status": "NOT_IMPLEMENTED",
+      "status": "READY",
+      "oracle_status": "QUALIFIED",
       "source_refs": [
         "harness/core/agent_flow.py",
         "harness/core/agent_proposal_review.py",
@@ -1400,7 +1442,9 @@
         "gpu": false,
         "wall_seconds": 120,
         "memory_mb": 1024
-      }
+      },
+      "scenario_source": "harness/contracts/wp20_scenarios.json",
+      "oracle_reference": "harness/contracts/wp20_reference_d.py"
     }
   ]
 }

@@ -17,13 +17,13 @@ def test_wp20_has_twenty_real_multistage_descriptions():
     assert result["normal_scenarios"] >= 40
     assert result["negative_scenarios"] >= 40
     assert result["source_references_checked"] >= 50
-    assert result["status"] == "SPEC_REVIEWED_ONLY_NOT_READY"
+    assert result["status"] == "READY_FOR_BEHAVIORAL_EXERCISE"
 
 
-def test_design_cannot_be_self_approved_or_marked_ready():
+def test_design_cannot_mark_unqualified_reference_ready():
     data = copy.deepcopy(wp20.load_spec())
-    data["cases"][0]["status"] = "READY"
-    with pytest.raises(ValueError, match="incorrectly claims"):
+    data["cases"][0]["oracle_status"] = "NOT_IMPLEMENTED"
+    with pytest.raises(ValueError, match="missing qualified reference"):
         wp20.validate(data)
 
 
