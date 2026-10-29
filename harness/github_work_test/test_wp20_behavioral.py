@@ -47,7 +47,7 @@ def test_git_has_real_branches_conflict_resolution_and_parents():
     assert out["conflicted"] is True
     assert len({out["base_sha"], out["head_a_sha"], out["head_b_sha"], out["merge_sha"]}) == 4
     assert set(out["merge_parents"]) == {out["head_a_sha"], out["head_b_sha"]}
-    assert out["source"] == "def f():\\n    return 4\\n"
+    assert out["source"] == "def f():\n    return 4\n"
     assert "module.py" in good["files"]
     automatic = grader._reference("X18", grader.load_scenarios()["cases"]["X18"][1]["input"])
     assert automatic["ok"], automatic
