@@ -57,7 +57,10 @@ def validate_spec() -> dict:
         names = [row["name"] for row in scenarios]
         if len(set(names)) != len(names):
             raise ValueError(f"{case_id} duplicate scenario name")
-        if sum("expected" in x for x in scenarios) < 2 or sum(x.get("reject") is True for x in scenarios) < 2:
+        if (
+            sum("expected" in x for x in scenarios) < 2
+            or sum(x.get("reject") is True for x in scenarios) < 2
+        ):
             raise ValueError(f"{case_id} requires positive and negative cases")
         for row in scenarios:
             if not isinstance(row.get("input"), dict):
@@ -94,7 +97,12 @@ def run_case(case_id: str, run_dir: Path) -> dict:
             }
             try:
                 proc = subprocess.run(
-                    [sys.executable, "-B", str(ROOT / "harness/contracts/wp18_worker.py"), str(source)],
+                    [
+                        sys.executable,
+                        "-B",
+                        str(ROOT / "harness/contracts/wp18_worker.py"),
+                        str(source),
+                    ],
                     input=json.dumps(copy.deepcopy(row["input"]), allow_nan=False),
                     capture_output=True,
                     text=True,
@@ -105,7 +113,9 @@ def run_case(case_id: str, run_dir: Path) -> dict:
                 )
                 output = json.loads(proc.stdout)
             except (subprocess.TimeoutExpired, ValueError, json.JSONDecodeError):
-                checks.append({"name": row["name"], "passed": False, "reason": "timeout_or_invalid_output"})
+                checks.append(
+                    {"name": row["name"], "passed": False, "reason": "timeout_or_invalid_output"}
+                )
                 continue
             if proc.returncode != 0 or not isinstance(output, dict):
                 passed = False
