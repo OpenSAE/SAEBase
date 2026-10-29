@@ -77,8 +77,14 @@ def gate(tool, payload, active=None):
             if parts[0] not in NEW_TOP_LEVEL_DIRS and not (ROOT / parts[0]).is_dir():
                 return "New top-level directories are forbidden except experiments/ and tests/"
             if rel.startswith(HARNESS_TEST_SANDBOX):
+                # The acceptance ledger and test instructions are owned by
+                # governance/independent reviewers, not the task agent.
+                if rel in ("harness/tests/README.md", "harness/tests/wp18/README.md") or rel.startswith(
+                    "harness/tests/wp18/acceptance/"
+                ):
+                    return "Harness test instructions and independent acceptance are read-only"
                 # A test exercise may create code, fixtures, reports and
-                # candidate trees here without exposing any governance files.
+                # candidate trees here without exposing governance files.
                 continue
             if rel.startswith((".cursor/", "harness/", ".github/")):
                 return "Harness/Core and execution rules are never editable by task agents"
