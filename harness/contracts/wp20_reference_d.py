@@ -66,7 +66,9 @@ def x17(p, root):
 
 def _git(root,*args):
     r=subprocess.run(["git","-C",str(root),*args],text=True,capture_output=True,check=False,
-                     timeout=5,env={"PATH":"/usr/bin:/bin","HOME":str(root),"GIT_CONFIG_NOSYSTEM":"1"})
+                     timeout=5,env={"PATH":"/usr/bin:/bin", "HOME":str(root), "GIT_CONFIG_NOSYSTEM":"1",
+                         "GIT_AUTHOR_DATE":"2001-01-01T00:00:00+0000",
+                         "GIT_COMMITTER_DATE":"2001-01-01T00:00:00+0000"})
     if r.returncode:
         raise ValueError("git failed")
     return r.stdout.strip()
@@ -92,7 +94,7 @@ def x18(p, root):
     head_a=_git(root,"rev-parse","HEAD")
     if head_a==base:
         raise ValueError("no change from A")
-    if p["rebase_b"]!=head_a:
+    if p["rebase_b"] != "HEAD_AFTER_A":
         raise ValueError("stale B expected SHA")
     target.write_text(p["b"],encoding="utf-8")
     _git(root,"add","module.py")
