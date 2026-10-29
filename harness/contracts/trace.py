@@ -8,21 +8,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from harness.contracts.registry import ContractError, ROOT, catalog, resolve
+from harness.contracts.registry import ContractError, ROOT, catalog, resolve, select_tags
 
 
 def ad_hoc_selection(tags: list[str]) -> list[str]:
-    """Select only predeclared contracts for a user-defined sandbox task."""
-    data = catalog()
-    if not isinstance(tags, list) or not tags or len(tags) != len(set(tags)):
-        raise ContractError("Custom task needs unique predeclared tags")
-    if not set(tags) <= set(data["task_tags"]):
-        raise ContractError("Unknown custom task tag")
-    chosen = list(data["required_always"])
-    for contract in data["contracts"]:
-        if contract["enforcement"] == "conditional" and set(contract["tags"]) & set(tags):
-            chosen.append(contract["id"])
-    return list(dict.fromkeys(chosen))
+    """Use only predeclared IDs for user-defined sandbox tasks."""
+    return select_tags(tags)["contract_ids"]
 
 
 def validate_receipt(record: dict, *, expected: list[str]) -> dict:
