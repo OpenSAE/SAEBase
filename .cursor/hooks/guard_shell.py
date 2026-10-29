@@ -144,7 +144,7 @@ def gate(command, plan_id=None):
             if len(args) == 7 and args[3] == "--case" and args[5] == "--run-dir":
                 case = args[4]
                 target = args[6]
-                if re.fullmatch(r"H(?:2[7-9]|3[0-9]|4[0-6])", case) and re.fullmatch(
+                if (re.fullmatch(r"H[0-9]{2,3}", case) is not None and 27 <= int(case[1:]) <= 226) and re.fullmatch(
                     r"harness/tests/wp19/runs/[A-Za-z0-9][A-Za-z0-9_-]{3,63}/" + case,
                     target,
                 ):

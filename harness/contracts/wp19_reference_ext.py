@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import math
 import re
-from pathlib import PurePosixPath
 
 
 def _path(p):
@@ -54,7 +53,7 @@ def _valid(op, v):
             if isinstance(x,list):return all(walk(z,key,depth+1) for z in x)
             if isinstance(x,str):
                 if re.search(r"(?i)token|secret|cookie|password|private.?key|credential",key):return x == "[REDACTED]"
-                return re.search(r"(?i)(token|secret|password)\\s*[:=]\\s*\\S+",x) is None
+                return re.search(r"(?i)(token|secret|password)\s*[:=]\s*\S+",x) is None
             return x is None or type(x) in (bool,int,float)
         return walk(v.get("record"))
     if op == "revision": return type(v.get("expected")) is int and v["expected"]>=0 and type(v.get("actual")) is int and v["expected"] == v["actual"]
@@ -119,7 +118,7 @@ def _valid(op, v):
         return len(ids)==len(set(ids))
     if op == "namespace":
         value=v.get("module")
-        return isinstance(value,str) and re.fullmatch(r"(tasks|models|datasets)\\.[a-z_][a-z_0-9]*",value) is not None
+        return isinstance(value,str) and re.fullmatch(r"(tasks|models|datasets)\.[a-z_][a-z_0-9]*",value) is not None
     if op == "numbers":return isinstance(v.get("values"),list) and all(_finite(x) for x in v["values"])
     if op == "provenance":return type(v.get("resolved")) is bool and type(v.get("exists")) is bool and v["resolved"] == v["exists"]
     if op == "schema":
