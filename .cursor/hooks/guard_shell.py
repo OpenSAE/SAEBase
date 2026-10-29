@@ -131,7 +131,7 @@ def gate(command, plan_id=None):
         except (IndexError, ValueError, OSError):
             pass
         return "Only exact read-only WP18 case verification is permitted"
-    if re.match(r"^(?:python|python3) -m harness\\.contracts\\.wp19_verify(?: |$)", command):
+    if re.match(r"^(?:python|python3) -m harness\.contracts\.wp19_verify(?: |$)", command):
         try:
             args = shlex.split(command)
             if args[:3] not in (
