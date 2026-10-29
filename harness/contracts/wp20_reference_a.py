@@ -1,4 +1,5 @@
 """Independent reference X01-X05: actual AST, graph, state, evidence and filesystem."""
+
 from __future__ import annotations
 import ast
 import hashlib
@@ -17,6 +18,7 @@ def unique(values):
 def x01(p, root):
     if set(p) != {"before", "after"}:
         raise ValueError("schema")
+
     def parse(src):
         if not isinstance(src, str):
             raise ValueError("source")
@@ -24,16 +26,31 @@ def x01(p, root):
             tree = ast.parse(src)
         except SyntaxError as exc:
             raise ValueError("Invalid Python source") from exc
-        return {n.name: {"signature": ast.unparse(n.args), "line": n.lineno}
-                for n in tree.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
+        return {
+            n.name: {"signature": ast.unparse(n.args), "line": n.lineno}
+            for n in tree.body
+            if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+        }
+
     before, after = parse(p["before"]), parse(p["after"])
-    return {"before": before, "after": after,
-            "diff": {"added": sorted(after.keys() - before.keys()),
-                     "removed": sorted(before.keys() - after.keys()),
-                     "changed": sorted(k for k in before.keys() & after.keys()
-                                       if before[k]["signature"] != after[k]["signature"])},
-            "evidence": {"before_sha256": digest(p["before"]),
-                         "after_sha256": digest(p["after"]), "review": "unchecked"}}
+    return {
+        "before": before,
+        "after": after,
+        "diff": {
+            "added": sorted(after.keys() - before.keys()),
+            "removed": sorted(before.keys() - after.keys()),
+            "changed": sorted(
+                k
+                for k in before.keys() & after.keys()
+                if before[k]["signature"] != after[k]["signature"]
+            ),
+        },
+        "evidence": {
+            "before_sha256": digest(p["before"]),
+            "after_sha256": digest(p["after"]),
+            "review": "unchecked",
+        },
+    }
 
 
 def x02(p, root):
@@ -56,13 +73,20 @@ def x02(p, root):
             if node not in nodes or row["id"] not in nodes[node]["terms"]:
                 raise ValueError("forward mismatch")
     for row in terms.values():
-        if any(not isinstance(row[lang], str) or not row[lang].strip()
-               or "unavailable" in row[lang].lower() or "翻译不可用" in row[lang]
-               for lang in ("zh", "en")):
+        if any(
+            not isinstance(row[lang], str)
+            or not row[lang].strip()
+            or "unavailable" in row[lang].lower()
+            or "翻译不可用" in row[lang]
+            for lang in ("zh", "en")
+        ):
             raise ValueError("translation")
-    return {"node_ids": sorted(nodes), "term_ids": sorted(terms),
-            "links": sorted(f"{nid}:{term}" for nid, r in nodes.items() for term in r["terms"]),
-            "updated": {"term": tid, "node": nid, "zh": terms[tid]["zh"], "en": terms[tid]["en"]}}
+    return {
+        "node_ids": sorted(nodes),
+        "term_ids": sorted(terms),
+        "links": sorted(f"{nid}:{term}" for nid, r in nodes.items() for term in r["terms"]),
+        "updated": {"term": tid, "node": nid, "zh": terms[tid]["zh"], "en": terms[tid]["en"]},
+    }
 
 
 def x03(p, root):
@@ -96,17 +120,26 @@ def x03(p, root):
                     expanded.sort()
         elif op == "review":
             state = trees[tree]
-            if (event["id"] not in p["trees"][tree] or event["revision"] != state["revision"]
-                    or event["decision"] not in ("approve", "deny", "unchecked")):
+            if (
+                event["id"] not in p["trees"][tree]
+                or event["revision"] != state["revision"]
+                or event["decision"] not in ("approve", "deny", "unchecked")
+            ):
                 raise ValueError("review")
             state["decisions"][event["id"]] = event["decision"]
             state["revision"] += 1
         else:
             raise ValueError("operation")
-        history.append({"op": op, "active": active, "language": lang,
-                        "revision": trees[tree]["revision"]})
-    return {"active": active, "language": lang, "trees": trees,
-            "event_count": len(history), "events": history}
+        history.append(
+            {"op": op, "active": active, "language": lang, "revision": trees[tree]["revision"]}
+        )
+    return {
+        "active": active,
+        "language": lang,
+        "trees": trees,
+        "event_count": len(history),
+        "events": history,
+    }
 
 
 def x04(p, root):
@@ -121,14 +154,19 @@ def x04(p, root):
         o = observed[r["id"]]
         if r["exit"] != o["exit"] or r["command"] != o["command"] or o["exit"] != 0:
             raise ValueError("false receipt")
-    if any("/" in r["name"] or r["name"].startswith(".") or r["sha"] != digest(r["content"])
-           for r in p["files"]):
+    if any(
+        "/" in r["name"] or r["name"].startswith(".") or r["sha"] != digest(r["content"])
+        for r in p["files"]
+    ):
         raise ValueError("provenance")
     if any("secret" in str(r).lower() or "token=" in str(r).lower() for r in p["receipt"]):
         raise ValueError("sensitive evidence")
-    return {"verified_commands": sorted(observed),
-            "source_hashes": {r["name"]: r["sha"] for r in p["files"]},
-            "failed_count": 0, "human_approved": False}
+    return {
+        "verified_commands": sorted(observed),
+        "source_hashes": {r["name"]: r["sha"] for r in p["files"]},
+        "failed_count": 0,
+        "human_approved": False,
+    }
 
 
 def x05(p, root):
@@ -138,9 +176,16 @@ def x05(p, root):
     planned = []
     for op in p["operations"]:
         rel = op.get("path")
-        if (not isinstance(rel, str) or not rel or rel.startswith(("/", "~"))
-                or "\\" in rel or ":" in rel or any(x in ("", ".", "..") for x in rel.split("/"))
-                or op.get("op") != "write" or not isinstance(op.get("text"), str)):
+        if (
+            not isinstance(rel, str)
+            or not rel
+            or rel.startswith(("/", "~"))
+            or "\\" in rel
+            or ":" in rel
+            or any(x in ("", ".", "..") for x in rel.split("/"))
+            or op.get("op") != "write"
+            or not isinstance(op.get("text"), str)
+        ):
             raise ValueError("path or operation")
         target = (workspace / rel).resolve()
         if not target.is_relative_to(workspace):
@@ -151,8 +196,12 @@ def x05(p, root):
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(text, encoding="utf-8")
         results.append({"path": rel, "sha256": digest(text)})
-    return {"written": results, "files": sorted(str(x.relative_to(workspace))
-            for x in workspace.rglob("*") if x.is_file()), "count": len(results), "scope": "workspace"}
+    return {
+        "written": results,
+        "files": sorted(str(x.relative_to(workspace)) for x in workspace.rglob("*") if x.is_file()),
+        "count": len(results),
+        "scope": "workspace",
+    }
 
 
 CASES = {"X01": x01, "X02": x02, "X03": x03, "X04": x04, "X05": x05}
