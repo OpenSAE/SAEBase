@@ -115,7 +115,7 @@ def bundle(output: Path) -> dict:
             raise ValueError("Wrong Atlas project branding in " + view)
         # A content-addressed asset version avoids using stale locale files.
         html = re.sub(
-            r'(\./(?:app|i18n|locale-data|locale-runtime|atlas-structure|atlas-public-balance)\.js)\?v=[^"]+',
+            r'(\./(?:app|i18n|locale-data|locale-runtime|atlas-structure|atlas-public-balance)\.js|\./(?:style|atlas-theme)\.css)\?v=[^"]+',
             lambda match: match.group(1) + "?v=" + source_commit[:12],
             html,
         )
