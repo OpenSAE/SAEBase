@@ -1787,6 +1787,7 @@
     searchOpen=true;searchView="all";searchSelection=0;
     searchInput.value="";
     searchInput.placeholder=searchText("搜索所有节点、术语、函数…","Search nodes, terms, functions…");
+    searchInput.dataset.atlasOriginalPlaceholder=searchInput.placeholder;
     const help=searchDialog.querySelectorAll(".atlas-search-footer > span");
     if(help[0])help[0].textContent="↑ ↓ "+searchText("选择","Select")+"   ↵ "+searchText("跳转","Open");
     if(help[1])help[1].textContent="Esc "+searchText("关闭","Close");
@@ -1818,6 +1819,7 @@
     searchInput.type="search";
     searchInput.autocomplete="off";
     searchInput.placeholder=searchText("搜索所有节点、术语、函数…","Search nodes, terms, functions…");
+    searchInput.dataset.atlasOriginalPlaceholder=searchInput.placeholder;
     heading.appendChild(searchInput);
     const dismiss=el("button","atlas-search-dismiss","Esc");
     dismiss.type="button";dismiss.setAttribute("aria-label","Close search");
@@ -2291,6 +2293,7 @@
     if(launcher)launcher.textContent=searchText("五树搜索","All trees");
     if(searchOpen){
       searchInput.placeholder=searchText("搜索所有节点、术语、函数…","Search nodes, terms, functions…");
+    searchInput.dataset.atlasOriginalPlaceholder=searchInput.placeholder;
       updateGlobalSearch();
     }
     render(false);
