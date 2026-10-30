@@ -1,5 +1,7 @@
 # WP21.2 Harness maintenance after round01
 
+**Local examiner follow-up:** [WP21.2 local GPU and evidence work order](../../github_work_plan/21_wp21_2_local_gpu_followup.md). This specifies the exact inputs, commands, deliverables and stop conditions for R08, R17, R20, Benchmark and 20 reviewer archives.
+
 This is a **new maintenance iteration**, not a modification of WP21.1's
 frozen R01–R20 questions, machine cases, contracts, input fixtures, asset
 revisions, tolerance values, or historical independent review finals.
