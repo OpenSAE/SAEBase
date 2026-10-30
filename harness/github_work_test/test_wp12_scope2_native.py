@@ -109,8 +109,8 @@ def test_p6_native_transcoder_circuit_intervention_changes_real_logits():
 
     from saebase.sae.scope2_native import ScopeIdentity
     from saebase.store import sha256_state_dict
-    from saebase.wp12.circuit_intervene import execute_transcoder_node
-    from saebase.wp12.circuits import GraphNode, GraphEdge, GraphRecord
+    from saebase.circuits.transcoder_intervention import execute_transcoder_node
+    from saebase.circuits.graph import GraphNode, GraphEdge, GraphRecord
 
     class TinyForward(nn.Module):
         def __init__(self):

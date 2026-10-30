@@ -7,7 +7,7 @@ import argparse
 import json
 from pathlib import Path
 
-from saebase.wp12.acceptance import audit_ledger, inspect_archive, render_progress
+from saebase.release.capability_acceptance import audit_ledger, inspect_archive, render_progress
 
 
 def main(argv: list[str] | None = None) -> int:

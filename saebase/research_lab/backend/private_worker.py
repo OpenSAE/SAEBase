@@ -122,7 +122,7 @@ def _edit_activation(pair, site: dict, prompt: str, feature_ids: list[int]) -> t
 def execute_one(*, root: Path, device: str = "cuda") -> dict:
     from saebase.api import load_registered
     from saebase.store import sha256_state_dict
-    from saebase.wp12.interventions import Edit, EditPlan, compare_sae_edits
+    from saebase.interventions.research_edits import Edit, EditPlan, compare_sae_edits
 
     if os.environ.get("OPENSAE_ENABLE_PRIVATE_JOBS") != "1":
         raise PermissionError("Local private worker is disabled")
