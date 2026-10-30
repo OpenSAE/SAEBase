@@ -1719,7 +1719,9 @@
       searchFilters.appendChild(button);
     }
     const filtered=matches.filter(x=>searchView==="all"||x.view===searchView);
-    searchHits=filtered.slice(0,65);
+    searchHits=q.trim()?filtered.slice(0,65):
+      Object.keys(ATLAS_VIEW_LABELS).flatMap(view=>
+        filtered.filter(hit=>hit.view===view).slice(0,4));
     searchSelection=Math.max(0,Math.min(searchSelection,searchHits.length-1));
     searchResults.replaceChildren();
     const grouped=new Map();
@@ -1788,7 +1790,7 @@
     updateGlobalSearch();searchInput.focus();
   }
   function installGlobalSearch() {
-    const launcher=el("button","atlas-global-launch", "⌘ K");
+    const launcher=el("button","atlas-global-launch", searchText("五树搜索","All trees"));
     launcher.type="button";launcher.id="atlasGlobalSearchButton";
     launcher.setAttribute("aria-label","Search all Atlas trees");
     launcher.title=searchText("搜索五棵树 · Ctrl K","Search five trees · Ctrl K");
