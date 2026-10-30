@@ -1355,8 +1355,14 @@
   function changeZoom(next,point=null) {
     const v=$("canvasWrap"),rect=v.getBoundingClientRect();
     const oldZoom=config.zoom||1;
-    const px=point?point.clientX-rect.left:v.clientWidth/2;
-    const py=point?point.clientY-rect.top:v.clientHeight/2;
+    // Toolbar zoom anchors the selected card or root, keeping it visible.
+    // Wheel zoom instead uses the pointer on the actual canvas.
+    const home=!point?config.positions.get(config.mode==="focus"?
+      config.focusId:config.visible[0]?.id):null;
+    const px=point?point.clientX-rect.left:
+      home?config.panX+oldZoom*(home.x+home.w/2):v.clientWidth/2;
+    const py=point?point.clientY-rect.top:
+      home?config.panY+oldZoom*(home.y+home.h/2):v.clientHeight/2;
     const oldX=(px-config.panX)/oldZoom;
     const oldY=(py-config.panY)/oldZoom;
     const targetId=point?.nodeId||null;
