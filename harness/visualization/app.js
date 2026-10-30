@@ -1733,6 +1733,7 @@
       for(const hit of hits){
         const index=searchHits.indexOf(hit);
         const button=el("button","atlas-search-result"+(index===searchSelection?" is-selected":""));
+        button.dataset.index=String(index);
         button.type="button";button.setAttribute("role","option");
         button.setAttribute("aria-selected",String(index===searchSelection));
         button.addEventListener("mouseenter",()=>{
@@ -1756,9 +1757,10 @@
   }
   function highlightGlobalSearch() {
     for(const [index,node] of [...searchResults.querySelectorAll(".atlas-search-result")].entries()){
-      node.classList.toggle("is-selected",index===searchSelection);
-      node.setAttribute("aria-selected",String(index===searchSelection));
-      if(index===searchSelection)node.scrollIntoView({block:"nearest"});
+      const key=Number(node.dataset.index);
+      node.classList.toggle("is-selected",key===searchSelection);
+      node.setAttribute("aria-selected",String(key===searchSelection));
+      if(key===searchSelection)node.scrollIntoView({block:"nearest"});
     }
   }
   function selectGlobalSearch(index) {
