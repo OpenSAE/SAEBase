@@ -1368,13 +1368,27 @@
     config.positions = position;
     config.scene = { width: layout.width, height: layout.height };
   }
+  // Fit the actual node positions, not the invisible padding that keeps
+  // a focused card centered during normal browsing.
+  function fitBounds() {
+    const path = config.mode === "focus" && config.focusId ?
+      new Set(ancestors(config.focusId)) : null;
+    const positions = [...config.positions.entries()]
+      .filter(([id]) => !path || path.has(id))
+      .map(([, p]) => p);
+    if (!positions.length) return {minX:0,minY:0,maxX:600,maxY:300};
+    return {
+      minX:Math.min(...positions.map(p => p.x)),
+      minY:Math.min(...positions.map(p => p.y)),
+      maxX:Math.max(...positions.map(p => p.x + p.w)),
+      maxY:Math.max(...positions.map(p => p.y + p.h))
+    };
+  }
   function fitZoom() {
-    const v = $("canvasWrap");
-    const w = Number(v.clientWidth) || 1150;
-    const h = Number(v.clientHeight) || 630;
-    const { width, height } = config.scene;
-    const a = (w - 56) / width, b = (h - 48) / height;
-    return Math.max(0.08, Math.min(1, a, b));
+    const v=$("canvasWrap"), bounds=fitBounds();
+    const w=Math.max(100,bounds.maxX-bounds.minX);
+    const h=Math.max(100,bounds.maxY-bounds.minY);
+    return Math.max(.08,Math.min(1,(v.clientWidth-56)/w,(v.clientHeight-62)/h));
   }
   function centerSelected() {
     const v = $("canvasWrap");
@@ -1426,10 +1440,10 @@
   function fitCanvas() {
     changeZoom(fitZoom());
     changeZoom(fitZoom());
-    const v = $("canvasWrap");
+    const v = $("canvasWrap"), b = fitBounds();
     v.scrollTo?.({
-      left: Math.max(0, (config.scene.width * config.zoom - v.clientWidth) / 2),
-      top: Math.max(0, (config.scene.height * config.zoom - v.clientHeight) / 2),
+      left: Math.max(0, (b.minX + b.maxX) * config.zoom / 2 - v.clientWidth / 2),
+      top: Math.max(0, (b.minY + b.maxY) * config.zoom / 2 - v.clientHeight / 2),
       behavior: "instant"
     });
   }
