@@ -64,7 +64,7 @@
             "term.api"
           ],
           "patterns": [
-            "^sae/(?:env_check|pipeline_checks|scope2_clt|scope2_native|sparsify_adapter|stage_d)\\.py$"
+            "^sae/(?:env_check|pipeline_checks|scope2_clt|scope2_native|sparsify_adapter|stage_d|external_training)\\.py$"
           ]
         }
       ]
@@ -101,9 +101,56 @@
       ],
       "patterns": [],
       "source_dirs": [
-        "interventions"
+        "interventions",
+        "circuits"
       ],
-      "children": []
+      "children": [
+        {
+          "name": "feature_operations",
+          "title": "SAE 特征编辑与安全执行",
+          "summary": "捕获并编辑激活，保证干预执行的一致性。",
+          "description": "捕获并编辑激活，保证干预执行的一致性。",
+          "en_title": "Feature editing and reliable execution",
+          "en_summary": "Apply recorded SAE feature edits and verify execution consistency.",
+          "en_description": "Apply recorded SAE feature edits and verify execution consistency.",
+          "context_terms": [
+            "term.sae.intervene"
+          ],
+          "patterns": [
+            "^interventions/(?:clean_prefix|engine|operators|results|specs|steering|research_edits)\\.py$"
+          ]
+        },
+        {
+          "name": "execution_backends",
+          "title": "跨框架干预与缓存执行",
+          "summary": "连接 Pyvene、NDIF 和缓存激活后端。",
+          "description": "连接 Pyvene、NDIF 和缓存激活后端。",
+          "en_title": "Backend-specific interventions and cached execution",
+          "en_summary": "Run feature interventions through supported hook frameworks and cached execution.",
+          "en_description": "Run feature interventions through supported hook frameworks and cached execution.",
+          "context_terms": [
+            "term.intervene"
+          ],
+          "patterns": [
+            "^interventions/(?:hf_cached_steering|kv_cache_exact|pyvene_adapter|ndif_adapter)\\.py$"
+          ]
+        },
+        {
+          "name": "causal_circuits",
+          "title": "因果电路建模和特征干预",
+          "summary": "读取可验证的电路图并执行跨层特征编辑。",
+          "description": "读取可验证的电路图并执行跨层特征编辑。",
+          "en_title": "Causal circuit graphs and interventions",
+          "en_summary": "Build source-grounded causal graphs and execute cross-layer feature interventions.",
+          "en_description": "Build source-grounded causal graphs and execute cross-layer feature interventions.",
+          "context_terms": [
+            "term.sae.circuits"
+          ],
+          "patterns": [
+            "^circuits/(?:graph|transcoder_intervention|clt_intervention)\\.py$"
+          ]
+        }
+      ]
     },
     {
       "name": "generation",
@@ -216,7 +263,7 @@
             "term.sae.benchmark"
           ],
           "patterns": [
-            "^benchmarks/(?:planner|registry|report|results|runner|schema)\\.py$"
+            "^benchmarks/(?:planner|registry|report|results|runner|schema|native_comparisons)\\.py$"
           ]
         },
         {
@@ -852,71 +899,6 @@
           ],
           "patterns": [
             "^(?:phase_a_sae_only|phase_bc_source_metadata|phase_bc_cpu_pair|phase_bc_matrix|phase_d_matrix|sae_prepare_prompts)\\.py$"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "research_backends",
-      "title": "跨框架的研究操作实现",
-      "summary": "为电路分析、干预、训练和外部基准提供实际适配实现。",
-      "description": "为电路分析、干预、训练和外部基准提供实际适配实现。",
-      "en_title": "Cross-framework research implementations",
-      "en_summary": "Implement feature interventions, circuit tracing, training, and benchmark adapters across compatible frameworks.",
-      "en_description": "Implement feature interventions, circuit tracing, training, and benchmark adapters across compatible frameworks.",
-      "context_terms": [
-        "term.sae",
-        "term.api"
-      ],
-      "patterns": [],
-      "source_dirs": [
-        "wp12"
-      ],
-      "children": [
-        {
-          "name": "intervention_frameworks",
-          "title": "外部框架的电路与特征干预",
-          "summary": "通过多种 Hook 和因果操作框架执行受控编辑与追踪。",
-          "description": "通过多种 Hook 和因果操作框架执行受控编辑与追踪。",
-          "en_title": "Circuit and feature intervention backends",
-          "en_summary": "Implement causal circuit edits and controlled interventions in supported research frameworks.",
-          "en_description": "Implement causal circuit edits and controlled interventions in supported research frameworks.",
-          "context_terms": [
-            "term.sae.circuits",
-            "term.sae.intervene"
-          ],
-          "patterns": [
-            "^wp12/(?:circuit_intervene|circuits|clt_intervene|interventions|ndif|pyvene)\\.py$"
-          ]
-        },
-        {
-          "name": "benchmark_adapters",
-          "title": "研究后端的基准覆盖",
-          "summary": "为外部 SAE 评测器建立运行接口和验收口径。",
-          "description": "为外部 SAE 评测器建立运行接口和验收口径。",
-          "en_title": "Cross-framework benchmark adapters",
-          "en_summary": "Connect external SAE benchmarking implementations and verify supported behavior.",
-          "en_description": "Connect external SAE benchmarking implementations and verify supported behavior.",
-          "context_terms": [
-            "term.sae.benchmark"
-          ],
-          "patterns": [
-            "^wp12/(?:acceptance|benchmarks|custom_saebench)\\.py$"
-          ]
-        },
-        {
-          "name": "training_adapters",
-          "title": "外部研究训练适配",
-          "summary": "连接研究后端可执行的 SAE 训练操作。",
-          "description": "连接研究后端可执行的 SAE 训练操作。",
-          "en_title": "Research training adapters",
-          "en_summary": "Adapt model and SAE training to supported execution backends.",
-          "en_description": "Adapt model and SAE training to supported execution backends.",
-          "context_terms": [
-            "term.sae.train"
-          ],
-          "patterns": [
-            "^wp12/training\\.py$"
           ]
         }
       ]

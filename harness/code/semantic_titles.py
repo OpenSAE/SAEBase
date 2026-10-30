@@ -312,7 +312,7 @@ SCOPES = (
     ("saebase/vllm_backend/", "vLLM 文本生成计算后端"),
     ("saebase/release/", "科研软件发布与验收"),
     ("saebase/tools/", "SAE 研究验证工具"),
-    ("saebase/wp12/", "SAE 研究能力验证与执行"),
+    ("saebase/circuits/", "SAE 因果电路图与受控干预"),
     ("tasks/benchmark/reliability/", "SAE 评测可靠性"),
     ("tasks/benchmark/integrations/", "SAR 与 RSS 评测适配"),
     ("tasks/benchmark/", "SAE 基准评测"),
