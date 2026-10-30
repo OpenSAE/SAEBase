@@ -2006,6 +2006,13 @@
           searchText("引用","References")));
         metadata.appendChild(el("span","atlas-relation-field",link.field));
         row.appendChild(metadata);
+        const visual=el("div","atlas-relation-flow");
+        const origin=link.direction==="in"?link.view:config.view;
+        const target=link.direction==="in"?config.view:link.view;
+        visual.appendChild(el("span","atlas-relation-endpoint",ATLAS_VIEW_LABELS[origin]));
+        visual.appendChild(el("span","atlas-relation-arrow","→"));
+        visual.appendChild(el("span","atlas-relation-endpoint is-target",ATLAS_VIEW_LABELS[target]));
+        row.appendChild(visual);
         const jump=el("button","atlas-relation-link",link.node.title);
         jump.type="button";jump.title=link.id;
         jump.addEventListener("click",()=>navigate(link.id,link.view,false));
