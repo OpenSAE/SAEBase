@@ -6,6 +6,7 @@ const params=new URLSearchParams(location.search);
 const requested=params.get("lang");
 const saved=(()=>{try{return localStorage.getItem(KEY)}catch{return null}})();
 let locale=["en","zh"].includes(requested)?requested:(["en","zh"].includes(saved)?saved:(navigator.language?.toLowerCase().startsWith("zh")?"zh":"en"));
+window.SAEBASE_ATLAS_LANGUAGE=locale;
 const CJK=/[\u3400-\u9fff]/;
 const EXACT={
 "展开节点属性与依据":"Expand attributes and evidence","这个节点在做什么":"What this node does",
@@ -23,6 +24,73 @@ const EXACT={
 "暂无经过验证的功能说明，请结合源代码审核。":"Source-linked description pending review.",
 "已有实现":"Implemented","待审阅":"Pending review","已批准":"Approved","已否决":"Denied"
 };
+Object.assign(EXACT, {
+  "收起节点属性": "Collapse node attributes",
+  "查看详情": "View details",
+  "查看功能说明与源码依据": "View function and source evidence",
+  "展开节点说明与依据": "Expand node explanation and evidence",
+  "展开或收起子节点": "Expand or collapse child nodes",
+  "在 Code Tree 中查看对应实现": "View implementation in Code Tree",
+  "查看真实源码": "View source code",
+  "查看源文件": "View source file",
+  "查看完整来源": "View complete source",
+  "查看依据": "View evidence",
+  "尝试其他检索词": "Try another search",
+  "五树搜索": "Search all trees",
+  "搜索五棵树 · Ctrl K": "Search five trees · Ctrl K",
+  "复制链接": "Copy link",
+  "已复制": "Copied",
+  "选择链接复制": "Select link to copy",
+  "选择节点查看关系与依据": "Select a node for relationships and evidence",
+  "当前节点": "Node",
+  "跨树关联": "Relations",
+  "来源与依据": "Evidence",
+  "被引用": "Referenced by",
+  "引用": "References",
+  "收起": "Show fewer",
+  "显示全部关联": "Show all relations",
+  "此节点暂无明确记录的跨树关联。": "No explicit cross-tree relation is recorded for this node.",
+  "此节点的来源信息请查看展开节点属性。": "Open node attributes to inspect additional source evidence.",
+  "演示配置": "Synthetic configuration",
+  "研究意义": "Why this matters",
+  "别名": "Aliases",
+  "下一步": "Next step",
+  "相关术语": "Context terms",
+  "科研知识": "Knowledge",
+  "项目目标": "Core goals",
+  "术语引用": "Term reference",
+  "术语定义": "Terminology",
+  "源码标识": "Source symbol",
+  "方法签名": "Signature",
+  "设备与执行信息": "Execution facts",
+  "直接源码": "Direct source",
+  "背景依据": "Background",
+  "证据来源": "Evidence sources",
+  "变化证据": "Observed changes",
+  "全部": "All",
+  "没有匹配的节点": "No matching nodes",
+  "选择": "Select",
+  "跳转": "Open",
+  "关闭": "Close",
+  "搜索所有节点、术语、函数…": "Search nodes, terms, functions…",
+  "在 Context 中查看": "View in Context",
+  "成员数据": "Member data",
+  "主要作用": "Purpose",
+  "返回值": "Return value",
+  "函数签名": "Function signature",
+  "输入参数": "Inputs",
+  "默认值": "Default value",
+  "类": "Class",
+  "函数": "Function",
+  "查看完整函数源码": "View complete function source",
+  "可核对的科研概念示意": "Verifiable research concept diagram",
+  "输入 x": "Input x",
+  "输出": "Output",
+  "捷径连接": "Shortcut connection",
+  "演示环境 · 合成设备配置": "Demo environment · synthetic device configuration",
+  "显示 ": "Showing ",
+  "保存的字段": "Stored fields",
+});
 const UI={"Guide":"Guide","Overview":"Overview","Details":"Details","Outline":"Outline","Fit":"Fit","Approve":"Approve","Deny":"Deny","Unchecked":"Unchecked","Partial":"Partial","Implemented":"Implemented","Not Implemented":"Not Implemented","Compare code changes":"Compare code changes","Find a node…":"Find a node…"};
 const ZH_UI={
 "Guide":"指南","Overview":"总览","Details":"详情","Outline":"目录","Fit":"适应画布",
@@ -58,7 +126,7 @@ function localize(raw,el){
  if(typeof translated==="string"&&translated.trim())return raw.replace(raw.trim(),translated);
  // A missing English mapping is a build-time localization defect, not user-facing prose.
  // Hide only the unknown explanatory text; technical source remains untouched.
- return "";
+ return raw;
 }
 function updateText(node){
  const el=node.parentElement;if(!el||el.closest("#atlasLanguageSwitch")||["SCRIPT","STYLE","NOSCRIPT"].includes(el.tagName))return;
@@ -117,7 +185,7 @@ const watcher=new MutationObserver(records=>{
 });
 function setLanguage(next){
  if(!["en","zh"].includes(next))return;
- locale=next;try{localStorage.setItem(KEY,next)}catch{}
+ locale=next;window.SAEBASE_ATLAS_LANGUAGE=next;try{localStorage.setItem(KEY,next)}catch{}
  const url=new URL(location.href);url.searchParams.set("lang",next);
  history.replaceState(history.state,"",url);
  window.SAEBASE_ATLAS_SET_NODE_LANGUAGE?.(locale);

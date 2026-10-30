@@ -282,3 +282,24 @@ button:focus-visible,a:focus-visible,input:focus-visible,.graph-node:focus-visib
   .atlas-search-result{min-height:58px}
   .atlas-search-footer{padding:0 9px;gap:7px;font-size:9px}
 }
+
+/* Visual 2.1 inspector is discoverable immediately after selecting a node. */
+.atlas-global-launch{min-width:112px;padding:0 11px;font:600 12px/1.1 Inter,system-ui,"Noto Sans SC",sans-serif}
+.atlas-copy-focused{
+ flex:none;height:32px;min-width:73px;padding:0 9px;border-radius:7px;
+ border:1px solid #4e5459;background:#202529;color:#e4e8e9;
+ font:600 11.5px Inter,system-ui,"Noto Sans SC",sans-serif;cursor:pointer;
+}
+.atlas-copy-focused:hover{background:#333a3f;border-color:#9fa6aa;color:white}
+.detail{width:min(390px,calc(100% - 36px));}
+.atlas-relation-metadata{justify-content:flex-start;flex-wrap:wrap;gap:6px}
+.atlas-relation-direction{font-size:10px;color:#d9dee1;background:#30373c;padding:2px 6px;border-radius:4px}
+.atlas-relation-expand{width:100%;height:34px;border:1px solid #41484e;border-radius:7px;
+ background:#1e2428;color:#e2e8eb;text-align:center;cursor:pointer;font-size:12px}
+.atlas-relation-expand:hover{background:#313a40}
+@media(max-width:730px){
+ .atlas-global-launch{min-width:66px;padding:0 6px;font-size:10.5px}
+ .atlas-copy-focused{min-width:59px;padding:0 6px;font-size:10px}
+ .tool-actions{flex-wrap:wrap;row-gap:4px}
+ .detail{width:auto}
+}
