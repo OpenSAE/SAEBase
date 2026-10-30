@@ -7,7 +7,7 @@ from types import ModuleType, SimpleNamespace
 
 import pytest
 
-from saebase.wp12.pyvene import (
+from saebase.interventions.pyvene_adapter import (
     PyvenePlan,
     PyveneRepresentation,
     build_native_pyvene,

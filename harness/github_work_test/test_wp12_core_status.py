@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from saebase.wp12.acceptance import audit_ledger
+from saebase.release.capability_acceptance import audit_ledger
 
 ROOT = Path(__file__).resolve().parents[2]
 

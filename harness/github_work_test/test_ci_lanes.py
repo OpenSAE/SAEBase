@@ -40,7 +40,7 @@ def workflow(name: str) -> dict:
 
 def test_only_essential_ci_and_pinned_research_run_on_pull_requests():
     paths = sorted(WORKFLOWS.glob("*.yml"))
-    assert len(paths) == 23  # Includes trusted-base WP19 examination PR scope check
+    assert len(paths) == 24  # Existing 23 lanes plus SAEBase project Pages
     atlas = workflow("saebase-atlas-snapshot.yml")
     assert set(atlas["on"]) == {"push", "workflow_dispatch"}
     assert set(atlas["on"]["push"]["branches"]) == {

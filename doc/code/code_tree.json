@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "code",
   "project": "SAEBase",
-  "source_sha256": "781a2d2da5b3b8ec7bba64bd0ff2a55a01600f560eb468e639807d09fdc50447",
+  "source_sha256": "12ebc9c7b2d54fb4c4e39618d136997e10a269d3fc7eb6e5533e6b6a3c582669",
   "scope": [
     "saebase",
     "datasets",
@@ -560,6 +560,42 @@
       ]
     },
     {
+      "id": "code:class:saebase.benchmarks.native_comparisons:ComparisonPoint",
+      "kind": "class",
+      "title": "ComparisonPoint",
+      "path": "saebase/benchmarks/native_comparisons.py",
+      "line": 102,
+      "status": "implemented",
+      "signature": "class ComparisonPoint()",
+      "description": "An actual native benchmark metric row; labels are not inferred.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/benchmarks/native_comparisons.py:102"
+      ]
+    },
+    {
+      "id": "code:class:saebase.benchmarks.native_comparisons:NativePilot",
+      "kind": "class",
+      "title": "NativePilot",
+      "path": "saebase/benchmarks/native_comparisons.py",
+      "line": 25,
+      "status": "implemented",
+      "signature": "class NativePilot()",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/benchmarks/native_comparisons.py:25"
+      ]
+    },
+    {
       "id": "code:class:saebase.benchmarks.planner:PlanNode",
       "kind": "class",
       "title": "PlanNode",
@@ -647,6 +683,78 @@
       "needs_review": true,
       "evidence": [
         "saebase/benchmarks/schema.py:43"
+      ]
+    },
+    {
+      "id": "code:class:saebase.circuits.graph:GraphEdge",
+      "kind": "class",
+      "title": "GraphEdge",
+      "path": "saebase/circuits/graph.py",
+      "line": 77,
+      "status": "implemented",
+      "signature": "class GraphEdge()",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/circuits/graph.py:77"
+      ]
+    },
+    {
+      "id": "code:class:saebase.circuits.graph:GraphNode",
+      "kind": "class",
+      "title": "GraphNode",
+      "path": "saebase/circuits/graph.py",
+      "line": 54,
+      "status": "implemented",
+      "signature": "class GraphNode()",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/circuits/graph.py:54"
+      ]
+    },
+    {
+      "id": "code:class:saebase.circuits.graph:GraphRecord",
+      "kind": "class",
+      "title": "GraphRecord",
+      "path": "saebase/circuits/graph.py",
+      "line": 90,
+      "status": "implemented",
+      "signature": "class GraphRecord()",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/circuits/graph.py:90"
+      ]
+    },
+    {
+      "id": "code:class:saebase.circuits.graph:RepresentationAsset",
+      "kind": "class",
+      "title": "RepresentationAsset",
+      "path": "saebase/circuits/graph.py",
+      "line": 25,
+      "status": "implemented",
+      "signature": "class RepresentationAsset()",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/circuits/graph.py:25"
       ]
     },
     {
@@ -1127,6 +1235,96 @@
       "needs_review": false,
       "evidence": [
         "saebase/interventions/kv_cache_exact.py:28"
+      ]
+    },
+    {
+      "id": "code:class:saebase.interventions.pyvene_adapter:PyvenePlan",
+      "kind": "class",
+      "title": "PyvenePlan",
+      "path": "saebase/interventions/pyvene_adapter.py",
+      "line": 42,
+      "status": "implemented",
+      "signature": "class PyvenePlan()",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/interventions/pyvene_adapter.py:42"
+      ]
+    },
+    {
+      "id": "code:class:saebase.interventions.pyvene_adapter:PyveneRepresentation",
+      "kind": "class",
+      "title": "PyveneRepresentation",
+      "path": "saebase/interventions/pyvene_adapter.py",
+      "line": 16,
+      "status": "implemented",
+      "signature": "class PyveneRepresentation()",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/interventions/pyvene_adapter.py:16"
+      ]
+    },
+    {
+      "id": "code:class:saebase.interventions.research_edits:Edit",
+      "kind": "class",
+      "title": "Edit",
+      "path": "saebase/interventions/research_edits.py",
+      "line": 24,
+      "status": "implemented",
+      "signature": "class Edit()",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/interventions/research_edits.py:24"
+      ]
+    },
+    {
+      "id": "code:class:saebase.interventions.research_edits:EditPlan",
+      "kind": "class",
+      "title": "EditPlan",
+      "path": "saebase/interventions/research_edits.py",
+      "line": 41,
+      "status": "implemented",
+      "signature": "class EditPlan()",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/interventions/research_edits.py:41"
+      ]
+    },
+    {
+      "id": "code:class:saebase.interventions.research_edits:ModuleEdit",
+      "kind": "class",
+      "title": "ModuleEdit",
+      "path": "saebase/interventions/research_edits.py",
+      "line": 195,
+      "status": "implemented",
+      "signature": "class ModuleEdit()",
+      "description": "A native PyTorch module's forward output, not SAE decoder features.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/interventions/research_edits.py:195"
       ]
     },
     {
@@ -1814,6 +2012,24 @@
       ]
     },
     {
+      "id": "code:class:saebase.sae.external_training:TrainPlan",
+      "kind": "class",
+      "title": "TrainPlan",
+      "path": "saebase/sae/external_training.py",
+      "line": 24,
+      "status": "implemented",
+      "signature": "class TrainPlan()",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/sae/external_training.py:24"
+      ]
+    },
+    {
       "id": "code:class:saebase.sae.registry:SAEProfile",
       "kind": "class",
       "title": "SAEProfile",
@@ -2337,222 +2553,6 @@
       "needs_review": true,
       "evidence": [
         "saebase/vllm_backend/sae_interventions.py:23"
-      ]
-    },
-    {
-      "id": "code:class:saebase.wp12.benchmarks:ComparisonPoint",
-      "kind": "class",
-      "title": "ComparisonPoint",
-      "path": "saebase/wp12/benchmarks.py",
-      "line": 102,
-      "status": "implemented",
-      "signature": "class ComparisonPoint()",
-      "description": "An actual native benchmark metric row; labels are not inferred.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/benchmarks.py:102"
-      ]
-    },
-    {
-      "id": "code:class:saebase.wp12.benchmarks:NativePilot",
-      "kind": "class",
-      "title": "NativePilot",
-      "path": "saebase/wp12/benchmarks.py",
-      "line": 25,
-      "status": "implemented",
-      "signature": "class NativePilot()",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/benchmarks.py:25"
-      ]
-    },
-    {
-      "id": "code:class:saebase.wp12.circuits:GraphEdge",
-      "kind": "class",
-      "title": "GraphEdge",
-      "path": "saebase/wp12/circuits.py",
-      "line": 77,
-      "status": "implemented",
-      "signature": "class GraphEdge()",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/circuits.py:77"
-      ]
-    },
-    {
-      "id": "code:class:saebase.wp12.circuits:GraphNode",
-      "kind": "class",
-      "title": "GraphNode",
-      "path": "saebase/wp12/circuits.py",
-      "line": 54,
-      "status": "implemented",
-      "signature": "class GraphNode()",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/circuits.py:54"
-      ]
-    },
-    {
-      "id": "code:class:saebase.wp12.circuits:GraphRecord",
-      "kind": "class",
-      "title": "GraphRecord",
-      "path": "saebase/wp12/circuits.py",
-      "line": 90,
-      "status": "implemented",
-      "signature": "class GraphRecord()",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/circuits.py:90"
-      ]
-    },
-    {
-      "id": "code:class:saebase.wp12.circuits:RepresentationAsset",
-      "kind": "class",
-      "title": "RepresentationAsset",
-      "path": "saebase/wp12/circuits.py",
-      "line": 25,
-      "status": "implemented",
-      "signature": "class RepresentationAsset()",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/circuits.py:25"
-      ]
-    },
-    {
-      "id": "code:class:saebase.wp12.interventions:Edit",
-      "kind": "class",
-      "title": "Edit",
-      "path": "saebase/wp12/interventions.py",
-      "line": 24,
-      "status": "implemented",
-      "signature": "class Edit()",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/interventions.py:24"
-      ]
-    },
-    {
-      "id": "code:class:saebase.wp12.interventions:EditPlan",
-      "kind": "class",
-      "title": "EditPlan",
-      "path": "saebase/wp12/interventions.py",
-      "line": 41,
-      "status": "implemented",
-      "signature": "class EditPlan()",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/interventions.py:41"
-      ]
-    },
-    {
-      "id": "code:class:saebase.wp12.interventions:ModuleEdit",
-      "kind": "class",
-      "title": "ModuleEdit",
-      "path": "saebase/wp12/interventions.py",
-      "line": 195,
-      "status": "implemented",
-      "signature": "class ModuleEdit()",
-      "description": "A native PyTorch module's forward output, not SAE decoder features.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/interventions.py:195"
-      ]
-    },
-    {
-      "id": "code:class:saebase.wp12.pyvene:PyvenePlan",
-      "kind": "class",
-      "title": "PyvenePlan",
-      "path": "saebase/wp12/pyvene.py",
-      "line": 42,
-      "status": "implemented",
-      "signature": "class PyvenePlan()",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/pyvene.py:42"
-      ]
-    },
-    {
-      "id": "code:class:saebase.wp12.pyvene:PyveneRepresentation",
-      "kind": "class",
-      "title": "PyveneRepresentation",
-      "path": "saebase/wp12/pyvene.py",
-      "line": 16,
-      "status": "implemented",
-      "signature": "class PyveneRepresentation()",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/pyvene.py:16"
-      ]
-    },
-    {
-      "id": "code:class:saebase.wp12.training:TrainPlan",
-      "kind": "class",
-      "title": "TrainPlan",
-      "path": "saebase/wp12/training.py",
-      "line": 24,
-      "status": "implemented",
-      "signature": "class TrainPlan()",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/training.py:24"
       ]
     },
     {
@@ -9884,6 +9884,60 @@
       ]
     },
     {
+      "id": "code:function:saebase.benchmarks.adapters.custom_saebench:main",
+      "kind": "function",
+      "title": "main",
+      "path": "saebase/benchmarks/adapters/custom_saebench.py",
+      "line": 205,
+      "status": "implemented",
+      "signature": "def main() -> int",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/benchmarks/adapters/custom_saebench.py:205"
+      ]
+    },
+    {
+      "id": "code:function:saebase.benchmarks.adapters.custom_saebench:native_worker",
+      "kind": "function",
+      "title": "native_worker",
+      "path": "saebase/benchmarks/adapters/custom_saebench.py",
+      "line": 28,
+      "status": "implemented",
+      "signature": "def native_worker(*, upstream: Path, sae_key: str, layer: int, model_name: str, eval_type: str, device: str) -> dict[str, Any]",
+      "description": "Call original SAEBench's exact custom SAE evaluator in this process.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/benchmarks/adapters/custom_saebench.py:28"
+      ]
+    },
+    {
+      "id": "code:function:saebase.benchmarks.adapters.custom_saebench:run_custom",
+      "kind": "function",
+      "title": "run_custom",
+      "path": "saebase/benchmarks/adapters/custom_saebench.py",
+      "line": 137,
+      "status": "implemented",
+      "signature": "def run_custom(*, upstream: Path, upstream_commit: str, sae_key: str, layer: int, model_name: str, eval_type: str, device: str, output: Path, approved: bool=False, timeout_seconds: int=3600) -> dict[str, Any]",
+      "description": "Isolated, time-bounded native run; source and trainer are immutable.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/benchmarks/adapters/custom_saebench.py:137"
+      ]
+    },
+    {
       "id": "code:function:saebase.benchmarks.adapters.localization:_artifact_reference",
       "kind": "function",
       "title": "_artifact_reference",
@@ -10151,6 +10205,42 @@
       "needs_review": false,
       "evidence": [
         "saebase/benchmarks/metrics/reconstruction.py:9"
+      ]
+    },
+    {
+      "id": "code:function:saebase.benchmarks.native_comparisons:compare_sae_points",
+      "kind": "function",
+      "title": "compare_sae_points",
+      "path": "saebase/benchmarks/native_comparisons.py",
+      "line": 134,
+      "status": "implemented",
+      "signature": "def compare_sae_points(points: list[ComparisonPoint]) -> dict[str, Any]",
+      "description": "Produce a *fairness-checked* Pareto series, never invented metrics.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/benchmarks/native_comparisons.py:134"
+      ]
+    },
+    {
+      "id": "code:function:saebase.benchmarks.native_comparisons:native_pilot",
+      "kind": "function",
+      "title": "native_pilot",
+      "path": "saebase/benchmarks/native_comparisons.py",
+      "line": 53,
+      "status": "implemented",
+      "signature": "def native_pilot(job: NativePilot) -> dict[str, Any]",
+      "description": "Execute the original upstream benchmark smoke, not fabricated metrics.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/benchmarks/native_comparisons.py:53"
       ]
     },
     {
@@ -10601,6 +10691,222 @@
       "needs_review": true,
       "evidence": [
         "saebase/cfg/contracts.py:10"
+      ]
+    },
+    {
+      "id": "code:function:saebase.circuits.clt_intervention:_model_logits",
+      "kind": "function",
+      "title": "_model_logits",
+      "path": "saebase/circuits/clt_intervention.py",
+      "line": 28,
+      "status": "implemented",
+      "signature": "def _model_logits(value: Any, position: int) -> torch.Tensor",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/circuits/clt_intervention.py:28"
+      ]
+    },
+    {
+      "id": "code:function:saebase.circuits.clt_intervention:_module_name",
+      "kind": "function",
+      "title": "_module_name",
+      "path": "saebase/circuits/clt_intervention.py",
+      "line": 22,
+      "status": "implemented",
+      "signature": "def _module_name(template: str, layer: int) -> str",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/circuits/clt_intervention.py:22"
+      ]
+    },
+    {
+      "id": "code:function:saebase.circuits.clt_intervention:execute_clt_feature",
+      "kind": "function",
+      "title": "execute_clt_feature",
+      "path": "saebase/circuits/clt_intervention.py",
+      "line": 43,
+      "status": "implemented",
+      "signature": "def execute_clt_feature(model: nn.Module, inputs: torch.Tensor, graph: GraphRecord, node_id: str, clt: Scope2CLT, identity: CLTIdentity, *, new_code: float=0.0, readout_position: int | None=None) -> dict[str, Any]",
+      "description": "A selected source-layer feature edits all later native output hooks. The original source activation is captured before the source layer's MLP output. For each target layer j >= source, add only (z_new - z_old) * w_dec[source][feature, target]. Earlier targets remain unchanged; biases and affine skips cancel.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/circuits/clt_intervention.py:43"
+      ]
+    },
+    {
+      "id": "code:function:saebase.circuits.graph:graph_feature_intervention_request",
+      "kind": "function",
+      "title": "graph_feature_intervention_request",
+      "path": "saebase/circuits/graph.py",
+      "line": 298,
+      "status": "implemented",
+      "signature": "def graph_feature_intervention_request(record: GraphRecord, node_id: str, asset: RepresentationAsset, *, value: float) -> dict",
+      "description": "Typed intervention request only; actual causal edit runs in native backend.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/circuits/graph.py:298"
+      ]
+    },
+    {
+      "id": "code:function:saebase.circuits.graph:import_native_graph_file",
+      "kind": "function",
+      "title": "import_native_graph_file",
+      "path": "saebase/circuits/graph.py",
+      "line": 161,
+      "status": "implemented",
+      "signature": "def import_native_graph_file(source: Path, *, model_sha256: str, transcoder_sha256: str, original_tool_commit: str) -> GraphRecord",
+      "description": "Convert exact circuit-tracer frontend v1 JSON without loading raw .pt. Native selected feature IDs live in node_id; the native \"feature\" field is Cantor-encoded and must not be mistaken for the SAE feature index.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/circuits/graph.py:161"
+      ]
+    },
+    {
+      "id": "code:function:saebase.circuits.graph:parse_typed_graph",
+      "kind": "function",
+      "title": "parse_typed_graph",
+      "path": "saebase/circuits/graph.py",
+      "line": 132,
+      "status": "implemented",
+      "signature": "def parse_typed_graph(raw: dict[str, Any], *, provenance: dict[str, str]) -> GraphRecord",
+      "description": "Import a verified *normalized* graph; never guess native tensor indexing. Upstream circuit-tracer emits raw .pt and its own visualization JSON schema. A separate explicit converter must map that exact pinned schema to nodes/edges before this function is called. Arbitrary .pt is never loaded in the public API.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/circuits/graph.py:132"
+      ]
+    },
+    {
+      "id": "code:function:saebase.circuits.graph:prune",
+      "kind": "function",
+      "title": "prune",
+      "path": "saebase/circuits/graph.py",
+      "line": 251,
+      "status": "implemented",
+      "signature": "def prune(record: GraphRecord, *, min_abs_weight: float) -> GraphRecord",
+      "description": "Return bounded view without deleting raw graph; retain all error/target nodes.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/circuits/graph.py:251"
+      ]
+    },
+    {
+      "id": "code:function:saebase.circuits.graph:run_native_circuit_tracer",
+      "kind": "function",
+      "title": "run_native_circuit_tracer",
+      "path": "saebase/circuits/graph.py",
+      "line": 327,
+      "status": "implemented",
+      "signature": "def run_native_circuit_tracer(*, prompt: str, transcoder_set: str, output: Path, slug: str, approved: bool=False, timeout_seconds: int=1800, offload: str | None=None, dtype: str | None=None, max_feature_nodes: int | None=None, batch_size: int | None=None, lazy_encoder: bool=False) -> dict",
+      "description": "Use original circuit-tracer CLI, without starting its web server.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/circuits/graph.py:327"
+      ]
+    },
+    {
+      "id": "code:function:saebase.circuits.graph:save_graph",
+      "kind": "function",
+      "title": "save_graph",
+      "path": "saebase/circuits/graph.py",
+      "line": 276,
+      "status": "implemented",
+      "signature": "def save_graph(record: GraphRecord, destination: Path) -> dict",
+      "description": "Save immutable graph JSON and checksum, no downloaded weights or prompts.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/circuits/graph.py:276"
+      ]
+    },
+    {
+      "id": "code:function:saebase.circuits.transcoder_intervention:_logits",
+      "kind": "function",
+      "title": "_logits",
+      "path": "saebase/circuits/transcoder_intervention.py",
+      "line": 26,
+      "status": "implemented",
+      "signature": "def _logits(output: Any, position: int) -> torch.Tensor",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/circuits/transcoder_intervention.py:26"
+      ]
+    },
+    {
+      "id": "code:function:saebase.circuits.transcoder_intervention:_module_name",
+      "kind": "function",
+      "title": "_module_name",
+      "path": "saebase/circuits/transcoder_intervention.py",
+      "line": 20,
+      "status": "implemented",
+      "signature": "def _module_name(hook: str) -> str",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/circuits/transcoder_intervention.py:20"
+      ]
+    },
+    {
+      "id": "code:function:saebase.circuits.transcoder_intervention:execute_transcoder_node",
+      "kind": "function",
+      "title": "execute_transcoder_node",
+      "path": "saebase/circuits/transcoder_intervention.py",
+      "line": 37,
+      "status": "implemented",
+      "signature": "def execute_transcoder_node(model: nn.Module, inputs: torch.Tensor, graph: GraphRecord, node_id: str, transcoder: JumpReLURepresentation, identity: ScopeIdentity, *, new_code: float=0.0, readout_position: int | None=None) -> dict[str, Any]",
+      "description": "Run baseline and one true module-hook feature intervention. This local reference supports single-layer transcoders only. A partial crosscoder or CLT needs simultaneous multi-source capture/target handling and is rejected rather than pretending its weights are an ordinary SAE.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/circuits/transcoder_intervention.py:37"
       ]
     },
     {
@@ -14168,6 +14474,24 @@
       ]
     },
     {
+      "id": "code:function:saebase.interventions.ndif_adapter:remote_ndif_capture",
+      "kind": "function",
+      "title": "remote_ndif_capture",
+      "path": "saebase/interventions/ndif_adapter.py",
+      "line": 18,
+      "status": "implemented",
+      "signature": "def remote_ndif_capture(model: Any, prompt: str, location: TraceLocation, *, model_id: str, approved: bool=False, rights_reviewed: bool=False, deployment_allowlist: frozenset[str]=frozenset(), max_output_elements: int=2048) -> dict[str, Any]",
+      "description": "Execute one real NDIF remote=True trace after explicit consent. If the deployed model or credentials are unknown, fail before submission. No NDIF account is created and no external GPU costs are authorized here.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/interventions/ndif_adapter.py:18"
+      ]
+    },
+    {
       "id": "code:function:saebase.interventions.operators:apply_condition",
       "kind": "function",
       "title": "apply_condition",
@@ -14183,6 +14507,132 @@
       "needs_review": true,
       "evidence": [
         "saebase/interventions/operators.py:12"
+      ]
+    },
+    {
+      "id": "code:function:saebase.interventions.pyvene_adapter:build_native_pyvene",
+      "kind": "function",
+      "title": "build_native_pyvene",
+      "path": "saebase/interventions/pyvene_adapter.py",
+      "line": 83,
+      "status": "implemented",
+      "signature": "def build_native_pyvene(model: Any, plan: PyvenePlan) -> Any",
+      "description": "Create the original pyvene backend (lazy-imported in its own environment).",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/interventions/pyvene_adapter.py:83"
+      ]
+    },
+    {
+      "id": "code:function:saebase.interventions.pyvene_adapter:execute_native_pyvene",
+      "kind": "function",
+      "title": "execute_native_pyvene",
+      "path": "saebase/interventions/pyvene_adapter.py",
+      "line": 107,
+      "status": "implemented",
+      "signature": "def execute_native_pyvene(intervenable: Any, *, base: Any, sources: Any, unit_locations: dict[str, Any]) -> tuple[Any, Any]",
+      "description": "Return upstream baseline/intervened outputs, no post-hoc simulated logits.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/interventions/pyvene_adapter.py:107"
+      ]
+    },
+    {
+      "id": "code:function:saebase.interventions.pyvene_adapter:load_native_pyvene",
+      "kind": "function",
+      "title": "load_native_pyvene",
+      "path": "saebase/interventions/pyvene_adapter.py",
+      "line": 134,
+      "status": "implemented",
+      "signature": "def load_native_pyvene(*, model: Any, directory: Path, trusted_local_source: bool=False) -> Any",
+      "description": "pyvene's original loader uses pickle; never auto-load untrusted artifacts.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/interventions/pyvene_adapter.py:134"
+      ]
+    },
+    {
+      "id": "code:function:saebase.interventions.pyvene_adapter:save_native_pyvene",
+      "kind": "function",
+      "title": "save_native_pyvene",
+      "path": "saebase/interventions/pyvene_adapter.py",
+      "line": 125,
+      "status": "implemented",
+      "signature": "def save_native_pyvene(intervenable: Any, output: Path) -> None",
+      "description": "Serialize via original library; never include the underlying base model.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/interventions/pyvene_adapter.py:125"
+      ]
+    },
+    {
+      "id": "code:function:saebase.interventions.research_edits:compare_module_edits",
+      "kind": "function",
+      "title": "compare_module_edits",
+      "path": "saebase/interventions/research_edits.py",
+      "line": 219,
+      "status": "implemented",
+      "signature": "def compare_module_edits(model: torch.nn.Module, inputs: Any, edits: Sequence[ModuleEdit]) -> dict[str, Any]",
+      "description": "Genuine forward hooks on arbitrary PyTorch modules including CNNs. Caller retains responsibility for user-selected output semantics. The same module cannot be targeted twice; unsupported tuple outputs fail.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/interventions/research_edits.py:219"
+      ]
+    },
+    {
+      "id": "code:function:saebase.interventions.research_edits:compare_sae_edits",
+      "kind": "function",
+      "title": "compare_sae_edits",
+      "path": "saebase/interventions/research_edits.py",
+      "line": 120,
+      "status": "implemented",
+      "signature": "def compare_sae_edits(bundle: Any, tokens: torch.Tensor, plan: EditPlan, *, readout_position: int=-1) -> dict[str, Any]",
+      "description": "Real baseline vs edited teacher-forced logits, no invented generation. The supplied bundle is an already loaded SAEBase LoadedResearchPair, so callers control weights and device. Sequential edits re-encode the current activation; parallel edits combine disjoint feature changes in one code vector. An unsupported SAE normalization is rejected by existing API.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/interventions/research_edits.py:120"
+      ]
+    },
+    {
+      "id": "code:function:saebase.interventions.research_edits:run_native_pyvene",
+      "kind": "function",
+      "title": "run_native_pyvene",
+      "path": "saebase/interventions/research_edits.py",
+      "line": 288,
+      "status": "implemented",
+      "signature": "def run_native_pyvene(intervenable: Any, *, base: Any, sources: Any, unit_locations: dict[str, Any], **upstream_kwargs: Any) -> Any",
+      "description": "Invoke an already constructed ORIGINAL pyvene IntervenableModel. The caller supplies its official IntervenableConfig, registrations and source, so OpenSAE never invents a pyvene location map or changes the computation to SAE steering. Use pyvene's own output and provenance.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/interventions/research_edits.py:288"
       ]
     },
     {
@@ -14763,6 +15213,78 @@
       "needs_review": false,
       "evidence": [
         "saebase/registry.py:106"
+      ]
+    },
+    {
+      "id": "code:function:saebase.release.capability_acceptance:_safe_zip_name",
+      "kind": "function",
+      "title": "_safe_zip_name",
+      "path": "saebase/release/capability_acceptance.py",
+      "line": 122,
+      "status": "implemented",
+      "signature": "def _safe_zip_name(name: str) -> bool",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/release/capability_acceptance.py:122"
+      ]
+    },
+    {
+      "id": "code:function:saebase.release.capability_acceptance:audit_ledger",
+      "kind": "function",
+      "title": "audit_ledger",
+      "path": "saebase/release/capability_acceptance.py",
+      "line": 52,
+      "status": "implemented",
+      "signature": "def audit_ledger(path: Path) -> dict[str, Any]",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/release/capability_acceptance.py:52"
+      ]
+    },
+    {
+      "id": "code:function:saebase.release.capability_acceptance:inspect_archive",
+      "kind": "function",
+      "title": "inspect_archive",
+      "path": "saebase/release/capability_acceptance.py",
+      "line": 132,
+      "status": "implemented",
+      "signature": "def inspect_archive(path: Path, *, expected_sha256: str, max_unpacked_bytes: int=4000000000) -> dict[str, Any]",
+      "description": "Hash the real archive bytes; inspect without executing archived code. ZIP CRC, internal SHA256 entries and raw tensor counts are different checks. Raw .pt weights/pickles are NEVER deserialized in this module.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/release/capability_acceptance.py:132"
+      ]
+    },
+    {
+      "id": "code:function:saebase.release.capability_acceptance:render_progress",
+      "kind": "function",
+      "title": "render_progress",
+      "path": "saebase/release/capability_acceptance.py",
+      "line": 202,
+      "status": "implemented",
+      "signature": "def render_progress(report: dict[str, Any]) -> str",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/release/capability_acceptance.py:202"
       ]
     },
     {
@@ -21012,6 +21534,96 @@
       ]
     },
     {
+      "id": "code:function:saebase.sae.external_training:_saelens_train",
+      "kind": "function",
+      "title": "_saelens_train",
+      "path": "saebase/sae/external_training.py",
+      "line": 85,
+      "status": "implemented",
+      "signature": "def _saelens_train(plan: TrainPlan, checkpoint_dir: Path) -> None",
+      "description": "Original SAELens v6 nested config; its trainer computes real activations.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/sae/external_training.py:85"
+      ]
+    },
+    {
+      "id": "code:function:saebase.sae.external_training:_sparsify_command",
+      "kind": "function",
+      "title": "_sparsify_command",
+      "path": "saebase/sae/external_training.py",
+      "line": 131,
+      "status": "implemented",
+      "signature": "def _sparsify_command(plan: TrainPlan) -> list[str]",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/sae/external_training.py:131"
+      ]
+    },
+    {
+      "id": "code:function:saebase.sae.external_training:register_checkpoint",
+      "kind": "function",
+      "title": "register_checkpoint",
+      "path": "saebase/sae/external_training.py",
+      "line": 315,
+      "status": "implemented",
+      "signature": "def register_checkpoint(native_directory: Path, output: Path, *, source: dict) -> dict",
+      "description": "Hash an actual saved native checkpoint without copying third-party weights.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/sae/external_training.py:315"
+      ]
+    },
+    {
+      "id": "code:function:saebase.sae.external_training:resume_sparsify_training",
+      "kind": "function",
+      "title": "resume_sparsify_training",
+      "path": "saebase/sae/external_training.py",
+      "line": 244,
+      "status": "implemented",
+      "signature": "def resume_sparsify_training(plan: TrainPlan, *, output: Path, approved: bool=False, allow_large: bool=False, timeout_seconds: int=1800) -> dict",
+      "description": "Resume real optimizer/trainer state only in its original run directory. Sparsify's upstream CLI resolves checkpoints/{run_name} relative to the current directory. The owner must approve resuming that *same* run; a fine-tuned new model is not equivalent to a resumed training trajectory. Logs are never overwritten, and failed attempts remain inspectable.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/sae/external_training.py:244"
+      ]
+    },
+    {
+      "id": "code:function:saebase.sae.external_training:run_training",
+      "kind": "function",
+      "title": "run_training",
+      "path": "saebase/sae/external_training.py",
+      "line": 174,
+      "status": "implemented",
+      "signature": "def run_training(plan: TrainPlan, *, output: Path, approved: bool=False, allow_large: bool=False, timeout_seconds: int=1800) -> dict",
+      "description": "Real native execution only on explicit approval and actual local snapshots.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/sae/external_training.py:174"
+      ]
+    },
+    {
       "id": "code:function:saebase.sae.loading:_phase_a_sae_lens_source",
       "kind": "function",
       "title": "_phase_a_sae_lens_source",
@@ -27211,618 +27823,6 @@
       "needs_review": true,
       "evidence": [
         "saebase/vllm_backend/generate.py:17"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.acceptance:_safe_zip_name",
-      "kind": "function",
-      "title": "_safe_zip_name",
-      "path": "saebase/wp12/acceptance.py",
-      "line": 122,
-      "status": "implemented",
-      "signature": "def _safe_zip_name(name: str) -> bool",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/acceptance.py:122"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.acceptance:audit_ledger",
-      "kind": "function",
-      "title": "audit_ledger",
-      "path": "saebase/wp12/acceptance.py",
-      "line": 52,
-      "status": "implemented",
-      "signature": "def audit_ledger(path: Path) -> dict[str, Any]",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/acceptance.py:52"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.acceptance:inspect_archive",
-      "kind": "function",
-      "title": "inspect_archive",
-      "path": "saebase/wp12/acceptance.py",
-      "line": 132,
-      "status": "implemented",
-      "signature": "def inspect_archive(path: Path, *, expected_sha256: str, max_unpacked_bytes: int=4000000000) -> dict[str, Any]",
-      "description": "Hash the real archive bytes; inspect without executing archived code. ZIP CRC, internal SHA256 entries and raw tensor counts are different checks. Raw .pt weights/pickles are NEVER deserialized in this module.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/acceptance.py:132"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.acceptance:render_progress",
-      "kind": "function",
-      "title": "render_progress",
-      "path": "saebase/wp12/acceptance.py",
-      "line": 202,
-      "status": "implemented",
-      "signature": "def render_progress(report: dict[str, Any]) -> str",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/acceptance.py:202"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.benchmarks:compare_sae_points",
-      "kind": "function",
-      "title": "compare_sae_points",
-      "path": "saebase/wp12/benchmarks.py",
-      "line": 134,
-      "status": "implemented",
-      "signature": "def compare_sae_points(points: list[ComparisonPoint]) -> dict[str, Any]",
-      "description": "Produce a *fairness-checked* Pareto series, never invented metrics.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/benchmarks.py:134"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.benchmarks:native_pilot",
-      "kind": "function",
-      "title": "native_pilot",
-      "path": "saebase/wp12/benchmarks.py",
-      "line": 53,
-      "status": "implemented",
-      "signature": "def native_pilot(job: NativePilot) -> dict[str, Any]",
-      "description": "Execute the original upstream benchmark smoke, not fabricated metrics.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/benchmarks.py:53"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.circuit_intervene:_logits",
-      "kind": "function",
-      "title": "_logits",
-      "path": "saebase/wp12/circuit_intervene.py",
-      "line": 26,
-      "status": "implemented",
-      "signature": "def _logits(output: Any, position: int) -> torch.Tensor",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/circuit_intervene.py:26"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.circuit_intervene:_module_name",
-      "kind": "function",
-      "title": "_module_name",
-      "path": "saebase/wp12/circuit_intervene.py",
-      "line": 20,
-      "status": "implemented",
-      "signature": "def _module_name(hook: str) -> str",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/circuit_intervene.py:20"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.circuit_intervene:execute_transcoder_node",
-      "kind": "function",
-      "title": "execute_transcoder_node",
-      "path": "saebase/wp12/circuit_intervene.py",
-      "line": 37,
-      "status": "implemented",
-      "signature": "def execute_transcoder_node(model: nn.Module, inputs: torch.Tensor, graph: GraphRecord, node_id: str, transcoder: JumpReLURepresentation, identity: ScopeIdentity, *, new_code: float=0.0, readout_position: int | None=None) -> dict[str, Any]",
-      "description": "Run baseline and one true module-hook feature intervention. This local reference supports single-layer transcoders only. A partial crosscoder or CLT needs simultaneous multi-source capture/target handling and is rejected rather than pretending its weights are an ordinary SAE.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/circuit_intervene.py:37"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.circuits:graph_feature_intervention_request",
-      "kind": "function",
-      "title": "graph_feature_intervention_request",
-      "path": "saebase/wp12/circuits.py",
-      "line": 298,
-      "status": "implemented",
-      "signature": "def graph_feature_intervention_request(record: GraphRecord, node_id: str, asset: RepresentationAsset, *, value: float) -> dict",
-      "description": "Typed intervention request only; actual causal edit runs in native backend.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/circuits.py:298"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.circuits:import_native_graph_file",
-      "kind": "function",
-      "title": "import_native_graph_file",
-      "path": "saebase/wp12/circuits.py",
-      "line": 161,
-      "status": "implemented",
-      "signature": "def import_native_graph_file(source: Path, *, model_sha256: str, transcoder_sha256: str, original_tool_commit: str) -> GraphRecord",
-      "description": "Convert exact circuit-tracer frontend v1 JSON without loading raw .pt. Native selected feature IDs live in node_id; the native \"feature\" field is Cantor-encoded and must not be mistaken for the SAE feature index.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/circuits.py:161"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.circuits:parse_typed_graph",
-      "kind": "function",
-      "title": "parse_typed_graph",
-      "path": "saebase/wp12/circuits.py",
-      "line": 132,
-      "status": "implemented",
-      "signature": "def parse_typed_graph(raw: dict[str, Any], *, provenance: dict[str, str]) -> GraphRecord",
-      "description": "Import a verified *normalized* graph; never guess native tensor indexing. Upstream circuit-tracer emits raw .pt and its own visualization JSON schema. A separate explicit converter must map that exact pinned schema to nodes/edges before this function is called. Arbitrary .pt is never loaded in the public API.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/circuits.py:132"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.circuits:prune",
-      "kind": "function",
-      "title": "prune",
-      "path": "saebase/wp12/circuits.py",
-      "line": 251,
-      "status": "implemented",
-      "signature": "def prune(record: GraphRecord, *, min_abs_weight: float) -> GraphRecord",
-      "description": "Return bounded view without deleting raw graph; retain all error/target nodes.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/circuits.py:251"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.circuits:run_native_circuit_tracer",
-      "kind": "function",
-      "title": "run_native_circuit_tracer",
-      "path": "saebase/wp12/circuits.py",
-      "line": 327,
-      "status": "implemented",
-      "signature": "def run_native_circuit_tracer(*, prompt: str, transcoder_set: str, output: Path, slug: str, approved: bool=False, timeout_seconds: int=1800, offload: str | None=None, dtype: str | None=None, max_feature_nodes: int | None=None, batch_size: int | None=None, lazy_encoder: bool=False) -> dict",
-      "description": "Use original circuit-tracer CLI, without starting its web server.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/circuits.py:327"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.circuits:save_graph",
-      "kind": "function",
-      "title": "save_graph",
-      "path": "saebase/wp12/circuits.py",
-      "line": 276,
-      "status": "implemented",
-      "signature": "def save_graph(record: GraphRecord, destination: Path) -> dict",
-      "description": "Save immutable graph JSON and checksum, no downloaded weights or prompts.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/circuits.py:276"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.clt_intervene:_model_logits",
-      "kind": "function",
-      "title": "_model_logits",
-      "path": "saebase/wp12/clt_intervene.py",
-      "line": 28,
-      "status": "implemented",
-      "signature": "def _model_logits(value: Any, position: int) -> torch.Tensor",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/clt_intervene.py:28"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.clt_intervene:_module_name",
-      "kind": "function",
-      "title": "_module_name",
-      "path": "saebase/wp12/clt_intervene.py",
-      "line": 22,
-      "status": "implemented",
-      "signature": "def _module_name(template: str, layer: int) -> str",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/clt_intervene.py:22"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.clt_intervene:execute_clt_feature",
-      "kind": "function",
-      "title": "execute_clt_feature",
-      "path": "saebase/wp12/clt_intervene.py",
-      "line": 43,
-      "status": "implemented",
-      "signature": "def execute_clt_feature(model: nn.Module, inputs: torch.Tensor, graph: GraphRecord, node_id: str, clt: Scope2CLT, identity: CLTIdentity, *, new_code: float=0.0, readout_position: int | None=None) -> dict[str, Any]",
-      "description": "A selected source-layer feature edits all later native output hooks. The original source activation is captured before the source layer's MLP output. For each target layer j >= source, add only (z_new - z_old) * w_dec[source][feature, target]. Earlier targets remain unchanged; biases and affine skips cancel.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/clt_intervene.py:43"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.custom_saebench:main",
-      "kind": "function",
-      "title": "main",
-      "path": "saebase/wp12/custom_saebench.py",
-      "line": 205,
-      "status": "implemented",
-      "signature": "def main() -> int",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/custom_saebench.py:205"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.custom_saebench:native_worker",
-      "kind": "function",
-      "title": "native_worker",
-      "path": "saebase/wp12/custom_saebench.py",
-      "line": 28,
-      "status": "implemented",
-      "signature": "def native_worker(*, upstream: Path, sae_key: str, layer: int, model_name: str, eval_type: str, device: str) -> dict[str, Any]",
-      "description": "Call original SAEBench's exact custom SAE evaluator in this process.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/custom_saebench.py:28"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.custom_saebench:run_custom",
-      "kind": "function",
-      "title": "run_custom",
-      "path": "saebase/wp12/custom_saebench.py",
-      "line": 137,
-      "status": "implemented",
-      "signature": "def run_custom(*, upstream: Path, upstream_commit: str, sae_key: str, layer: int, model_name: str, eval_type: str, device: str, output: Path, approved: bool=False, timeout_seconds: int=3600) -> dict[str, Any]",
-      "description": "Isolated, time-bounded native run; source and trainer are immutable.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/custom_saebench.py:137"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.interventions:compare_module_edits",
-      "kind": "function",
-      "title": "compare_module_edits",
-      "path": "saebase/wp12/interventions.py",
-      "line": 219,
-      "status": "implemented",
-      "signature": "def compare_module_edits(model: torch.nn.Module, inputs: Any, edits: Sequence[ModuleEdit]) -> dict[str, Any]",
-      "description": "Genuine forward hooks on arbitrary PyTorch modules including CNNs. Caller retains responsibility for user-selected output semantics. The same module cannot be targeted twice; unsupported tuple outputs fail.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/interventions.py:219"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.interventions:compare_sae_edits",
-      "kind": "function",
-      "title": "compare_sae_edits",
-      "path": "saebase/wp12/interventions.py",
-      "line": 120,
-      "status": "implemented",
-      "signature": "def compare_sae_edits(bundle: Any, tokens: torch.Tensor, plan: EditPlan, *, readout_position: int=-1) -> dict[str, Any]",
-      "description": "Real baseline vs edited teacher-forced logits, no invented generation. The supplied bundle is an already loaded SAEBase LoadedResearchPair, so callers control weights and device. Sequential edits re-encode the current activation; parallel edits combine disjoint feature changes in one code vector. An unsupported SAE normalization is rejected by existing API.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/interventions.py:120"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.interventions:run_native_pyvene",
-      "kind": "function",
-      "title": "run_native_pyvene",
-      "path": "saebase/wp12/interventions.py",
-      "line": 288,
-      "status": "implemented",
-      "signature": "def run_native_pyvene(intervenable: Any, *, base: Any, sources: Any, unit_locations: dict[str, Any], **upstream_kwargs: Any) -> Any",
-      "description": "Invoke an already constructed ORIGINAL pyvene IntervenableModel. The caller supplies its official IntervenableConfig, registrations and source, so OpenSAE never invents a pyvene location map or changes the computation to SAE steering. Use pyvene's own output and provenance.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/interventions.py:288"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.ndif:remote_ndif_capture",
-      "kind": "function",
-      "title": "remote_ndif_capture",
-      "path": "saebase/wp12/ndif.py",
-      "line": 18,
-      "status": "implemented",
-      "signature": "def remote_ndif_capture(model: Any, prompt: str, location: TraceLocation, *, model_id: str, approved: bool=False, rights_reviewed: bool=False, deployment_allowlist: frozenset[str]=frozenset(), max_output_elements: int=2048) -> dict[str, Any]",
-      "description": "Execute one real NDIF remote=True trace after explicit consent. If the deployed model or credentials are unknown, fail before submission. No NDIF account is created and no external GPU costs are authorized here.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/ndif.py:18"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.pyvene:build_native_pyvene",
-      "kind": "function",
-      "title": "build_native_pyvene",
-      "path": "saebase/wp12/pyvene.py",
-      "line": 83,
-      "status": "implemented",
-      "signature": "def build_native_pyvene(model: Any, plan: PyvenePlan) -> Any",
-      "description": "Create the original pyvene backend (lazy-imported in its own environment).",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/pyvene.py:83"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.pyvene:execute_native_pyvene",
-      "kind": "function",
-      "title": "execute_native_pyvene",
-      "path": "saebase/wp12/pyvene.py",
-      "line": 107,
-      "status": "implemented",
-      "signature": "def execute_native_pyvene(intervenable: Any, *, base: Any, sources: Any, unit_locations: dict[str, Any]) -> tuple[Any, Any]",
-      "description": "Return upstream baseline/intervened outputs, no post-hoc simulated logits.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/pyvene.py:107"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.pyvene:load_native_pyvene",
-      "kind": "function",
-      "title": "load_native_pyvene",
-      "path": "saebase/wp12/pyvene.py",
-      "line": 134,
-      "status": "implemented",
-      "signature": "def load_native_pyvene(*, model: Any, directory: Path, trusted_local_source: bool=False) -> Any",
-      "description": "pyvene's original loader uses pickle; never auto-load untrusted artifacts.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/pyvene.py:134"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.pyvene:save_native_pyvene",
-      "kind": "function",
-      "title": "save_native_pyvene",
-      "path": "saebase/wp12/pyvene.py",
-      "line": 125,
-      "status": "implemented",
-      "signature": "def save_native_pyvene(intervenable: Any, output: Path) -> None",
-      "description": "Serialize via original library; never include the underlying base model.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/pyvene.py:125"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.training:_saelens_train",
-      "kind": "function",
-      "title": "_saelens_train",
-      "path": "saebase/wp12/training.py",
-      "line": 85,
-      "status": "implemented",
-      "signature": "def _saelens_train(plan: TrainPlan, checkpoint_dir: Path) -> None",
-      "description": "Original SAELens v6 nested config; its trainer computes real activations.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/training.py:85"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.training:_sparsify_command",
-      "kind": "function",
-      "title": "_sparsify_command",
-      "path": "saebase/wp12/training.py",
-      "line": 131,
-      "status": "implemented",
-      "signature": "def _sparsify_command(plan: TrainPlan) -> list[str]",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/training.py:131"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.training:register_checkpoint",
-      "kind": "function",
-      "title": "register_checkpoint",
-      "path": "saebase/wp12/training.py",
-      "line": 315,
-      "status": "implemented",
-      "signature": "def register_checkpoint(native_directory: Path, output: Path, *, source: dict) -> dict",
-      "description": "Hash an actual saved native checkpoint without copying third-party weights.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/training.py:315"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.training:resume_sparsify_training",
-      "kind": "function",
-      "title": "resume_sparsify_training",
-      "path": "saebase/wp12/training.py",
-      "line": 244,
-      "status": "implemented",
-      "signature": "def resume_sparsify_training(plan: TrainPlan, *, output: Path, approved: bool=False, allow_large: bool=False, timeout_seconds: int=1800) -> dict",
-      "description": "Resume real optimizer/trainer state only in its original run directory. Sparsify's upstream CLI resolves checkpoints/{run_name} relative to the current directory. The owner must approve resuming that *same* run; a fine-tuned new model is not equivalent to a resumed training trajectory. Logs are never overwritten, and failed attempts remain inspectable.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/training.py:244"
-      ]
-    },
-    {
-      "id": "code:function:saebase.wp12.training:run_training",
-      "kind": "function",
-      "title": "run_training",
-      "path": "saebase/wp12/training.py",
-      "line": 174,
-      "status": "implemented",
-      "signature": "def run_training(plan: TrainPlan, *, output: Path, approved: bool=False, allow_large: bool=False, timeout_seconds: int=1800) -> dict",
-      "description": "Real native execution only on explicit approval and actual local snapshots.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/training.py:174"
       ]
     },
     {
@@ -34836,6 +34836,42 @@
       ]
     },
     {
+      "id": "code:method:saebase.benchmarks.native_comparisons:ComparisonPoint.__post_init__",
+      "kind": "method",
+      "title": "__post_init__",
+      "path": "saebase/benchmarks/native_comparisons.py",
+      "line": 115,
+      "status": "implemented",
+      "signature": "def __post_init__(self) -> None",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/benchmarks/native_comparisons.py:115"
+      ]
+    },
+    {
+      "id": "code:method:saebase.benchmarks.native_comparisons:NativePilot.validate",
+      "kind": "method",
+      "title": "validate",
+      "path": "saebase/benchmarks/native_comparisons.py",
+      "line": 32,
+      "status": "implemented",
+      "signature": "def validate(self) -> None",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/benchmarks/native_comparisons.py:32"
+      ]
+    },
+    {
       "id": "code:method:saebase.benchmarks.planner:PlanNode.to_dict",
       "kind": "method",
       "title": "to_dict",
@@ -34995,6 +35031,96 @@
       "needs_review": true,
       "evidence": [
         "saebase/benchmarks/schema.py:52"
+      ]
+    },
+    {
+      "id": "code:method:saebase.circuits.graph:GraphEdge.__post_init__",
+      "kind": "method",
+      "title": "__post_init__",
+      "path": "saebase/circuits/graph.py",
+      "line": 82,
+      "status": "implemented",
+      "signature": "def __post_init__(self) -> None",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/circuits/graph.py:82"
+      ]
+    },
+    {
+      "id": "code:method:saebase.circuits.graph:GraphNode.__post_init__",
+      "kind": "method",
+      "title": "__post_init__",
+      "path": "saebase/circuits/graph.py",
+      "line": 62,
+      "status": "implemented",
+      "signature": "def __post_init__(self) -> None",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/circuits/graph.py:62"
+      ]
+    },
+    {
+      "id": "code:method:saebase.circuits.graph:GraphRecord.payload",
+      "kind": "method",
+      "title": "payload",
+      "path": "saebase/circuits/graph.py",
+      "line": 116,
+      "status": "implemented",
+      "signature": "def payload(self) -> dict[str, Any]",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/circuits/graph.py:116"
+      ]
+    },
+    {
+      "id": "code:method:saebase.circuits.graph:GraphRecord.validate",
+      "kind": "method",
+      "title": "validate",
+      "path": "saebase/circuits/graph.py",
+      "line": 99,
+      "status": "implemented",
+      "signature": "def validate(self) -> None",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/circuits/graph.py:99"
+      ]
+    },
+    {
+      "id": "code:method:saebase.circuits.graph:RepresentationAsset.__post_init__",
+      "kind": "method",
+      "title": "__post_init__",
+      "path": "saebase/circuits/graph.py",
+      "line": 35,
+      "status": "implemented",
+      "signature": "def __post_init__(self) -> None",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/circuits/graph.py:35"
       ]
     },
     {
@@ -35931,6 +36057,168 @@
       "needs_review": true,
       "evidence": [
         "saebase/interventions/kv_cache_exact.py:93"
+      ]
+    },
+    {
+      "id": "code:method:saebase.interventions.pyvene_adapter:PyvenePlan.__post_init__",
+      "kind": "method",
+      "title": "__post_init__",
+      "path": "saebase/interventions/pyvene_adapter.py",
+      "line": 47,
+      "status": "implemented",
+      "signature": "def __post_init__(self) -> None",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/interventions/pyvene_adapter.py:47"
+      ]
+    },
+    {
+      "id": "code:method:saebase.interventions.pyvene_adapter:PyvenePlan.json",
+      "kind": "method",
+      "title": "json",
+      "path": "saebase/interventions/pyvene_adapter.py",
+      "line": 62,
+      "status": "implemented",
+      "signature": "def json(self) -> str",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/interventions/pyvene_adapter.py:62"
+      ]
+    },
+    {
+      "id": "code:method:saebase.interventions.pyvene_adapter:PyvenePlan.parse",
+      "kind": "method",
+      "title": "parse",
+      "path": "saebase/interventions/pyvene_adapter.py",
+      "line": 66,
+      "status": "implemented",
+      "signature": "def parse(cls, source: str) -> 'PyvenePlan'",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/interventions/pyvene_adapter.py:66"
+      ]
+    },
+    {
+      "id": "code:method:saebase.interventions.pyvene_adapter:PyveneRepresentation.__post_init__",
+      "kind": "method",
+      "title": "__post_init__",
+      "path": "saebase/interventions/pyvene_adapter.py",
+      "line": 23,
+      "status": "implemented",
+      "signature": "def __post_init__(self) -> None",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/interventions/pyvene_adapter.py:23"
+      ]
+    },
+    {
+      "id": "code:method:saebase.interventions.research_edits:Edit.condition",
+      "kind": "method",
+      "title": "condition",
+      "path": "saebase/interventions/research_edits.py",
+      "line": 30,
+      "status": "implemented",
+      "signature": "def condition(self) -> Condition",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/interventions/research_edits.py:30"
+      ]
+    },
+    {
+      "id": "code:method:saebase.interventions.research_edits:EditPlan.__post_init__",
+      "kind": "method",
+      "title": "__post_init__",
+      "path": "saebase/interventions/research_edits.py",
+      "line": 49,
+      "status": "implemented",
+      "signature": "def __post_init__(self) -> None",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/interventions/research_edits.py:49"
+      ]
+    },
+    {
+      "id": "code:method:saebase.interventions.research_edits:EditPlan.json",
+      "kind": "method",
+      "title": "json",
+      "path": "saebase/interventions/research_edits.py",
+      "line": 71,
+      "status": "implemented",
+      "signature": "def json(self) -> str",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/interventions/research_edits.py:71"
+      ]
+    },
+    {
+      "id": "code:method:saebase.interventions.research_edits:EditPlan.parse",
+      "kind": "method",
+      "title": "parse",
+      "path": "saebase/interventions/research_edits.py",
+      "line": 75,
+      "status": "implemented",
+      "signature": "def parse(cls, raw: str) -> 'EditPlan'",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/interventions/research_edits.py:75"
+      ]
+    },
+    {
+      "id": "code:method:saebase.interventions.research_edits:ModuleEdit.__post_init__",
+      "kind": "method",
+      "title": "__post_init__",
+      "path": "saebase/interventions/research_edits.py",
+      "line": 203,
+      "status": "implemented",
+      "signature": "def __post_init__(self) -> None",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/interventions/research_edits.py:203"
       ]
     },
     {
@@ -37357,6 +37645,24 @@
       "needs_review": true,
       "evidence": [
         "saebase/sae/coverage.py:54"
+      ]
+    },
+    {
+      "id": "code:method:saebase.sae.external_training:TrainPlan.validate",
+      "kind": "method",
+      "title": "validate",
+      "path": "saebase/sae/external_training.py",
+      "line": 44,
+      "status": "implemented",
+      "signature": "def validate(self, *, allow_large: bool=False) -> None",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/sae/external_training.py:44"
       ]
     },
     {
@@ -38959,312 +39265,6 @@
       "needs_review": true,
       "evidence": [
         "saebase/vllm_backend/sae_interventions.py:111"
-      ]
-    },
-    {
-      "id": "code:method:saebase.wp12.benchmarks:ComparisonPoint.__post_init__",
-      "kind": "method",
-      "title": "__post_init__",
-      "path": "saebase/wp12/benchmarks.py",
-      "line": 115,
-      "status": "implemented",
-      "signature": "def __post_init__(self) -> None",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/benchmarks.py:115"
-      ]
-    },
-    {
-      "id": "code:method:saebase.wp12.benchmarks:NativePilot.validate",
-      "kind": "method",
-      "title": "validate",
-      "path": "saebase/wp12/benchmarks.py",
-      "line": 32,
-      "status": "implemented",
-      "signature": "def validate(self) -> None",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/benchmarks.py:32"
-      ]
-    },
-    {
-      "id": "code:method:saebase.wp12.circuits:GraphEdge.__post_init__",
-      "kind": "method",
-      "title": "__post_init__",
-      "path": "saebase/wp12/circuits.py",
-      "line": 82,
-      "status": "implemented",
-      "signature": "def __post_init__(self) -> None",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/circuits.py:82"
-      ]
-    },
-    {
-      "id": "code:method:saebase.wp12.circuits:GraphNode.__post_init__",
-      "kind": "method",
-      "title": "__post_init__",
-      "path": "saebase/wp12/circuits.py",
-      "line": 62,
-      "status": "implemented",
-      "signature": "def __post_init__(self) -> None",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/circuits.py:62"
-      ]
-    },
-    {
-      "id": "code:method:saebase.wp12.circuits:GraphRecord.payload",
-      "kind": "method",
-      "title": "payload",
-      "path": "saebase/wp12/circuits.py",
-      "line": 116,
-      "status": "implemented",
-      "signature": "def payload(self) -> dict[str, Any]",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/circuits.py:116"
-      ]
-    },
-    {
-      "id": "code:method:saebase.wp12.circuits:GraphRecord.validate",
-      "kind": "method",
-      "title": "validate",
-      "path": "saebase/wp12/circuits.py",
-      "line": 99,
-      "status": "implemented",
-      "signature": "def validate(self) -> None",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/circuits.py:99"
-      ]
-    },
-    {
-      "id": "code:method:saebase.wp12.circuits:RepresentationAsset.__post_init__",
-      "kind": "method",
-      "title": "__post_init__",
-      "path": "saebase/wp12/circuits.py",
-      "line": 35,
-      "status": "implemented",
-      "signature": "def __post_init__(self) -> None",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/circuits.py:35"
-      ]
-    },
-    {
-      "id": "code:method:saebase.wp12.interventions:Edit.condition",
-      "kind": "method",
-      "title": "condition",
-      "path": "saebase/wp12/interventions.py",
-      "line": 30,
-      "status": "implemented",
-      "signature": "def condition(self) -> Condition",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/interventions.py:30"
-      ]
-    },
-    {
-      "id": "code:method:saebase.wp12.interventions:EditPlan.__post_init__",
-      "kind": "method",
-      "title": "__post_init__",
-      "path": "saebase/wp12/interventions.py",
-      "line": 49,
-      "status": "implemented",
-      "signature": "def __post_init__(self) -> None",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/interventions.py:49"
-      ]
-    },
-    {
-      "id": "code:method:saebase.wp12.interventions:EditPlan.json",
-      "kind": "method",
-      "title": "json",
-      "path": "saebase/wp12/interventions.py",
-      "line": 71,
-      "status": "implemented",
-      "signature": "def json(self) -> str",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/interventions.py:71"
-      ]
-    },
-    {
-      "id": "code:method:saebase.wp12.interventions:EditPlan.parse",
-      "kind": "method",
-      "title": "parse",
-      "path": "saebase/wp12/interventions.py",
-      "line": 75,
-      "status": "implemented",
-      "signature": "def parse(cls, raw: str) -> 'EditPlan'",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/interventions.py:75"
-      ]
-    },
-    {
-      "id": "code:method:saebase.wp12.interventions:ModuleEdit.__post_init__",
-      "kind": "method",
-      "title": "__post_init__",
-      "path": "saebase/wp12/interventions.py",
-      "line": 203,
-      "status": "implemented",
-      "signature": "def __post_init__(self) -> None",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/interventions.py:203"
-      ]
-    },
-    {
-      "id": "code:method:saebase.wp12.pyvene:PyvenePlan.__post_init__",
-      "kind": "method",
-      "title": "__post_init__",
-      "path": "saebase/wp12/pyvene.py",
-      "line": 47,
-      "status": "implemented",
-      "signature": "def __post_init__(self) -> None",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/pyvene.py:47"
-      ]
-    },
-    {
-      "id": "code:method:saebase.wp12.pyvene:PyvenePlan.json",
-      "kind": "method",
-      "title": "json",
-      "path": "saebase/wp12/pyvene.py",
-      "line": 62,
-      "status": "implemented",
-      "signature": "def json(self) -> str",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/pyvene.py:62"
-      ]
-    },
-    {
-      "id": "code:method:saebase.wp12.pyvene:PyvenePlan.parse",
-      "kind": "method",
-      "title": "parse",
-      "path": "saebase/wp12/pyvene.py",
-      "line": 66,
-      "status": "implemented",
-      "signature": "def parse(cls, source: str) -> 'PyvenePlan'",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/pyvene.py:66"
-      ]
-    },
-    {
-      "id": "code:method:saebase.wp12.pyvene:PyveneRepresentation.__post_init__",
-      "kind": "method",
-      "title": "__post_init__",
-      "path": "saebase/wp12/pyvene.py",
-      "line": 23,
-      "status": "implemented",
-      "signature": "def __post_init__(self) -> None",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/pyvene.py:23"
-      ]
-    },
-    {
-      "id": "code:method:saebase.wp12.training:TrainPlan.validate",
-      "kind": "method",
-      "title": "validate",
-      "path": "saebase/wp12/training.py",
-      "line": 44,
-      "status": "implemented",
-      "signature": "def validate(self, *, allow_large: bool=False) -> None",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/wp12/training.py:44"
       ]
     },
     {
@@ -44226,6 +44226,24 @@
       ]
     },
     {
+      "id": "code:module:saebase.benchmarks.adapters.custom_saebench",
+      "kind": "module",
+      "title": "saebase/benchmarks/adapters/custom_saebench.py",
+      "path": "saebase/benchmarks/adapters/custom_saebench.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "P4 bounded custom-SAE evaluations using original SAEBench Core/Sparse Probing. Supports actually loaded registered SAE objects, not hand-made metric emulation. A bounded subprocess is mandatory before any native suite.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/benchmarks/adapters/custom_saebench.py:1"
+      ]
+    },
+    {
       "id": "code:module:saebase.benchmarks.adapters.localization",
       "kind": "module",
       "title": "saebase/benchmarks/adapters/localization.py",
@@ -44349,6 +44367,24 @@
       "needs_review": false,
       "evidence": [
         "saebase/benchmarks/metrics/reconstruction.py:1"
+      ]
+    },
+    {
+      "id": "code:module:saebase.benchmarks.native_comparisons",
+      "kind": "module",
+      "title": "saebase/benchmarks/native_comparisons.py",
+      "path": "saebase/benchmarks/native_comparisons.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "P4 native-SAEBench pilot runner and provenance-aware SAE comparison. Reuses original upstream Core/Sparse-Probing code; native JSON import is not a substitute for running the upstream evaluators on real checkpoints.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/benchmarks/native_comparisons.py:1"
       ]
     },
     {
@@ -44511,6 +44547,78 @@
       "needs_review": false,
       "evidence": [
         "saebase/cfg/contracts.py:1"
+      ]
+    },
+    {
+      "id": "code:module:saebase.circuits.__init__",
+      "kind": "module",
+      "title": "saebase/circuits/__init__.py",
+      "path": "saebase/circuits/__init__.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "Source-backed circuit graphs and causal feature interventions.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/circuits/__init__.py:1"
+      ]
+    },
+    {
+      "id": "code:module:saebase.circuits.clt_intervention",
+      "kind": "module",
+      "title": "saebase/circuits/clt_intervention.py",
+      "path": "saebase/circuits/clt_intervention.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "Execute a real Gemma Scope 2 CLT feature edit across downstream model layers. This changes live PyTorch module outputs, not just a saved graph JSON or cross-layer decoder tensor. Requires exact input/output site mappings and the original model/transcoder identity. No arbitrary pickles are loaded.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/circuits/clt_intervention.py:1"
+      ]
+    },
+    {
+      "id": "code:module:saebase.circuits.graph",
+      "kind": "module",
+      "title": "saebase/circuits/graph.py",
+      "path": "saebase/circuits/graph.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "P6 native circuit-tracer CLI wrapper and typed graph data preservation. Native attribution must actually run upstream. Pruning, node annotations and a drawn graph cannot stand in for the gradient computation or intervention.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/circuits/graph.py:1"
+      ]
+    },
+    {
+      "id": "code:module:saebase.circuits.transcoder_intervention",
+      "kind": "module",
+      "title": "saebase/circuits/transcoder_intervention.py",
+      "path": "saebase/circuits/transcoder_intervention.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "Actual source-bound circuit feature edits via a native Scope 2 transcoder. The original output is changed by decode(z_new) - decode(z), preserving everything outside the chosen transcoder feature. This is not a proof that a traced circuit is unique. Requires a real PyTorch forward and exact hooks.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/circuits/transcoder_intervention.py:1"
       ]
     },
     {
@@ -46080,6 +46188,24 @@
       ]
     },
     {
+      "id": "code:module:saebase.interventions.ndif_adapter",
+      "kind": "module",
+      "title": "saebase/interventions/ndif_adapter.py",
+      "path": "saebase/interventions/ndif_adapter.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "P7 genuinely remote NNsight trace opt-in. Never turns a local simulation or self-hosted worker into an NDIF success. The user supplies an authorized NNsight model instance deployed on NDIF.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/interventions/ndif_adapter.py:1"
+      ]
+    },
+    {
       "id": "code:module:saebase.interventions.operators",
       "kind": "module",
       "title": "saebase/interventions/operators.py",
@@ -46095,6 +46221,42 @@
       "needs_review": false,
       "evidence": [
         "saebase/interventions/operators.py:1"
+      ]
+    },
+    {
+      "id": "code:module:saebase.interventions.pyvene_adapter",
+      "kind": "module",
+      "title": "saebase/interventions/pyvene_adapter.py",
+      "path": "saebase/interventions/pyvene_adapter.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "Native pyvene composition and serialization, not a PyTorch-hook substitute. Construction, execution and source intervention hooks are handled by the upstream pyvene IntervenableModel. No SAEs are silently passed off as pyvene.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/interventions/pyvene_adapter.py:1"
+      ]
+    },
+    {
+      "id": "code:module:saebase.interventions.research_edits",
+      "kind": "module",
+      "title": "saebase/interventions/research_edits.py",
+      "path": "saebase/interventions/research_edits.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "Typed, runnable SAE edits and native PyTorch interventions for WP12 P3. The two modes are deliberately distinct: SAE code changes preserve the reconstruction residual; PyTorch hooks operate on native module tensors. A native pyvene execution can be supplied via its original implementation.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/interventions/research_edits.py:1"
       ]
     },
     {
@@ -46223,6 +46385,24 @@
       "needs_review": false,
       "evidence": [
         "saebase/release/__init__.py:1"
+      ]
+    },
+    {
+      "id": "code:module:saebase.release.capability_acceptance",
+      "kind": "module",
+      "title": "saebase/release/capability_acceptance.py",
+      "path": "saebase/release/capability_acceptance.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "P8 reproducible ledger, evidence-archive and release-readiness validation. No feature is promoted because a file was committed or a GPU agent said PASS. P8 checks source-bound evidence, independent reviewer and requested scope.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/release/capability_acceptance.py:1"
       ]
     },
     {
@@ -47559,6 +47739,24 @@
       "needs_review": false,
       "evidence": [
         "saebase/sae/env_check.py:1"
+      ]
+    },
+    {
+      "id": "code:module:saebase.sae.external_training",
+      "kind": "module",
+      "title": "saebase/sae/external_training.py",
+      "path": "saebase/sae/external_training.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "P5 bounded native SAELens and Sparsify execution, checkpoint registration. Never substitutes a home-built trainer for SAELens/Sparsify. Local snapshot paths and permission must be supplied to keep dataset/model identity stable.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/sae/external_training.py:1"
       ]
     },
     {
@@ -49109,204 +49307,6 @@
       "needs_review": false,
       "evidence": [
         "saebase/vllm_backend/sae_interventions.py:1"
-      ]
-    },
-    {
-      "id": "code:module:saebase.wp12.__init__",
-      "kind": "module",
-      "title": "saebase/wp12/__init__.py",
-      "path": "saebase/wp12/__init__.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "WP12 P3-P8 adapters. Optional backends load only when selected.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/__init__.py:1"
-      ]
-    },
-    {
-      "id": "code:module:saebase.wp12.acceptance",
-      "kind": "module",
-      "title": "saebase/wp12/acceptance.py",
-      "path": "saebase/wp12/acceptance.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "P8 reproducible ledger, evidence-archive and release-readiness validation. No feature is promoted because a file was committed or a GPU agent said PASS. P8 checks source-bound evidence, independent reviewer and requested scope.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/acceptance.py:1"
-      ]
-    },
-    {
-      "id": "code:module:saebase.wp12.benchmarks",
-      "kind": "module",
-      "title": "saebase/wp12/benchmarks.py",
-      "path": "saebase/wp12/benchmarks.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "P4 native-SAEBench pilot runner and provenance-aware SAE comparison. Reuses original upstream Core/Sparse-Probing code; native JSON import is not a substitute for running the upstream evaluators on real checkpoints.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/benchmarks.py:1"
-      ]
-    },
-    {
-      "id": "code:module:saebase.wp12.circuit_intervene",
-      "kind": "module",
-      "title": "saebase/wp12/circuit_intervene.py",
-      "path": "saebase/wp12/circuit_intervene.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Actual source-bound circuit feature edits via a native Scope 2 transcoder. The original output is changed by decode(z_new) - decode(z), preserving everything outside the chosen transcoder feature. This is not a proof that a traced circuit is unique. Requires a real PyTorch forward and exact hooks.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/circuit_intervene.py:1"
-      ]
-    },
-    {
-      "id": "code:module:saebase.wp12.circuits",
-      "kind": "module",
-      "title": "saebase/wp12/circuits.py",
-      "path": "saebase/wp12/circuits.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "P6 native circuit-tracer CLI wrapper and typed graph data preservation. Native attribution must actually run upstream. Pruning, node annotations and a drawn graph cannot stand in for the gradient computation or intervention.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/circuits.py:1"
-      ]
-    },
-    {
-      "id": "code:module:saebase.wp12.clt_intervene",
-      "kind": "module",
-      "title": "saebase/wp12/clt_intervene.py",
-      "path": "saebase/wp12/clt_intervene.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Execute a real Gemma Scope 2 CLT feature edit across downstream model layers. This changes live PyTorch module outputs, not just a saved graph JSON or cross-layer decoder tensor. Requires exact input/output site mappings and the original model/transcoder identity. No arbitrary pickles are loaded.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/clt_intervene.py:1"
-      ]
-    },
-    {
-      "id": "code:module:saebase.wp12.custom_saebench",
-      "kind": "module",
-      "title": "saebase/wp12/custom_saebench.py",
-      "path": "saebase/wp12/custom_saebench.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "P4 bounded custom-SAE evaluations using original SAEBench Core/Sparse Probing. Supports actually loaded registered SAE objects, not hand-made metric emulation. A bounded subprocess is mandatory before any native suite.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/custom_saebench.py:1"
-      ]
-    },
-    {
-      "id": "code:module:saebase.wp12.interventions",
-      "kind": "module",
-      "title": "saebase/wp12/interventions.py",
-      "path": "saebase/wp12/interventions.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Typed, runnable SAE edits and native PyTorch interventions for WP12 P3. The two modes are deliberately distinct: SAE code changes preserve the reconstruction residual; PyTorch hooks operate on native module tensors. A native pyvene execution can be supplied via its original implementation.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/interventions.py:1"
-      ]
-    },
-    {
-      "id": "code:module:saebase.wp12.ndif",
-      "kind": "module",
-      "title": "saebase/wp12/ndif.py",
-      "path": "saebase/wp12/ndif.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "P7 genuinely remote NNsight trace opt-in. Never turns a local simulation or self-hosted worker into an NDIF success. The user supplies an authorized NNsight model instance deployed on NDIF.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/ndif.py:1"
-      ]
-    },
-    {
-      "id": "code:module:saebase.wp12.pyvene",
-      "kind": "module",
-      "title": "saebase/wp12/pyvene.py",
-      "path": "saebase/wp12/pyvene.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Native pyvene composition and serialization, not a PyTorch-hook substitute. Construction, execution and source intervention hooks are handled by the upstream pyvene IntervenableModel. No SAEs are silently passed off as pyvene.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/pyvene.py:1"
-      ]
-    },
-    {
-      "id": "code:module:saebase.wp12.training",
-      "kind": "module",
-      "title": "saebase/wp12/training.py",
-      "path": "saebase/wp12/training.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "P5 bounded native SAELens and Sparsify execution, checkpoint registration. Never substitutes a home-built trainer for SAELens/Sparsify. Local snapshot paths and permission must be supplied to keep dataset/model identity stable.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/wp12/training.py:1"
       ]
     },
     {
@@ -51784,6 +51784,16 @@
       "type": "contains"
     },
     {
+      "source": "code:class:saebase.benchmarks.native_comparisons:ComparisonPoint",
+      "target": "code:method:saebase.benchmarks.native_comparisons:ComparisonPoint.__post_init__",
+      "type": "contains"
+    },
+    {
+      "source": "code:class:saebase.benchmarks.native_comparisons:NativePilot",
+      "target": "code:method:saebase.benchmarks.native_comparisons:NativePilot.validate",
+      "type": "contains"
+    },
+    {
       "source": "code:class:saebase.benchmarks.planner:PlanNode",
       "target": "code:method:saebase.benchmarks.planner:PlanNode.to_dict",
       "type": "contains"
@@ -51826,6 +51836,31 @@
     {
       "source": "code:class:saebase.benchmarks.schema:MetricSpec",
       "target": "code:method:saebase.benchmarks.schema:MetricSpec.__post_init__",
+      "type": "contains"
+    },
+    {
+      "source": "code:class:saebase.circuits.graph:GraphEdge",
+      "target": "code:method:saebase.circuits.graph:GraphEdge.__post_init__",
+      "type": "contains"
+    },
+    {
+      "source": "code:class:saebase.circuits.graph:GraphNode",
+      "target": "code:method:saebase.circuits.graph:GraphNode.__post_init__",
+      "type": "contains"
+    },
+    {
+      "source": "code:class:saebase.circuits.graph:GraphRecord",
+      "target": "code:method:saebase.circuits.graph:GraphRecord.payload",
+      "type": "contains"
+    },
+    {
+      "source": "code:class:saebase.circuits.graph:GraphRecord",
+      "target": "code:method:saebase.circuits.graph:GraphRecord.validate",
+      "type": "contains"
+    },
+    {
+      "source": "code:class:saebase.circuits.graph:RepresentationAsset",
+      "target": "code:method:saebase.circuits.graph:RepresentationAsset.__post_init__",
       "type": "contains"
     },
     {
@@ -52091,6 +52126,51 @@
     {
       "source": "code:class:saebase.interventions.kv_cache_exact:CleanPrefixKVDecoder",
       "target": "code:method:saebase.interventions.kv_cache_exact:CleanPrefixKVDecoder.step",
+      "type": "contains"
+    },
+    {
+      "source": "code:class:saebase.interventions.pyvene_adapter:PyvenePlan",
+      "target": "code:method:saebase.interventions.pyvene_adapter:PyvenePlan.__post_init__",
+      "type": "contains"
+    },
+    {
+      "source": "code:class:saebase.interventions.pyvene_adapter:PyvenePlan",
+      "target": "code:method:saebase.interventions.pyvene_adapter:PyvenePlan.json",
+      "type": "contains"
+    },
+    {
+      "source": "code:class:saebase.interventions.pyvene_adapter:PyvenePlan",
+      "target": "code:method:saebase.interventions.pyvene_adapter:PyvenePlan.parse",
+      "type": "contains"
+    },
+    {
+      "source": "code:class:saebase.interventions.pyvene_adapter:PyveneRepresentation",
+      "target": "code:method:saebase.interventions.pyvene_adapter:PyveneRepresentation.__post_init__",
+      "type": "contains"
+    },
+    {
+      "source": "code:class:saebase.interventions.research_edits:Edit",
+      "target": "code:method:saebase.interventions.research_edits:Edit.condition",
+      "type": "contains"
+    },
+    {
+      "source": "code:class:saebase.interventions.research_edits:EditPlan",
+      "target": "code:method:saebase.interventions.research_edits:EditPlan.__post_init__",
+      "type": "contains"
+    },
+    {
+      "source": "code:class:saebase.interventions.research_edits:EditPlan",
+      "target": "code:method:saebase.interventions.research_edits:EditPlan.json",
+      "type": "contains"
+    },
+    {
+      "source": "code:class:saebase.interventions.research_edits:EditPlan",
+      "target": "code:method:saebase.interventions.research_edits:EditPlan.parse",
+      "type": "contains"
+    },
+    {
+      "source": "code:class:saebase.interventions.research_edits:ModuleEdit",
+      "target": "code:method:saebase.interventions.research_edits:ModuleEdit.__post_init__",
       "type": "contains"
     },
     {
@@ -52486,6 +52566,11 @@
     {
       "source": "code:class:saebase.sae.coverage:CoverageEntry",
       "target": "code:method:saebase.sae.coverage:CoverageEntry.source",
+      "type": "contains"
+    },
+    {
+      "source": "code:class:saebase.sae.external_training:TrainPlan",
+      "target": "code:method:saebase.sae.external_training:TrainPlan.validate",
       "type": "contains"
     },
     {
@@ -52941,91 +53026,6 @@
     {
       "source": "code:class:saebase.vllm_backend.sae_interventions:InterpVLLMSAE",
       "target": "code:method:saebase.vllm_backend.sae_interventions:InterpVLLMSAE.measure",
-      "type": "contains"
-    },
-    {
-      "source": "code:class:saebase.wp12.benchmarks:ComparisonPoint",
-      "target": "code:method:saebase.wp12.benchmarks:ComparisonPoint.__post_init__",
-      "type": "contains"
-    },
-    {
-      "source": "code:class:saebase.wp12.benchmarks:NativePilot",
-      "target": "code:method:saebase.wp12.benchmarks:NativePilot.validate",
-      "type": "contains"
-    },
-    {
-      "source": "code:class:saebase.wp12.circuits:GraphEdge",
-      "target": "code:method:saebase.wp12.circuits:GraphEdge.__post_init__",
-      "type": "contains"
-    },
-    {
-      "source": "code:class:saebase.wp12.circuits:GraphNode",
-      "target": "code:method:saebase.wp12.circuits:GraphNode.__post_init__",
-      "type": "contains"
-    },
-    {
-      "source": "code:class:saebase.wp12.circuits:GraphRecord",
-      "target": "code:method:saebase.wp12.circuits:GraphRecord.payload",
-      "type": "contains"
-    },
-    {
-      "source": "code:class:saebase.wp12.circuits:GraphRecord",
-      "target": "code:method:saebase.wp12.circuits:GraphRecord.validate",
-      "type": "contains"
-    },
-    {
-      "source": "code:class:saebase.wp12.circuits:RepresentationAsset",
-      "target": "code:method:saebase.wp12.circuits:RepresentationAsset.__post_init__",
-      "type": "contains"
-    },
-    {
-      "source": "code:class:saebase.wp12.interventions:Edit",
-      "target": "code:method:saebase.wp12.interventions:Edit.condition",
-      "type": "contains"
-    },
-    {
-      "source": "code:class:saebase.wp12.interventions:EditPlan",
-      "target": "code:method:saebase.wp12.interventions:EditPlan.__post_init__",
-      "type": "contains"
-    },
-    {
-      "source": "code:class:saebase.wp12.interventions:EditPlan",
-      "target": "code:method:saebase.wp12.interventions:EditPlan.json",
-      "type": "contains"
-    },
-    {
-      "source": "code:class:saebase.wp12.interventions:EditPlan",
-      "target": "code:method:saebase.wp12.interventions:EditPlan.parse",
-      "type": "contains"
-    },
-    {
-      "source": "code:class:saebase.wp12.interventions:ModuleEdit",
-      "target": "code:method:saebase.wp12.interventions:ModuleEdit.__post_init__",
-      "type": "contains"
-    },
-    {
-      "source": "code:class:saebase.wp12.pyvene:PyvenePlan",
-      "target": "code:method:saebase.wp12.pyvene:PyvenePlan.__post_init__",
-      "type": "contains"
-    },
-    {
-      "source": "code:class:saebase.wp12.pyvene:PyvenePlan",
-      "target": "code:method:saebase.wp12.pyvene:PyvenePlan.json",
-      "type": "contains"
-    },
-    {
-      "source": "code:class:saebase.wp12.pyvene:PyvenePlan",
-      "target": "code:method:saebase.wp12.pyvene:PyvenePlan.parse",
-      "type": "contains"
-    },
-    {
-      "source": "code:class:saebase.wp12.pyvene:PyveneRepresentation",
-      "target": "code:method:saebase.wp12.pyvene:PyveneRepresentation.__post_init__",
-      "type": "contains"
-    },
-    {
-      "source": "code:class:saebase.wp12.training:TrainPlan",
-      "target": "code:method:saebase.wp12.training:TrainPlan.validate",
       "type": "contains"
     },
     {
@@ -54379,6 +54379,11 @@
       "type": "calls"
     },
     {
+      "source": "code:function:saebase.benchmarks.adapters.custom_saebench:main",
+      "target": "code:function:saebase.benchmarks.adapters.custom_saebench:native_worker",
+      "type": "calls"
+    },
+    {
       "source": "code:function:saebase.benchmarks.adapters.localization:run_localization",
       "target": "code:function:saebase.benchmarks.adapters.localization:_artifact_reference",
       "type": "calls"
@@ -54461,6 +54466,26 @@
     {
       "source": "code:function:saebase.cfg.config_validate:validate_hydra_cfg",
       "target": "code:function:saebase.cfg.config_validate:validate_common_cfg",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:saebase.circuits.clt_intervention:execute_clt_feature",
+      "target": "code:function:saebase.circuits.clt_intervention:_model_logits",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:saebase.circuits.clt_intervention:execute_clt_feature",
+      "target": "code:function:saebase.circuits.clt_intervention:_module_name",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:saebase.circuits.transcoder_intervention:execute_transcoder_node",
+      "target": "code:function:saebase.circuits.transcoder_intervention:_logits",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:saebase.circuits.transcoder_intervention:execute_transcoder_node",
+      "target": "code:function:saebase.circuits.transcoder_intervention:_module_name",
       "type": "calls"
     },
     {
@@ -55036,6 +55061,11 @@
     {
       "source": "code:function:saebase.registry:list_registered_task_keys",
       "target": "code:function:saebase.registry:_ensure_plugins",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:saebase.release.capability_acceptance:inspect_archive",
+      "target": "code:function:saebase.release.capability_acceptance:_safe_zip_name",
       "type": "calls"
     },
     {
@@ -56236,6 +56266,21 @@
     {
       "source": "code:function:saebase.sae.contracts:assert_prompt_record",
       "target": "code:function:saebase.sae.contracts:_vocab_size",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:saebase.sae.external_training:resume_sparsify_training",
+      "target": "code:function:saebase.sae.external_training:_sparsify_command",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:saebase.sae.external_training:run_training",
+      "target": "code:function:saebase.sae.external_training:_saelens_train",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:saebase.sae.external_training:run_training",
+      "target": "code:function:saebase.sae.external_training:_sparsify_command",
       "type": "calls"
     },
     {
@@ -57871,51 +57916,6 @@
     {
       "source": "code:function:saebase.vllm_backend.fast_steering:generate_decoder_direction_cached",
       "target": "code:function:saebase.vllm_backend.fast_steering:decoder_feature_direction",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:saebase.wp12.acceptance:inspect_archive",
-      "target": "code:function:saebase.wp12.acceptance:_safe_zip_name",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:saebase.wp12.circuit_intervene:execute_transcoder_node",
-      "target": "code:function:saebase.wp12.circuit_intervene:_logits",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:saebase.wp12.circuit_intervene:execute_transcoder_node",
-      "target": "code:function:saebase.wp12.circuit_intervene:_module_name",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:saebase.wp12.clt_intervene:execute_clt_feature",
-      "target": "code:function:saebase.wp12.clt_intervene:_model_logits",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:saebase.wp12.clt_intervene:execute_clt_feature",
-      "target": "code:function:saebase.wp12.clt_intervene:_module_name",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:saebase.wp12.custom_saebench:main",
-      "target": "code:function:saebase.wp12.custom_saebench:native_worker",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:saebase.wp12.training:resume_sparsify_training",
-      "target": "code:function:saebase.wp12.training:_sparsify_command",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:saebase.wp12.training:run_training",
-      "target": "code:function:saebase.wp12.training:_saelens_train",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:saebase.wp12.training:run_training",
-      "target": "code:function:saebase.wp12.training:_sparsify_command",
       "type": "calls"
     },
     {
@@ -59605,6 +59605,11 @@
     },
     {
       "source": "code:group:saebase",
+      "target": "code:module:saebase.benchmarks.adapters.custom_saebench",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
       "target": "code:module:saebase.benchmarks.adapters.localization",
       "type": "contains"
     },
@@ -59636,6 +59641,11 @@
     {
       "source": "code:group:saebase",
       "target": "code:module:saebase.benchmarks.metrics.reconstruction",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
+      "target": "code:module:saebase.benchmarks.native_comparisons",
       "type": "contains"
     },
     {
@@ -59681,6 +59691,26 @@
     {
       "source": "code:group:saebase",
       "target": "code:module:saebase.cfg.contracts",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
+      "target": "code:module:saebase.circuits.__init__",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
+      "target": "code:module:saebase.circuits.clt_intervention",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
+      "target": "code:module:saebase.circuits.graph",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
+      "target": "code:module:saebase.circuits.transcoder_intervention",
       "type": "contains"
     },
     {
@@ -60120,7 +60150,22 @@
     },
     {
       "source": "code:group:saebase",
+      "target": "code:module:saebase.interventions.ndif_adapter",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
       "target": "code:module:saebase.interventions.operators",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
+      "target": "code:module:saebase.interventions.pyvene_adapter",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
+      "target": "code:module:saebase.interventions.research_edits",
       "type": "contains"
     },
     {
@@ -60156,6 +60201,11 @@
     {
       "source": "code:group:saebase",
       "target": "code:module:saebase.release.__init__",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
+      "target": "code:module:saebase.release.capability_acceptance",
       "type": "contains"
     },
     {
@@ -60526,6 +60576,11 @@
     {
       "source": "code:group:saebase",
       "target": "code:module:saebase.sae.env_check",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
+      "target": "code:module:saebase.sae.external_training",
       "type": "contains"
     },
     {
@@ -60956,61 +61011,6 @@
     {
       "source": "code:group:saebase",
       "target": "code:module:saebase.vllm_backend.sae_interventions",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:saebase",
-      "target": "code:module:saebase.wp12.__init__",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:saebase",
-      "target": "code:module:saebase.wp12.acceptance",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:saebase",
-      "target": "code:module:saebase.wp12.benchmarks",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:saebase",
-      "target": "code:module:saebase.wp12.circuit_intervene",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:saebase",
-      "target": "code:module:saebase.wp12.circuits",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:saebase",
-      "target": "code:module:saebase.wp12.clt_intervene",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:saebase",
-      "target": "code:module:saebase.wp12.custom_saebench",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:saebase",
-      "target": "code:module:saebase.wp12.interventions",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:saebase",
-      "target": "code:module:saebase.wp12.ndif",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:saebase",
-      "target": "code:module:saebase.wp12.pyvene",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:saebase",
-      "target": "code:module:saebase.wp12.training",
       "type": "contains"
     },
     {
@@ -63884,6 +63884,31 @@
       "type": "contains"
     },
     {
+      "source": "code:module:saebase.benchmarks.adapters.custom_saebench",
+      "target": "code:function:saebase.benchmarks.adapters.custom_saebench:main",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.benchmarks.adapters.custom_saebench",
+      "target": "code:function:saebase.benchmarks.adapters.custom_saebench:native_worker",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.benchmarks.adapters.custom_saebench",
+      "target": "code:function:saebase.benchmarks.adapters.custom_saebench:run_custom",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.benchmarks.adapters.custom_saebench",
+      "target": "code:module:saebase.sae.loading",
+      "type": "imports"
+    },
+    {
+      "source": "code:module:saebase.benchmarks.adapters.custom_saebench",
+      "target": "code:module:saebase.sae.registry",
+      "type": "imports"
+    },
+    {
       "source": "code:module:saebase.benchmarks.adapters.localization",
       "target": "code:class:saebase.benchmarks.adapters.localization:LocalizationOptions",
       "type": "contains"
@@ -63981,6 +64006,26 @@
     {
       "source": "code:module:saebase.benchmarks.metrics.reconstruction",
       "target": "code:function:saebase.benchmarks.metrics.reconstruction:target_nll",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.benchmarks.native_comparisons",
+      "target": "code:class:saebase.benchmarks.native_comparisons:ComparisonPoint",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.benchmarks.native_comparisons",
+      "target": "code:class:saebase.benchmarks.native_comparisons:NativePilot",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.benchmarks.native_comparisons",
+      "target": "code:function:saebase.benchmarks.native_comparisons:compare_sae_points",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.benchmarks.native_comparisons",
+      "target": "code:function:saebase.benchmarks.native_comparisons:native_pilot",
       "type": "contains"
     },
     {
@@ -64167,6 +64212,96 @@
       "source": "code:module:saebase.cfg.contracts",
       "target": "code:function:saebase.cfg.contracts:assert_task_in",
       "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.circuits.clt_intervention",
+      "target": "code:function:saebase.circuits.clt_intervention:_model_logits",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.circuits.clt_intervention",
+      "target": "code:function:saebase.circuits.clt_intervention:_module_name",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.circuits.clt_intervention",
+      "target": "code:function:saebase.circuits.clt_intervention:execute_clt_feature",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.circuits.clt_intervention",
+      "target": "code:module:saebase.sae.scope2_clt",
+      "type": "imports"
+    },
+    {
+      "source": "code:module:saebase.circuits.graph",
+      "target": "code:class:saebase.circuits.graph:GraphEdge",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.circuits.graph",
+      "target": "code:class:saebase.circuits.graph:GraphNode",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.circuits.graph",
+      "target": "code:class:saebase.circuits.graph:GraphRecord",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.circuits.graph",
+      "target": "code:class:saebase.circuits.graph:RepresentationAsset",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.circuits.graph",
+      "target": "code:function:saebase.circuits.graph:graph_feature_intervention_request",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.circuits.graph",
+      "target": "code:function:saebase.circuits.graph:import_native_graph_file",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.circuits.graph",
+      "target": "code:function:saebase.circuits.graph:parse_typed_graph",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.circuits.graph",
+      "target": "code:function:saebase.circuits.graph:prune",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.circuits.graph",
+      "target": "code:function:saebase.circuits.graph:run_native_circuit_tracer",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.circuits.graph",
+      "target": "code:function:saebase.circuits.graph:save_graph",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.circuits.transcoder_intervention",
+      "target": "code:function:saebase.circuits.transcoder_intervention:_logits",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.circuits.transcoder_intervention",
+      "target": "code:function:saebase.circuits.transcoder_intervention:_module_name",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.circuits.transcoder_intervention",
+      "target": "code:function:saebase.circuits.transcoder_intervention:execute_transcoder_node",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.circuits.transcoder_intervention",
+      "target": "code:module:saebase.sae.scope2_native",
+      "type": "imports"
     },
     {
       "source": "code:module:saebase.cli",
@@ -65534,9 +65669,94 @@
       "type": "imports"
     },
     {
+      "source": "code:module:saebase.interventions.ndif_adapter",
+      "target": "code:function:saebase.interventions.ndif_adapter:remote_ndif_capture",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.interventions.ndif_adapter",
+      "target": "code:module:saebase.api.nnsight_local",
+      "type": "imports"
+    },
+    {
       "source": "code:module:saebase.interventions.operators",
       "target": "code:function:saebase.interventions.operators:apply_condition",
       "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.interventions.pyvene_adapter",
+      "target": "code:class:saebase.interventions.pyvene_adapter:PyvenePlan",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.interventions.pyvene_adapter",
+      "target": "code:class:saebase.interventions.pyvene_adapter:PyveneRepresentation",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.interventions.pyvene_adapter",
+      "target": "code:function:saebase.interventions.pyvene_adapter:build_native_pyvene",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.interventions.pyvene_adapter",
+      "target": "code:function:saebase.interventions.pyvene_adapter:execute_native_pyvene",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.interventions.pyvene_adapter",
+      "target": "code:function:saebase.interventions.pyvene_adapter:load_native_pyvene",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.interventions.pyvene_adapter",
+      "target": "code:function:saebase.interventions.pyvene_adapter:save_native_pyvene",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.interventions.research_edits",
+      "target": "code:class:saebase.interventions.research_edits:Edit",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.interventions.research_edits",
+      "target": "code:class:saebase.interventions.research_edits:EditPlan",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.interventions.research_edits",
+      "target": "code:class:saebase.interventions.research_edits:ModuleEdit",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.interventions.research_edits",
+      "target": "code:function:saebase.interventions.research_edits:compare_module_edits",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.interventions.research_edits",
+      "target": "code:function:saebase.interventions.research_edits:compare_sae_edits",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.interventions.research_edits",
+      "target": "code:function:saebase.interventions.research_edits:run_native_pyvene",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.interventions.research_edits",
+      "target": "code:module:saebase.api.features",
+      "type": "imports"
+    },
+    {
+      "source": "code:module:saebase.interventions.research_edits",
+      "target": "code:module:saebase.interventions.operators",
+      "type": "imports"
+    },
+    {
+      "source": "code:module:saebase.interventions.research_edits",
+      "target": "code:module:saebase.interventions.specs",
+      "type": "imports"
     },
     {
       "source": "code:module:saebase.interventions.results",
@@ -65777,6 +65997,26 @@
       "source": "code:module:saebase.registry",
       "target": "code:module:saebase.results",
       "type": "imports"
+    },
+    {
+      "source": "code:module:saebase.release.capability_acceptance",
+      "target": "code:function:saebase.release.capability_acceptance:_safe_zip_name",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.release.capability_acceptance",
+      "target": "code:function:saebase.release.capability_acceptance:audit_ledger",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.release.capability_acceptance",
+      "target": "code:function:saebase.release.capability_acceptance:inspect_archive",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.release.capability_acceptance",
+      "target": "code:function:saebase.release.capability_acceptance:render_progress",
+      "type": "contains"
     },
     {
       "source": "code:module:saebase.release.gates",
@@ -66885,6 +67125,11 @@
     },
     {
       "source": "code:module:saebase.research_lab.backend.private_worker",
+      "target": "code:module:saebase.interventions.research_edits",
+      "type": "imports"
+    },
+    {
+      "source": "code:module:saebase.research_lab.backend.private_worker",
       "target": "code:module:saebase.interventions.specs",
       "type": "imports"
     },
@@ -66896,11 +67141,6 @@
     {
       "source": "code:module:saebase.research_lab.backend.private_worker",
       "target": "code:module:saebase.store.identity",
-      "type": "imports"
-    },
-    {
-      "source": "code:module:saebase.research_lab.backend.private_worker",
-      "target": "code:module:saebase.wp12.interventions",
       "type": "imports"
     },
     {
@@ -67911,6 +68151,36 @@
     {
       "source": "code:module:saebase.sae.env_check",
       "target": "code:function:saebase.sae.env_check:check_sae_env",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.sae.external_training",
+      "target": "code:class:saebase.sae.external_training:TrainPlan",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.sae.external_training",
+      "target": "code:function:saebase.sae.external_training:_saelens_train",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.sae.external_training",
+      "target": "code:function:saebase.sae.external_training:_sparsify_command",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.sae.external_training",
+      "target": "code:function:saebase.sae.external_training:register_checkpoint",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.sae.external_training",
+      "target": "code:function:saebase.sae.external_training:resume_sparsify_training",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.sae.external_training",
+      "target": "code:function:saebase.sae.external_training:run_training",
       "type": "contains"
     },
     {
@@ -70370,7 +70640,7 @@
     },
     {
       "source": "code:module:saebase.tools.wp12_p8_acceptance",
-      "target": "code:module:saebase.wp12.acceptance",
+      "target": "code:module:saebase.release.capability_acceptance",
       "type": "imports"
     },
     {
@@ -70450,7 +70720,7 @@
     },
     {
       "source": "code:module:saebase.tools.wp15_import_gemma_graph",
-      "target": "code:module:saebase.wp12.circuits",
+      "target": "code:module:saebase.circuits.graph",
       "type": "imports"
     },
     {
@@ -70552,276 +70822,6 @@
       "source": "code:module:saebase.vllm_backend.sae_interventions",
       "target": "code:module:saebase.interventions.specs",
       "type": "imports"
-    },
-    {
-      "source": "code:module:saebase.wp12.acceptance",
-      "target": "code:function:saebase.wp12.acceptance:_safe_zip_name",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.acceptance",
-      "target": "code:function:saebase.wp12.acceptance:audit_ledger",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.acceptance",
-      "target": "code:function:saebase.wp12.acceptance:inspect_archive",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.acceptance",
-      "target": "code:function:saebase.wp12.acceptance:render_progress",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.benchmarks",
-      "target": "code:class:saebase.wp12.benchmarks:ComparisonPoint",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.benchmarks",
-      "target": "code:class:saebase.wp12.benchmarks:NativePilot",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.benchmarks",
-      "target": "code:function:saebase.wp12.benchmarks:compare_sae_points",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.benchmarks",
-      "target": "code:function:saebase.wp12.benchmarks:native_pilot",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.circuit_intervene",
-      "target": "code:function:saebase.wp12.circuit_intervene:_logits",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.circuit_intervene",
-      "target": "code:function:saebase.wp12.circuit_intervene:_module_name",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.circuit_intervene",
-      "target": "code:function:saebase.wp12.circuit_intervene:execute_transcoder_node",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.circuit_intervene",
-      "target": "code:module:saebase.sae.scope2_native",
-      "type": "imports"
-    },
-    {
-      "source": "code:module:saebase.wp12.circuits",
-      "target": "code:class:saebase.wp12.circuits:GraphEdge",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.circuits",
-      "target": "code:class:saebase.wp12.circuits:GraphNode",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.circuits",
-      "target": "code:class:saebase.wp12.circuits:GraphRecord",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.circuits",
-      "target": "code:class:saebase.wp12.circuits:RepresentationAsset",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.circuits",
-      "target": "code:function:saebase.wp12.circuits:graph_feature_intervention_request",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.circuits",
-      "target": "code:function:saebase.wp12.circuits:import_native_graph_file",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.circuits",
-      "target": "code:function:saebase.wp12.circuits:parse_typed_graph",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.circuits",
-      "target": "code:function:saebase.wp12.circuits:prune",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.circuits",
-      "target": "code:function:saebase.wp12.circuits:run_native_circuit_tracer",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.circuits",
-      "target": "code:function:saebase.wp12.circuits:save_graph",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.clt_intervene",
-      "target": "code:function:saebase.wp12.clt_intervene:_model_logits",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.clt_intervene",
-      "target": "code:function:saebase.wp12.clt_intervene:_module_name",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.clt_intervene",
-      "target": "code:function:saebase.wp12.clt_intervene:execute_clt_feature",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.clt_intervene",
-      "target": "code:module:saebase.sae.scope2_clt",
-      "type": "imports"
-    },
-    {
-      "source": "code:module:saebase.wp12.custom_saebench",
-      "target": "code:function:saebase.wp12.custom_saebench:main",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.custom_saebench",
-      "target": "code:function:saebase.wp12.custom_saebench:native_worker",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.custom_saebench",
-      "target": "code:function:saebase.wp12.custom_saebench:run_custom",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.custom_saebench",
-      "target": "code:module:saebase.sae.loading",
-      "type": "imports"
-    },
-    {
-      "source": "code:module:saebase.wp12.custom_saebench",
-      "target": "code:module:saebase.sae.registry",
-      "type": "imports"
-    },
-    {
-      "source": "code:module:saebase.wp12.interventions",
-      "target": "code:class:saebase.wp12.interventions:Edit",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.interventions",
-      "target": "code:class:saebase.wp12.interventions:EditPlan",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.interventions",
-      "target": "code:class:saebase.wp12.interventions:ModuleEdit",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.interventions",
-      "target": "code:function:saebase.wp12.interventions:compare_module_edits",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.interventions",
-      "target": "code:function:saebase.wp12.interventions:compare_sae_edits",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.interventions",
-      "target": "code:function:saebase.wp12.interventions:run_native_pyvene",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.interventions",
-      "target": "code:module:saebase.api.features",
-      "type": "imports"
-    },
-    {
-      "source": "code:module:saebase.wp12.interventions",
-      "target": "code:module:saebase.interventions.operators",
-      "type": "imports"
-    },
-    {
-      "source": "code:module:saebase.wp12.interventions",
-      "target": "code:module:saebase.interventions.specs",
-      "type": "imports"
-    },
-    {
-      "source": "code:module:saebase.wp12.ndif",
-      "target": "code:function:saebase.wp12.ndif:remote_ndif_capture",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.ndif",
-      "target": "code:module:saebase.api.nnsight_local",
-      "type": "imports"
-    },
-    {
-      "source": "code:module:saebase.wp12.pyvene",
-      "target": "code:class:saebase.wp12.pyvene:PyvenePlan",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.pyvene",
-      "target": "code:class:saebase.wp12.pyvene:PyveneRepresentation",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.pyvene",
-      "target": "code:function:saebase.wp12.pyvene:build_native_pyvene",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.pyvene",
-      "target": "code:function:saebase.wp12.pyvene:execute_native_pyvene",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.pyvene",
-      "target": "code:function:saebase.wp12.pyvene:load_native_pyvene",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.pyvene",
-      "target": "code:function:saebase.wp12.pyvene:save_native_pyvene",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.training",
-      "target": "code:class:saebase.wp12.training:TrainPlan",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.training",
-      "target": "code:function:saebase.wp12.training:_saelens_train",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.training",
-      "target": "code:function:saebase.wp12.training:_sparsify_command",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.training",
-      "target": "code:function:saebase.wp12.training:register_checkpoint",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.training",
-      "target": "code:function:saebase.wp12.training:resume_sparsify_training",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.wp12.training",
-      "target": "code:function:saebase.wp12.training:run_training",
-      "type": "contains"
     },
     {
       "source": "code:module:tasks.benchmark.activation_health",

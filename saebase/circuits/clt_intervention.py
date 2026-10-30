@@ -16,7 +16,7 @@ from torch import nn
 from saebase.sae.scope2_clt import CLTIdentity, Scope2CLT
 from saebase.store import sha256_state_dict
 
-from .circuits import GraphRecord
+from .graph import GraphRecord
 
 
 def _module_name(template: str, layer: int) -> str:

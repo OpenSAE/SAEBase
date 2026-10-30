@@ -167,7 +167,7 @@ def run_custom(
     args = [
         sys.executable,
         "-m",
-        "saebase.wp12.custom_saebench",
+        "saebase.benchmarks.adapters.custom_saebench",
         "--worker",
         "--upstream",
         str(upstream),

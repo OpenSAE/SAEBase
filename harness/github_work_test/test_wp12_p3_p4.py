@@ -6,13 +6,13 @@ import pytest
 import torch
 from torch import nn
 
-from saebase.wp12.interventions import (
+from saebase.interventions.research_edits import (
     Edit,
     EditPlan,
     ModuleEdit,
     compare_module_edits,
 )
-from saebase.wp12.benchmarks import ComparisonPoint, compare_sae_points
+from saebase.benchmarks.native_comparisons import ComparisonPoint, compare_sae_points
 
 
 def test_edit_roundtrip_and_parallel_conflict():

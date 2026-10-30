@@ -12,3 +12,7 @@ python harness/code/diff.py --before /tmp/code_before.json --after doc/code/code
 ```
 
 Tree grouping is navigational. It does not create new Python APIs or substitute a generated explanation for the actual implementation.
+
+## Domain-owned source and Code Tree
+
+Historical work-plan numbers belong in `harness/github_work_plan`, not executable package names or Atlas functional domains. The original `saebase/wp12/` implementations now live in `saebase/interventions/`, `saebase/circuits/`, `saebase/benchmarks/`, `saebase/sae/`, and `saebase/release/`. Atlas rebuilds its source-backed tree from current paths. Historical records retain their original identities and evidence.

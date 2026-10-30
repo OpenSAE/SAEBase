@@ -8,8 +8,8 @@ from torch import nn
 
 from saebase.sae.scope2_clt import CLTIdentity, Scope2CLT
 from saebase.store import sha256_state_dict
-from saebase.wp12.circuits import GraphEdge, GraphNode, GraphRecord
-from saebase.wp12.clt_intervene import execute_clt_feature
+from saebase.circuits.graph import GraphEdge, GraphNode, GraphRecord
+from saebase.circuits.clt_intervention import execute_clt_feature
 
 
 class TinyCLTModel(nn.Module):

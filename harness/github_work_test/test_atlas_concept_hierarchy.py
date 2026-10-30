@@ -22,7 +22,10 @@ def test_saebase_concepts_are_meaningful_and_lossless() -> None:
     parent = "code:group:saebase"
     domains = children[parent]
     assert 10 <= len(domains) <= 20, len(domains)
-    assert len(domains) == 14, "Concept domain changes require a reviewed catalog update"
+    catalog = json.loads((ROOT / "harness/code/atlas_concepts.json").read_text(encoding="utf-8"))
+    reviewed = {"code:concept:" + item["name"] for item in catalog["concepts"]}
+    assert set(domains) == reviewed, "Concept domains must match the reviewed catalog"
+    assert "code:concept:research_backends" not in reviewed
     assert len(set(by_id[x]["title"] for x in domains)) == len(domains)
     source_modules = {
         n["id"]

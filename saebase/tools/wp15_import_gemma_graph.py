@@ -13,7 +13,7 @@ import json
 import re
 from pathlib import Path
 
-from saebase.wp12.circuits import import_native_graph_file, prune
+from saebase.circuits.graph import import_native_graph_file, prune
 
 DEFAULT_TOOL_COMMIT = "255d989e93be1299d53d67b59e9fd76a0e274b14"
 
