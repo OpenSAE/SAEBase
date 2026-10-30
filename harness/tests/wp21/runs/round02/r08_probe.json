@@ -1,0 +1,23 @@
+{
+  "schema": "saebase.wp21.real_probe.v1",
+  "status": "REAL_MODEL_PROBE_OK_NOT_EXAM_PASS",
+  "case_id": "R08",
+  "profile": "pythia14m_inference",
+  "device": "cpu",
+  "asset_lock_sha256": "89eeba088cc8020186470b935ccacd68d6e877de7cd0355b872e6edfba52a578",
+  "observed": {
+    "model_type": "gpt_neox",
+    "num_layers": 6,
+    "hidden_size": 128,
+    "logits_shape": [
+      1,
+      7,
+      50304
+    ],
+    "hidden_states": 7,
+    "dtype": "torch.float16",
+    "actual_device": "cpu"
+  },
+  "model_executed": true,
+  "note": "Offline loading and a small real forward succeeded. Reviewer must separately establish actual loader file provenance, case replay, and numerical acceptance."
+}

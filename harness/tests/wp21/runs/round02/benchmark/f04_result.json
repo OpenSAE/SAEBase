@@ -1,0 +1,120 @@
+{
+  "schema": "wp21.2.f04.padding_device.v1",
+  "source_inspection": {
+    "load_registered_calls": [
+      "runner.py:180:return load_registered(model_key=model_key, sae_key=sae_key, layer=layer)",
+      "runner.py:329:return load_registered(model_key=model_key, sae_key=sae_key, layer=layer)"
+    ],
+    "BatchEngine_calls": [
+      "runner.py:271:m2_stats=BatchEngine(model,sae,identity,activation_reader=ShardedReader(act_path),",
+      "runner.py:491:m2_stats = BatchEngine("
+    ],
+    "pad_token_id_in_runners": [],
+    "engine_mixed_length_guard": [
+      "engine.py:278:raise ValueError(\"mixed token lengths require explicit pad_token_id\")",
+      "engine.py:331:raise ValueError(\"mixed token lengths require explicit pad_token_id\")"
+    ]
+  },
+  "load_registered_signature": {
+    "parameters": {
+      "sae_key": "REQUIRED",
+      "layer": "REQUIRED",
+      "device": "cpu",
+      "model_key": "None"
+    },
+    "default_device": "cpu"
+  },
+  "tokenizer": {
+    "pad_token": "<pad>",
+    "pad_token_id": 0,
+    "eos_token_id": 1,
+    "padding_side": "left",
+    "short_n": 7,
+    "long_n": 32,
+    "short_ids": [
+      2,
+      27500,
+      235284,
+      235274,
+      7174,
+      586,
+      235265
+    ],
+    "long_ids": [
+      2,
+      27500,
+      235284,
+      235274,
+      7174,
+      599,
+      235265,
+      8447,
+      4191,
+      13087,
+      8447,
+      4191,
+      13087,
+      8447,
+      4191,
+      13087,
+      8447,
+      4191,
+      13087,
+      8447,
+      4191,
+      13087,
+      8447,
+      4191,
+      "..."
+    ],
+    "lengths_differ": true
+  },
+  "cuda_load": {
+    "requested_device": "cuda",
+    "parameter_device": "cuda:0",
+    "activation_device": "cuda:0",
+    "cuda_available": true,
+    "backend": "transformer_lens",
+    "site": {
+      "layer": 25,
+      "hook": "blocks.25.hook_resid_post"
+    }
+  },
+  "batch_engine_no_pad": {
+    "status": "EXCEPTION",
+    "pad_token_id": null,
+    "error_type": "ValueError",
+    "error": "mixed token lengths require explicit pad_token_id",
+    "traceback_tail": [
+      "    return self._baselines(active), 0",
+      "           ^^^^^^^^^^^^^^^^^^^^^^^",
+      "  File \"site-packages/torch/utils/_contextlib.py\", line 124, in decorate_context",
+      "    return func(*args, **kwargs)",
+      "           ^^^^^^^^^^^^^^^^^^^^^",
+      "  File \"saebase/interventions/engine.py\", line 331, in _baselines",
+      "    raise ValueError(\"mixed token lengths require explicit pad_token_id\")",
+      "ValueError: mixed token lengths require explicit pad_token_id"
+    ]
+  },
+  "batch_engine_with_pad": {
+    "status": "RAN",
+    "pad_token_id": 0,
+    "measured": 2,
+    "backend": "transformer_lens",
+    "elapsed_seconds": 0.23656089883297682
+  },
+  "product_findings": {
+    "runner_omits_device": true,
+    "runner_omits_pad_token_id": true,
+    "default_device": "cpu",
+    "actual_cuda_parameter_device": "cuda:0",
+    "mixed_length_without_pad": "EXCEPTION",
+    "repair_needed": true,
+    "repair_scope": [
+      "saebase/benchmarks/runner.py built_in_or_external should forward config/device",
+      "saebase/benchmarks/runner.py BatchEngine should receive tokenizer pad_token_id",
+      "tasks/benchmark/backend/runner.py has the same two omissions"
+    ],
+    "do_not_change_harness_rubric": true
+  }
+}

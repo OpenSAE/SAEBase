@@ -1,0 +1,23 @@
+{
+  "schema": "saebase.wp21.review_findings.v1",
+  "case_id": "R17",
+  "run_id": "round01",
+  "findings": [
+    {
+      "cause": "EVALUATOR_SCOPE_GAP",
+      "owner": "evaluator",
+      "description": "WP21.2 audit_evidence now accepts nonempty native_training_logs/ as a directory artifact. Round01 FAIL/57 is unchanged; the old auditor trailing-slash mismatch is a separate evidence-gate issue.",
+      "evidence_refs": [
+        "harness/tests/wp21/runs/round02/r17/evidence_audit.json"
+      ]
+    },
+    {
+      "cause": "IMPLEMENTATION_ERROR",
+      "owner": "baseline_product",
+      "description": "Two seed=7 native SAELens TopK runs share corpus hash, model revision, steps=16, batch=64, k=8 and seed=7. Plans differ only in run_name. W_dec still diverges: max_abs=0.08271190151572227, failing_elements=147398/147456. Seed is present in TrainPlan and LanguageModelSAERunnerConfig. Current process has deterministic_algorithms_enabled=false and cudnn_deterministic=false. First locatable numerical source is CUDA/SAELens TopK nondeterminism, not missing seed plumbing.",
+      "evidence_refs": [
+        "harness/tests/wp21/runs/round02/r17/r17_comparison.json"
+      ]
+    }
+  ]
+}
