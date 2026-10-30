@@ -2,7 +2,7 @@
 
 > WP21.2 的独立修复与后续本地 GPU 验证说明见 [WP21_2_HARDENING.md](WP21_2_HARDENING.md)。该版本不修改冻结题目或已完成考试的历史判定。
 
-**Exam-system ready** 指 20 题冻结材料、隔离工作树生成器、环境阻塞检查、命令记录、独立 Reviewer 复跑入口和汇总程序完成并通过离线回归测试。**Real-model execution ready** 另需实际的 Python 3.11/3.12、完整依赖、模型及 SAE checkpoint、必要 GPU 与网络隔离。**Case PASS** 只能在对应 Agent 完成工作、独立 Reviewer 复算所有正反例后产生。当前本包 20 题均未考试，不能写成已通过。
+**Exam-system ready** 指 20 题冻结材料、隔离工作树生成器、环境阻塞检查、命令记录、独立 Reviewer 复跑入口和汇总程序完成并通过离线回归测试。**Real-model execution ready** 另需实际的 Python 3.11/3.12、完整依赖、模型及 SAE checkpoint、必要 GPU 与网络隔离。**Case PASS** 只能在对应 Agent 完成工作、独立 Reviewer 复算所有正反例后产生。首次交付本包时 20 题均为 NOT_RUN；如今已有 round01 与 round02 的历史结果，具体见 [阶段结项](../../github_work_plan/21_harness_phase_closeout_20261030.md)。本手册中的示例仍为新考试的准备操作，不代表自动通过。
 
 ## 一、需要遵守的身份边界
 

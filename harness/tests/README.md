@@ -56,4 +56,4 @@ WP21 使用 [真实工作流协议](../contracts/REAL_WORKFLOW_PROTOCOL.md) 和�
 - reviewer 的评分和验收目录位于考生工作树外；本地 Hook 同时增加当前 WP21 指派 profile，并将 acceptance 保护推广到各主题。考生自测和独立验收分别记录，WP21 receipt 使用独立 schema，保留旧考试验证器的沙箱范围。
 - 新增与删除组件均使用题目给定的独立起点；保持其他组件可运行及历史实验可追溯。具体缺口及本地更新见 [WP21 规范审计](wp21/AUDIT.md)。
 
-本次交付完成规范与题目准备；二十名 agent 的综合考试结果需要后续实际执行产生。
+WP21 两轮真实考试已有 [round01 与 round02 结果及阶段结项](../github_work_plan/21_harness_phase_closeout_20261030.md)。所有历史判定保持不变；新测试须创建新 run_id 并独立验收。

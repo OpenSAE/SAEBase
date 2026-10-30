@@ -1,5 +1,8 @@
 # SAEBase Research Harness
 
+**Current Harness baseline (WP21.2 finalized):** [WP21 closeout](github_work_plan/21_harness_phase_closeout_20261030.en.md). The WP18–WP20 tests and prior Contract registry remain available; WP21's real-workflow exams, maintenance and archived round01/round02 results are linked from [Harness tests](tests/README.md). Remaining GPU or product fixes follow separate review.
+
+
 The Harness provides auditable navigation, scientific knowledge management, experiment provenance, environment records, and scoped agent collaboration. Research Lab, datasets, models, tasks, and the public SAE API remain part of the unified SAEBase repository.
 
 | Module | Responsibility |

@@ -1,0 +1,203 @@
+{
+  "schema": "saebase.wp21.summary.v1",
+  "run_id": "round01",
+  "base_commit": "41a54cbfdee5cce24d3d8f7517aadef0c752c5ac",
+  "exam_commit": "8a78be1209bb30c652d500f934c226a5d54684c9",
+  "cases": [
+    {
+      "case_id": "R01",
+      "status": "PASS",
+      "score": 100.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R01/review_final.json",
+      "blockers": [],
+      "attribution": "NONE",
+      "candidate_evidence_status": "EVIDENCE_READY_FOR_REPLAY"
+    },
+    {
+      "case_id": "R02",
+      "status": "PASS",
+      "score": 100.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R02/review_final.json",
+      "blockers": [],
+      "attribution": "NONE",
+      "candidate_evidence_status": "EVIDENCE_READY_FOR_REPLAY"
+    },
+    {
+      "case_id": "R03",
+      "status": "PASS",
+      "score": 100.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R03/review_final.json",
+      "blockers": [],
+      "attribution": "NONE",
+      "candidate_evidence_status": "EVIDENCE_READY_FOR_REPLAY"
+    },
+    {
+      "case_id": "R04",
+      "status": "PASS",
+      "score": 100.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R04/review_final.json",
+      "blockers": [],
+      "attribution": "NONE",
+      "candidate_evidence_status": "EVIDENCE_READY_FOR_REPLAY"
+    },
+    {
+      "case_id": "R05",
+      "status": "PASS",
+      "score": 100.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R05/review_final.json",
+      "blockers": [],
+      "attribution": "NONE",
+      "candidate_evidence_status": "EVIDENCE_READY_FOR_REPLAY"
+    },
+    {
+      "case_id": "R06",
+      "status": "PASS",
+      "score": 100.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R06/review_final.json",
+      "blockers": [],
+      "attribution": "NONE",
+      "candidate_evidence_status": "EVIDENCE_READY_FOR_REPLAY"
+    },
+    {
+      "case_id": "R07",
+      "status": "PASS",
+      "score": 100.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R07/review_final.json",
+      "blockers": [],
+      "attribution": "NONE",
+      "candidate_evidence_status": "EVIDENCE_READY_FOR_REPLAY"
+    },
+    {
+      "case_id": "R08",
+      "status": "ENV_BLOCKED",
+      "score": 0.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R08/review_final.json",
+      "blockers": [
+        "missing valid, compatible offline real-model probe and unchanged frozen assets",
+        "candidate evidence is not independently auditable"
+      ],
+      "attribution": "ENV_BLOCKED",
+      "candidate_evidence_status": "ENV_BLOCKED"
+    },
+    {
+      "case_id": "R09",
+      "status": "PASS",
+      "score": 100.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R09/review_final.json",
+      "blockers": [],
+      "attribution": "NONE",
+      "candidate_evidence_status": "EVIDENCE_READY_FOR_REPLAY"
+    },
+    {
+      "case_id": "R10",
+      "status": "PASS",
+      "score": 100.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R10/review_final.json",
+      "blockers": [],
+      "attribution": "NONE",
+      "candidate_evidence_status": "EVIDENCE_READY_FOR_REPLAY"
+    },
+    {
+      "case_id": "R11",
+      "status": "PASS",
+      "score": 100.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R11/review_final.json",
+      "blockers": [],
+      "attribution": "NONE",
+      "candidate_evidence_status": "EVIDENCE_READY_FOR_REPLAY"
+    },
+    {
+      "case_id": "R12",
+      "status": "PASS",
+      "score": 100.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R12/review_final.json",
+      "blockers": [],
+      "attribution": "NONE",
+      "candidate_evidence_status": "EVIDENCE_READY_FOR_REPLAY"
+    },
+    {
+      "case_id": "R13",
+      "status": "PASS",
+      "score": 100.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R13/review_final.json",
+      "blockers": [],
+      "attribution": "NONE",
+      "candidate_evidence_status": "EVIDENCE_READY_FOR_REPLAY"
+    },
+    {
+      "case_id": "R14",
+      "status": "PASS",
+      "score": 100.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R14/review_final.json",
+      "blockers": [],
+      "attribution": "NONE",
+      "candidate_evidence_status": "EVIDENCE_READY_FOR_REPLAY"
+    },
+    {
+      "case_id": "R15",
+      "status": "PASS",
+      "score": 100.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R15/review_final.json",
+      "blockers": [],
+      "attribution": "NONE",
+      "candidate_evidence_status": "EVIDENCE_READY_FOR_REPLAY"
+    },
+    {
+      "case_id": "R16",
+      "status": "PASS",
+      "score": 100.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R16/review_final.json",
+      "blockers": [],
+      "attribution": "NONE",
+      "candidate_evidence_status": "EVIDENCE_READY_FOR_REPLAY"
+    },
+    {
+      "case_id": "R17",
+      "status": "FAIL",
+      "score": 57.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R17/review_final.json",
+      "blockers": [
+        "candidate evidence is not independently auditable"
+      ],
+      "attribution": "IMPLEMENTATION_ERROR",
+      "candidate_evidence_status": "EVIDENCE_REJECTED"
+    },
+    {
+      "case_id": "R18",
+      "status": "PASS",
+      "score": 100.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R18/review_final.json",
+      "blockers": [],
+      "attribution": "NONE",
+      "candidate_evidence_status": "EVIDENCE_READY_FOR_REPLAY"
+    },
+    {
+      "case_id": "R19",
+      "status": "PASS",
+      "score": 100.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R19/review_final.json",
+      "blockers": [],
+      "attribution": "NONE",
+      "candidate_evidence_status": "EVIDENCE_READY_FOR_REPLAY"
+    },
+    {
+      "case_id": "R20",
+      "status": "INCOMPLETE",
+      "score": 65.0,
+      "review_final": "harness/tests/wp21/runs/round01/reviews/R20/review_final.json",
+      "blockers": [
+        "candidate evidence is not independently auditable"
+      ],
+      "attribution": "EVALUATOR_SCOPE_GAP",
+      "candidate_evidence_status": "EVIDENCE_REJECTED"
+    }
+  ],
+  "counts": {
+    "ENV_BLOCKED": 1,
+    "FAIL": 1,
+    "INCOMPLETE": 1,
+    "PASS": 17
+  },
+  "created_at_utc": "2026-10-30T19:36:41.211935+00:00",
+  "note": "Archived independent review finals only. Local candidate worktrees and tensors are not included. PASS requires independent replay hard gates."
+}

@@ -1,5 +1,7 @@
 # WP21 真实 SAEBase 综合测试
 
+> **阶段结项（2026-10-30）**：WP21.1 round01 已完成 17 PASS / 1 ENV_BLOCKED / 1 FAIL / 1 INCOMPLETE；WP21.2 的 round02 又新增 R08 独立 PASS，并完成 Harness 审计修复。旧判定保持不变。最新入口见 [WP21 阶段结项](../../github_work_plan/21_harness_phase_closeout_20261030.md)、[WP21.2 维护说明](WP21_2_HARDENING.md)、[两轮历史成绩](runs/)。以下关于初始 NOT_RUN、考试准备与本地交付的内容保留为首次发布时的操作背景。
+
 **2026-10-30 WP21.1 更新：考试执行工具链与独立 Review 流程请先读 [Exam Ready 手册](EXAM_READY.md)。** 冻结20道题不变，离线工具就绪并不表示20个真实模型考试已经完成。
 
 本轮为 20 个独立 agent 准备 20 道真实仓库任务。基线为 `41a54cbfdee5cce24d3d8f7517aadef0c752c5ac`。试卷、工具与本地规范已提供；逐题真实 checkpoint 实验的初始状态为 `NOT_RUN`。
