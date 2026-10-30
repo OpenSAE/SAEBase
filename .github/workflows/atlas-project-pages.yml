@@ -1,0 +1,118 @@
+name: SAEBase project-owned Atlas website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/atlas-project-pages.yml"
+      - "harness/visualization/**"
+      - "harness/code/**"
+      - "harness/knowledge/**"
+      - "doc/knowledge/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: saebase-project-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Generate source-owned Atlas data
+        run: |
+          python harness/core/validate.py
+          python harness/knowledge/validate.py
+          python harness/code/build.py
+          python harness/visualization/export.py
+          python harness/visualization/build_pages.py
+          python harness/visualization/build_language.py
+          python harness/visualization/package_site.py --output "$RUNNER_TEMP/atlas-web/atlas"
+      - name: Checkout review branch for an isolated Preview
+        uses: actions/checkout@v4
+        with:
+          ref: feat/atlas-global-search-evidence-inspector-20261029
+          path: preview-source
+          fetch-depth: 1
+      - name: Build project-owned preview without modifying stable Atlas
+        env:
+          ROOT: ${{ runner.temp }}/atlas-web
+        run: |
+          python - <<'PY'
+          import os, shutil, subprocess, re
+          from pathlib import Path
+          root = Path(os.environ["ROOT"])
+          stable = root / "atlas"
+          preview = root / "preview"
+          shutil.copytree(stable, preview)
+          source = Path("preview-source/harness/visualization")
+          sha = subprocess.check_output(
+              ["git", "-C", "preview-source", "rev-parse", "--short=12", "HEAD"],
+              text=True).strip()
+          for asset in ("app.js", "atlas-theme.css", "i18n.js"):
+              shutil.copy2(source / asset, preview / asset)
+          for name in ("index", "core", "knowledge", "code", "environment", "context"):
+              html = preview.joinpath(name + ".html")
+              value = html.read_text(encoding="utf-8")
+              value = re.sub(r'(\./(?:app|i18n)\.js|\./atlas-theme\.css)\?v=[^"]+',
+                  lambda m: m.group(1) + "?v=" + sha, value)
+              value = value.replace("</head>",
+                  '  <meta name="robots" content="noindex, nofollow">\n</head>', 1)
+              html.write_text(value, encoding="utf-8")
+          (root/"index.html").write_text(
+              '<!doctype html><meta charset="utf-8">'
+              '<meta http-equiv="refresh" content="0;url=./atlas/code.html">'
+              '<title>SAEBase Atlas</title><a href="./atlas/code.html">Open SAEBase Atlas</a>',
+              encoding="utf-8")
+          (root/".nojekyll").touch()
+          assert (preview/"code.html").exists()
+          assert "atlas-theme.css?v=" + sha in (preview/"code.html").read_text()
+          print("Project Atlas preview at /preview/code.html",sha)
+          PY
+      - name: Verify packaged JavaScript and file references
+        env:
+          ROOT: ${{ runner.temp }}/atlas-web
+        run: |
+          node --check "$ROOT/atlas/app.js"
+          node --check "$ROOT/preview/app.js"
+          node --check "$ROOT/preview/i18n.js"
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          base = Path(os.environ["ROOT"])
+          for tree in ("atlas", "preview"):
+              for view in ("index", "core", "knowledge", "code", "environment", "context"):
+                  p = base / tree / (view+".html")
+                  html = p.read_text()
+                  assert "data-bootstrap.js" in html
+                  assert "atlas-theme.css" in html
+                  assert "app.js" in html
+                  assert (base/tree/"app.js").exists()
+          PY
+      - name: Configure SAEBase GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload SAEBase Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ${{ runner.temp }}/atlas-web
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
