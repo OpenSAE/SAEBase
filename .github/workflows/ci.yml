@@ -44,6 +44,10 @@ jobs:
           python harness/visualization/build_language.py
           python harness/visualization/build_language.py --check
           python harness/visualization/build_pages.py --check
+      - name: Verify migrated domain packages and independent Atlas ownership
+        run: |
+          python -m pip install -q pytest
+          python -m pytest -q harness/github_work_test/test_wp12_package_migration.py
       - name: Audit functional Code Tree fanout
         run: |
           python - <<'PY'

@@ -11,3 +11,7 @@ python harness/visualization/export.py
 python harness/code/diff.py --before /tmp/code_before.json --after doc/code/code_tree.json
 ```
 
+
+## 功能代码迁移与 Code Tree
+
+历史工作计划编号属于 `harness/github_work_plan`，不得直接作为可执行 Python 包或 Atlas 功能节点。原 `saebase/wp12/` 中仍在使用的实现已按职责迁入 `saebase/interventions/`、`saebase/circuits/`、`saebase/benchmarks/`、`saebase/sae/` 和 `saebase/release/`。Atlas 从当前 Python 源码目录重建完整功能树；研发记录保留历史名称和原始证据，不再作为现役源码接口。
