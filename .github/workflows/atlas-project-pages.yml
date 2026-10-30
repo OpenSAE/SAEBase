@@ -101,6 +101,19 @@ jobs:
                   assert "app.js" in html
                   assert (base/tree/"app.js").exists()
           PY
+      - name: Verify preview in Chromium and save review screenshots
+        run: |
+          python -m pip install -q playwright
+          python -m playwright install --with-deps chromium
+          python -m http.server 8765 --bind 127.0.0.1 --directory "$RUNNER_TEMP/atlas-web" >/tmp/atlas-preview-server.log 2>&1 &
+          python preview-source/harness/visualization/check_visual21_preview.py
+      - name: Store screenshots for design review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: saebase-visual21-review
+          path: atlas-preview-screenshots/
+          if-no-files-found: ignore
       - name: Configure SAEBase GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload SAEBase Pages artifact
