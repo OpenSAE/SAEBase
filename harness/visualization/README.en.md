@@ -57,3 +57,7 @@ The `saebase/` branch now begins with 14 source-backed research domains, followe
 ## Full-depth ancestry and canvas zoom
 
 The mouse wheel zooms the graph at the pointer, including over cards. It no longer changes the selected sibling. Expanded code and explanations keep native scrolling. Focus retains the entire root-to-current ancestor chain inside the SVG and exposes every ancestor as a clickable title in a canvas-level path navigator. At 80% or lower, the navigator wraps titles and node cards use compact title-only density. Fit calculates the bounds of real path nodes, rather than focus-centering padding. This supports 20 or more levels without discarding ancestors or their Context and source links.
+
+## Complete levels and unconstrained camera
+
+Focus displays every real node at every depth preceding the selected node. At the selected depth, only the full sibling group belonging to its parent appears, while the selected node's immediate children remain available for deeper navigation. Siblings are never paginated or capped. Drag blank canvas or any ordinary card to pan freely in screen coordinates at all zoom levels without center locking, scroll boundaries or bounce resistance. Explicit node selection brings that node into view once, then leaves the camera entirely user-controlled. Wheel zoom remains pointer-centered; Fit includes every visible node.
