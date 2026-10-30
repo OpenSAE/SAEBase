@@ -17,7 +17,7 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "saebase" / "research_lab"))
-from backend import core, published_wp12  # noqa: E402
+from backend import core, published_records  # noqa: E402
 
 SCHEMA = "opensae.wp13.live03_teacher_forced_summary.v1"
 PUBLIC_SCHEMA = "opensae.wp12.p3.public_result.v1"
@@ -232,7 +232,7 @@ def main(argv: list[str] | None = None) -> int:
     # deploy to HF and cannot substitute for public storage approval.
     published = []
     for record in records:
-        receipt = published_wp12.publish_record(
+        receipt = published_records.publish_record(
             "interventions",
             {**record, "reviewed_by": args.reviewer},
             root=args.release_root,

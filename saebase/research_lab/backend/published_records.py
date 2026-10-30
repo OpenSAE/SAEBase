@@ -1,4 +1,4 @@
-"""Immutable, read-only public WP12 engineering records.
+"""Immutable, read-only published research experiment records.
 
 Only owner-approved nonsecret artifacts are served. Private original prompts,
 training weights, job errors and credential-bearing logs are never exposed.
