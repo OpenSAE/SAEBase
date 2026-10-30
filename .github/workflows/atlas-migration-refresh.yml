@@ -1,0 +1,42 @@
+name: Temporary Atlas source snapshot migration
+on:
+  push:
+    branches:
+      - refactor/remove-wp12-source-package-20261030
+    paths:
+      - .github/workflows/atlas-migration-refresh.yml
+permissions:
+  contents: write
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Regenerate canonical Code and Atlas snapshots
+        run: |
+          set -euo pipefail
+          python harness/core/validate.py
+          python harness/knowledge/validate.py
+          python harness/code/build.py
+          python harness/visualization/export.py
+          python harness/visualization/build_pages.py
+          python harness/visualization/build_language.py
+          python harness/visualization/build_pages.py --check
+          python harness/visualization/build_language.py --check
+      - name: Commit generated snapshots to migration branch
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A doc/code harness/visualization
+          git status --short
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(atlas): regenerate source-backed snapshots after WP12 migration"
+            git push origin HEAD:refactor/remove-wp12-source-package-20261030
+          fi
