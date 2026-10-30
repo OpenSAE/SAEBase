@@ -202,7 +202,8 @@ jobs:
             saebase/research_lab/tests/test_platform.py \
             saebase/research_lab/tests/test_p2_explorer.py \
             saebase/research_lab/tests/test_wp13_bundle.py \
-            saebase/research_lab/tests/test_wp13_live03_gallery.py
+            saebase/research_lab/tests/test_wp13_live03_gallery.py \
+            saebase/research_lab/tests/test_wp12_private_public.py
           node --check saebase/research_lab/frontend/app.js
 
   analysis-install:
