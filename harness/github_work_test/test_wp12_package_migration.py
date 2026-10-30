@@ -1,4 +1,5 @@
 """Migration guard: WP12 implementations belong to stable functional packages."""
+
 from __future__ import annotations
 
 import ast
@@ -36,15 +37,13 @@ def test_no_runtime_import_points_to_legacy_package():
             if isinstance(node, ast.ImportFrom):
                 assert not (node.module or "").startswith("saebase.wp12"), str(file)
             elif isinstance(node, ast.Import):
-                assert all(
-                    not alias.name.startswith("saebase.wp12") for alias in node.names
-                ), str(file)
+                assert all(not alias.name.startswith("saebase.wp12") for alias in node.names), str(
+                    file
+                )
 
 
 def test_atlas_source_ownership_uses_only_real_functional_directories():
-    spec = json.loads(
-        (ROOT / "harness/code/atlas_concepts.json").read_text(encoding="utf-8")
-    )
+    spec = json.loads((ROOT / "harness/code/atlas_concepts.json").read_text(encoding="utf-8"))
     roots = spec["concepts"]
     assert not any(node["name"] == "research_backends" for node in roots)
     assert all("wp12" not in node["source_dirs"] for node in roots)
