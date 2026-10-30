@@ -1,0 +1,24 @@
+{"prompt": "Mira placed a copper key in the blue box. The copper key is in the", "prompt_group_id": "group-001", "sample_id": "wp21-001", "split": "train"}
+{"prompt": "Mira placed a copper key in the green box. The copper key is in the", "prompt_group_id": "group-001", "sample_id": "wp21-002", "split": "train"}
+{"prompt": "Jon carried a green notebook to the library. The notebook was", "prompt_group_id": "group-002", "sample_id": "wp21-003", "split": "train"}
+{"prompt": "Jon carried a red notebook to the library. The notebook was", "prompt_group_id": "group-002", "sample_id": "wp21-004", "split": "train"}
+{"prompt": "A red cup stood beside a white plate. The cup was", "prompt_group_id": "group-003", "sample_id": "wp21-005", "split": "train"}
+{"prompt": "A blue cup stood beside a white plate. The cup was", "prompt_group_id": "group-003", "sample_id": "wp21-006", "split": "train"}
+{"prompt": "Nora sent a small parcel to the museum. The parcel went to the", "prompt_group_id": "group-004", "sample_id": "wp21-007", "split": "train"}
+{"prompt": "Nora sent a small parcel to the library. The parcel went to the", "prompt_group_id": "group-004", "sample_id": "wp21-008", "split": "train"}
+{"prompt": "The garden gate opened at noon. The gate opened at", "prompt_group_id": "group-005", "sample_id": "wp21-009", "split": "train"}
+{"prompt": "The garden gate opened at dawn. The gate opened at", "prompt_group_id": "group-005", "sample_id": "wp21-010", "split": "train"}
+{"prompt": "Eli stored the wooden spoon in the top drawer. The spoon was in the", "prompt_group_id": "group-006", "sample_id": "wp21-011", "split": "train"}
+{"prompt": "Eli stored the wooden spoon in the bottom drawer. The spoon was in the", "prompt_group_id": "group-006", "sample_id": "wp21-012", "split": "train"}
+{"prompt": "A silver bell hung above the door. The bell was", "prompt_group_id": "group-007", "sample_id": "wp21-013", "split": "validation"}
+{"prompt": "A brass bell hung above the door. The bell was", "prompt_group_id": "group-007", "sample_id": "wp21-014", "split": "validation"}
+{"prompt": "Lena wrote the number seven on the card. The number was", "prompt_group_id": "group-008", "sample_id": "wp21-015", "split": "validation"}
+{"prompt": "Lena wrote the number nine on the card. The number was", "prompt_group_id": "group-008", "sample_id": "wp21-016", "split": "validation"}
+{"prompt": "The morning train stopped at Cedar station. The station was", "prompt_group_id": "group-009", "sample_id": "wp21-017", "split": "validation"}
+{"prompt": "The morning train stopped at Birch station. The station was", "prompt_group_id": "group-009", "sample_id": "wp21-018", "split": "validation"}
+{"prompt": "Omar put three apples into the basket. The basket held three", "prompt_group_id": "group-010", "sample_id": "wp21-019", "split": "test"}
+{"prompt": "Omar put three pears into the basket. The basket held three", "prompt_group_id": "group-010", "sample_id": "wp21-020", "split": "test"}
+{"prompt": "A yellow scarf rested on the chair. The scarf was", "prompt_group_id": "group-011", "sample_id": "wp21-021", "split": "test"}
+{"prompt": "A purple scarf rested on the chair. The scarf was", "prompt_group_id": "group-011", "sample_id": "wp21-022", "split": "test"}
+{"prompt": "Ada returned the book on Tuesday. The book was returned on", "prompt_group_id": "group-012", "sample_id": "wp21-023", "split": "test"}
+{"prompt": "Ada returned the book on Friday. The book was returned on", "prompt_group_id": "group-012", "sample_id": "wp21-024", "split": "test"}

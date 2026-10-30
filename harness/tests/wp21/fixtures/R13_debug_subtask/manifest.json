@@ -1,0 +1,68 @@
+{
+  "schema": "saebase.wp21.seed.v1",
+  "fixture_id": "R13_debug_subtask",
+  "case_id": "R13",
+  "purpose": "Instructor-provided pre-deletion state; this fixture is not a deletion solution.",
+  "base_commit": "41a54cbfdee5cce24d3d8f7517aadef0c752c5ac",
+  "files": [
+    {
+      "source": "overlay/tasks/benchmark/operation.py",
+      "destination": "tasks/benchmark/operation.py",
+      "sha256": "558492a12f8e5cd90fc29d3930ca39cbca3ce4dbe32aa720326e684c97c47cb9"
+    },
+    {
+      "source": "overlay/tasks/benchmark/wp21_subtasks.py",
+      "destination": "tasks/benchmark/wp21_subtasks.py",
+      "sha256": "adbdc1fed34fc0a7d4107e5a0c07048c2b059784e683ba071a53ad2aae2b2dfc"
+    },
+    {
+      "source": "overlay/conf/task/wp21_benchmark_subtasks.yaml",
+      "destination": "conf/task/wp21_benchmark_subtasks.yaml",
+      "sha256": "c4217aa6d57d89b3d9476c6c8d57df1c186742e3aea7a97efb6e64be9ddd3c1d"
+    },
+    {
+      "source": "overlay/tests/wp21/R13/before.py",
+      "destination": "tests/wp21/R13/before.py",
+      "sha256": "779a1fe51d6986044621796ad38ed816d8d12764b72f178676dc34daae119f95"
+    }
+  ],
+  "replaced_base_paths": [
+    {
+      "path": "tasks/benchmark/operation.py",
+      "base_sha256": "fda91114e627e7098e166c251a2cfca1f7efd3f574a305c538205ae79bace5aa"
+    }
+  ],
+  "pre_deletion_check": {
+    "argv": [
+      "python",
+      "tests/wp21/R13/before.py",
+      "--check-only"
+    ],
+    "callable": "tasks.benchmark.wp21_subtasks.execute",
+    "mode": "registration_only_not_experiment"
+  },
+  "pre_deletion_real_run": {
+    "argv": [
+      "python",
+      "tests/wp21/R13/before.py",
+      "--output",
+      "<candidate_workspace>",
+      "--device",
+      "cuda"
+    ],
+    "requires": "Locally provisioned real Gemma-2 2B weights; SAE canonical layer25 except model-only R09. Runtime preflight supplies immutable asset identities.",
+    "network_policy": "No implicit downloads; use operator-provisioned cache with HF_HUB_OFFLINE=1 and TRANSFORMERS_OFFLINE=1."
+  },
+  "post_deletion_requirements": [
+    "Remove debug_norm computation and dispatch references while keeping reconstruction available.",
+    "Explicit task.subtask chooses computation; task.path continues to describe output hierarchy only.",
+    "Fresh-process debug_norm requests fail before model execution; real reconstruction runs and ordinary benchmark without subtask remain functional.",
+    "Preserve both historical debug_norm and reconstruction experiment outputs."
+  ],
+  "protected_inputs": [
+    "harness/tests/wp21/fixtures/common/prompts.jsonl",
+    "shared model and SAE checkpoints",
+    "all previous run artifacts"
+  ],
+  "validation_scope": "Compile and registration/config checks are separate from real checkpoint execution. Real before/after measurements remain mandatory for passing the agent case."
+}

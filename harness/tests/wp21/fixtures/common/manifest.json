@@ -1,0 +1,57 @@
+{
+  "schema": "saebase.wp21.prompt_manifest.v1",
+  "file": "prompts.jsonl",
+  "sha256": "67150f5f49c06f53c7047be90772ff6c1015e08b2e19e4fa72d71aac977c4425",
+  "record_fields": [
+    "sample_id",
+    "prompt_group_id",
+    "split",
+    "prompt"
+  ],
+  "record_count": 24,
+  "split_counts": {
+    "train": 12,
+    "validation": 6,
+    "test": 6
+  },
+  "split_sample_ids": {
+    "train": [
+      "wp21-001",
+      "wp21-002",
+      "wp21-003",
+      "wp21-004",
+      "wp21-005",
+      "wp21-006",
+      "wp21-007",
+      "wp21-008",
+      "wp21-009",
+      "wp21-010",
+      "wp21-011",
+      "wp21-012"
+    ],
+    "validation": [
+      "wp21-013",
+      "wp21-014",
+      "wp21-015",
+      "wp21-016",
+      "wp21-017",
+      "wp21-018"
+    ],
+    "test": [
+      "wp21-019",
+      "wp21-020",
+      "wp21-021",
+      "wp21-022",
+      "wp21-023",
+      "wp21-024"
+    ]
+  },
+  "group_policy": "Twelve groups of two neighboring controlled prompt variants; groups1-6 train, groups7-9 validation, groups10-12 test; no group crosses splits.",
+  "provenance": {
+    "source_type": "project_authored_controlled_text",
+    "created_for": "SAEBase WP21 local examination",
+    "external_sources": [],
+    "claims": "Engineering fixture, not an independently sampled research benchmark."
+  },
+  "training_repeat_policy": "Only train IDs may be repeated deterministically to satisfy a tokenizer token budget; repetitions never create additional unique observations."
+}

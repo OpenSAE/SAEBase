@@ -1,0 +1,9 @@
+# @package _global_
+task:
+  name: wp21_capture_legacy
+  path: wp21_capture_legacy
+  execute: false
+  sae_key: gemma2_2b_pt_l25_canonical
+  layer: 25
+  device: cpu
+  prompt: ''

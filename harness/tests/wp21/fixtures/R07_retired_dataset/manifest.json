@@ -1,0 +1,57 @@
+{
+  "schema": "saebase.wp21.seed.v1",
+  "fixture_id": "R07_retired_dataset",
+  "case_id": "R07",
+  "purpose": "Instructor-provided pre-deletion state; this fixture is not a deletion solution.",
+  "base_commit": "41a54cbfdee5cce24d3d8f7517aadef0c752c5ac",
+  "files": [
+    {
+      "source": "overlay/datasets/wp21_retired_prompts.py",
+      "destination": "datasets/wp21_retired_prompts.py",
+      "sha256": "f9f637f9c830e3ab7b980684bcef51ce939484bb8cd2ee8f6b12c444f827ae41"
+    },
+    {
+      "source": "overlay/conf/dataset/wp21_retired_prompts.yaml",
+      "destination": "conf/dataset/wp21_retired_prompts.yaml",
+      "sha256": "9a469afc143209370ff75b224d7e7928d94b68b1ec860c110ffe840f45f985f3"
+    },
+    {
+      "source": "overlay/tests/wp21/R07/before.py",
+      "destination": "tests/wp21/R07/before.py",
+      "sha256": "1e04ebec7199d005c61a234bd5b6c49eb9c800bc23114d33e9d524dbb5094aab"
+    }
+  ],
+  "replaced_base_paths": [],
+  "pre_deletion_check": {
+    "argv": [
+      "python",
+      "tests/wp21/R07/before.py",
+      "--check-only"
+    ],
+    "callable": "saebase.datasets.wp21_retired_prompts.register",
+    "mode": "registration_only_not_experiment"
+  },
+  "pre_deletion_real_run": {
+    "argv": [
+      "python",
+      "tests/wp21/R07/before.py",
+      "--output",
+      "<candidate_workspace>",
+      "--device",
+      "cuda"
+    ],
+    "requires": "Locally provisioned real Gemma-2 2B weights; SAE canonical layer25 except model-only R09. Runtime preflight supplies immutable asset identities.",
+    "network_policy": "No implicit downloads; use operator-provisioned cache with HF_HUB_OFFLINE=1 and TRANSFORMERS_OFFLINE=1."
+  },
+  "post_deletion_requirements": [
+    "Remove the dedicated dataset provider, configuration and live import/recipe references.",
+    "In a fresh process, both WP21RetiredPrompts and wp21_retired_prompts are unavailable; built-in IOI remains registered.",
+    "Preserve the common raw input and all historical experiment records byte-for-byte; verify canonical Gemma capture remains usable."
+  ],
+  "protected_inputs": [
+    "harness/tests/wp21/fixtures/common/prompts.jsonl",
+    "shared model and SAE checkpoints",
+    "all previous run artifacts"
+  ],
+  "validation_scope": "Compile and registration/config checks are separate from real checkpoint execution. Real before/after measurements remain mandatory for passing the agent case."
+}

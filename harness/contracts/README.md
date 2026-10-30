@@ -76,3 +76,10 @@ Agent 可 **读取** 上述全部资料。只可新增自己的 `harness/tests/w
 ## Independent output compliance (WP18 round-three follow-up)
 
 `harness/contracts/compliance.py` now validates **externally collected outputs**, not just Agent claims: canonical relative paths across OSes, non-finite numbers in derived JSON results, privacy over nested records/values, and bilingual metadata via existing `invariants`. The independent `acceptance.py` calls this common checker in addition to the existing receipt, identity and behavioral-test evidence. Older frozen test scores and submitted Agent branches remain unchanged; reviewer PR #89 retains the failure evidence. This check cannot replace executing independent negative tests or OS sandboxing.
+
+
+## 真实 SAEBase 工作流
+
+[REAL_WORKFLOW_PROTOCOL.md](REAL_WORKFLOW_PROTOCOL.md)（[English](REAL_WORKFLOW_PROTOCOL.en.md)）细化真实执行、组件增删、Task/Subtask、参数搜索和实验文件管理。它复用现有 22 个 Contract 与六类失败归因，Registry 版本仍为 `1.1.0`。新 Work Plan 明确引用该协议并逐题绑定现有 CT IDs；WP18–WP20 的冻结规范、历史范围和结果保持原样。
+
+WP21 本地包从 `prepared_not_assigned` 开始。具体任务分派、真实执行、自测、独立验收和产品批准具有各自依据；规范与题目存在不代表二十道题已经执行。

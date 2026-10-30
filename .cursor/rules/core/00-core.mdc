@@ -35,3 +35,10 @@ alwaysApply: true
 - 未得到用户对新范围的直接批准前，所有其他节点、源码和知识状态保持不变。
 
 - WP18 H07–H26 已在治理侧预声明 20 种不同 Repo 场景的合同、测试接口和验证器；考试 Agent 可读 `harness/contracts/wp18_cases.json` 与 `wp18_verify.py`，只在新的 `harness/tests/wp18/runs/` 中实现 `solve(payload)`，不得修改任何评分器/验证程序/Contracts 或历史试卷。CI 的 task PR diff gate 与独立 reviewer 的负面测试才是外部验收，不是 Agent 自评。
+
+
+# 真实 SAEBase 工作流
+
+- 被用户明确指派的 WP21 题目使用 `harness/contracts/REAL_WORKFLOW_PROTOCOL.md` 和该题冻结 scope，在独立工作树修改指定生产代码并调用真实 SAEBase 接口。准备包的 `prepared_not_assigned` 状态不自动转成人工批准；WP18–WP20 的历史权限与成绩保持原样。
+- 治理准备过程预建当前 Runtime 的单数 `experiment/` 根；Task、参数搜索和文件管理依照现有路径函数保存真实证据。配置检查、synthetic 接口运行与 real_checkpoint 执行分别报告。
+- 考生不能修改治理、裁判、历史记录或受保护 Runtime 语义；现有 Hook 拒绝记录为待解决的治理/环境问题。独立 reviewer 在考生工作树外保存验收，用户指派范围外的修改仍需另行明确。

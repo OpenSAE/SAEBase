@@ -1,0 +1,11 @@
+# @package _global_
+# Dedicated opt-in wrapper uses capture_with_full_codes; standard CaptureTask is unchanged.
+task:
+  name: capture
+  path: capture/full_codes
+  execute: false
+  export_full_codes: true
+  sae_key: gemma2_2b_pt_l25_canonical
+  layer: 25
+  device: cpu
+  prompt: ''

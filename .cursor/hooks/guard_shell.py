@@ -45,6 +45,23 @@ def gate(command, plan_id=None):
     if not isinstance(command, str) or not command.strip():
         return "Unknown shell command"
     command = command.strip()
+    if DANGEROUS.search(command):
+        return "High-risk shell operation is not permitted to task agents"
+    try:
+        import importlib.util
+        profile_path = ROOT / ".cursor/hooks/wp21_scope.py"
+        assignment_path = ROOT / ".cursor/wp21_assignment.json"
+        if profile_path.is_file():
+            module_spec = importlib.util.spec_from_file_location("wp21_scope", profile_path)
+            wp21 = importlib.util.module_from_spec(module_spec)
+            module_spec.loader.exec_module(wp21)
+            handled, reason = wp21.command_decision(command)
+            if handled:
+                return reason
+        elif assignment_path.exists() or assignment_path.is_symlink():
+            return "WP21 assignment exists but its scope profile is missing"
+    except Exception as exc:
+        return "WP21 assignment gate failed: " + str(exc)
     # Allow only mkdir -p inside the isolated Harness test directory.
     # Ordinary new project-root directories and production output paths
     # remain blocked, even when an Agent Flow lists a shell command.
@@ -58,7 +75,9 @@ def gate(command, plan_id=None):
                 resolved = (ROOT / candidate).resolve()
                 if not resolved.is_relative_to((ROOT / "harness/tests").resolve()):
                     return "Directory creation escapes the Harness test sandbox"
-                for protected in ("wp18", "wp19"):
+                if "acceptance" in candidate.split("/") or candidate.startswith("harness/tests/wp21/"):
+                    return "Independent acceptance and unassigned WP21 preparation are read-only"
+                for protected in ("wp18", "wp19", "wp20"):
                     acceptance = (ROOT / "harness/tests" / protected / "acceptance").resolve()
                     if resolved == acceptance or resolved.is_relative_to(acceptance):
                         return "Independent acceptance is read-only"

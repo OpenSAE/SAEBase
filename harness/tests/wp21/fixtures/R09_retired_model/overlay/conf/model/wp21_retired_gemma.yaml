@@ -1,0 +1,8 @@
+# @package _global_
+# The extension is an optional factory for the same sole canonical Gemma backbone.
+model:
+  name: gemma2_2b_base
+  hf_id: google/gemma-2-2b
+  extension_key: ext.wp21.retired_gemma
+  device: cpu
+  lazy: true

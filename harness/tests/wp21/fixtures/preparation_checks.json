@@ -1,0 +1,168 @@
+{
+  "schema": "saebase.wp21.seed_preparation_checks.v1",
+  "base_commit": "41a54cbfdee5cce24d3d8f7517aadef0c752c5ac",
+  "scope": "Local seed compilation, source-tree-only fresh-process registration/configuration and input validation; shared dependency environment remains outside each candidate. No real checkpoint loaded; no agent deletion task solved.",
+  "real_checkpoint_execution": "NOT_RUN",
+  "cases": [
+    {
+      "case_id": "R05",
+      "fixture_id": "R05_diagnostic_export",
+      "overlay_file_count": 3,
+      "status": "PASS",
+      "checks": [
+        {
+          "argv": [
+            "python",
+            "tests/wp21/R05/before.py",
+            "--check-only"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"details\": {\"capture_preserved\": true, \"feature\": \"wp21_full_codes\"}, \"measured\": false, \"status\": \"registration_only\"}",
+          "stderr": ""
+        }
+      ],
+      "source_root": "/workspace/scratch/649d5afa71bb/wp21_seed_source_checks_yv0ftmgj/R05_diagnostic_export/source",
+      "outside_output_rejected": true,
+      "installation": "none; source-only imports with shared external dependency environment",
+      "import_source_verified": "/workspace/scratch/649d5afa71bb/wp21_seed_source_checks_yv0ftmgj/R05_diagnostic_export/source/saebase/__init__.py"
+    },
+    {
+      "case_id": "R07",
+      "fixture_id": "R07_retired_dataset",
+      "overlay_file_count": 3,
+      "status": "PASS",
+      "checks": [
+        {
+          "argv": [
+            "python",
+            "tests/wp21/R07/before.py",
+            "--check-only"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"details\": {\"alias\": \"wp21_retired_prompts\", \"dataset\": \"WP21RetiredPrompts\", \"split_counts\": {\"test\": 6, \"train\": 12, \"validation\": 6}}, \"measured\": false, \"status\": \"registration_only\"}",
+          "stderr": ""
+        }
+      ],
+      "source_root": "/workspace/scratch/649d5afa71bb/wp21_seed_source_checks_yv0ftmgj/R07_retired_dataset/source",
+      "outside_output_rejected": true,
+      "installation": "none; source-only imports with shared external dependency environment",
+      "import_source_verified": "/workspace/scratch/649d5afa71bb/wp21_seed_source_checks_yv0ftmgj/R07_retired_dataset/source/saebase/__init__.py"
+    },
+    {
+      "case_id": "R09",
+      "fixture_id": "R09_retired_model",
+      "overlay_file_count": 3,
+      "status": "PASS",
+      "checks": [
+        {
+          "argv": [
+            "python",
+            "tests/wp21/R09/before.py",
+            "--check-only"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"details\": {\"checkpoint_measured\": false, \"model_only\": true, \"provider\": \"ext.wp21.retired_gemma\", \"source_kind\": \"local_provider_source\"}, \"measured\": false, \"status\": \"registration_only\"}",
+          "stderr": ""
+        }
+      ],
+      "source_root": "/workspace/scratch/649d5afa71bb/wp21_seed_source_checks_yv0ftmgj/R09_retired_model/source",
+      "outside_output_rejected": true,
+      "installation": "none; source-only imports with shared external dependency environment",
+      "import_source_verified": "/workspace/scratch/649d5afa71bb/wp21_seed_source_checks_yv0ftmgj/R09_retired_model/source/saebase/__init__.py"
+    },
+    {
+      "case_id": "R11",
+      "fixture_id": "R11_retired_task",
+      "overlay_file_count": 3,
+      "status": "PASS",
+      "checks": [
+        {
+          "argv": [
+            "python",
+            "tests/wp21/R11/before.py",
+            "--check-only"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"details\": {\"dispatch\": {\"dataset_key\": \"IOI\", \"delegated_task\": \"capture\", \"description\": \"Set task.execute=true and supply required runtime inputs to execute.\", \"model_key\": \"gemma2_2b_base\", \"operation\": \"capture\", \"registered_task\": \"wp21_capture_legacy\", \"status\": \"configured_only\"}, \"task\": \"wp21_capture_legacy\"}, \"measured\": false, \"status\": \"registration_only\"}",
+          "stderr": ""
+        }
+      ],
+      "source_root": "/workspace/scratch/649d5afa71bb/wp21_seed_source_checks_yv0ftmgj/R11_retired_task/source",
+      "outside_output_rejected": true,
+      "installation": "none; source-only imports with shared external dependency environment",
+      "import_source_verified": "/workspace/scratch/649d5afa71bb/wp21_seed_source_checks_yv0ftmgj/R11_retired_task/source/saebase/__init__.py"
+    },
+    {
+      "case_id": "R13",
+      "fixture_id": "R13_debug_subtask",
+      "overlay_file_count": 4,
+      "status": "PASS",
+      "checks": [
+        {
+          "argv": [
+            "python",
+            "tests/wp21/R13/before.py",
+            "--check-only"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"details\": {\"dispatch\": {\"dataset_key\": \"IOI\", \"description\": \"Set task.execute=true and supply required runtime inputs to execute.\", \"model_key\": \"gemma2_2b_base\", \"operation\": \"benchmark\", \"status\": \"configured_only\"}, \"selected\": \"debug_norm\", \"subtasks\": [\"debug_norm\", \"reconstruction\"]}, \"measured\": false, \"status\": \"registration_only\"}",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "python",
+            "tests/wp21/R13/before.py",
+            "--check-only",
+            "--subtask",
+            "reconstruction"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"details\": {\"dispatch\": {\"dataset_key\": \"IOI\", \"description\": \"Set task.execute=true and supply required runtime inputs to execute.\", \"model_key\": \"gemma2_2b_base\", \"operation\": \"benchmark\", \"status\": \"configured_only\"}, \"selected\": \"reconstruction\", \"subtasks\": [\"debug_norm\", \"reconstruction\"]}, \"measured\": false, \"status\": \"registration_only\"}",
+          "stderr": ""
+        }
+      ],
+      "source_root": "/workspace/scratch/649d5afa71bb/wp21_seed_source_checks_yv0ftmgj/R13_debug_subtask/source",
+      "outside_output_rejected": true,
+      "installation": "none; source-only imports with shared external dependency environment",
+      "import_source_verified": "/workspace/scratch/649d5afa71bb/wp21_seed_source_checks_yv0ftmgj/R13_debug_subtask/source/saebase/__init__.py"
+    }
+  ],
+  "common": {
+    "records": 24,
+    "groups": 12,
+    "split_counts": {
+      "train": 12,
+      "validation": 6,
+      "test": 6
+    },
+    "sha256": "67150f5f49c06f53c7047be90772ff6c1015e08b2e19e4fa72d71aac977c4425",
+    "status": "PASS"
+  },
+  "negative_checks": [
+    {
+      "case_id": "R07",
+      "check": "cross_split_group",
+      "status": "PASS",
+      "exit_code": 1,
+      "expected_error": "Prompt group crosses splits"
+    },
+    {
+      "case_id": "R07",
+      "check": "duplicate_sample_id",
+      "status": "PASS",
+      "exit_code": 1,
+      "expected_error": "Duplicate sample ID"
+    },
+    {
+      "case_id": "R13",
+      "check": "unknown_subtask",
+      "status": "PASS",
+      "exit_code": 2,
+      "expected_error": "Unknown seeded benchmark subtask"
+    }
+  ],
+  "source_support": {
+    "path": "saebase/datasets/__init__.py",
+    "reason": "Existing source-tree import alias; no candidate editable install"
+  }
+}
