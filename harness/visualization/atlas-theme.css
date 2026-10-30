@@ -157,3 +157,128 @@ button:focus-visible,a:focus-visible,input:focus-visible,.graph-node:focus-visib
 #canvasWrap #diagram{position:absolute;left:0;top:0;margin:0;
   transform-origin:0 0;max-width:none;max-height:none;will-change:transform}
 #canvasWrap.is-dragging,#canvasWrap.is-dragging #diagram{cursor:grabbing}
+
+
+/* Atlas global command search. Shared across all five authoritative trees. */
+.atlas-global-launch{
+  flex:none;min-width:48px;height:34px;border:1px solid #363a3e;
+  border-radius:7px;padding:0 9px;background:#141619;color:#b8bec3;
+  font:600 11px/1 ui-monospace,SFMono-Regular,Consolas,monospace;
+  cursor:pointer;white-space:nowrap;
+}
+.atlas-global-launch:hover,.atlas-global-launch:focus-visible{
+  color:#fff;background:#25292c;border-color:#888e93;
+}
+.atlas-search-overlay{
+  position:fixed;inset:0;z-index:1000;display:flex;align-items:flex-start;
+  justify-content:center;padding:clamp(52px,12vh,125px) 16px 16px;
+  background:rgba(0,0,0,.72);backdrop-filter:blur(10px);
+}
+.atlas-search-dialog{
+  width:min(720px,100%);max-height:min(76vh,770px);display:flex;flex-direction:column;
+  overflow:hidden;border:1px solid #45494d;border-radius:15px;
+  background:#101214;color:#f1f2f3;
+  box-shadow:0 24px 95px rgba(0,0,0,.78);
+}
+.atlas-search-dialog-top{
+  display:flex;align-items:center;gap:14px;min-height:70px;
+  padding:0 20px;border-bottom:1px solid #303438;
+}
+.atlas-search-dialog-icon{font-size:30px;color:#a2a8ad;font-weight:300}
+.atlas-search-input{
+  flex:1;min-width:0;border:0;outline:0;background:transparent;
+  color:#f4f5f6;font:520 17px/1.35 Inter,system-ui,"Noto Sans SC",sans-serif;
+}
+.atlas-search-input:focus{outline:0}
+.atlas-search-input::placeholder{color:#828990}
+.atlas-search-dismiss{
+  border:1px solid #3c4145;border-radius:6px;padding:6px 9px;
+  color:#bdc2c7;background:#1a1d20;font:550 11px ui-monospace,monospace;
+}
+.atlas-search-dismiss:hover{background:#292d31;color:#fff}
+.atlas-search-filters{
+  display:flex;gap:5px;flex:none;align-items:center;overflow-x:auto;
+  padding:10px 14px;border-bottom:1px solid #2e3235;scrollbar-width:thin;
+}
+.atlas-search-filter{
+  display:inline-flex;align-items:center;gap:7px;flex:none;min-height:32px;
+  padding:5px 10px;border:1px solid transparent;border-radius:7px;
+  color:#a9b0b5;background:transparent;white-space:nowrap;
+  font-size:12px;font-weight:590;cursor:pointer;
+}
+.atlas-search-filter.is-active{
+  color:#f3f4f5;background:#25292c;border-color:#454b50;
+}
+.atlas-search-filter:hover{background:#23272a;color:#fff}
+.atlas-search-filter-count{opacity:.57;font-size:10px;font-variant-numeric:tabular-nums}
+.atlas-search-results{flex:1;min-height:110px;max-height:min(55vh,545px);overflow:auto;padding:10px 13px 18px;scrollbar-color:#43494e transparent}
+.atlas-search-result-group{display:flex;flex-direction:column;gap:3px;margin:4px 0 16px}
+.atlas-search-group-name{
+  margin:0 0 5px;padding:4px 9px;font-size:10px;line-height:1.4;
+  text-transform:uppercase;letter-spacing:.11em;font-weight:750;color:#899298;
+}
+.atlas-search-result{
+  width:100%;min-height:62px;display:flex;flex-direction:column;gap:5px;
+  text-align:left;padding:11px 13px;border:1px solid transparent;border-radius:8px;
+  background:transparent;color:#eaeced;cursor:pointer;
+}
+.atlas-search-result.is-selected,.atlas-search-result:hover{
+  background:#23272b;border-color:#50575d;
+}
+.atlas-search-result-heading{display:flex;align-items:center;gap:10px}
+.atlas-search-result-heading strong{
+  font-size:13px;font-weight:650;line-height:1.45;
+}
+.atlas-search-result-summary{
+  font-size:11.5px;color:#9ea7ad;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.atlas-search-empty{padding:27px 16px;color:#aab1b7;text-align:center}
+.atlas-search-footer{
+  flex:none;min-height:43px;display:flex;align-items:center;gap:15px;
+  border-top:1px solid #303438;padding:0 17px;
+  font-size:10.5px;color:#899298;white-space:nowrap;
+}
+.atlas-search-total{margin-left:auto;font-variant-numeric:tabular-nums}
+.atlas-detail-layer{margin:5px 0 24px;padding:0 0 20px;border-bottom:1px solid #34393d}
+.atlas-detail-layer:last-child{border-bottom:0;margin-bottom:0}
+.atlas-detail-layer-heading{
+  margin:0 0 15px;display:flex;align-items:center;gap:10px;
+  color:#c9cfd3;font-size:11px;letter-spacing:.12em;font-weight:720;
+}
+.atlas-detail-layer-index{
+  color:#858e95;font:650 11px ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+.atlas-detail-title-row{display:flex;align-items:flex-start;gap:12px;justify-content:space-between}
+.atlas-detail-title-row .detail-title{min-width:0;flex:1;font-size:18px}
+.atlas-copy-link{
+  flex:none;border:1px solid #454b50;border-radius:7px;background:#23272a;
+  color:#dce1e4;padding:6px 8px;min-height:29px;cursor:pointer;
+  font-size:10.5px;white-space:nowrap;
+}
+.atlas-copy-link:hover{color:#fff;border-color:#919ba1}
+.atlas-detail-muted{font-size:12px;color:#89949a;line-height:1.65;margin:7px 0}
+.atlas-relation-row{
+  display:flex;flex-direction:column;gap:7px;padding:11px 12px;
+  margin-bottom:7px;background:#1a1d1f;border:1px solid #343a3e;border-radius:8px;
+}
+.atlas-relation-metadata{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.atlas-relation-view{font-size:11px;color:#bdc6ca;font-weight:670}
+.atlas-relation-field{font:10px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;color:#79858b}
+.atlas-relation-link{
+  display:block;width:100%;border:0;background:none;color:#eef0f1;
+  padding:0;text-align:left;font-size:12.5px;line-height:1.5;
+  cursor:pointer;font-weight:600;
+}
+.atlas-relation-link:hover{text-decoration:underline;text-underline-offset:3px}
+.atlas-copy-fallback{display:block;max-width:100%;margin:9px 0;padding:7px;
+  border:1px solid #68767c;border-radius:6px;background:#272c30;color:#fff}
+@media(max-width:730px){
+  .atlas-global-launch{min-width:38px;height:31px;padding:0 6px;font-size:10px}
+  .atlas-search-dialog{max-height:88vh}
+  .atlas-search-overlay{padding:42px 10px 10px}
+  .atlas-search-dialog-top{padding:0 11px;gap:9px;min-height:57px}
+  .atlas-search-input{font-size:14px}
+  .atlas-search-filter{font-size:11px;padding:5px 7px}
+  .atlas-search-result{min-height:58px}
+  .atlas-search-footer{padding:0 9px;gap:7px;font-size:9px}
+}
