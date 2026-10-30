@@ -931,7 +931,7 @@
   }
   function measure(node, focused) {
     const density=densityMode();
-    const expanded=config.expandedAttributes.has(node.id);
+    const expanded=density!=="compact" && config.expandedAttributes.has(node.id);
     const w=expanded?525:density==="compact"?278:density==="detail"?336:310;
     const title=wrap(node.title||node.id,w-45,density==="compact"?16:14.2,3);
     const body=density==="compact"&&!expanded?[]:
@@ -940,8 +940,10 @@
       wrap((node.context_term_ids||[]).slice(0,3).map(id=>
         DATA.context?.nodes?.find(term=>term.id===id)?.title
       ).filter(Boolean).join(" · "),w-42,11,1):[];
-    const base=Math.max(density==="compact"?86:98,22+title.length*19+
-      (body.length?10+body.length*17:0)+(context.length?8+context.length*17:0)+18);
+    const base=Math.max(density==="compact"?62:98,
+      (density==="compact"?14:22)+title.length*19+
+      (body.length?10+body.length*17:0)+(context.length?8+context.length*17:0)+
+      (density==="compact"?12:18));
     const isClass=(node.attributes||[]).some(x=>x.type==="class_methods");
     const count=(node.attributes||[]).length;
     const terms=(node.context_term_ids||[]).length;
@@ -1121,7 +1123,8 @@
       const cy=top+p.title.length*19+7+(p.body.length?p.body.length*17+9:0);
       textLines(card,p.context,titleX,cy,17,"node-context-preview");
     }
-    const onOpen = () => navigate(node.id,config.view,false,{toggle:true});
+    const onOpen = () => navigate(node.id,config.view,false,
+      {toggle:densityMode()!=="compact"});
     if(p.expanded){
       const embedded=svg("foreignObject",{
         x:10,y:p.baseH+8,width:p.w-20,height:p.extraH-41,
@@ -1207,7 +1210,7 @@
       });
       card.appendChild(label);
     }
-    {
+    if(densityMode()!=="compact") {
       const toggle = svg("g", {
         class: "attribute-trigger", role: "button", tabindex: "0",
         "data-attribute-toggle": node.id,
@@ -1223,7 +1226,6 @@
       toggle.appendChild(svg("text",{
         x:20,y:p.h-13
       },p.expanded ? "收起节点属性" :
-         densityMode() === "compact" ? "查看详情" :
          shortFunction ? "查看功能说明与源码依据" :
          "展开节点说明与依据"));
       const show = event => {
@@ -1440,6 +1442,14 @@
     $("detailDrawer").classList.toggle("is-hidden", !config.detailsOpen);
     $("detailsToggle").disabled = !config.focusId;
     $("atlasCopyFocused")?.classList.toggle("is-hidden",!config.focusId);
+    const relationShortcut=$("atlasRelationsShortcut");
+    if(relationShortcut){
+      relationShortcut.classList.toggle("is-hidden",!config.focusId);
+      if(config.focusId){
+        const count=explicitRelations(config.view,config.focusId).length;
+        relationShortcut.textContent=searchText("跨树关联","Relations")+" · "+count;
+      }
+    }
     $("overviewBack").classList.toggle("is-hidden", !config.focusId);
   }
   function updateBreadcrumb() {
@@ -1983,6 +1993,7 @@
     const links=explicitRelations(config.view,n.id);
     const relations=detailLayer(area,"02",
       searchText("跨树关联","RELATIONS")+" · "+links.length);
+    relations.id="atlasRelationsSection";
     const relationItems=el("div","atlas-relation-items");
     const displayRelations=(expanded=false)=>{
       relationItems.replaceChildren();
@@ -2187,6 +2198,19 @@
       if(config.focusId)copyDeepLink(config.focusId,copy);
     });
     $("detailsToggle").insertAdjacentElement("afterend",copy);
+    const relationShortcut=el("button","atlas-relations-shortcut is-hidden","");
+    relationShortcut.id="atlasRelationsShortcut";
+    relationShortcut.type="button";
+    relationShortcut.title=searchText("打开跨树关联","Open cross-tree relations");
+    relationShortcut.addEventListener("click",()=>{
+      if(!config.focusId)return;
+      config.detailsOpen=true;
+      config.outlineOpen=false;
+      renderDetails();
+      setDrawerState();
+      $("atlasRelationsSection")?.scrollIntoView({block:"start",behavior:"smooth"});
+    });
+    copy.insertAdjacentElement("afterend",relationShortcut);
     // All five tabs switch the mounted graph; links still work without JS
     // and support browser-native new-tab gestures.
     for (const tab of document.querySelectorAll(".tabs [data-graph]")) {
@@ -2338,6 +2362,9 @@
     if(launcher)launcher.textContent=searchText("五树搜索","Search all trees");
     const copy=$("atlasCopyFocused");
     if(copy)copy.textContent=searchText("复制链接","Copy link");
+    const shortcut=$("atlasRelationsShortcut");
+    if(shortcut && config.focusId)shortcut.textContent=
+      searchText("跨树关联","Relations")+" · "+explicitRelations(config.view,config.focusId).length;
     if(searchInput)searchInput.placeholder=
       searchText("搜索所有节点、术语、函数…","Search nodes, terms, functions…");
     if(searchOpen)updateGlobalSearch();
