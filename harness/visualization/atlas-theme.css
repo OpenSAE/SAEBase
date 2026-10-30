@@ -150,3 +150,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,.graph-node:focus-visib
   .atlas-path-trace.is-compact{max-height:34vh}
   .atlas-path-trace.is-compact .atlas-path-step{max-width:min(215px,64vw)}
 }
+
+/* Atlas camera: the graph is transformed freely rather than constrained
+   by a native scrolling rectangle or centered Focus padding. */
+#canvasWrap{display:block;overflow:hidden;scrollbar-gutter:auto;touch-action:none}
+#canvasWrap #diagram{position:absolute;left:0;top:0;margin:0;
+  transform-origin:0 0;max-width:none;max-height:none;will-change:transform}
+#canvasWrap.is-dragging,#canvasWrap.is-dragging #diagram{cursor:grabbing}
