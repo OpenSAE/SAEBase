@@ -18,6 +18,19 @@ with sync_playwright() as playwright:
     launcher = page.locator("#atlasGlobalSearchButton")
     assert launcher.is_visible()
     assert launcher.inner_text().strip() == "Search all trees", launcher.inner_text()
+    page.locator(".graph-node").first.click()
+    assert page.locator("#detailDrawer").is_visible(), "Node click did not reveal Details"
+    assert page.locator("#atlasCopyFocused").is_visible()
+    for _ in range(2):
+        page.locator("#zoomOut").click()
+    page.wait_for_function("""() => document.querySelectorAll(
+        ".graph-node.density-compact").length > 0""")
+    assert page.locator(".graph-node.density-compact .attribute-trigger").count() == 0, (
+        "Compact mode still renders grey detail bars")
+    assert page.locator(".graph-node.density-compact .node-title").count() > 0
+    page.screenshot(path=str(shots / "05-compact-no-grey-footer.png"))
+    page.locator("#zoomIn").click()
+    page.locator("#zoomIn").click()
     page.keyboard.press("Control+k")
     assert page.locator("#atlasGlobalSearch").is_visible()
     page.locator("#atlasGlobalSearchInput").fill("SAE")
@@ -54,11 +67,24 @@ with sync_playwright() as playwright:
     assert page.locator(".atlas-detail-layer").count() == 3
     assert page.locator(".atlas-relation-row").count() >= 1, (
         "Reverse reference to " + str(pair) + " was omitted")
+    shortcut=page.locator("#atlasRelationsShortcut")
+    assert shortcut.is_visible(), "Relations shortcut is hidden"
+    assert "Relations" in shortcut.inner_text()
+    assert page.locator(".atlas-relation-flow").count() > 0
+    assert page.locator(".atlas-relation-arrow").first.inner_text() == "→"
+    shortcut.click()
+    assert page.locator("#atlasRelationsSection").is_visible()
     assert page.locator(".atlas-relation-direction").filter(
         has_text="Referenced by").count() >= 1
     assert page.locator("#atlasCopyFocused").is_visible(), "Toolbar Copy link hidden"
     assert page.locator(".atlas-copy-link").is_visible(), "Inspector Copy link hidden"
     page.screenshot(path=str(shots / "02-auto-open-relations-copy.png"))
+    expected_view=page.locator(".atlas-relation-view").first.inner_text().strip().lower()
+    page.locator(".atlas-relation-link").first.click()
+    page.wait_for_function("""view => document.body.dataset.atlasView === view""",expected_view)
+    assert page.locator("#detailDrawer").is_visible()
+    page.goto(ROOT + pair["view"] + ".html?lang=en&focus=" + pair["id"],
+        wait_until="networkidle", timeout=90000)
     page.locator("#atlasCopyFocused").click()
     copied = page.evaluate("() => navigator.clipboard.readText()")
     assert "focus=" in copied and pair["id"] in copied
@@ -73,5 +99,5 @@ with sync_playwright() as playwright:
     assert page.locator("#atlasGlobalSearch").is_visible()
     page.screenshot(path=str(shots / "04-search-chinese.png"))
     assert not errors, "Page errors: " + "; ".join(errors)
-    print("PASS: full search, auto-open Details, incoming references, bilingual toolbar, Copy link")
+    print("PASS: node click auto-Details, compact footer, directional relations, deep links, locales")
     browser.close()
