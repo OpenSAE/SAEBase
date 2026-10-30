@@ -53,3 +53,7 @@ See the [Agent review process](../core/AGENT_FLOW.en.md). Status remains indepen
 ## Research-concept Code Tree
 
 The `saebase/` branch now begins with 14 source-backed research domains, followed by meaningful subdomains and actual modules. `harness/code/atlas_concepts.json` defines the reviewed bilingual responsibilities, Context terms, and precise source membership. Original module IDs, paths, signatures, and methods are retained. A functional parent has no more than 20 direct children, with 10 preferred; UI pagination does not replace the scientific hierarchy.
+
+## Full-depth ancestry and canvas zoom
+
+The mouse wheel zooms the graph at the pointer, including over cards. It no longer changes the selected sibling. Expanded code and explanations keep native scrolling. Focus retains the entire root-to-current ancestor chain inside the SVG and exposes every ancestor as a clickable title in a canvas-level path navigator. At 80% or lower, the navigator wraps titles and node cards use compact title-only density. Fit calculates the bounds of real path nodes, rather than focus-centering padding. This supports 20 or more levels without discarding ancestors or their Context and source links.

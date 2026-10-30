@@ -115,3 +115,38 @@ button:focus-visible,a:focus-visible,input:focus-visible,.graph-node:focus-visib
 .legend-item{font-size:10px}}
 @media(prefers-reduced-motion:reduce){
 .canvas-wrap,.graph-node,.canvas-wrap.in-focus .graph-node{animation:none;transition:none}}
+
+/* Deep Focus history: the entire root-to-focus chain stays discoverable.
+   At compact zoom the full titles wrap as an accessible, multi-row path. */
+.atlas-path-trace{
+  position:absolute;left:18px;right:18px;top:12px;z-index:6;
+  display:flex;align-items:center;gap:6px;
+  width:auto;max-width:calc(100% - 36px);min-height:39px;
+  padding:6px 10px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;
+  background:rgba(13,15,17,.93);border:1px solid #373b3e;border-radius:10px;
+  box-shadow:0 7px 25px rgba(0,0,0,.48);scrollbar-color:#4a4f54 transparent;
+  backdrop-filter:blur(14px);
+}
+.atlas-path-step{
+  flex:0 0 auto;min-height:26px;max-width:190px;
+  padding:4px 8px;border:1px solid transparent;border-radius:6px;
+  background:#1b1e20;color:#c5cbd0;font:560 12px/1.4 Inter,system-ui,"Noto Sans SC",sans-serif;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left;
+}
+.atlas-path-step:hover,.atlas-path-step:focus-visible{background:#292c30;color:#fff;border-color:#676b70}
+.atlas-path-step.is-current{color:#fff;background:#34383b;border-color:#84888c}
+.atlas-path-separator{color:#777c81;flex:0 0 auto;font-size:14px}
+.atlas-path-trace.is-compact{
+  flex-wrap:wrap;align-content:start;overflow-x:auto;overflow-y:auto;
+  white-space:normal;max-height:min(31vh,260px);gap:6px 4px;
+}
+.atlas-path-trace.is-compact .atlas-path-step{
+  max-width:min(255px,42vw);white-space:normal;overflow-wrap:anywhere;
+  text-overflow:clip;min-height:29px;font-size:12px;
+}
+@media(max-width:730px){
+  .atlas-path-trace{left:8px;right:8px;max-width:calc(100% - 16px);top:6px;padding:6px}
+  .atlas-path-step{max-width:140px;font-size:11.5px}
+  .atlas-path-trace.is-compact{max-height:34vh}
+  .atlas-path-trace.is-compact .atlas-path-step{max-width:min(215px,64vw)}
+}

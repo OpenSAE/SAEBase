@@ -656,7 +656,7 @@
   const viewStates = new Map();
   let parents = new Map(), children = new Map(), byId = new Map();
   let rootIds = [];
-  let drag = null, bounceFrame = null, wheelStamp = 0;
+  let drag = null, bounceFrame = null;
   let outgoingScene = null;
   let lastViewport = { width: 0, height: 0 };
 
@@ -728,7 +728,7 @@
   function ancestors(id) {
     const result = []; const seen = new Set();
     let cursor = id;
-    while (byId.has(cursor) && !seen.has(cursor) && result.length <= 16) {
+    while (byId.has(cursor) && !seen.has(cursor)) {
       seen.add(cursor); result.push(cursor);
       cursor = parents.get(cursor);
     }
@@ -971,7 +971,7 @@
     }
     const seen = new Set(), list = [];
     function visit(id, depth) {
-      if (!byId.has(id) || seen.has(id) || depth > 13) return;
+      if (!byId.has(id) || seen.has(id)) return;
       if (config.query && !needed.has(id)) return;
       seen.add(id); list.push({ id, depth, role: "overview" });
       if (config.query || config.expanded.has(id)) {
@@ -1033,7 +1033,7 @@
     const id = config.focusId;
     if (!byId.has(id)) return layoutOverview();
     const chain = ancestors(id);
-    const ancestorsShown = chain.slice(Math.max(0, chain.length - 3), -1);
+    const ancestorsShown = chain.slice(0, -1);
     const kids = pagedChildren(id);
     const siblings = siblingsOf(id), at = siblings.indexOf(id);
     const peerIds = [siblings[at-1],siblings[at+1]].filter(Boolean)
@@ -1286,21 +1286,6 @@
       card.appendChild(toggle);
     }
     card.addEventListener("click", onOpen);
-    // Wheel on a compact node turns actual siblings. Expanded HTML content
-    // retains its native scroll; blank canvas keeps native scrolling.
-    card.addEventListener("wheel", event => {
-      if(!config.focusId || !event.deltaY || event.ctrlKey ||
-         event.target?.closest?.(".node-attributes-inner,textarea,input,select,pre"))return;
-      if(node.id !== config.focusId &&
-         !["sibling-preview"].includes(p.role))return;
-      const now = Date.now();
-      if(now-wheelStamp<180){event.preventDefault?.();return;}
-      const next = adjacentSibling(event.deltaY>0?1:-1);
-      if(!next)return;
-      event.preventDefault?.();
-      wheelStamp=now;
-      navigate(next,config.view,false);
-    },{passive:false});
     card.addEventListener("keydown", event => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault(); onOpen();
@@ -1383,13 +1368,27 @@
     config.positions = position;
     config.scene = { width: layout.width, height: layout.height };
   }
+  // Fit the actual node positions, not the invisible padding that keeps
+  // a focused card centered during normal browsing.
+  function fitBounds() {
+    const path = config.mode === "focus" && config.focusId ?
+      new Set(ancestors(config.focusId)) : null;
+    const positions = [...config.positions.entries()]
+      .filter(([id]) => !path || path.has(id))
+      .map(([, p]) => p);
+    if (!positions.length) return {minX:0,minY:0,maxX:600,maxY:300};
+    return {
+      minX:Math.min(...positions.map(p => p.x)),
+      minY:Math.min(...positions.map(p => p.y)),
+      maxX:Math.max(...positions.map(p => p.x + p.w)),
+      maxY:Math.max(...positions.map(p => p.y + p.h))
+    };
+  }
   function fitZoom() {
-    const v = $("canvasWrap");
-    const w = Number(v.clientWidth) || 1150;
-    const h = Number(v.clientHeight) || 630;
-    const { width, height } = config.scene;
-    const a = (w - 56) / width, b = (h - 48) / height;
-    return Math.max(0.55, Math.min(1, a, b));
+    const v=$("canvasWrap"), bounds=fitBounds();
+    const w=Math.max(100,bounds.maxX-bounds.minX);
+    const h=Math.max(100,bounds.maxY-bounds.minY);
+    return Math.max(.08,Math.min(1,(v.clientWidth-56)/w,(v.clientHeight-62)/h));
   }
   function centerSelected() {
     const v = $("canvasWrap");
@@ -1410,17 +1409,67 @@
     drawing.setAttribute("height", Math.round(config.scene.height * config.zoom));
     $("zoomValue").textContent = Math.round(config.zoom * 100) + "%";
   }
-  function changeZoom(next) {
-    const v=$("canvasWrap"),oldZoom=config.zoom||1;
-    const anchorX=(v.scrollLeft+v.clientWidth/2)/oldZoom;
-    const anchorY=(v.scrollTop+v.clientHeight/2)/oldZoom;
-    config.zoom=Math.min(1.8,Math.max(.55,Math.round(next*100)/100));
-    config.zoomInitialized=true;
-    render(false,true);
-    if(config.mode==="focus"&&config.focusId)centerSelected();
-    else v.scrollTo?.({left:Math.max(0,anchorX*config.zoom-v.clientWidth/2),
-      top:Math.max(0,anchorY*config.zoom-v.clientHeight/2),behavior:"auto"});
+  // Zoom keeps the pointer's world location stable. When a density tier
+  // reflows the scene, the hovered node (or focused card) anchors that reflow.
+  function changeZoom(next, point = null) {
+    const v = $("canvasWrap"), rect = v.getBoundingClientRect();
+    const oldZoom = config.zoom || 1;
+    const px = point ? point.clientX - rect.left : v.clientWidth / 2;
+    const py = point ? point.clientY - rect.top : v.clientHeight / 2;
+    const oldX = (v.scrollLeft + px) / oldZoom;
+    const oldY = (v.scrollTop + py) / oldZoom;
+    const targetId = point?.nodeId || (config.mode === "focus" ? config.focusId : null);
+    const before = config.positions.get(targetId);
+    const localX = before ? (oldX - before.x) / before.w : 0;
+    const localY = before ? (oldY - before.y) / before.h : 0;
+    const zoom = Math.min(2.2, Math.max(.08, next));
+    if (Math.abs(zoom - oldZoom) < .0001) return;
+    config.zoom = zoom;
+    config.zoomInitialized = true;
+    render(false, true);
+    const after = config.positions.get(targetId);
+    const anchoredX = before && after ? after.x + localX * after.w : oldX;
+    const anchoredY = before && after ? after.y + localY * after.h : oldY;
+    v.scrollTo?.({
+      left: Math.max(0, anchoredX * zoom - px),
+      top: Math.max(0, anchoredY * zoom - py),
+      behavior: "instant"
+    });
   }
+  // Two passes account for the title-only layout after crossing 80%.
+  function fitCanvas() {
+    changeZoom(fitZoom());
+    changeZoom(fitZoom());
+    const v = $("canvasWrap"), b = fitBounds();
+    v.scrollTo?.({
+      left: Math.max(0, (b.minX + b.maxX) * config.zoom / 2 - v.clientWidth / 2),
+      top: Math.max(0, (b.minY + b.maxY) * config.zoom / 2 - v.clientHeight / 2),
+      behavior: "instant"
+    });
+  }
+  function renderPathTrace() {
+    const trace = $("atlasPathTrace");
+    if (!trace) return;
+    trace.replaceChildren();
+    const focused = config.mode === "focus" && byId.has(config.focusId);
+    trace.classList.toggle("is-hidden", !focused);
+    if (!focused) return;
+    trace.classList.toggle("is-compact", densityMode() === "compact");
+    for (const [index, id] of ancestors(config.focusId).entries()) {
+      const n = byId.get(id);
+      if (index) trace.appendChild(el("span", "atlas-path-separator", "›"));
+      const step = el("button", "atlas-path-step" +
+        (id === config.focusId ? " is-current" : ""), n.title);
+      step.type = "button";
+      step.title = n.title;
+      step.setAttribute("aria-current", id === config.focusId ? "step" : "false");
+      step.addEventListener("click", () => {
+        if (id !== config.focusId) navigate(id, config.view, false);
+      });
+      trace.appendChild(step);
+    }
+  }
+
   function rowButton(id, label, indent) {
     const button = el("button", "outline-item" +
       (config.focusId === id ? " selected" : ""), label);
@@ -1767,7 +1816,7 @@
       config.zoomInitialized = true;
     }
     setScale();
-    updateBreadcrumb(); updateChildPager(); renderOutline(); renderDetails(); setDrawerState();
+    updateBreadcrumb(); renderPathTrace(); updateChildPager(); renderOutline(); renderDetails(); setDrawerState();
     $("canvasWrap").classList.toggle("in-focus", config.mode === "focus");
     $("diffControl").classList.toggle("is-hidden", config.view !== "code");
     $("focusHint").textContent = config.view === "environment" && graph().synthetic
@@ -1785,6 +1834,28 @@
 
   function bindCanvasPan() {
     const canvas=$("canvasWrap");
+    // A single wheel gesture now zooms the graph, including when hovering
+    // a card. Scrollable source explanations keep their own native wheel.
+    let pendingWheel = 0, wheelPoint = null, wheelFrame = 0;
+    canvas.addEventListener("wheel", event => {
+      if (event.target?.closest?.(".node-attributes-inner,textarea,input,select,pre") &&
+          !event.ctrlKey) return;
+      event.preventDefault();
+      const delta = event.deltaY * (event.deltaMode === 1 ? 16 :
+        event.deltaMode === 2 ? canvas.clientHeight : 1);
+      pendingWheel += delta;
+      const card = event.target?.closest?.(".graph-node");
+      wheelPoint = {clientX:event.clientX,clientY:event.clientY,
+        nodeId:card?.getAttribute?.("data-node-id") || null};
+      if (wheelFrame) return;
+      wheelFrame = window.requestAnimationFrame(() => {
+        wheelFrame = 0;
+        const amount = Math.max(-700, Math.min(700, pendingWheel));
+        pendingWheel = 0;
+        changeZoom(config.zoom * Math.exp(-amount * .0017), wheelPoint);
+      });
+    }, {passive:false});
+
     const boundary=()=>({
       x:Math.max(0,(Number(canvas.scrollWidth)||config.scene.width*config.zoom)-
         (Number(canvas.clientWidth)||1150)),
@@ -1849,6 +1920,10 @@
       });
   }
   function bind() {
+    const pathTrace = el("nav", "atlas-path-trace is-hidden");
+    pathTrace.id = "atlasPathTrace";
+    pathTrace.setAttribute("aria-label", "Full node ancestry");
+    $("canvasWrap").parentNode.insertBefore(pathTrace, $("canvasWrap"));
     bindCanvasPan();
     // All five tabs switch the mounted graph; links still work without JS
     // and support browser-native new-tab gestures.
@@ -1933,9 +2008,9 @@
       config.expanded = new Set(byId.keys());
       render(true);
     });
-    $("fit").addEventListener("click", () => changeZoom(fitZoom()));
-    $("zoomIn").addEventListener("click", () => changeZoom(config.zoom + .15));
-    $("zoomOut").addEventListener("click", () => changeZoom(config.zoom - .15));
+    $("fit").addEventListener("click", fitCanvas);
+    $("zoomIn").addEventListener("click", () => changeZoom(config.zoom * 1.2));
+    $("zoomOut").addEventListener("click", () => changeZoom(config.zoom / 1.2));
     $("diffFile").addEventListener("change", async event => {
       const file = event.target.files?.[0];
       if (!file) return;
