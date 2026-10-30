@@ -26,7 +26,7 @@ vm.createContext(context);
 vm.runInContext([
  'const ATLAS_VIEW_LABELS={core:"Core",knowledge:"Knowledge",code:"Code",environment:"Environment",context:"Context"};',
  extract("globalSearchEntries","updateGlobalSearch"),
- extract("nodeDeepLink","copyDeepLink").replace("  async function copyDeepLink(id,button) {",""),
+ app.slice(app.indexOf("  function nodeDeepLink("),app.indexOf("  async function copyDeepLink(")),
  'globalThis.api={globalSearchEntries,nodeDeepLink};'
 ].join("\n"),context,{timeout:1000});
 const f=context.api;
