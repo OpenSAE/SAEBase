@@ -81,7 +81,7 @@ with sync_playwright() as playwright:
     page.screenshot(path=str(shots / "02-auto-open-relations-copy.png"))
     expected_view=page.locator(".atlas-relation-view").first.inner_text().strip().lower()
     page.locator(".atlas-relation-link").first.click()
-    page.wait_for_function("""view => document.body.dataset.atlasView === view""",expected_view)
+    page.wait_for_function("""view => document.body.dataset.atlasView === view""",arg=expected_view)
     assert page.locator("#detailDrawer").is_visible()
     page.goto(ROOT + pair["view"] + ".html?lang=en&focus=" + pair["id"],
         wait_until="networkidle", timeout=90000)
