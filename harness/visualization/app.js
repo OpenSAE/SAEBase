@@ -1790,68 +1790,50 @@
       });
     }, {passive:false});
 
-    const boundary=()=>({
-      x:Math.max(0,(Number(canvas.scrollWidth)||config.scene.width*config.zoom)-
-        (Number(canvas.clientWidth)||1150)),
-      y:Math.max(0,(Number(canvas.scrollHeight)||config.scene.height*config.zoom)-
-        (Number(canvas.clientHeight)||630))
-    });
-    const easeBack=()=>{
-      if(!drag)return;
-      const b=boundary(),left=Math.max(0,Math.min(b.x,canvas.scrollLeft)),
-        top=Math.max(0,Math.min(b.y,canvas.scrollTop));
-      canvas.scrollTo?.({left,top,behavior:"smooth"});
-      drag=null;
-      canvas.classList.remove("is-dragging");
-      canvas.classList.add("is-bouncing");
-      $("diagram").style.transform="translate(0px,0px)";
-    };
-    // Thumb buttons on five-button mice mirror forced previous/next.
-    // This does not replace Shift+Left/Right on the keyboard.
-    canvas.addEventListener("mousedown",event=>{
-      if(event.button!==3 && event.button!==4)return;
-      if(moveReviewOrSibling(event.button===3?-1:1))
-        event.preventDefault?.();
-    });
-    canvas.addEventListener("auxclick",event=>{
-      if(event.button===3 || event.button===4)event.preventDefault?.();
-    });
+    // Free camera panning in screen coordinates, without scroll boundaries,
+    // rubber-band resistance, or a forced Focus center.
+    let suppressClick=false;
+    canvas.addEventListener("click",event=>{
+      if(!suppressClick)return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      suppressClick=false;
+    },true);
     canvas.addEventListener("pointerdown",event=>{
-      if(event.button!==0 || event.target?.closest?.(
-        ".graph-node,button,a,input,textarea,select,[role=button]"))return;
-      if(bounceFrame && window.cancelAnimationFrame)window.cancelAnimationFrame(bounceFrame);
-      canvas.classList.remove("is-bouncing");
-      $("diagram").style.transform="translate(0px,0px)";
-      drag={id:event.pointerId,x:event.clientX,y:event.clientY,
-        left:canvas.scrollLeft,top:canvas.scrollTop};
-      canvas.setPointerCapture?.(event.pointerId);
-      canvas.classList.add("is-dragging");
+      if(event.button!==0||event.target?.closest?.(
+        ".node-attributes-inner,.attribute-trigger,.child-count,button,a,input,textarea,select,summary,pre,code"))
+        return;
+      drag={id:event.pointerId,startX:event.clientX,startY:event.clientY,
+        panX:config.panX,panY:config.panY,moved:false};
     });
     canvas.addEventListener("pointermove",event=>{
-      if(!drag || event.pointerId!==drag.id)return;
-      const bounds=boundary();
-      const rubber=(value,max)=>value<0?value*.18:value>max?
-        max+(value-max)*.18:value;
-      const wantedX=drag.left+drag.x-event.clientX,
-        wantedY=drag.top+drag.y-event.clientY;
-      canvas.scrollLeft=Math.max(0,Math.min(bounds.x,wantedX));
-      canvas.scrollTop=Math.max(0,Math.min(bounds.y,wantedY));
-      // Native scroll cannot overshoot its bounds: translate the SVG for
-      // visible resistance and spring it back on pointer release.
-      const offsetX=rubber(wantedX,bounds.x)-canvas.scrollLeft;
-      const offsetY=rubber(wantedY,bounds.y)-canvas.scrollTop;
-      $("diagram").style.transform="translate("+(-offsetX)+"px,"+(-offsetY)+"px)";
-      event.preventDefault?.();
+      if(!drag||event.pointerId!==drag.id)return;
+      const dx=event.clientX-drag.startX,dy=event.clientY-drag.startY;
+      if(!drag.moved&&Math.hypot(dx,dy)<4)return;
+      if(!drag.moved){
+        drag.moved=true;
+        canvas.setPointerCapture?.(drag.id);
+        canvas.classList.add("is-dragging");
+      }
+      config.panX=drag.panX+dx;
+      config.panY=drag.panY+dy;
+      setScale();
+      event.preventDefault();
     });
-    $("diagram").addEventListener("transitionend",()=>{
-      canvas.classList.remove("is-bouncing");
-    });
-    for(const key of ["pointerup","pointercancel","lostpointercapture"])
+    for(const key of ["pointerup","pointercancel","lostpointercapture"]){
       canvas.addEventListener(key,event=>{
-        if(!drag || event.pointerId!==drag.id)return;
-        canvas.releasePointerCapture?.(drag.id);
-        easeBack();
+        if(!drag||event.pointerId!==drag.id)return;
+        const moved=drag.moved,pointer=drag.id;
+        drag=null;
+        if(key==="pointerup"&&canvas.hasPointerCapture?.(pointer))
+          canvas.releasePointerCapture(pointer);
+        canvas.classList.remove("is-dragging");
+        if(moved){
+          suppressClick=true;
+          window.setTimeout(()=>{suppressClick=false;},0);
+        }
       });
+    }
   }
   function bind() {
     const pathTrace = el("nav", "atlas-path-trace is-hidden");
