@@ -639,6 +639,8 @@
     query: "",
     zoom: 1,
     zoomInitialized: false,
+    panX: 0,
+    panY: 0,
     outlineOpen: false,
     detailsOpen: false,
     diff: null,
@@ -655,7 +657,7 @@
   const viewStates = new Map();
   let parents = new Map(), children = new Map(), byId = new Map();
   let rootIds = [];
-  let drag = null, bounceFrame = null;
+  let drag = null;
   let outgoingScene = null;
   let lastViewport = { width: 0, height: 0 };
 
@@ -759,7 +761,6 @@
     return null;
   }
   function saveViewState() {
-    const canvas = $("canvasWrap");
     viewStates.set(config.view, {
       mode: config.mode, focusId: config.focusId,
       expanded: new Set(config.expanded),
@@ -767,7 +768,7 @@
       query: config.query, zoom: config.zoom,
       zoomInitialized: config.zoomInitialized,
       outlineOpen: config.outlineOpen, detailsOpen: config.detailsOpen,
-      scrollLeft: canvas?.scrollLeft || 0, scrollTop: canvas?.scrollTop || 0
+      panX: config.panX, panY: config.panY
     });
   }
   function activateView(view, options = {}) {
@@ -789,6 +790,8 @@
     config.query = prior?.query || "";
     config.zoom = prior?.zoom ?? 1;
     config.zoomInitialized = prior?.zoomInitialized ?? false;
+    config.panX = prior?.panX ?? 0;
+    config.panY = prior?.panY ?? 0;
     config.outlineOpen = prior?.outlineOpen || false;
     config.detailsOpen = !!prior?.detailsOpen && !!config.focusId;
     config.animateNextRender = false;
@@ -802,9 +805,7 @@
     if (review && view !== "core") reviewFilter = {level:"view", view};
     $("atlasReviewBar").classList.toggle("is-hidden", !review || view === "core");
     render(false, true);
-    const canvas = $("canvasWrap");
-    canvas.scrollLeft = prior?.scrollLeft || 0;
-    canvas.scrollTop = prior?.scrollTop || 0;
+    if (!prior && config.focusId) centerSelected();
     if (options.history !== false) setAddress(config.focusId, false);
     return true;
   }
@@ -862,7 +863,8 @@
     if (options.toggle && !wasExpanded) config.expandedAttributes.add(id);
     config.animateNextRender = true;
     setAddress(id, !!replace || sameFocus);
-    render(false);
+    render(false,true);
+    centerSelected();
     if(review) updateReviewBar();
     return true;
   }
@@ -874,6 +876,7 @@
     $("search").value = "";
     if (push) setAddress(null, false);
     render(true);
+    fitCanvas();
   }
   function openCross(id) { navigate(id, locateView(id), false); }
   function init() {
@@ -888,6 +891,7 @@
     }
     bind();
     render(true);
+    if (config.focusId) centerSelected();
     if(requestedReview() && config.view!=="core") {
       loadReview().catch(error=>{$("focusHint").textContent=error.message;});
     }
@@ -1047,34 +1051,15 @@
     return layout;
   }
   function normalizeLayout(layout) {
-    let minX = 0, minY = 0, maxX = 0, maxY = 0;
-    for (const p of layout.positions.values()) {
-      minX = Math.min(minX,p.x); minY = Math.min(minY,p.y);
-      maxX = Math.max(maxX,p.x+p.w); maxY = Math.max(maxY,p.y+p.h);
+    // Camera coordinates are unbounded. No selected-node padding or
+    // invisible scroll areas are needed to reposition the tree.
+    let maxX=0,maxY=0;
+    for(const p of layout.positions.values()){
+      maxX=Math.max(maxX,p.x+p.w);
+      maxY=Math.max(maxY,p.y+p.h);
     }
-    if(minX<0 || minY<0) {
-      const dx = minX<0 ? 35-minX : 0, dy = minY<0 ? 35-minY : 0;
-      for(const p of layout.positions.values()){p.x+=dx;p.y+=dy;}
-      maxX+=dx;maxY+=dy;
-    }
-    // Give the selected card enough scene padding to be exactly centered,
-    // even for the first/last node or a tree narrower than the viewport.
-    if(config.mode==="focus" && layout.positions.has(config.focusId)){
-      const v=$("canvasWrap"),zoom=config.zoom||1;
-      const halfW=(Number(v.clientWidth)||1150)/(2*zoom);
-      const halfH=(Number(v.clientHeight)||630)/(2*zoom);
-      const focus=layout.positions.get(config.focusId);
-      const dx=Math.max(0,halfW-focus.x-focus.w/2);
-      const dy=Math.max(0,halfH-focus.y-focus.h/2);
-      if(dx||dy){
-        for(const p of layout.positions.values()){p.x+=dx;p.y+=dy;}
-        maxX+=dx;maxY+=dy;
-      }
-      maxX=Math.max(maxX,focus.x+focus.w/2+halfW);
-      maxY=Math.max(maxY,focus.y+focus.h/2+halfH);
-    }
-    return { ...layout,width:Math.max(600,maxX+35),
-      height:Math.max(300,maxY+35) };
+    return {...layout,width:Math.max(600,maxX+35),
+      height:Math.max(300,maxY+35)};
   }
   function textLines(group, lines, x, startY, lineHeight, className) {
     for (let i = 0; i < lines.length; i++) {
@@ -1350,64 +1335,53 @@
     const v=$("canvasWrap"), bounds=fitBounds();
     const w=Math.max(100,bounds.maxX-bounds.minX);
     const h=Math.max(100,bounds.maxY-bounds.minY);
-    return Math.max(.08,Math.min(1,(v.clientWidth-56)/w,(v.clientHeight-62)/h));
+    return Math.max(.04,Math.min(1,(v.clientWidth-56)/w,(v.clientHeight-62)/h));
   }
   function centerSelected() {
-    const v = $("canvasWrap");
-    const p = config.positions.get(config.focusId);
-    if (!p) return;
-    const width = Number(v.clientWidth) || 1150;
-    const height = Number(v.clientHeight) || 630;
-    const x = config.zoom * (p.x + p.w / 2) - width / 2;
-    const y = config.zoom * (p.y + p.h / 2) - height / 2;
-    if (typeof v.scrollTo === "function") {
-      v.scrollTo({ left: Math.max(0, x), top: Math.max(0, y),
-        behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ? "auto" : "smooth" });
-    }
+    const v=$("canvasWrap"),p=config.positions.get(config.focusId);
+    if(!p)return;
+    config.panX=v.clientWidth/2-config.zoom*(p.x+p.w/2);
+    config.panY=v.clientHeight/2-config.zoom*(p.y+p.h/2);
+    setScale();
   }
   function setScale() {
-    const drawing = $("diagram");
-    drawing.setAttribute("width", Math.round(config.scene.width * config.zoom));
-    drawing.setAttribute("height", Math.round(config.scene.height * config.zoom));
-    $("zoomValue").textContent = Math.round(config.zoom * 100) + "%";
+    const drawing=$("diagram");
+    drawing.setAttribute("width",Math.round(config.scene.width));
+    drawing.setAttribute("height",Math.round(config.scene.height));
+    drawing.style.transform="translate("+config.panX+"px,"+
+      config.panY+"px) scale("+config.zoom+")";
+    $("zoomValue").textContent=Math.round(config.zoom*100)+"%";
   }
-  // Zoom keeps the pointer's world location stable. When a density tier
-  // reflows the scene, the hovered node (or focused card) anchors that reflow.
-  function changeZoom(next, point = null) {
-    const v = $("canvasWrap"), rect = v.getBoundingClientRect();
-    const oldZoom = config.zoom || 1;
-    const px = point ? point.clientX - rect.left : v.clientWidth / 2;
-    const py = point ? point.clientY - rect.top : v.clientHeight / 2;
-    const oldX = (v.scrollLeft + px) / oldZoom;
-    const oldY = (v.scrollTop + py) / oldZoom;
-    const targetId = point?.nodeId || (config.mode === "focus" ? config.focusId : null);
-    const before = config.positions.get(targetId);
-    const localX = before ? (oldX - before.x) / before.w : 0;
-    const localY = before ? (oldY - before.y) / before.h : 0;
-    const zoom = Math.min(2.2, Math.max(.08, next));
-    if (Math.abs(zoom - oldZoom) < .0001) return;
-    config.zoom = zoom;
-    config.zoomInitialized = true;
-    render(false, true);
-    const after = config.positions.get(targetId);
-    const anchoredX = before && after ? after.x + localX * after.w : oldX;
-    const anchoredY = before && after ? after.y + localY * after.h : oldY;
-    v.scrollTo?.({
-      left: Math.max(0, anchoredX * zoom - px),
-      top: Math.max(0, anchoredY * zoom - py),
-      behavior: "instant"
-    });
+  function changeZoom(next,point=null) {
+    const v=$("canvasWrap"),rect=v.getBoundingClientRect();
+    const oldZoom=config.zoom||1;
+    const px=point?point.clientX-rect.left:v.clientWidth/2;
+    const py=point?point.clientY-rect.top:v.clientHeight/2;
+    const oldX=(px-config.panX)/oldZoom;
+    const oldY=(py-config.panY)/oldZoom;
+    const targetId=point?.nodeId||null;
+    const before=config.positions.get(targetId);
+    const localX=before?(oldX-before.x)/before.w:0;
+    const localY=before?(oldY-before.y)/before.h:0;
+    const zoom=Math.min(2.2,Math.max(.04,next));
+    if(Math.abs(zoom-oldZoom)<.0001)return;
+    config.zoom=zoom;
+    config.zoomInitialized=true;
+    render(false,true);
+    const after=config.positions.get(targetId);
+    const worldX=before&&after?after.x+localX*after.w:oldX;
+    const worldY=before&&after?after.y+localY*after.h:oldY;
+    config.panX=px-worldX*zoom;
+    config.panY=py-worldY*zoom;
+    setScale();
   }
-  // Two passes account for the title-only layout after crossing 80%.
   function fitCanvas() {
     changeZoom(fitZoom());
     changeZoom(fitZoom());
-    const v = $("canvasWrap"), b = fitBounds();
-    v.scrollTo?.({
-      left: Math.max(0, (b.minX + b.maxX) * config.zoom / 2 - v.clientWidth / 2),
-      top: Math.max(0, (b.minY + b.maxY) * config.zoom / 2 - v.clientHeight / 2),
-      behavior: "instant"
-    });
+    const v=$("canvasWrap"),b=fitBounds();
+    config.panX=v.clientWidth/2-(b.minX+b.maxX)*config.zoom/2;
+    config.panY=v.clientHeight/2-(b.minY+b.maxY)*config.zoom/2;
+    setScale();
   }
   function renderPathTrace() {
     const trace = $("atlasPathTrace");
@@ -1788,10 +1762,8 @@
     $("collapse").disabled = config.mode === "focus";
     $("expand").disabled = config.mode === "focus";
     if (review) updateReviewBar();
-    if (config.mode === "focus" && !preserveViewport) centerSelected();
-    else if (autoFit && typeof $("canvasWrap").scrollTo === "function") {
-      $("canvasWrap").scrollTo({ left: 0, top: 0 });
-    }
+    // Renders preserve the freely moved camera. Center once only on an
+    // explicit navigation action, never while dragging or changing scale.
   }
 
   function bindCanvasPan() {
@@ -1923,18 +1895,6 @@
       if (focus) navigate(focus, target, false);
       else if (target !== config.view) activateView(target);
     }, true);
-    for (const [direction, elementId] of [[-1, "atlasChildPrev"], [1, "atlasChildNext"]]) {
-      const button = $(elementId);
-      button?.addEventListener("click", () => {
-        const id = config.focusId;
-        if (!id) return;
-        const pages = Math.ceil((children.get(id) || []).length / PAGE_SIZE);
-        const next = Math.max(0, Math.min(pages - 1,
-          (childPages.get(id) || 0) + direction));
-        childPages.set(id, next);
-        render(false);
-      });
-    }
     // Each public HTML is a genuine URL; same-view focus changes use browser history.
     $("overviewBack").addEventListener("click", () => overview(true));
     $("outlineToggle").addEventListener("click", () => {
