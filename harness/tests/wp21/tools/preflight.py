@@ -66,6 +66,37 @@ def preflight(case_id: str, *, model_snapshot: Path | None = None, sae_snapshot:
             "note":"Paths/dependencies alone do not prove the correct checkpoint loaded. Freeze assets and run the case's actual model probe."}
 
 
+def preflight_all(*, model_snapshot: Path | None = None,
+                  sae_snapshot: Path | None = None,
+                  pythia_snapshot: Path | None = None) -> dict:
+    """Pre-dispatch inventory covering every frozen case and both model types.
+
+    This deliberately never downloads or infers successful forward passes.
+    R09 is model-only, R17 trains its own SAE, and R08 uses a separate frozen
+    Pythia checkpoint. Case-level preflight alone can miss those distinctions.
+    """
+    checks = []
+    for n in range(1, 21):
+        cid = f"R{n:02d}"
+        case = get_case(cid)
+        is_pythia = case["profile"] == "pythia14m_inference"
+        model = pythia_snapshot if is_pythia else model_snapshot
+        need_sae = not (is_pythia or case["profile"] == "gemma_training" or cid == "R09")
+        result = preflight(cid, model_snapshot=model, sae_snapshot=sae_snapshot if need_sae else None)
+        checks.append({"case_id":cid, "profile":case["profile"],
+                       "requirements":{"model":"pythia-14m" if is_pythia else "gemma-2-2b",
+                                       "sae":"gemma-scope-layer25" if need_sae else None,
+                                       "single_cuda_device":case["profile"]=="gemma_training"},
+                       "status":result["status"], "blockers":result["blockers"],
+                       "model_snapshot":result["model_snapshot"],
+                       "sae_snapshot":result["sae_snapshot"]})
+    blocked=[r["case_id"] for r in checks if r["status"]=="ENV_BLOCKED"]
+    return {"schema":"saebase.wp21.preflight_all.v1", "status":"ENV_BLOCKED" if blocked else "PREREQUISITES_PRESENT_UNVERIFIED",
+            "cases":checks, "counts":{"ready_for_probe":20-len(blocked),"env_blocked":len(blocked)},
+            "blocked_cases":blocked,"downloaded_weights":False,"executed_model":False,
+            "note":"Per-case prerequisites only; frozen revisions, loaded devices and actual model execution still require immutable asset locks and real probes."}
+
+
 def freeze_assets(items: list[tuple[str, Path]], output: Path) -> dict:
     """Hash caller-selected local snapshots once, retaining private paths locally."""
     files = []
@@ -118,6 +149,8 @@ def verify_assets(lock_path: Path) -> dict:
 def main() -> int:
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--case",default="R01")
+    p.add_argument("--all",action="store_true",help="Audit all R01-R20 prerequisites before dispatch")
+    p.add_argument("--pythia-snapshot",type=Path,help="Frozen Pythia-14m model snapshot for R08")
     p.add_argument("--model-snapshot",type=Path)
     p.add_argument("--sae-snapshot",type=Path)
     p.add_argument("--output",type=Path)
@@ -126,7 +159,13 @@ def main() -> int:
     a=p.parse_args()
     if a.freeze_assets and a.verify_assets:
         p.error("freeze and verify are mutually exclusive")
-    if a.verify_assets:
+    if a.all and (a.freeze_assets or a.verify_assets):
+        p.error("--all is a prerequisite inventory, not an asset freeze/verify operation")
+    if a.all:
+        result = preflight_all(model_snapshot=a.model_snapshot, sae_snapshot=a.sae_snapshot,
+                               pythia_snapshot=a.pythia_snapshot)
+        if a.output: write_json(a.output, result, exclusive=True)
+    elif a.verify_assets:
         result = verify_assets(a.verify_assets)
     elif a.freeze_assets:
         items=[(k,v) for k,v in [("model",a.model_snapshot),("sae",a.sae_snapshot)] if v]

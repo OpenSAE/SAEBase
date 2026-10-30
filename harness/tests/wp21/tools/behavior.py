@@ -181,3 +181,24 @@ def pipeline_integrity(root: Path, stages: list[dict]) -> dict:
                 raise AssertionError("completed stage bytes changed or missing")
         seen[sid]=s
     return {"stages":len(stages),"completed":sum(s["status"]=="completed" for s in stages)}
+
+
+def observed_device(*, configured: str | None, actual: str,
+                    requires_cuda: bool = False) -> dict:
+    """Report a genuine runtime device instead of trusting a YAML preference.
+
+    Optional for inference tests: the frozen R12/R13 tasks allow documenting
+    an existing CPU fallback. Training R17 requires an actual CUDA device.
+    """
+    if not isinstance(actual, str) or not actual.strip():
+        raise AssertionError("model or activation actual device was not observed")
+    prefix = actual.split(":", 1)[0]
+    if prefix not in {"cpu", "cuda", "mps"}:
+        raise AssertionError("invalid observed device")
+    if configured is not None and configured.split(":", 1)[0] not in {"cpu", "cuda", "mps"}:
+        raise AssertionError("unsupported configured device")
+    if requires_cuda and prefix != "cuda":
+        raise AssertionError("CUDA-required task actually executed elsewhere")
+    return {"actual_device":actual, "configured_device":configured,
+            "configured_matches_actual":configured is None or configured.split(":",1)[0] == prefix,
+            "cuda_required":requires_cuda}

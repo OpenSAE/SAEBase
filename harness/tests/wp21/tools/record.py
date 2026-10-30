@@ -129,13 +129,20 @@ def main() -> int:
     p.add_argument("--output", required=True, type=Path)
     p.add_argument("--timeout", type=int, default=900)
     p.add_argument("--control", type=Path, help="Trusted external control/Rxx directory, mandatory for candidate runs")
+    p.add_argument("--propagate-exit", action="store_true",
+                   help="Legacy behavior: use the recorded child exit code as the recorder CLI exit code")
     p.add_argument("argv", nargs=argparse.REMAINDER)
     a = p.parse_args()
     argv = a.argv[1:] if a.argv and a.argv[0] == "--" else a.argv
     try:
         result = record(argv, a.cwd, a.output, a.timeout, control=a.control)
         print(json.dumps(result, ensure_ascii=False, indent=2))
-        return result["exit_code"] if 0 <= result["exit_code"] <= 255 else 1
+        # Recorder success means that the *observation* was durably written.
+        # An expected negative test may have child exit_code != 0. Its actual
+        # exit code remains in the JSON and may be propagated on request.
+        if a.propagate_exit:
+            return result["exit_code"] if 0 <= result["exit_code"] <= 255 else 1
+        return 0
     except (ValueError, OSError) as exc:
         print(json.dumps({"status": "RECORD_ERROR", "reason": str(exc)}), file=sys.stderr)
         return 2

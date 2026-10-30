@@ -32,6 +32,47 @@ def artifacts(workspace: Path) -> list[dict]:
     return result
 
 
+def required_artifact_present(name: str, *, evidence: Path, workspace: Path,
+                              experiment_files: list[dict]) -> bool:
+    """Match frozen file or directory deliverables by type, not string prefix.
+
+    The trailing slash in a frozen required_artifact means a *nonempty
+    directory*. An experiment directory counts only when a regular file below
+    it appears in the independently collected, byte-hashed experiment manifest.
+    Evidence directories are inspected in place and must contain a regular
+    non-symlink file. Directory names are matched at component boundaries.
+    """
+    is_directory = name.endswith("/")
+    logical = name[:-1] if is_directory else name
+    from common import relative_name
+    relative_name(logical)  # reject traversal, absolute and ambiguous paths
+    if is_directory:
+        # Most directory deliverables are directly under the case evidence root.
+        target = contained(evidence, logical)
+        if target.is_dir():
+            for entry in target.rglob("*"):
+                relative = entry.relative_to(evidence).as_posix()
+                contained(evidence, relative, exists=True)  # no symlink components
+                if entry.is_file():
+                    return True
+        # A logical directory can alternatively live inside a hashed run leaf.
+        # We must match the entire logical path, not merely a prefix or suffix
+        # of the basename (e.g., output/ cannot match output_backup/).
+        root = workspace / "experiment"
+        for folder in root.rglob("*"):
+            rel = folder.relative_to(workspace).as_posix()
+            contained(workspace, rel, exists=True)
+            if folder.is_dir() and (rel.endswith("/" + logical)):
+                prefix = rel + "/"
+                if any(item["path"].startswith(prefix) for item in experiment_files):
+                    return True
+        return False
+    target = contained(evidence, logical)
+    if target.is_file():
+        return True
+    return any(item["path"].endswith("/" + logical) for item in experiment_files)
+
+
 def evidence_folder(workspace: Path, control: Path) -> tuple[dict, Path]:
     assignment = read_json(control / "assignment.json")
     return assignment, contained(workspace, assignment["evidence_root"], exists=True)
@@ -143,9 +184,9 @@ def audit(workspace: Path, control: Path) -> dict:
     # Required case artifacts can live in the case evidence folder or beneath
     # actual experiment/ outputs; their existence is necessary, never
     # sufficient, to establish correct case behavior.
-    evidence_paths = {p.relative_to(folder).as_posix() for p in folder.rglob("*") if p.is_file()}
     missing_artifacts = [name for name in case["required_artifacts"]
-                         if name not in evidence_paths and not any(entry["path"].endswith("/"+name) for entry in actual)]
+                         if not required_artifact_present(name, evidence=folder, workspace=workspace,
+                                                          experiment_files=actual)]
     if missing_artifacts:
         raise ValueError("missing frozen required_artifacts: " + ", ".join(missing_artifacts))
     refs = report.get("command_refs")

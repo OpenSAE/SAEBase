@@ -32,20 +32,33 @@ def summarize(dispatch: Path, reviews: Path) -> tuple[dict,str]:
             status=record["status"]
             score=record.get("score",{}).get("total")
             blockers=record.get("blockers",[])
+            attribution=record.get("attribution")
+            failed_check_ids=record.get("failed_check_ids",[])
+            evidence_rejection=record.get("candidate_evidence_rejection_reason")
+            dimensions=record.get("score",{})
         else:
             status="NOT_RUN" if assignment["state"]!="assigned" else "ASSIGNED_NOT_REVIEWED"
             score=None
             blockers=[]
+            attribution=None
+            failed_check_ids=[]
+            evidence_rejection=None
+            dimensions=None
         output.append({"case_id":cid,"status":status,"score":score,
                        "workspace":item["workspace"],"review_final":str(final) if final.is_file() else None,
-                       "blockers":blockers})
+                       "blockers":blockers,"attribution":attribution,
+                       "failed_check_ids":failed_check_ids,"candidate_evidence_rejection_reason":evidence_rejection,
+                       "frozen_score_dimensions":dimensions})
     counts={status:sum(item["status"]==status for item in output) for status in sorted({x["status"] for x in output})}
     result={"schema":"saebase.wp21.summary.v1","run_id":data["run_id"],"base_commit":BASE_COMMIT,
             "cases":output,"counts":counts,"created_at_utc":dt.datetime.now(dt.timezone.utc).isoformat(),
             "note":"Only independent final reviews may record PASS; missing results remain NOT_RUN or ASSIGNED_NOT_REVIEWED."}
-    lines=["# WP21 独立考试结果","",f"Run ID: `{data['run_id']}`","", "| Case | 最终状态 | 分数 |", "| --- | --- | ---: |"]
+    lines=["# WP21 独立考试结果","",f"Run ID: `{data['run_id']}`","",
+           "| Case | 最终状态 | 冻结分数 | 归因 | 未完成检查 |", "| --- | --- | ---: | --- | --- |"]
     for x in output:
-        lines.append(f"| {x['case_id']} | {x['status']} | {x['score'] if x['score'] is not None else '—'} |")
+        ids = ", ".join(x["failed_check_ids"]) or "—"
+        cause = x["attribution"] or "—"
+        lines.append(f"| {x['case_id']} | {x['status']} | {x['score'] if x['score'] is not None else '—'} | {cause} | {ids} |")
     lines.extend(["","状态计数："+", ".join(f"{k}={v}" for k,v in counts.items()),"",
                   "只有真实独立复跑完成、所有硬门槛满足的题目才标记 PASS。"])
     return result,"\n".join(lines)+"\n"

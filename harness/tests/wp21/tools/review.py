@@ -266,6 +266,7 @@ def finalize(review_dir: Path, *, assets_lock: Path | None, probe_report: Path |
            "evidence_reproducibility":20 if evidence_ok and asset_ok else 0,
            "scope_and_documentation":15 if not scope["violations"] and evidence_ok else 0}
     score["total"]=round(sum(score.values()),2)
+    failed_check_ids = [c["id"] for c in state["checks"] if c["status"] != "PASS_VERIFIED"]
     all_checks=(p_pass==len(positives) and n_pass==len(negatives))
     status="PASS" if all_checks and not errors else ("FAIL" if any(c["status"]=="FAIL" for c in state["checks"]) or scope["violations"] else "INCOMPLETE")
     if candidate_evidence.get("status")=="ENV_BLOCKED" and not all_checks:
@@ -279,6 +280,8 @@ def finalize(review_dir: Path, *, assets_lock: Path | None, probe_report: Path |
             "review_checklist_sha256":canonical_hash(state["checks"]),"candidate_source_sha256":state["source_snapshot_sha256"],
             "reviewer_source_sha256":state["reviewer_workspace_source_sha256"],
             "candidate_evidence_status":candidate_evidence["status"],
+            "candidate_evidence_rejection_reason":candidate_evidence.get("reason"),
+            "failed_check_ids":failed_check_ids,
             "reviewed_at_utc":dt.datetime.now(dt.timezone.utc).isoformat(),
             "note":"Automatic hard gates only; independent reviewer scripts are responsible for genuine real-model checks. Human/Atlas approvals remain separate."}
     write_json(review_dir/"review_final.json",result,exclusive=True)

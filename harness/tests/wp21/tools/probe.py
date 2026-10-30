@@ -15,6 +15,12 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import ROOT, get_case, sha256, write_json
+
+# Running probe.py by its absolute path does not automatically add the project
+# root to sys.path. Resolve the checked-out SAEBase source explicitly; never
+# silently fall back to a different pip-installed package.
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 from preflight import preflight, verify_assets
 
 
@@ -34,6 +40,8 @@ def probe(case_id: str, model_snapshot: Path, sae_snapshot: Path | None, assets_
         raise ValueError("selected snapshots do not match supplied immutable asset lock")
     os.environ.update(HF_HUB_OFFLINE="1", TRANSFORMERS_OFFLINE="1", HF_DATASETS_OFFLINE="1")
     import torch
+    if device == "cuda" and not torch.cuda.is_available():
+        raise RuntimeError("CUDA requested but no CUDA device is available")
     started = dt.datetime.now(dt.timezone.utc).isoformat()
     if case["profile"] == "pythia14m_inference":
         from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -50,7 +58,8 @@ def probe(case_id: str, model_snapshot: Path, sae_snapshot: Path | None, assets_
             raise RuntimeError("Pythia model returned invalid logits")
         observed = {"model_type":model.config.model_type,"num_layers":model.config.num_hidden_layers,
                     "hidden_size":model.config.hidden_size,"logits_shape":list(output.logits.shape),
-                    "hidden_states":len(output.hidden_states),"dtype":str(output.logits.dtype)}
+                    "hidden_states":len(output.hidden_states),"dtype":str(output.logits.dtype),
+                    "actual_device": str(next(model.parameters()).device)}
     elif case["profile"]=="gemma_training" or case_id=="R09":
         # R17 creates its own SAE; R09 is expressly model-only. In both cases
         # a source SAE is not a prerequisite for the cache/load smoke test.
@@ -66,8 +75,11 @@ def probe(case_id: str, model_snapshot: Path, sae_snapshot: Path | None, assets_
         if not bool(torch.isfinite(logits).all()):
             raise RuntimeError("nonfinite actual Gemma logits")
         observed={"model_type":model.config.model_type,"logits_shape":list(logits.shape),"dtype":str(logits.dtype),
-                  "sae_required_at_probe":False,"note":"training or model-only case; task must independently verify its own loaded SAE or provider"}
+                  "actual_device":str(next(model.parameters()).device),"sae_required_at_probe":False,"note":"training or model-only case; task must independently verify its own loaded SAE or provider"}
     else:
+        import saebase
+        if not Path(saebase.__file__).resolve().is_relative_to(ROOT.resolve()):
+            raise RuntimeError("saebase import did not resolve inside the examined repository")
         from saebase.api import load_registered, capture_features
         loaded = load_registered(sae_key="gemma2_2b_pt_l25_canonical", model_key="gemma2_2b_base", layer=25, device=device)
         site = loaded.site
@@ -80,6 +92,7 @@ def probe(case_id: str, model_snapshot: Path, sae_snapshot: Path | None, assets_
         if not all(bool(torch.isfinite(t).all()) for t in [snap.activation, snap.codes, snap.reconstruction]):
             raise RuntimeError("nonfinite real SAE capture")
         observed = {"hook":site.hook_name,"layer":site.layer,"backend":loaded.model.backend,
+                    "actual_activation_device":str(snap.activation.device),
                     "activation_width":snap.activation.numel(),"sae_features":snap.codes.numel(),
                     "token_count":snap.tokens.numel(),"dtype":str(snap.activation.dtype),
                     "model_module":type(loaded.model.model).__module__,"sae_module":type(loaded.sae).__module__}
