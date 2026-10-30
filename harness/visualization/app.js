@@ -1661,91 +1661,374 @@
     return $("diagram");
   }
 
+
+  // All five source-backed Atlas trees share the search index. Rebuild from
+  // current graphs each time so locale and review overlays remain authoritative.
+  const ATLAS_VIEW_LABELS={core:"Core",knowledge:"Knowledge",code:"Code",
+    environment:"Environment",context:"Context"};
+  let searchDialog=null,searchInput=null,searchResults=null,searchFilters=null;
+  let searchOpen=false,searchView="all",searchHits=[],searchSelection=0;
+  let searchReturnFocus=null;
+  const searchText=(zh,en)=>document.documentElement.lang.toLowerCase().startsWith("zh")?zh:en;
+  function globalSearchEntries(query) {
+    const q=String(query||"").trim().toLocaleLowerCase();
+    const result=[];
+    for(const view of Object.keys(ATLAS_VIEW_LABELS)){
+      const nodes=(reviewGraphs[view]||DATA[view])?.nodes||[];
+      for(const node of nodes){
+        if(!node?.id || !node?.title)continue;
+        const title=String(node.title).toLocaleLowerCase();
+        const identity=[node.id,node.source_symbol,node.signature,node.path,
+          ...(node.aliases||[])].filter(Boolean).join(" ").toLocaleLowerCase();
+        const summary=String(node.summary||node.description||"").toLocaleLowerCase();
+        const other=String(node.reader_explanation||"").toLocaleLowerCase();
+        let score=0;
+        if(!q)score=1;
+        else if(title===q||String(node.id).toLocaleLowerCase()===q)score=150;
+        else if(title.startsWith(q))score=105;
+        else if(title.includes(q))score=80;
+        else if(identity.includes(q))score=65;
+        else if(summary.includes(q))score=40;
+        else if(other.includes(q))score=20;
+        if(!score)continue;
+        result.push({view,id:node.id,title:node.title,
+          summary:plain(node.summary||node.description||""),
+          identity:node.source_symbol||node.path||"",score});
+      }
+    }
+    // Exact identity must win over a merely related description.
+    result.sort((a,b)=>b.score-a.score||
+      a.title.localeCompare(b.title,document.documentElement.lang.startsWith("zh")?"zh":"en"));
+    return result;
+  }
+  function updateGlobalSearch() {
+    if(!searchDialog||!searchOpen)return;
+    const q=searchInput.value;
+    const matches=globalSearchEntries(q);
+    searchFilters.replaceChildren();
+    for(const [view,label] of [["all",searchText("全部","All")],
+      ...Object.entries(ATLAS_VIEW_LABELS)]){
+      const count=matches.filter(x=>view==="all"||x.view===view).length;
+      const button=el("button","atlas-search-filter"+(searchView===view?" is-active":""),label);
+      button.type="button";
+      button.setAttribute("aria-pressed",String(searchView===view));
+      button.appendChild(el("span","atlas-search-filter-count",String(count)));
+      button.addEventListener("click",()=>{
+        searchView=view;searchSelection=0;updateGlobalSearch();searchInput.focus();
+      });
+      searchFilters.appendChild(button);
+    }
+    const filtered=matches.filter(x=>searchView==="all"||x.view===searchView);
+    searchHits=filtered.slice(0,65);
+    searchSelection=Math.max(0,Math.min(searchSelection,searchHits.length-1));
+    searchResults.replaceChildren();
+    const grouped=new Map();
+    for(const hit of searchHits){
+      if(!grouped.has(hit.view))grouped.set(hit.view,[]);
+      grouped.get(hit.view).push(hit);
+    }
+    for(const [view,hits] of grouped){
+      const group=el("div","atlas-search-result-group");
+      group.appendChild(el("p","atlas-search-group-name",ATLAS_VIEW_LABELS[view]));
+      for(const hit of hits){
+        const index=searchHits.indexOf(hit);
+        const button=el("button","atlas-search-result"+(index===searchSelection?" is-selected":""));
+        button.type="button";button.setAttribute("role","option");
+        button.setAttribute("aria-selected",String(index===searchSelection));
+        button.addEventListener("mouseenter",()=>{
+          searchSelection=index;highlightGlobalSearch();
+        });
+        button.addEventListener("click",()=>selectGlobalSearch(index));
+        const top=el("span","atlas-search-result-heading");
+        top.appendChild(el("strong","",hit.title));
+        const caption=el("span","atlas-search-result-summary",hit.summary||hit.identity||hit.id);
+        button.append(top,caption);group.appendChild(button);
+      }
+      searchResults.appendChild(group);
+    }
+    if(!searchHits.length){
+      searchResults.appendChild(el("p","atlas-search-empty",
+        searchText("没有匹配的节点","No matching nodes")));
+    }
+    const counter=$("atlasGlobalSearchCount");
+    if(counter)counter.textContent=searchText("显示 ","Showing ")+
+      searchHits.length+" / "+filtered.length;
+  }
+  function highlightGlobalSearch() {
+    for(const [index,node] of [...searchResults.querySelectorAll(".atlas-search-result")].entries()){
+      node.classList.toggle("is-selected",index===searchSelection);
+      node.setAttribute("aria-selected",String(index===searchSelection));
+      if(index===searchSelection)node.scrollIntoView({block:"nearest"});
+    }
+  }
+  function selectGlobalSearch(index) {
+    const hit=searchHits[index];
+    if(!hit)return;
+    closeGlobalSearch(false);
+    // Explicit target view handles node IDs which appear in several trees.
+    navigate(hit.id,hit.view,false);
+  }
+  function closeGlobalSearch(restore=true) {
+    if(!searchDialog||!searchOpen)return;
+    searchOpen=false;
+    searchDialog.classList.add("is-hidden");
+    searchDialog.setAttribute("aria-hidden","true");
+    if(restore)searchReturnFocus?.focus?.();
+  }
+  function openGlobalSearch() {
+    if(!searchDialog)return;
+    if(searchOpen){searchInput.focus();return;}
+    searchReturnFocus=document.activeElement;
+    searchOpen=true;searchView="all";searchSelection=0;
+    searchInput.value="";
+    searchDialog.classList.remove("is-hidden");
+    searchDialog.setAttribute("aria-hidden","false");
+    updateGlobalSearch();searchInput.focus();
+  }
+  function installGlobalSearch() {
+    const launcher=el("button","atlas-global-launch", "⌘ K");
+    launcher.type="button";launcher.id="atlasGlobalSearchButton";
+    launcher.setAttribute("aria-label","Search all Atlas trees");
+    launcher.title=searchText("搜索五棵树 · Ctrl K","Search five trees · Ctrl K");
+    const toolbar=$("search")?.closest(".search-box");
+    toolbar?.insertAdjacentElement("afterend",launcher);
+    launcher.addEventListener("click",openGlobalSearch);
+    searchDialog=el("div","atlas-search-overlay is-hidden");
+    searchDialog.id="atlasGlobalSearch";
+    searchDialog.setAttribute("aria-hidden","true");
+    searchDialog.addEventListener("mousedown",event=>{
+      if(event.target===searchDialog)closeGlobalSearch();
+    });
+    const panel=el("div","atlas-search-dialog");
+    panel.setAttribute("role","dialog");panel.setAttribute("aria-modal","true");
+    panel.setAttribute("aria-label","Search across Atlas trees");
+    const heading=el("div","atlas-search-dialog-top");
+    heading.appendChild(el("span","atlas-search-dialog-icon","⌕"));
+    searchInput=el("input","atlas-search-input");
+    searchInput.id="atlasGlobalSearchInput";
+    searchInput.type="search";
+    searchInput.autocomplete="off";
+    searchInput.placeholder=searchText("搜索所有节点、术语、函数…","Search nodes, terms, functions…");
+    heading.appendChild(searchInput);
+    const dismiss=el("button","atlas-search-dismiss","Esc");
+    dismiss.type="button";dismiss.setAttribute("aria-label","Close search");
+    dismiss.addEventListener("click",()=>closeGlobalSearch());
+    heading.appendChild(dismiss);
+    searchFilters=el("div","atlas-search-filters");
+    searchResults=el("div","atlas-search-results");
+    searchResults.id="atlasGlobalSearchResults";
+    searchResults.setAttribute("role","listbox");
+    searchResults.setAttribute("aria-label","Atlas search results");
+    const footer=el("div","atlas-search-footer");
+    footer.appendChild(el("span","","↑ ↓ "+searchText("选择","Select")+"   ↵ "+searchText("跳转","Open")));
+    footer.appendChild(el("span","", "Esc "+searchText("关闭","Close")));
+    footer.appendChild(el("span","atlas-search-total",""));
+    footer.lastChild.id="atlasGlobalSearchCount";
+    panel.append(heading,searchFilters,searchResults,footer);
+    searchDialog.appendChild(panel);document.body.appendChild(searchDialog);
+    searchInput.addEventListener("input",()=>{searchSelection=0;updateGlobalSearch();});
+    document.addEventListener("keydown",event=>{
+      const openShortcut=(event.ctrlKey||event.metaKey)&&
+        String(event.key).toLocaleLowerCase()==="k";
+      if(openShortcut){
+        event.preventDefault();event.stopImmediatePropagation();
+        openGlobalSearch();return;
+      }
+      if(!searchOpen)return;
+      if(["ArrowDown","ArrowUp","Enter","Escape"].includes(event.key)){
+        event.preventDefault();event.stopImmediatePropagation();
+        if(event.key==="Escape")closeGlobalSearch();
+        if(event.key==="ArrowDown"&&searchHits.length){
+          searchSelection=(searchSelection+1)%searchHits.length;highlightGlobalSearch();
+        }
+        if(event.key==="ArrowUp"&&searchHits.length){
+          searchSelection=(searchSelection+searchHits.length-1)%searchHits.length;
+          highlightGlobalSearch();
+        }
+        if(event.key==="Enter")selectGlobalSearch(searchSelection);
+      }
+    },true);
+  }
+  function nodeDeepLink(id) {
+    const url=new URL(window.location.href);
+    url.pathname=url.pathname.replace(
+      /(?:index|core|knowledge|code|environment|context)\.html$/,
+      config.view+".html");
+    url.search="";
+    const lang=new URLSearchParams(window.location.search).get("lang");
+    if(lang==="zh"||lang==="en")url.searchParams.set("lang",lang);
+    url.searchParams.set("focus",id);
+    url.hash="";
+    return url.href;
+  }
+  async function copyDeepLink(id,button) {
+    const value=nodeDeepLink(id);
+    try {
+      if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(value);
+      else {
+        const input=el("textarea","");input.value=value;input.style.position="fixed";
+        input.style.opacity="0";document.body.appendChild(input);input.select();
+        if(!document.execCommand("copy"))throw new Error("Clipboard unavailable");
+        input.remove();
+      }
+      button.textContent=searchText("已复制","Copied");
+    } catch(_) {
+      // An ordinary shareable URL remains available if clipboard permission is blocked.
+      button.textContent=searchText("选择链接复制","Select link to copy");
+      button.title=value;
+      const input=el("input","atlas-copy-fallback");input.value=value;
+      button.after(input);input.focus();input.select();
+    }
+  }
+  function relatedNode(view,id) {
+    const tree=reviewGraphs[view]||DATA[view];
+    return tree?.nodes?.find(node=>node.id===id)||null;
+  }
+  function detailLayer(area,index,label) {
+    const block=el("section","atlas-detail-layer");
+    const heading=el("h3","atlas-detail-layer-heading");
+    heading.appendChild(el("span","atlas-detail-layer-index",index));
+    heading.appendChild(el("span","",label));
+    block.appendChild(heading);area.appendChild(block);
+    return block;
+  }
+
+
   function renderDetails() {
-    const area = $("detailBody"); area.replaceChildren();
-    const n = byId.get(config.focusId);
-    if (!n) {
-      area.appendChild(el("p", "empty-message", "选择节点查看证据与来源"));
+    const area=$("detailBody");area.replaceChildren();
+    const n=byId.get(config.focusId);
+    if(!n){
+      area.appendChild(el("p","empty-message",
+        searchText("选择节点查看关系与依据","Select a node for relationships and evidence")));
       return;
     }
-    area.appendChild(el("h2", "detail-title", n.title));
-    const status = el("div", "detail-status");
-    const swatch = el("span", "detail-status-swatch");
+    const nodeLayer=detailLayer(area,"01",searchText("当前节点","NODE"));
+    const titleRow=el("div","atlas-detail-title-row");
+    titleRow.appendChild(el("h2","detail-title",n.title));
+    const copy=el("button","atlas-copy-link",
+      searchText("复制链接","Copy link"));
+    copy.type="button";copy.title=nodeDeepLink(n.id);
+    copy.addEventListener("click",()=>copyDeepLink(n.id,copy));
+    titleRow.appendChild(copy);nodeLayer.appendChild(titleRow);
+    const status=el("div","detail-status"),swatch=el("span","detail-status-swatch");
     const proposal=itemFor(n.id);
-    swatch.style.background = proposal
-      ? REVIEW_PALETTE[proposalState(proposal)].stroke
-      : STATES[n.status] || "#adb2b9";
+    swatch.style.background=proposal?REVIEW_PALETTE[proposalState(proposal)].stroke:
+      STATES[n.status]||"#adb2b9";
     status.appendChild(swatch);
-    status.appendChild(el("span", "", config.view==="environment" && graph().synthetic
-      ? "演示数据（未实测）"
-      : ({unchecked:"Unchecked",denied:"Denied",not_implemented:"Not Implemented",
-          partial:"Partial",implemented:"Implemented"})[n.status] || "Unknown"));
-    area.appendChild(status);
-    const extra=plain(n.reader_explanation || "");
-    if(extra && extra.replace(/\s+/g,"") !==
-        plain(n.summary || "").replace(/\s+/g,"")){
-      area.appendChild(el("p","detail-description",extra));
+    const label=config.view==="environment"&&graph().synthetic?
+      searchText("演示配置","Synthetic configuration"):
+      ({unchecked:"Unchecked",denied:"Denied",not_implemented:"Not Implemented",
+         partial:"Partial",implemented:"Implemented"})[n.status]||"Unknown";
+    status.appendChild(el("span","",label));nodeLayer.appendChild(status);
+    const summary=plain(n.summary||n.description||"");
+    if(summary)nodeLayer.appendChild(el("p","detail-description",summary));
+    const extra=plain(n.reader_explanation||"");
+    if(extra&&extra.replace(/\s+/g,"")!==summary.replace(/\s+/g,""))
+      nodeLayer.appendChild(el("p","detail-description",extra));
+    if(n.why_it_matters)
+      section(nodeLayer,searchText("研究意义","Why this matters")).appendChild(
+        el("p","",n.why_it_matters));
+    if(n.aliases?.length)
+      section(nodeLayer,searchText("别名","Aliases")).appendChild(
+        el("p","",n.aliases.join(" · ")));
+    if(n.next)section(nodeLayer,searchText("下一步","Next step"))
+      .appendChild(el("p","",n.next));
+
+    const relations=detailLayer(area,"02",searchText("跨树关联","RELATIONS"));
+    const specs=[
+      ["context_term_ids","context",searchText("相关术语","Context term")],
+      ["context_ids","knowledge",searchText("科研知识","Knowledge")],
+      ["core_ids","core",searchText("项目目标","Core")],
+      ["term_ids","context",searchText("术语引用","Term")]
+    ];
+    let count=0;
+    const seen=new Set();
+    for(const [field,targetView,label] of specs){
+      for(const id of n[field]||[]){
+        const identity=targetView+":"+id;
+        if(seen.has(identity))continue;
+        const target=relatedNode(targetView,id);
+        if(!target)continue;
+        seen.add(identity);count++;
+        const row=el("div","atlas-relation-row");
+        const descriptor=el("div","atlas-relation-metadata");
+        descriptor.appendChild(el("span","atlas-relation-view",ATLAS_VIEW_LABELS[targetView]));
+        descriptor.appendChild(el("span","atlas-relation-field",field));
+        row.appendChild(descriptor);
+        const jump=el("button","atlas-relation-link",target.title);
+        jump.type="button";jump.title=id;
+        jump.addEventListener("click",()=>navigate(id,targetView,false));
+        row.appendChild(jump);
+        relations.appendChild(row);
+      }
     }
+    if(!count)relations.appendChild(el("p","atlas-detail-muted",
+      searchText("此节点暂无明确记录的跨树关联。",
+        "No explicit cross-tree relation is recorded for this node.")));
+
+    const evidence=detailLayer(area,"03",searchText("来源与依据","EVIDENCE"));
     if(n.context_term_ids?.length){
-      const context=section(area,"专业词汇 · Context");
+      const terms=section(evidence,searchText("术语定义","Terminology"));
       for(const id of n.context_term_ids){
-        const term=(reviewGraphs.context?.nodes || DATA.context?.nodes || []).find(x=>x.id===id);
+        const term=relatedNode("context",id);
         if(!term)continue;
         const row=el("div","node-term-row");
-        row.appendChild(refLink(id,term.title));
+        const link=el("button","context-link",term.title);
+        link.type="button";link.addEventListener("click",()=>navigate(id,"context",false));
+        row.appendChild(link);
         row.appendChild(el("p","node-term-definition",plain(term.description)));
-        context.appendChild(row);
+        terms.appendChild(row);
       }
     }
-    if (n.source_symbol && ["module","class","method","function"].includes(kind(n))) {
-      const technical = section(area, "源代码标识");
-      technical.appendChild(el("code", "signature", n.source_symbol));
+    if(n.source_symbol&&["module","class","method","function"].includes(kind(n)))
+      section(evidence,searchText("源码标识","Source symbol")).appendChild(
+        el("code","signature",n.source_symbol));
+    if(n.signature)section(evidence,searchText("方法签名","Signature"))
+      .appendChild(el("code","signature",n.signature));
+    if(n.facts){
+      const details=section(evidence,searchText("设备与执行信息","Execution facts"));
+      for(const [key,value] of Object.entries(n.facts))
+        details.appendChild(el("p","",key+"："+value));
     }
-    if (n.signature) section(area, "方法签名").appendChild(el("code", "signature", n.signature));
-    if (n.facts) {
-      const details = section(area, "设备与执行信息");
-      for (const [key,value] of Object.entries(n.facts)) {
-        details.appendChild(el("p", "", key + "：" + value));
+    if(n.path){
+      const direct=sourceHref(n.path,n.line);
+      if(direct){
+        const block=section(evidence,searchText("直接源码","Direct source"));
+        const anchor=el("a","context-link",n.path+(n.line?":"+n.line:""));
+        anchor.href=direct;anchor.rel="noopener noreferrer";anchor.target="_blank";
+        block.appendChild(anchor);
       }
     }
-    if (n.why_it_matters) section(area, "Why this matters").appendChild(el("p", "", n.why_it_matters));
-    if (n.aliases?.length) section(area, "Also known as").appendChild(el("p", "", n.aliases.join(" · ")));
-    if (n.next) section(area, "Next step").appendChild(el("p", "", n.next));
-    for (const [title, keys] of [
-      ["Scientific knowledge", n.context_ids], ["Project context", n.core_ids],
-      ["Scientific terms", n.term_ids]
-    ]) {
-      if (keys?.length) {
-        const block = section(area, title);
-        for (const key of keys) {
-          const targetView = locateView(key);
-          const source = (reviewGraphs[targetView]?.nodes || DATA[targetView]?.nodes || []).find(x=>x.id===key);
-          block.appendChild(refLink(key, source?.title || key));
-        }
+    if(n.foundation){
+      const direct=sourceHref(n.foundation);
+      if(direct){
+        const block=section(evidence,searchText("背景依据","Background"));
+        const a=el("a","context-link",n.foundation);
+        a.href=direct;a.target="_blank";a.rel="noopener noreferrer";
+        block.appendChild(a);
       }
     }
-    if (n.foundation) {
-      const block = section(area, "Background");
-      const a = el("a", "context-link", n.foundation);
-      a.href = "https://github.com/OpenSAE/SAEBase/blob/main/" + n.foundation;
-      a.target = "_blank"; a.rel = "noopener noreferrer"; block.appendChild(a);
-    }
-    if (n.evidence?.length) {
-      const block = section(area, "Evidence");
-      for (const source of n.evidence.slice(0, 12)) {
-        const a = el("a", "context-link", source);
-        const path = source.split(":")[0];
-        if (path.startsWith("https://")) a.href = path;
-        else if (!path.startsWith("/") && !path.includes("..")) {
-          a.href = "https://github.com/OpenSAE/SAEBase/blob/main/" + path;
-        }
-        a.target = "_blank"; a.rel = "noopener noreferrer"; block.appendChild(a);
+    if(n.evidence?.length){
+      const block=section(evidence,searchText("证据来源","Evidence"));
+      for(const source of n.evidence.slice(0,16)){
+        const link=el("a","context-link",source);
+        const raw=String(source),parts=raw.split(":");
+        const href=raw.startsWith("https://")?raw:
+          sourceHref(parts[0],/^\d+$/.test(parts[1]||"")?Number(parts[1]):null);
+        if(!href)continue;
+        link.href=href;link.target="_blank";link.rel="noopener noreferrer";
+        block.appendChild(link);
       }
     }
-    if (config.view === "code" && config.diff) {
-      const changed = config.diff.changed?.find(x => x.id === n.id);
-      if (changed) section(area, "Observed change").appendChild(el("p", "", changed.fields.join(", ")));
+    if(config.view==="code"&&config.diff){
+      const changed=config.diff.changed?.find(x=>x.id===n.id);
+      if(changed)section(evidence,searchText("变化证据","Observed change"))
+        .appendChild(el("p","",changed.fields.join(", ")));
     }
+    if(!evidence.querySelector(".context-section"))evidence.appendChild(
+      el("p","atlas-detail-muted",
+        searchText("此节点的来源信息请查看展开节点属性。",
+          "Open node attributes to inspect additional source evidence.")));
   }
   function render(autoFit, preserveViewport = false) {
     const layout = normalizeLayout(config.mode === "focus" ? layoutFocus() : layoutOverview());
@@ -1847,6 +2130,7 @@
     pathTrace.setAttribute("aria-label", "Full node ancestry");
     $("canvasWrap").parentNode.insertBefore(pathTrace, $("canvasWrap"));
     bindCanvasPan();
+    installGlobalSearch();
     // All five tabs switch the mounted graph; links still work without JS
     // and support browser-native new-tab gestures.
     for (const tab of document.querySelectorAll(".tabs [data-graph]")) {
@@ -1994,6 +2278,10 @@
 
   // Refresh translated labels without discarding focus, zoom or review state.
   window.addEventListener("saebase-atlas-locale", () => {
+    if(searchOpen){
+      searchInput.placeholder=searchText("搜索所有节点、术语、函数…","Search nodes, terms, functions…");
+      updateGlobalSearch();
+    }
     render(false);
     if (config.detailsOpen) renderDetails();
     updateBreadcrumb();
