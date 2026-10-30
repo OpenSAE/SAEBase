@@ -1719,9 +1719,10 @@
       searchFilters.appendChild(button);
     }
     const filtered=matches.filter(x=>searchView==="all"||x.view===searchView);
-    searchHits=q.trim()?filtered.slice(0,65):
+    searchHits=searchView==="all"?
       Object.keys(ATLAS_VIEW_LABELS).flatMap(view=>
-        filtered.filter(hit=>hit.view===view).slice(0,4));
+        filtered.filter(hit=>hit.view===view).slice(0,q.trim()?14:4)):
+      filtered.slice(0,q.trim()?65:24);
     searchSelection=Math.max(0,Math.min(searchSelection,searchHits.length-1));
     searchResults.replaceChildren();
     const grouped=new Map();
@@ -1785,6 +1786,10 @@
     searchReturnFocus=document.activeElement;
     searchOpen=true;searchView="all";searchSelection=0;
     searchInput.value="";
+    searchInput.placeholder=searchText("搜索所有节点、术语、函数…","Search nodes, terms, functions…");
+    const help=searchDialog.querySelectorAll(".atlas-search-footer > span");
+    if(help[0])help[0].textContent="↑ ↓ "+searchText("选择","Select")+"   ↵ "+searchText("跳转","Open");
+    if(help[1])help[1].textContent="Esc "+searchText("关闭","Close");
     searchDialog.classList.remove("is-hidden");
     searchDialog.setAttribute("aria-hidden","false");
     updateGlobalSearch();searchInput.focus();
@@ -2282,6 +2287,8 @@
 
   // Refresh translated labels without discarding focus, zoom or review state.
   window.addEventListener("saebase-atlas-locale", () => {
+    const launcher=$("atlasGlobalSearchButton");
+    if(launcher)launcher.textContent=searchText("五树搜索","All trees");
     if(searchOpen){
       searchInput.placeholder=searchText("搜索所有节点、术语、函数…","Search nodes, terms, functions…");
       updateGlobalSearch();
