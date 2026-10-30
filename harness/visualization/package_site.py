@@ -29,6 +29,7 @@ STATIC = (
     "locale-runtime.js",
     "i18n.js",
     "style.css",
+    "atlas-theme.css",
     "index.html",
     "core.html",
     "knowledge.html",
