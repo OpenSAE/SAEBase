@@ -793,7 +793,7 @@
     config.panX = prior?.panX ?? 0;
     config.panY = prior?.panY ?? 0;
     config.outlineOpen = prior?.outlineOpen || false;
-    config.detailsOpen = !!prior?.detailsOpen && !!config.focusId;
+    config.detailsOpen = !!config.focusId && (prior ? !!prior.detailsOpen : true);
     config.animateNextRender = false;
     $("search").value = config.query;
     for (const tab of document.querySelectorAll(".tabs [data-graph]")) {
@@ -856,7 +856,7 @@
     config.query = "";
     $("search").value = "";
     config.outlineOpen = false;
-    config.detailsOpen = false;
+    config.detailsOpen = true;
     for (const key of ancestors(id)) config.expanded.add(key);
     // A selected node is the only one permitted to hold open attributes.
     config.expandedAttributes.clear();
@@ -887,6 +887,7 @@
     const sourceOwner = deep && DATA[config.view]?.source_api_index?.[deep];
     if (deep && (byId.has(deep) || (sourceOwner && byId.has(sourceOwner)))) {
       config.mode = "focus"; config.focusId = byId.has(deep) ? deep : sourceOwner;
+      config.detailsOpen = true;
       if (sourceOwner) config.expandedAttributes.add(sourceOwner);
     }
     bind();
@@ -1438,6 +1439,7 @@
     $("sidebar").classList.toggle("is-hidden", !config.outlineOpen);
     $("detailDrawer").classList.toggle("is-hidden", !config.detailsOpen);
     $("detailsToggle").disabled = !config.focusId;
+    $("atlasCopyFocused")?.classList.toggle("is-hidden",!config.focusId);
     $("overviewBack").classList.toggle("is-hidden", !config.focusId);
   }
   function updateBreadcrumb() {
@@ -1669,7 +1671,9 @@
   let searchDialog=null,searchInput=null,searchResults=null,searchFilters=null;
   let searchOpen=false,searchView="all",searchHits=[],searchSelection=0;
   let searchReturnFocus=null;
-  const searchText=(zh,en)=>document.documentElement.lang.toLowerCase().startsWith("zh")?zh:en;
+  const searchText=(zh,en)=>(window.SAEBASE_ATLAS_LANGUAGE ||
+    new URLSearchParams(window.location.search).get("lang") ||
+    document.documentElement.lang).toLowerCase().startsWith("zh")?zh:en;
   function globalSearchEntries(query) {
     const q=String(query||"").trim().toLocaleLowerCase();
     const result=[];
@@ -1796,7 +1800,7 @@
     updateGlobalSearch();searchInput.focus();
   }
   function installGlobalSearch() {
-    const launcher=el("button","atlas-global-launch", searchText("五树搜索","All trees"));
+    const launcher=el("button","atlas-global-launch",searchText("五树搜索","Search all trees"));
     launcher.type="button";launcher.id="atlasGlobalSearchButton";
     launcher.setAttribute("aria-label","Search all Atlas trees");
     launcher.title=searchText("搜索五棵树 · Ctrl K","Search five trees · Ctrl K");
@@ -1895,6 +1899,37 @@
     const tree=reviewGraphs[view]||DATA[view];
     return tree?.nodes?.find(node=>node.id===id)||null;
   }
+  // Explicit forward and reverse links. Text similarity never creates edges.
+  const ATLAS_RELATION_FIELDS=[
+    ["context_term_ids","context"],["context_ids","knowledge"],
+    ["core_ids","core"],["term_ids","context"]
+  ];
+  function explicitRelations(view,id){
+    const seen=new Set(),results=[];
+    const add=(originView,originId,destinationView,destinationId,field,direction)=>{
+      const key=[originView,originId,destinationView,destinationId,field].join("|");
+      if(seen.has(key))return;
+      const otherView=direction==="out"?destinationView:originView;
+      const otherId=direction==="out"?destinationId:originId;
+      const node=relatedNode(otherView,otherId);
+      if(!node)return;
+      seen.add(key);
+      results.push({view:otherView,id:otherId,node,field,direction});
+    };
+    const current=relatedNode(view,id);
+    if(!current)return results;
+    for(const [field,targetView] of ATLAS_RELATION_FIELDS)
+      if(targetView!==view)
+        for(const target of current[field]||[])
+          add(view,id,targetView,target,field,"out");
+    for(const originView of Object.keys(ATLAS_VIEW_LABELS))
+      if(originView!==view)
+        for(const node of (reviewGraphs[originView]||DATA[originView])?.nodes||[])
+          for(const [field,targetView] of ATLAS_RELATION_FIELDS)
+            if(targetView===view&&(node[field]||[]).includes(id))
+              add(originView,node.id,view,id,field,"in");
+    return results;
+  }
   function detailLayer(area,index,label) {
     const block=el("section","atlas-detail-layer");
     const heading=el("h3","atlas-detail-layer-heading");
@@ -1945,37 +1980,39 @@
     if(n.next)section(nodeLayer,searchText("下一步","Next step"))
       .appendChild(el("p","",n.next));
 
-    const relations=detailLayer(area,"02",searchText("跨树关联","RELATIONS"));
-    const specs=[
-      ["context_term_ids","context",searchText("相关术语","Context term")],
-      ["context_ids","knowledge",searchText("科研知识","Knowledge")],
-      ["core_ids","core",searchText("项目目标","Core")],
-      ["term_ids","context",searchText("术语引用","Term")]
-    ];
-    let count=0;
-    const seen=new Set();
-    for(const [field,targetView,label] of specs){
-      for(const id of n[field]||[]){
-        const identity=targetView+":"+id;
-        if(seen.has(identity))continue;
-        const target=relatedNode(targetView,id);
-        if(!target)continue;
-        seen.add(identity);count++;
+    const links=explicitRelations(config.view,n.id);
+    const relations=detailLayer(area,"02",
+      searchText("跨树关联","RELATIONS")+" · "+links.length);
+    const relationItems=el("div","atlas-relation-items");
+    const displayRelations=(expanded=false)=>{
+      relationItems.replaceChildren();
+      for(const link of expanded?links:links.slice(0,8)){
         const row=el("div","atlas-relation-row");
-        const descriptor=el("div","atlas-relation-metadata");
-        descriptor.appendChild(el("span","atlas-relation-view",ATLAS_VIEW_LABELS[targetView]));
-        descriptor.appendChild(el("span","atlas-relation-field",field));
-        row.appendChild(descriptor);
-        const jump=el("button","atlas-relation-link",target.title);
-        jump.type="button";jump.title=id;
-        jump.addEventListener("click",()=>navigate(id,targetView,false));
-        row.appendChild(jump);
-        relations.appendChild(row);
+        const metadata=el("div","atlas-relation-metadata");
+        metadata.appendChild(el("span","atlas-relation-view",ATLAS_VIEW_LABELS[link.view]));
+        metadata.appendChild(el("span","atlas-relation-direction",
+          link.direction==="in"?searchText("被引用","Referenced by"):
+          searchText("引用","References")));
+        metadata.appendChild(el("span","atlas-relation-field",link.field));
+        row.appendChild(metadata);
+        const jump=el("button","atlas-relation-link",link.node.title);
+        jump.type="button";jump.title=link.id;
+        jump.addEventListener("click",()=>navigate(link.id,link.view,false));
+        row.appendChild(jump);relationItems.appendChild(row);
       }
-    }
-    if(!count)relations.appendChild(el("p","atlas-detail-muted",
+      if(links.length>8){
+        const button=el("button","atlas-relation-expand",
+          expanded?searchText("收起","Show fewer"):
+            searchText("显示全部关联","Show all relations")+" ("+links.length+")");
+        button.type="button";button.addEventListener("click",()=>displayRelations(!expanded));
+        relationItems.appendChild(button);
+      }
+    };
+    if(links.length)displayRelations();
+    else relationItems.appendChild(el("p","atlas-detail-muted",
       searchText("此节点暂无明确记录的跨树关联。",
         "No explicit cross-tree relation is recorded for this node.")));
+    relations.appendChild(relationItems);
 
     const evidence=detailLayer(area,"03",searchText("来源与依据","EVIDENCE"));
     if(n.context_term_ids?.length){
@@ -2142,6 +2179,14 @@
     $("canvasWrap").parentNode.insertBefore(pathTrace, $("canvasWrap"));
     bindCanvasPan();
     installGlobalSearch();
+    const copy=el("button","atlas-copy-focused is-hidden",
+      searchText("复制链接","Copy link"));
+    copy.id="atlasCopyFocused";
+    copy.type="button";
+    copy.addEventListener("click",()=>{
+      if(config.focusId)copyDeepLink(config.focusId,copy);
+    });
+    $("detailsToggle").insertAdjacentElement("afterend",copy);
     // All five tabs switch the mounted graph; links still work without JS
     // and support browser-native new-tab gestures.
     for (const tab of document.querySelectorAll(".tabs [data-graph]")) {
@@ -2247,7 +2292,7 @@
           config.mode = focusId ? "focus" : "overview";
           config.expandedAttributes.clear();
           if (sourceOwner && focusId) config.expandedAttributes.add(focusId);
-          config.detailsOpen = false;
+          config.detailsOpen = !!focusId;
           config.query = ""; $("search").value = "";
           render(false);
         }
@@ -2290,12 +2335,12 @@
   // Refresh translated labels without discarding focus, zoom or review state.
   window.addEventListener("saebase-atlas-locale", () => {
     const launcher=$("atlasGlobalSearchButton");
-    if(launcher)launcher.textContent=searchText("五树搜索","All trees");
-    if(searchOpen){
-      searchInput.placeholder=searchText("搜索所有节点、术语、函数…","Search nodes, terms, functions…");
-    searchInput.dataset.atlasOriginalPlaceholder=searchInput.placeholder;
-      updateGlobalSearch();
-    }
+    if(launcher)launcher.textContent=searchText("五树搜索","Search all trees");
+    const copy=$("atlasCopyFocused");
+    if(copy)copy.textContent=searchText("复制链接","Copy link");
+    if(searchInput)searchInput.placeholder=
+      searchText("搜索所有节点、术语、函数…","Search nodes, terms, functions…");
+    if(searchOpen)updateGlobalSearch();
     render(false);
     if (config.detailsOpen) renderDetails();
     updateBreadcrumb();
