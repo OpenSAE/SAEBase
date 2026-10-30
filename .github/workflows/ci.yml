@@ -118,6 +118,7 @@ jobs:
         run: |
           node --check harness/visualization/app.js
           node harness/github_work_test/test_atlas_deep_navigation.cjs
+          node harness/github_work_test/test_atlas_global_search.cjs
           node --check harness/visualization/i18n.js
           node --check harness/visualization/atlas-public-balance.js
           node --check harness/visualization/locale-data.js
