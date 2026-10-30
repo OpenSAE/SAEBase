@@ -1,0 +1,37 @@
+{
+  "schema": "saebase.wp21.final_review.v1",
+  "case_id": "R07",
+  "run_id": "round01",
+  "status": "PASS",
+  "score": {
+    "real_functionality": 40.0,
+    "compatibility_and_negative": 25.0,
+    "evidence_reproducibility": 20,
+    "scope_and_documentation": 15,
+    "total": 100.0
+  },
+  "hard_gates": {
+    "frozen_spec_valid": true,
+    "candidate_scope_valid": true,
+    "candidate_evidence_ready": true,
+    "real_model_probe_valid": true,
+    "all_positive_replayed": true,
+    "all_negative_replayed": true
+  },
+  "checks": {
+    "positive": 4,
+    "positive_total": 4,
+    "negative": 4,
+    "negative_total": 4
+  },
+  "blockers": [],
+  "attribution": "NONE",
+  "attribution_owner": null,
+  "attribution_stage": "independent_replay",
+  "review_checklist_sha256": "c970f0e0f3a45a2b3c3b8db518133fec72feb971dc86abf81f79b11cd23d7295",
+  "candidate_source_sha256": "0aacaf431a9dd1c88345e793b1ee137a7dee3a8c2a5a209d3bff2523dea9fc46",
+  "reviewer_source_sha256": "97a434365ae40c5814c8daabd2bb65af1a631e10294e776fcac380c096bbaac2",
+  "candidate_evidence_status": "EVIDENCE_READY_FOR_REPLAY",
+  "reviewed_at_utc": "2026-10-30T17:46:55.290244+00:00",
+  "note": "Automatic hard gates only; independent reviewer scripts are responsible for genuine real-model checks. Human/Atlas approvals remain separate."
+}

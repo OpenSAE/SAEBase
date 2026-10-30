@@ -1,3 +1,9 @@
+## Work Plan 21 · 真实 SAEBase 工作流考试
+
+[**WP21 — 真实 SAEBase 工作流综合考试**](21_real_saebase_workflow_exams.md)：R01–R20 在隔离工作树中调用生产接口（capture / intervene / train / benchmark / 组件增删）。试卷与工具在 `exam/wp21-1-ready`（`8a78be1209bb30c652d500f934c226a5d54684c9`）。
+
+**round01 独立 Review 归档（2026-10-30）**：[成绩、归因与 Harness 缺口](21_exam_round01_report_20261030.md)。PASS=17，ENV_BLOCKED=1（R08 缺 Pythia-14m），FAIL=1（R17 同 seed 容差），INCOMPLETE=1（R20 目录产物审计）。这是考试记录归档，不是产品发布或 Atlas 批准。
+
 ## Work Plan 20 · 中大型多阶段 Harness 集成考试
 
 [**WP20 — 20 道中大型集成题及独立验收设计**](20_integrated_multistage_harness_exams.md)：X01–X20 涉及真实 AST/Tree/Knowledge、SAE 编码/干预、AUROC/AP/Bootstrap、Checkpoint、文件原子性、CI 发布、并发与长时程重放。每题有模块来源、明确操作阶段、正反例与独立验收目标；配套 [机器可读设计](../contracts/wp20_cases.json)。**X01–X20 已有实际行为 Reference、80 组冻结正反例、独立 grader 与错误实现校准，现在可在隔离环境开展考试；产品级完整集成和人工审核仍是后续独立工作。**历史 WP19 的 200 个微型合成任务继续保留。
