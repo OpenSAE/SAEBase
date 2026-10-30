@@ -13,7 +13,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from backend import core, published_wp12  # noqa: E402
+from backend import core, published_records  # noqa: E402
 from backend.api import app  # noqa: E402
 
 client = TestClient(app)
@@ -41,12 +41,12 @@ def test_only_reviewed_native_records_become_browsable(monkeypatch, tmp_path):
     monkeypatch.setenv("OPENSAE_LAB_DATA", str(tmp_path))
     assert client.get("/api/wp12/circuits").json()["total"] == 0
     with pytest.raises(PermissionError):
-        published_wp12.publish_record(
+        published_records.publish_record(
             "circuits",
             graph_record(),
             root=tmp_path,
         )
-    record = published_wp12.publish_record(
+    record = published_records.publish_record(
         "circuits",
         graph_record(),
         root=tmp_path,

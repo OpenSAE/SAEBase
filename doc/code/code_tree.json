@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "code",
   "project": "SAEBase",
-  "source_sha256": "12ebc9c7b2d54fb4c4e39618d136997e10a269d3fc7eb6e5533e6b6a3c582669",
+  "source_sha256": "dfe906ad3ffec6a178410a7604dc2c2b975eed213dae96dd42ffec9d043ed5f0",
   "scope": [
     "saebase",
     "datasets",
@@ -18636,10 +18636,10 @@
       ]
     },
     {
-      "id": "code:function:saebase.research_lab.backend.published_wp12:_id",
+      "id": "code:function:saebase.research_lab.backend.published_records:_id",
       "kind": "function",
       "title": "_id",
-      "path": "saebase/research_lab/backend/published_wp12.py",
+      "path": "saebase/research_lab/backend/published_records.py",
       "line": 31,
       "status": "implemented",
       "signature": "def _id(value: str) -> bool",
@@ -18650,14 +18650,14 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/research_lab/backend/published_wp12.py:31"
+        "saebase/research_lab/backend/published_records.py:31"
       ]
     },
     {
-      "id": "code:function:saebase.research_lab.backend.published_wp12:_root",
+      "id": "code:function:saebase.research_lab.backend.published_records:_root",
       "kind": "function",
       "title": "_root",
-      "path": "saebase/research_lab/backend/published_wp12.py",
+      "path": "saebase/research_lab/backend/published_records.py",
       "line": 27,
       "status": "implemented",
       "signature": "def _root(root: Path | None=None) -> Path",
@@ -18668,14 +18668,14 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/research_lab/backend/published_wp12.py:27"
+        "saebase/research_lab/backend/published_records.py:27"
       ]
     },
     {
-      "id": "code:function:saebase.research_lab.backend.published_wp12:_validate",
+      "id": "code:function:saebase.research_lab.backend.published_records:_validate",
       "kind": "function",
       "title": "_validate",
-      "path": "saebase/research_lab/backend/published_wp12.py",
+      "path": "saebase/research_lab/backend/published_records.py",
       "line": 37,
       "status": "implemented",
       "signature": "def _validate(category: str, record: dict[str, Any]) -> None",
@@ -18686,14 +18686,14 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/research_lab/backend/published_wp12.py:37"
+        "saebase/research_lab/backend/published_records.py:37"
       ]
     },
     {
-      "id": "code:function:saebase.research_lab.backend.published_wp12:list_records",
+      "id": "code:function:saebase.research_lab.backend.published_records:list_records",
       "kind": "function",
       "title": "list_records",
-      "path": "saebase/research_lab/backend/published_wp12.py",
+      "path": "saebase/research_lab/backend/published_records.py",
       "line": 155,
       "status": "implemented",
       "signature": "def list_records(category: str, *, root: Path | None=None) -> dict[str, Any]",
@@ -18704,14 +18704,14 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/research_lab/backend/published_wp12.py:155"
+        "saebase/research_lab/backend/published_records.py:155"
       ]
     },
     {
-      "id": "code:function:saebase.research_lab.backend.published_wp12:load_record",
+      "id": "code:function:saebase.research_lab.backend.published_records:load_record",
       "kind": "function",
       "title": "load_record",
-      "path": "saebase/research_lab/backend/published_wp12.py",
+      "path": "saebase/research_lab/backend/published_records.py",
       "line": 118,
       "status": "implemented",
       "signature": "def load_record(category: str, record_id: str, *, root: Path | None=None) -> dict[str, Any] | None",
@@ -18722,14 +18722,14 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/research_lab/backend/published_wp12.py:118"
+        "saebase/research_lab/backend/published_records.py:118"
       ]
     },
     {
-      "id": "code:function:saebase.research_lab.backend.published_wp12:publish_record",
+      "id": "code:function:saebase.research_lab.backend.published_records:publish_record",
       "kind": "function",
       "title": "publish_record",
-      "path": "saebase/research_lab/backend/published_wp12.py",
+      "path": "saebase/research_lab/backend/published_records.py",
       "line": 84,
       "status": "implemented",
       "signature": "def publish_record(category: str, record: dict[str, Any], *, root: Path | None=None, public_consent: bool=False, rights_reviewed: bool=False) -> dict[str, Any]",
@@ -18740,7 +18740,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/research_lab/backend/published_wp12.py:84"
+        "saebase/research_lab/backend/published_records.py:84"
       ]
     },
     {
@@ -47090,21 +47090,21 @@
       ]
     },
     {
-      "id": "code:module:saebase.research_lab.backend.published_wp12",
+      "id": "code:module:saebase.research_lab.backend.published_records",
       "kind": "module",
-      "title": "saebase/research_lab/backend/published_wp12.py",
-      "path": "saebase/research_lab/backend/published_wp12.py",
+      "title": "saebase/research_lab/backend/published_records.py",
+      "path": "saebase/research_lab/backend/published_records.py",
       "line": 1,
       "status": "implemented",
       "signature": "",
-      "description": "Immutable, read-only public WP12 engineering records. Only owner-approved nonsecret artifacts are served. Private original prompts, training weights, job errors and credential-bearing logs are never exposed.",
+      "description": "Immutable, read-only published research experiment records. Only owner-approved nonsecret artifacts are served. Private original prompts, training weights, job errors and credential-bearing logs are never exposed.",
       "description_source": "docstring",
       "context_ids": [],
       "core_ids": [],
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "saebase/research_lab/backend/published_wp12.py:1"
+        "saebase/research_lab/backend/published_records.py:1"
       ]
     },
     {
@@ -55944,48 +55944,48 @@
       "type": "calls"
     },
     {
-      "source": "code:function:saebase.research_lab.backend.published_wp12:_validate",
-      "target": "code:function:saebase.research_lab.backend.published_wp12:_id",
+      "source": "code:function:saebase.research_lab.backend.published_records:_validate",
+      "target": "code:function:saebase.research_lab.backend.published_records:_id",
       "type": "calls"
     },
     {
-      "source": "code:function:saebase.research_lab.backend.published_wp12:list_records",
-      "target": "code:function:saebase.research_lab.backend.published_wp12:_id",
+      "source": "code:function:saebase.research_lab.backend.published_records:list_records",
+      "target": "code:function:saebase.research_lab.backend.published_records:_id",
       "type": "calls"
     },
     {
-      "source": "code:function:saebase.research_lab.backend.published_wp12:list_records",
-      "target": "code:function:saebase.research_lab.backend.published_wp12:_root",
+      "source": "code:function:saebase.research_lab.backend.published_records:list_records",
+      "target": "code:function:saebase.research_lab.backend.published_records:_root",
       "type": "calls"
     },
     {
-      "source": "code:function:saebase.research_lab.backend.published_wp12:list_records",
-      "target": "code:function:saebase.research_lab.backend.published_wp12:load_record",
+      "source": "code:function:saebase.research_lab.backend.published_records:list_records",
+      "target": "code:function:saebase.research_lab.backend.published_records:load_record",
       "type": "calls"
     },
     {
-      "source": "code:function:saebase.research_lab.backend.published_wp12:load_record",
-      "target": "code:function:saebase.research_lab.backend.published_wp12:_id",
+      "source": "code:function:saebase.research_lab.backend.published_records:load_record",
+      "target": "code:function:saebase.research_lab.backend.published_records:_id",
       "type": "calls"
     },
     {
-      "source": "code:function:saebase.research_lab.backend.published_wp12:load_record",
-      "target": "code:function:saebase.research_lab.backend.published_wp12:_root",
+      "source": "code:function:saebase.research_lab.backend.published_records:load_record",
+      "target": "code:function:saebase.research_lab.backend.published_records:_root",
       "type": "calls"
     },
     {
-      "source": "code:function:saebase.research_lab.backend.published_wp12:load_record",
-      "target": "code:function:saebase.research_lab.backend.published_wp12:_validate",
+      "source": "code:function:saebase.research_lab.backend.published_records:load_record",
+      "target": "code:function:saebase.research_lab.backend.published_records:_validate",
       "type": "calls"
     },
     {
-      "source": "code:function:saebase.research_lab.backend.published_wp12:publish_record",
-      "target": "code:function:saebase.research_lab.backend.published_wp12:_root",
+      "source": "code:function:saebase.research_lab.backend.published_records:publish_record",
+      "target": "code:function:saebase.research_lab.backend.published_records:_root",
       "type": "calls"
     },
     {
-      "source": "code:function:saebase.research_lab.backend.published_wp12:publish_record",
-      "target": "code:function:saebase.research_lab.backend.published_wp12:_validate",
+      "source": "code:function:saebase.research_lab.backend.published_records:publish_record",
+      "target": "code:function:saebase.research_lab.backend.published_records:_validate",
       "type": "calls"
     },
     {
@@ -60400,7 +60400,7 @@
     },
     {
       "source": "code:group:saebase",
-      "target": "code:module:saebase.research_lab.backend.published_wp12",
+      "target": "code:module:saebase.research_lab.backend.published_records",
       "type": "contains"
     },
     {
@@ -67154,33 +67154,33 @@
       "type": "contains"
     },
     {
-      "source": "code:module:saebase.research_lab.backend.published_wp12",
-      "target": "code:function:saebase.research_lab.backend.published_wp12:_id",
+      "source": "code:module:saebase.research_lab.backend.published_records",
+      "target": "code:function:saebase.research_lab.backend.published_records:_id",
       "type": "contains"
     },
     {
-      "source": "code:module:saebase.research_lab.backend.published_wp12",
-      "target": "code:function:saebase.research_lab.backend.published_wp12:_root",
+      "source": "code:module:saebase.research_lab.backend.published_records",
+      "target": "code:function:saebase.research_lab.backend.published_records:_root",
       "type": "contains"
     },
     {
-      "source": "code:module:saebase.research_lab.backend.published_wp12",
-      "target": "code:function:saebase.research_lab.backend.published_wp12:_validate",
+      "source": "code:module:saebase.research_lab.backend.published_records",
+      "target": "code:function:saebase.research_lab.backend.published_records:_validate",
       "type": "contains"
     },
     {
-      "source": "code:module:saebase.research_lab.backend.published_wp12",
-      "target": "code:function:saebase.research_lab.backend.published_wp12:list_records",
+      "source": "code:module:saebase.research_lab.backend.published_records",
+      "target": "code:function:saebase.research_lab.backend.published_records:list_records",
       "type": "contains"
     },
     {
-      "source": "code:module:saebase.research_lab.backend.published_wp12",
-      "target": "code:function:saebase.research_lab.backend.published_wp12:load_record",
+      "source": "code:module:saebase.research_lab.backend.published_records",
+      "target": "code:function:saebase.research_lab.backend.published_records:load_record",
       "type": "contains"
     },
     {
-      "source": "code:module:saebase.research_lab.backend.published_wp12",
-      "target": "code:function:saebase.research_lab.backend.published_wp12:publish_record",
+      "source": "code:module:saebase.research_lab.backend.published_records",
+      "target": "code:function:saebase.research_lab.backend.published_records:publish_record",
       "type": "contains"
     },
     {

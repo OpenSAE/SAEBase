@@ -17,7 +17,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from . import core, published_wp12, wp15_records
+from . import core, published_records, wp15_records
 from .private_api import router as private_router
 from .feature_store import feature_store_count
 from . import explore
@@ -428,7 +428,7 @@ def preflight(request: InterventionSpec) -> dict[str, Any]:
 def wp12_catalog(category: str) -> dict[str, Any]:
     """Only source-reviewed, immutable native result summaries."""
     try:
-        return published_wp12.list_records(category)
+        return published_records.list_records(category)
     except core.InvalidEvidence as exc:
         _bad_evidence(exc)
     except ValueError as exc:
@@ -438,7 +438,7 @@ def wp12_catalog(category: str) -> dict[str, Any]:
 @app.get("/api/wp12/{category}/{record_id}")
 def wp12_record(category: str, record_id: str) -> dict[str, Any]:
     try:
-        record = published_wp12.load_record(category, record_id)
+        record = published_records.load_record(category, record_id)
     except core.InvalidEvidence as exc:
         _bad_evidence(exc)
     if record is None:

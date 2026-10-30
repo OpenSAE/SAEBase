@@ -58,3 +58,30 @@ def test_committed_code_snapshot_has_only_migrated_source_paths():
     paths = {node["path"] for node in source["nodes"] if node.get("path")}
     assert not any(path.startswith("saebase/wp12/") for path in paths)
     assert MOVED <= paths
+    assert "saebase/research_lab/backend/published_records.py" in paths
+    assert "saebase/research_lab/backend/published_wp12.py" not in paths
+
+
+def test_published_records_integrations_use_new_module_name():
+    """Historical data storage stays stable, but imports target the domain module."""
+    roots = (
+        ROOT / "saebase/research_lab/backend",
+        ROOT / "saebase/research_lab/tests",
+        ROOT / "saebase/tools",
+    )
+    for folder in roots:
+        for file in folder.rglob("*.py"):
+            tree = ast.parse(file.read_text(encoding="utf-8"), filename=str(file))
+            for node in ast.walk(tree):
+                if isinstance(node, ast.ImportFrom):
+                    assert all(
+                        alias.name != "published_wp12" for alias in node.names
+                    ), str(file)
+                if isinstance(node, ast.Import):
+                    assert all(
+                        not alias.name.endswith(".published_wp12") for alias in node.names
+                    ), str(file)
+    published = ROOT / "saebase/research_lab/backend/published_records.py"
+    source = published.read_text(encoding="utf-8")
+    assert ' / "published_wp12"' in source, "Keep existing public evidence storage"
+

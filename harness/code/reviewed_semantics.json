@@ -721,9 +721,9 @@
         "term.api"
       ]
     },
-    "code:module:saebase.research_lab.backend.published_wp12": {
-      "source_path": "saebase/research_lab/backend/published_wp12.py",
-      "source_symbol": "saebase/research_lab/backend/published_wp12.py",
+    "code:module:saebase.research_lab.backend.published_records": {
+      "source_path": "saebase/research_lab/backend/published_records.py",
+      "source_symbol": "saebase/research_lab/backend/published_records.py",
       "zh_title": "读取已批准的历史工程验证记录",
       "zh_summary": "按受控类别返回已发布的干预、基准、训练和电路验证产物。",
       "en_title": "Read approved historical research evidence cards",

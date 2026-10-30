@@ -589,7 +589,7 @@
             "term.artifact"
           ],
           "patterns": [
-            "^research_lab/backend/(?:publish|published_wp12|source_audit|variant_audit|wp15_records)\\.py$"
+            "^research_lab/backend/(?:publish|published_records|source_audit|variant_audit|wp15_records)\\.py$"
           ]
         },
         {
