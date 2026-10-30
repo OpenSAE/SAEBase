@@ -1,3 +1,7 @@
+## Work Plan 21.2 · 真实 GPU 与独立证据复核
+
+[**WP21.2 — 本地 Examiner 执行工作单**](21_wp21_2_local_gpu_followup.md)：针对 R08 的 Pythia 资源与重考、R17 的同 seed 训练差异、R20 的目录审计、Benchmark 设备与 padding、20 题 Reviewer 原始证据，指定真实输入、运行命令、独立验收、可追溯交付和禁止覆盖历史成绩的边界。本工作单只规定本地后续工作，不改冻结考试标准。Harness 修复见 [WP21.2 硬化说明](../tests/wp21/WP21_2_HARDENING.md)。
+
 ## Work Plan 20 · 中大型多阶段 Harness 集成考试
 
 [**WP20 — 20 道中大型集成题及独立验收设计**](20_integrated_multistage_harness_exams.md)：X01–X20 涉及真实 AST/Tree/Knowledge、SAE 编码/干预、AUROC/AP/Bootstrap、Checkpoint、文件原子性、CI 发布、并发与长时程重放。每题有模块来源、明确操作阶段、正反例与独立验收目标；配套 [机器可读设计](../contracts/wp20_cases.json)。**X01–X20 已有实际行为 Reference、80 组冻结正反例、独立 grader 与错误实现校准，现在可在隔离环境开展考试；产品级完整集成和人工审核仍是后续独立工作。**历史 WP19 的 200 个微型合成任务继续保留。
