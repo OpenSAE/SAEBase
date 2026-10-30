@@ -303,3 +303,30 @@ button:focus-visible,a:focus-visible,input:focus-visible,.graph-node:focus-visib
  .tool-actions{flex-wrap:wrap;row-gap:4px}
  .detail{width:auto}
 }
+
+/* Compact semantic zoom renders no source/footer trigger. Only title and count. */
+#diagram .graph-node.density-compact .attribute-trigger{display:none}
+.atlas-relations-shortcut{
+  flex:none;min-height:32px;min-width:90px;padding:0 10px;
+  border:1px solid #586068;border-radius:7px;
+  background:#21272b;color:#f2f3f4;
+  cursor:pointer;font:640 11.5px Inter,system-ui,"Noto Sans SC",sans-serif;
+}
+.atlas-relations-shortcut:hover,.atlas-relations-shortcut:focus-visible{
+  background:#373e43;border-color:#b3bac0;color:#fff;
+}
+#atlasRelationsSection{scroll-margin-top:16px}
+.atlas-relation-flow{
+  display:flex;align-items:center;gap:9px;
+  border:1px solid #333a3e;background:#111416;border-radius:7px;
+  padding:7px 9px;margin:1px 0 2px;
+}
+.atlas-relation-endpoint{
+  font-size:10.5px;font-weight:600;color:#ccd2d6;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.atlas-relation-endpoint.is-target{color:#f4f6f7}
+.atlas-relation-arrow{color:#a7b3bb;flex:none;font-size:16px}
+@media(max-width:730px){
+  .atlas-relations-shortcut{font-size:10px;min-width:74px;padding:0 6px}
+}
