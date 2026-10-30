@@ -649,8 +649,7 @@
     animateNextRender: false,
     renderedView: null
   };
-  const PAGE_SIZE = 10;
-  // A page is a viewport choice, NOT a source node or Context concept.
+  // Every real child remains available without paging.
   const childPages = new Map();
   // Independent focus, expansion, zoom and scroll for each Atlas tree.
   const viewStates = new Map();
@@ -704,26 +703,10 @@
     rootIds = byId.has(preferred) ? [preferred] : [...byId.keys()].filter(id => !parents.has(id));
   }
   function pagedChildren(id) {
-    const all = (children.get(id) || []).filter(key => byId.has(key));
-    if (config.query.trim() || all.length <= PAGE_SIZE) return all;
-    const maxPage = Math.ceil(all.length / PAGE_SIZE) - 1;
-    const page = Math.min(childPages.get(id) || 0, maxPage);
-    return all.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+    return (children.get(id) || []).filter(key => byId.has(key));
   }
   function updateChildPager() {
-    const panel = $("atlasChildPager");
-    if (!panel) return;
-    const all = config.focusId ? (children.get(config.focusId) || []) : [];
-    const enabled = config.mode === "focus" && all.length > PAGE_SIZE;
-    panel.classList.toggle("is-hidden", !enabled);
-    if (!enabled) return;
-    const pages = Math.ceil(all.length / PAGE_SIZE);
-    const index = Math.min(childPages.get(config.focusId) || 0, pages - 1);
-    $("atlasChildCount").textContent =
-      (index * PAGE_SIZE + 1) + "–" +
-      Math.min((index + 1) * PAGE_SIZE, all.length) + " / " + all.length;
-    $("atlasChildPrev").disabled = index === 0;
-    $("atlasChildNext").disabled = index >= pages - 1;
+    $("atlasChildPager")?.classList.add("is-hidden");
   }
   function ancestors(id) {
     const result = []; const seen = new Set();
@@ -982,8 +965,7 @@
     return list;
   }
 
-  function layoutOverview() {
-    const visible = visibleOverview();
+  function layoutOverview(visible = visibleOverview()) {
     const allowed = new Set(visible.map(v => v.id));
     const sizes = new Map(), blocks = new Map(), positions = new Map();
     const VERTICAL_GAP = 18, HORIZONTAL_GAP = 48, ORIGIN_X = 36;
@@ -1029,56 +1011,40 @@
     return { visible, positions };
   }
 
-  function layoutFocus() {
-    const id = config.focusId;
-    if (!byId.has(id)) return layoutOverview();
-    const chain = ancestors(id);
-    const ancestorsShown = chain.slice(0, -1);
-    const kids = pagedChildren(id);
-    const siblings = siblingsOf(id), at = siblings.indexOf(id);
-    const peerIds = [siblings[at-1],siblings[at+1]].filter(Boolean)
-      .filter(key => !ancestorsShown.includes(key) && !kids.includes(key));
-    const ids = [...ancestorsShown, id, ...kids, ...peerIds];
-    const positions = new Map();
-    const horizontalGap = 48, xStart = 36;
-    const focusSize = measure(byId.get(id), true);
-    const childSizes = kids.map(k => measure(byId.get(k), false));
-    const childTotal = childSizes.reduce((sum, s) => sum + s.h, 0)
-      + Math.max(0, childSizes.length - 1) * 18;
-    const center = 38 + Math.max(focusSize.h, childTotal) / 2;
-    const depthOffset = ancestorsShown.length;
-    const ancestorSizes=ancestorsShown.map(key=>measure(byId.get(key),false));
-    const columns=[xStart];
-    for(let i=1;i<=depthOffset;i++){
-      columns[i]=columns[i-1]+ancestorSizes[i-1].w+horizontalGap;
+  // Focus shows every preceding level. At the focused depth, only
+  // siblings sharing its parent appear; the focused node's direct
+  // children remain available for deeper exploration.
+  function visibleFocus() {
+    const path=ancestors(config.focusId);
+    if(!path.length)return visibleOverview();
+    const depthLimit=path.length-1;
+    const siblings=new Set(siblingsOf(config.focusId));
+    const roots=[...new Set([...rootIds,path[0]])];
+    const list=[],seen=new Set(),onPath=new Set(path);
+    function visit(id,depth){
+      if(!byId.has(id)||seen.has(id)||depth>depthLimit+1)return;
+      if(depth===depthLimit&&!siblings.has(id))return;
+      if(depth===depthLimit+1&&parents.get(id)!==config.focusId)return;
+      seen.add(id);
+      list.push({id,depth,role:id===config.focusId?"focus":
+        onPath.has(id)?"ancestor":depth===depthLimit?"sibling":
+        depth===depthLimit+1?"child":"context"});
+      if(depth<depthLimit){
+        for(const child of children.get(id)||[])visit(child,depth+1);
+      } else if(id===config.focusId){
+        for(const child of children.get(id)||[])visit(child,depth+1);
+      }
     }
-    const ownX=columns[depthOffset];
-    positions.set(id, { x: ownX, y: center - focusSize.h / 2,
-      ...focusSize, depth: depthOffset, role: "focus" });
-    ancestorsShown.forEach((key, i) => {
-      const size=ancestorSizes[i];
-      positions.set(key, { x: columns[i],
-        y: center - size.h / 2, ...size, depth: i, role: "ancestor" });
-    });
-    let y = center - childTotal / 2;
-    kids.forEach((child, index) => {
-      const size = childSizes[index];
-      positions.set(child, { x: ownX + focusSize.w + horizontalGap,
-        y, ...size, depth: depthOffset + 1, role: "child" });
-      y += size.h + 20;
-    });
-    // Ghost siblings share the selected node's parent, not a fictional edge.
-    for(const peer of peerIds) {
-      const size = measure(byId.get(peer), false);
-      const direction = siblings.indexOf(peer) < at ? -1 : 1;
-      positions.set(peer, {x:ownX,
-        y:center - focusSize.h/2 + (direction < 0 ?
-          -size.h-26 : focusSize.h+26),
-        ...size, depth:depthOffset, role:"sibling-preview"});
+    for(const root of roots)visit(root,0);
+    return list;
+  }
+  function layoutFocus(){
+    const layout=layoutOverview(visibleFocus());
+    for(const item of layout.visible){
+      const p=layout.positions.get(item.id);
+      if(p)p.role=item.role;
     }
-    return { visible: ids.map(key => ({
-      id: key, depth: positions.get(key).depth, role: positions.get(key).role
-    })), positions };
+    return layout;
   }
   function normalizeLayout(layout) {
     let minX = 0, minY = 0, maxX = 0, maxY = 0;
@@ -1371,11 +1337,7 @@
   // Fit the actual node positions, not the invisible padding that keeps
   // a focused card centered during normal browsing.
   function fitBounds() {
-    const path = config.mode === "focus" && config.focusId ?
-      new Set(ancestors(config.focusId)) : null;
-    const positions = [...config.positions.entries()]
-      .filter(([id]) => !path || path.has(id))
-      .map(([, p]) => p);
+    const positions = [...config.positions.values()];
     if (!positions.length) return {minX:0,minY:0,maxX:600,maxY:300};
     return {
       minX:Math.min(...positions.map(p => p.x)),
@@ -1483,10 +1445,10 @@
     output.replaceChildren();
     const list = visibleOverview();
     if (config.mode === "focus" && config.focusId) {
-      const path = ancestors(config.focusId);
-      const ids = new Set([...path, ...(children.get(config.focusId) || [])]);
-      for (const id of ids) output.appendChild(rowButton(id, byId.get(id).title,
-        Math.min(4, path.indexOf(id) >= 0 ? path.indexOf(id) : path.length)));
+      for(const item of config.visible){
+        const node=byId.get(item.id);
+        if(node)output.appendChild(rowButton(item.id,node.title,Math.min(5,item.depth)));
+      }
     } else {
       for (const item of list) output.appendChild(rowButton(item.id, byId.get(item.id).title, item.depth));
     }
