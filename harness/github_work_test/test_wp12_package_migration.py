@@ -58,3 +58,5 @@ def test_committed_code_snapshot_has_only_migrated_source_paths():
     paths = {node["path"] for node in source["nodes"] if node.get("path")}
     assert not any(path.startswith("saebase/wp12/") for path in paths)
     assert MOVED <= paths
+    assert "saebase/research_lab/backend/published_records.py" in paths
+    assert "saebase/research_lab/backend/published_wp12.py" not in paths
