@@ -41,10 +41,10 @@ jobs:
           python harness/visualization/build_pages.py
           python harness/visualization/build_language.py
           python harness/visualization/package_site.py --output "$RUNNER_TEMP/atlas-web/atlas"
-      - name: Checkout review branch for an isolated Preview
+      - name: Checkout project-owned preview source
         uses: actions/checkout@v4
         with:
-          ref: feat/atlas-global-search-evidence-inspector-20261029
+          ref: main
           path: preview-source
           fetch-depth: 1
       - name: Build project-owned preview without modifying stable Atlas
