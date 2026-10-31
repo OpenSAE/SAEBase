@@ -172,6 +172,7 @@ def test_tracked_repository_has_only_approved_top_level_directories():
         "tasks",
         "experiments",
         "tests",
+        "scripts",
     }
     tree = subprocess.run(
         ["git", "ls-tree", "-d", "--name-only", "HEAD"],

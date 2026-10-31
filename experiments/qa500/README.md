@@ -1,12 +1,15 @@
-# QA500 本地 Agent 一键执行手册
+# QA500 · 实验定义与运行手册
+
+**目录归属** 此文件属于独立 Experiment，仅组合现有 Dataset / Model / SAE / Task。
+
 
 ## 这是一项确定性执行工作
 
 **工作计划** `harness/github_work_plan/22_qa500_standard_evaluation_pipeline.md`。
 
-**固定机器配置** `conf/qa500_standard_v1.json`，包含十个数据集、每源500题、十个模型/20个 SAE 层位点、 seed、token预算、所有任务采样规模和参数。研究决策已经完成。Agent 只按照本文件执行、记录失败、恢复原样配置的失败计算、交付收据。禁止修改实验协议以获得“通过”。
+**固定机器配置** `conf/experiment/qa500/protocol.json`，包含十个数据集、每源500题、十个模型/20个 SAE 层位点、 seed、token预算、所有任务采样规模和参数。研究决策已经完成。Agent 只按照本文件执行、记录失败、恢复原样配置的失败计算、交付收据。禁止修改实验协议以获得“通过”。
 
-**唯一入口** `harness/experiments/qa500_execute.sh`，它检查源分支、Python依赖、盘空间、22个通用Harness contracts的既有绑定、QA单元测试、全模型矩阵。脚本自动创建本地 `.venv-qa500/` 和 `experiment/qa500/`，所有运行输出留在本地，不会自动推送 HF。
+**唯一入口** `scripts/experiments/qa500.sh`，它检查源分支、Python依赖、盘空间、22个通用Harness contracts的既有绑定、QA单元测试、全模型矩阵。脚本自动创建本地 `.venv-qa500/` 和 `experiment/qa500/`，所有运行输出留在本地，不会自动推送 HF。
 
 ## 0. Agent 收到本工作后做什么
 
@@ -15,13 +18,13 @@
 ```bash
 git fetch origin
 git switch feat/qa-evaluation-500-v1
-bash harness/experiments/qa500_execute.sh preflight
+bash scripts/experiments/qa500.sh preflight
 ```
 
 然后在真实 GPU 已授权的机器上，仅运行下面 **一条** 标准命令
 
 ```bash
-bash harness/experiments/qa500_execute.sh full --allow-local-gpu
+bash scripts/experiments/qa500.sh full --allow-local-gpu
 ```
 
 这条命令依次自动运行软件测试、10数据集冻结、源验证、20个SAE位点的10题真实 Pilot、50,000 QA Baseline、100,000 Capture、4,000个特征消融、1,000个短生成、每位点/数据集两个 source explanation、独立完整性审计、六个HF新配置的本地 staging。它**不会执行 Train、Circuits、自动 HF 线上发布**。任一独立执行单元资源不满足时，记录对应 blocked 与原始报错，继续其他可运行单元，最后以非零退出码与部分审计结果交付；不允许 agent 自行替换样本和模型。
@@ -29,7 +32,7 @@ bash harness/experiments/qa500_execute.sh full --allow-local-gpu
 额外的原生实验由单独授权驱动
 
 ```bash
-bash harness/experiments/qa500_execute.sh native --allow-native-compute
+bash scripts/experiments/qa500.sh native --allow-native-compute
 ```
 
 此任务调用上游 `circuit-tracer` 真实 Gemma tracer 和 SAE-Lens bounded TopK training；原生工具未安装、transcoder/gated模型不存在、独立语料不可达时按实际 blocked，不得标记完成。建议先让 Agent 运行 `full`，主数据先完成后再使用 native。
@@ -40,14 +43,14 @@ bash harness/experiments/qa500_execute.sh native --allow-native-compute
 
 | 执行目标 | 完整命令 |
 | --- | --- |
-| 离线环境/单元测试/contract 检查 | `bash harness/experiments/qa500_execute.sh preflight` |
-| 冻结十个 Hugging Face 数据集 | `bash harness/experiments/qa500_execute.sh prepare` |
-| 全模型十题试跑 | `bash harness/experiments/qa500_execute.sh pilot --allow-local-gpu` |
-| 五千问题 × 二十 SAE 位点及QA baseline | `bash harness/experiments/qa500_execute.sh core --allow-local-gpu` |
-| 特征消融、生成、解释 | `bash harness/experiments/qa500_execute.sh effects --allow-local-gpu` |
-| Circuits 与独立SAE train | `bash harness/experiments/qa500_execute.sh native --allow-native-compute` |
-| 独立计数和来源审计 | `bash harness/experiments/qa500_execute.sh audit` |
-| 独立审计与HF staging | `bash harness/experiments/qa500_execute.sh stage` |
+| 离线环境/单元测试/contract 检查 | `bash scripts/experiments/qa500.sh preflight` |
+| 冻结十个 Hugging Face 数据集 | `bash scripts/experiments/qa500.sh prepare` |
+| 全模型十题试跑 | `bash scripts/experiments/qa500.sh pilot --allow-local-gpu` |
+| 五千问题 × 二十 SAE 位点及QA baseline | `bash scripts/experiments/qa500.sh core --allow-local-gpu` |
+| 特征消融、生成、解释 | `bash scripts/experiments/qa500.sh effects --allow-local-gpu` |
+| Circuits 与独立SAE train | `bash scripts/experiments/qa500.sh native --allow-native-compute` |
+| 独立计数和来源审计 | `bash scripts/experiments/qa500.sh audit` |
+| 独立审计与HF staging | `bash scripts/experiments/qa500.sh stage` |
 
 复杂故障无需决定新方法。 Agent 在原命令重试一次后仍失败，将原始错误及定位信息交付维护者；对没有手段修复的 HF 权限与权重门槛标记 `ENV_BLOCKED`，继续其他独立模型/数据集时只保留真实完成的结果。
 
@@ -112,7 +115,7 @@ experiment/qa500/
 Source-backed 解释只做**核对后关联**，而非自动猜测。Step 1 用完整 Capture 的实际 SHA 确认模型/SAE/layer 精确坐标；Step 2 获得 Neuronpedia 公开 source 的**原始对应关系证据**；Step 3 写入 `experiment/qa500/neuronpedia/mapping.json`，该文件至少列出 site_id 对应 `{"model":"...","source":"...","sae_sha256":"<64hex>"}`；Step 4 执行以下命令（不调用大量单feature API）
 
 ```bash
-python -m saebase.datasets.qa_neuronpedia_bulk \
+python -m experiments.qa500.neuronpedia_sync \
   --mapping experiment/qa500/neuronpedia/mapping.json \
   --result-root experiment/qa500/results \
   --output experiment/qa500/neuronpedia/annotations.jsonl
@@ -127,8 +130,8 @@ python -m saebase.datasets.qa_neuronpedia_bulk \
 审核命令
 
 ```bash
-python -m saebase.datasets.qa_report audit
-python -m saebase.datasets.qa_report stage
+python -m experiments.qa500.report audit
+python -m experiments.qa500.report stage
 ```
 
 审计要求 10 个源各500题、100个 model×dataset baseline 完成、200个 site×dataset capture 完成、200个干预任务单元各20条、200个生成任务单元各5条，并验证所有 sample ID、SAE hash、feature维度、token/源身份与数值。某些子任务如 Explain、Circuits、Train 在主矩阵以外，使用原生 source-only/not-verified 状态单独展示。
@@ -136,7 +139,7 @@ python -m saebase.datasets.qa_report stage
 只有研究人员明确批准对 HF dataset 的修改、完成外部权利审核和独立验收后，才可在本地加 `--approved` 执行
 
 ```bash
-python -m saebase.datasets.qa_hf_publish \
+python -m experiments.qa500.publish \
   --stage experiment/qa500/hf_stage --approved
 ```
 
@@ -146,4 +149,4 @@ python -m saebase.datasets.qa_hf_publish \
 
 ## 6. Agent 可直接复制的 Prompt
 
-> 使用 SAEBase 分支 `feat/qa-evaluation-500-v1`。阅读 `harness/github_work_plan/22_qa500_standard_evaluation_pipeline.md`、`harness/github_development_doc/qa500-agent-runbook.md` 和 `conf/qa500_standard_v1.json`，并使用 Registry 解析各阶段 CT contract。所有研究选择已经冻结，禁止自行修改题目、样本数量、模型、层、seed、feature selection、metrics、prompt模板、训练语料、HF schema 或发布门槛。先执行 `bash harness/experiments/qa500_execute.sh preflight`，然后在已经获得本地GPU授权的机器上执行 `bash harness/experiments/qa500_execute.sh full --allow-local-gpu`。失败时保留真实报错和状态，对同一命令恢复重试，不替换不兼容资产，不将 synthetic/failure 记录为成功。独立 native 工作只在收到 `--allow-native-compute` 许可后执行。最终提交可审查的 run receipts、source/model/SAE SHA、日志、审计结果和拟发布 staging；等待人工批准后才可进行实际 HF 线上发布。
+> 使用 SAEBase 分支 `feat/qa-evaluation-500-v1`。阅读 `harness/github_work_plan/22_qa500_standard_evaluation_pipeline.md`、`experiments/qa500/README.md` 和 `conf/experiment/qa500/protocol.json`，并使用 Registry 解析各阶段 CT contract。所有研究选择已经冻结，禁止自行修改题目、样本数量、模型、层、seed、feature selection、metrics、prompt模板、训练语料、HF schema 或发布门槛。先执行 `bash scripts/experiments/qa500.sh preflight`，然后在已经获得本地GPU授权的机器上执行 `bash scripts/experiments/qa500.sh full --allow-local-gpu`。失败时保留真实报错和状态，对同一命令恢复重试，不替换不兼容资产，不将 synthetic/failure 记录为成功。独立 native 工作只在收到 `--allow-native-compute` 许可后执行。最终提交可审查的 run receipts、source/model/SAE SHA、日志、审计结果和拟发布 staging；等待人工批准后才可进行实际 HF 线上发布。

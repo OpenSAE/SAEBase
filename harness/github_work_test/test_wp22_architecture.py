@@ -10,42 +10,53 @@ from pathlib import Path
 
 import pytest
 
-from saebase.datasets.qa_batch import make_plan
-from saebase.datasets.qa_pipeline import site_list
-from saebase.datasets.qa_standard import DATASETS, N_PER_DATASET, PROTOCOL_ID
-from saebase.datasets.qa_inference import score_choices
-from saebase.datasets.qa_neuronpedia import annotate
-from saebase.datasets.qa_report import audit
+from experiments.qa500.runner import make_plan
+from experiments.qa500.capture import site_list
+from experiments.qa500.cohort import DATASETS, N_PER_DATASET, PROTOCOL_ID
+from tasks.benchmark.qa_scoring import score_choices
+from saebase.integrations.neuronpedia import annotate
+from experiments.qa500.report import audit
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAN = "harness/github_work_plan/22_qa500_standard_evaluation_pipeline.md"
 
 
 def test_full_matrix_matches_immutable_protocol_config():
+    from experiments.qa500.config import get_protocol, get_dataset_ids, get_sites, get_tasks
+
     plan = make_plan()
-    cfg = json.loads((ROOT / "conf/qa500_standard_v1.json").read_text())
+    cfg = get_protocol()
+    datasets = get_dataset_ids()
+    sites = get_sites()
+    tasks = get_tasks()
     assert cfg["protocol_id"] == PROTOCOL_ID
     assert cfg["seed"] == 20261031
-    assert cfg["datasets"] == list(DATASETS)
-    assert cfg["dataset_count"] == len(DATASETS) == 10
+    assert list(datasets) == list(DATASETS)
     assert cfg["samples_per_dataset"] == N_PER_DATASET == 500
-    assert cfg["model_count"] == 10
-    assert cfg["site_count"] == len(site_list()) == 20
-    assert cfg["execution"]["expected_model_qa_baselines"] == plan["expected_model_qa_baselines"]
-    assert cfg["execution"]["expected_capture_rows"] == plan["expected_capture_rows"]
-    assert (
-        cfg["execution"]["expected_benchmark_summaries"]
-        == plan["expected_benchmark_summaries"]
-        == 200
-    )
-    assert cfg["execution"]["expected_intervene_rows"] == plan["expected_intervention_rows"]
-    assert cfg["execution"]["expected_generate_rows"] == plan["expected_generation_rows"]
-    assert cfg["execution"]["hf_publish_automatic"] is False
-    expected = [(m["model_key"], m["sae_key"], m["layers"]) for m in cfg["models"]]
-    from saebase.datasets.qa_pipeline import SITES
+    assert len(datasets) == 10
+    assert len(sites) == 10
+    assert len(site_list()) == 20
+    assert tasks["execution"]["expected_model_qa_baselines"] == plan[
+        "expected_model_qa_baselines"
+    ]
+    assert tasks["execution"]["expected_capture_rows"] == plan[
+        "expected_capture_rows"
+    ]
+    assert tasks["execution"]["expected_benchmark_summaries"] == plan[
+        "expected_benchmark_summaries"
+    ] == 200
+    assert tasks["execution"]["expected_intervene_rows"] == plan[
+        "expected_intervention_rows"
+    ]
+    assert tasks["execution"]["expected_generate_rows"] == plan[
+        "expected_generation_rows"
+    ]
+    assert tasks["execution"]["hf_publish_automatic"] is False
+    from experiments.qa500.capture import SITES
 
-    actual = [(name, sae, list(layers)) for name, sae, layers in SITES]
-    assert expected == actual
+    assert [(x["model_key"], x["sae_key"], x["layers"]) for x in sites] == [
+        (model, sae, list(layers)) for model, sae, layers in SITES
+    ]
 
 
 def test_workplan_uses_only_preexisting_universal_harness_contracts():
@@ -92,7 +103,7 @@ def test_audit_fails_closed_on_empty_records(tmp_path):
 
 
 def test_qa_answer_scorer_rejects_repeated_choices():
-    from harness.github_work_test.test_qa500_execution import MinimalPair
+    from experiments.qa500.tests.test_execution import MinimalPair
 
     p = MinimalPair()
     with pytest.raises(ValueError, match="unique"):
@@ -138,7 +149,7 @@ def test_qa_answer_scorer_rejects_repeated_choices():
     ],
 )
 def test_all_remaining_real_source_shapes_are_normalized(dataset_id, example, config):
-    from saebase.datasets.qa_standard import normalize, render_prompt
+    from experiments.qa500.cohort import normalize, render_prompt
 
     record = normalize(DATASETS[dataset_id], example, source_config=config, source_index=0)
     prompt = render_prompt(record)
@@ -150,7 +161,7 @@ def test_all_remaining_real_source_shapes_are_normalized(dataset_id, example, co
 
 
 def test_bootstrap_core_benchmark_is_reproducible_and_constant_cases():
-    from saebase.datasets.qa_benchmark import summarize_metric
+    from experiments.qa500.benchmark import summarize_metric
 
     metric = summarize_metric([4.0] * 500)
     assert metric["value"] == 4.0

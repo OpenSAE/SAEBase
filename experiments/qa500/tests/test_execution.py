@@ -9,10 +9,11 @@ from tempfile import TemporaryDirectory
 
 import torch
 
-from saebase.datasets.qa_standard import DATASETS, PROTOCOL_ID, digest, normalize
-from saebase.datasets.qa_inference import grade_answer, make_input, score_choices, evaluate_qa
-from saebase.datasets.qa_batch import make_plan
-from saebase.datasets.qa_evaluation import run_baseline
+from experiments.qa500.cohort import DATASETS, PROTOCOL_ID, digest, normalize
+from tasks.benchmark.qa_scoring import grade_answer, score_choices, evaluate_qa
+from models.qa_input import make_input
+from experiments.qa500.runner import make_plan
+from experiments.qa500.baseline import run_baseline
 
 
 class MinimalTokenizer:

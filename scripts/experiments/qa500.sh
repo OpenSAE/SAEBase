@@ -83,13 +83,13 @@ python -m pip check
 
 run_preflight() {
   python -m pytest -q \
-    harness/github_work_test/test_qa_standard_500.py \
-    harness/github_work_test/test_qa500_execution.py \
-    harness/github_work_test/test_qa500_protocol.py
+    experiments/qa500/tests/test_cohort.py \
+    experiments/qa500/tests/test_execution.py \
+    harness/github_work_test/test_wp22_architecture.py
   python -m harness.contracts.registry check \
     --plan harness/github_work_plan/22_qa500_standard_evaluation_pipeline.md
-  python -m saebase.datasets.qa_batch plan > experiment/qa500/logs/frozen_plan.json
-  python -m saebase.datasets.qa_pipeline sites > experiment/qa500/logs/frozen_sites.json
+  python -m experiments.qa500.runner plan > experiment/qa500/logs/frozen_plan.json
+  python -m experiments.qa500.capture sites > experiment/qa500/logs/frozen_sites.json
 }
 
 run_preflight
@@ -110,51 +110,51 @@ case "$PHASE" in
     echo "Preflight accepted; no remote datasets or model weights loaded."
     ;;
   prepare)
-    python -m saebase.datasets.qa_batch prepare
-    python -m saebase.datasets.qa_batch verify
+    python -m experiments.qa500.runner prepare
+    python -m experiments.qa500.runner verify
     ;;
   pilot)
-    python -m saebase.datasets.qa_batch verify
-    python -m saebase.datasets.qa_batch pilot --model all --device cuda
+    python -m experiments.qa500.runner verify
+    python -m experiments.qa500.runner pilot --model all --device cuda
     ;;
   core)
-    python -m saebase.datasets.qa_batch verify
-    python -m saebase.datasets.qa_batch core --model all --device cuda
+    python -m experiments.qa500.runner verify
+    python -m experiments.qa500.runner core --model all --device cuda
     ;;
   effects)
-    python -m saebase.datasets.qa_batch verify
-    python -m saebase.datasets.qa_batch effects --model all --device cuda
+    python -m experiments.qa500.runner verify
+    python -m experiments.qa500.runner effects --model all --device cuda
     ;;
   native)
-    run_scoped python -m saebase.datasets.qa_native circuits --approved
-    if python -m saebase.datasets.qa_native prepare-train; then
-      run_scoped python -m saebase.datasets.qa_native train --approved
+    run_scoped python -m experiments.qa500.native circuits --approved
+    if python -m experiments.qa500.native prepare-train; then
+      run_scoped python -m experiments.qa500.native train --approved
     else
       PARTIAL=1
       echo "QA500 native training preparation blocked; circuits receipt is preserved"
     fi
     ;;
   audit)
-    python -m saebase.datasets.qa_report audit
+    python -m experiments.qa500.report audit
     ;;
   stage)
-    python -m saebase.datasets.qa_report audit
-    python -m saebase.datasets.qa_report stage
+    python -m experiments.qa500.report audit
+    python -m experiments.qa500.report stage
     ;;
   full)
     # Scope failures are independent; do not let gated GPQA prevent nine
     # other real datasets from running on the approved local machine.
-    run_scoped python -m saebase.datasets.qa_batch prepare
-    run_scoped python -m saebase.datasets.qa_batch verify
-    run_scoped python -m saebase.datasets.qa_batch pilot --model all --device cuda
-    run_scoped python -m saebase.datasets.qa_batch core --model all --device cuda
-    run_scoped python -m saebase.datasets.qa_batch effects --model all --device cuda
-    run_scoped python -m saebase.datasets.qa_report audit
+    run_scoped python -m experiments.qa500.runner prepare
+    run_scoped python -m experiments.qa500.runner verify
+    run_scoped python -m experiments.qa500.runner pilot --model all --device cuda
+    run_scoped python -m experiments.qa500.runner core --model all --device cuda
+    run_scoped python -m experiments.qa500.runner effects --model all --device cuda
+    run_scoped python -m experiments.qa500.report audit
     if ((PARTIAL)); then
       # Local-only partial exports are clearly marked and cannot be published.
-      run_scoped python -m saebase.datasets.qa_report stage --allow-partial
+      run_scoped python -m experiments.qa500.report stage --allow-partial
     else
-      run_scoped python -m saebase.datasets.qa_report stage
+      run_scoped python -m experiments.qa500.report stage
     fi
     ;;
 esac

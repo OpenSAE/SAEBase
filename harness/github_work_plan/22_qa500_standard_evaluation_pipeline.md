@@ -1,4 +1,6 @@
-# WP22 — QA500 统一真实评测执行方案
+# WP22 — QA500 标准实验（科研组件与实验组合解耦）
+
+结构权威：`experiments/qa500/` 仅组织具体实验；`datasets/`、`models/`、`tasks/` 和 `saebase/` 提供可重用能力。`conf/experiment/qa500/` 是唯一研究配置源，运行入口归 `scripts/`。Runtime 正式产物需遵循既有 `saebase/runtime/experiment_paths.py`。
 
 ## 结论与操作边界
 
@@ -12,20 +14,20 @@
 
 | 组件 | 已确定的来源 |
 | --- | --- |
-| 统一协议 | `conf/qa500_standard_v1.json`，`datasets/qa_batch.py plan`，二者由离线验收检查一致性 |
-| 数据下载和冻结 | `datasets/qa_standard.py`，十源均使用确切 upstream commit、固定 seed=20261031、分层抽样 500 |
-| 模型层位点 | `datasets/qa_pipeline.py SITES`，20 个明确模型/SAE/hook/layer |
-| 模型输入与评分 | `datasets/qa_inference.py`；正确的模型 tokenizer、Gemma IT chat template、候选 token 序列 log prob、贪心回答及类型化 scorer |
-| 模型共享 Baseline | `datasets/qa_evaluation.py`，每模型每数据集只评测一次，两个 SAE 层共享 |
-| Capture/核心指标 | `datasets/qa_pipeline.py`，使用真实 `saebase.api.load_registered`、`capture_features`、真实 SAE state SHA256、last prompt token |
-| Intervene / Generate | `datasets/qa_effects.py`，真实 `evaluate_edit` 与 `compare_steered_generation` |
-| Explain | `datasets/qa_explain.py`，100 discovery/400 held-out，Neuronpedia 只作为外部来源文本，明确没有通过语义验收 |
-| Neuronpedia | `datasets/qa_neuronpedia.py` 和 `datasets/qa_neuronpedia_bulk.py`，必须精确匹配源 SAE 模型/source ID/权重 SHA256 |
-| Circuits / Train | `datasets/qa_native.py`，固定独立原生工作器与输入/训练资源；须另行授权、可能被环境阻塞 |
-| Audit / HF stage | `datasets/qa_report.py`，独立计数、源哈希、feature 范围、输入身份和聚合验证 |
-| HF publish | `datasets/qa_hf_publish.py`，仅在用户明确批准及完整验证后追加新 cohort，现有 25 configs 不动 |
-| 一键执行脚本 | `harness/experiments/qa500_execute.sh`；详见 `harness/github_development_doc/qa500-agent-runbook.md` |
-| 离线测试 | `harness/github_work_test/test_qa_standard_500.py`，`test_qa500_execution.py`，`test_qa500_protocol.py` |
+| 统一协议 | `conf/experiment/qa500/protocol.json`，`experiments/qa500/runner.py plan`，二者由离线验收检查一致性 |
+| 数据下载和冻结 | `experiments/qa500/cohort.py`，十源均使用确切 upstream commit、固定 seed=20261031、分层抽样 500 |
+| 模型层位点 | `experiments/qa500/capture.py SITES`，20 个明确模型/SAE/hook/layer |
+| 模型输入与评分 | `models/qa_input.py + tasks/benchmark/qa_scoring.py`；正确的模型 tokenizer、Gemma IT chat template、候选 token 序列 log prob、贪心回答及类型化 scorer |
+| 模型共享 Baseline | `experiments/qa500/baseline.py`，每模型每数据集只评测一次，两个 SAE 层共享 |
+| Capture/核心指标 | `experiments/qa500/capture.py`，使用真实 `saebase.api.load_registered`、`capture_features`、真实 SAE state SHA256、last prompt token |
+| Intervene / Generate | `experiments/qa500/effects.py`，真实 `evaluate_edit` 与 `compare_steered_generation` |
+| Explain | `experiments/qa500/explain.py`，100 discovery/400 held-out，Neuronpedia 只作为外部来源文本，明确没有通过语义验收 |
+| Neuronpedia | `saebase/integrations/neuronpedia.py` 和 `experiments/qa500/neuronpedia_sync.py`，必须精确匹配源 SAE 模型/source ID/权重 SHA256 |
+| Circuits / Train | `experiments/qa500/native.py`，固定独立原生工作器与输入/训练资源；须另行授权、可能被环境阻塞 |
+| Audit / HF stage | `experiments/qa500/report.py`，独立计数、源哈希、feature 范围、输入身份和聚合验证 |
+| HF publish | `experiments/qa500/publish.py`，仅在用户明确批准及完整验证后追加新 cohort，现有 25 configs 不动 |
+| 一键执行脚本 | `scripts/experiments/qa500.sh`；详见 `experiments/qa500/README.md` |
+| 离线测试 | `experiments/qa500/tests/test_cohort.py`，`test_qa500_execution.py`，`test_qa500_protocol.py` |
 
 任何代码与协议不一致，优先拒绝并提交差异报告，而不是让 Agent 选一个解释。
 
@@ -119,12 +121,12 @@ Capture 与 Benchmark 在当前 QA500 **只包括** `core.l0` 和 `core.reconstr
 ```bash
 git fetch origin
 git switch feat/qa-evaluation-500-v1
-bash harness/experiments/qa500_execute.sh full --allow-local-gpu
+bash scripts/experiments/qa500.sh full --allow-local-gpu
 ```
 
 完整流程执行 source setup、预检、10 源冻结、20-site Pilot、全部 Core、全部 Effects、独立 Audit、HF staging；自动保留失败和 partial。若缺 GPU、HF 权限、源样本不足或模型不兼容，返回相应 blocked 收据而不是改协议。原生扩展是单独授权 `native --allow-native-compute`，HF publish 无任何一键隐含许可。
 
-详尽命令、结果目录、恢复和 failure policy：`harness/github_development_doc/qa500-agent-runbook.md`。
+详尽命令、结果目录、恢复和 failure policy：`experiments/qa500/README.md`。
 
 ## 实验接收标准
 

@@ -76,6 +76,7 @@ saebase-audit = "saebase.cli:audit"
 saebase-ground-truth = "saebase.cli:ground_truth"
 saebase-release-matrix = "saebase.cli:release_matrix"
 saebase-release-gate = "saebase.cli:release_gate"
+saebase-qa-eval = "experiments.qa500.runner:main"
 
 [project.urls]
 Repository = "https://github.com/OpenSAE/SAEBase"
@@ -88,11 +89,12 @@ py-modules = []
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["saebase*", "models*", "tasks*", "conf*"]
+include = ["saebase*", "models*", "tasks*", "conf*", "experiments*"]
 exclude = ["tests*", "examples*"]
 
 [tool.setuptools.package-data]
 conf = ["**/*.yaml", "**/*.yml", "**/*.md", "**/*.json"]
+experiments = ["**/*.md", "**/*.json"]
 saebase = ["**/*.md", "**/*.yaml", "**/*.json", "**/*.html", "**/*.css", "**/*.js"]
 models = ["**/*.json", "**/*.yaml"]
 

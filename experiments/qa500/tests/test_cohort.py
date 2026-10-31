@@ -7,7 +7,7 @@ import unittest
 from tempfile import TemporaryDirectory
 from pathlib import Path
 
-from saebase.datasets.qa_standard import (
+from experiments.qa500.cohort import (
     DATASETS,
     N_PER_DATASET,
     PROTOCOL_ID,
@@ -16,7 +16,7 @@ from saebase.datasets.qa_standard import (
     digest,
     verify_dataset,
 )
-from saebase.datasets.qa_neuronpedia import annotate
+from saebase.integrations.neuronpedia import annotate
 
 
 class QA500ContractTests(unittest.TestCase):
