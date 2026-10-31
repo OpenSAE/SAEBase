@@ -75,7 +75,14 @@ NEEDED_WHEEL = {
     "conf/evaluation/activation_health.yaml",
     "conf/task/sae.yaml",
 }
-NEEDED_SDIST = NEEDED_WHEEL | {
+NEEDED_SDIST = (NEEDED_WHEEL - {
+    "saebase/datasets/plugins.py",
+    "saebase/datasets/prompt_schema.py",
+    "saebase/datasets/datamodule.py",
+}) | {
+    "datasets/plugins.py",
+    "datasets/prompt_schema.py",
+    "datasets/datamodule.py",
     ".github/workflows/m5-matrix.yml",
     ".github/workflows/m5-release.yml",
     "harness/github_development_doc/M5_RELEASE_NOTES.md",
