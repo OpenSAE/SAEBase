@@ -104,7 +104,8 @@ def test_publication_asset_lock_rejects_partial_and_unverified_revision_ids(monk
         "model_revisions": {row["model_key"]: "b" * 40 for row in sites},
         "sae_revisions": {
             f"{row['model_key']}:{row['sae_key']}:L{layer}": "c" * 40
-            for row in sites for layer in row["layers"]
+            for row in sites
+            for layer in row["layers"]
         },
     }
     monkeypatch.setattr(assets, "get_assets_lock", lambda: complete)
