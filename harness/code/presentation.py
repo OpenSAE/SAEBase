@@ -353,6 +353,7 @@ def concrete_groups(output: dict) -> None:
         parent = "code:group:" + area
         instances = defaultdict(list)
         common = []
+        dataset_instances = {"qa_sources": [], "behavior_sources": []}
         for node in nodes:
             if node["kind"] != "module":
                 continue
@@ -441,11 +442,63 @@ def concrete_groups(output: dict) -> None:
                     ],
                 }
             )
-            edges.append({"source": group_id, "target": instance_id, "type": "contains"})
+            if area == "datasets":
+                # Group source-owned QA adapters separately from legacy
+                # behavior-prompt sources. This is derived from actual module
+                # evidence, rather than a synthetic navigation or NLP/vision tier.
+                has_qa = any(
+                    PurePosixPath(item["path"]).name == "qa_adapter.py"
+                    for item in modules
+                )
+                bucket = "qa_sources" if has_qa else "behavior_sources"
+                dataset_instances[bucket].append((instance_id, modules))
+            else:
+                edges.append({"source": group_id, "target": instance_id, "type": "contains"})
             if area == "tasks":
                 task_configuration_nodes(name, instance_id, nodes, edges)
             for module in modules:
                 edges.append({"source": instance_id, "target": module["id"], "type": "contains"})
+        if area == "datasets":
+            specifications = {
+                "qa_sources": (
+                    "具备答案解析的真实问答数据集",
+                    "Dataset 独立解析真实题目、参考答案及上游配置，供多个科研实验复用。",
+                    "Datasets with real QA answer parsing",
+                    "Each source owns its question and answer parsing; experiments select samples.",
+                ),
+                "behavior_sources": (
+                    "受控行为与语言现象的数据源",
+                    "保留原有行为提示、样本来源和通用采样接口，供科研任务复用。",
+                    "Controlled behavior and language sources",
+                    "Preserve source-owned prompt and behavior datasets for reusable tasks.",
+                ),
+            }
+            for bucket, members in dataset_instances.items():
+                if not members:
+                    continue
+                heading, explanation, en_heading, en_explanation = specifications[bucket]
+                group_node_id = "code:concept:datasets:" + bucket
+                evidence = [
+                    module["path"] for _instance, sources in members for module in sources
+                ]
+                nodes.append({
+                    "id": group_node_id, "kind": "group",
+                    "title": heading, "summary": explanation,
+                    "description": explanation, "status": "implemented",
+                    "evidence": evidence,
+                    "presentation_only": True, "source_symbol": "",
+                    "context_term_ids": ["term.dataset"],
+                    "english_title": en_heading,
+                    "english_summary": en_explanation,
+                    "english_description": en_explanation,
+                })
+                edges.append({
+                    "source": group_id, "target": group_node_id, "type": "contains",
+                })
+                for instance_id, _modules in members:
+                    edges.append({
+                        "source": group_node_id, "target": instance_id, "type": "contains",
+                    })
     output["edges"] = edges
 
 
