@@ -88,6 +88,7 @@ def make_plan() -> dict[str, Any]:
         "n_sites": len(site_list()),
         "expected_model_qa_baselines": len(SITES) * 500 * len(DATASETS),
         "expected_capture_rows": 500 * len(DATASETS) * len(site_list()),
+        "expected_benchmark_summaries": len(DATASETS) * len(site_list()),
         "expected_intervention_rows": 20 * len(DATASETS) * len(site_list()),
         "expected_generation_rows": 5 * len(DATASETS) * len(site_list()),
         "task_status": TASK_STATUS,
