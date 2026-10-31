@@ -9,7 +9,7 @@ import pytest
 
 from harness.contracts import invariants, registry, trace
 
-PLAN = "harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md"
+PLAN = "harness/github/work_plan/18_harness_local_agent_examination_and_independent_acceptance.md"
 
 
 def test_catalog_has_a_closed_and_versioned_vocabulary():
@@ -68,8 +68,8 @@ def test_registry_rejects_category_without_specific_contract(monkeypatch):
     [
         "../private.md",
         "/etc/passwd",
-        "harness/github_work_plan/../../private.md",
-        "harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md/../x.md",
+        "harness/github/work_plan/../../private.md",
+        "harness/github/work_plan/18_harness_local_agent_examination_and_independent_acceptance.md/../x.md",
     ],
 )
 def test_registry_cannot_load_workplan_outside_source_root(source):
