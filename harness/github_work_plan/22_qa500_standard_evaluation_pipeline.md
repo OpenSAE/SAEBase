@@ -140,3 +140,20 @@ bash scripts/experiments/qa500.sh full --allow-local-gpu
 - HF：六个配置可 load_dataset，原 25 个配置和历史结果保持一致，清楚标注此为独立 cohort。
 
 **目前软件分支的科学状态：CODE_PREPARED、CI_PENDING_OR_CHECK_SEPARATELY、GPU_UNRUN、HF_UNPUBLISHED。** 凡报告更高状态必须附实际 source commit、模型权重 identity 和独立审计。
+
+
+## WP22 R2 架构迁移说明
+
+已基于本轮审阅拆分 Dataset/Model/Task/Experiment/Runtime/Harness。项目结构权威为
+[experiments/qa500/README.md](../../experiments/qa500/README.md)。
+
+- 一级 `scripts/experiments/qa500.sh` 是唯一 Shell 入口。
+- `conf/experiment/qa500/` 是科研配置所有者；`conf/experiment/qa500.yaml` 对接现有 Hydra experiment group。
+- 十个源 Dataset 通过现有 SAEBase Dataset Registry 解析各自 `qa_adapter.py`。
+- `models/qa_input.py` 负责输入，`tasks/capture` 与 `tasks/benchmark` 拥有通用算法。
+- `experiments/qa500/` 只组合实例、执行矩阵、run-level summary 和研究发布准备。
+- 所有 Task 实测写入现有 Runtime run leaf；跨 Run 冻结 cohort 与 Manifest 存在 `experiment/_studies/<protocol>/`。
+- Hardware Profile 和隔离 Worker 是通用 Runtime；目前只允许重新初始化并用相同精度重试，其他 Offload 方法须经过真实 backend 验证。
+- 当前版本 `assets.lock.json` 仍标注上游 SHA 未全部冻结，真实 GPU 和跨机器对比仍需独立验收，因此不能宣称达到零缓存跨机科学发布。
+
+PR #111 的历史 QA500 平行模块已删除，禁止新的代码再引用 `saebase.datasets.qa_*`。

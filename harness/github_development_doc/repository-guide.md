@@ -11,7 +11,9 @@ SAEBase separates runnable examples, research code, published evidence and engin
 | [`saebase/examples/interventions/`](../../saebase/examples/interventions/README.md) | Feature edits, downstream logits and steering | [Pythia feature edit](../../saebase/examples/interventions/pythia_feature_edit.py) |
 | [`saebase/examples/benchmarking/`](../../saebase/examples/benchmarking/README.md) | Benchmark preflight and reliability analysis | [Benchmark preflight](../../saebase/examples/benchmarking/benchmark_preflight.py) |
 | [`saebase/examples/research_integrations/`](../../saebase/examples/research_integrations/README.md) | SAR, RSS, Input Localization and SAEBench | [Research examples](../../saebase/examples/research_integrations/README.md) |
-| [`saebase/`](../../saebase) | Python APIs for loading, measuring, editing and reporting | [API guide](python-api.md) |
+| [`saebase/`](../../saebase) | Reusable Python APIs, runtime capabilities, provenance and storage | [API guide](python-api.md) |
+| [`experiments/`](../../experiments) | Concrete research experiment definitions and composition | [QA500 experiment](../../experiments/qa500/README.md) |
+| [`scripts/`](../../scripts) | Shell launchers and installation entrypoints | [QA500 local runner](../../scripts/experiments/qa500.sh) |
 | [`models/`](../../models) and [`conf/`](../../conf) | Model adapters, SAE profiles and experiment configurations | [Model support](model-support.md) |
 | [`saebase/research_lab/`](../../saebase/research_lab/README.md) | Browser-based exploration of recorded measurements | [Research Lab](../../saebase/research_lab/README.md) |
 | [`saebase/assets/`](../github_assets) | Branding and workflow figures used in documentation | [Workflow diagram](../github_assets/figures/saebase_workflow.svg) |
