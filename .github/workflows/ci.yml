@@ -36,7 +36,7 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: python harness/core/check_architecture.py --base "$BASE_SHA"
+        run: python -m harness.core.check_architecture --base "$BASE_SHA"
       - name: Validate Core and Knowledge source graphs
         run: |
           python harness/core/validate.py
