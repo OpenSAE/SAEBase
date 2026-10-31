@@ -5,7 +5,7 @@ Status: READY FOR LOCAL GPU EXECUTION. No GPU performance or real-checkpoint par
 Owner: OpenSAE / SAEBase.  
 Primary code: [performance PR #44](https://github.com/OpenSAE/SAEBase/pull/44), branch **perf/throughput-reliability-20261020**.  
 Historical comparison: pre-optimization main commit **339fbb603bc6d999fd126a91ea8709fee1c599c2**.  
-Related: [performance notes](https://github.com/OpenSAE/SAEBase/blob/perf/throughput-reliability-20261020/harness/github_development_doc/performance.md), [verified model matrix](../github_development_doc/verified-model-matrix.md), [Work Plan 05](05_research_lab_cpu_closure_and_gpu_handoff.md).
+Related: [performance notes](https://github.com/OpenSAE/SAEBase/blob/perf/throughput-reliability-20261020/harness/github_development_doc/performance.md), [verified model matrix](../development_doc/verified-model-matrix.md), [Work Plan 05](05_research_lab_cpu_closure_and_gpu_handoff.md).
 
 ## 0. Mission and nonnegotiable rules
 

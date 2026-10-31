@@ -18,31 +18,31 @@ This is a complete handoff for the next agent. It should be executable without r
 
 ## 1. Baseline and source of truth
 
-The real checkpoint source inventory is [conf/coverage/stage_bc.json](../../conf/coverage/stage_bc.json). Its schema is `saebase.coverage.stage_bc.v1`; the Python validator is [saebase/sae/coverage.py](../../saebase/sae/coverage.py). **Exactly 15 core profile entries plus 3 architecture entries, and 48 selected SAE layer configurations** are in the present catalog. The four depth bands, when an SAE exists near them, are 25%, 50%, 65%, and 85%; never assume an unreleased layer exists.
+The real checkpoint source inventory is [conf/coverage/stage_bc.json](../../../conf/coverage/stage_bc.json). Its schema is `saebase.coverage.stage_bc.v1`; the Python validator is [saebase/sae/coverage.py](../../../saebase/sae/coverage.py). **Exactly 15 core profile entries plus 3 architecture entries, and 48 selected SAE layer configurations** are in the present catalog. The four depth bands, when an SAE exists near them, are 25%, 50%, 65%, and 85%; never assume an unreleased layer exists.
 
 Completed evidence that must be **reused**, not repeated:
 
 | Evidence | What it establishes | Source |
 | --- | --- | --- |
 | Stage C upstream objects | 48/48 selected source files exist; no tensor execution proven by this check | [Source HEAD run](https://github.com/OpenSAE/SAEBase/actions/runs/38829795455/artifacts/12017011100) |
-| Stage C native CPU SAEs | 21/21 selected SAE weight loads, finite encode/decode and SHA-256; **not LLM pair tests** | [SHA-256 index](../../conf/coverage/stage_c_cpu_verified.json) |
+| Stage C native CPU SAEs | 21/21 selected SAE weight loads, finite encode/decode and SHA-256; **not LLM pair tests** | [SHA-256 index](../../../conf/coverage/stage_c_cpu_verified.json) |
 | Stage C Gemma2 9B PT L20 repair | Original L0 57 source did not resolve; correct checkpoint is `layer_20/width_16k/average_l0_58`; real SAE-only test passed | [Focused artifact](https://github.com/OpenSAE/SAEBase/actions/runs/38828805176/artifacts/12015864245) |
-| B: Pythia 410M + TopK MLP L4 | Real CPU LLM + SAE identity patch, feature ablation; M3 (5 metric rows), M4 (3 audits) | [B evidence](../../conf/coverage/stage_b_cpu_verified.json) |
-| B: Qwen3 1.7B **Base** + Qwen-Scope L7 | Real CPU LLM + SAE identity patch, feature ablation; M3/M4 | [B evidence](../../conf/coverage/stage_b_cpu_verified.json) |
-| B: DeepSeek R1 Distill Qwen 1.5B + Sparsify L20 | Real CPU LLM + SAE identity patch, feature ablation; M3/M4 | [B evidence](../../conf/coverage/stage_b_cpu_verified.json) |
-| A: Qwen3.5 2B Base + official TopK L12 | Real CPU LLM+SAE capture, feature intervention and M3/M4 | [A evidence](../../conf/release/phase_a_targets.json) |
-| A: Gemma 270M, Gemma 1B, Gemma2 2B, Llama 8B, Qwen3 8B | SAE-only success; the respective **model–SAE pair is not verified** (model access or compute pending) | [A status](../../conf/release/phase_a_targets.json) |
+| B: Pythia 410M + TopK MLP L4 | Real CPU LLM + SAE identity patch, feature ablation; M3 (5 metric rows), M4 (3 audits) | [B evidence](../../../conf/coverage/stage_b_cpu_verified.json) |
+| B: Qwen3 1.7B **Base** + Qwen-Scope L7 | Real CPU LLM + SAE identity patch, feature ablation; M3/M4 | [B evidence](../../../conf/coverage/stage_b_cpu_verified.json) |
+| B: DeepSeek R1 Distill Qwen 1.5B + Sparsify L20 | Real CPU LLM + SAE identity patch, feature ablation; M3/M4 | [B evidence](../../../conf/coverage/stage_b_cpu_verified.json) |
+| A: Qwen3.5 2B Base + official TopK L12 | Real CPU LLM+SAE capture, feature intervention and M3/M4 | [A evidence](../../../conf/release/phase_a_targets.json) |
+| A: Gemma 270M, Gemma 1B, Gemma2 2B, Llama 8B, Qwen3 8B | SAE-only success; the respective **model–SAE pair is not verified** (model access or compute pending) | [A status](../../../conf/release/phase_a_targets.json) |
 
 The confirmed pair checks in this 48-site catalog are therefore four sites (Pythia410M L4, Qwen3 1.7B Base L7, R1-Qwen1.5B L20, Qwen3.5 2B L12). **44 selected pair/layer sites remain without a real pair acceptance**, assuming no newer results exist. Only 21/48 have the Stage C *standalone SAE* weight check; the other 27 need actual SAE loading as part of Stage D. The count is a planning baseline, not permission to skip querying newer verified artifacts.
 
 Inspect current implementation and contracts:
 
-- [SAE profile registry](../../saebase/sae/registry.py): exact model key, legal layer, `hook_kind`, `sae_id`, `sae_folder`, source repo and allowed host model.
-- [SAE loaders](../../saebase/sae/loading.py), [Sparsify adapter](../../saebase/sae/sparsify_adapter.py), [HF hooks](../../models/hf_hooks_backend.py): original weight loading, normalization, BF16 hooks and edited activation patch.
-- [Direct model/SAE example](../../saebase/tools/phase_a_verify.py), [B CPU pair acceptance](../../saebase/tools/phase_bc_cpu_pair.py): numerical protocol examples; **B CPU pair loader explicitly rejects a CUDA device**.
-- [B real Benchmark](../../saebase/tools/phase_bc_cpu_benchmark.py), [A real Benchmark](../../saebase/tools/phase_a_benchmark.py): M3/M4 templates; **the B example is CPU-specific**, and the A script is hardcoded to Qwen3.5 2B.
-- [Benchmark CLI](../../saebase/tools/m3_benchmark.py), [Benchmark plan/config](../../saebase/benchmarks/schema.py), [M3 runner](../../saebase/benchmarks/runner.py), [M4 CLI](../../saebase/tools/m4_reliability.py), [AuditConfig](../../saebase/reliability/schema.py).
-- [Stage C validation docs](../github_development_doc/stage-bc-model-sae-coverage.md) and [A gated-model status](../github_development_doc/phase-a-model-coverage.md).
+- [SAE profile registry](../../../saebase/sae/registry.py): exact model key, legal layer, `hook_kind`, `sae_id`, `sae_folder`, source repo and allowed host model.
+- [SAE loaders](../../../saebase/sae/loading.py), [Sparsify adapter](../../../saebase/sae/sparsify_adapter.py), [HF hooks](../../../models/hf_hooks_backend.py): original weight loading, normalization, BF16 hooks and edited activation patch.
+- [Direct model/SAE example](../../../saebase/tools/phase_a_verify.py), [B CPU pair acceptance](../../../saebase/tools/phase_bc_cpu_pair.py): numerical protocol examples; **B CPU pair loader explicitly rejects a CUDA device**.
+- [B real Benchmark](../../../saebase/tools/phase_bc_cpu_benchmark.py), [A real Benchmark](../../../saebase/tools/phase_a_benchmark.py): M3/M4 templates; **the B example is CPU-specific**, and the A script is hardcoded to Qwen3.5 2B.
+- [Benchmark CLI](../../../saebase/tools/m3_benchmark.py), [Benchmark plan/config](../../../saebase/benchmarks/schema.py), [M3 runner](../../../saebase/benchmarks/runner.py), [M4 CLI](../../../saebase/tools/m4_reliability.py), [AuditConfig](../../../saebase/reliability/schema.py).
+- [Stage C validation docs](../development_doc/stage-bc-model-sae-coverage.md) and [A gated-model status](../development_doc/phase-a-model-coverage.md).
 
 Before proceeding: run `git status --short`, `git rev-parse HEAD`, inspect newer PRs and Actions evidence, and create a new coverage ledger from the current catalog. Do not overwrite completed CPU evidence or change previous `passed` hashes silently.
 
@@ -328,16 +328,16 @@ Large checkpoint variants should be unloaded between distinct **models**, not ne
 | Purpose | Link |
 | --- | --- |
 | Current source | [SAEBase main](https://github.com/OpenSAE/SAEBase) |
-| Stage B/C layer catalog | [stage_bc.json](../../conf/coverage/stage_bc.json) |
-| B verified pair/M3/M4 proof | [stage_b_cpu_verified.json](../../conf/coverage/stage_b_cpu_verified.json) |
-| C verified standalone SAE evidence | [stage_c_cpu_verified.json](../../conf/coverage/stage_c_cpu_verified.json) |
-| A gated-model/pair status | [phase_a_targets.json](../../conf/release/phase_a_targets.json) |
-| Hook registry | [sae/registry.py](../../saebase/sae/registry.py) |
-| Public original SAE loader | [sae/loading.py](../../saebase/sae/loading.py) |
-| Stage A baseline GPU script | [saebase/tools/phase_a_verify.py](../../saebase/tools/phase_a_verify.py) |
-| M3 CLI | [saebase/tools/m3_benchmark.py](../../saebase/tools/m3_benchmark.py) |
-| M4 CLI | [saebase/tools/m4_reliability.py](../../saebase/tools/m4_reliability.py) |
-| Controlled input Localize | [Localize Benchmark Docs](../github_development_doc/localization-benchmark.md) |
+| Stage B/C layer catalog | [stage_bc.json](../../../conf/coverage/stage_bc.json) |
+| B verified pair/M3/M4 proof | [stage_b_cpu_verified.json](../../../conf/coverage/stage_b_cpu_verified.json) |
+| C verified standalone SAE evidence | [stage_c_cpu_verified.json](../../../conf/coverage/stage_c_cpu_verified.json) |
+| A gated-model/pair status | [phase_a_targets.json](../../../conf/release/phase_a_targets.json) |
+| Hook registry | [sae/registry.py](../../../saebase/sae/registry.py) |
+| Public original SAE loader | [sae/loading.py](../../../saebase/sae/loading.py) |
+| Stage A baseline GPU script | [saebase/tools/phase_a_verify.py](../../../saebase/tools/phase_a_verify.py) |
+| M3 CLI | [saebase/tools/m3_benchmark.py](../../../saebase/tools/m3_benchmark.py) |
+| M4 CLI | [saebase/tools/m4_reliability.py](../../../saebase/tools/m4_reliability.py) |
+| Controlled input Localize | [Localize Benchmark Docs](../development_doc/localization-benchmark.md) |
 | Vast rental marketplace | [Vast.ai Console](https://cloud.vast.ai/) |
 | Vast pricing/billing | [Official instance pricing](https://docs.vast.ai/guides/instances/pricing) |
 | Vast disk warning | [Official storage types](https://docs.vast.ai/guides/instances/storage/types) |

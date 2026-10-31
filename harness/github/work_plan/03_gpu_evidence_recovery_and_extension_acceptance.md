@@ -12,11 +12,11 @@
 
 Earlier plans [01](01_stage_d_gpu_acceptance.md) and [02](02_stage_d_completion.md) were executed in subsequent Stage D PRs. Their historical "remaining site" counts and initial Mistral/Gemma bug reports are **not the current task list**. Current `main` has:
 
-- [Final Stage D matrix](../../conf/coverage/stage_d_evidence/final/stage_d_final_matrix.json): **18 model/SAE profiles, 48/48 selected pair sites, 48/48 M3 population benchmark reports and 48/48 M4 reliability reports**.
-- [Verified layer matrix](../github_development_doc/verified-model-matrix.md), [Stage D compact evidence archive](../github_development_doc/stage-d-evidence-archive.md) and immutable [compact Evidence Release](https://github.com/OpenSAE/SAEBase/releases/tag/stage-d-evidence-20261016). The committed compact evidence contains 48 M3/M4 report summaries and checksummed metadata.
-- [Raw run archive index](../../conf/coverage/stage_d_evidence/final/raw_run_archive_index.json) with **18 exact original .tar.gz filenames, byte lengths and SHA256 digests totaling 725,190 compressed bytes**. It names the former local directory `/workspace/stage_d_runs/archives`. These 18 original files **have not yet been published as publicly downloadable raw evidence**.
-- [Raw archive and verification CLI](../../saebase/tools/stage_d_archive.py), [native Stage D raw-to-summary auditor](../../saebase/tools/phase_d_verify_evidence.py), [single-site acceptance](../../saebase/tools/phase_d_verify.py) and [population M3/M4 runner](../../saebase/tools/phase_d_benchmark.py).
-- A new [versioned third-party extension API](../github_development_doc/extensions.md) and [first-experiment tutorial](../github_development_doc/first-experiment.md) added during engineering tasks 08–09. The tutorial's baseline is synthetic and CPU-only.
+- [Final Stage D matrix](../../../conf/coverage/stage_d_evidence/final/stage_d_final_matrix.json): **18 model/SAE profiles, 48/48 selected pair sites, 48/48 M3 population benchmark reports and 48/48 M4 reliability reports**.
+- [Verified layer matrix](../development_doc/verified-model-matrix.md), [Stage D compact evidence archive](../development_doc/stage-d-evidence-archive.md) and immutable [compact Evidence Release](https://github.com/OpenSAE/SAEBase/releases/tag/stage-d-evidence-20261016). The committed compact evidence contains 48 M3/M4 report summaries and checksummed metadata.
+- [Raw run archive index](../../../conf/coverage/stage_d_evidence/final/raw_run_archive_index.json) with **18 exact original .tar.gz filenames, byte lengths and SHA256 digests totaling 725,190 compressed bytes**. It names the former local directory `/workspace/stage_d_runs/archives`. These 18 original files **have not yet been published as publicly downloadable raw evidence**.
+- [Raw archive and verification CLI](../../../saebase/tools/stage_d_archive.py), [native Stage D raw-to-summary auditor](../../../saebase/tools/phase_d_verify_evidence.py), [single-site acceptance](../../../saebase/tools/phase_d_verify.py) and [population M3/M4 runner](../../../saebase/tools/phase_d_benchmark.py).
+- A new [versioned third-party extension API](../development_doc/extensions.md) and [first-experiment tutorial](../development_doc/first-experiment.md) added during engineering tasks 08–09. The tutorial's baseline is synthetic and CPU-only.
 - Unresolved [Issue #21](https://github.com/OpenSAE/SAEBase/issues/21) specifically tracks the missing original 18 GPU archives.
 
 **Do not rerun all 48 model/SAE combinations, retrain an SAE, change accepted scientific numbers, or construct new archives from compact report JSONs.** The first objective is to recover the *original bytes* and native measurements from the machine while they still exist.
@@ -108,7 +108,7 @@ python saebase/tools/stage_d_archive.py --check
 python saebase/tools/stage_d_archive.py --verify-raw /workspace/stage_d_runs/archives
 ~~~
 
-This invokes the existing verifier against the [original raw-run index](../../conf/coverage/stage_d_evidence/final/raw_run_archive_index.json) and must return:
+This invokes the existing verifier against the [original raw-run index](../../../conf/coverage/stage_d_evidence/final/raw_run_archive_index.json) and must return:
 
 - `verified_archives = 18`.
 - `original_bytes = 725190`.
@@ -152,7 +152,7 @@ The resulting bundle is built from the **original 18 tar files**, the immutable 
 
 1. Inspect which `runs/<m3_run_id>/` directories are already present under `/workspace/stage_d_runs/runs`. If absent, restore them from the exact, inspected original archives into an isolated directory. Preserve relative paths and permissions; **do not extract over the original source directory**.
 2. Make an audit workspace containing the restored `runs/` plus a faithful *copy*, not an edited rewrite, of the repository's 48 compact `reports/` and canonical `status.json`.
-3. Join each of the 48 [final matrix](../../conf/coverage/stage_d_evidence/final/stage_d_final_matrix.json) rows with its compact report by `(model_key, sae_key, layer, hook_name)`. For every report, resolve its original `m3_run_id` and find the corresponding native directory.
+3. Join each of the 48 [final matrix](../../../conf/coverage/stage_d_evidence/final/stage_d_final_matrix.json) rows with its compact report by `(model_key, sae_key, layer, hook_name)`. For every report, resolve its original `m3_run_id` and find the corresponding native directory.
 4. Require the native files `resolved_config.json`, `plan.json`, `metrics.jsonl`, `metrics_manifest.json`, `reliability.json` and `reliability_manifest.json`. Re-check native ledgers with SAEBase's `saebase.benchmarks.results.read_metrics` and `saebase.reliability.report.read_audit`, including M3→M4 linkage and stored SHA256 hashes.
 5. Compare each native M3 metric/condition row with the committed report's `metric_results`, `n_valid`, `m3_metrics_sha256` and `m4_audit_sha256`. Record exact numeric comparison results and tolerances; never silently reinterpret units, substitute means or drop a mismatched row.
 6. Check the evaluation corpus and token ledgers against the saved `dataset_sha256`, `population_corpus_sha256`, selection/evaluation separation, `feature_ablated`, source hook, host identity and model/SAE weight digests. The accepted population protocol reports 64 independent evaluation groups; do not claim natural-language diversity or broad generalization.
@@ -208,8 +208,8 @@ Also re-run P0-C's native verification on the recovered bundle data, not on the 
 
 Make a **small harness/github_development_doc/evidence follow-up PR** that links the immutable raw-archive release and numerical-audit report from:
 
-- [harness/github_development_doc/stage-d-evidence-archive.md](../github_development_doc/stage-d-evidence-archive.md);
-- [harness/github_development_doc/verified-model-matrix.md](../github_development_doc/verified-model-matrix.md);
+- [harness/github_development_doc/stage-d-evidence-archive.md](../development_doc/stage-d-evidence-archive.md);
+- [harness/github_development_doc/verified-model-matrix.md](../development_doc/verified-model-matrix.md);
 - [Issue #21](https://github.com/OpenSAE/SAEBase/issues/21), with exact status.
 
 Use a fresh branch from current `main`; run `python saebase/tools/check_documentation.py --check` and the normal Python 3.11/3.12 PR CI; merge only after sources and links have been verified. Do not place full raw caches or pretrained model/SAE weights directly in Git.

@@ -385,7 +385,7 @@ python -m backend.corpus_lock \
 
 发布目标是 **SAEBase v0.4.0 Research Lab Preview**。Release 公开内容包括源码、wheel/sdist、source-bound CI/校验摘要、中文/英文 README、Research Lab 使用指南、版本说明、去敏实验计数及对比报告。GitHub 代码库不包含私有 500 条原始文本、私有 GPU 输出、权重或未经版权审核的数据包。对应外部数据公开 release 必须另做审核及独立下载哈希验证。
 
-[Results and scientific scope](../github_development_doc/research-lab/results-20261020.md) · [Release acceptance](../github_development_doc/research-lab/release-acceptance.md) · [v0.4.0 notes](../github_development_doc/releases/v0.4.0.md)。
+[Results and scientific scope](../development_doc/research-lab/results-20261020.md) · [Release acceptance](../development_doc/research-lab/release-acceptance.md) · [v0.4.0 notes](../development_doc/releases/v0.4.0.md)。
 
 这一轮不再增加主要 GPU 实验数量；保留的独立项目包括真正的 steering rollout 文本生成、完整正交旋转对照、全量原始 GPU archive 的异机独立复核、原始内容许可/审核、以及 Hugging Face 官方在线部署和私有认证队列。它们**不是本软件预览版完成的先决条件**，但也不能说成已完成。
 
