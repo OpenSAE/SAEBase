@@ -16,7 +16,7 @@ import pytest
 sae_localize = pytest.importorskip("sae_localize")
 from sae_localize import exact_scope_curve, omission_errors  # noqa: E402
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "saebase" / "research_lab"))
 
 from backend.controlled_designs import (  # noqa: E402

@@ -79,7 +79,7 @@ def test_wp19_independent_acceptance_is_not_agent_writable():
     import importlib.util
     from pathlib import Path
 
-    root = Path(__file__).resolve().parents[2]
+    root = Path(__file__).resolve().parents[3]
     path = root / ".cursor/hooks/guard_shell.py"
     spec = importlib.util.spec_from_file_location("wp19_shell_review", path)
     assert spec is not None and spec.loader is not None

@@ -11,7 +11,7 @@ from saebase.api import ModelAdapter
 from saebase.release import MatrixConfig, load_matrix, plan_matrix
 from saebase.release.runner import execute_matrix, verify_matrix
 
-CONFIG = Path(__file__).resolve().parents[2] / "conf/release/m5_matrix.json"
+CONFIG = Path(__file__).resolve().parents[3] / "conf/release/m5_matrix.json"
 
 
 def mock_matrix():

@@ -6,7 +6,7 @@ import ast
 import json
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 MOVED = {
     "saebase/release/capability_acceptance.py",
     "saebase/benchmarks/native_comparisons.py",

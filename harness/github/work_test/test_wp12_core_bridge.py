@@ -95,7 +95,7 @@ def test_pyvene_roundtrip_parallel_serial_and_provenance(monkeypatch, tmp_path):
 def test_private_inspection_is_a_true_job_mode_with_no_steering():
     from pathlib import Path
 
-    path = Path(__file__).resolve().parents[2] / "apps" / "research-lab"
+    path = Path(__file__).resolve().parents[3] / "apps" / "research-lab"
     sys.path.insert(0, str(path))
     from backend import core
     from backend.jobs import JobQueue, JobError

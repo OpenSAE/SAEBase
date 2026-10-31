@@ -4,7 +4,7 @@ from pathlib import Path
 import ast
 import json
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 
 
 def test_original_saebase_public_entrypoints_preserved():

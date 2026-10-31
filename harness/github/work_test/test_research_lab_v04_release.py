@@ -8,7 +8,7 @@ import re
 import tomllib
 from pathlib import Path
 
-BASE = Path(__file__).resolve().parents[2]
+BASE = Path(__file__).resolve().parents[3]
 
 
 def test_release_version_and_notes_are_consistent():
@@ -23,15 +23,15 @@ def test_release_version_and_notes_are_consistent():
         and isinstance(node.value, ast.Constant)
     ]
     assert constants == [version]
-    assert re.search(r"(?m)^## 0\.4\.0\b", (BASE / "harness/github_development_doc/CHANGELOG.md").read_text())
+    assert re.search(r"(?m)^## 0\.4\.0\b", (BASE / "harness/github/development_doc/CHANGELOG.md").read_text())
     assert f"version: {version}" in (BASE / "CITATION.cff").read_text()
-    assert (BASE / "harness/github_development_doc/releases/v0.4.0.md").exists()
+    assert (BASE / "harness/github/development_doc/releases/v0.4.0.md").exists()
 
 
 def test_research_lab_report_distinguishes_experiment_scope_from_software():
     report = json.loads(
         (
-            BASE / "harness/github_development_doc/research-lab/release-evidence-v0.4.0.json"
+            BASE / "harness/github/development_doc/research-lab/release-evidence-v0.4.0.json"
         ).read_text()
     )
     assert report["software_version"] == "0.4.0"
@@ -65,14 +65,14 @@ def test_research_lab_report_distinguishes_experiment_scope_from_software():
 
 def test_readmes_and_workplan_refer_to_actual_preview():
     current_version = tomllib.loads((BASE / "pyproject.toml").read_text())["project"]["version"]
-    historical_notes = BASE / "harness/github_development_doc/releases/v0.4.0.md"
+    historical_notes = BASE / "harness/github/development_doc/releases/v0.4.0.md"
     assert historical_notes.is_file()
     for name in ("README.md", "README_cn.md"):
         txt = (BASE / name).read_text(encoding="utf-8")
-        assert f"harness/github_development_doc/releases/v{current_version}.md" in txt
+        assert f"harness/github/development_doc/releases/v{current_version}.md" in txt
         assert "Research Lab" in txt
     plan = (
-        BASE / "harness/github_work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md"
+        BASE / "harness/github/work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md"
     ).read_text()
-    assert (BASE / "harness/github_development_doc/research-lab/release-acceptance.md").is_file()
+    assert (BASE / "harness/github/development_doc/research-lab/release-acceptance.md").is_file()
     assert "K16" in plan and "RSS" in plan
