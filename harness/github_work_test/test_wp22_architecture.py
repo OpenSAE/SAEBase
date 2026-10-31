@@ -5,7 +5,6 @@ No HF network access, paid APIs, training, GPU model downloads or publication.
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
@@ -36,21 +35,15 @@ def test_full_matrix_matches_immutable_protocol_config():
     assert len(datasets) == 10
     assert len(sites) == 10
     assert len(site_list()) == 20
-    assert tasks["execution"]["expected_model_qa_baselines"] == plan[
-        "expected_model_qa_baselines"
-    ]
-    assert tasks["execution"]["expected_capture_rows"] == plan[
-        "expected_capture_rows"
-    ]
-    assert tasks["execution"]["expected_benchmark_summaries"] == plan[
-        "expected_benchmark_summaries"
-    ] == 200
-    assert tasks["execution"]["expected_intervene_rows"] == plan[
-        "expected_intervention_rows"
-    ]
-    assert tasks["execution"]["expected_generate_rows"] == plan[
-        "expected_generation_rows"
-    ]
+    assert tasks["execution"]["expected_model_qa_baselines"] == plan["expected_model_qa_baselines"]
+    assert tasks["execution"]["expected_capture_rows"] == plan["expected_capture_rows"]
+    assert (
+        tasks["execution"]["expected_benchmark_summaries"]
+        == plan["expected_benchmark_summaries"]
+        == 200
+    )
+    assert tasks["execution"]["expected_intervene_rows"] == plan["expected_intervention_rows"]
+    assert tasks["execution"]["expected_generate_rows"] == plan["expected_generation_rows"]
     assert tasks["execution"]["hf_publish_automatic"] is False
     from experiments.qa500.capture import SITES
 
@@ -189,8 +182,9 @@ def test_architecture_has_no_experiment_entrypoints_under_datasets():
             syntax = ast.parse(file.read_text(encoding="utf-8"), filename=str(file))
             for obj in ast.walk(syntax):
                 if isinstance(obj, ast.Import):
-                    assert all(not alias.name.startswith("experiments.qa500")
-                               for alias in obj.names), str(file)
+                    assert all(
+                        not alias.name.startswith("experiments.qa500") for alias in obj.names
+                    ), str(file)
                 elif isinstance(obj, ast.ImportFrom):
                     assert not (obj.module or "").startswith("experiments.qa500"), str(file)
 
@@ -199,9 +193,13 @@ def test_run_paths_use_existing_task_artifact_layout(tmp_path):
     from experiments.qa500.paths import task_dir, typed_file, study_dir
 
     path = task_dir(
-        tmp_path, task="capture", dataset="mmlu_pro",
-        model="gemma2_2b_base", sae_key="gemma2_2b_pt_l25_canonical",
-        layer=13, initialize=True,
+        tmp_path,
+        task="capture",
+        dataset="mmlu_pro",
+        model="gemma2_2b_base",
+        sae_key="gemma2_2b_pt_l25_canonical",
+        layer=13,
+        initialize=True,
     )
     assert path.is_relative_to(tmp_path / "experiment" / "mmlu_pro")
     assert "/capture/qa500/" in path.as_posix()

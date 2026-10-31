@@ -3,6 +3,7 @@
 Network requests are explicit. No substitute checkpoint or unpinned success
 is invented on a failed download. An approved lock can be used offline.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -48,7 +49,8 @@ def download(asset: HFAsset, *, cache_dir: Path | None = None) -> Path:
 
     asset.validate()
     path = snapshot_download(
-        repo_id=asset.repo_id, repo_type=asset.repo_type,
+        repo_id=asset.repo_id,
+        repo_type=asset.repo_type,
         revision=asset.revision,
         cache_dir=str(cache_dir) if cache_dir is not None else None,
     )

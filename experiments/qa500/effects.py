@@ -36,8 +36,14 @@ def _candidate_rows(
     task: str,
 ) -> list[tuple[dict[str, Any], dict[str, Any]]]:
     verify_dataset(dataset_id, data_root)
-    capture_dir = task_dir(results_root, task="capture", dataset=dataset_id,
-                           model=model_key, sae_key=sae_key, layer=layer)
+    capture_dir = task_dir(
+        results_root,
+        task="capture",
+        dataset=dataset_id,
+        model=model_key,
+        sae_key=sae_key,
+        layer=layer,
+    )
     capture_file = typed_file(capture_dir, "metrics", "capture.jsonl")
     source_file = data_root / dataset_id / "questions.jsonl"
     sources = {
@@ -101,8 +107,15 @@ def run_effects(
         layer=layer,
         task=task,
     )
-    root = task_dir(results_root, task=task, dataset=dataset_id,
-                    model=model_key, sae_key=sae_key, layer=layer, initialize=True)
+    root = task_dir(
+        results_root,
+        task=task,
+        dataset=dataset_id,
+        model=model_key,
+        sae_key=sae_key,
+        layer=layer,
+        initialize=True,
+    )
     output = typed_file(root, "metrics", f"{task}.jsonl")
     existing = _existing(output)
     expected = {item["sample_id"] for item, _ in choices}
@@ -240,5 +253,7 @@ def run_effects(
         "status": "complete" if len(existing) == len(choices) else "partial",
         "selected_on_evaluation_input": True,
     }
-    typed_file(root, "reports", f"{task}_summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+    typed_file(root, "reports", f"{task}_summary.json").write_text(
+        json.dumps(summary, indent=2) + "\n"
+    )
     return summary

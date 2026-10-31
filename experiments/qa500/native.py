@@ -7,7 +7,7 @@ requires explicit native-work authorization.
 
 from __future__ import annotations
 
-from experiments.qa500.paths import task_dir, typed_file, study_dir, inputs_dir
+from experiments.qa500.paths import task_dir, typed_file, study_dir
 
 import argparse
 from dataclasses import asdict
@@ -55,8 +55,14 @@ def run_circuits(
     )[:10]
     if len(candidates) != 10:
         raise RuntimeError("Fewer than 10 short, frozen BoolQ inputs for circuit tracer")
-    site_dir = task_dir(result_root, task="circuits", dataset="boolq",
-                        model="gemma2_2b_base", sae_key="native_gemma", initialize=True)
+    site_dir = task_dir(
+        result_root,
+        task="circuits",
+        dataset="boolq",
+        model="gemma2_2b_base",
+        sae_key="native_gemma",
+        initialize=True,
+    )
     root = site_dir
     results: list[dict[str, Any]] = []
     for row in candidates:
@@ -206,9 +212,15 @@ def run_train(
         sae_dtype="float32",
     )
     plan.validate(allow_large=False)
-    run_dir = task_dir(Path.cwd(), task="train", dataset="wikitext",
-                       model="gemma2_2b_base", sae_key="native_topk",
-                       layer=13, initialize=True)
+    run_dir = task_dir(
+        Path.cwd(),
+        task="train",
+        dataset="wikitext",
+        model="gemma2_2b_base",
+        sae_key="native_topk",
+        layer=13,
+        initialize=True,
+    )
     destination = run_dir / "checkpoints" / "native_training"
     result = run_training(
         plan,

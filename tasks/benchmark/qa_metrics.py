@@ -1,4 +1,5 @@
 """Reusable independent-question bootstrap metrics for evaluation tasks."""
+
 from __future__ import annotations
 import math
 import random
@@ -32,5 +33,3 @@ def summarize_metric(values: list[float], *, seed: int = BOOTSTRAP_SEED) -> dict
         "bootstrap_draws": BOOTSTRAP_DRAWS,
         "confidence_method": "iid_question_percentile_bootstrap_v1",
     }
-
-

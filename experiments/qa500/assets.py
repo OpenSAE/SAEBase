@@ -4,12 +4,9 @@ The researcher-published project lock is distinct from a first-run resolved
 local identity. A first-run identity supports same-machine resume, not
 cross-machine scientific equivalence.
 """
+
 from __future__ import annotations
 
-from dataclasses import dataclass
-from pathlib import Path
-import json
-from typing import Any
 
 from experiments.qa500.config import get_assets_lock
 from saebase.integrations.hf_assets import resolve_revision
@@ -40,9 +37,6 @@ def source_revision(repo_id: str, key: str) -> tuple[str, str]:
 
 def required_publication_lock() -> bool:
     lock = get_assets_lock()
-    return (
-        lock.get("status") == "pinned"
-        and all(lock.get(key) for key in (
-            "dataset_revisions", "model_revisions", "sae_revisions"
-        ))
+    return lock.get("status") == "pinned" and all(
+        lock.get(key) for key in ("dataset_revisions", "model_revisions", "sae_revisions")
     )

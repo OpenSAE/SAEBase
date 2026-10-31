@@ -10,8 +10,10 @@ from saebase.datasets.artifact_layout import BEHAVIOR_ALIASES, canonicalize_beha
 from saebase.datasets.prompt_schema import assert_available
 from saebase.cfg.contracts import assert_prompt_source_in, assert_task_in
 from saebase.registry import (
-    register_prompt_source, register_prompt_source_alias,
-    register_dataset, register_dataset_alias,
+    register_prompt_source,
+    register_prompt_source_alias,
+    register_dataset,
+    register_dataset_alias,
 )
 
 _TASKS_SAE: FrozenSet[str] = frozenset({"sae"})
@@ -125,11 +127,12 @@ def _register_builtin_datasets() -> None:
         )
 
     for name in NLP_NAMES:
-        adapter = (
-            "saebase.datasets.MMLUPro.qa_adapter" if name == "MMLUPro" else None
-        )
+        adapter = "saebase.datasets.MMLUPro.qa_adapter" if name == "MMLUPro" else None
         register_dataset(
-            name, setup_nlp, check_nlp, nlp_split_note,
+            name,
+            setup_nlp,
+            check_nlp,
+            nlp_split_note,
             qa_adapter_module=adapter,
         )
 
@@ -181,7 +184,10 @@ def _register_qa_dataset_adapters() -> None:
 
     for name, (alias, directory) in adapters.items():
         register_dataset(
-            name, qa_setup, qa_check, qa_note,
+            name,
+            qa_setup,
+            qa_check,
+            qa_note,
             qa_adapter_module=f"saebase.datasets.{directory}.qa_adapter",
         )
         register_dataset_alias(alias, name)

@@ -268,6 +268,4 @@ def study_root(workspace: str | Path, study_id: str) -> Path:
     metrics, intervention evidence, checkpoints and their typed directories.
     This root is for a study's *aggregate* metadata, not a new Task layout.
     """
-    return Path(workspace).resolve() / "experiment" / "_studies" / _component(
-        study_id, "study_id"
-    )
+    return Path(workspace).resolve() / "experiment" / "_studies" / _component(study_id, "study_id")

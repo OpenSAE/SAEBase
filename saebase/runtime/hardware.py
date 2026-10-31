@@ -4,15 +4,14 @@ This is detection and provenance, not an authority to change scientific
 configuration. Unknown quantities remain null; an unavailable GPU is not a
 simulated CPU pass for GPU tasks.
 """
+
 from __future__ import annotations
 
 import argparse
 import json
-import os
 from pathlib import Path
 import platform
 import shutil
-import subprocess
 import sys
 from typing import Any
 
@@ -34,10 +33,14 @@ def detect(*, probe_gpu: bool = False, cache_path: Path | None = None) -> dict[s
     free_disk = shutil.disk_usage(target).free
     info: dict[str, Any] = {
         "schema": "saebase.environment.v1",
-        "os": platform.system(), "machine": platform.machine(),
-        "python": sys.version.split()[0], "torch": torch.__version__,
-        "cuda_build": torch.version.cuda, "cuda_available": bool(torch.cuda.is_available()),
-        "gpu": [], "available_host_ram_bytes": _available_host_ram_bytes(),
+        "os": platform.system(),
+        "machine": platform.machine(),
+        "python": sys.version.split()[0],
+        "torch": torch.__version__,
+        "cuda_build": torch.version.cuda,
+        "cuda_available": bool(torch.cuda.is_available()),
+        "gpu": [],
+        "available_host_ram_bytes": _available_host_ram_bytes(),
         "disk_free_bytes": free_disk,
     }
     if torch.cuda.is_available():
@@ -46,9 +49,11 @@ def detect(*, probe_gpu: bool = False, cache_path: Path | None = None) -> dict[s
                 props = torch.cuda.get_device_properties(index)
                 free, total = torch.cuda.mem_get_info(index)
                 entry: dict[str, Any] = {
-                    "index": index, "name": props.name,
+                    "index": index,
+                    "name": props.name,
                     "compute_capability": list(torch.cuda.get_device_capability(index)),
-                    "total_vram_bytes": int(total), "free_vram_bytes": int(free),
+                    "total_vram_bytes": int(total),
+                    "free_vram_bytes": int(free),
                     "supports_bf16": bool(torch.cuda.is_bf16_supported()),
                     "cuda_kernel_ok": None,
                 }

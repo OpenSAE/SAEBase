@@ -5,7 +5,7 @@ import copy
 import json
 from collections import defaultdict
 from pathlib import Path, PurePosixPath
-from harness.code.semantic_titles import semantic_title, semantic_summary, context_for_path
+from harness.code.semantic_titles import semantic_title, semantic_summary
 from harness.code.functional_taxonomy import is_reexport_only
 
 GROUPS = {
@@ -40,16 +40,20 @@ MODULES = {
     "saebase/runtime/train.py": ("SAE 任务执行入口", "校验配置并分派已登记的研究任务。"),
     "tasks/sae_runtime.py": ("七类 SAE 任务公共入口", "核验模型与数据并调用对应任务实现。"),
     "tasks/benchmark/analyze.py": (
-        "分析 SAE 基准实验结果", "汇总基准任务的实际评测记录，形成可追溯的结果分析。"
+        "分析 SAE 基准实验结果",
+        "汇总基准任务的实际评测记录，形成可追溯的结果分析。",
     ),
     "tasks/benchmark/reliability/bootstrap.py": (
-        "估计 SAE 评测分数的置信区间", "重采样评测观测值并计算分数区间，刻画分数的统计波动范围。"
+        "估计 SAE 评测分数的置信区间",
+        "重采样评测观测值并计算分数区间，刻画分数的统计波动范围。",
     ),
     "tasks/benchmark/reliability/discriminability.py": (
-        "衡量 SAE 指标的区分能力", "比较各实验条件下的指标分布，测量分数对研究条件的区分程度。"
+        "衡量 SAE 指标的区分能力",
+        "比较各实验条件下的指标分布，测量分数对研究条件的区分程度。",
     ),
     "tasks/benchmark/backend/adapters/localization.py": (
-        "接入 SAE 特征局部性评测", "连接局部性基准适配器并将测量结果整理为通用评测指标。"
+        "接入 SAE 特征局部性评测",
+        "连接局部性基准适配器并将测量结果整理为通用评测指标。",
     ),
 }
 CLASSES = {
@@ -135,34 +139,100 @@ TASK_INSTANCE_SEMANTICS = {
     ),
 }
 TASK_WRAPPER_SUMMARIES = {
-    "capture": ("绑定激活捕获任务入口", "将 CaptureTask 注册为 capture 操作，交由统一运行器加载模型、SAE 和输入配置。"),
-    "intervene": ("绑定教师强制干预任务入口", "将 InterveneTask 指向 intervene 操作；特征替换和 Logit 对比由具体执行模块负责。"),
-    "generate": ("绑定生成干预任务入口", "通过 GenerateTask 声明 generate 操作，并将任务配置交给统一 SAE 运行接口。"),
-    "circuits": ("绑定电路追踪任务入口", "用 CircuitsTask 声明 circuits 操作，连接通用任务注册表与电路计算流程。"),
-    "explain": ("提供解释器依赖与任务分派", "ExplainTask 接受解释生成器与预测器，并在 run 时转交给解释任务执行逻辑。"),
-    "benchmark": ("绑定基准评测任务入口", "BenchmarkTask 选择 benchmark 操作，由运行器继续加载配置和已注册的评测后端。"),
-    "train": ("绑定 SAE 训练任务入口", "TrainTask 声明 train 操作，统一接收 Hydra 配置并交给训练实现。"),
+    "capture": (
+        "绑定激活捕获任务入口",
+        "将 CaptureTask 注册为 capture 操作，交由统一运行器加载模型、SAE 和输入配置。",
+    ),
+    "intervene": (
+        "绑定教师强制干预任务入口",
+        "将 InterveneTask 指向 intervene 操作；特征替换和 Logit 对比由具体执行模块负责。",
+    ),
+    "generate": (
+        "绑定生成干预任务入口",
+        "通过 GenerateTask 声明 generate 操作，并将任务配置交给统一 SAE 运行接口。",
+    ),
+    "circuits": (
+        "绑定电路追踪任务入口",
+        "用 CircuitsTask 声明 circuits 操作，连接通用任务注册表与电路计算流程。",
+    ),
+    "explain": (
+        "提供解释器依赖与任务分派",
+        "ExplainTask 接受解释生成器与预测器，并在 run 时转交给解释任务执行逻辑。",
+    ),
+    "benchmark": (
+        "绑定基准评测任务入口",
+        "BenchmarkTask 选择 benchmark 操作，由运行器继续加载配置和已注册的评测后端。",
+    ),
+    "train": (
+        "绑定 SAE 训练任务入口",
+        "TrainTask 声明 train 操作，统一接收 Hydra 配置并交给训练实现。",
+    ),
 }
 TASK_IMPLEMENTATION_SUMMARIES = {
-    "capture": ("提取激活特征及重建统计", "捕获指定 Hook 的 SAE 编码，返回活跃特征数、最强特征以及重建范数。"),
-    "intervene": ("替换稀疏特征并测量输出变化", "对固定 Prompt 替换指定 SAE 特征，比较前后 Logit 并返回变化范数及候选 Token。"),
-    "generate": ("比较逐步生成前后的特征干预", "把 Prompt 转成可定位的 Token 样本，构造特征编辑条件并调用逐步生成对照评估。"),
-    "circuits": ("运行原生电路追踪并保存图结构", "核验执行授权与输入配置后调用电路追踪器，在独立目录输出分析产物。"),
-    "explain": ("生成特征解释并测试泛化预测", "读取发现与留出输入，调用真实解释生成器，并检查解释对新样本的预测能力。"),
-    "benchmark": ("执行配置化基准并汇总指标", "读取已存在的评测配置，核验 Gemma 模型目标，再调用真实评测运行器保存指标。"),
-    "train": ("执行训练计划并写入 SAE 检查点", "校验训练授权与模型快照，构造 TrainPlan 并把结果保存到独立检查点目录。"),
+    "capture": (
+        "提取激活特征及重建统计",
+        "捕获指定 Hook 的 SAE 编码，返回活跃特征数、最强特征以及重建范数。",
+    ),
+    "intervene": (
+        "替换稀疏特征并测量输出变化",
+        "对固定 Prompt 替换指定 SAE 特征，比较前后 Logit 并返回变化范数及候选 Token。",
+    ),
+    "generate": (
+        "比较逐步生成前后的特征干预",
+        "把 Prompt 转成可定位的 Token 样本，构造特征编辑条件并调用逐步生成对照评估。",
+    ),
+    "circuits": (
+        "运行原生电路追踪并保存图结构",
+        "核验执行授权与输入配置后调用电路追踪器，在独立目录输出分析产物。",
+    ),
+    "explain": (
+        "生成特征解释并测试泛化预测",
+        "读取发现与留出输入，调用真实解释生成器，并检查解释对新样本的预测能力。",
+    ),
+    "benchmark": (
+        "执行配置化基准并汇总指标",
+        "读取已存在的评测配置，核验 Gemma 模型目标，再调用真实评测运行器保存指标。",
+    ),
+    "train": (
+        "执行训练计划并写入 SAE 检查点",
+        "校验训练授权与模型快照，构造 TrainPlan 并把结果保存到独立检查点目录。",
+    ),
 }
 # Reviewed modules explain a specific source responsibility. Avoid treating
 # every backend file as another implementation of the same research goal.
 INTERVENTION_MODULES = {
-    "clean_prefix": ("重算干净前缀的编辑对照", "每步重算原始前缀，在该前缀上运行 SAE 编辑以提供明确的干净历史参考结果。"),
-    "engine": ("批量执行干预并管理重试", "按计算预算调度批量 Hook 前向传播，处理微批重试和可恢复的测量任务。"),
-    "hf_cached_steering": ("在持久 KV 缓存中逐 Token 编辑特征", "每个新 Token 都编码真实残差并执行特征修改，同时保存编辑过的 KV 历史。"),
-    "kv_cache_exact": ("核对独立干净 KV 与编辑解码", "使用独立的干净与编辑分支检验增量解码一致性，保留其试验协议和误差证据。"),
-    "operators": ("应用 SAE 特征空间编辑算子", "根据消融、缩放、钳制、添加或特征集合条件生成 FeaturePatch。"),
-    "results": ("原子写入干预测量记录", "通过 JSONL 分片、校验和与 Manifest 提供崩溃恢复及实验测量追溯。"),
-    "specs": ("定义可复现的干预条件与样本身份", "声明特征集合、编辑幅度、样本读出位置及实验身份的校验约束。"),
-    "steering": ("逐步重算前缀进行生成对照", "使用完整前缀重算的参考解码，比较每一步 SAE 编辑与基线生成结果。"),
+    "clean_prefix": (
+        "重算干净前缀的编辑对照",
+        "每步重算原始前缀，在该前缀上运行 SAE 编辑以提供明确的干净历史参考结果。",
+    ),
+    "engine": (
+        "批量执行干预并管理重试",
+        "按计算预算调度批量 Hook 前向传播，处理微批重试和可恢复的测量任务。",
+    ),
+    "hf_cached_steering": (
+        "在持久 KV 缓存中逐 Token 编辑特征",
+        "每个新 Token 都编码真实残差并执行特征修改，同时保存编辑过的 KV 历史。",
+    ),
+    "kv_cache_exact": (
+        "核对独立干净 KV 与编辑解码",
+        "使用独立的干净与编辑分支检验增量解码一致性，保留其试验协议和误差证据。",
+    ),
+    "operators": (
+        "应用 SAE 特征空间编辑算子",
+        "根据消融、缩放、钳制、添加或特征集合条件生成 FeaturePatch。",
+    ),
+    "results": (
+        "原子写入干预测量记录",
+        "通过 JSONL 分片、校验和与 Manifest 提供崩溃恢复及实验测量追溯。",
+    ),
+    "specs": (
+        "定义可复现的干预条件与样本身份",
+        "声明特征集合、编辑幅度、样本读出位置及实验身份的校验约束。",
+    ),
+    "steering": (
+        "逐步重算前缀进行生成对照",
+        "使用完整前缀重算的参考解码，比较每一步 SAE 编辑与基线生成结果。",
+    ),
 }
 for _task, _pair in TASK_WRAPPER_SUMMARIES.items():
     MODULES[f"tasks/{_task}/task.py"] = _pair
@@ -179,8 +249,6 @@ ROOT = Path(__file__).resolve().parents[2]
 SOURCE_REVIEWS = json.loads(
     (ROOT / "harness/code/reviewed_semantics.json").read_text(encoding="utf-8")
 )["nodes"]
-
-
 
 
 def source_excerpt(node: dict) -> str | None:
@@ -237,7 +305,8 @@ def task_configuration_nodes(name: str, parent: str, nodes: list, edges: list) -
             "kind": "group",
             "title": "配置 " + TASK_CONFIGURATION_ROLES[name] + " 的 Hydra 执行选项",
             "summary": (
-                "汇集 " + TASK_CONFIGURATION_ROLES[name]
+                "汇集 "
+                + TASK_CONFIGURATION_ROLES[name]
                 + " 使用的真实 YAML 输入、执行参数与资源设置。"
             ),
             "description": "以对应任务的 Hydra YAML 配置声明运行所需的选项。",
@@ -298,18 +367,35 @@ def concrete_groups(output: dict) -> None:
         if not selected:
             continue
         ids = {node["id"] for node in selected}
-        edges = [edge for edge in edges
-                 if not (edge["type"] == "contains" and edge["source"] == parent
-                         and edge["target"] in ids)]
+        edges = [
+            edge
+            for edge in edges
+            if not (
+                edge["type"] == "contains" and edge["source"] == parent and edge["target"] in ids
+            )
+        ]
         group_id = "code:concrete:" + area
-        nodes.append({
-            "id": group_id, "kind": "group", "title": title,
-            "summary": summary, "description": summary, "status": "implemented",
-            "evidence": [node["path"] for node in selected],
-            "presentation_only": True, "source_symbol": "",
-            "context_term_ids": [{"datasets": "term.dataset", "models": "term.model",
-                                  "tasks": "term.task", "experiments": "term.saebase_runtime"}[area]],
-        })
+        nodes.append(
+            {
+                "id": group_id,
+                "kind": "group",
+                "title": title,
+                "summary": summary,
+                "description": summary,
+                "status": "implemented",
+                "evidence": [node["path"] for node in selected],
+                "presentation_only": True,
+                "source_symbol": "",
+                "context_term_ids": [
+                    {
+                        "datasets": "term.dataset",
+                        "models": "term.model",
+                        "tasks": "term.task",
+                        "experiments": "term.saebase_runtime",
+                    }[area]
+                ],
+            }
+        )
         edges.append({"source": parent, "target": group_id, "type": "contains"})
         for module in common:
             edges.append({"source": group_id, "target": module["id"], "type": "contains"})
@@ -334,14 +420,27 @@ def concrete_groups(output: dict) -> None:
             if area == "experiments":
                 instance_title = "QA500 标准评测实验定义" if name == "qa500" else "科研实验 " + name
                 instance_summary = "选择已注册科研组件并组织可复查的实验执行与产物。"
-            nodes.append({
-                "id": instance_id, "kind": "group", "title": instance_title,
-                "summary": instance_summary, "description": instance_summary,
-                "status": "implemented", "evidence": [m["path"] for m in modules],
-                "presentation_only": True, "source_symbol": "",
-                "context_term_ids": [{"datasets": "term.dataset", "models": "term.model",
-                                      "tasks": "term.task", "experiments": "term.saebase_runtime"}[area]],
-            })
+            nodes.append(
+                {
+                    "id": instance_id,
+                    "kind": "group",
+                    "title": instance_title,
+                    "summary": instance_summary,
+                    "description": instance_summary,
+                    "status": "implemented",
+                    "evidence": [m["path"] for m in modules],
+                    "presentation_only": True,
+                    "source_symbol": "",
+                    "context_term_ids": [
+                        {
+                            "datasets": "term.dataset",
+                            "models": "term.model",
+                            "tasks": "term.task",
+                            "experiments": "term.saebase_runtime",
+                        }[area]
+                    ],
+                }
+            )
             edges.append({"source": group_id, "target": instance_id, "type": "contains"})
             if area == "tasks":
                 task_configuration_nodes(name, instance_id, nodes, edges)
@@ -380,8 +479,9 @@ def readable_code_tree(graph: dict) -> dict:
         if kind in ("function", "method") and raw.startswith("_"):
             if item["id"] not in KEY_METHODS:
                 continue
-        if (kind in {"function", "method", "class"}
-                and path.startswith("saebase/research_lab/tests/")):
+        if kind in {"function", "method", "class"} and path.startswith(
+            "saebase/research_lab/tests/"
+        ):
             # An acceptance test is evidence of the Research Lab contract, not
             # dozens of separate public research capabilities. The test module
             # and original Python source remain available as evidence.
@@ -398,8 +498,7 @@ def readable_code_tree(graph: dict) -> dict:
         node["source_symbol"] = original
         review = SOURCE_REVIEWS.get(node["id"])
         if review and (
-            review["source_path"] != node.get("path")
-            or review["source_symbol"] != original
+            review["source_path"] != node.get("path") or review["source_symbol"] != original
         ):
             raise ValueError("Stale source review for " + node["id"])
         if review:

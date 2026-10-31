@@ -3,6 +3,7 @@
 Adapters own source-specific schemas. Experiments select subsets and tasks.
 This module knows no dataset list, SAE model matrix, or experiment budget.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -24,7 +25,10 @@ class DatasetSpec:
 
 def digest(value: Any) -> str:
     blob = json.dumps(
-        value, sort_keys=True, ensure_ascii=False, separators=(",", ":"),
+        value,
+        sort_keys=True,
+        ensure_ascii=False,
+        separators=(",", ":"),
         allow_nan=False,
     )
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()
@@ -34,9 +38,7 @@ def text(value: Any) -> str:
     return str(value if value is not None else "").strip()
 
 
-def choices(
-    pairs: Iterable[tuple[str, Any]], gold_key: str
-) -> tuple[list[dict[str, str]], str]:
+def choices(pairs: Iterable[tuple[str, Any]], gold_key: str) -> tuple[list[dict[str, str]], str]:
     options: list[dict[str, str]] = []
     canonical_gold = ""
     for index, (label, option) in enumerate(pairs):
@@ -77,8 +79,11 @@ def render_prompt(record: dict[str, Any]) -> str:
 
 
 def make_record(
-    spec: DatasetSpec, source: dict[str, Any], fields: dict[str, Any],
-    source_config: str | None, source_index: int,
+    spec: DatasetSpec,
+    source: dict[str, Any],
+    fields: dict[str, Any],
+    source_config: str | None,
+    source_index: int,
 ) -> dict[str, Any]:
     """Attach generic identity/provenance to a source-specific parsed row."""
     question = text(fields.get("question"))
@@ -86,20 +91,34 @@ def make_record(
     if not question or not answer:
         raise ValueError("Question or reference answer is empty")
     source_id = text(
-        source.get("question_id") or source.get("id") or source.get("_id")
-        or source.get("Record ID") or source_index
+        source.get("question_id")
+        or source.get("id")
+        or source.get("_id")
+        or source.get("Record ID")
+        or source_index
     )
     sample_id = digest([spec.key, source_config, spec.split, source_id, question])[:24]
     record = {
-        "sample_id": sample_id, "dataset_id": spec.key,
-        "source_repo": spec.repo, "source_config": source_config,
-        "source_split": spec.split, "source_id": source_id,
-        "question": question, "context": text(fields.get("context")),
+        "sample_id": sample_id,
+        "dataset_id": spec.key,
+        "source_repo": spec.repo,
+        "source_config": source_config,
+        "source_split": spec.split,
+        "source_id": source_id,
+        "question": question,
+        "context": text(fields.get("context")),
         "choices": list(fields.get("choices") or []),
-        "answer": answer, "answer_type": fields.get("answer_type", "exact_text"),
-        "category": text(fields.get("category") or source.get("category")
-                            or source.get("type") or source_config or "all"),
-        "prompt_group_id": sample_id, "restricted_source": spec.restricted,
+        "answer": answer,
+        "answer_type": fields.get("answer_type", "exact_text"),
+        "category": text(
+            fields.get("category")
+            or source.get("category")
+            or source.get("type")
+            or source_config
+            or "all"
+        ),
+        "prompt_group_id": sample_id,
+        "restricted_source": spec.restricted,
     }
     prompt = render_prompt(record)
     if len(prompt) > 12000:

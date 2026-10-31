@@ -3,6 +3,7 @@
 The JSON files under conf/experiment/qa500 are the only scientific
 configuration source; this module merely validates and resolves them.
 """
+
 from __future__ import annotations
 
 from functools import lru_cache
@@ -14,13 +15,15 @@ from typing import Any
 @lru_cache(maxsize=None)
 def _read(name: str) -> dict[str, Any]:
     if name not in {
-        "protocol.json", "datasets.json", "sites.json", "tasks.json",
-        "resources.json", "assets.lock.json",
+        "protocol.json",
+        "datasets.json",
+        "sites.json",
+        "tasks.json",
+        "resources.json",
+        "assets.lock.json",
     }:
         raise ValueError("Unknown QA500 configuration file")
-    data = json.loads(
-        (files("conf") / "experiment" / "qa500" / name).read_text(encoding="utf-8")
-    )
+    data = json.loads((files("conf") / "experiment" / "qa500" / name).read_text(encoding="utf-8"))
     if not isinstance(data, dict):
         raise TypeError("QA500 configuration must be a JSON object")
     return data

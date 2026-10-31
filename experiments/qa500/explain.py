@@ -37,10 +37,23 @@ def explain_from_captures(
 ) -> dict[str, Any]:
     verify_dataset(dataset_id, data_root)
     site_id = f"{model_key}:{sae_key}:L{layer}"
-    capture_dir = task_dir(result_root, task="capture", dataset=dataset_id,
-                           model=model_key, sae_key=sae_key, layer=layer)
-    base = task_dir(result_root, task="explain", dataset=dataset_id,
-                    model=model_key, sae_key=sae_key, layer=layer, initialize=True)
+    capture_dir = task_dir(
+        result_root,
+        task="capture",
+        dataset=dataset_id,
+        model=model_key,
+        sae_key=sae_key,
+        layer=layer,
+    )
+    base = task_dir(
+        result_root,
+        task="explain",
+        dataset=dataset_id,
+        model=model_key,
+        sae_key=sae_key,
+        layer=layer,
+        initialize=True,
+    )
     rows = _read(typed_file(capture_dir, "metrics", "capture.jsonl"))
     if len(rows) != 500 or len({r["sample_id"] for r in rows}) != 500:
         raise RuntimeError("Explanation discovery requires complete 500-sample capture")

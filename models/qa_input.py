@@ -1,4 +1,5 @@
 """Shared tokenizer-aware QA input construction, independent of experiments."""
+
 from __future__ import annotations
 import hashlib
 from typing import Any
@@ -6,6 +7,7 @@ import torch
 from saebase.data.qa_records import render_prompt
 
 INSTRUCTION_MODELS = frozenset({"gemma3_4b_it"})
+
 
 def _tokenizer(pair: Any) -> Any:
     tokenizer = getattr(pair.model.model, "tokenizer", None)
@@ -47,7 +49,6 @@ def make_input(pair: Any, record: dict[str, Any], model_key: str) -> tuple[Any, 
         # Some tokenizers have additional special tokens beyond vocab_size.
         if not hasattr(tokenizer, "__len__") or bool((tokens >= len(tokenizer)).any()):
             raise ValueError("Input token ID exceeds tokenizer vocabulary")
-    import hashlib
 
     digest = hashlib.sha256(
         tokens.detach().cpu().numpy().astype("<i8", copy=False).tobytes()
@@ -58,5 +59,3 @@ def make_input(pair: Any, record: dict[str, Any], model_key: str) -> tuple[Any, 
         "token_ids_sha256": digest,
         "token_count": int(tokens.size(1)),
     }
-
-

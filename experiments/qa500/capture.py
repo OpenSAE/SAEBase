@@ -11,7 +11,6 @@ from experiments.qa500.config import get_sites
 
 import argparse
 import json
-import math
 from pathlib import Path
 from typing import Any
 
@@ -29,8 +28,7 @@ from models.qa_input import make_input
 
 # Each pair is from the existing verified-site matrix, not inferred by layer fraction.
 SITES: tuple[tuple[str, str, tuple[int, ...]], ...] = tuple(
-    (entry["model_key"], entry["sae_key"], tuple(entry["layers"]))
-    for entry in get_sites()
+    (entry["model_key"], entry["sae_key"], tuple(entry["layers"])) for entry in get_sites()
 )
 
 
@@ -124,9 +122,15 @@ def run_capture(
     if not 1 <= top_k <= 100:
         raise ValueError("top_k must be in [1, 100]")
     subset = records[:limit] if limit else records
-    base = task_dir(output_root, task="capture", dataset=dataset_id,
-                    model=model_key, sae_key=target["sae_key"], layer=layer,
-                    initialize=True)
+    base = task_dir(
+        output_root,
+        task="capture",
+        dataset=dataset_id,
+        model=model_key,
+        sae_key=target["sae_key"],
+        layer=layer,
+        initialize=True,
+    )
     outpath = typed_file(base, "metrics", "pilot.jsonl" if limit else "capture.jsonl")
     cfg = {
         "protocol_id": PROTOCOL_ID,
@@ -138,7 +142,9 @@ def run_capture(
         "sample_limit": limit,
     }
     base.mkdir(parents=True, exist_ok=True)
-    config_path = typed_file(base, "metadata", "pilot_config.json" if limit else "capture_config.json")
+    config_path = typed_file(
+        base, "metadata", "pilot_config.json" if limit else "capture_config.json"
+    )
     if config_path.exists():
         if json.loads(config_path.read_text(encoding="utf-8")) != cfg:
             raise RuntimeError("Existing output directory belongs to a different configuration")
@@ -185,7 +191,9 @@ def run_capture(
             )
         except ValueError as exc:
             # Invalid prompts are explicit failures; never count as successful data.
-            failure = typed_file(base, "logs", "pilot_failures.jsonl" if limit else "capture_failures.jsonl")
+            failure = typed_file(
+                base, "logs", "pilot_failures.jsonl" if limit else "capture_failures.jsonl"
+            )
             _append_once(
                 failure,
                 {
@@ -224,9 +232,9 @@ def run_capture(
         "sae_sha256": sae_sha256,
         "result_path": str(outpath),
     }
-    typed_file(base, "reports", "pilot_summary.json" if limit else "capture_summary.json").write_text(
-        json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
+    typed_file(
+        base, "reports", "pilot_summary.json" if limit else "capture_summary.json"
+    ).write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return summary
 
 

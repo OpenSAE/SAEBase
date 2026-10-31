@@ -96,8 +96,11 @@ def _capture_identity(
     features: set[int] = set()
     for dataset_id in get_dataset_ids():
         run = task_dir(
-            results_root, task="capture", dataset=dataset_id,
-            model=site["model_key"], sae_key=site["sae_key"],
+            results_root,
+            task="capture",
+            dataset=dataset_id,
+            model=site["model_key"],
+            sae_key=site["sae_key"],
             layer=site["layer"],
         )
         dataset_file = typed_file(run, "metrics", "capture.jsonl")

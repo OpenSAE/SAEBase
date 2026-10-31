@@ -3,6 +3,7 @@
 Dataset schemas live in source-owned Dataset adapters. The experiment selects
 its dataset instances through the canonical SAEBase Dataset Registry.
 """
+
 from __future__ import annotations
 import hashlib
 import json
@@ -20,14 +21,17 @@ PROTOCOL_ID = PROTOCOL["protocol_id"]
 SEED = int(PROTOCOL["seed"])
 N_PER_DATASET = int(PROTOCOL["samples_per_dataset"])
 DATASETS: dict[str, DatasetSpec] = {
-    dataset_id: get_qa_dataset_adapter(dataset_id).SPEC
-    for dataset_id in get_dataset_ids()
+    dataset_id: get_qa_dataset_adapter(dataset_id).SPEC for dataset_id in get_dataset_ids()
 }
 
 
 def normalize(
-    spec: DatasetSpec, original: dict[str, Any], *,
-    source_config: str | None, source_index: int, seed: int = SEED,
+    spec: DatasetSpec,
+    original: dict[str, Any],
+    *,
+    source_config: str | None,
+    source_index: int,
+    seed: int = SEED,
 ) -> dict[str, Any]:
     """Invoke the relevant Dataset's own schema parser."""
     adapter = get_qa_dataset_adapter(spec.key)

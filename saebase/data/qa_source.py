@@ -1,4 +1,5 @@
 """Read one pinned Hugging Face dataset without choosing a benchmark cohort."""
+
 from __future__ import annotations
 
 from typing import Any, Iterator
@@ -15,13 +16,12 @@ def iter_source(
         raise ValueError("Dataset source revision must be a full 40-char commit")
     configs = (
         sorted(get_dataset_config_names(spec.repo, revision=revision))
-        if spec.kind == "bbh" else [spec.config]
+        if spec.kind == "bbh"
+        else [spec.config]
     )
     if spec.kind == "bbh" and len(configs) < 20:
         raise RuntimeError("BBH should expose multiple real task configurations")
     for config in configs:
-        dataset = load_dataset(
-            spec.repo, name=config, split=spec.split, revision=revision
-        )
+        dataset = load_dataset(spec.repo, name=config, split=spec.split, revision=revision)
         for index, row in enumerate(dataset):
             yield config, index, dict(row)

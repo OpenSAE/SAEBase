@@ -4,10 +4,10 @@ Task results use the official `experiment/<dataset>/<model>/<task.path>/<run>`
 layout. A study-level directory stores only frozen input identities, cross-run
 receipts and staging. This module owns NO new experiment artifact contract.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 from omegaconf import OmegaConf
 
@@ -57,8 +57,13 @@ def task_dir(
 ) -> Path:
     """Derive one native Run leaf from the existing validated Runtime API."""
     if task not in {
-        "capture", "benchmark", "intervene", "generate",
-        "explain", "circuits", "train",
+        "capture",
+        "benchmark",
+        "intervene",
+        "generate",
+        "explain",
+        "circuits",
+        "train",
     }:
         raise ValueError("Task directory must be a registered SAEBase operation")
     site = "baseline" if sae_key is None else str(sae_key)
@@ -67,14 +72,16 @@ def task_dir(
         if type(layer) is not int or layer < 0:
             raise ValueError("Invalid SAE layer")
         segments.append(f"L{layer}")
-    cfg = OmegaConf.create({
-        "paths": {"root": str(_root(workspace))},
-        "dataset": {"name": dataset},
-        "model": {"name": model},
-        "task": {"name": task, "path": "/".join(segments)},
-        "experiment": {"sub_name": "qa500", "overwrite": False},
-        "seed": SEED,
-    })
+    cfg = OmegaConf.create(
+        {
+            "paths": {"root": str(_root(workspace))},
+            "dataset": {"name": dataset},
+            "model": {"name": model},
+            "task": {"name": task, "path": "/".join(segments)},
+            "experiment": {"sub_name": "qa500", "overwrite": False},
+            "seed": SEED,
+        }
+    )
     destination = run_leaf(cfg)
     if initialize:
         destination.mkdir(parents=True, exist_ok=True)
@@ -85,7 +92,9 @@ def task_dir(
 
 
 def typed_file(
-    run: Path, category: str, filename: str,
+    run: Path,
+    category: str,
+    filename: str,
 ) -> Path:
     """Respect the existing typed-artifact contract."""
     return runtime_artifact_path(run, category, filename)

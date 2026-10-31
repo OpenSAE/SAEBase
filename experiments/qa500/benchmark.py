@@ -1,4 +1,5 @@
 """QA500 orchestration of the existing benchmark Task's Core metrics."""
+
 from __future__ import annotations
 
 from experiments.qa500.paths import task_dir, typed_file
@@ -8,6 +9,7 @@ import math
 from pathlib import Path
 from typing import Any
 from tasks.benchmark.qa_metrics import summarize_metric, BOOTSTRAP_SEED
+
 
 def benchmark_from_capture(
     *,
@@ -19,10 +21,23 @@ def benchmark_from_capture(
     dataset_id: str,
 ) -> dict[str, Any]:
     verify_dataset(dataset_id, data_root)
-    capture_dir = task_dir(result_root, task="capture", dataset=dataset_id,
-                           model=model_key, sae_key=sae_key, layer=layer)
-    base = task_dir(result_root, task="benchmark", dataset=dataset_id,
-                    model=model_key, sae_key=sae_key, layer=layer, initialize=True)
+    capture_dir = task_dir(
+        result_root,
+        task="capture",
+        dataset=dataset_id,
+        model=model_key,
+        sae_key=sae_key,
+        layer=layer,
+    )
+    base = task_dir(
+        result_root,
+        task="benchmark",
+        dataset=dataset_id,
+        model=model_key,
+        sae_key=sae_key,
+        layer=layer,
+        initialize=True,
+    )
     capture = typed_file(capture_dir, "metrics", "capture.jsonl")
     if not capture.is_file():
         raise FileNotFoundError("Frozen full capture required before Core benchmark")

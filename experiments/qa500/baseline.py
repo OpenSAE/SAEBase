@@ -53,8 +53,9 @@ def run_baseline(
         if not 1 <= pilot <= len(items):
             raise ValueError("pilot count exceeds frozen cohort")
         items = items[:pilot]
-    root = task_dir(output_root, task="benchmark", dataset=dataset_id,
-                    model=model_key, initialize=True)
+    root = task_dir(
+        output_root, task="benchmark", dataset=dataset_id, model=model_key, initialize=True
+    )
     root.mkdir(parents=True, exist_ok=True)
     name = "pilot" if pilot else "all"
     path = typed_file(root, "metrics", f"{name}.jsonl")
@@ -126,5 +127,7 @@ def run_baseline(
     }
     denom = summary["n_scored"]
     summary["accuracy"] = summary["n_correct"] / denom if denom else None
-    typed_file(root, "reports", f"{name}_summary.json").write_text(json.dumps(summary, sort_keys=True, indent=2) + "\n")
+    typed_file(root, "reports", f"{name}_summary.json").write_text(
+        json.dumps(summary, sort_keys=True, indent=2) + "\n"
+    )
     return summary

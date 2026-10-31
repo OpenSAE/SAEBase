@@ -1,4 +1,5 @@
 """Reusable benchmark QA scorers with real logits and deterministic generation."""
+
 from __future__ import annotations
 import math
 import re
@@ -9,6 +10,7 @@ import torch
 from models.qa_input import _tokenizer
 
 MAX_GENERATION = {"number": 48, "math": 96, "exact_text": 48}
+
 
 def choice_label_tokens(tokenizer: Any, label: str) -> list[int]:
     """Tokenize an explicit completion, never the gold reference as prompt."""

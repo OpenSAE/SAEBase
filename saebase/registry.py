@@ -192,10 +192,19 @@ def list_registered_task_keys() -> list[str]:
     return sorted(_TASK_REGISTRY.keys())
 
 
-def register_dataset(name: str, setup, assert_task_supported, eval_split_note, *, qa_adapter_module: str | None = None) -> None:
+def register_dataset(
+    name: str,
+    setup,
+    assert_task_supported,
+    eval_split_note,
+    *,
+    qa_adapter_module: str | None = None,
+) -> None:
     if name in _DATASET_REGISTRY:
         raise ValueError(f"Dataset already registered: {name}")
-    _DATASET_REGISTRY[name] = DatasetPlugin(setup, assert_task_supported, eval_split_note, qa_adapter_module)
+    _DATASET_REGISTRY[name] = DatasetPlugin(
+        setup, assert_task_supported, eval_split_note, qa_adapter_module
+    )
 
 
 def register_dataset_alias(alias: str, canonical: str) -> None:

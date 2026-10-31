@@ -5,6 +5,7 @@ scientific settings. This avoids carrying a potentially corrupted CUDA
 allocator into the next attempt. Unsupported precision changes or alternative
 models are never chosen as OOM workarounds.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -40,7 +41,10 @@ def run_worker(
         try:
             with stdout.open("w", encoding="utf-8") as so, stderr.open("w", encoding="utf-8") as se:
                 proc = subprocess.run(
-                    argv, stdout=so, stderr=se, check=False,
+                    argv,
+                    stdout=so,
+                    stderr=se,
+                    check=False,
                     timeout=timeout_seconds,
                 )
             code = proc.returncode
@@ -67,9 +71,13 @@ def run_worker(
                 pass
         oom = "OutOfMemoryError" in content or "CUDA out of memory" in content
         row = {
-            "index": index, "argv": argv, "started_utc": started,
-            "ended_utc": _utc(), "returncode": code,
-            "stdout": str(stdout), "stderr": str(stderr),
+            "index": index,
+            "argv": argv,
+            "started_utc": started,
+            "ended_utc": _utc(),
+            "returncode": code,
+            "stdout": str(stdout),
+            "stderr": str(stderr),
             "reason": error_type or ("CUDA_OOM" if oom else "PROCESS_EXIT"),
         }
         attempts.append(row)
@@ -79,9 +87,9 @@ def run_worker(
             break
     result = {
         "schema": "saebase.execution.worker_attempts.v1",
-        "status": "completed" if attempts[-1]["returncode"] == 0 else (
-            "blocked_resource" if attempts[-1]["reason"] == "CUDA_OOM" else "failed"
-        ),
+        "status": "completed"
+        if attempts[-1]["returncode"] == 0
+        else ("blocked_resource" if attempts[-1]["reason"] == "CUDA_OOM" else "failed"),
         "attempts": attempts,
         "recovery": "fresh_process_same_model_sae_dtype_and_inputs_only",
         "precision_changed": False,

@@ -1,8 +1,10 @@
 """Task-owned real SAE capture, independent of experiment identity."""
+
 from __future__ import annotations
 import math
 from typing import Any
 from saebase.integrations.neuronpedia import annotate
+
 
 def _capture_one(
     pair: Any,
@@ -62,5 +64,3 @@ def _capture_one(
             for i in top
         ],
     }
-
-

@@ -10,8 +10,6 @@ import argparse
 import copy
 import json
 import re
-from hashlib import sha256
-from collections import defaultdict
 from pathlib import Path
 import sys
 
@@ -683,16 +681,21 @@ def attach_context_explanations(graphs: dict) -> None:
                     "code:group:experiments": ["term.saebase_runtime"],
                     "code:group:harness": ["term.code_tree"],
                 }
-                selected = list(dict.fromkeys(
-                    explicit + code_roots.get(node["id"], [])
-                    + exact_code_context(node, context_ids) + selected
-                ))
+                selected = list(
+                    dict.fromkeys(
+                        explicit
+                        + code_roots.get(node["id"], [])
+                        + exact_code_context(node, context_ids)
+                        + selected
+                    )
+                )
             else:
                 selected = list(dict.fromkeys(explicit + selected))
             if node.get("presentation_only") and view != "context":
                 if not selected:
-                    raise ValueError("Generated node lacks authoritative Context: "
-                                     + view + "/" + node["id"])
+                    raise ValueError(
+                        "Generated node lacks authoritative Context: " + view + "/" + node["id"]
+                    )
                 title = str(node.get("title") or "")
                 explanation = str(node.get("reader_explanation") or "")
                 banned = (
@@ -702,14 +705,16 @@ def attach_context_explanations(graphs: dict) -> None:
                     r"按同一来源与主题整理已有节点"
                 )
                 if re.search(banned, title + " " + explanation):
-                    raise ValueError("Generic synthetic node rejected: "
-                                     + view + "/" + node["id"])
+                    raise ValueError("Generic synthetic node rejected: " + view + "/" + node["id"])
             node["context_term_ids"] = selected
     for view, graph in graphs.items():
         node_ids = {node["id"] for node in graph["nodes"]}
         for node in graph["nodes"]:
-            if (":nav:" in node["id"] or ":public-nav:" in node["id"]
-                    or re.search(r"第\d+组", str(node.get("title") or ""))):
+            if (
+                ":nav:" in node["id"]
+                or ":public-nav:" in node["id"]
+                or re.search(r"第\d+组", str(node.get("title") or ""))
+            ):
                 raise ValueError("Synthetic navigation node rejected: " + node["id"])
         sibling_titles = set()
         for edge in graph["edges"]:
@@ -722,8 +727,9 @@ def attach_context_explanations(graphs: dict) -> None:
                 continue
             signature = (edge["source"], child["title"])
             if signature in sibling_titles:
-                raise ValueError("Duplicate generated node responsibility: "
-                                 + view + "/" + child["id"])
+                raise ValueError(
+                    "Duplicate generated node responsibility: " + view + "/" + child["id"]
+                )
             sibling_titles.add(signature)
 
 
@@ -808,30 +814,39 @@ def main() -> int:
         # Keep the raw AST/source-backed inventory; display only semantic
         # capabilities as independent cards. All folded APIs remain expandable.
         from harness.code.semantic_projection import compact_public_code_tree
+
         compact_public_code_tree(graphs["code"])
         attach_context_explanations(graphs)
         # One visible summary is enough: repeated descriptions are not a
         # second semantic explanation, across any of the five Trees.
         from harness.code.audit_semantics import normalize
+
         for graph in graphs.values():
             for node in graph["nodes"]:
-                if (normalize(node.get("summary"))
-                        and normalize(node.get("summary")) == normalize(node.get("description"))):
+                if normalize(node.get("summary")) and normalize(node.get("summary")) == normalize(
+                    node.get("description")
+                ):
                     node["description"] = ""
         verify_public_prose(graphs)
         # Generation itself rejects repetitive display responsibilities, so
         # the no-duplicate promise does not depend solely on a later CI job.
         from harness.code.audit_semantics import audit
+
         semantic_report = audit(graphs)
         blockers = (
-            "repeated_sibling_title", "repeated_sibling_summary",
-            "similar_sibling_purpose", "repeated_global_title",
-            "repeated_global_summary", "similar_global_purpose",
-            "template_summary", "tautological_purpose",
+            "repeated_sibling_title",
+            "repeated_sibling_summary",
+            "similar_sibling_purpose",
+            "repeated_global_title",
+            "repeated_global_summary",
+            "similar_global_purpose",
+            "template_summary",
+            "tautological_purpose",
         )
         defects = {
             key: semantic_report["counts"].get(key, 0)
-            for key in blockers if semantic_report["counts"].get(key, 0)
+            for key in blockers
+            if semantic_report["counts"].get(key, 0)
         }
         if defects:
             raise ValueError("Atlas generation rejected repetitive semantics: " + repr(defects))
