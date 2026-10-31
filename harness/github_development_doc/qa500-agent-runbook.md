@@ -24,7 +24,7 @@ bash harness/experiments/qa500_execute.sh preflight
 bash harness/experiments/qa500_execute.sh full --allow-local-gpu
 ```
 
-这条命令依次自动运行软件测试、10数据集冻结、源验证、20个SAE位点的10题真实 Pilot、50,000 QA Baseline、100,000 Capture、4,000个特征消融、1,000个短生成、每位点/数据集两个 source explanation、独立完整性审计、六个HF新配置的本地 staging。它**不会执行 Train、Circuits、自动 HF 线上发布**。任何资源不满足时停止并写入部分实验/阻塞结果，不允许 agent 自行替换样本和模型。
+这条命令依次自动运行软件测试、10数据集冻结、源验证、20个SAE位点的10题真实 Pilot、50,000 QA Baseline、100,000 Capture、4,000个特征消融、1,000个短生成、每位点/数据集两个 source explanation、独立完整性审计、六个HF新配置的本地 staging。它**不会执行 Train、Circuits、自动 HF 线上发布**。任一独立执行单元资源不满足时，记录对应 blocked 与原始报错，继续其他可运行单元，最后以非零退出码与部分审计结果交付；不允许 agent 自行替换样本和模型。
 
 额外的原生实验由单独授权驱动
 
@@ -34,7 +34,7 @@ bash harness/experiments/qa500_execute.sh native --allow-native-compute
 
 此任务调用上游 `circuit-tracer` 真实 Gemma tracer 和 SAE-Lens bounded TopK training；原生工具未安装、transcoder/gated模型不存在、独立语料不可达时按实际 blocked，不得标记完成。建议先让 Agent 运行 `full`，主数据先完成后再使用 native。
 
-如果 GPU 任务中断，使用同样的命令继续。主程序对完成的 sample 做哈希身份匹配、拒绝输入/SAE身份变更。失败仍然应该留在不可覆盖的独立 failure file，完整结果应由独立审计评定。
+如果 GPU 任务中断，使用同样的命令继续。即使 GPQA 权限阻塞，脚本仍会尝试其他九个冻结数据集并生成明确标识为 partial 的本地 staging；partial staging 无法通过线上发布门槛。主程序对完成的 sample 做哈希身份匹配、拒绝输入/SAE身份变更。失败仍然应该留在不可覆盖的独立 failure file，完整结果应由独立审计评定。
 
 ## 1. 单独阶段重跑
 
@@ -59,7 +59,7 @@ bash harness/experiments/qa500_execute.sh native --allow-native-compute
 
 QA多选（MMLU、ARC、CommonsenseQA、MedQA、GPQA）以真实 log probabilities 评估所有候选**完整 token 序列**；BoolQ在 Yes/No 上评分；GSM8K 为数值 final answer，Hotpot/BBH 为固定 normalized exact match；MATH-500 使用 `math-verify==0.9.0` 等价判断，若grader不可用则标记 `needs_math_equivalence`。准确率的分母是实际 `correct != null` 的样本数，不把 unsupported 算作答错。
 
-**真实 Model/SAE 校验**：`load_registered`、真实 `torch.no_grad()`、model_forward logits finite、`capture_features` 对应 hook 、最后一个 prompt token、SAE `d_in/d_sae` 对齐、decoder reconstruction MSE有限、真正非零 Top10 SAE ID 位于 [0,d_sae)。该 Top10 为**最后一个 prompt token** 激活，不是整段 prompt 的全部激活 feature。每个 sample 存储 token IDs SHA、真实 SAE 权重 SHA256。禁止将历史 Stage D 的单层存在性证明当成本次实际实验成功。
+**真实 Model/SAE 校验**：`load_registered`、真实 `torch.no_grad()`、model_forward logits finite、`capture_features` 对应 hook 、最后一个 prompt token、SAE `d_in/d_sae` 对齐、decoder reconstruction MSE有限、真正非零 Top10 SAE ID 位于 [0,d_sae)。该 Top10 为**最后一个 prompt token** 激活，不是整段 prompt 的全部激活 feature。每个 sample 存储 token IDs SHA、真实 SAE 权重 SHA256；每个模型执行收据另外计算真实模型 state_dict SHA256，并核对两个 SAE 层加载了同一套模型权重。禁止将历史 Stage D 的单层存在性证明当成本次实际实验成功。
 
 ## 3. 标准结果和失败收据
 
@@ -74,6 +74,7 @@ experiment/qa500/
     {model_key}/{sae_key}/L{layer}/{dataset_id}/
       pilot.jsonl, pilot_summary.json
       capture.jsonl, capture_summary.json
+      benchmark_summary.json
       intervene.jsonl, intervene_summary.json
       generate.jsonl, generate_summary.json
       explain.json
