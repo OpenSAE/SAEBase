@@ -49,7 +49,7 @@ def validate_path(name: str, roots: set[str]) -> list[str]:
     if (
         p.parts[0] in {"scripts", "tests"}
         and len(p.parts) == 2
-        and p.name not in {"README.md", "README.en.md"}
+        and p.name not in {"README.md", "README.en.md", "__init__.py"}
     ):
         errors.append("Group new scripts/tests below their owned category: " + name)
     if p.parts[0] == "datasets" and p.name.startswith("qa") and p.name.endswith("_runner.py"):
