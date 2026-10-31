@@ -16,7 +16,7 @@
 | Run ID | `round01` |
 | 授权来源 | 2026-10-30 12:00 UTC-5 Cursor 用户指令，明确启动 R01–R20，独立工作树，真实生产接口，环境阻塞记 `ENV_BLOCKED` |
 
-机器成绩表：[`harness/tests/wp21/runs/round01/summary.md`](../tests/wp21/runs/round01/summary.md)。逐题独立判定：[`harness/tests/wp21/runs/round01/reviews/`](../tests/wp21/runs/round01/reviews/)。
+机器成绩表：[`harness/tests/wp21/runs/round01/summary.md`](../../tests/wp21/runs/round01/summary.md)。逐题独立判定：[`harness/tests/wp21/runs/round01/reviews/`](../../tests/wp21/runs/round01/reviews)。
 
 ## 2. 成绩
 

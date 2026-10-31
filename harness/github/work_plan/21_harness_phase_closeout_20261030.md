@@ -5,9 +5,9 @@
 **WP21.1 考试系统和 WP21.2 Harness 修复阶段结项。** 从此以本仓库 \`main\` 上的 Harness 为后续工作起点；WP18、WP19、WP20 保留原有题目、验证器、结果与权限边界。WP21 的冻结试卷、68 项文件锁和 22 个通用 Contract 继续有效。只有新考试轮次可以生成新成绩；历史原始记录保持不可变。
 
 - [Harness 总入口](../README.md)
-- [WP21 题目与工具](../tests/wp21/README.md)
-- [WP21.1 Exam Ready 手册](../tests/wp21/EXAM_READY.md)
-- [WP21.2 修复记录](../tests/wp21/WP21_2_HARDENING.md)
+- [WP21 题目与工具](../../tests/wp21/README.md)
+- [WP21.1 Exam Ready 手册](../../tests/wp21/EXAM_READY.md)
+- [WP21.2 修复记录](../../tests/wp21/WP21_2_HARDENING.md)
 - [WP21.1 round01 报告](21_exam_round01_report_20261030.md)
 - [WP21.2 round02 后续复核](21_wp21_2_followup_report_20261030.md)
 - [后续 GPU 工作单](21_wp21_2_local_gpu_followup.md)
@@ -44,4 +44,4 @@ R08 的独立探测记录中出现 CPU float16 logits，而原题 Factory 要求
 
 ## 下一阶段如何开始
 
-新的 Harness 任务从最新 \`main\` 读取 [统一 Tests 入口](../tests/README.md)、[通用 Contract Registry](../contracts/README.md)、相关 Work Plan 及对应版本的工具。运行新一轮真实考试时生成**新的 run_id、工作树和 Reviewer**；先验证资源和冻结身份，再判断行为结果。改产品代码的任务单独走研发 PR，Harness 治理修改需要明确维护者审阅。
+新的 Harness 任务从最新 \`main\` 读取 [统一 Tests 入口](../../tests/README.md)、[通用 Contract Registry](../../contracts/README.md)、相关 Work Plan 及对应版本的工具。运行新一轮真实考试时生成**新的 run_id、工作树和 Reviewer**；先验证资源和冻结身份，再判断行为结果。改产品代码的任务单独走研发 PR，Harness 治理修改需要明确维护者审阅。

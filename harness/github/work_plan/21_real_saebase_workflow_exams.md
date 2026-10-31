@@ -1,8 +1,8 @@
 # WP21 真实 SAEBase 工作流综合考试
 
-本工作单准备20道可分派给20个agent的独立综合题。所有题目基于固定源码 `41a54cbfdee5cce24d3d8f7517aadef0c752c5ac`，机器题库为 [cases.json](../tests/wp21/cases.json)，具体运行义务见 [真实工作流协议](../contracts/REAL_WORKFLOW_PROTOCOL.md)。本地交付状态为 **DESIGN_READY，WP21.1 EXAM_SYSTEM_READY**。尚未执行20位考生的真实考试，也未完成20道题的独立真实checkpoint验收。
+本工作单准备20道可分派给20个agent的独立综合题。所有题目基于固定源码 `41a54cbfdee5cce24d3d8f7517aadef0c752c5ac`，机器题库为 [cases.json](../../tests/wp21/cases.json)，具体运行义务见 [真实工作流协议](../../contracts/REAL_WORKFLOW_PROTOCOL.md)。本地交付状态为 **DESIGN_READY，WP21.1 EXAM_SYSTEM_READY**。尚未执行20位考生的真实考试，也未完成20道题的独立真实checkpoint验收。
 
-WP21.1 已新增冻结完整性校验、单题预算限制、真实 loader 探测、独立工作树 Reviewer 及逐项复跑记录，执行说明见 [EXAM_READY.md](../tests/wp21/EXAM_READY.md)。此状态只表示考试基础设施可部署，真实 checkpoint 环境仍需逐项准备。
+WP21.1 已新增冻结完整性校验、单题预算限制、真实 loader 探测、独立工作树 Reviewer 及逐项复跑记录，执行说明见 [EXAM_READY.md](../../tests/wp21/EXAM_READY.md)。此状态只表示考试基础设施可部署，真实 checkpoint 环境仍需逐项准备。
 
 ## 1. 本轮目标
 
@@ -21,38 +21,38 @@ WP21.1 已新增冻结完整性校验、单题预算限制、真实 loader 探�
 7. experiment遵守已有路径与typed artifact目录。新canonical配置hash与runtime现有hash并列，不改写旧身份语义。
 8. 考生自测、证据结构检查、独立真实复跑、人工正式审批是不同状态。题包工具负责预检/分派/记录/完整性，不把这些工作冒充数值行为grader。
 
-审计原始证据与具体缺口见 [AUDIT.md](../tests/wp21/AUDIT.md)。本工作单和协议优先界定这一次隔离本地考试的操作范围，不使历史工作单或公开发布状态自动改变。
+审计原始证据与具体缺口见 [AUDIT.md](../../tests/wp21/AUDIT.md)。本工作单和协议优先界定这一次隔离本地考试的操作范围，不使历史工作单或公开发布状态自动改变。
 
 ## 3. 20题分派矩阵
 
 | 题号 | 内容 | profile | 自给定seed | 最大trial |
 | --- | --- | --- | --- | ---: |
-| [R01](../tests/wp21/cases/R01.md) | 真实采集、恒等写回与特征消融 | gemma_inference | 无 | 1 |
-| [R02](../tests/wp21/cases/R02.md) | 让 capture 的 top_k 参数真实生效 | gemma_inference | 无 | 6 |
-| [R03](../tests/wp21/cases/R03.md) | 新增真实 token_position 参数 | gemma_inference | 无 | 4 |
-| [R04](../tests/wp21/cases/R04.md) | 增加真实重建误差并保持旧指标含义 | gemma_inference | 无 | 4 |
-| [R05](../tests/wp21/cases/R05.md) | 删除临时完整 code 导出功能 | gemma_inference | R05_diagnostic_export | 2 |
-| [R06](../tests/wp21/cases/R06.md) | 挂载带明确划分的新数据集 | gemma_inference | 无 | 4 |
-| [R07](../tests/wp21/cases/R07.md) | 删除临时数据集并保留历史实验 | gemma_inference | R07_retired_dataset | 2 |
-| [R08](../tests/wp21/cases/R08.md) | 挂载真正的新 pretrained 模型 | pythia14m_inference | 无 | 1 |
-| [R09](../tests/wp21/cases/R09.md) | 删除临时模型 provider | gemma_inference | R09_retired_model | 2 |
-| [R10](../tests/wp21/cases/R10.md) | 新增已注册的 feature summary 任务 | gemma_inference | 无 | 1 |
-| [R11](../tests/wp21/cases/R11.md) | 退役临时已注册 task | gemma_inference | R11_retired_task | 2 |
-| [R12](../tests/wp21/cases/R12.md) | 新增实际执行的 reconstruction subtask | gemma_inference | 无 | 5 |
-| [R13](../tests/wp21/cases/R13.md) | 删除 debug_norm 子任务并保留兄弟分支 | gemma_inference | R13_debug_subtask | 4 |
-| [R14](../tests/wp21/cases/R14.md) | 让 capture 按记录批量消费输入 | gemma_inference | 无 | 3 |
-| [R15](../tests/wp21/cases/R15.md) | 十二组 replacement 搜索与独立确认 | gemma_inference | 无 | 14 |
-| [R16](../tests/wp21/cases/R16.md) | 中断后恢复真实六组搜索 | gemma_inference | 无 | 6 |
-| [R17](../tests/wp21/cases/R17.md) | 训练 seed 贯通与短程 SAE 复现 | gemma_training | 无 | 3 |
-| [R18](../tests/wp21/cases/R18.md) | 真实实验产物完整性与稳定配置身份 | gemma_inference | 无 | 1 |
-| [R19](../tests/wp21/cases/R19.md) | 安全归档、精确清理与恢复一个真实 run | gemma_inference | 无 | 1 |
-| [R20](../tests/wp21/cases/R20.md) | 真实多阶段实验与故障后交接 | gemma_inference | 无 | 3 |
+| [R01](../../tests/wp21/cases/R01.md) | 真实采集、恒等写回与特征消融 | gemma_inference | 无 | 1 |
+| [R02](../../tests/wp21/cases/R02.md) | 让 capture 的 top_k 参数真实生效 | gemma_inference | 无 | 6 |
+| [R03](../../tests/wp21/cases/R03.md) | 新增真实 token_position 参数 | gemma_inference | 无 | 4 |
+| [R04](../../tests/wp21/cases/R04.md) | 增加真实重建误差并保持旧指标含义 | gemma_inference | 无 | 4 |
+| [R05](../../tests/wp21/cases/R05.md) | 删除临时完整 code 导出功能 | gemma_inference | R05_diagnostic_export | 2 |
+| [R06](../../tests/wp21/cases/R06.md) | 挂载带明确划分的新数据集 | gemma_inference | 无 | 4 |
+| [R07](../../tests/wp21/cases/R07.md) | 删除临时数据集并保留历史实验 | gemma_inference | R07_retired_dataset | 2 |
+| [R08](../../tests/wp21/cases/R08.md) | 挂载真正的新 pretrained 模型 | pythia14m_inference | 无 | 1 |
+| [R09](../../tests/wp21/cases/R09.md) | 删除临时模型 provider | gemma_inference | R09_retired_model | 2 |
+| [R10](../../tests/wp21/cases/R10.md) | 新增已注册的 feature summary 任务 | gemma_inference | 无 | 1 |
+| [R11](../../tests/wp21/cases/R11.md) | 退役临时已注册 task | gemma_inference | R11_retired_task | 2 |
+| [R12](../../tests/wp21/cases/R12.md) | 新增实际执行的 reconstruction subtask | gemma_inference | 无 | 5 |
+| [R13](../../tests/wp21/cases/R13.md) | 删除 debug_norm 子任务并保留兄弟分支 | gemma_inference | R13_debug_subtask | 4 |
+| [R14](../../tests/wp21/cases/R14.md) | 让 capture 按记录批量消费输入 | gemma_inference | 无 | 3 |
+| [R15](../../tests/wp21/cases/R15.md) | 十二组 replacement 搜索与独立确认 | gemma_inference | 无 | 14 |
+| [R16](../../tests/wp21/cases/R16.md) | 中断后恢复真实六组搜索 | gemma_inference | 无 | 6 |
+| [R17](../../tests/wp21/cases/R17.md) | 训练 seed 贯通与短程 SAE 复现 | gemma_training | 无 | 3 |
+| [R18](../../tests/wp21/cases/R18.md) | 真实实验产物完整性与稳定配置身份 | gemma_inference | 无 | 1 |
+| [R19](../../tests/wp21/cases/R19.md) | 安全归档、精确清理与恢复一个真实 run | gemma_inference | 无 | 1 |
+| [R20](../../tests/wp21/cases/R20.md) | 真实多阶段实验与故障后交接 | gemma_inference | 无 | 3 |
 
 每个agent只领取一题。每题使用同一baseline与自身seed，不要求完成任何前置题。R05/R07/R09/R11/R13的seed提供真实可执行的待删除能力，避免要求考生先凭空构建删除对象。可以先分派4–5题检查环境和证据流程，再独立并行其余题；总题目数保持20。
 
 ## 4. 冻结资源与输入
 
-- common输入为 [prompts.jsonl](../tests/wp21/fixtures/common/prompts.jsonl)，24条、12组，每组2条；train12条属于group-001–group-006，validation6条属于group-007–group-009，test6条属于group-010–group-012。规范字段是sample_id、prompt_group_id、split、prompt。它们是原创工程输入。
+- common输入为 [prompts.jsonl](../../tests/wp21/fixtures/common/prompts.jsonl)，24条、12组，每组2条；train12条属于group-001–group-006，validation6条属于group-007–group-009，test6条属于group-010–group-012。规范字段是sample_id、prompt_group_id、split、prompt。它们是原创工程输入。
 - `gemma_inference` 使用冻结真实Gemma-2 2B及canonical layer25 SAE；`gemma_training` 使用同一真实模型及已锁定原生SAELens环境，训练产生的新SAE另记identity。
 - `pythia14m_inference` 使用官方revision `d31f659f077f9ea500c4d7faa999893d7f28cbdf`，只验证model-only external provider。R09也可全程model-only，SAE身份明确为未使用。
 - 具体本地snapshot、实际设备、文件hash与依赖版本由环境预检锁定。未取得这些资源时保持ENV_BLOCKED，不自动换模型、伪造GPU或把toy升级为最终证据。
@@ -71,7 +71,7 @@ WP21.1 已新增冻结完整性校验、单题预算限制、真实 loader 探�
 5. 独立reviewer在新的受控环境重放本题正反例，查看真实source、import路线、数值和副作用，而非只核对agent写的状态字段。
 6. 汇总每题结果和失败归因。环境缺口、产品缺陷、规范缺口、执行错误分别报告，基于失败再由维护者更新后续版本的harness。考生不能改规则或评分来通过本轮。
 
-实际命令参数以 [tools](../tests/wp21/tools) 的--help及本题卡为准。candidate的证据目录固定为 `harness/tests/wp21/runs/<run_id>/<case_id>/`。产品源码只能修改机器清单中的allowed_paths；runtime、治理、fixtures、评分、历史结果和正式Tree保持受保护。
+实际命令参数以 [tools](../../tests/wp21/tools) 的--help及本题卡为准。candidate的证据目录固定为 `harness/tests/wp21/runs/<run_id>/<case_id>/`。产品源码只能修改机器清单中的allowed_paths；runtime、治理、fixtures、评分、历史结果和正式Tree保持受保护。
 
 ## 6. 独立验收与评分
 

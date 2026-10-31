@@ -6,7 +6,7 @@
 - 冻结试卷：`8a78be1209bb30c652d500f934c226a5d54684c9`
 - 产品基线：`41a54cbfdee5cce24d3d8f7517aadef0c752c5ac`
 - 新考试 run：`round02`（仅 R08）
-- 机器摘要：[`harness/tests/wp21/runs/round02/`](../tests/wp21/runs/round02/)
+- 机器摘要：[`harness/tests/wp21/runs/round02/`](../../tests/wp21/runs/round02)
 
 未纳入本归档：考生工作树、GPU 张量、checkpoint、Reviewer ZIP、含绝对路径的原始 stdout/stderr。
 
@@ -35,7 +35,7 @@
 - 架构 GPTNeoXForCausalLM，6 层，宽 128，CPU float32
 - `model.safetensors` sha256 `116a02532db461f91386a5b20f942ff2c8d4de7341e21b55caafc3d7b25f49a1`
 - identity patch max_abs = 0.0
-- [`reviews/R08/review_final.json`](../tests/wp21/runs/round02/reviews/R08/review_final.json)
+- [`reviews/R08/review_final.json`](../../tests/wp21/runs/round02/reviews/R08/review_final.json)
 
 ## 4. 归因
 
@@ -45,4 +45,4 @@
 | EVALUATOR_SCOPE_GAP | evaluator | round01 目录产物审计；工具已修，历史成绩保留 |
 | IMPLEMENTATION_ERROR | baseline_product | R17 CUDA TopK 同 seed 不可复现；Benchmark runner 不转发 device/`pad_token_id` |
 
-产品 runner 修复应另开产品 PR，见 [`product_fix_candidate.md`](../tests/wp21/runs/round02/benchmark/product_fix_candidate.md)。Harness 评分与冻结容差未改。
+产品 runner 修复应另开产品 PR，见 [`product_fix_candidate.md`](../../tests/wp21/runs/round02/benchmark/product_fix_candidate.md)。Harness 评分与冻结容差未改。

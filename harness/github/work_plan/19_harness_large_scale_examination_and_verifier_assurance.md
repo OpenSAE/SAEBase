@@ -2,7 +2,7 @@
 
 状态：**200 道合成不变量 Exam v1.0，2026-10-29**。H27–H226 共 200 题已有固定 CPU 合成输入输出与机器可执行检查。H27–H46 维持原始参考行为；H47–H226 将 180 个主题各自落实为可运行的微型不变量检测任务，复用 43 种共享验证算子。**这不是 200 个真实产品集成测试，也不代表 GPU、科研结果、长时程及真实多代理操作已验证。**
 
-依据：[WP18](18_harness_local_agent_examination_and_independent_acceptance.md)、[已发布的 Universal Contract Registry](../contracts/catalog.json)、[20 题执行规范](../contracts/wp18_cases.json)、[现有独立验证器](../contracts/wp18_verify.py)。本计划遵循奥卡姆剃刀原则，先复用现有 Contract 和 Verification；发现新的**跨任务**要求时才提出新 Contract，不能因单个 HW 失败就增加一套新术语。
+依据：[WP18](18_harness_local_agent_examination_and_independent_acceptance.md)、[已发布的 Universal Contract Registry](../../contracts/catalog.json)、[20 题执行规范](../../contracts/wp18_cases.json)、[现有独立验证器](../../contracts/wp18_verify.py)。本计划遵循奥卡姆剃刀原则，先复用现有 Contract 和 Verification；发现新的**跨任务**要求时才提出新 Contract，不能因单个 HW 失败就增加一套新术语。
 
 ## 0. 为什么需要 WP19
 

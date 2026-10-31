@@ -16,4 +16,4 @@ The local finalization run covered 233 passing selected assertions; 28 long-runn
 
 Open product-level issues include R17 training reproducibility and Benchmark pad-token/device forwarding. Five historical reviewer worktrees showed script-hash mismatches, with supplementary "b" trees archived locally. R08 probe dtype must be distinguished from the candidate Factory dtype. Do not retroactively rewrite any frozen verdict, relax tolerances, merge candidate product patches or present the archived evidence as a scientific release.
 
-See the [Chinese closeout](21_harness_phase_closeout_20261030.md), [WP21 tests](../tests/wp21/README.md), [WP21.2 maintenance](../tests/wp21/WP21_2_HARDENING.md), [round01 report](21_exam_round01_report_20261030.md), and [round02 follow-up](21_wp21_2_followup_report_20261030.md).
+See the [Chinese closeout](21_harness_phase_closeout_20261030.md), [WP21 tests](../../tests/wp21/README.md), [WP21.2 maintenance](../../tests/wp21/WP21_2_HARDENING.md), [round01 report](21_exam_round01_report_20261030.md), and [round02 follow-up](21_wp21_2_followup_report_20261030.md).

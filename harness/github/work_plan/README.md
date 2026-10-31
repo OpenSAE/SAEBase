@@ -10,13 +10,13 @@
 
 ## Work Plan 21.2 · 真实 GPU 与独立证据复核
 
-[**WP21.2 — 本地 Examiner 执行工作单**](21_wp21_2_local_gpu_followup.md)：针对 R08 的 Pythia 资源与重考、R17 的同 seed 训练差异、R20 的目录审计、Benchmark 设备与 padding、20 题 Reviewer 原始证据，指定真实输入、运行命令、独立验收、可追溯交付和禁止覆盖历史成绩的边界。本工作单只规定本地后续工作，不改冻结考试标准。Harness 修复见 [WP21.2 硬化说明](../tests/wp21/WP21_2_HARDENING.md)。
+[**WP21.2 — 本地 Examiner 执行工作单**](21_wp21_2_local_gpu_followup.md)：针对 R08 的 Pythia 资源与重考、R17 的同 seed 训练差异、R20 的目录审计、Benchmark 设备与 padding、20 题 Reviewer 原始证据，指定真实输入、运行命令、独立验收、可追溯交付和禁止覆盖历史成绩的边界。本工作单只规定本地后续工作，不改冻结考试标准。Harness 修复见 [WP21.2 硬化说明](../../tests/wp21/WP21_2_HARDENING.md)。
 
 **F00–F05 本地复核归档（2026-10-30）**：[成绩、归因与产品缺口](21_wp21_2_followup_report_20261030.md)。R08 新 round02 独立评审 PASS 100；round01 的 R08 ENV_BLOCKED、R17 FAIL、R20 INCOMPLETE 原样保留。这是考试记录归档，不是产品发布或 Atlas 批准。
 
 ## Work Plan 20 · 中大型多阶段 Harness 集成考试
 
-[**WP20 — 20 道中大型集成题及独立验收设计**](20_integrated_multistage_harness_exams.md)：X01–X20 涉及真实 AST/Tree/Knowledge、SAE 编码/干预、AUROC/AP/Bootstrap、Checkpoint、文件原子性、CI 发布、并发与长时程重放。每题有模块来源、明确操作阶段、正反例与独立验收目标；配套 [机器可读设计](../contracts/wp20_cases.json)。**X01–X20 已有实际行为 Reference、80 组冻结正反例、独立 grader 与错误实现校准，现在可在隔离环境开展考试；产品级完整集成和人工审核仍是后续独立工作。**历史 WP19 的 200 个微型合成任务继续保留。
+[**WP20 — 20 道中大型集成题及独立验收设计**](20_integrated_multistage_harness_exams.md)：X01–X20 涉及真实 AST/Tree/Knowledge、SAE 编码/干预、AUROC/AP/Bootstrap、Checkpoint、文件原子性、CI 发布、并发与长时程重放。每题有模块来源、明确操作阶段、正反例与独立验收目标；配套 [机器可读设计](../../contracts/wp20_cases.json)。**X01–X20 已有实际行为 Reference、80 组冻结正反例、独立 grader 与错误实现校准，现在可在隔离环境开展考试；产品级完整集成和人工审核仍是后续独立工作。**历史 WP19 的 200 个微型合成任务继续保留。
 
 **WP20 阶段结项（2026-10-29）**：[考试结果、证据等级与下一阶段边界](20_exam_phase_closeout_20261029.md)。20 题考生提交已通过 [PR #96](https://github.com/OpenSAE/SAEBase/pull/96) 归档至 `main`。公开行为自测记录为 80/80；本阶段验证的是 Harness 内受控 CPU 合成考试，不代表真实 SAEBase 环境集成验收。
 
@@ -26,7 +26,7 @@
 
 ## New Work Plans · 预先声明 Contract
 
-新建 Work Plan 时，先从 [通用 Contract Registry](../contracts/README.md) 选择现有 `CT-` ID，在 Work Plan 的 `harness-contracts-json` 声明中逐 CASE 绑定 tags 和合同。Always-on 自动继承，不能取消；未知新任务先从固定 tags 选择，并把选择结果写入测试 Run 收据。**不允许为了通过一次考试临时重定义 Contract 或让本地 Agent 修改治理目录。** 历史 Work Plan 未迁移声明的只能算 legacy，不能声称已经完成 Contract 验证。
+新建 Work Plan 时，先从 [通用 Contract Registry](../../contracts/README.md) 选择现有 `CT-` ID，在 Work Plan 的 `harness-contracts-json` 声明中逐 CASE 绑定 tags 和合同。Always-on 自动继承，不能取消；未知新任务先从固定 tags 选择，并把选择结果写入测试 Run 收据。**不允许为了通过一次考试临时重定义 Contract 或让本地 Agent 修改治理目录。** 历史 Work Plan 未迁移声明的只能算 legacy，不能声称已经完成 Contract 验证。
 
 ## Harness-only local Agent examination — WP18
 

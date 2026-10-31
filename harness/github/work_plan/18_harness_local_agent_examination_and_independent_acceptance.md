@@ -362,7 +362,7 @@ Harness 的通用合同**预先定义于** `harness/contracts/catalog.json`。�
 
 ## 2. 目录与交付标准（强制）
 
-权威操作规则见 [`harness/tests/README.md`](../tests/README.md) 与 [`harness/tests/wp18/README.md`](../tests/wp18/README.md)。
+权威操作规则见 [`harness/tests/README.md`](../../tests/README.md) 与 [`harness/tests/wp18/README.md`](../../tests/wp18/README.md)。
 
 ```text
 harness/
@@ -447,7 +447,7 @@ harness/
 
 这二十个 HW 是 **本次新增**，不替换旧 H01–H06，也不把 20 个不同目标合成一个大函数。20 题必须执行真实 Python 行为，全部只用最小 synthetic CPU 数据；不联网、不请求 GPU、不下载模型或泄露个人环境。
 
-权威、冻结的任务规格：[`harness/contracts/wp18_cases.json`](../contracts/wp18_cases.json)。每题的 `goal`、`rule`、`signals`、`checks` 已经事先写定，包含可执行的正确输出和非法输入。下面是索引，详细的 JSON 规范优先于表格摘要；任何测试 Agent 不得改两者来通过测验。
+权威、冻结的任务规格：[`harness/contracts/wp18_cases.json`](../../contracts/wp18_cases.json)。每题的 `goal`、`rule`、`signals`、`checks` 已经事先写定，包含可执行的正确输出和非法输入。下面是索引，详细的 JSON 规范优先于表格摘要；任何测试 Agent 不得改两者来通过测验。
 
 | 题号 | 任务 | 额外 Contract（自动叠加 5 个 Always-on 和 CT-ERROR） | 公共验证数 |
 | --- | --- | --- | ---: |
