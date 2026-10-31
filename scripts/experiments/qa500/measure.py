@@ -1,21 +1,22 @@
 """QA500-specific baseline and aggregate study measurements."""
+
 from __future__ import annotations
 
-
-# --- baseline ---
-"""Run one QA baseline per model/dataset, shared across its two SAE sites."""
-
-
-from scripts.experiments.qa500.context import task_dir, typed_file
-
 import hashlib
+from hashlib import sha256
 import json
+import math
 from pathlib import Path
 from typing import Any
 
-from scripts.experiments.qa500.cohort import PROTOCOL_ID, verify_dataset
-from tasks.benchmark.qa_scoring import evaluate_qa
 from models.qa_input import make_input
+from scripts.experiments.qa500.cohort import PROTOCOL_ID, verify_dataset
+from scripts.experiments.qa500.context import task_dir, typed_file
+from tasks.benchmark.qa_metrics import BOOTSTRAP_SEED, summarize_metric
+from tasks.benchmark.qa_scoring import evaluate_qa
+
+
+# --- Shared model baseline ---
 
 
 def _append(path: Path, row: dict[str, Any]) -> None:
@@ -137,18 +138,7 @@ def run_baseline(
     return summary
 
 
-# --- benchmark ---
-"""QA500 orchestration of the existing benchmark Task's Core metrics."""
-
-
-from scripts.experiments.qa500.context import task_dir, typed_file
-from hashlib import sha256
-import json
-import math
-from pathlib import Path
-from typing import Any
-from tasks.benchmark.qa_metrics import summarize_metric, BOOTSTRAP_SEED
-from scripts.experiments.qa500.cohort import verify_dataset, PROTOCOL_ID
+# --- Frozen SAE benchmark ---
 
 
 def benchmark_from_capture(
@@ -250,4 +240,3 @@ def benchmark_from_capture(
         raise RuntimeError("Existing benchmark result differs from current frozen observations")
     output.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return summary
-
