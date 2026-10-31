@@ -155,6 +155,18 @@ def run_model(
             pair = load_registered(
                 sae_key=pairs[1], layer=layer, model_key=model_key, device=device
             )
+            from saebase.store import sha256_state_dict
+
+            # The actual loaded *model* bytes, not just an HF display name,
+            # must be the same across both SAE layers and every QA dataset.
+            current_model_sha = sha256_state_dict(pair.model.model)
+            if len(current_model_sha) != 64:
+                raise RuntimeError("Loaded model state digest invalid")
+            by_layer = receipt.setdefault("model_state_sha256_by_layer", {})
+            if by_layer and current_model_sha not in set(by_layer.values()):
+                raise RuntimeError("Two SAE layers loaded different base-model weights")
+            by_layer[str(layer)] = current_model_sha
+            _atomic_json(job_root / f"{phase}.json", receipt)
             for dataset in DATASETS:
                 step: dict[str, Any] = {
                     "site": f"{model_key}:{pairs[1]}:L{layer}",
