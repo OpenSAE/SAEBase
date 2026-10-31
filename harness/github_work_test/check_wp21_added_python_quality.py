@@ -16,7 +16,13 @@ FROZEN_PREFIX = "harness/tests/wp21/fixtures/"
 
 def added_python_files(base_sha: str) -> list[str]:
     command = [
-        "git", "diff", "--name-only", "--diff-filter=A", "-z", f"{base_sha}...HEAD", "--"
+        "git",
+        "diff",
+        "--name-only",
+        "--diff-filter=A",
+        "-z",
+        f"{base_sha}...HEAD",
+        "--",
     ]
     result = subprocess.run(command, check=True, capture_output=True)
     return sorted(
@@ -78,7 +84,10 @@ def main() -> int:
     try:
         return check_added(args.base_sha)
     except (
-        OSError, ValueError, subprocess.CalledProcessError, UnicodeDecodeError
+        OSError,
+        ValueError,
+        subprocess.CalledProcessError,
+        UnicodeDecodeError,
     ) as exc:
         parser.exit(2, f"WP21 scoped Python quality check failed: {exc}\n")
 
