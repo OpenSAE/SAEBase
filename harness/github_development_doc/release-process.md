@@ -115,6 +115,10 @@ Preserve the generated Atlas snapshot and its history. If the main branch moved 
 
 This rule does not authorize bypassing CI, force-moving `main`, changing an existing tag, or publishing without explicit release confirmation.
 
+## Version-specific v0.6.5 dispatch
+
+The maintainer-authorized v0.6.5 one-time dispatcher (`.github/workflows/saebase-v065-release-dispatch.yml`) requests the standard exact-source release workflow after a successful push-to-main CI for the current HEAD. It uses the same six contexts and immutable-tag gates; a CI or candidate failure does not authorize publication. The installed wheel must expose source-owned dataset modules as `saebase.datasets`, while the sdist retains the physical `datasets/` source tree. This is checked in distribution validation before release.
+
 ## After publication
 
 Review the new GitHub Release, its exact commit, release notes and all
