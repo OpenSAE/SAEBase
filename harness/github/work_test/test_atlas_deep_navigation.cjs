@@ -4,7 +4,7 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
 const path=require("node:path");
-const source=fs.readFileSync(path.join(__dirname,"..","visualization","app.js"),"utf8");
+const source=fs.readFileSync(path.join(__dirname,"..","..","visualization","app.js"),"utf8");
 function section(from,to){
   const i=source.indexOf("  function "+from+"(");
   const j=source.indexOf("  function "+to+"(",i+5);

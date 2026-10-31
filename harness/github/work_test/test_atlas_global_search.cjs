@@ -2,7 +2,7 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs"),vm=require("node:vm"),path=require("node:path");
-const app=fs.readFileSync(path.join(__dirname,"..","visualization","app.js"),"utf8");
+const app=fs.readFileSync(path.join(__dirname,"..","..","visualization","app.js"),"utf8");
 function extract(name,next) {
   const first=app.indexOf("  function "+name+"(");
   const last=app.indexOf("  function "+next+"(",first+5);

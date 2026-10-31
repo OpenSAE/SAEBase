@@ -153,7 +153,7 @@ def render_table(s: dict) -> str:
         for row in selected:
             label = f"L{row['layer']}"
             report = row.get("m3m4_summary")
-            layers.append(f"[{label}](../../{EVIDENCE_REL.as_posix()}/{report})" if report else label)
+            layers.append(f"[{label}](../../../{EVIDENCE_REL.as_posix()}/{report})" if report else label)
         count = lambda field: sum(row.get(field) is True for row in selected)
         arch = {"topk": "TopK", "jumprelu": "JumpReLU"}.get(
             target["architecture"], target["architecture"]
