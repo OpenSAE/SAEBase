@@ -63,4 +63,4 @@ It does not duplicate or silently execute upstream SAEBench estimators. Numerica
 - Mark missing, unsupported and undefined outputs explicitly; do not replace them with favorable numbers.
 - Do not redistribute third-party estimator sources, checkpoint weights or datasets without the original rights.
 
-[Validation and Evidence](validation.md) · [Reliability Analysis](reliability.md) · [Examples](../../saebase/examples/README.md)
+[Validation and Evidence](validation.md) · [Reliability Analysis](reliability.md) · [Examples](../../../saebase/examples/README.md)
