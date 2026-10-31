@@ -211,12 +211,41 @@ def grade_answer(answer_type: str, predicted: str, gold: str) -> dict[str, Any]:
         correct = actual is not None and expected is not None and actual == expected
         method = "numeric_final_v1"
     elif answer_type == "math":
-        # A mathematical equivalence scorer must be separately installed and
-        # validated. Do not call string equality a standard MATH500 accuracy.
+        # Match the published Hugging Face MATH-500 equivalence approach.
+        try:
+            from math_verify import parse, verify
+            from math_verify.parser import LatexExtractionConfig, ExprExtractionConfig
+        except ImportError:
+            return {
+                "correct": None, "grade_status": "needs_math_equivalence",
+                "grader_id": "math_verify_0_9_0_missing",
+            }
+        gold_text = gold if "$" in gold or "\\boxed" in gold else f"${gold}$"
+        try:
+            reference = parse(
+                gold_text,
+                extraction_config=[LatexExtractionConfig(boxed_match_priority=0),
+                                   ExprExtractionConfig()],
+            )
+            candidate = parse(
+                predicted,
+                extraction_config=[LatexExtractionConfig(), ExprExtractionConfig()],
+            )
+            if not reference:
+                return {
+                    "correct": None, "grade_status": "unparseable_reference",
+                    "grader_id": "math_verify_0_9_0",
+                }
+            correct = bool(candidate and verify(reference, candidate))
+        except Exception as exc:
+            return {
+                "correct": None, "grade_status": "math_grader_error",
+                "grader_id": "math_verify_0_9_0",
+                "error_type": type(exc).__name__,
+            }
         return {
-            "correct": None,
-            "grade_status": "needs_math_equivalence",
-            "grader_id": "math_equivalence_unavailable",
+            "correct": correct, "grade_status": "scored",
+            "grader_id": "math_verify_0_9_0",
         }
     else:
         correct = _normalize_text(predicted) == _normalize_text(gold)
