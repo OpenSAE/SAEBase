@@ -4,6 +4,7 @@ Official public S3 exports are preferable to hundreds of thousands of
 individual feature API requests. Annotations are always contingent on a
 user-auditable exact mapping to the loaded SAE weight digest.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -61,10 +62,7 @@ def list_exports(prefix: str) -> list[str]:
         token = xml.findtext("{*}NextContinuationToken")
         if not token:
             raise RuntimeError("S3 listing truncated without a continuation token")
-    return [
-        key for key in keys if key.endswith(".jsonl.gz")
-        and "/explanations/" in key
-    ]
+    return [key for key in keys if key.endswith(".jsonl.gz") and "/explanations/" in key]
 
 
 def _description(record: dict[str, Any]) -> tuple[int, str] | None:
@@ -88,12 +86,10 @@ def _description(record: dict[str, Any]) -> tuple[int, str] | None:
 
 
 def _capture_identity(
-    results_root: Path, site: dict[str, Any],
+    results_root: Path,
+    site: dict[str, Any],
 ) -> tuple[str, set[int]]:
-    root = (
-        results_root / PROTOCOL_ID / site["model_key"]
-        / site["sae_key"] / f"L{site['layer']}"
-    )
+    root = results_root / PROTOCOL_ID / site["model_key"] / site["sae_key"] / f"L{site['layer']}"
     identities: set[str] = set()
     features: set[int] = set()
     for dataset_dir in root.glob("*/capture.jsonl"):
@@ -111,7 +107,10 @@ def _capture_identity(
 
 
 def sync(
-    *, mapping_path: Path, result_root: Path, output_path: Path,
+    *,
+    mapping_path: Path,
+    result_root: Path,
+    output_path: Path,
 ) -> dict[str, Any]:
     mappings = load_mapping(mapping_path)
     sites = {site["site_id"]: site for site in site_list()}
@@ -149,18 +148,23 @@ def sync(
                     idx, explanation = value
                     rec_key = f"{model}/{source}/{idx}"
                     records[rec_key] = {
-                        "model": model, "source": source, "feature_id": idx,
+                        "model": model,
+                        "source": source,
+                        "feature_id": idx,
                         "description": explanation,
                     }
                     found += 1
             report[site_id] = {
-                "status": "source_loaded", "observed_features": len(observed),
+                "status": "source_loaded",
+                "observed_features": len(observed),
                 "descriptions_available": found,
-                "exports_used": len(batch_keys), "sae_sha256": digest,
+                "exports_used": len(batch_keys),
+                "sae_sha256": digest,
             }
         except (ValueError, RuntimeError, OSError, ET.ParseError) as exc:
             report[site_id] = {
-                "status": "blocked", "error_type": type(exc).__name__,
+                "status": "blocked",
+                "error_type": type(exc).__name__,
                 "reason": str(exc)[:300],
             }
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -171,8 +175,10 @@ def sync(
     data = "\n".join(lines) + ("\n" if lines else "")
     output_path.write_text(data, encoding="utf-8")
     summary = {
-        "protocol_id": PROTOCOL_ID, "sites": report,
-        "annotations": len(records), "output": str(output_path),
+        "protocol_id": PROTOCOL_ID,
+        "sites": report,
+        "annotations": len(records),
+        "output": str(output_path),
         "sha256": hashlib.sha256(data.encode("utf-8")).hexdigest(),
         "provenance": BUCKET,
     }
@@ -185,19 +191,20 @@ def sync(
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description="Bulk Neuronpedia QA feature explanations")
     ap.add_argument("--mapping", type=Path, required=True)
+    ap.add_argument("--result-root", type=Path, default=Path("experiment/qa500/results"))
     ap.add_argument(
-        "--result-root", type=Path, default=Path("experiment/qa500/results")
-    )
-    ap.add_argument(
-        "--output", type=Path,
+        "--output",
+        type=Path,
         default=Path("experiment/qa500/neuronpedia/annotations.jsonl"),
     )
     args = ap.parse_args(argv)
-    print(json.dumps(
-        sync(mapping_path=args.mapping, result_root=args.result_root,
-             output_path=args.output),
-        indent=2, ensure_ascii=False,
-    ))
+    print(
+        json.dumps(
+            sync(mapping_path=args.mapping, result_root=args.result_root, output_path=args.output),
+            indent=2,
+            ensure_ascii=False,
+        )
+    )
 
 
 if __name__ == "__main__":
