@@ -30,10 +30,18 @@ QA500 是一个 **具体实验执行脚本集合**，不是 Dataset、Model、Ta
 权重及数据需要根据实际上游许可单独授权。
 
 ```bash
-git fetch origin
-git switch feat/qa-evaluation-500-v1
+# 单次显式获取分支，适用于 origin 默认仅跟踪 main 的仓库
+git fetch origin refs/heads/feat/qa-evaluation-500-v1:refs/remotes/origin/feat/qa-evaluation-500-v1
+if git show-ref --quiet --verify refs/heads/feat/qa-evaluation-500-v1; then
+  git switch feat/qa-evaluation-500-v1
+else
+  git switch --track -c feat/qa-evaluation-500-v1 origin/feat/qa-evaluation-500-v1
+fi
+git pull --ff-only origin feat/qa-evaluation-500-v1
+git rev-parse HEAD
 bash scripts/experiments/qa500.sh preflight
-bash scripts/experiments/qa500.sh full --allow-local-gpu
+# 完整 GPU 执行需要单独明确授权
+# bash scripts/experiments/qa500.sh full --allow-local-gpu
 ```
 
 `preflight` 负责本地导入、离线负例、Harness Contract、机器可用资源与真实 CUDA

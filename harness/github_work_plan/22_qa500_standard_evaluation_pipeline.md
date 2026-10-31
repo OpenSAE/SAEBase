@@ -116,11 +116,18 @@ Capture 与 Benchmark 在当前 QA500 **只包括** `core.l0` 和 `core.reconstr
 
 ## 如何给本地 Agent 指派
 
-只需发送如下命令，由操作者提供一次本地 GPU 的授权
+先执行分支与环境预检。预检通过并核实模型/SAE/HF 访问权限后，才由操作者另行授权后续阶段。
 
 ```bash
-git fetch origin
-git switch feat/qa-evaluation-500-v1
+# 单次显式获取分支，适用于 origin 默认仅跟踪 main 的仓库
+git fetch origin refs/heads/feat/qa-evaluation-500-v1:refs/remotes/origin/feat/qa-evaluation-500-v1
+if git show-ref --quiet --verify refs/heads/feat/qa-evaluation-500-v1; then
+  git switch feat/qa-evaluation-500-v1
+else
+  git switch --track -c feat/qa-evaluation-500-v1 origin/feat/qa-evaluation-500-v1
+fi
+git pull --ff-only origin feat/qa-evaluation-500-v1
+git rev-parse HEAD
 bash scripts/experiments/qa500.sh full --allow-local-gpu
 ```
 
