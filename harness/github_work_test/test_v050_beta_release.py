@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[2]
 def test_v050_package_version_and_release_notes():
     project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
     assert project["name"] == "opensae-saebase"
-    assert project["version"] == "0.6.0"
+    assert tuple(int(part) for part in project["version"].split(".")) >= (0, 6, 0)
     src = ast.parse((ROOT / "saebase" / "__init__.py").read_text())
     found = [
         node.value.value
@@ -34,6 +34,8 @@ def test_v050_package_version_and_release_notes():
     assert f"version: {project['version']}" in (ROOT / "CITATION.cff").read_text()
     assert "## 0.6.0" in changelog
     assert (ROOT / "harness/github_development_doc/releases/v0.6.0.md").is_file()
+    assert (ROOT / f"harness/github_development_doc/releases/v{project['version']}.md").is_file()
+    assert f"## {project['version']}" in changelog
 
 
 def test_v050_distinguishes_open_playground_from_owner_gpu_compute():
@@ -41,8 +43,9 @@ def test_v050_distinguishes_open_playground_from_owner_gpu_compute():
     assert "operator authentication" in notes
     assert "no implied PyPI publication" in notes
     assert "no reliable" not in notes  # human-facing copy stays specific
+    version = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["version"]
     for text in ("README.md", "README_cn.md"):
-        assert "harness/github_development_doc/releases/v0.6.0.md" in (ROOT / text).read_text()
+        assert f"harness/github_development_doc/releases/v{version}.md" in (ROOT / text).read_text()
     backend = (ROOT / "saebase/research_lab/backend/private_api.py").read_text()
     assert "OPENSAE_ENABLE_PRIVATE_JOBS" in backend
     assert "len(operator) < 32" in backend
