@@ -39,7 +39,7 @@ upstream asset is Apache-licensed.
 
 ## v0.2.0 external asset inventory
 
-The machine-readable [release asset inventory](../../conf/release/m5_asset_provenance.json)
+The machine-readable [release asset inventory](../../../conf/release/m5_asset_provenance.json)
 lists external model/checkpoint cards and documented license status.
 The SAEBase source archive and wheel **do not include checkpoint weights,
 tokenizers, or third-party evaluation datasets**. Real model and SAE

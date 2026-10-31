@@ -15,7 +15,7 @@ python -m pytest -q tests/test_m1_store.py
 ```
 
 The example is synthetic, with no model downloads. A real, opt-in Pythia
-acceptance run is defined in [Real Pythia Smoke Acceptance](../../.github/workflows/real-smoke.yml)
+acceptance run is defined in [Real Pythia Smoke Acceptance](../../../.github/workflows/real-smoke.yml)
 with the `m1` input, which checks the **frozen real checkpoint reference** in
 `tests/fixtures/m0_reference_public.json` against live loaded checkpoint
 weights and activations. The fixture was copied byte-for-byte from the
@@ -161,7 +161,7 @@ error before use in a publication. The verified reference cache uses FP32.
 - `saebase/tools/m1_real_smoke.py` loads **actual pretrained checkpoints**, compares
   their SHA-256 digests and activation probes with reference validation, then independently
   checks last-token and multi-position caches plus CSR SAE codes.
-- The [manual `m1` smoke workflow](../../.github/workflows/real-smoke.yml) reads
+- The [manual `m1` smoke workflow](../../../.github/workflows/real-smoke.yml) reads
   the verified reference from a committed fixture and runs on CPU,
   and publishes a `m1_reference.json` artifact. Never label the job passed
   until its real-model step and the numeric checks have succeeded.
@@ -192,7 +192,7 @@ The resumable Activation Store has been accepted and shipped as part of SAEBase 
 | Analysis dependencies | Same clean GitHub Actions CI, separate `analysis-install` job | Passed |
 | Wheel and sdist | Same CI, `package` job | Passed |
 | Real pretrained checkpoint | [real activation-store run #38642950452](https://github.com/OpenSAE/SAEBase/actions/runs/38642950452), public Pythia-70M + registered pretrained SAE | Passed |
-| Original reference comparison | [reference validation fixture](../github_work_test/fixtures/m0_reference_public.json), same model/SAE full-state SHA-256 and stored activation probes | Passed |
+| Original reference comparison | [reference validation fixture](../work_test/fixtures/m0_reference_public.json), same model/SAE full-state SHA-256 and stored activation probes | Passed |
 | Resume and SAE code reuse | Actual real-model artifact, zero model calls during resumed capture/SAE code encoding | Passed |
 
 The [real-model artifact](https://github.com/OpenSAE/SAEBase/actions/runs/38642950452/artifacts/11931745526) contains `m1_reference.json` with:
