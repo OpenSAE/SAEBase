@@ -7,7 +7,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-const ROOT = path.resolve(__dirname, "../..");
+const ROOT = path.resolve(__dirname, "../../..");
 const read = p => fs.readFileSync(path.join(ROOT, p), "utf8");
 const data = JSON.parse(read("harness/visualization/data.js")
   .slice(read("harness/visualization/data.js").indexOf("window.OPENRESEARCH_ATLAS = ") + "window.OPENRESEARCH_ATLAS = ".length).trim().replace(/;\s*$/, ""));

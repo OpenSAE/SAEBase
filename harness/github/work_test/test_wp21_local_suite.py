@@ -17,7 +17,7 @@ from types import SimpleNamespace
 import pytest
 
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 TOOLS = ROOT / "harness/tests/wp21/tools"
 
 

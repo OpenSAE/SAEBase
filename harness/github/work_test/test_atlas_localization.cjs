@@ -7,7 +7,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-const ROOT = path.resolve(__dirname, "../..");
+const ROOT = path.resolve(__dirname, "../../..");
 const read = file => fs.readFileSync(path.join(ROOT, file), "utf8");
 const load = file => JSON.parse(read(file));
 const source = read("harness/visualization/data.js");

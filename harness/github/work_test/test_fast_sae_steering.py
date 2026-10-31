@@ -15,7 +15,7 @@ from saebase.vllm_backend.fast_steering import (
     decoder_feature_direction,
     generate_decoder_direction_cached,
 )
-from harness.github_work_test.test_clean_kv_exact import build
+from harness.github.work_test.test_clean_kv_exact import build
 
 
 def test_live_sae_kv_uses_one_forward_per_token_and_cleans_hook():

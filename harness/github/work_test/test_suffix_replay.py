@@ -14,7 +14,7 @@ from saebase.interventions.clean_prefix import (
 )
 from saebase.store import sha256_state_dict
 from saebase.examples._synthetic_common import ResearchToySAE
-from harness.github_work_test.test_performance_hf_batch import records
+from harness.github.work_test.test_performance_hf_batch import records
 
 
 class CausalMix(torch.nn.Module):
