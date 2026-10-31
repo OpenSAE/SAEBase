@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "code",
   "project": "SAEBase",
-  "source_sha256": "c9f0fd4547d8aea7ceca6446674180007639236fa3bdd71e248fe1844109c7dc",
+  "source_sha256": "c0fcad5f6f2fe6e5358d99e972fb8d1eb1ee622a5f8cff8f7cf7b205d663c3f6",
   "scope": [
     "saebase",
     "datasets",
@@ -24446,7 +24446,7 @@
       "kind": "function",
       "title": "_safe_archive_name",
       "path": "saebase/tools/release_candidate.py",
-      "line": 98,
+      "line": 97,
       "status": "implemented",
       "signature": "def _safe_archive_name(name: str) -> None",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -24456,7 +24456,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/tools/release_candidate.py:98"
+        "saebase/tools/release_candidate.py:97"
       ]
     },
     {
@@ -24464,7 +24464,7 @@
       "kind": "function",
       "title": "_static_version",
       "path": "saebase/tools/release_candidate.py",
-      "line": 59,
+      "line": 58,
       "status": "implemented",
       "signature": "def _static_version(text: str) -> str",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -24474,7 +24474,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/tools/release_candidate.py:59"
+        "saebase/tools/release_candidate.py:58"
       ]
     },
     {
@@ -24482,7 +24482,7 @@
       "kind": "function",
       "title": "inspect_distributions",
       "path": "saebase/tools/release_candidate.py",
-      "line": 110,
+      "line": 109,
       "status": "implemented",
       "signature": "def inspect_distributions(root: Path, dist: Path, version: str, entrypoints: dict[str, str]) -> dict[str, dict[str, object]]",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -24492,7 +24492,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/tools/release_candidate.py:110"
+        "saebase/tools/release_candidate.py:109"
       ]
     },
     {
@@ -24500,7 +24500,7 @@
       "kind": "function",
       "title": "main",
       "path": "saebase/tools/release_candidate.py",
-      "line": 316,
+      "line": 315,
       "status": "implemented",
       "signature": "def main() -> int",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -24510,7 +24510,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/tools/release_candidate.py:316"
+        "saebase/tools/release_candidate.py:315"
       ]
     },
     {
@@ -24518,7 +24518,7 @@
       "kind": "function",
       "title": "prepare",
       "path": "saebase/tools/release_candidate.py",
-      "line": 208,
+      "line": 207,
       "status": "implemented",
       "signature": "def prepare(root: Path, dist: Path, output: Path, commit: str, expected_version: str | None=None, ci_run_id: int | None=None) -> dict",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -24528,7 +24528,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/tools/release_candidate.py:208"
+        "saebase/tools/release_candidate.py:207"
       ]
     },
     {
@@ -24536,7 +24536,7 @@
       "kind": "function",
       "title": "project_info",
       "path": "saebase/tools/release_candidate.py",
-      "line": 74,
+      "line": 73,
       "status": "implemented",
       "signature": "def project_info(root: Path=ROOT) -> tuple[str, str, dict[str, str]]",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -24546,7 +24546,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/tools/release_candidate.py:74"
+        "saebase/tools/release_candidate.py:73"
       ]
     },
     {
@@ -24554,7 +24554,7 @@
       "kind": "function",
       "title": "publish_eligible",
       "path": "saebase/tools/release_candidate.py",
-      "line": 291,
+      "line": 290,
       "status": "implemented",
       "signature": "def publish_eligible(root: Path=ROOT, expected_version: str | None=None) -> dict",
       "description": "Reject old, reused or lower version tags before a privileged publish.",
@@ -24564,7 +24564,7 @@
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "saebase/tools/release_candidate.py:291"
+        "saebase/tools/release_candidate.py:290"
       ]
     },
     {
@@ -24572,7 +24572,7 @@
       "kind": "function",
       "title": "sha256_file",
       "path": "saebase/tools/release_candidate.py",
-      "line": 42,
+      "line": 41,
       "status": "implemented",
       "signature": "def sha256_file(path: Path) -> str",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -24582,7 +24582,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/tools/release_candidate.py:42"
+        "saebase/tools/release_candidate.py:41"
       ]
     },
     {
@@ -24590,7 +24590,7 @@
       "kind": "function",
       "title": "source_sha",
       "path": "saebase/tools/release_candidate.py",
-      "line": 50,
+      "line": 49,
       "status": "implemented",
       "signature": "def source_sha(root: Path=ROOT) -> str",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -24600,7 +24600,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/tools/release_candidate.py:50"
+        "saebase/tools/release_candidate.py:49"
       ]
     },
     {
@@ -24608,7 +24608,7 @@
       "kind": "function",
       "title": "verify_assets",
       "path": "saebase/tools/release_candidate.py",
-      "line": 251,
+      "line": 250,
       "status": "implemented",
       "signature": "def verify_assets(dist: Path, output: Path, commit: str | None=None, version: str | None=None) -> dict",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -24618,7 +24618,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/tools/release_candidate.py:251"
+        "saebase/tools/release_candidate.py:250"
       ]
     },
     {
@@ -24626,7 +24626,7 @@
       "kind": "function",
       "title": "verify_ci_jobs",
       "path": "saebase/tools/release_candidate.py",
-      "line": 183,
+      "line": 182,
       "status": "implemented",
       "signature": "def verify_ci_jobs(record: dict, commit: str) -> dict[str, str]",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -24636,7 +24636,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/tools/release_candidate.py:183"
+        "saebase/tools/release_candidate.py:182"
       ]
     },
     {
