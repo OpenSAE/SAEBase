@@ -3,6 +3,7 @@
 Run this copy from the immutable package, not from candidate-edited code.
 Preparation never runs a candidate, downloads a model, or changes GitHub.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -14,9 +15,25 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import (ALWAYS, BASE_COMMIT, IGNORED_DIRS, ROOT, SUITE, allowed_source,
-                    canonical_hash, contained, get_case, load_spec, read_json,
-                    relative_name, sha256, snapshot, source_changes, write_json, validate_suite_lock)
+from common import (
+    ALWAYS,
+    BASE_COMMIT,
+    IGNORED_DIRS,
+    ROOT,
+    SUITE,
+    allowed_source,
+    canonical_hash,
+    contained,
+    get_case,
+    load_spec,
+    read_json,
+    relative_name,
+    sha256,
+    snapshot,
+    source_changes,
+    write_json,
+    validate_suite_lock,
+)
 
 
 def check_spec(root: Path = ROOT) -> dict:
@@ -34,21 +51,41 @@ def check_spec(root: Path = ROOT) -> dict:
     for case in cases:
         cid = case["id"]
         contracts = case["contracts"]
-        if len(contracts) != len(set(contracts)) or not ALWAYS <= set(contracts) or not set(contracts) <= ids:
+        if (
+            len(contracts) != len(set(contracts))
+            or not ALWAYS <= set(contracts)
+            or not set(contracts) <= ids
+        ):
             raise ValueError(cid + ": invalid contract binding")
         if not set(case["tags"]) <= tag_set:
             raise ValueError(cid + ": unknown tag")
-        for key in ["goal", "steps", "positive_checks", "negative_checks", "required_artifacts", "entrypoints"]:
+        for key in [
+            "goal",
+            "steps",
+            "positive_checks",
+            "negative_checks",
+            "required_artifacts",
+            "entrypoints",
+        ]:
             if not case.get(key):
                 raise ValueError(cid + ": missing " + key)
         if case.get("profile") not in {"gemma_inference", "pythia14m_inference", "gemma_training"}:
             raise ValueError(cid + ": unknown environment profile")
-        for key in ["max_prompts", "max_tokens_per_prompt", "max_trials", "max_seconds", "max_new_artifact_mb"]:
+        for key in [
+            "max_prompts",
+            "max_tokens_per_prompt",
+            "max_trials",
+            "max_seconds",
+            "max_new_artifact_mb",
+        ]:
             if type(case.get("budget", {}).get(key)) is not int or case["budget"][key] < 1:
                 raise ValueError(cid + ": positive integer budget required: " + key)
         for name in case["allowed_paths"]:
             relative_name(name, pattern=True)
-            if name.startswith(("harness/", ".cursor/", ".github/", "saebase/runtime/", "doc/")) or "/" not in name:
+            if (
+                name.startswith(("harness/", ".cursor/", ".github/", "saebase/runtime/", "doc/"))
+                or "/" not in name
+            ):
                 raise ValueError(cid + ": protected or root-level product edit")
         for name in case["context_paths"]:
             if not contained(root, name, exists=True).is_file():
@@ -62,7 +99,9 @@ def check_spec(root: Path = ROOT) -> dict:
             manifest = read_json(manifest_path)
             if manifest.get("case_id") != cid or manifest.get("base_commit") != BASE_COMMIT:
                 raise ValueError(cid + ": seed identity/base mismatch")
-            replaced = {x["path"]: x["base_sha256"] for x in manifest.get("replaced_base_paths", [])}
+            replaced = {
+                x["path"]: x["base_sha256"] for x in manifest.get("replaced_base_paths", [])
+            }
             destinations = set()
             for file in manifest["files"]:
                 src = contained(manifest_path.parent, file["source"], exists=True)
@@ -76,18 +115,28 @@ def check_spec(root: Path = ROOT) -> dict:
                     raise ValueError(cid + ": seed checksum mismatch " + dest)
                 baseline = contained(root, dest)
                 if baseline.is_file() and replaced.get(dest) != sha256(baseline):
-                    raise ValueError(cid + ": seed replacement not bound to exact baseline file " + dest)
+                    raise ValueError(
+                        cid + ": seed replacement not bound to exact baseline file " + dest
+                    )
                 if not baseline.exists() and dest in replaced:
                     raise ValueError(cid + ": declared seed replacement target missing")
             if not set(replaced) <= destinations:
                 raise ValueError(cid + ": replacement declaration outside seed files")
             seed_count += 1
-    return {"status": "SPEC_VALID", "cases": len(cases), "seeded_cases": seed_count,
-            "base_commit": BASE_COMMIT, "runtime_results": "NOT_RUN", "suite_integrity": integrity,
-            "meaning": "Specification integrity only. Independent real-model acceptance is separate."}
+    return {
+        "status": "SPEC_VALID",
+        "cases": len(cases),
+        "seeded_cases": seed_count,
+        "base_commit": BASE_COMMIT,
+        "runtime_results": "NOT_RUN",
+        "suite_integrity": integrity,
+        "meaning": "Specification integrity only. Independent real-model acceptance is separate.",
+    }
 
 
-def prepare(destination: Path, case_ids: list[str], run_id: str, assignment_ref: str | None) -> dict:
+def prepare(
+    destination: Path, case_ids: list[str], run_id: str, assignment_ref: str | None
+) -> dict:
     check_spec()
     if re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{2,47}", run_id) is None:
         raise ValueError("run_id must have 3..48 safe characters")
@@ -99,13 +148,17 @@ def prepare(destination: Path, case_ids: list[str], run_id: str, assignment_ref:
     for cid in case_ids:
         case = get_case(cid)
         candidate = destination / "candidates" / cid
+
         def ignore(folder, names):
-            skipped = {name for name in names if name in IGNORED_DIRS or name.endswith((".pyc", ".pyo"))}
+            skipped = {
+                name for name in names if name in IGNORED_DIRS or name.endswith((".pyc", ".pyo"))
+            }
             if Path(folder) == ROOT:
                 skipped.update({"experiment", "experiments"} & set(names))
             if Path(folder) == SUITE:
                 skipped.update({"runs", "acceptance"} & set(names))
             return skipped
+
         shutil.copytree(ROOT, candidate, ignore=ignore)
         seed = case.get("seed_fixture")
         if seed:
@@ -124,8 +177,11 @@ def prepare(destination: Path, case_ids: list[str], run_id: str, assignment_ref:
         control = destination / "control" / cid
         write_json(control / "source_before.json", before)
         assignment = {
-            "schema": "saebase.wp21.assignment.v1", "case_id": cid, "run_id": run_id,
-            "base_commit": BASE_COMMIT, "case_sha256": canonical_hash(case),
+            "schema": "saebase.wp21.assignment.v1",
+            "case_id": cid,
+            "run_id": run_id,
+            "base_commit": BASE_COMMIT,
+            "case_sha256": canonical_hash(case),
             "spec_sha256": sha256(candidate / "harness/tests/wp21/cases.json"),
             "suite_lock_sha256": sha256(candidate / "harness/tests/wp21/suite_lock.json"),
             "catalog_sha256": sha256(candidate / "harness/contracts/catalog.json"),
@@ -134,7 +190,8 @@ def prepare(destination: Path, case_ids: list[str], run_id: str, assignment_ref:
             "state": "assigned" if assignment_ref else "prepared_not_assigned",
             "assignment_ref": assignment_ref,
             "created_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
-            "allowed_paths": case["allowed_paths"], "budget": case["budget"],
+            "allowed_paths": case["allowed_paths"],
+            "budget": case["budget"],
             "evidence_root": evidence_dir.relative_to(candidate).as_posix(),
             "runtime_output_root": "experiment",
             "note": "Dispatcher record of an existing user assignment; not a fabricated human approval, grading result, or production/release permission.",
@@ -142,25 +199,66 @@ def prepare(destination: Path, case_ids: list[str], run_id: str, assignment_ref:
         write_json(control / "assignment.json", assignment)
         write_json(candidate / ".cursor/wp21_assignment.json", assignment)
         # These are templates. They cannot pass an evidence audit unchanged.
-        write_json(evidence_dir / "evidence.json", {
-            "schema": "saebase.wp21.evidence.v1", "case_id": cid, "run_id": run_id,
-            "status": "NOT_RUN", "evidence_kind": "unexecuted", "base_commit": BASE_COMMIT,
-            "source_snapshot_sha256": None, "input_identity": None, "model_identity": None,
-            "sae_identity": None, "environment": None, "runtime_config_sha256": None,
-            "canonical_config_sha256": None, "executed_result_paths": [], "command_refs": [],
-            "unresolved": ["Real checkpoint execution has not started."],
-        })
-        write_json(evidence_dir / "contract_receipt.json", {
-            "schema": "saebase.wp21.contract_receipt.v1", "case_id": cid,
-            "registry_version": "1.1.0", "contract_ids": case["contracts"],
-            "context_paths": [], "edited_paths": [], "commands": [], "unresolved": ["NOT_RUN"],
-        })
+        write_json(
+            evidence_dir / "evidence.json",
+            {
+                "schema": "saebase.wp21.evidence.v1",
+                "case_id": cid,
+                "run_id": run_id,
+                "status": "NOT_RUN",
+                "evidence_kind": "unexecuted",
+                "base_commit": BASE_COMMIT,
+                "source_snapshot_sha256": None,
+                "input_identity": None,
+                "model_identity": None,
+                "sae_identity": None,
+                "environment": None,
+                "runtime_config_sha256": None,
+                "canonical_config_sha256": None,
+                "executed_result_paths": [],
+                "command_refs": [],
+                "unresolved": ["Real checkpoint execution has not started."],
+            },
+        )
+        write_json(
+            evidence_dir / "contract_receipt.json",
+            {
+                "schema": "saebase.wp21.contract_receipt.v1",
+                "case_id": cid,
+                "registry_version": "1.1.0",
+                "contract_ids": case["contracts"],
+                "context_paths": [],
+                "edited_paths": [],
+                "commands": [],
+                "unresolved": ["NOT_RUN"],
+            },
+        )
         write_json(evidence_dir / "selfcheck.json", {"status": "NOT_RUN", "checks": []})
-        write_json(evidence_dir / "expected_code_diff.json", {"status": "NOT_WRITTEN", "changes": []})
-        write_json(evidence_dir / "review_candidate.json", {"status": "unchecked", "nodes": [], "context_terms": []})
-        (evidence_dir / "report.md").write_text("# " + cid + " 执行报告\n\n当前状态 NOT_RUN。填写实际修改、真实运行、失败、证据和未完成项。\n", encoding="utf-8")
-        created.append({"case_id": cid, "workspace": str(candidate), "evidence": str(evidence_dir), "state": assignment["state"]})
-    write_json(destination / "dispatch.json", {"schema": "saebase.wp21.dispatch.v1", "run_id": run_id, "cases": created})
+        write_json(
+            evidence_dir / "expected_code_diff.json", {"status": "NOT_WRITTEN", "changes": []}
+        )
+        write_json(
+            evidence_dir / "review_candidate.json",
+            {"status": "unchecked", "nodes": [], "context_terms": []},
+        )
+        (evidence_dir / "report.md").write_text(
+            "# "
+            + cid
+            + " 执行报告\n\n当前状态 NOT_RUN。填写实际修改、真实运行、失败、证据和未完成项。\n",
+            encoding="utf-8",
+        )
+        created.append(
+            {
+                "case_id": cid,
+                "workspace": str(candidate),
+                "evidence": str(evidence_dir),
+                "state": assignment["state"],
+            }
+        )
+    write_json(
+        destination / "dispatch.json",
+        {"schema": "saebase.wp21.dispatch.v1", "run_id": run_id, "cases": created},
+    )
     return {"status": "PREPARED", "cases": created, "models_executed": 0}
 
 
@@ -176,7 +274,9 @@ def scope_audit(workspace: Path, control: Path) -> dict:
         raise ValueError("assignment case identity no longer matches trusted exam")
     if assignment.get("spec_sha256") != sha256(ROOT / "harness/tests/wp21/cases.json"):
         raise ValueError("assignment references another frozen exam")
-    if assignment.get("suite_lock_sha256") is not None and assignment["suite_lock_sha256"] != sha256(ROOT / "harness/tests/wp21/suite_lock.json"):
+    if assignment.get("suite_lock_sha256") is not None and assignment[
+        "suite_lock_sha256"
+    ] != sha256(ROOT / "harness/tests/wp21/suite_lock.json"):
         raise ValueError("assignment references another suite lock")
     after = snapshot(workspace)
     changes = source_changes(before, after)
@@ -186,10 +286,15 @@ def scope_audit(workspace: Path, control: Path) -> dict:
         violations.append(".cursor/wp21_assignment.json")
     if case != get_case(cid, workspace):
         violations.append("harness/tests/wp21/cases.json")
-    return {"status": "SCOPE_VALID" if not violations else "SCOPE_VIOLATION",
-            "case_id": cid, "changes": changes, "violations": violations,
-            "source_snapshot_sha256": canonical_hash(after), "source_files": after,
-            "note": "Scope correctness does not establish functional correctness or real execution."}
+    return {
+        "status": "SCOPE_VALID" if not violations else "SCOPE_VIOLATION",
+        "case_id": cid,
+        "changes": changes,
+        "violations": violations,
+        "source_snapshot_sha256": canonical_hash(after),
+        "source_files": after,
+        "note": "Scope correctness does not establish functional correctness or real execution.",
+    }
 
 
 def main() -> int:
@@ -200,7 +305,10 @@ def main() -> int:
     prep.add_argument("--destination", required=True, type=Path)
     prep.add_argument("--case", default="all")
     prep.add_argument("--run-id", required=True)
-    prep.add_argument("--assignment-ref", help="Trusted dispatcher only: cite the ACTUAL existing user assignment. Omit for preparation only.")
+    prep.add_argument(
+        "--assignment-ref",
+        help="Trusted dispatcher only: cite the ACTUAL existing user assignment. Omit for preparation only.",
+    )
     audit = sub.add_parser("scope")
     audit.add_argument("--workspace", required=True, type=Path)
     audit.add_argument("--control", required=True, type=Path)
@@ -222,7 +330,10 @@ def main() -> int:
         print(json.dumps(printable, ensure_ascii=False, indent=2))
         return int(result.get("status") == "SCOPE_VIOLATION")
     except (ValueError, KeyError, OSError, TypeError) as exc:
-        print(json.dumps({"status": "INVALID", "reason": str(exc)}, ensure_ascii=False), file=sys.stderr)
+        print(
+            json.dumps({"status": "INVALID", "reason": str(exc)}, ensure_ascii=False),
+            file=sys.stderr,
+        )
         return 2
 
 

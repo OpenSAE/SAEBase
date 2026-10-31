@@ -1,4 +1,5 @@
 """WP21 preparation and evidence utilities. No model execution or grading here."""
+
 from __future__ import annotations
 
 import fnmatch
@@ -27,7 +28,9 @@ def sha256(path: Path) -> str:
 
 
 def canonical_hash(value) -> str:
-    blob = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False)
+    blob = json.dumps(
+        value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False
+    )
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()
 
 
@@ -37,6 +40,7 @@ def read_json(path: Path):
         if not math.isfinite(value):
             raise ValueError("non-finite JSON number")
         return value
+
     def pairs(items):
         obj = {}
         for key, value in items:
@@ -44,8 +48,13 @@ def read_json(path: Path):
                 raise ValueError("duplicate JSON field: " + key)
             obj[key] = value
         return obj
-    return json.loads(path.read_text(encoding="utf-8"), parse_float=finite_float, object_pairs_hook=pairs,
-                      parse_constant=lambda x: (_ for _ in ()).throw(ValueError("non-finite JSON: " + x)))
+
+    return json.loads(
+        path.read_text(encoding="utf-8"),
+        parse_float=finite_float,
+        object_pairs_hook=pairs,
+        parse_constant=lambda x: (_ for _ in ()).throw(ValueError("non-finite JSON: " + x)),
+    )
 
 
 def write_json(path: Path, value, *, exclusive: bool = False) -> None:
@@ -128,8 +137,18 @@ def source_changes(before: dict, after: dict) -> list[dict]:
     result = []
     for path in sorted(set(before) | set(after)):
         if before.get(path) != after.get(path):
-            result.append({"path": path, "before_sha256": before.get(path), "after_sha256": after.get(path),
-                           "operation": "add" if path not in before else "delete" if path not in after else "modify"})
+            result.append(
+                {
+                    "path": path,
+                    "before_sha256": before.get(path),
+                    "after_sha256": after.get(path),
+                    "operation": "add"
+                    if path not in before
+                    else "delete"
+                    if path not in after
+                    else "modify",
+                }
+            )
     return result
 
 
@@ -149,9 +168,12 @@ def validate_suite_lock(root: Path = ROOT) -> dict:
     files = lock.get("files")
     if not isinstance(files, dict) or not files:
         raise ValueError("suite lock has no file table")
-    expected = {"harness/tests/wp21/cases.json", "harness/contracts/catalog.json",
-                "harness/contracts/REAL_WORKFLOW_PROTOCOL.md",
-                "harness/tests/wp21/fixtures/common/prompts.jsonl"}
+    expected = {
+        "harness/tests/wp21/cases.json",
+        "harness/contracts/catalog.json",
+        "harness/contracts/REAL_WORKFLOW_PROTOCOL.md",
+        "harness/tests/wp21/fixtures/common/prompts.jsonl",
+    }
     expected.update(f"harness/tests/wp21/cases/R{i:02d}.md" for i in range(1, 21))
     expected.update(f"harness/tests/wp21/prompts/R{i:02d}.md" for i in range(1, 21))
     fixtures = root / "harness/tests/wp21/fixtures"
@@ -160,7 +182,10 @@ def validate_suite_lock(root: Path = ROOT) -> dict:
             if item.is_file():
                 expected.add(item.relative_to(root).as_posix())
     if set(files) != expected:
-        raise ValueError("frozen suite file list changed: added/missing=" + repr(sorted(expected ^ set(files))[:12]))
+        raise ValueError(
+            "frozen suite file list changed: added/missing="
+            + repr(sorted(expected ^ set(files))[:12])
+        )
     for relative, digest in sorted(files.items()):
         if not isinstance(digest, str) or not re.fullmatch(r"[a-f0-9]{64}", digest):
             raise ValueError("bad suite lock checksum: " + relative)

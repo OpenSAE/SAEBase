@@ -401,7 +401,7 @@ jobs:
         run: |
           set -euo pipefail
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            python saebase/tools/check_new_python_quality.py --base-sha "$PR_BASE_SHA"
+            python harness/github_work_test/check_wp21_added_python_quality.py --base-sha "$PR_BASE_SHA"
           else
             python saebase/tools/check_new_python_quality.py --base-sha HEAD^
           fi
