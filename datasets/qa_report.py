@@ -558,6 +558,8 @@ def stage(
             "value",
             "n_valid",
             "n_expected",
+            "ci_lower_95",
+            "ci_upper_95",
             "status",
         ],
         metrics,
