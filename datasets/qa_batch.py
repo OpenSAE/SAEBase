@@ -21,6 +21,7 @@ from saebase.datasets.qa_standard import DATASETS, PROTOCOL_ID, prepare_dataset,
 from saebase.datasets.qa_pipeline import SITES, site_list, run_capture
 from saebase.datasets.qa_evaluation import run_baseline
 from saebase.datasets.qa_effects import run_effects
+from saebase.datasets.qa_explain import explain_from_captures
 
 
 DATA_ROOT = Path("experiment/qa500/inputs")
@@ -218,6 +219,16 @@ def run_model(
                             layer=layer,
                             max_tokens=max_tokens,
                         )
+                        step["explain"] = {
+                            "status": "source_annotations_only",
+                            "details": explain_from_captures(
+                                data_root=data_root, result_root=result_root,
+                                model_key=model_key, sae_key=pairs[1],
+                                layer=layer, dataset_id=dataset,
+                                mapping_file=neuronpedia_map,
+                                annotation_file=neuronpedia_records,
+                            )["candidates"],
+                        }
                     statuses = [
                         result["status"]
                         for key, result in step.items()
