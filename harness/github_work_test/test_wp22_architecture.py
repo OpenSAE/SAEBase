@@ -207,3 +207,18 @@ def test_run_paths_use_existing_task_artifact_layout(tmp_path):
     assert typed_file(path, "metrics", "capture.jsonl").parent == path / "metrics"
     assert (path / "metadata" / "run.json").is_file()
     assert study_dir(tmp_path).is_relative_to(tmp_path / "experiment" / "_studies")
+
+
+def test_independent_qa_sources_have_native_hydra_dataset_configs():
+    from omegaconf import OmegaConf
+    from experiments.qa500.config import get_dataset_ids
+    from saebase.registry import get_qa_dataset_adapter
+
+    root = Path(__file__).resolve().parents[2]
+    for dataset_id in get_dataset_ids():
+        adapter = get_qa_dataset_adapter(dataset_id)
+        config = root / "conf" / "dataset" / (dataset_id + ".yaml")
+        assert config.is_file(), config
+        parsed = OmegaConf.load(config)
+        assert parsed.dataset.name
+        assert adapter.SPEC.key == dataset_id
