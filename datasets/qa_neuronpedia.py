@@ -1,4 +1,5 @@
 """Versioned, exact-match Neuronpedia annotations, with no guessed feature IDs."""
+
 from __future__ import annotations
 import json
 from pathlib import Path
@@ -27,13 +28,19 @@ def load_mapping(path: str | Path | None) -> dict[str, dict[str, str]]:
 
 
 def annotate(
-    feature_id: int, *, site_id: str, sae_sha256: str | None,
-    mapping: dict[str, dict[str, str]], annotations: dict[str, Any] | None = None
+    feature_id: int,
+    *,
+    site_id: str,
+    sae_sha256: str | None,
+    mapping: dict[str, dict[str, str]],
+    annotations: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Use independently downloaded feature data, never construct claims from IDs."""
     base: dict[str, Any] = {
-        "feature_id": feature_id, "explanation": None,
-        "explanation_status": "unmapped", "explanation_source": None,
+        "feature_id": feature_id,
+        "explanation": None,
+        "explanation_status": "unmapped",
+        "explanation_source": None,
     }
     cfg = mapping.get(site_id)
     if not cfg:
@@ -52,7 +59,9 @@ def annotate(
     if not isinstance(text, str) or not text.strip():
         return {**base, "explanation_status": "no_description"}
     return {
-        **base, "explanation": text.strip(), "explanation_status": "source_reported",
+        **base,
+        "explanation": text.strip(),
+        "explanation_status": "source_reported",
         "explanation_source": f"https://www.neuronpedia.org/{key}",
     }
 

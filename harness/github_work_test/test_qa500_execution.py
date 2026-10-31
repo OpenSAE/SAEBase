@@ -1,4 +1,5 @@
 """Offline functional acceptance for frozen QA model inputs and real-logit scorers."""
+
 from __future__ import annotations
 
 import hashlib
@@ -33,7 +34,9 @@ class MinimalTokenizer:
         return [2, 3, 4]
 
     def decode(self, token_ids, skip_special_tokens=True):
-        return "".join({10: "A", 11: "B", 12: "Yes", 13: "No", 99: ""}.get(x, "?") for x in token_ids)
+        return "".join(
+            {10: "A", 11: "B", 12: "Yes", 13: "No", 99: ""}.get(x, "?") for x in token_ids
+        )
 
 
 class MinimalEngine:
@@ -89,8 +92,13 @@ def test_candidate_logprobs_are_real_logits():
 def test_question_answer_not_leaked_and_token_hash_reproducible():
     record = normalize(
         DATASETS["arc_challenge"],
-        {"question": "Select?", "choices": {"label": ["A", "B"], "text": ["No", "Yes"]}, "answerKey": "B"},
-        source_config="ARC-Challenge", source_index=0,
+        {
+            "question": "Select?",
+            "choices": {"label": ["A", "B"], "text": ["No", "Yes"]},
+            "answerKey": "B",
+        },
+        source_config="ARC-Challenge",
+        source_index=0,
     )
     pair = MinimalPair()
     tok1, meta1 = make_input(pair, record, "gemma2_2b_base")
@@ -115,11 +123,13 @@ def test_qa_baseline_resume_and_cross_model_input_hash():
         row = normalize(
             DATASETS["arc_challenge"],
             {
-                "id": str(i), "question": f"Question {i}?",
+                "id": str(i),
+                "question": f"Question {i}?",
                 "choices": {"label": ["A", "B"], "text": ["bad", "good"]},
                 "answerKey": "B",
             },
-            source_config="ARC-Challenge", source_index=i,
+            source_config="ARC-Challenge",
+            source_index=i,
         )
         row["source_revision"] = "f" * 40
         rows.append(row)
@@ -130,16 +140,22 @@ def test_qa_baseline_resume_and_cross_model_input_hash():
         root.mkdir(parents=True)
         (root / "questions.jsonl").write_text(payload)
         (root / "manifest.json").write_text(
-            json.dumps({
-                "protocol_id": PROTOCOL_ID, "n": 500,
-                "sha256": hashlib.sha256(payload.encode()).hexdigest(),
-                "sample_ids_sha256": digest([r["sample_id"] for r in rows]),
-                "source_revision": "f" * 40, "source_split": "test",
-            })
+            json.dumps(
+                {
+                    "protocol_id": PROTOCOL_ID,
+                    "n": 500,
+                    "sha256": hashlib.sha256(payload.encode()).hexdigest(),
+                    "sample_ids_sha256": digest([r["sample_id"] for r in rows]),
+                    "source_revision": "f" * 40,
+                    "source_split": "test",
+                }
+            )
         )
         kw = {
-            "model_key": "gemma2_2b_base", "dataset_id": "arc_challenge",
-            "data_root": base / "inputs", "output_root": base / "results",
+            "model_key": "gemma2_2b_base",
+            "dataset_id": "arc_challenge",
+            "data_root": base / "inputs",
+            "output_root": base / "results",
             "pilot": 10,
         }
         first = run_baseline(pair, **kw)

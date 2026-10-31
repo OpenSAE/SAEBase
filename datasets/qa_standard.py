@@ -4,6 +4,7 @@ This module intentionally lives in the source-owned datasets/ tree.  Use it thro
 saebase.datasets.qa_standard so the installed wheel and source checkout share imports.
 No implicit synthetic data, fallback dataset, answer leakage or silent truncation.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -32,14 +33,20 @@ class DatasetSpec:
 
 DATASETS: dict[str, DatasetSpec] = {
     "mmlu_pro": DatasetSpec("mmlu_pro", "TIGER-Lab/MMLU-Pro", None, "test", "mmlu"),
-    "arc_challenge": DatasetSpec("arc_challenge", "allenai/ai2_arc", "ARC-Challenge", "test", "arc"),
-    "commonsense_qa": DatasetSpec("commonsense_qa", "tau/commonsense_qa", None, "validation", "commonsense"),
+    "arc_challenge": DatasetSpec(
+        "arc_challenge", "allenai/ai2_arc", "ARC-Challenge", "test", "arc"
+    ),
+    "commonsense_qa": DatasetSpec(
+        "commonsense_qa", "tau/commonsense_qa", None, "validation", "commonsense"
+    ),
     "boolq": DatasetSpec("boolq", "google/boolq", None, "validation", "boolq"),
     "bbh": DatasetSpec("bbh", "lukaemon/bbh", None, "test", "bbh"),
     "gsm8k": DatasetSpec("gsm8k", "openai/gsm8k", "main", "test", "gsm8k"),
     "math500": DatasetSpec("math500", "HuggingFaceH4/MATH-500", None, "test", "math500"),
     "medqa": DatasetSpec("medqa", "GBaker/MedQA-USMLE-4-options", None, "test", "medqa"),
-    "hotpot_qa": DatasetSpec("hotpot_qa", "hotpotqa/hotpot_qa", "distractor", "validation", "hotpot"),
+    "hotpot_qa": DatasetSpec(
+        "hotpot_qa", "hotpotqa/hotpot_qa", "distractor", "validation", "hotpot"
+    ),
     "gpqa_extended": DatasetSpec(
         "gpqa_extended", "Idavidrein/gpqa", "gpqa_extended", "train", "gpqa", True
     ),
@@ -48,7 +55,9 @@ DATASETS: dict[str, DatasetSpec] = {
 
 def digest(value: Any) -> str:
     """Canonical SHA256 of JSON data, independent of dictionary insertion order."""
-    blob = json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+    blob = json.dumps(
+        value, sort_keys=True, ensure_ascii=False, separators=(",", ":"), allow_nan=False
+    )
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()
 
 
@@ -76,13 +85,19 @@ def _choices(pairs: Iterable[tuple[str, Any]], gold_key: str) -> tuple[list[dict
 
 
 def normalize(
-    spec: DatasetSpec, original: dict[str, Any], *, source_config: str | None,
-    source_index: int, seed: int = SEED,
+    spec: DatasetSpec,
+    original: dict[str, Any],
+    *,
+    source_config: str | None,
+    source_index: int,
+    seed: int = SEED,
 ) -> dict[str, Any]:
     """Normalize a *real* source item; fail rather than substituting question/answer."""
     data = dict(original)
     kind = spec.kind
-    question = _string(data.get("question") or data.get("problem") or data.get("input") or data.get("Question"))
+    question = _string(
+        data.get("question") or data.get("problem") or data.get("input") or data.get("Question")
+    )
     context = ""
     options: list[dict[str, str]] = []
     answer_type = "exact_text"
@@ -162,17 +177,28 @@ def normalize(
     if not question or not answer:
         raise ValueError("Question or reference answer is empty")
     source_id = _string(
-        data.get("question_id") or data.get("id") or data.get("_id")
-        or data.get("Record ID") or source_index
+        data.get("question_id")
+        or data.get("id")
+        or data.get("_id")
+        or data.get("Record ID")
+        or source_index
     )
     # Include the upstream config: source indices are only unique within a config.
     sample_id = digest([spec.key, source_config, spec.split, source_id, question])[:24]
     record = {
-        "sample_id": sample_id, "dataset_id": spec.key, "source_repo": spec.repo,
-        "source_config": source_config, "source_split": spec.split,
-        "source_id": source_id, "question": question, "context": context,
-        "choices": options, "answer": answer, "answer_type": answer_type,
-        "category": category, "prompt_group_id": sample_id,
+        "sample_id": sample_id,
+        "dataset_id": spec.key,
+        "source_repo": spec.repo,
+        "source_config": source_config,
+        "source_split": spec.split,
+        "source_id": source_id,
+        "question": question,
+        "context": context,
+        "choices": options,
+        "answer": answer,
+        "answer_type": answer_type,
+        "category": category,
+        "prompt_group_id": sample_id,
         "restricted_source": spec.restricted,
     }
     prompt = render_prompt(record)
@@ -210,7 +236,8 @@ def _load_source(spec: DatasetSpec, revision: str) -> list[tuple[str | None, int
 
     configs = (
         sorted(get_dataset_config_names(spec.repo, revision=revision))
-        if spec.kind == "bbh" else [spec.config]
+        if spec.kind == "bbh"
+        else [spec.config]
     )
     sources: list[tuple[str | None, int, dict[str, Any]]] = []
     if spec.kind == "bbh" and len(configs) < 20:
@@ -246,8 +273,12 @@ def _balanced_select(records: list[dict[str, Any]], n: int, seed: int) -> list[d
 
 
 def prepare_dataset(
-    dataset_id: str, output_root: str | Path, *, seed: int = SEED,
-    n: int = N_PER_DATASET, force: bool = False,
+    dataset_id: str,
+    output_root: str | Path,
+    *,
+    seed: int = SEED,
+    n: int = N_PER_DATASET,
+    force: bool = False,
 ) -> dict[str, Any]:
     """Download exactly one pinned dataset and freeze 500 QA rows locally.
 
@@ -290,13 +321,21 @@ def prepare_dataset(
     selected = _balanced_select(normal, n, seed)
     for row in selected:
         row["source_revision"] = revision
-    lines = [json.dumps(row, ensure_ascii=False, sort_keys=True, allow_nan=False) for row in selected]
+    lines = [
+        json.dumps(row, ensure_ascii=False, sort_keys=True, allow_nan=False) for row in selected
+    ]
     payload = "\n".join(lines) + "\n"
     manifest = {
-        "protocol_id": PROTOCOL_ID, "dataset_id": dataset_id, "n": n,
-        "seed": seed, "source_repo": spec.repo, "source_config": spec.config,
-        "source_split": spec.split, "source_revision": revision,
-        "restricted_source": spec.restricted, "invalid_source_rows": invalid,
+        "protocol_id": PROTOCOL_ID,
+        "dataset_id": dataset_id,
+        "n": n,
+        "seed": seed,
+        "source_repo": spec.repo,
+        "source_config": spec.config,
+        "source_split": spec.split,
+        "source_revision": revision,
+        "restricted_source": spec.restricted,
+        "invalid_source_rows": invalid,
         "sha256": hashlib.sha256(payload.encode("utf-8")).hexdigest(),
         "sample_ids_sha256": digest([r["sample_id"] for r in selected]),
         "format": "saebase.qa.inputs.v1",
@@ -306,7 +345,9 @@ def prepare_dataset(
     tmp.write_text(payload, encoding="utf-8")
     tmp.replace(path)
     temp_manifest = manifest_path.with_suffix(".json.tmp")
-    temp_manifest.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    temp_manifest.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
     temp_manifest.replace(manifest_path)
     return verify_dataset(dataset_id, output_root)
 
@@ -329,9 +370,7 @@ def verify_dataset(dataset_id: str, output_root: str | Path) -> dict[str, Any]:
             raise RuntimeError("Question source identity mismatch")
         if hashlib.sha256(render_prompt(r).encode("utf-8")).hexdigest() != r["prompt_sha256"]:
             raise RuntimeError("Question prompt identity mismatch")
-        if r["answer_type"] == "choice" and r["answer"] not in {
-            c["label"] for c in r["choices"]
-        }:
+        if r["answer_type"] == "choice" and r["answer"] not in {c["label"] for c in r["choices"]}:
             raise RuntimeError("Choice answer does not resolve to an option")
     if manifest["protocol_id"] != PROTOCOL_ID:
         raise RuntimeError("Unexpected QA protocol version")

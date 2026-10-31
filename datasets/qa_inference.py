@@ -4,6 +4,7 @@ All public metrics are produced by actual model logits. The gold answer is
 never included in model tokens. Candidate label likelihood and generated
 answer accuracy use different scorer IDs and are never mixed.
 """
+
 from __future__ import annotations
 
 import math
@@ -84,8 +85,11 @@ def choice_label_tokens(tokenizer: Any, label: str) -> list[int]:
 
 @torch.no_grad()
 def score_choices(
-    pair: Any, tokens: torch.Tensor, labels: list[str],
-    *, clean_logits: torch.Tensor | None = None,
+    pair: Any,
+    tokens: torch.Tensor,
+    labels: list[str],
+    *,
+    clean_logits: torch.Tensor | None = None,
 ) -> dict[str, Any]:
     """Score complete candidate letter sequences by conditional log likelihood.
 
@@ -110,10 +114,10 @@ def score_choices(
         if len(suffix) > 1:
             # Each successive token is conditioned on the prior candidate tokens.
             for i in range(1, len(suffix)):
-                prefix = torch.cat([
-                    tokens,
-                    torch.tensor([suffix[:i]], device=tokens.device, dtype=torch.long)
-                ], dim=1)
+                prefix = torch.cat(
+                    [tokens, torch.tensor([suffix[:i]], device=tokens.device, dtype=torch.long)],
+                    dim=1,
+                )
                 next_logits = pair.model.forward_logits(tokens=prefix)
                 log_probs = torch.log_softmax(next_logits.float(), dim=-1)
                 value += float(log_probs[suffix[i]].item())
@@ -124,14 +128,18 @@ def score_choices(
     # reproducible protocol; a longer answer should not be rewarded by average.
     predicted = sorted(values, key=lambda label: (-values[label], label))[0]
     return {
-        "prediction": predicted, "choice_logprobs": values,
+        "prediction": predicted,
+        "choice_logprobs": values,
         "scorer_id": "candidate_sequence_logprob_v1",
     }
 
 
 @torch.no_grad()
 def greedy_answer(
-    pair: Any, tokens: torch.Tensor, *, max_new_tokens: int,
+    pair: Any,
+    tokens: torch.Tensor,
+    *,
+    max_new_tokens: int,
     eos_token_id: int | None,
 ) -> dict[str, Any]:
     """Deterministic, backend-neutral greedy autoregressive generation."""
@@ -206,7 +214,8 @@ def grade_answer(answer_type: str, predicted: str, gold: str) -> dict[str, Any]:
         # A mathematical equivalence scorer must be separately installed and
         # validated. Do not call string equality a standard MATH500 accuracy.
         return {
-            "correct": None, "grade_status": "needs_math_equivalence",
+            "correct": None,
+            "grade_status": "needs_math_equivalence",
             "grader_id": "math_equivalence_unavailable",
         }
     else:
@@ -216,19 +225,23 @@ def grade_answer(answer_type: str, predicted: str, gold: str) -> dict[str, Any]:
 
 
 def evaluate_qa(
-    pair: Any, tokens: torch.Tensor, record: dict[str, Any],
-    *, clean_logits: torch.Tensor | None = None,
+    pair: Any,
+    tokens: torch.Tensor,
+    record: dict[str, Any],
+    *,
+    clean_logits: torch.Tensor | None = None,
 ) -> dict[str, Any]:
     kind = record["answer_type"]
     if kind in {"choice", "boolean"}:
         labels = (
-            [item["label"] for item in record["choices"]]
-            if kind == "choice" else ["Yes", "No"]
+            [item["label"] for item in record["choices"]] if kind == "choice" else ["Yes", "No"]
         )
         pred = score_choices(pair, tokens, labels, clean_logits=clean_logits)
     else:
         pred = greedy_answer(
-            pair, tokens, max_new_tokens=MAX_GENERATION[kind],
+            pair,
+            tokens,
+            max_new_tokens=MAX_GENERATION[kind],
             eos_token_id=getattr(_tokenizer(pair), "eos_token_id", None),
         )
     scored = grade_answer(kind, pred["prediction"], record["answer"])

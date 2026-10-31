@@ -1,4 +1,5 @@
 """Run one QA baseline per model/dataset, shared across its two SAE sites."""
+
 from __future__ import annotations
 
 import hashlib
@@ -6,7 +7,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from saebase.datasets.qa_standard import PROTOCOL_ID, render_prompt, verify_dataset
+from saebase.datasets.qa_standard import PROTOCOL_ID, verify_dataset
 from saebase.datasets.qa_inference import evaluate_qa, make_input
 
 
@@ -32,8 +33,13 @@ def _existing(path: Path) -> dict[str, dict[str, Any]]:
 
 
 def run_baseline(
-    pair: Any, *, model_key: str, dataset_id: str,
-    data_root: Path, output_root: Path, max_tokens: int = 2048,
+    pair: Any,
+    *,
+    model_key: str,
+    dataset_id: str,
+    data_root: Path,
+    output_root: Path,
+    max_tokens: int = 2048,
     pilot: int | None = None,
 ) -> dict[str, Any]:
     """Use a verified model with one already loaded real SAE, but no SAE edits."""
@@ -49,9 +55,12 @@ def run_baseline(
     name = "pilot" if pilot else "all"
     path = root / f"{name}.jsonl"
     config = {
-        "protocol_id": PROTOCOL_ID, "dataset_id": dataset_id, "model_key": model_key,
+        "protocol_id": PROTOCOL_ID,
+        "dataset_id": dataset_id,
+        "model_key": model_key,
         "input_manifest_sha256": source["sha256"],
-        "max_tokens": max_tokens, "pilot": pilot,
+        "max_tokens": max_tokens,
+        "pilot": pilot,
         "scorer": "qa_inference_v1",
     }
     cfg_file = root / f"{name}_config.json"
@@ -75,22 +84,35 @@ def run_baseline(
                 raise ValueError("token_length_exceeds_limit")
             result = evaluate_qa(pair, tokens, item)
             row = {
-                "status": "executed", "protocol_id": PROTOCOL_ID,
-                "dataset_id": dataset_id, "model_key": model_key,
-                "sample_id": item["sample_id"], "source_revision": source["source_revision"],
-                "source_split": source["source_split"], **input_meta, **result,
+                "status": "executed",
+                "protocol_id": PROTOCOL_ID,
+                "dataset_id": dataset_id,
+                "model_key": model_key,
+                "sample_id": item["sample_id"],
+                "source_revision": source["source_revision"],
+                "source_split": source["source_split"],
+                **input_meta,
+                **result,
             }
             # An answer key is intentionally not echoed into public raw logs.
             _append(path, row)
             done[item["sample_id"]] = row
         except (ValueError, RuntimeError, IndexError) as exc:
-            _append(root / f"{name}_failures.jsonl", {
-                "status": "failed", "sample_id": item["sample_id"],
-                "error_type": type(exc).__name__, "reason": str(exc)[:600],
-            })
+            _append(
+                root / f"{name}_failures.jsonl",
+                {
+                    "status": "failed",
+                    "sample_id": item["sample_id"],
+                    "error_type": type(exc).__name__,
+                    "reason": str(exc)[:600],
+                },
+            )
     summary = {
-        "protocol_id": PROTOCOL_ID, "model_key": model_key, "dataset_id": dataset_id,
-        "expected": len(items), "executed": len(done),
+        "protocol_id": PROTOCOL_ID,
+        "model_key": model_key,
+        "dataset_id": dataset_id,
+        "expected": len(items),
+        "executed": len(done),
         "missing": len(items) - len(done),
         "status": "complete" if len(done) == len(items) else "partial",
         "n_scored": sum(row.get("correct") is not None for row in done.values()),
@@ -100,7 +122,5 @@ def run_baseline(
     }
     denom = summary["n_scored"]
     summary["accuracy"] = summary["n_correct"] / denom if denom else None
-    (root / f"{name}_summary.json").write_text(
-        json.dumps(summary, sort_keys=True, indent=2) + "\n"
-    )
+    (root / f"{name}_summary.json").write_text(json.dumps(summary, sort_keys=True, indent=2) + "\n")
     return summary
