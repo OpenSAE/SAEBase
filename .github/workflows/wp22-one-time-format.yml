@@ -1,0 +1,51 @@
+name: WP22 one-time architecture formatter
+on:
+  push:
+    branches:
+      - feat/qa-evaluation-500-v1
+    paths:
+      - ".github/workflows/wp22-one-time-format.yml"
+permissions:
+  contents: write
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Format new source and tests without touching unrelated files
+        run: |
+          python -m pip install "ruff>=0.12,<0.16"
+          ruff check --fix datasets/*/qa_adapter.py saebase/data/qa_*.py \
+            saebase/runtime/{hardware,supervisor,experiment_paths}.py \
+            saebase/integrations/{hf_assets,neuronpedia}.py \
+            saebase/registry.py datasets/plugins.py models/qa_input.py \
+            tasks/capture/qa_capture.py tasks/benchmark/qa_*.py \
+            experiments/qa500/*.py experiments/qa500/tests/*.py \
+            harness/github_work_test/test_wp22_architecture.py \
+            harness/github_work_test/test_wp18_sandbox_gate.py \
+            harness/code/{build,presentation}.py \
+            harness/visualization/export.py || true
+          ruff format datasets/*/qa_adapter.py saebase/data/qa_*.py \
+            saebase/runtime/{hardware,supervisor,experiment_paths}.py \
+            saebase/integrations/{hf_assets,neuronpedia}.py \
+            saebase/registry.py datasets/plugins.py models/qa_input.py \
+            tasks/capture/qa_capture.py tasks/benchmark/qa_*.py \
+            experiments/qa500/*.py experiments/qa500/tests/*.py \
+            harness/github_work_test/test_wp22_architecture.py \
+            harness/github_work_test/test_wp18_sandbox_gate.py \
+            harness/code/{build,presentation}.py \
+            harness/visualization/export.py
+      - name: Commit scoped formatting changes
+        run: |
+          if ! git diff --quiet -- '*.py'; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -u -- '*.py'
+            git commit -m "style(wp22): normalize migrated component formatting"
+            git push origin HEAD:feat/qa-evaluation-500-v1
+          fi
