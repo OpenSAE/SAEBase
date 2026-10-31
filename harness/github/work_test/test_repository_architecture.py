@@ -40,3 +40,8 @@ def test_unowned_layouts():
         "experiments/qa500/runner.py",
     ]:
         assert validate_path(p, ROOTS), p
+
+def test_python_package_markers_are_not_unowned_programs():
+    assert not validate_path("tests/__init__.py", ROOTS)
+    assert not validate_path("scripts/__init__.py", ROOTS)
+    assert validate_path("tests/test_unowned.py", ROOTS)

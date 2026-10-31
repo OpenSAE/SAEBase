@@ -1,0 +1,16 @@
+{
+  "schema": "saebase.experiment.dataset_selection.v1",
+  "dataset_ids": [
+    "mmlu_pro",
+    "arc_challenge",
+    "commonsense_qa",
+    "boolq",
+    "bbh",
+    "gsm8k",
+    "math500",
+    "medqa",
+    "hotpot_qa",
+    "gpqa_extended"
+  ],
+  "source_count": 10
+}

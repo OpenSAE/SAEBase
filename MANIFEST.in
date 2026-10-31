@@ -18,3 +18,4 @@ recursive-exclude conf/coverage/stage_d_evidence *
 
 recursive-include datasets *.py
 recursive-include saebase/research_lab *.html *.css *.js *.json
+recursive-include scripts *.sh

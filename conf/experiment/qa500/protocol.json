@@ -1,0 +1,14 @@
+{
+  "schema": "saebase.experiment.protocol.v1",
+  "protocol_id": "qa_standard_500_v1",
+  "seed": 20261031,
+  "samples_per_dataset": 500,
+  "max_prompt_tokens": 2048,
+  "publication": "explicit_approval_only",
+  "scientific_identity_files": [
+    "datasets.json",
+    "sites.json",
+    "tasks.json",
+    "assets.lock.json"
+  ]
+}

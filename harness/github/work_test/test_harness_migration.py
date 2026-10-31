@@ -48,3 +48,27 @@ def test_code_navigation_requires_real_source_and_context() -> None:
             assert node["id"] in originals, node["id"]
     for edge in visible["edges"]:
         assert edge["source"] != edge["target"]
+
+
+def test_new_experiment_shell_entrypoint_has_one_canonical_location() -> None:
+    assert (ROOT / "scripts/experiments/qa500.sh").is_file()
+    assert not (ROOT / "harness/experiments/qa500_execute.sh").exists()
+    assert not list((ROOT / "datasets").glob("qa_*.py"))
+
+
+def test_code_navigation_requires_real_source_and_context() -> None:
+    """No ordinal, role-guess, or source-range navigation pseudo-components."""
+    from harness.code.presentation import readable_code_tree
+
+    graph = json.loads((ROOT / "doc/code/code_tree.json").read_text(encoding="utf-8"))
+    visible = readable_code_tree(graph)
+    originals = {n["id"] for n in graph["nodes"]}
+    for node in visible["nodes"]:
+        assert not node["id"].startswith("code:nav:"), node["id"]
+        assert "第1组" not in node["title"] and "第2组" not in node["title"]
+        if node.get("presentation_only"):
+            assert node.get("context_term_ids"), node["id"]
+        else:
+            assert node["id"] in originals, node["id"]
+    for edge in visible["edges"]:
+        assert edge["source"] != edge["target"]

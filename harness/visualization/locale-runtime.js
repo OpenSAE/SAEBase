@@ -118,7 +118,8 @@
       // responsibility. The exact name, type, default and implementation
       // are always included alongside this technical-only fallback.
       if (field) {
-        const type = String(parent?.annotation || "").trim();
+        const annotation = String(parent?.annotation || "").trim();
+        const type = annotation.replace(/由源码推导/g, "inferred from source");
         return "Declared parameter " + field + (type ? " (" + type + ")" : "") +
           "; consult its exact source usage and default.";
       }

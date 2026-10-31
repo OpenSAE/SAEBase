@@ -1,0 +1,220 @@
+"""Reusable benchmark QA scorers with real logits and deterministic generation."""
+
+from __future__ import annotations
+import math
+import re
+import string
+from decimal import Decimal, InvalidOperation
+from typing import Any
+import torch
+from models.qa_input import _tokenizer
+
+MAX_GENERATION = {"number": 48, "math": 96, "exact_text": 48}
+
+
+def choice_label_tokens(tokenizer: Any, label: str) -> list[int]:
+    """Tokenize an explicit completion, never the gold reference as prompt."""
+    ids = tokenizer.encode(" " + label, add_special_tokens=False)
+    if not ids or not all(isinstance(k, int) and k >= 0 for k in ids):
+        raise ValueError(f"Tokenization of candidate {label} failed")
+    return list(ids)
+
+
+@torch.no_grad()
+def score_choices(
+    pair: Any,
+    tokens: torch.Tensor,
+    labels: list[str],
+    *,
+    clean_logits: torch.Tensor | None = None,
+) -> dict[str, Any]:
+    """Score complete candidate letter sequences by conditional log likelihood.
+
+    Single-token candidates share one clean next-token forward. Multi-token
+    candidates use explicit teacher forcing, never a different denominator.
+    """
+    if not labels or len(labels) != len(set(labels)):
+        raise ValueError("Expected nonempty unique choice labels")
+    tok = _tokenizer(pair)
+    encoded = {x: choice_label_tokens(tok, x) for x in labels}
+    if clean_logits is None:
+        clean_logits = pair.model.forward_logits(tokens=tokens)
+    if not bool(torch.isfinite(clean_logits).all()):
+        raise ValueError("Nonfinite baseline model logits")
+    first = torch.log_softmax(clean_logits.float(), dim=-1)
+    values: dict[str, float] = {}
+    vocab = int(first.numel())
+    for label, suffix in encoded.items():
+        if any(x >= vocab for x in suffix):
+            raise ValueError("Choice token ID outside model output vocabulary")
+        value = float(first[suffix[0]].item())
+        if len(suffix) > 1:
+            # Each successive token is conditioned on the prior candidate tokens.
+            for i in range(1, len(suffix)):
+                prefix = torch.cat(
+                    [tokens, torch.tensor([suffix[:i]], device=tokens.device, dtype=torch.long)],
+                    dim=1,
+                )
+                next_logits = pair.model.forward_logits(tokens=prefix)
+                log_probs = torch.log_softmax(next_logits.float(), dim=-1)
+                value += float(log_probs[suffix[i]].item())
+        if not math.isfinite(value):
+            raise ValueError("Nonfinite QA choice likelihood")
+        values[label] = value
+    # Sum of log probabilities without length normalization is an explicit,
+    # reproducible protocol; a longer answer should not be rewarded by average.
+    predicted = sorted(values, key=lambda label: (-values[label], label))[0]
+    return {
+        "prediction": predicted,
+        "choice_logprobs": values,
+        "scorer_id": "candidate_sequence_logprob_v1",
+    }
+
+
+@torch.no_grad()
+def greedy_answer(
+    pair: Any,
+    tokens: torch.Tensor,
+    *,
+    max_new_tokens: int,
+    eos_token_id: int | None,
+) -> dict[str, Any]:
+    """Deterministic, backend-neutral greedy autoregressive generation."""
+    if not 1 <= max_new_tokens <= 256:
+        raise ValueError("Unapproved QA generation budget")
+    tokenizer = _tokenizer(pair)
+    prefix = tokens
+    generated: list[int] = []
+    reason = "max_new_tokens"
+    with torch.inference_mode():
+        for _ in range(max_new_tokens):
+            logits = pair.model.forward_logits(tokens=prefix)
+            if not bool(torch.isfinite(logits).all()):
+                raise ValueError("Nonfinite logits during QA generation")
+            next_id = int(torch.argmax(logits).item())
+            generated.append(next_id)
+            if eos_token_id is not None and next_id == int(eos_token_id):
+                reason = "eos"
+                break
+            new_token = torch.tensor([[next_id]], dtype=torch.long, device=prefix.device)
+            prefix = torch.cat([prefix, new_token], dim=1)
+    response = tokenizer.decode(generated, skip_special_tokens=True)
+    if not isinstance(response, str):
+        raise ValueError("Tokenizer.decode returned a non-string answer")
+    return {
+        "prediction": response.strip(),
+        "generated_token_ids": generated,
+        "stop_reason": reason,
+        "scorer_id": "greedy_text_v1",
+    }
+
+
+def _normalize_text(s: str) -> str:
+    s = s.lower().strip()
+    s = "".join(ch for ch in s if ch not in string.punctuation)
+    s = re.sub(r"\b(a|an|the)\b", " ", s)
+    return " ".join(s.split())
+
+
+def _parse_number(text: str) -> Decimal | None:
+    raw = text.strip().replace(",", "")
+    boxed = re.search(r"\\boxed\s*\{([^{}]+)\}", raw)
+    if boxed:
+        raw = boxed.group(1)
+    if "####" in raw:
+        raw = raw.rsplit("####", 1)[1].strip()
+    match = re.search(r"[-+]?(?:\d*\.\d+|\d+)(?:/\d+)?", raw)
+    if not match:
+        return None
+    s = match.group(0)
+    try:
+        if "/" in s:
+            a, b = s.split("/", 1)
+            return Decimal(a) / Decimal(b)
+        return Decimal(s)
+    except (InvalidOperation, ZeroDivisionError):
+        return None
+
+
+def grade_answer(answer_type: str, predicted: str, gold: str) -> dict[str, Any]:
+    """Basic QA grading. Math is deliberately provisional without math-verify."""
+    if answer_type in {"choice", "boolean"}:
+        valid = _normalize_text(predicted)
+        expected = _normalize_text(gold)
+        correct = valid == expected
+        method = "strict_label_v1"
+    elif answer_type == "number":
+        actual, expected = _parse_number(predicted), _parse_number(gold)
+        correct = actual is not None and expected is not None and actual == expected
+        method = "numeric_final_v1"
+    elif answer_type == "math":
+        # Match the published Hugging Face MATH-500 equivalence approach.
+        try:
+            from math_verify import parse, verify
+            from math_verify.parser import LatexExtractionConfig, ExprExtractionConfig
+        except ImportError:
+            return {
+                "correct": None,
+                "grade_status": "needs_math_equivalence",
+                "grader_id": "math_verify_0_9_0_missing",
+            }
+        gold_text = gold if "$" in gold or "\\boxed" in gold else f"${gold}$"
+        try:
+            reference = parse(
+                gold_text,
+                extraction_config=[
+                    LatexExtractionConfig(boxed_match_priority=0),
+                    ExprExtractionConfig(),
+                ],
+            )
+            candidate = parse(
+                predicted,
+                extraction_config=[LatexExtractionConfig(), ExprExtractionConfig()],
+            )
+            if not reference:
+                return {
+                    "correct": None,
+                    "grade_status": "unparseable_reference",
+                    "grader_id": "math_verify_0_9_0",
+                }
+            correct = bool(candidate and verify(reference, candidate))
+        except Exception as exc:
+            return {
+                "correct": None,
+                "grade_status": "math_grader_error",
+                "grader_id": "math_verify_0_9_0",
+                "error_type": type(exc).__name__,
+            }
+        return {
+            "correct": correct,
+            "grade_status": "scored",
+            "grader_id": "math_verify_0_9_0",
+        }
+    else:
+        correct = _normalize_text(predicted) == _normalize_text(gold)
+        method = "normalized_exact_match_v1"
+    return {"correct": bool(correct), "grade_status": "scored", "grader_id": method}
+
+
+def evaluate_qa(
+    pair: Any,
+    tokens: torch.Tensor,
+    record: dict[str, Any],
+    *,
+    clean_logits: torch.Tensor | None = None,
+) -> dict[str, Any]:
+    kind = record["answer_type"]
+    if kind in {"choice", "boolean"}:
+        labels = (
+            [item["label"] for item in record["choices"]] if kind == "choice" else ["Yes", "No"]
+        )
+        pred = score_choices(pair, tokens, labels, clean_logits=clean_logits)
+    else:
+        pred = greedy_answer(
+            pair,
+            tokens,
+            max_new_tokens=MAX_GENERATION[kind],
+            eos_token_id=getattr(_tokenizer(pair), "eos_token_id", None),
+        )
+    scored = grade_answer(kind, pred["prediction"], record["answer"])
+    return {**pred, **scored, "answer_type": kind}

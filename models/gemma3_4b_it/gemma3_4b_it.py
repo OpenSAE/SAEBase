@@ -14,6 +14,7 @@ SPEC = BaseModelSpec(
     family="gemma",
     model_candidates=("google/gemma-3-4b-it",),
     notes="Gemma-3 4B IT; native Scope 2 residual SAE (same layers as PT).",
+    prompt_format="chat_template",
 )
 
 from saebase.datasets.prompt_schema import behaviors_for_model

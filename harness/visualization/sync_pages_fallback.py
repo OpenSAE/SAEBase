@@ -66,8 +66,7 @@ def render_page(view: str, source: str) -> str:
     )
     html = html.replace(
         "<!doctype html>",
-        "<!doctype html>\n"
-        "<!-- SAEBase Pages fallback, generated from harness/visualization -->",
+        "<!doctype html>\n<!-- SAEBase Pages fallback, generated from harness/visualization -->",
         1,
     )
     for asset in ("data.js", "app.js", "style.css"):

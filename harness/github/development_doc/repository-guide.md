@@ -12,6 +12,8 @@ SAEBase separates runnable examples, research code, published evidence and engin
 | [`saebase/examples/benchmarking/`](../../../saebase/examples/benchmarking/README.md) | Benchmark preflight and reliability analysis | [Benchmark preflight](../../../saebase/examples/benchmarking/benchmark_preflight.py) |
 | [`saebase/examples/research_integrations/`](../../../saebase/examples/research_integrations/README.md) | SAR, RSS, Input Localization and SAEBench | [Research examples](../../../saebase/examples/research_integrations/README.md) |
 | [`saebase/`](../../../saebase) | Python APIs for loading, measuring, editing and reporting | [API guide](python-api.md) |
+| [`scripts/experiments/`](../../../scripts/experiments/) | Specific study orchestration | [QA500](../../../scripts/experiments/qa500/README.md) |
+| [`scripts/`](../../../scripts/) | Launchers | [QA500 runner](../../../scripts/experiments/qa500.sh) |
 | [`models/`](../../../models) and [`conf/`](../../../conf) | Model adapters, SAE profiles and experiment configurations | [Model support](model-support.md) |
 | [`saebase/research_lab/`](../../../saebase/research_lab/README.md) | Browser-based exploration of recorded measurements | [Research Lab](../../../saebase/research_lab/README.md) |
 | [`saebase/assets/`](../assets) | Branding and workflow figures used in documentation | [Workflow diagram](../assets/figures/saebase_workflow.svg) |
