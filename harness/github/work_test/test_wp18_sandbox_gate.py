@@ -76,11 +76,12 @@ def test_only_approved_root_exception_names_need_formal_flow(tmp_path, monkeypat
     hooks = prepare_root(tmp_path, monkeypatch)
     for path in ("tests/unassigned_test.py", "scripts/workplan/wp22.sh"):
         assert hooks.gate("write_file", {"file_path": path}, active=None) is not None
+    assert hooks.gate("write_file", {"file_path": "experiments/research_run/metrics.json"}, active="TRUSTED") is not None
     from harness.core import agent_flow
 
     monkeypatch.setattr(agent_flow, "load", lambda _: {"phase": "authorized"})
     monkeypatch.setattr(agent_flow, "scope", lambda _obj, _files: None)
-    for path in ("experiments/research_run/metrics.json", "tests/unassigned_test.py"):
+    for path in ("tests/unassigned_test.py", "scripts/workplan/wp22.sh"):
         assert hooks.gate("write_file", {"file_path": path}, active="TRUSTED") is None
 
 
