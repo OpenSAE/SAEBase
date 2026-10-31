@@ -183,9 +183,7 @@ def audit(data_root: Path, result_root: Path) -> dict[str, Any]:
                     summary = json.loads(benchmark_file.read_text(encoding="utf-8"))
                     from hashlib import sha256
 
-                    metric_ids = {
-                        m.get("metric_id") for m in summary.get("metrics", [])
-                    }
+                    metric_ids = {m.get("metric_id") for m in summary.get("metrics", [])}
                     if (
                         summary.get("status") != "complete"
                         or summary.get("source_capture_sha256")
@@ -377,21 +375,23 @@ def stage(
             if benchmark_file.is_file():
                 benchmark = json.loads(benchmark_file.read_text(encoding="utf-8"))
                 for m in benchmark["metrics"]:
-                    metrics.append({
-                        "protocol_id": PROTOCOL_ID,
-                        "model_key": site["model_key"],
-                        "sae_key": site["sae_key"],
-                        "layer": site["layer"],
-                        "dataset_id": dataset,
-                        "task": "benchmark",
-                        "metric_id": m["metric_id"],
-                        "value": m["value"],
-                        "n_valid": m["n_valid"],
-                        "n_expected": N_PER_DATASET,
-                        "ci_lower_95": m["ci_lower_95"],
-                        "ci_upper_95": m["ci_upper_95"],
-                        "status": benchmark["status"],
-                    })
+                    metrics.append(
+                        {
+                            "protocol_id": PROTOCOL_ID,
+                            "model_key": site["model_key"],
+                            "sae_key": site["sae_key"],
+                            "layer": site["layer"],
+                            "dataset_id": dataset,
+                            "task": "benchmark",
+                            "metric_id": m["metric_id"],
+                            "value": m["value"],
+                            "n_valid": m["n_valid"],
+                            "n_expected": N_PER_DATASET,
+                            "ci_lower_95": m["ci_lower_95"],
+                            "ci_upper_95": m["ci_upper_95"],
+                            "status": benchmark["status"],
+                        }
+                    )
             for task in ("intervene", "generate"):
                 efile = base / f"{task}.jsonl"
                 for r in _read_rows(efile):

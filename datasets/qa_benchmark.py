@@ -4,6 +4,7 @@ This is a small, explicitly named Core protocol, not a substitute for the
 native SAEBench estimator or LM loss-recovered. Bootstrap samples the
 independent frozen question IDs, never tokens or duplicate variants.
 """
+
 from __future__ import annotations
 
 from hashlib import sha256
@@ -32,8 +33,7 @@ def summarize_metric(values: list[float], *, seed: int = BOOTSTRAP_SEED) -> dict
     n = len(values)
     rnd = random.Random(seed)
     bootstrap = [
-        sum(values[rnd.randrange(n)] for _ in range(n)) / n
-        for _ in range(BOOTSTRAP_DRAWS)
+        sum(values[rnd.randrange(n)] for _ in range(n)) / n for _ in range(BOOTSTRAP_DRAWS)
     ]
     return {
         "value": float(sum(values) / n),
@@ -47,8 +47,13 @@ def summarize_metric(values: list[float], *, seed: int = BOOTSTRAP_SEED) -> dict
 
 
 def benchmark_from_capture(
-    *, data_root: Path, result_root: Path,
-    model_key: str, sae_key: str, layer: int, dataset_id: str,
+    *,
+    data_root: Path,
+    result_root: Path,
+    model_key: str,
+    sae_key: str,
+    layer: int,
+    dataset_id: str,
 ) -> dict[str, Any]:
     verify_dataset(dataset_id, data_root)
     base = result_root / PROTOCOL_ID / model_key / sae_key / f"L{layer}" / dataset_id
@@ -60,8 +65,10 @@ def benchmark_from_capture(
     sources = {
         obj["sample_id"]: obj
         for obj in (
-            json.loads(line) for line in
-            (data_root / dataset_id / "questions.jsonl").read_text(encoding="utf-8").splitlines()
+            json.loads(line)
+            for line in (data_root / dataset_id / "questions.jsonl")
+            .read_text(encoding="utf-8")
+            .splitlines()
         )
     }
     if len(rows) != 500 or len(sources) != 500:
@@ -87,18 +94,25 @@ def benchmark_from_capture(
         l0 = row.get("l0")
         error = row.get("reconstruction_mse")
         if (
-            type(l0) is not int or l0 < 0 or l0 > int(row["sae_d_sae"])
-            or not isinstance(error, (float, int)) or not math.isfinite(error)
+            type(l0) is not int
+            or l0 < 0
+            or l0 > int(row["sae_d_sae"])
+            or not isinstance(error, (float, int))
+            or not math.isfinite(error)
             or error < 0
         ):
             raise RuntimeError("Core numerical observation invalid")
         values["core.l0"].append(float(l0))
         values["core.reconstruction_mse_token"].append(float(error))
     summary = {
-        "status": "executed", "protocol_id": PROTOCOL_ID,
-        "task": "benchmark", "dataset_id": dataset_id,
-        "model_key": model_key, "sae_key": sae_key,
-        "layer": layer, "site_id": site_id,
+        "status": "executed",
+        "protocol_id": PROTOCOL_ID,
+        "task": "benchmark",
+        "dataset_id": dataset_id,
+        "model_key": model_key,
+        "sae_key": sae_key,
+        "layer": layer,
+        "site_id": site_id,
         "sae_sha256": next(iter(shas)),
         "source_capture_sha256": sha256(payload).hexdigest(),
         "sample_count": len(rows),

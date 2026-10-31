@@ -33,7 +33,11 @@ def test_full_matrix_matches_immutable_protocol_config():
     assert cfg["site_count"] == len(site_list()) == 20
     assert cfg["execution"]["expected_model_qa_baselines"] == plan["expected_model_qa_baselines"]
     assert cfg["execution"]["expected_capture_rows"] == plan["expected_capture_rows"]
-    assert cfg["execution"]["expected_benchmark_summaries"] == plan["expected_benchmark_summaries"] == 200
+    assert (
+        cfg["execution"]["expected_benchmark_summaries"]
+        == plan["expected_benchmark_summaries"]
+        == 200
+    )
     assert cfg["execution"]["expected_intervene_rows"] == plan["expected_intervention_rows"]
     assert cfg["execution"]["expected_generate_rows"] == plan["expected_generation_rows"]
     assert cfg["execution"]["hf_publish_automatic"] is False
@@ -98,23 +102,39 @@ def test_qa_answer_scorer_rejects_repeated_choices():
 @pytest.mark.parametrize(
     ("dataset_id", "example", "config"),
     [
-        ("commonsense_qa", {
-            "question": "Which action?", "choices": {
-                "label": ["A", "B"], "text": ["Walk", "Fly"]
-            }, "answerKey": "A",
-        }, None),
+        (
+            "commonsense_qa",
+            {
+                "question": "Which action?",
+                "choices": {"label": ["A", "B"], "text": ["Walk", "Fly"]},
+                "answerKey": "A",
+            },
+            None,
+        ),
         ("bbh", {"input": "Is it true?", "target": "yes"}, "boolean_expressions"),
         ("math500", {"problem": "Compute 1+2", "answer": "3"}, None),
-        ("medqa", {"question": "Which therapy?", "options": {
-            "A": "first", "B": "second"
-        }, "answer_idx": "B"}, None),
-        ("hotpot_qa", {
-            "_id": "hotpot-1", "question": "Who?", "answer": "Ada",
-            "context": {
-                "title": ["Source One"],
-                "sentences": [["Ada", "was", "a", "pioneer."]],
+        (
+            "medqa",
+            {
+                "question": "Which therapy?",
+                "options": {"A": "first", "B": "second"},
+                "answer_idx": "B",
             },
-        }, "distractor"),
+            None,
+        ),
+        (
+            "hotpot_qa",
+            {
+                "_id": "hotpot-1",
+                "question": "Who?",
+                "answer": "Ada",
+                "context": {
+                    "title": ["Source One"],
+                    "sentences": [["Ada", "was", "a", "pioneer."]],
+                },
+            },
+            "distractor",
+        ),
     ],
 )
 def test_all_remaining_real_source_shapes_are_normalized(dataset_id, example, config):

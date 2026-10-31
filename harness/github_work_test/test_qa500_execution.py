@@ -112,9 +112,7 @@ def test_question_answer_not_leaked_and_token_hash_reproducible():
 
 def test_math_refuses_fake_equivalence_and_numeric_requires_final():
     math = grade_answer("math", "$2$", "$1+1$")
-    assert math["grade_status"] in {
-        "scored", "needs_math_equivalence", "unparseable_reference"
-    }
+    assert math["grade_status"] in {"scored", "needs_math_equivalence", "unparseable_reference"}
     if math["grade_status"] == "scored":
         assert math["correct"] is True
     assert grade_answer("number", "Final: 3", "3")["correct"] is True
