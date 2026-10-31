@@ -85,4 +85,4 @@ Integration Agent should:
 
 **Next handoff to GPU Agent:** perform tasks A–E only, not a new broad experiment suite. Return small approved bundle paths, one improved G6 result if possible, one queue-edit receipt and screenshots; the release integrator can then perform the final staging/release operation.
 
-Links: [WP15 master plan](15_complete_six_workflows_and_release.md), [PR #57](https://github.com/OpenSAE/SAEBase/pull/57), [pre-release fixes PR #58](https://github.com/OpenSAE/SAEBase/pull/58), [WP13 publication script](../../saebase/tools/wp13_prepare_public_bundle.py).
+Links: [WP15 master plan](15_complete_six_workflows_and_release.md), [PR #57](https://github.com/OpenSAE/SAEBase/pull/57), [pre-release fixes PR #58](https://github.com/OpenSAE/SAEBase/pull/58), [WP13 publication script](../../../saebase/tools/wp13_prepare_public_bundle.py).
