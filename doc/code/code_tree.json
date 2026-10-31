@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "code",
   "project": "SAEBase",
-  "source_sha256": "2d807a0c3ecf9b88079c0d30cf0180eb55f449b8400ef6a09dd43759ae0e7b04",
+  "source_sha256": "1d4053b81d45deb367c5a2a96c4a4b607f4d9253796cbfc56a8c804c7892b5d7",
   "scope": [
     "saebase",
     "datasets",
@@ -6517,7 +6517,7 @@
       "kind": "function",
       "title": "declared_revision",
       "path": "experiments/qa500/assets.py",
-      "line": 15,
+      "line": 17,
       "status": "implemented",
       "signature": "def declared_revision(kind: str, name: str) -> str | None",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -6527,7 +6527,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "experiments/qa500/assets.py:15"
+        "experiments/qa500/assets.py:17"
       ]
     },
     {
@@ -6535,17 +6535,17 @@
       "kind": "function",
       "title": "required_publication_lock",
       "path": "experiments/qa500/assets.py",
-      "line": 38,
+      "line": 40,
       "status": "implemented",
       "signature": "def required_publication_lock() -> bool",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
+      "description": "Check full study asset coverage, never merely nonempty lock dictionaries. Keys are protocol dataset IDs, model registry keys, and the exact `model_key:sae_key:L{layer}` SAE sites. Values are full upstream commits. A future release must ALSO compare these revisions with downloaded assets and independently verified real run manifests.",
+      "description_source": "docstring",
       "context_ids": [],
       "core_ids": [],
       "bases": [],
-      "needs_review": true,
+      "needs_review": false,
       "evidence": [
-        "experiments/qa500/assets.py:38"
+        "experiments/qa500/assets.py:40"
       ]
     },
     {
@@ -6553,7 +6553,7 @@
       "kind": "function",
       "title": "source_revision",
       "path": "experiments/qa500/assets.py",
-      "line": 31,
+      "line": 33,
       "status": "implemented",
       "signature": "def source_revision(repo_id: str, key: str) -> tuple[str, str]",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -6563,7 +6563,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "experiments/qa500/assets.py:31"
+        "experiments/qa500/assets.py:33"
       ]
     },
     {
