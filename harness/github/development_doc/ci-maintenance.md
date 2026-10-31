@@ -7,11 +7,13 @@ offline test does not establish that a real checkpoint was verified.
 ## Fast software and packaging CI
 
 [CI](../../../.github/workflows/ci.yml) runs on every pull request and on pushes
-to `main`. Six job contexts remain stable:
+to `main`. Five release-required job contexts remain, and normal PR checks run on a
+single Python 3.11 version:
 
-- `offline-tests (3.11)` and `offline-tests (3.12)` run
-  offline regression tests, documentation/evidence verification, public
-  examples and installed-wheel checks. Python 3.11 also uploads coverage.
+- `offline-tests (3.11)` runs the full offline regression suite in two
+  isolated xdist workers (`--dist=loadfile`), retains branch coverage, and
+  executes documentation/evidence, examples, CLI and installed-wheel checks.
+  The `saebase-core-coverage-py311` artifact is unchanged.
 - `quality` runs Ruff, incremental mypy, and pre-commit validation.
 - `package` validates wheel and sdist contents and a clean sdist
   rebuild. Runtime configs remain available without bundling experiment caches.
@@ -19,9 +21,28 @@ to `main`. Six job contexts remain stable:
 - `localization-native` tests the original, source-pinned Input
   Localization integration.
 
-These six jobs are reported for every PR and are suitable candidates for
+These five jobs are reported for every PR and are suitable candidates for
 branch protection. The [administrative ruleset issue](https://github.com/OpenSAE/.github/issues/3)
 tracks enabling that enforcement.
+
+## CI runtime, performance and compatibility
+
+The automatic CI and generic software release verification jobs now use Python
+3.11. Setup-python's pip wheel/download cache is keyed by dependency
+declarations. The same functional checks, source-pinned regression and exact-SHA
+release gates remain required. Superseded pull-request runs may be cancelled;
+all main-branch push CI runs remain independent for release provenance.
+
+The two-worker `pytest-xdist` execution runs the **same suite** with per-file
+worker affinity. It continues to generate the same branch coverage reports.
+Always compare measured run time and coverage with the earlier serial baseline;
+a faster CI cannot justify dropping a failing or flaky test.
+
+`pyproject.toml` still declares support for Python 3.11 and 3.12, while
+Python 3.12 is no longer tested in routine PR CI. If a future release relies on
+3.12 compatibility, verify that interpreter explicitly before publication.
+The Research Lab's existing Python 3.12 Docker **runtime image** remains
+unchanged; the CI Docker smoke continues to exercise that image.
 
 ## Pinned research integration regression
 

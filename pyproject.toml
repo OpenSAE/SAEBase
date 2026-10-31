@@ -60,7 +60,7 @@ tl4 = [
     "huggingface-hub>=0.23",
 ]
 nnsight-local = ["nnsight>=0.8,<0.9"]
-dev = ["pytest>=7", "build>=1.2", "twine>=5", "PyYAML>=6", "pytest-cov>=5,<8"]
+dev = ["pytest>=7", "build>=1.2", "twine>=5", "PyYAML>=6", "pytest-cov>=5,<8", "pytest-xdist>=3.5,<5"]
 quality = ["ruff>=0.12,<0.16", "mypy>=1.15,<2", "pre-commit>=4,<5"]
 
 [project.scripts]

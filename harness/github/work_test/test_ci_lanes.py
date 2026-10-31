@@ -145,3 +145,37 @@ def test_one_time_saebase_v060_dispatch_stays_sha_and_version_bounded():
     assert "software-release.yml" in source and 'PUBLISH-$TAG' in source
     assert "repos/$REPO/branches/main" in source
     assert "git/ref/tags/$TAG" in source
+
+
+def test_python311_pr_ci_is_cached_parallel_and_release_safe():
+    """Keep the single Python CI version and exact-source release gate aligned."""
+    ci = workflow("ci.yml")
+    offline = ci["jobs"]["offline-tests"]
+    assert offline["strategy"]["matrix"]["python-version"] == ["3.11"]
+    assert ci["jobs"]["package"]["steps"][1]["with"]["python-version"] == "3.11"
+
+    for job in ci["jobs"].values():
+        for step in job["steps"]:
+            if not step.get("uses", "").startswith("actions/setup-python@"):
+                continue
+            assert step["with"]["python-version"] in ("3.11", "${{ matrix.python-version }}")
+            if step["with"]["python-version"] == "${{ matrix.python-version }}":
+                assert step["with"]["cache"] == "pip"
+                assert "pyproject.toml" in step["with"]["cache-dependency-path"]
+
+    assert ci["concurrency"]["cancel-in-progress"] == "${{ github.event_name == 'pull_request' }}"
+    assert "github.run_id" in ci["concurrency"]["group"]
+    suite = next(step for step in offline["steps"]
+                 if step.get("name") == "Run full offline tests and collect Python 3.11 branch coverage")
+    assert "-n 2" in suite["run"] and "--dist=loadfile" in suite["run"]
+    assert "--cov-branch" in suite["run"]
+
+    from saebase.tools.release_candidate import REQUIRED_CI
+    assert set(REQUIRED_CI) == {
+        "offline-tests (3.11)", "analysis-install", "package", "localization-native", "quality"
+    }
+    release = workflow("software-release.yml")
+    assert {step["with"]["python-version"]
+            for job in release["jobs"].values()
+            for step in job["steps"]
+            if step.get("uses", "").startswith("actions/setup-python@")} == {"3.11"}

@@ -26,12 +26,11 @@ Review software source licensing and third-party provenance as usual.
 
 Merge the candidate into `main`. Before a software release, the
 exact target Commit SHA must have a successful **push-to-main** CI run.
-The release workflow verifies the SHA and all six standard job contexts:
+The release workflow verifies the SHA and all five current standard job contexts:
 
 | Required job | Meaning |
 | --- | --- |
 | `offline-tests (3.11)` | Python tests, branch coverage, CLI and wheel installation |
-| `offline-tests (3.12)` | Second supported Python version |
 | `analysis-install` | Model analysis dependency compatibility |
 | `package` | Wheel and sdist build, metadata and source roundtrip |
 | `localization-native` | Source-pinned original research integration |
@@ -44,6 +43,13 @@ The source SHA in each GitHub Actions job must match the requested commit.
 Research-specific source-pinned regressions are separately executed when
 relevant files change. They are not always-on jobs and are not falsely
 reported as universally required checks.
+
+The current automatic CI and software release verifier use Python 3.11 for
+package installation, unit tests, coverage and distribution checks. Python 3.12
+remains a declared compatible version, but requires an explicit independent
+compatibility check when relevant to a new release. The Research Lab Docker
+image is a separate runtime and still uses Python 3.12. Earlier six-job release
+records remain unchanged.
 
 ## Verify without publishing
 
@@ -117,7 +123,7 @@ This rule does not authorize bypassing CI, force-moving `main`, changing an exis
 
 ## Version-specific v0.6.5 dispatch
 
-The maintainer-authorized v0.6.5 one-time dispatcher (`.github/workflows/saebase-v065-release-dispatch.yml`) requests the standard exact-source release workflow after a successful push-to-main CI for the current HEAD. It uses the same six contexts and immutable-tag gates; a CI or candidate failure does not authorize publication. The installed wheel must expose source-owned dataset modules as `saebase.datasets`, while the sdist retains the physical `datasets/` source tree. This is checked in distribution validation before release.
+The maintainer-authorized v0.6.5 one-time dispatcher (`.github/workflows/saebase-v065-release-dispatch.yml`) requests the standard exact-source release workflow after a successful push-to-main CI for the current HEAD. It uses the same five current contexts and immutable-tag gates; a CI or candidate failure does not authorize publication. The installed wheel must expose source-owned dataset modules as `saebase.datasets`, while the sdist retains the physical `datasets/` source tree. This is checked in distribution validation before release.
 
 ## After publication
 

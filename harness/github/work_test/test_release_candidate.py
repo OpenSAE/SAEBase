@@ -112,7 +112,7 @@ def test_source_commit_must_be_exact_and_match_checkout(tmp_path, monkeypatch):
         gate.prepare(root, dist, tmp_path / "out", "not-a-commit")
 
 
-def test_ci_jobs_require_all_six_successful_for_one_commit():
+def test_ci_jobs_require_all_five_successful_for_one_commit():
     jobs = [
         {
             "name": name,
@@ -122,7 +122,7 @@ def test_ci_jobs_require_all_six_successful_for_one_commit():
         }
         for name in gate.REQUIRED_CI
     ]
-    assert len(gate.verify_ci_jobs({"jobs": jobs}, SHA)) == 6
+    assert len(gate.verify_ci_jobs({"jobs": jobs}, SHA)) == 5
     jobs[-1]["conclusion"] = "skipped"
     with pytest.raises(ValueError, match="not successful"):
         gate.verify_ci_jobs({"jobs": jobs}, SHA)
@@ -130,6 +130,10 @@ def test_ci_jobs_require_all_six_successful_for_one_commit():
     jobs.pop()
     with pytest.raises(ValueError, match="missing required"):
         gate.verify_ci_jobs({"jobs": jobs}, SHA)
+    assert "offline-tests (3.12)" not in gate.REQUIRED_CI
+    assert set(gate.REQUIRED_CI) == {
+        "offline-tests (3.11)", "analysis-install", "package", "localization-native", "quality"
+    }
 
 
 def test_publish_rejects_old_and_existing_tags(tmp_path, monkeypatch):
