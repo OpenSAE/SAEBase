@@ -74,7 +74,7 @@ def test_unknown_new_root_directory_is_denied_even_when_named(tmp_path, monkeypa
 
 def test_only_approved_root_exception_names_need_formal_flow(tmp_path, monkeypatch):
     hooks = prepare_root(tmp_path, monkeypatch)
-    for path in ("experiments/research_run/metrics.json", "tests/unassigned_test.py", "scripts/workplan/wp22.sh"):
+    for path in ("tests/unassigned_test.py", "scripts/workplan/wp22.sh"):
         assert hooks.gate("write_file", {"file_path": path}, active=None) is not None
     from harness.core import agent_flow
 
@@ -170,7 +170,6 @@ def test_tracked_repository_has_only_approved_top_level_directories():
         "models",
         "saebase",
         "tasks",
-        "experiments",
         "tests",
         "scripts",
     }

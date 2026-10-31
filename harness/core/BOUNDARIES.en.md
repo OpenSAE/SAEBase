@@ -40,3 +40,6 @@ A study is an instance, not a framework. Shared Dataset / Model / Task / Runtime
 Scripts and tests prefer either Work Plan grouping (`scripts/workplan/<id>.sh`, `tests/workplan/<id>/`) or experimental identity (`scripts/<dataset>/<model>/<task>/<sub_name>/` and the matching test path). Study-based `scripts/experiments/<study>/` is also valid. These are flexible conventions; an alternative needs documented ownership and purpose.
 
 New root modules, independent registries, cross-component frameworks or dependency reversals require separate architecture approval. Every PR must document new/moved paths, existing alternatives, ownership, tests and evidence. Do not rewrite historical acceptance evidence merely to rename directories.
+
+
+**Root guardrail:** Do not create a top-level `experiments/` study code package. Keep per-study glue under `conf/experiment/<study>/` and `scripts/experiments/<study>/`, tests under an owned `tests/` structure, and generated results under singular `experiment/`. Other new roots require separate architecture approval.

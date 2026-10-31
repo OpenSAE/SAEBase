@@ -12,7 +12,6 @@ ROOTS = {
     "saebase",
     "tasks",
     "datasets",
-    "experiments",
     "scripts",
     "tests",
     "atlas",
@@ -38,5 +37,6 @@ def test_unowned_layouts():
         "scripts/random.sh",
         "tests/test_random.py",
         "unknown_new_module/runner.py",
+        "experiments/qa500/runner.py",
     ]:
         assert validate_path(p, ROOTS), p

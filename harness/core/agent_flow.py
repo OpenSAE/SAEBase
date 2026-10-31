@@ -25,7 +25,6 @@ EDITABLE = (
     "doc/knowledge/",
     "doc/code/",
     "tests/",
-    "experiments/",
     "scripts/",
     "saebase/tools/",
 )

@@ -44,3 +44,6 @@
 **Scripts / Tests 开放组织原则**：优先按 Work Plan，例如 `scripts/workplan/wp22.sh` 与 `tests/workplan/wp22/`；或者参照 Runtime 实验路径，在一级目录内部按 `<dataset>/<model>/<task>/<sub_name>/` 分类。研究级布局 `scripts/experiments/<study>/`、`tests/experiments/<study>/` 也可接受。它们是优先约定，不是唯一合法层级；其他方案须交代归属、复用依据和为何现有布局不足。不要将临时脚本或测试直接散落在仓库根目录。
 
 **新增结构审批**：现有模块内新增受控实例可按照已授权 Work Plan 进行；新增仓库一级目录、通用 Registry、独立配置体系、跨模块框架或改变依赖方向必须单独提出架构变更并通过独立审阅。每次 PR 列出新增/移动文件的所有权、依赖、配置和注册影响、测试及证据。Path scope 授权不代表架构许可。机器检查处理结构性错误，Reviewer 审核语义正确性。历史冻结验收和科研证据不因迁移重写。
+
+
+**一级目录扩展规则**：不再接受新建顶层 `experiments/` 科研源码包。具体实验由既有 `conf/experiment/<study>/`、`scripts/experiments/<study>/` 和受控产品测试组织；运行记录归单数 `experiment/`。新增其他根目录必须经过独立架构审批。
