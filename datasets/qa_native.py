@@ -129,14 +129,12 @@ def prepare_training(*, root: Path) -> dict[str, Any]:
         raise RuntimeError("Missing exact model or training corpus revision")
     raw = load_dataset(TRAIN_DATASET, name=TRAIN_CONFIG, split="train", revision=dataset_rev)
     strings = sorted(
-        (str(row["text"]).strip() for row in raw if str(row.get("text", "")).strip()),
+        {str(row["text"]).strip() for row in raw if str(row.get("text", "")).strip()},
         key=lambda val: hashlib.sha256(f"{TRAIN_SEED}:{val}".encode("utf-8")).hexdigest(),
     )
     if len(strings) < TRAIN_MAX_RECORDS:
         raise RuntimeError("Training corpus has too few nonempty text records")
     subset = strings[:TRAIN_MAX_RECORDS]
-    if len(set(subset)) != len(subset):
-        raise RuntimeError("Duplicate selected training texts; use a distinct corpus")
     output = root / "native_train"
     output.mkdir(parents=True, exist_ok=True)
     data_file = output / "wikitext_train.jsonl"
