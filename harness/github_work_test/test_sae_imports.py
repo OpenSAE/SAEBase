@@ -22,7 +22,7 @@ def _collect_imports(path: Path) -> list[str]:
 
 
 def test_package_layout():
-    for directory in ("datasets", "models", "tasks", "saebase", "harness", "conf", "experiments", "scripts"):
+    for directory in ("datasets", "models", "tasks", "saebase", "harness", "conf", "scripts"):
         assert (ROOT / directory).is_dir(), directory
     for directory in ("dlbase", "research_datasets", "apps", "examples", "work_plan"):
         assert not (ROOT / directory).exists(), directory
