@@ -9,7 +9,10 @@ from omegaconf import DictConfig
 from saebase.datasets.artifact_layout import BEHAVIOR_ALIASES, canonicalize_behavior
 from saebase.datasets.prompt_schema import assert_available
 from saebase.cfg.contracts import assert_prompt_source_in, assert_task_in
-from saebase.registry import register_prompt_source, register_prompt_source_alias, register_dataset
+from saebase.registry import (
+    register_prompt_source, register_prompt_source_alias,
+    register_dataset, register_dataset_alias,
+)
 
 _TASKS_SAE: FrozenSet[str] = frozenset({"sae"})
 _TASKS_DISCOVERY: FrozenSet[str] = frozenset({"sae", "discovery", "logic_chain"})
@@ -122,7 +125,67 @@ def _register_builtin_datasets() -> None:
         )
 
     for name in NLP_NAMES:
-        register_dataset(name, setup_nlp, check_nlp, nlp_split_note)
+        adapter = (
+            "saebase.datasets.MMLUPro.qa_adapter" if name == "MMLUPro" else None
+        )
+        register_dataset(
+            name, setup_nlp, check_nlp, nlp_split_note,
+            qa_adapter_module=adapter,
+        )
 
 
 _register_builtin_datasets()
+
+
+def _register_qa_dataset_adapters() -> None:
+    """Register source-owned QA adapters on the existing Dataset registry.
+
+    This augments reusable dataset capabilities; experiment selection belongs
+    exclusively to an experiment config, not to this module.
+    """
+    adapters = {
+        "ARCChallenge": ("arc_challenge", "ARCChallenge"),
+        "CommonsenseQA": ("commonsense_qa", "CommonsenseQA"),
+        "BoolQ": ("boolq", "BoolQ"),
+        "BBH": ("bbh", "BBH"),
+        "GSM8K": ("gsm8k", "GSM8K"),
+        "MATH500": ("math500", "MATH500"),
+        "MedQA": ("medqa", "MedQA"),
+        "HotpotQA": ("hotpot_qa", "HotpotQA"),
+        "GPQAExtended": ("gpqa_extended", "GPQAExtended"),
+    }
+
+    def qa_setup(dm, cfg, stage=None):
+        from saebase.registry import get_qa_dataset_adapter
+        from saebase.data.qa_records import make_record
+        from saebase.data.qa_source import iter_source
+
+        adapter = get_qa_dataset_adapter(str(cfg.dataset.name))
+        revision = str(cfg.dataset.get("source_revision", "")).strip()
+        if len(revision) != 40:
+            raise ValueError("QA Dataset requires an explicitly pinned 40-char revision")
+        data = []
+        for config, index, row in iter_source(adapter.SPEC, revision):
+            parsed = adapter.parse(row, source_config=config, seed=int(cfg.get("seed", 0)))
+            data.append(make_record(adapter.SPEC, row, parsed, config, index))
+        dm.train_set = data if adapter.SPEC.split == "train" else []
+        dm.val_set = data if adapter.SPEC.split == "validation" else []
+        dm.test_set = data if adapter.SPEC.split == "test" else []
+
+    def qa_check(cfg):
+        if str(cfg.task.name) not in SAE_TASKS:
+            raise ValueError("QA dataset must be paired with a registered SAEBase task")
+
+    def qa_note(dm):
+        return "Upstream QA source split is pinned; no extra split is inferred"
+
+    for name, (alias, directory) in adapters.items():
+        register_dataset(
+            name, qa_setup, qa_check, qa_note,
+            qa_adapter_module=f"saebase.datasets.{directory}.qa_adapter",
+        )
+        register_dataset_alias(alias, name)
+    register_dataset_alias("mmlu_pro", "MMLUPro")
+
+
+_register_qa_dataset_adapters()

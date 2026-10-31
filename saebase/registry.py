@@ -36,6 +36,7 @@ class DatasetPlugin:
     setup: Callable[[Any, DictConfig, Any], None]
     assert_task_supported: Callable[[DictConfig], None]
     eval_split_note: Callable[[Any], str]
+    qa_adapter_module: str | None = None
 
 
 @dataclass(frozen=True)
@@ -191,10 +192,10 @@ def list_registered_task_keys() -> list[str]:
     return sorted(_TASK_REGISTRY.keys())
 
 
-def register_dataset(name: str, setup, assert_task_supported, eval_split_note) -> None:
+def register_dataset(name: str, setup, assert_task_supported, eval_split_note, *, qa_adapter_module: str | None = None) -> None:
     if name in _DATASET_REGISTRY:
         raise ValueError(f"Dataset already registered: {name}")
-    _DATASET_REGISTRY[name] = DatasetPlugin(setup, assert_task_supported, eval_split_note)
+    _DATASET_REGISTRY[name] = DatasetPlugin(setup, assert_task_supported, eval_split_note, qa_adapter_module)
 
 
 def register_dataset_alias(alias: str, canonical: str) -> None:
@@ -213,6 +214,23 @@ def get_dataset_plugin(name: str) -> DatasetPlugin:
     if key not in _DATASET_REGISTRY:
         raise ValueError(f"Unknown dataset.name: {name}")
     return _DATASET_REGISTRY[key]
+
+
+def get_qa_dataset_adapter(name: str):
+    """Resolve a real QA adapter through the existing Dataset Registry.
+
+    QA source adapters are a capability of DatasetPlugin, never a second
+    experimental dataset registry. Import happens lazily and is source-owned.
+    """
+    from importlib import import_module
+
+    plugin = get_dataset_plugin(name)
+    if plugin.qa_adapter_module is None:
+        raise ValueError(f"Dataset {name!r} does not provide a QA source adapter")
+    module = import_module(plugin.qa_adapter_module)
+    if not callable(getattr(module, "parse", None)):
+        raise TypeError(f"Registered QA adapter {name!r} lacks parse()")
+    return module
 
 
 def list_registered_dataset_keys() -> list[str]:
