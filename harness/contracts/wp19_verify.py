@@ -20,7 +20,7 @@ from pathlib import Path
 from harness.contracts import registry, wp19_reference, wp19_reference_ext
 
 ROOT = registry.ROOT
-PLAN = "harness/github_work_plan/19_harness_large_scale_examination_and_verifier_assurance.md"
+PLAN = "harness/github/work_plan/19_harness_large_scale_examination_and_verifier_assurance.md"
 SPEC = ROOT / "harness/contracts/wp19_cases.json"
 RUNS = ROOT / "harness/tests/wp19/runs"
 RUN_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{3,63}$")

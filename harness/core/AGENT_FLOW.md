@@ -4,7 +4,7 @@
 
 ## 审阅新的空节点
 
-- **紫色：Unchecked。** 外部 `github_work_plan` 的提案还没有人类决定。
+- **紫色：Unchecked。** 外部 `github/work_plan` 的提案还没有人类决定。
 - **Approve → 红色：Not Implemented。** 审核通过了节点的存在与位置，不代表代码实现，也没有科研结果。
 - **Deny → 灰色：Denied。** 在审阅 JSON 中保留否决记录，节点不进入正式 Knowledge 图。
 - **Unchecked → 紫色**：可以把已经 Approve 的红色或 Deny 的灰色节点恢复为紫色，撤销浏览器草稿中的决定。本地服务对空 Knowledge 节点也会安全撤回其已批准的占位写入。
@@ -20,7 +20,7 @@ python -m harness.core.agent_flow serve EXISTING_PLAN_ID --port 8766
 
 浏览器打开终端打印的完整地址，其中 `#key=...` 只在当前本地审阅服务会话有效。**不要将包含 Key 的地址提交到 GitHub。**
 
-每次通过/否决都会立刻写入 `harness/github_work_plan/agent_flow/<ID>.json`；通过合法空 Knowledge 新节点，还会写入 `doc/knowledge/context_graph.json` 和 `doc/knowledge/glossary.json`，执行原有 Knowledge/Glossary 验证。服务器返回保存成功后才会自动切换节点。关闭页面不回滚已确认的操作。每次点击都受 JSON revision 和来源 SHA 限制；若其他程序改过权威图，将拒绝过期的审阅。
+每次通过/否决都会立刻写入 `harness/github/work_plan/agent_flow/<ID>.json`；通过合法空 Knowledge 新节点，还会写入 `doc/knowledge/context_graph.json` 和 `doc/knowledge/glossary.json`，执行原有 Knowledge/Glossary 验证。服务器返回保存成功后才会自动切换节点。关闭页面不回滚已确认的操作。每次点击都受 JSON revision 和来源 SHA 限制；若其他程序改过权威图，将拒绝过期的审阅。
 
 ## 与科研实验的审批是两件事
 
@@ -59,5 +59,5 @@ Knowledge、Code、Environment、Context 与 Core 共用一套 Atlas 节点交�
 测试提案、样例设备、未存在的计划 ID 不构成真实科研证据。
 
 公开页面的 Approve/Deny 只保存浏览器草稿。本地审阅服务在
-`harness/github_work_plan/agent_flow/` 写入经身份与版本检查的审阅决定，
+`harness/github/work_plan/agent_flow/` 写入经身份与版本检查的审阅决定，
 并按审批结果更新允许修改的权威图。未经核验的示例数据不得写入实际科研结果。

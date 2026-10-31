@@ -16,8 +16,8 @@ Harness 的通用 Contract **在任务出现之前**定义于 [catalog.json](cat
 
 ```bash
 python -m harness.contracts.registry list
-python -m harness.contracts.registry check --plan harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md
-python -m harness.contracts.registry resolve --plan harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md --case H04
+python -m harness.contracts.registry check --plan harness/github/work_plan/18_harness_local_agent_examination_and_independent_acceptance.md
+python -m harness.contracts.registry resolve --plan harness/github/work_plan/18_harness_local_agent_examination_and_independent_acceptance.md --case H04
 ```
 
 对于自定义测试，按 `catalog.json` 的固定 tags 选择 `CT-` ID；不能改变目录。独立工具 `harness/contracts/invariants.py` 提供可复用来源验证、完整结构脱敏、Tree 身份和中英完整性检查的参考实现，属于**治理层**，不让被测 Agent 为通过测验而编辑。
@@ -69,7 +69,7 @@ python -m harness.contracts.registry resolve --plan harness/github_work_plan/18_
 - `wp18_cases.json`：20 个任务的目标、规则、选择 tags、signals、测试数据与预期结果，当前冻结 86 个正/反验证用例。
 - `wp18_verify.py`：按 Work Plan 解析并验证每题所选 Contract，复核实际 `solve(payload)` 的结果/拒绝、输入不变性、稳定输出和超时；并在考试 PR 中进行真实 diff 的治理范围审计。
 - `wp18_worker.py`：隔离子进程接口，输出结构化结果，不打印候选异常中的敏感值；子进程不是安全沙箱。
-- `harness/github_work_test/test_wp18_h07_h26_contracts.py`：独立回归，确保 20 个任务、全部合同绑定和验证器存在且有效。
+- `harness/github/work_test/test_wp18_h07_h26_contracts.py`：独立回归，确保 20 个任务、全部合同绑定和验证器存在且有效。
 
 Agent 可 **读取** 上述全部资料。只可新增自己的 `harness/tests/wp18/runs/<run_id>/<case>/`，不能编辑任何规范、验证或治理源码。独立 CI 从实际 PR diff 检查修改范围，并实际执行新 HW 的可见验证；另由独立评审运行不同输入与人工审阅。失败先归因，不给任务 Agent 放宽验证标准的权限。
 
