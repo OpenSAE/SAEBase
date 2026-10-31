@@ -13,7 +13,7 @@
 
 先阅读 [Harness 总览](../README.md)、[仓库架构纲领](../core/BOUNDARIES.md) 和 [通用 Task Contracts](../contracts/README.md)，再按 Work Plan 选择必需文件。先搜已有实现及注册接口，区分通用能力和某个具体 Experiment。
 
-新增脚本和产品测试应归入 `scripts/` 与 `tests/` 一级目录，优先按 `workplan/<id>` 或 `<dataset>/<model>/<task>/<sub_name>` 分类；具体研究也可用 `experiments/<study>` 组织。这是开放规范，特殊布局需说明归属和复用原因。
+新增脚本和产品测试应归入 `scripts/` 与 `tests/` 一级目录，优先按 `workplan/<id>` 或 `<dataset>/<model>/<task>/<sub_name>` 分类；具体研究也可用 `scripts/experiments/<study>/`、`tests/experiments/<study>/` 组织。这是开放规范，特殊布局需说明归属和复用原因。
 
 PR 必须列出新增与移动文件、原有可复用接口、依赖方向、配置与注册影响、对应测试、证据及未完成验证。新一级模块或改变模块职责必须独立架构审批，获准编辑路径不等于获准新架构。
 

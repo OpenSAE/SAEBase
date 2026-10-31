@@ -53,7 +53,7 @@ def validate_path(name: str, roots: set[str]) -> list[str]:
     ):
         errors.append("Group new scripts/tests below their owned category: " + name)
     if p.parts[0] == "datasets" and p.name.startswith("qa") and p.name.endswith("_runner.py"):
-        errors.append("Study-specific QA orchestration belongs to experiments/: " + name)
+        errors.append("Study-specific QA orchestration belongs to scripts/experiments/: " + name)
     if p.parts[0] in {"datasets", "models", "tasks"} and p.suffix == ".sh":
         errors.append("Shell launcher belongs to scripts/: " + name)
     return errors

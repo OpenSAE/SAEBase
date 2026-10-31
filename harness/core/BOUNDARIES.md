@@ -32,7 +32,7 @@
 | `datasets/<Dataset>/` | 数据来源、适配器；对应配置在 `conf/dataset/` |
 | `models/<Model>/` | 模型格式、加载与适配；配置在 `conf/model/` |
 | `tasks/<Task>/` | 可跨数据集、模型、实验重用的任务；配置在 `conf/task/` |
-| `experiments/<Study>/` | 研究实例的组合、编排、分析；配置在 `conf/experiment/` |
+| `scripts/experiments/<Study>/` | 具体研究执行与组合；配置在 `conf/experiment/<Study>/` |
 | `scripts/` | 可执行脚本与启动入口 |
 | `tests/` | 产品功能及集成验证 |
 | `experiment/` | Runtime 管理的运行产物 |

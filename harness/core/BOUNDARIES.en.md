@@ -28,7 +28,7 @@ Always identify the existing owner before editing. File edit permission and arch
 | `datasets/<Dataset>/` and `conf/dataset/` | Source-specific adapters and configuration |
 | `models/<Model>/` and `conf/model/` | Model adapters and configuration |
 | `tasks/<Task>/` and `conf/task/` | Reusable task operations and configuration |
-| `experiments/<Study>/` and `conf/experiment/` | Study-specific orchestration and configuration |
+| `scripts/experiments/<Study>/` and `conf/experiment/<Study>/` | Study-specific orchestration and configuration |
 | `scripts/` | Launch scripts and operational entrypoints |
 | `tests/` | Product and integration tests |
 | `experiment/` | Runtime-owned results |
