@@ -18,6 +18,7 @@ from saebase.datasets.qa_standard import (
     prepare_dataset, verify_dataset,
 )
 from saebase.datasets.qa_neuronpedia import load_mapping, load_annotations, annotate
+from saebase.datasets.qa_inference import make_input
 
 
 # Each pair is from the existing verified-site matrix, not inferred by layer fraction.
@@ -80,14 +81,14 @@ def _read_verified(path: Path) -> dict[str, dict[str, Any]]:
     return data
 
 
-def _tokenize(pair: Any, prompt: str, limit: int) -> Any:
-    tokens = pair.model.tokens(prompt=prompt)
+def _tokenize(pair: Any, record: dict[str, Any], model_key: str, limit: int) -> tuple[Any, dict[str, Any]]:
+    tokens, metadata = make_input(pair, record, model_key)
     length = int(tokens.shape[1])
     if length > limit:
         raise ValueError(f"token_length_exceeds_limit:{length}>{limit}")
     if length < 2:
         raise ValueError(f"token_length_too_short:{length}")
-    return tokens
+    return tokens, metadata
 
 
 def _capture_one(
@@ -140,6 +141,7 @@ def run_capture(
     dataset_id: str, device: str = "cuda", max_tokens: int = 2048,
     limit: int | None = None, top_k: int = 10,
     mapping_file: Path | None = None, annotation_file: Path | None = None,
+    loaded_pair: Any | None = None,
 ) -> dict[str, Any]:
     from saebase.api import load_registered
     from saebase.sae.registry import get_profile
@@ -174,21 +176,28 @@ def run_capture(
     expected_ids = {r["sample_id"] for r in subset}
     if not set(completed).issubset(expected_ids):
         raise RuntimeError("Existing results include samples outside this cohort")
-    pair = load_registered(
+    pair = loaded_pair or load_registered(
         model_key=model_key, sae_key=target["sae_key"], layer=layer, device=device
     )
-    if pair.identity.hook_name != target["hook_name"]:
-        raise RuntimeError("Loaded SAE hook does not match frozen target")
+    if (
+        pair.identity.hook_name != target["hook_name"]
+        or pair.identity.model_key != model_key
+        or pair.identity.sae_key != target["sae_key"]
+        or pair.identity.layer != layer
+    ):
+        raise RuntimeError("Loaded model/SAE/hook identity differs from frozen target")
     from saebase.store import sha256_state_dict
     sae_sha256 = sha256_state_dict(pair.sae)
     mappings = load_mapping(mapping_file)
     annotations = load_annotations(annotation_file)
     for item in subset:
         if item["sample_id"] in completed:
+            old = completed[item["sample_id"]]
+            if old.get("prompt_sha256") != item["prompt_sha256"] or old.get("sae_sha256") != sae_sha256:
+                raise RuntimeError("Existing capture row uses a different prompt or SAE weight")
             continue
-        prompt = render_prompt(item)
         try:
-            tokens = _tokenize(pair, prompt, max_tokens)
+            tokens, input_meta = _tokenize(pair, item, model_key, max_tokens)
             measured = _capture_one(
                 pair, tokens, top_k=top_k, mapping=mappings,
                 annotations=annotations, sae_sha256=sae_sha256,
@@ -209,7 +218,7 @@ def run_capture(
             "sae_key": target["sae_key"], "layer": layer,
             "hook_name": target["hook_name"], "sae_sha256": sae_sha256,
             "source_revision": manifest["source_revision"],
-            "prompt_sha256": item["prompt_sha256"], **measured,
+            **input_meta, **measured,
         }
         _append_once(outpath, row)
         completed[item["sample_id"]] = row
