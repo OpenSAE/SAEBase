@@ -1,10 +1,10 @@
-# 🧱 SAEBase：稀疏自编码器研究基础设施
+# 🧱 SAEBase：SAE 科研工具与 Agent 工作流
 
 🌍 语言：[English](README.md) | [中文](README_cn.md) &nbsp; [![CI](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml)
 
-**最新软件版本：** [v0.6.0 Unified SAE Research Workspace](harness/github_development_doc/releases/v0.6.0.md) · [OpenSAE Playground](https://atheavenma.github.io/opensae/workspace.html) · [Python API](harness/github_development_doc/python-api.md)
+**软件版本：** [v0.6.5 — Auditable Agent Research Workflows](harness/github_development_doc/releases/v0.6.5.md) · [Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Python API](harness/github_development_doc/python-api.md)
 
-👉 **简介。** SAEBase 用于理解、测试和修改语言模型中的稀疏自编码器（SAE）特征。它提供激活提取与复用、重构分析、特征干预、下游行为评测以及可追溯的实验结果。
+**SAEBase** 帮助研究者理解和评估语言模型中的稀疏自编码器（SAE），探索特征、测量特征干预对模型行为的影响，并组织可复现的实验。Research Harness 进一步支持编程 Agent 在明确范围内执行任务，让结果可追溯、可独立验证。
 
 <p align="center">
   <a href="#-快速开始"><b>🚀 快速开始</b></a> &nbsp; | &nbsp;
@@ -18,19 +18,19 @@
 
 ## 🧭 Research Harness
 
-**SAEBase Atlas · 五棵研究树**
+**让 AI Agent 参与 SAE 科研工程，同时让研究者掌握目标、决策和验证过程。** SAEBase Harness 为 Agent 提供明确的任务范围，让代码修改连接到真实科研接口，并支持独立检查实际执行结果。
 
-SAEBase 集成了用于组织代码、科研知识、实验、运行环境和 Agent 协作的 Research Harness。**Atlas** 将这些内容组织为五棵相互关联的研究 Tree。
-
-| Atlas Tree | 内容 |
+| 科研环节 | Harness 提供的帮助 |
 | --- | --- |
-| **[Core](https://atheavenma.github.io/opensae/saebase/atlas/core.html)** | 项目架构、组件职责与科研结构 |
-| **[Knowledge](https://atheavenma.github.io/opensae/saebase/atlas/knowledge.html)** | 科研问题、方法、目标与证据 |
-| **[Code](https://atheavenma.github.io/opensae/saebase/atlas/code.html)** | 基于真实 Python 源码的模块、类、函数与接口 |
-| **[Environment](https://atheavenma.github.io/opensae/saebase/atlas/environment.html)** | GPU/CPU 资源、依赖及运行环境 |
-| **[Context](https://atheavenma.github.io/opensae/saebase/atlas/context.html)** | 科研术语、定义与实现关联 |
+| **制定任务** | 明确研究目标、允许修改的范围和验收条件。 |
+| **执行实验** | 在隔离的项目副本中调用真实 SAEBase 接口，保存实验结果。 |
+| **独立验证** | 检查功能行为、异常输入和已有工作流的兼容性。 |
+| **追踪证据** | 将结果与输入、代码、模型、执行命令和产物关联。 |
+| **持续改进** | 区分实现、环境与验证过程的问题，支持下一轮修复。 |
 
-**Agent Harness：** [Agent Flow](harness/core/AGENT_FLOW.md) 进行结构化审阅 · [Cursor Rules 和 Skills](.cursor/) 支持 Agent 编程 · [实验追踪](harness/experiments/README.md) 管理可复现的科研流程。
+**Atlas** 提供五个相互关联的研究视图。[Core](https://atheavenma.github.io/opensae/saebase/atlas/core.html) 介绍项目架构，[Knowledge](https://atheavenma.github.io/opensae/saebase/atlas/knowledge.html) 组织研究问题，[Code](https://atheavenma.github.io/opensae/saebase/atlas/code.html) 连接真实源码，[Environment](https://atheavenma.github.io/opensae/saebase/atlas/environment.html) 介绍计算资源，[Context](https://atheavenma.github.io/opensae/saebase/atlas/context.html) 解释研究术语。
+
+[了解 Harness](harness/README.md) · [Agent 协作指南](harness/core/AGENT_FLOW.md) · [科研流程文档](harness/github_development_doc/index.md)
 
 ## 🧭 概览
 
@@ -44,32 +44,18 @@ SAEBase 将预训练模型、SAE 字典、激活测量、受控特征干预、�
 
 ## ✨ 核心能力
 
-🧠 **模型与 SAE。** 已注册 checkpoint、明确的激活位置、模型适配器及来源身份校验。
-
-🗃️ **可复用的激活。** 支持恢复的分片缓存、无损 SAE 编码、指定 token 测量和完整性校验。
-
-🎛️ **特征干预。** Identity、ablation、scaling、clamping、addition、coalition 和 reconstruction，支持测量下游 logits 与行为变化。
-
-⚡ **高速执行。** 可选的 suffix replay、逐 token SAE KV 缓存干预，以及 vLLM decoder-direction steering。
-
-📊 **基准与可靠性。** 重构、稀疏性、行为指标、配对比较、按 prompt group 的 Bootstrap 与负对照。
-
-🧩 **研究集成。** 原始 SAR、RSS 估计器、Input Localization，以及已验证的 SAEBench 原生结果导入。
+- **探索 SAE 特征。** 提取模型激活，观察稀疏特征编码，分析重构结果。
+- **测试特征干预。** 消融、缩放、添加或替换特征，测量模型输出的变化。
+- **复用实验结果。** 缓存激活、中断后恢复，并比较兼容的模型和 SAE。
+- **评估科研结果。** 使用重构和行为指标、实验对照及可复现报告。
+- **与 Agent 协作。** 在明确的任务范围内开发和实验，并独立验证实现与产物。
+- **扩展研究流程。** 通过现有接口接入数据集、模型、任务及研究方法。
 
 ## 🧪 Research Lab
 
-[Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) 展示已公开的 SAE 测量与报告。下表还包括单独记录的 GPU 实验结果。
+[Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) 提供可浏览的 SAE 研究结果、特征测量、干预案例和实验报告，并区分已记录的真实结果、演示案例与新计算。执行新输入的真实模型推理，需要单独配置运行环境及相应权重。
 
-| 研究内容 | 已记录的实验结果 |
-| --- | --- |
-| 模型与 SAE 覆盖 | 48 个选定层位、500 个冻结的父提示 |
-| Feature Explorer | 六个主要层位的 300 张特征统计卡片 |
-| 特征干预 | 六个真实模型/SAE 层位的 clean 与 edited logits |
-| SAR | 1,485 组 K16、14 组 K8 与一组 K4 测量 |
-| RSS | 六个层位，共 138,000 条原始输入和候选变体记录 |
-| Input Localization | 一个 64 状态的输入网格、55 个有观测支持的特征 |
-
-[**打开 Research Lab**](https://huggingface.co/spaces/OpenSAE/SAEBase) · [数据集](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation) · [实验结果](harness/github_development_doc/research-lab/results-20261020.md) · [软件版本说明](harness/github_development_doc/releases/v0.6.0.md)
+[打开 Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [评估数据集](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation) · [实验结果与方法](harness/github_development_doc/research-lab/results-20261020.md)
 
 ## 🚀 快速开始
 
@@ -121,6 +107,10 @@ print(float(effect.logit_delta.float().norm()))
 
 这段代码保留两个特征贡献，移除另两个，并输出下一个 token 的 logits 变化幅度。其他模型、token 位置和编辑操作参见 [Python API](harness/github_development_doc/python-api.md) 和 [模型注册表](harness/github_development_doc/model-support.md)。
 
+### 3. 与编程 Agent 协作
+
+在编程 Agent 环境中打开 SAEBase 源码仓库，从 [Harness 指南](harness/README.md)开始。提出需要完成的科研任务，确认允许修改的范围，再由独立审阅流程检查真实执行行为及产物证据。**完整 Harness 随源码仓库提供**；单独安装 Python wheel 主要提供 SAEBase 软件接口。
+
 ## 🔬 研究工作流
 
 SAEBase 将模型测量与后续统计分析分开，方便按需要组合。
@@ -140,11 +130,9 @@ edited_activation = original_activation + decode(edited_codes) - decode(original
 
 完整 SAE 重构是另一种实验对照。可靠性分析以独立的 prompt group 为采样单位，不把同一个提示的多个 token 或变体当作相互独立的数据。
 
-### ⚡ 实测加速
+### ⚡ 运行性能
 
-在单张 RTX 5070 上，Qwen3-1.7B Base 的 25 个样本、7 种条件的完整干预评测通过可选 suffix replay 加速 **1.28×**，报告的指标保持一致。128-token 生成时，逐 token SAE 编辑与 KV 缓存达到 **89 tokens/s**，vLLM SAE decoder-direction steering 达到 **158 tokens/s**。两种生成方式采用不同的干预协议。
-
-[完整 GPU 结果](harness/github_development_doc/performance/workplan11_final_results.md) · [性能实现说明](harness/github_development_doc/performance.md)
+SAEBase 为重复模型评测和特征干预提供可选加速功能。具体实测结果、硬件条件和适用范围参见[性能报告](harness/github_development_doc/performance/workplan11_final_results.md)。
 
 ## 🧠 模型与 SAE 支持
 

@@ -1,10 +1,10 @@
-# 🧱 SAEBase: Research Infrastructure for Sparse Autoencoders
+# 🧱 SAEBase: SAE Research Tools and Agent Workflows
 
 🌍 Languages: [English](README.md) | [中文](README_cn.md) &nbsp; [![CI](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml)
 
-**Latest software release:** [v0.6.0 Unified SAE Research Workspace](harness/github_development_doc/releases/v0.6.0.md) · [OpenSAE Playground](https://atheavenma.github.io/opensae/workspace.html) · [Python API](harness/github_development_doc/python-api.md)
+**Software version:** [v0.6.5 — Auditable Agent Research Workflows](harness/github_development_doc/releases/v0.6.5.md) · [Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Python API](harness/github_development_doc/python-api.md)
 
-👉 **TL;DR.** SAEBase helps researchers understand, test, and modify sparse autoencoder (SAE) features in language models. Capture activations, evaluate reconstructions, edit features, measure downstream effects, and reproduce results with checkpoint-aware caches.
+**SAEBase** helps researchers study sparse autoencoders (SAEs) in language models. Explore features, test how feature edits affect model behavior, and build reproducible experiments. Its Research Harness also helps coding agents carry out scoped work with traceable evidence and independent review.
 
 <p align="center">
   <a href="#-quick-start"><b>🚀 Quick Start</b></a> &nbsp; | &nbsp;
@@ -18,19 +18,19 @@
 
 ## 🧭 Research Harness
 
-**SAEBase Atlas · Five research trees**
+**Build SAE experiments with AI agents while keeping decisions and evidence under your control.** The SAEBase Harness gives coding agents a clear task scope, connects their work to real research code, and supports independent checks of what actually ran.
 
-SAEBase includes a research Harness for organizing code, scientific knowledge, experiments, computing environments, and agent collaboration. **Atlas** connects these through five research trees.
-
-| Atlas Tree | Explore |
+| Research step | What the Harness helps you do |
 | --- | --- |
-| **[Core](https://atheavenma.github.io/opensae/saebase/atlas/core.html)** | Project architecture, component responsibilities and research structure |
-| **[Knowledge](https://atheavenma.github.io/opensae/saebase/atlas/knowledge.html)** | Scientific questions, methods, goals and supporting evidence |
-| **[Code](https://atheavenma.github.io/opensae/saebase/atlas/code.html)** | Source-backed Python modules, classes, functions and interfaces |
-| **[Environment](https://atheavenma.github.io/opensae/saebase/atlas/environment.html)** | GPU/CPU resources, dependencies and execution environments |
-| **[Context](https://atheavenma.github.io/opensae/saebase/atlas/context.html)** | Research terminology, definitions and implementation links |
+| **Plan** | Define the objective, what an agent may change, and how the result will be reviewed. |
+| **Run** | Work in an isolated copy of the project, using SAEBase's actual research interfaces and saved experiment outputs. |
+| **Verify** | Check behavior independently, including expected results, failures, and compatibility with existing workflows. |
+| **Trace** | Connect a result to its inputs, code, models, commands, and output files. |
+| **Improve** | Distinguish issues in the implementation, environment, and verification process before the next attempt. |
 
-**Agent Harness:** [Agent Flow](harness/core/AGENT_FLOW.md) for structured reviews · [Cursor rules and skills](.cursor/) for coding agents · [Experiment tracking](harness/experiments/README.md) for reproducible research.
+**Atlas** provides five connected views of the project. [Core](https://atheavenma.github.io/opensae/saebase/atlas/core.html) explains the architecture; [Knowledge](https://atheavenma.github.io/opensae/saebase/atlas/knowledge.html) organizes research questions; [Code](https://atheavenma.github.io/opensae/saebase/atlas/code.html) links to source implementations; [Environment](https://atheavenma.github.io/opensae/saebase/atlas/environment.html) describes computing resources; and [Context](https://atheavenma.github.io/opensae/saebase/atlas/context.html) explains terminology.
+
+[Explore the Harness](harness/README.md) · [Agent collaboration guide](harness/core/AGENT_FLOW.md) · [Research workflow documentation](harness/github_development_doc/index.md)
 
 ## 🧭 Overview
 
@@ -44,32 +44,18 @@ SAEBase connects pretrained models, SAE dictionaries, activation measurements, c
 
 ## ✨ Highlights
 
-🧠 **Model and SAE support.** Registered checkpoints, named activation sites, compatible adapters and verified model/SAE identities.
-
-🗃️ **Reusable activations.** Resumable sharded caches, lossless SAE codes, selected-token measurements and integrity checks.
-
-🎛️ **Feature interventions.** Identity, ablation, scaling, clamping, addition, coalitions and reconstruction, with downstream logit and behavioral readouts.
-
-⚡ **Faster experiments.** Opt-in suffix replay and KV-cached steering, including live tokenwise SAE edits and vLLM decoder-direction steering.
-
-📊 **Benchmarking and reliability.** Reconstruction, sparsity and behavioral metrics, paired comparisons, prompt-group bootstrap and negative controls.
-
-🧩 **Research integrations.** Original SAR and RSS estimators, Input Localization and verified imports of native SAEBench results.
+- **Explore SAE features.** Capture model activations, inspect sparse feature codes, and compare reconstructions.
+- **Test interventions.** Ablate, scale, add, or replace selected features and measure the effect on model outputs.
+- **Reuse measurements.** Cache activations, resume interrupted work, and compare compatible model and SAE checkpoints.
+- **Evaluate results.** Run reconstruction and behavior measurements with controls and reproducible reports.
+- **Work with agents.** Give coding agents scoped research tasks and independently review their implementations and outputs.
+- **Extend your research.** Connect datasets, models, tasks, and established research methods through the existing interfaces.
 
 ## 🧪 Research Lab
 
-The [Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) displays public SAE measurements and reports. The table also includes results recorded in separate GPU experiments.
+The [Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) lets you browse recorded SAE research results, feature measurements, intervention examples, and reports. Recorded results are distinguished from illustrative examples and new computations. Fresh model inference requires a separately configured runtime and appropriate weights.
 
-| Research area | Recorded evidence |
-| --- | --- |
-| Model and SAE coverage | 48 selected sites, 500 frozen parent prompts |
-| Feature exploration | 300 statistical feature cards across six deep-dive sites |
-| Interventions | Six real model/SAE sites with clean and edited logits |
-| SAR | 1,485 measured K16 groups, 14 K8 groups and one K4 group |
-| RSS | 138,000 records of clean inputs and proposed variants across six sites |
-| Input Localization | One 64-state input grid and 55 observed features |
-
-[**Open the Research Lab**](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Dataset](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation) · [Recorded results](harness/github_development_doc/research-lab/results-20261020.md) · [Software release notes](harness/github_development_doc/releases/v0.6.0.md)
+[Open the Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Evaluation Dataset](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation) · [Measured results and methods](harness/github_development_doc/research-lab/results-20261020.md)
 
 ## 🚀 Quick Start
 
@@ -121,6 +107,10 @@ print(float(effect.logit_delta.float().norm()))
 
 This removes two selected feature contributions and reports the change in next-token logits. For other checkpoints, token selection and editing operations, see the [Python API](harness/github_development_doc/python-api.md) and [model registry](harness/github_development_doc/model-support.md).
 
+### 3. Work with a coding agent
+
+Open this source checkout in your coding-agent environment and start with the [Harness guide](harness/README.md). Describe the research change you want, review its allowed scope, and have a separate reviewer check the real run and saved evidence before accepting the result. The complete Harness is available in the **source repository**; installing the Python wheel alone provides the SAEBase package rather than the full agent workspace.
+
 ## 🔬 Research Workflows
 
 SAEBase separates what gets measured from how the results are analyzed.
@@ -140,11 +130,9 @@ edited_activation = original_activation + decode(edited_codes) - decode(original
 
 Full SAE reconstruction is a separate experimental control. Reliability estimates resample independent prompt groups rather than treating related token variants as independent observations.
 
-### ⚡ Measured acceleration
+### ⚡ Performance
 
-On one RTX 5070 with Qwen3-1.7B Base, opt-in block-suffix replay accelerated the **complete 25-sample × 7-condition intervention workload by 1.28×**, with unchanged reported metrics. For 128-token generation, live SAE editing with a KV cache achieved **89 tokens/s**, and vLLM SAE decoder-direction steering achieved **158 tokens/s**. The generation paths use distinct steering protocols.
-
-[Full GPU results](harness/github_development_doc/performance/workplan11_final_results.md) · [Execution details](harness/github_development_doc/performance.md)
+SAEBase includes optional optimizations for repeated model evaluations and feature interventions. Results and hardware conditions are documented separately in the [performance report](harness/github_development_doc/performance/workplan11_final_results.md).
 
 ## 🧠 Model and SAE Support
 

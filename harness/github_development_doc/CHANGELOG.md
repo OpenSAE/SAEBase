@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 0.6.5 — Auditable Agent Research Workflows
+
+- **Agent research workflows:** added scoped, independently reviewed workflows for extending SAEBase datasets, models, tasks, feature analysis, parameter searches, and experiment lifecycle operations.
+- **Trusted execution and evidence:** improved isolated task dispatch, real model preflight, recorded commands, source and checkpoint provenance, artifact integrity, and independent behavior checks.
+- **Review quality:** added positive and negative replay, reproducibility diagnostics, multi-cause failure attribution, and reviewer evidence archives.
+- **Documentation and usability:** refreshed bilingual onboarding and Atlas/Harness navigation. Maintained the existing Python API, experiment workflows, and nine command-line entry points.
+- **Validation:** source-bound CI on Python 3.11 and 3.12; historical small-scale SAEBase task reviews and their limitations are documented separately. No new general agent success rate or scientific validity is claimed.
+- **Distribution:** the Python wheel provides SAEBase software interfaces. The full coding-agent Harness, including rules and examination tools, is available in the tagged source checkout; private model weights and raw GPU evidence are excluded.
+
 ## 0.6.0 — Unified SAE Research Workspace
 
 - **Architecture:** integrate the research runtime, Gemma-2 2B model adapter and prompt dataset sources alongside SAEBase's existing API and model catalog.
