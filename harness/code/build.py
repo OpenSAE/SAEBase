@@ -10,7 +10,7 @@ from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
-CODE_ROOTS = ("saebase", "datasets", "models", "tasks")
+CODE_ROOTS = ("saebase", "datasets", "models", "tasks", "experiments")
 ANNOTATIONS = ROOT / "doc/code/code_annotations.json"
 DEFAULT_OUT = ROOT / "doc/code/code_tree.json"
 GROUP_LABELS = {
@@ -18,6 +18,7 @@ GROUP_LABELS = {
     "datasets": "Datasets · NLP 输入数据",
     "models": "Models · 网络构建",
     "tasks": "Tasks · 科研任务",
+    "experiments": "Experiments · 科研实验组合",
     "harness": "Harness · 可选工具",
 }
 

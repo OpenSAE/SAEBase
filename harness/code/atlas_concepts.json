@@ -381,6 +381,23 @@
       "children": []
     },
     {
+      "name": "dataset_records",
+      "title": "通用数据记录与来源验证",
+      "summary": "规定研究输入记录身份、来源读取及一致性约束。",
+      "description": "规定研究输入记录身份、来源读取及一致性约束。",
+      "en_title": "Reusable data records and source validation",
+      "en_summary": "Represent scientific input records and load pinned dataset sources.",
+      "en_description": "Represent scientific input records and load pinned dataset sources.",
+      "context_terms": [
+        "term.dataset"
+      ],
+      "patterns": [],
+      "source_dirs": [
+        "data"
+      ],
+      "children": []
+    },
+    {
       "name": "runtime",
       "title": "实验配置、训练与执行生命周期",
       "summary": "组合 Hydra 配置，管理训练、资源检查和实验产物。",

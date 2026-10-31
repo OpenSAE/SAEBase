@@ -13,6 +13,7 @@ GROUPS = {
     "datasets": "NLP Prompt 数据集与来源",
     "models": "LLM 模型适配与兼容性",
     "tasks": "SAE 捕获、干预、生成、解释和评测任务",
+    "experiments": "科研实验的组件选择与执行计划",
     "harness": "Harness 代码结构与研究证据",
 }
 GROUP_SUMMARIES = {
@@ -20,6 +21,7 @@ GROUP_SUMMARIES = {
     "datasets": "组织 NLP Prompt、数据来源及其可追溯的版本化输入。",
     "models": "实现语言模型的加载、激活位置与任务兼容性检查。",
     "tasks": "执行七类 LLM SAE 科研任务并保留原有 SAEBase 接口。",
+    "experiments": "组织已注册 Dataset、Model、SAE、Task 的具体科研配置和独立运行证据。",
     "harness": "维护项目结构、代码树、科研术语、实验审阅与环境记录。",
 }
 MODULES = {
@@ -75,6 +77,7 @@ CONCRETE = {
     "datasets": ("NLP 数据集实现", "查看语言模型 Prompt 来源、读取和产物协议。"),
     "models": ("LLM 模型实现", "查看实际语言模型和任务兼容性。"),
     "tasks": ("七类 LLM SAE 任务", "查看特征捕获、干预、生成、电路、解释、评测与训练。"),
+    "experiments": ("科研实验定义", "查看科研组件的选择、运行矩阵与可验证的实验结果。"),
 }
 # Reviewed task responsibilities. A task family, its plugin entry, and its
 # implementation are distinct concepts, even when all share the same operation.
