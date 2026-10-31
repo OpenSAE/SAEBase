@@ -1,0 +1,57 @@
+{
+  "schema": "saebase.wp21.seed.v1",
+  "fixture_id": "R09_retired_model",
+  "case_id": "R09",
+  "purpose": "Instructor-provided pre-deletion state; this fixture is not a deletion solution.",
+  "base_commit": "41a54cbfdee5cce24d3d8f7517aadef0c752c5ac",
+  "files": [
+    {
+      "source": "overlay/models/wp21_retired_gemma.py",
+      "destination": "models/wp21_retired_gemma.py",
+      "sha256": "53bd4c26890a4d5478a3b0d52fd4a42b226fadd8f4a77b820b57859a35c34cd3"
+    },
+    {
+      "source": "overlay/conf/model/wp21_retired_gemma.yaml",
+      "destination": "conf/model/wp21_retired_gemma.yaml",
+      "sha256": "2b358bc9bd17ac17bbe4323171654169372fc20fdc7ffd35394903101b742b62"
+    },
+    {
+      "source": "overlay/tests/wp21/R09/before.py",
+      "destination": "tests/wp21/R09/before.py",
+      "sha256": "73a1e7892e6aff939640f428692598480e1efb1f2a7be6bc3298d2c308473a32"
+    }
+  ],
+  "replaced_base_paths": [],
+  "pre_deletion_check": {
+    "argv": [
+      "python",
+      "tests/wp21/R09/before.py",
+      "--check-only"
+    ],
+    "callable": "models.wp21_retired_gemma.register",
+    "mode": "registration_only_not_experiment"
+  },
+  "pre_deletion_real_run": {
+    "argv": [
+      "python",
+      "tests/wp21/R09/before.py",
+      "--output",
+      "<candidate_workspace>",
+      "--device",
+      "cuda"
+    ],
+    "requires": "Locally provisioned real Gemma-2 2B weights; SAE canonical layer25 except model-only R09. Runtime preflight supplies immutable asset identities.",
+    "network_policy": "No implicit downloads; use operator-provisioned cache with HF_HUB_OFFLINE=1 and TRANSFORMERS_OFFLINE=1."
+  },
+  "post_deletion_requirements": [
+    "Remove only the temporary external provider/config/live entry references.",
+    "In a fresh process the external extension key is absent; the original gemma2_2b_base model remains registered and loadable.",
+    "Run real canonical Gemma capture after retirement. Preserve the checkpoint, shared cache and all previous experiment files."
+  ],
+  "protected_inputs": [
+    "harness/tests/wp21/fixtures/common/prompts.jsonl",
+    "shared model and SAE checkpoints",
+    "all previous run artifacts"
+  ],
+  "validation_scope": "Compile and registration/config checks are separate from real checkpoint execution. Real before/after measurements remain mandatory for passing the agent case."
+}

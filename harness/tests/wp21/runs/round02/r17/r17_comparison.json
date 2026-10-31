@@ -1,0 +1,58 @@
+{
+  "schema": "saebase.wp21.training_repro.v1",
+  "status": "OUTSIDE_FROZEN_TOLERANCE",
+  "tensor_name": "W_dec",
+  "tensor_keys": [
+    "W_dec",
+    "W_dec"
+  ],
+  "checkpoints": [
+    {
+      "file_sha256": "f969ab69fd1aaacb0d5e4ea266df5dc47540e7497b89f9a23ef9a5fde488d8e3",
+      "path": "experiment/wp21_prompts/gemma2_2b_base/train/r17_s7a_0/checkpoints/native_sae_training/checkpoint/inference/sae_weights.safetensors"
+    },
+    {
+      "file_sha256": "d98f54d2a2004939bede58ed3f2e251d92cd24d305a73d2fada5ff73d1d7df67",
+      "path": "experiment/wp21_prompts/gemma2_2b_base/train/r17_s7b_0/checkpoints/native_sae_training/checkpoint/inference/sae_weights.safetensors"
+    }
+  ],
+  "shape": [
+    64,
+    2304
+  ],
+  "numel": 147456,
+  "rtol": 0.0001,
+  "atol": 1e-05,
+  "comparison": {
+    "max_abs": 0.08271190151572227,
+    "max_relative_over_atol_floored_reference": 3595.507286584552,
+    "max_reference_abs": 0.0474640354514122,
+    "failing_elements": 147398,
+    "allclose": false
+  },
+  "plans": {
+    "a": {
+      "sha256": "bc0a3bb71d352b175fab38813092167bf08b81fb28513c5d89f967f16dd950db",
+      "seed": 7,
+      "config": null,
+      "training_tokens": null
+    },
+    "b": {
+      "sha256": "b113ce2dcf34eb7e4d45d51e406377a4a0acf883fbb241adfda23c02ba69ee44",
+      "seed": 7,
+      "config": null,
+      "training_tokens": null
+    }
+  },
+  "same_seed_reported": true,
+  "current_diagnostic_runtime": {
+    "torch": "2.11.0+cu128",
+    "torch_cuda": "12.8",
+    "cuda_available": true,
+    "deterministic_algorithms_enabled": false,
+    "cudnn_benchmark": false,
+    "cudnn_deterministic": false,
+    "cuda_matmul_tf32": false
+  },
+  "note": "This inspects saved checkpoint tensors only. Current process settings do not prove the historical trainer used them. Preserve frozen rtol/atol and compare the actual training logs before attribution."
+}

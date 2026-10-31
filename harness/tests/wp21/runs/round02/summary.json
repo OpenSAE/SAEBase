@@ -1,0 +1,345 @@
+{
+  "schema": "saebase.wp21.followup_manifest.v1",
+  "tool_branch": "harness/wp21-2-hardening-20261030",
+  "tool_commit": "473784823419f57099b1a6e0f62aafca54f89c23",
+  "exam_commit": "8a78be1209bb30c652d500f934c226a5d54684c9",
+  "product_base_commit": "41a54cbfdee5cce24d3d8f7517aadef0c752c5ac",
+  "run_id": "round02",
+  "executed_at_utc": "2026-10-30",
+  "environment": {
+    "python": "3.12.14",
+    "torch": "2.11.0+cu128",
+    "cuda_available": true,
+    "gpu": "NVIDIA GeForce RTX 5070"
+  },
+  "assets": {
+    "gemma_sae_lock_sha256": "d4b585e038ef944762b424cef82c9bdb07874b295f8e63e264dacf77ad15d2cd",
+    "pythia_lock_sha256": "89eeba088cc8020186470b935ccacd68d6e877de7cd0355b872e6edfba52a578",
+    "pythia_model_safetensors_sha256": "116a02532db461f91386a5b20f942ff2c8d4de7341e21b55caafc3d7b25f49a1",
+    "pythia_revision": "d31f659f077f9ea500c4d7faa999893d7f28cbdf",
+    "gemma_revision": "c5ebcd40d208330abc697524c919956e692655cf",
+    "sae_revision": "fd571b47c1c64851e9b1989792367b9babb4af63"
+  },
+  "items": {
+    "F00": {
+      "status": "DONE",
+      "preflight_after_pythia": "PREREQUISITES_PRESENT_UNVERIFIED",
+      "pytest": "108 passed"
+    },
+    "F01": {
+      "status": "DONE",
+      "old": "ENV_BLOCKED",
+      "new": "PASS",
+      "score": 100,
+      "positive": "5/5",
+      "negative": "4/4"
+    },
+    "F02": {
+      "status": "DONE",
+      "old": "FAIL",
+      "audit": "EVIDENCE_READY_FOR_REPLAY",
+      "weights": "OUTSIDE_FROZEN_TOLERANCE",
+      "max_abs": 0.08271190151572227,
+      "failing_elements": 147398,
+      "new_train": false
+    },
+    "F03": {
+      "status": "DONE",
+      "old": "INCOMPLETE",
+      "audit": "EVIDENCE_READY_FOR_REPLAY",
+      "replay_evidence": true,
+      "new_pass_issued": false
+    },
+    "F04": {
+      "status": "DONE",
+      "mixed_length_no_pad": "EXCEPTION",
+      "mixed_length_with_pad": "RAN",
+      "default_device": "cpu",
+      "cuda_param_device": "cuda:0"
+    },
+    "F05": {
+      "status": "DONE",
+      "canonical_archived": 15,
+      "canonical_script_mismatch": [
+        "R03",
+        "R06",
+        "R13",
+        "R15",
+        "R18"
+      ],
+      "official_replay_trees_archived": [
+        "R03b",
+        "R06b",
+        "R13b",
+        "R15b",
+        "R17b",
+        "R18b"
+      ]
+    }
+  },
+  "attributions": [
+    {
+      "code": "ENV_BLOCKED",
+      "owner": "environment",
+      "ref": "round01 R08"
+    },
+    {
+      "code": "EVALUATOR_SCOPE_GAP",
+      "owner": "evaluator",
+      "ref": "round01 R17/R20 directory artifacts"
+    },
+    {
+      "code": "IMPLEMENTATION_ERROR",
+      "owner": "baseline_product",
+      "ref": "R17 CUDA TopK; F04 runner device/pad"
+    }
+  ],
+  "reviewer_archives_local_only": [
+    {
+      "review_dir": "R01",
+      "status": "ARCHIVED",
+      "sha256": "ded8dd271b7078572b18c7233532eb282714884720a6de4e367b358b82c4577e",
+      "files": 39,
+      "reason": null,
+      "final_status": "PASS",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R02",
+      "status": "ARCHIVED",
+      "sha256": "0445d3932c7f1a34050351c63861f2a4a7382ea49618cdbbcadae9bbcbc6bb9a",
+      "files": 35,
+      "reason": null,
+      "final_status": "PASS",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R03",
+      "status": "ARCHIVE_ERROR",
+      "sha256": null,
+      "files": null,
+      "reason": "independent reviewer script changed or belongs to candidate",
+      "final_status": null,
+      "independent_scripts": null
+    },
+    {
+      "review_dir": "R04",
+      "status": "ARCHIVED",
+      "sha256": "e66ce28365c6d40553646df95c5d29b368907bcfe40a380d955544a0922bf732",
+      "files": 35,
+      "reason": null,
+      "final_status": "PASS",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R05",
+      "status": "ARCHIVED",
+      "sha256": "1d029e73667bfde60dd4e7e509b74a6ebc8cfac9c51d9da06609faee79e947c4",
+      "files": 35,
+      "reason": null,
+      "final_status": "PASS",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R06",
+      "status": "ARCHIVE_ERROR",
+      "sha256": null,
+      "files": null,
+      "reason": "independent reviewer script changed or belongs to candidate",
+      "final_status": null,
+      "independent_scripts": null
+    },
+    {
+      "review_dir": "R07",
+      "status": "ARCHIVED",
+      "sha256": "037a6d942733539d7df3fd590293255d76ec091e0bfee38c52addf83b36296da",
+      "files": 35,
+      "reason": null,
+      "final_status": "PASS",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R08",
+      "status": "ARCHIVED",
+      "sha256": "19a1a462e92c0e70d0b8b2070c1089f7f51513be0de71ef3f95ec3f1b2077bc3",
+      "files": 2,
+      "reason": null,
+      "final_status": "ENV_BLOCKED",
+      "independent_scripts": 0
+    },
+    {
+      "review_dir": "R09",
+      "status": "ARCHIVED",
+      "sha256": "6049d612e61bf3937851c04af77ce7728733f5ca715c2d52c474ced075c54b8b",
+      "files": 35,
+      "reason": null,
+      "final_status": "PASS",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R10",
+      "status": "ARCHIVED",
+      "sha256": "f9cc13dc5057cf358e2ce505ae0f389f2311ef7898fd83340d21fecbb75454cd",
+      "files": 35,
+      "reason": null,
+      "final_status": "PASS",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R11",
+      "status": "ARCHIVED",
+      "sha256": "f052b66ea1b8a387cf3c77e2f6d2ea77d02dc288b28af6f578ffa3d48613dfee",
+      "files": 35,
+      "reason": null,
+      "final_status": "PASS",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R12",
+      "status": "ARCHIVED",
+      "sha256": "388e8f92a0688e20a3fa15b8e9a29abca7ab885110aff798083145c9dec198c9",
+      "files": 39,
+      "reason": null,
+      "final_status": "PASS",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R13",
+      "status": "ARCHIVE_ERROR",
+      "sha256": null,
+      "files": null,
+      "reason": "independent reviewer script changed or belongs to candidate",
+      "final_status": null,
+      "independent_scripts": null
+    },
+    {
+      "review_dir": "R14",
+      "status": "ARCHIVED",
+      "sha256": "412b2f213f099999712c8785f89b117f650552b8378b6861bbb40a27c4d23ecd",
+      "files": 35,
+      "reason": null,
+      "final_status": "PASS",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R15",
+      "status": "ARCHIVE_ERROR",
+      "sha256": null,
+      "files": null,
+      "reason": "independent reviewer script changed or belongs to candidate",
+      "final_status": null,
+      "independent_scripts": null
+    },
+    {
+      "review_dir": "R16",
+      "status": "ARCHIVED",
+      "sha256": "6350ebe386cf1787a171a813bce4eeb492a56f4be64dccbf0919f477498431cd",
+      "files": 39,
+      "reason": null,
+      "final_status": "PASS",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R17",
+      "status": "ARCHIVED",
+      "sha256": "bf27383b467f307d5a36040c651f7f1ffa3da7e4a3fc5f084e85004a720f3206",
+      "files": 38,
+      "reason": null,
+      "final_status": "FAIL",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R18",
+      "status": "ARCHIVE_ERROR",
+      "sha256": null,
+      "files": null,
+      "reason": "independent reviewer script changed or belongs to candidate",
+      "final_status": null,
+      "independent_scripts": null
+    },
+    {
+      "review_dir": "R19",
+      "status": "ARCHIVED",
+      "sha256": "f1115ae7d77bd40557273facb972c25ad83c5802d7c9c6467c859f54e4b6d6e2",
+      "files": 39,
+      "reason": null,
+      "final_status": "PASS",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R20",
+      "status": "ARCHIVED",
+      "sha256": "ddfb2c54ad6adc8ce668bfeba653efcd6de7b2d77a77f963eaa6010518ba64b8",
+      "files": 39,
+      "reason": null,
+      "final_status": "INCOMPLETE",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R03b",
+      "status": "ARCHIVED",
+      "sha256": "00dd0cdf5c2203c6511049597ae810fabe2e81552604ecfb7e6c5f6f1b2d772a",
+      "files": 35,
+      "reason": null,
+      "final_status": "PASS",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R06b",
+      "status": "ARCHIVED",
+      "sha256": "bc8e81b5c0edc6172f93370874d48c4b77072840f5bc62f2674b888707a245ef",
+      "files": 39,
+      "reason": null,
+      "final_status": "PASS",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R13b",
+      "status": "ARCHIVED",
+      "sha256": "97da7babf989d5ff6f76266aabeab235ac49c5714e5881ebff28613572634737",
+      "files": 39,
+      "reason": null,
+      "final_status": "PASS",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R15b",
+      "status": "ARCHIVED",
+      "sha256": "72100e954275c4b9204f47476ac04320a83bbfa907232248b9d743097e5411ac",
+      "files": 47,
+      "reason": null,
+      "final_status": "PASS",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R17b",
+      "status": "ARCHIVED",
+      "sha256": "2961c092a03d68600f3fd3f9f88a7a683d362f8fc3809c9d0a2d063b8cfa8784",
+      "files": 39,
+      "reason": null,
+      "final_status": "FAIL",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R18b",
+      "status": "ARCHIVED",
+      "sha256": "2bf7c85a8114e405f5bc2ca7023aa0c3044ba1719c93393ab646cef1fe5280f9",
+      "files": 39,
+      "reason": null,
+      "final_status": "PASS",
+      "independent_scripts": 1
+    },
+    {
+      "review_dir": "R08_round02",
+      "status": "ARCHIVED",
+      "sha256": "dc3e764dc0cc1b9a0bbf568c0ae33af7393ca39e91bb61990037190eec542e8c",
+      "files": 39,
+      "reason": null,
+      "final_status": "PASS",
+      "independent_scripts": 1
+    }
+  ],
+  "round01_preserved": true,
+  "harness_scoring_unchanged": true,
+  "note": "ZIP archives, weights and raw logs remain local. PASS requires independent replay hard gates."
+}

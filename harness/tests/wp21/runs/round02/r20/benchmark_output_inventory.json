@@ -1,0 +1,40 @@
+{
+  "n": 7,
+  "files": [
+    {
+      "rel": "metrics.jsonl",
+      "size": 3546,
+      "sha256": "bd56692ff33a0a0764b2432ac8008a7711b7443c04763c3de0f164b32c047d9f"
+    },
+    {
+      "rel": "metrics_manifest.json",
+      "size": 173,
+      "sha256": "a851a5adb74841373c51fd047e2929739b16609f3952a20aa899e7eefc1b524e"
+    },
+    {
+      "rel": "plan.json",
+      "size": 3213,
+      "sha256": "3768d4e0401d86927e422546418b2c6478368373e92f43ac5080fee337b6fedb"
+    },
+    {
+      "rel": "provenance.json",
+      "size": 337,
+      "sha256": "217d895b3abfa26ae5696cd521fa264d03fb74262b9c3e45f2b1c43f5451c7bf"
+    },
+    {
+      "rel": "report.html",
+      "size": 2213,
+      "sha256": "6ca3b568b2fdf0b2c49f19e5b8e1a77ef8769c3b8166260481fd9a6a673f2da5"
+    },
+    {
+      "rel": "resolved_config.json",
+      "size": 3791,
+      "sha256": "7740deb2e7e4b9716f8c61b1c0f96328318936758a864cfa2956f73eef9b08d2"
+    },
+    {
+      "rel": "summary.csv",
+      "size": 744,
+      "sha256": "356d96a315a5f4c7418bb53c8853c19d6bc38ceb1980eb227582129abd0e53d2"
+    }
+  ]
+}

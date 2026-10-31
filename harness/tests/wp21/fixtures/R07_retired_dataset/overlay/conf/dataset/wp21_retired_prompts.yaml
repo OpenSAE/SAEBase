@@ -1,0 +1,9 @@
+# @package _global_
+dataset:
+  name: WP21RetiredPrompts
+  input_format: text
+  data_path: ${paths.data_dir}/WP21RetiredPrompts
+  prompt_file: ''
+  batch_size: 2
+  num_workers: 0
+  pin_memory: false

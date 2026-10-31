@@ -1,0 +1,57 @@
+{
+  "schema": "saebase.wp21.seed.v1",
+  "fixture_id": "R11_retired_task",
+  "case_id": "R11",
+  "purpose": "Instructor-provided pre-deletion state; this fixture is not a deletion solution.",
+  "base_commit": "41a54cbfdee5cce24d3d8f7517aadef0c752c5ac",
+  "files": [
+    {
+      "source": "overlay/tasks/capture/wp21_capture_legacy.py",
+      "destination": "tasks/capture/wp21_capture_legacy.py",
+      "sha256": "e30c1fb53f542a8471d46dea9ddf7afd3aa9cd665c98b63c438b891126e9f647"
+    },
+    {
+      "source": "overlay/conf/task/wp21_capture_legacy.yaml",
+      "destination": "conf/task/wp21_capture_legacy.yaml",
+      "sha256": "baa1b8e73025496b654087e54205a34975a6ded31b7b7475d6e54001bb80b83c"
+    },
+    {
+      "source": "overlay/tests/wp21/R11/before.py",
+      "destination": "tests/wp21/R11/before.py",
+      "sha256": "8cc45d4b6aa23645fd05b797c410717872a3f246ef939b6868b129db89fe82b1"
+    }
+  ],
+  "replaced_base_paths": [],
+  "pre_deletion_check": {
+    "argv": [
+      "python",
+      "tests/wp21/R11/before.py",
+      "--check-only"
+    ],
+    "callable": "tasks.capture.wp21_capture_legacy.register",
+    "mode": "registration_only_not_experiment"
+  },
+  "pre_deletion_real_run": {
+    "argv": [
+      "python",
+      "tests/wp21/R11/before.py",
+      "--output",
+      "<candidate_workspace>",
+      "--device",
+      "cuda"
+    ],
+    "requires": "Locally provisioned real Gemma-2 2B weights; SAE canonical layer25 except model-only R09. Runtime preflight supplies immutable asset identities.",
+    "network_policy": "No implicit downloads; use operator-provisioned cache with HF_HUB_OFFLINE=1 and TRANSFORMERS_OFFLINE=1."
+  },
+  "post_deletion_requirements": [
+    "Remove the dedicated registered legacy task, its configuration and live import/recipe references.",
+    "In a fresh process lookup of wp21_capture_legacy fails; all original task registry keys and CaptureTask behavior remain intact.",
+    "Run canonical Gemma capture after retirement and preserve the old legacy experiment hierarchy and outputs."
+  ],
+  "protected_inputs": [
+    "harness/tests/wp21/fixtures/common/prompts.jsonl",
+    "shared model and SAE checkpoints",
+    "all previous run artifacts"
+  ],
+  "validation_scope": "Compile and registration/config checks are separate from real checkpoint execution. Real before/after measurements remain mandatory for passing the agent case."
+}

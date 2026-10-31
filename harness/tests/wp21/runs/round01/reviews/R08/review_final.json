@@ -1,0 +1,40 @@
+{
+  "schema": "saebase.wp21.final_review.v1",
+  "case_id": "R08",
+  "run_id": "round01",
+  "status": "ENV_BLOCKED",
+  "score": {
+    "real_functionality": 0.0,
+    "compatibility_and_negative": 0.0,
+    "evidence_reproducibility": 0,
+    "scope_and_documentation": 0,
+    "total": 0.0
+  },
+  "hard_gates": {
+    "frozen_spec_valid": true,
+    "candidate_scope_valid": true,
+    "candidate_evidence_ready": false,
+    "real_model_probe_valid": false,
+    "all_positive_replayed": false,
+    "all_negative_replayed": false
+  },
+  "checks": {
+    "positive": 0,
+    "positive_total": 5,
+    "negative": 0,
+    "negative_total": 4
+  },
+  "blockers": [
+    "missing valid, compatible offline real-model probe and unchanged frozen assets",
+    "candidate evidence is not independently auditable"
+  ],
+  "attribution": "ENV_BLOCKED",
+  "attribution_owner": "environment",
+  "attribution_stage": "independent_replay",
+  "review_checklist_sha256": "b731e9cf54f6af36b78cfb20e2d1d29dcc6e7de8b7071a3e13a34d3542f96e80",
+  "candidate_source_sha256": "16845623698ab909a072c094f3cc25e239381ef4e9488d1a9b5ef797f1300d4b",
+  "reviewer_source_sha256": "16845623698ab909a072c094f3cc25e239381ef4e9488d1a9b5ef797f1300d4b",
+  "candidate_evidence_status": "ENV_BLOCKED",
+  "reviewed_at_utc": "2026-10-30T17:19:45.913299+00:00",
+  "note": "Automatic hard gates only; independent reviewer scripts are responsible for genuine real-model checks. Human/Atlas approvals remain separate."
+}

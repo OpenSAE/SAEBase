@@ -5,7 +5,7 @@ description: 当需要新增、替换或扩展模型及其构造、配置、兼�
 
 # 接入 Model
 
-1. 阅读 saebase/runtime/registry.py 的 ModelPlugin、models/build.py、models/plugins.py 和相近模型实现，确定 construct(cfg) 与 assert_compatible(cfg) 的实际契约。
+1. 阅读 saebase/registry.py 的 ModelPlugin、models/build.py、models/plugins.py 和相近模型实现，确定 construct(cfg) 与 assert_compatible(cfg) 的实际契约。
 2. 明确输入 shape、dtype、输出语义（logits/embedding/probability）、预训练权重来源及目标 Dataset/Task。
 3. 在 models/<name>/ 实现模型和 model_task_dataset_compatibility.py；通用模型构造层不引入名字特判。
 4. 在 models/plugins.py 注册 register_model；添加 conf/model/<name>.yaml；按需更新 conf/models_log.md 人类摘要。

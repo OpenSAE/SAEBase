@@ -3,6 +3,8 @@
 Harness 为 SAEBase 提供可审计的科研代码导航、知识管理、环境记录和 Agent 审阅流程。
 Research Lab、Dataset、Model、Task 及通用 SAE 接口均由 SAEBase 仓库统一维护。
 
+**当前 Harness 基线（WP21.2 已结项）**：[WP21 阶段结项及旧 Harness 兼容验证](github_work_plan/21_harness_phase_closeout_20261030.md)。WP18–WP20 的历史 Reference/Verifier 和 Contract 不变；WP21 真实工作流考试的工具、审计修复、round01/round02 记录已统一归档。入口见 [Harness Tests](tests/README.md)，冻结题目见 [WP21](tests/wp21/README.md)。产品代码与真实 GPU 问题独立处理。
+
 | 模块 | 作用 |
 | --- | --- |
 | `core/` | 项目结构、Agent Flow 与审批 |

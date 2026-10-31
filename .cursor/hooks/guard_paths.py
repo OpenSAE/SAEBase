@@ -60,6 +60,17 @@ def gate(tool, payload, active=None):
         return "Mutation tool supplies no auditable file paths"
     plan_id = active if active is not None else os.environ.get("OPENRESEARCH_ACTIVE_AGENT_FLOW")
     try:
+        import importlib.util
+        profile_path = ROOT / ".cursor/hooks/wp21_scope.py"
+        assignment_path = ROOT / ".cursor/wp21_assignment.json"
+        wp21, assigned = None, None
+        if profile_path.is_file():
+            module_spec = importlib.util.spec_from_file_location("wp21_scope", profile_path)
+            wp21 = importlib.util.module_from_spec(module_spec)
+            module_spec.loader.exec_module(wp21)
+            assigned = wp21.assignment()
+        elif assignment_path.exists() or assignment_path.is_symlink():
+            raise ValueError("WP21 assignment exists but its scope profile is missing")
         from harness.core.agent_flow import load, scope
 
         plan = None
@@ -76,10 +87,16 @@ def gate(tool, payload, active=None):
                 return "Task agents cannot create or edit root-level entries"
             if parts[0] not in NEW_TOP_LEVEL_DIRS and not (ROOT / parts[0]).is_dir():
                 return "New top-level directories are forbidden except experiments/ and tests/"
+            if assigned is not None:
+                if not wp21.allows_path(rel, assigned):
+                    return "Path outside the current WP21 case assignment"
+                continue
+            if rel.startswith("harness/tests/wp21/"):
+                return "WP21 preparation and task files require the trusted dispatcher; no case is assigned"
             if rel.startswith(HARNESS_TEST_SANDBOX):
                 # The acceptance ledger and test instructions are owned by
                 # governance/independent reviewers, not the task agent.
-                if rel in ("harness/tests/README.md", "harness/tests/wp18/README.md", "harness/tests/wp19/README.md", "harness/tests/wp20/README.md") or rel in ("harness/tests/wp18/acceptance", "harness/tests/wp19/acceptance", "harness/tests/wp20/acceptance") or rel.startswith(
+                if "acceptance" in parts[2:] or (len(parts) <= 4 and parts[-1] == "README.md") or rel in ("harness/tests/README.md", "harness/tests/wp18/README.md", "harness/tests/wp19/README.md", "harness/tests/wp20/README.md") or rel in ("harness/tests/wp18/acceptance", "harness/tests/wp19/acceptance", "harness/tests/wp20/acceptance") or rel.startswith(
                     ("harness/tests/wp18/acceptance/", "harness/tests/wp19/acceptance/", "harness/tests/wp20/acceptance/")
                 ):
                     return "Harness test instructions and independent acceptance are read-only"

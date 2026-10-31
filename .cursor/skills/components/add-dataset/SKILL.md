@@ -5,7 +5,7 @@ description: 当需要新增、接入或更换数据集及其 DataModule、split
 
 # 接入 Dataset
 
-1. 阅读 datasets/datamodule.py、datasets/plugins.py、saebase/runtime/registry.py、已有最相近的数据集和实际 Task 消费的数据接口。
+1. 阅读 datasets/datamodule.py、datasets/plugins.py、saebase/registry.py、已有最相近的数据集和实际 Task 消费的数据接口。
 2. 先写清样本结构、dtype、label mapping、split 来源，以及哪些信息属于 Dataset 而非 Task。
 3. 在 datasets/<DatasetName>/ 添加实现、数据准备入口及 dataset_task_policy.py，保留现有 DataModule 插件契约。
 4. 在 datasets/plugins.py 注册 register_dataset；需要 alias 再调用 register_dataset_alias，不修改 saebase.registry 或 datamodule 内的具体数据集分支。

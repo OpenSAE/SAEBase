@@ -1,3 +1,19 @@
+## Work Plan 21 · Harness 阶段结项（2026-10-30）
+
+[**WP21 阶段最终结项**](21_harness_phase_closeout_20261030.md)：WP21.1 考试工具和 WP21.2 Harness 修复已形成统一基线，WP18–WP20 的旧考试与 Contract 保持原样。round01 为 17 PASS、R08 环境阻塞、R17 失败、R20 未完成；round02 新增 R08 独立 PASS。18/20 道题在两轮中至少有一次 PASS 记录。余下 CUDA 训练复现、Benchmark 参数转发和 R20 最终复核按产品/评审工作处理，不作为 Harness 结项阻塞。
+
+## Work Plan 21 · 真实 SAEBase 工作流考试
+
+[**WP21 — 真实 SAEBase 工作流综合考试**](21_real_saebase_workflow_exams.md)：R01–R20 在隔离工作树中调用生产接口（capture / intervene / train / benchmark / 组件增删）。试卷与工具在 `exam/wp21-1-ready`（`8a78be1209bb30c652d500f934c226a5d54684c9`）。
+
+**round01 独立 Review 归档（2026-10-30）**：[成绩、归因与 Harness 缺口](21_exam_round01_report_20261030.md)。PASS=17，ENV_BLOCKED=1（R08 缺 Pythia-14m），FAIL=1（R17 同 seed 容差），INCOMPLETE=1（R20 目录产物审计）。这是考试记录归档，不是产品发布或 Atlas 批准。
+
+## Work Plan 21.2 · 真实 GPU 与独立证据复核
+
+[**WP21.2 — 本地 Examiner 执行工作单**](21_wp21_2_local_gpu_followup.md)：针对 R08 的 Pythia 资源与重考、R17 的同 seed 训练差异、R20 的目录审计、Benchmark 设备与 padding、20 题 Reviewer 原始证据，指定真实输入、运行命令、独立验收、可追溯交付和禁止覆盖历史成绩的边界。本工作单只规定本地后续工作，不改冻结考试标准。Harness 修复见 [WP21.2 硬化说明](../tests/wp21/WP21_2_HARDENING.md)。
+
+**F00–F05 本地复核归档（2026-10-30）**：[成绩、归因与产品缺口](21_wp21_2_followup_report_20261030.md)。R08 新 round02 独立评审 PASS 100；round01 的 R08 ENV_BLOCKED、R17 FAIL、R20 INCOMPLETE 原样保留。这是考试记录归档，不是产品发布或 Atlas 批准。
+
 ## Work Plan 20 · 中大型多阶段 Harness 集成考试
 
 [**WP20 — 20 道中大型集成题及独立验收设计**](20_integrated_multistage_harness_exams.md)：X01–X20 涉及真实 AST/Tree/Knowledge、SAE 编码/干预、AUROC/AP/Bootstrap、Checkpoint、文件原子性、CI 发布、并发与长时程重放。每题有模块来源、明确操作阶段、正反例与独立验收目标；配套 [机器可读设计](../contracts/wp20_cases.json)。**X01–X20 已有实际行为 Reference、80 组冻结正反例、独立 grader 与错误实现校准，现在可在隔离环境开展考试；产品级完整集成和人工审核仍是后续独立工作。**历史 WP19 的 200 个微型合成任务继续保留。

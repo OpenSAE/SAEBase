@@ -1,0 +1,11 @@
+# @package _global_
+# subtask chooses computation; path only chooses the output hierarchy.
+task:
+  name: benchmark
+  path: benchmark/debug_norm
+  subtask: debug_norm
+  execute: false
+  sae_key: gemma2_2b_pt_l25_canonical
+  layer: 25
+  device: cpu
+  prompt: ''

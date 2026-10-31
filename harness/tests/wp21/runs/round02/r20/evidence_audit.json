@@ -1,0 +1,13 @@
+{
+  "status": "EVIDENCE_READY_FOR_REPLAY",
+  "case_id": "R20",
+  "grade": null,
+  "independent_real_execution": false,
+  "artifact_files": 41,
+  "command_count": 9,
+  "remaining": [
+    "Verify assets lock against actually loaded files and model/tokenizer/SAE identity.",
+    "Replay every case-specific positive/negative check in a fresh reviewer workspace.",
+    "Inspect actual imports, numerical traces, budgets, diff and frozen grading rubric."
+  ]
+}

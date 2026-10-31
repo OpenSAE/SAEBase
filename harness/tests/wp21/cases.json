@@ -1,0 +1,2302 @@
+{
+  "schema": "saebase.wp21.cases.v1",
+  "base_commit": "41a54cbfdee5cce24d3d8f7517aadef0c752c5ac",
+  "protocol": "harness/contracts/REAL_WORKFLOW_PROTOCOL.md",
+  "cases": [
+    {
+      "id": "R01",
+      "title": "真实采集、恒等写回与特征消融",
+      "goal": "使用现有 SAEBase 接口完成一个可复核的真实 Gemma-2 2B 小实验，建立本轮真实运行基线。现有 configured_only 与 synthetic quickstart 均不能作为本题完成证据。",
+      "profile": "gemma_inference",
+      "seed_fixture": null,
+      "allowed_paths": [
+        "tests/wp21/R01/**"
+      ],
+      "context_paths": [
+        "saebase/api/__init__.py",
+        "saebase/api/model.py",
+        "saebase/api/features.py",
+        "saebase/store/identity.py",
+        "tasks/capture/operation.py",
+        "tasks/intervene/operation.py",
+        "conf/task/capture.yaml"
+      ],
+      "steps": [
+        "从冻结 common/prompts.jsonl 取前 8 条固定记录；保留 sample_id、prompt_group_id、split 与完整文本 SHA256，每条按冻结 tokenizer 实际编码后最多 96 tokens，超限明确拒绝而非静默截断。",
+        "加载已冻结的 gemma2_2b_base / gemma2_2b_pt_l25_canonical，layer=25，记录真实 checkpoint 文件身份、tokenizer、dtype、device、依赖版本和源码身份。",
+        "对每条记录调用 capture_features，保留 activation、codes、reconstruction 的可复算小型张量文件及 shape/finite 统计。",
+        "通过 ModelAdapter.assert_identity_patch，并独立保存原始 forward_logits 与原 activation 写回 logits 的最大绝对误差；使用 rtol=1e-4、atol=1e-4。",
+        "在第一条记录选择绝对值最大且非零的 feature，平局按较小 feature_id；冻结该选择，再用 evaluate_edit(replacements={id:0.0}) 对同一条记录做消融。若所有 codes 为零则记为真实观测，转用下一个固定输入，全部为零则报告 BLOCKED_NO_ACTIVE_FEATURE。",
+        "用实际 snapshot 与 decoder 复算被修改 code、activation 和 logits 差异；消融误差或无变化按实际记录，不预设改善指标。",
+        "保存完整命令、退出码、原始产物、正反检查与范围差异；本题可保持产品源码无改动。"
+      ],
+      "positive_checks": [
+        "8 条输入各有且仅有一个对应 capture 记录，输入 ID/hash 与真实 tokens 对齐。",
+        "activation width、SAE code width、重建 width 与加载对象一致，全部 finite。",
+        "恒等写回满足冻结 allclose 容差，误差来自真实 logits。",
+        "消融后的选定 code 为 0，未选 code 和重建残差按 evaluate_edit 原有规则保留。",
+        "相同冻结输入与 checkpoint 的重复调用在声明容差内一致。"
+      ],
+      "negative_checks": [
+        "空 prompt、超预算 prompt 在实验 runner 中拒绝并保留失败退出码。",
+        "越界 feature_id 传入真实 API 必须报错，不能裁剪成合法 ID。",
+        "未知 hook 或越界 layer 在实际 adapter 中拒绝，不能返回空张量当成功。",
+        "缺少 checkpoint、输入 manifest 不匹配时记为 BLOCKED/FAIL，不能换成随机或 toy 权重。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "capture_rows.jsonl",
+        "captures.pt",
+        "identity_rows.jsonl",
+        "ablation.json",
+        "logit_vectors.pt"
+      ],
+      "budget": {
+        "max_prompts": 8,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 1,
+        "max_seconds": 900,
+        "max_new_artifact_mb": 64
+      },
+      "entrypoints": [
+        "saebase.api.load_registered",
+        "saebase.api.capture_features",
+        "saebase.api.evaluate_edit",
+        "saebase.api.ModelAdapter.assert_identity_patch"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "data"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-DATA",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R02",
+      "title": "让 capture 的 top_k 参数真实生效",
+      "goal": "修复 capture 配置中已有 top_k 与执行代码硬编码 10 的不一致，同时保留默认行为。题目针对真实返回 feature 数量和排序。",
+      "profile": "gemma_inference",
+      "seed_fixture": null,
+      "allowed_paths": [
+        "tasks/capture/operation.py",
+        "conf/task/capture.yaml",
+        "tests/wp21/R02/**"
+      ],
+      "context_paths": [
+        "tasks/capture/operation.py",
+        "conf/task/capture.yaml",
+        "tasks/sae_runtime.py",
+        "saebase/api/features.py"
+      ],
+      "steps": [
+        "先保存一次baseline真实运行：conf/task/capture.yaml的top_k=10已公开，但operation固定min(10,codes.numel())；显式top_k=3时返回10个feature，记录这一错误行为及其原始codes。",
+        "在 capture operation 内读取并严格验证 top_k。接受非 bool 的正整数；实际输出数量为 min(top_k,d_sae)，默认 10。",
+        "本题固定六个完整真实配置运行，使用同一prompt/checkpoint/layer/dtype且独立experiment leaf：baseline top_k=3；修复后top_k=3、7、10；修复后省略top_k；修复后top_k=d_sae+1。其中d_sae从冻结真实SAE读取。",
+        "用保存的原始 codes 独立计算按绝对值下降的 top features；相同绝对值的 feature_id 顺序固定为升序。输出的 activation 保留原符号。",
+        "以baseline硬编码10的实际codes与源定义作为旧默认行为依据，比较修复后top_k=10和省略top_k的结果；除明确的平局排序规则和requested/effective参数记录外，原字段含义与数值保持一致。",
+        "在启动模型加载前验证scalar类型和正范围；合法的大k在获得真实d_sae后显式截至d_sae，记录requested_k和effective_k。负例在加载前拒绝，不额外占用这六个model trial，但其命令、退出码与耗时仍计入本题总预算。"
+      ],
+      "positive_checks": [
+        "k=3、7、10 分别返回 3、7、10 个 feature，并与保存的真实 code 数值一致。",
+        "修复后省略top_k与显式10等效，原字段active_count、feature_count、reconstruction_l2含义保持；六个真实配置都有原始证据。",
+        "输出排序按绝对值下降、feature_id 升序处理平局。",
+        "top_k 大于 d_sae 时返回全部 d_sae 个 feature，requested/effective 数量明确。"
+      ],
+      "negative_checks": [
+        "top_k=0、-1 在模型加载之前失败。",
+        "top_k=true、1.5、'3' 等错误类型不能被 int() 静默接受；Hydra 会转成 int 的正常 CLI top_k=3 属于合法值。",
+        "任何 fixture 或独立 runner 绕过 task 配置后直接改变结果条数不能作为参数贯通证据。",
+        "无真实 codes 的手工 top_features JSON 不构成正例。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "baseline_top_k.json",
+        "top_k_comparison.jsonl",
+        "capture_codes.pt",
+        "default_compatibility.json",
+        "parameter_negative_checks.json"
+      ],
+      "budget": {
+        "max_prompts": 1,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 6,
+        "max_seconds": 900,
+        "max_new_artifact_mb": 64
+      },
+      "entrypoints": [
+        "python -m saebase.runtime.train task=capture task.execute=true task.top_k=3",
+        "tasks.capture.operation.execute"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "code",
+        "tree",
+        "context",
+        "localization",
+        "review"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-LOCALE",
+        "CT-CONTEXT",
+        "CT-AST",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R03",
+      "title": "新增真实 token_position 参数",
+      "goal": "为 capture 新增 token_position 参数，使同一 prompt 可选择明确 token 的 activation，默认仍为最后 token。参数必须传到 ActivationSite 而非仅写进日志。",
+      "profile": "gemma_inference",
+      "seed_fixture": null,
+      "allowed_paths": [
+        "tasks/capture/operation.py",
+        "conf/task/capture.yaml",
+        "tests/wp21/R03/**"
+      ],
+      "context_paths": [
+        "tasks/capture/operation.py",
+        "conf/task/capture.yaml",
+        "saebase/api/model.py",
+        "saebase/api/features.py",
+        "saebase/store/identity.py"
+      ],
+      "steps": [
+        "新增 task.token_position，默认 -1；仅接受非 bool 整数，合法范围为 [-L,L-1]，L 为实际 tokenizer 输出 token 数量。",
+        "在 capture operation 构造相同 layer/hook、指定 position 的 ActivationSite，保留共享 tasks.sae_runtime 与 runtime 路径模块不变。",
+        "对 common/prompts.jsonl 的前两条记录分别运行 -1 和 0，完整保存实际 token IDs、requested_position 与归一化 resolved_position。位置 0 明确指 tokenizer 输出中的第一个 token，包含其原有 BOS 规则。",
+        "通过公共 ModelAdapter.capture 对相同 token IDs 与 site 重新取得 activation，验证 task 真正使用指定位置。",
+        "参数与 resolved position 进入配置/运行身份；若本题 runner 使用缓存，position 必须进入 cache identity。",
+        "保留默认 -1 的旧字段和原有结果含义。"
+      ],
+      "positive_checks": [
+        "两条记录、两个位置得到四条实际结果，每条 resolved_position 与 token IDs 可核对。",
+        "任务输出 activation 与公共 API 相同位置的 capture 在冻结容差内一致。",
+        "未传参数与显式 -1 等效。",
+        "位置改变会改变 site/config identity；不要求所有输入的 activation 数值必然不同。"
+      ],
+      "negative_checks": [
+        "位置 L 与 -L-1 明确拒绝，并且没有成功结果文件。",
+        "true、1.2、null 等非法类型在实际 operation 拒绝，不能截断成整数。",
+        "空 token 序列被拒绝。",
+        "请求 0 却读取 -1 缓存的结果必须被本题检查发现。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "token_position_rows.jsonl",
+        "token_ids.json",
+        "position_captures.pt",
+        "position_identity_checks.json"
+      ],
+      "budget": {
+        "max_prompts": 2,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 4,
+        "max_seconds": 900,
+        "max_new_artifact_mb": 64
+      },
+      "entrypoints": [
+        "tasks.capture.operation.execute",
+        "saebase.api.ActivationSite",
+        "saebase.api.ModelAdapter.capture"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "code",
+        "tree",
+        "context",
+        "localization",
+        "review",
+        "data"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-LOCALE",
+        "CT-CONTEXT",
+        "CT-AST",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-DATA",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R04",
+      "title": "增加真实重建误差并保持旧指标含义",
+      "goal": "为 capture 增加 reconstruction_error_l2=||activation-reconstruction||₂。现有 reconstruction_l2 是重建向量的范数，必须保留其旧含义。",
+      "profile": "gemma_inference",
+      "seed_fixture": null,
+      "allowed_paths": [
+        "tasks/capture/operation.py",
+        "tests/wp21/R04/**"
+      ],
+      "context_paths": [
+        "tasks/capture/operation.py",
+        "saebase/api/features.py",
+        "tasks/benchmark/backend/metrics/core.py"
+      ],
+      "steps": [
+        "先记录当前 reconstruction_l2 的实际定义为 vector_norm(snapshot.reconstruction)，避免把旧字段重新解释成误差。",
+        "新增 reconstruction_error_l2，使用 snapshot.activation.float() 与 snapshot.reconstruction.float() 的差计算；原字段继续计算重建向量范数。",
+        "用 common/prompts.jsonl 前 4 条记录、同一真实 Gemma/SAE 运行 capture，保存 activation 与 reconstruction 的原始小型张量。",
+        "独立复算两个范数及可选的 MSE 对照，明确 L2 与 MSE 的单位和归一化差别；新正式字段只要求 L2。",
+        "对默认 capture 的其它字段做兼容比较。"
+      ],
+      "positive_checks": [
+        "每条记录的 reconstruction_error_l2 与原始向量差的独立 L2 计算一致，rtol=1e-5、atol=1e-5。",
+        "旧 reconstruction_l2 仍等于 reconstruction 向量范数。",
+        "输出指标为有限非负数，字段名与公式在 report 中对应。",
+        "记录数、prompt SHA、feature_count 等旧接口保持。"
+      ],
+      "negative_checks": [
+        "检查器必须发现把 ||reconstruction||₂ 再复制一遍当误差的错误实现。",
+        "检查器必须发现把 MSE 或 squared L2 填进新字段的错误实现。",
+        "非有限 activation/reconstruction 的小型负例必须失败，不能序列化 NaN 为成功。",
+        "shape 不匹配的负例不得通过广播悄悄产生指标。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "reconstruction_rows.jsonl",
+        "reconstruction_vectors.pt",
+        "formula_recheck.json",
+        "compatibility.json"
+      ],
+      "budget": {
+        "max_prompts": 4,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 4,
+        "max_seconds": 900,
+        "max_new_artifact_mb": 64
+      },
+      "entrypoints": [
+        "tasks.capture.operation.execute",
+        "saebase.api.FeatureSnapshot.activation",
+        "saebase.api.FeatureSnapshot.reconstruction"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "code",
+        "tree",
+        "context",
+        "localization",
+        "review"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-LOCALE",
+        "CT-CONTEXT",
+        "CT-AST",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R05",
+      "title": "删除临时完整 code 导出功能",
+      "goal": "删除题目 seed 提供的完整 SAE codes 诊断导出功能，并证明标准 capture 仍可真实运行。删除对象仅是已标明的实验诊断出口。",
+      "profile": "gemma_inference",
+      "seed_fixture": "R05_diagnostic_export",
+      "allowed_paths": [
+        "tasks/capture/wp21_full_codes.py",
+        "conf/task/wp21_full_codes.yaml",
+        "tests/wp21/R05/**"
+      ],
+      "context_paths": [
+        "tasks/capture/operation.py",
+        "tasks/sae_runtime.py",
+        "saebase/api/features.py",
+        "conf/task/capture.yaml"
+      ],
+      "steps": [
+        "按 fixture manifest 应用本题 seed；在独立进程执行 tests/wp21/R05/before.py 的真实模式，使用一条固定 prompt 保存原诊断完整 codes 产物和 source hashes。",
+        "阅读 seed 中诊断 wrapper、配置与显式入口关系，列出拟删除的导出 API/开关，确认标准 capture 不属于删除目标。",
+        "删除诊断代码、配置和可发现入口；可以保留一个明确报 retired 的兼容入口，但其中不得保留导出实现或成功返回旧 payload。",
+        "用 fresh process 调旧入口/旧配置，确认明确报错或 retired 状态，不能忽略旧开关后返回成功。",
+        "再用原标准 capture operation 对相同真实 prompt 运行，确认正常 top_features、active_count 等结果保持。",
+        "历史 before 诊断产物作为考试证据保留；后续标准 capture 的序列化产物不再包含完整 codes 数组。"
+      ],
+      "positive_checks": [
+        "before 证据由真实 model/SAE capture 生成。",
+        "after fresh process 的旧诊断入口不可继续导出完整 codes。",
+        "标准 capture 的真实结果与删除前兼容，保留 top_features 摘要。",
+        "代码 diff 只移除指定实验功能，历史 before 产物及其 SHA256 不变。"
+      ],
+      "negative_checks": [
+        "旧配置或旧参数仍可悄悄导出完整 codes 判失败。",
+        "通过删除 saebase.api.capture_features 或剪除标准 capture 规避诊断导出判失败。",
+        "通过清理历史实验输出模拟功能删除判失败。",
+        "仅修改测试 fixture 的预期、注释或文档而保留活动导出路径判失败。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "before_export.json",
+        "after_retirement_check.json",
+        "standard_capture_after.json",
+        "historical_hash_comparison.json",
+        "retired_surface_inventory.json"
+      ],
+      "budget": {
+        "max_prompts": 1,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 2,
+        "max_seconds": 900,
+        "max_new_artifact_mb": 64
+      },
+      "entrypoints": [
+        "python tests/wp21/R05/before.py --help",
+        "tasks.capture.operation.execute"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "code",
+        "tree",
+        "context",
+        "localization",
+        "review",
+        "recovery"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-LOCALE",
+        "CT-CONTEXT",
+        "CT-AST",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-RECOVERY",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R06",
+      "title": "挂载带明确划分的新数据集",
+      "goal": "把 WP21MiniPairs 接入 SAEBase 的 dataset registry、配置、reader 与真实模型消费流程。输入固定为 24 条原创工程 prompts，不以这 24 条代表任何标准数据集总体。",
+      "profile": "gemma_inference",
+      "seed_fixture": null,
+      "allowed_paths": [
+        "datasets/WP21MiniPairs/**",
+        "datasets/plugins.py",
+        "datasets/prompts.py",
+        "datasets/artifacts.py",
+        "datasets/artifact_layout.py",
+        "datasets/prompt_schema.py",
+        "conf/dataset/wp21_mini_pairs.yaml",
+        "tests/wp21/R06/**"
+      ],
+      "context_paths": [
+        "datasets/plugins.py",
+        "datasets/prompts.py",
+        "datasets/artifacts.py",
+        "datasets/artifact_layout.py",
+        "datasets/prompt_schema.py",
+        "saebase/datasets/__init__.py",
+        "saebase/registry.py",
+        "conf/dataset/ioi.yaml",
+        "models/gemma2_2b_base/model_task_dataset_compatibility.py"
+      ],
+      "steps": [
+        "common fixture保持只读。把frozen fixtures/common/prompts.jsonl复制到本题允许目录tests/wp21/R06/data/WP21MiniPairs/gemma2_2b_base/v1/prompts.jsonl，matching manifest也放该v1目录；禁止另建仓库根data/。新dataset canonical ID为WP21MiniPairs；24 records、12 groups，每组两条，train/validation/test分别12/6/6 records且group互不重叠。原文本、sample_id、prompt_group_id、split保持不变。",
+        "在物理 datasets/WP21MiniPairs/ 实现读取与注册，增加 conf/dataset/wp21_mini_pairs.yaml；通过已有 register_dataset 注册，统一新 key 在实际 reader、canonical/alias、Gemma 可用性检查路径的解析。",
+        "给新数据集生成来源和字节 SHA256 manifest，注明这些是工程 prompts；样本数/ID/组/划分从实际记录重算。",
+        "证明 fresh process 的 registry list 可发现 WP21MiniPairs，Hydra 组合 dataset=wp21_mini_pairs 后 cfg.dataset.name 正确且正常配置校验通过。",
+        "通过新 DatasetPlugin.setup 读取全部 24 条，检查三个显式 split；随后选 validation 的前 4 条，通过现有真实 Gemma/SAE capture 消费，不用 task.prompt 固定字符串绕过新 reader。",
+        "run evidence 将每条 capture 绑定读取后的 sample_id、prompt_group_id、split、prompt hash 和 dataset manifest identity。",
+        "保持现有 IOI 数据集与已知公共任务的兼容；新数据集 metadata/代码变化只生成候选 Context/Code 差异。"
+      ],
+      "positive_checks": [
+        "新 key 经 fresh process 注册、列举、Hydra、validator、reader、真实 capture 闭环全部可用。",
+        "总24条，train12/validation6/test6，12个group，无sample或group跨split重叠。",
+        "至少4条 validation 输入的真实 capture 与新 reader 输出一一对应。",
+        "同样 frozen data/config 再加载顺序、IDs及hash稳定。",
+        "已有IOI配置/读取路径仍通过原有检查。"
+      ],
+      "negative_checks": [
+        "重复 sample_id、同一 group 分配到两个 split、未知 split 明确拒绝。",
+        "manifest记录数量或文件hash被篡改明确拒绝，不能只信字符串source。",
+        "空prompt、缺失sample_id/prompt_group_id、非字符串prompt明确拒绝。",
+        "未知dataset key或任意路径 traversal 不得自动落入新dataset默认值。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "dataset_manifest.json",
+        "dataset_registry_checks.json",
+        "dataset_split_inventory.json",
+        "dataset_capture_rows.jsonl",
+        "dataset_captures.pt",
+        "existing_dataset_regression.json"
+      ],
+      "budget": {
+        "max_prompts": 24,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 4,
+        "max_seconds": 1200,
+        "max_new_artifact_mb": 96
+      },
+      "entrypoints": [
+        "saebase.registry.register_dataset",
+        "saebase.registry.get_dataset_plugin",
+        "saebase.registry.list_registered_dataset_keys",
+        "saebase.datasets.prompts.read_prompts",
+        "saebase.api.capture_features"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "code",
+        "tree",
+        "context",
+        "localization",
+        "review",
+        "data"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-LOCALE",
+        "CT-CONTEXT",
+        "CT-AST",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-DATA",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R07",
+      "title": "删除临时数据集并保留历史实验",
+      "goal": "移除 instructor seed 的 WP21RetiredPrompts dataset、别名及活动配置依赖，使新运行无法选择它，同时历史数据与真实结果继续可读。",
+      "profile": "gemma_inference",
+      "seed_fixture": "R07_retired_dataset",
+      "allowed_paths": [
+        "datasets/wp21_retired_prompts.py",
+        "conf/dataset/wp21_retired_prompts.yaml",
+        "tests/wp21/R07/**"
+      ],
+      "context_paths": [
+        "saebase/registry.py",
+        "datasets/plugins.py",
+        "datasets/prompts.py",
+        "datasets/prompt_schema.py",
+        "saebase/api/features.py"
+      ],
+      "steps": [
+        "应用 R07 seed；使用 before.py --help 确认参数后，以 frozen dataset fixture 通过 seed 的真实 DatasetPlugin.setup 消费至少2条输入并进行真实Gemma capture。",
+        "保存 canonical key WP21RetiredPrompts、alias wp21_retired_prompts、配置与引用依赖清单，以及before数据/结果/源码hash。",
+        "删除本题实验dataset module、活动注册入口与配置引用；对于保留的兼容入口应明确返回 retired 错误。",
+        "在 fresh process 重新加载可用组件，确认 get_dataset_plugin 对 canonical与alias均拒绝，list_registered_dataset_keys 不含临时key。",
+        "对原有IOI或本题shared prompt原始数据执行至少1次真实Gemma capture，以证明核心路径保留。",
+        "重读before的dataset文件、manifest、capture产物，字节hash不变；移除旧key的运行支持不等于销毁历史数据。"
+      ],
+      "positive_checks": [
+        "before阶段实际从seed dataset读取并由真实Gemma消费。",
+        "after fresh process canonical和alias都不可作为活动dataset运行。",
+        "所有活动配置/入口对旧key不再宣称可用；历史说明可保留并标retired。",
+        "历史原始数据与已完成结果字节完整，标准baseline仍执行成功。"
+      ],
+      "negative_checks": [
+        "只删配置而显式registration函数仍能成功挂载同名旧dataset判失败。",
+        "只删canonical但alias仍解析成功判失败。",
+        "只清空当前进程private registry，不变更活动入口判失败。",
+        "误删shared common prompts、其它dataset或历史实验目录判失败。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "before_dataset_run.json",
+        "retired_dataset_references.json",
+        "fresh_process_registry_checks.json",
+        "baseline_after.json",
+        "historical_hash_comparison.json"
+      ],
+      "budget": {
+        "max_prompts": 3,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 2,
+        "max_seconds": 900,
+        "max_new_artifact_mb": 64
+      },
+      "entrypoints": [
+        "python tests/wp21/R07/before.py --help",
+        "saebase.registry.get_dataset_plugin",
+        "saebase.registry.resolve_dataset_name",
+        "saebase.api.capture_features"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "code",
+        "tree",
+        "context",
+        "localization",
+        "review",
+        "data",
+        "recovery"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-LOCALE",
+        "CT-CONTEXT",
+        "CT-AST",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-DATA",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-RECOVERY",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R08",
+      "title": "挂载真正的新 pretrained 模型",
+      "goal": "在考试实验作用域挂载 ext.wp21.pythia14m，以真实 EleutherAI/pythia-14m pretrained 权重完成捕获与恒等写回。公开七任务的Gemma模型范围保持；本题验证external provider。",
+      "profile": "pythia14m_inference",
+      "seed_fixture": null,
+      "allowed_paths": [
+        "models/wp21_pythia14m.py",
+        "models/hf_hooks_backend.py",
+        "conf/model/wp21_pythia14m.yaml",
+        "tests/wp21/R08/**"
+      ],
+      "context_paths": [
+        "saebase/extensions/contracts.py",
+        "saebase/extensions/registry.py",
+        "saebase/extensions/runtime.py",
+        "models/hf_hooks_backend.py",
+        "models/hf_logits_backend.py",
+        "saebase/api/model.py",
+        "models/plugins.py"
+      ],
+      "steps": [
+        "使用冻结官方source https://huggingface.co/EleutherAI/pythia-14m ，revision=d31f659f077f9ea500c4d7faa999893d7f28cbdf。环境准备者提供已核对的本地snapshot；考生只从该snapshot加载，记录model.safetensors、config及tokenizer文件hash。",
+        "实现 models/wp21_pythia14m.py 的显式 factory 与 model-only ExtensionBundle，provider key=ext.wp21.pythia14m；factory使用AutoModelForCausalLM.from_pretrained(local_snapshot,local_files_only=True,use_safetensors=True)及同snapshot tokenizer，CPU float32、eval、关闭梯度。",
+        "声明HookSpec为layer2、blocks.2.hook_resid_post、width128；官方config为6层GPTNeoX。使用saebase.extensions.register_extension显式注册，import模块本身不自动执行下载/加载/注册。",
+        "适配HFHooksModel的GPTNeoX层路径gpt_neox.layers；可用局部subclass或对既有backend做小范围扩展，保留原model.layers和transformer.h行为。",
+        "配置文件的filesystem/model slug使用wp21_pythia14m，provider_key单独记录ext.wp21.pythia14m；不要把含点provider ID作为runtime的受限路径片段。",
+        "在fresh process显式注册后，经external_model(key).factory加载、包装ModelAdapter，对common前4条prompt调用tokens、forward_logits、capture、assert_identity_patch。",
+        "保存每条真实tokens、128维activation、logits及恒等误差，rtol=1e-4、atol=1e-4；同时确认官方registry未添加该实验key。",
+        "本题不使用SAE，evidence中的sae明确为未使用；不能调用需要model+SAE的load_external_pair后虚构SAE来凑接口。"
+      ],
+      "positive_checks": [
+        "实际模型架构GPTNeoXForCausalLM、层数6、宽128，来自固定pretrained文件且state/filehash一致。",
+        "四条capture均由真实HF forward hook得到，shape为128且finite。",
+        "恒等写回真实logits满足冻结容差。",
+        "显式registration之前provider不可发现，之后可发现；重复注册被拒绝。",
+        "既有两种HF层路径兼容且官方七任务模型范围未扩容。"
+      ],
+      "negative_checks": [
+        "使用from_config、随机权重、toy、已有模型换alias均不能通过真实挂载验收。",
+        "错误revision/hash或缺失snapshot必须失败，不能自动联网切换main/latest。",
+        "未知layer、错误hook、声明width与实际不符必须拒绝。",
+        "重复provider ID不得覆盖先前注册。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "external_model_manifest.json",
+        "provider_registry_checks.json",
+        "pythia14m_capture_rows.jsonl",
+        "pythia14m_tensors.pt",
+        "identity_patch_checks.json",
+        "existing_backend_regression.json"
+      ],
+      "budget": {
+        "max_prompts": 4,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 1,
+        "max_seconds": 900,
+        "max_new_artifact_mb": 64
+      },
+      "entrypoints": [
+        "saebase.extensions.ExternalModel",
+        "saebase.extensions.ExtensionBundle",
+        "saebase.extensions.register_extension",
+        "saebase.extensions.registry.external_model",
+        "models.hf_hooks_backend.HFHooksModel",
+        "saebase.api.ModelAdapter"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "code",
+        "tree",
+        "context",
+        "localization",
+        "review",
+        "data"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-LOCALE",
+        "CT-CONTEXT",
+        "CT-AST",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-DATA",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R09",
+      "title": "删除临时模型 provider",
+      "goal": "删除 seed 中 ext.wp21.retired_gemma 实验provider与配置入口，保留真实Gemma模型文件、原内置模型和历史测量。此题model-only，不退役任何官方model。",
+      "profile": "gemma_inference",
+      "seed_fixture": "R09_retired_model",
+      "allowed_paths": [
+        "models/wp21_retired_gemma.py",
+        "conf/model/wp21_retired_gemma.yaml",
+        "tests/wp21/R09/**"
+      ],
+      "context_paths": [
+        "saebase/extensions/contracts.py",
+        "saebase/extensions/registry.py",
+        "saebase/api/model.py",
+        "saebase/api/__init__.py",
+        "models/plugins.py"
+      ],
+      "steps": [
+        "应用R09 seed，在fresh process显式注册ext.wp21.retired_gemma，通过其factory真实加载Gemma并做2条capture/identity patch，保留provider与checkpoint的不同身份。 种子before.py只提供单prompt的可用性见证；删除生产provider前，可在本题tests/wp21/R09/内新增薄runner，加载一次provider后对common前2条完成capture和identity patch，并保存独立新leaf。不要重复覆盖种子固定before叶子。",
+        "记录provider的活动代码/配置/显式注册入口，说明它只是临时provider，底层Gemma checkpoint仍属于共享只读资源。",
+        "删除临时provider实现和活动配置入口，或保留显式retired兼容入口；不改官方Gemma registry。",
+        "fresh process尝试原provider加载必须失败，list_extensions不得列出该key；不能仅在当前进程清空registry。",
+        "从models.gemma2_2b_base.gemma2_2b_base.load_model直接加载官方Gemma，包装公共ModelAdapter，在相同prompt上真实capture/identity patch并对照before底层checkpoint身份；本题全程可为model-only，SAE身份明确为未使用。",
+        "验证历史provider运行结果可读且hash不变；shared model/tokenizer/SAE caches保持只读。"
+      ],
+      "positive_checks": [
+        "before经临时provider真实执行，而非只登记。",
+        "after fresh process无活动临时provider；旧入口明确拒绝。",
+        "官方Gemma model-only加载、capture与identity patch仍真实可用。",
+        "checkpoint与历史实验bytes不被删除。"
+      ],
+      "negative_checks": [
+        "把provider改名但留一个等效旧key入口判失败。",
+        "清除shared checkpoint/cache来制造模型不可用判失败。",
+        "错误退役models/plugins.py中的Gemma官方key判失败。",
+        "只有list变化、旧factory仍正常公开可调用判失败。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "before_provider_run.json",
+        "retired_provider_references.json",
+        "provider_after_checks.json",
+        "official_gemma_after.json",
+        "historical_hash_comparison.json"
+      ],
+      "budget": {
+        "max_prompts": 3,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 2,
+        "max_seconds": 900,
+        "max_new_artifact_mb": 64
+      },
+      "entrypoints": [
+        "python tests/wp21/R09/before.py --help",
+        "saebase.extensions.list_extensions",
+        "saebase.extensions.registry.external_model",
+        "models.gemma2_2b_base.gemma2_2b_base.load_model",
+        "saebase.api.ModelAdapter"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "code",
+        "tree",
+        "context",
+        "localization",
+        "review",
+        "recovery"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-LOCALE",
+        "CT-CONTEXT",
+        "CT-AST",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-RECOVERY",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R10",
+      "title": "新增已注册的 feature summary 任务",
+      "goal": "新增 wp21_feature_summary task，读取多条真实prompt并汇总SAE feature统计；任务实现放入既有capture源码类别，使用现有TaskModule/Registry/Hydra链。",
+      "profile": "gemma_inference",
+      "seed_fixture": null,
+      "allowed_paths": [
+        "tasks/capture/wp21_feature_summary.py",
+        "tasks/plugins.py",
+        "conf/task/wp21_feature_summary.yaml",
+        "datasets/plugins.py",
+        "models/gemma2_2b_base/model_task_dataset_compatibility.py",
+        "tests/wp21/R10/**"
+      ],
+      "context_paths": [
+        "saebase/registry.py",
+        "saebase/runner.py",
+        "saebase/results.py",
+        "tasks/plugins.py",
+        "tasks/capture/task.py",
+        "datasets/plugins.py",
+        "models/gemma2_2b_base/model_task_dataset_compatibility.py",
+        "saebase/runtime/train.py"
+      ],
+      "steps": [
+        "实现TaskModule子类并通过tasks/plugins.py注册唯一task key wp21_feature_summary，配置放conf/task/wp21_feature_summary.yaml；源码放tasks/capture/wp21_feature_summary.py，不新建第八个顶层task目录。",
+        "明确task.path必须以wp21_feature_summary开头，source归属capture和运行task名是不同职责。新task自己使用公共load_registered/capture_features，不向七操作固定列表硬塞第八操作。",
+        "配置max_prompts默认4且范围1..8，feature_limit默认5且范围1..20；本题实际使用冻结common的前4条，输入来源与dataset identity完整。",
+        "为新task补齐仅必要的dataset/model兼容声明，使runtime.train的registry/config验证通过；不放宽未知task或未知model。",
+        "每条保存真实codes，定义per_prompt_active_count=count_nonzero(codes)，全体mean_active_count为其算术均值；top_features依据各feature的mean_abs_activation排序，平局feature_id升序。",
+        "返回saebase.results.EvaluationResult并将统计写入规范metrics/tables目录；记录实际sample IDs/count。",
+        "从fresh process通过python -m saebase.runtime.train task=wp21_feature_summary task.execute=true运行，而非仅直接调用类。"
+      ],
+      "positive_checks": [
+        "registry列举、Hydra选择、compatibility验证、runner dispatch、真实数据消费与结果均贯通。",
+        "4条真实codes独立复算的mean_active_count与mean_abs_activation一致。",
+        "EvaluationResult.ok、task、model_key、sae_key、summary与产物相符。",
+        "原capture和未知key拒绝行为保持。"
+      ],
+      "negative_checks": [
+        "重复task注册必须拒绝，不可覆盖旧task。",
+        "未知task/model/dataset不能静默映射到本task。",
+        "max_prompts=0/9或feature_limit=0/21、bool等错误值在模型加载前拒绝。",
+        "仅新增一个未被registry/runner调用的辅助函数不能视为新增task。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "task_registry_checks.json",
+        "feature_summary_rows.jsonl",
+        "feature_summary_codes.pt",
+        "feature_summary_recompute.json",
+        "legacy_capture_regression.json"
+      ],
+      "budget": {
+        "max_prompts": 4,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 1,
+        "max_seconds": 1200,
+        "max_new_artifact_mb": 64
+      },
+      "entrypoints": [
+        "saebase.registry.TaskModule",
+        "saebase.registry.register_task",
+        "saebase.runner.run_task",
+        "python -m saebase.runtime.train task=wp21_feature_summary task.execute=true"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "code",
+        "tree",
+        "context",
+        "localization",
+        "review",
+        "data"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-LOCALE",
+        "CT-CONTEXT",
+        "CT-AST",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-DATA",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R11",
+      "title": "退役临时已注册 task",
+      "goal": "删除 seed 中 wp21_capture_legacy 的注册、配置与实现入口，保留标准capture和历史任务输出。既有公开task集合保持。",
+      "profile": "gemma_inference",
+      "seed_fixture": "R11_retired_task",
+      "allowed_paths": [
+        "tasks/capture/wp21_capture_legacy.py",
+        "conf/task/wp21_capture_legacy.yaml",
+        "tests/wp21/R11/**"
+      ],
+      "context_paths": [
+        "saebase/registry.py",
+        "saebase/runner.py",
+        "tasks/plugins.py",
+        "tasks/capture/task.py",
+        "tasks/capture/operation.py"
+      ],
+      "steps": [
+        "应用R11 seed，通过tests/wp21/R11/before.py真实模式在fresh process注册wp21_capture_legacy，经run_task运行一条prompt；保留任务名、配置、source和measurement证据。",
+        "读取LegacyCaptureTask与register入口，核对它委托原CaptureTask的真实调用链。",
+        "删除临时task实现/注册入口/活动配置，或留下明确retired的兼容入口，禁止仍成功运行旧行为。",
+        "fresh process中get_task_plugin('wp21_capture_legacy')和旧显式入口均应明确失败；list_registered_task_keys不含旧key。",
+        "以标准capture在相同checkpoint和prompt上真实复跑；历史before结果hash不变。"
+      ],
+      "positive_checks": [
+        "before阶段经真实Registry/runner调用并得到真实capture。",
+        "after活动任务列表、旧配置和显式旧入口一致退役。",
+        "标准capture真正执行且原输出兼容。",
+        "原数据/模型/任务历史证据保留。"
+      ],
+      "negative_checks": [
+        "只删YAML却保留可用register()/task类旧出口判失败。",
+        "用registry private dict临时pop模拟删除判失败。",
+        "删标准capture或修改公共runner使所有未知task都成功判失败。",
+        "旧入口捕获异常并伪造ok结果判失败。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "before_task_run.json",
+        "retired_task_references.json",
+        "task_registry_after.json",
+        "standard_capture_after.json",
+        "historical_hash_comparison.json"
+      ],
+      "budget": {
+        "max_prompts": 1,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 2,
+        "max_seconds": 900,
+        "max_new_artifact_mb": 64
+      },
+      "entrypoints": [
+        "python tests/wp21/R11/before.py --help",
+        "saebase.registry.get_task_plugin",
+        "saebase.runner.run_task",
+        "tasks.capture.task.CaptureTask.run"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "code",
+        "tree",
+        "context",
+        "localization",
+        "review",
+        "recovery"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-LOCALE",
+        "CT-CONTEXT",
+        "CT-AST",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-RECOVERY",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R12",
+      "title": "新增实际执行的 reconstruction subtask",
+      "goal": "为benchmark增加task.subtask=reconstruction的真实执行分支，计算真实activation重建MSE。task.path负责目录，task.subtask负责行为选择，两者必须分别落实。",
+      "profile": "gemma_inference",
+      "seed_fixture": null,
+      "allowed_paths": [
+        "tasks/benchmark/operation.py",
+        "conf/task/benchmark.yaml",
+        "tests/wp21/R12/**"
+      ],
+      "context_paths": [
+        "tasks/benchmark/operation.py",
+        "conf/task/benchmark.yaml",
+        "tasks/sae_runtime.py",
+        "saebase/api/features.py",
+        "tasks/benchmark/backend/metrics/core.py",
+        "saebase/runtime/experiment_paths.py"
+      ],
+      "steps": [
+        "新增task.subtask默认空字符串，空值保留现有benchmark_config驱动完整benchmark行为；仅新值reconstruction进入小型重建子任务。",
+        "定义reconstruction分支通过真实load_registered/capture_features取得snapshot，指标为mean((activation.float()-reconstruction.float())**2)，不把vector norm当MSE。",
+        "设置task.path=benchmark/reconstruction并通过实际task.subtask dispatch执行；单独改path不得改变运算。",
+        "使用common前4条prompt，四个独立run leaf真实执行该subtask，保存原始向量和每条MSE。",
+        "额外用一条真实prompt的小型BenchmarkConfig调用默认benchmark路线，证明新增分支保留原默认能力。",
+        "未知subtask和无效类型在加载模型前失败，error记录明确说明受支持值。",
+        "当前默认benchmark loader未把task.device传给load_registered，因此默认路线实际使用CPU，即使task.device=cuda。记录实际device、内存与用时，不宣称已走GPU路线；硬件资源不足记为环境阻塞，不越权修改shared runtime或backend runner。"
+      ],
+      "positive_checks": [
+        "subtask=reconstruction真实执行，并产生4条可独立复算MSE。",
+        "task.path层级和subtask值在run/config身份中同时出现，含义明确。",
+        "同path却无subtask参数时不会偷偷改为reconstruction行为。",
+        "原默认benchmark_config路线用真实checkpoint完成至少core.l0或core.reconstruction_mse一项。",
+        "默认benchmark回归记录实际加载device；配置写cuda而实际CPU的差异明确可见，不伪报GPU执行。"
+      ],
+      "negative_checks": [
+        "未知subtask、null/列表等不支持类型拒绝，不能回退默认然后声称成功。",
+        "仅写入benchmark/reconstruction目录而实际执行旧函数判失败。",
+        "把squared L2或norm写成MSE，检查器应发现。",
+        "默认benchmark_config缺失依旧明确报错，不因新分支而吞掉。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "subtask_dispatch_checks.json",
+        "reconstruction_rows.jsonl",
+        "reconstruction_vectors.pt",
+        "default_benchmark_regression.json",
+        "subtask_negative_checks.json"
+      ],
+      "budget": {
+        "max_prompts": 4,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 5,
+        "max_seconds": 1200,
+        "max_new_artifact_mb": 96
+      },
+      "entrypoints": [
+        "tasks.benchmark.operation.execute",
+        "python -m saebase.runtime.train task=benchmark task.execute=true task.subtask=reconstruction task.path=benchmark/reconstruction",
+        "saebase.api.capture_features"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "code",
+        "tree",
+        "context",
+        "localization",
+        "review"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-LOCALE",
+        "CT-CONTEXT",
+        "CT-AST",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R13",
+      "title": "删除 debug_norm 子任务并保留兄弟分支",
+      "goal": "移除 instructor seed 中 benchmark/debug_norm 的实际执行分支，保留同级reconstruction子任务与原默认benchmark行为。",
+      "profile": "gemma_inference",
+      "seed_fixture": "R13_debug_subtask",
+      "allowed_paths": [
+        "tasks/benchmark/wp21_subtasks.py",
+        "tasks/benchmark/operation.py",
+        "conf/task/wp21_benchmark_subtasks.yaml",
+        "tests/wp21/R13/**"
+      ],
+      "context_paths": [
+        "tasks/benchmark/operation.py",
+        "conf/task/benchmark.yaml",
+        "tasks/sae_runtime.py",
+        "saebase/api/features.py",
+        "saebase/runtime/experiment_paths.py"
+      ],
+      "steps": [
+        "应用R13 seed，它预先提供SUBTASKS debug_norm/reconstruction与真实benchmark operation dispatch；无需R12先完成。",
+        "在before.py真实模式分别运行debug_norm和reconstruction，保存同一prompt的真实输出；debug_norm计算activation范数，reconstruction计算MSE。",
+        "删除debug_norm的计算实现、dispatch项和活动配置/示例；对旧参数明确拒绝，不能映射为reconstruction。",
+        "使用fresh process经registered benchmark task再次运行reconstruction，独立从真实向量复算MSE。",
+        "用受限真实BenchmarkConfig验证没有subtask的原默认路线仍工作；保存删除前后的源码与历史产物hash。",
+        "当前默认benchmark loader未把task.device传给load_registered，因此默认路线实际使用CPU，即使task.device=cuda。记录实际device、内存与用时，不宣称已走GPU路线；硬件资源不足记为环境阻塞，不越权修改shared runtime或backend runner。"
+      ],
+      "positive_checks": [
+        "debug_norm曾在before阶段执行真实模型，而后在fresh process明确退役。",
+        "reconstruction兄弟分支保持同样公式与真实执行结果。",
+        "无subtask时的默认benchmark路线保留。",
+        "目录可保留历史debug_norm输出，但不能据此声称旧子任务仍为活动能力。",
+        "默认benchmark回归记录实际加载device；配置写cuda而实际CPU的差异明确可见，不伪报GPU执行。"
+      ],
+      "negative_checks": [
+        "移除一个配置文件但SUBTASKS映射仍能调用debug_norm判失败。",
+        "把debug_norm静默重定向到reconstruction判失败。",
+        "误删除整个benchmark operation或兄弟reconstruction判失败。",
+        "删除历史产物来掩盖行为变化判失败。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "before_subtasks.json",
+        "subtasks_after.json",
+        "reconstruction_after_vectors.pt",
+        "default_benchmark_regression.json",
+        "retired_subtask_references.json"
+      ],
+      "budget": {
+        "max_prompts": 1,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 4,
+        "max_seconds": 1200,
+        "max_new_artifact_mb": 96
+      },
+      "entrypoints": [
+        "python tests/wp21/R13/before.py --help",
+        "tasks.benchmark.operation.execute",
+        "tasks.benchmark.wp21_subtasks.execute"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "code",
+        "tree",
+        "context",
+        "localization",
+        "review",
+        "recovery"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-LOCALE",
+        "CT-CONTEXT",
+        "CT-AST",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-RECOVERY",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R14",
+      "title": "让 capture 按记录批量消费输入",
+      "goal": "修改现有capture，使task.max_prompts默认1、范围1..8，按真实dataset记录执行并保存对应IDs。保持原单prompt接口的兼容。",
+      "profile": "gemma_inference",
+      "seed_fixture": null,
+      "allowed_paths": [
+        "tasks/capture/operation.py",
+        "conf/task/capture.yaml",
+        "tests/wp21/R14/**"
+      ],
+      "context_paths": [
+        "tasks/capture/operation.py",
+        "conf/task/capture.yaml",
+        "tasks/sae_runtime.py",
+        "datasets/prompts.py",
+        "saebase/api/features.py"
+      ],
+      "steps": [
+        "记录基线_prompt只返回数据集第一条；在capture新增max_prompts默认1，严格接受非bool整数1..8。",
+        "当task.prompt非空时沿用原单prompt行为，max_prompts只能为1；用户给定单prompt与批量请求同时出现时明确拒绝，避免复制同一prompt。",
+        "当task.prompt为空时，使用datasets.prompts.read_prompts读取完整records；按文件原顺序取前N条，若可用条数不足N则报错，不静默少跑。",
+        "对common数据准备一份明确身份的IOI可用prompt文件，保留sample_id/prompt_group_id/split；配置dataset.prompt_file指向它，并用max_prompts=1、4、8真实运行。",
+        "一批内只加载同一真实model/SAE一次，对每条分别capture；每条结果绑定sample_id与prompt SHA。",
+        "max_prompts=1保留原顶级summary字段；批量返回records与n_requested/n_completed，并说明顶级summary是否仅保留单条模式，避免把第一条冒充aggregate。",
+        "原始records含重复ID、空prompt等情况先验证后运行，不生成部分成功的完整声明。"
+      ],
+      "positive_checks": [
+        "N=1、4、8实际运行条数一致；所有sample IDs、order、prompt hashes对应输入。",
+        "单条模式与原返回字段/数值兼容。",
+        "批量记录分别来自真实前向，而不是复用第一条张量。",
+        "同checkpoint加载复用与每条真实capture可由调用日志及原始tensor复查。"
+      ],
+      "negative_checks": [
+        "N=0、9、true、1.5等非法值在模型加载前拒绝。",
+        "不足N条、重复sample_id、空prompt拒绝且n_completed不伪造。",
+        "非空task.prompt与N>1冲突明确失败。",
+        "输入中出现不同prompt但全部结果复制第一条的错误实现必须被检查发现。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "batch_capture_rows.jsonl",
+        "batch_captures.pt",
+        "batch_input_manifest.json",
+        "single_mode_compatibility.json",
+        "batch_consumption_checks.json"
+      ],
+      "budget": {
+        "max_prompts": 24,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 3,
+        "max_seconds": 1200,
+        "max_new_artifact_mb": 96
+      },
+      "entrypoints": [
+        "tasks.capture.operation.execute",
+        "saebase.datasets.prompts.read_prompts",
+        "python -m saebase.runtime.train task=capture task.execute=true task.max_prompts=8"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "code",
+        "tree",
+        "context",
+        "localization",
+        "review",
+        "data"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-LOCALE",
+        "CT-CONTEXT",
+        "CT-AST",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-DATA",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R15",
+      "title": "十二组 replacement 搜索与独立确认",
+      "goal": "用真实SAEBase intervention搜索两个feature与三个绝对replacement值，在两条validation prompt上最小化平均logit_delta_l2；冻结最佳配置后，用两条heldout test prompt各确认一次。目标仅是在给定replacement候选中尽量保持模型输出。",
+      "profile": "gemma_inference",
+      "seed_fixture": null,
+      "allowed_paths": [
+        "tests/wp21/R15/**"
+      ],
+      "context_paths": [
+        "saebase/api/features.py",
+        "tasks/intervene/operation.py",
+        "saebase/interventions/specs.py",
+        "saebase/interventions/results.py",
+        "saebase/store/identity.py"
+      ],
+      "steps": [
+        "从common train split取前2条作feature选择，validation split取前2条作搜索评估，test split前2条仅作最终确认；记录三个集合无sample/prompt_group重叠。test内容与结果在best_config冻结前不参与任何选择。",
+        "用真实capture计算选择集每个feature的mean absolute activation，按该值下降、ID升序取两个非零feature，并在评估前写入只读selection.json冻结IDs。若不足两个，报告明确阻塞，不扩大数据量。",
+        "冻结完整grid为两个feature IDs×replacement_values=[0.0,1.0,2.0]×两个validation prompt IDs，共12个不同trial IDs、6个feature/value候选。每次只替换一个feature；value是绝对SAE code值。",
+        "冻结优化目标J(f,v)=(delta_l2(f,v,p1)+delta_l2(f,v,p2))/2，取MIN。排序key为(J,feature_id,value)，J完全相等时按feature_id再value升序；两个validation结果缺任意一条，候选不具备完整目标，整个网格保持partial。",
+        "逐validation trial调用evaluate_edit(replacements={feature_id:value})，默认identity verification开启。保存baseline/edited logits、实际replacement code、logit_delta_l2、max_abs_logit_change及source/config/input身份。",
+        "独立复算12条测量及6个J，核对笛卡尔积缺项/重复；完整网格才可将argmin写入best_config.json，包含selection/grid/source/validation产物hash并冻结文件。",
+        "冻结best_config后，在此前未用于选择的两条test prompt上各运行一次该feature/value，共2次confirmation；保存confirmation_rows.jsonl和原始logits。不得根据test表现更换feature/value、追加候选或再次选择。",
+        "总干预trial固定14次，其中12次validation网格加2次heldout确认；另有2条train prompt的feature选择capture，全部记录计算与耗时。输出validation目标值、唯一best config及heldout实测值，明确小工程目标和小样本范围，不宣称科学改善。"
+      ],
+      "positive_checks": [
+        "validation恰好12个唯一完整组合，对应6个feature/value候选；每条均有真实模型测量与输入身份。",
+        "实际选定code等于绝对value，而非原值乘value；指标与真实logits独立复算一致。",
+        "六个目标J都按两条validation结果的算术均值计算，best_config确为冻结排序规则的argmin。",
+        "best_config在访问heldout结果之前冻结，其hash在确认后不变；test两条仅各运行该配置一次。",
+        "总14个干预trial完整，2条选择输入、2条validation与2条test来源及用途可复查；失败/缺项不补成0。",
+        "独立检查可发现一个使用最大值、错误均值或错误并列规则的selector；该检查可用小型数值负例，真实最佳配置仍来自真实12条网格。"
+      ],
+      "negative_checks": [
+        "重复或遗漏validation trial、NaN replacement或越界feature必须失败或明确partial，不能选择best并宣布完成。",
+        "把replacement当scale、最大化而非最小化J、错误处理平局，均必须被检查发现。",
+        "根据validation结果重新挑feature IDs、在best冻结前使用test内容/结果调参、确认后重新选择best，均判失败。",
+        "两条heldout test上测试多个候选、追加test试验或复写best_config判失败。",
+        "复制同一测量为不同trial，或仅改参数标签而没有真实forward，判失败。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "selection.json",
+        "grid.json",
+        "sweep_rows.jsonl",
+        "sweep_logits.pt",
+        "sweep_summary.csv",
+        "best_config.json",
+        "confirmation_rows.jsonl",
+        "confirmation_logits.pt",
+        "selection_objective_checks.json",
+        "grid_completeness.json"
+      ],
+      "budget": {
+        "max_prompts": 6,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 14,
+        "max_seconds": 1800,
+        "max_new_artifact_mb": 128
+      },
+      "entrypoints": [
+        "saebase.api.capture_features",
+        "saebase.api.evaluate_edit",
+        "saebase.api.edit_features"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "data"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-DATA",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R16",
+      "title": "中断后恢复真实六组搜索",
+      "goal": "让一个预先固定的六trial真实intervention参数枚举在完成两条后中断，并从新attempt继续，只执行未完成四条。此题目标是恢复与去重，不包含最优参数选择。",
+      "profile": "gemma_inference",
+      "seed_fixture": null,
+      "allowed_paths": [
+        "saebase/tools/wp21_sweep.py",
+        "tests/wp21/R16/**"
+      ],
+      "context_paths": [
+        "saebase/api/features.py",
+        "saebase/interventions/results.py",
+        "saebase/interventions/engine.py",
+        "saebase/store/identity.py",
+        "saebase/runtime/experiment_paths.py"
+      ],
+      "steps": [
+        "独立从common train前2条真实capture选择一个非零feature并冻结；用validation前2条×replacement_values=[0.0,1.0,2.0]形成6个唯一trial。它是固定参数枚举，全部六条同等执行，没有优化目标、best选择或heldout确认；无需R15输出。",
+        "实现一个薄的真实SAEBase搜索runner，计划身份包含源码、模型/SAE/tokenizer、输入、site、seed、完整参数grid；允许代码在saebase/tools/wp21_sweep.py。",
+        "attempt_001运行前2个trial后在提交边界主动以非零状态中断；每条成功trial原子提交完整结果和hash，保留stdout/stderr、退出码、partial状态。",
+        "attempt_002使用同一frozen plan和新目录，只读已提交两条，验证身份/hash后只实际运行余下四条；总ledger引用各原始结果，不覆盖前两条。",
+        "再次resume应零新增模型trial，返回已完成索引；原来两条和失败日志hash保持。",
+        "独立检查实际trial执行事件：6个unique trial累计成功执行各一次；必要的feature选择/identity baseline不混记为搜索trial。",
+        "对损坏、身份冲突、重复trial分别运行小型负面路径，保留其失败记录。"
+      ],
+      "positive_checks": [
+        "中断事件真实发生在2条成功提交之后，attempt_001为partial而非completed。",
+        "恢复确实运行4条，累计6个完整不同trial，已有2条未重算。",
+        "再次resume不新增trial，输出可由只读原始结果重建。",
+        "source/config/model/SAE/input/seed身份均参与resume校验。",
+        "前attempt及成功trial文件hash不变。"
+      ],
+      "negative_checks": [
+        "任何source/config/input/model/SAE/seed变化均拒绝跨身份resume。",
+        "已完成trial文件损坏或缺失必须阻塞，不能当成0或无痕重写。",
+        "duplicate trial_id或两个冲突结果均拒绝。",
+        "未完成trial不得仅凭存在目录或status=true算已完成。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "sweep_plan.json",
+        "attempt_001/status.json",
+        "attempt_002/status.json",
+        "trial_events.jsonl",
+        "final_trial_index.json",
+        "resume_identity_checks.json",
+        "historical_hash_comparison.json"
+      ],
+      "budget": {
+        "max_prompts": 4,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 6,
+        "max_seconds": 1800,
+        "max_new_artifact_mb": 128
+      },
+      "entrypoints": [
+        "saebase.api.evaluate_edit",
+        "saebase.interventions.results.ResultWriter",
+        "saebase.store.fingerprint"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "code",
+        "tree",
+        "context",
+        "localization",
+        "review",
+        "data",
+        "recovery"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-LOCALE",
+        "CT-CONTEXT",
+        "CT-AST",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-DATA",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-RECOVERY",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R17",
+      "title": "训练 seed 贯通与短程 SAE 复现",
+      "goal": "修复native SAELens adapter把seed固定为0的问题，完成三个每次1024训练token的真实小SAE训练，并在训练外固定输入上重载检查。这里只验证训练链与seed行为。",
+      "profile": "gemma_training",
+      "seed_fixture": null,
+      "allowed_paths": [
+        "tasks/train/backend/training.py",
+        "tasks/train/operation.py",
+        "conf/task/train.yaml",
+        "tests/wp21/R17/**"
+      ],
+      "context_paths": [
+        "tasks/train/backend/training.py",
+        "tasks/train/operation.py",
+        "conf/task/train.yaml",
+        "harness/github_development_doc/gpu-acceptance-20261027.md",
+        "saebase/api/features.py"
+      ],
+      "steps": [
+        "基线_saelens_train构造LanguageModelSAERunnerConfig(seed=0)。在TrainPlan新增严格非bool非负int的seed，历史默认0；task路径将cfg.seed传入plan，若显式plan.seed与cfg.seed冲突则拒绝。",
+        "将SAELens runner seed改为plan.seed，并使plan.json、checkpoint登记和恢复身份包含该seed；旧plan无seed按0解释。修改范围仅native training/task-owned代码，不改共享runtime。",
+        "固定backend=saelens、architecture=topk、d_in=2304、d_sae=64、k=8、hookpoint=blocks.25.hook_resid_post、steps=16、batch_size=64、ctx_len=16、distributed_gpus=1。SAELens训练token数是steps×batch_size=1024，不能再乘ctx_len。",
+        "从common train的12条构建本地训练corpus；如需重复以满足原生loader，确定性重复并记录每条原sample_id/prompt_group_id。validation/test样本不得进入训练。model与dataset revision/内容hash冻结，model_dtype及sae_dtype由gemma_training环境锁定，记录实际dtype。",
+        "执行seed=7、7、11三次真实原生SAELens训练，分别新run_name/输出目录，每次最多1024训练token，合计最多3072；用进程监督执行time budget，不能以SAELens函数内timeout字段未强制为由无限运行。",
+        "用原生SAE.load_from_disk重载每个实际checkpoint，再以冻结Gemma真实activation对common validation的6条做encode/decode，报告MSE与L0，记录文件hash与tensor统计。",
+        "相同seed两次在冻结同环境下比较checkpoint张量，预设rtol=1e-4、atol=1e-5；不满足则保留失败与原因。seed11至少证明已传到原生配置且真实训练发生，比较实际权重，不能仅靠目录seed。",
+        "Sparsify不属于本题真实运行；保持既有默认seed=0行为。若新seed字段可传给Sparsify而未支持，非零seed必须明确拒绝，不能悄悄忽略。"
+      ],
+      "positive_checks": [
+        "三次真实native训练均有原生日志、实际checkpoint与重载证据，每次训练token1024、总3072以内。",
+        "plan/task/native runner seed贯通，默认0兼容，冲突拒绝。",
+        "同seed checkpoint张量在预设容差内一致；不同seed配置真实不同且有实际权重比较记录。",
+        "heldout6条真实activation上的重载SAE输出shape正确、finite，MSE/L0由原始输出复算。",
+        "训练、validation的sample和group无交叉。"
+      ],
+      "negative_checks": [
+        "负seed、bool、非整数seed与task/plan冲突在训练前拒绝。",
+        "越过1024训练token/单次、3次总运行、单GPU或明确时间预算必须阻止。",
+        "随机伪造checkpoint、仅改seed标签、以synthetic model替代Gemma判失败。",
+        "训练corpus含validation/test或旧结果目录被覆盖判失败。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "training_corpus_manifest.json",
+        "native_plans.json",
+        "native_training_logs/",
+        "checkpoint_manifest.json",
+        "seed_reproducibility.json",
+        "heldout_metrics.jsonl",
+        "heldout_codes.pt"
+      ],
+      "budget": {
+        "max_prompts": 24,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 3,
+        "max_seconds": 2400,
+        "max_new_artifact_mb": 192
+      },
+      "entrypoints": [
+        "tasks.train.backend.training.TrainPlan",
+        "tasks.train.backend.training.run_training",
+        "tasks.train.backend.training.register_checkpoint",
+        "tasks.train.operation.execute"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "code",
+        "tree",
+        "context",
+        "localization",
+        "review",
+        "data",
+        "recovery"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-LOCALE",
+        "CT-CONTEXT",
+        "CT-AST",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-DATA",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-RECOVERY",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R18",
+      "title": "真实实验产物完整性与稳定配置身份",
+      "goal": "为真实SAEBase run增加可检查的artifact integrity manifest和canonical配置身份，检测字节篡改、缺失及配置变化。新身份与现有runtime run.json配置hash并列保留。",
+      "profile": "gemma_inference",
+      "seed_fixture": null,
+      "allowed_paths": [
+        "saebase/tools/experiment_integrity.py",
+        "tests/wp21/R18/**"
+      ],
+      "context_paths": [
+        "saebase/runtime/experiment_paths.py",
+        "tasks/capture/operation.py",
+        "saebase/store/identity.py",
+        "saebase/benchmarks/results.py"
+      ],
+      "steps": [
+        "先经真实capture运行common前2条，获得规范experiment leaf的metadata、metric/tensor与配置产物。",
+        "在saebase/tools/experiment_integrity.py实现薄的manifest create/verify工具；输入为一个已存在的本题owned run，路径必须在明确experiment root内，拒绝symlink/traversal。",
+        "冻结入清单的不可变文件集合，条目包含相对路径、字节大小、SHA256；manifest不包含它自身，明确排除尚会追加的命令日志、tmp与其它非目标文件，列明排除策略而非事后随意跳过。",
+        "将完全resolved的实验语义配置转为规范JSON（字典key排序、固定分隔、拒绝NaN），生成canonical_config_sha256；声明哪些临时输出路径/时间字段不属于实验语义配置，并给出固定字段列表。",
+        "保留metadata/run.json现有config_sha256及其名称/含义。新增canonical hash写在独立integrity manifest中，不编辑saebase/runtime。",
+        "验证未修改真实run通过，再在独立副本分别修改一个metric字节、删除一个tensor、改seed/参数；检查具体拒绝原因。",
+        "仅重排配置字典key应保持canonical hash；改变实际seed/model/input/参数必须改变它。校验原始run未被负例污染。"
+      ],
+      "positive_checks": [
+        "manifest列出的路径确实存在，大小/hash来自真实字节，非手写期望值。",
+        "真实原run校验通过；canonical hash可独立重算。",
+        "mapping key重排不改变canonical identity，实际参数变化改变。",
+        "现有runtime config_sha256原值保持，新增字段不冒充旧hash。",
+        "负例在独立副本执行，原始真实run的hash始终不变。"
+      ],
+      "negative_checks": [
+        "一个字节篡改、缺文件、同名不同内容均失败。",
+        "manifest里的../、绝对路径、symlink外逃拒绝。",
+        "NaN配置、重复文件条目、未声明跳过文件拒绝。",
+        "把空manifest或只验证文件名当完整性通过判失败。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "integrity_manifest.json",
+        "canonical_config.json",
+        "canonical_identity_checks.json",
+        "corruption_checks.json",
+        "original_run_hash_comparison.json"
+      ],
+      "budget": {
+        "max_prompts": 2,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 1,
+        "max_seconds": 900,
+        "max_new_artifact_mb": 96
+      },
+      "entrypoints": [
+        "saebase.runtime.experiment_paths.prepare_run",
+        "saebase.runtime.experiment_paths.artifact_path",
+        "saebase.api.capture_features",
+        "saebase.store.fingerprint"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "code",
+        "tree",
+        "context",
+        "localization",
+        "review",
+        "recovery"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-LOCALE",
+        "CT-CONTEXT",
+        "CT-AST",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-RECOVERY",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R19",
+      "title": "安全归档、精确清理与恢复一个真实 run",
+      "goal": "对一个已完成真实运行提供归档、校验、精确清理和恢复，证明操作只影响明确拥有的单个run，不跟随symlink或越界路径。",
+      "profile": "gemma_inference",
+      "seed_fixture": null,
+      "allowed_paths": [
+        "saebase/tools/experiment_archive.py",
+        "tests/wp21/R19/**"
+      ],
+      "context_paths": [
+        "saebase/runtime/experiment_paths.py",
+        "saebase/store/shards.py",
+        "tasks/capture/operation.py"
+      ],
+      "steps": [
+        "先创建本题独立真实capture run并保存至少1条模型测量。旁边建立另一个run目录与sentinel文件，记录其hash作为保护对照。",
+        "在saebase/tools/experiment_archive.py实现create/verify/cleanup/restore，输入必须包含明确experiment root与一个owned run相对路径；根据metadata/run.json核对run身份。不得允许root、dataset父级或任意目录整体清理。",
+        "归档内写入逐文件相对路径、size、SHA256与run身份manifest；只处理常规文件/目录，不沿symlink进入其它位置；本题archive自身放在目标run之外。",
+        "完成archive并独立验证后，cleanup才可删除该精确run；cleanup前再次核对源bytes与归档identity一致，拒绝中途变化。",
+        "restore到原目标的不存在/空位置，先安全展开到受限临时目录并验完整性，再提交；已存在非空目标拒绝覆盖。",
+        "重读恢复后的原始capture数据与metadata，逐文件hash等于归档前；不要求重跑模型。",
+        "分别测试../、绝对路径、symlink到sentinel、坏hash/截断archive、冲突目标；所有失败不得修改sentinel、兄弟run或原始归档。"
+      ],
+      "positive_checks": [
+        "操作前有真实SAEBase运行与可读原始产物。",
+        "archive/verify成功后精确cleanup仅删除指定owned run。",
+        "restore逐文件bytes一致且原metadata语义可读。",
+        "兄弟run与sentinel全过程hash不变。",
+        "归档工具独立自足，不依赖R18另一个agent的实现。"
+      ],
+      "negative_checks": [
+        "任何../、绝对路径、symlink或祖先目录目标拒绝。",
+        "损坏/截断/篡改archive、异常成员名或重复member拒绝。",
+        "已有非空restore目标、未验证archive的cleanup拒绝。",
+        "source在create后到cleanup前变化必须失败，禁止误删新数据。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "archive_manifest.json",
+        "archive.zip",
+        "archive_lifecycle_checks.json",
+        "sentinel_hash_comparison.json",
+        "restored_file_hashes.json",
+        "negative_archive_checks.json"
+      ],
+      "budget": {
+        "max_prompts": 1,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 1,
+        "max_seconds": 900,
+        "max_new_artifact_mb": 128
+      },
+      "entrypoints": [
+        "saebase.runtime.experiment_paths.prepare_run",
+        "saebase.api.capture_features",
+        "saebase.store.ShardedReader"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "code",
+        "tree",
+        "context",
+        "localization",
+        "review",
+        "recovery"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-STRUCT",
+        "CT-REVIEW",
+        "CT-LOCALE",
+        "CT-CONTEXT",
+        "CT-AST",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-RECOVERY",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    },
+    {
+      "id": "R20",
+      "title": "真实多阶段实验与故障后交接",
+      "goal": "在一个自给定工作流中贯通真实capture、intervene、benchmark及失败后重试，把每阶段结果关联到实际输入与上游证据。无需其它19位agent的代码或结果。",
+      "profile": "gemma_inference",
+      "seed_fixture": null,
+      "allowed_paths": [
+        "tests/wp21/R20/**"
+      ],
+      "context_paths": [
+        "saebase/api/features.py",
+        "saebase/store/collect.py",
+        "saebase/interventions/engine.py",
+        "saebase/benchmarks/schema.py",
+        "saebase/benchmarks/runner.py",
+        "saebase/benchmarks/results.py",
+        "saebase/benchmarks/report.py"
+      ],
+      "steps": [
+        "从common train选前2条用于冻结一个非零feature，从validation选前4条作为完整pipeline测量集合；冻结source/config/model/SAE/tokenizer/site/input身份，不使用test调参。",
+        "阶段A通过真实capture_features采集4条输入，保存activation/codes及完整sample身份。",
+        "阶段B用evaluate_edit在相同4条输入执行identity和该feature置零的消融，保存真实logits差异与对阶段A记录的引用。",
+        "阶段C用实际BenchmarkConfig与saebase.benchmarks.runner.execute(real=True)执行core.l0、core.reconstruction_mse、intervention.logit_delta_l2，条件含identity与同feature ablate；用真实pair loader且记录其来源，不注入toy。",
+        "每阶段记录parent artifact hash、自己的config与产物hash；benchmark的sample、site、checkpoint与A/B一致，指标独立复算可对上，明确每种指标的sample unit。",
+        "在另一个attempt完成A后注入一次已声明的B阶段失败（例如不合法feature ID），确认后续C不产生成功声明；保留失败事件、退出码及已经提交的A产物。",
+        "新attempt修正为冻结合法feature并从已验证A证据交接，完成B/C。若API实际重新前向必须如实记录，不把引用旧证据说成零计算缓存命中。",
+        "输出阶段表、原始数值、可浏览报告与失败归因；无需优化指标或宣称研究结论。"
+      ],
+      "positive_checks": [
+        "A/B/C全部执行真实SAEBase对应组件，原始输入、checkpoint与site一致。",
+        "完整pipeline每个metric的n_requested/n_valid/status与真实样本数一致，undefined/blocked不当作completed。",
+        "parent references确实能解析到既有字节及hash，不是随手填路径。",
+        "注入故障确实阻止成功下游；新attempt完成后旧失败日志与A产物保持。",
+        "最终结果可从冻结输入、公开命令和真实中间产物独立重放。"
+      ],
+      "negative_checks": [
+        "以状态JSON或模拟张量代替任一实际阶段判失败。",
+        "跨model/SAE/site/input引用旧capture或漏检parent hash判失败。",
+        "B失败后仍发布成功C、覆盖失败日志或把partial当completed判失败。",
+        "删除一条样本但仍报完整n_valid、只有report没有原始metrics判失败。"
+      ],
+      "required_artifacts": [
+        "contract_receipt.json",
+        "evidence.json",
+        "commands/0001.json",
+        "selfcheck.json",
+        "report.md",
+        "source_manifest.json",
+        "diff.patch",
+        "artifacts_manifest.json",
+        "expected_code_diff.json",
+        "review_candidate.json",
+        "pipeline_plan.json",
+        "stage_index.json",
+        "capture_rows.jsonl",
+        "capture_tensors.pt",
+        "intervention_rows.jsonl",
+        "intervention_logits.pt",
+        "benchmark_output/",
+        "failure_attempt.json",
+        "retry_attempt.json",
+        "pipeline_report.md"
+      ],
+      "budget": {
+        "max_prompts": 6,
+        "max_tokens_per_prompt": 96,
+        "max_trials": 3,
+        "max_seconds": 1800,
+        "max_new_artifact_mb": 192
+      },
+      "entrypoints": [
+        "saebase.api.capture_features",
+        "saebase.api.evaluate_edit",
+        "saebase.benchmarks.BenchmarkConfig.from_dict",
+        "saebase.benchmarks.runner.execute",
+        "saebase.benchmarks.results.read_metrics"
+      ],
+      "tags": [
+        "evidence",
+        "environment",
+        "resource",
+        "config",
+        "validation",
+        "interface",
+        "determinism",
+        "namespace",
+        "data",
+        "recovery"
+      ],
+      "contracts": [
+        "CT-BASE",
+        "CT-SCOPE",
+        "CT-TRUTH",
+        "CT-CHECK",
+        "CT-TRACE",
+        "CT-ERROR",
+        "CT-EVIDENCE",
+        "CT-ENV",
+        "CT-DETERMINISM",
+        "CT-INTERFACE",
+        "CT-DATA",
+        "CT-CONFIG",
+        "CT-RESOURCE",
+        "CT-RECOVERY",
+        "CT-NAMESPACE"
+      ],
+      "capability_status": "DESIGN_READY",
+      "grading": [
+        "真实行为40分：独立评审者在真实checkpoint环境重放题目正例并核对实际数学/文件副作用；仅自报执行、toy、配置通过均不给该项完成分。",
+        "兼容性与负例25分：逐项完成本题公开的负例、边界、默认兼容与删除后fresh-process验证；保留实际失败退出码。",
+        "证据20分：实际源码、配置、输入、checkpoint、环境、命令、退出码和产物hash相互对应，原始数值可复算。",
+        "范围与说明15分：仅改允许路径，沿用目录规范；Expected/Observed和候选Context/Code信息可审阅，状态保持unchecked。",
+        "完整PASS要求所有本题必需正反例独立重放通过且范围/真实性硬门槛通过；SELF_TESTED或EVIDENCE_READY_FOR_REPLAY均不是PASS，分数本身不授予发布、合并或正式Atlas审批。"
+      ]
+    }
+  ]
+}
