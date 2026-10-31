@@ -33,4 +33,4 @@ The **software preview** and the **scientific raw-data release** are separate de
 
 **Release naming:** `v0.4.0` identifies the **software preview**. It does not imply raw-data availability, full text-steered generation, or production GPU readiness.
 
-References: [Research Lab results](results-20261020.md) · [Work Plan 05](../../github_work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md) · [Source lock](corpus-cpu-source-lock.md).
+References: [Research Lab results](results-20261020.md) · [Work Plan 05](../../work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md) · [Source lock](corpus-cpu-source-lock.md).
