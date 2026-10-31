@@ -90,7 +90,8 @@ run_preflight() {
   python -m pytest -q \
     experiments/qa500/tests/test_cohort.py \
     experiments/qa500/tests/test_execution.py \
-    harness/github_work_test/test_wp22_architecture.py
+    harness/github_work_test/test_wp22_architecture.py \
+    harness/github_work_test/test_wp22_runtime.py
   python -m harness.contracts.registry check \
     --plan harness/github_work_plan/22_qa500_standard_evaluation_pipeline.md
   python -m experiments.qa500.runner plan > "$LOG_ROOT/frozen_plan.json"
