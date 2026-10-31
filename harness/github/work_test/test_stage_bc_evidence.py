@@ -10,7 +10,7 @@ import pytest
 from saebase.sae.coverage import load_coverage, verify_cpu_sae_evidence
 from saebase.tools.phase_bc_aggregate import aggregate
 
-CATALOG = Path(__file__).resolve().parents[2] / "conf" / "coverage" / "stage_bc.json"
+CATALOG = Path(__file__).resolve().parents[3] / "conf" / "coverage" / "stage_bc.json"
 
 
 def _synthetic_evidence():
@@ -131,7 +131,7 @@ def test_published_real_stage_b_and_c_ledgers_are_consistent():
     import json
     import re
 
-    root = Path(__file__).resolve().parents[2] / "conf" / "coverage"
+    root = Path(__file__).resolve().parents[3] / "conf" / "coverage"
     catalog = load_coverage(CATALOG)
     stage_c = json.loads((root / "stage_c_cpu_verified.json").read_text())
     expected = {(e.sae_key, layer) for e in catalog.entries for layer in e.cpu_probe_layers}

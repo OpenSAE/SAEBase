@@ -3,7 +3,7 @@
 from pathlib import Path
 import importlib.util
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 ATLAS = ROOT / "harness" / "visualization"
 spec = importlib.util.spec_from_file_location("saebase_atlas_pages", ATLAS / "build_pages.py")
 pages = importlib.util.module_from_spec(spec)

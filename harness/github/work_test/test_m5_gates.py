@@ -8,7 +8,7 @@ import pytest
 from saebase.release.gates import audit_inventory,audit_result,audit_distributions
 from saebase.release.schema import load_matrix
 
-ROOT=Path(__file__).resolve().parents[2]
+ROOT=Path(__file__).resolve().parents[3]
 CONFIG=load_matrix(ROOT/"conf/release/m5_matrix.json")
 SOURCE=json.loads((ROOT/"conf/release/m5_asset_provenance.json").read_text())
 

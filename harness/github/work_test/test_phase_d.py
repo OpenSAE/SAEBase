@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 import tomllib
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 
 
 def test_package_metadata_matches_public_api_version():
@@ -21,14 +21,14 @@ def test_package_metadata_matches_public_api_version():
 def test_public_distribution_has_required_files():
     for rel in (
         "LICENSE",
-        "harness/github_development_doc/legal/NOTICE",
+        "harness/github/development_doc/legal/NOTICE",
         ".github/CONTRIBUTING.md",
         ".github/SECURITY.md",
-        "harness/github_development_doc/CHANGELOG.md",
+        "harness/github/development_doc/CHANGELOG.md",
         ".github/workflows/ci.yml",
         "MANIFEST.in",
-        "harness/github_development_doc/PROVENANCE.md",
-        "harness/github_development_doc/RELEASE_CHECKLIST.md",
+        "harness/github/development_doc/PROVENANCE.md",
+        "harness/github/development_doc/RELEASE_CHECKLIST.md",
         "conf/__init__.py",
         "conf/config.yaml",
     ):

@@ -3,7 +3,7 @@
 from pathlib import Path
 import re
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 RETIRED_PATHS = (
     "datasets/vision",
     "models/vision",
@@ -21,7 +21,7 @@ CONTENT_FILES = (
     "conf/tasks_log.md",
     "README.md",
     "README_cn.md",
-    "harness/github_development_doc/openresearch-integration.md",
+    "harness/github/development_doc/openresearch-integration.md",
 )
 RETIRED_TERMS = re.compile(
     r"(?i)CUB[-_ ]?200|ResNet(?:[-_ ]?18)?|"

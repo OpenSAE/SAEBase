@@ -9,11 +9,11 @@ import pytest
 
 from saebase.release.capability_acceptance import audit_ledger
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 
 
 def test_core_pass_matrix_is_specific_and_not_release_certification():
-    file = ROOT / "harness" / "github_work_plan" / "12_capability_acceptance_matrix.csv"
+    file = ROOT / "harness" / "github/work_plan" / "12_capability_acceptance_matrix.csv"
     report = audit_ledger(file)
     assert report["capabilities"] == 50
     assert report["status_counts"]["PASS"] == 48
@@ -41,7 +41,7 @@ def test_core_pass_matrix_is_specific_and_not_release_certification():
 
 
 def test_invalid_core_pass_does_not_escape_schema_validation(tmp_path):
-    source = ROOT / "harness" / "github_work_plan" / "12_capability_acceptance_matrix.csv"
+    source = ROOT / "harness" / "github/work_plan" / "12_capability_acceptance_matrix.csv"
     with source.open(encoding="utf-8", newline="") as stream:
         rows = list(csv.DictReader(stream))
         fieldnames = list(rows[0])
