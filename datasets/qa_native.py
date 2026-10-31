@@ -4,6 +4,7 @@ These tasks are separate from the 20-site capture cross-product. They invoke
 original upstream workers, never synthetic substitute results. Their execution
 requires explicit native-work authorization.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -11,7 +12,6 @@ from dataclasses import asdict
 import hashlib
 import json
 from pathlib import Path
-import random
 from typing import Any
 
 from saebase.datasets.qa_standard import PROTOCOL_ID, render_prompt, verify_dataset
@@ -36,7 +36,10 @@ def _load_records(input_root: Path, dataset: str) -> list[dict[str, Any]]:
 
 
 def run_circuits(
-    *, data_root: Path, result_root: Path, approved: bool,
+    *,
+    data_root: Path,
+    result_root: Path,
+    approved: bool,
 ) -> dict[str, Any]:
     """Fixed 10 short BoolQ prompts, original circuit-tracer Gemma shortcut."""
     if not approved:
@@ -46,9 +49,7 @@ def run_circuits(
     candidates = _load_records(data_root, "boolq")
     candidates = sorted(
         (row for row in candidates if len(render_prompt(row)) <= 1900),
-        key=lambda row: hashlib.sha256(
-            ("circuit:" + row["sample_id"]).encode("utf-8")
-        ).hexdigest(),
+        key=lambda row: hashlib.sha256(("circuit:" + row["sample_id"]).encode("utf-8")).hexdigest(),
     )[:10]
     if len(candidates) != 10:
         raise RuntimeError("Fewer than 10 short, frozen BoolQ inputs for circuit tracer")
@@ -65,34 +66,50 @@ def run_circuits(
                 continue
         try:
             result = run_native_circuit_tracer(
-                prompt=render_prompt(row), transcoder_set="gemma",
-                output=out, slug=f"qa-{ident[:16]}",
-                approved=True, timeout_seconds=1800,
-                offload="cpu", dtype="bfloat16",
-                max_feature_nodes=64, batch_size=4,
+                prompt=render_prompt(row),
+                transcoder_set="gemma",
+                output=out,
+                slug=f"qa-{ident[:16]}",
+                approved=True,
+                timeout_seconds=1800,
+                offload="cpu",
+                dtype="bfloat16",
+                max_feature_nodes=64,
+                batch_size=4,
             )
             receipt = {
-                "protocol_id": PROTOCOL_ID, "sample_id": ident,
-                "model_key": "gemma2_2b_base", "dataset_id": "boolq",
+                "protocol_id": PROTOCOL_ID,
+                "sample_id": ident,
+                "model_key": "gemma2_2b_base",
+                "dataset_id": "boolq",
                 "prompt_sha256": row["prompt_sha256"],
-                "original_native_tracer": True, **result,
+                "original_native_tracer": True,
+                **result,
             }
         except Exception as exc:
             receipt = {
-                "protocol_id": PROTOCOL_ID, "sample_id": ident,
-                "model_key": "gemma2_2b_base", "dataset_id": "boolq",
-                "status": "blocked", "error_type": type(exc).__name__,
+                "protocol_id": PROTOCOL_ID,
+                "sample_id": ident,
+                "model_key": "gemma2_2b_base",
+                "dataset_id": "boolq",
+                "status": "blocked",
+                "error_type": type(exc).__name__,
                 "reason": str(exc)[:500],
             }
         _save(receipt_path, receipt)
         results.append(receipt)
     status = (
-        "complete" if all(r["status"] == "native_raw_graph_generated_not_normalized" for r in results)
+        "complete"
+        if all(r["status"] == "native_raw_graph_generated_not_normalized" for r in results)
         else "partial"
     )
     summary = {
-        "protocol_id": PROTOCOL_ID, "task": "circuits", "status": status,
-        "completed": sum(r["status"] == "native_raw_graph_generated_not_normalized" for r in results),
+        "protocol_id": PROTOCOL_ID,
+        "task": "circuits",
+        "status": status,
+        "completed": sum(
+            r["status"] == "native_raw_graph_generated_not_normalized" for r in results
+        ),
         "expected": 10,
         "interpretation": "native transcoder graph, not SAE feature explanation",
     }
@@ -110,14 +127,10 @@ def prepare_training(*, root: Path) -> dict[str, Any]:
     model_rev = api.model_info(MODEL).sha
     if not dataset_rev or not model_rev:
         raise RuntimeError("Missing exact model or training corpus revision")
-    raw = load_dataset(
-        TRAIN_DATASET, name=TRAIN_CONFIG, split="train", revision=dataset_rev
-    )
+    raw = load_dataset(TRAIN_DATASET, name=TRAIN_CONFIG, split="train", revision=dataset_rev)
     strings = sorted(
         (str(row["text"]).strip() for row in raw if str(row.get("text", "")).strip()),
-        key=lambda val: hashlib.sha256(
-            f"{TRAIN_SEED}:{val}".encode("utf-8")
-        ).hexdigest(),
+        key=lambda val: hashlib.sha256(f"{TRAIN_SEED}:{val}".encode("utf-8")).hexdigest(),
     )
     if len(strings) < TRAIN_MAX_RECORDS:
         raise RuntimeError("Training corpus has too few nonempty text records")
@@ -133,9 +146,12 @@ def prepare_training(*, root: Path) -> dict[str, Any]:
     data_file.write_text(payload, encoding="utf-8")
     model_path = snapshot_download(repo_id=MODEL, revision=model_rev)
     receipt = {
-        "protocol_id": PROTOCOL_ID, "model_repo": MODEL,
-        "model_revision": model_rev, "model_snapshot": model_path,
-        "dataset_repo": TRAIN_DATASET, "dataset_revision": dataset_rev,
+        "protocol_id": PROTOCOL_ID,
+        "model_repo": MODEL,
+        "model_revision": model_rev,
+        "model_snapshot": model_path,
+        "dataset_repo": TRAIN_DATASET,
+        "dataset_revision": dataset_rev,
         "n_text_records": len(subset),
         "dataset_sha256": hashlib.sha256(payload.encode("utf-8")).hexdigest(),
         "dataset_path": str(data_file),
@@ -146,12 +162,14 @@ def prepare_training(*, root: Path) -> dict[str, Any]:
 
 
 def run_train(
-    *, root: Path, approved: bool,
+    *,
+    root: Path,
+    approved: bool,
 ) -> dict[str, Any]:
     """Bounded 200-step official SAE-Lens smoke on separate Wikitext."""
     if not approved:
         raise PermissionError("Native SAE training requires explicit approval")
-    from tasks.train.backend.training import TrainPlan, run_training, register_checkpoint
+    from tasks.train.backend.training import TrainPlan, run_training
 
     prepared = root / "native_train" / "data_and_model.json"
     if not prepared.is_file():
@@ -166,27 +184,44 @@ def run_train(
     if hashlib.sha256(data_path.read_bytes()).hexdigest() != evidence["dataset_sha256"]:
         raise RuntimeError("Training source checksum mismatch")
     plan = TrainPlan(
-        backend="saelens", model_path=str(model_path),
-        dataset_path=str(data_path), model_revision=evidence["model_revision"],
+        backend="saelens",
+        model_path=str(model_path),
+        dataset_path=str(data_path),
+        model_revision=evidence["model_revision"],
         dataset_revision=evidence["dataset_revision"],
         hookpoint="blocks.13.hook_resid_post",
-        d_in=2304, d_sae=4096, k=32, architecture="topk",
-        max_examples=TRAIN_MAX_RECORDS, steps=200,
-        batch_size=32, ctx_len=128, run_name="qa500_train_gemma2b",
-        device="cuda", model_dtype="float16", sae_dtype="float32",
+        d_in=2304,
+        d_sae=4096,
+        k=32,
+        architecture="topk",
+        max_examples=TRAIN_MAX_RECORDS,
+        steps=200,
+        batch_size=32,
+        ctx_len=128,
+        run_name="qa500_train_gemma2b",
+        device="cuda",
+        model_dtype="float16",
+        sae_dtype="float32",
     )
     plan.validate(allow_large=False)
     destination = root / "native_train" / "execution"
     result = run_training(
-        plan, output=destination, approved=True, allow_large=False,
+        plan,
+        output=destination,
+        approved=True,
+        allow_large=False,
         timeout_seconds=1800,
     )
     answer = {
-        "protocol_id": PROTOCOL_ID, "status": result["status"],
-        "task": "train", "model_key": "gemma2_2b_base",
-        "training_corpus": TRAIN_DATASET, "training_corpus_revision": evidence["dataset_revision"],
+        "protocol_id": PROTOCOL_ID,
+        "status": result["status"],
+        "task": "train",
+        "model_key": "gemma2_2b_base",
+        "training_corpus": TRAIN_DATASET,
+        "training_corpus_revision": evidence["dataset_revision"],
         "qa_evaluation_inputs_used": False,
-        "train_plan": asdict(plan), "native": result,
+        "train_plan": asdict(plan),
+        "native": result,
     }
     _save(root / "native_train" / "summary.json", answer)
     return answer
@@ -201,7 +236,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.task == "circuits":
         result = run_circuits(
             data_root=args.root / "inputs",
-            result_root=args.root / "results", approved=args.approved,
+            result_root=args.root / "results",
+            approved=args.approved,
         )
     elif args.task == "prepare-train":
         result = prepare_training(root=args.root)
