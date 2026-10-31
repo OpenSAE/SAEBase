@@ -115,6 +115,7 @@ def audit(data_root: Path, result_root: Path) -> dict[str, Any]:
         "input_datasets_complete": 0,
         "baseline_complete": 0,
         "capture_complete": 0,
+        "benchmark_complete": 0,
         "intervene_complete": 0,
         "generate_complete": 0,
     }
@@ -175,6 +176,27 @@ def audit(data_root: Path, result_root: Path) -> dict[str, Any]:
                 if len(shas) != 1:
                     raise RuntimeError("Multiple SAE checkpoint weights within one site/dataset")
                 counts["capture_complete"] += 1
+                benchmark_file = base / "benchmark_summary.json"
+                if not benchmark_file.is_file():
+                    defects.append(f"{site['site_id']}/{dataset}: benchmark summary missing")
+                else:
+                    summary = json.loads(benchmark_file.read_text(encoding="utf-8"))
+                    from hashlib import sha256
+
+                    metric_ids = {
+                        m.get("metric_id") for m in summary.get("metrics", [])
+                    }
+                    if (
+                        summary.get("status") != "complete"
+                        or summary.get("source_capture_sha256")
+                        != sha256((base / "capture.jsonl").read_bytes()).hexdigest()
+                        or summary.get("site_id") != site["site_id"]
+                        or summary.get("sample_count") != 500
+                        or metric_ids != {"core.l0", "core.reconstruction_mse_token"}
+                    ):
+                        defects.append(f"{site['site_id']}/{dataset}: benchmark identity mismatch")
+                    else:
+                        counts["benchmark_complete"] += 1
             except (RuntimeError, ValueError, KeyError) as exc:
                 defects.append(f"{site['site_id']}/{dataset}: {exc}")
             for task, n in (("intervene", 20), ("generate", 5)):
@@ -197,6 +219,7 @@ def audit(data_root: Path, result_root: Path) -> dict[str, Any]:
         "input_datasets_complete": 10,
         "baseline_complete": 100,
         "capture_complete": 200,
+        "benchmark_complete": 200,
         "intervene_complete": 200,
         "generate_complete": 200,
     }
@@ -350,6 +373,25 @@ def stage(
                             "status": r["status"],
                         }
                     )
+            benchmark_file = base / "benchmark_summary.json"
+            if benchmark_file.is_file():
+                benchmark = json.loads(benchmark_file.read_text(encoding="utf-8"))
+                for m in benchmark["metrics"]:
+                    metrics.append({
+                        "protocol_id": PROTOCOL_ID,
+                        "model_key": site["model_key"],
+                        "sae_key": site["sae_key"],
+                        "layer": site["layer"],
+                        "dataset_id": dataset,
+                        "task": "benchmark",
+                        "metric_id": m["metric_id"],
+                        "value": m["value"],
+                        "n_valid": m["n_valid"],
+                        "n_expected": N_PER_DATASET,
+                        "ci_lower_95": m["ci_lower_95"],
+                        "ci_upper_95": m["ci_upper_95"],
+                        "status": benchmark["status"],
+                    })
             for task in ("intervene", "generate"):
                 efile = base / f"{task}.jsonl"
                 for r in _read_rows(efile):
