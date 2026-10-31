@@ -35,7 +35,7 @@ from models.r1_distill_llama8b.r1_distill_llama8b import SPEC as R1_DISTILL_LLAM
 from models.qwen35_9b.qwen35_9b import SPEC as QWEN35_9B_SPEC
 from models.qwen35_27b.qwen35_27b import SPEC as QWEN35_27B_SPEC
 
-LoaderKind = Literal["sae_lens", "eleutherai_topk_mlp", "qwen_resid_topk", "dictionary_learning", "sparsify_topk"]
+LoaderKind = Literal["sae_lens", "eleutherai_topk_mlp", "qwen_resid_topk", "dictionary_learning", "sparsify_topk", "saebench_topk"]
 TransferKind = Literal["none", "base_to_instruct"]
 
 _BASE_SPECS: dict[str, BaseModelSpec] = {
@@ -354,6 +354,21 @@ _PROFILES: dict[str, SAEProfile] = {
         target_model_key="gemma2_2b_it",
         transfer_kind="base_to_instruct",
         hook_note="blocks.25.hook_resid_post (pre-final-norm)",
+    ),
+    "gemma2_2b_saebench_topk_l12_k80": SAEProfile(
+        key="gemma2_2b_saebench_topk_l12_k80",
+        model_key="gemma2_2b_base",
+        sae_release="canrager/saebench_gemma-2-2b_width-2pow14_date-0107",
+        layers=(12,),
+        hook_kind="hook_resid_post",
+        loader="saebench_topk",
+        sae_folder_template=(
+            "gemma-2-2b_top_k_width-2pow14_date-0107/"
+            "resid_post_layer_12/trainer_2"
+        ),
+        notes="Original SAEBench TopK k=80, 16k dictionary, Gemma-2-2B L12.",
+        repo_id="canrager/saebench_gemma-2-2b_width-2pow14_date-0107",
+        hook_note="blocks.12.hook_resid_post (SAEBench native TopK)",
     ),
     "gemma3_4b_pt_scope_resid": SAEProfile(
         key="gemma3_4b_pt_scope_resid",

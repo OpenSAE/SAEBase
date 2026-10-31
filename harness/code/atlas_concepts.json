@@ -64,7 +64,7 @@
             "term.api"
           ],
           "patterns": [
-            "^sae/(?:env_check|pipeline_checks|scope2_clt|scope2_native|sparsify_adapter|stage_d|external_training)\\.py$"
+            "^sae/(?:env_check|pipeline_checks|saebench_topk|scope2_clt|scope2_native|sparsify_adapter|stage_d|external_training)\\.py$"
           ]
         }
       ]
