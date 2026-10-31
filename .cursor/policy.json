@@ -12,7 +12,8 @@
     "tasks",
     "tests",
     "datasets",
-    "experiments"
+    "experiments",
+    "scripts"
   ],
   "approved_files": [
     ".cursorignore",

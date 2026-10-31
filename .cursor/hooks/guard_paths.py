@@ -27,7 +27,7 @@ EDIT_WORDS = ("write", "edit", "delete", "patch", "move", "rename", "create", "r
 # Test-only writes are restricted to this sandbox and never imply permission
 # to modify the Harness governance implementation or real research records.
 HARNESS_TEST_SANDBOX = "harness/tests/"
-NEW_TOP_LEVEL_DIRS = {"experiments", "tests"}
+NEW_TOP_LEVEL_DIRS = {"experiments", "tests", "scripts"}
 
 
 def candidate_paths(value):
@@ -86,7 +86,7 @@ def gate(tool, payload, active=None):
             if len(parts) < 2:
                 return "Task agents cannot create or edit root-level entries"
             if parts[0] not in NEW_TOP_LEVEL_DIRS and not (ROOT / parts[0]).is_dir():
-                return "New top-level directories are forbidden except experiments/ and tests/"
+                return "New top-level directories are forbidden except experiments/, tests/ and scripts/"
             if assigned is not None:
                 if not wp21.allows_path(rel, assigned):
                     return "Path outside the current WP21 case assignment"

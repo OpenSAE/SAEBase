@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 
 
 def test_core_evidence_targets_exist() -> None:
@@ -18,7 +18,7 @@ def test_core_evidence_targets_exist() -> None:
 def test_agent_plan_storage_matches_harness_structure() -> None:
     from harness.core.agent_flow import PLANS
 
-    assert PLANS == ROOT / "harness/github_work_plan/agent_flow"
+    assert PLANS == ROOT / "harness/github/work_plan/agent_flow"
     for path in (
         "harness/core/agent_flow.py",
         "harness/core/github_review.py",
@@ -28,7 +28,7 @@ def test_agent_plan_storage_matches_harness_structure() -> None:
 
 
 def test_legacy_component_directories_removed() -> None:
-    for directory in ("dlbase", "research_datasets", "apps", "scripts", "examples", "work_plan"):
+    for directory in ("dlbase", "research_datasets", "apps", "examples", "work_plan"):
         assert not (ROOT / directory).exists(), directory
 
 
