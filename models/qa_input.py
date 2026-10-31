@@ -6,6 +6,7 @@ from typing import Any
 import torch
 from saebase.data.qa_records import render_prompt
 
+
 def _prompt_format(model_key: str) -> str:
     """Read the model implementation's own prompt contract, never a QA500 list."""
     import importlib
@@ -20,7 +21,6 @@ def _prompt_format(model_key: str) -> str:
     if mode not in {"plain", "chat_template"}:
         raise ValueError("Unknown model prompt-format policy")
     return mode
-
 
 
 def _tokenizer(pair: Any) -> Any:
