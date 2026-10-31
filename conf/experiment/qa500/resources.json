@@ -21,5 +21,6 @@
     "seed"
   ],
   "max_oom_retries": 2,
-  "model_load": "one_model_multiple_saes_when_supported"
+  "model_load": "one_model_multiple_saes_when_supported",
+  "minimum_free_vram_bytes": 1073741824
 }

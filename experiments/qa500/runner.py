@@ -332,12 +332,35 @@ def run_matrix(
     """Dispatch model-isolated workers; independent failures never mix CUDA state."""
     output: dict[str, Any] = {}
     for name in model_keys:
+        active_device = device
+        if device == "auto":
+            from saebase.runtime.resource_planner import select_cuda_device
+            from saebase.runtime.hardware import detect
+
+            try:
+                resource_policy = get_resources()
+                selected = select_cuda_device(
+                    detect(probe_gpu=True),
+                    minimum_free_bytes=int(resource_policy["minimum_free_vram_bytes"]),
+                )
+            except (RuntimeError, ValueError) as exc:
+                output[name] = {
+                    "model_key": name, "status": "blocked",
+                    "reason": str(exc), "phase": phase,
+                }
+                _atomic_json(receipts_dir(result_root) / f"{phase}_matrix.json", output)
+                continue
+            active_device = selected["device"]
+            _atomic_json(
+                receipts_dir(result_root, name) / f"{phase}_device_plan.json",
+                selected,
+            )
         if len(model_keys) == 1:
             # Explicit single-model invocation runs directly in this child.
             output[name] = run_model(
                 name,
                 phase=phase,
-                device=device,
+                device=active_device,
                 data_root=data_root,
                 result_root=result_root,
                 max_tokens=max_tokens,
@@ -353,7 +376,7 @@ def run_matrix(
                 "--model",
                 name,
                 "--device",
-                device,
+                active_device,
                 "--data-root",
                 str(data_root),
                 "--result-root",
@@ -405,7 +428,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--data-root", type=Path, default=DATA_ROOT)
     ap.add_argument("--result-root", type=Path, default=RESULT_ROOT)
     ap.add_argument("--model", default="all")
-    ap.add_argument("--device", default="cuda")
+    ap.add_argument("--device", default="auto")
     ap.add_argument("--max-tokens", type=int, default=2048)
     ap.add_argument("--neuronpedia-map", type=Path)
     ap.add_argument("--neuronpedia-records", type=Path)

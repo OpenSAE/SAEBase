@@ -120,15 +120,15 @@ case "$PHASE" in
     ;;
   pilot)
     python -m experiments.qa500.runner verify
-    python -m experiments.qa500.runner pilot --model all --device cuda
+    python -m experiments.qa500.runner pilot --model all --device auto
     ;;
   core)
     python -m experiments.qa500.runner verify
-    python -m experiments.qa500.runner core --model all --device cuda
+    python -m experiments.qa500.runner core --model all --device auto
     ;;
   effects)
     python -m experiments.qa500.runner verify
-    python -m experiments.qa500.runner effects --model all --device cuda
+    python -m experiments.qa500.runner effects --model all --device auto
     ;;
   native)
     run_scoped python -m experiments.qa500.native circuits --approved
@@ -151,9 +151,9 @@ case "$PHASE" in
     # other real datasets from running on the approved local machine.
     run_scoped python -m experiments.qa500.runner prepare
     run_scoped python -m experiments.qa500.runner verify
-    run_scoped python -m experiments.qa500.runner pilot --model all --device cuda
-    run_scoped python -m experiments.qa500.runner core --model all --device cuda
-    run_scoped python -m experiments.qa500.runner effects --model all --device cuda
+    run_scoped python -m experiments.qa500.runner pilot --model all --device auto
+    run_scoped python -m experiments.qa500.runner core --model all --device auto
+    run_scoped python -m experiments.qa500.runner effects --model all --device auto
     run_scoped python -m experiments.qa500.report audit
     if ((PARTIAL)); then
       # Local-only partial exports are clearly marked and cannot be published.

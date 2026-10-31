@@ -123,3 +123,26 @@ def test_publication_asset_lock_rejects_partial_and_unverified_revision_ids(monk
     }
     monkeypatch.setattr(assets, "get_assets_lock", lambda: malformed)
     assert assets.required_publication_lock() is False
+
+
+def test_gpu_planner_selects_by_current_free_memory_not_device_name():
+    from saebase.runtime.resource_planner import select_cuda_device
+
+    profile = {
+        "cuda_available": True,
+        "gpu": [
+            {"index": 0, "name": "A", "free_vram_bytes": 12 << 30,
+             "total_vram_bytes": 32 << 30, "cuda_kernel_ok": True},
+            {"index": 1, "name": "B", "free_vram_bytes": 20 << 30,
+             "total_vram_bytes": 24 << 30, "cuda_kernel_ok": True},
+            {"index": 2, "name": "C", "free_vram_bytes": 22 << 30,
+             "total_vram_bytes": 32 << 30, "cuda_kernel_ok": False},
+        ],
+    }
+    plan = select_cuda_device(profile)
+    assert plan["device"] == "cuda:1"
+    assert plan["precision_change"] is False
+    assert plan["offload_requested"] is False
+    profile["cuda_available"] = False
+    with pytest.raises(RuntimeError, match="BLOCKED_ENV_NO_CUDA"):
+        select_cuda_device(profile)
