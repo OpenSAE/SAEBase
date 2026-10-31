@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "code",
   "project": "SAEBase",
-  "source_sha256": "1d4053b81d45deb367c5a2a96c4a4b607f4d9253796cbfc56a8c804c7892b5d7",
+  "source_sha256": "9db1318cdf465a16badf4a13da6cd0cf2f10a0686b251c6f462782f5f175b8cc",
   "scope": [
     "saebase",
     "datasets",
@@ -7651,7 +7651,7 @@
       "kind": "function",
       "title": "main",
       "path": "experiments/qa500/runner.py",
-      "line": 400,
+      "line": 423,
       "status": "implemented",
       "signature": "def main(argv: list[str] | None=None) -> int",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -7661,7 +7661,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "experiments/qa500/runner.py:400"
+        "experiments/qa500/runner.py:423"
       ]
     },
     {
@@ -22652,6 +22652,24 @@
       "needs_review": true,
       "evidence": [
         "saebase/runtime/hardware.py:74"
+      ]
+    },
+    {
+      "id": "code:function:saebase.runtime.resource_planner:select_cuda_device",
+      "kind": "function",
+      "title": "select_cuda_device",
+      "path": "saebase/runtime/resource_planner.py",
+      "line": 12,
+      "status": "implemented",
+      "signature": "def select_cuda_device(hardware: dict[str, Any], *, minimum_free_bytes: int=1 << 30) -> dict[str, Any]",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/runtime/resource_planner.py:12"
       ]
     },
     {
@@ -50783,6 +50801,24 @@
       ]
     },
     {
+      "id": "code:module:saebase.runtime.resource_planner",
+      "kind": "module",
+      "title": "saebase/runtime/resource_planner.py",
+      "path": "saebase/runtime/resource_planner.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "Hardware-capability resource selection for registered model tasks. This selects an actual compatible CUDA device, not a substitute model, precision or task. It does not predict model+SAE peak memory without a real Pilot. When safe execution cannot be established, the worker remains blocked.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/runtime/resource_planner.py:1"
+      ]
+    },
+    {
       "id": "code:module:saebase.runtime.runtime_check",
       "kind": "module",
       "title": "saebase/runtime/runtime_check.py",
@@ -64587,6 +64623,11 @@
     },
     {
       "source": "code:group:saebase",
+      "target": "code:module:saebase.runtime.resource_planner",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
       "target": "code:module:saebase.runtime.runtime_check",
       "type": "contains"
     },
@@ -67108,6 +67149,11 @@
     {
       "source": "code:module:experiments.qa500.runner",
       "target": "code:module:saebase.runtime.hardware",
+      "type": "imports"
+    },
+    {
+      "source": "code:module:experiments.qa500.runner",
+      "target": "code:module:saebase.runtime.resource_planner",
       "type": "imports"
     },
     {
@@ -72848,6 +72894,11 @@
     {
       "source": "code:module:saebase.runtime.hardware",
       "target": "code:function:saebase.runtime.hardware:main",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.runtime.resource_planner",
+      "target": "code:function:saebase.runtime.resource_planner:select_cuda_device",
       "type": "contains"
     },
     {
