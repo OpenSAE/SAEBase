@@ -7,7 +7,7 @@ requires explicit native-work authorization.
 
 from __future__ import annotations
 
-from experiments.qa500.paths import task_dir, typed_file, study_dir
+from scripts.experiments.qa500.context import task_dir, typed_file, study_dir
 
 import argparse
 from dataclasses import asdict
@@ -16,7 +16,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from experiments.qa500.cohort import PROTOCOL_ID, render_prompt, verify_dataset
+from scripts.experiments.qa500.cohort import PROTOCOL_ID, render_prompt, verify_dataset
 
 ROOT = study_dir(Path.cwd())
 MODEL = "google/gemma-2-2b"

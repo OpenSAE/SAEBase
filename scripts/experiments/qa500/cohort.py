@@ -13,8 +13,8 @@ from typing import Any
 from saebase.data.qa_records import DatasetSpec, digest, render_prompt, make_record
 from saebase.data.qa_source import iter_source as _load_source
 from saebase.registry import get_qa_dataset_adapter
-from experiments.qa500.config import get_protocol, get_dataset_ids
-from experiments.qa500.assets import source_revision
+from scripts.experiments.qa500.context import get_protocol, get_dataset_ids
+from scripts.experiments.qa500.context import source_revision
 
 PROTOCOL = get_protocol()
 PROTOCOL_ID = PROTOCOL["protocol_id"]

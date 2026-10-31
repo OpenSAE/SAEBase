@@ -13,9 +13,9 @@ import re
 from pathlib import Path
 from typing import Any
 
-from experiments.qa500.report import CONFIGS, DEFAULT_EXPORT
-from experiments.qa500.cohort import PROTOCOL_ID
-from experiments.qa500.assets import required_publication_lock
+from scripts.experiments.qa500.report import CONFIGS, DEFAULT_EXPORT
+from scripts.experiments.qa500.cohort import PROTOCOL_ID
+from scripts.experiments.qa500.context import required_publication_lock
 
 DESTINATION = "OpenSAE/SAEBase-Evaluation"
 

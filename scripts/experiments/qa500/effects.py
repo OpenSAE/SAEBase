@@ -6,8 +6,8 @@ magnitudes descriptively; these are not held-out causal feature-meaning tests.
 
 from __future__ import annotations
 
-from experiments.qa500.paths import task_dir, typed_file
-from experiments.qa500.config import get_tasks
+from scripts.experiments.qa500.context import task_dir, typed_file
+from scripts.experiments.qa500.context import get_tasks
 
 import hashlib
 import json
@@ -17,7 +17,7 @@ from typing import Any
 
 import torch
 
-from experiments.qa500.cohort import PROTOCOL_ID, verify_dataset
+from scripts.experiments.qa500.cohort import PROTOCOL_ID, verify_dataset
 from models.qa_input import make_input
 
 

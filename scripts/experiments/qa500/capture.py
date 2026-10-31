@@ -6,15 +6,15 @@ silently substitute unavailable weights/datasets.
 
 from __future__ import annotations
 
-from experiments.qa500.paths import task_dir, inputs_dir, typed_file
-from experiments.qa500.config import get_sites
+from scripts.experiments.qa500.context import task_dir, inputs_dir, typed_file
+from scripts.experiments.qa500.context import get_sites
 
 import argparse
 import json
 from pathlib import Path
 from typing import Any
 
-from experiments.qa500.cohort import (
+from scripts.experiments.qa500.cohort import (
     DATASETS,
     PROTOCOL_ID,
     digest,

@@ -6,7 +6,7 @@ new, clearly labeled subset CSVs only after auditing exact frozen identities.
 
 from __future__ import annotations
 
-from experiments.qa500.paths import task_dir, typed_file, inputs_dir, staging_dir, study_dir
+from scripts.experiments.qa500.context import task_dir, typed_file, inputs_dir, staging_dir, study_dir
 
 import argparse
 import csv
@@ -16,10 +16,10 @@ import math
 from pathlib import Path
 from typing import Any
 
-from experiments.qa500.cohort import DATASETS, PROTOCOL_ID, N_PER_DATASET, verify_dataset
-from experiments.qa500.capture import site_list
-from experiments.qa500.runner import TASK_STATUS
-from experiments.qa500.assets import required_publication_lock
+from scripts.experiments.qa500.cohort import DATASETS, PROTOCOL_ID, N_PER_DATASET, verify_dataset
+from scripts.experiments.qa500.capture import site_list
+from scripts.experiments.qa500.runner import TASK_STATUS
+from scripts.experiments.qa500.context import required_publication_lock
 
 
 DEFAULT_INPUT = inputs_dir(Path.cwd())
