@@ -428,7 +428,7 @@
           ],
           "patterns": [
             "^code:configurations:tasks:benchmark$",
-            "^tasks/benchmark/(?:activation_health|analyze|controlled_inputs|health_results|operation|pipeline_checks|stage_d|task)\\.py$"
+            "^tasks/benchmark/(?:qa_scoring|activation_health|analyze|controlled_inputs|health_results|operation|pipeline_checks|stage_d|task)\\.py$"
           ]
         },
         {
@@ -458,7 +458,7 @@
             "term.sae.benchmark"
           ],
           "patterns": [
-            "^tasks/benchmark/backend/metrics/.*\\.py$"
+            "^tasks/benchmark/(?:backend/metrics/.*|qa_metrics)\\.py$"
           ]
         },
         {
