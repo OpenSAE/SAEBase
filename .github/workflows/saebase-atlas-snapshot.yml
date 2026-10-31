@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - fix/atlas-project-isolation-20261027
+      - feat/qa-evaluation-500-v1
     paths:
       - ".github/workflows/saebase-atlas-snapshot.yml"
       - "harness/visualization/**"
@@ -16,6 +17,7 @@ on:
       - "datasets/**"
       - "models/**"
       - "tasks/**"
+      - "experiments/**"
   workflow_dispatch:
 
 permissions:

@@ -28,8 +28,14 @@ def test_agent_plan_storage_matches_harness_structure() -> None:
 
 
 def test_legacy_component_directories_removed() -> None:
-    for directory in ("dlbase", "research_datasets", "apps", "scripts", "examples", "work_plan"):
+    for directory in ("dlbase", "research_datasets", "apps", "examples", "work_plan"):
         assert not (ROOT / directory).exists(), directory
+
+
+def test_new_experiment_shell_entrypoint_has_one_canonical_location() -> None:
+    assert (ROOT / "scripts/experiments/qa500.sh").is_file()
+    assert not (ROOT / "harness/experiments/qa500_execute.sh").exists()
+    assert not list((ROOT / "datasets").glob("qa_*.py"))
 
 
 def test_code_navigation_requires_real_source_and_context() -> None:

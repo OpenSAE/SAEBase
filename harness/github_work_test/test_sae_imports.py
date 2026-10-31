@@ -22,10 +22,12 @@ def _collect_imports(path: Path) -> list[str]:
 
 
 def test_package_layout():
-    for directory in ("datasets", "models", "tasks", "saebase", "harness", "conf"):
+    for directory in ("datasets", "models", "tasks", "saebase", "harness", "conf", "experiments", "scripts"):
         assert (ROOT / directory).is_dir(), directory
-    for directory in ("dlbase", "research_datasets", "apps", "examples", "scripts", "work_plan"):
+    for directory in ("dlbase", "research_datasets", "apps", "examples", "work_plan"):
         assert not (ROOT / directory).exists(), directory
+    assert (ROOT / "scripts" / "experiments" / "qa500.sh").is_file()
+    assert (ROOT / "experiments" / "qa500" / "runner.py").is_file()
     assert (ROOT / "datasets" / "plugins.py").is_file()
     assert (ROOT / "saebase" / "registry.py").is_file()
     assert (ROOT / "saebase" / "runtime" / "train.py").is_file()
