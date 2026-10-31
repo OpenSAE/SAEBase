@@ -331,13 +331,16 @@ def concrete_groups(output: dict) -> None:
                     else ("执行 " + name + " 对应的 SAE 研究操作及其配置。"),
                 ),
             )
+            if area == "experiments":
+                instance_title = "QA500 标准评测实验定义" if name == "qa500" else "科研实验 " + name
+                instance_summary = "选择已注册科研组件并组织可复查的实验执行与产物。"
             nodes.append({
                 "id": instance_id, "kind": "group", "title": instance_title,
                 "summary": instance_summary, "description": instance_summary,
                 "status": "implemented", "evidence": [m["path"] for m in modules],
                 "presentation_only": True, "source_symbol": "",
                 "context_term_ids": [{"datasets": "term.dataset", "models": "term.model",
-                                      "tasks": "term.task"}[area]],
+                                      "tasks": "term.task", "experiments": "term.saebase_runtime"}[area]],
             })
             edges.append({"source": group_id, "target": instance_id, "type": "contains"})
             if area == "tasks":
