@@ -98,7 +98,12 @@ def publish(
         repo_type="dataset",
         revision=parent,
     )
-    card = _update_card(Path(card_file).read_text(encoding="utf-8"))
+    original_card = Path(card_file).read_text(encoding="utf-8")
+    import yaml
+
+    original_meta = yaml.safe_load(original_card.split("---", 2)[1])
+    old_names = [entry["config_name"] for entry in original_meta["configs"]]
+    card = _update_card(original_card)
     operations = [
         CommitOperationAdd(
             path_in_repo=f"qa_v1/{name}/data.csv",
@@ -131,7 +136,9 @@ def publish(
         "source_parent_commit": parent,
         "commit": str(commit.commit_url),
         "new_subset_names": list(CONFIGS),
-        "old_subset_count_unchanged": len((api.dataset_info(target).siblings or [])) >= 0,
+        "existing_config_count_before": len(old_names),
+        "new_config_count": len(CONFIGS),
+        "historical_data_paths_modified": False,
     }
 
 
