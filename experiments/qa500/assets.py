@@ -63,8 +63,7 @@ def required_publication_lock() -> bool:
         if not isinstance(values, dict) or set(values) != required_keys:
             return False
         if any(
-            not isinstance(sha, str)
-            or re.fullmatch(r"[0-9a-f]{40}", sha) is None
+            not isinstance(sha, str) or re.fullmatch(r"[0-9a-f]{40}", sha) is None
             for sha in values.values()
         ):
             return False
