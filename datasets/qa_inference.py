@@ -217,15 +217,18 @@ def grade_answer(answer_type: str, predicted: str, gold: str) -> dict[str, Any]:
             from math_verify.parser import LatexExtractionConfig, ExprExtractionConfig
         except ImportError:
             return {
-                "correct": None, "grade_status": "needs_math_equivalence",
+                "correct": None,
+                "grade_status": "needs_math_equivalence",
                 "grader_id": "math_verify_0_9_0_missing",
             }
         gold_text = gold if "$" in gold or "\\boxed" in gold else f"${gold}$"
         try:
             reference = parse(
                 gold_text,
-                extraction_config=[LatexExtractionConfig(boxed_match_priority=0),
-                                   ExprExtractionConfig()],
+                extraction_config=[
+                    LatexExtractionConfig(boxed_match_priority=0),
+                    ExprExtractionConfig(),
+                ],
             )
             candidate = parse(
                 predicted,
@@ -233,18 +236,21 @@ def grade_answer(answer_type: str, predicted: str, gold: str) -> dict[str, Any]:
             )
             if not reference:
                 return {
-                    "correct": None, "grade_status": "unparseable_reference",
+                    "correct": None,
+                    "grade_status": "unparseable_reference",
                     "grader_id": "math_verify_0_9_0",
                 }
             correct = bool(candidate and verify(reference, candidate))
         except Exception as exc:
             return {
-                "correct": None, "grade_status": "math_grader_error",
+                "correct": None,
+                "grade_status": "math_grader_error",
                 "grader_id": "math_verify_0_9_0",
                 "error_type": type(exc).__name__,
             }
         return {
-            "correct": correct, "grade_status": "scored",
+            "correct": correct,
+            "grade_status": "scored",
             "grader_id": "math_verify_0_9_0",
         }
     else:
