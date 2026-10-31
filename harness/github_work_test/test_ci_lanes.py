@@ -40,7 +40,11 @@ def workflow(name: str) -> dict:
 
 def test_only_essential_ci_and_pinned_research_run_on_pull_requests():
     paths = sorted(WORKFLOWS.glob("*.yml"))
-    assert len(paths) == 24  # Existing 23 lanes plus SAEBase project Pages
+    assert len(paths) == 25  # Existing lanes plus one-time SAEBase v0.6.5 release dispatcher
+    version_dispatch = workflow("saebase-v065-release-dispatch.yml")
+    assert set(version_dispatch["on"]) == {"workflow_run"}
+    assert version_dispatch["on"]["workflow_run"]["workflows"] == ["CI"]
+    assert "PUBLISH-$TAG" in (WORKFLOWS / "saebase-v065-release-dispatch.yml").read_text()
     atlas = workflow("saebase-atlas-snapshot.yml")
     assert set(atlas["on"]) == {"push", "workflow_dispatch"}
     assert set(atlas["on"]["push"]["branches"]) == {
