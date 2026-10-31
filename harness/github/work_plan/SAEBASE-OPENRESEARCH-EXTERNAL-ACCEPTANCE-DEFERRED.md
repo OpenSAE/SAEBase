@@ -10,7 +10,7 @@
 
 ## D. GPU 首轮验收后的修复与复验工作（2026-10-27，本地 Agent 下一轮任务）
 
-**当前基线**：PR #60，已记录 GPU 实测的提交 `f7dca13dbc1d06ff06a3efb0780e7c2d27582282`。GPU 验收报告 [harness/github_development_doc/gpu-acceptance-20261027.md](../../harness/github_development_doc/gpu-acceptance-20261027.md)；原始私有证据目录 `/workspace/SAEBase-gpu-acceptance-20261027`。首次实测使用 RTX 5070 12GB、Gemma-2 2B、Gemma Scope SAE。CPU CI（Python 3.11/3.12、Ruff、Hydra、Harness、打包）在此基线通过。后续每次执行应先确认当前分支与 HEAD，并记录实际 commit，不能假定旧 SHA 是新 HEAD。
+**当前基线**：PR #60，已记录 GPU 实测的提交 `f7dca13dbc1d06ff06a3efb0780e7c2d27582282`。GPU 验收报告 [harness/github_development_doc/gpu-acceptance-20261027.md](../development_doc/gpu-acceptance-20261027.md)；原始私有证据目录 `/workspace/SAEBase-gpu-acceptance-20261027`。首次实测使用 RTX 5070 12GB、Gemma-2 2B、Gemma Scope SAE。CPU CI（Python 3.11/3.12、Ruff、Hydra、Harness、打包）在此基线通过。后续每次执行应先确认当前分支与 HEAD，并记录实际 commit，不能假定旧 SHA 是新 HEAD。
 
 **本轮目标**：先解决已观察到的产品缺陷，再做最小真实 GPU 复验；生成代码、测试、报告和提交。无需重复所有七类功能的完整运行。不得将正常 Python/CI 修复放进本文件等待 GPU。原始 A/B/C 验收条款仍保留，未获得实测证据的部分不得宣称 PASS。
 
@@ -52,7 +52,7 @@
 ### D6. P2 — 环境与验收报告收尾
 
 - 主环境 `/venv/main` 的 vLLM 安装不完整；已有隔离虚拟环境中的 vLLM 0.27.1 能完成真实 8-token 基线验证。只在独立隔离环境中核对可重复性，未经许可不重装主环境、不更换全局 torch/CUDA。
-- 修订 [GPU 验收报告](../../harness/github_development_doc/gpu-acceptance-20261027.md) 中的“代码改动（未提交）”历史措辞：两项改动已经进入 PR；记录对应 commit、测试与复验状态，保留首次实测时的真实 HEAD 和数据，而非覆盖历史信息。
+- 修订 [GPU 验收报告](../development_doc/gpu-acceptance-20261027.md) 中的“代码改动（未提交）”历史措辞：两项改动已经进入 PR；记录对应 commit、测试与复验状态，保留首次实测时的真实 HEAD 和数据，而非覆盖历史信息。
 - 报告区分 `runtime smoke passed`、`partial/limited validation`、`scientific acceptance pending`。Circuits 仍有标准化/干预缺口、Explain 仍无独立语义验证、Train 仅为 2-step smoke。
 - 只将脱敏的小体积 receipt、数值摘要、哈希与执行命令纳入 Git；不上传 HF token、原始私有 prompts、模型权重、大型 checkpoint 或未经批准的原始日志。
 
