@@ -27,7 +27,7 @@ from saebase.sae.stage_d import (
     write_stage_d_targets,
 )
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 CATALOG = ROOT / "conf" / "coverage" / "stage_bc.json"
 
 

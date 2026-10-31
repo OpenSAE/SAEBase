@@ -18,6 +18,25 @@ import pytest
 
 
 ROOT = Path(__file__).resolve().parents[3]
+
+def historical_source(relative: str) -> Path:
+    """Resolve old read-only exam references without changing frozen files."""
+    source = ROOT / relative
+    if source.is_file():
+        return source
+    owners = {
+        "harness/github_work_plan/": "harness/github/work_plan/",
+        "harness/github_work_test/": "harness/github/work_test/",
+        "harness/github_development_doc/": "harness/github/development_doc/",
+        "harness/github_assets/": "harness/github/assets/",
+    }
+    for old, new in owners.items():
+        if relative.startswith(old):
+            mapped = ROOT / (new + relative[len(old):])
+            if mapped.is_file():
+                return mapped
+            break
+    raise FileNotFoundError(relative)
 TOOLS = ROOT / "harness/tests/wp21/tools"
 
 
@@ -79,7 +98,7 @@ def spec_tree(tmp_path):
     for relative in sorted(paths):
         target = root / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(ROOT / relative, target)
+        shutil.copyfile(historical_source(relative), target)
     for case in spec["cases"]:
         if case.get("seed_fixture"):
             relative = "harness/tests/wp21/fixtures/" + case["seed_fixture"]
@@ -100,7 +119,7 @@ def scoped_workspace(tmp_path):
     ):
         target = workspace / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(ROOT / relative, target)
+        shutil.copyfile(historical_source(relative), target)
     allowed = "tests/wp21/R01/test_candidate.py"
     assert T.common.allowed_source(allowed, case), "R01 must expose its declared test path"
     _text(workspace / allowed, "# original synthetic test fixture\n")
@@ -541,7 +560,7 @@ def hook_workspace(scoped_workspace, monkeypatch):
     ]:
         target = f.workspace / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(ROOT / relative, target)
+        shutil.copyfile(historical_source(relative), target)
     monkeypatch.setattr(sys, "path", list(sys.path))
     loaded = {}
     for name in ["guard_paths", "guard_shell"]:

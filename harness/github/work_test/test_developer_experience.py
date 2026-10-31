@@ -17,10 +17,10 @@ def test_repository_docs_have_valid_relative_navigation():
     assert count >= 35
     assert not broken
     paths = {
-        "harness/github_development_doc/first-experiment.md",
-        "harness/github_development_doc/troubleshooting.md",
-        "harness/github_development_doc/contributor-guide.md",
-        "harness/github_development_doc/maintainer-workflow.md",
+        "harness/github/development_doc/first-experiment.md",
+        "harness/github/development_doc/troubleshooting.md",
+        "harness/github/development_doc/contributor-guide.md",
+        "harness/github/development_doc/maintainer-workflow.md",
         ".github/CODEOWNERS",
     }
     assert all((ROOT / name).is_file() for name in paths)
@@ -28,12 +28,12 @@ def test_repository_docs_have_valid_relative_navigation():
 
 def test_relative_link_checker_detects_bad_paths(tmp_path):
     guide = tmp_path / "README.md"
-    guide.write_text("[tutorial](harness/github_development_doc/missing.md)\n", encoding="utf-8")
+    guide.write_text("[tutorial](harness/github/development_doc/missing.md)\n", encoding="utf-8")
     assert missing_links(guide, tmp_path) == [
-        "README.md:1: harness/github_development_doc/missing.md"
+        "README.md:1: harness/github/development_doc/missing.md"
     ]
-    (tmp_path / "harness" / "github_development_doc").mkdir(parents=True)
-    (tmp_path / "harness" / "github_development_doc" / "missing.md").write_text("# Present\n", encoding="utf-8")
+    (tmp_path / "harness" / "github/development_doc").mkdir(parents=True)
+    (tmp_path / "harness" / "github/development_doc" / "missing.md").write_text("# Present\n", encoding="utf-8")
     assert missing_links(guide, tmp_path) == []
 
 

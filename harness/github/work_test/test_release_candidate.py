@@ -21,7 +21,7 @@ def fake_project(tmp_path: Path, version: str = "0.3.0") -> tuple[Path, Path]:
     root.mkdir(parents=True)
     dist.mkdir(parents=True)
     (root / "saebase").mkdir()
-    (root / "harness" / "github_development_doc" / "releases").mkdir(parents=True)
+    (root / "harness" / "github/development_doc" / "releases").mkdir(parents=True)
     entrypoints = {
         "saebase": "saebase.cli:main",
         "saebase-prepare-prompts": "saebase.cli:prepare_prompts",
@@ -41,10 +41,10 @@ def fake_project(tmp_path: Path, version: str = "0.3.0") -> tuple[Path, Path]:
     )
     (root / "pyproject.toml").write_text(project, encoding="utf-8")
     (root / "saebase" / "__init__.py").write_text(f'__version__ = "{version}"\n', encoding="utf-8")
-    (root / "harness/github_development_doc/CHANGELOG.md").write_text(
+    (root / "harness/github/development_doc/CHANGELOG.md").write_text(
         f"# Changelog\n\n## {version} - Candidate\n", encoding="utf-8"
     )
-    (root / "harness" / "github_development_doc" / "releases" / f"v{version}.md").write_text(
+    (root / "harness" / "github/development_doc" / "releases" / f"v{version}.md").write_text(
         "# Candidate\n\nRelease notes.\n", encoding="utf-8"
     )
     (root / "LICENSE").write_text("Apache License, Version 2.0\n", encoding="utf-8")
@@ -67,8 +67,8 @@ def fake_project(tmp_path: Path, version: str = "0.3.0") -> tuple[Path, Path]:
             "pyproject.toml",
             "saebase/__init__.py",
             "LICENSE",
-            "harness/github_development_doc/CHANGELOG.md",
-            f"harness/github_development_doc/releases/v{version}.md",
+            "harness/github/development_doc/CHANGELOG.md",
+            f"harness/github/development_doc/releases/v{version}.md",
         ):
             payload = (root / name).read_bytes()
             entry = tarfile.TarInfo(f"opensae_saebase-{version}/{name}")
@@ -98,7 +98,7 @@ def test_version_must_match_package_source_and_notes(tmp_path, monkeypatch):
     with pytest.raises(ValueError, match="disagree"):
         gate.project_info(root)
     (root / "saebase" / "__init__.py").write_text('__version__ = "0.3.0"\n', encoding="utf-8")
-    (root / "harness" / "github_development_doc" / "releases" / "v0.3.0.md").unlink()
+    (root / "harness" / "github/development_doc" / "releases" / "v0.3.0.md").unlink()
     with pytest.raises(ValueError, match="notes missing"):
         gate.project_info(root)
 
