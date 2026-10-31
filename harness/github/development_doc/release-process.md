@@ -1,9 +1,9 @@
 # General Software Release Process
 
-The [manual Software Release workflow](../../.github/workflows/software-release.yml)
+The [manual Software Release workflow](../../../.github/workflows/software-release.yml)
 publishes new SAEBase versions after separate, source-bound verification.
 The existing `v0.2.0` tag and the [historical M5 release
-gate](../../.github/workflows/m5-release.yml) remain untouched.
+gate](../../../.github/workflows/m5-release.yml) remain untouched.
 
 ## Prepare the source
 
@@ -13,7 +13,7 @@ In a focused pull request, update the following files for the next
 - `pyproject.toml` under `[project].version`.
 - `saebase/__init__.py` with the identical `__version__`.
 - `CHANGELOG.md` with a new `## X.Y.Z` section.
-- `harness/github_development_doc/releases/vX.Y.Z.md` with changes, compatibility implications
+- `harness/github/development_doc/releases/vX.Y.Z.md` with changes, compatibility implications
   and links to the tests and scientific acceptance relevant to this release.
 
 Model, SAE, hook, decoder, normalization, intervention or metric changes
@@ -136,7 +136,7 @@ the [historical v0.2.0 checklist](RELEASE_CHECKLIST.md) as necessary.
 ## One-time approved Research Lab v0.4.0 publication
 
 The source of the version-specific release request lives at
-[Research Lab v0.4.0 Approved Release Dispatch](../../.github/workflows/research-lab-v04-release-dispatch.yml).
+[Research Lab v0.4.0 Approved Release Dispatch](../../../.github/workflows/research-lab-v04-release-dispatch.yml).
 It exists solely for the explicit maintainer-approved Research Lab v0.4.0
 publication after successful *push-to-main* CI of the final source.
 
@@ -155,7 +155,7 @@ GPU experiment archive and third-party source texts are excluded.
 ## One-time maintainer-authorized SAEBase v0.5.0 publication
 
 The maintainer explicitly requested the v0.5.0 release. A version-specific
-[one-time CI dispatch](../../.github/workflows/saebase-v050-release-dispatch.yml)
+[one-time CI dispatch](../../../.github/workflows/saebase-v050-release-dispatch.yml)
 reacts **only** to a completed, successful push-to-main CI for the exact
 current head, confirms `pyproject.toml` is version 0.5.0 and the release
 notes exist, and invokes the existing checked `software-release.yml`
@@ -170,6 +170,6 @@ future versions. Prior v0.4.0 and all historical tags stay immutable.
 
 ## One-time maintainer-authorized SAEBase v0.6.0 publication
 
-The maintainer explicitly authorized the v0.6.0 release following review of PR #60 and its source-bound CPU CI and documented bounded real-GPU tests. [The version-specific dispatch](../../.github/workflows/saebase-v060-release-dispatch.yml) may act **only** after a successful push-to-main CI for the exact current main SHA, provided that source declares version 0.6.0 and contains its release notes.
+The maintainer explicitly authorized the v0.6.0 release following review of PR #60 and its source-bound CPU CI and documented bounded real-GPU tests. [The version-specific dispatch](../../../.github/workflows/saebase-v060-release-dispatch.yml) may act **only** after a successful push-to-main CI for the exact current main SHA, provided that source declares version 0.6.0 and contains its release notes.
 
 The dispatch requests the existing `software-release.yml` `mode=publish` with `PUBLISH-v0.6.0`. The normal release gate still checks the original six CI contexts, wheel/sdist installation, tag immutability, SHA-256 and source identity. It cannot publish other versions or replace a version tag. No PyPI, GPU model assets or private research data are published.

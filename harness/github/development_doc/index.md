@@ -4,11 +4,11 @@ Start with a working example, then choose the research task you want to perform.
 
 ## Getting started
 
-- [**Quick Start**](../../README.md#-quick-start) — install SAEBase, run an offline example and try a real model/SAE in Python.
+- [**Quick Start**](../../../README.md#-quick-start) — install SAEBase, run an offline example and try a real model/SAE in Python.
 - [First Experiment](first-experiment.md) — create an HTML report, CSV metrics, source records and a reliability audit without model downloads.
 - [Getting Started](getting-started.md) — installation, preflight and real-checkpoint commands.
 - [Python API](python-api.md) · [API Reference](API.md) — model adapters, SAE features, stores and evaluation.
-- [Runnable Examples](../../saebase/examples/README.md) · [Troubleshooting](troubleshooting.md).
+- [Runnable Examples](../../../saebase/examples/README.md) · [Troubleshooting](troubleshooting.md).
 
 ## Research workflows
 
@@ -24,7 +24,7 @@ Start with a working example, then choose the research task you want to perform.
 
 ## Research Lab
 
-- [Explore the Research Lab](../../saebase/research_lab/README.md) — recorded measurements, feature explorer and reports.
+- [Explore the Research Lab](../../../saebase/research_lab/README.md) — recorded measurements, feature explorer and reports.
 - [Measured results](research-lab/results-20261020.md) — model/SAE coverage and recorded SAR, RSS and feature-intervention evidence.
 - [Release acceptance](research-lab/release-acceptance.md) — artifact checks, public data and deployment boundaries.
 
@@ -38,8 +38,8 @@ Start with a working example, then choose the research task you want to perform.
 ## Repository and maintenance
 
 - [**Repository Guide**](repository-guide.md) — where examples, configuration, research code, assets and evidence live.
-- [Contributing](../../.github/CONTRIBUTING.md) · [Maintainer Workflow](maintainer-workflow.md) · [CI Checks](ci-maintenance.md)
-- [Packaging](packaging.md) · [Software Release Process](release-process.md) · [Security](../../.github/SECURITY.md)
+- [Contributing](../../../.github/CONTRIBUTING.md) · [Maintainer Workflow](maintainer-workflow.md) · [CI Checks](ci-maintenance.md)
+- [Packaging](packaging.md) · [Software Release Process](release-process.md) · [Security](../../../.github/SECURITY.md)
 - [Historical Research and Engineering Notes](history.md) — older implementation, compatibility and checkpoint records.
 
 Versioned source identities and older command aliases remain usable for reproducibility. They are not required to follow the current Quick Start.

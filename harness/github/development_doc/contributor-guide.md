@@ -14,7 +14,7 @@ For a first pull request, good entry points are:
 
 | Area | Where to start | How to verify |
 | --- | --- | --- |
-| Documentation or tutorial | `harness/github_development_doc/`, `saebase/examples/README.md` | `python saebase/tools/check_documentation.py --check` |
+| Documentation or tutorial | `harness/github/development_doc/`, `saebase/examples/README.md` | `python saebase/tools/check_documentation.py --check` |
 | Beginner offline examples | `saebase/examples/quickstart/`, `tests/` | Run the example and its targeted test |
 | Model/SAE metadata checks | `saebase/sae/` and `saebase/extensions/` | Test hook, dtype, shape and revision mismatch cases |
 | Cache and experiment integrity | `saebase/store/`, `saebase/benchmarks/` | Use synthetic fixtures; assert corrupted identities are rejected |
@@ -53,18 +53,18 @@ See [Code Quality](code-quality.md).
 5. Include exact upstream model/SAE sources, license and revision where used.
 6. Link real checkpoint evidence only when those tests actually ran.
 
-Use the [PR template](../../.github/PULL_REQUEST_TEMPLATE.md).
+Use the [PR template](../../../.github/PULL_REQUEST_TEMPLATE.md).
 The maintainer's [review workflow](maintainer-workflow.md) defines how
 changes and critical paths are reviewed. Code ownership is recorded in
-[CODEOWNERS](../../.github/CODEOWNERS); GitHub branch protection is
+[CODEOWNERS](../../../.github/CODEOWNERS); GitHub branch protection is
 a distinct administrative setting, not something the file itself enforces.
 
 ## Documentation changes
 
 Update existing task pages rather than copying explanations into several
-READMEs. Keep the main [README](../../README.md) and
-[Chinese README](../../README_cn.md) as concise capability and navigation
-entry points. Add task-level details under `harness/github_development_doc/` and runnable
+READMEs. Keep the main [README](../../../README.md) and
+[Chinese README](../../../README_cn.md) as concise capability and navigation
+entry points. Add task-level details under `harness/github/development_doc/` and runnable
 checks under `saebase/examples/`.
 
 For changed local links, run:
@@ -83,6 +83,6 @@ contract. A real model/SAE pair claim requires exact model and checkpoint
 provenance, site/hook compatibility and actual acceptance evidence.
 Scientific conclusions need the original evaluation protocol and data.
 
-[Contributing rules](../../.github/CONTRIBUTING.md) ·
+[Contributing rules](../../../.github/CONTRIBUTING.md) ·
 [CI Lanes](ci-maintenance.md) ·
-[Security Policy](../../.github/SECURITY.md)
+[Security Policy](../../../.github/SECURITY.md)
