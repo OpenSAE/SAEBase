@@ -38,7 +38,7 @@ jobs:
           test "$(gh api "repos/$REPO/branches/main" --jq '.commit.sha')" = "$SOURCE_SHA"
           gh api "repos/$REPO/contents/pyproject.toml?ref=$SOURCE_SHA" --jq '.content' | base64 -d | grep -Fqx 'version = "0.6.5"'
           gh api "repos/$REPO/contents/saebase/__init__.py?ref=$SOURCE_SHA" --jq '.content' | base64 -d | grep -Fq '__version__ = "0.6.5"'
-          gh api "repos/$REPO/contents/harness/github_development_doc/releases/v0.6.5.md?ref=$SOURCE_SHA" --jq '.sha' | grep -Eq '^[a-f0-9]{40}$'
+          gh api "repos/$REPO/contents/harness/github/development_doc/releases/v0.6.5.md?ref=$SOURCE_SHA" --jq '.sha' | grep -Eq '^[a-f0-9]{40}$'
           if gh api "repos/$REPO/git/ref/tags/$TAG" >/dev/null 2>&1; then
             echo "Tag already exists; refusing to republish." >&2
             exit 1

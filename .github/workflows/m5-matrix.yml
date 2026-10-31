@@ -28,7 +28,7 @@ jobs:
       - name: Dry-run matrix without downloads
         run: |
           saebase-release-matrix --config conf/release/m5_matrix.json --dry-run
-          python -m pytest -q harness/github_work_test/test_m5_matrix.py
+          python -m pytest -q harness/github/work_test/test_m5_matrix.py
       - name: Download and validate all four real model-SAE pairs
         env:
           HF_HUB_DISABLE_TELEMETRY: '1'
