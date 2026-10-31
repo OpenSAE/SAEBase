@@ -35,7 +35,7 @@ jobs:
           saebase-check-env --mode analysis
       - name: Require frozen M0 reference for M1/M2
         if: matrix.suite != 'm0'
-        run: test -f harness/github_work_test/fixtures/m0_reference_public.json
+        run: test -f harness/github/work_test/fixtures/m0_reference_public.json
       - name: Run original real-checkpoint acceptance
         shell: bash
         env:
@@ -52,13 +52,13 @@ jobs:
               ;;
             m1)
               python scripts/m1_real_smoke.py \
-                --m0-reference harness/github_work_test/fixtures/m0_reference_public.json \
+                --m0-reference harness/github/work_test/fixtures/m0_reference_public.json \
                 --cache-root "$RUNNER_TEMP/m1-store" \
                 --output "$RUNNER_TEMP/m1-results/m1_reference.json"
               ;;
             m2)
               python scripts/m2_real_smoke.py \
-                --m0-reference harness/github_work_test/fixtures/m0_reference_public.json \
+                --m0-reference harness/github/work_test/fixtures/m0_reference_public.json \
                 --cache-root "$RUNNER_TEMP/m2-cache" \
                 --output "$RUNNER_TEMP/m2-results/m2_reference.json"
               ;;

@@ -27,7 +27,7 @@ python saebase/examples/quickstart/first_experiment.py --dry-run
 python saebase/examples/quickstart/first_experiment.py --output runs/first-experiment
 ```
 
-See the [first-experiment walkthrough](../../harness/github_development_doc/first-experiment.md) for the resulting cache, benchmark report, and reliability audit. All numbers in this example come from **synthetic toy weights**, not published research findings.
+See the [first-experiment walkthrough](../../harness/github/development_doc/first-experiment.md) for the resulting cache, benchmark report, and reliability audit. All numbers in this example come from **synthetic toy weights**, not published research findings.
 
 ### Then explore individual capabilities
 
@@ -47,4 +47,4 @@ The shared `_synthetic_common.py` helper is used by multiple offline examples an
 
 The original numbered paths remain accessible in the immutable [v0.3.0 GitHub release](https://github.com/OpenSAE/SAEBase/releases/tag/v0.3.0) and its source archive. **The current `main` branch uses the task-based paths above.** Public package APIs, CLIs, verification records and existing release tags are unchanged.
 
-[Getting Started](../../harness/github_development_doc/getting-started.md) · [Documentation](../../harness/github_development_doc/index.md) · [Python API](../../harness/github_development_doc/python-api.md)
+[Getting Started](../../harness/github/development_doc/getting-started.md) · [Documentation](../../harness/github/development_doc/index.md) · [Python API](../../harness/github/development_doc/python-api.md)

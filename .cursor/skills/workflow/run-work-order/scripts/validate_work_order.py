@@ -44,11 +44,11 @@ def reference(value, kind, check_exists=True):
     prefixes = (
         ("doc/knowledge/", "doc/code/")
         if kind == "doc"
-        else ("harness/github_work_plan/",)
+        else ("harness/github/work_plan/",)
     )
     demand(any(value.startswith(p) for p in prefixes), f"Reference is outside {kind}: {value}")
     dest = (ROOT / value).resolve(strict=False)
-    roots = ("doc/knowledge", "doc/code") if kind == "doc" else ("harness/github_work_plan",)
+    roots = ("doc/knowledge", "doc/code") if kind == "doc" else ("harness/github/work_plan",)
     demand(
         any(dest.is_relative_to((ROOT / p).resolve(strict=False)) for p in roots),
         "Reference symlink escapes root",

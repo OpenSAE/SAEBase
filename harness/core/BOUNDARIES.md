@@ -21,3 +21,29 @@
 ## 风险和局限
 
 静态 Atlas 不代表真实训练通过；验证集与测试集若复用相同样本，则不能当作独立测试证据；HTML 公网镜像不是实时读私有仓库；`.cursorignore` 不是 OS 沙箱。与 B2、多 GPU 和真实训练相关的端到端验收仍需对应环境实测。
+
+## 仓库文件架构纲领
+
+在修改之前先确定文件所有权。改动权限与架构合规是两个独立条件。新增实体必须说明为什么现有模块不足以满足需求。宏观框架与微观实验分离。
+
+| 所有者 | 合法职责 |
+| --- | --- |
+| `saebase/` | 通用 API、Registry、Runtime 与跨任务机制 |
+| `datasets/<Dataset>/` | 数据来源、适配器；对应配置在 `conf/dataset/` |
+| `models/<Model>/` | 模型格式、加载与适配；配置在 `conf/model/` |
+| `tasks/<Task>/` | 可跨数据集、模型、实验重用的任务；配置在 `conf/task/` |
+| `scripts/experiments/<Study>/` | 具体研究执行与组合；配置在 `conf/experiment/<Study>/` |
+| `scripts/` | 可执行脚本与启动入口 |
+| `tests/` | 产品功能及集成验证 |
+| `experiment/` | Runtime 管理的运行产物 |
+| `harness/` | 治理、审阅、知识和独立验收 |
+| `.github/` | GitHub 原生配置，与 `harness/github/` 独立 |
+
+**依赖方向**：具体实验可以组合 Dataset、Model、Task，但通用组件不得反向依赖某个具体 Experiment。Dataset 专属解析属于对应 Dataset，不能把单一研究提升为 Dataset 总纲；启动脚本不能散落在组件目录中。配置、可执行入口、实现和结果必须分别归其所有者。
+
+**Scripts / Tests 开放组织原则**：优先按 Work Plan，例如 `scripts/workplan/wp22.sh` 与 `tests/workplan/wp22/`；或者参照 Runtime 实验路径，在一级目录内部按 `<dataset>/<model>/<task>/<sub_name>/` 分类。研究级布局 `scripts/experiments/<study>/`、`tests/experiments/<study>/` 也可接受。它们是优先约定，不是唯一合法层级；其他方案须交代归属、复用依据和为何现有布局不足。不要将临时脚本或测试直接散落在仓库根目录。
+
+**新增结构审批**：现有模块内新增受控实例可按照已授权 Work Plan 进行；新增仓库一级目录、通用 Registry、独立配置体系、跨模块框架或改变依赖方向必须单独提出架构变更并通过独立审阅。每次 PR 列出新增/移动文件的所有权、依赖、配置和注册影响、测试及证据。Path scope 授权不代表架构许可。机器检查处理结构性错误，Reviewer 审核语义正确性。历史冻结验收和科研证据不因迁移重写。
+
+
+**一级目录扩展规则**：不再接受新建顶层 `experiments/` 科研源码包。具体实验由既有 `conf/experiment/<study>/`、`scripts/experiments/<study>/` 和受控产品测试组织；运行记录归单数 `experiment/`。新增其他根目录必须经过独立架构审批。

@@ -15,4 +15,4 @@ python saebase/examples/extensions/qwen3_external_probe.py
 
 A successful external probe establishes one checkpoint/site integration, not general interpretability or full population-level reliability.
 
-[Examples index](../README.md) · [Extension API](../../../harness/github_development_doc/extensions.md)
+[Examples index](../README.md) · [Extension API](../../../harness/github/development_doc/extensions.md)

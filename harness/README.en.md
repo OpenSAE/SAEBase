@@ -1,6 +1,6 @@
 # SAEBase Research Harness
 
-**Current Harness baseline (WP21.2 finalized):** [WP21 closeout](github_work_plan/21_harness_phase_closeout_20261030.en.md). The WP18–WP20 tests and prior Contract registry remain available; WP21's real-workflow exams, maintenance and archived round01/round02 results are linked from [Harness tests](tests/README.md). Remaining GPU or product fixes follow separate review.
+**Current Harness baseline (WP21.2 finalized):** [WP21 closeout](github/work_plan/21_harness_phase_closeout_20261030.en.md). The WP18–WP20 tests and prior Contract registry remain available; WP21's real-workflow exams, maintenance and archived round01/round02 results are linked from [Harness tests](tests/README.md). Remaining GPU or product fixes follow separate review.
 
 
 The Harness provides auditable navigation, scientific knowledge management, experiment provenance, environment records, and scoped agent collaboration. Research Lab, datasets, models, tasks, and the public SAE API remain part of the unified SAEBase repository.
@@ -14,9 +14,9 @@ The Harness provides auditable navigation, scientific knowledge management, expe
 | `environment/` | Machine resource observations and comparisons |
 | `transfer/` | Authorized and verified file transfers |
 | `visualization/` | Interactive Core, Knowledge, Code, Environment, and Context trees |
-| `github_work_plan/` | Historical plans, research reviews, and deferred acceptance work |
-| `github_development_doc/` | Developer documentation and public reference material |
-| `github_work_test/` | Integration and regression tests |
+| `github/work_plan/` | Historical plans, research reviews, and deferred acceptance work |
+| `github/development_doc/` | Developer documentation and public reference material |
+| `github/work_test/` | Integration and regression tests |
 
 ## Code architecture
 
@@ -28,7 +28,7 @@ Legacy public API imports remain compatible where required. Historical release t
 
 ```bash
 python .cursor/hooks/validate_repo.py --full
-python -m pytest -q harness/github_work_test/test_harness_migration.py
+python -m pytest -q harness/github/work_test/test_harness_migration.py
 python -m saebase.runtime.train --cfg job
 python harness/core/validate.py
 python harness/knowledge/validate.py
@@ -42,3 +42,7 @@ Actual results are established by CI logs for the corresponding commit. Real GPU
 ## Agent permissions
 
 See `.cursor/hooks.json`, `.cursor/policy.json`, and [AGENT_FLOW](core/AGENT_FLOW.en.md). Unreviewed proposals cannot modify protected governance state or count as scientific acceptance.
+
+## GitHub agents and ownership
+
+See [the GitHub workspace](github/README.en.md) for engineering plans and tests, and [architecture boundaries](core/BOUNDARIES.en.md) before editing. Scripts and tests prefer Work Plan or Dataset/Model/Task/Sub-name layouts with justified extensions.

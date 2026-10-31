@@ -2,10 +2,10 @@ include README.md README_cn.md LICENSE CITATION.cff
 include requirements.txt
 recursive-include .github *.yml *.md
 recursive-include conf *.yaml *.md *.json
-recursive-include harness/github_development_doc *.md *.json *.cff NOTICE
+recursive-include harness/github/development_doc *.md *.json *.cff NOTICE
 recursive-include saebase *.md
-recursive-include harness/github_work_test *.py
-recursive-include harness/github_work_test/fixtures *.json
+recursive-include harness/github/work_test *.py
+recursive-include harness/github/work_test/fixtures *.json
 recursive-include saebase/examples *.py *.sh
 recursive-include saebase/tools *.py
 prune data

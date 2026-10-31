@@ -23,7 +23,7 @@ from harness.contracts import wp20_reference_a, wp20_reference_b, wp20_reference
 
 ROOT = registry.ROOT
 RUNS = ROOT / "harness/tests/wp20/runs"
-PLAN = "harness/github_work_plan/20_integrated_multistage_harness_exams.md"
+PLAN = "harness/github/work_plan/20_integrated_multistage_harness_exams.md"
 SCENARIOS = ROOT / "harness/contracts/wp20_scenarios.json"
 SPEC = ROOT / "harness/contracts/wp20_cases.json"
 RUN_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{3,63}$")

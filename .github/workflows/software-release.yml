@@ -211,7 +211,7 @@ jobs:
             release/SHA256SUMS \
             --repo "$REPO" --verify-tag --latest \
             --title "SAEBase $TAG" \
-            --notes-file "harness/github_development_doc/releases/$TAG.md"
+            --notes-file "harness/github/development_doc/releases/$TAG.md"
           gh api -X GET "repos/$REPO/releases/tags/$TAG" > release-remote.json
           python - <<'PY'
           import hashlib
