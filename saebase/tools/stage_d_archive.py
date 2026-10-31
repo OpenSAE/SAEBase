@@ -32,8 +32,8 @@ SUPPORT_FILES = (
     Path("conf/coverage/stage_b_cpu_verified.json"),
     Path("conf/coverage/stage_c_cpu_verified.json"),
     Path("conf/coverage/stage_d_population.jsonl"),
-    Path("harness/github_development_doc/verified-model-matrix.md"),
-    Path("harness/github_development_doc/stage-d-evidence-archive.md"),
+    Path("harness/github/development_doc/verified-model-matrix.md"),
+    Path("harness/github/development_doc/stage-d-evidence-archive.md"),
     Path("saebase/tools/stage_d_archive.py"),
 )
 SHA_LINE = re.compile(r"^([a-f0-9]{64})  (\S+)$")

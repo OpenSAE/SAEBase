@@ -81,10 +81,10 @@ def project_info(root: Path = ROOT) -> tuple[str, str, dict[str, str]]:
     declared = _static_version((root / "saebase" / "__init__.py").read_text(encoding="utf-8"))
     if declared != version:
         raise ValueError("pyproject.toml and saebase.__version__ disagree")
-    changelog = (root / "harness/github_development_doc/CHANGELOG.md").read_text(encoding="utf-8")
+    changelog = (root / "harness/github/development_doc/CHANGELOG.md").read_text(encoding="utf-8")
     if re.search(rf"^##[ \t]+{re.escape(version)}(?=\s|$)", changelog, re.M) is None:
         raise ValueError(f"CHANGELOG.md lacks a release heading for {version}")
-    notes = root / "harness/github_development_doc" / "releases" / f"v{version}.md"
+    notes = root / "harness/github/development_doc" / "releases" / f"v{version}.md"
     if not notes.is_file() or not notes.read_text(encoding="utf-8").strip():
         raise ValueError(f"release notes missing for v{version}")
     entrypoints = project["scripts"]
@@ -103,7 +103,7 @@ def _safe_archive_name(name: str) -> None:
         raise ValueError(f"private/credential file in distribution: {name}")
     if item.suffix.lower() in BANNED_SUFFIX:
         raise ValueError(f"model binary in software distribution: {name}")
-    if EVIDENCE_PREFIX in name or "harness/github_work_plan/" in name:
+    if EVIDENCE_PREFIX in name or "harness/github/work_plan/" in name:
         raise ValueError(f"non-runtime evidence in software distribution: {name}")
 
 
@@ -168,8 +168,8 @@ def inspect_distributions(
             raise ValueError("sdist package version differs from wheel")
         for required in (
             "LICENSE",
-            "harness/github_development_doc/CHANGELOG.md",
-            f"harness/github_development_doc/releases/v{version}.md",
+            "harness/github/development_doc/CHANGELOG.md",
+            f"harness/github/development_doc/releases/v{version}.md",
         ):
             if root_path + required not in names:
                 raise ValueError(f"sdist missing release source: {required}")
@@ -231,7 +231,7 @@ def prepare(
         else "not independently checked by this offline command",
         "software_license": "Apache-2.0",
         "distribution_artifacts": artifacts,
-        "release_notes": f"harness/github_development_doc/releases/{tag}.md",
+        "release_notes": f"harness/github/development_doc/releases/{tag}.md",
         "model_or_sae_weights_included": False,
         "scientific_scope": (
             "software packaging/API/integration checks; no new real checkpoint "

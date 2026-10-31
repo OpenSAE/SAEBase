@@ -94,7 +94,7 @@ saebase = ["**/*.md", "**/*.yaml", "**/*.json", "**/*.html", "**/*.css", "**/*.j
 models = ["**/*.json", "**/*.yaml"]
 
 [tool.pytest.ini_options]
-testpaths = ["harness/github_work_test"]
+testpaths = ["harness/github/work_test"]
 
 [tool.ruff]
 line-length = 100
