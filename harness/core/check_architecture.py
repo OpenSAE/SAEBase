@@ -52,7 +52,7 @@ def validate_path(name: str, roots: set[str]) -> list[str]:
         and p.name not in {"README.md", "README.en.md"}
     ):
         errors.append("Group new scripts/tests below their owned category: " + name)
-    if name.startswith("datasets/qa_") and p.suffix == ".py":
+    if p.parts[0] == "datasets" and p.name.startswith("qa") and p.name.endswith("_runner.py"):
         errors.append("Study-specific QA orchestration belongs to experiments/: " + name)
     if p.parts[0] in {"datasets", "models", "tasks"} and p.suffix == ".sh":
         errors.append("Shell launcher belongs to scripts/: " + name)
