@@ -92,3 +92,34 @@ def test_worker_oom_simulation_is_not_fake_gpu_acceptance(tmp_path):
     assert len(report["attempts"]) == 2
     assert report["precision_changed"] is False
     assert report["model_substituted"] is False
+
+
+def test_publication_asset_lock_rejects_partial_and_unverified_revision_ids(monkeypatch):
+    from experiments.qa500 import assets
+
+    sites = get_sites()
+    complete = {
+        "status": "pinned",
+        "dataset_revisions": {key: "a" * 40 for key in get_dataset_ids()},
+        "model_revisions": {row["model_key"]: "b" * 40 for row in sites},
+        "sae_revisions": {
+            f"{row['model_key']}:{row['sae_key']}:L{layer}": "c" * 40
+            for row in sites for layer in row["layers"]
+        },
+    }
+    monkeypatch.setattr(assets, "get_assets_lock", lambda: complete)
+    assert assets.required_publication_lock() is True
+
+    incomplete = {
+        **complete,
+        "sae_revisions": dict(list(complete["sae_revisions"].items())[:-1]),
+    }
+    monkeypatch.setattr(assets, "get_assets_lock", lambda: incomplete)
+    assert assets.required_publication_lock() is False
+
+    malformed = {
+        **complete,
+        "dataset_revisions": {**complete["dataset_revisions"], "mmlu_pro": "x" * 40},
+    }
+    monkeypatch.setattr(assets, "get_assets_lock", lambda: malformed)
+    assert assets.required_publication_lock() is False
