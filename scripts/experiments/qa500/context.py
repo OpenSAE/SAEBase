@@ -2,21 +2,26 @@
 
 Keep reusable Dataset, Model, Task, and Runtime behavior in their owning modules.
 """
+
 from __future__ import annotations
-
-
-# --- config: instance glue ---
-"""Experiment definition loader. Component implementations live elsewhere.
-
-The JSON files under conf/experiment/qa500 are the only scientific
-configuration source; this module merely validates and resolves them.
-"""
-
 
 from functools import lru_cache
 from importlib.resources import files
 import json
 from typing import Any
+import re
+from saebase.integrations.hf_assets import resolve_revision
+from pathlib import Path
+from omegaconf import OmegaConf
+from saebase.runtime.experiment_paths import (
+    artifact_path as runtime_artifact_path,
+    create_layout,
+    run_leaf,
+    study_root,
+)
+
+
+# --- config: instance glue ---
 
 
 @lru_cache(maxsize=None)
@@ -71,18 +76,7 @@ def get_assets_lock() -> dict[str, Any]:
 
 
 # --- assets: instance glue ---
-"""Read frozen experiment assets without silently substituting another source.
 
-The researcher-published project lock is distinct from a first-run resolved
-local identity. A first-run identity supports same-machine resume, not
-cross-machine scientific equivalence.
-"""
-
-
-
-import re
-
-from saebase.integrations.hf_assets import resolve_revision
 
 
 def declared_revision(kind: str, name: str) -> str | None:
@@ -142,24 +136,6 @@ def required_publication_lock() -> bool:
 
 
 # --- paths: instance glue ---
-"""Project-neutral SAEBase Runtime paths for the QA500 Experiment.
-
-Task results use the official `experiment/<dataset>/<model>/<task.path>/<run>`
-layout. A study-level directory stores only frozen input identities, cross-run
-receipts and staging. This module owns NO new experiment artifact contract.
-"""
-
-
-from pathlib import Path
-
-from omegaconf import OmegaConf
-
-from saebase.runtime.experiment_paths import (
-    artifact_path as runtime_artifact_path,
-    create_layout,
-    run_leaf,
-    study_root,
-)
 
 
 PROTOCOL_ID = get_protocol()["protocol_id"]
@@ -240,4 +216,3 @@ def typed_file(
 ) -> Path:
     """Respect the existing typed-artifact contract."""
     return runtime_artifact_path(run, category, filename)
-
