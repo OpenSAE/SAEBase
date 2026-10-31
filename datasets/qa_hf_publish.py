@@ -3,6 +3,7 @@
 Never edit historic results or overwrite the existing 25 HF subsets. Parent
 commit guards prevent an agent from silently overwriting concurrent changes.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -34,10 +35,12 @@ def _update_card(original: str) -> str:
     if any(n in names for n in CONFIGS):
         raise RuntimeError("QA500 dataset configs already exist; refuse overwrite")
     for name in CONFIGS:
-        old.append({
-            "config_name": name,
-            "data_files": [{"split": "train", "path": f"qa_v1/{name}/data.csv"}],
-        })
+        old.append(
+            {
+                "config_name": name,
+                "data_files": [{"split": "train", "path": f"qa_v1/{name}/data.csv"}],
+            }
+        )
     updated_meta = yaml.safe_dump(meta, sort_keys=False, allow_unicode=True)
     body = parts[2]
     addendum = (
@@ -56,7 +59,10 @@ def _update_card(original: str) -> str:
 
 
 def publish(
-    *, stage: Path, approved: bool, target: str = DESTINATION,
+    *,
+    stage: Path,
+    approved: bool,
+    target: str = DESTINATION,
 ) -> dict[str, Any]:
     if not approved:
         raise PermissionError("HF publication requires explicit approval")
@@ -87,8 +93,10 @@ def publish(
     if not re.fullmatch(r"[0-9a-f]{40}", str(parent)):
         raise RuntimeError("Cannot pin current HF target commit")
     card_file = hf_hub_download(
-        repo_id=target, filename="README.md",
-        repo_type="dataset", revision=parent,
+        repo_id=target,
+        filename="README.md",
+        repo_type="dataset",
+        revision=parent,
     )
     card = _update_card(Path(card_file).read_text(encoding="utf-8"))
     operations = [
@@ -98,14 +106,18 @@ def publish(
         )
         for name in CONFIGS
     ]
-    operations.append(CommitOperationAdd(
-        path_in_repo="qa_v1/publication_manifest.json",
-        path_or_fileobj=str(manifest_path),
-    ))
-    operations.append(CommitOperationAdd(
-        path_in_repo="README.md",
-        path_or_fileobj=BytesIO(card.encode("utf-8")),
-    ))
+    operations.append(
+        CommitOperationAdd(
+            path_in_repo="qa_v1/publication_manifest.json",
+            path_or_fileobj=str(manifest_path),
+        )
+    )
+    operations.append(
+        CommitOperationAdd(
+            path_in_repo="README.md",
+            path_or_fileobj=BytesIO(card.encode("utf-8")),
+        )
+    )
     commit = api.create_commit(
         repo_id=target,
         repo_type="dataset",
@@ -114,8 +126,10 @@ def publish(
         parent_commit=parent,
     )
     return {
-        "status": "published", "repository": target,
-        "source_parent_commit": parent, "commit": str(commit.commit_url),
+        "status": "published",
+        "repository": target,
+        "source_parent_commit": parent,
+        "commit": str(commit.commit_url),
         "new_subset_names": list(CONFIGS),
         "old_subset_count_unchanged": len((api.dataset_info(target).siblings or [])) >= 0,
     }
