@@ -1,5 +1,7 @@
 """QA500 orchestration of the existing benchmark Task's Core metrics."""
 from __future__ import annotations
+
+from experiments.qa500.paths import task_dir, typed_file
 from hashlib import sha256
 import json
 import math
@@ -17,8 +19,11 @@ def benchmark_from_capture(
     dataset_id: str,
 ) -> dict[str, Any]:
     verify_dataset(dataset_id, data_root)
-    base = result_root / PROTOCOL_ID / model_key / sae_key / f"L{layer}" / dataset_id
-    capture = base / "capture.jsonl"
+    capture_dir = task_dir(result_root, task="capture", dataset=dataset_id,
+                           model=model_key, sae_key=sae_key, layer=layer)
+    base = task_dir(result_root, task="benchmark", dataset=dataset_id,
+                    model=model_key, sae_key=sae_key, layer=layer, initialize=True)
+    capture = typed_file(capture_dir, "metrics", "capture.jsonl")
     if not capture.is_file():
         raise FileNotFoundError("Frozen full capture required before Core benchmark")
     payload = capture.read_bytes()
@@ -84,7 +89,7 @@ def benchmark_from_capture(
         ],
         "not_claimed": ["saebench_native_fvu", "loss_recovered", "causal_semantics"],
     }
-    output = base / "benchmark_summary.json"
+    output = typed_file(base, "reports", "benchmark_summary.json")
     if output.is_file() and json.loads(output.read_text(encoding="utf-8")) != summary:
         raise RuntimeError("Existing benchmark result differs from current frozen observations")
     output.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")

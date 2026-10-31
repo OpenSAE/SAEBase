@@ -7,6 +7,8 @@ frozen in code. No HF publication, training or paid inference is implicit.
 
 from __future__ import annotations
 
+from experiments.qa500.paths import inputs_dir, study_dir, receipts_dir
+
 import argparse
 from datetime import datetime, timezone
 import gc
@@ -25,8 +27,8 @@ from experiments.qa500.explain import explain_from_captures
 from experiments.qa500.benchmark import benchmark_from_capture
 
 
-DATA_ROOT = Path("experiment/qa500/inputs")
-RESULT_ROOT = Path("experiment/qa500/results")
+DATA_ROOT = inputs_dir(Path.cwd())
+RESULT_ROOT = Path.cwd()
 TASK_STATUS = {
     "capture": "executable",
     "benchmark": "frozen_500_question_core_summary_with_bootstrap",
@@ -133,7 +135,7 @@ def run_model(
 
         if not torch.cuda.is_available():
             raise RuntimeError("CUDA not available; refusing a fake GPU execution")
-    job_root = result_root / PROTOCOL_ID / "_receipts" / model_key
+    job_root = receipts_dir(result_root, model_key)
     job_root.mkdir(parents=True, exist_ok=True)
     receipt: dict[str, Any] = {
         "protocol_id": PROTOCOL_ID,
@@ -347,7 +349,7 @@ def run_matrix(
                 "reason": str(exc)[:1000],
                 "error_type": type(exc).__name__,
             }
-        _atomic_json(result_root / PROTOCOL_ID / "_receipts" / f"{phase}_matrix.json", output)
+        _atomic_json(receipts_dir(result_root) / f"{phase}_matrix.json", output)
     return output
 
 

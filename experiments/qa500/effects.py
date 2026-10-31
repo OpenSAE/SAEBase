@@ -6,6 +6,9 @@ magnitudes descriptively; these are not held-out causal feature-meaning tests.
 
 from __future__ import annotations
 
+from experiments.qa500.paths import task_dir, typed_file
+from experiments.qa500.config import get_tasks
+
 import hashlib
 import json
 import math
@@ -18,7 +21,7 @@ from experiments.qa500.cohort import PROTOCOL_ID, verify_dataset
 from models.qa_input import make_input
 
 
-TASK_BUDGET = {"intervene": 20, "generate": 5}
+TASK_BUDGET = {name: int(get_tasks()["budgets"][name]) for name in ("intervene", "generate")}
 FEATURE_SELECTION_RULE = "max_abs_nonzero_activation_on_same_input_v1"
 
 
@@ -33,8 +36,9 @@ def _candidate_rows(
     task: str,
 ) -> list[tuple[dict[str, Any], dict[str, Any]]]:
     verify_dataset(dataset_id, data_root)
-    root = results_root / PROTOCOL_ID / model_key / sae_key / f"L{layer}" / dataset_id
-    capture_file = root / "capture.jsonl"
+    capture_dir = task_dir(results_root, task="capture", dataset=dataset_id,
+                           model=model_key, sae_key=sae_key, layer=layer)
+    capture_file = typed_file(capture_dir, "metrics", "capture.jsonl")
     source_file = data_root / dataset_id / "questions.jsonl"
     sources = {
         record["sample_id"]: record
@@ -97,8 +101,9 @@ def run_effects(
         layer=layer,
         task=task,
     )
-    root = results_root / PROTOCOL_ID / model_key / sae_key / f"L{layer}" / dataset_id
-    output = root / f"{task}.jsonl"
+    root = task_dir(results_root, task=task, dataset=dataset_id,
+                    model=model_key, sae_key=sae_key, layer=layer, initialize=True)
+    output = typed_file(root, "metrics", f"{task}.jsonl")
     existing = _existing(output)
     expected = {item["sample_id"] for item, _ in choices}
     if not set(existing).issubset(expected):
@@ -119,7 +124,7 @@ def run_effects(
         features = captured["top_features"]
         if not features or float(features[0]["activation"]) == 0:
             _append(
-                root / f"{task}_failures.jsonl",
+                typed_file(root, "logs", f"{task}_failures.jsonl"),
                 {
                     "sample_id": sid,
                     "status": "blocked",
@@ -235,5 +240,5 @@ def run_effects(
         "status": "complete" if len(existing) == len(choices) else "partial",
         "selected_on_evaluation_input": True,
     }
-    (root / f"{task}_summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+    typed_file(root, "reports", f"{task}_summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     return summary

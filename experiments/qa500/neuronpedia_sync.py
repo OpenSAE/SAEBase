@@ -7,6 +7,9 @@ user-auditable exact mapping to the loaded SAE weight digest.
 
 from __future__ import annotations
 
+from experiments.qa500.paths import task_dir, typed_file, study_dir
+from experiments.qa500.config import get_dataset_ids
+
 import argparse
 import gzip
 import hashlib
@@ -89,11 +92,18 @@ def _capture_identity(
     results_root: Path,
     site: dict[str, Any],
 ) -> tuple[str, set[int]]:
-    root = results_root / PROTOCOL_ID / site["model_key"] / site["sae_key"] / f"L{site['layer']}"
     identities: set[str] = set()
     features: set[int] = set()
-    for dataset_dir in root.glob("*/capture.jsonl"):
-        for line in dataset_dir.read_text(encoding="utf-8").splitlines():
+    for dataset_id in get_dataset_ids():
+        run = task_dir(
+            results_root, task="capture", dataset=dataset_id,
+            model=site["model_key"], sae_key=site["sae_key"],
+            layer=site["layer"],
+        )
+        dataset_file = typed_file(run, "metrics", "capture.jsonl")
+        if not dataset_file.is_file():
+            continue
+        for line in dataset_file.read_text(encoding="utf-8").splitlines():
             if not line:
                 continue
             row = json.loads(line)
@@ -191,11 +201,11 @@ def sync(
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description="Bulk Neuronpedia QA feature explanations")
     ap.add_argument("--mapping", type=Path, required=True)
-    ap.add_argument("--result-root", type=Path, default=Path("experiment/qa500/results"))
+    ap.add_argument("--result-root", type=Path, default=Path.cwd())
     ap.add_argument(
         "--output",
         type=Path,
-        default=Path("experiment/qa500/neuronpedia/annotations.jsonl"),
+        default=study_dir(Path.cwd()) / "metadata" / "neuronpedia" / "annotations.jsonl",
     )
     args = ap.parse_args(argv)
     print(

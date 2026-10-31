@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from experiments.qa500.paths import task_dir, typed_file
+
 import hashlib
 import json
 from pathlib import Path
@@ -51,10 +53,11 @@ def run_baseline(
         if not 1 <= pilot <= len(items):
             raise ValueError("pilot count exceeds frozen cohort")
         items = items[:pilot]
-    root = output_root / PROTOCOL_ID / "_model_baselines" / model_key / dataset_id
+    root = task_dir(output_root, task="benchmark", dataset=dataset_id,
+                    model=model_key, initialize=True)
     root.mkdir(parents=True, exist_ok=True)
     name = "pilot" if pilot else "all"
-    path = root / f"{name}.jsonl"
+    path = typed_file(root, "metrics", f"{name}.jsonl")
     config = {
         "protocol_id": PROTOCOL_ID,
         "dataset_id": dataset_id,
@@ -64,7 +67,7 @@ def run_baseline(
         "pilot": pilot,
         "scorer": "qa_inference_v1",
     }
-    cfg_file = root / f"{name}_config.json"
+    cfg_file = typed_file(root, "metadata", f"{name}_config.json")
     if cfg_file.exists():
         if json.loads(cfg_file.read_text(encoding="utf-8")) != config:
             raise RuntimeError("QA baseline config changed under an existing run")
@@ -100,7 +103,7 @@ def run_baseline(
             done[item["sample_id"]] = row
         except (ValueError, RuntimeError, IndexError) as exc:
             _append(
-                root / f"{name}_failures.jsonl",
+                typed_file(root, "logs", f"{name}_failures.jsonl"),
                 {
                     "status": "failed",
                     "sample_id": item["sample_id"],
@@ -123,5 +126,5 @@ def run_baseline(
     }
     denom = summary["n_scored"]
     summary["accuracy"] = summary["n_correct"] / denom if denom else None
-    (root / f"{name}_summary.json").write_text(json.dumps(summary, sort_keys=True, indent=2) + "\n")
+    typed_file(root, "reports", f"{name}_summary.json").write_text(json.dumps(summary, sort_keys=True, indent=2) + "\n")
     return summary

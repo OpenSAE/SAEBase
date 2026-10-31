@@ -6,6 +6,9 @@ silently substitute unavailable weights/datasets.
 
 from __future__ import annotations
 
+from experiments.qa500.paths import task_dir, inputs_dir, typed_file
+from experiments.qa500.config import get_sites
+
 import argparse
 import json
 import math
@@ -25,17 +28,9 @@ from models.qa_input import make_input
 
 
 # Each pair is from the existing verified-site matrix, not inferred by layer fraction.
-SITES: tuple[tuple[str, str, tuple[int, int]], ...] = (
-    ("gemma270m", "gemma270m_scope_resid", (5, 12)),
-    ("pythia410m", "pythia410m_mlp_topk", (12, 20)),
-    ("gemma1b", "gemma1b_scope_resid", (7, 17)),
-    ("qwen3_1_7b_base", "qwen3_1_7b_base_resid_w32k", (14, 23)),
-    ("gemma2_2b_base", "gemma2_2b_pt_l25_canonical", (13, 25)),
-    ("qwen35_2b", "qwen35_2b_resid_w32k", (6, 20)),
-    ("gemma3_4b_pt", "gemma3_4b_pt_scope_resid", (9, 29)),
-    ("gemma3_4b_it", "gemma3_4b_it_scope_resid", (9, 29)),
-    ("qwen3_8b", "qwen3_8b_resid_w64k", (9, 31)),
-    ("llama31_8b", "llama31_8b_lxr_8x", (8, 27)),
+SITES: tuple[tuple[str, str, tuple[int, ...]], ...] = tuple(
+    (entry["model_key"], entry["sae_key"], tuple(entry["layers"]))
+    for entry in get_sites()
 )
 
 
@@ -129,8 +124,10 @@ def run_capture(
     if not 1 <= top_k <= 100:
         raise ValueError("top_k must be in [1, 100]")
     subset = records[:limit] if limit else records
-    base = output_root / PROTOCOL_ID / model_key / target["sae_key"] / f"L{layer}" / dataset_id
-    outpath = base / ("pilot.jsonl" if limit else "capture.jsonl")
+    base = task_dir(output_root, task="capture", dataset=dataset_id,
+                    model=model_key, sae_key=target["sae_key"], layer=layer,
+                    initialize=True)
+    outpath = typed_file(base, "metrics", "pilot.jsonl" if limit else "capture.jsonl")
     cfg = {
         "protocol_id": PROTOCOL_ID,
         "target": target,
@@ -141,7 +138,7 @@ def run_capture(
         "sample_limit": limit,
     }
     base.mkdir(parents=True, exist_ok=True)
-    config_path = base / ("pilot_config.json" if limit else "capture_config.json")
+    config_path = typed_file(base, "metadata", "pilot_config.json" if limit else "capture_config.json")
     if config_path.exists():
         if json.loads(config_path.read_text(encoding="utf-8")) != cfg:
             raise RuntimeError("Existing output directory belongs to a different configuration")
@@ -188,7 +185,7 @@ def run_capture(
             )
         except ValueError as exc:
             # Invalid prompts are explicit failures; never count as successful data.
-            failure = base / ("pilot_failures.jsonl" if limit else "capture_failures.jsonl")
+            failure = typed_file(base, "logs", "pilot_failures.jsonl" if limit else "capture_failures.jsonl")
             _append_once(
                 failure,
                 {
@@ -227,7 +224,7 @@ def run_capture(
         "sae_sha256": sae_sha256,
         "result_path": str(outpath),
     }
-    (base / ("pilot_summary.json" if limit else "capture_summary.json")).write_text(
+    typed_file(base, "reports", "pilot_summary.json" if limit else "capture_summary.json").write_text(
         json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     return summary
@@ -239,18 +236,18 @@ def main(argv: list[str] | None = None) -> None:
     sub.add_parser("sites", help="List 20 registered and validated-by-metadata sites")
     prep = sub.add_parser("prepare", help="Freeze upstream HF samples with exact source commit")
     prep.add_argument("--dataset", choices=[*DATASETS, "all"], default="all")
-    prep.add_argument("--data-root", type=Path, default=Path("experiment/qa500/inputs"))
+    prep.add_argument("--data-root", type=Path, default=inputs_dir(Path.cwd()))
     check = sub.add_parser("verify", help="Check prepared cohort checksums and prompt identities")
     check.add_argument("--dataset", choices=[*DATASETS, "all"], default="all")
-    check.add_argument("--data-root", type=Path, default=Path("experiment/qa500/inputs"))
+    check.add_argument("--data-root", type=Path, default=inputs_dir(Path.cwd()))
     cap = sub.add_parser(
         "capture", help="Run real model + SAE weights with explicit GPU authorization"
     )
     cap.add_argument("--dataset", required=True, choices=sorted(DATASETS))
     cap.add_argument("--model", required=True, choices=[s[0] for s in SITES])
     cap.add_argument("--layer", required=True, type=int)
-    cap.add_argument("--data-root", type=Path, default=Path("experiment/qa500/inputs"))
-    cap.add_argument("--output-root", type=Path, default=Path("experiment/qa500/results"))
+    cap.add_argument("--data-root", type=Path, default=inputs_dir(Path.cwd()))
+    cap.add_argument("--output-root", type=Path, default=Path.cwd())
     cap.add_argument("--device", default="cuda")
     cap.add_argument("--max-tokens", type=int, default=2048)
     cap.add_argument("--limit", type=int)

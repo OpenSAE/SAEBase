@@ -7,6 +7,8 @@ requires explicit native-work authorization.
 
 from __future__ import annotations
 
+from experiments.qa500.paths import task_dir, typed_file, study_dir, inputs_dir
+
 import argparse
 from dataclasses import asdict
 import hashlib
@@ -16,7 +18,7 @@ from typing import Any
 
 from experiments.qa500.cohort import PROTOCOL_ID, render_prompt, verify_dataset
 
-ROOT = Path("experiment/qa500")
+ROOT = study_dir(Path.cwd())
 MODEL = "google/gemma-2-2b"
 TRAIN_DATASET = "Salesforce/wikitext"
 TRAIN_CONFIG = "wikitext-2-raw-v1"
@@ -53,12 +55,14 @@ def run_circuits(
     )[:10]
     if len(candidates) != 10:
         raise RuntimeError("Fewer than 10 short, frozen BoolQ inputs for circuit tracer")
-    root = result_root / PROTOCOL_ID / "_native" / "circuits_gemma2_2b"
+    site_dir = task_dir(result_root, task="circuits", dataset="boolq",
+                        model="gemma2_2b_base", sae_key="native_gemma", initialize=True)
+    root = site_dir
     results: list[dict[str, Any]] = []
     for row in candidates:
         ident = row["sample_id"]
-        out = root / ident
-        receipt_path = root / f"{ident}.json"
+        out = root / "metrics" / ident
+        receipt_path = typed_file(root, "metadata", f"{ident}.json")
         if receipt_path.is_file():
             previous = json.loads(receipt_path.read_text(encoding="utf-8"))
             if previous.get("status") == "native_raw_graph_generated_not_normalized":
@@ -113,7 +117,7 @@ def run_circuits(
         "expected": 10,
         "interpretation": "native transcoder graph, not SAE feature explanation",
     }
-    _save(root / "summary.json", summary)
+    _save(typed_file(root, "reports", "summary.json"), summary)
     return summary
 
 
@@ -202,7 +206,10 @@ def run_train(
         sae_dtype="float32",
     )
     plan.validate(allow_large=False)
-    destination = root / "native_train" / "execution"
+    run_dir = task_dir(Path.cwd(), task="train", dataset="wikitext",
+                       model="gemma2_2b_base", sae_key="native_topk",
+                       layer=13, initialize=True)
+    destination = run_dir / "checkpoints" / "native_training"
     result = run_training(
         plan,
         output=destination,

@@ -6,6 +6,8 @@ new, clearly labeled subset CSVs only after auditing exact frozen identities.
 
 from __future__ import annotations
 
+from experiments.qa500.paths import task_dir, typed_file, inputs_dir, staging_dir, study_dir
+
 import argparse
 import csv
 import hashlib
@@ -19,9 +21,9 @@ from experiments.qa500.capture import site_list
 from experiments.qa500.runner import TASK_STATUS
 
 
-DEFAULT_INPUT = Path("experiment/qa500/inputs")
-DEFAULT_RESULTS = Path("experiment/qa500/results")
-DEFAULT_EXPORT = Path("experiment/qa500/hf_stage")
+DEFAULT_INPUT = inputs_dir(Path.cwd())
+DEFAULT_RESULTS = Path.cwd()
+DEFAULT_EXPORT = staging_dir(Path.cwd())
 CONFIGS = (
     "qa_v1_inputs",
     "qa_v1_sites",
@@ -134,9 +136,10 @@ def audit(data_root: Path, result_root: Path) -> dict[str, Any]:
             sources = dataset_sources.get(dataset)
             if sources is None:
                 continue
-            path = (
-                result_root / PROTOCOL_ID / "_model_baselines" / model_key / dataset / "all.jsonl"
-            )
+            path = typed_file(task_dir(
+                result_root, task="benchmark", dataset=dataset,
+                model=model_key,
+            ), "metrics", "all.jsonl")
             rows = _read_rows(path)
             if not _ids_exact(rows, set(sources)):
                 defects.append(f"baseline/{model_key}/{dataset}: incomplete or duplicate IDs")
@@ -156,15 +159,12 @@ def audit(data_root: Path, result_root: Path) -> dict[str, Any]:
             sources = dataset_sources.get(dataset)
             if sources is None:
                 continue
-            base = (
-                result_root
-                / PROTOCOL_ID
-                / site["model_key"]
-                / site["sae_key"]
-                / f"L{site['layer']}"
-                / dataset
+            base = task_dir(
+                result_root, task="capture", dataset=dataset,
+                model=site["model_key"], sae_key=site["sae_key"],
+                layer=site["layer"],
             )
-            rows = _read_rows(base / "capture.jsonl")
+            rows = _read_rows(typed_file(base, "metrics", "capture.jsonl"))
             if not _ids_exact(rows, set(sources)):
                 defects.append(f"{site['site_id']}/{dataset}: incomplete capture IDs")
                 continue
@@ -176,7 +176,9 @@ def audit(data_root: Path, result_root: Path) -> dict[str, Any]:
                 if len(shas) != 1:
                     raise RuntimeError("Multiple SAE checkpoint weights within one site/dataset")
                 counts["capture_complete"] += 1
-                benchmark_file = base / "benchmark_summary.json"
+                benchmark_file = typed_file(task_dir(result_root, task="benchmark", dataset=dataset,
+                                               model=site["model_key"], sae_key=site["sae_key"],
+                                               layer=site["layer"]), "reports", "benchmark_summary.json")
                 if not benchmark_file.is_file():
                     defects.append(f"{site['site_id']}/{dataset}: benchmark summary missing")
                 else:
@@ -187,7 +189,7 @@ def audit(data_root: Path, result_root: Path) -> dict[str, Any]:
                     if (
                         summary.get("status") != "complete"
                         or summary.get("source_capture_sha256")
-                        != sha256((base / "capture.jsonl").read_bytes()).hexdigest()
+                        != sha256((typed_file(base, "metrics", "capture.jsonl")).read_bytes()).hexdigest()
                         or summary.get("site_id") != site["site_id"]
                         or summary.get("sample_count") != 500
                         or metric_ids != {"core.l0", "core.reconstruction_mse_token"}
@@ -198,7 +200,10 @@ def audit(data_root: Path, result_root: Path) -> dict[str, Any]:
             except (RuntimeError, ValueError, KeyError) as exc:
                 defects.append(f"{site['site_id']}/{dataset}: {exc}")
             for task, n in (("intervene", 20), ("generate", 5)):
-                effects = _read_rows(base / f"{task}.jsonl")
+                effects = _read_rows(typed_file(task_dir(
+                    result_root, task=task, dataset=dataset,
+                    model=site["model_key"], sae_key=site["sae_key"], layer=site["layer"],
+                ), "metrics", f"{task}.jsonl"))
                 if len(effects) != n or len({r.get("sample_id") for r in effects}) != n:
                     defects.append(f"{site['site_id']}/{dataset}/{task}: {len(effects)} of {n}")
                     continue
@@ -287,7 +292,8 @@ def stage(
     task_records = []
     for model in dict.fromkeys(s["model_key"] for s in sites):
         for dataset in DATASETS:
-            p = result_root / PROTOCOL_ID / "_model_baselines" / model / dataset / "all.jsonl"
+            p = typed_file(task_dir(result_root, task="benchmark",
+                                    dataset=dataset, model=model), "metrics", "all.jsonl")
             data = _read_rows(p)
             if not data:
                 continue
@@ -320,15 +326,12 @@ def stage(
             )
     for site in sites:
         for dataset in DATASETS:
-            base = (
-                result_root
-                / PROTOCOL_ID
-                / site["model_key"]
-                / site["sae_key"]
-                / f"L{site['layer']}"
-                / dataset
+            base = task_dir(
+                result_root, task="capture", dataset=dataset,
+                model=site["model_key"], sae_key=site["sae_key"],
+                layer=site["layer"],
             )
-            p = base / "capture.jsonl"
+            p = typed_file(base, "metrics", "capture.jsonl")
             data = _read_rows(p)
             if data:
                 metrics.extend(
@@ -371,7 +374,9 @@ def stage(
                             "status": r["status"],
                         }
                     )
-            benchmark_file = base / "benchmark_summary.json"
+            benchmark_file = typed_file(task_dir(result_root, task="benchmark", dataset=dataset,
+                                               model=site["model_key"], sae_key=site["sae_key"],
+                                               layer=site["layer"]), "reports", "benchmark_summary.json")
             if benchmark_file.is_file():
                 benchmark = json.loads(benchmark_file.read_text(encoding="utf-8"))
                 for m in benchmark["metrics"]:
@@ -393,7 +398,10 @@ def stage(
                         }
                     )
             for task in ("intervene", "generate"):
-                efile = base / f"{task}.jsonl"
+                efile = typed_file(task_dir(
+                    result_root, task=task, dataset=dataset,
+                    model=site["model_key"], sae_key=site["sae_key"], layer=site["layer"],
+                ), "metrics", f"{task}.jsonl")
                 for r in _read_rows(efile):
                     task_records.append(
                         {
@@ -413,15 +421,11 @@ def stage(
     # discovery and held-out top-activation occurrence, not semantic validation.
     for site in sites:
         for dataset in DATASETS:
-            ep = (
-                result_root
-                / PROTOCOL_ID
-                / site["model_key"]
-                / site["sae_key"]
-                / f"L{site['layer']}"
-                / dataset
-                / "explain.json"
-            )
+            ep = typed_file(task_dir(
+                result_root, task="explain", dataset=dataset,
+                model=site["model_key"], sae_key=site["sae_key"],
+                layer=site["layer"],
+            ), "reports", "explain.json")
             if not ep.is_file():
                 continue
             obj = json.loads(ep.read_text(encoding="utf-8"))
@@ -445,7 +449,8 @@ def stage(
                         "status": "source_annotations_only",
                     }
                 )
-    native_root = result_root / PROTOCOL_ID / "_native" / "circuits_gemma2_2b"
+    native_root = task_dir(result_root, task="circuits", dataset="boolq",
+                           model="gemma2_2b_base", sae_key="native_gemma") / "metadata"
     for receipt in sorted(native_root.glob("*.json")):
         if receipt.name == "summary.json":
             continue
@@ -464,7 +469,7 @@ def stage(
                 "status": obj.get("status", "blocked"),
             }
         )
-    native_train = result_root.parent / "native_train" / "summary.json"
+    native_train = study_dir(result_root) / "native_train" / "summary.json"
     if native_train.is_file():
         obj = json.loads(native_train.read_text(encoding="utf-8"))
         task_records.append(
@@ -499,47 +504,22 @@ def stage(
                 "status": "not_verified",
             }
         )
-    run_records = model_baselines + [
-        {
-            "protocol_id": PROTOCOL_ID,
-            "model_key": s["model_key"],
-            "dataset_id": d,
-            "n": len(
-                _read_rows(
-                    result_root
-                    / PROTOCOL_ID
-                    / s["model_key"]
-                    / s["sae_key"]
-                    / f"L{s['layer']}"
-                    / d
-                    / "capture.jsonl"
-                )
-            ),
-            "file_sha256": (
-                _sha(
-                    result_root
-                    / PROTOCOL_ID
-                    / s["model_key"]
-                    / s["sae_key"]
-                    / f"L{s['layer']}"
-                    / d
-                    / "capture.jsonl"
-                )
-                if (
-                    result_root
-                    / PROTOCOL_ID
-                    / s["model_key"]
-                    / s["sae_key"]
-                    / f"L{s['layer']}"
-                    / d
-                    / "capture.jsonl"
-                ).is_file()
-                else ""
-            ),
-        }
-        for s in sites
-        for d in DATASETS
-    ]
+    run_records = list(model_baselines)
+    for site in sites:
+        for dataset in DATASETS:
+            capture_file = typed_file(task_dir(
+                result_root, task="capture", dataset=dataset,
+                model=site["model_key"], sae_key=site["sae_key"],
+                layer=site["layer"],
+            ), "metrics", "capture.jsonl")
+            captures = _read_rows(capture_file)
+            run_records.append({
+                "protocol_id": PROTOCOL_ID,
+                "model_key": site["model_key"],
+                "dataset_id": dataset,
+                "n": len(captures),
+                "file_sha256": _sha(capture_file) if capture_file.is_file() else "",
+            })
     _csv(
         output / "qa_v1_runs/data.csv",
         ["protocol_id", "model_key", "dataset_id", "n", "file_sha256"],

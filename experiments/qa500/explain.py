@@ -6,6 +6,8 @@ is a descriptive activity check, NOT semantic/casual explanation validation.
 
 from __future__ import annotations
 
+from experiments.qa500.paths import task_dir, typed_file
+
 from collections import Counter
 import hashlib
 import json
@@ -35,8 +37,11 @@ def explain_from_captures(
 ) -> dict[str, Any]:
     verify_dataset(dataset_id, data_root)
     site_id = f"{model_key}:{sae_key}:L{layer}"
-    base = result_root / PROTOCOL_ID / model_key / sae_key / f"L{layer}" / dataset_id
-    rows = _read(base / "capture.jsonl")
+    capture_dir = task_dir(result_root, task="capture", dataset=dataset_id,
+                           model=model_key, sae_key=sae_key, layer=layer)
+    base = task_dir(result_root, task="explain", dataset=dataset_id,
+                    model=model_key, sae_key=sae_key, layer=layer, initialize=True)
+    rows = _read(typed_file(capture_dir, "metrics", "capture.jsonl"))
     if len(rows) != 500 or len({r["sample_id"] for r in rows}) != 500:
         raise RuntimeError("Explanation discovery requires complete 500-sample capture")
     if any(row.get("site_id") != site_id or row.get("status") != "executed" for row in rows):
@@ -96,12 +101,12 @@ def explain_from_captures(
             json.dumps([r["sample_id"] for r in heldout]).encode()
         ).hexdigest(),
     }
-    dest = base / "explain.json"
+    dest = typed_file(base, "reports", "explain.json")
     if dest.is_file():
         previous = json.loads(dest.read_text(encoding="utf-8"))
         if previous != output:
             # Changing annotation source counts as an intentional update.
-            previous_path = base / "explain_previous.json"
+            previous_path = typed_file(base, "reports", "explain_previous.json")
             if previous_path.exists():
                 raise RuntimeError("Explanation revision requires a new run revision")
             previous_path.write_text(json.dumps(previous, indent=2) + "\n")
