@@ -1,25 +1,25 @@
 """QA500 source-only annotation aggregation and Neuronpedia provenance sync."""
+
 from __future__ import annotations
 
-
-# --- explain ---
-"""Deterministic feature-explanation evidence from frozen QA500 activations.
-
-Only source-reported descriptions are attached. Held-out top-feature occurrence
-is a descriptive activity check, NOT semantic/casual explanation validation.
-"""
-
-
-from scripts.experiments.qa500.context import task_dir, typed_file
-
+import argparse
 from collections import Counter
+import gzip
 import hashlib
 import json
 from pathlib import Path
 from typing import Any
+import urllib.parse
+import urllib.request
+import xml.etree.ElementTree as ET
 
+from saebase.integrations.neuronpedia import annotate, load_annotations, load_mapping
+from scripts.experiments.qa500.capture import site_list
 from scripts.experiments.qa500.cohort import PROTOCOL_ID, verify_dataset
-from saebase.integrations.neuronpedia import load_annotations, load_mapping, annotate
+from scripts.experiments.qa500.context import get_dataset_ids, study_dir, task_dir, typed_file
+
+
+# --- Deterministic feature explanations ---
 
 
 def _read(path: Path) -> list[dict[str, Any]]:
@@ -131,31 +131,7 @@ def explain_from_captures(
     return output
 
 
-# --- neuronpedia_sync ---
-"""Neuronpedia bulk-export ingestion for QA500 without rate-limited feature scraping.
-
-Official public S3 exports are preferable to hundreds of thousands of
-individual feature API requests. Annotations are always contingent on a
-user-auditable exact mapping to the loaded SAE weight digest.
-"""
-
-
-from scripts.experiments.qa500.context import task_dir, typed_file, study_dir
-from scripts.experiments.qa500.context import get_dataset_ids
-
-import argparse
-import gzip
-import hashlib
-import json
-from pathlib import Path
-from typing import Any
-import urllib.parse
-import urllib.request
-import xml.etree.ElementTree as ET
-
-from saebase.integrations.neuronpedia import load_mapping
-from scripts.experiments.qa500.capture import site_list
-from scripts.experiments.qa500.cohort import PROTOCOL_ID
+# --- Neuronpedia provenance synchronization ---
 
 
 BUCKET = "https://neuronpedia-datasets.s3.us-east-1.amazonaws.com"
@@ -355,4 +331,3 @@ def main(argv: list[str] | None = None) -> None:
 
 if __name__ == "__main__":
     main()
-
