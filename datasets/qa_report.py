@@ -3,6 +3,7 @@
 The exporter never writes to the existing Evaluation repository. It writes
 new, clearly labeled subset CSVs only after auditing exact frozen identities.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -22,8 +23,12 @@ DEFAULT_INPUT = Path("experiment/qa500/inputs")
 DEFAULT_RESULTS = Path("experiment/qa500/results")
 DEFAULT_EXPORT = Path("experiment/qa500/hf_stage")
 CONFIGS = (
-    "qa_v1_inputs", "qa_v1_sites", "qa_v1_runs", "qa_v1_metrics",
-    "qa_v1_per_question", "qa_v1_task_records",
+    "qa_v1_inputs",
+    "qa_v1_sites",
+    "qa_v1_runs",
+    "qa_v1_metrics",
+    "qa_v1_per_question",
+    "qa_v1_task_records",
 )
 
 
@@ -77,13 +82,20 @@ def _check_capture(row: dict[str, Any], *, source: dict[str, Any], site: dict[st
     for f in features:
         fid = f.get("feature_id")
         activation = f.get("activation")
-        if (type(fid) is not int or not 0 <= fid < d_sae
-                or not isinstance(activation, (int, float))
-                or not math.isfinite(activation) or activation == 0):
+        if (
+            type(fid) is not int
+            or not 0 <= fid < d_sae
+            or not isinstance(activation, (int, float))
+            or not math.isfinite(activation)
+            or activation == 0
+        ):
             raise RuntimeError("Invalid active feature ID or activation")
         if f.get("explanation_status") not in {
-            "unmapped", "checkpoint_mismatch", "not_available",
-            "no_description", "source_reported",
+            "unmapped",
+            "checkpoint_mismatch",
+            "not_available",
+            "no_description",
+            "source_reported",
         }:
             raise RuntimeError("Unknown explanation provenance status")
         if f["explanation_status"] != "source_reported" and f.get("explanation") is not None:
@@ -100,8 +112,11 @@ def audit(data_root: Path, result_root: Path) -> dict[str, Any]:
     dataset_sources = {}
     defects: list[str] = []
     counts = {
-        "input_datasets_complete": 0, "baseline_complete": 0,
-        "capture_complete": 0, "intervene_complete": 0, "generate_complete": 0,
+        "input_datasets_complete": 0,
+        "baseline_complete": 0,
+        "capture_complete": 0,
+        "intervene_complete": 0,
+        "generate_complete": 0,
     }
     for dataset in DATASETS:
         try:
@@ -119,8 +134,7 @@ def audit(data_root: Path, result_root: Path) -> dict[str, Any]:
             if sources is None:
                 continue
             path = (
-                result_root / PROTOCOL_ID / "_model_baselines" / model_key
-                / dataset / "all.jsonl"
+                result_root / PROTOCOL_ID / "_model_baselines" / model_key / dataset / "all.jsonl"
             )
             rows = _read_rows(path)
             if not _ids_exact(rows, set(sources)):
@@ -142,8 +156,12 @@ def audit(data_root: Path, result_root: Path) -> dict[str, Any]:
             if sources is None:
                 continue
             base = (
-                result_root / PROTOCOL_ID / site["model_key"] / site["sae_key"]
-                / f"L{site['layer']}" / dataset
+                result_root
+                / PROTOCOL_ID
+                / site["model_key"]
+                / site["sae_key"]
+                / f"L{site['layer']}"
+                / dataset
             )
             rows = _read_rows(base / "capture.jsonl")
             if not _ids_exact(rows, set(sources)):
@@ -169,23 +187,27 @@ def audit(data_root: Path, result_root: Path) -> dict[str, Any]:
                     or r.get("protocol_id") != PROTOCOL_ID
                     or r.get("sae_key") != site["sae_key"]
                     or r.get("layer") != site["layer"]
-                    or r.get("feature_selection")
-                    != "max_abs_nonzero_activation_on_same_input_v1"
+                    or r.get("feature_selection") != "max_abs_nonzero_activation_on_same_input_v1"
                     for r in effects
                 ):
                     defects.append(f"{site['site_id']}/{dataset}/{task}: invalid effects")
                 else:
                     counts[f"{task}_complete"] += 1
     expected = {
-        "input_datasets_complete": 10, "baseline_complete": 100,
-        "capture_complete": 200, "intervene_complete": 200,
+        "input_datasets_complete": 10,
+        "baseline_complete": 100,
+        "capture_complete": 200,
+        "intervene_complete": 200,
         "generate_complete": 200,
     }
     status = "complete" if counts == expected and not defects else "partial"
     return {
-        "protocol_id": PROTOCOL_ID, "status": status,
-        "counts": counts, "expected": expected,
-        "defect_count": len(defects), "defects": defects,
+        "protocol_id": PROTOCOL_ID,
+        "status": status,
+        "counts": counts,
+        "expected": expected,
+        "defect_count": len(defects),
+        "defects": defects,
         "review_boundary": {
             "explain": "annotation-only, no native explanation validation",
             "circuits": "not part of the universal 20-site matrix",
@@ -201,14 +223,19 @@ def _csv(path: Path, fields: list[str], records: list[dict[str, Any]]) -> None:
         writer = csv.DictWriter(stream, fieldnames=fields, extrasaction="ignore")
         writer.writeheader()
         for rec in records:
-            writer.writerow({
-                name: json.dumps(rec[name], ensure_ascii=False, sort_keys=True)
-                if isinstance(rec.get(name), (dict, list)) else rec.get(name)
-                for name in fields
-            })
+            writer.writerow(
+                {
+                    name: json.dumps(rec[name], ensure_ascii=False, sort_keys=True)
+                    if isinstance(rec.get(name), (dict, list))
+                    else rec.get(name)
+                    for name in fields
+                }
+            )
 
 
-def stage(data_root: Path, result_root: Path, output: Path, *, require_complete: bool = True) -> dict[str, Any]:
+def stage(
+    data_root: Path, result_root: Path, output: Path, *, require_complete: bool = True
+) -> dict[str, Any]:
     """Prepare new, source-safe tables in a separate local staging directory."""
     report = audit(data_root, result_root)
     if require_complete and report["status"] != "complete":
@@ -218,13 +245,18 @@ def stage(data_root: Path, result_root: Path, output: Path, *, require_complete:
     inputs = []
     for dataset in DATASETS:
         for row in _read_rows(data_root / dataset / "questions.jsonl"):
-            inputs.append({
-                "protocol_id": PROTOCOL_ID, "dataset_id": dataset,
-                "sample_id": row["sample_id"], "source_revision": row["source_revision"],
-                "source_repo": row["source_repo"], "source_split": row["source_split"],
-                "prompt_sha256": row["prompt_sha256"],
-                "restricted_source": row["restricted_source"],
-            })
+            inputs.append(
+                {
+                    "protocol_id": PROTOCOL_ID,
+                    "dataset_id": dataset,
+                    "sample_id": row["sample_id"],
+                    "source_revision": row["source_revision"],
+                    "source_repo": row["source_repo"],
+                    "source_split": row["source_split"],
+                    "prompt_sha256": row["prompt_sha256"],
+                    "restricted_source": row["restricted_source"],
+                }
+            )
     _csv(output / "qa_v1_inputs/data.csv", list(inputs[0]), inputs)
     sites = site_list()
     _csv(output / "qa_v1_sites/data.csv", list(sites[0]), sites)
@@ -234,111 +266,228 @@ def stage(data_root: Path, result_root: Path, output: Path, *, require_complete:
     task_records = []
     for model in dict.fromkeys(s["model_key"] for s in sites):
         for dataset in DATASETS:
-            p = (
-                result_root / PROTOCOL_ID / "_model_baselines" / model
-                / dataset / "all.jsonl"
-            )
+            p = result_root / PROTOCOL_ID / "_model_baselines" / model / dataset / "all.jsonl"
             data = _read_rows(p)
             if not data:
                 continue
             complete = sum(x.get("correct") is not None for x in data)
-            metrics.append({
-                "protocol_id": PROTOCOL_ID, "model_key": model, "sae_key": "",
-                "layer": "", "dataset_id": dataset, "task": "qa_baseline",
-                "metric_id": "qa.accuracy",
-                "value": sum(x.get("correct") is True for x in data) / complete
-                if complete else "",
-                "n_valid": complete, "n_expected": N_PER_DATASET,
-                "status": "complete" if len(data) == N_PER_DATASET else "partial",
-            })
-            model_baselines.append({
-                "protocol_id": PROTOCOL_ID, "model_key": model,
-                "dataset_id": dataset, "n": len(data), "file_sha256": _sha(p),
-            })
+            metrics.append(
+                {
+                    "protocol_id": PROTOCOL_ID,
+                    "model_key": model,
+                    "sae_key": "",
+                    "layer": "",
+                    "dataset_id": dataset,
+                    "task": "qa_baseline",
+                    "metric_id": "qa.accuracy",
+                    "value": sum(x.get("correct") is True for x in data) / complete
+                    if complete
+                    else "",
+                    "n_valid": complete,
+                    "n_expected": N_PER_DATASET,
+                    "status": "complete" if len(data) == N_PER_DATASET else "partial",
+                }
+            )
+            model_baselines.append(
+                {
+                    "protocol_id": PROTOCOL_ID,
+                    "model_key": model,
+                    "dataset_id": dataset,
+                    "n": len(data),
+                    "file_sha256": _sha(p),
+                }
+            )
     for site in sites:
         for dataset in DATASETS:
             base = (
-                result_root / PROTOCOL_ID / site["model_key"] / site["sae_key"]
-                / f"L{site['layer']}" / dataset
+                result_root
+                / PROTOCOL_ID
+                / site["model_key"]
+                / site["sae_key"]
+                / f"L{site['layer']}"
+                / dataset
             )
             p = base / "capture.jsonl"
             data = _read_rows(p)
             if data:
-                metrics.extend([
-                    {
-                        "protocol_id": PROTOCOL_ID, "model_key": site["model_key"],
-                        "sae_key": site["sae_key"], "layer": site["layer"],
-                        "dataset_id": dataset, "task": "capture",
-                        "metric_id": metric, "value": (
-                            sum(r[field] for r in data) / len(data)
-                        ), "n_valid": len(data), "n_expected": N_PER_DATASET,
-                        "status": "complete" if len(data) == N_PER_DATASET else "partial",
-                    }
-                    for metric, field in (
-                        ("core.l0", "l0"),
-                        ("core.reconstruction_mse_token", "reconstruction_mse"),
-                    )
-                ])
+                metrics.extend(
+                    [
+                        {
+                            "protocol_id": PROTOCOL_ID,
+                            "model_key": site["model_key"],
+                            "sae_key": site["sae_key"],
+                            "layer": site["layer"],
+                            "dataset_id": dataset,
+                            "task": "capture",
+                            "metric_id": metric,
+                            "value": (sum(r[field] for r in data) / len(data)),
+                            "n_valid": len(data),
+                            "n_expected": N_PER_DATASET,
+                            "status": "complete" if len(data) == N_PER_DATASET else "partial",
+                        }
+                        for metric, field in (
+                            ("core.l0", "l0"),
+                            ("core.reconstruction_mse_token", "reconstruction_mse"),
+                        )
+                    ]
+                )
                 for r in data:
-                    per_question.append({
-                        "protocol_id": PROTOCOL_ID, "sample_id": r["sample_id"],
-                        "model_key": r["model_key"], "dataset_id": dataset,
-                        "sae_key": r["sae_key"], "layer": r["layer"],
-                        "site_id": r["site_id"], "sae_sha256": r["sae_sha256"],
-                        "prompt_sha256": r["prompt_sha256"],
-                        "token_ids_sha256": r.get("token_ids_sha256", ""),
-                        "l0": r["l0"], "reconstruction_mse": r["reconstruction_mse"],
-                        "top_features": r["top_features"],
-                        "status": r["status"],
-                    })
+                    per_question.append(
+                        {
+                            "protocol_id": PROTOCOL_ID,
+                            "sample_id": r["sample_id"],
+                            "model_key": r["model_key"],
+                            "dataset_id": dataset,
+                            "sae_key": r["sae_key"],
+                            "layer": r["layer"],
+                            "site_id": r["site_id"],
+                            "sae_sha256": r["sae_sha256"],
+                            "prompt_sha256": r["prompt_sha256"],
+                            "token_ids_sha256": r.get("token_ids_sha256", ""),
+                            "l0": r["l0"],
+                            "reconstruction_mse": r["reconstruction_mse"],
+                            "top_features": r["top_features"],
+                            "status": r["status"],
+                        }
+                    )
             for task in ("intervene", "generate"):
                 efile = base / f"{task}.jsonl"
                 for r in _read_rows(efile):
-                    task_records.append({
-                        "protocol_id": PROTOCOL_ID, "task": task,
-                        "model_key": site["model_key"], "sae_key": site["sae_key"],
-                        "layer": site["layer"], "dataset_id": dataset,
-                        "sample_id": r["sample_id"], "feature_id": r["feature_id"],
-                        "result": r["measurement"], "status": r["status"],
-                    })
+                    task_records.append(
+                        {
+                            "protocol_id": PROTOCOL_ID,
+                            "task": task,
+                            "model_key": site["model_key"],
+                            "sae_key": site["sae_key"],
+                            "layer": site["layer"],
+                            "dataset_id": dataset,
+                            "sample_id": r["sample_id"],
+                            "feature_id": r["feature_id"],
+                            "result": r["measurement"],
+                            "status": r["status"],
+                        }
+                    )
     for task in ("explain", "circuits", "train"):
-        task_records.append({
-            "protocol_id": PROTOCOL_ID, "task": task, "model_key": "",
-            "sae_key": "", "layer": "", "dataset_id": "",
-            "sample_id": "", "feature_id": "",
-            "result": {"reason": TASK_STATUS[task]}, "status": "not_verified",
-        })
-    run_records = model_baselines + [{
-        "protocol_id": PROTOCOL_ID, "model_key": s["model_key"],
-        "dataset_id": d, "n": len(_read_rows(
-            result_root / PROTOCOL_ID / s["model_key"] / s["sae_key"]
-            / f"L{s['layer']}" / d / "capture.jsonl"
-        )), "file_sha256": (_sha(
-            result_root / PROTOCOL_ID / s["model_key"] / s["sae_key"]
-            / f"L{s['layer']}" / d / "capture.jsonl"
-        ) if (result_root / PROTOCOL_ID / s["model_key"] / s["sae_key"]
-              / f"L{s['layer']}" / d / "capture.jsonl").is_file() else ""),
-    } for s in sites for d in DATASETS]
-    _csv(output / "qa_v1_runs/data.csv",
-         ["protocol_id", "model_key", "dataset_id", "n", "file_sha256"], run_records)
-    _csv(output / "qa_v1_metrics/data.csv",
-         ["protocol_id", "model_key", "sae_key", "layer", "dataset_id", "task",
-          "metric_id", "value", "n_valid", "n_expected", "status"], metrics)
-    _csv(output / "qa_v1_per_question/data.csv",
-         ["protocol_id", "sample_id", "model_key", "dataset_id", "sae_key",
-          "layer", "site_id", "sae_sha256", "prompt_sha256",
-          "token_ids_sha256", "l0", "reconstruction_mse",
-          "top_features", "status"], per_question)
-    _csv(output / "qa_v1_task_records/data.csv",
-         ["protocol_id", "task", "model_key", "sae_key", "layer", "dataset_id",
-          "sample_id", "feature_id", "result", "status"], task_records)
+        task_records.append(
+            {
+                "protocol_id": PROTOCOL_ID,
+                "task": task,
+                "model_key": "",
+                "sae_key": "",
+                "layer": "",
+                "dataset_id": "",
+                "sample_id": "",
+                "feature_id": "",
+                "result": {"reason": TASK_STATUS[task]},
+                "status": "not_verified",
+            }
+        )
+    run_records = model_baselines + [
+        {
+            "protocol_id": PROTOCOL_ID,
+            "model_key": s["model_key"],
+            "dataset_id": d,
+            "n": len(
+                _read_rows(
+                    result_root
+                    / PROTOCOL_ID
+                    / s["model_key"]
+                    / s["sae_key"]
+                    / f"L{s['layer']}"
+                    / d
+                    / "capture.jsonl"
+                )
+            ),
+            "file_sha256": (
+                _sha(
+                    result_root
+                    / PROTOCOL_ID
+                    / s["model_key"]
+                    / s["sae_key"]
+                    / f"L{s['layer']}"
+                    / d
+                    / "capture.jsonl"
+                )
+                if (
+                    result_root
+                    / PROTOCOL_ID
+                    / s["model_key"]
+                    / s["sae_key"]
+                    / f"L{s['layer']}"
+                    / d
+                    / "capture.jsonl"
+                ).is_file()
+                else ""
+            ),
+        }
+        for s in sites
+        for d in DATASETS
+    ]
+    _csv(
+        output / "qa_v1_runs/data.csv",
+        ["protocol_id", "model_key", "dataset_id", "n", "file_sha256"],
+        run_records,
+    )
+    _csv(
+        output / "qa_v1_metrics/data.csv",
+        [
+            "protocol_id",
+            "model_key",
+            "sae_key",
+            "layer",
+            "dataset_id",
+            "task",
+            "metric_id",
+            "value",
+            "n_valid",
+            "n_expected",
+            "status",
+        ],
+        metrics,
+    )
+    _csv(
+        output / "qa_v1_per_question/data.csv",
+        [
+            "protocol_id",
+            "sample_id",
+            "model_key",
+            "dataset_id",
+            "sae_key",
+            "layer",
+            "site_id",
+            "sae_sha256",
+            "prompt_sha256",
+            "token_ids_sha256",
+            "l0",
+            "reconstruction_mse",
+            "top_features",
+            "status",
+        ],
+        per_question,
+    )
+    _csv(
+        output / "qa_v1_task_records/data.csv",
+        [
+            "protocol_id",
+            "task",
+            "model_key",
+            "sae_key",
+            "layer",
+            "dataset_id",
+            "sample_id",
+            "feature_id",
+            "result",
+            "status",
+        ],
+        task_records,
+    )
     evidence = {
-        "protocol_id": PROTOCOL_ID, "status": report["status"],
-        "publication_approved": False, "source_text_included": False,
+        "protocol_id": PROTOCOL_ID,
+        "status": report["status"],
+        "publication_approved": False,
+        "source_text_included": False,
         "number_of_subsets": len(CONFIGS),
-        "file_sha256": {
-            name: _sha(output / name / "data.csv") for name in CONFIGS
-        },
+        "file_sha256": {name: _sha(output / name / "data.csv") for name in CONFIGS},
     }
     (output / "publication_manifest.json").write_text(
         json.dumps(evidence, indent=2, sort_keys=True) + "\n"
@@ -358,7 +507,9 @@ def main(argv: list[str] | None = None) -> int:
         result = audit(args.data_root, args.result_root)
     else:
         result = stage(
-            args.data_root, args.result_root, args.output,
+            args.data_root,
+            args.result_root,
+            args.output,
             require_complete=not args.allow_partial,
         )
     print(json.dumps(result, indent=2, ensure_ascii=False))
