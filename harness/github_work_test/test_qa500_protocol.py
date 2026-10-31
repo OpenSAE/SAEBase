@@ -33,6 +33,7 @@ def test_full_matrix_matches_immutable_protocol_config():
     assert cfg["site_count"] == len(site_list()) == 20
     assert cfg["execution"]["expected_model_qa_baselines"] == plan["expected_model_qa_baselines"]
     assert cfg["execution"]["expected_capture_rows"] == plan["expected_capture_rows"]
+    assert cfg["execution"]["expected_benchmark_summaries"] == plan["expected_benchmark_summaries"] == 200
     assert cfg["execution"]["expected_intervene_rows"] == plan["expected_intervention_rows"]
     assert cfg["execution"]["expected_generate_rows"] == plan["expected_generation_rows"]
     assert cfg["execution"]["hf_publish_automatic"] is False
