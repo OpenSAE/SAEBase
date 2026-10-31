@@ -60,7 +60,7 @@ def run_worker(
             content += stderr.read_text(encoding="utf-8")[-4000:]
         if stdout.exists():
             content += stdout.read_text(encoding="utf-8")[-4000:]
-        # Exact error classification can also be recovered from a per-model
+        # Exact error category can also be recovered from a per-model
         # receipt, which remains authoritative when a child crashes mid-run.
         if receipt_file.exists():
             try:
