@@ -93,6 +93,18 @@ run_preflight() {
 }
 
 run_preflight
+PARTIAL=0
+run_scoped() {
+  if "$@"; then
+    return 0
+  else
+    result=$?
+    PARTIAL=1
+    echo "QA500 scoped stage returned $result: $*"
+    echo "The frozen protocol remains unchanged; inspect the stage receipts."
+    return 0
+  fi
+}
 case "$PHASE" in
   preflight)
     echo "Preflight accepted; no remote datasets or model weights loaded."
@@ -114,9 +126,13 @@ case "$PHASE" in
     python -m saebase.datasets.qa_batch effects --model all --device cuda
     ;;
   native)
-    python -m saebase.datasets.qa_native circuits --approved
-    python -m saebase.datasets.qa_native prepare-train
-    python -m saebase.datasets.qa_native train --approved
+    run_scoped python -m saebase.datasets.qa_native circuits --approved
+    if python -m saebase.datasets.qa_native prepare-train; then
+      run_scoped python -m saebase.datasets.qa_native train --approved
+    else
+      PARTIAL=1
+      echo "QA500 native training preparation blocked; circuits receipt is preserved"
+    fi
     ;;
   audit)
     python -m saebase.datasets.qa_report audit
@@ -126,14 +142,25 @@ case "$PHASE" in
     python -m saebase.datasets.qa_report stage
     ;;
   full)
-    python -m saebase.datasets.qa_batch prepare
-    python -m saebase.datasets.qa_batch verify
-    python -m saebase.datasets.qa_batch pilot --model all --device cuda
-    python -m saebase.datasets.qa_batch core --model all --device cuda
-    python -m saebase.datasets.qa_batch effects --model all --device cuda
-    python -m saebase.datasets.qa_report audit
-    python -m saebase.datasets.qa_report stage
+    # Scope failures are independent; do not let gated GPQA prevent nine
+    # other real datasets from running on the approved local machine.
+    run_scoped python -m saebase.datasets.qa_batch prepare
+    run_scoped python -m saebase.datasets.qa_batch verify
+    run_scoped python -m saebase.datasets.qa_batch pilot --model all --device cuda
+    run_scoped python -m saebase.datasets.qa_batch core --model all --device cuda
+    run_scoped python -m saebase.datasets.qa_batch effects --model all --device cuda
+    run_scoped python -m saebase.datasets.qa_report audit
+    if ((PARTIAL)); then
+      # Local-only partial exports are clearly marked and cannot be published.
+      run_scoped python -m saebase.datasets.qa_report stage --allow-partial
+    else
+      run_scoped python -m saebase.datasets.qa_report stage
+    fi
     ;;
 esac
-echo "QA500 $PHASE completed at $(date -u +%FT%TZ)."
+echo "QA500 phase=$PHASE finished UTC=$(date -u +%FT%TZ) partial=$PARTIAL"
 echo "No Hugging Face publication was performed."
+if ((PARTIAL)); then
+  echo "QA500 completed with blocked/partial scoped units; return receipt for review" >&2
+  exit 5
+fi
