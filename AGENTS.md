@@ -13,12 +13,12 @@ Offline CI proves software checks only, not real GPU or scientific acceptance.
 
 Before implementing a new Work Plan, read [the Work Plan authoring standard](harness/github/work_plan/WRITING_STANDARD.en.md). Do not assume every remote branch is locally fetched; do not run a compute-intensive phase before environment, dependency and small-pilot checks succeed.
 
-## SAEBase delivery skill
+## Conversational task planning
 
-For new feature, experiment, multi-agent, CI, architecture and release planning, use
-[SAEBase Delivery](.github/skills/saebase-delivery/SKILL.md) to route through the
-existing Work Plan, Contracts, Work Order v3, and human-authorized Agent Flow.
-Use the non-mutating `scripts/workplan/delivery_precheck.py` only to recommend
-checks and verify local identity; it cannot approve edits, GPU runs or publication.
-The [delivery protocol](harness/github/development_doc/agent-delivery.md) defines
-GitHub-to-local handoff and evidence. Do not create a parallel governance system.
+For planning, task decomposition, ownership review or multi-PR coordination,
+use [SAEBase Delivery](.github/skills/saebase-delivery/SKILL.md) and the
+[GitHub collaboration principles](harness/github/development_doc/agent-delivery.en.md).
+A conversational assistant can apply the skill using repository source context;
+it does not need a Cursor Skill, local precheck runner, Work Order, or GPU.
+Actual source edits and experimental execution still obey existing Harness
+permissions, Work Plans, Contracts, and independent acceptance.

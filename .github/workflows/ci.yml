@@ -9,11 +9,6 @@ on:
 permissions:
   contents: read
 
-# Cancel superseded PR checks only; preserve exact-SHA main/release evidence.
-concurrency:
-  group: ci-${{ github.event.pull_request.number || github.run_id }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
-
 jobs:
   hydra-composition:
     runs-on: ubuntu-latest
@@ -149,7 +144,6 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
-          cache: pip
       - name: Validate integrated source and Cursor contracts
         run: python .cursor/hooks/validate_repo.py --full
       - name: Install SAEBase for development

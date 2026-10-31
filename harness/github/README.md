@@ -9,6 +9,15 @@
 | [development_doc/](development_doc/README.md) | 开发、API 和发布文档 |
 | [assets/](assets/) | 图示与品牌资源 |
 
+## 对话式任务规划
+
+先使用 [SAEBase Delivery Skill](../../.github/skills/saebase-delivery/SKILL.md)
+理解目标、判断是否需要源码层面的 Precheck、确定现有模块归属、建立最小任务依赖图。
+详细规范见 [任务规划与协作原则](development_doc/agent-delivery.md)
+和 [English](development_doc/agent-delivery.en.md)。
+此阶段由对话式 GPT 完成，不要求本地 Agent、GPU 或额外的预检脚本。
+需要正式实现时继续遵守既有 Work Plan、Contracts 和权限约束。
+
 ## Agent 的修改准则
 
 先阅读 [Harness 总览](../README.md)、[仓库架构纲领](../core/BOUNDARIES.md) 和 [通用 Task Contracts](../contracts/README.md)，再按 Work Plan 选择必需文件。先搜已有实现及注册接口，区分通用能力和某个具体 Experiment。

@@ -1,79 +1,73 @@
 ---
 name: saebase-delivery
-description: Plan and deliver SAEBase changes through the existing Harness, Work Plan, Work Order, independent review, and local agent handoff. Use for feature, experiment, integration, CI, architecture, or release requests.
+description: Use when planning, decomposing, prioritizing, reviewing, or coordinating SAEBase research and engineering tasks with a conversational AI. Produce a grounded, minimal Work Plan and conditional precheck recommendations without requiring a local coding agent or GPU.
 ---
 
-# SAEBase delivery orchestration
+# SAEBase planning and task decomposition
 
-This is a **routing skill**, not a new registry, approval system, or scientific acceptance standard.
-Authoritative rules: `AGENTS.md`, `harness/core/BOUNDARIES.md`,
-`harness/github/work_plan/WRITING_STANDARD.md`, `harness/contracts/catalog.json`,
-`harness/core/AGENT_FLOW.md` and `harness/github/development_doc/agent-delivery.md`.
-Read only the relevant additional context; do not bulk load all trees.
+This is a **planning skill for a conversational assistant**, not a new software framework, Runner, local-agent workflow, verification tool, or authorization mechanism. By default, **analyze and propose only**. Editing GitHub, committing, merging, executing experiments, downloading assets, and publishing require separate user authorization. Never represent proposed checks as completed.
 
-## Start with an outcome, then choose the smallest plan
+Source hierarchy: the user's current goal and authorization; the actual repository and relevant existing Work Plan; `AGENTS.md`; `harness/core/BOUNDARIES.md`; `harness/github/work_plan/WRITING_STANDARD.md`; existing Universal Contracts and Agent Flow; and `harness/github/development_doc/agent-delivery.md`. Reuse those sources instead of inventing parallel governance. For source-dependent claims, inspect the **current** branch and relevant paths when repository access is available; otherwise clearly mark assumptions. Read narrowly, not whole trees by default.
 
-1. State the requested observable result, its owner, scientific/engineering boundary,
-   existing reusable implementation, deliverables, and exact acceptance evidence.
-2. Identify whether this is an ordinary change, a protected governance change, a new
-   architecture entity, or a real experiment. Path permission is not architecture approval.
-3. Reuse existing Work Plans and their frozen Contracts. For new plans, follow the
-   existing writing standard; resolve applicable predeclared Contract IDs. A gap is
-   `CONTRACT_GAP`, not permission to invent or weaken a contract.
-4. Assign each new or moved file to an existing owner. Study-specific orchestration
-   belongs in `scripts/experiments/<study>/` with configs in `conf/experiment/<study>/`.
-   Reusable Dataset, Model, Task, and Runtime implementations retain their own owners.
-5. Split by **independent ownership, authorization, or evidence boundary**, not by every
-   implementation step. Prefer one focused PR with ordered stages. Parallel PRs need
-   an explicit dependency DAG and a single integration owner; do not create circular
-   stacked branches or merge a Draft experimental branch into main accidentally.
-6. Freeze the base SHA, target ref, allowed paths, expected evidence, required
-   environments, compute/download budget, and stopping conditions before execution.
-   No unspecified write, download, GPU experiment, deployment, publication, or release.
+## 1. Begin with the outcome
 
-## Classify prechecks before implementation
+Write a one-sentence target result, relevant scientific/engineering value, actual inputs and outputs, and what counts as success. Separate **required deliverables** from optional improvements, real scientific evidence from software-only checks, and what is out of scope.
 
-Use `python scripts/workplan/delivery_precheck.py --mode plan --profile auto
---changed <paths>` on an existing checkout for a non-mutating route report.
-Use `--profile` if no files exist yet. This report chooses checks, **not permissions**.
-Run the same command in local mode with `--expected-branch`, `--expected-sha` and
-the named `--work-order` (when required); `--run-safe` performs only explicitly
-listed, local, read-only checks. Never install, download, execute a GPU workload,
-publish or edit governance as a precheck.
+Identify whether the change is:
+- a local fix or documentation change;
+- a reusable Dataset / Model / Task / runtime capability;
+- a particular experiment or study configuration;
+- Harness, architecture, CI, release, or research-governance work;
+- a combination that needs explicit dependencies.
 
-- Docs-only: Git identity, scope and relevant links.
-- Source / registry: architecture and syntax, dependency availability, smallest
-  related import/test. Test a new or changed parameter's actual propagation.
-- Experiment / model / dataset: dependencies, pinned source/weights, licenses,
-  resources, a bounded synthetic/CPU pilot, then a separately authorized real pilot.
-- Governance / release: separate maintainer approval and exact-source evidence;
-  an agent's local PASS is never equivalent to independent review.
+For each new concept, ask whether an existing implementation can serve it. Apply the simplest compliant design. A specific experiment is **not** a second Dataset API, framework, registry, or top-level source package.
 
-Classify `PASS`, `FAIL`, `BLOCKED`, and `NOT_RUN` accurately. The planner
-must not claim that checks ran in a machine it cannot access.
+## 2. Perform a **desk precheck** only when it changes the plan
 
-## Produce a handoff instead of guessing the local machine
+Desk precheck means reasoning and source inspection by the conversational assistant. It does **not** require Cursor, a shell, a GPU, a server, or real model weights.
 
-Record in the Work Plan: exact branch/base SHA, dependency DAG, scope, selected
-Contracts, Precheck commands, local environment/pilot/full commands, authorization
-boundaries, expected artifacts, recovery, and independent acceptance. Bind an
-existing v3 Work Order when production Agent Flow requires one; do not modify the
-v3 schema or forge approval.
+Choose the minimum relevant questions:
+- **Always:** identify current source version if available, existing owners/interfaces, protected paths, compatibility constraints, relevant frozen contracts and outstanding blockers.
+- **Docs or UI:** links, generator/build ownership, generated assets, localization, deployment route; no environment checklist unless needed.
+- **Code / components:** Registry, signatures, configuration, imports, callers, backward compatibility and existing tests; highlight possible dependency conflicts based on declarations.
+- **Experiments:** distinguish study orchestration from shared components, check protocol, dataset and checkpoint identities, sample/compute budgets and evidence requirements **as a plan**. Only specify eventual runtime checks if actual execution is needed.
+- **Governance / release:** frozen tests, authorization, exact-SHA release or independent acceptance requirements.
 
-Return the smallest self-contained local-agent message, specifying the Work Plan,
-Work Order (if authorized), branch, exact SHA, first precheck command and stop
-conditions. The local agent must actually measure its environment and report logs,
-exit codes, source identity, changes and remaining blockers. GitHub-side reviewer
-replays relevant tests independently before merge.
+Mark each item **VERIFIED_FROM_SOURCE**, **INFERRED**, **OPEN**, or **REQUIRES_EXECUTION**. Never claim dependency resolution, tests, weight loading, GPU availability, CI success, or scientific validity based solely on reading files. Do not write or run a precheck script.
 
-## Delivery optimization
+If a material ambiguity remains, state a bounded assumption and proceed with a best-effort plan; ask the user only about decisions they must make.
 
-Batch related file writes into normal Git commits; do not create a commit per file.
-Keep research evidence and frozen history immutable. Check generated Atlas assets
-and release SHA **before** merge, rather than relying on a bot-generated post-merge
-commit. Preserve the existing exact-main-SHA release gate. Use CI results from the
-actual head SHA; never equate PR creation, green lint, or a configured-only runtime
-with successful real execution.
+## 3. Decompose into the smallest meaningful task DAG
 
-Finish with: what is ready, what was truly executed, what's blocked, the branch/PR,
-the next local-agent instruction, and the human approval still needed.
+Decompose by **deliverable and independent ownership**, not by number of files or execution commands. For every task specify:
+- ID and concrete observable result;
+- existing owner and expected touched paths (with new/moved/deleted paths distinguished);
+- dependencies and which tasks can truly proceed in parallel;
+- acceptance evidence and remaining risks;
+- who can perform it and any required human authorization.
+
+Reuse existing `datasets/<Dataset>/`, `models/<Model>/`, `tasks/<Task>/`, `saebase/`, `conf/`, `scripts/`, `tests/`, and `harness/` ownership. Study-specific code belongs under `scripts/experiments/<study>/`; its config belongs under `conf/experiment/<study>/`; run outputs follow the existing singular `experiment/` runtime. New top-level roots, parallel registries and cross-component abstractions need separate architecture approval.
+
+Prefer **one coherent PR** with ordered tasks. Split PRs only if independent review/permission, non-overlapping file ownership, genuine parallel development, or a separate merge gate makes this worthwhile. If split, show dependency edges, base branches, integration order, and a single merge owner. Avoid circular stacked PRs, unnecessary merge-sync PRs, and many one-file commits.
+
+## 4. Define phase gates, not busywork
+
+For each task decide whether it needs only a source review, a targeted code test, a packaging/dependency check, independent Harness review, or eventually an actual dataset/model experiment. The conversational assistant specifies the required check and **who will perform it**; no local agent is required to generate the plan.
+
+Use a short pipeline: design acceptance -> ownership and dependency check -> implementation -> relevant tests -> integration review -> merge -> opt-in real scientific acceptance / release as appropriate. Put cheap failure detection **before** expensive implementation. Do not make all project tasks wait for the availability of a real GPU when only planning or static code work is needed.
+
+Do not weaken the existing Work Order v3, Contracts, Hooks or Agent Flow when they are applicable to **later** execution. Planning alone does not activate them, freeze user permission or imply approval. Treat PASS/FAIL/BLOCKED/NOT_RUN as execution results only, with actual evidence.
+
+## 5. Output a decision-ready plan
+
+Default response order:
+1. **Recommendation**: smallest approach and key trade-off.
+2. **Desk precheck findings**: source-verified vs uncertain.
+3. **Task DAG**: task, owner/path, dependencies, deliverable, acceptance.
+4. **GitHub support changes**: only necessary files, docs, workflow/PR changes; separate optional CI tuning.
+5. **Execution handoff**: a short actionable instruction or commands for whichever implementer the user chooses (human, GitHub agent, or a local agent), **without requiring a local agent**.
+6. **Completion criteria**: merge dependencies, independent checks, deferred real experiments, and permissions.
+
+When the user requests a formal Work Plan, follow `harness/github/work_plan/WRITING_STANDARD.md` and reuse Contract IDs selected from existing governance. Otherwise, a concise plan in the conversation is sufficient; do not create a Work Order or PR merely to discuss a proposal.
+
+If the user asks to make the change, use a focused branch and one reviewable PR. State exactly what was changed, what was tested, what remains unverified, and whether `main` was affected. Preserve historical scientific results, release identities and the existing approval process.
