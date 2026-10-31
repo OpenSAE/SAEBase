@@ -52,6 +52,14 @@ def test_no_retired_terms_in_integrated_sources():
         if not path.is_file():
             continue
         for i, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-            if RETIRED_TERMS.search(line):
-                failures.append(f"{path.relative_to(ROOT)}:{i}: {line.strip()[:120]}")
+            for match in RETIRED_TERMS.finditer(line):
+                # Compiled one-line Atlas JSON may contain millions of characters.
+                # Print the exact prohibited text with local context rather than
+                # just the beginning of the unrelated line.
+                start = max(0, match.start() - 100)
+                stop = min(len(line), match.end() + 100)
+                failures.append(
+                    f"{path.relative_to(ROOT)}:{i}: "
+                    + line[start:stop].strip()
+                )
     assert not failures, "\n".join(failures[:100])

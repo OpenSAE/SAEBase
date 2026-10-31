@@ -4,13 +4,16 @@ This selects an actual compatible CUDA device, not a substitute model,
 precision or task. It does not predict model+SAE peak memory without a real
 Pilot. When safe execution cannot be established, the worker remains blocked.
 """
+
 from __future__ import annotations
 
 from typing import Any
 
 
 def select_cuda_device(
-    hardware: dict[str, Any], *, minimum_free_bytes: int = 1 << 30,
+    hardware: dict[str, Any],
+    *,
+    minimum_free_bytes: int = 1 << 30,
 ) -> dict[str, Any]:
     if not isinstance(minimum_free_bytes, int) or minimum_free_bytes < 0:
         raise ValueError("Invalid physical GPU free-memory requirement")
@@ -36,9 +39,7 @@ def select_cuda_device(
             "BLOCKED_RESOURCE: no CUDA device passed the actual free-VRAM "
             "and executable-kernel checks"
         )
-    selected = sorted(
-        candidates, key=lambda item: (-item["free_vram_bytes"], item["index"])
-    )[0]
+    selected = sorted(candidates, key=lambda item: (-item["free_vram_bytes"], item["index"]))[0]
     return {
         "schema": "saebase.runtime.device_selection.v1",
         "device": f"cuda:{selected['index']}",

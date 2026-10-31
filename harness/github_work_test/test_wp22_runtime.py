@@ -132,12 +132,27 @@ def test_gpu_planner_selects_by_current_free_memory_not_device_name():
     profile = {
         "cuda_available": True,
         "gpu": [
-            {"index": 0, "name": "A", "free_vram_bytes": 12 << 30,
-             "total_vram_bytes": 32 << 30, "cuda_kernel_ok": True},
-            {"index": 1, "name": "B", "free_vram_bytes": 20 << 30,
-             "total_vram_bytes": 24 << 30, "cuda_kernel_ok": True},
-            {"index": 2, "name": "C", "free_vram_bytes": 22 << 30,
-             "total_vram_bytes": 32 << 30, "cuda_kernel_ok": False},
+            {
+                "index": 0,
+                "name": "A",
+                "free_vram_bytes": 12 << 30,
+                "total_vram_bytes": 32 << 30,
+                "cuda_kernel_ok": True,
+            },
+            {
+                "index": 1,
+                "name": "B",
+                "free_vram_bytes": 20 << 30,
+                "total_vram_bytes": 24 << 30,
+                "cuda_kernel_ok": True,
+            },
+            {
+                "index": 2,
+                "name": "C",
+                "free_vram_bytes": 22 << 30,
+                "total_vram_bytes": 32 << 30,
+                "cuda_kernel_ok": False,
+            },
         ],
     }
     plan = select_cuda_device(profile)

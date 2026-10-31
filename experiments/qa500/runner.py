@@ -345,8 +345,10 @@ def run_matrix(
                 )
             except (RuntimeError, ValueError) as exc:
                 output[name] = {
-                    "model_key": name, "status": "blocked",
-                    "reason": str(exc), "phase": phase,
+                    "model_key": name,
+                    "status": "blocked",
+                    "reason": str(exc),
+                    "phase": phase,
                 }
                 _atomic_json(receipts_dir(result_root) / f"{phase}_matrix.json", output)
                 continue
