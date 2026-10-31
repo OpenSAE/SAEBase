@@ -308,7 +308,7 @@ def concrete_groups(output: dict) -> None:
             "evidence": [node["path"] for node in selected],
             "presentation_only": True, "source_symbol": "",
             "context_term_ids": [{"datasets": "term.dataset", "models": "term.model",
-                                  "tasks": "term.task"}[area]],
+                                  "tasks": "term.task", "experiments": "term.saebase_runtime"}[area]],
         })
         edges.append({"source": parent, "target": group_id, "type": "contains"})
         for module in common:

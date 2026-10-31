@@ -680,6 +680,7 @@ def attach_context_explanations(graphs: dict) -> None:
                     "code:group:datasets": ["term.dataset"],
                     "code:group:models": ["term.model"],
                     "code:group:tasks": ["term.task"],
+                    "code:group:experiments": ["term.saebase_runtime"],
                     "code:group:harness": ["term.code_tree"],
                 }
                 selected = list(dict.fromkeys(
