@@ -307,14 +307,16 @@ def prepare_dataset(
     normal: list[dict[str, Any]] = []
     invalid = 0
     seen: set[str] = set()
+    seen_prompts: set[str] = set()
     for config, index, row in raw:
         try:
             record = normalize(spec, row, source_config=config, source_index=index, seed=seed)
         except (ValueError, KeyError, TypeError, IndexError):
             invalid += 1
             continue
-        if record["sample_id"] not in seen:
+        if record["sample_id"] not in seen and record["prompt_sha256"] not in seen_prompts:
             seen.add(record["sample_id"])
+            seen_prompts.add(record["prompt_sha256"])
             normal.append(record)
     if len(normal) < n:
         raise RuntimeError(f"{dataset_id}: only {len(normal)} usable unique rows, need {n}")
@@ -365,6 +367,8 @@ def verify_dataset(dataset_id: str, output_root: str | Path) -> dict[str, Any]:
     ids = [r["sample_id"] for r in records]
     if len(set(ids)) != len(ids) or digest(ids) != manifest["sample_ids_sha256"]:
         raise RuntimeError(f"{dataset_id}: duplicate/changed question identities")
+    if len({r["prompt_sha256"] for r in records}) != N_PER_DATASET:
+        raise RuntimeError(f"{dataset_id}: duplicated rendered QA prompts")
     for r in records:
         if r["dataset_id"] != dataset_id or r["source_revision"] != manifest["source_revision"]:
             raise RuntimeError("Question source identity mismatch")
