@@ -46,8 +46,9 @@ if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
   exit 4
 fi
 
-mkdir -p experiment/qa500/logs
-RECEIPT="experiment/qa500/logs/driver_${PHASE}_$(date -u +%Y%m%dT%H%M%SZ).log"
+LOG_ROOT="experiment/_studies/qa_standard_500_v1/logs"
+mkdir -p "$LOG_ROOT"
+RECEIPT="$LOG_ROOT/driver_${PHASE}_$(date -u +%Y%m%dT%H%M%SZ).log"
 if [[ -e "$RECEIPT" ]]; then
   echo "ERROR: QA500 driver log already exists" >&2
   exit 4
@@ -55,31 +56,35 @@ fi
 exec > >(tee -a "$RECEIPT") 2>&1
 echo "QA500 phase=$PHASE commit=$(git rev-parse HEAD) UTC=$(date -u +%FT%TZ)"
 echo "driver=$RECEIPT"
-python - <<'PY'
-import shutil, os
+if command -v python3.11 >/dev/null 2>&1; then
+  BASE_PYTHON="python3.11"
+elif command -v python3.12 >/dev/null 2>&1; then
+  BASE_PYTHON="python3.12"
+else
+  echo "ERROR: Python 3.11 or 3.12 required. See experiments/qa500/README.md" >&2
+  exit 3
+fi
+
+"$BASE_PYTHON" - <<'PY'
+import shutil
 from pathlib import Path
-root=Path("experiment/qa500")
+root=Path("experiment/_studies/qa_standard_500_v1")
+root.mkdir(parents=True, exist_ok=True)
 free=shutil.disk_usage(root).free
 print("free_disk_bytes", free)
 if free < 20 * 1024**3:
-    raise SystemExit("ERROR: QA500 requires at least 20 GiB unallocated disk before start")
+    raise SystemExit("QA500 needs at least 20 GiB free for startup; asset planning will need more")
 PY
 
 if [[ ! -x ".venv-qa500/bin/python" ]]; then
-  if command -v python3.11 >/dev/null 2>&1; then
-    python3.11 -m venv .venv-qa500
-  elif command -v python3.12 >/dev/null 2>&1; then
-    python3.12 -m venv .venv-qa500
-  else
-    echo "ERROR: Python 3.11 or 3.12 required" >&2
-    exit 3
-  fi
+  "$BASE_PYTHON" -m venv .venv-qa500
 fi
 # shellcheck disable=SC1091
 source .venv-qa500/bin/activate
 python -m pip install -q --upgrade pip
 python -m pip install -q -e '.[analysis,dev,qa-eval]'
 python -m pip check
+python -m saebase.runtime.hardware --output "$LOG_ROOT/hardware.json" --device-probe
 
 run_preflight() {
   python -m pytest -q \
@@ -88,8 +93,8 @@ run_preflight() {
     harness/github_work_test/test_wp22_architecture.py
   python -m harness.contracts.registry check \
     --plan harness/github_work_plan/22_qa500_standard_evaluation_pipeline.md
-  python -m experiments.qa500.runner plan > experiment/qa500/logs/frozen_plan.json
-  python -m experiments.qa500.capture sites > experiment/qa500/logs/frozen_sites.json
+  python -m experiments.qa500.runner plan > "$LOG_ROOT/frozen_plan.json"
+  python -m experiments.qa500.capture sites > "$LOG_ROOT/frozen_sites.json"
 }
 
 run_preflight

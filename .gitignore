@@ -41,3 +41,5 @@ experiments/
 # Checked-in Research Lab source records (not experimental caches)
 !saebase/research_lab/data/
 !saebase/research_lab/data/**
+
+.venv-qa500/

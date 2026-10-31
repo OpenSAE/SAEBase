@@ -97,7 +97,8 @@ def make_record(
         "question": question, "context": text(fields.get("context")),
         "choices": list(fields.get("choices") or []),
         "answer": answer, "answer_type": fields.get("answer_type", "exact_text"),
-        "category": text(fields.get("category") or source_config or "all"),
+        "category": text(fields.get("category") or source.get("category")
+                            or source.get("type") or source_config or "all"),
         "prompt_group_id": sample_id, "restricted_source": spec.restricted,
     }
     prompt = render_prompt(record)

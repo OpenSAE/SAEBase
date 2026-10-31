@@ -171,3 +171,41 @@ def test_bootstrap_core_benchmark_is_reproducible_and_constant_cases():
     assert summarize_metric([4.0] * 500) == metric
     with pytest.raises(ValueError):
         summarize_metric([float("nan")])
+
+
+def test_architecture_has_no_experiment_entrypoints_under_datasets():
+    import ast
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[2]
+    assert not list((root / "datasets").glob("qa_*.py"))
+    assert not (root / "harness/experiments/qa500_execute.sh").exists()
+    assert (root / "scripts/experiments/qa500.sh").is_file()
+    assert (root / "conf/experiment/qa500/protocol.json").is_file()
+    assert (root / "experiments/qa500/runner.py").is_file()
+
+    for folder in ("datasets", "models", "tasks", "saebase"):
+        for file in (root / folder).rglob("*.py"):
+            syntax = ast.parse(file.read_text(encoding="utf-8"), filename=str(file))
+            for obj in ast.walk(syntax):
+                if isinstance(obj, ast.Import):
+                    assert all(not alias.name.startswith("experiments.qa500")
+                               for alias in obj.names), str(file)
+                elif isinstance(obj, ast.ImportFrom):
+                    assert not (obj.module or "").startswith("experiments.qa500"), str(file)
+
+
+def test_run_paths_use_existing_task_artifact_layout(tmp_path):
+    from experiments.qa500.paths import task_dir, typed_file, study_dir
+
+    path = task_dir(
+        tmp_path, task="capture", dataset="mmlu_pro",
+        model="gemma2_2b_base", sae_key="gemma2_2b_pt_l25_canonical",
+        layer=13, initialize=True,
+    )
+    assert path.is_relative_to(tmp_path / "experiment" / "mmlu_pro")
+    assert "/capture/qa500/" in path.as_posix()
+    assert path.name == "qa500_20261031"
+    assert typed_file(path, "metrics", "capture.jsonl").parent == path / "metrics"
+    assert (path / "metadata" / "run.json").is_file()
+    assert study_dir(tmp_path).is_relative_to(tmp_path / "experiment" / "_studies")
