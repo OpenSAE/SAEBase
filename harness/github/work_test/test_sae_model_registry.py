@@ -106,7 +106,7 @@ def test_hydra_compose_standalone_sae():
     from saebase.cfg.config_validate import validate_hydra_cfg
 
     ensure_plugins_loaded()
-    conf = Path(__file__).resolve().parents[2] / "conf"
+    conf = Path(__file__).resolve().parents[3] / "conf"
     with initialize_config_dir(version_base=None, config_dir=str(conf)):
         cfg = compose(config_name="config", overrides=[
             "task=sae", "evaluation=activation_health", "model=pythia70m",

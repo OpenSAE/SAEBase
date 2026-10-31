@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "saebase" / "research_lab"))
 
 from backend.core import digest, has_complete_identity, load_sites  # noqa: E402

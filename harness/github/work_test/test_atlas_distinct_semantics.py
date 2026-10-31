@@ -5,7 +5,7 @@ import json
 
 from harness.code.presentation import readable_code_tree, TASK_INSTANCE_SEMANTICS
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 
 
 def test_task_goal_wrapper_and_operation_describe_separate_work() -> None:

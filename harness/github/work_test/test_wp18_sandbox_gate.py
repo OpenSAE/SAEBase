@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 
 
 def load_hook(name: str):
@@ -127,7 +127,7 @@ def test_shell_only_runs_scoped_pytest_not_governance_or_arbitrary_scripts():
     for command in (
         "python -m pytest -p no:cacheprovider -q harness/tests/../core/test_secrets.py",
         "python -m pytest -p no:cacheprovider -q harness/tests/wp18/acceptance/demo/H01/test_secret.py",
-        "python -m pytest -q harness/github_work_test/test_atlas_semantic_audit.py",
+        "python -m pytest -q harness/github/work_test/test_atlas_semantic_audit.py",
         "mkdir -p novel_root",
         "mkdir -p harness/tests/../../novel_root",
         "mkdir -p harness/tests/wp18/acceptance/private",
@@ -147,14 +147,14 @@ def test_work_order_harness_reference_uses_real_repository_path(tmp_path, monkey
     assert spec.loader is not None
     spec.loader.exec_module(module)
     monkeypatch.setattr(module, "ROOT", tmp_path)
-    (tmp_path / "harness/github_work_plan").mkdir(parents=True)
+    (tmp_path / "harness/github/work_plan").mkdir(parents=True)
     correct = (
-        "harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md"
+        "harness/github/work_plan/18_harness_local_agent_examination_and_independent_acceptance.md"
     )
     assert module.reference(correct, "harness", check_exists=False) == correct
     with pytest.raises(module.InvalidOrder):
         module.reference(
-            "harness/github_harness/github_work_plan/18.md", "harness", check_exists=False
+            "harness/github_harness/github/work_plan/18.md", "harness", check_exists=False
         )
 
 

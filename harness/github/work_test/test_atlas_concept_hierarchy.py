@@ -7,7 +7,7 @@ from pathlib import Path
 from harness.code.presentation import readable_code_tree
 from harness.code.functional_taxonomy import is_reexport_only
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 
 
 def test_saebase_concepts_are_meaningful_and_lossless() -> None:

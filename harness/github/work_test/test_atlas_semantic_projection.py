@@ -6,7 +6,7 @@ from pathlib import Path
 from harness.code.presentation import readable_code_tree, SOURCE_REVIEWS
 from harness.code.semantic_projection import compact_public_code_tree
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 
 
 def test_generated_atlas_keeps_all_source_interfaces():
