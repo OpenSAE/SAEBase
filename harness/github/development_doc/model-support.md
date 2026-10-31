@@ -29,7 +29,7 @@ Early [checkpoint tests](phase-a-model-coverage.md) examined six model and SAE p
 
 ## Additional CPU checkpoint testing
 
-The [earlier CPU verification records](stage-bc-model-sae-coverage.md) cover 15 model variants (270M–9B), three additional SAE architectures, and selected layers later included in the full validation matrix. Real feature-intervention tests passed for Pythia 410M, Qwen3 1.7B Base, and DeepSeek R1 Distill Qwen 1.5B. The original CPU evidence includes **21/21 SAE-weight checks** with [checkpoint hashes](../../conf/coverage/stage_c_cpu_verified.json), alongside three small-model benchmark and reliability runs in an [earlier run ledger](../../conf/coverage/stage_b_cpu_verified.json). These checks preceded the 48-site evaluation and should not be interpreted as broader validation on their own.
+The [earlier CPU verification records](stage-bc-model-sae-coverage.md) cover 15 model variants (270M–9B), three additional SAE architectures, and selected layers later included in the full validation matrix. Real feature-intervention tests passed for Pythia 410M, Qwen3 1.7B Base, and DeepSeek R1 Distill Qwen 1.5B. The original CPU evidence includes **21/21 SAE-weight checks** with [checkpoint hashes](../../../conf/coverage/stage_c_cpu_verified.json), alongside three small-model benchmark and reliability runs in an [earlier run ledger](../../../conf/coverage/stage_b_cpu_verified.json). These checks preceded the 48-site evaluation and should not be interpreted as broader validation on their own.
 
 ## Registered configurations and optional models
 
@@ -57,6 +57,6 @@ The latest evidence and original run archives are available through [Verificatio
 
 The repository stores SAE profile identifiers, public source cards, model and tokenizer revisions when available, and exact loaded state SHA-256 values for completed experiments. A key or model card alone is not sufficient to establish loaded weight identity.
 
-Model, SAE, dataset and library licensing is upstream-specific. The [asset inventory](../../conf/release/m5_asset_provenance.json) records known and explicitly unverified terms; no pretrained model or SAE weights are redistributed with the package.
+Model, SAE, dataset and library licensing is upstream-specific. The [asset inventory](../../../conf/release/m5_asset_provenance.json) records known and explicitly unverified terms; no pretrained model or SAE weights are redistributed with the package.
 
 [Release Checkpoint Validation](checkpoint-validation.md) · [Validation](validation.md) · [Getting Started](getting-started.md)

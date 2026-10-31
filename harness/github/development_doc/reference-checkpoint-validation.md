@@ -79,7 +79,7 @@ checkpoint acceptance.
 
 - `.github/workflows/ci.yml` installs development and analysis extras in
   separate clean environments; it executes offline tests and packaging checks.
-- [Real Pythia Smoke Acceptance](../../.github/workflows/real-smoke.yml) runs
+- [Real Pythia Smoke Acceptance](../../../.github/workflows/real-smoke.yml) runs
   manually with the `m0` input (or `all` for M0/M1/M2). Ordinary pushes
   and commit-message markers no longer download real checkpoint weights.
 - Inspect the final Actions job status and produced artifact before claiming
