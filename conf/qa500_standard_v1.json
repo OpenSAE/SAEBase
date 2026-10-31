@@ -104,7 +104,15 @@
   "task_budgets": {
     "qa_baseline": 500,
     "capture": 500,
-    "benchmark": "core.l0 and core.reconstruction_mse_token from verified capture",
+    "benchmark": {
+      "per_site_dataset": 1,
+      "samples_per_summary": 500,
+      "bootstrap_draws": 512,
+      "metrics": [
+        "core.l0",
+        "core.reconstruction_mse_token"
+      ]
+    },
     "intervene": 20,
     "generate": 5,
     "explain": 2,
@@ -143,7 +151,8 @@
     "expected_model_qa_baselines": 50000,
     "expected_capture_rows": 100000,
     "expected_intervene_rows": 4000,
-    "expected_generate_rows": 1000
+    "expected_generate_rows": 1000,
+    "expected_benchmark_summaries": 200
   },
   "publication": {
     "target": "OpenSAE/SAEBase-Evaluation",
