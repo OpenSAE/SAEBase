@@ -372,52 +372,91 @@ def stage(
     for site in sites:
         for dataset in DATASETS:
             ep = (
-                result_root / PROTOCOL_ID / site["model_key"] / site["sae_key"]
-                / f"L{site['layer']}" / dataset / "explain.json"
+                result_root
+                / PROTOCOL_ID
+                / site["model_key"]
+                / site["sae_key"]
+                / f"L{site['layer']}"
+                / dataset
+                / "explain.json"
             )
             if not ep.is_file():
                 continue
             obj = json.loads(ep.read_text(encoding="utf-8"))
-            if obj.get("status") != "source_annotations_only" or obj.get("site_id") != site["site_id"]:
+            if (
+                obj.get("status") != "source_annotations_only"
+                or obj.get("site_id") != site["site_id"]
+            ):
                 raise RuntimeError("Unrecognized explanation artifact")
             for entry in obj["candidates"]:
-                task_records.append({
-                    "protocol_id": PROTOCOL_ID, "task": "explain",
-                    "model_key": site["model_key"], "sae_key": site["sae_key"],
-                    "layer": site["layer"], "dataset_id": dataset,
-                    "sample_id": "", "feature_id": entry["feature_id"],
-                    "result": entry, "status": "source_annotations_only",
-                })
+                task_records.append(
+                    {
+                        "protocol_id": PROTOCOL_ID,
+                        "task": "explain",
+                        "model_key": site["model_key"],
+                        "sae_key": site["sae_key"],
+                        "layer": site["layer"],
+                        "dataset_id": dataset,
+                        "sample_id": "",
+                        "feature_id": entry["feature_id"],
+                        "result": entry,
+                        "status": "source_annotations_only",
+                    }
+                )
     native_root = result_root / PROTOCOL_ID / "_native" / "circuits_gemma2_2b"
     for receipt in sorted(native_root.glob("*.json")):
         if receipt.name == "summary.json":
             continue
         obj = json.loads(receipt.read_text(encoding="utf-8"))
-        task_records.append({
-            "protocol_id": PROTOCOL_ID, "task": "circuits",
-            "model_key": "gemma2_2b_base", "sae_key": "", "layer": "",
-            "dataset_id": "boolq", "sample_id": obj.get("sample_id", ""),
-            "feature_id": "", "result": obj, "status": obj.get("status", "blocked"),
-        })
+        task_records.append(
+            {
+                "protocol_id": PROTOCOL_ID,
+                "task": "circuits",
+                "model_key": "gemma2_2b_base",
+                "sae_key": "",
+                "layer": "",
+                "dataset_id": "boolq",
+                "sample_id": obj.get("sample_id", ""),
+                "feature_id": "",
+                "result": obj,
+                "status": obj.get("status", "blocked"),
+            }
+        )
     native_train = result_root.parent / "native_train" / "summary.json"
     if native_train.is_file():
         obj = json.loads(native_train.read_text(encoding="utf-8"))
-        task_records.append({
-            "protocol_id": PROTOCOL_ID, "task": "train",
-            "model_key": "gemma2_2b_base", "sae_key": "", "layer": 13,
-            "dataset_id": "wikitext", "sample_id": "", "feature_id": "",
-            "result": obj, "status": obj.get("status", "blocked"),
-        })
+        task_records.append(
+            {
+                "protocol_id": PROTOCOL_ID,
+                "task": "train",
+                "model_key": "gemma2_2b_base",
+                "sae_key": "",
+                "layer": 13,
+                "dataset_id": "wikitext",
+                "sample_id": "",
+                "feature_id": "",
+                "result": obj,
+                "status": obj.get("status", "blocked"),
+            }
+        )
     # Preserve explicit coverage gaps rather than creating fake zero metrics.
     for task in ("explain", "circuits", "train"):
         if any(item["task"] == task for item in task_records):
             continue
-        task_records.append({
-            "protocol_id": PROTOCOL_ID, "task": task, "model_key": "",
-            "sae_key": "", "layer": "", "dataset_id": "",
-            "sample_id": "", "feature_id": "",
-            "result": {"reason": TASK_STATUS[task]}, "status": "not_verified",
-        })
+        task_records.append(
+            {
+                "protocol_id": PROTOCOL_ID,
+                "task": task,
+                "model_key": "",
+                "sae_key": "",
+                "layer": "",
+                "dataset_id": "",
+                "sample_id": "",
+                "feature_id": "",
+                "result": {"reason": TASK_STATUS[task]},
+                "status": "not_verified",
+            }
+        )
     run_records = model_baselines + [
         {
             "protocol_id": PROTOCOL_ID,
