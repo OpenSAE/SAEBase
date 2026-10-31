@@ -222,9 +222,12 @@ def run_model(
                         step["explain"] = {
                             "status": "source_annotations_only",
                             "details": explain_from_captures(
-                                data_root=data_root, result_root=result_root,
-                                model_key=model_key, sae_key=pairs[1],
-                                layer=layer, dataset_id=dataset,
+                                data_root=data_root,
+                                result_root=result_root,
+                                model_key=model_key,
+                                sae_key=pairs[1],
+                                layer=layer,
+                                dataset_id=dataset,
                                 mapping_file=neuronpedia_map,
                                 annotation_file=neuronpedia_records,
                             )["candidates"],
