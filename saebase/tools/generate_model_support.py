@@ -153,7 +153,7 @@ def render_table(s: dict) -> str:
         for row in selected:
             label = f"L{row['layer']}"
             report = row.get("m3m4_summary")
-            layers.append(f"[{label}](../../{EVIDENCE_REL.as_posix()}/{report})" if report else label)
+            layers.append(f"[{label}](../../../{EVIDENCE_REL.as_posix()}/{report})" if report else label)
         count = lambda field: sum(row.get(field) is True for row in selected)
         arch = {"topk": "TopK", "jumprelu": "JumpReLU"}.get(
             target["architecture"], target["architecture"]
@@ -179,16 +179,16 @@ def render_blocks(s: dict) -> dict[str, str]:
             f"passed real-checkpoint compatibility tests, **{bench}** completed "
             "benchmark evaluations on 64 held-out prompt groups, and "
             f"**{rel}** completed reliability audits. See the "
-            "[verified model and SAE matrix](harness/github_development_doc/verified-model-matrix.md)."
+            "[verified model and SAE matrix](harness/github/development_doc/verified-model-matrix.md)."
         ),
         "README_cn.md": (
             f"**已验证的模型与 SAE（{date}）。** 覆盖 **{profiles}** 组模型与 SAE 配置"
             f"（270M-9B），**{pair}** 个选定层位通过真实权重兼容性检查，"
             f"**{bench}** 个完成基于 64 组独立留出提示的基准评估，"
             f"**{rel}** 个完成统计可靠性审计。详见"
-            "[模型支持与逐层验证结果](harness/github_development_doc/verified-model-matrix.md)。"
+            "[模型支持与逐层验证结果](harness/github/development_doc/verified-model-matrix.md)。"
         ),
-        "harness/github_development_doc/model-support.md": (
+        "harness/github/development_doc/model-support.md": (
             "## Verified checkpoints and layers\n\n"
             f"As of {date}, **{profiles}** model-SAE configurations spanning "
             f"270M-9B cover **{pair}** selected model/layer sites with genuine "
@@ -197,7 +197,7 @@ def render_blocks(s: dict) -> dict[str, str]:
             "reliability auditing. See the "
             "[per-layer verification reports](verified-model-matrix.md)."
         ),
-        "harness/github_development_doc/validation.md": (
+        "harness/github/development_doc/validation.md": (
             "## Verified model and SAE evaluations\n\n"
             f"**{profiles}** selected model-SAE configurations, **{pair}** "
             f"real-checkpoint compatibility tests, **{bench}** benchmark "
@@ -205,14 +205,14 @@ def render_blocks(s: dict) -> dict[str, str]:
             f"reliability audits ({date}). See the "
             "[per-layer reports](verified-model-matrix.md)."
         ),
-        "harness/github_development_doc/CHANGELOG.md": (
+        "harness/github/development_doc/CHANGELOG.md": (
             f"- **Verified model and SAE coverage ({date}):** **{pair}** "
             f"real-checkpoint compatibility tests, **{bench}** benchmark "
             f"evaluations on 64 held-out prompt groups, and **{rel}** "
             f"reliability audits across **{profiles}** model-SAE configurations. "
             "See the [verified model and SAE matrix](verified-model-matrix.md)."
         ),
-        "harness/github_development_doc/verified-model-matrix.md": render_table(s),
+        "harness/github/development_doc/verified-model-matrix.md": render_table(s),
     }
 
 
@@ -235,7 +235,7 @@ def generate(*, check: bool, root: Path = ROOT) -> list[str]:
             if not check:
                 path.write_text(rendered, encoding="utf-8")
     if "](verified-model-matrix.md)" not in (
-        root / "harness/github_development_doc/index.md"
+        root / "harness/github/development_doc/index.md"
     ).read_text(encoding="utf-8"):
         raise ValueError("docs index does not link the current verified matrix")
     if check and changed:

@@ -39,7 +39,7 @@ analysis = [
     "pandas>=2.0",
     "tqdm>=4.65",
 ]
-# Optional official QA500 mathematical answer equivalence scorer.
+# QA500 answer equivalence scorer.
 qa-eval = ["math-verify[antlr4_9_3]==0.9.0", "PyYAML>=6"]
 
 generation = [
@@ -97,7 +97,7 @@ saebase = ["**/*.md", "**/*.yaml", "**/*.json", "**/*.html", "**/*.css", "**/*.j
 models = ["**/*.json", "**/*.yaml"]
 
 [tool.pytest.ini_options]
-testpaths = ["harness/github_work_test"]
+testpaths = ["harness/github/work_test"]
 
 [tool.ruff]
 line-length = 100

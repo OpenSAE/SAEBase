@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "code",
   "project": "SAEBase",
-  "source_sha256": null,
+  "source_sha256": "c9f0fd4547d8aea7ceca6446674180007639236fa3bdd71e248fe1844109c7dc",
   "scope": [
     "saebase",
     "datasets",
@@ -238,7 +238,7 @@
       "kind": "class",
       "title": "HookedLMHandle",
       "path": "models/hooked_lm_common.py",
-      "line": 42,
+      "line": 41,
       "status": "implemented",
       "signature": "class HookedLMHandle()",
       "description": "Lightweight handle returned by hooked LM ``construct`` plugins.",
@@ -248,7 +248,7 @@
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "models/hooked_lm_common.py:42"
+        "models/hooked_lm_common.py:41"
       ]
     },
     {
@@ -758,24 +758,6 @@
       ]
     },
     {
-      "id": "code:class:saebase.data.qa_records:DatasetSpec",
-      "kind": "class",
-      "title": "DatasetSpec",
-      "path": "saebase/data/qa_records.py",
-      "line": 17,
-      "status": "implemented",
-      "signature": "class DatasetSpec()",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/data/qa_records.py:17"
-      ]
-    },
-    {
       "id": "code:class:saebase.examples._synthetic_common:ResearchToyModel",
       "kind": "class",
       "title": "ResearchToyModel",
@@ -1017,24 +999,6 @@
       "needs_review": true,
       "evidence": [
         "saebase/extensions/runtime.py:15"
-      ]
-    },
-    {
-      "id": "code:class:saebase.integrations.hf_assets:HFAsset",
-      "kind": "class",
-      "title": "HFAsset",
-      "path": "saebase/integrations/hf_assets.py",
-      "line": 19,
-      "status": "implemented",
-      "signature": "class HFAsset()",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/integrations/hf_assets.py:19"
       ]
     },
     {
@@ -1498,7 +1462,7 @@
       "kind": "class",
       "title": "ModelPlugin",
       "path": "saebase/registry.py",
-      "line": 43,
+      "line": 42,
       "status": "implemented",
       "signature": "class ModelPlugin()",
       "description": "``model.name`` → compatibility gate + lazy construction metadata.",
@@ -1510,7 +1474,7 @@
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "saebase/registry.py:43"
+        "saebase/registry.py:42"
       ]
     },
     {
@@ -1538,7 +1502,7 @@
       "kind": "class",
       "title": "SAEPlugin",
       "path": "saebase/registry.py",
-      "line": 51,
+      "line": 50,
       "status": "implemented",
       "signature": "class SAEPlugin()",
       "description": "``sae.name`` → SAE profile lookup / validation hook.",
@@ -1550,7 +1514,7 @@
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "saebase/registry.py:51"
+        "saebase/registry.py:50"
       ]
     },
     {
@@ -1580,7 +1544,7 @@
       "kind": "class",
       "title": "TaskPlugin",
       "path": "saebase/registry.py",
-      "line": 59,
+      "line": 58,
       "status": "implemented",
       "signature": "class TaskPlugin()",
       "description": "数据集、模型与任务的插件接口和中心注册表。",
@@ -1592,7 +1556,7 @@
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "saebase/registry.py:59"
+        "saebase/registry.py:58"
       ]
     },
     {
@@ -3886,24 +3850,6 @@
       ]
     },
     {
-      "id": "code:function:datasets.ARCChallenge.qa_adapter:parse",
-      "kind": "function",
-      "title": "parse",
-      "path": "datasets/ARCChallenge/qa_adapter.py",
-      "line": 19,
-      "status": "implemented",
-      "signature": "def parse(row: dict[str, Any], *, source_config: str | None, seed: int) -> dict[str, Any]",
-      "description": "Extract real QA fields; select/score samples in the owning experiment.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/ARCChallenge/qa_adapter.py:19"
-      ]
-    },
-    {
       "id": "code:function:datasets.BBH.BBH:_cache_bbh_from_hf",
       "kind": "function",
       "title": "_cache_bbh_from_hf",
@@ -3973,60 +3919,6 @@
       "needs_review": true,
       "evidence": [
         "datasets/BBH/BBH.py:99"
-      ]
-    },
-    {
-      "id": "code:function:datasets.BBH.qa_adapter:parse",
-      "kind": "function",
-      "title": "parse",
-      "path": "datasets/BBH/qa_adapter.py",
-      "line": 19,
-      "status": "implemented",
-      "signature": "def parse(row: dict[str, Any], *, source_config: str | None, seed: int) -> dict[str, Any]",
-      "description": "Extract real QA fields; select/score samples in the owning experiment.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/BBH/qa_adapter.py:19"
-      ]
-    },
-    {
-      "id": "code:function:datasets.BoolQ.qa_adapter:parse",
-      "kind": "function",
-      "title": "parse",
-      "path": "datasets/BoolQ/qa_adapter.py",
-      "line": 19,
-      "status": "implemented",
-      "signature": "def parse(row: dict[str, Any], *, source_config: str | None, seed: int) -> dict[str, Any]",
-      "description": "Extract real QA fields; select/score samples in the owning experiment.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/BoolQ/qa_adapter.py:19"
-      ]
-    },
-    {
-      "id": "code:function:datasets.CommonsenseQA.qa_adapter:parse",
-      "kind": "function",
-      "title": "parse",
-      "path": "datasets/CommonsenseQA/qa_adapter.py",
-      "line": 19,
-      "status": "implemented",
-      "signature": "def parse(row: dict[str, Any], *, source_config: str | None, seed: int) -> dict[str, Any]",
-      "description": "Extract real QA fields; select/score samples in the owning experiment.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/CommonsenseQA/qa_adapter.py:19"
       ]
     },
     {
@@ -4243,42 +4135,6 @@
       "needs_review": true,
       "evidence": [
         "datasets/CounterFact/tokenize.py:94"
-      ]
-    },
-    {
-      "id": "code:function:datasets.GPQAExtended.qa_adapter:parse",
-      "kind": "function",
-      "title": "parse",
-      "path": "datasets/GPQAExtended/qa_adapter.py",
-      "line": 20,
-      "status": "implemented",
-      "signature": "def parse(row: dict[str, Any], *, source_config: str | None, seed: int) -> dict[str, Any]",
-      "description": "Extract real QA fields; select/score samples in the owning experiment.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/GPQAExtended/qa_adapter.py:20"
-      ]
-    },
-    {
-      "id": "code:function:datasets.GSM8K.qa_adapter:parse",
-      "kind": "function",
-      "title": "parse",
-      "path": "datasets/GSM8K/qa_adapter.py",
-      "line": 19,
-      "status": "implemented",
-      "signature": "def parse(row: dict[str, Any], *, source_config: str | None, seed: int) -> dict[str, Any]",
-      "description": "Extract real QA fields; select/score samples in the owning experiment.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/GSM8K/qa_adapter.py:19"
       ]
     },
     {
@@ -4552,24 +4408,6 @@
       ]
     },
     {
-      "id": "code:function:datasets.HotpotQA.qa_adapter:parse",
-      "kind": "function",
-      "title": "parse",
-      "path": "datasets/HotpotQA/qa_adapter.py",
-      "line": 19,
-      "status": "implemented",
-      "signature": "def parse(row: dict[str, Any], *, source_config: str | None, seed: int) -> dict[str, Any]",
-      "description": "Extract real QA fields; select/score samples in the owning experiment.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/HotpotQA/qa_adapter.py:19"
-      ]
-    },
-    {
       "id": "code:function:datasets.IOI.IOI:attach_ioi_token_ids",
       "kind": "function",
       "title": "attach_ioi_token_ids",
@@ -4747,24 +4585,6 @@
       "needs_review": true,
       "evidence": [
         "datasets/IOI/tokenize.py:48"
-      ]
-    },
-    {
-      "id": "code:function:datasets.MATH500.qa_adapter:parse",
-      "kind": "function",
-      "title": "parse",
-      "path": "datasets/MATH500/qa_adapter.py",
-      "line": 19,
-      "status": "implemented",
-      "signature": "def parse(row: dict[str, Any], *, source_config: str | None, seed: int) -> dict[str, Any]",
-      "description": "Extract real QA fields; select/score samples in the owning experiment.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/MATH500/qa_adapter.py:19"
       ]
     },
     {
@@ -5038,24 +4858,6 @@
       ]
     },
     {
-      "id": "code:function:datasets.MMLUPro.qa_adapter:parse",
-      "kind": "function",
-      "title": "parse",
-      "path": "datasets/MMLUPro/qa_adapter.py",
-      "line": 20,
-      "status": "implemented",
-      "signature": "def parse(row: dict[str, Any], *, source_config: str | None, seed: int) -> dict[str, Any]",
-      "description": "Extract real QA fields; select/score samples in the owning experiment.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/MMLUPro/qa_adapter.py:20"
-      ]
-    },
-    {
       "id": "code:function:datasets.MMLUPro.tokenize:attach_token_ids",
       "kind": "function",
       "title": "attach_token_ids",
@@ -5071,24 +4873,6 @@
       "needs_review": false,
       "evidence": [
         "datasets/MMLUPro/tokenize.py:8"
-      ]
-    },
-    {
-      "id": "code:function:datasets.MedQA.qa_adapter:parse",
-      "kind": "function",
-      "title": "parse",
-      "path": "datasets/MedQA/qa_adapter.py",
-      "line": 19,
-      "status": "implemented",
-      "signature": "def parse(row: dict[str, Any], *, source_config: str | None, seed: int) -> dict[str, Any]",
-      "description": "Extract real QA fields; select/score samples in the owning experiment.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/MedQA/qa_adapter.py:19"
       ]
     },
     {
@@ -6118,7 +5902,7 @@
       "kind": "function",
       "title": "_make_assert",
       "path": "datasets/plugins.py",
-      "line": 53,
+      "line": 48,
       "status": "implemented",
       "signature": "def _make_assert(canonical: str)",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -6128,7 +5912,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "datasets/plugins.py:53"
+        "datasets/plugins.py:48"
       ]
     },
     {
@@ -6136,7 +5920,7 @@
       "kind": "function",
       "title": "_notes",
       "path": "datasets/plugins.py",
-      "line": 67,
+      "line": 62,
       "status": "implemented",
       "signature": "def _notes(canonical: str)",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -6146,7 +5930,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "datasets/plugins.py:67"
+        "datasets/plugins.py:62"
       ]
     },
     {
@@ -6154,7 +5938,7 @@
       "kind": "function",
       "title": "_register_builtin_datasets",
       "path": "datasets/plugins.py",
-      "line": 104,
+      "line": 99,
       "status": "implemented",
       "signature": "def _register_builtin_datasets() -> None",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -6164,7 +5948,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "datasets/plugins.py:104"
+        "datasets/plugins.py:99"
       ]
     },
     {
@@ -6172,7 +5956,7 @@
       "kind": "function",
       "title": "_register_builtin_prompt_sources",
       "path": "datasets/plugins.py",
-      "line": 76,
+      "line": 71,
       "status": "implemented",
       "signature": "def _register_builtin_prompt_sources() -> None",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -6182,25 +5966,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "datasets/plugins.py:76"
-      ]
-    },
-    {
-      "id": "code:function:datasets.plugins:_register_qa_dataset_adapters",
-      "kind": "function",
-      "title": "_register_qa_dataset_adapters",
-      "path": "datasets/plugins.py",
-      "line": 143,
-      "status": "implemented",
-      "signature": "def _register_qa_dataset_adapters() -> None",
-      "description": "Register source-owned QA adapters on the existing Dataset registry. This augments reusable dataset capabilities; experiment selection belongs exclusively to an experiment config, not to this module.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/plugins.py:143"
+        "datasets/plugins.py:71"
       ]
     },
     {
@@ -6208,7 +5974,7 @@
       "kind": "function",
       "title": "_tasks_for",
       "path": "datasets/plugins.py",
-      "line": 41,
+      "line": 36,
       "status": "implemented",
       "signature": "def _tasks_for(canonical: str) -> FrozenSet[str]",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -6218,7 +5984,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "datasets/plugins.py:41"
+        "datasets/plugins.py:36"
       ]
     },
     {
@@ -7458,7 +7224,7 @@
       "kind": "function",
       "title": "construct",
       "path": "models/gemma3_4b_it/gemma3_4b_it.py",
-      "line": 33,
+      "line": 32,
       "status": "implemented",
       "signature": "def construct(cfg: DictConfig) -> HookedLMHandle",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -7468,7 +7234,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "models/gemma3_4b_it/gemma3_4b_it.py:33"
+        "models/gemma3_4b_it/gemma3_4b_it.py:32"
       ]
     },
     {
@@ -7476,7 +7242,7 @@
       "kind": "function",
       "title": "construct_lazy",
       "path": "models/gemma3_4b_it/gemma3_4b_it.py",
-      "line": 40,
+      "line": 39,
       "status": "implemented",
       "signature": "def construct_lazy(cfg: DictConfig) -> dict[str, Any]",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -7486,7 +7252,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "models/gemma3_4b_it/gemma3_4b_it.py:40"
+        "models/gemma3_4b_it/gemma3_4b_it.py:39"
       ]
     },
     {
@@ -7494,7 +7260,7 @@
       "kind": "function",
       "title": "get_spec",
       "path": "models/gemma3_4b_it/gemma3_4b_it.py",
-      "line": 25,
+      "line": 24,
       "status": "implemented",
       "signature": "def get_spec() -> BaseModelSpec",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -7504,7 +7270,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "models/gemma3_4b_it/gemma3_4b_it.py:25"
+        "models/gemma3_4b_it/gemma3_4b_it.py:24"
       ]
     },
     {
@@ -7512,7 +7278,7 @@
       "kind": "function",
       "title": "load_model",
       "path": "models/gemma3_4b_it/gemma3_4b_it.py",
-      "line": 29,
+      "line": 28,
       "status": "implemented",
       "signature": "def load_model(device: str | None=None) -> HookedLMHandle",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -7522,7 +7288,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "models/gemma3_4b_it/gemma3_4b_it.py:29"
+        "models/gemma3_4b_it/gemma3_4b_it.py:28"
       ]
     },
     {
@@ -7944,7 +7710,7 @@
       "kind": "function",
       "title": "_default_load_kwargs",
       "path": "models/hooked_lm_common.py",
-      "line": 59,
+      "line": 58,
       "status": "implemented",
       "signature": "def _default_load_kwargs(model_name: str) -> dict[str, Any]",
       "description": "Memory-safe defaults for Gemma loads on modest host RAM / VRAM. ``from_pretrained`` post-processing for gemma-3-1b can OOM ~15GB hosts; skip processing but keep float32 so logit filtering stays finite. Gemma-2-2B uses float16 to fit 16GB with SAE headroom. Larger Gemma-3 / Llama / Qwen checkpoints default to bfloat16. Quantized HF checkpoints are allowed whe",
@@ -7954,7 +7720,7 @@
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "models/hooked_lm_common.py:59"
+        "models/hooked_lm_common.py:58"
       ]
     },
     {
@@ -7962,7 +7728,7 @@
       "kind": "function",
       "title": "load_from_spec",
       "path": "models/hooked_lm_common.py",
-      "line": 196,
+      "line": 195,
       "status": "implemented",
       "signature": "def load_from_spec(spec: BaseModelSpec, device: str | None=None, *, dtype: torch.dtype | None=None, no_processing: bool | None=None, architecture_aliases: dict[str, str] | None=None) -> HookedLMHandle",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -7972,7 +7738,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "models/hooked_lm_common.py:196"
+        "models/hooked_lm_common.py:195"
       ]
     },
     {
@@ -7980,7 +7746,7 @@
       "kind": "function",
       "title": "load_hf_causal_lm",
       "path": "models/hooked_lm_common.py",
-      "line": 123,
+      "line": 122,
       "status": "implemented",
       "signature": "def load_hf_causal_lm(repo_id: str, *, dtype: torch.dtype | None=None) -> tuple[Any, Any]",
       "description": "Load HF CausalLM + tokenizer on CPU. Quantized checkpoints are allowed.",
@@ -7990,7 +7756,7 @@
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "models/hooked_lm_common.py:123"
+        "models/hooked_lm_common.py:122"
       ]
     },
     {
@@ -7998,7 +7764,7 @@
       "kind": "function",
       "title": "load_hooked_model",
       "path": "models/hooked_lm_common.py",
-      "line": 93,
+      "line": 92,
       "status": "implemented",
       "signature": "def load_hooked_model(model_name: str, device: str | None=None, *, dtype: torch.dtype | None=None, no_processing: bool | None=None, hf_model: Any | None=None, tokenizer: Any | None=None, architecture_name: str | None=None) -> Any",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -8008,7 +7774,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "models/hooked_lm_common.py:93"
+        "models/hooked_lm_common.py:92"
       ]
     },
     {
@@ -8016,7 +7782,7 @@
       "kind": "function",
       "title": "load_hooked_model_with_candidates",
       "path": "models/hooked_lm_common.py",
-      "line": 138,
+      "line": 137,
       "status": "implemented",
       "signature": "def load_hooked_model_with_candidates(model_names: tuple[str, ...] | list[str], device: str | None=None, *, dtype: torch.dtype | None=None, no_processing: bool | None=None, architecture_aliases: dict[str, str] | None=None) -> tuple[Any, str]",
       "description": "Try each candidate name; return (model, loaded_name). ``architecture_aliases`` maps a weight-repo candidate (e.g. unsloth/...) to a TransformerLens official architecture id (e.g. google/gemma-3-1b-it).",
@@ -8026,7 +7792,7 @@
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "models/hooked_lm_common.py:138"
+        "models/hooked_lm_common.py:137"
       ]
     },
     {
@@ -8034,7 +7800,7 @@
       "kind": "function",
       "title": "model_forward_smoke",
       "path": "models/hooked_lm_common.py",
-      "line": 225,
+      "line": 224,
       "status": "implemented",
       "signature": "def model_forward_smoke(model: Any, text: str='Hello world') -> tuple[int, ...]",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -8044,7 +7810,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "models/hooked_lm_common.py:225"
+        "models/hooked_lm_common.py:224"
       ]
     },
     {
@@ -8052,7 +7818,7 @@
       "kind": "function",
       "title": "print_vram_gb",
       "path": "models/hooked_lm_common.py",
-      "line": 230,
+      "line": 229,
       "status": "implemented",
       "signature": "def print_vram_gb(label: str='VRAM peak (GB)') -> None",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -8062,7 +7828,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "models/hooked_lm_common.py:230"
+        "models/hooked_lm_common.py:229"
       ]
     },
     {
@@ -8070,7 +7836,7 @@
       "kind": "function",
       "title": "require_cuda",
       "path": "models/hooked_lm_common.py",
-      "line": 51,
+      "line": 50,
       "status": "implemented",
       "signature": "def require_cuda() -> str",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -8080,7 +7846,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "models/hooked_lm_common.py:51"
+        "models/hooked_lm_common.py:50"
       ]
     },
     {
@@ -8549,60 +8315,6 @@
       "needs_review": true,
       "evidence": [
         "models/pythia70m/pythia70m.py:27"
-      ]
-    },
-    {
-      "id": "code:function:models.qa_input:_prompt_format",
-      "kind": "function",
-      "title": "_prompt_format",
-      "path": "models/qa_input.py",
-      "line": 10,
-      "status": "implemented",
-      "signature": "def _prompt_format(model_key: str) -> str",
-      "description": "Read the model implementation's own prompt contract, never a QA500 list.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "models/qa_input.py:10"
-      ]
-    },
-    {
-      "id": "code:function:models.qa_input:_tokenizer",
-      "kind": "function",
-      "title": "_tokenizer",
-      "path": "models/qa_input.py",
-      "line": 26,
-      "status": "implemented",
-      "signature": "def _tokenizer(pair: Any) -> Any",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "models/qa_input.py:26"
-      ]
-    },
-    {
-      "id": "code:function:models.qa_input:make_input",
-      "kind": "function",
-      "title": "make_input",
-      "path": "models/qa_input.py",
-      "line": 33,
-      "status": "implemented",
-      "signature": "def make_input(pair: Any, record: dict[str, Any], model_key: str) -> tuple[Any, dict[str, Any]]",
-      "description": "Render model-appropriate prompt, return verified token IDs and provenance.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "models/qa_input.py:33"
       ]
     },
     {
@@ -12566,114 +12278,6 @@
       ]
     },
     {
-      "id": "code:function:saebase.data.qa_records:choices",
-      "kind": "function",
-      "title": "choices",
-      "path": "saebase/data/qa_records.py",
-      "line": 41,
-      "status": "implemented",
-      "signature": "def choices(pairs: Iterable[tuple[str, Any]], gold_key: str) -> tuple[list[dict[str, str]], str]",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/data/qa_records.py:41"
-      ]
-    },
-    {
-      "id": "code:function:saebase.data.qa_records:digest",
-      "kind": "function",
-      "title": "digest",
-      "path": "saebase/data/qa_records.py",
-      "line": 26,
-      "status": "implemented",
-      "signature": "def digest(value: Any) -> str",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/data/qa_records.py:26"
-      ]
-    },
-    {
-      "id": "code:function:saebase.data.qa_records:make_record",
-      "kind": "function",
-      "title": "make_record",
-      "path": "saebase/data/qa_records.py",
-      "line": 81,
-      "status": "implemented",
-      "signature": "def make_record(spec: DatasetSpec, source: dict[str, Any], fields: dict[str, Any], source_config: str | None, source_index: int) -> dict[str, Any]",
-      "description": "Attach generic identity/provenance to a source-specific parsed row.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/data/qa_records.py:81"
-      ]
-    },
-    {
-      "id": "code:function:saebase.data.qa_records:render_prompt",
-      "kind": "function",
-      "title": "render_prompt",
-      "path": "saebase/data/qa_records.py",
-      "line": 59,
-      "status": "implemented",
-      "signature": "def render_prompt(record: dict[str, Any]) -> str",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/data/qa_records.py:59"
-      ]
-    },
-    {
-      "id": "code:function:saebase.data.qa_records:text",
-      "kind": "function",
-      "title": "text",
-      "path": "saebase/data/qa_records.py",
-      "line": 37,
-      "status": "implemented",
-      "signature": "def text(value: Any) -> str",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/data/qa_records.py:37"
-      ]
-    },
-    {
-      "id": "code:function:saebase.data.qa_source:iter_source",
-      "kind": "function",
-      "title": "iter_source",
-      "path": "saebase/data/qa_source.py",
-      "line": 10,
-      "status": "implemented",
-      "signature": "def iter_source(spec: DatasetSpec, revision: str) -> Iterator[tuple[str | None, int, dict[str, Any]]]",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/data/qa_source.py:10"
-      ]
-    },
-    {
       "id": "code:function:saebase.examples.activations.activation_store:main",
       "kind": "function",
       "title": "main",
@@ -14492,42 +14096,6 @@
       ]
     },
     {
-      "id": "code:function:saebase.integrations.hf_assets:download",
-      "kind": "function",
-      "title": "download",
-      "path": "saebase/integrations/hf_assets.py",
-      "line": 46,
-      "status": "implemented",
-      "signature": "def download(asset: HFAsset, *, cache_dir: Path | None=None) -> Path",
-      "description": "Download a *specified* source revision using official resume/cache semantics.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/integrations/hf_assets.py:46"
-      ]
-    },
-    {
-      "id": "code:function:saebase.integrations.hf_assets:resolve_revision",
-      "kind": "function",
-      "title": "resolve_revision",
-      "path": "saebase/integrations/hf_assets.py",
-      "line": 31,
-      "status": "implemented",
-      "signature": "def resolve_revision(repo_id: str, *, repo_type: str) -> str",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/integrations/hf_assets.py:31"
-      ]
-    },
-    {
       "id": "code:function:saebase.integrations.localization:_ordered_states",
       "kind": "function",
       "title": "_ordered_states",
@@ -14615,60 +14183,6 @@
       "needs_review": false,
       "evidence": [
         "saebase/integrations/localization.py:206"
-      ]
-    },
-    {
-      "id": "code:function:saebase.integrations.neuronpedia:annotate",
-      "kind": "function",
-      "title": "annotate",
-      "path": "saebase/integrations/neuronpedia.py",
-      "line": 30,
-      "status": "implemented",
-      "signature": "def annotate(feature_id: int, *, site_id: str, sae_sha256: str | None, mapping: dict[str, dict[str, str]], annotations: dict[str, Any] | None=None) -> dict[str, Any]",
-      "description": "Use independently downloaded feature data, never construct claims from IDs.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/integrations/neuronpedia.py:30"
-      ]
-    },
-    {
-      "id": "code:function:saebase.integrations.neuronpedia:load_annotations",
-      "kind": "function",
-      "title": "load_annotations",
-      "path": "saebase/integrations/neuronpedia.py",
-      "line": 69,
-      "status": "implemented",
-      "signature": "def load_annotations(path: str | Path | None) -> dict[str, Any]",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/integrations/neuronpedia.py:69"
-      ]
-    },
-    {
-      "id": "code:function:saebase.integrations.neuronpedia:load_mapping",
-      "kind": "function",
-      "title": "load_mapping",
-      "path": "saebase/integrations/neuronpedia.py",
-      "line": 13,
-      "status": "implemented",
-      "signature": "def load_mapping(path: str | Path | None) -> dict[str, dict[str, str]]",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/integrations/neuronpedia.py:13"
       ]
     },
     {
@@ -15306,7 +14820,7 @@
       "kind": "function",
       "title": "_ensure_plugins",
       "path": "saebase/registry.py",
-      "line": 73,
+      "line": 72,
       "status": "implemented",
       "signature": "def _ensure_plugins() -> None",
       "description": "数据集、模型与任务的插件接口和中心注册表。",
@@ -15318,7 +14832,7 @@
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "saebase/registry.py:73"
+        "saebase/registry.py:72"
       ]
     },
     {
@@ -15326,249 +14840,9 @@
       "kind": "function",
       "title": "get_dataset_plugin",
       "path": "saebase/registry.py",
-      "line": 220,
-      "status": "implemented",
-      "signature": "def get_dataset_plugin(name: str) -> DatasetPlugin",
-      "description": "数据集、模型与任务的插件接口和中心注册表。",
-      "description_source": "reviewed_context",
-      "context_ids": [],
-      "core_ids": [
-        "g.registry"
-      ],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/registry.py:220"
-      ]
-    },
-    {
-      "id": "code:function:saebase.registry:get_model_plugin",
-      "kind": "function",
-      "title": "get_model_plugin",
-      "path": "saebase/registry.py",
-      "line": 149,
-      "status": "implemented",
-      "signature": "def get_model_plugin(name: str) -> ModelPlugin",
-      "description": "数据集、模型与任务的插件接口和中心注册表。",
-      "description_source": "reviewed_context",
-      "context_ids": [],
-      "core_ids": [
-        "g.registry"
-      ],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/registry.py:149"
-      ]
-    },
-    {
-      "id": "code:function:saebase.registry:get_prompt_source_plugin",
-      "kind": "function",
-      "title": "get_prompt_source_plugin",
-      "path": "saebase/registry.py",
-      "line": 141,
-      "status": "implemented",
-      "signature": "def get_prompt_source_plugin(name: str) -> PromptSourcePlugin",
-      "description": "数据集、模型与任务的插件接口和中心注册表。",
-      "description_source": "reviewed_context",
-      "context_ids": [],
-      "core_ids": [
-        "g.registry"
-      ],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/registry.py:141"
-      ]
-    },
-    {
-      "id": "code:function:saebase.registry:get_qa_dataset_adapter",
-      "kind": "function",
-      "title": "get_qa_dataset_adapter",
-      "path": "saebase/registry.py",
-      "line": 228,
-      "status": "implemented",
-      "signature": "def get_qa_dataset_adapter(name: str)",
-      "description": "Resolve a real QA adapter through the existing Dataset Registry. QA source adapters are a capability of DatasetPlugin, never a second experimental dataset registry. Import happens lazily and is source-owned.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [
-        "g.registry"
-      ],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/registry.py:228"
-      ]
-    },
-    {
-      "id": "code:function:saebase.registry:get_sae_plugin",
-      "kind": "function",
-      "title": "get_sae_plugin",
-      "path": "saebase/registry.py",
-      "line": 157,
-      "status": "implemented",
-      "signature": "def get_sae_plugin(name: str) -> SAEPlugin",
-      "description": "数据集、模型与任务的插件接口和中心注册表。",
-      "description_source": "reviewed_context",
-      "context_ids": [],
-      "core_ids": [
-        "g.registry"
-      ],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/registry.py:157"
-      ]
-    },
-    {
-      "id": "code:function:saebase.registry:get_task_plugin",
-      "kind": "function",
-      "title": "get_task_plugin",
-      "path": "saebase/registry.py",
-      "line": 165,
-      "status": "implemented",
-      "signature": "def get_task_plugin(name: str) -> TaskPlugin",
-      "description": "数据集、模型与任务的插件接口和中心注册表。",
-      "description_source": "reviewed_context",
-      "context_ids": [],
-      "core_ids": [
-        "g.registry"
-      ],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/registry.py:165"
-      ]
-    },
-    {
-      "id": "code:function:saebase.registry:list_registered_dataset_keys",
-      "kind": "function",
-      "title": "list_registered_dataset_keys",
-      "path": "saebase/registry.py",
-      "line": 245,
-      "status": "implemented",
-      "signature": "def list_registered_dataset_keys() -> list[str]",
-      "description": "数据集、模型与任务的插件接口和中心注册表。",
-      "description_source": "reviewed_context",
-      "context_ids": [],
-      "core_ids": [
-        "g.registry"
-      ],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/registry.py:245"
-      ]
-    },
-    {
-      "id": "code:function:saebase.registry:list_registered_model_keys",
-      "kind": "function",
-      "title": "list_registered_model_keys",
-      "path": "saebase/registry.py",
-      "line": 180,
-      "status": "implemented",
-      "signature": "def list_registered_model_keys() -> list[str]",
-      "description": "数据集、模型与任务的插件接口和中心注册表。",
-      "description_source": "reviewed_context",
-      "context_ids": [],
-      "core_ids": [
-        "g.registry"
-      ],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/registry.py:180"
-      ]
-    },
-    {
-      "id": "code:function:saebase.registry:list_registered_prompt_source_keys",
-      "kind": "function",
-      "title": "list_registered_prompt_source_keys",
-      "path": "saebase/registry.py",
-      "line": 175,
-      "status": "implemented",
-      "signature": "def list_registered_prompt_source_keys() -> list[str]",
-      "description": "数据集、模型与任务的插件接口和中心注册表。",
-      "description_source": "reviewed_context",
-      "context_ids": [],
-      "core_ids": [
-        "g.registry"
-      ],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/registry.py:175"
-      ]
-    },
-    {
-      "id": "code:function:saebase.registry:list_registered_sae_keys",
-      "kind": "function",
-      "title": "list_registered_sae_keys",
-      "path": "saebase/registry.py",
-      "line": 185,
-      "status": "implemented",
-      "signature": "def list_registered_sae_keys() -> list[str]",
-      "description": "数据集、模型与任务的插件接口和中心注册表。",
-      "description_source": "reviewed_context",
-      "context_ids": [],
-      "core_ids": [
-        "g.registry"
-      ],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/registry.py:185"
-      ]
-    },
-    {
-      "id": "code:function:saebase.registry:list_registered_task_keys",
-      "kind": "function",
-      "title": "list_registered_task_keys",
-      "path": "saebase/registry.py",
-      "line": 190,
-      "status": "implemented",
-      "signature": "def list_registered_task_keys() -> list[str]",
-      "description": "数据集、模型与任务的插件接口和中心注册表。",
-      "description_source": "reviewed_context",
-      "context_ids": [],
-      "core_ids": [
-        "g.registry"
-      ],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/registry.py:190"
-      ]
-    },
-    {
-      "id": "code:function:saebase.registry:register_dataset",
-      "kind": "function",
-      "title": "register_dataset",
-      "path": "saebase/registry.py",
-      "line": 195,
-      "status": "implemented",
-      "signature": "def register_dataset(name: str, setup, assert_task_supported, eval_split_note, *, qa_adapter_module: str | None=None) -> None",
-      "description": "数据集、模型与任务的插件接口和中心注册表。",
-      "description_source": "reviewed_context",
-      "context_ids": [],
-      "core_ids": [
-        "g.registry"
-      ],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/registry.py:195"
-      ]
-    },
-    {
-      "id": "code:function:saebase.registry:register_dataset_alias",
-      "kind": "function",
-      "title": "register_dataset_alias",
-      "path": "saebase/registry.py",
       "line": 210,
       "status": "implemented",
-      "signature": "def register_dataset_alias(alias: str, canonical: str) -> None",
+      "signature": "def get_dataset_plugin(name: str) -> DatasetPlugin",
       "description": "数据集、模型与任务的插件接口和中心注册表。",
       "description_source": "reviewed_context",
       "context_ids": [],
@@ -15582,11 +14856,231 @@
       ]
     },
     {
+      "id": "code:function:saebase.registry:get_model_plugin",
+      "kind": "function",
+      "title": "get_model_plugin",
+      "path": "saebase/registry.py",
+      "line": 148,
+      "status": "implemented",
+      "signature": "def get_model_plugin(name: str) -> ModelPlugin",
+      "description": "数据集、模型与任务的插件接口和中心注册表。",
+      "description_source": "reviewed_context",
+      "context_ids": [],
+      "core_ids": [
+        "g.registry"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/registry.py:148"
+      ]
+    },
+    {
+      "id": "code:function:saebase.registry:get_prompt_source_plugin",
+      "kind": "function",
+      "title": "get_prompt_source_plugin",
+      "path": "saebase/registry.py",
+      "line": 140,
+      "status": "implemented",
+      "signature": "def get_prompt_source_plugin(name: str) -> PromptSourcePlugin",
+      "description": "数据集、模型与任务的插件接口和中心注册表。",
+      "description_source": "reviewed_context",
+      "context_ids": [],
+      "core_ids": [
+        "g.registry"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/registry.py:140"
+      ]
+    },
+    {
+      "id": "code:function:saebase.registry:get_sae_plugin",
+      "kind": "function",
+      "title": "get_sae_plugin",
+      "path": "saebase/registry.py",
+      "line": 156,
+      "status": "implemented",
+      "signature": "def get_sae_plugin(name: str) -> SAEPlugin",
+      "description": "数据集、模型与任务的插件接口和中心注册表。",
+      "description_source": "reviewed_context",
+      "context_ids": [],
+      "core_ids": [
+        "g.registry"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/registry.py:156"
+      ]
+    },
+    {
+      "id": "code:function:saebase.registry:get_task_plugin",
+      "kind": "function",
+      "title": "get_task_plugin",
+      "path": "saebase/registry.py",
+      "line": 164,
+      "status": "implemented",
+      "signature": "def get_task_plugin(name: str) -> TaskPlugin",
+      "description": "数据集、模型与任务的插件接口和中心注册表。",
+      "description_source": "reviewed_context",
+      "context_ids": [],
+      "core_ids": [
+        "g.registry"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/registry.py:164"
+      ]
+    },
+    {
+      "id": "code:function:saebase.registry:list_registered_dataset_keys",
+      "kind": "function",
+      "title": "list_registered_dataset_keys",
+      "path": "saebase/registry.py",
+      "line": 218,
+      "status": "implemented",
+      "signature": "def list_registered_dataset_keys() -> list[str]",
+      "description": "数据集、模型与任务的插件接口和中心注册表。",
+      "description_source": "reviewed_context",
+      "context_ids": [],
+      "core_ids": [
+        "g.registry"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/registry.py:218"
+      ]
+    },
+    {
+      "id": "code:function:saebase.registry:list_registered_model_keys",
+      "kind": "function",
+      "title": "list_registered_model_keys",
+      "path": "saebase/registry.py",
+      "line": 179,
+      "status": "implemented",
+      "signature": "def list_registered_model_keys() -> list[str]",
+      "description": "数据集、模型与任务的插件接口和中心注册表。",
+      "description_source": "reviewed_context",
+      "context_ids": [],
+      "core_ids": [
+        "g.registry"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/registry.py:179"
+      ]
+    },
+    {
+      "id": "code:function:saebase.registry:list_registered_prompt_source_keys",
+      "kind": "function",
+      "title": "list_registered_prompt_source_keys",
+      "path": "saebase/registry.py",
+      "line": 174,
+      "status": "implemented",
+      "signature": "def list_registered_prompt_source_keys() -> list[str]",
+      "description": "数据集、模型与任务的插件接口和中心注册表。",
+      "description_source": "reviewed_context",
+      "context_ids": [],
+      "core_ids": [
+        "g.registry"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/registry.py:174"
+      ]
+    },
+    {
+      "id": "code:function:saebase.registry:list_registered_sae_keys",
+      "kind": "function",
+      "title": "list_registered_sae_keys",
+      "path": "saebase/registry.py",
+      "line": 184,
+      "status": "implemented",
+      "signature": "def list_registered_sae_keys() -> list[str]",
+      "description": "数据集、模型与任务的插件接口和中心注册表。",
+      "description_source": "reviewed_context",
+      "context_ids": [],
+      "core_ids": [
+        "g.registry"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/registry.py:184"
+      ]
+    },
+    {
+      "id": "code:function:saebase.registry:list_registered_task_keys",
+      "kind": "function",
+      "title": "list_registered_task_keys",
+      "path": "saebase/registry.py",
+      "line": 189,
+      "status": "implemented",
+      "signature": "def list_registered_task_keys() -> list[str]",
+      "description": "数据集、模型与任务的插件接口和中心注册表。",
+      "description_source": "reviewed_context",
+      "context_ids": [],
+      "core_ids": [
+        "g.registry"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/registry.py:189"
+      ]
+    },
+    {
+      "id": "code:function:saebase.registry:register_dataset",
+      "kind": "function",
+      "title": "register_dataset",
+      "path": "saebase/registry.py",
+      "line": 194,
+      "status": "implemented",
+      "signature": "def register_dataset(name: str, setup, assert_task_supported, eval_split_note) -> None",
+      "description": "数据集、模型与任务的插件接口和中心注册表。",
+      "description_source": "reviewed_context",
+      "context_ids": [],
+      "core_ids": [
+        "g.registry"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/registry.py:194"
+      ]
+    },
+    {
+      "id": "code:function:saebase.registry:register_dataset_alias",
+      "kind": "function",
+      "title": "register_dataset_alias",
+      "path": "saebase/registry.py",
+      "line": 200,
+      "status": "implemented",
+      "signature": "def register_dataset_alias(alias: str, canonical: str) -> None",
+      "description": "数据集、模型与任务的插件接口和中心注册表。",
+      "description_source": "reviewed_context",
+      "context_ids": [],
+      "core_ids": [
+        "g.registry"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/registry.py:200"
+      ]
+    },
+    {
       "id": "code:function:saebase.registry:register_model",
       "kind": "function",
       "title": "register_model",
       "path": "saebase/registry.py",
-      "line": 111,
+      "line": 110,
       "status": "implemented",
       "signature": "def register_model(name: str, assert_compatible: Callable[[DictConfig], None], construct: Callable[[DictConfig], Any]) -> None",
       "description": "数据集、模型与任务的插件接口和中心注册表。",
@@ -15598,7 +15092,7 @@
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "saebase/registry.py:111"
+        "saebase/registry.py:110"
       ]
     },
     {
@@ -15606,7 +15100,7 @@
       "kind": "function",
       "title": "register_prompt_source",
       "path": "saebase/registry.py",
-      "line": 83,
+      "line": 82,
       "status": "implemented",
       "signature": "def register_prompt_source(name: str, assert_compatible: Callable[[DictConfig], None], canonicalize: Callable[[str], str], notes: Callable[[], str]) -> None",
       "description": "数据集、模型与任务的插件接口和中心注册表。",
@@ -15618,7 +15112,7 @@
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "saebase/registry.py:83"
+        "saebase/registry.py:82"
       ]
     },
     {
@@ -15626,7 +15120,7 @@
       "kind": "function",
       "title": "register_prompt_source_alias",
       "path": "saebase/registry.py",
-      "line": 98,
+      "line": 97,
       "status": "implemented",
       "signature": "def register_prompt_source_alias(alias: str, canonical: str) -> None",
       "description": "数据集、模型与任务的插件接口和中心注册表。",
@@ -15638,7 +15132,7 @@
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "saebase/registry.py:98"
+        "saebase/registry.py:97"
       ]
     },
     {
@@ -15646,7 +15140,7 @@
       "kind": "function",
       "title": "register_sae",
       "path": "saebase/registry.py",
-      "line": 121,
+      "line": 120,
       "status": "implemented",
       "signature": "def register_sae(name: str, assert_compatible: Callable[[DictConfig], None], *, profile_key: str | None=None) -> None",
       "description": "数据集、模型与任务的插件接口和中心注册表。",
@@ -15658,7 +15152,7 @@
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "saebase/registry.py:121"
+        "saebase/registry.py:120"
       ]
     },
     {
@@ -15666,7 +15160,7 @@
       "kind": "function",
       "title": "register_task",
       "path": "saebase/registry.py",
-      "line": 135,
+      "line": 134,
       "status": "implemented",
       "signature": "def register_task(name: str, task_class: Type[TaskModule]) -> None",
       "description": "数据集、模型与任务的插件接口和中心注册表。",
@@ -15678,7 +15172,7 @@
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "saebase/registry.py:135"
+        "saebase/registry.py:134"
       ]
     },
     {
@@ -15686,7 +15180,7 @@
       "kind": "function",
       "title": "resolve_dataset_name",
       "path": "saebase/registry.py",
-      "line": 216,
+      "line": 206,
       "status": "implemented",
       "signature": "def resolve_dataset_name(name: str) -> str",
       "description": "数据集、模型与任务的插件接口和中心注册表。",
@@ -15698,7 +15192,7 @@
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "saebase/registry.py:216"
+        "saebase/registry.py:206"
       ]
     },
     {
@@ -15706,7 +15200,7 @@
       "kind": "function",
       "title": "resolve_prompt_source_name",
       "path": "saebase/registry.py",
-      "line": 107,
+      "line": 106,
       "status": "implemented",
       "signature": "def resolve_prompt_source_name(name: str) -> str",
       "description": "数据集、模型与任务的插件接口和中心注册表。",
@@ -15718,7 +15212,7 @@
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "saebase/registry.py:107"
+        "saebase/registry.py:106"
       ]
     },
     {
@@ -21122,24 +20616,6 @@
       ]
     },
     {
-      "id": "code:function:saebase.runtime.experiment_paths:study_root",
-      "kind": "function",
-      "title": "study_root",
-      "path": "saebase/runtime/experiment_paths.py",
-      "line": 264,
-      "status": "implemented",
-      "signature": "def study_root(workspace: str | Path, study_id: str) -> Path",
-      "description": "Root for cross-run study manifests, frozen cohorts and publication staging. Individual Task results MUST continue to use run_leaf(cfg), including all metrics, intervention evidence, checkpoints and their typed directories. This root is for a study's *aggregate* metadata, not a new Task layout.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/runtime/experiment_paths.py:264"
-      ]
-    },
-    {
       "id": "code:function:saebase.runtime.experiment_paths:task_components",
       "kind": "function",
       "title": "task_components",
@@ -21191,78 +20667,6 @@
       "needs_review": false,
       "evidence": [
         "saebase/runtime/experiment_paths.py:179"
-      ]
-    },
-    {
-      "id": "code:function:saebase.runtime.hardware:_available_host_ram_bytes",
-      "kind": "function",
-      "title": "_available_host_ram_bytes",
-      "path": "saebase/runtime/hardware.py",
-      "line": 19,
-      "status": "implemented",
-      "signature": "def _available_host_ram_bytes() -> int | None",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/runtime/hardware.py:19"
-      ]
-    },
-    {
-      "id": "code:function:saebase.runtime.hardware:detect",
-      "kind": "function",
-      "title": "detect",
-      "path": "saebase/runtime/hardware.py",
-      "line": 29,
-      "status": "implemented",
-      "signature": "def detect(*, probe_gpu: bool=False, cache_path: Path | None=None) -> dict[str, Any]",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/runtime/hardware.py:29"
-      ]
-    },
-    {
-      "id": "code:function:saebase.runtime.hardware:main",
-      "kind": "function",
-      "title": "main",
-      "path": "saebase/runtime/hardware.py",
-      "line": 74,
-      "status": "implemented",
-      "signature": "def main(argv: list[str] | None=None) -> int",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/runtime/hardware.py:74"
-      ]
-    },
-    {
-      "id": "code:function:saebase.runtime.resource_planner:select_cuda_device",
-      "kind": "function",
-      "title": "select_cuda_device",
-      "path": "saebase/runtime/resource_planner.py",
-      "line": 13,
-      "status": "implemented",
-      "signature": "def select_cuda_device(hardware: dict[str, Any], *, minimum_free_bytes: int=1 << 30) -> dict[str, Any]",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/runtime/resource_planner.py:13"
       ]
     },
     {
@@ -21475,42 +20879,6 @@
       "needs_review": false,
       "evidence": [
         "saebase/runtime/summary_log.py:132"
-      ]
-    },
-    {
-      "id": "code:function:saebase.runtime.supervisor:_utc",
-      "kind": "function",
-      "title": "_utc",
-      "path": "saebase/runtime/supervisor.py",
-      "line": 18,
-      "status": "implemented",
-      "signature": "def _utc() -> str",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/runtime/supervisor.py:18"
-      ]
-    },
-    {
-      "id": "code:function:saebase.runtime.supervisor:run_worker",
-      "kind": "function",
-      "title": "run_worker",
-      "path": "saebase/runtime/supervisor.py",
-      "line": 22,
-      "status": "implemented",
-      "signature": "def run_worker(*, argv: list[str], receipt_file: Path, log_dir: Path, retry_limit: int=1, timeout_seconds: int=172800) -> dict[str, Any]",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/runtime/supervisor.py:22"
       ]
     },
     {
@@ -30040,168 +29408,6 @@
       ]
     },
     {
-      "id": "code:function:tasks.benchmark.qa_metrics:_percentile",
-      "kind": "function",
-      "title": "_percentile",
-      "path": "tasks/benchmark/qa_metrics.py",
-      "line": 12,
-      "status": "implemented",
-      "signature": "def _percentile(values: list[float], fraction: float) -> float",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "tasks/benchmark/qa_metrics.py:12"
-      ]
-    },
-    {
-      "id": "code:function:tasks.benchmark.qa_metrics:summarize_metric",
-      "kind": "function",
-      "title": "summarize_metric",
-      "path": "tasks/benchmark/qa_metrics.py",
-      "line": 19,
-      "status": "implemented",
-      "signature": "def summarize_metric(values: list[float], *, seed: int=BOOTSTRAP_SEED) -> dict[str, Any]",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "tasks/benchmark/qa_metrics.py:19"
-      ]
-    },
-    {
-      "id": "code:function:tasks.benchmark.qa_scoring:_normalize_text",
-      "kind": "function",
-      "title": "_normalize_text",
-      "path": "tasks/benchmark/qa_scoring.py",
-      "line": 112,
-      "status": "implemented",
-      "signature": "def _normalize_text(s: str) -> str",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "tasks/benchmark/qa_scoring.py:112"
-      ]
-    },
-    {
-      "id": "code:function:tasks.benchmark.qa_scoring:_parse_number",
-      "kind": "function",
-      "title": "_parse_number",
-      "path": "tasks/benchmark/qa_scoring.py",
-      "line": 119,
-      "status": "implemented",
-      "signature": "def _parse_number(text: str) -> Decimal | None",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "tasks/benchmark/qa_scoring.py:119"
-      ]
-    },
-    {
-      "id": "code:function:tasks.benchmark.qa_scoring:choice_label_tokens",
-      "kind": "function",
-      "title": "choice_label_tokens",
-      "path": "tasks/benchmark/qa_scoring.py",
-      "line": 15,
-      "status": "implemented",
-      "signature": "def choice_label_tokens(tokenizer: Any, label: str) -> list[int]",
-      "description": "Tokenize an explicit completion, never the gold reference as prompt.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "tasks/benchmark/qa_scoring.py:15"
-      ]
-    },
-    {
-      "id": "code:function:tasks.benchmark.qa_scoring:evaluate_qa",
-      "kind": "function",
-      "title": "evaluate_qa",
-      "path": "tasks/benchmark/qa_scoring.py",
-      "line": 199,
-      "status": "implemented",
-      "signature": "def evaluate_qa(pair: Any, tokens: torch.Tensor, record: dict[str, Any], *, clean_logits: torch.Tensor | None=None) -> dict[str, Any]",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "tasks/benchmark/qa_scoring.py:199"
-      ]
-    },
-    {
-      "id": "code:function:tasks.benchmark.qa_scoring:grade_answer",
-      "kind": "function",
-      "title": "grade_answer",
-      "path": "tasks/benchmark/qa_scoring.py",
-      "line": 139,
-      "status": "implemented",
-      "signature": "def grade_answer(answer_type: str, predicted: str, gold: str) -> dict[str, Any]",
-      "description": "Basic QA grading. Math is deliberately provisional without math-verify.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "tasks/benchmark/qa_scoring.py:139"
-      ]
-    },
-    {
-      "id": "code:function:tasks.benchmark.qa_scoring:greedy_answer",
-      "kind": "function",
-      "title": "greedy_answer",
-      "path": "tasks/benchmark/qa_scoring.py",
-      "line": 75,
-      "status": "implemented",
-      "signature": "def greedy_answer(pair: Any, tokens: torch.Tensor, *, max_new_tokens: int, eos_token_id: int | None) -> dict[str, Any]",
-      "description": "Deterministic, backend-neutral greedy autoregressive generation.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "tasks/benchmark/qa_scoring.py:75"
-      ]
-    },
-    {
-      "id": "code:function:tasks.benchmark.qa_scoring:score_choices",
-      "kind": "function",
-      "title": "score_choices",
-      "path": "tasks/benchmark/qa_scoring.py",
-      "line": 24,
-      "status": "implemented",
-      "signature": "def score_choices(pair: Any, tokens: torch.Tensor, labels: list[str], *, clean_logits: torch.Tensor | None=None) -> dict[str, Any]",
-      "description": "Score complete candidate letter sequences by conditional log likelihood. Single-token candidates share one clean next-token forward. Multi-token candidates use explicit teacher forcing, never a different denominator.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "tasks/benchmark/qa_scoring.py:24"
-      ]
-    },
-    {
       "id": "code:function:tasks.benchmark.release.gates:audit_distributions",
       "kind": "function",
       "title": "audit_distributions",
@@ -31813,24 +31019,6 @@
       "needs_review": false,
       "evidence": [
         "tasks/capture/operation.py:38"
-      ]
-    },
-    {
-      "id": "code:function:tasks.capture.qa_capture:_capture_one",
-      "kind": "function",
-      "title": "_capture_one",
-      "path": "tasks/capture/qa_capture.py",
-      "line": 9,
-      "status": "implemented",
-      "signature": "def _capture_one(pair: Any, tokens: Any, *, top_k: int, mapping: dict[str, Any], annotations: dict[str, Any], sae_sha256: str | None, site_id: str) -> dict[str, Any]",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "tasks/capture/qa_capture.py:9"
       ]
     },
     {
@@ -34974,7 +34162,7 @@
       "kind": "method",
       "title": "candidates",
       "path": "models/hooked_lm_common.py",
-      "line": 35,
+      "line": 34,
       "status": "implemented",
       "signature": "def candidates(self) -> tuple[str, ...]",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -34984,7 +34172,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "models/hooked_lm_common.py:35"
+        "models/hooked_lm_common.py:34"
       ]
     },
     {
@@ -36419,24 +35607,6 @@
       "needs_review": true,
       "evidence": [
         "saebase/extensions/runtime.py:22"
-      ]
-    },
-    {
-      "id": "code:method:saebase.integrations.hf_assets:HFAsset.validate",
-      "kind": "method",
-      "title": "validate",
-      "path": "saebase/integrations/hf_assets.py",
-      "line": 24,
-      "status": "implemented",
-      "signature": "def validate(self) -> None",
-      "description": "暂无经过验证的功能说明，请结合源代码审核。",
-      "description_source": "needs_review",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": true,
-      "evidence": [
-        "saebase/integrations/hf_assets.py:24"
       ]
     },
     {
@@ -42434,42 +41604,6 @@
       ]
     },
     {
-      "id": "code:module:datasets.ARCChallenge.__init__",
-      "kind": "module",
-      "title": "datasets/ARCChallenge/__init__.py",
-      "path": "datasets/ARCChallenge/__init__.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "ARCChallenge dataset implementation.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/ARCChallenge/__init__.py:1"
-      ]
-    },
-    {
-      "id": "code:module:datasets.ARCChallenge.qa_adapter",
-      "kind": "module",
-      "title": "datasets/ARCChallenge/qa_adapter.py",
-      "path": "datasets/ARCChallenge/qa_adapter.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Source-owned ARCChallenge QA adapter (independent of any experiment).",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/ARCChallenge/qa_adapter.py:1"
-      ]
-    },
-    {
       "id": "code:module:datasets.BBH.BBH",
       "kind": "module",
       "title": "datasets/BBH/BBH.py",
@@ -42503,96 +41637,6 @@
       "needs_review": false,
       "evidence": [
         "datasets/BBH/__init__.py:1"
-      ]
-    },
-    {
-      "id": "code:module:datasets.BBH.qa_adapter",
-      "kind": "module",
-      "title": "datasets/BBH/qa_adapter.py",
-      "path": "datasets/BBH/qa_adapter.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Source-owned BBH QA adapter (independent of any experiment).",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/BBH/qa_adapter.py:1"
-      ]
-    },
-    {
-      "id": "code:module:datasets.BoolQ.__init__",
-      "kind": "module",
-      "title": "datasets/BoolQ/__init__.py",
-      "path": "datasets/BoolQ/__init__.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "BoolQ dataset implementation.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/BoolQ/__init__.py:1"
-      ]
-    },
-    {
-      "id": "code:module:datasets.BoolQ.qa_adapter",
-      "kind": "module",
-      "title": "datasets/BoolQ/qa_adapter.py",
-      "path": "datasets/BoolQ/qa_adapter.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Source-owned BoolQ QA adapter (independent of any experiment).",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/BoolQ/qa_adapter.py:1"
-      ]
-    },
-    {
-      "id": "code:module:datasets.CommonsenseQA.__init__",
-      "kind": "module",
-      "title": "datasets/CommonsenseQA/__init__.py",
-      "path": "datasets/CommonsenseQA/__init__.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "CommonsenseQA dataset implementation.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/CommonsenseQA/__init__.py:1"
-      ]
-    },
-    {
-      "id": "code:module:datasets.CommonsenseQA.qa_adapter",
-      "kind": "module",
-      "title": "datasets/CommonsenseQA/qa_adapter.py",
-      "path": "datasets/CommonsenseQA/qa_adapter.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Source-owned CommonsenseQA QA adapter (independent of any experiment).",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/CommonsenseQA/qa_adapter.py:1"
       ]
     },
     {
@@ -42668,78 +41712,6 @@
       ]
     },
     {
-      "id": "code:module:datasets.GPQAExtended.__init__",
-      "kind": "module",
-      "title": "datasets/GPQAExtended/__init__.py",
-      "path": "datasets/GPQAExtended/__init__.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "GPQAExtended dataset implementation.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/GPQAExtended/__init__.py:1"
-      ]
-    },
-    {
-      "id": "code:module:datasets.GPQAExtended.qa_adapter",
-      "kind": "module",
-      "title": "datasets/GPQAExtended/qa_adapter.py",
-      "path": "datasets/GPQAExtended/qa_adapter.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Source-owned GPQAExtended QA adapter (independent of any experiment).",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/GPQAExtended/qa_adapter.py:1"
-      ]
-    },
-    {
-      "id": "code:module:datasets.GSM8K.__init__",
-      "kind": "module",
-      "title": "datasets/GSM8K/__init__.py",
-      "path": "datasets/GSM8K/__init__.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "GSM8K dataset implementation.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/GSM8K/__init__.py:1"
-      ]
-    },
-    {
-      "id": "code:module:datasets.GSM8K.qa_adapter",
-      "kind": "module",
-      "title": "datasets/GSM8K/qa_adapter.py",
-      "path": "datasets/GSM8K/qa_adapter.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Source-owned GSM8K QA adapter (independent of any experiment).",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/GSM8K/qa_adapter.py:1"
-      ]
-    },
-    {
       "id": "code:module:datasets.GreaterThan.GreaterThan",
       "kind": "module",
       "title": "datasets/GreaterThan/GreaterThan.py",
@@ -42809,42 +41781,6 @@
       "needs_review": false,
       "evidence": [
         "datasets/GreaterThan/tokenize.py:1"
-      ]
-    },
-    {
-      "id": "code:module:datasets.HotpotQA.__init__",
-      "kind": "module",
-      "title": "datasets/HotpotQA/__init__.py",
-      "path": "datasets/HotpotQA/__init__.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "HotpotQA dataset implementation.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/HotpotQA/__init__.py:1"
-      ]
-    },
-    {
-      "id": "code:module:datasets.HotpotQA.qa_adapter",
-      "kind": "module",
-      "title": "datasets/HotpotQA/qa_adapter.py",
-      "path": "datasets/HotpotQA/qa_adapter.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Source-owned HotpotQA QA adapter (independent of any experiment).",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/HotpotQA/qa_adapter.py:1"
       ]
     },
     {
@@ -42920,42 +41856,6 @@
       ]
     },
     {
-      "id": "code:module:datasets.MATH500.__init__",
-      "kind": "module",
-      "title": "datasets/MATH500/__init__.py",
-      "path": "datasets/MATH500/__init__.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "MATH500 dataset implementation.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/MATH500/__init__.py:1"
-      ]
-    },
-    {
-      "id": "code:module:datasets.MATH500.qa_adapter",
-      "kind": "module",
-      "title": "datasets/MATH500/qa_adapter.py",
-      "path": "datasets/MATH500/qa_adapter.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Source-owned MATH500 QA adapter (independent of any experiment).",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/MATH500/qa_adapter.py:1"
-      ]
-    },
-    {
       "id": "code:module:datasets.MMLUPro.MMLUPro",
       "kind": "module",
       "title": "datasets/MMLUPro/MMLUPro.py",
@@ -43010,24 +41910,6 @@
       ]
     },
     {
-      "id": "code:module:datasets.MMLUPro.qa_adapter",
-      "kind": "module",
-      "title": "datasets/MMLUPro/qa_adapter.py",
-      "path": "datasets/MMLUPro/qa_adapter.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Source-owned MMLUPro QA adapter (independent of any experiment).",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/MMLUPro/qa_adapter.py:1"
-      ]
-    },
-    {
       "id": "code:module:datasets.MMLUPro.tokenize",
       "kind": "module",
       "title": "datasets/MMLUPro/tokenize.py",
@@ -43043,42 +41925,6 @@
       "needs_review": false,
       "evidence": [
         "datasets/MMLUPro/tokenize.py:1"
-      ]
-    },
-    {
-      "id": "code:module:datasets.MedQA.__init__",
-      "kind": "module",
-      "title": "datasets/MedQA/__init__.py",
-      "path": "datasets/MedQA/__init__.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "MedQA dataset implementation.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/MedQA/__init__.py:1"
-      ]
-    },
-    {
-      "id": "code:module:datasets.MedQA.qa_adapter",
-      "kind": "module",
-      "title": "datasets/MedQA/qa_adapter.py",
-      "path": "datasets/MedQA/qa_adapter.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Source-owned MedQA QA adapter (independent of any experiment).",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "datasets/MedQA/qa_adapter.py:1"
       ]
     },
     {
@@ -44561,24 +43407,6 @@
       "needs_review": false,
       "evidence": [
         "models/pythia70m/pythia70m.py:1"
-      ]
-    },
-    {
-      "id": "code:module:models.qa_input",
-      "kind": "module",
-      "title": "models/qa_input.py",
-      "path": "models/qa_input.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Shared tokenizer-aware QA input construction, independent of experiments.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "models/qa_input.py:1"
       ]
     },
     {
@@ -46406,42 +45234,6 @@
       ]
     },
     {
-      "id": "code:module:saebase.data.qa_records",
-      "kind": "module",
-      "title": "saebase/data/qa_records.py",
-      "path": "saebase/data/qa_records.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Dataset-independent QA record identities and zero-shot rendering. Adapters own source-specific schemas. Experiments select subsets and tasks. This module knows no dataset list, SAE model matrix, or experiment budget.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/data/qa_records.py:1"
-      ]
-    },
-    {
-      "id": "code:module:saebase.data.qa_source",
-      "kind": "module",
-      "title": "saebase/data/qa_source.py",
-      "path": "saebase/data/qa_source.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Read one pinned Hugging Face dataset without choosing a benchmark cohort.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/data/qa_source.py:1"
-      ]
-    },
-    {
       "id": "code:module:saebase.datasets.__init__",
       "kind": "module",
       "title": "saebase/datasets/__init__.py",
@@ -47234,24 +46026,6 @@
       ]
     },
     {
-      "id": "code:module:saebase.integrations.hf_assets",
-      "kind": "module",
-      "title": "saebase/integrations/hf_assets.py",
-      "path": "saebase/integrations/hf_assets.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Versioned Hugging Face asset discovery for any SAEBase experiment. Network requests are explicit. No substitute checkpoint or unpinned success is invented on a failed download. An approved lock can be used offline.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/integrations/hf_assets.py:1"
-      ]
-    },
-    {
       "id": "code:module:saebase.integrations.localization",
       "kind": "module",
       "title": "saebase/integrations/localization.py",
@@ -47267,24 +46041,6 @@
       "needs_review": false,
       "evidence": [
         "saebase/integrations/localization.py:1"
-      ]
-    },
-    {
-      "id": "code:module:saebase.integrations.neuronpedia",
-      "kind": "module",
-      "title": "saebase/integrations/neuronpedia.py",
-      "path": "saebase/integrations/neuronpedia.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Versioned, exact-match Neuronpedia annotations, with no guessed feature IDs.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/integrations/neuronpedia.py:1"
       ]
     },
     {
@@ -48712,42 +47468,6 @@
       ]
     },
     {
-      "id": "code:module:saebase.runtime.hardware",
-      "kind": "module",
-      "title": "saebase/runtime/hardware.py",
-      "path": "saebase/runtime/hardware.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Environment capability inventory for any SAEBase GPU experiment. This is detection and provenance, not an authority to change scientific configuration. Unknown quantities remain null; an unavailable GPU is not a simulated CPU pass for GPU tasks.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/runtime/hardware.py:1"
-      ]
-    },
-    {
-      "id": "code:module:saebase.runtime.resource_planner",
-      "kind": "module",
-      "title": "saebase/runtime/resource_planner.py",
-      "path": "saebase/runtime/resource_planner.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Hardware-capability resource selection for registered model tasks. This selects an actual compatible CUDA device, not a substitute model, precision or task. It does not predict model+SAE peak memory without a real Pilot. When safe execution cannot be established, the worker remains blocked.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/runtime/resource_planner.py:1"
-      ]
-    },
-    {
       "id": "code:module:saebase.runtime.runtime_check",
       "kind": "module",
       "title": "saebase/runtime/runtime_check.py",
@@ -48783,24 +47503,6 @@
       "needs_review": false,
       "evidence": [
         "saebase/runtime/summary_log.py:1"
-      ]
-    },
-    {
-      "id": "code:module:saebase.runtime.supervisor",
-      "kind": "module",
-      "title": "saebase/runtime/supervisor.py",
-      "path": "saebase/runtime/supervisor.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Isolated, bounded execution of registered experiments on heterogeneous machines. A failed CUDA worker is allowed one fresh-process retry at identical scientific settings. This avoids carrying a potentially corrupted CUDA allocator into the next attempt. Unsupported precision changes or alternative models are never chosen as OOM workarounds.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "saebase/runtime/supervisor.py:1"
       ]
     },
     {
@@ -51250,42 +49952,6 @@
       ]
     },
     {
-      "id": "code:module:tasks.benchmark.qa_metrics",
-      "kind": "module",
-      "title": "tasks/benchmark/qa_metrics.py",
-      "path": "tasks/benchmark/qa_metrics.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Reusable independent-question bootstrap metrics for evaluation tasks.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "tasks/benchmark/qa_metrics.py:1"
-      ]
-    },
-    {
-      "id": "code:module:tasks.benchmark.qa_scoring",
-      "kind": "module",
-      "title": "tasks/benchmark/qa_scoring.py",
-      "path": "tasks/benchmark/qa_scoring.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Reusable benchmark QA scorers with real logits and deterministic generation.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "tasks/benchmark/qa_scoring.py:1"
-      ]
-    },
-    {
       "id": "code:module:tasks.benchmark.release.__init__",
       "kind": "module",
       "title": "tasks/benchmark/release/__init__.py",
@@ -51741,24 +50407,6 @@
       "needs_review": false,
       "evidence": [
         "tasks/capture/operation.py:1"
-      ]
-    },
-    {
-      "id": "code:module:tasks.capture.qa_capture",
-      "kind": "module",
-      "title": "tasks/capture/qa_capture.py",
-      "path": "tasks/capture/qa_capture.py",
-      "line": 1,
-      "status": "implemented",
-      "signature": "",
-      "description": "Task-owned real SAE capture, independent of experiment identity.",
-      "description_source": "docstring",
-      "context_ids": [],
-      "core_ids": [],
-      "bases": [],
-      "needs_review": false,
-      "evidence": [
-        "tasks/capture/qa_capture.py:1"
       ]
     },
     {
@@ -53353,11 +52001,6 @@
     {
       "source": "code:class:saebase.extensions.runtime:LoadedExternalPair",
       "target": "code:method:saebase.extensions.runtime:LoadedExternalPair.site",
-      "type": "contains"
-    },
-    {
-      "source": "code:class:saebase.integrations.hf_assets:HFAsset",
-      "target": "code:method:saebase.integrations.hf_assets:HFAsset.validate",
       "type": "contains"
     },
     {
@@ -55591,16 +54234,6 @@
       "type": "calls"
     },
     {
-      "source": "code:function:models.qa_input:make_input",
-      "target": "code:function:models.qa_input:_prompt_format",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:models.qa_input:make_input",
-      "target": "code:function:models.qa_input:_tokenizer",
-      "type": "calls"
-    },
-    {
       "source": "code:function:models.qwen25_3b.qwen25_3b:construct",
       "target": "code:function:models.qwen25_3b.qwen25_3b:load_model",
       "type": "calls"
@@ -55928,31 +54561,6 @@
     {
       "source": "code:function:saebase.cli_compat:main",
       "target": "code:function:saebase.cli_compat:parse_args",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:saebase.data.qa_records:choices",
-      "target": "code:function:saebase.data.qa_records:text",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:saebase.data.qa_records:make_record",
-      "target": "code:function:saebase.data.qa_records:digest",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:saebase.data.qa_records:make_record",
-      "target": "code:function:saebase.data.qa_records:render_prompt",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:saebase.data.qa_records:make_record",
-      "target": "code:function:saebase.data.qa_records:text",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:saebase.data.qa_records:render_prompt",
-      "target": "code:function:saebase.data.qa_records:text",
       "type": "calls"
     },
     {
@@ -56418,11 +55026,6 @@
     {
       "source": "code:function:saebase.registry:get_prompt_source_plugin",
       "target": "code:function:saebase.registry:resolve_prompt_source_name",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:saebase.registry:get_qa_dataset_adapter",
-      "target": "code:function:saebase.registry:get_dataset_plugin",
       "type": "calls"
     },
     {
@@ -57551,11 +56154,6 @@
       "type": "calls"
     },
     {
-      "source": "code:function:saebase.runtime.experiment_paths:study_root",
-      "target": "code:function:saebase.runtime.experiment_paths:_component",
-      "type": "calls"
-    },
-    {
       "source": "code:function:saebase.runtime.experiment_paths:task_components",
       "target": "code:function:saebase.runtime.experiment_paths:_component",
       "type": "calls"
@@ -57578,16 +56176,6 @@
     {
       "source": "code:function:saebase.runtime.experiment_paths:task_tmp_dir",
       "target": "code:function:saebase.runtime.experiment_paths:task_root",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:saebase.runtime.hardware:detect",
-      "target": "code:function:saebase.runtime.hardware:_available_host_ram_bytes",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:saebase.runtime.hardware:main",
-      "target": "code:function:saebase.runtime.hardware:detect",
       "type": "calls"
     },
     {
@@ -57628,11 +56216,6 @@
     {
       "source": "code:function:saebase.runtime.summary_log:format_split_metrics_table",
       "target": "code:function:saebase.runtime.summary_log:_normalize_metric_keys_per_split",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:saebase.runtime.supervisor:run_worker",
-      "target": "code:function:saebase.runtime.supervisor:_utc",
       "type": "calls"
     },
     {
@@ -59516,41 +58099,6 @@
       "type": "calls"
     },
     {
-      "source": "code:function:tasks.benchmark.qa_metrics:summarize_metric",
-      "target": "code:function:tasks.benchmark.qa_metrics:_percentile",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:tasks.benchmark.qa_scoring:evaluate_qa",
-      "target": "code:function:tasks.benchmark.qa_scoring:grade_answer",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:tasks.benchmark.qa_scoring:evaluate_qa",
-      "target": "code:function:tasks.benchmark.qa_scoring:greedy_answer",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:tasks.benchmark.qa_scoring:evaluate_qa",
-      "target": "code:function:tasks.benchmark.qa_scoring:score_choices",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:tasks.benchmark.qa_scoring:grade_answer",
-      "target": "code:function:tasks.benchmark.qa_scoring:_normalize_text",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:tasks.benchmark.qa_scoring:grade_answer",
-      "target": "code:function:tasks.benchmark.qa_scoring:_parse_number",
-      "type": "calls"
-    },
-    {
-      "source": "code:function:tasks.benchmark.qa_scoring:score_choices",
-      "target": "code:function:tasks.benchmark.qa_scoring:choice_label_tokens",
-      "type": "calls"
-    },
-    {
       "source": "code:function:tasks.benchmark.release.gates:generate_release_evidence",
       "target": "code:function:tasks.benchmark.release.gates:audit_distributions",
       "type": "calls"
@@ -60332,47 +58880,12 @@
     },
     {
       "source": "code:group:datasets",
-      "target": "code:module:datasets.ARCChallenge.__init__",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:datasets",
-      "target": "code:module:datasets.ARCChallenge.qa_adapter",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:datasets",
       "target": "code:module:datasets.BBH.BBH",
       "type": "contains"
     },
     {
       "source": "code:group:datasets",
       "target": "code:module:datasets.BBH.__init__",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:datasets",
-      "target": "code:module:datasets.BBH.qa_adapter",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:datasets",
-      "target": "code:module:datasets.BoolQ.__init__",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:datasets",
-      "target": "code:module:datasets.BoolQ.qa_adapter",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:datasets",
-      "target": "code:module:datasets.CommonsenseQA.__init__",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:datasets",
-      "target": "code:module:datasets.CommonsenseQA.qa_adapter",
       "type": "contains"
     },
     {
@@ -60397,26 +58910,6 @@
     },
     {
       "source": "code:group:datasets",
-      "target": "code:module:datasets.GPQAExtended.__init__",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:datasets",
-      "target": "code:module:datasets.GPQAExtended.qa_adapter",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:datasets",
-      "target": "code:module:datasets.GSM8K.__init__",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:datasets",
-      "target": "code:module:datasets.GSM8K.qa_adapter",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:datasets",
       "target": "code:module:datasets.GreaterThan.GreaterThan",
       "type": "contains"
     },
@@ -60433,16 +58926,6 @@
     {
       "source": "code:group:datasets",
       "target": "code:module:datasets.GreaterThan.tokenize",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:datasets",
-      "target": "code:module:datasets.HotpotQA.__init__",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:datasets",
-      "target": "code:module:datasets.HotpotQA.qa_adapter",
       "type": "contains"
     },
     {
@@ -60467,16 +58950,6 @@
     },
     {
       "source": "code:group:datasets",
-      "target": "code:module:datasets.MATH500.__init__",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:datasets",
-      "target": "code:module:datasets.MATH500.qa_adapter",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:datasets",
       "target": "code:module:datasets.MMLUPro.MMLUPro",
       "type": "contains"
     },
@@ -60492,22 +58965,7 @@
     },
     {
       "source": "code:group:datasets",
-      "target": "code:module:datasets.MMLUPro.qa_adapter",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:datasets",
       "target": "code:module:datasets.MMLUPro.tokenize",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:datasets",
-      "target": "code:module:datasets.MedQA.__init__",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:datasets",
-      "target": "code:module:datasets.MedQA.qa_adapter",
       "type": "contains"
     },
     {
@@ -60918,11 +59376,6 @@
     {
       "source": "code:group:models",
       "target": "code:module:models.pythia70m.pythia70m",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:models",
-      "target": "code:module:models.qa_input",
       "type": "contains"
     },
     {
@@ -61432,16 +59885,6 @@
     },
     {
       "source": "code:group:saebase",
-      "target": "code:module:saebase.data.qa_records",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:saebase",
-      "target": "code:module:saebase.data.qa_source",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:saebase",
       "target": "code:module:saebase.datasets.__init__",
       "type": "contains"
     },
@@ -61662,17 +60105,7 @@
     },
     {
       "source": "code:group:saebase",
-      "target": "code:module:saebase.integrations.hf_assets",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:saebase",
       "target": "code:module:saebase.integrations.localization",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:saebase",
-      "target": "code:module:saebase.integrations.neuronpedia",
       "type": "contains"
     },
     {
@@ -62072,27 +60505,12 @@
     },
     {
       "source": "code:group:saebase",
-      "target": "code:module:saebase.runtime.hardware",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:saebase",
-      "target": "code:module:saebase.runtime.resource_planner",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:saebase",
       "target": "code:module:saebase.runtime.runtime_check",
       "type": "contains"
     },
     {
       "source": "code:group:saebase",
       "target": "code:module:saebase.runtime.summary_log",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:saebase",
-      "target": "code:module:saebase.runtime.supervisor",
       "type": "contains"
     },
     {
@@ -62772,16 +61190,6 @@
     },
     {
       "source": "code:group:tasks",
-      "target": "code:module:tasks.benchmark.qa_metrics",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:tasks",
-      "target": "code:module:tasks.benchmark.qa_scoring",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:tasks",
       "target": "code:module:tasks.benchmark.release.__init__",
       "type": "contains"
     },
@@ -62903,11 +61311,6 @@
     {
       "source": "code:group:tasks",
       "target": "code:module:tasks.capture.operation",
-      "type": "contains"
-    },
-    {
-      "source": "code:group:tasks",
-      "target": "code:module:tasks.capture.qa_capture",
       "type": "contains"
     },
     {
@@ -63161,16 +61564,6 @@
       "type": "contains"
     },
     {
-      "source": "code:module:datasets.ARCChallenge.qa_adapter",
-      "target": "code:function:datasets.ARCChallenge.qa_adapter:parse",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:datasets.ARCChallenge.qa_adapter",
-      "target": "code:module:saebase.data.qa_records",
-      "type": "imports"
-    },
-    {
       "source": "code:module:datasets.BBH.BBH",
       "target": "code:function:datasets.BBH.BBH:_cache_bbh_from_hf",
       "type": "contains"
@@ -63189,36 +61582,6 @@
       "source": "code:module:datasets.BBH.BBH",
       "target": "code:function:datasets.BBH.BBH:default_data_dir",
       "type": "contains"
-    },
-    {
-      "source": "code:module:datasets.BBH.qa_adapter",
-      "target": "code:function:datasets.BBH.qa_adapter:parse",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:datasets.BBH.qa_adapter",
-      "target": "code:module:saebase.data.qa_records",
-      "type": "imports"
-    },
-    {
-      "source": "code:module:datasets.BoolQ.qa_adapter",
-      "target": "code:function:datasets.BoolQ.qa_adapter:parse",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:datasets.BoolQ.qa_adapter",
-      "target": "code:module:saebase.data.qa_records",
-      "type": "imports"
-    },
-    {
-      "source": "code:module:datasets.CommonsenseQA.qa_adapter",
-      "target": "code:function:datasets.CommonsenseQA.qa_adapter:parse",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:datasets.CommonsenseQA.qa_adapter",
-      "target": "code:module:saebase.data.qa_records",
-      "type": "imports"
     },
     {
       "source": "code:module:datasets.CounterFact.CounterFact",
@@ -63284,26 +61647,6 @@
       "source": "code:module:datasets.CounterFact.tokenize",
       "target": "code:function:datasets.CounterFact.tokenize:filter_with_model",
       "type": "contains"
-    },
-    {
-      "source": "code:module:datasets.GPQAExtended.qa_adapter",
-      "target": "code:function:datasets.GPQAExtended.qa_adapter:parse",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:datasets.GPQAExtended.qa_adapter",
-      "target": "code:module:saebase.data.qa_records",
-      "type": "imports"
-    },
-    {
-      "source": "code:module:datasets.GSM8K.qa_adapter",
-      "target": "code:function:datasets.GSM8K.qa_adapter:parse",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:datasets.GSM8K.qa_adapter",
-      "target": "code:module:saebase.data.qa_records",
-      "type": "imports"
     },
     {
       "source": "code:module:datasets.GreaterThan.GreaterThan",
@@ -63381,16 +61724,6 @@
       "type": "contains"
     },
     {
-      "source": "code:module:datasets.HotpotQA.qa_adapter",
-      "target": "code:function:datasets.HotpotQA.qa_adapter:parse",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:datasets.HotpotQA.qa_adapter",
-      "target": "code:module:saebase.data.qa_records",
-      "type": "imports"
-    },
-    {
       "source": "code:module:datasets.IOI.IOI",
       "target": "code:function:datasets.IOI.IOI:attach_ioi_token_ids",
       "type": "contains"
@@ -63439,16 +61772,6 @@
       "source": "code:module:datasets.IOI.tokenize",
       "target": "code:function:datasets.IOI.tokenize:filter_with_model",
       "type": "contains"
-    },
-    {
-      "source": "code:module:datasets.MATH500.qa_adapter",
-      "target": "code:function:datasets.MATH500.qa_adapter:parse",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:datasets.MATH500.qa_adapter",
-      "target": "code:module:saebase.data.qa_records",
-      "type": "imports"
     },
     {
       "source": "code:module:datasets.MMLUPro.MMLUPro",
@@ -63531,29 +61854,9 @@
       "type": "contains"
     },
     {
-      "source": "code:module:datasets.MMLUPro.qa_adapter",
-      "target": "code:function:datasets.MMLUPro.qa_adapter:parse",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:datasets.MMLUPro.qa_adapter",
-      "target": "code:module:saebase.data.qa_records",
-      "type": "imports"
-    },
-    {
       "source": "code:module:datasets.MMLUPro.tokenize",
       "target": "code:function:datasets.MMLUPro.tokenize:attach_token_ids",
       "type": "contains"
-    },
-    {
-      "source": "code:module:datasets.MedQA.qa_adapter",
-      "target": "code:function:datasets.MedQA.qa_adapter:parse",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:datasets.MedQA.qa_adapter",
-      "target": "code:module:saebase.data.qa_records",
-      "type": "imports"
     },
     {
       "source": "code:module:datasets.SimpleCopying.SimpleCopying",
@@ -63892,27 +62195,12 @@
     },
     {
       "source": "code:module:datasets.plugins",
-      "target": "code:function:datasets.plugins:_register_qa_dataset_adapters",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:datasets.plugins",
       "target": "code:function:datasets.plugins:_tasks_for",
       "type": "contains"
     },
     {
       "source": "code:module:datasets.plugins",
       "target": "code:module:saebase.cfg.contracts",
-      "type": "imports"
-    },
-    {
-      "source": "code:module:datasets.plugins",
-      "target": "code:module:saebase.data.qa_records",
-      "type": "imports"
-    },
-    {
-      "source": "code:module:datasets.plugins",
-      "target": "code:module:saebase.data.qa_source",
       "type": "imports"
     },
     {
@@ -64893,26 +63181,6 @@
     {
       "source": "code:module:models.pythia70m.pythia70m",
       "target": "code:module:models.hooked_lm_common",
-      "type": "imports"
-    },
-    {
-      "source": "code:module:models.qa_input",
-      "target": "code:function:models.qa_input:_prompt_format",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:models.qa_input",
-      "target": "code:function:models.qa_input:_tokenizer",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:models.qa_input",
-      "target": "code:function:models.qa_input:make_input",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:models.qa_input",
-      "target": "code:module:saebase.data.qa_records",
       "type": "imports"
     },
     {
@@ -66426,46 +64694,6 @@
       "type": "contains"
     },
     {
-      "source": "code:module:saebase.data.qa_records",
-      "target": "code:class:saebase.data.qa_records:DatasetSpec",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.data.qa_records",
-      "target": "code:function:saebase.data.qa_records:choices",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.data.qa_records",
-      "target": "code:function:saebase.data.qa_records:digest",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.data.qa_records",
-      "target": "code:function:saebase.data.qa_records:make_record",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.data.qa_records",
-      "target": "code:function:saebase.data.qa_records:render_prompt",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.data.qa_records",
-      "target": "code:function:saebase.data.qa_records:text",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.data.qa_source",
-      "target": "code:function:saebase.data.qa_source:iter_source",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.data.qa_source",
-      "target": "code:module:saebase.data.qa_records",
-      "type": "imports"
-    },
-    {
       "source": "code:module:saebase.examples._synthetic_common",
       "target": "code:class:saebase.examples._synthetic_common:ResearchToyModel",
       "type": "contains"
@@ -67256,21 +65484,6 @@
       "type": "imports"
     },
     {
-      "source": "code:module:saebase.integrations.hf_assets",
-      "target": "code:class:saebase.integrations.hf_assets:HFAsset",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.integrations.hf_assets",
-      "target": "code:function:saebase.integrations.hf_assets:download",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.integrations.hf_assets",
-      "target": "code:function:saebase.integrations.hf_assets:resolve_revision",
-      "type": "contains"
-    },
-    {
       "source": "code:module:saebase.integrations.localization",
       "target": "code:class:saebase.integrations.localization:LocalizationGrid",
       "type": "contains"
@@ -67303,21 +65516,6 @@
     {
       "source": "code:module:saebase.integrations.localization",
       "target": "code:function:saebase.integrations.localization:localization_grid_from_code_store",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.integrations.neuronpedia",
-      "target": "code:function:saebase.integrations.neuronpedia:annotate",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.integrations.neuronpedia",
-      "target": "code:function:saebase.integrations.neuronpedia:load_annotations",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.integrations.neuronpedia",
-      "target": "code:function:saebase.integrations.neuronpedia:load_mapping",
       "type": "contains"
     },
     {
@@ -67708,11 +65906,6 @@
     {
       "source": "code:module:saebase.registry",
       "target": "code:function:saebase.registry:get_prompt_source_plugin",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.registry",
-      "target": "code:function:saebase.registry:get_qa_dataset_adapter",
       "type": "contains"
     },
     {
@@ -69592,11 +67785,6 @@
     },
     {
       "source": "code:module:saebase.runtime.experiment_paths",
-      "target": "code:function:saebase.runtime.experiment_paths:study_root",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.runtime.experiment_paths",
       "target": "code:function:saebase.runtime.experiment_paths:task_components",
       "type": "contains"
     },
@@ -69608,26 +67796,6 @@
     {
       "source": "code:module:saebase.runtime.experiment_paths",
       "target": "code:function:saebase.runtime.experiment_paths:task_tmp_dir",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.runtime.hardware",
-      "target": "code:function:saebase.runtime.hardware:_available_host_ram_bytes",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.runtime.hardware",
-      "target": "code:function:saebase.runtime.hardware:detect",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.runtime.hardware",
-      "target": "code:function:saebase.runtime.hardware:main",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.runtime.resource_planner",
-      "target": "code:function:saebase.runtime.resource_planner:select_cuda_device",
       "type": "contains"
     },
     {
@@ -69683,16 +67851,6 @@
     {
       "source": "code:module:saebase.runtime.summary_log",
       "target": "code:function:saebase.runtime.summary_log:write_summary_log",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.runtime.supervisor",
-      "target": "code:function:saebase.runtime.supervisor:_utc",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:saebase.runtime.supervisor",
-      "target": "code:function:saebase.runtime.supervisor:run_worker",
       "type": "contains"
     },
     {
@@ -73381,56 +71539,6 @@
       "type": "imports"
     },
     {
-      "source": "code:module:tasks.benchmark.qa_metrics",
-      "target": "code:function:tasks.benchmark.qa_metrics:_percentile",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:tasks.benchmark.qa_metrics",
-      "target": "code:function:tasks.benchmark.qa_metrics:summarize_metric",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:tasks.benchmark.qa_scoring",
-      "target": "code:function:tasks.benchmark.qa_scoring:_normalize_text",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:tasks.benchmark.qa_scoring",
-      "target": "code:function:tasks.benchmark.qa_scoring:_parse_number",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:tasks.benchmark.qa_scoring",
-      "target": "code:function:tasks.benchmark.qa_scoring:choice_label_tokens",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:tasks.benchmark.qa_scoring",
-      "target": "code:function:tasks.benchmark.qa_scoring:evaluate_qa",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:tasks.benchmark.qa_scoring",
-      "target": "code:function:tasks.benchmark.qa_scoring:grade_answer",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:tasks.benchmark.qa_scoring",
-      "target": "code:function:tasks.benchmark.qa_scoring:greedy_answer",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:tasks.benchmark.qa_scoring",
-      "target": "code:function:tasks.benchmark.qa_scoring:score_choices",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:tasks.benchmark.qa_scoring",
-      "target": "code:module:models.qa_input",
-      "type": "imports"
-    },
-    {
       "source": "code:module:tasks.benchmark.release.gates",
       "target": "code:function:tasks.benchmark.release.gates:audit_distributions",
       "type": "contains"
@@ -74043,16 +72151,6 @@
     {
       "source": "code:module:tasks.capture.operation",
       "target": "code:module:tasks.sae_runtime",
-      "type": "imports"
-    },
-    {
-      "source": "code:module:tasks.capture.qa_capture",
-      "target": "code:function:tasks.capture.qa_capture:_capture_one",
-      "type": "contains"
-    },
-    {
-      "source": "code:module:tasks.capture.qa_capture",
-      "target": "code:module:saebase.integrations.neuronpedia",
       "type": "imports"
     },
     {
@@ -75115,7 +73213,5 @@
       "target": "code:group:tasks",
       "type": "contains"
     }
-  ],
-  "source_snapshot_status": "historical_nodes_filtered_pending_current_source_regeneration",
-  "previous_source_sha256": "4c254660ac348aaf9fe8a041d9f27c8e7aad8e71ca902a987393bd39e66ad685"
+  ]
 }

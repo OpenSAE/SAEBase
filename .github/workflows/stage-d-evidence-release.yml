@@ -70,6 +70,6 @@ jobs:
             dist/stage-d-evidence/SHA256SUMS \
             --repo "$REPO" --verify-tag \
             --title "Stage D compact verification evidence (48 sites)" \
-            --notes-file harness/github_development_doc/stage-d-evidence-archive.md \
+            --notes-file harness/github/development_doc/stage-d-evidence-archive.md \
             --latest=false
           gh release view "$TAG" --repo "$REPO" --json url,tagName,assets

@@ -22,7 +22,7 @@ from harness.contracts.selection import audit_selection
 ROOT = registry.ROOT
 RUNS = ROOT / "harness/tests/wp18/runs"
 SPEC = ROOT / "harness/contracts/wp18_cases.json"
-PLAN = "harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md"
+PLAN = "harness/github/work_plan/18_harness_local_agent_examination_and_independent_acceptance.md"
 REQUIRED = {f"H{i:02d}" for i in range(7, 27)}
 RUN_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{3,63}$")
 

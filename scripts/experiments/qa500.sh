@@ -116,10 +116,10 @@ run_preflight() {
   python -m pytest -q \
     tests/workplan/wp22/test_cohort.py \
     tests/workplan/wp22/test_execution.py \
-    harness/github_work_test/test_wp22_architecture.py \
-    harness/github_work_test/test_wp22_runtime.py
+    harness/github/work_test/test_wp22_architecture.py \
+    harness/github/work_test/test_wp22_runtime.py
   python -m harness.contracts.registry check \
-    --plan harness/github_work_plan/22_qa500_standard_evaluation_pipeline.md
+    --plan harness/github/work_plan/22_qa500_standard_evaluation_pipeline.md
   python -m scripts.experiments.qa500.runner plan > "$LOG_ROOT/frozen_plan.json"
   python -m scripts.experiments.qa500.capture sites > "$LOG_ROOT/frozen_sites.json"
 }

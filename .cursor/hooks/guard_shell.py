@@ -111,7 +111,7 @@ def gate(command, plan_id=None):
                 return "Only read-only Contract Registry actions are permitted"
             plan = args[5]
             if not re.fullmatch(
-                r"harness/github_work_plan/[A-Za-z0-9_-]+\.md", plan
+                r"harness/github/work_plan/[A-Za-z0-9_-]+\.md", plan
             ):
                 return "Invalid Work Plan reference for contract selection"
             if args[3] == "check" and len(args) == 6:

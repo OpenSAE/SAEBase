@@ -21,4 +21,4 @@ python saebase/examples/quickstart/public_api_offline.py
 
 The first two examples use small synthetic model/SAE weights. Real checkpoint examples require optional analysis dependencies and may require checkpoint access approval.
 
-[Examples index](../README.md) · [First-experiment walkthrough](../../../harness/github_development_doc/first-experiment.md)
+[Examples index](../README.md) · [First-experiment walkthrough](../../../harness/github/development_doc/first-experiment.md)

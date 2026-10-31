@@ -15,7 +15,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument(
         "--ledger",
         type=Path,
-        default=Path("harness/github_work_plan/12_capability_acceptance_matrix.csv"),
+        default=Path("harness/github/work_plan/12_capability_acceptance_matrix.csv"),
     )
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--archive", type=Path, default=None)

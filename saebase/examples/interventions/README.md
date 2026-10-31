@@ -13,4 +13,4 @@ python saebase/examples/interventions/batch_interventions.py
 python saebase/examples/interventions/pythia_feature_edit.py
 ```
 
-[Examples index](../README.md) · [Feature Interventions](../../../harness/github_development_doc/feature-interventions.md)
+[Examples index](../README.md) · [Feature Interventions](../../../harness/github/development_doc/feature-interventions.md)

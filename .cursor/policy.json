@@ -4,16 +4,15 @@
     ".cursor",
     ".github",
     "conf",
-    "datasets",
     "doc",
     "experiment",
-    "experiments",
     "harness",
     "models",
     "saebase",
-    "scripts",
     "tasks",
-    "tests"
+    "tests",
+    "datasets",
+    "scripts"
   ],
   "approved_files": [
     ".cursorignore",

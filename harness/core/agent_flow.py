@@ -12,7 +12,7 @@ import sys
 from pathlib import Path, PurePosixPath
 
 ROOT = Path(__file__).resolve().parents[2]
-PLANS = ROOT / "harness/github_work_plan/agent_flow"
+PLANS = ROOT / "harness/github/work_plan/agent_flow"
 VIEWS = ("knowledge", "code", "environment", "context")
 SCHEMA = "openresearch.agent_flow.v1"
 PROTECTED = (".cursor/", ".github/", "harness/", "saebase/runtime/")
@@ -25,7 +25,7 @@ EDITABLE = (
     "doc/knowledge/",
     "doc/code/",
     "tests/",
-    "experiments/",
+    "scripts/",
     "saebase/tools/",
 )
 AUTHORITY = {
@@ -302,7 +302,7 @@ def intake(manifest, source=None):
     if source is not None:
         canonical(source, True)
         need(
-            source.startswith("harness/github_work_plan/"),
+            source.startswith("harness/github/work_plan/"),
             "Only external GitHub work plan sources are accepted",
         )
         txt = (ROOT / source).read_text(encoding="utf-8")

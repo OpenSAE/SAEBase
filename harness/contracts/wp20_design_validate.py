@@ -12,7 +12,7 @@ from pathlib import PurePosixPath
 from harness.contracts import registry
 
 ROOT = registry.ROOT
-PLAN = "harness/github_work_plan/20_integrated_multistage_harness_exams.md"
+PLAN = "harness/github/work_plan/20_integrated_multistage_harness_exams.md"
 SPEC = ROOT / "harness/contracts/wp20_cases.json"
 CASE_IDS = [f"X{i:02d}" for i in range(1, 21)]
 CASE_GROUPS = {

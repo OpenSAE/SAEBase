@@ -17,7 +17,7 @@ QA500 是一个 **具体实验执行脚本集合**，不是 Dataset、Model、Ta
 | 环境检测、隔离与 Runtime 产物布局 | `saebase/runtime/hardware.py`、`supervisor.py`、`experiment_paths.py` |
 | QA500 所有科学配置 | `conf/experiment/qa500/` |
 | 入口 Bash 脚本 | `scripts/experiments/qa500.sh` |
-| 治理、独立验证、授权及验收 | `harness/github_work_plan/22_qa500_standard_evaluation_pipeline.md` |
+| 治理、独立验证、授权及验收 | `harness/github/work_plan/22_qa500_standard_evaluation_pipeline.md` |
 
 实验的通用资源能力必须保持对 QA500 零依赖。
 其他实验可以复用 Dataset、Model、Task 和 Runtime，而无需导入此目录。
@@ -118,9 +118,9 @@ experiment/
 ## 独立验收与发布
 
 ```bash
-python -m pytest -q scripts/experiments/qa500/tests harness/github_work_test/test_wp22_architecture.py
+python -m pytest -q tests/workplan/wp22 harness/github/work_test/test_wp22_architecture.py
 python -m harness.contracts.registry check \
-  --plan harness/github_work_plan/22_qa500_standard_evaluation_pipeline.md
+  --plan harness/github/work_plan/22_qa500_standard_evaluation_pipeline.md
 python -m scripts.experiments.qa500.report audit
 python -m scripts.experiments.qa500.report stage
 ```

@@ -6,7 +6,7 @@ alwaysApply: true
 # Context Selection · Core 与科研 Knowledge 分离
 
 - 先根据当前 Work Plan 选定的 `Contract IDs` / task tags 读取 `harness/contracts/catalog.json` 的**相关条目**（Always-on 始终生效），再选取少量关联业务 Context。规则约束不依赖 Agent 是否恰好记得之前一次的失败例子。
-- WP18 H01–H06 在 `harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md` 有预声明绑定；不得为测试通过改 ID。用户自定义 Harness 测试可在受控测试 sandbox 内选择 catalog 既有 tags，并在本次 Run 收据中如实记录。
+- WP18 H01–H06 在 `harness/github/work_plan/18_harness_local_agent_examination_and_independent_acceptance.md` 有预声明绑定；不得为测试通过改 ID。用户自定义 Harness 测试可在受控测试 sandbox 内选择 catalog 既有 tags，并在本次 Run 收据中如实记录。
 - 未能解析必要 Contract、相关 Context 权威来源不可访问、或合同和用户范围冲突，应报告 `CONTRACT_GAP` / `SELECTION_GAP` / `BLOCKED`，不得自行修改治理 Registry。
 
 
@@ -16,7 +16,7 @@ alwaysApply: true
 - `doc/code/code_tree.json` 是真实 AST 派生快照；`doc/code/code_annotations.json` 中 `core_ids` 和 `context_ids` 必须分别引用 Core 和 Knowledge，不能未经验证从名字生成研究结论。
 - 未经用户明确指定某份文档、Work Order 或模块，不主动递归搜索、加载 `doc/` 或 `harness/`。修改代码仍应阅读实际相关业务源码、Hydra 配置与必要的测试。
 - 对正式生产任务，仅根据用户明确指定的 `.cursor/work_orders/<ID>.yaml` 激活当前工作单；使用 `run-work-order` Skill 验证 v3。用户明确要求 Harness 测验时则采用受限 `harness/tests/` 预授权 sandbox，可自由决定测试主题与小功能，不读取未授权治理源、不变更权威 Tree，详见 `harness/tests/README.md`。分别按照 `core_ids`、`knowledge_ids`、`term_ids` 提取**少量节点**，不要把整本字典和整棵树加载进 Context。
-- `activation.core/code/knowledge/experiments/transfer/environment` 默认关闭；不允许 Agent 自己扩大启用范围。未列出的 `doc/` 或 `harness/github_work_plan/` 文件不得主动浏览或通过 Subagent/Shell/MCP 变相获取。
+- `activation.core/code/knowledge/experiments/transfer/environment` 默认关闭；不允许 Agent 自己扩大启用范围。未列出的 `doc/` 或 `harness/github/work_plan/` 文件不得主动浏览或通过 Subagent/Shell/MCP 变相获取。
 - Core 的项目决策与 Knowledge 的科研语义均由 GitHub 端维护。Agent 可以提交有事实依据的修改提案；未经授权不直接替换两套权威图与 Glossary。
 - 激活 `code` 且执行代码修改时，先保存旧 AST、提出 Expected 变化，完成后重建并比较 Observed 变化，不以图代替运行测试。
 - GitHub 端的治理计划和评审资料仅由受信任维护者处理；本地考试 Agent 不应批量读取治理资料。`.cursorignore` 只能阻止常规 AI 读取，不是系统级文件权限。
@@ -26,4 +26,4 @@ alwaysApply: true
 
 - 除 Github 人类治理侧外，Agent 不遍历 Core Tree；新的部署/执行流程只涉及 `knowledge`、`code`、`environment`、`context` 四个 review 视图。
 - `harness/core/agent_flow.py inspect` 只返回当前人工批准的计划记录，不意味着可以读取/修改 Core 权威图。
-- `harness/github_work_plan/agent_flow` 包含可审计的流程数据；Agent 只能提交新的提案与真实运行证据，人类审批通过 GitHub PR review 或本地 loopback UI 落地。
+- `harness/github/work_plan/agent_flow` 包含可审计的流程数据；Agent 只能提交新的提案与真实运行证据，人类审批通过 GitHub PR review 或本地 loopback UI 落地。

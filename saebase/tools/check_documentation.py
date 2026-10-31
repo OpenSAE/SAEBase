@@ -25,7 +25,7 @@ def markdown_files(root: Path) -> list[Path]:
     return sorted(
         [
             *(root / p for p in DOCS),
-            *(root / "harness/github_development_doc").rglob("*.md"),
+            *(root / "harness/github/development_doc").rglob("*.md"),
             *(root / "saebase/examples").rglob("*.md"),
         ]
     )

@@ -18,4 +18,4 @@ reporting channel. Please avoid sharing credentials or exploit details in public
 - Evaluate GPU integrations on dedicated test machines and control their process ownership.
 - Never commit tokens, private prompts, or personal data to the repository.
 
-See `harness/github_development_doc/PROVENANCE.md` for the release provenance checklist.
+See `harness/github/development_doc/PROVENANCE.md` for the release provenance checklist.

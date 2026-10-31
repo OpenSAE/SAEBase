@@ -13,7 +13,7 @@ from pathlib import Path, PurePosixPath
 
 ROOT = Path(__file__).resolve().parents[2]
 CATALOG = ROOT / "harness/contracts/catalog.json"
-PLAN_ROOT = ROOT / "harness/github_work_plan"
+PLAN_ROOT = ROOT / "harness/github/work_plan"
 BLOCK = re.compile(r"```harness-contracts-json\s*\n(.*?)\n```", re.DOTALL)
 CASE = re.compile(r"[A-Za-z][A-Za-z0-9_-]{1,63}\Z")
 

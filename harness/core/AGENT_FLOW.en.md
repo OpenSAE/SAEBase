@@ -17,7 +17,7 @@ python -m harness.core.agent_flow serve EXISTING_PLAN_ID --port 8766
 
 Open the full address printed by the local service. A session token in the URL fragment must never be committed or shared publicly.
 
-Authenticated decisions are written to `harness/github_work_plan/agent_flow/<ID>.json`. Eligible, approved empty Knowledge nodes can also update the authoritative Knowledge graph and glossary. Revision and source-hash checks reject stale writes. Saving a decision does not execute a model.
+Authenticated decisions are written to `harness/github/work_plan/agent_flow/<ID>.json`. Eligible, approved empty Knowledge nodes can also update the authoritative Knowledge graph and glossary. Revision and source-hash checks reject stale writes. Saving a decision does not execute a model.
 
 ## Scientific acceptance is separate
 
@@ -34,7 +34,7 @@ GitHub Pages serves static HTML. Its review controls modify a local browser draf
 ## Verification
 
 ```bash
-python -m pytest -q harness/github_work_test/test_harness_migration.py harness/github_work_test/test_openresearch_integration.py
+python -m pytest -q harness/github/work_test/test_harness_migration.py harness/github/work_test/test_openresearch_integration.py
 python harness/core/validate.py
 python harness/knowledge/validate.py
 node --check harness/visualization/app.js

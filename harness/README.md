@@ -3,7 +3,7 @@
 Harness 为 SAEBase 提供可审计的科研代码导航、知识管理、环境记录和 Agent 审阅流程。
 Research Lab、Dataset、Model、Task 及通用 SAE 接口均由 SAEBase 仓库统一维护。
 
-**当前 Harness 基线（WP21.2 已结项）**：[WP21 阶段结项及旧 Harness 兼容验证](github_work_plan/21_harness_phase_closeout_20261030.md)。WP18–WP20 的历史 Reference/Verifier 和 Contract 不变；WP21 真实工作流考试的工具、审计修复、round01/round02 记录已统一归档。入口见 [Harness Tests](tests/README.md)，冻结题目见 [WP21](tests/wp21/README.md)。产品代码与真实 GPU 问题独立处理。
+**当前 Harness 基线（WP21.2 已结项）**：[WP21 阶段结项及旧 Harness 兼容验证](github/work_plan/21_harness_phase_closeout_20261030.md)。WP18–WP20 的历史 Reference/Verifier 和 Contract 不变；WP21 真实工作流考试的工具、审计修复、round01/round02 记录已统一归档。入口见 [Harness Tests](tests/README.md)，冻结题目见 [WP21](tests/wp21/README.md)。产品代码与真实 GPU 问题独立处理。
 
 | 模块 | 作用 |
 | --- | --- |
@@ -16,8 +16,8 @@ Research Lab、Dataset、Model、Task 及通用 SAE 接口均由 SAEBase 仓库�
 | `environment/` | 本地环境记录与资源比较 |
 | `transfer/` | 明确授权后的数据校验传输 |
 | `visualization/` | Core、Knowledge、Code、Environment、Context 五棵 Atlas Tree |
-| `github_work_plan/` | 历史记录、待审任务与外部验收计划 |
-| `github_development_doc/` | SAEBase 开发文档与公开说明 |
+| `github/work_plan/` | 历史记录、待审任务与外部验收计划 |
+| `github/development_doc/` | SAEBase 开发文档与公开说明 |
 
 ## 代码边界
 
@@ -32,7 +32,7 @@ Research Lab、Dataset、Model、Task 及通用 SAE 接口均由 SAEBase 仓库�
 
 ```bash
 python .cursor/hooks/validate_repo.py --full
-python -m pytest -q harness/github_work_test/test_harness_migration.py harness/github_work_test/test_openresearch_integration.py
+python -m pytest -q harness/github/work_test/test_harness_migration.py harness/github/work_test/test_openresearch_integration.py
 python -m saebase.runtime.train --cfg job
 python harness/core/validate.py
 python harness/knowledge/validate.py
@@ -42,9 +42,13 @@ python harness/visualization/build_pages.py --check
 ```
 
 实际通过情况必须以对应 commit 的 CI 结果为准。需要 GPU、权重、私有数据审核或生产权限的验收见
-[外部验收记录](github_work_plan/SAEBASE-OPENRESEARCH-EXTERNAL-ACCEPTANCE-DEFERRED.md)，不能由离线检查替代。
+[外部验收记录](github/work_plan/SAEBASE-OPENRESEARCH-EXTERNAL-ACCEPTANCE-DEFERRED.md)，不能由离线检查替代。
 
 ## Agent 权限
 
 遵循 `.cursor/hooks.json`、`.cursor/policy.json` 与 `core/AGENT_FLOW.md`。
 未经人类批准不得修改治理层，批准新增节点也不表示科研结果已经验证。
+
+## GitHub Agent 与文件所有权
+
+从 [GitHub 工程入口](github/README.md) 读取 Work Plan、开发文档、独立测试。正式编辑前须遵守 [架构纲领](core/BOUNDARIES.md)，确定文件归属、层次及新增实体的必要性。Scripts 和 Tests 优先按照 Work Plan 或 Dataset/Model/Task/Sub-name 分类；具体规范允许有依据的扩展。
