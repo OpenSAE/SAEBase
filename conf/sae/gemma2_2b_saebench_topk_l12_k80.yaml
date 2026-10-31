@@ -1,0 +1,8 @@
+# @package _global_
+# Original SAEBench Gemma-2-2B L12 residual TopK k=80, 16k width.
+# Immutable HF source revision enforced by saebase.sae.saebench_topk.
+sae:
+  name: gemma2_2b_saebench_topk_l12_k80
+  layer: 12
+  device: cuda
+  require_prepared_prompts: true

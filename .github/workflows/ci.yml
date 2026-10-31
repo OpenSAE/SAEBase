@@ -179,6 +179,9 @@ jobs:
             coverage.xml
             coverage.json
           if-no-files-found: error
+      - name: Verify pinned native SAEBench TopK source contract (offline)
+        run: python -m pytest -q tests/workplan/saebench_topk/test_baseline.py
+
       - name: Check CLI
         run: |
           cd "$(mktemp -d)"

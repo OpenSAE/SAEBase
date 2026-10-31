@@ -376,6 +376,38 @@ def load_sae_for_profile(
         }
         return sae, meta
 
+    if profile.loader == "saebench_topk":
+        from .saebench_topk import load_saebench_topk
+
+        if folder is None or profile.repo_id is None:
+            raise ValueError("SAEBench TopK profile requires a pinned repository and folder")
+        sae, upstream = load_saebench_topk(
+            repo_id=profile.repo_id,
+            checkpoint_dir=folder,
+            expected_layer=layer,
+            expected_hook=hook_name,
+            device=dev,
+            revision=revision,
+        )
+        return sae, {
+            "sae_key": profile.key,
+            "model_key": profile.model_key,
+            "model_name": profile.model_name,
+            "layer": layer,
+            "sae_release": profile.sae_release,
+            "sae_id": sae_id,
+            "hook_name": hook_name,
+            "loader": profile.loader,
+            "folder": folder,
+            "cfg": upstream["config"],
+            "sparsity": None,
+            "d_in": int(sae.cfg.d_in),
+            "d_sae": int(sae.cfg.d_sae),
+            "source_revision": upstream["revision"],
+            "checkpoint_sha256": upstream["checkpoint_sha256"],
+            **profile.transfer_meta(),
+        }
+
     if profile.loader == "dictionary_learning":
         if profile.key.startswith("llama31_8b_instruct_andyrdt"):
             raise RuntimeError(
