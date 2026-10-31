@@ -28,7 +28,7 @@
 | **追踪证据** | 将结果与输入、代码、模型、执行命令和产物关联。 |
 | **持续改进** | 区分实现、环境与验证过程的问题，支持下一轮修复。 |
 
-**Atlas** 提供五个相互关联的研究视图。[Core](https://atheavenma.github.io/opensae/saebase/atlas/core.html) 介绍项目架构，[Knowledge](https://atheavenma.github.io/opensae/saebase/atlas/knowledge.html) 组织研究问题，[Code](https://atheavenma.github.io/opensae/saebase/atlas/code.html) 连接真实源码，[Environment](https://atheavenma.github.io/opensae/saebase/atlas/environment.html) 介绍计算资源，[Context](https://atheavenma.github.io/opensae/saebase/atlas/context.html) 解释研究术语。
+**Atlas** 提供五个相互关联的研究视图。[Core](https://opensae.github.io/SAEBase/atlas/core.html) 介绍项目架构，[Knowledge](https://opensae.github.io/SAEBase/atlas/knowledge.html) 组织研究问题，[Code](https://opensae.github.io/SAEBase/atlas/code.html) 连接真实源码，[Environment](https://opensae.github.io/SAEBase/atlas/environment.html) 介绍计算资源，[Context](https://opensae.github.io/SAEBase/atlas/context.html) 解释研究术语。
 
 [了解 Harness](harness/README.md) · [Agent 协作指南](harness/core/AGENT_FLOW.md) · [科研流程文档](harness/github_development_doc/index.md)
 
