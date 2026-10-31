@@ -92,3 +92,50 @@ def test_qa_answer_scorer_rejects_repeated_choices():
     p = MinimalPair()
     with pytest.raises(ValueError, match="unique"):
         score_choices(p, p.model.tokens(prompt="Question: testing"), ["A", "A"])
+
+
+@pytest.mark.parametrize(
+    ("dataset_id", "example", "config"),
+    [
+        ("commonsense_qa", {
+            "question": "Which action?", "choices": {
+                "label": ["A", "B"], "text": ["Walk", "Fly"]
+            }, "answerKey": "A",
+        }, None),
+        ("bbh", {"input": "Is it true?", "target": "yes"}, "boolean_expressions"),
+        ("math500", {"problem": "Compute 1+2", "answer": "3"}, None),
+        ("medqa", {"question": "Which therapy?", "options": {
+            "A": "first", "B": "second"
+        }, "answer_idx": "B"}, None),
+        ("hotpot_qa", {
+            "_id": "hotpot-1", "question": "Who?", "answer": "Ada",
+            "context": {
+                "title": ["Source One"],
+                "sentences": [["Ada", "was", "a", "pioneer."]],
+            },
+        }, "distractor"),
+    ],
+)
+def test_all_remaining_real_source_shapes_are_normalized(dataset_id, example, config):
+    from saebase.datasets.qa_standard import normalize, render_prompt
+
+    record = normalize(DATASETS[dataset_id], example, source_config=config, source_index=0)
+    prompt = render_prompt(record)
+    assert record["question"]
+    assert record["answer"]
+    assert "Question:" in prompt
+    assert "Answer: " + record["answer"] not in prompt
+    assert record["prompt_sha256"]
+
+
+def test_bootstrap_core_benchmark_is_reproducible_and_constant_cases():
+    from saebase.datasets.qa_benchmark import summarize_metric
+
+    metric = summarize_metric([4.0] * 500)
+    assert metric["value"] == 4.0
+    assert metric["ci_lower_95"] == 4.0
+    assert metric["ci_upper_95"] == 4.0
+    assert metric["n_valid"] == 500
+    assert summarize_metric([4.0] * 500) == metric
+    with pytest.raises(ValueError):
+        summarize_metric([float("nan")])
