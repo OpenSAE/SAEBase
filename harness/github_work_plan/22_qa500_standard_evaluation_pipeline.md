@@ -1,6 +1,6 @@
 # WP22 — QA500 标准实验（科研组件与实验组合解耦）
 
-结构权威：`experiments/qa500/` 仅组织具体实验；`datasets/`、`models/`、`tasks/` 和 `saebase/` 提供可重用能力。`conf/experiment/qa500/` 是唯一研究配置源，运行入口归 `scripts/`。Runtime 正式产物需遵循既有 `saebase/runtime/experiment_paths.py`。
+结构权威：`scripts/experiments/qa500/` 仅保留特定实验的执行编排；`datasets/`、`models/`、`tasks/` 和 `saebase/` 提供可重用能力。`conf/experiment/qa500/` 是唯一研究配置源，运行入口归 `scripts/`。Runtime 正式产物需遵循既有 `saebase/runtime/experiment_paths.py`。
 
 ## 结论与操作边界
 
@@ -14,20 +14,20 @@
 
 | 组件 | 已确定的来源 |
 | --- | --- |
-| 统一协议 | `conf/experiment/qa500/protocol.json`，`experiments/qa500/runner.py plan`，二者由离线验收检查一致性 |
-| 数据下载和冻结 | `experiments/qa500/cohort.py`，十源均使用确切 upstream commit、固定 seed=20261031、分层抽样 500 |
-| 模型层位点 | `experiments/qa500/capture.py SITES`，20 个明确模型/SAE/hook/layer |
+| 统一协议 | `conf/experiment/qa500/protocol.json`，`scripts/experiments/qa500/runner.py plan`，二者由离线验收检查一致性 |
+| 数据下载和冻结 | `scripts/experiments/qa500/cohort.py`，十源均使用确切 upstream commit、固定 seed=20261031、分层抽样 500 |
+| 模型层位点 | `scripts/experiments/qa500/capture.py SITES`，20 个明确模型/SAE/hook/layer |
 | 模型输入与评分 | `models/qa_input.py + tasks/benchmark/qa_scoring.py`；正确的模型 tokenizer、Gemma IT chat template、候选 token 序列 log prob、贪心回答及类型化 scorer |
-| 模型共享 Baseline | `experiments/qa500/baseline.py`，每模型每数据集只评测一次，两个 SAE 层共享 |
-| Capture/核心指标 | `experiments/qa500/capture.py`，使用真实 `saebase.api.load_registered`、`capture_features`、真实 SAE state SHA256、last prompt token |
-| Intervene / Generate | `experiments/qa500/effects.py`，真实 `evaluate_edit` 与 `compare_steered_generation` |
-| Explain | `experiments/qa500/explain.py`，100 discovery/400 held-out，Neuronpedia 只作为外部来源文本，明确没有通过语义验收 |
-| Neuronpedia | `saebase/integrations/neuronpedia.py` 和 `experiments/qa500/neuronpedia_sync.py`，必须精确匹配源 SAE 模型/source ID/权重 SHA256 |
-| Circuits / Train | `experiments/qa500/native.py`，固定独立原生工作器与输入/训练资源；须另行授权、可能被环境阻塞 |
-| Audit / HF stage | `experiments/qa500/report.py`，独立计数、源哈希、feature 范围、输入身份和聚合验证 |
-| HF publish | `experiments/qa500/publish.py`，仅在用户明确批准及完整验证后追加新 cohort，现有 25 configs 不动 |
-| 一键执行脚本 | `scripts/experiments/qa500.sh`；详见 `experiments/qa500/README.md` |
-| 离线测试 | `experiments/qa500/tests/test_cohort.py`，`test_qa500_execution.py`，`test_qa500_protocol.py` |
+| 模型共享 Baseline | `scripts/experiments/qa500/measure.py`，每模型每数据集只评测一次，两个 SAE 层共享 |
+| Capture/核心指标 | `scripts/experiments/qa500/capture.py`，使用真实 `saebase.api.load_registered`、`capture_features`、真实 SAE state SHA256、last prompt token |
+| Intervene / Generate | `scripts/experiments/qa500/effects.py`，真实 `evaluate_edit` 与 `compare_steered_generation` |
+| Explain | `scripts/experiments/qa500/annotations.py`，100 discovery/400 held-out，Neuronpedia 只作为外部来源文本，明确没有通过语义验收 |
+| Neuronpedia | `saebase/integrations/neuronpedia.py` 和 `scripts/experiments/qa500/annotations.py`，必须精确匹配源 SAE 模型/source ID/权重 SHA256 |
+| Circuits / Train | `scripts/experiments/qa500/native.py`，固定独立原生工作器与输入/训练资源；须另行授权、可能被环境阻塞 |
+| Audit / HF stage | `scripts/experiments/qa500/report.py`，独立计数、源哈希、feature 范围、输入身份和聚合验证 |
+| HF publish | `scripts/experiments/qa500/publish.py`，仅在用户明确批准及完整验证后追加新 cohort，现有 25 configs 不动 |
+| 一键执行脚本 | `scripts/experiments/qa500.sh`；详见 `scripts/experiments/qa500/README.md` |
+| 离线测试 | `tests/workplan/wp22/test_cohort.py`，`test_qa500_execution.py`，`test_qa500_protocol.py` |
 
 任何代码与协议不一致，优先拒绝并提交差异报告，而不是让 Agent 选一个解释。
 
@@ -126,7 +126,7 @@ bash scripts/experiments/qa500.sh full --allow-local-gpu
 
 完整流程执行 source setup、预检、10 源冻结、20-site Pilot、全部 Core、全部 Effects、独立 Audit、HF staging；自动保留失败和 partial。若缺 GPU、HF 权限、源样本不足或模型不兼容，返回相应 blocked 收据而不是改协议。原生扩展是单独授权 `native --allow-native-compute`，HF publish 无任何一键隐含许可。
 
-详尽命令、结果目录、恢复和 failure policy：`experiments/qa500/README.md`。
+详尽命令、结果目录、恢复和 failure policy：`scripts/experiments/qa500/README.md`。
 
 ## 实验接收标准
 
@@ -145,15 +145,25 @@ bash scripts/experiments/qa500.sh full --allow-local-gpu
 ## WP22 R2 架构迁移说明
 
 已基于本轮审阅拆分 Dataset/Model/Task/Experiment/Runtime/Harness。项目结构权威为
-[experiments/qa500/README.md](../../experiments/qa500/README.md)。
+[scripts/experiments/qa500/README.md](../../scripts/experiments/qa500/README.md)。
 
 - 一级 `scripts/experiments/qa500.sh` 是唯一 Shell 入口。
 - `conf/experiment/qa500/` 是科研配置所有者；`conf/experiment/qa500.yaml` 对接现有 Hydra experiment group。
 - 十个源 Dataset 通过现有 SAEBase Dataset Registry 解析各自 `qa_adapter.py`。
 - `models/qa_input.py` 负责输入，`tasks/capture` 与 `tasks/benchmark` 拥有通用算法。
-- `experiments/qa500/` 只组合实例、执行矩阵、run-level summary 和研究发布准备。
+- `scripts/experiments/qa500/` 只组合实例、执行矩阵、run-level summary 和研究发布准备。
 - 所有 Task 实测写入现有 Runtime run leaf；跨 Run 冻结 cohort 与 Manifest 存在 `experiment/_studies/<protocol>/`。
 - Hardware Profile 和隔离 Worker 是通用 Runtime；目前只允许重新初始化并用相同精度重试，其他 Offload 方法须经过真实 backend 验证。
 - 当前版本 `assets.lock.json` 仍标注上游 SHA 未全部冻结，真实 GPU 和跨机器对比仍需独立验收，因此不能宣称达到零缓存跨机科学发布。
 
 PR #111 的历史 QA500 平行模块已删除，禁止新的代码再引用 `saebase.datasets.qa_*`。
+
+
+## WP22 R3 环境与结构整改（执行前强制门槛）
+
+- 仓库根目录不得出现独立 `experiments/` 源码包；QA500 特定编排属于 `scripts/experiments/qa500/`，产品测试位于 `tests/workplan/wp22/`。本次将 14 个分散的研究编排模块按职责合并为 10 个，通用 Dataset/Model/Task/Runtime 保持在现有所有者中，不创建第二套 Registry。
+- `qa-eval` 的 ANTLR extra 固定为 `math-verify[antlr4_9_3]==0.9.0`，与 Hydra Core 兼容。必须在相同 Python 环境实测 `pip check`、ANTLR 4.9.3、Math Verify 0.9.0 和真实评分负例。
+- Agent 先确认当前仓库 `git remote -v` 和 `git config --get-all remote.origin.fetch`，若目标分支未在本地存在，使用 `git fetch origin refs/heads/fix/wp22-architecture-install-and-governance:refs/remotes/origin/fix/wp22-architecture-install-and-governance`，再显式切换。禁止修改现有 remote fetch 策略，禁止伪造成功。
+- 依次检查项目 Python 版本、可用存储、包安装、导入/评分、冻结配置、CPU 负例、模型/SAE 实际下载权限与 GPU 资源。出现依赖解析失败时必须停止在 Preflight，返回直接冲突链和源码问题归因，而不是私自升级 Hydra、替换 scorer 或继续训练。
+- `opensae_saebase.egg-info/` 为构建工具生成的辅助元数据，不是源码一级模块，也不代表版本发布。保持 Git 忽略并将临时安装/运行证据归入受控路径；如有已存在的用户数据不得自动删除。
+- WP22 必须先通过独立安装与目录所有权检查，再由人工决定 Pilot 和正式大规模执行。HF Publish 必须另行授权。

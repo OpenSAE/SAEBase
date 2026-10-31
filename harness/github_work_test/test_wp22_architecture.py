@@ -9,19 +9,19 @@ from pathlib import Path
 
 import pytest
 
-from experiments.qa500.runner import make_plan
-from experiments.qa500.capture import site_list
-from experiments.qa500.cohort import DATASETS, N_PER_DATASET, PROTOCOL_ID
+from scripts.experiments.qa500.runner import make_plan
+from scripts.experiments.qa500.capture import site_list
+from scripts.experiments.qa500.cohort import DATASETS, N_PER_DATASET, PROTOCOL_ID
 from tasks.benchmark.qa_scoring import score_choices
 from saebase.integrations.neuronpedia import annotate
-from experiments.qa500.report import audit
+from scripts.experiments.qa500.report import audit
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAN = "harness/github_work_plan/22_qa500_standard_evaluation_pipeline.md"
 
 
 def test_full_matrix_matches_immutable_protocol_config():
-    from experiments.qa500.config import get_protocol, get_dataset_ids, get_sites, get_tasks
+    from scripts.experiments.qa500.context import get_protocol, get_dataset_ids, get_sites, get_tasks
 
     plan = make_plan()
     cfg = get_protocol()
@@ -45,7 +45,7 @@ def test_full_matrix_matches_immutable_protocol_config():
     assert tasks["execution"]["expected_intervene_rows"] == plan["expected_intervention_rows"]
     assert tasks["execution"]["expected_generate_rows"] == plan["expected_generation_rows"]
     assert tasks["execution"]["hf_publish_automatic"] is False
-    from experiments.qa500.capture import SITES
+    from scripts.experiments.qa500.capture import SITES
 
     assert [(x["model_key"], x["sae_key"], x["layers"]) for x in sites] == [
         (model, sae, list(layers)) for model, sae, layers in SITES
@@ -96,7 +96,7 @@ def test_audit_fails_closed_on_empty_records(tmp_path):
 
 
 def test_qa_answer_scorer_rejects_repeated_choices():
-    from experiments.qa500.tests.test_execution import MinimalPair
+    from tests.workplan.wp22.test_execution import MinimalPair
 
     p = MinimalPair()
     with pytest.raises(ValueError, match="unique"):
@@ -142,7 +142,7 @@ def test_qa_answer_scorer_rejects_repeated_choices():
     ],
 )
 def test_all_remaining_real_source_shapes_are_normalized(dataset_id, example, config):
-    from experiments.qa500.cohort import normalize, render_prompt
+    from scripts.experiments.qa500.cohort import normalize, render_prompt
 
     record = normalize(DATASETS[dataset_id], example, source_config=config, source_index=0)
     prompt = render_prompt(record)
@@ -154,7 +154,7 @@ def test_all_remaining_real_source_shapes_are_normalized(dataset_id, example, co
 
 
 def test_bootstrap_core_benchmark_is_reproducible_and_constant_cases():
-    from experiments.qa500.benchmark import summarize_metric
+    from scripts.experiments.qa500.measure import summarize_metric
 
     metric = summarize_metric([4.0] * 500)
     assert metric["value"] == 4.0
@@ -175,7 +175,8 @@ def test_architecture_has_no_experiment_entrypoints_under_datasets():
     assert not (root / "harness/experiments/qa500_execute.sh").exists()
     assert (root / "scripts/experiments/qa500.sh").is_file()
     assert (root / "conf/experiment/qa500/protocol.json").is_file()
-    assert (root / "experiments/qa500/runner.py").is_file()
+    assert (root / "scripts/experiments/qa500/runner.py").is_file()
+    assert not (root / "experiments/qa500").exists()
 
     for folder in ("datasets", "models", "tasks", "saebase"):
         for file in (root / folder).rglob("*.py"):
@@ -183,14 +184,14 @@ def test_architecture_has_no_experiment_entrypoints_under_datasets():
             for obj in ast.walk(syntax):
                 if isinstance(obj, ast.Import):
                     assert all(
-                        not alias.name.startswith("experiments.qa500") for alias in obj.names
+                        not alias.name.startswith("scripts.experiments.qa500") for alias in obj.names
                     ), str(file)
                 elif isinstance(obj, ast.ImportFrom):
-                    assert not (obj.module or "").startswith("experiments.qa500"), str(file)
+                    assert not (obj.module or "").startswith("scripts.experiments.qa500"), str(file)
 
 
 def test_run_paths_use_existing_task_artifact_layout(tmp_path):
-    from experiments.qa500.paths import task_dir, typed_file, study_dir
+    from scripts.experiments.qa500.context import task_dir, typed_file, study_dir
 
     path = task_dir(
         tmp_path,
@@ -211,7 +212,7 @@ def test_run_paths_use_existing_task_artifact_layout(tmp_path):
 
 def test_independent_qa_sources_have_native_hydra_dataset_configs():
     from omegaconf import OmegaConf
-    from experiments.qa500.config import get_dataset_ids
+    from scripts.experiments.qa500.context import get_dataset_ids
     from saebase.registry import get_qa_dataset_adapter
 
     root = Path(__file__).resolve().parents[2]

@@ -1,6 +1,6 @@
 # QA500 标准问答评测实验
 
-QA500 是一个 **Experiment**，不是 Dataset、Model、Task、Runtime 或 Harness。
+QA500 是一个 **具体实验执行脚本集合**，不是 Dataset、Model、Task、Runtime 或 Harness。
 本目录只拥有科研组件的选择、运行矩阵、Frozen cohort、结果汇总、
 跨 Run 审计和 HF staging。科学实现调用现有的 SAEBase 组件。
 
@@ -110,18 +110,21 @@ experiment/
 ## 独立验收与发布
 
 ```bash
-python -m pytest -q experiments/qa500/tests harness/github_work_test/test_wp22_architecture.py
+python -m pytest -q scripts/experiments/qa500/tests harness/github_work_test/test_wp22_architecture.py
 python -m harness.contracts.registry check \
   --plan harness/github_work_plan/22_qa500_standard_evaluation_pipeline.md
-python -m experiments.qa500.report audit
-python -m experiments.qa500.report stage
+python -m scripts.experiments.qa500.report audit
+python -m scripts.experiments.qa500.report stage
 ```
 
 实际发布只可以在独立审计完成、项目完整 asset lock 和人工批准后使用
 
 ```bash
-python -m experiments.qa500.publish \
+python -m scripts.experiments.qa500.publish \
   --stage experiment/_studies/qa_standard_500_v1/staging --approved
 ```
 
 历史 SAEBase-Evaluation 的既有配置保持不变，所有重试和冻结输入的证据不得静默覆盖。
+
+
+> QA500 研究编排位于 scripts/，不属于可安装的 SAEBase Python 公共 API。测试集中于 `tests/workplan/wp22/`。运行环境与生成元数据均为非源码工件。

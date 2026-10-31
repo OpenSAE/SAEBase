@@ -35,8 +35,7 @@ coverage.json
 
 # Local first-run benchmarks and saved reports
 runs/
-# Work Plan 05 private corpus, weights, and run artifacts
-experiments/
+# Work Plan 05 outputs remain under the Runtime-managed experiment/ root
 
 # Checked-in Research Lab source records (not experimental caches)
 !saebase/research_lab/data/

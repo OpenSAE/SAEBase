@@ -7,7 +7,7 @@ import unittest
 from tempfile import TemporaryDirectory
 from pathlib import Path
 
-from experiments.qa500.cohort import (
+from scripts.experiments.qa500.cohort import (
     DATASETS,
     N_PER_DATASET,
     PROTOCOL_ID,
