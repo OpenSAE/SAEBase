@@ -107,6 +107,14 @@ The workflow intentionally does **not** publish to PyPI. Future PyPI
 distribution should use a separate reviewed Trusted Publishing workflow,
 not a long-lived personal API token.
 
+## When source snapshots advance `main`
+
+The repository may automatically refresh Atlas source snapshots after a release-preparation merge. Those source-only commits deliberately include `[skip ci]`. Because the software release gate requires an exact-source **push-to-main CI** result, a skipped snapshot commit is not an eligible publication SHA, even if the preceding release PR passed CI.
+
+Preserve the generated Atlas snapshot and its history. If the main branch moved after a release candidate was merged, incorporate a normal, reviewed follow-up release-documentation commit without `[skip ci]`, allow the resulting push-to-main CI to complete, and use **that exact current main SHA** for `mode=verify`. The prior PR CI, a workflow-dispatch test, or a manually selected older SHA cannot substitute for the current push CI.
+
+This rule does not authorize bypassing CI, force-moving `main`, changing an existing tag, or publishing without explicit release confirmation.
+
 ## After publication
 
 Review the new GitHub Release, its exact commit, release notes and all
