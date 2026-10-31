@@ -6,22 +6,31 @@ import pytest
 import torch
 
 from saebase.sae.saebench_topk import (
-    D_IN, D_SAE, FOLDER, HOOK, REPO, REVISION,
-    remap_state_dict, validate_config, validate_source,
+    D_IN,
+    D_SAE,
+    FOLDER,
+    HOOK,
+    REPO,
+    REVISION,
+    remap_state_dict,
+    validate_config,
+    validate_source,
 )
 
 
 def _config() -> dict:
-    return {"trainer": {
-        "trainer_class": "TopKTrainer",
-        "dict_class": "AutoEncoderTopK",
-        "lm_name": "google/gemma-2-2b",
-        "layer": 12,
-        "submodule_name": "resid_post_layer_12",
-        "activation_dim": D_IN,
-        "dict_size": D_SAE,
-        "k": 80,
-    }}
+    return {
+        "trainer": {
+            "trainer_class": "TopKTrainer",
+            "dict_class": "AutoEncoderTopK",
+            "lm_name": "google/gemma-2-2b",
+            "layer": 12,
+            "submodule_name": "resid_post_layer_12",
+            "activation_dim": D_IN,
+            "dict_size": D_SAE,
+            "k": 80,
+        }
+    }
 
 
 def test_pinned_source_and_hook() -> None:
@@ -40,8 +49,13 @@ def test_pinned_source_and_hook() -> None:
 
 def test_config_is_strict() -> None:
     assert validate_config(_config())["k"] == 80
-    for field, bad in (("k", 40), ("layer", 13), ("activation_dim", 1024),
-                       ("trainer_class", "GatedSAETrainer"), ("lm_name", "other/model")):
+    for field, bad in (
+        ("k", 40),
+        ("layer", 13),
+        ("activation_dim", 1024),
+        ("trainer_class", "GatedSAETrainer"),
+        ("lm_name", "other/model"),
+    ):
         value = _config()
         value["trainer"][field] = bad
         with pytest.raises(ValueError, match="mismatch"):

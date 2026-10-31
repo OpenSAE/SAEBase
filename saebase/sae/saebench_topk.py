@@ -16,10 +16,7 @@ from typing import Any
 
 REPO = "canrager/saebench_gemma-2-2b_width-2pow14_date-0107"
 REVISION = "18190d53776b0710543f8e7e8b78a2cb8f12e773"
-FOLDER = (
-    "gemma-2-2b_top_k_width-2pow14_date-0107/"
-    "resid_post_layer_12/trainer_2"
-)
+FOLDER = "gemma-2-2b_top_k_width-2pow14_date-0107/resid_post_layer_12/trainer_2"
 MODEL = "google/gemma-2-2b"
 HOOK = "blocks.12.hook_resid_post"
 D_IN = 2304
@@ -28,13 +25,18 @@ K = 80
 
 
 def validate_source(
-    repo_id: str, checkpoint_dir: str, expected_layer: int,
-    expected_hook: str, revision: str | None,
+    repo_id: str,
+    checkpoint_dir: str,
+    expected_layer: int,
+    expected_hook: str,
+    revision: str | None,
 ) -> None:
     """Refuse a new or mismatched asset rather than guessing compatibility."""
     if (
-        repo_id != REPO or checkpoint_dir != FOLDER
-        or expected_layer != 12 or expected_hook != HOOK
+        repo_id != REPO
+        or checkpoint_dir != FOLDER
+        or expected_layer != 12
+        or expected_hook != HOOK
         or revision not in (None, REVISION)
     ):
         raise ValueError("SAEBench baseline source identity is not approved")
@@ -81,8 +83,7 @@ def remap_state_dict(raw: Any) -> dict[str, Any]:
         or int(raw["k"].item()) != K
     ):
         raise ValueError("SAEBench TopK checkpoint tensor shape/k mismatch")
-    if any(not torch.isfinite(value).all().item()
-           for name, value in raw.items() if name != "k"):
+    if any(not torch.isfinite(value).all().item() for name, value in raw.items() if name != "k"):
         raise ValueError("SAEBench checkpoint has non-finite weights")
     # Source TopK inference intentionally ignores the training threshold.
     # Keep the original upstream key mapping and transpositions.
@@ -105,8 +106,12 @@ def _sha256(path: Path) -> str:
 
 def load_saebench_topk(
     *,
-    repo_id: str, checkpoint_dir: str, expected_layer: int,
-    expected_hook: str, device: str, revision: str | None = None,
+    repo_id: str,
+    checkpoint_dir: str,
+    expected_layer: int,
+    expected_hook: str,
+    device: str,
+    revision: str | None = None,
 ) -> tuple[Any, dict[str, Any]]:
     """Explicitly download/load one immutable native SAE Bench baseline."""
     validate_source(repo_id, checkpoint_dir, expected_layer, expected_hook, revision)
@@ -122,21 +127,23 @@ def load_saebench_topk(
             "Install the approved upstream SAEBench package for this optional baseline"
         ) from exc
 
-    cfg_file = hf_hub_download(
-        repo_id=REPO, filename=f"{FOLDER}/config.json", revision=REVISION
-    )
+    cfg_file = hf_hub_download(repo_id=REPO, filename=f"{FOLDER}/config.json", revision=REVISION)
     config = json.loads(Path(cfg_file).read_text(encoding="utf-8"))
     validate_config(config)
-    weights_file = hf_hub_download(
-        repo_id=REPO, filename=f"{FOLDER}/ae.pt", revision=REVISION
-    )
+    weights_file = hf_hub_download(repo_id=REPO, filename=f"{FOLDER}/ae.pt", revision=REVISION)
     raw = torch.load(weights_file, map_location="cpu", weights_only=True)
     state = remap_state_dict(raw)
 
     sae = TopKSAE(
-        d_in=D_IN, d_sae=D_SAE, k=K, model_name="gemma-2-2b",
-        hook_layer=12, device=torch.device(device), dtype=torch.bfloat16,
-        use_threshold=False, hook_name=HOOK,
+        d_in=D_IN,
+        d_sae=D_SAE,
+        k=K,
+        model_name="gemma-2-2b",
+        hook_layer=12,
+        device=torch.device(device),
+        dtype=torch.bfloat16,
+        use_threshold=False,
+        hook_name=HOOK,
     )
     sae.load_state_dict(state, strict=True)
     sae.to(device=torch.device(device), dtype=torch.bfloat16)
