@@ -2,6 +2,7 @@
 
 No HF network access, paid APIs, training, GPU model downloads or publication.
 """
+
 from __future__ import annotations
 
 import json
@@ -30,16 +31,10 @@ def test_full_matrix_matches_immutable_protocol_config():
     assert cfg["samples_per_dataset"] == N_PER_DATASET == 500
     assert cfg["model_count"] == 10
     assert cfg["site_count"] == len(site_list()) == 20
-    assert cfg["execution"]["expected_model_qa_baselines"] == plan[
-        "expected_model_qa_baselines"
-    ]
+    assert cfg["execution"]["expected_model_qa_baselines"] == plan["expected_model_qa_baselines"]
     assert cfg["execution"]["expected_capture_rows"] == plan["expected_capture_rows"]
-    assert cfg["execution"]["expected_intervene_rows"] == plan[
-        "expected_intervention_rows"
-    ]
-    assert cfg["execution"]["expected_generate_rows"] == plan[
-        "expected_generation_rows"
-    ]
+    assert cfg["execution"]["expected_intervene_rows"] == plan["expected_intervention_rows"]
+    assert cfg["execution"]["expected_generate_rows"] == plan["expected_generation_rows"]
     assert cfg["execution"]["hf_publish_automatic"] is False
     expected = [(m["model_key"], m["sae_key"], m["layers"]) for m in cfg["models"]]
     from saebase.datasets.qa_pipeline import SITES
@@ -55,8 +50,13 @@ def test_workplan_uses_only_preexisting_universal_harness_contracts():
     cases = selected["cases"]
     assert len(cases) == 7
     assert set(cases) == {
-        "Q01_PREPARE", "Q02_PILOT", "Q03_CORE", "Q04_EFFECTS",
-        "Q05_NATIVE", "Q06_AUDIT", "Q07_PUBLISH",
+        "Q01_PREPARE",
+        "Q02_PILOT",
+        "Q03_CORE",
+        "Q04_EFFECTS",
+        "Q05_NATIVE",
+        "Q06_AUDIT",
+        "Q07_PUBLISH",
     }
     known = {r["id"] for r in catalog()["contracts"]}
     for case in cases:
@@ -68,8 +68,11 @@ def test_workplan_uses_only_preexisting_universal_harness_contracts():
 
 def test_unmapped_external_explanations_do_not_become_scientific_facts():
     explanation = annotate(
-        11, site_id="unmapped-site", sae_sha256="0" * 64,
-        mapping={}, annotations={},
+        11,
+        site_id="unmapped-site",
+        sae_sha256="0" * 64,
+        mapping={},
+        annotations={},
     )
     assert explanation["explanation"] is None
     assert explanation["explanation_status"] == "unmapped"
