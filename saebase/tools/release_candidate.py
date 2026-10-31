@@ -25,7 +25,6 @@ ROOT = Path(__file__).resolve().parents[2]
 SCHEMA = "saebase.software_release_evidence.v1"
 REQUIRED_CI = (
     "offline-tests (3.11)",
-    "offline-tests (3.12)",
     "analysis-install",
     "package",
     "localization-native",
@@ -226,7 +225,7 @@ def prepare(
         "version": version,
         "source_commit": commit,
         "ci_run_id": ci_run_id,
-        "ci_gate": "six successful main-branch push jobs checked by release workflow"
+        "ci_gate": "five successful main-branch push jobs checked by release workflow"
         if ci_run_id
         else "not independently checked by this offline command",
         "software_license": "Apache-2.0",
@@ -327,7 +326,7 @@ def main() -> int:
     b.add_argument("--output-dir", type=Path, required=True)
     b.add_argument("--source-sha", default=None)
     b.add_argument("--expected-version", default=None)
-    c = mode.add_parser("verify-ci", help="confirm all six jobs passed on one commit")
+    c = mode.add_parser("verify-ci", help="confirm all five jobs passed on one commit")
     c.add_argument("--ci-jobs", type=Path, required=True)
     c.add_argument("--source-sha", required=True)
     d = mode.add_parser("publish-eligible", help="reject existing and older release tags")

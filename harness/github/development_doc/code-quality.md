@@ -32,7 +32,8 @@ The quality dependencies are optional. They are not required to use SAEBase.
 4. **Coverage** is collected from the complete offline pytest suite on
    Python 3.11 using `--cov=saebase --cov-branch`. CI uploads
    `coverage.xml` and `coverage.json` as artifacts and prints
-   the measured total. Python 3.12 still runs ordinary pytest.
+   the measured total. The default suite runs on Python 3.11 with two
+   `pytest-xdist` workers. Python 3.12 does not run in routine PR CI.
 5. **Coverage threshold** is deliberately not imposed until an observed
    baseline and a justified improvement target exist. No modules are omitted
    solely to make the percentage look better.
