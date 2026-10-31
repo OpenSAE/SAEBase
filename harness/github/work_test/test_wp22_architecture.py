@@ -21,7 +21,12 @@ PLAN = "harness/github/work_plan/22_qa500_standard_evaluation_pipeline.md"
 
 
 def test_full_matrix_matches_immutable_protocol_config():
-    from scripts.experiments.qa500.context import get_protocol, get_dataset_ids, get_sites, get_tasks
+    from scripts.experiments.qa500.context import (
+        get_protocol,
+        get_dataset_ids,
+        get_sites,
+        get_tasks,
+    )
 
     plan = make_plan()
     cfg = get_protocol()
@@ -184,7 +189,8 @@ def test_architecture_has_no_experiment_entrypoints_under_datasets():
             for obj in ast.walk(syntax):
                 if isinstance(obj, ast.Import):
                     assert all(
-                        not alias.name.startswith("scripts.experiments.qa500") for alias in obj.names
+                        not alias.name.startswith("scripts.experiments.qa500")
+                        for alias in obj.names
                     ), str(file)
                 elif isinstance(obj, ast.ImportFrom):
                     assert not (obj.module or "").startswith("scripts.experiments.qa500"), str(file)
