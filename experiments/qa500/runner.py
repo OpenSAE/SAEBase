@@ -8,6 +8,8 @@ frozen in code. No HF publication, training or paid inference is implicit.
 from __future__ import annotations
 
 from experiments.qa500.paths import inputs_dir, study_dir, receipts_dir
+from experiments.qa500.config import get_resources
+from saebase.runtime.supervisor import run_worker
 
 import argparse
 from datetime import datetime, timezone
@@ -63,10 +65,8 @@ def _environment() -> dict[str, Any]:
         "packages": packages,
         "cuda": bool(torch.cuda.is_available()),
     }
-    if torch.cuda.is_available():
-        gpu = torch.cuda.get_device_properties(torch.cuda.current_device())
-        result["gpu_name"] = gpu.name
-        result["gpu_total_bytes"] = int(gpu.total_memory)
+    from saebase.runtime.hardware import detect
+    result["hardware"] = detect(probe_gpu=False)
     return result
 
 
@@ -319,36 +319,56 @@ def run_model(
 
 def run_matrix(
     *,
-    phase: str,
-    device: str,
-    data_root: Path,
-    result_root: Path,
-    model_keys: list[str],
-    max_tokens: int,
-    neuronpedia_map: Path | None,
-    neuronpedia_records: Path | None,
+    phase: str, device: str, data_root: Path,
+    result_root: Path, model_keys: list[str], max_tokens: int,
+    neuronpedia_map: Path | None, neuronpedia_records: Path | None,
 ) -> dict[str, Any]:
-    output = {}
+    """Dispatch model-isolated workers; independent failures never mix CUDA state."""
+    output: dict[str, Any] = {}
     for name in model_keys:
-        try:
+        if len(model_keys) == 1:
+            # Explicit single-model invocation runs directly in this child.
             output[name] = run_model(
-                name,
-                phase=phase,
-                device=device,
-                data_root=data_root,
-                result_root=result_root,
-                max_tokens=max_tokens,
+                name, phase=phase, device=device, data_root=data_root,
+                result_root=result_root, max_tokens=max_tokens,
                 neuronpedia_map=neuronpedia_map,
                 neuronpedia_records=neuronpedia_records,
             )
-        except (KeyboardInterrupt, SystemExit):
-            raise
-        except Exception as exc:
-            output[name] = {
-                "status": "blocked",
-                "reason": str(exc)[:1000],
-                "error_type": type(exc).__name__,
-            }
+        else:
+            argv = [
+                sys.executable, "-m", "experiments.qa500.runner",
+                phase, "--model", name, "--device", device,
+                "--data-root", str(data_root), "--result-root", str(result_root),
+                "--max-tokens", str(max_tokens),
+            ]
+            if neuronpedia_map:
+                argv.extend(["--neuronpedia-map", str(neuronpedia_map)])
+            if neuronpedia_records:
+                argv.extend(["--neuronpedia-records", str(neuronpedia_records)])
+            receipt_file = receipts_dir(result_root, name) / f"{phase}.json"
+            policy = get_resources()
+            report = run_worker(
+                argv=argv, receipt_file=receipt_file,
+                log_dir=study_dir(result_root) / "logs" / phase / name,
+                retry_limit=int(policy.get("max_oom_retries", 1)),
+            )
+            if receipt_file.exists():
+                record = json.loads(receipt_file.read_text(encoding="utf-8"))
+                output[name] = {
+                    "model_key": name, "phase": phase,
+                    "status": record.get("status", "partial"),
+                    "complete_steps": sum(x.get("status") == "complete"
+                                          for x in record.get("steps", [])),
+                    "total_steps": len(record.get("steps", [])),
+                    "receipt": str(receipt_file),
+                    "worker_status": report["status"],
+                    "worker_attempt_count": len(report["attempts"]),
+                }
+            else:
+                output[name] = {
+                    "status": "blocked", "reason": report["status"],
+                    "worker_attempt_count": len(report["attempts"]),
+                }
         _atomic_json(receipts_dir(result_root) / f"{phase}_matrix.json", output)
     return output
 

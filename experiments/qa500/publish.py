@@ -15,6 +15,7 @@ from typing import Any
 
 from experiments.qa500.report import CONFIGS, DEFAULT_EXPORT
 from experiments.qa500.cohort import PROTOCOL_ID
+from experiments.qa500.assets import required_publication_lock
 
 DESTINATION = "OpenSAE/SAEBase-Evaluation"
 
@@ -66,6 +67,8 @@ def publish(
 ) -> dict[str, Any]:
     if not approved:
         raise PermissionError("HF publication requires explicit approval")
+    if not required_publication_lock():
+        raise RuntimeError("Project dataset/model/SAE asset revisions are not fully pinned")
     if target != DESTINATION:
         raise ValueError("Cannot publish QA500 to an unrelated HF repository")
     manifest_path = stage / "publication_manifest.json"

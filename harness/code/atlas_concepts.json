@@ -458,7 +458,7 @@
             "term.saebase_runtime"
           ],
           "patterns": [
-            "^runtime/(?:train|runtime_check|summary_log|experiment_paths)\\.py$"
+            "^runtime/(?:train|runtime_check|summary_log|experiment_paths|hardware|supervisor)\\\\.py$"
           ]
         }
       ]

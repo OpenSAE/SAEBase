@@ -19,6 +19,7 @@ from typing import Any
 from experiments.qa500.cohort import DATASETS, PROTOCOL_ID, N_PER_DATASET, verify_dataset
 from experiments.qa500.capture import site_list
 from experiments.qa500.runner import TASK_STATUS
+from experiments.qa500.assets import required_publication_lock
 
 
 DEFAULT_INPUT = inputs_dir(Path.cwd())
@@ -234,6 +235,7 @@ def audit(data_root: Path, result_root: Path) -> dict[str, Any]:
         "expected": expected,
         "defect_count": len(defects),
         "defects": defects,
+        "publication_asset_lock_ready": required_publication_lock(),
         "review_boundary": {
             "explain": "annotation-only, no native explanation validation",
             "circuits": "not part of the universal 20-site matrix",

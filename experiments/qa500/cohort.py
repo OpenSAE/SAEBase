@@ -13,6 +13,7 @@ from saebase.data.qa_records import DatasetSpec, digest, render_prompt, make_rec
 from saebase.data.qa_source import iter_source as _load_source
 from saebase.registry import get_qa_dataset_adapter
 from experiments.qa500.config import get_protocol, get_dataset_ids
+from experiments.qa500.assets import source_revision
 
 PROTOCOL = get_protocol()
 PROTOCOL_ID = PROTOCOL["protocol_id"]
@@ -70,8 +71,6 @@ def prepare_dataset(
     This is a controlled, *explicit* network operation. On gated datasets it
     raises and preserves the reason; it never silently changes the benchmark.
     """
-    from huggingface_hub import HfApi
-
     if dataset_id not in DATASETS:
         raise KeyError(f"Unknown dataset {dataset_id}; choices: {sorted(DATASETS)}")
     if n != N_PER_DATASET:
@@ -85,7 +84,7 @@ def prepare_dataset(
             raise RuntimeError("Partial previous cohort found; repair manually")
         if not force:
             return verify_dataset(dataset_id, output_root)
-    revision = HfApi().dataset_info(spec.repo).sha
+    revision, lock_status = source_revision(spec.repo, spec.key)
     if not revision or len(revision) != 40:
         raise RuntimeError("Unable to resolve exact upstream HF dataset commit")
     raw = _load_source(spec, revision)
@@ -121,6 +120,7 @@ def prepare_dataset(
         "source_config": spec.config,
         "source_split": spec.split,
         "source_revision": revision,
+        "lock_status": lock_status,
         "restricted_source": spec.restricted,
         "invalid_source_rows": invalid,
         "sha256": hashlib.sha256(payload.encode("utf-8")).hexdigest(),
