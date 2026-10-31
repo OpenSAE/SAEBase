@@ -7,9 +7,7 @@
 **SAEBase** 帮助研究者理解和评估语言模型中的稀疏自编码器（SAE），探索特征、测量特征干预对模型行为的影响，并组织可复现的实验。Research Harness 进一步支持编程 Agent 在明确范围内执行任务，让结果可追溯、可独立验证。
 
 <p align="center">
-  <a href="#-快速开始"><b>🚀 快速开始</b></a> &nbsp; | &nbsp;
-  <a href="#-research-harness"><b>🧭 Harness</b></a> &nbsp; | &nbsp;
-  <a href="#-研究工作流"><b>🔬 研究工作流</b></a> &nbsp; | &nbsp;
+  <a href="https://opensae.github.io/SAEBase/atlas/index.html"><b>🧭 Atlas</b></a> &nbsp; | &nbsp;
   <a href="https://huggingface.co/spaces/OpenSAE/SAEBase"><b>🤗 Research Lab</b></a> &nbsp; | &nbsp;
   <a href="https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation"><b>🤗 Evaluation Dataset</b></a>
 </p>
@@ -20,17 +18,13 @@
 
 **让 AI Agent 参与 SAE 科研工程，同时让研究者掌握目标、决策和验证过程。** SAEBase Harness 为 Agent 提供明确的任务范围，让代码修改连接到真实科研接口，并支持独立检查实际执行结果。
 
-| 科研环节 | Harness 提供的帮助 |
+| Atlas 视图 | 内容 |
 | --- | --- |
-| **制定任务** | 明确研究目标、允许修改的范围和验收条件。 |
-| **执行实验** | 在隔离的项目副本中调用真实 SAEBase 接口，保存实验结果。 |
-| **独立验证** | 检查功能行为、异常输入和已有工作流的兼容性。 |
-| **追踪证据** | 将结果与输入、代码、模型、执行命令和产物关联。 |
-| **持续改进** | 区分实现、环境与验证过程的问题，支持下一轮修复。 |
-
-**Atlas** 提供五个相互关联的研究视图。[Core](https://opensae.github.io/SAEBase/atlas/core.html) 介绍项目架构，[Knowledge](https://opensae.github.io/SAEBase/atlas/knowledge.html) 组织研究问题，[Code](https://opensae.github.io/SAEBase/atlas/code.html) 连接真实源码，[Environment](https://opensae.github.io/SAEBase/atlas/environment.html) 介绍计算资源，[Context](https://opensae.github.io/SAEBase/atlas/context.html) 解释研究术语。
-
-[了解 Harness](harness/README.md) · [Agent 协作指南](harness/core/AGENT_FLOW.md) · [科研流程文档](harness/github_development_doc/index.md)
+| [**Core**](https://opensae.github.io/SAEBase/atlas/core.html) | 项目架构和科研工作流管理。 |
+| [**Knowledge**](https://opensae.github.io/SAEBase/atlas/knowledge.html) | 科研问题及其关联。 |
+| [**Code**](https://opensae.github.io/SAEBase/atlas/code.html) | 真实源码与代码结构。 |
+| [**Environment**](https://opensae.github.io/SAEBase/atlas/environment.html) | 计算资源与运行环境。 |
+| [**Context**](https://opensae.github.io/SAEBase/atlas/context.html) | 术语与项目概念。 |
 
 ## 🧭 概览
 

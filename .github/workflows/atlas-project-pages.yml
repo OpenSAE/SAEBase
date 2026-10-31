@@ -7,6 +7,9 @@ on:
     paths:
       - ".github/workflows/atlas-project-pages.yml"
       - "harness/visualization/**"
+      - "atlas/**"
+      - "index.html"
+      - ".nojekyll"
       - "harness/code/**"
       - "harness/knowledge/**"
       - "doc/knowledge/**"
@@ -74,8 +77,8 @@ jobs:
               html.write_text(value, encoding="utf-8")
           (root/"index.html").write_text(
               '<!doctype html><meta charset="utf-8">'
-              '<meta http-equiv="refresh" content="0;url=./atlas/code.html">'
-              '<title>SAEBase Atlas</title><a href="./atlas/code.html">Open SAEBase Atlas</a>',
+              '<meta http-equiv="refresh" content="0;url=./atlas/index.html">'
+              '<title>SAEBase Atlas</title><a href="./atlas/index.html">Open SAEBase Atlas</a>',
               encoding="utf-8")
           (root/".nojekyll").touch()
           assert (preview/"code.html").exists()
@@ -130,3 +133,42 @@ jobs:
     steps:
       - id: deploy
         uses: actions/deploy-pages@v4
+      - name: Verify deployed Atlas pages and live assets
+        env:
+          PAGES_URL: ${{ steps.deploy.outputs.page_url }}
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          import time
+          from urllib.parse import urljoin
+          from urllib.request import Request, urlopen
+
+          base = os.environ["PAGES_URL"].rstrip("/") + "/"
+          pages = ("index", "core", "knowledge", "code", "environment", "context")
+          error = ""
+          for attempt in range(18):
+              try:
+                  for view in pages:
+                      url = urljoin(base, f"atlas/{view}.html") + f"?probe={attempt}"
+                      with urlopen(Request(url, headers={"User-Agent": "SAEBase-Pages-verify"}), timeout=15) as response:
+                          assert response.status == 200, f"{url}: HTTP {response.status}"
+                          html = response.read(20000).decode("utf-8")
+                      assert "SAEBase" in html and "app.js" in html, f"Not an Atlas view: {url}"
+                      assert "data.js" in html or "data-bootstrap.js" in html, f"No graph: {url}"
+                      links = re.findall(r'(?:src|href)="([^"]+)"', html)
+                      for needed in ("app.js", "style.css"):
+                          asset = next((value for value in links if needed in value), None)
+                          assert asset, f"Missing {needed} in {url}"
+                          resource = urljoin(url, asset)
+                          with urlopen(Request(resource, headers={"User-Agent": "SAEBase-Pages-verify"}), timeout=15) as result:
+                              assert result.status == 200 and result.read(1), f"Missing static asset: {resource}"
+                  print("Public SAEBase Atlas verified across six pages and assets:", base)
+                  break
+              except Exception as exc:
+                  error = f"{type(exc).__name__}: {exc}"
+                  print(f"Pages probe {attempt+1}/18: {error}", flush=True)
+                  time.sleep(5)
+          else:
+              raise SystemExit("Real GitHub Pages Atlas is not accessible: " + error)
+          PY
