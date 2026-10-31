@@ -259,3 +259,15 @@ def create_analysis_group(
             )
             tmp.replace(manifest_path)
     return group
+
+
+def study_root(workspace: str | Path, study_id: str) -> Path:
+    """Root for cross-run study manifests, frozen cohorts and publication staging.
+
+    Individual Task results MUST continue to use run_leaf(cfg), including all
+    metrics, intervention evidence, checkpoints and their typed directories.
+    This root is for a study's *aggregate* metadata, not a new Task layout.
+    """
+    return Path(workspace).resolve() / "experiment" / "_studies" / _component(
+        study_id, "study_id"
+    )
