@@ -22,13 +22,14 @@ from saebase.datasets.qa_pipeline import SITES, site_list, run_capture
 from saebase.datasets.qa_evaluation import run_baseline
 from saebase.datasets.qa_effects import run_effects
 from saebase.datasets.qa_explain import explain_from_captures
+from saebase.datasets.qa_benchmark import benchmark_from_capture
 
 
 DATA_ROOT = Path("experiment/qa500/inputs")
 RESULT_ROOT = Path("experiment/qa500/results")
 TASK_STATUS = {
     "capture": "executable",
-    "benchmark": "core_capture_metrics_only",
+    "benchmark": "frozen_500_question_core_summary_with_bootstrap",
     "intervene": "executable_after_full_capture",
     "generate": "executable_after_full_capture",
     "explain": "external_annotations_only_not_independent_validation",
@@ -191,6 +192,17 @@ def run_model(
                             mapping_file=neuronpedia_map,
                             annotation_file=neuronpedia_records,
                         )
+                    if phase in {"core", "complete"}:
+                        if step.get("capture", {}).get("status") != "complete":
+                            raise RuntimeError("Benchmark requires 500 complete Capture results")
+                        step["benchmark"] = benchmark_from_capture(
+                            data_root=data_root,
+                            result_root=result_root,
+                            model_key=model_key,
+                            sae_key=pairs[1],
+                            layer=layer,
+                            dataset_id=dataset,
+                        )
                     if phase in {"effects", "complete"}:
                         if (
                             phase == "complete"
@@ -235,7 +247,7 @@ def run_model(
                     statuses = [
                         result["status"]
                         for key, result in step.items()
-                        if key in {"qa_baseline", "capture", "intervene", "generate"}
+                        if key in {"qa_baseline", "capture", "benchmark", "intervene", "generate"}
                     ]
                     step["status"] = (
                         "complete"
