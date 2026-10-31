@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "code",
   "project": "SAEBase",
-  "source_sha256": "ad62a44dcc77bb916c89c2752eb61e50306963e9a034de148f252d112eb85927",
+  "source_sha256": "3b108169c5f09d4419e14f86d625f450301c894a240667bc3da386dc69877548",
   "scope": [
     "saebase",
     "datasets",
@@ -24986,7 +24986,7 @@
       "kind": "function",
       "title": "main",
       "path": "saebase/tools/verify_distribution.py",
-      "line": 236,
+      "line": 239,
       "status": "implemented",
       "signature": "def main() -> int",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -24996,7 +24996,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/tools/verify_distribution.py:236"
+        "saebase/tools/verify_distribution.py:239"
       ]
     },
     {
@@ -25004,7 +25004,7 @@
       "kind": "function",
       "title": "project_version_from_sdist",
       "path": "saebase/tools/verify_distribution.py",
-      "line": 130,
+      "line": 133,
       "status": "implemented",
       "signature": "def project_version_from_sdist(source: Path) -> str",
       "description": "Read authoritative release version from the built source distribution.",
@@ -25014,7 +25014,7 @@
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "saebase/tools/verify_distribution.py:130"
+        "saebase/tools/verify_distribution.py:133"
       ]
     },
     {
@@ -25022,7 +25022,7 @@
       "kind": "function",
       "title": "validate",
       "path": "saebase/tools/verify_distribution.py",
-      "line": 149,
+      "line": 152,
       "status": "implemented",
       "signature": "def validate(dist_dir: Path) -> dict[str, object]",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -25032,7 +25032,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/tools/verify_distribution.py:149"
+        "saebase/tools/verify_distribution.py:152"
       ]
     },
     {
