@@ -445,7 +445,7 @@ def concrete_groups(output: dict) -> None:
             if area == "datasets":
                 # Group source-owned QA adapters separately from legacy
                 # behavior-prompt sources. This is derived from actual module
-                # evidence, rather than a synthetic navigation or NLP/vision tier.
+                # evidence rather than an invented presentation-only category.
                 has_qa = any(
                     PurePosixPath(item["path"]).name == "qa_adapter.py"
                     for item in modules
