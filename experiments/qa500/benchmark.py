@@ -9,6 +9,7 @@ import math
 from pathlib import Path
 from typing import Any
 from tasks.benchmark.qa_metrics import summarize_metric, BOOTSTRAP_SEED
+from experiments.qa500.cohort import verify_dataset, PROTOCOL_ID
 
 
 def benchmark_from_capture(
@@ -86,7 +87,8 @@ def benchmark_from_capture(
         values["core.l0"].append(float(l0))
         values["core.reconstruction_mse_token"].append(float(error))
     summary = {
-        "status": "executed",
+        "status": "complete",
+        "execution_status": "executed",
         "protocol_id": PROTOCOL_ID,
         "task": "benchmark",
         "dataset_id": dataset_id,
