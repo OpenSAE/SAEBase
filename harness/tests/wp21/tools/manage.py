@@ -91,15 +91,19 @@ def check_spec(root: Path = ROOT) -> dict:
             # Frozen WP21 context strings retain their original checksummed bytes.
             # Read-only historical paths resolve to the reorganized owners.
             current = name
-            for legacy, moved in (
-                ("harness/github_work_plan/", "harness/github/work_plan/"),
-                ("harness/github_work_test/", "harness/github/work_test/"),
-                ("harness/github_development_doc/", "harness/github/development_doc/"),
-                ("harness/github_assets/", "harness/github/assets/"),
-            ):
-                if current.startswith(legacy):
-                    current = moved + current[len(legacy):]
-                    break
+            if (root / name).is_file():
+                # A frozen isolated exam copy retains its original path.
+                current = name
+            else:
+                for legacy, moved in (
+                    ("harness/github_work_plan/", "harness/github/work_plan/"),
+                    ("harness/github_work_test/", "harness/github/work_test/"),
+                    ("harness/github_development_doc/", "harness/github/development_doc/"),
+                    ("harness/github_assets/", "harness/github/assets/"),
+                ):
+                    if current.startswith(legacy):
+                        current = moved + current[len(legacy):]
+                        break
             if not contained(root, current, exists=True).is_file():
                 raise ValueError(cid + ": missing source context " + name)
         if not (root / f"harness/tests/wp21/cases/{cid}.md").is_file():
