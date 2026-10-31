@@ -7,8 +7,8 @@ frozen in code. No HF publication, training or paid inference is implicit.
 
 from __future__ import annotations
 
-from experiments.qa500.paths import inputs_dir, study_dir, receipts_dir
-from experiments.qa500.config import get_resources
+from scripts.experiments.qa500.context import inputs_dir, study_dir, receipts_dir
+from scripts.experiments.qa500.context import get_resources
 from saebase.runtime.supervisor import run_worker
 
 import argparse
@@ -21,12 +21,12 @@ import sys
 import traceback
 from typing import Any
 
-from experiments.qa500.cohort import DATASETS, PROTOCOL_ID, prepare_dataset, verify_dataset
-from experiments.qa500.capture import SITES, site_list, run_capture
-from experiments.qa500.baseline import run_baseline
-from experiments.qa500.effects import run_effects
-from experiments.qa500.explain import explain_from_captures
-from experiments.qa500.benchmark import benchmark_from_capture
+from scripts.experiments.qa500.cohort import DATASETS, PROTOCOL_ID, prepare_dataset, verify_dataset
+from scripts.experiments.qa500.capture import SITES, site_list, run_capture
+from scripts.experiments.qa500.measure import run_baseline
+from scripts.experiments.qa500.effects import run_effects
+from scripts.experiments.qa500.annotations import explain_from_captures
+from scripts.experiments.qa500.measure import benchmark_from_capture
 
 
 DATA_ROOT = inputs_dir(Path.cwd())
@@ -373,7 +373,7 @@ def run_matrix(
             argv = [
                 sys.executable,
                 "-m",
-                "experiments.qa500.runner",
+                "scripts.experiments.qa500.runner",
                 phase,
                 "--model",
                 name,

@@ -9,11 +9,11 @@ from tempfile import TemporaryDirectory
 
 import torch
 
-from experiments.qa500.cohort import DATASETS, PROTOCOL_ID, digest, normalize
+from scripts.experiments.qa500.cohort import DATASETS, PROTOCOL_ID, digest, normalize
 from tasks.benchmark.qa_scoring import grade_answer, score_choices, evaluate_qa
 from models.qa_input import make_input
-from experiments.qa500.runner import make_plan
-from experiments.qa500.baseline import run_baseline
+from scripts.experiments.qa500.runner import make_plan
+from scripts.experiments.qa500.measure import run_baseline
 
 
 class MinimalTokenizer:

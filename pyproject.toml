@@ -40,7 +40,7 @@ analysis = [
     "tqdm>=4.65",
 ]
 # Optional official QA500 mathematical answer equivalence scorer.
-qa-eval = ["math-verify[antlr4_13_2]==0.9.0", "PyYAML>=6"]
+qa-eval = ["math-verify[antlr4_9_3]==0.9.0", "PyYAML>=6"]
 
 generation = [
     "transformer-lens>=2.0",
@@ -88,12 +88,11 @@ py-modules = []
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["saebase*", "models*", "tasks*", "conf*", "experiments*"]
+include = ["saebase*", "models*", "tasks*", "conf*"]
 exclude = ["tests*", "examples*"]
 
 [tool.setuptools.package-data]
 conf = ["**/*.yaml", "**/*.yml", "**/*.md", "**/*.json"]
-experiments = ["**/*.md", "**/*.json"]
 saebase = ["**/*.md", "**/*.yaml", "**/*.json", "**/*.html", "**/*.css", "**/*.js"]
 models = ["**/*.json", "**/*.yaml"]
 

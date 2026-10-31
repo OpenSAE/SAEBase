@@ -6,7 +6,7 @@ import sys
 
 import pytest
 
-from experiments.qa500.config import (
+from scripts.experiments.qa500.context import (
     get_assets_lock,
     get_dataset_ids,
     get_protocol,
@@ -14,7 +14,7 @@ from experiments.qa500.config import (
     get_sites,
     get_tasks,
 )
-from experiments.qa500.assets import required_publication_lock
+from scripts.experiments.qa500.context import required_publication_lock
 from models.qa_input import _prompt_format
 from saebase.runtime.hardware import detect
 from saebase.runtime.supervisor import run_worker
@@ -95,7 +95,7 @@ def test_worker_oom_simulation_is_not_fake_gpu_acceptance(tmp_path):
 
 
 def test_publication_asset_lock_rejects_partial_and_unverified_revision_ids(monkeypatch):
-    from experiments.qa500 import assets
+    from scripts.experiments.qa500 import context as assets
 
     sites = get_sites()
     complete = {
