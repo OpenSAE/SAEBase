@@ -102,3 +102,7 @@ Turn WP12's source-level implementations into actual runnable research workflows
 - [**13 — LIVE-03 measured intervention integration**](13_live03_review_and_gallery.md). PR #55/#56 merged; L5 F506 and L9 F95 no-op/ablation/scale with separate edited-token and final-token logits, optional approved CPU gallery and remaining private job work.
 
 WP13 changes **operational readiness and deployment**, not the untouched WP12 P8 scientific release verdicts. Start with one complete real Prompt → Feature → Intervention workflow, publish a useful reviewed CPU Lab, then extend to native training and circuits.
+
+## 所有新 Work Plan 的必读编写标准
+
+正式创建或扩展新的 Work Plan 前，先阅读 [Work Plan 编写标准](WRITING_STANDARD.md)（[English](WRITING_STANDARD.en.md)）。必须提供架构所有权表、清洁环境依赖验证、精确 Git 分支获取、最小化 Pilot 和独立验收收据。历史冻结证据原样保留。

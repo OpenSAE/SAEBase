@@ -10,3 +10,5 @@ Before changing files read [the Harness overview](harness/README.en.md), [reposi
 6. A path-edit authorization is not permission to change architecture or protected governance. Historical results and acceptance remain unchanged without independent evidence.
 
 Offline CI proves software checks only, not real GPU or scientific acceptance.
+
+Before implementing a new Work Plan, read [the Work Plan authoring standard](harness/github/work_plan/WRITING_STANDARD.en.md). Do not assume every remote branch is locally fetched; do not run a compute-intensive phase before environment, dependency and small-pilot checks succeed.
