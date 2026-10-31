@@ -78,7 +78,6 @@ def get_assets_lock() -> dict[str, Any]:
 # --- assets: instance glue ---
 
 
-
 def declared_revision(kind: str, name: str) -> str | None:
     key = {
         "dataset": "dataset_revisions",
