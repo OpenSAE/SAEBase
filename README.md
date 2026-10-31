@@ -7,9 +7,7 @@
 **SAEBase** helps researchers study sparse autoencoders (SAEs) in language models. Explore features, test how feature edits affect model behavior, and build reproducible experiments. Its Research Harness also helps coding agents carry out scoped work with traceable evidence and independent review.
 
 <p align="center">
-  <a href="#-quick-start"><b>🚀 Quick Start</b></a> &nbsp; | &nbsp;
-  <a href="#-research-harness"><b>🧭 Harness</b></a> &nbsp; | &nbsp;
-  <a href="#-research-workflows"><b>🔬 Workflows</b></a> &nbsp; | &nbsp;
+  <a href="https://opensae.github.io/SAEBase/atlas/index.html"><b>🧭 Atlas</b></a> &nbsp; | &nbsp;
   <a href="https://huggingface.co/spaces/OpenSAE/SAEBase"><b>🤗 Research Lab</b></a> &nbsp; | &nbsp;
   <a href="https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation"><b>🤗 Evaluation Dataset</b></a>
 </p>
@@ -20,17 +18,13 @@
 
 **Build SAE experiments with AI agents while keeping decisions and evidence under your control.** The SAEBase Harness gives coding agents a clear task scope, connects their work to real research code, and supports independent checks of what actually ran.
 
-| Research step | What the Harness helps you do |
+| Atlas view | What you can explore |
 | --- | --- |
-| **Plan** | Define the objective, what an agent may change, and how the result will be reviewed. |
-| **Run** | Work in an isolated copy of the project, using SAEBase's actual research interfaces and saved experiment outputs. |
-| **Verify** | Check behavior independently, including expected results, failures, and compatibility with existing workflows. |
-| **Trace** | Connect a result to its inputs, code, models, commands, and output files. |
-| **Improve** | Distinguish issues in the implementation, environment, and verification process before the next attempt. |
-
-**Atlas** provides five connected views of the project. [Core](https://opensae.github.io/SAEBase/atlas/core.html) explains the architecture; [Knowledge](https://opensae.github.io/SAEBase/atlas/knowledge.html) organizes research questions; [Code](https://opensae.github.io/SAEBase/atlas/code.html) links to source implementations; [Environment](https://opensae.github.io/SAEBase/atlas/environment.html) describes computing resources; and [Context](https://opensae.github.io/SAEBase/atlas/context.html) explains terminology.
-
-[Explore the Harness](harness/README.md) · [Agent collaboration guide](harness/core/AGENT_FLOW.md) · [Research workflow documentation](harness/github_development_doc/index.md)
+| [**Core**](https://opensae.github.io/SAEBase/atlas/core.html) | Project architecture and research workflow management. |
+| [**Knowledge**](https://opensae.github.io/SAEBase/atlas/knowledge.html) | Research questions and their relationships. |
+| [**Code**](https://opensae.github.io/SAEBase/atlas/code.html) | Source implementations and code structure. |
+| [**Environment**](https://opensae.github.io/SAEBase/atlas/environment.html) | Computing resources and execution environments. |
+| [**Context**](https://opensae.github.io/SAEBase/atlas/context.html) | Terminology and project concepts. |
 
 ## 🧭 Overview
 
