@@ -180,7 +180,18 @@ def test_tracked_repository_has_only_approved_top_level_directories():
         text=True,
         check=True,
     )
+    # Atlas is a *fixed, generated, public static-site directory*, not a
+    # general new source root. The Cursor guard remains unchanged and continues
+    # to deny untrusted Agent writes to this directory.
+    generated_pages = {"atlas"}
     observed = set(tree.stdout.splitlines())
-    assert observed <= approved, "Unexpected project root directory: " + repr(
-        sorted(observed - approved)
+    assert observed <= approved | generated_pages, "Unexpected project root directory: " + repr(
+        sorted(observed - approved - generated_pages)
     )
+    if "atlas" in observed:
+        published = ROOT / "atlas"
+        pages = {"index.html", "core.html", "knowledge.html", "code.html",
+                 "environment.html", "context.html"}
+        assert {p.name for p in published.iterdir()} == pages
+        assert all((published / name).is_file() and not (published / name).is_symlink()
+                   for name in pages)
