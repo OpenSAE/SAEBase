@@ -11,6 +11,9 @@ import zipfile
 
 
 NEEDED_WHEEL = {
+    "saebase/datasets/plugins.py",
+    "saebase/datasets/prompt_schema.py",
+    "saebase/datasets/datamodule.py",
     "saebase/cli.py",
     "saebase/cli_compat.py",
     "saebase/model_plugins.py",
