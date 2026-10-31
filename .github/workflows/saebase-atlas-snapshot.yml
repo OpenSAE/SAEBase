@@ -52,6 +52,8 @@ jobs:
           python harness/visualization/build_pages.py --check
           python harness/visualization/build_language.py
           python harness/visualization/build_language.py --check
+          python harness/visualization/sync_pages_fallback.py
+          python harness/visualization/sync_pages_fallback.py --check
           node --check harness/visualization/app.js
           node --check harness/visualization/i18n.js
           node --check harness/visualization/locale-runtime.js
@@ -79,6 +81,7 @@ jobs:
           git add -f doc/code/code_tree.json harness/visualization/data.js harness/visualization/atlas-structure.js harness/visualization/locale-data.js
           git add harness/visualization/build_language.py
           git add harness/visualization/{core,knowledge,code,environment,context,glossary}.html
+          git add -f .nojekyll index.html atlas/{index,core,knowledge,code,environment,context}.html
           if ! git diff --cached --quiet; then
             git commit -m "chore(atlas): refresh SAEBase source-backed snapshots [atlas snapshot] [skip ci]"
             git push origin "HEAD:${GITHUB_REF_NAME}"
