@@ -28,7 +28,7 @@
 | **Trace** | Connect a result to its inputs, code, models, commands, and output files. |
 | **Improve** | Distinguish issues in the implementation, environment, and verification process before the next attempt. |
 
-**Atlas** provides five connected views of the project. [Core](https://atheavenma.github.io/opensae/saebase/atlas/core.html) explains the architecture; [Knowledge](https://atheavenma.github.io/opensae/saebase/atlas/knowledge.html) organizes research questions; [Code](https://atheavenma.github.io/opensae/saebase/atlas/code.html) links to source implementations; [Environment](https://atheavenma.github.io/opensae/saebase/atlas/environment.html) describes computing resources; and [Context](https://atheavenma.github.io/opensae/saebase/atlas/context.html) explains terminology.
+**Atlas** provides five connected views of the project. [Core](https://opensae.github.io/SAEBase/atlas/core.html) explains the architecture; [Knowledge](https://opensae.github.io/SAEBase/atlas/knowledge.html) organizes research questions; [Code](https://opensae.github.io/SAEBase/atlas/code.html) links to source implementations; [Environment](https://opensae.github.io/SAEBase/atlas/environment.html) describes computing resources; and [Context](https://opensae.github.io/SAEBase/atlas/context.html) explains terminology.
 
 [Explore the Harness](harness/README.md) · [Agent collaboration guide](harness/core/AGENT_FLOW.md) · [Research workflow documentation](harness/github_development_doc/index.md)
 
