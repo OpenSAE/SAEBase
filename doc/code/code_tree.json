@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "code",
   "project": "SAEBase",
-  "source_sha256": "441434a96cfa8802a9346093c1dace19682b653af3697bb6173e8f4a2d337e5c",
+  "source_sha256": "2d807a0c3ecf9b88079c0d30cf0180eb55f449b8400ef6a09dd43759ae0e7b04",
   "scope": [
     "saebase",
     "datasets",
@@ -9963,7 +9963,7 @@
       "kind": "function",
       "title": "_prompt_format",
       "path": "models/qa_input.py",
-      "line": 9,
+      "line": 10,
       "status": "implemented",
       "signature": "def _prompt_format(model_key: str) -> str",
       "description": "Read the model implementation's own prompt contract, never a QA500 list.",
@@ -9973,7 +9973,7 @@
       "bases": [],
       "needs_review": false,
       "evidence": [
-        "models/qa_input.py:9"
+        "models/qa_input.py:10"
       ]
     },
     {
