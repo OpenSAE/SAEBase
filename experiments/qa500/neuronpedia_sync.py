@@ -17,9 +17,9 @@ import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 
-from saebase.datasets.qa_neuronpedia import load_mapping
-from saebase.datasets.qa_pipeline import site_list
-from saebase.datasets.qa_standard import PROTOCOL_ID
+from saebase.integrations.neuronpedia import load_mapping
+from experiments.qa500.capture import site_list
+from experiments.qa500.cohort import PROTOCOL_ID
 
 
 BUCKET = "https://neuronpedia-datasets.s3.us-east-1.amazonaws.com"

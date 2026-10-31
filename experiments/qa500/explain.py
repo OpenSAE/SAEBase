@@ -12,8 +12,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from saebase.datasets.qa_standard import PROTOCOL_ID, verify_dataset
-from saebase.datasets.qa_neuronpedia import load_annotations, load_mapping, annotate
+from experiments.qa500.cohort import PROTOCOL_ID, verify_dataset
+from saebase.integrations.neuronpedia import load_annotations, load_mapping, annotate
 
 
 def _read(path: Path) -> list[dict[str, Any]]:

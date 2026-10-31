@@ -1,0 +1,5 @@
+# @package _global_
+# Reusable Experiment group selector; QA500 assets and matrices live below.
+experiment:
+  sub_name: qa500
+  protocol: qa500_standard_500_v1

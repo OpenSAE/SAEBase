@@ -1,0 +1,8 @@
+{
+  "schema": "saebase.experiment.asset_lock.v1",
+  "status": "source_revisions_to_be_pinned_by_independent_cold_start_review",
+  "dataset_revisions": {},
+  "model_revisions": {},
+  "sae_revisions": {},
+  "policy": "each run must record real upstream commit and actual checkpoint hashes; public cross-machine comparison requires frozen lock"
+}

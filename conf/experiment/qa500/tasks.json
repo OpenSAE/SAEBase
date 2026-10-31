@@ -1,0 +1,68 @@
+{
+  "schema": "saebase.experiment.task_selection.v1",
+  "budgets": {
+    "qa_baseline": 500,
+    "capture": 500,
+    "benchmark": {
+      "per_site_dataset": 1,
+      "samples_per_summary": 500,
+      "bootstrap_draws": 512,
+      "metrics": [
+        "core.l0",
+        "core.reconstruction_mse_token"
+      ]
+    },
+    "intervene": 20,
+    "generate": 5,
+    "explain": 2,
+    "circuits": {
+      "model_key": "gemma2_2b_base",
+      "dataset_id": "boolq",
+      "sample_count": 10,
+      "requires_native_approval": true
+    },
+    "train": {
+      "model_key": "gemma2_2b_base",
+      "dataset_id": "Salesforce/wikitext:wikitext-2-raw-v1",
+      "max_examples": 6400,
+      "steps": 200,
+      "requires_native_approval": true
+    }
+  },
+  "decode": {
+    "temperature": 0,
+    "seed": 20261031
+  },
+  "feature_selection": "maximum absolute nonzero SAE activation at last prompt token (explicitly postselected)",
+  "explanation_policy": "Exact SAE weight SHA256 + Neuronpedia model/source match; otherwise explanation=null",
+  "execution": {
+    "phases": [
+      "preflight",
+      "prepare",
+      "pilot",
+      "core",
+      "effects",
+      "native",
+      "audit",
+      "stage"
+    ],
+    "hf_publish_automatic": false,
+    "expected_model_qa_baselines": 50000,
+    "expected_capture_rows": 100000,
+    "expected_intervene_rows": 4000,
+    "expected_generate_rows": 1000,
+    "expected_benchmark_summaries": 200
+  },
+  "publication": {
+    "target": "OpenSAE/SAEBase-Evaluation",
+    "requires_human_approval": true,
+    "new_configs": [
+      "qa_v1_inputs",
+      "qa_v1_sites",
+      "qa_v1_runs",
+      "qa_v1_metrics",
+      "qa_v1_per_question",
+      "qa_v1_task_records"
+    ]
+  }
+}

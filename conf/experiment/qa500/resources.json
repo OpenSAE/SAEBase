@@ -1,0 +1,25 @@
+{
+  "schema": "saebase.experiment.resource_policy.v1",
+  "device_selector": "auto",
+  "max_prompt_tokens": 2048,
+  "allowed_strategies": [
+    "same_device",
+    "release_worker_reinitialize",
+    "bounded_cache",
+    "identical_precision_offload_if_verified",
+    "resource_blocked"
+  ],
+  "forbidden_changes": [
+    "dataset",
+    "model",
+    "sae",
+    "layer",
+    "prompt",
+    "token_limit",
+    "precision_without_comparability",
+    "metrics",
+    "seed"
+  ],
+  "max_oom_retries": 2,
+  "model_load": "one_model_multiple_saes_when_supported"
+}

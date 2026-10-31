@@ -14,7 +14,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from saebase.datasets.qa_standard import PROTOCOL_ID, render_prompt, verify_dataset
+from experiments.qa500.cohort import PROTOCOL_ID, render_prompt, verify_dataset
 
 ROOT = Path("experiment/qa500")
 MODEL = "google/gemma-2-2b"

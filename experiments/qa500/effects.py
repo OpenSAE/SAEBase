@@ -14,8 +14,8 @@ from typing import Any
 
 import torch
 
-from saebase.datasets.qa_standard import PROTOCOL_ID, verify_dataset
-from saebase.datasets.qa_inference import make_input
+from experiments.qa500.cohort import PROTOCOL_ID, verify_dataset
+from models.qa_input import make_input
 
 
 TASK_BUDGET = {"intervene": 20, "generate": 5}

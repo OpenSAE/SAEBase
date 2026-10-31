@@ -13,8 +13,8 @@ import re
 from pathlib import Path
 from typing import Any
 
-from saebase.datasets.qa_report import CONFIGS, DEFAULT_EXPORT
-from saebase.datasets.qa_standard import PROTOCOL_ID
+from experiments.qa500.report import CONFIGS, DEFAULT_EXPORT
+from experiments.qa500.cohort import PROTOCOL_ID
 
 DESTINATION = "OpenSAE/SAEBase-Evaluation"
 

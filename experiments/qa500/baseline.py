@@ -7,8 +7,9 @@ import json
 from pathlib import Path
 from typing import Any
 
-from saebase.datasets.qa_standard import PROTOCOL_ID, verify_dataset
-from saebase.datasets.qa_inference import evaluate_qa, make_input
+from experiments.qa500.cohort import PROTOCOL_ID, verify_dataset
+from tasks.benchmark.qa_scoring import evaluate_qa
+from models.qa_input import make_input
 
 
 def _append(path: Path, row: dict[str, Any]) -> None:
