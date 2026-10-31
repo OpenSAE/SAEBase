@@ -30,6 +30,7 @@ class BaseModelSpec:
     family: str
     model_candidates: tuple[str, ...] = ()
     notes: str = ""
+    prompt_format: str = "plain"  # Source model decides whether a chat template is required
 
     def candidates(self) -> tuple[str, ...]:
         if self.model_candidates:

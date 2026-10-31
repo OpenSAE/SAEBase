@@ -6,7 +6,21 @@ from typing import Any
 import torch
 from saebase.data.qa_records import render_prompt
 
-INSTRUCTION_MODELS = frozenset({"gemma3_4b_it"})
+def _prompt_format(model_key: str) -> str:
+    """Read the model implementation's own prompt contract, never a QA500 list."""
+    import importlib
+
+    if not model_key or not model_key.replace("_", "").isalnum():
+        raise ValueError("Invalid model registry key")
+    model_module = importlib.import_module(f"models.{model_key}.{model_key}")
+    spec = model_module.get_spec()
+    if str(spec.key) != model_key:
+        raise ValueError("Model prompt profile identity does not match requested model")
+    mode = str(spec.prompt_format)
+    if mode not in {"plain", "chat_template"}:
+        raise ValueError("Unknown model prompt-format policy")
+    return mode
+
 
 
 def _tokenizer(pair: Any) -> Any:
@@ -20,7 +34,7 @@ def make_input(pair: Any, record: dict[str, Any], model_key: str) -> tuple[Any, 
     """Render model-appropriate prompt, return verified token IDs and provenance."""
     tokenizer = _tokenizer(pair)
     prompt = render_prompt(record)
-    if model_key in INSTRUCTION_MODELS:
+    if _prompt_format(model_key) == "chat_template":
         if not callable(getattr(tokenizer, "apply_chat_template", None)):
             raise RuntimeError("Instruction-tuned model has no chat template")
         encoded = tokenizer.apply_chat_template(
