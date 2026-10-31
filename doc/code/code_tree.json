@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "code",
   "project": "SAEBase",
-  "source_sha256": "9db1318cdf465a16badf4a13da6cd0cf2f10a0686b251c6f462782f5f175b8cc",
+  "source_sha256": "8ee0a790c4393eec56e6a3ce00a6e0ee574c6c56f8ce7a057cbf0a5547ee831c",
   "scope": [
     "saebase",
     "datasets",
@@ -7651,7 +7651,7 @@
       "kind": "function",
       "title": "main",
       "path": "experiments/qa500/runner.py",
-      "line": 423,
+      "line": 425,
       "status": "implemented",
       "signature": "def main(argv: list[str] | None=None) -> int",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -7661,7 +7661,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "experiments/qa500/runner.py:423"
+        "experiments/qa500/runner.py:425"
       ]
     },
     {
@@ -22659,7 +22659,7 @@
       "kind": "function",
       "title": "select_cuda_device",
       "path": "saebase/runtime/resource_planner.py",
-      "line": 12,
+      "line": 13,
       "status": "implemented",
       "signature": "def select_cuda_device(hardware: dict[str, Any], *, minimum_free_bytes: int=1 << 30) -> dict[str, Any]",
       "description": "暂无经过验证的功能说明，请结合源代码审核。",
@@ -22669,7 +22669,7 @@
       "bases": [],
       "needs_review": true,
       "evidence": [
-        "saebase/runtime/resource_planner.py:12"
+        "saebase/runtime/resource_planner.py:13"
       ]
     },
     {
