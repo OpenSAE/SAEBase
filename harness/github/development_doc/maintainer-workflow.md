@@ -1,10 +1,10 @@
 # Maintainer Workflow
 
-SAEBase is the shared software infrastructure for OpenSAE projects. Its own [Contributing Guide](../../.github/CONTRIBUTING.md) defines the repository-specific test and provenance expectations; the [OpenSAE Governance](https://github.com/OpenSAE/.github/blob/main/GOVERNANCE.md) and [Code of Conduct](https://github.com/OpenSAE/.github/blob/main/CODE_OF_CONDUCT.md) apply across the organization.
+SAEBase is the shared software infrastructure for OpenSAE projects. Its own [Contributing Guide](../../../.github/CONTRIBUTING.md) defines the repository-specific test and provenance expectations; the [OpenSAE Governance](https://github.com/OpenSAE/.github/blob/main/GOVERNANCE.md) and [Code of Conduct](https://github.com/OpenSAE/.github/blob/main/CODE_OF_CONDUCT.md) apply across the organization.
 
 ## Review and ownership
 
-The primary maintainer is [@AtheavenMa](https://github.com/AtheavenMa). The [CODEOWNERS](../../.github/CODEOWNERS) file assigns current ownership of critical API, experiment, infrastructure, and release paths. Additional maintainers should only be added to CODEOWNERS once they have agreed to the responsibility and have write access.
+The primary maintainer is [@AtheavenMa](https://github.com/AtheavenMa). The [CODEOWNERS](../../../.github/CODEOWNERS) file assigns current ownership of critical API, experiment, infrastructure, and release paths. Additional maintainers should only be added to CODEOWNERS once they have agreed to the responsibility and have write access.
 
 Code-owner designation requests reviewers; it does not by itself block a merge. Requiring separate code-owner approval is appropriate once a second independent reviewer is available. The author of a pull request cannot independently approve their own proposed changes.
 

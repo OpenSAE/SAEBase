@@ -16,6 +16,6 @@ The following records document earlier checkpoint validation and software implem
 - [Work Plan 9 measurements](performance/workplan09_results.md) · [Work Plan 10](performance/workplan10_results.md) · [Work Plan 11](performance/workplan11_final_results.md)
 - [Original checkpoint evidence archive](stage-d-evidence-archive.md)
 - [Current release notes](releases/v0.4.0.md) · [Earlier release notes](releases/v0.3.0.md)
-- [Full engineering plan archive](../github_work_plan/README.md)
+- [Full engineering plan archive](../work_plan/README.md)
 
 These records are maintained for reproducibility, not presented as numbered steps for first-time users.
