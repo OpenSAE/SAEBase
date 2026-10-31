@@ -1,0 +1,65 @@
+name: SAEBase v0.6.5 Approved Release Dispatch
+
+# One-time, version-specific maintainer-authorized release request.
+# Reuses the existing source-bound, six-context Software Release workflow.
+# This dispatch does not create tags, bypass CI, or upload software itself.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: saebase-v0.6.5-once
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: >-
+      ${{ github.repository == 'OpenSAE/SAEBase' &&
+          github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'push' &&
+          github.event.workflow_run.head_branch == 'main' &&
+          github.event.workflow_run.head_repository.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+      VERSION: "0.6.5"
+      TAG: "v0.6.5"
+    steps:
+      - name: Confirm exact current main, version metadata, and unused tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$(gh api "repos/$REPO/branches/main" --jq '.commit.sha')" = "$SOURCE_SHA"
+          test "$(gh api "repos/$REPO/contents/pyproject.toml?ref=$SOURCE_SHA" --jq '.content' | base64 -d | grep -Ec '^version = "0\.6\.5"$')" = 1
+          test "$(gh api "repos/$REPO/contents/saebase/__init__.py?ref=$SOURCE_SHA" --jq '.content' | base64 -d | grep -Ec '^__version__ = "0\.6\.5"$')" = 1
+          gh api "repos/$REPO/contents/harness/github_development_doc/releases/v0.6.5.md?ref=$SOURCE_SHA" --jq '.sha' | grep -Eq '^[a-f0-9]{40}$'
+          if gh api "repos/$REPO/git/ref/tags/$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG exists; refusing to republish." >&2
+            exit 1
+          fi
+          if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            echo "Release $TAG exists; refusing to replace." >&2
+            exit 1
+          fi
+          echo "Authorized v0.6.5 at exact main $SOURCE_SHA; CI run ${{ github.event.workflow_run.id }}"
+
+      - name: Dispatch established verify-and-publish workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(gh api "repos/$REPO/branches/main" --jq '.commit.sha')" = "$SOURCE_SHA"
+          gh workflow run software-release.yml --repo "$REPO" --ref main \
+            -f source_sha="$SOURCE_SHA" \
+            -f version="$VERSION" \
+            -f mode=publish \
+            -f confirmation="PUBLISH-$TAG"
+          echo "Dispatched the standard release workflow; publication remains gated on exact-source six-context CI and verified distribution assets."
