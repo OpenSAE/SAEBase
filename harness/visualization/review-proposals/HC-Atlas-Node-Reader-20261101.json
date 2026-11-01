@@ -1,0 +1,390 @@
+{
+  "plan": {
+    "schema": "saebase.human_check.v1",
+    "kind": "human_check",
+    "id": "HC-Atlas-Node-Reader-20261101",
+    "goal": "在现有 Atlas 内添加可随滚轮缩回 Graph 的固定视口节点阅读卡，并保留全部真实直接关联。",
+    "base_sha": "6cdc7abe3b9c487fa713b27aa8d39463d1fdacfd",
+    "mode": "on",
+    "default_enabled": true,
+    "revision": 0,
+    "viewed": {},
+    "items": [
+      {
+        "view": "core",
+        "node_id": "q.transparency",
+        "operation": "change",
+        "parent_id": null,
+        "before": {
+          "title": "人和 Agent 怎样共同理解项目？",
+          "description": "问题：如何分离科学知识、代码实现与物理执行环境？"
+        },
+        "after": {
+          "title": "人和 Agent 怎样共同理解项目？",
+          "description": "让现有 Atlas 的普通节点可以原位放大为固定视口的阅读卡，缩小时准确返回原树位置；不创建独立阅读网页。"
+        },
+        "files": [
+          "harness/visualization/app.js",
+          "harness/visualization/node-reader.js",
+          "harness/visualization/node-reader.css",
+          "harness/visualization/index.html",
+          "harness/github/work_test/test_atlas_node_reader.cjs"
+        ],
+        "reason": "阅读是原 Atlas 节点的另一种显示状态；当前节点内展开与侧栏内容分散。",
+        "risk": "缩放回退、相机位置、深链及画布操作可能受到影响。",
+        "checks": [
+          "普通节点进入 Reader；子节点计数仍只开合树枝",
+          "卡片固定视口尺寸，内文独立滚动",
+          "缩小回同一节点且不自动 Fit",
+          "维持五棵 Tree 原有视口"
+        ],
+        "context_term_ids": [
+          "term.core_tree",
+          "term.code_tree"
+        ],
+        "proposal_review": null,
+        "key": "core:q.transparency"
+      },
+      {
+        "view": "core",
+        "node_id": "s.explainability",
+        "operation": "change",
+        "parent_id": null,
+        "before": {
+          "title": "三树协作的 Context 管理",
+          "description": "方案：知识树回答为什么，代码树回答怎样实现，环境树回答在哪里运行。"
+        },
+        "after": {
+          "title": "三树协作的 Context 管理",
+          "description": "将当前节点的说明、属性、参数、完整源码接口、Context 术语与证据合并为同一 Reader，不复制权威定义。"
+        },
+        "files": [
+          "harness/visualization/app.js",
+          "harness/visualization/node-reader.js",
+          "harness/visualization/node-reader.css",
+          "harness/visualization/index.html",
+          "harness/github/work_test/test_atlas_node_reader.cjs"
+        ],
+        "reason": "现有 Node 属性与 Details 出现重复并有内容被分拆。",
+        "risk": "折叠在 Code 节点下的实际源码成员丢失或来源不准确。",
+        "checks": [
+          "逐字段覆盖原 Details 及 Expanded Attributes",
+          "方法签名、参数、返回值、源码地址不丢失",
+          "中英切换不影响定位"
+        ],
+        "context_term_ids": [
+          "term.context_tree",
+          "term.function_signature"
+        ],
+        "proposal_review": null,
+        "key": "core:s.explainability"
+      },
+      {
+        "view": "core",
+        "node_id": "g.context",
+        "operation": "change",
+        "parent_id": null,
+        "before": {
+          "title": "结构化研究知识与证据",
+          "description": "目标：用稳定 ID、状态、证据、AND/OR 与依赖描述研究目标。"
+        },
+        "after": {
+          "title": "结构化研究知识与证据",
+          "description": "Reader 显示本节点真实直接父子关系、同树引用、跨树正反向关系、来源字段和关联链接，不递归展开其他节点全文。"
+        },
+        "files": [
+          "harness/visualization/app.js",
+          "harness/visualization/node-reader.js",
+          "harness/visualization/node-reader.css",
+          "harness/visualization/index.html",
+          "harness/github/work_test/test_atlas_node_reader.cjs"
+        ],
+        "reason": "现有关联列表只覆盖部分显式跨树引用。",
+        "risk": "漏掉真实关系、产生推断边、跨树跳转后丢失阅读与相机历史。",
+        "checks": [
+          "关联由真实边与明确引用构成",
+          "向内/向外和同树关系完整",
+          "超过 8 条仍能完整查看",
+          "点击关联进入下一节点并可返回"
+        ],
+        "context_term_ids": [
+          "term.knowledge_tree",
+          "term.context_tree",
+          "term.code_tree"
+        ],
+        "proposal_review": null,
+        "key": "core:g.context"
+      },
+      {
+        "view": "core",
+        "node_id": "g.code_tree",
+        "operation": "change",
+        "parent_id": null,
+        "before": {
+          "title": "可核验的类与函数结构图",
+          "description": "目标：从 Python AST 输出节点、继承、成员与调用，附带已有 Knowledge 链接。"
+        },
+        "after": {
+          "title": "可核验的类与函数结构图",
+          "description": "新增构建期 Node Reader 数据校验，核对真实 Code AST 接口归属、源码链接和直接关系的完整性，不改变权威图。"
+        },
+        "files": [
+          "harness/visualization/node_reader.py",
+          "harness/github/work_test/test_atlas_node_reader_data.py"
+        ],
+        "reason": "Code Tree 的真实身份来自 Python AST，Reader 仅应读取与校验。",
+        "risk": "误将拟议模块当作现存 AST；校验器可能误写权威 Code 树。",
+        "checks": [
+          "丢失接口/引用时可解释地失败",
+          "不写权威图或伪造方法",
+          "可独立执行"
+        ],
+        "context_term_ids": [
+          "term.ast",
+          "term.code_tree",
+          "term.python"
+        ],
+        "proposal_review": null,
+        "key": "core:g.code_tree"
+      },
+      {
+        "view": "code",
+        "node_id": "code:module:harness.visualization.node_reader",
+        "operation": "add",
+        "parent_id": "code:root",
+        "before": null,
+        "after": {
+          "type": "module",
+          "title": "校验 Atlas Reader 的节点数据与源码关联",
+          "description": "拟新增 harness/visualization/node_reader.py，作为独立构建期数据验证器；该 Python 文件目前尚未实现，仅为 Proposed。",
+          "path": "harness/visualization/node_reader.py",
+          "status": "not_implemented"
+        },
+        "files": [
+          "harness/visualization/node_reader.py",
+          "harness/github/work_test/test_atlas_node_reader_data.py"
+        ],
+        "reason": "把构建期数据验证单独维护，浏览器中的缩放和阅读逻辑仍由 JavaScript 负责。",
+        "risk": "假装当前存在此模块，或重复保存/改写科学数据。",
+        "checks": [
+          "严格标注 Proposed",
+          "验证不修改 AST",
+          "新增模块归属可追踪"
+        ],
+        "context_term_ids": [
+          "term.python",
+          "term.ast",
+          "term.code_tree"
+        ],
+        "proposal_review": null,
+        "key": "code:code:module:harness.visualization.node_reader"
+      },
+      {
+        "view": "core",
+        "node_id": "q.reproducibility",
+        "operation": "change",
+        "parent_id": null,
+        "before": {
+          "title": "如何保证每次实验都能追溯？",
+          "description": "问题：实验目录、完整配置、运行条件和结果如何唯一关联？"
+        },
+        "after": {
+          "title": "如何保证每次实验都能追溯？",
+          "description": "将 Node Reader 的 JS/CSS 和模板接入 Atlas 五树静态构建发布，确保在线 Atlas 资源版本、深链和回退一致。"
+        },
+        "files": [
+          "harness/visualization/package_site.py",
+          "harness/visualization/README.md",
+          "harness/visualization/README.en.md",
+          "harness/github/work_test/test_atlas_node_reader_bundle.py"
+        ],
+        "reason": "Atlas 公共构建必须跟踪新增静态资源并可回滚。",
+        "risk": "公共 Atlas 版本不一致、页面缺失脚本或样式。",
+        "checks": [
+          "五树均能加载新 Reader",
+          "源身份及分块校验维持有效",
+          "恢复旧链接及语言偏好"
+        ],
+        "context_term_ids": [
+          "term.artifact",
+          "term.sae.reproducible"
+        ],
+        "proposal_review": null,
+        "key": "core:q.reproducibility"
+      },
+      {
+        "view": "core",
+        "node_id": "g.agent_execution_flow",
+        "operation": "change",
+        "parent_id": null,
+        "before": {
+          "title": "Agent 执行任务的流程",
+          "description": "目标：外部 GitHub Work Plan → 审计和部署预览 → 人类授权 → 任务代码变更与统一审阅 → 真实实验及独立结果审计 → 人类逐节点审批四种归宿及可追溯报告。Core 与 Harness 规则对普通 Agent 只读屏蔽。"
+        },
+        "after": {
+          "title": "Agent 执行任务的流程",
+          "description": "补充 Node Reader 的独立回归测试与双语维护指南，保持 Human Check 原来的节点顺序、四箭头及公开草稿/本地正式批准边界。"
+        },
+        "files": [
+          "harness/visualization/package_site.py",
+          "harness/visualization/README.md",
+          "harness/visualization/README.en.md",
+          "harness/github/work_test/test_atlas_node_reader_bundle.py"
+        ],
+        "reason": "这次视觉修改不能破坏先前已经完成的 Review 导航和审批。",
+        "risk": "浏览器只读审批被误称为正式批准，节点导航回退。",
+        "checks": [
+          "四个审阅箭头和 unchecked 导航正常",
+          "组内审阅与 All done 保持原有规则",
+          "公开版只保存浏览器草稿",
+          "中英文文档同步更新"
+        ],
+        "context_term_ids": [
+          "term.artifact",
+          "term.core_tree"
+        ],
+        "proposal_review": null,
+        "key": "core:g.agent_execution_flow"
+      }
+    ],
+    "groups": [
+      {
+        "id": "HC01",
+        "title": "Graph 内的阅读卡及节点关联",
+        "item_keys": [
+          "core:q.transparency",
+          "core:s.explainability",
+          "core:g.context"
+        ]
+      },
+      {
+        "id": "HC02",
+        "title": "Reader 内容完整性与源码验证",
+        "item_keys": [
+          "core:g.code_tree",
+          "code:code:module:harness.visualization.node_reader"
+        ]
+      },
+      {
+        "id": "HC03",
+        "title": "五树发布、双语和审阅回归",
+        "item_keys": [
+          "core:q.reproducibility",
+          "core:g.agent_execution_flow"
+        ]
+      }
+    ],
+    "preview_sha256": "6cdc7abe3b9c487fa713b27aa8d39463d1fdacfd",
+    "created_for": "Public read-only Human Check preview before Node Reader implementation. No authenticated approvals or source changes authorized."
+  },
+  "context": {
+    "nodes": [],
+    "edges": []
+  },
+  "core_context": {
+    "nodes": [
+      {
+        "id": "q.reproducibility",
+        "type": "question",
+        "title": "如何保证每次实验都能追溯？",
+        "description": "问题：实验目录、完整配置、运行条件和结果如何唯一关联？",
+        "status": "partial",
+        "evidence": [
+          "conf/config.yaml",
+          "saebase/runtime/summary_log.py"
+        ],
+        "next": "标准化结构化产物与运行元数据。",
+        "environment_refs": []
+      },
+      {
+        "id": "q.transparency",
+        "type": "question",
+        "title": "人和 Agent 怎样共同理解项目？",
+        "description": "问题：如何分离科学知识、代码实现与物理执行环境？",
+        "status": "implemented",
+        "evidence": [
+          "harness/core/project_graph.json"
+        ],
+        "next": "建立三棵可浏览且可验证的结构树。",
+        "environment_refs": []
+      },
+      {
+        "id": "s.explainability",
+        "type": "solve",
+        "title": "三树协作的 Context 管理",
+        "description": "方案：知识树回答为什么，代码树回答怎样实现，环境树回答在哪里运行。",
+        "status": "implemented",
+        "evidence": [
+          "harness/core/project_graph.json",
+          "harness/visualization/index.html",
+          "harness/code/build.py",
+          "harness/knowledge/validate.py"
+        ],
+        "next": "用源数据生成动态交互视图。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "partial",
+          "explanation": "现状：三棵树与可交互浏览器已实现，科学描述仍需研究者维护。 证据：harness/visualization/index.html、harness/code/build.py、harness/knowledge/validate.py。下一步：用源数据生成动态交互视图。"
+        }
+      },
+      {
+        "id": "g.context",
+        "type": "goal",
+        "title": "结构化研究知识与证据",
+        "description": "目标：用稳定 ID、状态、证据、AND/OR 与依赖描述研究目标。",
+        "status": "implemented",
+        "evidence": [
+          "harness/core/project_graph.json",
+          "harness/knowledge/validate.py"
+        ],
+        "next": "增设 schema 校验和受控变更提案。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "implemented",
+          "explanation": "现状：Knowledge tree 的 question/solve/goal、AND/OR、证据和状态有机器可读图与校验器。 证据：doc/knowledge/context_graph.json、harness/knowledge/validate.py。下一步：增设 schema 校验和受控变更提案。"
+        }
+      },
+      {
+        "id": "g.code_tree",
+        "type": "goal",
+        "title": "可核验的类与函数结构图",
+        "description": "目标：从 Python AST 输出节点、继承、成员与调用，附带已有 Knowledge 链接。",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "harness/code/build.py",
+          "harness/code/diff.py",
+          "harness/visualization/app.js"
+        ],
+        "next": "实现生成器、差异比对与浏览器。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "implemented",
+          "explanation": "现状：自动 AST 提取、代码 Diff、静态浏览器及节点交互已接入并通过 CI。 证据：harness/code/build.py、harness/code/diff.py、tests/test_atlas_interactivity.cjs。下一步：实现生成器、差异比对与浏览器。"
+        }
+      },
+      {
+        "id": "g.agent_execution_flow",
+        "type": "goal",
+        "title": "Agent 执行任务的流程",
+        "description": "目标：外部 GitHub Work Plan → 审计和部署预览 → 人类授权 → 任务代码变更与统一审阅 → 真实实验及独立结果审计 → 人类逐节点审批四种归宿及可追溯报告。Core 与 Harness 规则对普通 Agent 只读屏蔽。",
+        "status": "partial",
+        "evidence": [
+          "harness/core/agent_flow.py",
+          "harness/core/agent_apply.py",
+          "harness/core/agent_flow.py",
+          "harness/visualization/app.js"
+        ],
+        "next": "本地真人评审和 GitHub 原生 Approved 事件尚需端到端验收。",
+        "environment_refs": []
+      }
+    ],
+    "edges": []
+  }
+}

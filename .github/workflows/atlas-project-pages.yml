@@ -2,6 +2,15 @@
 name: SAEBase project-owned Atlas website
 
 on:
+  # A Human Check proposal published to main should become browsable without
+  # requiring a separate manual Pages dispatch or full browser screenshot job.
+  push:
+    branches: [main]
+    paths:
+      - "harness/visualization/review-proposals/**"
+      - "harness/visualization/package_site.py"
+      - "harness/visualization/app.js"
+      - ".github/workflows/atlas-project-pages.yml"
   workflow_dispatch:
 
 permissions:
@@ -25,6 +34,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Generate source-owned Atlas data
+        if: github.event_name == 'workflow_dispatch'
         run: |
           python harness/core/validate.py
           python harness/knowledge/validate.py
@@ -32,6 +42,11 @@ jobs:
           python harness/visualization/export.py
           python harness/visualization/build_pages.py
           python harness/visualization/build_language.py
+          python harness/visualization/package_site.py --output "$RUNNER_TEMP/atlas-web/atlas"
+      - name: Fast package existing Atlas plus public review snapshots
+        if: github.event_name == 'push'
+        run: |
+          python harness/visualization/build_pages.py
           python harness/visualization/package_site.py --output "$RUNNER_TEMP/atlas-web/atlas"
       - name: Checkout project-owned preview source
         uses: actions/checkout@v4
@@ -95,13 +110,14 @@ jobs:
                   assert (base/tree/"app.js").exists()
           PY
       - name: Verify preview in Chromium and save review screenshots
+        if: github.event_name == 'workflow_dispatch'
         run: |
           python -m pip install -q playwright
           python -m playwright install --with-deps chromium
           python -m http.server 8765 --bind 127.0.0.1 --directory "$RUNNER_TEMP/atlas-web" >/tmp/atlas-preview-server.log 2>&1 &
           python preview-source/harness/visualization/check_visual21_preview.py
       - name: Store screenshots for design review
-        if: always()
+        if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
           name: saebase-visual21-review
@@ -152,7 +168,19 @@ jobs:
                           resource = urljoin(url, asset)
                           with urlopen(Request(resource, headers={"User-Agent": "SAEBase-Pages-verify"}), timeout=15) as result:
                               assert result.status == 200 and result.read(1), f"Missing static asset: {resource}"
-                  print("Public SAEBase Atlas verified across six pages and assets:", base)
+                  # The exact Human Check link must load an actual public
+                  # proposal JSON from the same Atlas deployment.
+                  import json
+                  with urlopen(urljoin(base, "atlas/review-proposals/index.json"), timeout=15) as response:
+                      listing = json.load(response)
+                  assert listing.get("schema") == "saebase.atlas.review-index.v1"
+                  for proposal in listing["reviews"]:
+                      location = urljoin(base, "atlas/review-proposals/" + proposal["file"])
+                      with urlopen(location, timeout=15) as response:
+                          payload = json.load(response)
+                      assert payload.get("plan", {}).get("id") == proposal["id"], location
+                  print("Public SAEBase Atlas and", len(listing["reviews"]),
+                        "real Human Check review links verified:", base)
                   break
               except Exception as exc:
                   error = f"{type(exc).__name__}: {exc}"
