@@ -5,6 +5,27 @@ maintenance. It does **not** create a PR, edit source code, execute a model, or
 approve scientific findings. A typed proposal and the written report use the
 same immutable facts. Review only changes a local ignored ledger.
 
+## Mandatory Atlas UI step
+
+Every Human Check MUST deliver a directly browsable Atlas review UI, not only
+a JSON proposal, report, ZIP or shell script. Use the existing Atlas review,
+not a separate question form. The one-command local entry is:
+
+~~~bash
+python -m harness.github.human_check quickstart --manifest /path/to/proposal.json
+~~~
+
+This command freezes or resumes the proposal, verifies the actual local Atlas
+HTML/JS/CSS/graph/review endpoints, prints the authenticated localhost URL and
+tries to open it in a desktop browser. It does not record approval. A failed
+browser launch reports the verified URL instead. A remote/headless environment
+may still require port forwarding.
+
+If no executable checkout or accessible UI is available, do not claim that
+Human Check is ready. Provide a clearly labeled browsable preview if possible,
+explain that it cannot save formal authenticated decisions, and report the
+blocker. The legacy prepare/report/serve/check commands remain available.
+
 ## 1. Author one proposal before editing
 
 Start with the current GitHub source and the smallest relevant Core, Knowledge,
