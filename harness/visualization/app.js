@@ -680,6 +680,8 @@
       button.textContent=glyph;
       button.title=label;
       button.setAttribute("aria-label",label);
+      button.classList.toggle("review-skip",
+        id==="atlasReviewPrev" || id==="atlasReviewNext");
     }
     $("atlasReviewPrevUnchecked").addEventListener("click",()=>reviewGo(reviewPosition()-1));
     $("atlasReviewPrev").addEventListener("click",()=>reviewGoUnchecked(-1));
