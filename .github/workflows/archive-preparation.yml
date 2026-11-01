@@ -1,0 +1,52 @@
+name: Archive Preparation (read-only)
+
+# Start during the NEXT release's preparation, before final source SHA freezes.
+# Generates deterministic candidates for human approval; never writes main/PR.
+on:
+  workflow_dispatch:
+    inputs:
+      closing_version:
+        description: Version being frozen into archive, e.g. 0.6.5
+        required: true
+        type: string
+      next_version:
+        description: Upcoming release, matching pyproject.toml
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: harness-archive-prepare-${{ inputs.next_version }}
+  cancel-in-progress: false
+
+jobs:
+  archive-preview:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Check frozen history before planning
+        run: python -m harness.github.archive check
+      - name: Prepare versioned archive manifest for Atlas Human Check
+        env:
+          CLOSING: ${{ inputs.closing_version }}
+          NEXT: ${{ inputs.next_version }}
+        run: |
+          python -m harness.github.archive prepare \
+            --closing-version "$CLOSING" --next-version "$NEXT" \
+            --output "$RUNNER_TEMP/archive-preparation.json"
+      - name: Preserve preview for human review
+        uses: actions/upload-artifact@v4
+        with:
+          name: archive-preview-${{ inputs.closing_version }}-to-${{ inputs.next_version }}
+          path: ${{ runner.temp }}/archive-preparation.json
+          if-no-files-found: error
+          retention-days: 30
