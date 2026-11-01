@@ -2,17 +2,6 @@
 name: SAEBase project-owned Atlas website
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/atlas-project-pages.yml"
-      - "harness/visualization/**"
-      - "atlas/**"
-      - "index.html"
-      - ".nojekyll"
-      - "harness/code/**"
-      - "harness/knowledge/**"
-      - "doc/knowledge/**"
   workflow_dispatch:
 
 permissions:

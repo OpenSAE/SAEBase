@@ -2,37 +2,15 @@ name: Research Integration Regression (pinned)
 
 # Fixed upstream SHAs for reproducible PR regression, never floating heads.
 on:
-  pull_request:
-    paths:
-      - "saebase/benchmarks/**"
-      - "saebase/reliability/**"
-      - "saebase/integrations/**"
-      - "harness/github/work_test/test_phase_c_reference_contract.py"
-      - "harness/github/work_test/test_m3_paper_adapters.py"
-      - "harness/github/work_test/test_research_lab_native_methods.py"
-      - "apps/research-lab/backend/methods.py"
-      - "harness/github/work_test/test_m4_ground_truth.py"
-      - "scripts/m4_ground_truth.py"
-      - ".github/workflows/research-regression.yml"
-  push:
-    branches: [main]
-    paths:
-      - "saebase/benchmarks/**"
-      - "saebase/reliability/**"
-      - "saebase/integrations/**"
-      - "harness/github/work_test/test_phase_c_reference_contract.py"
-      - "harness/github/work_test/test_m3_paper_adapters.py"
-      - "harness/github/work_test/test_m4_ground_truth.py"
-      - "scripts/m4_ground_truth.py"
-      - ".github/workflows/research-regression.yml"
+  workflow_call:
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: research-regression-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  group: research-regression-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   original-estimators:

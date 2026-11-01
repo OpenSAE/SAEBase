@@ -1,126 +1,79 @@
 # CI and Research Validation Lanes
 
-SAEBase separates ordinary software checks, original research regression,
-real model and SAE acceptance, and historical release gates. Passing an
-offline test does not establish that a real checkpoint was verified.
+SAEBase deliberately separates **frequent development checks** from **full
+software release acceptance**, real model experiments, and historical evidence.
+A lightweight result does not establish full scientific or release validity.
 
-## Fast software and packaging CI
+## PR and main: the same lightweight CI
 
-[CI](../../../.github/workflows/ci.yml) runs on every pull request and on pushes
-to `main`. Five release-required job contexts remain, and normal PR checks run on a
-single Python 3.11 version:
+[CI](../../../.github/workflows/ci.yml) runs after every PR update and
+`main` push, using the actual Git diff (including old and new rename paths).
+[Selector](../ci/select_checks.py) combines all relevant scopes; unknown
+paths or missing Git history conservatively run all lightweight scopes.
 
-- `offline-tests (3.11)` runs the full offline regression suite in two
-  isolated xdist workers (`--dist=loadfile`), retains branch coverage, and
-  executes documentation/evidence, examples, CLI and installed-wheel checks.
-  The `saebase-core-coverage-py311` artifact is unchanged.
-- `quality` runs Ruff, incremental mypy, and pre-commit validation.
-- `package` validates wheel and sdist contents and a clean sdist
-  rebuild. Runtime configs remain available without bundling experiment caches.
-- `analysis-install` verifies optional model analysis dependencies.
-- `localization-native` tests the original, source-pinned Input
-  Localization integration.
+- `changes` identifies the needed Harness, Atlas, Product and CI-policy checks.
+- `quality` always verifies added Python quality, CI routing and release gates.
+- `harness-targeted` exercises governance and Contract tests when relevant.
+- `atlas-targeted` exercises source validation and JavaScript Atlas navigation
+  when relevant.
+- `product-targeted` runs bounded Registry, Runtime and configuration checks
+  with the core/development dependencies when product code changes.
+- `ci-required` is the **only recommended required branch-protection status**;
+  skipped scopes are permitted only if they were not selected. Selected checks
+  must finish successfully.
 
-These five jobs are reported for every PR and are suitable candidates for
-branch protection. The [administrative ruleset issue](https://github.com/OpenSAE/.github/issues/3)
-tracks enabling that enforcement.
+No routine PR/main run installs `.[analysis]`, runs full xdist coverage,
+builds Wheel/sdist and Research Lab Docker, or runs pinned research acceptance.
+The sole routine Python version is 3.11. PR and `main` use the same policy.
+New commits cancel superseded ordinary runs, including rapid `main` pushes.
+Exact per-commit full release evidence is provided separately.
 
-## CI runtime, performance and compatibility
+## Full software release validation
 
-The automatic CI and generic software release verification jobs now use Python
-3.11. Setup-python's pip wheel/download cache is keyed by dependency
-declarations. The same functional checks, source-pinned regression and exact-SHA
-release gates remain required. Superseded pull-request runs may be cancelled;
-all main-branch push CI runs remain independent for release provenance.
+[Release Validation](../../../.github/workflows/release-validation.yml)
+is **manual** and accepts only an explicitly selected current `main` SHA.
+Its source gate runs before any full job, and every job checks out that same
+source revision.
 
-The two-worker `pytest-xdist` execution runs the **same suite** with per-file
-worker affinity. It continues to generate the same branch coverage reports.
-Always compare measured run time and coverage with the earlier serial baseline;
-a faster CI cannot justify dropping a failing or flaky test.
+It preserves the complete Python 3.11 offline suite + coverage, `.[analysis]`
+installation, full package/sdist and real Research Lab CPU Docker checks,
+localization reference tests, Hydra, Atlas/Harness checks and pinned original
+SAR/RSS integration and ground-truth parity. Its final gate requires every
+mandatory job to complete successfully. Distribution artifacts come from
+the exact full-validation run.
 
-`pyproject.toml` still declares support for Python 3.11 and 3.12, while
-Python 3.12 is no longer tested in routine PR CI. If a future release relies on
-3.12 compatibility, verify that interpreter explicitly before publication.
-The Research Lab's existing Python 3.12 Docker **runtime image** remains
-unchanged; the CI Docker smoke continues to exercise that image.
+[Software Release](../../../.github/workflows/software-release.yml) accepts
+only a successful Release Validation run on that exact SHA, checks the five
+historically required job names and downloads its distribution artifacts.
+It requires explicit `PUBLISH-vX.Y.Z` confirmation for actual publication.
+Lightweight `main` CI cannot supply release evidence or automatically publish.
 
-## Pinned research integration regression
+The historical v0.4.0/v0.5.0/v0.6.0/v0.6.5 release dispatchers are now
+manual-only archived notices. They no longer listen for normal CI successes.
+
+## Other scheduled or manual integrations
 
 [Research Integration Regression](../../../.github/workflows/research-regression.yml)
-runs for changes to benchmarks, reliability, integrations and their research
-tests. It can also be started manually. Both jobs use the original SAR and
-RSS estimator implementations at immutable source revisions:
-
-- SAR: `c253dca303437318c1f4f4937557ac9d22143b19`.
-- RSS: `0b321851e7b79564bf72656e1dbcaaca513048d8`.
-
-One job checks the original M3 estimator parity and protocol contracts.
-The other checks M4 synthetic truth, factor interactions and negative
-controls, preserving the native ground truth JSON as an artifact.
-Their results are reproducible against the recorded source revisions.
-
+can run manually or be invoked by Release Validation. Both pinned upstream
+sources remain fixed: SAR `c253dca303437318c1f4f4937557ac9d22143b19`,
+RSS `0b321851e7b79564bf72656e1dbcaaca513048d8`.
 [Upstream Compatibility Watch](../../../.github/workflows/upstream-compatibility.yml)
-checks the *latest* SAR/RSS default branches once per week or on manual
-request, recording the resolved source SHAs. Its findings are **not
-required PR checks**, and a failure indicates a compatibility change
-rather than invalidating the pinned historical regression.
+still checks floating upstream sources weekly; it is not a release proof.
 
-## Manual real checkpoint and scientific acceptance
+Real M0/M1/M2 Pythia, native SAEBench, M3/M4, M5 matrix, Stage B/C and
+Phase A CPU/GPU probes retain their explicit manual entrypoints and evidence
+requirements. Software release CI never asserts new GPU scientific results
+without real independent evidence.
 
-The following suites require model weights, checkpoint downloads,
-permissions or substantial CPU/GPU work. None are automatically triggered
-for a regular PR:
+Atlas source snapshot regeneration and browser-validated Pages deployment
+are also manual. They no longer generate another `main` commit or expensive
+Chromium validation following ordinary source changes.
 
-| Purpose | GitHub workflow |
-| --- | --- |
-| Real M0/M1/M2 Pythia | [Real Pythia Smoke](../../../.github/workflows/real-smoke.yml); choose `m0`, `m1`, `m2` or `all` |
-| Real M3/M4 Pythia | [M3](../../../.github/workflows/m3-real.yml) and [M4](../../../.github/workflows/m4-real.yml) |
-| Native SAEBench parity | [M3 Native SAEBench](../../../.github/workflows/m3-saebench-native.yml) |
-| Frozen four-checkpoint release matrix | [M5 Matrix](../../../.github/workflows/m5-matrix.yml) |
-| Original Phase A | [CPU feasibility](../../../.github/workflows/phase-a-cpu-probes.yml), [SAE-only](../../../.github/workflows/phase-a-sae-probes.yml), [model-SAE runner](../../../.github/workflows/phase-a-real.yml) |
-| Stage B/C CPU acceptance | [Model pairs](../../../.github/workflows/stage-bc-cpu-pairs.yml), [SAE-only](../../../.github/workflows/stage-bc-cpu-sae.yml), [Gemma 9B](../../../.github/workflows/stage-bc-gemma9b-recheck.yml), [source metadata](../../../.github/workflows/stage-bc-source-head.yml) |
+## Measuring the improvement
 
-The old separate `m0-real.yml`, `m1-real.yml` and `m2-real.yml`
-definitions were combined into a single manual matrix with the same
-scripts, frozen fixtures, arguments and evidence artifact names.
-The previous `m3-papers.yml` and `m4-ground-truth.yml`
-jobs were consolidated into the pinned research workflow.
-Previous GitHub Actions run records and the source history of those
-retired workflow files remain intact. Historic scientific evidence was
-not rewritten.
-
-For changes affecting SAE normalization, hooks, checkpoint identity,
-loading or native model behavior, maintainers should run the relevant
-manual acceptance and link the actual passing result to the PR.
-
-## Historical release safety
-
-The [v0.2.0 M5 release gate](../../../.github/workflows/m5-release.yml)
-still checks exact main-branch source SHA, real checkpoint evidence and
-successful same-commit CI. The M5 acceptance itself is now manually
-triggered, so routine code merges no longer start the old publish chain.
-
-The [Stage D evidence publication](../../../.github/workflows/stage-d-evidence-release.yml)
-continues to require successful main CI and refuses to overwrite an
-existing evidence release. Missing original GPU run archives remain
-tracked in [Issue #21](https://github.com/OpenSAE/SAEBase/issues/21).
-
-Future versions now use the [General Software Release Process](release-process.md)
-and its [manually dispatched release workflow](../../../.github/workflows/software-release.yml).
-This requires exact-source successful main CI, a matching version and
-verified distribution assets before creating a new tag. Existing tags,
-including the historical `v0.2.0` release, are never moved or overwritten.
-
-## Future maintenance
-
-- Add offline regressions to the existing core CI instead of creating a
-  separate workflow for every research feature.
-- Pin original source revisions for reproducible PR decisions. Test
-  upstream HEAD separately.
-- Keep real checkpoint jobs opt-in with explicit timeouts and evidence.
-- Do not configure manually or path-filter-triggered workflows as
-  universally required CI checks.
-- Before renaming a standard job or workflow used in `workflow_run`,
-  update its dependent rulesets and release guards.
-- Use `tests/test_ci_lanes.py` to catch accidental regressions in
-  trigger policy or original-source pinning.
+For matched PR/main scopes record GitHub Actions creation time, start time,
+finish time and per-job durations, plus cancelled superseded runs. Report
+wall-clock median/P90 and total runner-minutes, separately from release tests.
+Preserve previous run records; do not describe planned time savings as measured.
+See [CI routing details](../ci/README.md) and
+[Software release process](release-process.md).

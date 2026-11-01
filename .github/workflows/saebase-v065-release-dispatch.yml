@@ -1,61 +1,20 @@
-name: SAEBase v0.6.5 Approved Release Dispatch
+name: SAEBase v0.6.5 Approved Release Dispatch (retired auto-dispatch)
 
+# Historical version-bound automation is deliberately manual and non-publishing.
+# A lightweight push-to-main CI success is NOT release authorization.
+# Use release-validation.yml with an exact source SHA, then software-release.yml.
 on:
-  workflow_run:
-    workflows: ["CI"]
-    types: [completed]
+  workflow_dispatch:
 
 permissions:
-  actions: write
   contents: read
 
-concurrency:
-  group: saebase-v0.6.5-once
-  cancel-in-progress: false
-
 jobs:
-  release:
-    if: >-
-      ${{ github.repository == 'OpenSAE/SAEBase' &&
-          github.event.workflow_run.conclusion == 'success' &&
-          github.event.workflow_run.event == 'push' &&
-          github.event.workflow_run.head_branch == 'main' &&
-          github.event.workflow_run.head_repository.full_name == github.repository }}
+  archived:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      GH_TOKEN: ${{ github.token }}
-      REPO: ${{ github.repository }}
-      SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
-      VERSION: "0.6.5"
-      TAG: "v0.6.5"
     steps:
-      - name: Confirm exact current main and release metadata
-        shell: bash
+      - name: Explain the supported, manual release workflow
         run: |
-          set -euo pipefail
-          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
-          test "$(gh api "repos/$REPO/branches/main" --jq '.commit.sha')" = "$SOURCE_SHA"
-          gh api "repos/$REPO/contents/pyproject.toml?ref=$SOURCE_SHA" --jq '.content' | base64 -d | grep -Fqx 'version = "0.6.5"'
-          gh api "repos/$REPO/contents/saebase/__init__.py?ref=$SOURCE_SHA" --jq '.content' | base64 -d | grep -Fq '__version__ = "0.6.5"'
-          gh api "repos/$REPO/contents/harness/github/development_doc/releases/v0.6.5.md?ref=$SOURCE_SHA" --jq '.sha' | grep -Eq '^[a-f0-9]{40}$'
-          if gh api "repos/$REPO/git/ref/tags/$TAG" >/dev/null 2>&1; then
-            echo "Tag already exists; refusing to republish." >&2
-            exit 1
-          fi
-          if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
-            echo "GitHub Release already exists; refusing to replace." >&2
-            exit 1
-          fi
-          echo "Authorized exact-source v0.6.5 dispatch."
-
-      - name: Request existing source-bound software release workflow
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$(gh api "repos/$REPO/branches/main" --jq '.commit.sha')" = "$SOURCE_SHA"
-          gh workflow run software-release.yml --repo "$REPO" --ref main \
-            -f source_sha="$SOURCE_SHA" \
-            -f version="$VERSION" \
-            -f mode=publish \
-            -f confirmation="PUBLISH-$TAG"
+          echo "This historical automatic release dispatcher is disabled."
+          echo "Run Release Validation for a chosen current-main SHA."
+          echo "After all required jobs pass, use Software Release with explicit confirmation."
