@@ -1,7 +1,7 @@
 name: SAEBase Software Release (manual)
 
-# Only an explicitly chosen source SHA, successful main CI, and an explicit
-# PUBLISH-vX.Y.Z confirmation can create a new software release.
+# Only explicit exact-SHA Full Release Validation and human PUBLISH confirmation
+# can create a software release; lightweight PR/main CI is never release evidence.
 on:
   workflow_dispatch:
     inputs:
@@ -89,15 +89,15 @@ jobs:
               exit 1
             fi
           fi
-      - name: Require successful exact-source main CI and all five check contexts
+      - name: Require successful exact-source full Release Validation and all five check contexts
         shell: bash
         run: |
           set -euo pipefail
           CI_JSON="$(gh api -X GET \
-            "repos/$REPO/actions/workflows/ci.yml/runs?head_sha=$SOURCE_SHA&branch=main&per_page=40")"
+            "repos/$REPO/actions/workflows/release-validation.yml/runs?head_sha=$SOURCE_SHA&branch=main&per_page=40")"
           CI_RUN_ID="$(echo "$CI_JSON" | jq -r --arg sha "$SOURCE_SHA" '
             .workflow_runs[] |
-            select(.event == "push" and .head_sha == $sha and
+            select(.event == "workflow_dispatch" and .head_sha == $sha and
                    .status == "completed" and .conclusion == "success") |
             .id' | head -n 1)"
           test -n "$CI_RUN_ID"
@@ -106,7 +106,7 @@ jobs:
             > "$RUNNER_TEMP/ci-jobs.json"
           python saebase/tools/release_candidate.py verify-ci \
             --ci-jobs "$RUNNER_TEMP/ci-jobs.json" --source-sha "$SOURCE_SHA"
-      - name: Download distributions from the same successful CI run
+      - name: Download distributions from the exact successful Release Validation run
         shell: bash
         run: |
           set -euo pipefail

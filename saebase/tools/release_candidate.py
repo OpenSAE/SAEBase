@@ -225,7 +225,7 @@ def prepare(
         "version": version,
         "source_commit": commit,
         "ci_run_id": ci_run_id,
-        "ci_gate": "five successful main-branch push jobs checked by release workflow"
+        "ci_gate": "five successful full Release Validation jobs checked by release workflow"
         if ci_run_id
         else "not independently checked by this offline command",
         "software_license": "Apache-2.0",

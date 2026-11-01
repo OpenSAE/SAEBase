@@ -1,21 +1,6 @@
 name: SAEBase Atlas snapshots (project isolated)
 
 on:
-  push:
-    branches:
-      - main
-      - fix/atlas-project-isolation-20261027
-    paths:
-      - ".github/workflows/saebase-atlas-snapshot.yml"
-      - "harness/visualization/**"
-      - "harness/code/**"
-      - "harness/core/**"
-      - "harness/environment/**"
-      - "doc/knowledge/**"
-      - "saebase/**"
-      - "datasets/**"
-      - "models/**"
-      - "tasks/**"
   workflow_dispatch:
 
 permissions:
