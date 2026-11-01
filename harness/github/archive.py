@@ -69,7 +69,7 @@ def read_index(root: Path = ROOT) -> dict:
 
 def archive_identity(path: str) -> tuple[str, str, int]:
     relative = safe(path).parts
-    if len(relative) < 7:
+    if len(relative) < 6:
         raise ArchiveError("Invalid version archive depth: " + path)
     # harness/github/<owner>/archive/<version>/<name>[/<file>]
     _, _, owner, archive, version = relative[:5]
@@ -86,7 +86,7 @@ def archive_identity(path: str) -> tuple[str, str, int]:
             raise ArchiveError("Versioned Dev/WP must be direct archive files")
         m = DOC_NAME.fullmatch(relative[5])
         kind = "dev" if owner == "development_doc" else "wp"
-    if not m or m.group("kind") != kind if kind != "wt" else not m:
+    if m is None or (kind != "wt" and m.group("kind") != kind):
         raise ArchiveError("Noncanonical archive filename: " + path)
     if m.group("version") != version:
         raise ArchiveError("Archive filename and folder versions differ")
