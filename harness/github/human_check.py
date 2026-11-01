@@ -19,6 +19,14 @@ from harness.core import agent_flow as atlas
 
 ROOT = atlas.ROOT
 WORKSPACE = ROOT / "experiment" / "_human_check"
+AUTHORITIES = (
+    "harness/core/project_graph.json",
+    "doc/knowledge/context_graph.json",
+    "doc/code/code_tree.json",
+    "doc/knowledge/glossary.json",
+    "doc/knowledge/atlas_terms.json",
+    "harness/environment/example.json",
+)
 SCHEMA = "saebase.human_check.v1"
 VIEWS = ("core", "knowledge", "code", "environment", "context")
 STATES = ("approved", "denied", "unchecked")
@@ -55,6 +63,7 @@ def _intent(plan: dict[str, Any]) -> dict[str, Any]:
     return {
         key: plan[key] for key in (
             "schema", "kind", "id", "goal", "base_sha", "source_identities",
+            "authority_sha256",
             "items", "created_for", "default_enabled",
         )
         if key in plan
@@ -171,6 +180,7 @@ def create(manifest: dict[str, Any], *, base_sha: str | None = None) -> dict[str
         "schema": SCHEMA, "kind": "human_check", "id": plan_id,
         "goal": goal.strip(), "created_for": manifest.get("created_for", "GitHub source change"),
         "base_sha": proposed_base, "source_identities": sources,
+        "authority_sha256": {p: _file_hash(p) for p in AUTHORITIES},
         "default_enabled": True, "mode": "on", "opt_out": None, "revision": 0,
         "items": items,
     }
@@ -279,6 +289,10 @@ def allowed_paths(
         raise atlas.FlowError("Source commit drift; refresh the Human Check")
     if not paths or len(set(paths)) != len(paths):
         raise atlas.FlowError("Nonempty distinct path scope required")
+    if before_edit:
+        for authority, expected in plan["authority_sha256"].items():
+            if _file_hash(authority) != expected:
+                raise atlas.FlowError("Atlas authority drift; refresh proposal: " + authority)
     selected = []
     for path in paths:
         _safe(path)
