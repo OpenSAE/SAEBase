@@ -31,6 +31,7 @@ MANUAL = {
     "saebase-v060-release-dispatch.yml",
     "saebase-v065-release-dispatch.yml",
     "stage-d-evidence-release.yml",
+    "archive-preparation.yml",
 }
 
 
@@ -64,6 +65,14 @@ def test_pr_and_main_use_only_lightweight_ci():
     assert "offline-tests" not in ci["jobs"]
     assert "localization-native" not in ci["jobs"]
     assert ci["concurrency"]["cancel-in-progress"] == "true"
+
+
+def test_manual_archive_workflow_never_pushes_or_publishes():
+    flow = workflow("archive-preparation.yml")
+    assert set(flow["on"]) == {"workflow_dispatch"}
+    assert flow["permissions"]["contents"] == "read"
+    assert "archive prepare" in (WORKFLOWS / "archive-preparation.yml").read_text()
+    assert "actions/upload-artifact" in (WORKFLOWS / "archive-preparation.yml").read_text()
 
 
 def test_lightweight_gate_is_fail_closed_and_scope_aware():

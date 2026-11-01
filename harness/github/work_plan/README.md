@@ -114,3 +114,13 @@ WP13 changes **operational readiness and deployment**, not the untouched WP12 P8
 ## Work Plan declarative execution
 
 The existing [dispatcher](dispatch.py) reads a validated plan's per-step `command` and `needs` DAG and checks script identity. Preview with `python -m harness.github.work_plan.dispatch --plan <path> --run-id <id>`. Actual `--execute` requires approved plan state and explicit human permission flags; remote publication is never implicit. The coordinator records exact process exit codes, elapsed time and local/independent failure scope. It reuses study Task entrypoints, not a new scientific Runner or OS-level security sandbox.
+
+
+
+## 按版本冻结的 Work Plan 历史记录
+
+具体版本、原始 WP ID 和 Git Blob 原始身份以
+[统一 Archive Index](../archive_index.json) 为准，版本归档位于
+[archive/](archive/)。原有 WP 标识、考试成绩和证据不随
+`wpNNN` 归档编号改变；冻结历史不重新适用未来的 Work Plan 写作校验。
+永久规范仍位于本目录中的 [WRITING_STANDARD.md](WRITING_STANDARD.md)。

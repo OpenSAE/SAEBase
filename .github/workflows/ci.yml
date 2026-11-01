@@ -87,6 +87,10 @@ jobs:
         with:
           python-version: "3.11"
       - run: python -m pip install -q pytest PyYAML
+      - name: Validate frozen versioned Harness archives
+        run: |
+          python -m harness.github.archive check
+          python -m pytest -q harness/github/work_test/test_archive_lifecycle.py
       - name: Run bounded Harness and Contract tests
         shell: bash
         run: |

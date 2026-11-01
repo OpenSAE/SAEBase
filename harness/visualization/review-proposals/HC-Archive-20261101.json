@@ -7,7 +7,7 @@
     "base_sha": "82bd727ef885b60f7c4fcea38881987521bc4c40",
     "mode": "on",
     "default_enabled": true,
-    "revision": 0,
+    "revision": 1,
     "viewed": {},
     "items": [
       {
@@ -34,7 +34,13 @@
         "context_term_ids": [
           "term.core_tree"
         ],
-        "proposal_review": null,
+        "proposal_review": {
+          "decision": "approved",
+          "actor": "Human (explicit chat instruction, not Atlas click)",
+          "at": "2026-11-01",
+          "source": "chat_authorization",
+          "approval_ref": "harness/github/archive_approval.json"
+        },
         "key": "core:g.context"
       },
       {
@@ -64,7 +70,13 @@
         "context_term_ids": [
           "term.core_tree"
         ],
-        "proposal_review": null,
+        "proposal_review": {
+          "decision": "approved",
+          "actor": "Human (explicit chat instruction, not Atlas click)",
+          "at": "2026-11-01",
+          "source": "chat_authorization",
+          "approval_ref": "harness/github/archive_approval.json"
+        },
         "key": "core:g.archive_catalog"
       },
       {
@@ -94,7 +106,13 @@
         "context_term_ids": [
           "term.core_tree"
         ],
-        "proposal_review": null,
+        "proposal_review": {
+          "decision": "approved",
+          "actor": "Human (explicit chat instruction, not Atlas click)",
+          "at": "2026-11-01",
+          "source": "chat_authorization",
+          "approval_ref": "harness/github/archive_approval.json"
+        },
         "key": "core:g.archive_index"
       },
       {
@@ -121,7 +139,13 @@
         "context_term_ids": [
           "term.artifact"
         ],
-        "proposal_review": null,
+        "proposal_review": {
+          "decision": "approved",
+          "actor": "Human (explicit chat instruction, not Atlas click)",
+          "at": "2026-11-01",
+          "source": "chat_authorization",
+          "approval_ref": "harness/github/archive_approval.json"
+        },
         "key": "core:q.transparency"
       },
       {
@@ -151,7 +175,13 @@
         "context_term_ids": [
           "term.artifact"
         ],
-        "proposal_review": null,
+        "proposal_review": {
+          "decision": "approved",
+          "actor": "Human (explicit chat instruction, not Atlas click)",
+          "at": "2026-11-01",
+          "source": "chat_authorization",
+          "approval_ref": "harness/github/archive_approval.json"
+        },
         "key": "core:g.archive_dev_guides"
       },
       {
@@ -181,7 +211,13 @@
         "context_term_ids": [
           "term.artifact"
         ],
-        "proposal_review": null,
+        "proposal_review": {
+          "decision": "approved",
+          "actor": "Human (explicit chat instruction, not Atlas click)",
+          "at": "2026-11-01",
+          "source": "chat_authorization",
+          "approval_ref": "harness/github/archive_approval.json"
+        },
         "key": "core:g.archive_dev_history"
       },
       {
@@ -208,7 +244,13 @@
         "context_term_ids": [
           "term.sae.reproducible"
         ],
-        "proposal_review": null,
+        "proposal_review": {
+          "decision": "approved",
+          "actor": "Human (explicit chat instruction, not Atlas click)",
+          "at": "2026-11-01",
+          "source": "chat_authorization",
+          "approval_ref": "harness/github/archive_approval.json"
+        },
         "key": "core:q.reproducibility"
       },
       {
@@ -238,7 +280,13 @@
         "context_term_ids": [
           "term.sae.reproducible"
         ],
-        "proposal_review": null,
+        "proposal_review": {
+          "decision": "approved",
+          "actor": "Human (explicit chat instruction, not Atlas click)",
+          "at": "2026-11-01",
+          "source": "chat_authorization",
+          "approval_ref": "harness/github/archive_approval.json"
+        },
         "key": "core:g.archive_wp_reports"
       },
       {
@@ -268,7 +316,13 @@
         "context_term_ids": [
           "term.sae.reproducible"
         ],
-        "proposal_review": null,
+        "proposal_review": {
+          "decision": "approved",
+          "actor": "Human (explicit chat instruction, not Atlas click)",
+          "at": "2026-11-01",
+          "source": "chat_authorization",
+          "approval_ref": "harness/github/archive_approval.json"
+        },
         "key": "core:g.archive_wp_paths"
       },
       {
@@ -295,7 +349,13 @@
         "context_term_ids": [
           "term.python"
         ],
-        "proposal_review": null,
+        "proposal_review": {
+          "decision": "approved",
+          "actor": "Human (explicit chat instruction, not Atlas click)",
+          "at": "2026-11-01",
+          "source": "chat_authorization",
+          "approval_ref": "harness/github/archive_approval.json"
+        },
         "key": "core:q.agent_flow"
       },
       {
@@ -325,7 +385,13 @@
         "context_term_ids": [
           "term.python"
         ],
-        "proposal_review": null,
+        "proposal_review": {
+          "decision": "approved",
+          "actor": "Human (explicit chat instruction, not Atlas click)",
+          "at": "2026-11-01",
+          "source": "chat_authorization",
+          "approval_ref": "harness/github/archive_approval.json"
+        },
         "key": "core:g.archive_wt_history"
       },
       {
@@ -355,7 +421,13 @@
         "context_term_ids": [
           "term.python"
         ],
-        "proposal_review": null,
+        "proposal_review": {
+          "decision": "approved",
+          "actor": "Human (explicit chat instruction, not Atlas click)",
+          "at": "2026-11-01",
+          "source": "chat_authorization",
+          "approval_ref": "harness/github/archive_approval.json"
+        },
         "key": "core:g.archive_wt_ci"
       },
       {
@@ -382,7 +454,13 @@
         "context_term_ids": [
           "term.code_tree"
         ],
-        "proposal_review": null,
+        "proposal_review": {
+          "decision": "approved",
+          "actor": "Human (explicit chat instruction, not Atlas click)",
+          "at": "2026-11-01",
+          "source": "chat_authorization",
+          "approval_ref": "harness/github/archive_approval.json"
+        },
         "key": "core:g.code_tree"
       },
       {
@@ -415,7 +493,13 @@
           "term.python",
           "term.code_tree"
         ],
-        "proposal_review": null,
+        "proposal_review": {
+          "decision": "approved",
+          "actor": "Human (explicit chat instruction, not Atlas click)",
+          "at": "2026-11-01",
+          "source": "chat_authorization",
+          "approval_ref": "harness/github/archive_approval.json"
+        },
         "key": "code:code:module:harness.github.archive"
       },
       {
@@ -445,7 +529,13 @@
         "context_term_ids": [
           "term.code_tree"
         ],
-        "proposal_review": null,
+        "proposal_review": {
+          "decision": "approved",
+          "actor": "Human (explicit chat instruction, not Atlas click)",
+          "at": "2026-11-01",
+          "source": "chat_authorization",
+          "approval_ref": "harness/github/archive_approval.json"
+        },
         "key": "core:g.archive_tool_test"
       },
       {
@@ -472,7 +562,13 @@
         "context_term_ids": [
           "term.artifact"
         ],
-        "proposal_review": null,
+        "proposal_review": {
+          "decision": "approved",
+          "actor": "Human (explicit chat instruction, not Atlas click)",
+          "at": "2026-11-01",
+          "source": "chat_authorization",
+          "approval_ref": "harness/github/archive_approval.json"
+        },
         "key": "core:g.agent_execution_flow"
       },
       {
@@ -502,7 +598,13 @@
         "context_term_ids": [
           "term.artifact"
         ],
-        "proposal_review": null,
+        "proposal_review": {
+          "decision": "approved",
+          "actor": "Human (explicit chat instruction, not Atlas click)",
+          "at": "2026-11-01",
+          "source": "chat_authorization",
+          "approval_ref": "harness/github/archive_approval.json"
+        },
         "key": "core:g.archive_release_gate"
       },
       {
@@ -532,7 +634,13 @@
         "context_term_ids": [
           "term.artifact"
         ],
-        "proposal_review": null,
+        "proposal_review": {
+          "decision": "approved",
+          "actor": "Human (explicit chat instruction, not Atlas click)",
+          "at": "2026-11-01",
+          "source": "chat_authorization",
+          "approval_ref": "harness/github/archive_approval.json"
+        },
         "key": "core:g.archive_release_doc"
       }
     ],
@@ -592,8 +700,22 @@
         ]
       }
     ],
-    "preview_sha256": "review-archive-20261101-v1",
-    "created_for": "Atlas grouped archival review; proposal-only; no source changes authorized"
+    "preview_sha256": "archive-20261101-chat-approved-v2",
+    "created_for": "Atlas grouped archival review; proposal-only; no source changes authorized",
+    "review_receipt": {
+      "source": "chat",
+      "group_count": 6,
+      "approved_group_ids": [
+        "HC01",
+        "HC02",
+        "HC03",
+        "HC04",
+        "HC05",
+        "HC06"
+      ],
+      "local_authenticated": false,
+      "policy": "No simulated Atlas visits. All six groups explicitly approved by user in this conversation."
+    }
   },
   "context": {
     "nodes": [],

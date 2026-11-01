@@ -60,3 +60,14 @@ git rev-parse HEAD
 每个实际研究阶段明确 Setup 的样本、环境、网络和 GPU 授权；先测量真实执行速度，再按用户在 WP 确定的预算与阈值选择执行路径。代表性 Pilot 只是已执行组合的证据，不能替代全部模型和来源。计划外失败经通用 Audit 归因并分 local/global/human-decision，科研指标本身仍由所属 Task 的真实实现检查。失败记录与已完成结果不可覆盖。
 
 [DELIVERABLE_STANDARD.md](DELIVERABLE_STANDARD.md) 是每份 WP 的交付规范。主要结果是一份**完整填写的原始 Work Plan 副本**和预先设计的表格，附真实运行、资源、时间、日志、文件哈希、证据和备注；自由形式分析是次要附件。冻结原始文件只读，已填写文档存 `experiment/` 的单次运行目录。B2 是推荐持久化目的地，必须有授权范围、实际校验及脱敏记录；人类服务器上已有凭据由配置读取，不写入仓库。规范检查、执行授权、科学验收和公开发布依然是不同动作。
+
+
+
+## 8. 版本命名与历史归档的长期约束
+
+新版本的具体 Work Plan 使用 `<semver>_wpNNN_<word>_<word>.md`
+（两个简短英文单词、每个版本独立三位序号）；`WP22` 等原计划 ID
+仍保存在计划内容和独立 Index 中，不以归档顺序改变身份。
+Release Preparation 前按 [ARCHIVE_STANDARD.md](../ARCHIVE_STANDARD.md)
+生成 Human Check 关联审阅方案；仅对审核通过的独立范围进行迁移。
+过去已冻结的 WP/考试记录永久豁免未来新增的格式和内容校验。

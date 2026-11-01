@@ -1,0 +1,37 @@
+{
+  "schema": "saebase.human_check.chat_authorization.v1",
+  "proposal_id": "HC-Archive-20261101",
+  "proposal_baseline_sha": "82bd727ef885b60f7c4fcea38881987521bc4c40",
+  "archive_implementation_baseline_sha": "9270bd71a81e80f2809e72b0f0644f83906c7954",
+  "authorization_source": "explicit user instruction in this conversation (2026-11-01)",
+  "authorization_kind": "human_chat_approval_not_local_atlas_clicks",
+  "scope": "six archive lifecycle change groups; implementation limited to archived records and safe compatible paths, without scientifc algorithm changes or release",
+  "decisions": [
+    {
+      "group_id": "HC01",
+      "decision": "approved"
+    },
+    {
+      "group_id": "HC02",
+      "decision": "approved"
+    },
+    {
+      "group_id": "HC03",
+      "decision": "approved"
+    },
+    {
+      "group_id": "HC04",
+      "decision": "approved"
+    },
+    {
+      "group_id": "HC05",
+      "decision": "approved"
+    },
+    {
+      "group_id": "HC06",
+      "decision": "approved"
+    }
+  ],
+  "atlas_authenticated_ledger": false,
+  "source_note": "This is an auditable chat authorization receipt and MUST NOT be presented as an authenticated Atlas review receipt. Human Check remains default-on for all future tasks."
+}

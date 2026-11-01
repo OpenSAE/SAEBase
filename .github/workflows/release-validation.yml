@@ -36,6 +36,18 @@ jobs:
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
           test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$SOURCE_SHA"
           echo "Release Validation for exact source $SOURCE_SHA"
+      - name: Require prepared versioned Harness archive on this source SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="$(python - <<'PY'
+          import tomllib
+          from pathlib import Path
+          print(tomllib.loads(Path("pyproject.toml").read_text())["project"]["version"])
+          PY
+          )"
+          python -m harness.github.archive check --release-version "$VERSION"
+
 
   hydra-composition:
     needs: source-verify

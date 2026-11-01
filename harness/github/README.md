@@ -29,3 +29,16 @@ PR 必须列出新增与移动文件、原有可复用接口、依赖方向、�
 ## Work Plan 规范
 
 所有新工程计划遵循 [Work Plan 编写标准](work_plan/WRITING_STANDARD.md)，包含先验依赖冲突检查、具体文件所有权、可执行命令以及分阶段验收。
+
+
+## 按版本归档与 Human Check
+
+永久文件命名及历史迁移规则见 [ARCHIVE_STANDARD.md](ARCHIVE_STANDARD.md)，
+具体冻结路径、版本和 Git Blob 身份见 [archive_index.json](archive_index.json)。
+Development Doc、Work Plan、Work Test 的历史记录按各自所有权保存在
+`archive/<version>/`；持续有效的管理规则和当前 CI 测试保持稳定入口。
+
+下一版本准备阶段，先运行 [Archive Preparation](../../.github/workflows/archive-preparation.yml)
+产生只读候选，再在 Atlas Human Check 的关联节点中逐项审阅。只有
+获批范围才可迁移；归档后经过 [Release Validation](../../.github/workflows/release-validation.yml)
+的 SHA 固定验收。
