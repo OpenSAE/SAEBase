@@ -42,3 +42,10 @@ python harness/visualization/build_pages.py --check
 ```
 
 These checks cannot replace a real browser interaction test or scientific experiment. Node status belongs to that node and does not automatically propagate from children to parents.
+
+## Human Check: independent pre-implementation proposals
+
+Human Check is a separate **proposal-only** review mode using the existing Atlas. It defaults to on before GitHub edits and pull requests. Unlike the older blank-Knowledge-node adoption flow, it writes **no** Core, Knowledge, Code, Context or Environment authority while reviewing. Both the written report and five-tree overlay come from the same Context-grounded manifest.
+
+Each node is approved, denied or unchecked independently; there is no whole-plan Approve Plan. Denying one node does not prevent unrelated approved work. A source file shared by approved and unapproved proposals must be separated or re-reviewed before modifying that file. Approval of a proposal does not prove implementation, execution, science or publication. The authenticated local Atlas stores decisions and explicit human opt-out in the ignored `experiment/_human_check/<id>/` ledger; public static review remains a browser-only draft. Source or scope drift invalidates the corresponding permission. See [Human Check guide](../github/HUMAN_CHECK.md). Existing Agent Flow retains its own later scientific approval stages.
+
