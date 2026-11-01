@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "code",
   "project": "SAEBase",
-  "source_sha256": "c0fcad5f6f2fe6e5358d99e972fb8d1eb1ee622a5f8cff8f7cf7b205d663c3f6",
+  "source_sha256": "138e6880f7d109178e06a5912113b789170ee29f17c66f287508b782b6d13e21",
   "scope": [
     "saebase",
     "datasets",
@@ -20364,6 +20364,72 @@
       ]
     },
     {
+      "id": "code:function:saebase.runtime.audit:audit_artifacts",
+      "kind": "function",
+      "title": "audit_artifacts",
+      "path": "saebase/runtime/audit.py",
+      "line": 28,
+      "status": "implemented",
+      "signature": "def audit_artifacts(root: Path, manifest: dict[str, Any]) -> dict[str, Any]",
+      "description": "Check an immutable manifest with hard/optional failures kept separate.",
+      "description_source": "docstring",
+      "context_ids": [
+        "g.sae.reliability"
+      ],
+      "core_ids": [
+        "g.artifact_schema"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/runtime/audit.py:28"
+      ]
+    },
+    {
+      "id": "code:function:saebase.runtime.audit:file_sha256",
+      "kind": "function",
+      "title": "file_sha256",
+      "path": "saebase/runtime/audit.py",
+      "line": 19,
+      "status": "implemented",
+      "signature": "def file_sha256(path: Path) -> str",
+      "description": "Hash actual file bytes without loading an entire checkpoint in memory.",
+      "description_source": "docstring",
+      "context_ids": [
+        "g.sae.reliability"
+      ],
+      "core_ids": [
+        "g.artifact_schema"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/runtime/audit.py:19"
+      ]
+    },
+    {
+      "id": "code:function:saebase.runtime.audit:main",
+      "kind": "function",
+      "title": "main",
+      "path": "saebase/runtime/audit.py",
+      "line": 93,
+      "status": "implemented",
+      "signature": "def main() -> int",
+      "description": "校验真实运行文件的数量、大小、SHA256 和允许的局部失败阈值；指标语义由 Task 审核。",
+      "description_source": "reviewed_context",
+      "context_ids": [
+        "g.sae.reliability"
+      ],
+      "core_ids": [
+        "g.artifact_schema"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/runtime/audit.py:93"
+      ]
+    },
+    {
       "id": "code:function:saebase.runtime.cfg.config_validate:validate_hydra_cfg",
       "kind": "function",
       "title": "validate_hydra_cfg",
@@ -20670,6 +20736,94 @@
       ]
     },
     {
+      "id": "code:function:saebase.runtime.hardware:_available_host_ram_bytes",
+      "kind": "function",
+      "title": "_available_host_ram_bytes",
+      "path": "saebase/runtime/hardware.py",
+      "line": 19,
+      "status": "implemented",
+      "signature": "def _available_host_ram_bytes() -> int | None",
+      "description": "从当前主机观测 CUDA、CPU、存储和真实设备信息并标记不可观测项。",
+      "description_source": "reviewed_context",
+      "context_ids": [
+        "q.sae.methods"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/runtime/hardware.py:19"
+      ]
+    },
+    {
+      "id": "code:function:saebase.runtime.hardware:detect",
+      "kind": "function",
+      "title": "detect",
+      "path": "saebase/runtime/hardware.py",
+      "line": 29,
+      "status": "implemented",
+      "signature": "def detect(*, probe_gpu: bool=False, cache_path: Path | None=None) -> dict[str, Any]",
+      "description": "从当前主机观测 CUDA、CPU、存储和真实设备信息并标记不可观测项。",
+      "description_source": "reviewed_context",
+      "context_ids": [
+        "q.sae.methods"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/runtime/hardware.py:29"
+      ]
+    },
+    {
+      "id": "code:function:saebase.runtime.hardware:main",
+      "kind": "function",
+      "title": "main",
+      "path": "saebase/runtime/hardware.py",
+      "line": 74,
+      "status": "implemented",
+      "signature": "def main(argv: list[str] | None=None) -> int",
+      "description": "从当前主机观测 CUDA、CPU、存储和真实设备信息并标记不可观测项。",
+      "description_source": "reviewed_context",
+      "context_ids": [
+        "q.sae.methods"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/runtime/hardware.py:74"
+      ]
+    },
+    {
+      "id": "code:function:saebase.runtime.resource_planner:select_cuda_device",
+      "kind": "function",
+      "title": "select_cuda_device",
+      "path": "saebase/runtime/resource_planner.py",
+      "line": 13,
+      "status": "implemented",
+      "signature": "def select_cuda_device(hardware: dict[str, Any], *, minimum_free_bytes: int=1 << 30) -> dict[str, Any]",
+      "description": "依据实测可用资源决定是否能够安全启动指定真实模型任务。",
+      "description_source": "reviewed_context",
+      "context_ids": [
+        "q.sae.methods"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/runtime/resource_planner.py:13"
+      ]
+    },
+    {
       "id": "code:function:saebase.runtime.runtime_check:_available",
       "kind": "function",
       "title": "_available",
@@ -20879,6 +21033,50 @@
       "needs_review": false,
       "evidence": [
         "saebase/runtime/summary_log.py:132"
+      ]
+    },
+    {
+      "id": "code:function:saebase.runtime.supervisor:_utc",
+      "kind": "function",
+      "title": "_utc",
+      "path": "saebase/runtime/supervisor.py",
+      "line": 18,
+      "status": "implemented",
+      "signature": "def _utc() -> str",
+      "description": "在隔离子进程中执行冻结工作并保留有界重试及失败收据。",
+      "description_source": "reviewed_context",
+      "context_ids": [
+        "q.sae.methods"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/runtime/supervisor.py:18"
+      ]
+    },
+    {
+      "id": "code:function:saebase.runtime.supervisor:run_worker",
+      "kind": "function",
+      "title": "run_worker",
+      "path": "saebase/runtime/supervisor.py",
+      "line": 22,
+      "status": "implemented",
+      "signature": "def run_worker(*, argv: list[str], receipt_file: Path, log_dir: Path, retry_limit: int=1, timeout_seconds: int=172800) -> dict[str, Any]",
+      "description": "在隔离子进程中执行冻结工作并保留有界重试及失败收据。",
+      "description_source": "reviewed_context",
+      "context_ids": [
+        "q.sae.methods"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/runtime/supervisor.py:22"
       ]
     },
     {
@@ -22621,6 +22819,134 @@
       "needs_review": true,
       "evidence": [
         "saebase/seed.py:10"
+      ]
+    },
+    {
+      "id": "code:function:saebase.setup.__main__:main",
+      "kind": "function",
+      "title": "main",
+      "path": "saebase/setup/__main__.py",
+      "line": 15,
+      "status": "implemented",
+      "signature": "def main() -> int",
+      "description": "暂无经过验证的功能说明，请结合源代码审核。",
+      "description_source": "needs_review",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": true,
+      "evidence": [
+        "saebase/setup/__main__.py:15"
+      ]
+    },
+    {
+      "id": "code:function:saebase.setup.smoke:main",
+      "kind": "function",
+      "title": "main",
+      "path": "saebase/setup/smoke.py",
+      "line": 40,
+      "status": "implemented",
+      "signature": "def main() -> int",
+      "description": "通过现有 SAE API 运行显式授权的单个位点真实模型与稀疏特征检查。",
+      "description_source": "reviewed_context",
+      "context_ids": [
+        "g.sae.activation_capture"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/setup/smoke.py:40"
+      ]
+    },
+    {
+      "id": "code:function:saebase.setup.smoke:smoke",
+      "kind": "function",
+      "title": "smoke",
+      "path": "saebase/setup/smoke.py",
+      "line": 15,
+      "status": "implemented",
+      "signature": "def smoke(model_key: str, sae_key: str, layer: int, prompt: str) -> dict[str, Any]",
+      "description": "Load exact registered assets and exercise the public capture interface.",
+      "description_source": "docstring",
+      "context_ids": [
+        "g.sae.activation_capture"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/setup/smoke.py:15"
+      ]
+    },
+    {
+      "id": "code:function:saebase.setup.workflow:estimate_runtime",
+      "kind": "function",
+      "title": "estimate_runtime",
+      "path": "saebase/setup/workflow.py",
+      "line": 52,
+      "status": "implemented",
+      "signature": "def estimate_runtime(pilot_rows: list[dict[str, Any]], total_samples: int) -> dict[str, Any]",
+      "description": "Extrapolate observed throughput, never invent timings when no pilot ran.",
+      "description_source": "docstring",
+      "context_ids": [
+        "q.sae.methods"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/setup/workflow.py:52"
+      ]
+    },
+    {
+      "id": "code:function:saebase.setup.workflow:representative_sites",
+      "kind": "function",
+      "title": "representative_sites",
+      "path": "saebase/setup/workflow.py",
+      "line": 14,
+      "status": "implemented",
+      "signature": "def representative_sites(sites: list[dict[str, Any]], limit: int) -> dict[str, Any]",
+      "description": "Select one existing site per model first; report any uncovered model.",
+      "description_source": "docstring",
+      "context_ids": [
+        "q.sae.methods"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/setup/workflow.py:14"
+      ]
+    },
+    {
+      "id": "code:function:saebase.setup.workflow:setup_report",
+      "kind": "function",
+      "title": "setup_report",
+      "path": "saebase/setup/workflow.py",
+      "line": 84,
+      "status": "implemented",
+      "signature": "def setup_report(*, dataset_ids: list[str], sites: list[dict[str, Any]], representative_limit: int, require_cuda: bool, cache_path: Path, real_gpu_probe: bool=False, pilot_rows: list[dict[str, Any]] | None=None, total_samples: int=0) -> dict[str, Any]",
+      "description": "Read actual hardware with the existing Runtime; never download assets.",
+      "description_source": "docstring",
+      "context_ids": [
+        "q.sae.methods"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/setup/workflow.py:84"
       ]
     },
     {
@@ -47396,6 +47722,28 @@
       ]
     },
     {
+      "id": "code:module:saebase.runtime.audit",
+      "kind": "module",
+      "title": "saebase/runtime/audit.py",
+      "path": "saebase/runtime/audit.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "Generic immutable run-artifact integrity audit. The owning Dataset/Model/Task evaluator still verifies scientific semantics; this module verifies declared file identities, completeness and block scope.",
+      "description_source": "docstring",
+      "context_ids": [
+        "g.sae.reliability"
+      ],
+      "core_ids": [
+        "g.artifact_schema"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/runtime/audit.py:1"
+      ]
+    },
+    {
       "id": "code:module:saebase.runtime.cfg.__init__",
       "kind": "module",
       "title": "saebase/runtime/cfg/__init__.py",
@@ -47468,6 +47816,50 @@
       ]
     },
     {
+      "id": "code:module:saebase.runtime.hardware",
+      "kind": "module",
+      "title": "saebase/runtime/hardware.py",
+      "path": "saebase/runtime/hardware.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "Environment capability inventory for any SAEBase GPU experiment. This is detection and provenance, not an authority to change scientific configuration. Unknown quantities remain null; an unavailable GPU is not a simulated CPU pass for GPU tasks.",
+      "description_source": "docstring",
+      "context_ids": [
+        "q.sae.methods"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/runtime/hardware.py:1"
+      ]
+    },
+    {
+      "id": "code:module:saebase.runtime.resource_planner",
+      "kind": "module",
+      "title": "saebase/runtime/resource_planner.py",
+      "path": "saebase/runtime/resource_planner.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "Hardware-capability resource selection for registered model tasks. This selects an actual compatible CUDA device, not a substitute model, precision or task. It does not predict model+SAE peak memory without a real Pilot. When safe execution cannot be established, the worker remains blocked.",
+      "description_source": "docstring",
+      "context_ids": [
+        "q.sae.methods"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/runtime/resource_planner.py:1"
+      ]
+    },
+    {
       "id": "code:module:saebase.runtime.runtime_check",
       "kind": "module",
       "title": "saebase/runtime/runtime_check.py",
@@ -47503,6 +47895,28 @@
       "needs_review": false,
       "evidence": [
         "saebase/runtime/summary_log.py:1"
+      ]
+    },
+    {
+      "id": "code:module:saebase.runtime.supervisor",
+      "kind": "module",
+      "title": "saebase/runtime/supervisor.py",
+      "path": "saebase/runtime/supervisor.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "Isolated, bounded execution of registered experiments on heterogeneous machines. A failed CUDA worker is allowed one fresh-process retry at identical scientific settings. This avoids carrying a potentially corrupted CUDA allocator into the next attempt. Unsupported precision changes or alternative models are never chosen as OOM workarounds.",
+      "description_source": "docstring",
+      "context_ids": [
+        "q.sae.methods"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/runtime/supervisor.py:1"
       ]
     },
     {
@@ -47975,6 +48389,86 @@
       "needs_review": false,
       "evidence": [
         "saebase/seed.py:1"
+      ]
+    },
+    {
+      "id": "code:module:saebase.setup.__init__",
+      "kind": "module",
+      "title": "saebase/setup/__init__.py",
+      "path": "saebase/setup/__init__.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "Shared, study-agnostic setup orchestration. Specific experiments choose datasets, models, SAE sites and budgets through their own existing conf/experiment configurations. This package orchestrates the existing SAEBase Runtime and never changes scientific parameters.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/setup/__init__.py:1"
+      ]
+    },
+    {
+      "id": "code:module:saebase.setup.__main__",
+      "kind": "module",
+      "title": "saebase/setup/__main__.py",
+      "path": "saebase/setup/__main__.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "Prepare a generic study from its existing selected Dataset and SAE configs. Static setup is not a scientific pilot. Real smoke is opt-in separately.",
+      "description_source": "docstring",
+      "context_ids": [],
+      "core_ids": [],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/setup/__main__.py:1"
+      ]
+    },
+    {
+      "id": "code:module:saebase.setup.smoke",
+      "kind": "module",
+      "title": "saebase/setup/smoke.py",
+      "path": "saebase/setup/smoke.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "An opt-in real model/SAE smoke; only a real GPU run can produce a PASS. Use one fresh worker per selected Model/SAE site. No source modifications, checkpoint substitutions or simulated numerical outcomes are permitted.",
+      "description_source": "docstring",
+      "context_ids": [
+        "g.sae.activation_capture"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/setup/smoke.py:1"
+      ]
+    },
+    {
+      "id": "code:module:saebase.setup.workflow",
+      "kind": "module",
+      "title": "saebase/setup/workflow.py",
+      "path": "saebase/setup/workflow.py",
+      "line": 1,
+      "status": "implemented",
+      "signature": "",
+      "description": "Environment inventory, representative selection and measured time estimates. Setup does not claim a real model pass until an approved smoke has actually loaded that model. All speed estimates come from timed, observed pilot rows.",
+      "description_source": "docstring",
+      "context_ids": [
+        "q.sae.methods"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "bases": [],
+      "needs_review": false,
+      "evidence": [
+        "saebase/setup/workflow.py:1"
       ]
     },
     {
@@ -56099,6 +56593,16 @@
       "type": "calls"
     },
     {
+      "source": "code:function:saebase.runtime.audit:audit_artifacts",
+      "target": "code:function:saebase.runtime.audit:file_sha256",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:saebase.runtime.audit:main",
+      "target": "code:function:saebase.runtime.audit:audit_artifacts",
+      "type": "calls"
+    },
+    {
       "source": "code:function:saebase.runtime.experiment_paths:check_run_location",
       "target": "code:function:saebase.runtime.experiment_paths:run_leaf",
       "type": "calls"
@@ -56179,6 +56683,16 @@
       "type": "calls"
     },
     {
+      "source": "code:function:saebase.runtime.hardware:detect",
+      "target": "code:function:saebase.runtime.hardware:_available_host_ram_bytes",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:saebase.runtime.hardware:main",
+      "target": "code:function:saebase.runtime.hardware:detect",
+      "type": "calls"
+    },
+    {
       "source": "code:function:saebase.runtime.runtime_check:missing_packages",
       "target": "code:function:saebase.runtime.runtime_check:_available",
       "type": "calls"
@@ -56216,6 +56730,11 @@
     {
       "source": "code:function:saebase.runtime.summary_log:format_split_metrics_table",
       "target": "code:function:saebase.runtime.summary_log:_normalize_metric_keys_per_split",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:saebase.runtime.supervisor:run_worker",
+      "target": "code:function:saebase.runtime.supervisor:_utc",
       "type": "calls"
     },
     {
@@ -56481,6 +57000,21 @@
     {
       "source": "code:function:saebase.sae.stage_d:write_stage_d_targets",
       "target": "code:function:saebase.sae.stage_d:build_site_records",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:saebase.setup.smoke:main",
+      "target": "code:function:saebase.setup.smoke:smoke",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:saebase.setup.workflow:setup_report",
+      "target": "code:function:saebase.setup.workflow:estimate_runtime",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:saebase.setup.workflow:setup_report",
+      "target": "code:function:saebase.setup.workflow:representative_sites",
       "type": "calls"
     },
     {
@@ -60485,6 +61019,11 @@
     },
     {
       "source": "code:group:saebase",
+      "target": "code:module:saebase.runtime.audit",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
       "target": "code:module:saebase.runtime.cfg.__init__",
       "type": "contains"
     },
@@ -60505,12 +61044,27 @@
     },
     {
       "source": "code:group:saebase",
+      "target": "code:module:saebase.runtime.hardware",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
+      "target": "code:module:saebase.runtime.resource_planner",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
       "target": "code:module:saebase.runtime.runtime_check",
       "type": "contains"
     },
     {
       "source": "code:group:saebase",
       "target": "code:module:saebase.runtime.summary_log",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
+      "target": "code:module:saebase.runtime.supervisor",
       "type": "contains"
     },
     {
@@ -60641,6 +61195,26 @@
     {
       "source": "code:group:saebase",
       "target": "code:module:saebase.seed",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
+      "target": "code:module:saebase.setup.__init__",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
+      "target": "code:module:saebase.setup.__main__",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
+      "target": "code:module:saebase.setup.smoke",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:saebase",
+      "target": "code:module:saebase.setup.workflow",
       "type": "contains"
     },
     {
@@ -67709,6 +68283,21 @@
       "type": "imports"
     },
     {
+      "source": "code:module:saebase.runtime.audit",
+      "target": "code:function:saebase.runtime.audit:audit_artifacts",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.runtime.audit",
+      "target": "code:function:saebase.runtime.audit:file_sha256",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.runtime.audit",
+      "target": "code:function:saebase.runtime.audit:main",
+      "type": "contains"
+    },
+    {
       "source": "code:module:saebase.runtime.cfg.config_validate",
       "target": "code:function:saebase.runtime.cfg.config_validate:validate_hydra_cfg",
       "type": "contains"
@@ -67799,6 +68388,26 @@
       "type": "contains"
     },
     {
+      "source": "code:module:saebase.runtime.hardware",
+      "target": "code:function:saebase.runtime.hardware:_available_host_ram_bytes",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.runtime.hardware",
+      "target": "code:function:saebase.runtime.hardware:detect",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.runtime.hardware",
+      "target": "code:function:saebase.runtime.hardware:main",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.runtime.resource_planner",
+      "target": "code:function:saebase.runtime.resource_planner:select_cuda_device",
+      "type": "contains"
+    },
+    {
       "source": "code:module:saebase.runtime.runtime_check",
       "target": "code:function:saebase.runtime.runtime_check:_available",
       "type": "contains"
@@ -67851,6 +68460,16 @@
     {
       "source": "code:module:saebase.runtime.summary_log",
       "target": "code:function:saebase.runtime.summary_log:write_summary_log",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.runtime.supervisor",
+      "target": "code:function:saebase.runtime.supervisor:_utc",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.runtime.supervisor",
+      "target": "code:function:saebase.runtime.supervisor:run_worker",
       "type": "contains"
     },
     {
@@ -68727,6 +69346,41 @@
       "source": "code:module:saebase.seed",
       "target": "code:function:saebase.seed:apply_seed",
       "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.setup.__main__",
+      "target": "code:function:saebase.setup.__main__:main",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.setup.smoke",
+      "target": "code:function:saebase.setup.smoke:main",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.setup.smoke",
+      "target": "code:function:saebase.setup.smoke:smoke",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.setup.workflow",
+      "target": "code:function:saebase.setup.workflow:estimate_runtime",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.setup.workflow",
+      "target": "code:function:saebase.setup.workflow:representative_sites",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.setup.workflow",
+      "target": "code:function:saebase.setup.workflow:setup_report",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:saebase.setup.workflow",
+      "target": "code:module:saebase.runtime.hardware",
+      "type": "imports"
     },
     {
       "source": "code:module:saebase.store.collect",
