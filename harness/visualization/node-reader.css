@@ -3,7 +3,7 @@
 .atlas-reader-shell{
  position:absolute;inset:10px 18px 47px;z-index:4;
  display:flex;align-items:stretch;justify-content:center;
- pointer-events:auto;
+ pointer-events:none;
 }
 .atlas-reader-shell.is-review{bottom:121px}
 .atlas-reader-panel{
@@ -11,7 +11,7 @@
  display:flex;flex-direction:column;overflow:hidden;
  border:1px solid #565b63;border-radius:15px;
  box-shadow:0 24px 72px #000b;
- background:#101315;color:#eef1f3;
+ background:#101315;color:#eef1f3;pointer-events:auto;
 }
 .atlas-reader-head{
  min-height:70px;flex:none;display:flex;align-items:center;justify-content:space-between;
@@ -33,52 +33,52 @@
  overflow:hidden}
 .atlas-reader-card{
  flex:1;min-width:0;display:flex;flex-direction:column;min-height:0;
- border-radius:10px;border:1px solid #c8cdd2;background:#fdfefd;color:#253038;
+ border-radius:10px;border:1px solid #383d43;background:#17191c;color:#edf0f2;
  overflow:hidden;
 }
-.atlas-reader-pages.is-compare .atlas-reader-card.is-before{border-color:#a7afb9}
-.atlas-reader-pages.is-compare .atlas-reader-card.is-after{border-color:#7db39c}
-.atlas-reader-card.is-removing{border:1px dashed #cb8693;background:#fcf7f8}
+.atlas-reader-pages.is-compare .atlas-reader-card.is-before{border-color:#515860}
+.atlas-reader-pages.is-compare .atlas-reader-card.is-after{border-color:#565e65}
+.atlas-reader-card.is-removing{border:1px dashed #b65d64;background:#241b1e}
 .atlas-reader-card.is-removing .atlas-reader-card-title{text-decoration:line-through;
- text-decoration-thickness:1.5px;text-decoration-color:#9d4b59}
-.atlas-reader-card-head{flex:none;padding:18px 21px 13px;border-bottom:1px solid #e6e9ed}
-.atlas-reader-card.is-before .atlas-reader-card-head{background:#f2f4f7}
-.atlas-reader-card.is-after .atlas-reader-card-head{background:#f0f7f4}
-.atlas-reader-card.is-removing .atlas-reader-card-head{background:#f9e9ec}
-.atlas-reader-card-side{font-size:11px;font-weight:750;letter-spacing:.45px;color:#5d6873}
+ text-decoration-thickness:1.5px;text-decoration-color:#ea7078}
+.atlas-reader-card-head{flex:none;padding:18px 21px 13px;border-bottom:1px solid #383d42}
+.atlas-reader-card.is-before .atlas-reader-card-head{background:#202428}
+.atlas-reader-card.is-after .atlas-reader-card-head{background:#202428}
+.atlas-reader-card.is-removing .atlas-reader-card-head{background:#291f22}
+.atlas-reader-card-side{font-size:11px;font-weight:750;letter-spacing:.45px;color:#aeb5bb}
 .atlas-reader-card-title{font-size:19px;line-height:1.4;margin:6px 0 0;font-weight:720}
 .atlas-reader-scroll{
  flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;
  padding:16px 23px 30px;overscroll-behavior:contain;
- scrollbar-color:#b7c7c4 transparent;scrollbar-width:thin;
+ scrollbar-color:#535a62 transparent;scrollbar-width:thin;
 }
 .atlas-reader-section{margin:0 0 24px;padding:0 0 8px}
-.atlas-reader-section-title{margin:0 0 12px;font-size:13px;letter-spacing:.1px;color:#2d5c4a}
+.atlas-reader-section-title{margin:0 0 12px;font-size:13px;letter-spacing:.1px;color:#e0e3e6}
 .atlas-reader-field{margin:0 0 14px;overflow-wrap:anywhere}
 .atlas-reader-field-label{font-size:10.5px;text-transform:uppercase;
- letter-spacing:.45px;font-weight:700;color:#64717b;margin-bottom:4px}
-.atlas-reader-field-value{font-size:13px;white-space:pre-wrap;line-height:1.85;color:#313a42}
-.atlas-reader-field.is-changed{border-left:3px solid #63ad88;
- background:#f0f8f3;padding:7px 11px;border-radius:0 5px 5px 0}
-.atlas-reader-subheading{margin:13px 0 7px;font-size:11px;font-weight:740;color:#4b5965}
+ letter-spacing:.45px;font-weight:700;color:#a3abb2;margin-bottom:4px}
+.atlas-reader-field-value{font-size:13px;white-space:pre-wrap;line-height:1.85;color:#dfe3e6}
+.atlas-reader-field.is-changed{border-left:3px solid #e7737c;
+ background:#3c2429;padding:7px 11px;border-radius:0 5px 5px 0}
+.atlas-reader-subheading{margin:13px 0 7px;font-size:11px;font-weight:740;color:#c2c9cf}
 .atlas-reader-attributes{overflow:visible;height:auto;width:100%;
  background:transparent;border:0;padding:0}
 .atlas-reader-attributes .node-attribute-section{padding:12px 0}
 .atlas-reader-attributes .node-attribute-code{max-height:none}
-.atlas-reader-attributes.is-changed{border-left:3px solid #63ad88;padding-left:11px}
+.atlas-reader-attributes.is-changed{border-left:3px solid #e7737c;padding-left:11px}
 .atlas-reader-link{
  display:flex;align-items:center;gap:10px;width:100%;text-align:left;
- padding:9px 11px;margin:6px 0;background:#f3f6f5;color:#2a4b41;
- border:1px solid #dae7e0;border-radius:7px;cursor:pointer;
+ padding:9px 11px;margin:6px 0;background:#23272b;color:#e2e6e9;
+ border:1px solid #3b4248;border-radius:7px;cursor:pointer;
 }
-.atlas-reader-link:hover{background:#e5f2eb;border-color:#a5c8b5}
-.atlas-reader-link-type{font-size:10px;color:#607169;min-width:40px}
+.atlas-reader-link:hover{background:#31363c;border-color:#6b747d}
+.atlas-reader-link-type{font-size:10px;color:#acb5bd;min-width:40px}
 .atlas-reader-link-title{font-size:12px;flex:1;overflow-wrap:anywhere}
-.atlas-reader-link-tree{font-size:10px;color:#77848b;text-transform:uppercase}
-.atlas-reader-term-definition{font-size:12px;color:#52685e;line-height:1.7;margin:0 0 12px}
-.atlas-reader-source-link{display:inline-block;color:#207655;text-decoration:underline;
+.atlas-reader-link-tree{font-size:10px;color:#aab3bb;text-transform:uppercase}
+.atlas-reader-term-definition{font-size:12px;color:#b5c0c7;line-height:1.7;margin:0 0 12px}
+.atlas-reader-source-link{display:inline-block;color:#d4d9e0;text-decoration:underline;
  text-underline-offset:3px;font-size:12px;margin:5px 12px 6px 0;overflow-wrap:anywhere}
-.atlas-reader-removal-note{font-size:13px;color:#854657;line-height:1.8}
+.atlas-reader-removal-note{font-size:13px;color:#f1a9ae;line-height:1.8}
 .atlas-reader-proposal{
  display:flex;align-items:start;gap:14px;flex-wrap:wrap;flex:none;
  max-height:106px;overflow:auto;padding:11px 19px 2px;
@@ -111,3 +111,52 @@
 @media(prefers-reduced-motion:reduce){
  .atlas-reader-panel{animation:none!important;transition:none!important}
 }
+
+/* A diff uses editorial marks, not green field cards: red del/ins and strikeout. */
+.atlas-reader-diff-remove{
+ color:#ff8b94;font-weight:690;background:rgba(194,60,72,.13);
+ text-decoration:line-through;text-decoration-color:#ff727c;
+ text-decoration-thickness:2px;text-decoration-skip-ink:none;
+}
+.atlas-reader-diff-add{
+ color:#ff939b;font-weight:690;background:rgba(194,60,72,.13);
+ text-decoration:underline;text-decoration-color:#ff727c;
+ text-decoration-thickness:1.5px;text-underline-offset:3px;
+}
+.atlas-reader-diff-same{color:inherit}
+.atlas-reader-card-title .atlas-reader-diff-remove,
+.atlas-reader-card-title .atlas-reader-diff-add{font-weight:760}
+.atlas-reader-field.is-changed{
+ border-left-color:#c5666b;background:rgba(147,49,59,.09);
+}
+.atlas-reader-attributes.is-changed{border-left-color:#c5666b}
+.atlas-reader-panel *::selection{background:#735063;color:#fff}
+.atlas-reader-panel .node-attribute-section{border-bottom-color:#343a40}
+.atlas-reader-panel .node-attribute-heading{color:#c7cfd5}
+.atlas-reader-panel .node-attribute-text,
+.atlas-reader-panel .node-parameter-meaning,
+.atlas-reader-panel .node-field-assignment{color:#d3dce1}
+.atlas-reader-panel .node-attribute-note,
+.atlas-reader-panel .node-parameter-extra{color:#a5adb7}
+.atlas-reader-panel .node-attribute-code,
+.atlas-reader-panel .node-attribute-signature,
+.atlas-reader-panel .node-method-summary,
+.atlas-reader-panel .node-field-row,
+.atlas-reader-panel .node-attribute-formula{
+ background:#20252a;color:#e0e5e8;border-color:#424a50;
+}
+.atlas-reader-panel .node-method-details{
+ background:#1b2024;border-color:#424a50;
+}
+.atlas-reader-panel .node-method-details[open]>.node-method-summary{
+ background:#2a3035;border-color:#464e54;
+}
+.atlas-reader-panel .node-term-definition{color:#b7c4c9}
+.atlas-reader-panel .node-term-link,.atlas-reader-panel .node-attribute-link{
+ color:#d2e0dc;text-decoration-color:#929fa5;
+}
+/* The old Focus ancestor strips are redundant above a Reader and obscure it. */
+body.atlas-reader-active #atlasPathTrace,
+body.atlas-reader-active #breadcrumb,
+body.atlas-reader-active .toolbar .navigation{display:none!important}
+body.atlas-reader-active .toolbar{justify-content:flex-end}

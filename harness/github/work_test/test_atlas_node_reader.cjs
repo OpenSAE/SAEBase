@@ -32,4 +32,12 @@ assert(js.includes("data.evidence")&&js.includes("renderAttributes"));
 assert(js.includes("event.deltaY")&&js.includes(".atlas-reader-scroll"));
 assert(html.includes("node-reader.js")&&html.includes("node-reader.css"));
 assert(css.includes(".atlas-reader-pages.is-compare")&&css.includes(".atlas-reader-card.is-removing"));
-console.log("SAEBase Atlas Node Reader add/remove/change, source and zoom behavior PASS");
+assert(css.includes("pointer-events:none")&&css.includes("pointer-events:auto"),
+  "outside reader panel must pass wheel events to graph");
+assert(css.includes("body.atlas-reader-active #atlasPathTrace"),
+  "reader must remove redundant ancestor strip");
+assert(css.includes(".atlas-reader-diff-remove")&&
+  css.includes("text-decoration:line-through")&&
+  css.includes(".atlas-reader-diff-add"),"red editorial additions/deletions");
+assert(!js.includes("threshold+=event.deltaY"),"reader must not exit on content-scroll boundary");
+console.log("SAEBase Atlas Node Reader editorial diff and wheel boundary PASS");

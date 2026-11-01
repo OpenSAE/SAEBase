@@ -17,6 +17,60 @@
     return {operation:op,cards};
   }
   function differs(a,b) { return JSON.stringify(a) !== JSON.stringify(b); }
+
+  function displayValue(value) {
+    return Array.isArray(value)?value.join(" · "):
+      value && typeof value==="object"?JSON.stringify(value,null,2):
+      String(value??"");
+  }
+  function tokenize(text) {
+    return Array.from(String(text).matchAll(/\s+|[\p{Script=Han}]|[\p{L}\p{N}_]+|[^\s]/gu),m=>m[0]);
+  }
+  // Bounded word/Chinese-character LCS, never interpreting untrusted HTML.
+  function diffSegments(oldValue,newValue) {
+    const before=tokenize(displayValue(oldValue)),after=tokenize(displayValue(newValue));
+    const oldParts=[],newParts=[];
+    const put=(target,kind,value)=>{
+      if(!value)return;
+      const last=target[target.length-1];
+      if(last?.kind===kind)last.text+=value;
+      else target.push({kind,text:value});
+    };
+    const n=before.length,m=after.length;
+    if(n*m>200000) {
+      let start=0,end=0;
+      while(start<Math.min(n,m)&&before[start]===after[start])start++;
+      while(end<Math.min(n-start,m-start)&&before[n-1-end]===after[m-1-end])end++;
+      const prefix=before.slice(0,start).join("");
+      const suffix=end?before.slice(n-end).join(""):"";
+      put(oldParts,"same",prefix);put(newParts,"same",prefix);
+      put(oldParts,"remove",before.slice(start,n-end).join(""));
+      put(newParts,"add",after.slice(start,m-end).join(""));
+      put(oldParts,"same",suffix);put(newParts,"same",suffix);
+      return {before:oldParts,after:newParts};
+    }
+    const dp=Array.from({length:n+1},()=>new Uint32Array(m+1));
+    for(let i=n-1;i>=0;i--)
+      for(let j=m-1;j>=0;j--)
+        dp[i][j]=before[i]===after[j]?dp[i+1][j+1]+1:
+          Math.max(dp[i+1][j],dp[i][j+1]);
+    let i=0,j=0;
+    while(i<n||j<m){
+      if(i<n&&j<m&&before[i]===after[j]){
+        put(oldParts,"same",before[i]);put(newParts,"same",after[j]);i++;j++;
+      }else if(i<n&&(j===m||dp[i+1][j]>=dp[i][j+1])){
+        put(oldParts,"remove",before[i++]);
+      }else put(newParts,"add",after[j++]);
+    }
+    return {before:oldParts,after:newParts};
+  }
+  function appendDiff(target,oldValue,newValue,side){
+    for(const part of diffSegments(oldValue,newValue)[side]){
+      target.appendChild(element(part.kind==="remove"?"del":
+        part.kind==="add"?"ins":"span","atlas-reader-diff-"+part.kind,part.text));
+    }
+  }
+
   function element(tag,className,text) {
     const el = document.createElement(tag);
     if(className)el.className=className;
@@ -24,7 +78,7 @@
     return el;
   }
   function create({host}) {
-    let shell=null,cardWrap=null,current=null,sourceRect=null,threshold=0;
+    let shell=null,cardWrap=null,current=null,sourceRect=null;
     function animateFromNode(panel,reverse=false) {
       if(!panel?.animate || !sourceRect || !sourceRect.width || !sourceRect.height)return;
       const rect=panel.getBoundingClientRect();
@@ -41,7 +95,8 @@
     function close() {
       if(!shell)return;
       const old=shell, panel=cardWrap;
-      shell=null; cardWrap=null;current=null;threshold=0;
+      shell=null; cardWrap=null;current=null;
+      document.body.classList.remove("atlas-reader-active");
       animateFromNode(panel,true);
       old.remove();
     }
@@ -51,15 +106,16 @@
       root.appendChild(section);
       return section;
     }
-    function field(root,label,value,changed=false) {
+    function field(root,label,value,changed=false,comparison=null,side="after") {
       if(value === undefined || value === null || value === "")return;
       if(Array.isArray(value) && !value.length)return;
       const row=element("div","atlas-reader-field"+(changed?" is-changed":""));
       row.appendChild(element("div","atlas-reader-field-label",label));
-      row.appendChild(element("div","atlas-reader-field-value",
-        Array.isArray(value)?value.join(" · "):typeof value==="object"?
-          JSON.stringify(value,null,2):value));
-      root.appendChild(row);
+      const body=element("div","atlas-reader-field-value");
+      if(changed)appendDiff(body,side==="before"?value:comparison,
+        side==="before"?comparison:value,side);
+      else body.textContent=displayValue(value);
+      row.appendChild(body);root.appendChild(row);
     }
     function sourceLink(root,name,path,line) {
       const href=current?.sourceHref?.(path,line);
@@ -94,42 +150,55 @@
         operation==="change"?(isBefore?L("修改前","Before"):L("修改后","After")):
         operation==="remove"?L("现有节点 · 拟删除","Existing node · proposed removal"):
         operation==="add"?L("拟新增节点","Proposed node"):L("当前节点","Current node")));
-      heading.appendChild(element("h2","atlas-reader-card-title",data.title || current.node.title));
+      const cardTitle=element("h2","atlas-reader-card-title");
+      if(operation==="change"&&differs(data.title,otherData.title))
+        appendDiff(cardTitle,isBefore?data.title:otherData.title,
+          isBefore?otherData.title:data.title,part.side);
+      else cardTitle.textContent=data.title||current.node.title;
+      heading.appendChild(cardTitle);
       card.appendChild(heading);
       const scroll=element("div","atlas-reader-scroll");
       scroll.tabIndex=0;
       const changed=key=>operation==="change" && differs(data[key],otherData[key]);
+      const readField=(root,label,key)=>field(root,label,data[key],
+        changed(key),otherData[key],part.side);
       const explanatory=section(scroll,L("节点说明","Explanation"));
-      field(explanatory,L("摘要","Summary"),data.summary,changed("summary"));
-      field(explanatory,L("完整说明","Description"),data.description,changed("description"));
+      readField(explanatory,L("摘要","Summary"),"summary");
+      readField(explanatory,L("完整说明","Description"),"description");
       const extra=data.reader_explanation;
       if(extra && extra!==data.description && extra!==data.summary)
-        field(explanatory,L("详细解释","Detailed explanation"),extra,changed("reader_explanation"));
-      field(explanatory,L("研究意义","Why this matters"),data.why_it_matters,changed("why_it_matters"));
-      field(explanatory,L("下一步","Next step"),data.next,changed("next"));
-      field(explanatory,L("别名","Aliases"),data.aliases,changed("aliases"));
+        readField(explanatory,L("详细解释","Detailed explanation"),"reader_explanation");
+      readField(explanatory,L("研究意义","Why this matters"),"why_it_matters");
+      readField(explanatory,L("下一步","Next step"),"next");
+      readField(explanatory,L("别名","Aliases"),"aliases");
       const hasAttributes=Array.isArray(data.attributes) && data.attributes.length;
       if(data.signature || data.source_symbol || data.path || hasAttributes ||
          data.facts || data.technical_description){
         const attributes=section(scroll,L("属性与实现","Attributes and implementation"));
-        field(attributes,L("源码标识","Source symbol"),data.source_symbol,changed("source_symbol"));
-        field(attributes,L("函数签名","Signature"),data.signature,changed("signature"));
+        readField(attributes,L("源码标识","Source symbol"),"source_symbol");
+        readField(attributes,L("函数签名","Signature"),"signature");
         if(data.path){
           field(attributes,L("源码路径","Source path"),data.path+
-            (data.line?":"+data.line:""),changed("path"));
+            (data.line?":"+data.line:""),changed("path"),
+            (otherData.path||"")+(otherData.line?":"+otherData.line:""),part.side);
           sourceLink(attributes,L("查看真实源码","View source"),data.path,data.line);
         }
         if(data.technical_description)
-          field(attributes,L("技术说明","Technical details"),
-            data.technical_description,changed("technical_description"));
+          readField(attributes,L("技术说明","Technical details"),"technical_description");
         if(data.facts){
           for(const [key,value] of Object.entries(data.facts))
-            field(attributes,key,value,changed("facts"));
+            field(attributes,key,value,
+              operation==="change"&&differs(value,otherData.facts?.[key]),
+              otherData.facts?.[key],part.side);
         }
         if(hasAttributes){
           const content=element("div","atlas-reader-attributes");
           current.renderAttributes?.(content,data);
-          if(changed("attributes"))content.classList.add("is-changed");
+          if(changed("attributes")){
+            content.classList.add("is-changed");
+            field(attributes,L("属性差异","Attribute differences"),
+              data.attributes,true,otherData.attributes,part.side);
+          }
           attributes.appendChild(content);
         }
       }
@@ -152,11 +221,12 @@
       if(data.foundation || data.evidence?.length){
         const evidence=section(scroll,L("来源与依据","Sources and evidence"));
         if(data.foundation){
-          field(evidence,L("依据","Foundation"),data.foundation,changed("foundation"));
+          readField(evidence,L("依据","Foundation"),"foundation");
           sourceLink(evidence,L("查看依据","Open foundation"),data.foundation);
         }
         for(const source of data.evidence || []){
-          field(evidence,L("来源","Evidence"),source,changed("evidence"));
+          field(evidence,L("来源","Evidence"),source,changed("evidence"),
+            otherData.evidence,part.side);
           if(typeof source==="string" && source.startsWith("https://")){
             const a=element("a","atlas-reader-source-link",L("查看来源","Open source"));
             a.href=source;a.target="_blank";a.rel="noopener noreferrer";
@@ -176,18 +246,13 @@
       card.appendChild(scroll);
       holder.appendChild(card);
     }
+    // Inside the card, the wheel only scrolls content (even at the end).
     function onWheel(event) {
-      if(event.ctrlKey || event.deltaY<=0){threshold=0;return;}
-      const scroller=event.target.closest?.(".atlas-reader-scroll");
-      if(scroller){
-        const end=scroller.scrollTop+scroller.clientHeight>=scroller.scrollHeight-3;
-        if(!end){threshold=0;return;}
-        threshold+=event.deltaY;
-        if(threshold<140)return;
-      }
-      event.preventDefault();
       event.stopPropagation();
-      close();
+      const scroll=event.target.closest?.(".atlas-reader-scroll");
+      if(scroll)return;
+      const first=cardWrap?.querySelector(".atlas-reader-scroll");
+      if(first){event.preventDefault();first.scrollTop+=event.deltaY;}
     }
     function open(entry) {
       if(!entry?.node)return;
@@ -195,7 +260,6 @@
         current.node.id===entry.node.id && current.operation===entry.operation;
       current=entry;
       sourceRect=entry.nodeRect || sourceRect;
-      threshold=0;
       if(!shell){
         shell=element("div","atlas-reader-shell"+(entry.review?" is-review":""));
         shell.setAttribute("role","region");
@@ -203,7 +267,8 @@
         const panel=element("div","atlas-reader-panel");
         shell.appendChild(panel);cardWrap=panel;
         host.appendChild(shell);
-        shell.addEventListener("wheel",onWheel,{passive:false});
+        document.body.classList.add("atlas-reader-active");
+        cardWrap.addEventListener("wheel",onWheel,{passive:false});
         shell.addEventListener("keydown",event=>{
           if(event.key==="Escape"){
             event.preventDefault();event.stopPropagation();close();
@@ -224,7 +289,7 @@
       head.appendChild(title);
       const controls=element("div","atlas-reader-controls");
       controls.appendChild(element("span","atlas-reader-hint",
-        L("正文滚动阅读 · 向外滚轮缩回 Graph","Scroll to read · wheel out to return to graph")));
+        L("卡内滚动阅读 · 卡外滚轮缩放 Graph","Scroll inside to read · wheel outside to zoom graph")));
       const dismiss=element("button","atlas-reader-close",L("缩回 Graph","Back to graph"));
       dismiss.type="button";
       dismiss.addEventListener("click",close);
@@ -249,5 +314,5 @@
     function isOpen(){return !!shell;}
     return {open,close,isOpen};
   }
-  window.SAEBASE_ATLAS_NODE_READER={create,presentation,differs};
+  window.SAEBASE_ATLAS_NODE_READER={create,presentation,differs,diffSegments};
 })();
