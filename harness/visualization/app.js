@@ -2469,6 +2469,8 @@
     // a card. Scrollable source explanations keep their own native wheel.
     let pendingWheel = 0, wheelPoint = null, wheelFrame = 0;
     canvas.addEventListener("wheel", event => {
+      // Wheel outside the HTML card returns to normal pointer-based graph zoom.
+      if(nodeReader?.isOpen())nodeReader.close();
       if (event.target?.closest?.(".node-attributes-inner,textarea,input,select,pre") &&
           !event.ctrlKey) return;
       event.preventDefault();
