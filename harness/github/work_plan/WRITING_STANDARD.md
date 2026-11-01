@@ -46,3 +46,17 @@ git rev-parse HEAD
 8. 最终交付路径、工作树卫生、权限和发布限制
 
 发现架构冲突、依赖冲突或缺少执行前提时，Work Plan 应返回修改方案并停止执行，不能把错误交给不知上下文的 Agent 临场猜测解决。
+
+## 6. 新 Work Plan 的控制源与 Atlas 双向审阅
+
+正式起草前与用户讨论目标、科学价值、可复用成果、预期结果表、计算及 B2 交付边界，将已确认内容与未决问题分开记录在 [from_human/](from_human/README.md)。没有确认的信息必须保持 unresolved，不得猜测。起草时先读取 Atlas Core/Knowledge/Context 的真实节点 ID，复用已存在的目标和术语；新节点需独立审阅。
+
+采用 [WORKPLAN_TEMPLATE.md](WORKPLAN_TEMPLATE.md) 中的章节及 `workplan-json` 引用块，在同一份 WP 中关联 `from_human`、Atlas Core/Knowledge/Context、真实 Code 路径、具体 Experiment 配置、具有依赖关系的任务及预定义结果表。具体科研参数仅在 `conf/experiment/<study>/`，不可在计划、Prompt 和脚本中创建数套彼此竞争的数值权威。功能性注释描述 Code 实际职责与对应 WP/Knowledge，不在通用 API 内硬编码单一 WP。
+
+起草后运行 `python -m harness.github.work_plan.lifecycle validate --plan <repo-relative-plan.md>` 和已有 `python -m harness.contracts.registry check --plan <plan>`，核对真实引用、上下游职责、执行 DAG、必要交付表、双语 Context 与 Atlas 来源。起草前后均需审阅关联，不能通过新增抽象节点满足检查。
+
+## 7. Setup、Audit 与已填写 Work Plan
+
+每个实际研究阶段明确 Setup 的样本、环境、网络和 GPU 授权；先测量真实执行速度，再按用户在 WP 确定的预算与阈值选择执行路径。代表性 Pilot 只是已执行组合的证据，不能替代全部模型和来源。计划外失败经通用 Audit 归因并分 local/global/human-decision，科研指标本身仍由所属 Task 的真实实现检查。失败记录与已完成结果不可覆盖。
+
+[DELIVERABLE_STANDARD.md](DELIVERABLE_STANDARD.md) 是每份 WP 的交付规范。主要结果是一份**完整填写的原始 Work Plan 副本**和预先设计的表格，附真实运行、资源、时间、日志、文件哈希、证据和备注；自由形式分析是次要附件。冻结原始文件只读，已填写文档存 `experiment/` 的单次运行目录。B2 是推荐持久化目的地，必须有授权范围、实际校验及脱敏记录；人类服务器上已有凭据由配置读取，不写入仓库。规范检查、执行授权、科学验收和公开发布依然是不同动作。

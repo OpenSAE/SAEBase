@@ -209,6 +209,66 @@
         "g.llm_sae_training"
       ],
       "summary": "SAE 训练任务的统一入口。"
+    },
+    {
+      "path": "saebase/setup/workflow.py",
+      "context_ids": [
+        "q.sae.methods"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "summary": "协调通用运行前检查，复用硬件探测并依据实际 Pilot 测量估计成本。"
+    },
+    {
+      "path": "saebase/setup/smoke.py",
+      "context_ids": [
+        "g.sae.activation_capture"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "summary": "通过现有 SAE API 运行显式授权的单个位点真实模型与稀疏特征检查。"
+    },
+    {
+      "path": "saebase/runtime/hardware.py",
+      "context_ids": [
+        "q.sae.methods"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "summary": "从当前主机观测 CUDA、CPU、存储和真实设备信息并标记不可观测项。"
+    },
+    {
+      "path": "saebase/runtime/resource_planner.py",
+      "context_ids": [
+        "q.sae.methods"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "summary": "依据实测可用资源决定是否能够安全启动指定真实模型任务。"
+    },
+    {
+      "path": "saebase/runtime/supervisor.py",
+      "context_ids": [
+        "q.sae.methods"
+      ],
+      "core_ids": [
+        "g.pipeline"
+      ],
+      "summary": "在隔离子进程中执行冻结工作并保留有界重试及失败收据。"
+    },
+    {
+      "path": "saebase/runtime/audit.py",
+      "context_ids": [
+        "g.sae.reliability"
+      ],
+      "core_ids": [
+        "g.artifact_schema"
+      ],
+      "summary": "校验真实运行文件的数量、大小、SHA256 和允许的局部失败阈值；指标语义由 Task 审核。"
     }
   ],
   "knowledge_source": "doc/knowledge/context_graph.json",
