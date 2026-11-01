@@ -327,3 +327,105 @@ def test_authority_drift_invalidates_pre_edit_approval(workspace):
     path.write_text('{"nodes":[],"edges":[]}', encoding="utf-8")
     with pytest.raises(agent_flow.FlowError, match="Atlas authority drift"):
         hc.allowed_paths(plan, ["tasks/capture/operation.py"], base_sha="f" * 40)
+
+
+def test_logical_group_requires_visiting_every_atlas_part(workspace):
+    manifest = _manifest()
+    manifest["id"] = "HC-Group-001"
+    for item in manifest["items"][:2]:
+        item["group_id"] = "HC01"
+        item["group_title"] = "One change across Core and Code"
+    item = manifest["items"][2]
+    item["group_id"] = "HC02"
+    item["group_title"] = "Independent Knowledge change"
+    plan = hc.create(manifest, base_sha="a" * 40)
+    assert len(plan["groups"]) == 2
+    with pytest.raises(agent_flow.FlowError, match="Grouped Atlas part"):
+        hc.decide(plan, "core:g.registry", "approved", actor="Human")
+    hc.visit(plan, "core:g.registry", actor="Human")
+    with pytest.raises(agent_flow.FlowError, match="Visit every linked Atlas part"):
+        hc.decide_group(plan, "HC01", "approved", actor="Human")
+    hc.visit(plan, "code:code:module:saebase.registry", actor="Human")
+    hc.decide_group(plan, "HC01", "denied", actor="Human")
+    hc.visit(plan, "knowledge:q.sae.methods", actor="Human")
+    hc.decide_group(plan, "HC02", "approved", actor="Human")
+    assert hc.load(plan["id"])["revision"] == 5
+    assert hc.allowed_paths(
+        plan, ["tasks/capture/operation.py"], base_sha="a" * 40
+    )["status"] == "APPROVED_SCOPE"
+    with pytest.raises(agent_flow.FlowError, match="Unapproved"):
+        hc.allowed_paths(plan, ["saebase/registry.py"], base_sha="a" * 40)
+
+
+def test_review_server_group_endpoints_check_nonce_and_revision(workspace):
+    import threading
+    from urllib.error import HTTPError
+    from urllib.request import Request, urlopen
+
+    from harness.core.agent_review_server import create_server
+
+    manifest = _manifest()
+    manifest["id"] = "HC-Group-002"
+    for item in manifest["items"]:
+        item["group_id"] = "HC01"
+        item["group_title"] = "Three linked Atlas parts"
+    hc.create(manifest, base_sha="b" * 40)
+    server = create_server("HC-Group-002", 0, human_check=True)
+    runner = threading.Thread(target=server.serve_forever, daemon=True)
+    runner.start()
+    origin = "http://127.0.0.1:" + str(server.server_address[1])
+
+    def post(path, body, key=None):
+        request = Request(
+            origin + path, data=json.dumps(body).encode(),
+            headers={
+                "Content-Type": "application/json",
+                "Origin": origin,
+                "X-Atlas-Review-Key": key or "",
+            },
+            method="POST",
+        )
+        with urlopen(request, timeout=5) as response:
+            return json.loads(response.read())
+
+    try:
+        with pytest.raises(HTTPError) as error:
+            post("/api/review/visit", {
+                "revision": 0, "key": "core:g.registry"
+            })
+        assert error.value.code == 403
+        for revision, node in enumerate([
+            "core:g.registry",
+            "code:code:module:saebase.registry",
+            "knowledge:q.sae.methods",
+        ]):
+            result = post("/api/review/visit", {
+                "revision": revision, "key": node,
+            }, key=server.review_key)
+            assert result["plan"]["revision"] == revision + 1
+        final = post("/api/review/group-decision", {
+            "revision": 3, "group_id": "HC01", "decision": "approved",
+        }, key=server.review_key)
+        assert all(i["proposal_review"]["decision"] == "approved"
+                   for i in final["plan"]["items"])
+        with pytest.raises(HTTPError) as stale:
+            post("/api/review/group-decision", {
+                "revision": 3, "group_id": "HC01", "decision": "denied",
+            }, key=server.review_key)
+        assert stale.value.code == 409
+    finally:
+        server.shutdown()
+        server.server_close()
+        runner.join(timeout=5)
+
+
+def test_atlas_group_review_frontend_opens_core_and_guides_cross_tree_review():
+    from pathlib import Path
+
+    app = (Path(__file__).resolve().parents[2] / "visualization/app.js").read_text()
+    assert "if(requestedReview())" in app
+    assert "function logicalReviewGroup(" in app
+    assert "/api/review/visit" in app
+    assert "/api/review/group-decision" in app
+    assert "Next linked part" in app
+    assert "groupComplete" in app

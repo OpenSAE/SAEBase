@@ -75,6 +75,7 @@ def _intent(plan: dict[str, Any]) -> dict[str, Any]:
             "source_identities",
             "authority_sha256",
             "items",
+            "groups",
             "created_for",
             "default_enabled",
         )
@@ -102,6 +103,15 @@ def validate(plan: dict[str, Any]) -> dict[str, Any]:
             not isinstance(decision, dict) or decision.get("decision") not in STATES[:2]
         ):
             raise atlas.FlowError("Invalid independent node decision")
+    if not isinstance(plan.get("viewed", {}), dict):
+        raise atlas.FlowError("Invalid review coverage ledger")
+    groups = plan.get("groups", [])
+    if not isinstance(groups, list):
+        raise atlas.FlowError("Invalid review groups")
+    known = {item["key"] for item in plan["items"]}
+    grouped = [key for group in groups for key in group["item_keys"]]
+    if groups and (set(grouped) != known or len(grouped) != len(set(grouped))):
+        raise atlas.FlowError("Every proposed Atlas part must have exactly one review group")
     if plan["mode"] == "off" and not plan.get("opt_out"):
         raise atlas.FlowError("Human Check can only be disabled by human action")
     return plan
@@ -213,6 +223,27 @@ def create(manifest: dict[str, Any], *, base_sha: str | None = None) -> dict[str
     proposed_base = base_sha or _git_head()
     if not re.fullmatch(r"[0-9a-f]{40}", proposed_base):
         raise atlas.FlowError("Invalid source commit SHA")
+    # Multi-node review groups are optional for legacy single-node proposals.
+    # Each group independently authorizes one change that can touch several
+    # Atlas trees; all its source-backed parts must be visited first.
+    grouped: dict[str, dict[str, Any]] = {}
+    for item in items:
+        entry = next(x for x in raw_items if x["view"] == item["view"] and
+                     x["node_id"] == item["node_id"])
+        group_id = entry.get("group_id")
+        if group_id is None:
+            continue
+        if not isinstance(group_id, str) or re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]{1,63}", group_id) is None:
+            raise atlas.FlowError("Invalid Human Check review group ID")
+        title = entry.get("group_title")
+        if not isinstance(title, str) or not title.strip():
+            raise atlas.FlowError("Grouped review needs a human-readable group title")
+        group = grouped.setdefault(group_id, {"id": group_id, "title": title.strip(), "item_keys": []})
+        if group["title"] != title.strip():
+            raise atlas.FlowError("Conflicting titles within a review group")
+        group["item_keys"].append(item["key"])
+    if grouped and len([x for x in raw_items if x.get("group_id")]) != len(items):
+        raise atlas.FlowError("Grouped Human Check cannot mix group and independent nodes")
     plan = {
         "schema": SCHEMA,
         "kind": "human_check",
@@ -227,6 +258,8 @@ def create(manifest: dict[str, Any], *, base_sha: str | None = None) -> dict[str
         "opt_out": None,
         "revision": 0,
         "items": items,
+        "groups": list(grouped.values()),
+        "viewed": {},
     }
     plan["seal"] = _hash(_intent(plan))
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -250,6 +283,13 @@ def report_markdown(plan: dict[str, Any]) -> str:
         "| Tree | Node | Operation | Files | Decision |",
         "| --- | --- | --- | --- | --- |",
     ]
+    if plan["groups"]:
+        lines.extend(["", "## Review groups (one decision after all parts have been visited)", ""])
+        for group in plan["groups"]:
+            seen = plan["viewed"].get(group["id"], {})
+            state = (next((item.get("proposal_review") for item in plan["items"]
+                      if item["key"] == group["item_keys"][0]), None) or {}).get("decision", "unchecked")
+            lines.append(f"- **{group['id']} · {group['title']}**: {len(seen)}/{len(group['item_keys'])} viewed; {state}")
     for item in plan["items"]:
         status = (item.get("proposal_review") or {}).get("decision", "unchecked")
         lines.append(
@@ -306,6 +346,45 @@ def _write(plan: dict[str, Any]) -> None:
     (destination.parent / "report.md").write_text(report_markdown(plan), encoding="utf-8")
 
 
+def visit(plan: dict[str, Any], key: str, *, actor: str) -> dict[str, Any]:
+    """Persist a human's view of one actual Atlas proposal part."""
+    validate(plan)
+    if plan["mode"] == "off" or not actor.strip():
+        raise atlas.FlowError("Review must be enabled and human-authenticated")
+    for group in plan["groups"]:
+        if key in group["item_keys"]:
+            plan["viewed"].setdefault(group["id"], {})[key] = {
+                "at": atlas.now(), "actor": actor,
+            }
+            plan["revision"] += 1
+            _write(plan)
+            return snapshot(plan)
+    raise atlas.FlowError("Atlas proposal part is not in a review group")
+
+
+def decide_group(plan: dict[str, Any], group_id: str, decision: str, *, actor: str) -> dict[str, Any]:
+    """Authorize a logical change only after *every* related Atlas part was viewed."""
+    validate(plan)
+    if plan["mode"] == "off" or not actor.strip() or decision not in STATES:
+        raise atlas.FlowError("Invalid authenticated group decision")
+    group = next((g for g in plan["groups"] if g["id"] == group_id), None)
+    if group is None:
+        raise atlas.FlowError("Unknown Human Check review group")
+    seen = plan["viewed"].get(group_id, {})
+    if decision != "unchecked" and not set(group["item_keys"]) <= set(seen):
+        raise atlas.FlowError("Visit every linked Atlas part before approving or denying this group")
+    for item in plan["items"]:
+        if item["key"] not in group["item_keys"]:
+            continue
+        item["proposal_review"] = None if decision == "unchecked" else {
+            "decision": decision, "actor": actor, "at": atlas.now(),
+            "group_id": group_id,
+        }
+    plan["revision"] += 1
+    _write(plan)
+    return snapshot(plan)
+
+
 def decide(plan: dict[str, Any], key: str, decision: str, *, actor: str) -> dict[str, Any]:
     """Local authenticated Atlas decides one item; never writes authority graphs."""
     validate(plan)
@@ -318,6 +397,8 @@ def decide(plan: dict[str, Any], key: str, decision: str, *, actor: str) -> dict
         raise atlas.FlowError("Unknown independent change")
     if not actor.strip():
         raise atlas.FlowError("Human reviewer identity required")
+    if any(key in group["item_keys"] for group in plan.get("groups", [])):
+        raise atlas.FlowError("Grouped Atlas part cannot bypass review-group decision")
     item["proposal_review"] = (
         None
         if decision == "unchecked"

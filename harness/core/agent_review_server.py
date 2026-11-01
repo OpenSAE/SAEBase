@@ -111,7 +111,7 @@ def create_server(
         def do_POST(self):
             if not self.allowed_host():
                 return self.send(403, b'{"error":"Untrusted host"}')
-            if urlsplit(self.path).path not in ("/api/review/decision", "/api/review/mode"):
+            if urlsplit(self.path).path not in ("/api/review/decision", "/api/review/mode", "/api/review/visit", "/api/review/group-decision"):
                 return self.send(404, b'{"error":"Not found"}')
             expected_origin = "http://" + self.headers.get("Host", "")
             if (
@@ -141,10 +141,21 @@ def create_server(
                             plan, data.get("enabled"), actor="Human via local Atlas"
                         )
                     elif human_check:
-                        body = human.decide(
-                            plan, data.get("key"), data.get("decision"),
-                            actor="Human via local Atlas",
-                        )
+                        request_path = urlsplit(self.path).path
+                        if request_path == "/api/review/visit":
+                            body = human.visit(
+                                plan, data.get("key"), actor="Human via local Atlas"
+                            )
+                        elif request_path == "/api/review/group-decision":
+                            body = human.decide_group(
+                                plan, data.get("group_id"), data.get("decision"),
+                                actor="Human via local Atlas",
+                            )
+                        else:
+                            body = human.decide(
+                                plan, data.get("key"), data.get("decision"),
+                                actor="Human via local Atlas",
+                            )
                     else:
                         body = proposal.decide(
                             plan, data.get("key"), data.get("decision"),
