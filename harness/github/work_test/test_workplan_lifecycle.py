@@ -128,10 +128,18 @@ def test_dispatch_permissions_are_source_bound(tmp_path):
     source.write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
     plan = {
         "steps": [
-            {"id": "setup", "needs": [], "permission": "local",
-             "command": ["python", "-m", "saebase.setup", "--help"]},
-            {"id": "run", "needs": ["setup"], "permissions": ["network", "gpu"],
-             "command": ["bash", "scripts/experiments/example.sh", "--allow-local-gpu"]},
+            {
+                "id": "setup",
+                "needs": [],
+                "permission": "local",
+                "command": ["python", "-m", "saebase.setup", "--help"],
+            },
+            {
+                "id": "run",
+                "needs": ["setup"],
+                "permissions": ["network", "gpu"],
+                "command": ["bash", "scripts/experiments/example.sh", "--allow-local-gpu"],
+            },
         ]
     }
     steps = plan_commands(plan, tmp_path, {"local", "network"})
@@ -140,6 +148,25 @@ def test_dispatch_permissions_are_source_bound(tmp_path):
     assert plan_commands(plan, tmp_path, {"local", "network", "gpu"})[1]["status"] == "PLANNED"
     with pytest.raises(life.PlanError, match="lacks declared permission"):
         approved_command(
-            {"permission": "local", "command": ["bash", "scripts/experiments/example.sh", "--allow-local-gpu"]},
+            {
+                "permission": "local",
+                "command": ["bash", "scripts/experiments/example.sh", "--allow-local-gpu"],
+            },
             tmp_path,
         )
+
+
+def test_dispatch_rejects_implicit_network_and_gpu_execution(tmp_path):
+    from harness.github.work_plan.dispatch import approved_command
+
+    for argv in (
+        ["python", "-m", "saebase.setup.smoke", "--allow-network"],
+        ["python", "-m", "saebase.setup.smoke", "--allow-gpu"],
+        ["bash", "scripts/experiments/example.sh", "--execute"],
+    ):
+        if argv[0] == "bash":
+            source = tmp_path / "scripts/experiments/example.sh"
+            source.parent.mkdir(parents=True, exist_ok=True)
+            source.write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
+        with pytest.raises(life.PlanError, match="lacks declared permission"):
+            approved_command({"permission": "local", "command": argv}, tmp_path)
