@@ -22,6 +22,8 @@ ASSETS = (
     "atlas-structure.js",
     "atlas-public-balance.js",
     "app.js",
+    "node-reader.js",
+    "node-reader.css",
     "locale-data.js",
     "locale-runtime.js",
     "i18n.js",

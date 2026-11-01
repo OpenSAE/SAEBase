@@ -80,3 +80,11 @@ Atlas Code Tree 的节点名称必须是一句有内容的中文功能概括，�
 ## 五树全局搜索与来源检查
 
 点击工具栏的「五树搜索」或按 Ctrl+K / ⌘K，可直接在五棵 Tree 中搜索真实节点、描述、函数名和别名。结果按 Tree 分类，方向键与 Enter 定位，Esc 关闭并保留当前视图。Details 将已存在的节点信息组织为 NODE、RELATIONS、EVIDENCE 三层；RELATIONS 仅从节点明示的 `context_term_ids`、`context_ids`、`core_ids`、`term_ids` 建立，展示实际字段和目标 Tree，不进行推测匹配。详情顶部提供复制节点深链接，自动排除 Review 访问参数和哈希。该更新不引入第二套 Map 或新的知识数据源。
+
+
+## Atlas Node Reader：原位阅读与三类变更审阅
+
+Node Reader 由 `harness/visualization/node-reader.js` 和 `node-reader.css` 独立维护。
+点击普通节点展开阅读卡，原 Graph 保持原位；鼠标在阅读卡外缘向下滚动或使用“缩回 Graph”返回，正文在固定尺寸卡片内独立滚动。
+Human Check 中按提案操作展示：`add` 单张新增阅读卡、`remove` 单张带删除标记的旧内容卡、`change` 左侧 Before 与右侧 After 并排阅读卡。源文件中未声明修改的字段保持原始内容；差异字段标记高亮，旧版数据与当前属性均来自权威 Atlas，未生成第二套科学定义。
+审阅决定颜色仍是紫/红/灰，和 add/remove/change 的操作标记不同。四箭头与底部三个审批按钮始终在 Reader 外保持可用。公开 Pages 决定仍为浏览器草稿，报告通过原有 Send report 入口交接；正式授权继续遵守 Human Check 权限检查。

@@ -1,0 +1,113 @@
+
+/* Source-backed Atlas Reader shares the real graph; only its presentation is separate. */
+.atlas-reader-shell{
+ position:absolute;inset:10px 18px 47px;z-index:4;
+ display:flex;align-items:stretch;justify-content:center;
+ pointer-events:auto;
+}
+.atlas-reader-shell.is-review{bottom:121px}
+.atlas-reader-panel{
+ width:min(1180px,100%);height:100%;min-height:0;
+ display:flex;flex-direction:column;overflow:hidden;
+ border:1px solid #565b63;border-radius:15px;
+ box-shadow:0 24px 72px #000b;
+ background:#101315;color:#eef1f3;
+}
+.atlas-reader-head{
+ min-height:70px;flex:none;display:flex;align-items:center;justify-content:space-between;
+ gap:20px;padding:12px 22px;border-bottom:1px solid #393e42;
+}
+.atlas-reader-heading{min-width:0}
+.atlas-reader-eyebrow{font-size:10px;color:#b5bac1;text-transform:uppercase;
+ letter-spacing:.9px;font-weight:740}
+.atlas-reader-current-title{font-size:16px;font-weight:690;line-height:1.5;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.atlas-reader-controls{display:flex;align-items:center;gap:16px;flex:none}
+.atlas-reader-hint{font-size:11px;color:#9ea7af}
+.atlas-reader-close{
+ border:1px solid #6c757c;background:#282d32;color:#f0f3f5;
+ border-radius:8px;padding:9px 14px;font-weight:650;white-space:nowrap;cursor:pointer;
+}
+.atlas-reader-close:hover{background:#3f464c}
+.atlas-reader-pages{flex:1;min-height:0;display:flex;gap:12px;padding:14px;
+ overflow:hidden}
+.atlas-reader-card{
+ flex:1;min-width:0;display:flex;flex-direction:column;min-height:0;
+ border-radius:10px;border:1px solid #c8cdd2;background:#fdfefd;color:#253038;
+ overflow:hidden;
+}
+.atlas-reader-pages.is-compare .atlas-reader-card.is-before{border-color:#a7afb9}
+.atlas-reader-pages.is-compare .atlas-reader-card.is-after{border-color:#7db39c}
+.atlas-reader-card.is-removing{border:1px dashed #cb8693;background:#fcf7f8}
+.atlas-reader-card.is-removing .atlas-reader-card-title{text-decoration:line-through;
+ text-decoration-thickness:1.5px;text-decoration-color:#9d4b59}
+.atlas-reader-card-head{flex:none;padding:18px 21px 13px;border-bottom:1px solid #e6e9ed}
+.atlas-reader-card.is-before .atlas-reader-card-head{background:#f2f4f7}
+.atlas-reader-card.is-after .atlas-reader-card-head{background:#f0f7f4}
+.atlas-reader-card.is-removing .atlas-reader-card-head{background:#f9e9ec}
+.atlas-reader-card-side{font-size:11px;font-weight:750;letter-spacing:.45px;color:#5d6873}
+.atlas-reader-card-title{font-size:19px;line-height:1.4;margin:6px 0 0;font-weight:720}
+.atlas-reader-scroll{
+ flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;
+ padding:16px 23px 30px;overscroll-behavior:contain;
+ scrollbar-color:#b7c7c4 transparent;scrollbar-width:thin;
+}
+.atlas-reader-section{margin:0 0 24px;padding:0 0 8px}
+.atlas-reader-section-title{margin:0 0 12px;font-size:13px;letter-spacing:.1px;color:#2d5c4a}
+.atlas-reader-field{margin:0 0 14px;overflow-wrap:anywhere}
+.atlas-reader-field-label{font-size:10.5px;text-transform:uppercase;
+ letter-spacing:.45px;font-weight:700;color:#64717b;margin-bottom:4px}
+.atlas-reader-field-value{font-size:13px;white-space:pre-wrap;line-height:1.85;color:#313a42}
+.atlas-reader-field.is-changed{border-left:3px solid #63ad88;
+ background:#f0f8f3;padding:7px 11px;border-radius:0 5px 5px 0}
+.atlas-reader-subheading{margin:13px 0 7px;font-size:11px;font-weight:740;color:#4b5965}
+.atlas-reader-attributes{overflow:visible;height:auto;width:100%;
+ background:transparent;border:0;padding:0}
+.atlas-reader-attributes .node-attribute-section{padding:12px 0}
+.atlas-reader-attributes .node-attribute-code{max-height:none}
+.atlas-reader-attributes.is-changed{border-left:3px solid #63ad88;padding-left:11px}
+.atlas-reader-link{
+ display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+ padding:9px 11px;margin:6px 0;background:#f3f6f5;color:#2a4b41;
+ border:1px solid #dae7e0;border-radius:7px;cursor:pointer;
+}
+.atlas-reader-link:hover{background:#e5f2eb;border-color:#a5c8b5}
+.atlas-reader-link-type{font-size:10px;color:#607169;min-width:40px}
+.atlas-reader-link-title{font-size:12px;flex:1;overflow-wrap:anywhere}
+.atlas-reader-link-tree{font-size:10px;color:#77848b;text-transform:uppercase}
+.atlas-reader-term-definition{font-size:12px;color:#52685e;line-height:1.7;margin:0 0 12px}
+.atlas-reader-source-link{display:inline-block;color:#207655;text-decoration:underline;
+ text-underline-offset:3px;font-size:12px;margin:5px 12px 6px 0;overflow-wrap:anywhere}
+.atlas-reader-removal-note{font-size:13px;color:#854657;line-height:1.8}
+.atlas-reader-proposal{
+ display:flex;align-items:start;gap:14px;flex-wrap:wrap;flex:none;
+ max-height:106px;overflow:auto;padding:11px 19px 2px;
+ border-top:1px solid #434b50;background:#171a1e;
+}
+.atlas-reader-proposal .atlas-reader-field{flex:1 1 180px;max-width:38%;margin:0 0 6px}
+.atlas-reader-proposal .atlas-reader-field-label{color:#b4bdc5}
+.atlas-reader-proposal .atlas-reader-field-value{color:#e2e7ea;font-size:10.5px;line-height:1.5}
+.graph-node.node-operation-remove .node-title{text-decoration:line-through}
+.graph-node.node-operation-remove .node-surface{stroke-dasharray:8 5}
+.graph-node.node-operation-remove .node-description{opacity:.64}
+.graph-node.node-operation-add .node-surface{stroke-width:2.1}
+.graph-node.node-operation-change .node-surface{stroke-width:2.1}
+.node-operation-label{font-size:10px;fill:#a3b0bf;font-weight:750;letter-spacing:.3px}
+@media(max-width:950px){
+ .atlas-reader-shell{left:9px;right:9px}
+ .atlas-reader-pages.is-compare{flex-direction:column;overflow-y:auto}
+ .atlas-reader-pages.is-compare .atlas-reader-card{min-height:290px;overflow:visible}
+ .atlas-reader-pages.is-compare .atlas-reader-scroll{max-height:260px}
+ .atlas-reader-hint{display:none}
+ .atlas-reader-proposal{max-height:75px}
+}
+@media(max-width:730px){
+ .atlas-reader-shell.is-review{bottom:185px}
+ .atlas-reader-head{padding:9px 12px;min-height:62px}
+ .atlas-reader-card-head{padding:12px}
+ .atlas-reader-scroll{padding:13px}
+ .atlas-reader-proposal{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+ .atlas-reader-panel{animation:none!important;transition:none!important}
+}

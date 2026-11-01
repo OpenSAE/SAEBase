@@ -117,6 +117,7 @@
     denied: { fill: STATE_FILL.denied, stroke: "#78818b" }
   };
   let review = null, reviewGraphs = {}, reviewBusy = false, reviewError = "";
+  let nodeReader = null; // HTML presentation owned by node-reader.js; graph remains authoritative.
   let reviewDraftMessage = "";
   const REVIEW_VIEWS=["core","knowledge","code","environment","context"];
   const REVIEW_TITLES={core:"Core",knowledge:"Knowledge",code:"Code",
@@ -1015,6 +1016,7 @@
   function activateView(view, options = {}) {
     if (!VIEWS[view] || !DATA[view]) return false;
     if (view === config.view) return true;
+    nodeReader?.close();
     saveViewState();
     config.view = view;
     if (document.body?.dataset) document.body.dataset.atlasView = view;
@@ -1098,7 +1100,7 @@
     config.query = "";
     $("search").value = "";
     config.outlineOpen = false;
-    config.detailsOpen = true;
+    config.detailsOpen = !nodeReader || !(options.toggle || review || nodeReader.isOpen());
     for (const key of ancestors(id)) config.expanded.add(key);
     // Review navigation lands on the actual node in normal Focus mode.
     const reviewTarget=!!review?.plan?.items?.some(item=>
@@ -1109,7 +1111,7 @@
       config.zoomInitialized=true;
     }
     config.expandedAttributes.clear();
-    if(reviewTarget || (options.toggle && !wasExpanded))
+    if(!nodeReader && (reviewTarget || (options.toggle && !wasExpanded)))
       config.expandedAttributes.add(id);
     config.animateNextRender = true;
     setAddress(id, !!replace || sameFocus);
@@ -1122,9 +1124,12 @@
     render(false,true);
     centerSelected();
     if(review){updateReviewBar();queueReviewVisit();}
+    if(nodeReader && (reviewTarget || options.toggle || nodeReader.isOpen()))
+      showNodeReader();
     return true;
   }
   function overview(push) {
+    nodeReader?.close();
     config.expandedAttributes.clear();
     config.animateNextRender = true;
     config.mode = "overview"; config.focusId = null; config.query = "";
@@ -1135,6 +1140,60 @@
     fitCanvas();
   }
   function openCross(id) { navigate(id, locateView(id), false); }
+
+  function showNodeReader() {
+    if(!nodeReader || !config.focusId)return;
+    const active=byId.get(config.focusId);
+    if(!active)return;
+    const proposal=itemFor(active.id,config.view);
+    const base=(DATA[config.view]?.nodes||[]).find(x=>x.id===active.id)||{};
+    const before=proposal?.operation==="add"?null:
+      {...base,...(proposal?.before||{})};
+    const after=proposal?.operation==="remove"?null:
+      {...base,...(proposal?.after||active)};
+    const recorded=[],seen=new Set();
+    function add(view,id,role){
+      if(!id || !view || (view===config.view && id===active.id))return;
+      const key=view+"|"+id+"|"+role;
+      if(seen.has(key))return;
+      seen.add(key);
+      const node=relatedNode(view,id);
+      recorded.push({view,id,title:node?.title||id,role});
+    }
+    const parent=parents.get(active.id);
+    if(parent)add(config.view,parent,searchText("父节点","Parent"));
+    for(const child of children.get(active.id)||[])
+      add(config.view,child,searchText("子节点","Child"));
+    const allEdges=graph().edges||[];
+    const primary=new Set(VIEWS[config.view].primary);
+    for(const edge of allEdges){
+      if(primary.has(edge.type))continue;
+      if(edge.source===active.id)
+        add(config.view,edge.target,edge.type+" →");
+      if(edge.target===active.id)
+        add(config.view,edge.source,"← "+edge.type);
+    }
+    for(const rel of explicitRelations(config.view,active.id))
+      add(rel.view,rel.id,rel.field+" "+(rel.direction==="in"?"←":"→"));
+    const termIds=[...new Set([...(active.context_term_ids||[]),
+      ...(proposal?.context_term_ids||[])])];
+    const contextTerms=termIds.map(id=>{
+      const term=relatedNode("context",id);
+      return term?{id,title:term.title,description:term.description}:null;
+    }).filter(Boolean);
+    const origin=document.querySelector("#diagram .graph-node.node-selected");
+    nodeReader.open({
+      review:!!review,node:active,view:config.view,
+      operation:proposal?.operation||"view",proposal,before,after,
+      relations:recorded,contextTerms,
+      nodeRect:origin?.getBoundingClientRect?.()||null,
+      onFollow:(id,view)=>navigate(id,view,false,{toggle:true}),
+      sourceHref,
+      renderAttributes:(container,node)=>{
+        for(const block of node.attributes||[])renderAttributeBlock(container,block,node);
+      }
+    });
+  }
   function init() {
     if (!VIEWS[config.view] || !DATA[config.view]) config.view = "core";
     rebuildHierarchy();
@@ -1331,6 +1390,8 @@
     const classes = ["graph-node", "node-" + k, "density-" + densityMode(), chosen ? "node-selected" : "",
       p.expanded ? "node-expanded" : "",
       p.role === "sibling-preview" ? "node-sibling-preview" : "",
+      review && itemFor(node.id,config.view) ?
+        "node-operation-"+itemFor(node.id,config.view).operation : "",
       config.diff && config.view === "code" &&
         (config.diff.added_ids || []).includes(node.id) ? "node-added" : "",
       config.diff && config.view === "code" &&
@@ -1368,6 +1429,16 @@
       class: "node-status", rx: 2, x: 0, y: 9,
       width: 4, height: p.h - 18, fill: status
     }));
+    // A removal is shown as a ghost of the recorded node, never an empty new node.
+    // The color still represents the review decision, independently of operation.
+    const operation=review&&itemFor(node.id,config.view)?.operation;
+    if(operation){
+      const label={add:searchText("＋ 新增","＋ ADD"),
+        remove:searchText("－ 删除","－ REMOVE"),
+        change:searchText("↔ 修改","↔ CHANGE")}[operation];
+      if(label)card.appendChild(svg("text",{x:17,y:-6,
+        class:"node-operation-label"},label));
+    }
     // Typography and text layout are identical in normal and review modes.
     const titleX=17, top=23;
     textLines(card, p.title, titleX, top, 19, "node-title");
@@ -2462,6 +2533,8 @@
     }
   }
   function bind() {
+    if(window.SAEBASE_ATLAS_NODE_READER)
+      nodeReader=window.SAEBASE_ATLAS_NODE_READER.create({host:$("canvasWrap").closest(".graph-panel")});
     const pathTrace = el("nav", "atlas-path-trace is-hidden");
     pathTrace.id = "atlasPathTrace";
     pathTrace.setAttribute("aria-label", "Full node ancestry");
@@ -2544,6 +2617,7 @@
     });
     $("search").addEventListener("input", event => {
       config.query = String(event.target.value || "");
+      nodeReader?.close();
       config.expandedAttributes.clear();
       config.mode = "overview"; config.focusId = null; config.detailsOpen = false;
       config.outlineOpen = !!config.query.trim();
@@ -2562,7 +2636,10 @@
     });
     $("fit").addEventListener("click", fitCanvas);
     $("zoomIn").addEventListener("click", () => changeZoom(config.zoom * 1.2));
-    $("zoomOut").addEventListener("click", () => changeZoom(config.zoom / 1.2));
+    $("zoomOut").addEventListener("click", () => {
+      if(nodeReader?.isOpen())nodeReader.close();
+      else changeZoom(config.zoom / 1.2);
+    });
     $("diffFile").addEventListener("change", async event => {
       const file = event.target.files?.[0];
       if (!file) return;
@@ -2613,6 +2690,7 @@
           return;
         }
         if (event.key === "Escape") {
+          if(nodeReader?.isOpen()){nodeReader.close();return;}
           if(config.expandedAttributes.size) {
             config.expandedAttributes.clear();render(true);return;
           }
@@ -2647,6 +2725,7 @@
       searchText("搜索所有节点、术语、函数…","Search nodes, terms, functions…");
     if(searchOpen)updateGlobalSearch();
     render(false);
+    if(nodeReader?.isOpen())showNodeReader();
     if (config.detailsOpen) renderDetails();
     updateBreadcrumb();
   });
