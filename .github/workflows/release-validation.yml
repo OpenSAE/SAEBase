@@ -1,0 +1,493 @@
+name: Release Validation
+
+# Full, expensive, source-bound acceptance ONLY when explicitly requested.
+# Ordinary PR/main CI is lightweight and must never provide release evidence.
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Exact current main SHA to validate
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-validation-${{ inputs.source_sha }}
+  cancel-in-progress: false
+
+jobs:
+  source-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Verify selected SHA is exactly current main
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha }}
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_SHA" =~ ^[a-f0-9]{40}$ ]]
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$SOURCE_SHA"
+          echo "Release Validation for exact source $SOURCE_SHA"
+
+  hydra-composition:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_sha }}
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install CPU configuration dependencies
+        run: python -m pip install -e ".[dev]" "pytorch-lightning>=2.1,<3" "torchvision>=0.15"
+      - name: Compose SAE capture defaults without launching model
+        run: python -m saebase.runtime.train --cfg job
+      - name: Compose alternate SAE benchmark without model weights
+        run: python -m saebase.runtime.train dataset=ioi model=openresearch_gemma2_2b_base task=benchmark --cfg job
+  harness-source:
+    needs: source-verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Validate newly added architecture paths
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: python -m harness.core.check_architecture --base "$BASE_SHA"
+      - name: Validate Core and Knowledge source graphs
+        run: |
+          python harness/core/validate.py
+          python harness/knowledge/validate.py
+      - name: Regenerate Code and Atlas snapshots in temporary CI checkout
+        run: |
+          python harness/code/build.py
+          python harness/visualization/export.py
+          python harness/visualization/build_pages.py
+          python harness/visualization/build_language.py
+          python harness/visualization/build_language.py --check
+          python harness/visualization/build_pages.py --check
+      - name: Verify migrated domain packages and independent Atlas ownership
+        run: |
+          python -m pip install -q pytest
+          python -m pytest -q harness/github/work_test/test_wp12_package_migration.py
+      - name: Audit functional Code Tree fanout
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+          text = Path("harness/visualization/data.js").read_text(encoding="utf-8")
+          graph = json.loads(text.split("window.OPENRESEARCH_ATLAS = ", 1)[1].strip().removesuffix(";"))
+          code = graph["code"]
+          parent_counts = Counter(e["source"] for e in code["edges"] if e["type"] == "contains")
+          excess = {k: v for k, v in parent_counts.items() if v > 20}
+          by_id = {n["id"]: n for n in code["nodes"]}
+          for parent in excess:
+              children = [e["target"] for e in code["edges"]
+                          if e["type"] == "contains" and e["source"] == parent]
+              print("OVERSIZED", parent, "=>",
+                    [(child, by_id[child].get("title"), by_id[child].get("path"))
+                     for child in children], flush=True)
+          assert not excess, f"Code functional hierarchy exceeds 20 direct children: {excess}"
+          direct = parent_counts["code:group:saebase"]
+          assert 10 <= direct <= 20, f"Expected conceptual categories, got {direct}"
+          print("Code concept hierarchy accepted; root categories:", direct)
+          PY
+      - name: Audit all Atlas trees and retain full semantic-duplicate report
+        run: |
+          python harness/code/audit_semantics.py --output atlas-semantic-audit.json --check
+          python -m pip install -q pytest PyYAML
+          python -m pytest -q harness/github/work_test/test_atlas_semantic_audit.py harness/github/work_test/test_atlas_semantic_projection.py
+      - name: Verify Harness WP18 sandbox and root-directory guardrails
+        run: python -m pytest -q harness/github/work_test/test_wp18_sandbox_gate.py
+      - name: Resolve universal task contracts and audit invariants
+        run: |
+          python -m harness.contracts.registry check --plan harness/github/work_plan/18_harness_local_agent_examination_and_independent_acceptance.md
+          python -m pytest -q harness/github/work_test/test_universal_task_contracts.py harness/github/work_test/test_contract_acceptance.py
+      - name: Verify twenty predeclared WP18 contracts and reviewer checks
+        run: |
+          python -m harness.contracts.wp18_verify --check-spec
+          python -m pytest -q harness/github/work_test/test_wp18_h07_h26_contracts.py
+      - name: Enforce WP18 task PR scope and check candidate behavior
+        if: ${{ github.event_name == 'pull_request' && startsWith(github.head_ref, 'wp18/') }}
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: python -m harness.contracts.wp18_verify --base "$BASE_SHA" --scan
+      - name: Verify WP19 frozen 200 synthetic cases and reference
+        run: |
+          python -m harness.contracts.registry check --plan harness/github/work_plan/19_harness_large_scale_examination_and_verifier_assurance.md
+          python -m harness.contracts.wp19_verify --check-spec
+          python -m pytest -q harness/github/work_test/test_compliance_regression.py harness/github/work_test/test_wp19_p0_contracts.py
+      - name: Reject WP19 governance edits and test submitted 200 cases
+        if: ${{ github.event_name == 'pull_request' && startsWith(github.head_ref, 'wp19/') }}
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: python -m harness.contracts.wp19_verify --base "$BASE_SHA" --scan
+      - name: Validate WP20 behavioral grader and reviewer calibration
+        run: |
+          python -m harness.contracts.registry check --plan harness/github/work_plan/20_integrated_multistage_harness_exams.md
+          python -m harness.contracts.wp20_design_validate
+          python -m harness.contracts.wp20_verify --check-spec
+          python -m pytest -q harness/github/work_test/test_wp20_design.py
+          python -m pytest -q harness/github/work_test/test_wp20_behavioral.py
+      - name: Reject unauthorized WP20 task PR changes without executing candidate
+        if: ${{ github.event_name == 'pull_request' && startsWith(github.head_ref, 'wp20/') }}
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: python -m harness.contracts.wp20_verify --base "$BASE_SHA"
+      - name: Upload full Atlas duplicate inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: atlas-semantic-duplicate-inventory
+          path: atlas-semantic-audit.json
+      - name: Check interactive Atlas JavaScript
+        run: |
+          node --check harness/visualization/app.js
+          node harness/github/work_test/test_atlas_deep_navigation.cjs
+          node harness/github/work_test/test_atlas_global_search.cjs
+          node --check harness/visualization/i18n.js
+          node --check harness/visualization/atlas-public-balance.js
+          node --check harness/visualization/locale-data.js
+          node harness/github/work_test/test_atlas_localization.cjs
+          node harness/github/work_test/test_atlas_bilingual_semantics.cjs
+  offline-tests:
+    needs: source-verify
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11"]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_sha }}
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            saebase/research_lab/requirements.txt
+      - name: Validate integrated source and Cursor contracts
+        run: python .cursor/hooks/validate_repo.py --full
+      - name: Install SAEBase for development
+        run: python -m pip install -e ".[dev]"
+      - name: Verify minimal development installation
+        run: |
+          python -m pip check
+          saebase-check-env --mode core
+          python -c "from saebase.sae.loading import load_sae_for_profile; print('lazy SAE imports OK')"
+      - name: Check current Stage D support documentation
+        run: python saebase/tools/generate_model_support.py --check
+      - name: Check developer documentation links
+        run: python saebase/tools/check_documentation.py --check
+      - name: Verify committed Stage D evidence SHA256 and coverage
+        run: python saebase/tools/stage_d_archive.py --check
+      - name: Run full offline tests and collect Python 3.11 branch coverage
+        run: |
+          python -m pytest -q -n 2 --dist=loadfile --durations=25 \
+            --cov=saebase --cov-branch \
+            --cov-report=term --cov-report=xml:coverage.xml \
+            --cov-report=json:coverage.json
+      - name: Upload Python 3.11 coverage baseline
+        uses: actions/upload-artifact@v4
+        with:
+          name: saebase-core-coverage-py311
+          path: |
+            coverage.xml
+            coverage.json
+          if-no-files-found: error
+      - name: Check CLI
+        run: |
+          cd "$(mktemp -d)"
+          saebase --list
+          saebase-check-env --mode core
+          python -m saebase.sae.verify_registry --list
+      - name: Check v0.4.0 Research Lab release manifest and docs
+        run: python -m pytest -q harness/github/work_test/test_research_lab_v04_release.py
+      - name: Run offline public API example
+        run: python saebase/examples/quickstart/public_api_offline.py
+      - name: Run persistent first experiment and reliability audit
+        run: python saebase/examples/quickstart/first_experiment.py --output "$RUNNER_TEMP/saebase-first-experiment"
+      - name: Run external extension demo without model downloads
+        run: python saebase/examples/extensions/external_providers.py
+      - name: Run controlled input cache example
+        run: python saebase/examples/research_integrations/controlled_inputs.py
+      - name: Validate installed wheel outside checkout
+        run: |
+          python -m build --wheel
+          python saebase/tools/check_installed_wheel.py dist
+
+      - name: Verify Research Lab CPU APIs and browser scripts
+        run: |
+          python -m pip install -r saebase/research_lab/requirements.txt httpx
+          python -m pytest -q \
+            saebase/research_lab/tests/test_platform.py \
+            saebase/research_lab/tests/test_p2_explorer.py \
+            saebase/research_lab/tests/test_wp13_bundle.py \
+            saebase/research_lab/tests/test_wp13_live03_gallery.py \
+            saebase/research_lab/tests/test_wp12_private_public.py
+          node --check saebase/research_lab/frontend/app.js
+
+  analysis-install:
+    needs: source-verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_sha }}
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install complete analysis extra in a fresh environment
+        run: python -m pip install -e ".[analysis]"
+      - name: Verify analysis dependencies and model loading imports
+        run: |
+          python -m pip check
+          saebase-check-env --mode analysis
+          python -c "from saebase.sae.loading import load_sae_lens; from models.hf_compat import import_sae_lens, import_transformer_lens; import_sae_lens(); import_transformer_lens(); print('analysis imports OK')"
+
+  package:
+    needs: source-verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_sha }}
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install build tools
+        run: python -m pip install build twine
+      - name: Build wheel and source distribution
+        run: python -m build
+      - name: Verify archives and metadata
+        run: |
+          python -m twine check dist/*
+          python saebase/tools/verify_distribution.py dist
+      - name: Rebuild wheel from clean source archive
+        run: python saebase/tools/check_sdist_roundtrip.py dist
+      - name: Verify generic software release candidate without publishing
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          python saebase/tools/release_candidate.py prepare             --dist dist --output-dir "$RUNNER_TEMP/software-release"             --source-sha "$SOURCE_SHA"
+          python saebase/tools/release_candidate.py verify-assets             --dist dist --output-dir "$RUNNER_TEMP/software-release"             --source-sha "$SOURCE_SHA"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: saebase-distributions
+          path: dist/*
+          if-no-files-found: error
+
+      - name: Build and browse Research Lab CPU container
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build -f saebase/research_lab/Dockerfile -t opensae-lab:cpu .
+          docker run -d --rm --name opensae-lab-ci -p 127.0.0.1:17860:7860 opensae-lab:cpu
+          trap 'docker rm -f opensae-lab-ci >/dev/null 2>&1 || true' EXIT
+          python - <<'PY'
+          import json
+          import time
+          import urllib.request
+          url = "http://127.0.0.1:17860/api/summary"
+          result = None
+          for attempt in range(30):
+              try:
+                  with urllib.request.urlopen(url, timeout=2) as response:
+                      result = json.load(response)
+                  break
+              except Exception:
+                  time.sleep(0.5)
+          if result is None:
+              import subprocess
+              subprocess.run(["docker", "logs", "opensae-lab-ci"], check=False)
+          assert result is not None, "CPU container did not start"
+          assert result["sites_verified"] == 48
+          assert result["historical_groups_per_site"] == 64
+          assert result["curated_prompts"] == 0
+          assert result["gpu_online"] is False
+          # Exercise all five recorded WP15 cards inside the *actual* CPU image,
+          # not only API mocks or a localhost FastAPI test client.
+          def fetch(path):
+              with urllib.request.urlopen("http://127.0.0.1:17860" + path, timeout=5) as response:
+                  return json.load(response)
+          benchmark = fetch("/api/wp15/benchmark")
+          training = fetch("/api/wp15/training")
+          generation = fetch("/api/wp15/generation")
+          explanation = fetch("/api/wp15/explanation")
+          circuit = fetch("/api/wp15/circuit")
+          assert benchmark["metrics"]["saebench.core.l0"] == 376.0
+          assert training["reloaded"] is True and training["global_step"] == 50
+          assert any(
+              c["argmax_changed"]
+              for sample in generation["samples"]
+              for c in sample["conditions"]
+              if c["name"] == "ablate"
+          )
+          assert explanation["approved"] is False and explanation["description_published"] is False
+          assert len(circuit["graph"]["nodes"]) == 155
+          assert len(circuit["graph"]["edges"]) == 748
+          for name, card in (
+              ("benchmark", benchmark),
+              ("training", training),
+              ("generation", generation),
+              ("explanation", explanation),
+              ("circuit", circuit),
+          ):
+              content = json.dumps(card).lower()
+              assert '"prompt_text"' not in content, name
+              assert '"baseline_continuation"' not in content, name
+              assert '"edited_continuation"' not in content, name
+          try:
+              fetch("/api/wp15/not-a-real-record")
+              raise AssertionError("Unknown record was returned as a success")
+          except urllib.error.HTTPError as exc:
+              assert exc.code == 404
+          print("WP15 recorded cards passed in real CPU Docker, with private text omitted")
+          PY
+          docker restart opensae-lab-ci >/dev/null
+          python - <<'PY'
+          import json, time, urllib.request
+          url = "http://127.0.0.1:17860/api/wp15/circuit"
+          for _ in range(40):
+              try:
+                  with urllib.request.urlopen(url, timeout=3) as response:
+                      graph = json.load(response)
+                  assert len(graph["graph"]["nodes"]) == 155
+                  assert len(graph["graph"]["edges"]) == 748
+                  print("WP15 real recorded circuit survives CPU Docker restart")
+                  break
+              except Exception:
+                  time.sleep(0.5)
+          else:
+              raise AssertionError("Research Lab did not recover after Docker restart")
+          PY
+
+  localization-native:
+    needs: source-verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_sha }}
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install SAEBase and original Localize reference
+        run: |
+          python -m pip install -e ".[dev]"
+          python -m pip install "git+https://github.com/OpenSAE/SAE-Input-Localization.git@82b86d7ca20051cc16f7528a0966f4531c4a8eb3"
+      - name: Run original-estimator benchmark acceptance
+        run: python -m pytest -q harness/github/work_test/test_m3_localization.py -k native
+      - name: Validate Research Lab six-factor synthetic truth with original Localize
+        run: python -m pytest -q harness/github/work_test/test_research_lab_controlled_native.py
+      - name: Run full Localize benchmark and reliability demo
+        run: python saebase/examples/research_integrations/localization_benchmark.py --output "$(mktemp -d)"
+      - name: Export both 64-state controlled input designs (CPU)
+        run: |
+          PYTHONPATH=saebase/research_lab python -m backend.controlled_designs --output-dir "$RUNNER_TEMP/opensae-six-factor-inputs"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import os
+          folder = Path(os.environ["RUNNER_TEMP"]) / "opensae-six-factor-inputs"
+          files = sorted(folder.glob("*.json"))
+          assert len(files) == 2
+          assert all(len(json.loads(p.read_text())["states"]) == 64 for p in files)
+          print("Exported two full 64-state CPU-only input grids.")
+          PY
+      - name: Archive GPU-ready six-factor input designs
+        uses: actions/upload-artifact@v4
+        with:
+          name: opensae-research-lab-six-factor-inputs
+          path: ${{ runner.temp }}/opensae-six-factor-inputs/*.json
+          if-no-files-found: error
+          retention-days: 30
+
+  quality:
+    needs: source-verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install scoped development quality tools
+        run: python -m pip install -e ".[dev,quality]"
+      - name: Ruff on adopted modules
+        run: ruff check saebase/seed.py saebase/data/artifact_layout.py saebase/data/prompt_schema.py saebase/benchmarks/registry.py
+      - name: Check WP15 release adapter formatting
+        run: |
+          ruff check saebase/tools/wp15_steer.py saebase/tools/wp15_import_gemma_graph.py saebase/research_lab/backend/wp15_records.py saebase/research_lab/tests/test_wp15_records.py
+          ruff format --check saebase/tools/wp15_steer.py saebase/tools/wp15_import_gemma_graph.py saebase/research_lab/backend/wp15_records.py saebase/research_lab/tests/test_wp15_records.py || { ruff format --diff saebase/tools/wp15_steer.py saebase/tools/wp15_import_gemma_graph.py saebase/research_lab/backend/wp15_records.py saebase/research_lab/tests/test_wp15_records.py; exit 1; }
+      - name: Mypy on adopted modules
+        run: mypy --config-file pyproject.toml saebase/seed.py saebase/data/artifact_layout.py saebase/data/prompt_schema.py saebase/benchmarks/registry.py
+      - name: Enforce lint and formatting on new Python files
+        shell: bash
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            python harness/github/work_test/check_wp21_added_python_quality.py --base-sha "$PR_BASE_SHA"
+          else
+            python saebase/tools/check_new_python_quality.py --base-sha HEAD^
+          fi
+      - name: Validate pre-commit config
+        run: pre-commit validate-config .pre-commit-config.yaml
+
+
+  pinned-research-regression:
+    needs: source-verify
+    uses: ./.github/workflows/research-regression.yml
+
+  release-validation-required:
+    if: ${{ always() }}
+    needs: [source-verify, offline-tests, analysis-install, package, localization-native, quality, hydra-composition, harness-source, pinned-research-regression]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every full validation job to pass
+        shell: bash
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          python - <<'PY'
+          import json, os
+          results = json.loads(os.environ["JOB_RESULTS"])
+          failures = {key: entry["result"] for key, entry in results.items()
+                      if entry["result"] != "success"}
+          if failures:
+              raise SystemExit("Full Release Validation incomplete: " + str(failures))
+          print("All full release acceptance jobs succeeded")
+          PY
