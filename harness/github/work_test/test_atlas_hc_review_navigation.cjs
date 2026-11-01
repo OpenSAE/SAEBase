@@ -60,7 +60,7 @@ review.plan.viewed.HC01={"core:g.alpha":{},"code:code:new":{}};
 assert.equal(test.findUnchecked(1),2,"next unchecked part stays in HC01");
 config.view="core";config.focusId="g.beta";
 review.plan.viewed.HC01["core:g.beta"]={};
-assert.equal(test.findUnchecked(1),-1,"after viewing all parts, decide HC01 before HC02");
+assert.equal(test.findUnchecked(1),3,"outer arrow reaches next unchecked HC after all current parts were viewed");
 for(const x of items.filter(x=>groups[0].item_keys.includes(x.key)))
   x.proposal_review={decision:"approved"};
 assert.equal(test.findUnchecked(1),3,"approved HC01 permits HC02");
@@ -72,6 +72,18 @@ assert(app.includes('config.zoom=1.1')&&app.includes('config.expanded.add(id)'),
 assert(app.includes('config.expandedAttributes.add(id)'),"selected node explanation expands");
 assert(css.includes(".atlas-review-done"),"completion dialog styling");
 assert(css.includes(".graph-node.node-selected[data-review]"),"review focus highlight");
-assert(app.includes('"atlasReviewPrev","‹","Previous unchecked'),"single prev is unchecked");
-assert(app.includes('"atlasReviewNext","›","Next unchecked'),"single next is unchecked");
+assert(app.includes('"atlasReviewPrev","‹","Previous item'),"single prev navigates directly");
+assert(app.includes('"atlasReviewNext","›","Next item'),"single next navigates directly");
+assert(app.includes('"atlasReviewPrevUnchecked","«","Previous unchecked'),"outer prev skips unchecked");
+assert(app.includes('"atlasReviewNextUnchecked","»","Next unchecked'),"outer next skips unchecked");
+assert(app.includes('"atlasReviewPrev").addEventListener("click",()=>reviewGo(reviewPosition()-1))'),
+       "inner left must force adjacent previous node");
+assert(app.includes('"atlasReviewNext").addEventListener("click",()=>reviewGo(reviewPosition()+1))'),
+       "inner right must force adjacent next node");
+assert(app.includes('"atlasReviewPrevUnchecked").addEventListener("click",()=>reviewGoUnchecked(-1))'),
+       "outer left must skip to prior unchecked node");
+assert(app.includes('"atlasReviewNextUnchecked").addEventListener("click",()=>reviewGoUnchecked(1))'),
+       "outer right must skip to following unchecked node");
+assert(css.includes(".review-arrow.review-skip")&&css.includes("border:2px solid #8255b5"),
+       "outer unchecked arrows need a prominent purple border");
 console.log("Atlas HC ordering, navigation, zoom and completion UI passed");
