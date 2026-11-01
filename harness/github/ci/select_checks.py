@@ -25,42 +25,82 @@ def classify(paths: Iterable[str], *, unknown_diff: bool = False) -> dict[str, b
     for path in paths:
         if not path or path.startswith("/") or "\\" in path or ".." in PurePosixPath(path).parts:
             return {key: True for key in result}
-        if path.startswith((
-            "harness/core/", "harness/github/", "harness/contracts/",
-            "harness/environment/", ".cursor/", ".github/skills/",
-        )) or path in ("AGENTS.md",):
+        if path.startswith(
+            (
+                "harness/core/",
+                "harness/github/",
+                "harness/contracts/",
+                "harness/environment/",
+                ".cursor/",
+                ".github/skills/",
+            )
+        ) or path in ("AGENTS.md",):
             result["harness"] = True
         elif path.startswith(("harness/", "doc/knowledge/", "doc/code/", "atlas/")):
             result["atlas"] = True
-        if path.startswith((
-            "harness/visualization/", "harness/code/", "harness/knowledge/",
-            "harness/core/", "doc/knowledge/", "doc/code/", "atlas/",
-        )):
+        if path.startswith(
+            (
+                "harness/visualization/",
+                "harness/code/",
+                "harness/knowledge/",
+                "harness/core/",
+                "doc/knowledge/",
+                "doc/code/",
+                "atlas/",
+            )
+        ):
             result["atlas"] = True
-        if path.startswith((
-            "saebase/", "models/", "datasets/", "tasks/", "conf/",
-            "tests/", "scripts/",
-        )) or path in ("pyproject.toml", "setup.py", "MANIFEST.in", "requirements.txt"):
+        if path.startswith(
+            (
+                "saebase/",
+                "models/",
+                "datasets/",
+                "tasks/",
+                "conf/",
+                "tests/",
+                "scripts/",
+            )
+        ) or path in ("pyproject.toml", "setup.py", "MANIFEST.in", "requirements.txt"):
             result["product"] = True
-        if path.startswith(".github/workflows/") or path.startswith(
-            "harness/github/ci/"
-        ) or path in (".github/dependabot.yml",):
+        if (
+            path.startswith(".github/workflows/")
+            or path.startswith("harness/github/ci/")
+            or path in (".github/dependabot.yml",)
+        ):
             result["ci_policy"] = True
             result["harness"] = True
-        known = (
-            path.startswith((
-                "harness/", "doc/", "atlas/", ".github/", ".cursor/",
-                "saebase/", "models/", "datasets/", "tasks/", "conf/",
-                "tests/", "scripts/",
-            ))
-            or path in {
-                "AGENTS.md", "README.md", "README_cn.md", "LICENSE",
-                "CITATION.cff", "MANIFEST.in", "pyproject.toml",
-                "setup.py", "requirements.txt", ".gitignore",
-                ".dockerignore", ".cursorignore", ".nojekyll",
-                ".pre-commit-config.yaml", "index.html",
-            }
-        )
+        known = path.startswith(
+            (
+                "harness/",
+                "doc/",
+                "atlas/",
+                ".github/",
+                ".cursor/",
+                "saebase/",
+                "models/",
+                "datasets/",
+                "tasks/",
+                "conf/",
+                "tests/",
+                "scripts/",
+            )
+        ) or path in {
+            "AGENTS.md",
+            "README.md",
+            "README_cn.md",
+            "LICENSE",
+            "CITATION.cff",
+            "MANIFEST.in",
+            "pyproject.toml",
+            "setup.py",
+            "requirements.txt",
+            ".gitignore",
+            ".dockerignore",
+            ".cursorignore",
+            ".nojekyll",
+            ".pre-commit-config.yaml",
+            "index.html",
+        }
         if not known:
             return {key: True for key in result}
     return result
@@ -72,7 +112,9 @@ def changed_paths(base: str, head: str) -> list[str] | None:
     try:
         raw = subprocess.run(
             ["git", "diff", "--name-status", "-z", "--find-renames", base, head],
-            capture_output=True, check=True, timeout=30,
+            capture_output=True,
+            check=True,
+            timeout=30,
         ).stdout
     except (OSError, subprocess.SubprocessError):
         return None
@@ -88,7 +130,7 @@ def changed_paths(base: str, head: str) -> list[str] | None:
         count = 2 if flag.startswith(("R", "C")) else 1
         if i + count >= len(chunks):
             return None
-        paths.extend(chunks[i + 1:i + 1 + count])
+        paths.extend(chunks[i + 1 : i + 1 + count])
         i += count + 1
     return paths
 
