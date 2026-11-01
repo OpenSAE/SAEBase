@@ -564,6 +564,16 @@
       "title": "Research terminology and source evidence",
       "summary": "Definitions and verifiable sources for scientific and engineering terms used throughout Atlas.",
       "description": "Definitions and verifiable sources for scientific and engineering terms used throughout Atlas."
+    },
+    "term.b2": {
+      "title": "Backblaze B2",
+      "summary": "Object storage for reproducible, explicitly scoped research artifact backups.",
+      "description": "SAEBase uses rclone over the native B2 API with copy-only transfers, immutable destinations and post-copy checks. Actual keys belong to each server's private configuration.",
+      "why_it_matters": "Supports recoverable cross-server storage without treating a remote transfer as independent scientific acceptance.",
+      "aliases": [
+        "Backblaze B2",
+        "B2 Cloud"
+      ]
     }
   }
 }

@@ -1,23 +1,16 @@
-# Backblaze B2 and rclone Transfers
+# Backblaze B2 and rclone transfers
 
-Backing up large files, checkpoints, and experiment outputs is optional infrastructure. **The default operation is a dry run.** Without an explicit user-approved execution, the tool does not contact the remote service, read credentials, upload, or download.
+Use the existing **B2 Native API** rclone remote already configured on each user server. The CLI defaults to preview and requires explicit `--execute` for a real transfer. It never reads, prints or writes keys to the repository. The tool always uses `copy --immutable`, never `sync` or `purge`; a changed existing destination fails rather than being overwritten.
+
+Initial mixed-research-data settings are 16 transfers, 16 checkers, four multithread streams, 256M cutoff, 64M chunk, fast-list, ten retries and twenty low-level retries. Multipart B2 upload concurrency is separate, initially four chunks per file. Tune for RAM, object sizes, throughput and rate limiting; 16 × 4 × 64 MiB can consume several GiB of buffer memory.
 
 ```bash
-# Install rclone locally and configure b2remote in the user's private configuration.
-# Never put credentials in the repository or a Work Order.
-python harness/transfer/b2.py push --local experiment/IOI --remote b2remote:my-bucket/openresearch/IOI
-# Transfer only after explicit authorization:
-python harness/transfer/b2.py push --local experiment/IOI --remote b2remote:my-bucket/openresearch/IOI --execute
-# Read-only integrity verification:
-python harness/transfer/b2.py verify --local experiment/IOI --remote b2remote:my-bucket/openresearch/IOI --execute
-# Recover previously stored artifacts:
-python harness/transfer/b2.py pull --local ./restore/IOI --remote b2remote:my-bucket/openresearch/IOI --execute
+python harness/transfer/b2.py push --local experiment/_studies/example --remote b2:bucket/saebase/WP23/run_001
+python harness/transfer/b2.py push --local experiment/_studies/example --remote b2:bucket/saebase/WP23/run_001 --execute --receipt experiment/_studies/example/reports/run_001/b2-copy.json
+python harness/transfer/b2.py verify --local experiment/_studies/example --remote b2:bucket/saebase/WP23/run_001 --execute --receipt experiment/_studies/example/reports/run_001/b2-check.json
+python harness/transfer/b2.py pull --local /workspace/restore/WP23/run_001 --remote b2:bucket/saebase/WP23/run_001 --execute
 ```
 
-The implementation uses `rclone copy`, rather than `sync`, so extra objects at the destination are not deliberately deleted. It does not call `purge`. Repeating an authorized copy can resume or incrementally update a transfer.
+The Work Plan must authorize the exact source, destination prefix and content types, and its primary filled report must link transfer receipts. The remote rclone check is not a substitute for a locally computed SHA256 manifest or scientific acceptance. Missing credentials or access are BLOCKED, not fake success.
 
-Integrity checks use `rclone check --one-way` with checksums supported by the chosen backend. Large-file hash verification depends on backend capabilities. Without `--execute`, commands display a plan instead of transferring.
-
-Backblaze B2 commonly uses multipart uploads for large files. Transfer concurrency and chunk size jointly affect RAM use. Choose values based on observed local resources from `harness/environment/probe.py`, rather than assuming maximum parallelism is safe.
-
-References: <https://rclone.org/b2/> and <https://rclone.org/commands/rclone_check/>.
+Documentation: <https://rclone.org/b2/>, <https://rclone.org/docs/>, and <https://www.backblaze.com/docs/cloud-storage-integrate-rclone-with-backblaze-b2>.

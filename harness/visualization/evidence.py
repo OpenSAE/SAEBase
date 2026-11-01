@@ -42,6 +42,7 @@ DIRECT_TARGETS = {
     "g.code_tree": ("harness/code/build.py", "build", "从实际 Python AST 生成代码树。"),
     "g.env_tree": ("harness/environment/probe.py", "profile", "采集当前机器的硬件与执行信息。"),
     "g.transfer": ("harness/transfer/b2.py", "command", "构建现有云端复制与校验命令。"),
+    "g.b2": ("harness/transfer/b2.py", "command", "使用服务器已配置的 Backblaze B2 连接创建可审核的非删除式传输。"),
 }
 
 

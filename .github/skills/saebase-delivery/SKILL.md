@@ -71,3 +71,7 @@ Default response order:
 When the user requests a formal Work Plan, follow `harness/github/work_plan/WRITING_STANDARD.md` and reuse Contract IDs selected from existing governance. Otherwise, a concise plan in the conversation is sufficient; do not create a Work Order or PR merely to discuss a proposal.
 
 If the user asks to make the change, use a focused branch and one reviewable PR. State exactly what was changed, what was tested, what remains unverified, and whether `main` was affected. Preserve historical scientific results, release identities and the existing approval process.
+
+## Human intake, Atlas links and durable execution contracts
+
+Before issuing a formal Work Plan, reconcile the user's confirmed goal, scientific motivation, existing Knowledge/Core/Context IDs, budget, authorization, risk trade-offs and intended result table. Preserve those decisions and unresolved questions in `harness/github/work_plan/from_human/<WP_ID>.md`, not in a duplicated execution prompt. Refer to the existing Atlas five-tree authority. Reuse `WORKPLAN_TEMPLATE.md`, `WRITING_STANDARD.md`, and `DELIVERABLE_STANDARD.md`; validate the structured WP references and existing Contracts. Agent-facing instructions should normally contain only the plan ID, checked-out source, scope and explicit human authorizations. Runtime Setup, Audit and B2 result delivery should be handled by the existing implementation; do not silently promote a Draft to approved or published.
