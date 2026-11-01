@@ -95,6 +95,8 @@ models = ["**/*.json", "**/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["harness/github/work_test"]
+# Frozen versioned WT archives must not be reinterpreted by future test suites.
+norecursedirs = ["archive"]
 
 [tool.ruff]
 line-length = 100
