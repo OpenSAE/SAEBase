@@ -13,6 +13,11 @@ Offline CI proves software checks only, not real GPU or scientific acceptance.
 
 Before implementing a new Work Plan, read [the Work Plan authoring standard](harness/github/work_plan/WRITING_STANDARD.en.md). Do not assume every remote branch is locally fetched; do not run a compute-intensive phase before environment, dependency and small-pilot checks succeed.
 
+## Human Check before GitHub changes
+
+For conversational GitHub maintenance, use [Human Check](harness/github/HUMAN_CHECK.md) and the [Delivery Skill](.github/skills/saebase-delivery/SKILL.md) **before source edits or a PR**. Default is enabled. Generate one Context-grounded written report plus a five-tree Atlas proposed-change overlay; every node has an **independent** Approve / Deny / Unchecked decision, without a whole-plan approval. Denied/unreviewed node scopes do not authorize code changes; unrelated approved scopes may proceed. Only a human may explicitly opt out via the local Atlas review. This does not bypass protected changes, contracts, GPU/publish permissions, or independent verification.
+
+
 ## Conversational task planning
 
 For planning, task decomposition, ownership review or multi-PR coordination,
