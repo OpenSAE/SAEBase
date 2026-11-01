@@ -22,34 +22,31 @@ scientific benchmark quality or checkpoint correctness. Include actual
 evidence links rather than implying that old validation covered new code.
 Review software source licensing and third-party provenance as usual.
 
-## CI verification
+## Exact-source Release Validation
 
-Merge the candidate into `main`. Before a software release, the
-exact target Commit SHA must have a successful **push-to-main** CI run.
-The release workflow verifies the SHA and all five current standard job contexts:
+Ordinary PR and `main` runs are deliberately lightweight. **They are not
+release evidence**. After merging the candidate to `main`, copy the exact
+current `main` SHA and manually start
+[Release Validation](../../../.github/workflows/release-validation.yml) on
+`main` with `source_sha=<40-character SHA>`.
 
-| Required job | Meaning |
-| --- | --- |
-| `offline-tests (3.11)` | Python tests, branch coverage, CLI and wheel installation |
-| `analysis-install` | Model analysis dependency compatibility |
-| `package` | Wheel and sdist build, metadata and source roundtrip |
-| `localization-native` | Source-pinned original research integration |
-| `quality` | Ruff, gradual mypy, new-code formatting |
+The source gate verifies the requested SHA is the exact current main commit.
+Every full job checks out that same source. It executes the old complete
+offline coverage, `.[analysis]` install, full package/Research Lab Docker,
+Localization, Hydra, quality, Atlas/Harness and pinned SAR/RSS regressions.
+The final gate requires all mandatory jobs to succeed.
 
-It downloads the wheel and sdist **from the same successful CI run**,
-rather than rebuilding a different binary and treating it as CI-tested.
-The source SHA in each GitHub Actions job must match the requested commit.
+The software release workflow checks a successful **workflow_dispatch
+Release Validation run for the identical SHA**, its five historical required
+contexts (`offline-tests (3.11)`, `analysis-install`, `package`,
+`localization-native`, `quality`), and uses only the distribution assets
+from that very same full-validation run. Skipped/failed/cancelled jobs,
+an older SHA or the lightweight main CI cannot substitute.
 
-Research-specific source-pinned regressions are separately executed when
-relevant files change. They are not always-on jobs and are not falsely
-reported as universally required checks.
-
-The current automatic CI and software release verifier use Python 3.11 for
-package installation, unit tests, coverage and distribution checks. Python 3.12
-remains a declared compatible version, but requires an explicit independent
-compatibility check when relevant to a new release. The Research Lab Docker
-image is a separate runtime and still uses Python 3.12. Earlier six-job release
-records remain unchanged.
+The standard automated lane runs Python 3.11. Python 3.12 is still declared
+compatible, so relevant changes require their own explicit compatibility
+evidence when releasing; the existing Research Lab Docker runtime remains
+separate.
 
 ## Verify without publishing
 
@@ -57,7 +54,7 @@ In GitHub Actions choose **SAEBase Software Release (manual)**, run on
 `main`, and enter the exact current main SHA and the version in the
 project. Select `mode = verify` and leave the confirmation blank.
 
-The job downloads the CI-tested assets and independently checks package
+The job downloads the fully release-validated assets and independently checks package
 metadata, all nine CLI names, software license declaration, absence of
 checkpoint weights and archived Stage D evidence, installation outside
 the checkout, clean rebuilding from sdist, and source/asset SHA256.
@@ -94,7 +91,7 @@ the explicit confirmation `PUBLISH-vX.Y.Z`.
 The publishing job executes only if verification succeeds. It refuses:
 
 - a source SHA that is not the current `main` HEAD;
-- a missing, failed or wrong-SHA standard CI job;
+- a missing, failed or wrong-SHA Release Validation job;
 - a version inconsistent across project, package and release notes;
 - a version that is older than or equal to an existing software tag;
 - any attempt to move an existing tag or overwrite a Release;
@@ -113,17 +110,16 @@ The workflow intentionally does **not** publish to PyPI. Future PyPI
 distribution should use a separate reviewed Trusted Publishing workflow,
 not a long-lived personal API token.
 
-## When source snapshots advance `main`
+## Atlas snapshots and historical dispatchers
 
-The repository may automatically refresh Atlas source snapshots after a release-preparation merge. Those source-only commits deliberately include `[skip ci]`. Because the software release gate requires an exact-source **push-to-main CI** result, a skipped snapshot commit is not an eligible publication SHA, even if the preceding release PR passed CI.
+Atlas snapshots and Pages deployment are manually triggered; ordinary
+`main` pushes do not generate extra snapshot commits. If the source SHA
+changes after full validation, restart Release Validation on the new
+current-main SHA. No prior PR check or lightweight CI result can be reused.
 
-Preserve the generated Atlas snapshot and its history. If the main branch moved after a release candidate was merged, incorporate a normal, reviewed follow-up release-documentation commit without `[skip ci]`, allow the resulting push-to-main CI to complete, and use **that exact current main SHA** for `mode=verify`. The prior PR CI, a workflow-dispatch test, or a manually selected older SHA cannot substitute for the current push CI.
-
-This rule does not authorize bypassing CI, force-moving `main`, changing an existing tag, or publishing without explicit release confirmation.
-
-## Version-specific v0.6.5 dispatch
-
-The maintainer-authorized v0.6.5 one-time dispatcher (`.github/workflows/saebase-v065-release-dispatch.yml`) requests the standard exact-source release workflow after a successful push-to-main CI for the current HEAD. It uses the same five current contexts and immutable-tag gates; a CI or candidate failure does not authorize publication. The installed wheel must expose source-owned dataset modules as `saebase.datasets`, while the sdist retains the physical `datasets/` source tree. This is checked in distribution validation before release.
+Historical version-specific release dispatchers (v0.4.0, v0.5.0, v0.6.0,
+v0.6.5) are retained as non-publishing manual archive notices.
+There is no automatic publish transition from lightweight CI success.
 
 ## After publication
 
