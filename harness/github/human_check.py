@@ -151,6 +151,14 @@ def create(manifest: dict[str, Any], *, base_sha: str | None = None) -> dict[str
             _safe(path)
             sources[path] = _file_hash(path)
         after = row.get("after")
+        if view == "code":
+            source_path = (original or {}).get("path") or (after or {}).get("path")
+            if (
+                not isinstance(source_path, str)
+                or not source_path.endswith(".py")
+                or source_path not in files
+            ):
+                raise atlas.FlowError("Code proposal must bind the exact Python source path")
         if operation != "remove" and (
             not isinstance(after, dict)
             or any(not isinstance(after.get(k), str) or not after[k].strip()
