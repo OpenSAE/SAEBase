@@ -130,12 +130,14 @@ def check(index: dict, root: Path = ROOT, *, release_version: str | None = None)
         highest = max((version_tuple(e["version"]) for e in index["entries"]), default=(0, 0, 0))
         if v > highest and release_version not in index.get("prepared_for_versions", []):
             raise ArchiveError(
-                "Full Release Validation requires archive preparation for "
-                + release_version
+                "Full Release Validation requires archive preparation for " + release_version
             )
-    return {"status": "PASS", "records": len(targets),
-            "versions": sorted({e["version"] for e in index["entries"]}, key=version_tuple),
-            "release_ready": release_version or "not_requested"}
+    return {
+        "status": "PASS",
+        "records": len(targets),
+        "versions": sorted({e["version"] for e in index["entries"]}, key=version_tuple),
+        "release_ready": release_version or "not_requested",
+    }
 
 
 def git_head(root: Path) -> str:
@@ -167,23 +169,41 @@ def prepare(closing: str, next_version: str, root: Path = ROOT) -> dict:
                 for source in sorted(child.rglob("*")):
                     if source.is_file():
                         relative = source.relative_to(root).as_posix()
-                        target = ("harness/github/" + owner + "/archive/"
-                                  + closing + "/" + child.name + "/"
-                                  + source.relative_to(child).as_posix())
-                        found.append({"original_path": relative, "archived_path": target,
-                                      "git_blob_sha": path_blob(root, relative), "mode": "move",
-                                      "version": closing})
+                        target = (
+                            "harness/github/"
+                            + owner
+                            + "/archive/"
+                            + closing
+                            + "/"
+                            + child.name
+                            + "/"
+                            + source.relative_to(child).as_posix()
+                        )
+                        found.append(
+                            {
+                                "original_path": relative,
+                                "archived_path": target,
+                                "git_blob_sha": path_blob(root, relative),
+                                "mode": "move",
+                                "version": closing,
+                            }
+                        )
         else:
             for source in sorted(folder.iterdir()):
                 m = DOC_NAME.fullmatch(source.name)
                 if not m or m.group("version") != closing or m.group("kind") != kind:
                     continue
                 relative = source.relative_to(root).as_posix()
-                target = ("harness/github/" + owner + "/archive/"
-                          + closing + "/" + source.name)
-                found.append({"original_path": relative, "archived_path": target,
-                              "git_blob_sha": path_blob(root, relative), "mode": "move",
-                              "version": closing})
+                target = "harness/github/" + owner + "/archive/" + closing + "/" + source.name
+                found.append(
+                    {
+                        "original_path": relative,
+                        "archived_path": target,
+                        "git_blob_sha": path_blob(root, relative),
+                        "mode": "move",
+                        "version": closing,
+                    }
+                )
     existing = {x["original_path"] for x in index["entries"]}
     candidates = [x for x in found if x["original_path"] not in existing]
     for row in candidates:
@@ -192,12 +212,13 @@ def prepare(closing: str, next_version: str, root: Path = ROOT) -> dict:
             raise ArchiveError("Archive target already exists: " + row["archived_path"])
     return {
         "schema": "saebase.harness.archive_preparation.v1",
-        "source_sha": git_head(root), "closing_version": closing,
-        "next_version": next_version, "status": "HUMAN_CHECK_REQUIRED",
+        "source_sha": git_head(root),
+        "closing_version": closing,
+        "next_version": next_version,
+        "status": "HUMAN_CHECK_REQUIRED",
         "candidates": candidates,
         "note": "Prepare is read-only. Review all affected Atlas locations before implementation.",
     }
-
 
 
 def apply_reviewed(preparation_path: Path, review_id: str, root: Path = ROOT) -> dict:
@@ -236,11 +257,13 @@ def apply_reviewed(preparation_path: Path, review_id: str, root: Path = ROOT) ->
     for row in candidates:
         if row["archived_path"] in existing:
             raise ArchiveError("Duplicate archive target")
-        index_copy["entries"].append({
-            **row,
-            "status": "archived",
-            "reason": "Automatically prepared; human-approved exact-source migration",
-        })
+        index_copy["entries"].append(
+            {
+                **row,
+                "status": "archived",
+                "reason": "Automatically prepared; human-approved exact-source migration",
+            }
+        )
         existing.add(row["archived_path"])
     version = plan.get("next_version")
     version_tuple(version)
@@ -275,6 +298,7 @@ def apply_reviewed(preparation_path: Path, review_id: str, root: Path = ROOT) ->
         "prepared_for": version,
         "approved_human_check": review_id,
     }
+
 
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
