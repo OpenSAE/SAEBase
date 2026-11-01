@@ -386,16 +386,18 @@
         "key": "core:g.code_tree"
       },
       {
-        "view": "core",
-        "node_id": "g.archive_tool",
+        "view": "code",
+        "node_id": "code:module:harness.github.archive",
         "operation": "add",
-        "parent_id": "g.code_tree",
+        "parent_id": null,
         "before": null,
         "after": {
-          "type": "goal",
-          "title": "生成归档候选",
-          "description": "只生成确定性路径、版本证据和冲突报告",
+          "type": "module",
+          "title": "生成确定性的版本归档候选",
+          "description": "在独立的归档工具里执行扫描、命名和完整性检查；正式源码目前尚不存在。",
+          "path": "harness/github/archive.py",
           "context_term_ids": [
+            "term.python",
             "term.code_tree"
           ]
         },
@@ -410,10 +412,11 @@
           "引用关系核验"
         ],
         "context_term_ids": [
+          "term.python",
           "term.code_tree"
         ],
         "proposal_review": null,
-        "key": "core:g.archive_tool"
+        "key": "code:code:module:harness.github.archive"
       },
       {
         "view": "core",
@@ -575,7 +578,7 @@
         "title": "归档工具与完整性校验",
         "item_keys": [
           "core:g.code_tree",
-          "core:g.archive_tool",
+          "code:code:module:harness.github.archive",
           "core:g.archive_tool_test"
         ]
       },
