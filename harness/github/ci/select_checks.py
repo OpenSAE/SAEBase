@@ -50,7 +50,15 @@ def classify(paths: Iterable[str], *, unknown_diff: bool = False) -> dict[str, b
             )
         ):
             result["atlas"] = True
-        if path.startswith(
+        if path in {
+            "saebase/tools/release_candidate.py",
+            "saebase/tools/verify_distribution.py",
+            "saebase/tools/check_installed_wheel.py",
+            "saebase/tools/check_sdist_roundtrip.py",
+        }:
+            result["harness"] = True
+            result["ci_policy"] = True
+        elif path.startswith(
             (
                 "saebase/",
                 "models/",
