@@ -340,8 +340,11 @@ def test_logical_group_requires_visiting_every_atlas_part(workspace):
     item["group_title"] = "Independent Knowledge change"
     plan = hc.create(manifest, base_sha="a" * 40)
     assert len(plan["groups"]) == 2
-    with pytest.raises(agent_flow.FlowError, match="Grouped Atlas part"):
-        hc.decide(plan, "core:g.registry", "approved", actor="Human")
+    hc.decide(plan, "core:g.registry", "approved", actor="Human")
+    assert plan["items"][0]["proposal_review"]["decision"] == "approved"
+    assert plan["items"][1]["proposal_review"] is None
+    with pytest.raises(agent_flow.FlowError, match="Unapproved"):
+        hc.allowed_paths(plan, ["saebase/registry.py"], base_sha="a" * 40)
     hc.visit(plan, "core:g.registry", actor="Human")
     with pytest.raises(agent_flow.FlowError, match="Visit every linked Atlas part"):
         hc.decide_group(plan, "HC01", "approved", actor="Human")
@@ -349,7 +352,7 @@ def test_logical_group_requires_visiting_every_atlas_part(workspace):
     hc.decide_group(plan, "HC01", "denied", actor="Human")
     hc.visit(plan, "knowledge:q.sae.methods", actor="Human")
     hc.decide_group(plan, "HC02", "approved", actor="Human")
-    assert hc.load(plan["id"])["revision"] == 5
+    assert hc.load(plan["id"])["revision"] == 6
     assert hc.allowed_paths(
         plan, ["tasks/capture/operation.py"], base_sha="a" * 40
     )["status"] == "APPROVED_SCOPE"
@@ -426,12 +429,16 @@ def test_atlas_group_review_frontend_opens_core_and_guides_cross_tree_review():
     assert "if(requestedReview())" in app
     assert "function logicalReviewGroup(" in app
     assert "/api/review/visit" in app
-    assert "/api/review/group-decision" in app
+    # New Atlas decisions use the node endpoint; the old group endpoint remains
+    # available server-side for historical grouped clients.
+    assert "/api/review/decision" in app
     assert "Next linked part" not in app
     assert "atlasReviewGroupScope" not in app
     assert "maybeShowReviewDone" in app
     assert "reviewQueue=[...ordered,...byKey.values()]" in app
-    assert "groupComplete" in app
+    assert "groupComplete" not in app
+    assert "reviewHandoffURL" in app
+    assert 'fetch("/api/review/decision"' in app
 
 
 def test_quickstart_reuses_proposal_and_checks_ui(workspace, monkeypatch, tmp_path):
