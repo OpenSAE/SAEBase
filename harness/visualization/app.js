@@ -118,8 +118,8 @@
   };
   let review = null, reviewGraphs = {}, reviewBusy = false, reviewError = "";
   let reviewDraftMessage = "";
-  const REVIEW_VIEWS=["knowledge","code","environment","context"];
-  const REVIEW_TITLES={knowledge:"Knowledge",code:"Code",
+  const REVIEW_VIEWS=["core","knowledge","code","environment","context"];
+  const REVIEW_TITLES={core:"Core",knowledge:"Knowledge",code:"Code",
     environment:"Environment",context:"Context"};
   let reviewQueue=[],reviewGroupOf=new Map(),reviewGroups=[];
   let reviewFilter={level:"all"},reviewMenuOpen=false;
@@ -145,7 +145,7 @@
     reviewGraphs = {};
     if (!review) return;
     const anchor = review.context || { nodes:[], edges:[] };
-    for(const view of ["knowledge","code","environment","context"]) {
+    for(const view of REVIEW_VIEWS) {
       const base = DATA[view] || {nodes:[],edges:[]};
       const nodes = new Map((base.nodes || []).map(n=>[n.id,n]));
       const edges = [...(base.edges || [])];
@@ -185,6 +185,7 @@
           reader_explanation: after.reader_explanation || after.description || origin.description || "",
           context_term_ids: after.context_term_ids || after.term_ids ||
                             baseNode.context_term_ids || [],
+          human_check: review.plan.kind==="human_check",
           review_item: true
         };
         nodes.set(item.node_id,displayed);
@@ -481,9 +482,16 @@
     $("atlasReviewNextUnchecked").disabled=reviewBusy||findUnchecked(1)<0;
     $("atlasReviewPrev").disabled=reviewBusy||current<=0;
     $("atlasReviewNext").disabled=reviewBusy||current>=items.length-1;
-    $("atlasReviewApprove").disabled=reviewBusy||current<0;
-    $("atlasReviewDeny").disabled=reviewBusy||current<0;
-    $("atlasReviewUnchecked").disabled=reviewBusy||current<0;
+    const disabled=review.plan.kind==="human_check" && review.plan.mode==="off";
+    $("atlasReviewApprove").disabled=reviewBusy||current<0||disabled;
+    $("atlasReviewDeny").disabled=reviewBusy||current<0||disabled;
+    $("atlasReviewUnchecked").disabled=reviewBusy||current<0||disabled;
+    const toggle=$("atlasHumanCheckToggle");
+    if(toggle){
+      toggle.textContent=disabled?"Human Check OFF · Enable":"Human Check ON · Disable";
+      toggle.disabled=reviewBusy||!review.editable;
+      toggle.classList.toggle("chosen",!disabled);
+    }
     $("atlasReviewExport").classList.toggle("is-hidden", !!review.editable);
     $("atlasReviewExport").disabled = reviewBusy;
     const currentItem=items[current];
@@ -493,7 +501,7 @@
     $("atlasReviewUnchecked").classList.toggle("chosen",status==="unchecked");
     renderReviewCategories();
     $("atlasReviewMessage").textContent = reviewBusy ? "Saving…" : reviewError ? reviewError :
-       (!review.editable ? (reviewDraftMessage || "Browser draft") :
+       (disabled ? "Human opted out · recorded" : !review.editable ? (reviewDraftMessage || "Browser draft") :
        (status === "unchecked" ? "Unchecked" :
         status === "approved" ? "Not implemented" : "Denied"));
   }
@@ -510,7 +518,7 @@
     render(false);
   }
   async function loadReview() {
-    if(!requestedReview() || config.view==="core") return;
+    if(!requestedReview()) return;
     let payload,live=false;
     try {
       const response=await fetch("/api/review/state",{cache:"no-store"});
@@ -537,6 +545,22 @@
       if(first) navigate(first.node_id,first.view,true);
     }
     const bar=$("atlasReviewBar");
+    if(review.plan.kind==="human_check"){
+      let toggle=$("atlasHumanCheckToggle");
+      if(!toggle){
+        toggle=el("button","review-export","Human Check ON · Disable");
+        toggle.id="atlasHumanCheckToggle";toggle.type="button";
+        toggle.title="Only the human can disable this optional pre-PR review; other approvals remain required";
+        bar.appendChild(toggle);
+        toggle.addEventListener("click",toggleHumanCheck);
+      }
+      if(!$("atlasHumanCheckReport")){
+        const report=el("a","review-export","Written report");
+        report.id="atlasHumanCheckReport";report.href="/api/review/report";
+        report.target="_blank";report.rel="noopener noreferrer";
+        bar.appendChild(report);
+      }
+    }
     $("atlasReviewPrevUnchecked").addEventListener("click",()=>reviewGoUnchecked(-1));
     $("atlasReviewPrev").addEventListener("click",()=>reviewGo(reviewPosition()-1));
     $("atlasReviewNext").addEventListener("click",()=>reviewGo(reviewPosition()+1));
@@ -590,8 +614,25 @@
     return true;
   }
 
+  async function toggleHumanCheck(){
+    if(!review?.editable || reviewBusy || review.plan.kind!=="human_check")return;
+    reviewBusy=true;updateReviewBar();
+    try{
+      const response=await fetch("/api/review/mode",{
+        method:"POST",credentials:"same-origin",
+        headers:{"Content-Type":"application/json","X-Atlas-Review-Key":reviewKey()},
+        body:JSON.stringify({revision:review.plan.revision,enabled:review.plan.mode==="off"})
+      });
+      const data=await response.json();
+      if(!response.ok)throw Error(data.error||"Mode not saved");
+      applyReviewResponse(data,true);
+    }catch(error){
+      reviewError=error.message;
+    }finally{reviewBusy=false;updateReviewBar();}
+  }
+
   async function submitReview(decision) {
-    if(!review || reviewBusy) return;
+    if(!review || reviewBusy || (review.plan.kind==="human_check" && review.plan.mode==="off")) return;
     const at=reviewPosition();
     if(at<0)return;
     const current=filteredReviewQueue()[at];
@@ -1989,6 +2030,21 @@
         el("p","",n.aliases.join(" · ")));
     if(n.next)section(nodeLayer,searchText("下一步","Next step"))
       .appendChild(el("p","",n.next));
+    if(review?.plan?.kind==="human_check" && proposal){
+      const details=section(nodeLayer,searchText("Human Check 修改方案","Human Check proposal"));
+      const original=proposal.before?.description || "New node";
+      const proposed=proposal.after?.description || "Remove this node";
+      for(const [heading,value] of [
+        ["Operation",proposal.operation],
+        ["Before",original],["Proposed after",proposed],
+        ["Reason",proposal.reason],["Risk",proposal.risk],
+        ["Files",(proposal.files||[]).join(", ")],
+        ["Checks",(proposal.checks||[]).join("; ")],
+        ["Context",(proposal.context_term_ids||[]).join(", ")]
+      ]){
+        details.appendChild(el("p","detail-description",heading+": "+(value||"—")));
+      }
+    }
 
     const links=explicitRelations(config.view,n.id);
     const relations=detailLayer(area,"02",
