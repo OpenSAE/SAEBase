@@ -67,3 +67,11 @@ including queue delay; compare median and P90 PR/main wall time and total
 runner-minutes against the previous unconditional CI runs. Distinguish
 cancelled superseded runs and Release Validation from daily CI.
 No duration estimate is a measured result until checked against real runs.
+
+
+
+Versioned Harness archives are checked using
+`python -m harness.github.archive check` in Harness-targeted CI and
+Release Validation. Old WT archives are excluded from ordinary pytest
+collection; current Contract/CI and release tests remain in `work_test/`.
+Archive preparation is a separately authorized manual, read-only workflow.
