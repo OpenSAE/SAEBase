@@ -334,7 +334,11 @@ def snapshot(plan: dict[str, Any]) -> dict[str, Any]:
     """Use the existing Atlas overlay and cards, including read-only Core."""
     from harness.core.agent_proposal_review import selected_context
 
-    return {"plan": validate(plan), "context": selected_context(plan)}
+    # The published Atlas snapshot can lag behind current Core authority.
+    # Ship the real source-backed Core hierarchy inside the *local* review
+    # response so existing nodes such as q.reproducibility remain reachable.
+    core = json.loads((ROOT / "harness/core/project_graph.json").read_text(encoding="utf-8"))
+    return {"plan": validate(plan), "context": selected_context(plan), "core_context": core}
 
 
 def _write(plan: dict[str, Any]) -> None:
