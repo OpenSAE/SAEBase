@@ -432,3 +432,42 @@ def test_atlas_group_review_frontend_opens_core_and_guides_cross_tree_review():
     assert "maybeShowReviewDone" in app
     assert "reviewQueue=[...ordered,...byKey.values()]" in app
     assert "groupComplete" in app
+
+
+def test_quickstart_reuses_proposal_and_checks_ui(workspace, monkeypatch, tmp_path):
+    import threading
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+    from urllib.parse import urlsplit
+    from harness.core import agent_review_server
+
+    class FakeHandler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            path = urlsplit(self.path).path
+            if path == "/api/review/state":
+                body = json.dumps({"plan": {"id": "HC-Example-001"}}).encode()
+            elif path == "/core.html":
+                body = b"<html><script src='app.js'></script></html>"
+            else:
+                body = b"static asset " * 20
+            self.send_response(200)
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+        def log_message(self, *_):
+            pass
+
+    def fake_server(plan_id, port, *, human_check):
+        assert human_check and plan_id == "HC-Example-001"
+        server = ThreadingHTTPServer(("127.0.0.1", 0), FakeHandler)
+        server.review_key = "test-only"
+        return server
+
+    monkeypatch.setattr(agent_review_server, "create_server", fake_server)
+    monkeypatch.setattr(hc, "_git_head", lambda: "a" * 40)
+    # Avoid the interactive serve-forever wait while retaining the HTTP probe.
+    original_join = threading.Thread.join
+    monkeypatch.setattr(threading.Thread, "join", lambda self, timeout=None: None)
+    manifest = tmp_path / "proposal.json"
+    manifest.write_text(json.dumps(_manifest()), encoding="utf-8")
+    hc.quickstart_review(manifest, base_sha="a" * 40, port=0, no_browser=True)
+    assert hc.load("HC-Example-001")["base_sha"] == "a" * 40

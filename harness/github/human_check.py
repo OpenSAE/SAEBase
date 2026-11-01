@@ -473,9 +473,78 @@ def allowed_paths(
     }
 
 
+
+def quickstart_review(
+    manifest_path: Path, *, base_sha: str | None, port: int, no_browser: bool
+) -> None:
+    """Prepare and open a verified local Atlas Human Check; never approve on behalf of a user."""
+    import threading
+    import webbrowser
+    from urllib.parse import quote
+    from urllib.request import urlopen
+
+    from harness.core.agent_review_server import create_server
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    plan_id = manifest["id"]
+    expected = base_sha or _git_head()
+    if _git_head() != expected:
+        raise atlas.FlowError("Source SHA drift; create a new Human Check")
+    if _ledger_path(plan_id).exists():
+        plan = load(plan_id)
+        if plan["base_sha"] != expected or plan["goal"] != manifest["goal"]:
+            raise atlas.FlowError("Existing proposal differs; use a new Human Check ID")
+        if {(i["view"], i["node_id"], i["operation"]) for i in plan["items"]} != {
+            (i["view"], i["node_id"], i["operation"]) for i in manifest["items"]
+        }:
+            raise atlas.FlowError("Existing proposal node scope differs")
+    else:
+        plan = create(manifest, base_sha=expected)
+
+    for path, checksum in {**plan["source_identities"], **plan["authority_sha256"]}.items():
+        if _file_hash(path) != checksum:
+            raise atlas.FlowError("Human Check source drift: " + path)
+
+    server = create_server(plan_id, port, human_check=True)
+    host = f"http://127.0.0.1:{server.server_address[1]}"
+    url = f"{host}/core.html?review={quote(plan_id)}#key={server.review_key}"
+    worker = threading.Thread(target=server.serve_forever, kwargs={"poll_interval": 0.1}, daemon=True)
+    worker.start()
+    try:
+        for path, check in (
+            (f"/core.html?review={quote(plan_id)}", lambda b: b'app.js' in b),
+            ("/app.js", lambda b: len(b) > 100),
+            ("/style.css", lambda b: len(b) > 100),
+            ("/data.js", lambda b: len(b) > 100),
+            ("/api/review/state", lambda b: json.loads(b)["plan"]["id"] == plan_id),
+        ):
+            with urlopen(host + path, timeout=8) as response:
+                if response.status != 200 or not check(response.read()):
+                    raise atlas.FlowError("Atlas UI is not ready: " + path)
+        print("ATLAS_REVIEW_READY: " + url, flush=True)
+        print("Decisions require the authenticated local Atlas.", flush=True)
+        if not no_browser:
+            try:
+                if not webbrowser.open(url):
+                    print("Browser did not open; use the verified URL above.", flush=True)
+            except webbrowser.Error:
+                print("Browser unavailable; use the verified URL above.", flush=True)
+        worker.join()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.shutdown()
+        server.server_close()
+        worker.join(timeout=5)
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     sub = p.add_subparsers(dest="command", required=True)
+    quick = sub.add_parser("quickstart", help="Prepare and open the Atlas Human Check")
+    quick.add_argument("--manifest", type=Path, required=True)
+    quick.add_argument("--base-sha")
+    quick.add_argument("--port", type=int, default=0)
+    quick.add_argument("--no-browser", action="store_true")
     create_parser = sub.add_parser("prepare")
     create_parser.add_argument("--manifest", type=Path, required=True)
     create_parser.add_argument("--base-sha")
@@ -490,7 +559,10 @@ def main() -> int:
             parser.add_argument("--path", action="append", required=True)
     args = p.parse_args()
     try:
-        if args.command == "prepare":
+        if args.command == "quickstart":
+            quickstart_review(args.manifest, base_sha=args.base_sha,
+                              port=args.port, no_browser=args.no_browser)
+        elif args.command == "prepare":
             data = json.loads(args.manifest.read_text(encoding="utf-8"))
             result = create(data, base_sha=args.base_sha)
             print(
