@@ -432,32 +432,17 @@
         },
         {
           "name": "execution",
-          "title": "实验启动、运行记录与产物目录",
-          "summary": "启动任务并记录设备、结果和实验目录。",
-          "description": "启动任务并记录设备、结果和实验目录。",
-          "en_title": "Experiment launch and run records",
-          "en_summary": "Check runtime availability, execute configured experiments, and capture result paths.",
-          "en_description": "Check runtime availability, execute configured experiments, and capture result paths.",
+          "title": "实验启动、运行前检查与产物记录",
+          "summary": "执行运行前检查、启动实验并记录设备、资源及产物目录。",
+          "description": "执行运行前检查、启动实验并记录设备、资源及产物目录。",
+          "en_title": "Experiment setup, execution and records",
+          "en_summary": "Check setup resources, launch experiments, and track the resulting artifacts.",
+          "en_description": "Check setup resources, launch experiments, and track the resulting artifacts.",
           "context_terms": [
             "term.saebase_runtime"
           ],
           "patterns": [
-            "^runtime/(?:train|runtime_check|summary_log|experiment_paths|hardware|resource_planner|supervisor|audit)\\.py$"
-          ]
-        },
-        {
-          "name": "setup",
-          "title": "运行前的环境与代表性组件验证",
-          "summary": "按已有研究配置检查真实资源、代表性组件和实测吞吐量。",
-          "description": "复用 Runtime 的硬件探测及既有 Model/SAE API，依据实际 Pilot 收据估算执行成本，并明确列出每个组合的验证覆盖范围。",
-          "en_title": "Environment and representative component setup",
-          "en_summary": "Inventory available resources, select representative study components, and estimate time from measured pilots.",
-          "en_description": "Reuse Runtime device observations and registered Model/SAE APIs to estimate real pilot costs and report exact coverage.",
-          "context_terms": [
-            "term.saebase_runtime",
-            "term.model"
-          ],
-          "patterns": [
+            "^runtime/(?:train|runtime_check|summary_log|experiment_paths|hardware|resource_planner|supervisor|audit)\\.py$",
             "^setup/.*\\.py$"
           ]
         }
