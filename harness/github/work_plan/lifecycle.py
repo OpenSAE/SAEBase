@@ -105,6 +105,8 @@ def check(plan_path, root=ROOT, check_contracts=True):
         if (step.get("permission") not in ("local", "network", "gpu", "native", "publish")
                 or not step.get("goal") or not step.get("evidence")):
             raise PlanError("Missing purpose, evidence or permission")
+        if plan["status"] == "approved" and not step.get("command"):
+            raise PlanError("Approved executable step requires a concrete command")
         seen.add(step["id"])
     if not seen or not plan.get("deliverables"):
         raise PlanError("Steps and deliverables are mandatory")
@@ -120,7 +122,7 @@ def check(plan_path, root=ROOT, check_contracts=True):
 
 def completed(plan_path, receipt, root=ROOT):
     """Fill a new copy of the original plan from observed results."""
-    plan = check(plan_path, root=root)
+    plan = check(plan_path, root=root, check_contracts=(root.resolve() == ROOT.resolve()))
     if (receipt.get("schema") != "saebase.workplan.run.v1"
             or receipt.get("plan_id") != plan["plan_id"]
             or not receipt.get("run_id")):

@@ -449,10 +449,10 @@
           "name": "setup",
           "title": "运行前的环境与代表性组件验证",
           "summary": "按已有研究配置检查真实资源、代表性组件和实测吞吐量。",
-          "description": "复用 Runtime 的硬件探测及既有 Model/SAE API，在实际 Pilot 收据支持下估算执行成本，未运行组合始终保留未验证状态。",
+          "description": "复用 Runtime 的硬件探测及既有 Model/SAE API，依据实际 Pilot 收据估算执行成本，并明确列出每个组合的验证覆盖范围。",
           "en_title": "Environment and representative component setup",
           "en_summary": "Inventory available resources, select representative study components, and estimate time from measured pilots.",
-          "en_description": "Reuse Runtime device observations and registered Model/SAE loaders without changing scientific parameters; explicitly retain untested coverage.",
+          "en_description": "Reuse Runtime device observations and registered Model/SAE APIs to estimate real pilot costs and report exact coverage.",
           "context_terms": [
             "term.saebase_runtime",
             "term.model"

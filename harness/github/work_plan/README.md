@@ -110,3 +110,7 @@ WP13 changes **operational readiness and deployment**, not the untouched WP12 P8
 ## 新 Work Plan 的统一入口
 
 起草前将人类确认的科研目标与 Atlas 关联保存在 [from_human](from_human/README.md)，使用 [Work Plan 模板](WORKPLAN_TEMPLATE.md) 并遵循 [写作规范](WRITING_STANDARD.md)。每份新计划需包含可解析的 `workplan-json`、既有 `harness-contracts-json`，以及预定义结果表。通过 [生命周期校验器](lifecycle.py) 核查引用、结构与选定合同；这些元数据并不授权执行。结果按 [交付规范](DELIVERABLE_STANDARD.md) 存成填写完成的 Work Plan 与独立收据。
+
+## Work Plan declarative execution
+
+The existing [dispatcher](dispatch.py) reads a validated plan's per-step `command` and `needs` DAG and checks script identity. Preview with `python -m harness.github.work_plan.dispatch --plan <path> --run-id <id>`. Actual `--execute` requires approved plan state and explicit human permission flags; remote publication is never implicit. The coordinator records exact process exit codes, elapsed time and local/independent failure scope. It reuses study Task entrypoints, not a new scientific Runner or OS-level security sandbox.

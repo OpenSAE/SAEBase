@@ -54,9 +54,9 @@ The fields below are references and predefined output slots, **not a duplicate c
     "config": "conf/experiment/example.yaml"
   },
   "steps": [
-    {"id": "setup", "needs": [], "permission": "local", "goal": "Check actual environment", "evidence": "setup receipt"},
-    {"id": "run", "needs": ["setup"], "permission": "gpu", "goal": "Real bounded experiment", "evidence": "run receipt"},
-    {"id": "audit", "needs": ["run"], "permission": "local", "goal": "Independent result audit", "evidence": "audit report"}
+    {"id": "setup", "needs": [], "permission": "local", "goal": "Check actual environment", "evidence": "setup receipt", "command": ["python", "-m", "saebase.setup", "--help"]},
+    {"id": "run", "needs": ["setup"], "permission": "gpu", "goal": "Real bounded experiment", "evidence": "run receipt", "command": ["bash", "scripts/experiments/example.sh", "full"]},
+    {"id": "audit", "needs": ["run"], "permission": "local", "goal": "Independent result audit", "evidence": "audit report", "command": ["python", "-m", "saebase.runtime.audit", "--help"]}
   ],
   "deliverables": [
     {"experiment": "E1", "metric": "example metric", "expected": "fixed population"}
