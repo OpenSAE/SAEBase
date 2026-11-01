@@ -668,6 +668,19 @@
         bar.appendChild(report);
       }
     }
+    // Existing IDs are preserved for backwards-compatible Atlas tests,
+    // but the visible single/double arrow behavior is deliberately swapped.
+    for(const [id,glyph,label] of [
+      ["atlasReviewPrevUnchecked","«","Previous any item · Shift+←"],
+      ["atlasReviewPrev","‹","Previous unchecked · ←"],
+      ["atlasReviewNext","›","Next unchecked · →"],
+      ["atlasReviewNextUnchecked","»","Next any item · Shift+→"]
+    ]){
+      const button=$(id);
+      button.textContent=glyph;
+      button.title=label;
+      button.setAttribute("aria-label",label);
+    }
     $("atlasReviewPrevUnchecked").addEventListener("click",()=>reviewGo(reviewPosition()-1));
     $("atlasReviewPrev").addEventListener("click",()=>reviewGoUnchecked(-1));
     $("atlasReviewNext").addEventListener("click",()=>reviewGoUnchecked(1));
@@ -1027,6 +1040,12 @@
       config.expandedAttributes.add(id);
     config.animateNextRender = true;
     setAddress(id, !!replace || sameFocus);
+    if(reviewTarget){
+      const canvas=$("canvasWrap");
+      canvas.classList.add("atlas-review-landing");
+      // The landing animation is transient; wheel/pointer pan stays immediate.
+      window.setTimeout(()=>canvas.classList.remove("atlas-review-landing"),420);
+    }
     render(false,true);
     centerSelected();
     if(review){updateReviewBar();queueReviewVisit();}
