@@ -4,6 +4,8 @@ const fs=require("node:fs"),path=require("node:path"),vm=require("node:vm");
 const assert=require("node:assert/strict");
 const app=fs.readFileSync(path.join(__dirname,"../../visualization/app.js"),"utf8");
 const css=fs.readFileSync(path.join(__dirname,"../../visualization/style.css"),"utf8");
+const html=fs.readFileSync(path.join(__dirname,"../../visualization/index.html"),"utf8");
+const i18n=fs.readFileSync(path.join(__dirname,"../../visualization/i18n.js"),"utf8");
 function method(start,next){
   const a=app.indexOf("  function "+start+"("),b=app.indexOf("  function "+next+"(",a+2);
   assert(a>=0&&b>a,"Atlas method "+start+" must precede "+next);
@@ -110,7 +112,7 @@ const mock={
 vm.createContext(mock);
 vm.runInContext(extract("saveBrowserDraft","reviewHandoffData")+"\n"+
   extract("reviewHandoffData","reviewHandoffURL")+"\n"+
-  extract("reviewHandoffURL","exportBrowserDraft")+"\n"+
+  extract("reviewHandoffURL","maybeShowReviewDone")+"\n"+
   "globalThis.inspect={saveBrowserDraft,reviewHandoffData,reviewHandoffURL}",
   mock,{timeout:1200});
 mock.inspect.saveBrowserDraft("core:g.alpha","approved");
@@ -123,4 +125,14 @@ assert.equal(mock.inspect.reviewHandoffData().decisions["code:code:new"],"unchec
 assert(mock.inspect.reviewHandoffURL().startsWith("https://github.com/OpenSAE/SAEBase/issues/new?title="));
 assert(!app.includes("||!groupComplete"),"A group visit must not lock current approval buttons");
 
+
+assert.equal((html.match(/id="atlasReviewSendReport"/g)||[]).length,1,"one report link");
+assert(!html.includes("atlasReviewExport"),"remove JSON export");
+assert(!app.includes("atlasReviewShare")&&!app.includes("atlasHumanCheckReport"),"no redundant report links");
+assert(app.includes('review.plan.kind==="human_check" && review.editable'),"hide nonfunctional public toggle");
+assert(app.includes('searchText("发送报告","Send report")'),"report label tracks language");
+assert(app.includes('report.href=url'),"report handoff must be functional");
+assert(i18n.includes('"Send report":"发送报告"'),"English -> Chinese");
+assert(i18n.includes('"发送报告":"Send report"'),"Chinese -> English");
+assert(css.includes(".atlas-review-bar .review-send-report")&&css.includes("order:4"),"report positioning");
 console.log("Atlas HC ordering, immediate approval, handoff and navigation passed");

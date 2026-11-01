@@ -609,19 +609,6 @@
     return "https://github.com/OpenSAE/SAEBase/issues/new?title="
       +encodeURIComponent(title)+"&body="+encodeURIComponent(body);
   }
-  function exportBrowserDraft() {
-    if(!review || review.editable) return;
-    const store=browserDraftStorage();
-    const raw=store?.getItem(browserDraftKey(review.plan));
-    if(!raw){reviewError="Nothing saved";updateReviewBar();return;}
-    const data=JSON.parse(raw);
-    const payload=JSON.stringify(data,null,2)+"\n";
-    const url=URL.createObjectURL(new Blob([payload],{type:"application/json"}));
-    const link=el("a");
-    link.href=url;link.download=review.plan.id+".proposal-draft.json";
-    document.body.appendChild(link);link.click();link.remove();
-    setTimeout(()=>URL.revokeObjectURL(url),0);
-  }
   function maybeShowReviewDone(){
     if(!review?.plan?.items?.length || reviewDoneShown)return;
     if(review.plan.items.some(item=>proposalState(item)==="unchecked"))return;
@@ -664,16 +651,15 @@
       toggle.disabled=reviewBusy||!review.editable;
       toggle.classList.toggle("chosen",!disabled);
     }
-    $("atlasReviewExport").classList.toggle("is-hidden", !!review.editable);
-    $("atlasReviewExport").disabled = reviewBusy;
-    const share=$("atlasReviewShare");
-    if(share){
+    // One public report link; the user explicitly submits the GitHub issue.
+    const report=$("atlasReviewSendReport");
+    if(report){
       const url=reviewHandoffURL();
-      const available=!review.editable && url.length<7500;
-      share.classList.toggle("is-hidden",!available);
-      if(available)share.href=url;
-      share.title=available?"Opens a GitHub issue draft; submit it to share decisions.":
-        "Export JSON for a large review";
+      report.classList.toggle("is-hidden",review.editable||!url);
+      if(url)report.href=url;
+      report.textContent=searchText("发送报告","Send report");
+      report.setAttribute("aria-label",searchText("发送当前审阅报告","Send current review report"));
+      report.title=searchText("在 GitHub 确认并提交报告","Review and submit the report on GitHub");
     }
     const currentItem=items[current];
     const status=proposalState(currentItem);
@@ -681,10 +667,14 @@
     $("atlasReviewDeny").classList.toggle("chosen",status==="denied");
     $("atlasReviewUnchecked").classList.toggle("chosen",status==="unchecked");
     renderReviewCategories();
-    $("atlasReviewMessage").textContent = reviewBusy ? "Saving…" : reviewError ? reviewError :
-       (disabled ? "Human opted out · recorded" : !review.editable ? (reviewDraftMessage || "Browser draft") :
-       (status === "unchecked" ? "Unchecked" :
-        status === "approved" ? "Not implemented" : "Denied"));
+    $("atlasReviewMessage").textContent = reviewBusy ? searchText("保存中…","Saving…") : reviewError ? reviewError :
+       (disabled ? searchText("Human Check 已关闭","Human Check off") :
+        !review.editable ? (reviewDraftMessage==="Saved in browser" ?
+          searchText("已保存浏览器草稿","Saved in browser") :
+          searchText("浏览器草稿","Browser draft")) :
+       (status === "unchecked" ? searchText("待审阅","Unchecked") :
+        status === "approved" ? searchText("尚未实现","Not implemented") :
+        searchText("已否决","Denied")));
   }
   function applyReviewResponse(data,live) {
     if (!data?.plan || !Array.isArray(data.plan.items) ||
@@ -744,7 +734,8 @@
       if(first) navigate(first.node_id,first.view,true);
     }
     const bar=$("atlasReviewBar");
-    if(review.plan.kind==="human_check"){
+    if(review.plan.kind==="human_check" && review.editable){
+      // Only an authenticated local Atlas can change Human Check mode.
       let toggle=$("atlasHumanCheckToggle");
       if(!toggle){
         toggle=el("button","review-export","Human Check ON · Disable");
@@ -752,12 +743,6 @@
         toggle.title="Only the human can disable this optional pre-PR review; other approvals remain required";
         bar.appendChild(toggle);
         toggle.addEventListener("click",toggleHumanCheck);
-      }
-      if(!$("atlasHumanCheckReport")){
-        const report=el("a","review-export","Written report");
-        report.id="atlasHumanCheckReport";report.href="/api/review/report";
-        report.target="_blank";report.rel="noopener noreferrer";
-        bar.appendChild(report);
       }
     }
     for(const [id,glyph,label] of [
@@ -785,15 +770,6 @@
       reviewMenuOpen=!reviewMenuOpen;
       renderReviewCategories();
     });
-    $("atlasReviewExport").addEventListener("click",exportBrowserDraft);
-    if(!$("atlasReviewShare")){
-      const share=el("a","review-export",searchText("发送审阅结果","Share review"));
-      share.id="atlasReviewShare";
-      share.target="_blank";
-      share.rel="noopener noreferrer";
-      share.setAttribute("aria-label",searchText("将审阅结果发送到 GitHub Issue","Share review with an agent"));
-      $("atlasReviewExport").insertAdjacentElement("afterend",share);
-    }
     // Top-level tabs use the unified switcher, including review mode.
     bar.classList.remove("is-hidden");
     updateReviewBar();

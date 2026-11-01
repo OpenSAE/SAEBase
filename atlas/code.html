@@ -7,15 +7,15 @@
   <meta name="theme-color" content="#fafaf9">
   <meta name="description" content="Explore SAEBase research architecture, scientific questions, source code and feature terminology through five interactive Atlas trees.">
   <title>SAEBase Atlas · Code</title>
-  <link rel="stylesheet" href="../harness/visualization/style.css?v=locale-20261027">
+  <link rel="stylesheet" href="../harness/visualization/style.css?v=hc-report-layout-20261101">
   <link rel="stylesheet" href="../harness/visualization/atlas-theme.css?v=atlas-visual-2-20261029">
   <script defer src="../harness/visualization/data.js"></script>
   <script defer src="../harness/visualization/atlas-structure.js?v=research-hierarchy-20261026"></script>
   <script defer src="../harness/visualization/atlas-public-balance.js?v=context-cleanup-20261028"></script>
-  <script defer src="../harness/visualization/app.js?v=hc-review-decisions-20261101"></script>
+  <script defer src="../harness/visualization/app.js?v=hc-report-single-20261101"></script>
   <script defer src="../harness/visualization/locale-data.js?v=saebase-bilingual-20261027"></script>
   <script defer src="../harness/visualization/locale-runtime.js?v=saebase-bilingual-20261027"></script>
-  <script defer src="../harness/visualization/i18n.js?v=saebase-bilingual-20261027"></script>
+  <script defer src="../harness/visualization/i18n.js?v=hc-report-i18n-20261101"></script>
 </head>
 <body data-atlas-view="code">
   <div class="app">
@@ -85,8 +85,8 @@
               <button id="atlasReviewDeny" class="review-deny" title="Deny · Backspace">Deny <kbd>⌫</kbd></button>
               <button id="atlasReviewUnchecked" class="review-unchecked" title="Reset to Unchecked · U">Unchecked <kbd>U</kbd></button>
             </div>
-            <button id="atlasReviewExport" class="review-export is-hidden" title="Export browser-only review JSON">JSON ↓</button>
             <span id="atlasReviewMessage" class="review-message" aria-live="polite">Unchecked</span>
+            <a id="atlasReviewSendReport" class="review-send-report is-hidden" href="#" target="_blank" rel="noopener noreferrer" aria-label="Send report" title="Send report">Send report</a>
           </div>
           <div class="status-legend" id="statusLegend" role="note" aria-label="Node status colors: Not Implemented red, Partial yellow, Implemented green">
             <span class="legend-item"><i class="legend-swatch not-implemented" aria-hidden="true"></i>Not Implemented</span>

@@ -59,7 +59,7 @@ Atlas Code Tree 的节点名称必须是一句有内容的中文功能概括，�
 - [四树演示](knowledge.html?review=OR-Atlas-MultiTree-Demo-20261026)：Knowledge → Code → Environment → Context，同一页面滑动切换，可查看方法签名、GPU facts 和术语别名。四项全都是测试提案，不自动改变代码或设备数据。
 - 本地实时写入：`python -m harness.core.agent_flow serve OR-Atlas-MultiTree-Demo-20261026 --port 8766`，使用终端显示的完整 URL
 - 每次点击同步保存 Plan JSON，空 Knowledge 新节点批准时同步写入 Graph/Glossary，退出页面不丢失已保存的决定
-- 公开 GitHub Pages 页面中的 Approve / Deny 会实时修改颜色、在浏览器的 JSON 草稿存储中保存决定并自动翻页；底部 JSON ↓ 可导出文件。这些决定并未写入 GitHub 权威图。
+- 公开 GitHub Pages 页面中的 Approve / Deny 会实时修改颜色、在浏览器的 JSON 草稿存储中保存决定并自动翻页；底部仅有「发送报告 / Send report」入口，随语言切换。用户点击后进入预填审阅决定的 GitHub Issue，并自行确认提交；这些浏览器草稿并未直接修改 GitHub 权威图。
 - 本地认证的 Atlas 服务可在每次点击后同步更新审阅 Ledger、Knowledge Graph 与 Glossary。
 - 每个节点的 partial 状态独立审计，不自动沿父分支传播；仅作背景的上级节点在审阅界面保持中性配色。
 

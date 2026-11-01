@@ -586,3 +586,30 @@ button:focus-visible,a:focus-visible,input:focus-visible,.graph-node:focus-visib
 .atlas-review-bar .review-nav .review-arrow.review-skip:focus-visible{
   outline:2px solid #8255b5;outline-offset:2px;
 }
+
+/* Human Check: one localized report action at the right edge. */
+.atlas-review-bar .review-send-report{
+ display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;
+ flex:0 0 auto;min-width:121px;height:48px;margin-left:5px;padding:0 15px;
+ border:1px solid #9a83c4;border-radius:9px;background:#624c85;
+ color:#fff;text-decoration:none;white-space:nowrap;
+ font:700 13.5px/1.15 Inter,system-ui,"Noto Sans SC",sans-serif;
+ transition:background .15s ease,border-color .15s ease;
+}
+.atlas-review-bar .review-send-report:hover{
+ background:#755999;border-color:#c4afe3;color:#fff;
+}
+.atlas-review-bar .review-send-report:focus-visible{
+ outline:2px solid #e0caef;outline-offset:3px;
+}
+.atlas-review-bar .review-message{flex:0 1 auto;margin-left:2px;min-width:70px}
+@media(max-width:1120px){
+ .atlas-review-bar .review-send-report{
+  min-width:105px;height:43px;padding:0 11px;font-size:12.5px;margin-left:0;
+ }
+}
+@media(max-width:730px){
+ .atlas-review-bar .review-send-report{
+  order:4;height:40px;min-width:132px;margin:0 auto;
+ }
+}

@@ -46,7 +46,7 @@ English Markdown counterparts use the same document ID and a `.en.md` suffix whe
 
 The existing tree supports human-review drafts. Purple represents unchecked, red an approved but not implemented placeholder, and gray a denied proposal. Review navigation follows actual tree order, with selectors and keyboard shortcuts; it does not turn a proposal into verified scientific evidence.
 
-A local authenticated review service can persist permitted decisions. The public GitHub Pages interface only saves local browser drafts, which may be exported and separately reviewed; it does not write directly to GitHub.
+A local authenticated review service can persist permitted decisions. The public GitHub Pages interface saves browser drafts and offers one localized **Send report / 发送报告** link. It opens a prefilled GitHub Issue that the user must submit; it does not directly change the authority graph or record authenticated approval.
 
 See the [Agent review process](../core/AGENT_FLOW.en.md). Status remains independently evidenced per node, and published snapshots do not substitute for hardware tests or research verification.
 
