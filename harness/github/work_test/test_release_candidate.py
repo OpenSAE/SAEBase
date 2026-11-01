@@ -161,7 +161,8 @@ def test_release_workflow_is_manual_explicit_and_privileged_only_when_publish():
     assert jobs["publish"]["if"].count("publish") >= 1
     text = path.read_text(encoding="utf-8")
     assert "PUBLISH-v$VERSION" in text
-    assert "actions/workflows/ci.yml/runs?" in text
+    assert "actions/workflows/release-validation.yml/runs?" in text
+    assert "actions/workflows/ci.yml/runs?" not in text
     assert "git ls-remote --tags" in text
     assert "release-evidence.json" in text
     assert 'assets[name]["digest"] == "sha256:" + proof["sha256"]' in text
