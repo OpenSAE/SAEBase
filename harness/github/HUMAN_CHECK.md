@@ -9,7 +9,23 @@ same immutable facts. Review only changes a local ignored ledger.
 
 Every Human Check MUST deliver a directly browsable Atlas review UI, not only
 a JSON proposal, report, ZIP or shell script. Use the existing Atlas review,
-not a separate question form. The one-command local entry is:
+not a separate question form.
+
+**Default for conversational GitHub reviews:** publish the source-backed
+read-only proposal snapshot under
+`harness/visualization/review-proposals/<HC-ID>.json`, including its real
+Atlas node IDs, groups, Before/After, risk, checks and explicit context.
+The source Pages fallback reads this directory directly; the Actions Pages
+bundle must also ship these snapshots beside the five tree pages. Confirm
+that the actual SAEBase Pages `/atlas/core.html?review=<HC-ID>` link loads the
+proposal before giving the user that URL. Do not substitute a custom HTML
+preview, local ZIP or script for that link. The existing Atlas visual design,
+four review arrows and grouped reading order remain authoritative.
+
+**Authenticated decisions:** public GitHub Pages permits browser-only draft
+decisions; it is not a server-side approval receipt. When formal saved
+decisions are required in an accessible local checkout, the one-command
+authenticated entry is:
 
 ~~~bash
 python -m harness.github.human_check quickstart --manifest /path/to/proposal.json
