@@ -667,7 +667,7 @@
         "harness/transfer/b2.py",
         "harness/transfer/README.md"
       ],
-      "why_it_matters": "为跨服务器恢复提供可追溯的远端位置；成功传输不等于科学结果验收。",
+      "why_it_matters": "为跨服务器恢复提供可追溯的远端位置，将传输完整性检查与独立科研验收分别记录。",
       "foundation": "harness/transfer/README.md"
     }
   ]

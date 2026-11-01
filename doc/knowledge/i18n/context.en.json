@@ -569,7 +569,7 @@
       "title": "Backblaze B2",
       "summary": "Object storage for reproducible, explicitly scoped research artifact backups.",
       "description": "SAEBase uses rclone over the native B2 API with copy-only transfers, immutable destinations and post-copy checks. Actual keys belong to each server's private configuration.",
-      "why_it_matters": "Supports recoverable cross-server storage without treating a remote transfer as independent scientific acceptance.",
+      "why_it_matters": "Supports recoverable cross-server storage with distinct transfer-integrity and independent scientific acceptance evidence.",
       "aliases": [
         "Backblaze B2",
         "B2 Cloud"
