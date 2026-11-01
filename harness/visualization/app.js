@@ -128,10 +128,19 @@
     return review?.plan?.groups?.find(group=>group.item_keys.includes(key)) || null;
   }
   function queueReviewVisit(){
-    if(!review?.plan?.groups?.length || !review.editable)return;
+    if(!review?.plan?.groups?.length)return;
     const item=itemFor(config.focusId,config.view),group=item&&logicalReviewGroup(item.key);
     if(!group || review.plan.viewed?.[group.id]?.[item.key] || queuedVisits.has(item.key))return;
     queuedVisits.add(item.key);
+    if(!review.editable){
+      if(!review.plan.viewed)review.plan.viewed={};
+      if(!review.plan.viewed[group.id])review.plan.viewed[group.id]={};
+      review.plan.viewed[group.id][item.key]={actor:"Browser draft",at:new Date().toISOString()};
+      persistBrowserDraft();
+      queuedVisits.delete(item.key);
+      updateReviewBar();
+      return;
+    }
     reviewVisitPromise=reviewVisitPromise.then(async()=>{
       const response=await fetch("/api/review/visit",{
         method:"POST",credentials:"same-origin",
@@ -459,6 +468,7 @@
       if(saved.schema!=="openresearch.atlas.proposal-draft.v1" ||
          saved.plan_id!==plan.id || saved.preview_sha256!==plan.preview_sha256)
          return;
+      if(saved.viewed && typeof saved.viewed==="object")plan.viewed=saved.viewed;
       for(const item of plan.items){
         const decision=saved.decisions?.[item.key];
         if(["approved","denied"].includes(decision))
@@ -466,23 +476,41 @@
       }
     } catch (_) { reviewDraftMessage="Could not load saved draft"; }
   }
+  function persistBrowserDraft(){
+    const store=browserDraftStorage();
+    if(!store)throw Error("Browser storage unavailable");
+    const choices={};
+    for(const item of review.plan.items){
+      const value=proposalState(item);
+      if(value==="approved"||value==="denied")choices[item.key]=value;
+    }
+    const data={schema:"openresearch.atlas.proposal-draft.v1",
+      plan_id:review.plan.id,preview_sha256:review.plan.preview_sha256,
+      decisions:choices,viewed:review.plan.viewed||{},
+      updated_at:new Date().toISOString(),authority_applied:false};
+    store.setItem(browserDraftKey(review.plan),JSON.stringify(data));
+  }
   function saveBrowserDraft(key,decision) {
     const store=browserDraftStorage();
     if(!store) throw Error("Browser storage unavailable. Use local Atlas to save JSON.");
+    const group=logicalReviewGroup(key),keys=group?.item_keys||[key];
     const choices={};
     for(const item of review.plan.items){
-      const val=item.key===key?decision:proposalState(item);
+      const val=keys.includes(item.key)?decision:proposalState(item);
       if(val==="approved"||val==="denied") choices[item.key]=val;
     }
     const data={schema:"openresearch.atlas.proposal-draft.v1",
       plan_id:review.plan.id,preview_sha256:review.plan.preview_sha256,
-      decisions:choices,updated_at:new Date().toISOString(),
+      decisions:choices,viewed:review.plan.viewed||{},
+      updated_at:new Date().toISOString(),
       authority_applied:false};
     // Synchronous storage completes before the visible node state changes.
     store.setItem(browserDraftKey(review.plan),JSON.stringify(data));
-    review.plan.items.find(item=>item.key===key).proposal_review=
-      decision==="unchecked"?null:
-      {decision,actor:"Browser draft",at:data.updated_at};
+    for(const item of review.plan.items){
+      if(keys.includes(item.key))item.proposal_review=
+        decision==="unchecked"?null:
+        {decision,actor:"Browser draft",at:data.updated_at};
+    }
     reviewDraftMessage="Saved in browser";
   }
   function exportBrowserDraft() {
@@ -566,13 +594,15 @@
       live=true;
     } catch (_) {
       // GitHub Pages is read-only. It cannot secretly persist human decisions.
-      if(!["OR-Knowledge-Demo-20261026","OR-Atlas-MultiTree-Demo-20261026"]
-          .includes(requestedReview())) {
-        $("focusHint").textContent="Local Atlas review service required";
-        return;
+      const demo=["OR-Knowledge-Demo-20261026","OR-Atlas-MultiTree-Demo-20261026"]
+          .includes(requestedReview());
+      const id=requestedReview();
+      if(!demo && !/^[A-Za-z][A-Za-z0-9_-]{2,63}$/.test(id||"")){
+        $("focusHint").textContent="Invalid review identifier";return;
       }
-      const response=await fetch("./demo-knowledge-plan.json",{cache:"no-store"});
-      if(!response.ok) throw Error("Preview JSON missing");
+      const response=await fetch(demo?"./demo-knowledge-plan.json":
+        "./review-proposals/"+encodeURIComponent(id)+".json",{cache:"no-store"});
+      if(!response.ok) throw Error("Atlas proposal missing: use local service or publish a read-only review proposal");
       payload=await response.json();
       if(!payload.plan) payload={plan:payload,context:payload.review_context};
     }
