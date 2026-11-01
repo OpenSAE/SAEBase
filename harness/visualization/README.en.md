@@ -61,3 +61,10 @@ The mouse wheel zooms the graph at the pointer, including over cards. It no long
 ## Complete levels and unconstrained camera
 
 Focus displays every real node at every depth preceding the selected node. At the selected depth, only the full sibling group belonging to its parent appears, while the selected node's immediate children remain available for deeper navigation. Siblings are never paginated or capped. Drag blank canvas or any ordinary card to pan freely in screen coordinates at all zoom levels without center locking, scroll boundaries or bounce resistance. Explicit node selection brings that node into view once, then leaves the camera entirely user-controlled. Wheel zoom remains pointer-centered; Fit includes every visible node.
+
+
+## Atlas Node Reader and three change types
+
+`harness/visualization/node-reader.js` and `node-reader.css` implement a bounded reader associated with the selected real Atlas node, without duplicating the graph. Use the mouse wheel on the card boundary or **Back to graph** to return; long content scrolls inside the card.
+In Human Check, **Add** shows a proposed-node reader, **Remove** shows a labeled ghost of the existing node without inventing an after state, and **Change** shows side-by-side **Before** and **After** readers. Recorded, unchanged fields are retained, while declared differences are highlighted. The decision palette (purple/red/gray) remains separate from the operation labels; review arrows and decisions stay accessible under the card.
+Public Pages decisions remain local browser drafts until the user explicitly sends the report; code authorization continues to require the existing scope checks.

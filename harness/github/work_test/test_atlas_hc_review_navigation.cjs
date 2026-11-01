@@ -135,4 +135,5 @@ assert(app.includes('report.href=url'),"report handoff must be functional");
 assert(i18n.includes('"Send report":"发送报告"'),"English -> Chinese");
 assert(i18n.includes('"发送报告":"Send report"'),"Chinese -> English");
 assert(css.includes(".atlas-review-bar .review-send-report")&&css.includes("order:4"),"report positioning");
+require("./test_atlas_node_reader.cjs");
 console.log("Atlas HC ordering, immediate approval, handoff and navigation passed");
