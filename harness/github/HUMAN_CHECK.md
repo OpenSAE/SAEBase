@@ -126,3 +126,51 @@ offer the local Atlas review URL **only when a real service is available**.
 The implementation cannot programmatically open the ChatGPT application's
 native UI or guarantee that uncooperative direct GitHub API clients invoke
 the local gate.
+
+
+## Multi-part Atlas review (linked local changes)
+
+A logical GitHub change may affect multiple separate Atlas nodes. To review
+it **as one independently authorizable change**, give each member the same
+`group_id` and `group_title` in the manifest:
+
+~~~json
+{
+  "id": "HC-Multi-001",
+  "goal": "Review one repository change through linked Core and Code perspectives",
+  "items": [
+    {
+      "view": "core", "node_id": "g.context", "operation": "change",
+      "files": ["harness/github/ARCHIVE_STANDARD.md"],
+      "after": {"title": "Document archive naming", "description": "Specify stable versioned names."},
+      "reason": "Preserve existing architecture", "context_term_ids": ["term.core_tree"],
+      "group_id": "HC01", "group_title": "Archive naming"
+    },
+    {
+      "view": "code", "node_id": "code:module:harness.github.archive", "operation": "add",
+      "files": ["harness/github/archive.py"],
+      "after": {"title": "Archive path selector",
+                "description": "Prepare a bounded deterministic archive plan.",
+                "path": "harness/github/archive.py"},
+      "reason": "Implement reviewed naming rules",
+      "context_term_ids": ["term.python"],
+      "group_id": "HC01", "group_title": "Archive naming"
+    }
+  ]
+}
+~~~
+
+The **existing Atlas Tree**, not a separate question form, displays each
+proposal at its actual or explicitly proposed node. The group selector above
+the existing review bar moves between independent logical changes; **Next
+linked part** moves among the related tree nodes. The local service records
+each visited part with the plan revision. Approve and Deny remain disabled
+until all of the group's parts have been visited. The selected decision then
+applies atomically to that group's node items only; no global Approve Plan.
+Unchecked resets the group's decision. Unrelated approved groups may proceed.
+
+The original single-node manifest remains supported for legacy plans.
+The source version, declared paths, source and authority checksums, and human
+authentication still apply. A grouped approval is not release, scientific
+validation or code implementation. Do not create speculative Code AST nodes
+as if they already existed: mark them as Proposed.
