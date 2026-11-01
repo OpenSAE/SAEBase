@@ -86,6 +86,13 @@ def create_server(
             if path == "/":
                 url = ("/core.html" if human_check else "/knowledge.html") + "?review=" + quote(plan_id) + "#key=" + secret
                 return self.send(302, b"", location=url)
+            if path == "/api/review/report" and human_check:
+                try:
+                    with lock:
+                        report = human.report_markdown(get_plan())
+                    return self.send(200, report.encode("utf-8"), "text/markdown; charset=utf-8")
+                except (ValueError, KeyError, OSError, TypeError) as exc:
+                    return self.send(409, json.dumps({"error": str(exc)}).encode())
             if path == "/api/review/state":
                 try:
                     with lock:
