@@ -1,0 +1,99 @@
+{
+  "schema": "saebase.harness.archive.v1",
+  "baseline_sha": "9270bd71a81e80f2809e72b0f0644f83906c7954",
+  "approval": "harness/github/archive_approval.json",
+  "prepared_for_versions": [],
+  "entries": [
+    {
+      "original_path": "harness/github/development_doc/M5_RELEASE_NOTES.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev001_release_notes.md",
+      "git_blob_sha": "cfa72a4c8e63ecf37348e335002380ecc6171290",
+      "version": "0.2.0",
+      "mode": "copy_compat",
+      "reason": "Document explicitly describes v0.2.0; old path is an intentional external-link compatibility entry",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/M5_RELEASE_MATRIX.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev002_release_matrix.md",
+      "git_blob_sha": "c8264d64e762e47cce7352649f30b3d0d413bf92",
+      "version": "0.2.0",
+      "mode": "copy_compat",
+      "reason": "Historical v0.2.0 M5 release; preserved legacy link",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/research-lab/release-evidence-v0.4.0.json",
+      "archived_path": "harness/github/development_doc/archive/0.4.0/0.4.0_dev001_lab_evidence.json",
+      "git_blob_sha": "1023e81b2b7b45d5455c0e29060b5150554bb47a",
+      "version": "0.4.0",
+      "mode": "copy_compat",
+      "reason": "Source declares software_version=0.4.0 and is referenced by an active regression",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/gpu-acceptance-20261027.md",
+      "archived_path": "harness/github/development_doc/archive/0.6.0/0.6.0_dev001_gpu_accept.md",
+      "git_blob_sha": "2704f5ad4959857f5d8887f57b5f11b1b9bdeda2",
+      "version": "0.6.0",
+      "mode": "copy_compat",
+      "reason": "Cited by v0.6.0 release note and frozen WP21 cases; original link remains",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/20_exam_phase_closeout_20261029.md",
+      "archived_path": "harness/github/work_plan/archive/0.6.5/0.6.5_wp001_exam_closeout.md",
+      "git_blob_sha": "29baee4829b398184abc1a03cbcf615babe2fd0c",
+      "version": "0.6.5",
+      "mode": "copy_compat",
+      "reason": "Dated WP20 closeout after v0.6.0 release, referenced by frozen WP21 audit",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/21_exam_round01_report_20261030.md",
+      "archived_path": "harness/github/work_plan/archive/0.6.5/0.6.5_wp002_exam_roundone.md",
+      "git_blob_sha": "0a0f4427f562bddf39362a19071418e4131bf005",
+      "version": "0.6.5",
+      "mode": "copy_compat",
+      "reason": "Dated 2026-10-30; cited by WP21 closeout and exam record",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/21_wp21_2_followup_report_20261030.md",
+      "archived_path": "harness/github/work_plan/archive/0.6.5/0.6.5_wp003_gpu_followup.md",
+      "git_blob_sha": "0b5e9ca887062b3cf9f5121ee9c30dc772ca2f56",
+      "version": "0.6.5",
+      "mode": "copy_compat",
+      "reason": "Dated 2026-10-30; freeze historical independent evidence",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/21_harness_phase_closeout_20261030.md",
+      "archived_path": "harness/github/work_plan/archive/0.6.5/0.6.5_wp004_harness_closeout.md",
+      "git_blob_sha": "56ebe8f8d670b5b110cb81cb25fe8c77f0c77f76",
+      "version": "0.6.5",
+      "mode": "copy_compat",
+      "reason": "Dated WP21 closure and referenced by existing release/exam documents",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/21_harness_phase_closeout_20261030.en.md",
+      "archived_path": "harness/github/work_plan/archive/0.6.5/0.6.5_wp005_harness_closeout.en.md",
+      "git_blob_sha": "9f05169db216b4c0d87e1742ed15038c066f5743",
+      "version": "0.6.5",
+      "mode": "copy_compat",
+      "reason": "Existing English translation of frozen WP21 closure",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_test/test_v050_beta_release.py",
+      "archived_path": "harness/github/work_test/archive/0.5.0/0.5.0_wt001_beta_release/test_v050_beta_release.py",
+      "git_blob_sha": "0a83b64b22641af3cabaef4e1a7dee96a01801a6",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "v0.5.0-specific historical assertions; removed from routine collection, recoverable by recorded source",
+      "status": "archived"
+    }
+  ],
+  "notes": "All archive bytes retained unchanged. copy_compat entries keep old source link intentionally; only move entries delete their original path. Ambiguous version assignments stay unarchived."
+}
