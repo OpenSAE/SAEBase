@@ -194,6 +194,24 @@
           if (!nodes.has(node.id)) nodes.set(node.id,node);
         for(const edge of anchor.edges || []) addEdge(edge);
       }
+      if(view==="core" && review.core_context?.nodes?.length){
+        // A static Atlas can lag behind the authoritative Core graph.
+        // Restore the real source ancestry; do not fabricate implemented
+        // Code or scientific nodes to compensate for a missing path.
+        const authority=review.core_context;
+        for(const node of authority.nodes){
+          if(!nodes.has(node.id))nodes.set(node.id,{
+            ...node,kind:node.type||"goal",
+            summary:node.description||"",reader_explanation:node.description||""
+          });
+        }
+        for(const edge of authority.edges||[])addEdge(edge);
+        const parented=new Set((authority.edges||[]).map(edge=>edge.target));
+        for(const node of authority.nodes){
+          if(!parented.has(node.id) && nodes.has(VIEWS.core.root))
+            addEdge({source:VIEWS.core.root,target:node.id,type:"contains"});
+        }
+      }
       for(const item of review.plan.items.filter(x=>x.view===view)) {
         const baseNode = nodes.get(item.node_id) || {};
         const after = item.after || {};
@@ -230,6 +248,30 @@
           addEdge({source:parent,target:item.node_id,type:"contains"});
         } else if (item.operation === "add" && nodes.has(VIEWS[view].root)) {
           addEdge({source:VIEWS[view].root,target:item.node_id,type:"contains"});
+        }
+      }
+      // Last-resort compatibility for older proposals without an authority
+      // snapshot: connect an orphaned review subtree's highest known parent
+      // to the real Atlas root, so Focus never collapses into an empty tree.
+      const root=VIEWS[view].root,allowed=new Set(VIEWS[view].primary);
+      if(nodes.has(root)){
+        const owners=new Map();
+        for(const edge of edges)
+          if(allowed.has(edge.type) && nodes.has(edge.source) &&
+             nodes.has(edge.target) && !owners.has(edge.target))
+            owners.set(edge.target,edge.source);
+        for(const item of review.plan.items.filter(x=>x.view===view)){
+          let cursor=item.node_id,top=cursor;
+          const visited=new Set();
+          while(cursor!==root && nodes.has(cursor) && !visited.has(cursor)){
+            visited.add(cursor);
+            top=cursor;
+            cursor=owners.get(cursor);
+          }
+          if(cursor!==root && top!==root){
+            addEdge({source:root,target:top,type:"contains"});
+            owners.set(top,root);
+          }
         }
       }
       reviewGraphs[view] = {...base,nodes:[...nodes.values()],edges};
@@ -326,14 +368,16 @@
     if(group && proposalState(current)==="unchecked"){
       const seen=review.plan.viewed?.[group.id]||{};
       // Visit every related part before leaving the current HC.
-      // Once all are seen, stay for the group's one decision.
+      // Visit the current HC's unseen parts first. Once all were seen,
+      // the outer arrow may continue to the next unchecked HC; approvals
+      // still require every part of the selected group to be visited.
       const pending=group.item_keys.filter(key=>!seen[key]);
-      if(!pending.length)return -1;
-      for(let offset=1;offset<queue.length;offset++){
-        const index=(at+direction*offset+queue.length)%queue.length;
-        if(pending.includes(queue[index].key))return index;
+      if(pending.length){
+        for(let offset=1;offset<queue.length;offset++){
+          const index=(at+direction*offset+queue.length)%queue.length;
+          if(pending.includes(queue[index].key))return index;
+        }
       }
-      return -1;
     }
     for(let offset=1;offset<queue.length;offset++){
       const index=(at+direction*offset+queue.length)%queue.length;
@@ -576,11 +620,12 @@
     bar.classList.remove("is-hidden");
     const items=filteredReviewQueue(),current=reviewPosition();
     $("atlasReviewCount").textContent=(current>=0?current+1:"–")+" / "+items.length;
-    // Single arrows skip to unchecked; double arrows force one adjacent item.
-    $("atlasReviewPrev").disabled=reviewBusy||findUnchecked(-1)<0;
-    $("atlasReviewNext").disabled=reviewBusy||findUnchecked(1)<0;
-    $("atlasReviewPrevUnchecked").disabled=reviewBusy||current<=0;
-    $("atlasReviewNextUnchecked").disabled=reviewBusy||current>=items.length-1;
+    // Inner single arrows: immediate adjacent item.
+    // Outer double arrows: previous/next unchecked, highlighted purple.
+    $("atlasReviewPrev").disabled=reviewBusy||current<=0;
+    $("atlasReviewNext").disabled=reviewBusy||current>=items.length-1;
+    $("atlasReviewPrevUnchecked").disabled=reviewBusy||findUnchecked(-1)<0;
+    $("atlasReviewNextUnchecked").disabled=reviewBusy||findUnchecked(1)<0;
     const disabled=review.plan.kind==="human_check" && review.plan.mode==="off";
     const group=review.plan.groups?.length ? logicalReviewGroup(items[current]?.key) : null;
     const visited=group?Object.keys(review.plan.viewed?.[group.id]||{}).length:0;
@@ -613,7 +658,8 @@
     if(!live) restoreBrowserDraft(data.plan);
     reviewVisitPromise=Promise.resolve();
     review = {plan:data.plan,context:data.context || data.review_context ||
-              {nodes:[],edges:[]},editable:!!live && !!reviewKey()};
+              {nodes:[],edges:[]},core_context:data.core_context||null,
+              editable:!!live && !!reviewKey()};
     overlayGraphs();
     buildReviewQueue();
     rebuildHierarchy();
@@ -668,25 +714,23 @@
         bar.appendChild(report);
       }
     }
-    // Existing IDs are preserved for backwards-compatible Atlas tests,
-    // but the visible single/double arrow behavior is deliberately swapped.
     for(const [id,glyph,label] of [
-      ["atlasReviewPrevUnchecked","«","Previous any item · Shift+←"],
-      ["atlasReviewPrev","‹","Previous unchecked · ←"],
-      ["atlasReviewNext","›","Next unchecked · →"],
-      ["atlasReviewNextUnchecked","»","Next any item · Shift+→"]
+      ["atlasReviewPrevUnchecked","«","Previous unchecked · ←"],
+      ["atlasReviewPrev","‹","Previous item · Shift+←"],
+      ["atlasReviewNext","›","Next item · Shift+→"],
+      ["atlasReviewNextUnchecked","»","Next unchecked · →"]
     ]){
       const button=$(id);
       button.textContent=glyph;
       button.title=label;
       button.setAttribute("aria-label",label);
       button.classList.toggle("review-skip",
-        id==="atlasReviewPrev" || id==="atlasReviewNext");
+        id==="atlasReviewPrevUnchecked" || id==="atlasReviewNextUnchecked");
     }
-    $("atlasReviewPrevUnchecked").addEventListener("click",()=>reviewGo(reviewPosition()-1));
-    $("atlasReviewPrev").addEventListener("click",()=>reviewGoUnchecked(-1));
-    $("atlasReviewNext").addEventListener("click",()=>reviewGoUnchecked(1));
-    $("atlasReviewNextUnchecked").addEventListener("click",()=>reviewGo(reviewPosition()+1));
+    $("atlasReviewPrevUnchecked").addEventListener("click",()=>reviewGoUnchecked(-1));
+    $("atlasReviewPrev").addEventListener("click",()=>reviewGo(reviewPosition()-1));
+    $("atlasReviewNext").addEventListener("click",()=>reviewGo(reviewPosition()+1));
+    $("atlasReviewNextUnchecked").addEventListener("click",()=>reviewGoUnchecked(1));
     $("atlasReviewApprove").addEventListener("click",()=>submitReview("approved"));
     $("atlasReviewDeny").addEventListener("click",()=>submitReview("denied"));
     $("atlasReviewUnchecked").addEventListener("click",()=>submitReview("unchecked"));
