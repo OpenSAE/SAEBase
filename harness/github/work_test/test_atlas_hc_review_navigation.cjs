@@ -51,7 +51,7 @@ vm.runInContext([
 ].join("\n"),ctx,{timeout:1200});
 const test=ctx.exposed;
 test.buildReviewQueue();
-assert.deepEqual(ctx.reviewQueue.map(x=>x.key),[
+assert.deepEqual(Array.from(ctx.reviewQueue,x=>x.key),[
   "core:g.alpha","code:code:new","core:g.beta","core:g.gamma"
 ], "all parts of HC01 must precede HC02 even across different trees");
 assert.equal(test.findUnchecked(1),1,"single next reaches next HC01 part");
