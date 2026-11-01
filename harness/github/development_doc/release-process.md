@@ -175,3 +175,19 @@ future versions. Prior v0.4.0 and all historical tags stay immutable.
 The maintainer explicitly authorized the v0.6.0 release following review of PR #60 and its source-bound CPU CI and documented bounded real-GPU tests. [The version-specific dispatch](../../../.github/workflows/saebase-v060-release-dispatch.yml) may act **only** after a successful push-to-main CI for the exact current main SHA, provided that source declares version 0.6.0 and contains its release notes.
 
 The dispatch requests the existing `software-release.yml` `mode=publish` with `PUBLISH-v0.6.0`. The normal release gate still checks the original six CI contexts, wheel/sdist installation, tag immutability, SHA-256 and source identity. It cannot publish other versions or replace a version tag. No PyPI, GPU model assets or private research data are published.
+
+
+
+## Harness archived documents before the next Release Validation
+
+Before freezing the next Release's exact SHA, run
+[Archive Preparation](../../../.github/workflows/archive-preparation.yml)
+with the previous version and the target version. The workflow creates a
+read-only deterministic candidate report, not a commit or release. Review its
+linked Atlas Human Check changes, then apply only the approved scope with
+`python -m harness.github.archive apply --preparation <manifest.json> --human-check-id <id>`.
+Commit the versioned archive and immutable registry in a reviewed PR before
+running Release Validation on the new exact main SHA. The release's source
+verification calls `python -m harness.github.archive check --release-version`
+to ensure future-version readiness. No historical report is reinterpreted under
+later WP/WT rules. See [Archive Standard](../ARCHIVE_STANDARD.md).
