@@ -576,3 +576,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,.graph-node:focus-visib
 @media(prefers-reduced-motion:reduce){
  .canvas-wrap.atlas-review-landing #diagram{transition:none}
 }
+
+/* Review navigation: outer double arrows explicitly mark Unchecked search. */
+.atlas-review-bar .review-nav .review-arrow.review-skip{
+  border:2px solid #8255b5;
+  color:#684494;
+  background:#f5effc;
+}
+.atlas-review-bar .review-nav .review-arrow.review-skip:focus-visible{
+  outline:2px solid #8255b5;outline-offset:2px;
+}
