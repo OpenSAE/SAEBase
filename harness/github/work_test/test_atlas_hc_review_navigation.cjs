@@ -86,4 +86,41 @@ assert(app.includes('"atlasReviewNextUnchecked").addEventListener("click",()=>re
        "outer right must skip to following unchecked node");
 assert(css.includes(".review-arrow.review-skip")&&css.includes("border:2px solid #8255b5"),
        "outer unchecked arrows need a prominent purple border");
-console.log("Atlas HC ordering, navigation, zoom and completion UI passed");
+
+// The very first node must be decidable, without switching trees.
+function extract(start,next){
+  const a=app.indexOf("  function "+start+"("),b=app.indexOf("  function "+next+"(",a+2);
+  assert(a>=0&&b>a,"Missing "+start);
+  return app.slice(a,b);
+}
+const savedDrafts=new Map();
+const decisionItems=[
+  {view:"core",node_id:"g.alpha",key:"core:g.alpha",proposal_review:null},
+  {view:"code",node_id:"code:new",key:"code:code:new",proposal_review:null}
+];
+const decisionPlan={plan:{id:"HC-test-001",base_sha:"a".repeat(40),
+  preview_sha256:"stable",viewed:{},items:decisionItems}};
+const mock={
+  review:decisionPlan,Map,Set,Date,JSON,
+  browserDraftKey:plan=>"draft:"+plan.id,
+  browserDraftStorage:()=>({setItem:(k,v)=>savedDrafts.set(k,v)}),
+  proposalState:item=>item?.proposal_review?.decision||"unchecked",
+  reviewDraftMessage:""
+};
+vm.createContext(mock);
+vm.runInContext(extract("saveBrowserDraft","reviewHandoffData")+"\n"+
+  extract("reviewHandoffData","reviewHandoffURL")+"\n"+
+  extract("reviewHandoffURL","exportBrowserDraft")+"\n"+
+  "globalThis.inspect={saveBrowserDraft,reviewHandoffData,reviewHandoffURL}",
+  mock,{timeout:1200});
+mock.inspect.saveBrowserDraft("core:g.alpha","approved");
+assert.equal(decisionItems[0].proposal_review.decision,"approved");
+assert.equal(decisionItems[1].proposal_review,null,"other HC item must stay unchecked");
+const savedReceipt=JSON.parse(savedDrafts.get("draft:HC-test-001"));
+assert.equal(savedReceipt.decisions["core:g.alpha"],"approved");
+assert.equal(savedReceipt.decisions["code:code:new"],undefined);
+assert.equal(mock.inspect.reviewHandoffData().decisions["code:code:new"],"unchecked");
+assert(mock.inspect.reviewHandoffURL().startsWith("https://github.com/OpenSAE/SAEBase/issues/new?title="));
+assert(!app.includes("||!groupComplete"),"A group visit must not lock current approval buttons");
+
+console.log("Atlas HC ordering, immediate approval, handoff and navigation passed");

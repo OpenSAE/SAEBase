@@ -33,7 +33,19 @@ python -m harness.github.human_check quickstart --manifest /path/to/proposal.jso
 
 This command freezes or resumes the proposal, verifies the actual local Atlas
 HTML/JS/CSS/graph/review endpoints, prints the authenticated localhost URL and
-tries to open it in a desktop browser. It does not record approval. A failed
+tries to open it in a desktop browser. It does not record approval.
+
+**Immediate node decisions:** Approve / Deny / Unchecked work on the current
+node without switching tabs or visiting every related HC item first. Nodes
+remain browsed in their existing HC-first order. Shared files remain blocked
+until every related item is approved; older atomic group APIs remain available.
+
+**Share reviewed content:** the public Atlas "Share review" link opens a
+prefilled GitHub Issue containing the current browser-draft decisions and
+proposal identity. Only the human can submit it; the UI does not publish
+automatically. A connected agent can read the submitted issue. Browser-local
+drafts alone cannot be read by an agent, and the GitHub Issue is not a local
+authenticated approval. JSON export remains available. A failed
 browser launch reports the verified URL instead. A remote/headless environment
 may still require port forwarding.
 

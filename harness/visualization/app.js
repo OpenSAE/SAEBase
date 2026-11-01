@@ -562,10 +562,11 @@
   function saveBrowserDraft(key,decision) {
     const store=browserDraftStorage();
     if(!store) throw Error("Browser storage unavailable. Use local Atlas to save JSON.");
-    const group=logicalReviewGroup(key),keys=group?.item_keys||[key];
+    // Decisions apply to the current item only; shared files remain gated.
+    if(!review.plan.items.some(item=>item.key===key))throw Error("Unknown review item");
     const choices={};
     for(const item of review.plan.items){
-      const val=keys.includes(item.key)?decision:proposalState(item);
+      const val=item.key===key?decision:proposalState(item);
       if(val==="approved"||val==="denied") choices[item.key]=val;
     }
     const data={schema:"openresearch.atlas.proposal-draft.v1",
@@ -576,11 +577,37 @@
     // Synchronous storage completes before the visible node state changes.
     store.setItem(browserDraftKey(review.plan),JSON.stringify(data));
     for(const item of review.plan.items){
-      if(keys.includes(item.key))item.proposal_review=
+      if(item.key===key)item.proposal_review=
         decision==="unchecked"?null:
         {decision,actor:"Browser draft",at:data.updated_at};
     }
     reviewDraftMessage="Saved in browser";
+  }
+
+  // Browser-local decisions can be shared only by an explicit user action.
+  function reviewHandoffData(){
+    if(!review)return null;
+    return {
+      schema:"saebase.atlas.browser-review.v1",
+      plan_id:review.plan.id,
+      base_sha:review.plan.base_sha,
+      preview_sha256:review.plan.preview_sha256,
+      decisions:Object.fromEntries(review.plan.items.map(item=>
+        [item.key,proposalState(item)])),
+      updated_at:new Date().toISOString(),
+      authority_applied:false
+    };
+  }
+  function reviewHandoffURL(){
+    const receipt=reviewHandoffData();
+    if(!receipt)return "";
+    const title="Atlas Human Check decisions: "+receipt.plan_id;
+    const body="Browser review draft from SAEBase Atlas. Verify plan identity, "
+      +"source and approval scope before implementation.\n\n"
+      +"Decisions (JSON):\n"+JSON.stringify(receipt,null,2)+"\n\n"
+      +"Not an authenticated local approval. Please submit this issue to share.";
+    return "https://github.com/OpenSAE/SAEBase/issues/new?title="
+      +encodeURIComponent(title)+"&body="+encodeURIComponent(body);
   }
   function exportBrowserDraft() {
     if(!review || review.editable) return;
@@ -627,11 +654,9 @@
     $("atlasReviewPrevUnchecked").disabled=reviewBusy||findUnchecked(-1)<0;
     $("atlasReviewNextUnchecked").disabled=reviewBusy||findUnchecked(1)<0;
     const disabled=review.plan.kind==="human_check" && review.plan.mode==="off";
-    const group=review.plan.groups?.length ? logicalReviewGroup(items[current]?.key) : null;
-    const visited=group?Object.keys(review.plan.viewed?.[group.id]||{}).length:0;
-    const groupComplete=!group||visited>=group.item_keys.length;
-    $("atlasReviewApprove").disabled=reviewBusy||current<0||disabled||!groupComplete;
-    $("atlasReviewDeny").disabled=reviewBusy||current<0||disabled||!groupComplete;
+    // Group order is for browsing; do not lock buttons until another tab was visited.
+    $("atlasReviewApprove").disabled=reviewBusy||current<0||disabled;
+    $("atlasReviewDeny").disabled=reviewBusy||current<0||disabled;
     $("atlasReviewUnchecked").disabled=reviewBusy||current<0||disabled;
     const toggle=$("atlasHumanCheckToggle");
     if(toggle){
@@ -641,6 +666,15 @@
     }
     $("atlasReviewExport").classList.toggle("is-hidden", !!review.editable);
     $("atlasReviewExport").disabled = reviewBusy;
+    const share=$("atlasReviewShare");
+    if(share){
+      const url=reviewHandoffURL();
+      const available=!review.editable && url.length<7500;
+      share.classList.toggle("is-hidden",!available);
+      if(available)share.href=url;
+      share.title=available?"Opens a GitHub issue draft; submit it to share decisions.":
+        "Export JSON for a large review";
+    }
     const currentItem=items[current];
     const status=proposalState(currentItem);
     $("atlasReviewApprove").classList.toggle("chosen",status==="approved");
@@ -752,6 +786,14 @@
       renderReviewCategories();
     });
     $("atlasReviewExport").addEventListener("click",exportBrowserDraft);
+    if(!$("atlasReviewShare")){
+      const share=el("a","review-export",searchText("发送审阅结果","Share review"));
+      share.id="atlasReviewShare";
+      share.target="_blank";
+      share.rel="noopener noreferrer";
+      share.setAttribute("aria-label",searchText("将审阅结果发送到 GitHub Issue","Share review with an agent"));
+      $("atlasReviewExport").insertAdjacentElement("afterend",share);
+    }
     // Top-level tabs use the unified switcher, including review mode.
     bar.classList.remove("is-hidden");
     updateReviewBar();
@@ -815,9 +857,7 @@
     const at=reviewPosition();
     if(at<0)return;
     const current=filteredReviewQueue()[at];
-    const group=logicalReviewGroup(current.key);
-    if(group && decision!=="unchecked" &&
-       Object.keys(review.plan.viewed?.[group.id]||{}).length < group.item_keys.length)return;
+    // One item may be decided before any other item in its HC group.
     reviewError="";
     reviewBusy=true;
     updateReviewBar();
@@ -826,11 +866,10 @@
       // Public Atlas persists a clearly labeled browser-only JSON draft.
       if(review.editable){
         await reviewVisitPromise;
-        const response=await fetch(group?"/api/review/group-decision":"/api/review/decision",{
+        const response=await fetch("/api/review/decision",{
           method:"POST",credentials:"same-origin",keepalive:true,
           headers:{"Content-Type":"application/json","X-Atlas-Review-Key":reviewKey()},
-          body:JSON.stringify({revision:review.plan.revision,key:current.key,
-            group_id:group?.id,decision})
+          body:JSON.stringify({revision:review.plan.revision,key:current.key,decision})
         });
         const data=await response.json();
         if(!response.ok) throw Error(data.error || "Review not saved");

@@ -390,7 +390,7 @@ def decide_group(plan: dict[str, Any], group_id: str, decision: str, *, actor: s
 
 
 def decide(plan: dict[str, Any], key: str, decision: str, *, actor: str) -> dict[str, Any]:
-    """Local authenticated Atlas decides one item; never writes authority graphs."""
+    """Local authenticated Atlas decides one item, including grouped items."""
     validate(plan)
     if plan["mode"] == "off":
         raise atlas.FlowError("Human Check disabled; decisions unavailable")
@@ -401,8 +401,7 @@ def decide(plan: dict[str, Any], key: str, decision: str, *, actor: str) -> dict
         raise atlas.FlowError("Unknown independent change")
     if not actor.strip():
         raise atlas.FlowError("Human reviewer identity required")
-    if any(key in group["item_keys"] for group in plan.get("groups", [])):
-        raise atlas.FlowError("Grouped Atlas part cannot bypass review-group decision")
+    # Groups control navigation and file-scope safety, not a single node's button.
     item["proposal_review"] = (
         None
         if decision == "unchecked"
