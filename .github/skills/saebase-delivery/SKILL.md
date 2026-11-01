@@ -75,3 +75,12 @@ If the user asks to make the change, use a focused branch and one reviewable PR.
 ## Human intake, Atlas links and durable execution contracts
 
 Before issuing a formal Work Plan, reconcile the user's confirmed goal, scientific motivation, existing Knowledge/Core/Context IDs, budget, authorization, risk trade-offs and intended result table. Preserve those decisions and unresolved questions in `harness/github/work_plan/from_human/<WP_ID>.md`, not in a duplicated execution prompt. Refer to the existing Atlas five-tree authority. Reuse `WORKPLAN_TEMPLATE.md`, `WRITING_STANDARD.md`, and `DELIVERABLE_STANDARD.md`; validate the structured WP references and existing Contracts. Agent-facing instructions should normally contain only the plan ID, checked-out source, scope and explicit human authorizations. Runtime Setup, Audit and B2 result delivery should be handled by the existing implementation; do not silently promote a Draft to approved or published.
+
+## Default Human Check before GitHub writes
+
+For GitHub maintenance, generate a single Context-grounded written proposal and Atlas five-tree node change overlay **before the first repository write or PR**. Source path, owner, Before/After, scientific/engineering purpose, Context IDs, risk and verification are required; unknown facts stay unresolved. This proposal is not an implementation or verified Code Tree.
+
+Human Check starts **on**; only the human can explicitly opt out through the authenticated local Atlas review. Each item is approved/denied/unchecked **independently**; there is no global Approve Plan and a denied item cannot block unrelated approved work. A file jointly claimed by an approved and unapproved item is not independently authorized and must be split/re-reviewed. Do not modify governance, Core/Knowledge/Code authority or task files while assembling proposals. Only edit files in individually approved scope, and re-check exact base SHA and unchanged source before implementation; compare actual changed files with approved scope before PR. Review decisions never imply GPU, publication, or scientific approval.
+
+Use `harness/github/HUMAN_CHECK.md` and `python -m harness.github.human_check` for the proposal/report and Atlas approval flow. The browser UI is available only when a local service is actually running; do not claim ChatGPT can automatically open or authenticate a browser tab. Preserve the per-item receipt, or an explicit human opt-out receipt, with the PR handoff.
+
