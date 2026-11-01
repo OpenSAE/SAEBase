@@ -123,6 +123,7 @@
     environment:"Environment",context:"Context"};
   let reviewQueue=[],reviewGroupOf=new Map(),reviewGroups=[];
   let reviewVisitPromise=Promise.resolve();
+  let reviewDoneShown=false;
   const queuedVisits=new Set();
   function logicalReviewGroup(key){
     return review?.plan?.groups?.find(group=>group.item_keys.includes(key)) || null;
@@ -286,6 +287,17 @@
         view,title:REVIEW_TITLES[view],groups:[...branches.values()]
       });
     }
+    // Default HC01 parts → HC02 parts → ..., including cross-tree parts.
+    if(review.plan.groups?.length){
+      const byKey=new Map(reviewQueue.map(item=>[item.key,item]));
+      const ordered=[];
+      for(const group of review.plan.groups)
+        for(const key of group.item_keys){
+          const item=byKey.get(key);
+          if(item){ordered.push(item);byKey.delete(key);}
+        }
+      reviewQueue=[...ordered,...byKey.values()];
+    }
   }
   function filteredReviewQueue(){
     if(reviewFilter.level==="all")return reviewQueue;
@@ -310,6 +322,19 @@
   function findUnchecked(direction){
     const queue=filteredReviewQueue(),at=reviewPosition();
     if(at<0||queue.length<2)return -1;
+    const current=queue[at],group=logicalReviewGroup(current.key);
+    if(group && proposalState(current)==="unchecked"){
+      const seen=review.plan.viewed?.[group.id]||{};
+      // Visit every related part before leaving the current HC.
+      // Once all are seen, stay for the group's one decision.
+      const pending=group.item_keys.filter(key=>!seen[key]);
+      if(!pending.length)return -1;
+      for(let offset=1;offset<queue.length;offset++){
+        const index=(at+direction*offset+queue.length)%queue.length;
+        if(pending.includes(queue[index].key))return index;
+      }
+      return -1;
+    }
     for(let offset=1;offset<queue.length;offset++){
       const index=(at+direction*offset+queue.length)%queue.length;
       if(proposalState(queue[index])==="unchecked")return index;
@@ -526,29 +551,40 @@
     document.body.appendChild(link);link.click();link.remove();
     setTimeout(()=>URL.revokeObjectURL(url),0);
   }
+  function maybeShowReviewDone(){
+    if(!review?.plan?.items?.length || reviewDoneShown)return;
+    if(review.plan.items.some(item=>proposalState(item)==="unchecked"))return;
+    reviewDoneShown=true;
+    let dialog=$("atlasReviewAllDone");
+    if(!dialog){
+      dialog=el("dialog","atlas-review-done");
+      dialog.id="atlasReviewAllDone";
+      const heading=el("h2","","All done");
+      const caption=el("p","", "All Human Check review items are complete.");
+      const close=el("button","atlas-review-done-close","Close");
+      close.type="button";
+      close.addEventListener("click",()=>dialog.close?.());
+      dialog.append(heading,caption,close);
+      document.body.appendChild(dialog);
+    }
+    if(typeof dialog.showModal==="function")dialog.showModal();
+    else dialog.setAttribute("open","");
+  }
   function updateReviewBar() {
     if(!review) return;
     const bar=$("atlasReviewBar");
     bar.classList.remove("is-hidden");
     const items=filteredReviewQueue(),current=reviewPosition();
     $("atlasReviewCount").textContent=(current>=0?current+1:"–")+" / "+items.length;
-    $("atlasReviewPrevUnchecked").disabled=reviewBusy||findUnchecked(-1)<0;
-    $("atlasReviewNextUnchecked").disabled=reviewBusy||findUnchecked(1)<0;
-    $("atlasReviewPrev").disabled=reviewBusy||current<=0;
-    $("atlasReviewNext").disabled=reviewBusy||current>=items.length-1;
+    // Single arrows skip to unchecked; double arrows force one adjacent item.
+    $("atlasReviewPrev").disabled=reviewBusy||findUnchecked(-1)<0;
+    $("atlasReviewNext").disabled=reviewBusy||findUnchecked(1)<0;
+    $("atlasReviewPrevUnchecked").disabled=reviewBusy||current<=0;
+    $("atlasReviewNextUnchecked").disabled=reviewBusy||current>=items.length-1;
     const disabled=review.plan.kind==="human_check" && review.plan.mode==="off";
     const group=review.plan.groups?.length ? logicalReviewGroup(items[current]?.key) : null;
     const visited=group?Object.keys(review.plan.viewed?.[group.id]||{}).length:0;
     const groupComplete=!group||visited>=group.item_keys.length;
-    const scopeLabel=$("atlasReviewGroupScope");
-    if(scopeLabel){
-      if(group){
-        $("atlasReviewGroupSelect").value=group.id;
-        $("atlasReviewGroupCount").textContent=visited+"/"+group.item_keys.length+
-          " reviewed"+(groupComplete?" · Ready":" · Keep browsing");
-        scopeLabel.classList.remove("is-hidden");
-      }else scopeLabel.classList.add("is-hidden");
-    }
     $("atlasReviewApprove").disabled=reviewBusy||current<0||disabled||!groupComplete;
     $("atlasReviewDeny").disabled=reviewBusy||current<0||disabled||!groupComplete;
     $("atlasReviewUnchecked").disabled=reviewBusy||current<0||disabled;
@@ -612,47 +648,11 @@
     const key=getSearchFocus(),item=reviewQueue.find(x=>x.node_id===key && x.view===config.view);
     if(item) navigate(item.node_id,item.view,true);
     else {
-      const first=reviewQueue.find(x=>x.view===config.view)||reviewQueue[0];
+      const first=reviewQueue.find(x=>proposalState(x)==="unchecked")||reviewQueue[0];
       if(first) navigate(first.node_id,first.view,true);
     }
     const bar=$("atlasReviewBar");
     if(review.plan.kind==="human_check"){
-      if(review.plan.groups?.length && !$("atlasReviewGroupScope")){
-        const scope=el("div","atlas-review-group-scope","");
-        scope.id="atlasReviewGroupScope";
-        scope.setAttribute("role","group");
-        const selector=el("select","atlas-review-group-select");
-        selector.id="atlasReviewGroupSelect";
-        for(const item of review.plan.groups){
-          const option=el("option","",item.id+" · "+item.title);
-          option.value=item.id;
-          selector.appendChild(option);
-        }
-        selector.addEventListener("change",()=>{
-          const group=review.plan.groups.find(x=>x.id===selector.value);
-          if(!group)return;
-          const next=group.item_keys.find(key=>!review.plan.viewed?.[group.id]?.[key])||
-                     group.item_keys[0];
-          const target=review.plan.items.find(item=>item.key===next);
-          if(target)navigate(target.node_id,target.view,false);
-        });
-        scope.appendChild(selector);
-        const coverage=el("span","atlas-review-group-count","");
-        coverage.id="atlasReviewGroupCount";
-        scope.appendChild(coverage);
-        const next=el("button","atlas-review-group-next","Next linked part →");
-        next.id="atlasReviewGroupNext";next.type="button";
-        next.addEventListener("click",()=>{
-          const item=itemFor(config.focusId,config.view),group=item&&logicalReviewGroup(item.key);
-          if(!group)return;
-          const index=group.item_keys.indexOf(item.key);
-          const target=review.plan.items.find(x=>x.key===
-            group.item_keys[(index+1)%group.item_keys.length]);
-          if(target)navigate(target.node_id,target.view,false);
-        });
-        scope.appendChild(next);
-        bar.prepend(scope);
-      }
       let toggle=$("atlasHumanCheckToggle");
       if(!toggle){
         toggle=el("button","review-export","Human Check ON · Disable");
@@ -668,10 +668,10 @@
         bar.appendChild(report);
       }
     }
-    $("atlasReviewPrevUnchecked").addEventListener("click",()=>reviewGoUnchecked(-1));
-    $("atlasReviewPrev").addEventListener("click",()=>reviewGo(reviewPosition()-1));
-    $("atlasReviewNext").addEventListener("click",()=>reviewGo(reviewPosition()+1));
-    $("atlasReviewNextUnchecked").addEventListener("click",()=>reviewGoUnchecked(1));
+    $("atlasReviewPrevUnchecked").addEventListener("click",()=>reviewGo(reviewPosition()-1));
+    $("atlasReviewPrev").addEventListener("click",()=>reviewGoUnchecked(-1));
+    $("atlasReviewNext").addEventListener("click",()=>reviewGoUnchecked(1));
+    $("atlasReviewNextUnchecked").addEventListener("click",()=>reviewGo(reviewPosition()+1));
     $("atlasReviewApprove").addEventListener("click",()=>submitReview("approved"));
     $("atlasReviewDeny").addEventListener("click",()=>submitReview("denied"));
     $("atlasReviewUnchecked").addEventListener("click",()=>submitReview("unchecked"));
@@ -684,6 +684,7 @@
     // Top-level tabs use the unified switcher, including review mode.
     bar.classList.remove("is-hidden");
     updateReviewBar();
+    maybeShowReviewDone();
   }
   function handleReviewShortcut(event) {
     if(!review || reviewBusy || !event || event.repeat ||
@@ -769,6 +770,7 @@
         rebuildHierarchy();
         render(false);
       }
+      maybeShowReviewDone();
       // Keep a purple-reset node visible. Approve/Deny advances within scope.
       if(decision!=="unchecked"){
         const next=findUnchecked(1);
@@ -955,8 +957,9 @@
       if (active) tab.setAttribute("aria-current", "page");
       else tab.removeAttribute("aria-current");
     }
-    if (review && view !== "core") reviewFilter = {level:"view", view};
-    $("atlasReviewBar").classList.toggle("is-hidden", !review || view === "core");
+    // Cross-tree HC traversal keeps the All filter instead of silently
+    // switching to a single tree.
+    $("atlasReviewBar").classList.toggle("is-hidden", !review);
     render(false, true);
     if (!prior && config.focusId) centerSelected();
     if (options.history !== false) setAddress(config.focusId, false);
@@ -1011,9 +1014,17 @@
     config.outlineOpen = false;
     config.detailsOpen = true;
     for (const key of ancestors(id)) config.expanded.add(key);
-    // A selected node is the only one permitted to hold open attributes.
+    // Review navigation lands on the actual node in normal Focus mode.
+    const reviewTarget=!!review?.plan?.items?.some(item=>
+      item.node_id===id && item.view===target);
+    if(reviewTarget){
+      config.expanded.add(id);
+      config.zoom=1.1;
+      config.zoomInitialized=true;
+    }
     config.expandedAttributes.clear();
-    if (options.toggle && !wasExpanded) config.expandedAttributes.add(id);
+    if(reviewTarget || (options.toggle && !wasExpanded))
+      config.expandedAttributes.add(id);
     config.animateNextRender = true;
     setAddress(id, !!replace || sameFocus);
     render(false,true);
