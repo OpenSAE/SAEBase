@@ -2,6 +2,7 @@
 
 Static setup is not a scientific pilot. Real smoke is opt-in separately.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -25,15 +26,17 @@ def main() -> int:
     args = p.parse_args()
     datasets = json.loads(args.datasets.read_text(encoding="utf-8"))
     site_data = json.loads(args.sites.read_text(encoding="utf-8"))
-    if not isinstance(datasets.get("dataset_ids"), list) or not isinstance(site_data.get("models"), list):
+    if not isinstance(datasets.get("dataset_ids"), list) or not isinstance(
+        site_data.get("models"), list
+    ):
         p.error("Expected existing dataset_ids and models selectors")
     sites = [
         {"model_key": model["model_key"], "sae_key": model["sae_key"], "layer": layer}
-        for model in site_data["models"] for layer in model["layers"]
+        for model in site_data["models"]
+        for layer in model["layers"]
     ]
     timings = (
-        json.loads(args.pilot_timings.read_text(encoding="utf-8"))
-        if args.pilot_timings else []
+        json.loads(args.pilot_timings.read_text(encoding="utf-8")) if args.pilot_timings else []
     )
     report = setup_report(
         dataset_ids=datasets["dataset_ids"],

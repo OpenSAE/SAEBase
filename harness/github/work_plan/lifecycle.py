@@ -2,6 +2,7 @@
 
 Plan declarations reference existing authority; they grant no execution rights.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -21,9 +22,13 @@ class PlanError(ValueError):
 
 def source(root, name):
     """Reject filesystem traversal, external symlinks and nonexistent sources."""
-    if (not isinstance(name, str) or not name or "\\" in name
-            or PurePosixPath(name).is_absolute()
-            or any(p in ("", ".", "..") for p in name.split("/"))):
+    if (
+        not isinstance(name, str)
+        or not name
+        or "\\" in name
+        or PurePosixPath(name).is_absolute()
+        or any(p in ("", ".", "..") for p in name.split("/"))
+    ):
         raise PlanError("Unsafe source path")
     root = root.resolve()
     path = (root / name).resolve()
@@ -51,23 +56,29 @@ def ids(root, path, field):
 
 def check(plan_path, root=ROOT, check_contracts=True):
     """Validate Work Plan refs and DAG; this is never task authorization."""
-    if (not plan_path.startswith("harness/github/work_plan/")
-            or "/from_human/" in plan_path or not plan_path.endswith(".md")):
+    if (
+        not plan_path.startswith("harness/github/work_plan/")
+        or "/from_human/" in plan_path
+        or not plan_path.endswith(".md")
+    ):
         raise PlanError("Only a repository Work Plan can be dispatched")
     plan = block(source(root, plan_path).read_text(encoding="utf-8"), BLOCK)
-    if (plan.get("schema") != "saebase.workplan.v1"
-            or not re.fullmatch(r"WP[0-9]+", str(plan.get("plan_id", "")))):
+    if plan.get("schema") != "saebase.workplan.v1" or not re.fullmatch(
+        r"WP[0-9]+", str(plan.get("plan_id", ""))
+    ):
         raise PlanError("Invalid Work Plan identity")
     if plan.get("status") not in ("draft", "reviewed", "approved"):
         raise PlanError("Missing review state")
     human = plan.get("from_human", "")
-    if not isinstance(human, str) or not human.startswith(
-            "harness/github/work_plan/from_human/"):
+    if not isinstance(human, str) or not human.startswith("harness/github/work_plan/from_human/"):
         raise PlanError("Missing from_human reference")
     intent = block(source(root, human).read_text(encoding="utf-8"), HUMAN)
-    if (intent.get("schema") != "saebase.from_human.v1"
-            or intent.get("plan_id") != plan["plan_id"]
-            or not intent.get("goal") or not intent.get("scientific_motivation")):
+    if (
+        intent.get("schema") != "saebase.from_human.v1"
+        or intent.get("plan_id") != plan["plan_id"]
+        or not intent.get("goal")
+        or not intent.get("scientific_motivation")
+    ):
         raise PlanError("Human intent is missing or mismatched")
     known = {
         "core_ids": ids(root, "harness/core/project_graph.json", "nodes"),
@@ -80,8 +91,12 @@ def check(plan_path, root=ROOT, check_contracts=True):
     atlas = plan.get("atlas") or {}
     for field, valid in known.items():
         entries = atlas.get(field)
-        if (not isinstance(entries, list) or not entries
-                or len(entries) != len(set(entries)) or not set(entries) <= valid):
+        if (
+            not isinstance(entries, list)
+            or not entries
+            or len(entries) != len(set(entries))
+            or not set(entries) <= valid
+        ):
             raise PlanError("Invalid Atlas " + field)
     paths = atlas.get("code_refs")
     if not isinstance(paths, list) or not paths:
@@ -99,11 +114,18 @@ def check(plan_path, root=ROOT, check_contracts=True):
     source(root, config)
     seen = set()
     for step in plan.get("steps", []):
-        if (not isinstance(step, dict) or step.get("id") in seen
-                or not step.get("id") or not set(step.get("needs", [])) <= seen):
+        if (
+            not isinstance(step, dict)
+            or step.get("id") in seen
+            or not step.get("id")
+            or not set(step.get("needs", [])) <= seen
+        ):
             raise PlanError("Invalid task DAG")
-        if (step.get("permission") not in ("local", "network", "gpu", "native", "publish")
-                or not step.get("goal") or not step.get("evidence")):
+        if (
+            step.get("permission") not in ("local", "network", "gpu", "native", "publish")
+            or not step.get("goal")
+            or not step.get("evidence")
+        ):
             raise PlanError("Missing purpose, evidence or permission")
         if plan["status"] == "approved" and not step.get("command"):
             raise PlanError("Approved executable step requires a concrete command")
@@ -111,11 +133,16 @@ def check(plan_path, root=ROOT, check_contracts=True):
     if not seen or not plan.get("deliverables"):
         raise PlanError("Steps and deliverables are mandatory")
     for row in plan["deliverables"]:
-        if (not isinstance(row, dict) or not row.get("experiment")
-                or not row.get("metric") or not row.get("expected")):
+        if (
+            not isinstance(row, dict)
+            or not row.get("experiment")
+            or not row.get("metric")
+            or not row.get("expected")
+        ):
             raise PlanError("Incomplete result template")
     if check_contracts:
         from harness.contracts.registry import validate_plan
+
         validate_plan(plan_path)
     return plan
 
@@ -123,13 +150,16 @@ def check(plan_path, root=ROOT, check_contracts=True):
 def completed(plan_path, receipt, root=ROOT):
     """Fill a new copy of the original plan from observed results."""
     plan = check(plan_path, root=root, check_contracts=(root.resolve() == ROOT.resolve()))
-    if (receipt.get("schema") != "saebase.workplan.run.v1"
-            or receipt.get("plan_id") != plan["plan_id"]
-            or not receipt.get("run_id")):
+    if (
+        receipt.get("schema") != "saebase.workplan.run.v1"
+        or receipt.get("plan_id") != plan["plan_id"]
+        or not receipt.get("run_id")
+    ):
         raise PlanError("Mismatched run receipt")
     observations = receipt.get("results", {})
-    if (not isinstance(observations, dict)
-            or set(observations) - {x["experiment"] for x in plan["deliverables"]}):
+    if not isinstance(observations, dict) or set(observations) - {
+        x["experiment"] for x in plan["deliverables"]
+    }:
         raise PlanError("Unexpected result")
     rows = [
         "| Experiment | Metric | Expected | Actual | Status | Notes | Evidence |",
@@ -138,25 +168,32 @@ def completed(plan_path, receipt, root=ROOT):
     for entry in plan["deliverables"]:
         result = observations.get(entry["experiment"], {"status": "NOT_RUN"})
         status = result.get("status")
-        if (status not in STATUSES or (
+        if status not in STATUSES or (
             status == "PASS" and (result.get("value") is None or not result.get("evidence"))
-        )):
+        ):
             raise PlanError("Results must have truthful status and evidence")
         values = (
-            entry["experiment"], entry["metric"], entry["expected"],
-            result.get("value", ""), status, result.get("notes", ""),
+            entry["experiment"],
+            entry["metric"],
+            entry["expected"],
+            result.get("value", ""),
+            status,
+            result.get("notes", ""),
             result.get("evidence", ""),
         )
         rows.append(
-            "| " + " | ".join(
-                str(v).replace("|", "\\|").replace("\n", " ") for v in values
-            ) + " |"
+            "| " + " | ".join(str(v).replace("|", "\\|").replace("\n", " ") for v in values) + " |"
         )
     markdown = source(root, plan_path).read_text(encoding="utf-8").rstrip()
     return (
-        markdown + "\n\n## Filled execution results\n\n"
-        + "\n".join(rows) + "\n\nRun ID: " + str(receipt["run_id"])
-        + "\nSource commit: " + str(receipt.get("source_commit", "UNVERIFIED")) + "\n"
+        markdown
+        + "\n\n## Filled execution results\n\n"
+        + "\n".join(rows)
+        + "\n\nRun ID: "
+        + str(receipt["run_id"])
+        + "\nSource commit: "
+        + str(receipt.get("source_commit", "UNVERIFIED"))
+        + "\n"
     )
 
 

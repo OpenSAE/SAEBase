@@ -1,4 +1,5 @@
 """Work Plan, Atlas, human-intent and immutable-result regression."""
+
 from __future__ import annotations
 
 import json
@@ -29,7 +30,8 @@ def _fixture(root: Path) -> str:
         "scientific_motivation": "Evidence for the research question",
     }
     _write(
-        root, "harness/github/work_plan/from_human/WP23.md",
+        root,
+        "harness/github/work_plan/from_human/WP23.md",
         "```from-human-json\n" + json.dumps(human) + "\n```\n",
     )
     manifest = {
@@ -45,10 +47,20 @@ def _fixture(root: Path) -> str:
         },
         "experiment": {"study_id": "study23", "config": "conf/experiment/example.yaml"},
         "steps": [
-            {"id": "setup", "needs": [], "permission": "local",
-             "goal": "Observe setup", "evidence": "local receipt"},
-            {"id": "run", "needs": ["setup"], "permission": "gpu",
-             "goal": "Run frozen benchmark", "evidence": "model receipt"},
+            {
+                "id": "setup",
+                "needs": [],
+                "permission": "local",
+                "goal": "Observe setup",
+                "evidence": "local receipt",
+            },
+            {
+                "id": "run",
+                "needs": ["setup"],
+                "permission": "gpu",
+                "goal": "Run frozen benchmark",
+                "evidence": "model receipt",
+            },
         ],
         "deliverables": [
             {"experiment": "E1", "metric": "accuracy", "expected": "100 real samples"}
@@ -64,16 +76,23 @@ def test_plan_from_human_atlas_and_filled_result(tmp_path):
     assert life.check(plan, root=tmp_path, check_contracts=False)["plan_id"] == "WP23"
     incomplete = life.completed(
         plan,
-        {"schema": "saebase.workplan.run.v1", "plan_id": "WP23",
-         "run_id": "r1", "results": {}},
+        {"schema": "saebase.workplan.run.v1", "plan_id": "WP23", "run_id": "r1", "results": {}},
         root=tmp_path,
     )
     assert "| E1 | accuracy | 100 real samples |  | NOT_RUN |" in incomplete
     receipt = {
         "schema": "saebase.workplan.run.v1",
-        "plan_id": "WP23", "run_id": "r2", "source_commit": "a" * 40,
-        "results": {"E1": {"status": "PASS", "value": 0.8,
-                           "notes": "100 actual samples", "evidence": "metrics/acc.json"}},
+        "plan_id": "WP23",
+        "run_id": "r2",
+        "source_commit": "a" * 40,
+        "results": {
+            "E1": {
+                "status": "PASS",
+                "value": 0.8,
+                "notes": "100 actual samples",
+                "evidence": "metrics/acc.json",
+            }
+        },
     }
     assert "0.8 | PASS" in life.completed(plan, receipt, root=tmp_path)
     receipt["results"]["E1"]["evidence"] = ""

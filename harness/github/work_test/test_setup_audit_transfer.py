@@ -1,4 +1,5 @@
 """Study-independent Setup, Audit and B2 boundaries without GPU or network."""
+
 from __future__ import annotations
 
 import hashlib

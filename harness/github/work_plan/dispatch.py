@@ -3,6 +3,7 @@
 This Harness coordinator neither defines scientific algorithms nor grants
 network, GPU, native or publication permissions on the user's behalf.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -20,16 +21,18 @@ from .lifecycle import ROOT, PlanError, check, source
 def approved_command(step, root):
     """Use only repo-owned study scripts or known SAEBase module entrypoints."""
     argv = step.get("command")
-    if (not isinstance(argv, list) or not 2 <= len(argv) <= 30
-            or any(not isinstance(a, str) or not a or "\n" in a for a in argv)):
+    if (
+        not isinstance(argv, list)
+        or not 2 <= len(argv) <= 30
+        or any(not isinstance(a, str) or not a or "\n" in a for a in argv)
+    ):
         raise PlanError("Each executable step needs explicit argv")
     if argv[0] == "bash":
         if not argv[1].startswith("scripts/") or not argv[1].endswith(".sh"):
             raise PlanError("Only repository scripts may launch via bash")
         source(root, argv[1])
     elif argv[:2] == ["python", "-m"]:
-        if (len(argv) < 3
-                or not argv[2].startswith(("saebase.", "scripts.experiments."))):
+        if len(argv) < 3 or not argv[2].startswith(("saebase.", "scripts.experiments.")):
             raise PlanError("Only SAEBase or study module entrypoints allowed")
         if "-c" in argv or "--eval" in argv:
             raise PlanError("Inline code is forbidden")
@@ -46,13 +49,16 @@ def plan_commands(plan, root, allowed):
     for step in plan["steps"]:
         argv = approved_command(step, root)
         permission = step["permission"]
-        result.append({
-            "id": step["id"], "needs": step["needs"],
-            "permission": permission,
-            "on_failure": step.get("on_failure", "global_block"),
-            "status": "PLANNED" if permission in allowed else "NOT_AUTHORIZED",
-            "argv": argv,
-        })
+        result.append(
+            {
+                "id": step["id"],
+                "needs": step["needs"],
+                "permission": permission,
+                "on_failure": step.get("on_failure", "global_block"),
+                "status": "PLANNED" if permission in allowed else "NOT_AUTHORIZED",
+                "argv": argv,
+            }
+        )
     return result
 
 
@@ -71,25 +77,35 @@ def execute(plan_path, run_id, allowed, *, root=ROOT):
     directory.mkdir(parents=True, exist_ok=False)
     ledger = {
         "schema": "saebase.workplan.dispatch.v1",
-        "plan_id": plan["plan_id"], "source_plan": plan_path,
+        "plan_id": plan["plan_id"],
+        "source_plan": plan_path,
         "run_id": run_id,
         "started_at": datetime.now(timezone.utc).isoformat(),
         "steps": [],
     }
     head = subprocess.run(
-        ["git", "rev-parse", "HEAD"], cwd=root, text=True,
-        capture_output=True, timeout=20, check=False
+        ["git", "rev-parse", "HEAD"],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        timeout=20,
+        check=False,
     )
     ledger["source_commit"] = head.stdout.strip() if head.returncode == 0 else None
     previous = {}
     global_block = False
     for step in steps:
-        if (global_block or step["status"] != "PLANNED"
-                or any(previous.get(d) != "PASS" for d in step["needs"])):
+        if (
+            global_block
+            or step["status"] != "PLANNED"
+            or any(previous.get(d) != "PASS" for d in step["needs"])
+        ):
             reason = (
-                "GLOBAL_BLOCK" if global_block else
-                "NOT_AUTHORIZED" if step["status"] != "PLANNED" else
-                "DEPENDENCY_BLOCKED"
+                "GLOBAL_BLOCK"
+                if global_block
+                else "NOT_AUTHORIZED"
+                if step["status"] != "PLANNED"
+                else "DEPENDENCY_BLOCKED"
             )
             previous[step["id"]] = "BLOCKED"
             ledger["steps"].append({**step, "status": "BLOCKED", "reason": reason})
@@ -99,14 +115,12 @@ def execute(plan_path, run_id, allowed, *, root=ROOT):
             argv = [sys.executable, *argv[1:]]
         started = time.monotonic()
         try:
-            with (directory / (step["id"] + ".stdout.log")).open(
-                "x", encoding="utf-8"
-            ) as out, (directory / (step["id"] + ".stderr.log")).open(
-                "x", encoding="utf-8"
-            ) as err:
+            with (
+                (directory / (step["id"] + ".stdout.log")).open("x", encoding="utf-8") as out,
+                (directory / (step["id"] + ".stderr.log")).open("x", encoding="utf-8") as err,
+            ):
                 code = subprocess.run(
-                    argv, cwd=root, stdout=out, stderr=err,
-                    check=False, timeout=172800
+                    argv, cwd=root, stdout=out, stderr=err, check=False, timeout=172800
                 ).returncode
         except subprocess.TimeoutExpired:
             code = 124
@@ -114,17 +128,19 @@ def execute(plan_path, run_id, allowed, *, root=ROOT):
             code = 127
         state = "PASS" if code == 0 else "BLOCKED"
         previous[step["id"]] = state
-        ledger["steps"].append({
-            **step, "status": state, "exit_code": code,
-            "elapsed_seconds": time.monotonic() - started,
-            "stdout": step["id"] + ".stdout.log",
-            "stderr": step["id"] + ".stderr.log",
-        })
+        ledger["steps"].append(
+            {
+                **step,
+                "status": state,
+                "exit_code": code,
+                "elapsed_seconds": time.monotonic() - started,
+                "stdout": step["id"] + ".stdout.log",
+                "stderr": step["id"] + ".stderr.log",
+            }
+        )
         if state != "PASS" and step["on_failure"] != "local_block":
             global_block = True
-    ledger["status"] = (
-        "PASS" if all(s == "PASS" for s in previous.values()) else "PARTIAL"
-    )
+    ledger["status"] = "PASS" if all(s == "PASS" for s in previous.values()) else "PARTIAL"
     ledger["finished_at"] = datetime.now(timezone.utc).isoformat()
     with (directory / "dispatch.json").open("x", encoding="utf-8") as f:
         json.dump(ledger, f, ensure_ascii=False, indent=2)
@@ -147,10 +163,16 @@ def main():
     try:
         plan = check(args.plan)
         if not args.execute:
-            print(json.dumps({
-                "status": "PREVIEW",
-                "steps": plan_commands(plan, ROOT, allowed),
-            }, ensure_ascii=False, indent=2))
+            print(
+                json.dumps(
+                    {
+                        "status": "PREVIEW",
+                        "steps": plan_commands(plan, ROOT, allowed),
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                )
+            )
             return 0
         receipt = execute(args.plan, args.run_id, allowed)
         print(json.dumps(receipt, ensure_ascii=False, indent=2))

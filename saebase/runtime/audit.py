@@ -3,6 +3,7 @@
 The owning Dataset/Model/Task evaluator still verifies scientific semantics;
 this module verifies declared file identities, completeness and block scope.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -43,12 +44,19 @@ def audit_artifacts(root: Path, manifest: dict[str, Any]) -> dict[str, Any]:
         sha = record.get("sha256")
         size = record.get("bytes")
         required = record.get("required", True)
-        if (not isinstance(path, str) or not path or "\\" in path
-                or PurePosixPath(path).is_absolute()
-                or any(x in ("", ".", "..") for x in path.split("/"))
-                or path in seen or type(size) is not int or size < 0
-                or not isinstance(sha, str) or SHA.fullmatch(sha) is None
-                or type(required) is not bool):
+        if (
+            not isinstance(path, str)
+            or not path
+            or "\\" in path
+            or PurePosixPath(path).is_absolute()
+            or any(x in ("", ".", "..") for x in path.split("/"))
+            or path in seen
+            or type(size) is not int
+            or size < 0
+            or not isinstance(sha, str)
+            or SHA.fullmatch(sha) is None
+            or type(required) is not bool
+        ):
             raise ValueError("Malformed, repeated or escaping artifact identity")
         seen.add(path)
         actual = (root / path).resolve(strict=False)
@@ -71,7 +79,8 @@ def audit_artifacts(root: Path, manifest: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("Invalid optional failure threshold")
     return {
         "schema": "saebase.artifact_audit.v1",
-        "status": "BLOCKED" if hard or failed_optional > max_optional
+        "status": "BLOCKED"
+        if hard or failed_optional > max_optional
         else ("PARTIAL" if defects else "PASS"),
         "verified_files": ok,
         "declared_files": len(records),
@@ -87,9 +96,7 @@ def main() -> int:
     p.add_argument("--manifest", type=Path, required=True)
     p.add_argument("--output", type=Path, required=True)
     args = p.parse_args()
-    report = audit_artifacts(
-        args.root, json.loads(args.manifest.read_text(encoding="utf-8"))
-    )
+    report = audit_artifacts(args.root, json.loads(args.manifest.read_text(encoding="utf-8")))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("x", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)

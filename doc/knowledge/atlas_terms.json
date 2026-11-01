@@ -656,7 +656,7 @@
     {
       "id": "term.b2",
       "term": "Backblaze B2",
-      "definition": "Backblaze B2 对象存储服务，用于以明确 Bucket 和前缀保存科研产物。SAEBase 使用 rclone 的 B2 Native API 进行非删除式传输及远端校验，密钥来自服务器私有配置。",
+      "definition": "Backblaze B2 对象存储服务，用于以明确 Bucket 和前缀保存科研产物。SAEBase 使用 rclone 的 B2 Native API 进行可校验的文件复制、归档及恢复，密钥来自服务器私有配置。",
       "aliases": [
         "Backblaze B2",
         "B2 Cloud",

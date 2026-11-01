@@ -3,6 +3,7 @@
 Setup does not claim a real model pass until an approved smoke has actually
 loaded that model. All speed estimates come from timed, observed pilot rows.
 """
+
 from __future__ import annotations
 
 import math
@@ -57,9 +58,13 @@ def estimate_runtime(pilot_rows: list[dict[str, Any]], total_samples: int) -> di
     for row in pilot_rows:
         count = row.get("samples")
         duration = row.get("elapsed_seconds")
-        if (type(count) is not int or count < 1
-                or not isinstance(duration, (int, float))
-                or not math.isfinite(duration) or duration <= 0):
+        if (
+            type(count) is not int
+            or count < 1
+            or not isinstance(duration, (int, float))
+            or not math.isfinite(duration)
+            or duration <= 0
+        ):
             raise ValueError("Invalid measured pilot timing")
         samples += count
         times.append(float(duration))
@@ -90,9 +95,12 @@ def setup_report(
     """Read actual hardware with the existing Runtime; never download assets."""
     from saebase.runtime.hardware import detect
 
-    if not isinstance(dataset_ids, list) or not dataset_ids or any(
-        not isinstance(x, str) or not x for x in dataset_ids
-    ) or len(set(dataset_ids)) != len(dataset_ids):
+    if (
+        not isinstance(dataset_ids, list)
+        or not dataset_ids
+        or any(not isinstance(x, str) or not x for x in dataset_ids)
+        or len(set(dataset_ids)) != len(dataset_ids)
+    ):
         raise ValueError("Invalid or duplicate Dataset identities")
     if real_gpu_probe and not require_cuda:
         raise ValueError("Real GPU probe requires a declared CUDA task")
