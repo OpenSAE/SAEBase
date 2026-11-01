@@ -49,6 +49,12 @@ def test_docs_only_do_not_install_analysis():
     assert docs["harness"] and not docs["product"] and not docs["atlas"]
 
 
+def test_release_metadata_edits_do_not_need_torch():
+    flags = classify(["saebase/tools/release_candidate.py"])
+    assert flags["harness"] and flags["ci_policy"]
+    assert not flags["product"] and not flags["atlas"]
+
+
 def test_unknown_or_invalid_scope_is_conservative():
     for value in ("unknown/path.txt", "../private", "/absolute", "weird\\path"):
         assert all(classify([value]).values())
