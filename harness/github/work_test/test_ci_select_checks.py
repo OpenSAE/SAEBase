@@ -38,7 +38,8 @@ def test_ci_changes_always_select_harness():
 
 def test_docs_only_do_not_install_analysis():
     assert not any(classify(["README.md"]).values())
-    assert not any(classify(["harness/github/development_doc/note.md"]).values()) is False
+    docs = classify(["harness/github/development_doc/note.md"])
+    assert docs["harness"] and not docs["product"] and not docs["atlas"]
 
 
 def test_unknown_or_invalid_scope_is_conservative():
