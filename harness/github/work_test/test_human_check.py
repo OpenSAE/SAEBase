@@ -427,5 +427,8 @@ def test_atlas_group_review_frontend_opens_core_and_guides_cross_tree_review():
     assert "function logicalReviewGroup(" in app
     assert "/api/review/visit" in app
     assert "/api/review/group-decision" in app
-    assert "Next linked part" in app
+    assert "Next linked part" not in app
+    assert "atlasReviewGroupScope" not in app
+    assert "maybeShowReviewDone" in app
+    assert "reviewQueue=[...ordered,...byKey.values()]" in app
     assert "groupComplete" in app
