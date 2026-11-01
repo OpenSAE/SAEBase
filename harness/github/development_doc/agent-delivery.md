@@ -9,6 +9,18 @@
 Universal Contracts、Work Order v3、Agent Flow 和所有独立审批机制继续有效。
 这套规划指南不是新的治理或执行框架。
 
+## Human Check（GitHub 修改前的默认人类审阅）
+
+默认 **开启**，在第一次修改仓库源码、配置、文档、治理文件或提交 PR **之前**完成。对话式 AI 先以当前精确 commit、已有 Core / Knowledge / Code / Environment / Context 节点与权威 Context 术语生成一份可读的修改报告，并从同一提案数据呈现 Atlas Before / Proposed After、原因、受影响文件、风险与验收条件。新 Code 节点仅为拟议节点，不可伪称已有 AST。
+
+**逐节点决定，不存在整体 Approve Plan。** 用户可对每个拟议改动单独 Approve / Deny / Unchecked；一个节点被拒绝不妨碍其他已批准、文件范围独立的节点实施。若同一文件同时对应已批准和未批准的改动，不能用文件级授权绕过未批准节点：该文件必须拆分或重新审阅。修改提案、源版本或允许范围发生变化，必须重新审核相关节点。Approve 只批准本节点明确声明的改动范围，不代表实现、实验通过、科学验证或发布。
+
+Human Check 提案、报告和审阅记录默认保存在 **未纳入 Git 的** `experiment/_human_check/<id>/`。现有 Atlas 的本地审阅服务保存节点决定，不改任何权威 Atlas Graph / Glossary。打开服务需要可信用户现场操作；静态 GitHub Pages 只能保存浏览器草稿，不能作为正式审批。Human Check 可由用户在本地 Atlas 明确关闭（并记录 actor/time），默认始终开启；关闭仅跳过这一额外预审，不取消 Work Order、Contracts、受保护架构、真实 GPU、B2、GitHub 合并与发布的原有授权。
+
+入口与每项命令、输入字段参见 [Human Check 操作说明](../HUMAN_CHECK.md)。开始实施前运行 `python -m harness.github.human_check check ...` 对将改动的路径和原始 SHA 做核验；实现后再用 `--after-edit` 核对实际改动的文件范围。审阅摘要随对应 PR 记录，不把含认证 Key 的浏览器地址写入 Git。
+
+---
+
 ## 一、GPT 如何规划
 
 首先定义最终的可观察成果，区分通用能力、具体 Dataset/Model/Task、

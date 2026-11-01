@@ -29,11 +29,30 @@ STATIC = {
     "/app.js": ("app.js", "text/javascript; charset=utf-8"),
     "/style.css": ("style.css", "text/css; charset=utf-8"),
     "/data.js": ("data.js", "text/javascript; charset=utf-8"),
+    "/atlas-theme.css": ("atlas-theme.css", "text/css; charset=utf-8"),
+    "/atlas-structure.js": ("atlas-structure.js", "text/javascript; charset=utf-8"),
+    "/atlas-public-balance.js": ("atlas-public-balance.js", "text/javascript; charset=utf-8"),
+    "/locale-data.js": ("locale-data.js", "text/javascript; charset=utf-8"),
+    "/locale-runtime.js": ("locale-runtime.js", "text/javascript; charset=utf-8"),
+    "/i18n.js": ("i18n.js", "text/javascript; charset=utf-8"),
 }
 
 
-def create_server(plan_id: str, port: int = 0) -> ThreadingHTTPServer:
-    engine.load(plan_id)
+def create_server(
+    plan_id: str, port: int = 0, *, human_check: bool = False
+) -> ThreadingHTTPServer:
+    if human_check:
+        from harness.github import human_check as human
+
+        human.load(plan_id)
+    else:
+        engine.load(plan_id)
+
+    def get_plan():
+        return human.load(plan_id) if human_check else engine.load(plan_id)
+
+    def snapshot(plan):
+        return human.snapshot(plan) if human_check else proposal.snapshot(plan)
     secret = secrets.token_urlsafe(32)
     lock = threading.RLock()
 
@@ -65,12 +84,19 @@ def create_server(plan_id: str, port: int = 0) -> ThreadingHTTPServer:
                 return self.send(403, b'{"error":"Untrusted host"}')
             path = urlsplit(self.path).path
             if path == "/":
-                url = "/knowledge.html?review=" + quote(plan_id) + "#key=" + secret
+                url = ("/core.html" if human_check else "/knowledge.html") + "?review=" + quote(plan_id) + "#key=" + secret
                 return self.send(302, b"", location=url)
+            if path == "/api/review/report" and human_check:
+                try:
+                    with lock:
+                        report = human.report_markdown(get_plan())
+                    return self.send(200, report.encode("utf-8"), "text/markdown; charset=utf-8")
+                except (ValueError, KeyError, OSError, TypeError) as exc:
+                    return self.send(409, json.dumps({"error": str(exc)}).encode())
             if path == "/api/review/state":
                 try:
                     with lock:
-                        body = proposal.snapshot(engine.load(plan_id))
+                        body = snapshot(get_plan())
                     return self.send(200, json.dumps(body, ensure_ascii=False).encode())
                 except (ValueError, KeyError, OSError, TypeError) as exc:
                     return self.send(409, json.dumps({"error": str(exc)}).encode())
@@ -85,7 +111,7 @@ def create_server(plan_id: str, port: int = 0) -> ThreadingHTTPServer:
         def do_POST(self):
             if not self.allowed_host():
                 return self.send(403, b'{"error":"Untrusted host"}')
-            if urlsplit(self.path).path != "/api/review/decision":
+            if urlsplit(self.path).path not in ("/api/review/decision", "/api/review/mode"):
                 return self.send(404, b'{"error":"Not found"}')
             expected_origin = "http://" + self.headers.get("Host", "")
             if (
@@ -102,15 +128,28 @@ def create_server(plan_id: str, port: int = 0) -> ThreadingHTTPServer:
                 if not isinstance(data, dict):
                     raise engine.FlowError("Expected a review object")
                 with lock:
-                    plan = engine.load(plan_id)
+                    plan = get_plan()
                     if (
                         type(data.get("revision")) is not int
                         or data["revision"] != plan["revision"]
                     ):
                         raise engine.FlowError("Stale review; reload Atlas before continuing")
-                    body = proposal.decide(
-                        plan, data.get("key"), data.get("decision"), actor="Human via local Atlas"
-                    )
+                    if urlsplit(self.path).path == "/api/review/mode":
+                        if not human_check:
+                            raise engine.FlowError("Review mode toggle not supported")
+                        body = human.set_mode(
+                            plan, data.get("enabled"), actor="Human via local Atlas"
+                        )
+                    elif human_check:
+                        body = human.decide(
+                            plan, data.get("key"), data.get("decision"),
+                            actor="Human via local Atlas",
+                        )
+                    else:
+                        body = proposal.decide(
+                            plan, data.get("key"), data.get("decision"),
+                            actor="Human via local Atlas",
+                        )
                 return self.send(200, json.dumps(body, ensure_ascii=False).encode())
             except (ValueError, KeyError, OSError, TypeError) as exc:
                 return self.send(409, json.dumps({"error": str(exc)}).encode())
@@ -124,9 +163,10 @@ def create_server(plan_id: str, port: int = 0) -> ThreadingHTTPServer:
     return server
 
 
-def serve(plan_id: str, port: int = 8766) -> None:
-    server = create_server(plan_id, port)
-    url = f"http://127.0.0.1:{server.server_address[1]}/knowledge.html?review={quote(plan_id)}#key={server.review_key}"
+def serve(plan_id: str, port: int = 8766, *, human_check: bool = False) -> None:
+    server = create_server(plan_id, port, human_check=human_check)
+    view = "core" if human_check else "knowledge"
+    url = f"http://127.0.0.1:{server.server_address[1]}/{view}.html?review={quote(plan_id)}#key={server.review_key}"
     print("Atlas human review: " + url, flush=True)
     try:
         server.serve_forever(poll_interval=0.1)

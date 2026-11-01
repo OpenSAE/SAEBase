@@ -61,3 +61,12 @@ Knowledge、Code、Environment、Context 与 Core 共用一套 Atlas 节点交�
 公开页面的 Approve/Deny 只保存浏览器草稿。本地审阅服务在
 `harness/github/work_plan/agent_flow/` 写入经身份与版本检查的审阅决定，
 并按审批结果更新允许修改的权威图。未经核验的示例数据不得写入实际科研结果。
+
+## Human Check：实施前的逐节点提案审阅
+
+普通 Agent Flow 中，合法的 Knowledge 空节点被批准后可能立即更新权威图；**新的 Human Check 不采用这种写入行为**。Human Check 默认开启，在任何 GitHub 源码编辑和 PR 之前，读取 Context、Core、Knowledge、Code、Environment 的权威状态并生成文字报告和同源 Atlas Overlay。
+
+审阅过程只写 `experiment/_human_check/<id>/review.json`，**绝不**修改 Core/Knowledge/Code/Context 权威数据。五棵树各项 Approve / Deny / Unchecked 独立生效，不设置整体 Approve Plan。被拒绝的节点只影响其自身授权；同一文件若被已批准和未批准节点同时覆盖，必须先拆分边界或重新审阅才可编辑该文件。每个节点审批只证明允许按拟议范围修改，不代表实现或科研验收。
+
+本地经密钥与 Origin 验证的 Atlas 可以逐节点保存并显式切换 Human Check 开关，关闭时记录人类 actor/time；公开静态 Atlas 只存草稿。实现方案、源 commit 或审阅范围变化，须重新形成对应审批。参见 [Human Check 操作说明](../github/HUMAN_CHECK.md)。原有 Agent Flow 仍用于其专门的后续执行与科研状态审批。
+
