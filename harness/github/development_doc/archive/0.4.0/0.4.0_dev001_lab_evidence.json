@@ -1,0 +1,81 @@
+{
+  "schema": "opensae.research_lab_preview_report.v1",
+  "software_version": "0.4.0",
+  "report_as_of": "2026-10-20",
+  "scope": "software_preview_and_executor_reported_gpu_counts__not_raw_evidence_distribution",
+  "gpu_source_branch": "work-plan-05-gpu-handoff",
+  "historical_reference": {
+    "model_sae_configurations": 18,
+    "sites": 48,
+    "prompt_groups_per_site": 64,
+    "data_class": "separate_20261016_engineering_acceptance"
+  },
+  "new_cohort": {
+    "source_lock_path": "saebase/research_lab/data/source_lock_v1.json",
+    "sources": 10,
+    "parent_groups_per_source": 50,
+    "parent_groups": 500,
+    "discovery": 200,
+    "evaluation": 300,
+    "source_text_public": false,
+    "human_content_reviewed": false,
+    "license_reviewed": false
+  },
+  "gpu_executor_recorded": {
+    "status": "reported_by_executor_not_independently_replica_verified",
+    "base_site_group_captures": 24000,
+    "sites": 48,
+    "deep_site_feature_cards": 300,
+    "historical_site_feature_cards": 2400,
+    "intervention_sites_with_logit_pairs": 6,
+    "sar": {
+      "protocol": "decoder_mediated_residual_preserving_v1",
+      "groups_K16": 1485,
+      "groups_K8": 14,
+      "groups_K4": 1,
+      "groups_K2": 0,
+      "groups_total": 1500,
+      "genuine_orthogonal_rotation_controls": "pending"
+    },
+    "rss": {
+      "parent_group_site_pairs": 3000,
+      "proposed_variants_per_parent": 45,
+      "selection_site_variants": 45000,
+      "held_out_site_variants": 90000,
+      "clean_site_inputs": 3000,
+      "unique_site_input_occurrences": 138000,
+      "old_position_unverified_nominal_calls": 99200,
+      "semantic_review": false
+    },
+    "localization": {
+      "states": 64,
+      "source": "real_model_grid",
+      "observed_support_features": 55,
+      "budget_at_90pct": 132,
+      "total_variance": 0.279009701245975,
+      "population": "one_controlled_six_factor_grid"
+    },
+    "full_steered_text_generation": "pending",
+    "gpu_public_hosting": "disabled",
+    "raw_experiment_archive": "private_not_in_git"
+  },
+  "release_exclusions": [
+    "third_party_dataset_source_text",
+    "raw_private_gpu_experiment_artifacts",
+    "SAE_and_model_checkpoint_weights",
+    "provider_credentials",
+    "unreviewed_token_excerpts"
+  ],
+  "verification": {
+    "software_CI_source_bound_required": true,
+    "original_SAR_RSS_regression_required": true,
+    "full_gpu_raw_independent_verification": "not_completed",
+    "full_external_public_dataset_license_review": "not_completed"
+  },
+  "documentation": {
+    "release_notes": "harness/github_development_doc/releases/v0.4.0.md",
+    "results": "harness/github_development_doc/research-lab/results-20261020.md",
+    "work_plan": "harness/github_work_plan/05_research_lab_cpu_closure_and_gpu_handoff.md",
+    "acceptance": "harness/github_development_doc/research-lab/release-acceptance.md"
+  }
+}
