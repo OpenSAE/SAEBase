@@ -39,8 +39,12 @@ def _hash(value: Any) -> str:
 
 def _git_head() -> str:
     run = subprocess.run(
-        ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True,
-        text=True, check=True, timeout=15,
+        ["git", "rev-parse", "HEAD"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+        timeout=15,
     )
     return run.stdout.strip()
 
@@ -61,10 +65,18 @@ def _ledger_path(name: str) -> Path:
 
 def _intent(plan: dict[str, Any]) -> dict[str, Any]:
     return {
-        key: plan[key] for key in (
-            "schema", "kind", "id", "goal", "base_sha", "source_identities",
+        key: plan[key]
+        for key in (
+            "schema",
+            "kind",
+            "id",
+            "goal",
+            "base_sha",
+            "source_identities",
             "authority_sha256",
-            "items", "created_for", "default_enabled",
+            "items",
+            "created_for",
+            "default_enabled",
         )
         if key in plan
     } | {
@@ -118,15 +130,14 @@ def create(manifest: dict[str, Any], *, base_sha: str | None = None) -> dict[str
         raise atlas.FlowError("Human Check requires 1..150 independent changes")
     items, names, sources = [], set(), {}
     context_ids = {
-        term["id"] for path in ("doc/knowledge/glossary.json", "doc/knowledge/atlas_terms.json")
+        term["id"]
+        for path in ("doc/knowledge/glossary.json", "doc/knowledge/atlas_terms.json")
         for term in json.loads((ROOT / path).read_text(encoding="utf-8"))["terms"]
     }
     for row in raw_items:
         if not isinstance(row, dict):
             raise atlas.FlowError("Invalid change item")
-        view, node_id, operation = (
-            row.get("view"), row.get("node_id"), row.get("operation")
-        )
+        view, node_id, operation = (row.get("view"), row.get("node_id"), row.get("operation"))
         if view not in VIEWS or operation not in ("add", "change", "remove"):
             raise atlas.FlowError("Invalid Atlas change view or operation")
         if not isinstance(node_id, str) or not node_id or len(node_id) > 220:
@@ -135,12 +146,16 @@ def create(manifest: dict[str, Any], *, base_sha: str | None = None) -> dict[str
         if key in names:
             raise atlas.FlowError("Repeated Atlas change")
         names.add(key)
-        originals = atlas.view_nodes(view) if view != "core" else {
-            node["id"]: node
-            for node in json.loads((ROOT / "harness/core/project_graph.json").read_text(
-                encoding="utf-8"
-            ))["nodes"]
-        }
+        originals = (
+            atlas.view_nodes(view)
+            if view != "core"
+            else {
+                node["id"]: node
+                for node in json.loads(
+                    (ROOT / "harness/core/project_graph.json").read_text(encoding="utf-8")
+                )["nodes"]
+            }
+        )
         original = originals.get(node_id)
         if (operation == "add") == (original is not None):
             raise atlas.FlowError("Atlas node presence conflicts with proposed operation: " + key)
@@ -161,42 +176,61 @@ def create(manifest: dict[str, Any], *, base_sha: str | None = None) -> dict[str
                 raise atlas.FlowError("Code proposal must bind the exact Python source path")
         if operation != "remove" and (
             not isinstance(after, dict)
-            or any(not isinstance(after.get(k), str) or not after[k].strip()
-                   for k in ("title", "description"))
+            or any(
+                not isinstance(after.get(k), str) or not after[k].strip()
+                for k in ("title", "description")
+            )
         ):
             raise atlas.FlowError("Proposed nodes require an explanatory title and description")
         if operation == "remove" and after is not None:
             raise atlas.FlowError("Removed nodes cannot have new values")
         terms = row.get("context_term_ids", [])
-        if not isinstance(terms, list) or len(set(terms)) != len(terms) or (
-            not set(terms) <= context_ids
+        if (
+            not isinstance(terms, list)
+            or len(set(terms)) != len(terms)
+            or (not set(terms) <= context_ids)
         ):
             raise atlas.FlowError("Invalid Context reference")
         if not isinstance(row.get("reason"), str) or not row["reason"].strip():
             raise atlas.FlowError("Every change needs a Context-grounded reason")
-        items.append({
-            "key": key, "view": view, "node_id": node_id, "operation": operation,
-            "parent_id": row.get("parent_id"), "before": atlas.brief(original),
-            "after": after, "files": files, "reason": row["reason"],
-            "risk": str(row.get("risk", "")), "checks": row.get("checks", []),
-            "context_term_ids": terms, "proposal_review": None,
-        })
+        items.append(
+            {
+                "key": key,
+                "view": view,
+                "node_id": node_id,
+                "operation": operation,
+                "parent_id": row.get("parent_id"),
+                "before": atlas.brief(original),
+                "after": after,
+                "files": files,
+                "reason": row["reason"],
+                "risk": str(row.get("risk", "")),
+                "checks": row.get("checks", []),
+                "context_term_ids": terms,
+                "proposal_review": None,
+            }
+        )
     proposed_base = base_sha or _git_head()
     if not re.fullmatch(r"[0-9a-f]{40}", proposed_base):
         raise atlas.FlowError("Invalid source commit SHA")
     plan = {
-        "schema": SCHEMA, "kind": "human_check", "id": plan_id,
-        "goal": goal.strip(), "created_for": manifest.get("created_for", "GitHub source change"),
-        "base_sha": proposed_base, "source_identities": sources,
+        "schema": SCHEMA,
+        "kind": "human_check",
+        "id": plan_id,
+        "goal": goal.strip(),
+        "created_for": manifest.get("created_for", "GitHub source change"),
+        "base_sha": proposed_base,
+        "source_identities": sources,
         "authority_sha256": {p: _file_hash(p) for p in AUTHORITIES},
-        "default_enabled": True, "mode": "on", "opt_out": None, "revision": 0,
+        "default_enabled": True,
+        "mode": "on",
+        "opt_out": None,
+        "revision": 0,
         "items": items,
     }
     plan["seal"] = _hash(_intent(plan))
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(
-        json.dumps(plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+    destination.write_text(json.dumps(plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     report = report_markdown(plan)
     (destination.parent / "report.md").write_text(report, encoding="utf-8")
     return plan
@@ -205,35 +239,54 @@ def create(manifest: dict[str, Any], *, base_sha: str | None = None) -> dict[str
 def report_markdown(plan: dict[str, Any]) -> str:
     validate(plan)
     lines = [
-        "# Human Check · " + plan["id"], "",
-        "Goal: " + plan["goal"], "",
-        "Baseline: " + plan["base_sha"], "",
-        "Default: ON; each Atlas item is approved or denied independently.", "",
+        "# Human Check · " + plan["id"],
+        "",
+        "Goal: " + plan["goal"],
+        "",
+        "Baseline: " + plan["base_sha"],
+        "",
+        "Default: ON; each Atlas item is approved or denied independently.",
+        "",
         "| Tree | Node | Operation | Files | Decision |",
         "| --- | --- | --- | --- | --- |",
     ]
     for item in plan["items"]:
         status = (item.get("proposal_review") or {}).get("decision", "unchecked")
         lines.append(
-            "| " + " | ".join(
+            "| "
+            + " | ".join(
                 str(x).replace("|", "\\|")
                 for x in (
-                    item["view"], item["node_id"], item["operation"],
-                    ", ".join(item["files"]), status,
+                    item["view"],
+                    item["node_id"],
+                    item["operation"],
+                    ", ".join(item["files"]),
+                    status,
                 )
-            ) + " |"
+            )
+            + " |"
         )
     for item in plan["items"]:
-        lines.extend([
-            "", "## " + item["key"], "",
-            "**Why:** " + item["reason"], "",
-            "**Before:** " + (item["before"] or {}).get("description", "New node"),
-            "", "**Proposed after:** " +
-            ((item["after"] or {}).get("description", "Remove this item")),
-            "", "**Risk:** " + item["risk"],
-            "", "**Verification:** " + ", ".join(map(str, item["checks"])),
-            "", "**Context:** " + ", ".join(item["context_term_ids"]), "",
-        ])
+        lines.extend(
+            [
+                "",
+                "## " + item["key"],
+                "",
+                "**Why:** " + item["reason"],
+                "",
+                "**Before:** " + (item["before"] or {}).get("description", "New node"),
+                "",
+                "**Proposed after:** "
+                + ((item["after"] or {}).get("description", "Remove this item")),
+                "",
+                "**Risk:** " + item["risk"],
+                "",
+                "**Verification:** " + ", ".join(map(str, item["checks"])),
+                "",
+                "**Context:** " + ", ".join(item["context_term_ids"]),
+                "",
+            ]
+        )
     return "\n".join(lines)
 
 
@@ -250,9 +303,7 @@ def _write(plan: dict[str, Any]) -> None:
     temp = destination.with_suffix(".tmp")
     temp.write_text(json.dumps(plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     temp.replace(destination)
-    (destination.parent / "report.md").write_text(
-        report_markdown(plan), encoding="utf-8"
-    )
+    (destination.parent / "report.md").write_text(report_markdown(plan), encoding="utf-8")
 
 
 def decide(plan: dict[str, Any], key: str, decision: str, *, actor: str) -> dict[str, Any]:
@@ -267,9 +318,15 @@ def decide(plan: dict[str, Any], key: str, decision: str, *, actor: str) -> dict
         raise atlas.FlowError("Unknown independent change")
     if not actor.strip():
         raise atlas.FlowError("Human reviewer identity required")
-    item["proposal_review"] = None if decision == "unchecked" else {
-        "decision": decision, "actor": actor, "at": atlas.now(),
-    }
+    item["proposal_review"] = (
+        None
+        if decision == "unchecked"
+        else {
+            "decision": decision,
+            "actor": actor,
+            "at": atlas.now(),
+        }
+    )
     plan["revision"] += 1
     _write(plan)
     return snapshot(plan)
@@ -288,7 +345,10 @@ def set_mode(plan: dict[str, Any], enabled: bool, *, actor: str) -> dict[str, An
 
 
 def allowed_paths(
-    plan: dict[str, Any], paths: list[str], *, base_sha: str,
+    plan: dict[str, Any],
+    paths: list[str],
+    *,
+    base_sha: str,
     before_edit: bool = True,
 ) -> dict[str, Any]:
     """Reject unapproved or mixed-decision file scopes; keep independent successes."""
@@ -306,9 +366,9 @@ def allowed_paths(
         _safe(path)
         matches = [row for row in plan["items"] if path in row["files"]]
         if plan["mode"] == "on" and (
-            not matches or any(
-                (row.get("proposal_review") or {}).get("decision") != "approved"
-                for row in matches
+            not matches
+            or any(
+                (row.get("proposal_review") or {}).get("decision") != "approved" for row in matches
             )
         ):
             raise atlas.FlowError("Unapproved or overlapping denied scope: " + path)
@@ -317,9 +377,11 @@ def allowed_paths(
         selected.append(path)
     return {
         "status": "HUMAN_CHECK_OPTED_OUT" if plan["mode"] == "off" else "APPROVED_SCOPE",
-        "paths": selected, "base_sha": plan["base_sha"],
+        "paths": selected,
+        "base_sha": plan["base_sha"],
         "approved_items": [
-            row["key"] for row in plan["items"]
+            row["key"]
+            for row in plan["items"]
             if (row.get("proposal_review") or {}).get("decision") == "approved"
             and any(p in selected for p in row["files"])
         ],
@@ -346,7 +408,14 @@ def main() -> int:
         if args.command == "prepare":
             data = json.loads(args.manifest.read_text(encoding="utf-8"))
             result = create(data, base_sha=args.base_sha)
-            print(json.dumps({"id": result["id"], "report": str(_ledger_path(result["id"]).parent / "report.md")}))
+            print(
+                json.dumps(
+                    {
+                        "id": result["id"],
+                        "report": str(_ledger_path(result["id"]).parent / "report.md"),
+                    }
+                )
+            )
         else:
             plan = load(args.id)
             if args.command == "inspect":
@@ -356,12 +425,20 @@ def main() -> int:
             elif args.command == "check":
                 if not args.after_edit and _git_head() != args.base_sha:
                     raise atlas.FlowError("Current HEAD differs from approved source commit")
-                print(json.dumps(allowed_paths(
-                    plan, args.path, base_sha=args.base_sha,
-                    before_edit=not args.after_edit,
-                ), indent=2))
+                print(
+                    json.dumps(
+                        allowed_paths(
+                            plan,
+                            args.path,
+                            base_sha=args.base_sha,
+                            before_edit=not args.after_edit,
+                        ),
+                        indent=2,
+                    )
+                )
             else:
                 from harness.core.agent_review_server import serve
+
                 serve(args.id, args.port, human_check=True)
         return 0
     except (ValueError, OSError, KeyError, TypeError, subprocess.SubprocessError) as exc:
