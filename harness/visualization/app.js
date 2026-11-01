@@ -122,6 +122,32 @@
   const REVIEW_TITLES={core:"Core",knowledge:"Knowledge",code:"Code",
     environment:"Environment",context:"Context"};
   let reviewQueue=[],reviewGroupOf=new Map(),reviewGroups=[];
+  let reviewVisitPromise=Promise.resolve();
+  const queuedVisits=new Set();
+  function logicalReviewGroup(key){
+    return review?.plan?.groups?.find(group=>group.item_keys.includes(key)) || null;
+  }
+  function queueReviewVisit(){
+    if(!review?.plan?.groups?.length || !review.editable)return;
+    const item=itemFor(config.focusId,config.view),group=item&&logicalReviewGroup(item.key);
+    if(!group || review.plan.viewed?.[group.id]?.[item.key] || queuedVisits.has(item.key))return;
+    queuedVisits.add(item.key);
+    reviewVisitPromise=reviewVisitPromise.then(async()=>{
+      const response=await fetch("/api/review/visit",{
+        method:"POST",credentials:"same-origin",
+        headers:{"Content-Type":"application/json","X-Atlas-Review-Key":reviewKey()},
+        body:JSON.stringify({revision:review.plan.revision,key:item.key})
+      });
+      const data=await response.json();
+      if(!response.ok)throw Error(data.error||"Could not record visited Atlas part");
+      // Do not reset camera or tree focus just because a read receipt was saved.
+      review.plan=data.plan;
+      updateReviewBar();
+    }).catch(error=>{
+      reviewError=error.message;
+      updateReviewBar();
+    }).finally(()=>queuedVisits.delete(item.key));
+  }
   let reviewFilter={level:"all"},reviewMenuOpen=false;
   const reviewExpanded=new Set(["all",...REVIEW_VIEWS.map(v=>"view:"+v)]);
 
@@ -483,8 +509,19 @@
     $("atlasReviewPrev").disabled=reviewBusy||current<=0;
     $("atlasReviewNext").disabled=reviewBusy||current>=items.length-1;
     const disabled=review.plan.kind==="human_check" && review.plan.mode==="off";
-    $("atlasReviewApprove").disabled=reviewBusy||current<0||disabled;
-    $("atlasReviewDeny").disabled=reviewBusy||current<0||disabled;
+    const group=review.plan.groups?.length ? logicalReviewGroup(items[current]?.key) : null;
+    const visited=group?Object.keys(review.plan.viewed?.[group.id]||{}).length:0;
+    const groupComplete=!group||visited>=group.item_keys.length;
+    const scopeLabel=$("atlasReviewGroupScope");
+    if(scopeLabel){
+      if(group){
+        scopeLabel.textContent=group.title+" · "+visited+"/"+group.item_keys.length+
+          " Atlas parts viewed"+(groupComplete?" · Ready to decide":" · Browse linked parts first");
+        scopeLabel.classList.remove("is-hidden");
+      }else scopeLabel.classList.add("is-hidden");
+    }
+    $("atlasReviewApprove").disabled=reviewBusy||current<0||disabled||!groupComplete;
+    $("atlasReviewDeny").disabled=reviewBusy||current<0||disabled||!groupComplete;
     $("atlasReviewUnchecked").disabled=reviewBusy||current<0||disabled;
     const toggle=$("atlasHumanCheckToggle");
     if(toggle){
@@ -509,6 +546,7 @@
     if (!data?.plan || !Array.isArray(data.plan.items) ||
         data.plan.id !== requestedReview()) throw Error("Invalid Atlas plan");
     if(!live) restoreBrowserDraft(data.plan);
+    reviewVisitPromise=Promise.resolve();
     review = {plan:data.plan,context:data.context || data.review_context ||
               {nodes:[],edges:[]},editable:!!live && !!reviewKey()};
     overlayGraphs();
@@ -546,6 +584,12 @@
     }
     const bar=$("atlasReviewBar");
     if(review.plan.kind==="human_check"){
+      if(review.plan.groups?.length && !$("atlasReviewGroupScope")){
+        const scope=el("div","atlas-review-group-scope","");
+        scope.id="atlasReviewGroupScope";
+        scope.setAttribute("role","status");
+        bar.prepend(scope);
+      }
       let toggle=$("atlasHumanCheckToggle");
       if(!toggle){
         toggle=el("button","review-export","Human Check ON · Disable");
@@ -636,6 +680,9 @@
     const at=reviewPosition();
     if(at<0)return;
     const current=filteredReviewQueue()[at];
+    const group=logicalReviewGroup(current.key);
+    if(group && decision!=="unchecked" &&
+       Object.keys(review.plan.viewed?.[group.id]||{}).length < group.item_keys.length)return;
     reviewError="";
     reviewBusy=true;
     updateReviewBar();
@@ -643,10 +690,12 @@
       // Local Atlas commits Knowledge and Ledger before returning success.
       // Public Atlas persists a clearly labeled browser-only JSON draft.
       if(review.editable){
-        const response=await fetch("/api/review/decision",{
+        await reviewVisitPromise;
+        const response=await fetch(group?"/api/review/group-decision":"/api/review/decision",{
           method:"POST",credentials:"same-origin",keepalive:true,
           headers:{"Content-Type":"application/json","X-Atlas-Review-Key":reviewKey()},
-          body:JSON.stringify({revision:review.plan.revision,key:current.key,decision})
+          body:JSON.stringify({revision:review.plan.revision,key:current.key,
+            group_id:group?.id,decision})
         });
         const data=await response.json();
         if(!response.ok) throw Error(data.error || "Review not saved");
@@ -906,7 +955,7 @@
     setAddress(id, !!replace || sameFocus);
     render(false,true);
     centerSelected();
-    if(review) updateReviewBar();
+    if(review){updateReviewBar();queueReviewVisit();}
     return true;
   }
   function overview(push) {
@@ -934,7 +983,7 @@
     bind();
     render(true);
     if (config.focusId) centerSelected();
-    if(requestedReview() && config.view!=="core") {
+    if(requestedReview()) {
       loadReview().catch(error=>{$("focusHint").textContent=error.message;});
     }
   }
