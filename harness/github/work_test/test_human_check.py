@@ -429,7 +429,9 @@ def test_atlas_group_review_frontend_opens_core_and_guides_cross_tree_review():
     assert "if(requestedReview())" in app
     assert "function logicalReviewGroup(" in app
     assert "/api/review/visit" in app
-    assert "/api/review/group-decision" in app
+    # New Atlas decisions use the node endpoint; the old group endpoint remains
+    # available server-side for historical grouped clients.
+    assert "/api/review/decision" in app
     assert "Next linked part" not in app
     assert "atlasReviewGroupScope" not in app
     assert "maybeShowReviewDone" in app
