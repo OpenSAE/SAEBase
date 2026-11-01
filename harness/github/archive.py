@@ -199,6 +199,83 @@ def prepare(closing: str, next_version: str, root: Path = ROOT) -> dict:
     }
 
 
+
+def apply_reviewed(preparation_path: Path, review_id: str, root: Path = ROOT) -> dict:
+    """Perform only already-approved moves after a successful Atlas Human Check.
+
+    This command never commits or publishes. A normal reviewed PR must contain
+    the resulting Git changes and pass the usual CI before release validation.
+    """
+    from harness.github import human_check
+
+    plan = json.loads(preparation_path.read_text(encoding="utf-8"))
+    if plan.get("schema") != "saebase.harness.archive_preparation.v1":
+        raise ArchiveError("Invalid archive preparation manifest")
+    head = git_head(root)
+    if head != plan.get("source_sha"):
+        raise ArchiveError("Source commit changed since archive preparation")
+    index = read_index(root)
+    check(index, root)
+    candidates = plan.get("candidates")
+    if not isinstance(candidates, list):
+        raise ArchiveError("Invalid candidate list")
+    paths = [row["original_path"] for row in candidates] + [INDEX.as_posix()]
+    review = human_check.load(review_id)
+    human_check.allowed_paths(review, paths, base_sha=head)
+    for row in candidates:
+        safe(row["original_path"])
+        archive_identity(row["archived_path"])
+        if row["version"] != plan["closing_version"]:
+            raise ArchiveError("Candidate belongs to wrong closing version")
+        if path_blob(root, row["original_path"]) != row["git_blob_sha"]:
+            raise ArchiveError("Source changed since review: " + row["original_path"])
+        if (root / safe(row["archived_path"])).exists():
+            raise ArchiveError("Target archive path exists: " + row["archived_path"])
+    index_copy = json.loads(json.dumps(index))
+    existing = {entry["archived_path"] for entry in index_copy["entries"]}
+    for row in candidates:
+        if row["archived_path"] in existing:
+            raise ArchiveError("Duplicate archive target")
+        index_copy["entries"].append({
+            **row,
+            "status": "archived",
+            "reason": "Automatically prepared; human-approved exact-source migration",
+        })
+        existing.add(row["archived_path"])
+    version = plan.get("next_version")
+    version_tuple(version)
+    index_copy.setdefault("prepared_for_versions", [])
+    if version not in index_copy["prepared_for_versions"]:
+        index_copy["prepared_for_versions"].append(version)
+    # The approved migration modifies only the versioned candidate source
+    # files, their destinations, and the already-scoped archive index.
+    moved = []
+    original_index = (root / INDEX).read_bytes()
+    try:
+        for row in candidates:
+            old = root / row["original_path"]
+            new = root / row["archived_path"]
+            new.parent.mkdir(parents=True, exist_ok=True)
+            old.rename(new)
+            moved.append((new, old))
+        (root / INDEX).write_text(
+            json.dumps(index_copy, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        check(index_copy, root, release_version=version)
+    except Exception:
+        for new, old in reversed(moved):
+            old.parent.mkdir(parents=True, exist_ok=True)
+            new.rename(old)
+        (root / INDEX).write_bytes(original_index)
+        raise
+    return {
+        "status": "ARCHIVED_NEEDS_GIT_REVIEW",
+        "moved": len(candidates),
+        "prepared_for": version,
+        "approved_human_check": review_id,
+    }
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     sub = p.add_subparsers(dest="command", required=True)
@@ -208,10 +285,15 @@ def main() -> int:
     plan.add_argument("--closing-version", required=True)
     plan.add_argument("--next-version", required=True)
     plan.add_argument("--output", type=Path)
+    apply_parser = sub.add_parser("apply")
+    apply_parser.add_argument("--preparation", type=Path, required=True)
+    apply_parser.add_argument("--human-check-id", required=True)
     args = p.parse_args()
     try:
         if args.command == "check":
             result = check(read_index(), release_version=args.release_version)
+        elif args.command == "apply":
+            result = apply_reviewed(args.preparation, args.human_check_id)
         else:
             result = prepare(args.closing_version, args.next_version)
             if args.output:
