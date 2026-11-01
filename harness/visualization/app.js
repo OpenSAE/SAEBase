@@ -600,8 +600,10 @@
       if(!demo && !/^[A-Za-z][A-Za-z0-9_-]{2,63}$/.test(id||"")){
         $("focusHint").textContent="Invalid review identifier";return;
       }
+      const staticRoot=(window.location.pathname||"").includes("/atlas/")?
+        "../harness/visualization/review-proposals/":"./review-proposals/";
       const response=await fetch(demo?"./demo-knowledge-plan.json":
-        "./review-proposals/"+encodeURIComponent(id)+".json",{cache:"no-store"});
+        staticRoot+encodeURIComponent(id)+".json",{cache:"no-store"});
       if(!response.ok) throw Error("Atlas proposal missing: use local service or publish a read-only review proposal");
       payload=await response.json();
       if(!payload.plan) payload={plan:payload,context:payload.review_context};
