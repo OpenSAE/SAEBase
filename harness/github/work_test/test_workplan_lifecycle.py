@@ -118,6 +118,19 @@ def test_invalid_atlas_code_and_dag_fail_closed(tmp_path):
         life.check(plan, root=tmp_path, check_contracts=False)
 
 
+def test_workplan_rejects_unsafe_step_ids(tmp_path):
+    plan = _fixture(tmp_path)
+    target = tmp_path / plan
+    original = target.read_text(encoding="utf-8")
+    for unsafe in ("../escape", "/absolute", "run/id", ".hidden"):
+        target.write_text(
+            original.replace('"id": "setup"', '"id": ' + json.dumps(unsafe)),
+            encoding="utf-8",
+        )
+        with pytest.raises(life.PlanError, match="Invalid task DAG"):
+            life.check(plan, root=tmp_path, check_contracts=False)
+
+
 def test_dispatch_permissions_are_source_bound(tmp_path):
     from harness.github.work_plan.dispatch import approved_command, plan_commands
 
