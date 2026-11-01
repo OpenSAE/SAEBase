@@ -6,23 +6,30 @@ from harness.github.ci.select_checks import classify
 
 
 def test_harness_and_atlas_changes_are_lightweight():
-    flags = classify([
-        "harness/github/human_check.py",
-        "harness/visualization/app.js",
-        "harness/core/AGENT_FLOW.md",
-    ])
+    flags = classify(
+        [
+            "harness/github/human_check.py",
+            "harness/visualization/app.js",
+            "harness/core/AGENT_FLOW.md",
+        ]
+    )
     assert flags == {
-        "harness": True, "atlas": True, "product": False, "ci_policy": False,
+        "harness": True,
+        "atlas": True,
+        "product": False,
+        "ci_policy": False,
     }
 
 
 def test_main_push_uses_union_not_one_category():
-    flags = classify([
-        "tasks/capture/operation.py",
-        "harness/core/agent_flow.py",
-        "doc/knowledge/glossary.json",
-        "pyproject.toml",
-    ])
+    flags = classify(
+        [
+            "tasks/capture/operation.py",
+            "harness/core/agent_flow.py",
+            "doc/knowledge/glossary.json",
+            "pyproject.toml",
+        ]
+    )
     assert flags["harness"] and flags["atlas"] and flags["product"]
 
 
