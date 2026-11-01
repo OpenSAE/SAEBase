@@ -682,11 +682,23 @@
       if(!demo && !/^[A-Za-z][A-Za-z0-9_-]{2,63}$/.test(id||"")){
         $("focusHint").textContent="Invalid review identifier";return;
       }
-      const staticRoot=(window.location.pathname||"").includes("/atlas/")?
-        "../harness/visualization/review-proposals/":"./review-proposals/";
-      const response=await fetch(demo?"./demo-knowledge-plan.json":
-        staticRoot+encodeURIComponent(id)+".json",{cache:"no-store"});
-      if(!response.ok) throw Error("Atlas proposal missing: use local service or publish a read-only review proposal");
+      // Prefer the versioned review data published alongside this Atlas.
+      // Preserve the legacy branch-hosted review location for old bookmarks.
+      const roots=(window.location.pathname||"").includes("/atlas/")?
+        ["./review-proposals/","../harness/visualization/review-proposals/"]:
+        ["./review-proposals/"];
+      let response=null;
+      if(demo){
+        response=await fetch("./demo-knowledge-plan.json",{cache:"no-store"});
+      }else{
+        for(const root of roots){
+          try{
+            const candidate=await fetch(root+encodeURIComponent(id)+".json",{cache:"no-store"});
+            if(candidate.ok){response=candidate;break;}
+          }catch(_){/* Continue to the legacy published location. */}
+        }
+      }
+      if(!response?.ok) throw Error("Atlas proposal missing: published review data unavailable");
       payload=await response.json();
       if(!payload.plan) payload={plan:payload,context:payload.review_context};
     }

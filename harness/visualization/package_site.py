@@ -101,6 +101,30 @@ def bundle(output: Path) -> dict:
     for name in STATIC:
         shutil.copy2(HERE / name, output / name)
 
+    # Public Human Check is the existing Atlas UI with a source-backed
+    # proposal overlay. Ship review snapshots beside Atlas so a ?review= link
+    # works without a local server or a separately authored HTML page.
+    published = output / "review-proposals"
+    published.mkdir(parents=True, exist_ok=True)
+    for obsolete in published.glob("*.json"):
+        obsolete.unlink()
+    review_index = []
+    for source in sorted((HERE / "review-proposals").glob("*.json")):
+        if source.name.endswith(".manifest.json"):
+            continue  # Authoring manifests do not belong in the public UI.
+        review = json.loads(source.read_text(encoding="utf-8"))
+        if review.get("plan", {}).get("id") != source.stem:
+            raise ValueError("Invalid Atlas review snapshot: " + source.name)
+        if review["plan"].get("kind") != "human_check":
+            raise ValueError("Unexpected public review kind: " + source.name)
+        shutil.copy2(source, published / source.name)
+        review_index.append({"id": source.stem, "file": source.name})
+    (published / "index.json").write_text(
+        json.dumps({"schema": "saebase.atlas.review-index.v1",
+                    "reviews": review_index}, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
     script_tags = "\n".join(
         f'  <script defer src="./{name}?v={source_commit[:12]}"></script>'
         for name in [*names, "data-bootstrap.js"]
