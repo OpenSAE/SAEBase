@@ -165,7 +165,8 @@ def test_proposal_is_sealed_and_absent_nodes_are_not_implemented(workspace):
     manifest["items"] = [{
         "view": "code", "node_id": "code:module:saebase.new_feature",
         "operation": "add", "after": {
-            "title": "Proposed feature", "description": "Pending actual Python AST"
+            "title": "Proposed feature", "description": "Pending actual Python AST",
+            "path": "saebase/tools/new.py"
         }, "files": ["saebase/tools/new.py"], "reason": "Optional proposed code node",
         "context_term_ids": ["term.registry"],
     }]
