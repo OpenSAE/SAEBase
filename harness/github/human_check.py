@@ -346,6 +346,8 @@ def main() -> int:
             elif args.command == "report":
                 print(report_markdown(plan))
             elif args.command == "check":
+                if not args.after_edit and _git_head() != args.base_sha:
+                    raise atlas.FlowError("Current HEAD differs from approved source commit")
                 print(json.dumps(allowed_paths(
                     plan, args.path, base_sha=args.base_sha,
                     before_edit=not args.after_edit,
