@@ -1,0 +1,496 @@
+{
+  "id": "HC-Archive-20261101",
+  "goal": "按版本整理 SAEBase Harness development_doc、work_plan、work_test；历史资料冻结，Release 前归档。",
+  "created_for": "Atlas grouped archival review; proposal-only; no source changes authorized",
+  "items": [
+    {
+      "view": "core",
+      "node_id": "g.context",
+      "operation": "change",
+      "parent_id": null,
+      "after": {
+        "title": "永久命名与索引",
+        "description": "拟将该目标对应的版本归档职责以可追溯方式纳入 Harness。"
+      },
+      "files": [
+        "harness/github/ARCHIVE_STANDARD.md"
+      ],
+      "reason": "在原有 Core 目标下组织治理变更；仅作为提案，不修改权威图。",
+      "risk": "不能误改科研事实或批准后直接发布。",
+      "checks": [
+        "现有 Core/Context 引用有效"
+      ],
+      "context_term_ids": [
+        "term.core_tree"
+      ],
+      "group_id": "HC01",
+      "group_title": "永久命名与索引"
+    },
+    {
+      "view": "core",
+      "node_id": "g.archive_catalog",
+      "operation": "add",
+      "parent_id": "g.context",
+      "after": {
+        "type": "goal",
+        "title": "制定版本命名",
+        "description": "规范 dev/wp/wt 的版本、短名及编号",
+        "context_term_ids": [
+          "term.core_tree"
+        ]
+      },
+      "files": [
+        "harness/github/ARCHIVE_STANDARD.md"
+      ],
+      "reason": "本部分属于 永久命名与索引，须与其余部分一起审阅。",
+      "risk": "拟议节点，不是已存在的 Core 事实；只批准指定路径的方案。",
+      "checks": [
+        "逐文件来源哈希",
+        "历史文件原文不变",
+        "引用关系核验"
+      ],
+      "context_term_ids": [
+        "term.core_tree"
+      ],
+      "group_id": "HC01",
+      "group_title": "永久命名与索引"
+    },
+    {
+      "view": "core",
+      "node_id": "g.archive_index",
+      "operation": "add",
+      "parent_id": "g.context",
+      "after": {
+        "type": "goal",
+        "title": "记录历史映射",
+        "description": "记录原路径、目标路径和来源身份",
+        "context_term_ids": [
+          "term.core_tree"
+        ]
+      },
+      "files": [
+        "harness/github/archive_index.json"
+      ],
+      "reason": "本部分属于 永久命名与索引，须与其余部分一起审阅。",
+      "risk": "拟议节点，不是已存在的 Core 事实；只批准指定路径的方案。",
+      "checks": [
+        "逐文件来源哈希",
+        "历史文件原文不变",
+        "引用关系核验"
+      ],
+      "context_term_ids": [
+        "term.core_tree"
+      ],
+      "group_id": "HC01",
+      "group_title": "永久命名与索引"
+    },
+    {
+      "view": "core",
+      "node_id": "q.transparency",
+      "operation": "change",
+      "parent_id": null,
+      "after": {
+        "title": "Development Doc 历史归档",
+        "description": "拟将该目标对应的版本归档职责以可追溯方式纳入 Harness。"
+      },
+      "files": [
+        "harness/github/development_doc/README.md"
+      ],
+      "reason": "在原有 Core 目标下组织治理变更；仅作为提案，不修改权威图。",
+      "risk": "不能误改科研事实或批准后直接发布。",
+      "checks": [
+        "现有 Core/Context 引用有效"
+      ],
+      "context_term_ids": [
+        "term.artifact"
+      ],
+      "group_id": "HC02",
+      "group_title": "Development Doc 历史归档"
+    },
+    {
+      "view": "core",
+      "node_id": "g.archive_dev_guides",
+      "operation": "add",
+      "parent_id": "q.transparency",
+      "after": {
+        "type": "goal",
+        "title": "保留永久指南",
+        "description": "现有 API 与维护入口继续保持稳定",
+        "context_term_ids": [
+          "term.artifact"
+        ]
+      },
+      "files": [
+        "harness/github/development_doc/README.md"
+      ],
+      "reason": "本部分属于 Development Doc 历史归档，须与其余部分一起审阅。",
+      "risk": "拟议节点，不是已存在的 Core 事实；只批准指定路径的方案。",
+      "checks": [
+        "逐文件来源哈希",
+        "历史文件原文不变",
+        "引用关系核验"
+      ],
+      "context_term_ids": [
+        "term.artifact"
+      ],
+      "group_id": "HC02",
+      "group_title": "Development Doc 历史归档"
+    },
+    {
+      "view": "core",
+      "node_id": "g.archive_dev_history",
+      "operation": "add",
+      "parent_id": "q.transparency",
+      "after": {
+        "type": "goal",
+        "title": "归档历史报告",
+        "description": "只迁移版本可验证的历史报告",
+        "context_term_ids": [
+          "term.artifact"
+        ]
+      },
+      "files": [
+        "harness/github/development_doc/history.md"
+      ],
+      "reason": "本部分属于 Development Doc 历史归档，须与其余部分一起审阅。",
+      "risk": "拟议节点，不是已存在的 Core 事实；只批准指定路径的方案。",
+      "checks": [
+        "逐文件来源哈希",
+        "历史文件原文不变",
+        "引用关系核验"
+      ],
+      "context_term_ids": [
+        "term.artifact"
+      ],
+      "group_id": "HC02",
+      "group_title": "Development Doc 历史归档"
+    },
+    {
+      "view": "core",
+      "node_id": "q.reproducibility",
+      "operation": "change",
+      "parent_id": null,
+      "after": {
+        "title": "Work Plan 版本归档",
+        "description": "拟将该目标对应的版本归档职责以可追溯方式纳入 Harness。"
+      },
+      "files": [
+        "harness/github/work_plan/21_exam_round01_report_20261030.md"
+      ],
+      "reason": "在原有 Core 目标下组织治理变更；仅作为提案，不修改权威图。",
+      "risk": "不能误改科研事实或批准后直接发布。",
+      "checks": [
+        "现有 Core/Context 引用有效"
+      ],
+      "context_term_ids": [
+        "term.sae.reproducible"
+      ],
+      "group_id": "HC03",
+      "group_title": "Work Plan 版本归档"
+    },
+    {
+      "view": "core",
+      "node_id": "g.archive_wp_reports",
+      "operation": "add",
+      "parent_id": "q.reproducibility",
+      "after": {
+        "type": "goal",
+        "title": "冻结既往计划",
+        "description": "按真实发布标签冻结既往 Work Plan",
+        "context_term_ids": [
+          "term.sae.reproducible"
+        ]
+      },
+      "files": [
+        "harness/github/work_plan/21_exam_round01_report_20261030.md"
+      ],
+      "reason": "本部分属于 Work Plan 版本归档，须与其余部分一起审阅。",
+      "risk": "拟议节点，不是已存在的 Core 事实；只批准指定路径的方案。",
+      "checks": [
+        "逐文件来源哈希",
+        "历史文件原文不变",
+        "引用关系核验"
+      ],
+      "context_term_ids": [
+        "term.sae.reproducible"
+      ],
+      "group_id": "HC03",
+      "group_title": "Work Plan 版本归档"
+    },
+    {
+      "view": "core",
+      "node_id": "g.archive_wp_paths",
+      "operation": "add",
+      "parent_id": "q.reproducibility",
+      "after": {
+        "type": "goal",
+        "title": "保持计划解析",
+        "description": "确保旧 WP ID 和 Contract 引用仍可解析",
+        "context_term_ids": [
+          "term.sae.reproducible"
+        ]
+      },
+      "files": [
+        "harness/github/work_plan/lifecycle.py"
+      ],
+      "reason": "本部分属于 Work Plan 版本归档，须与其余部分一起审阅。",
+      "risk": "拟议节点，不是已存在的 Core 事实；只批准指定路径的方案。",
+      "checks": [
+        "逐文件来源哈希",
+        "历史文件原文不变",
+        "引用关系核验"
+      ],
+      "context_term_ids": [
+        "term.sae.reproducible"
+      ],
+      "group_id": "HC03",
+      "group_title": "Work Plan 版本归档"
+    },
+    {
+      "view": "core",
+      "node_id": "q.agent_flow",
+      "operation": "change",
+      "parent_id": null,
+      "after": {
+        "title": "Work Test 版本归档",
+        "description": "拟将该目标对应的版本归档职责以可追溯方式纳入 Harness。"
+      },
+      "files": [
+        "harness/github/work_test/test_wp20_design.py"
+      ],
+      "reason": "在原有 Core 目标下组织治理变更；仅作为提案，不修改权威图。",
+      "risk": "不能误改科研事实或批准后直接发布。",
+      "checks": [
+        "现有 Core/Context 引用有效"
+      ],
+      "context_term_ids": [
+        "term.python"
+      ],
+      "group_id": "HC04",
+      "group_title": "Work Test 版本归档"
+    },
+    {
+      "view": "core",
+      "node_id": "g.archive_wt_history",
+      "operation": "add",
+      "parent_id": "q.agent_flow",
+      "after": {
+        "type": "goal",
+        "title": "筛选退役测试",
+        "description": "仅将不再承担当前 CI 门槛的测试归档",
+        "context_term_ids": [
+          "term.python"
+        ]
+      },
+      "files": [
+        "harness/github/work_test/test_wp20_design.py"
+      ],
+      "reason": "本部分属于 Work Test 版本归档，须与其余部分一起审阅。",
+      "risk": "拟议节点，不是已存在的 Core 事实；只批准指定路径的方案。",
+      "checks": [
+        "逐文件来源哈希",
+        "历史文件原文不变",
+        "引用关系核验"
+      ],
+      "context_term_ids": [
+        "term.python"
+      ],
+      "group_id": "HC04",
+      "group_title": "Work Test 版本归档"
+    },
+    {
+      "view": "core",
+      "node_id": "g.archive_wt_ci",
+      "operation": "add",
+      "parent_id": "q.agent_flow",
+      "after": {
+        "type": "goal",
+        "title": "保留现行回归",
+        "description": "当前必须运行的验收测试继续保持有效入口",
+        "context_term_ids": [
+          "term.python"
+        ]
+      },
+      "files": [
+        "harness/github/work_test/test_ci_lanes.py"
+      ],
+      "reason": "本部分属于 Work Test 版本归档，须与其余部分一起审阅。",
+      "risk": "拟议节点，不是已存在的 Core 事实；只批准指定路径的方案。",
+      "checks": [
+        "逐文件来源哈希",
+        "历史文件原文不变",
+        "引用关系核验"
+      ],
+      "context_term_ids": [
+        "term.python"
+      ],
+      "group_id": "HC04",
+      "group_title": "Work Test 版本归档"
+    },
+    {
+      "view": "core",
+      "node_id": "g.code_tree",
+      "operation": "change",
+      "parent_id": null,
+      "after": {
+        "title": "归档工具与完整性校验",
+        "description": "拟将该目标对应的版本归档职责以可追溯方式纳入 Harness。"
+      },
+      "files": [
+        "harness/github/archive.py"
+      ],
+      "reason": "在原有 Core 目标下组织治理变更；仅作为提案，不修改权威图。",
+      "risk": "不能误改科研事实或批准后直接发布。",
+      "checks": [
+        "现有 Core/Context 引用有效"
+      ],
+      "context_term_ids": [
+        "term.code_tree"
+      ],
+      "group_id": "HC05",
+      "group_title": "归档工具与完整性校验"
+    },
+    {
+      "view": "code",
+      "node_id": "code:module:harness.github.archive",
+      "operation": "add",
+      "parent_id": null,
+      "after": {
+        "type": "module",
+        "title": "生成确定性的版本归档候选",
+        "description": "在独立的归档工具里执行扫描、命名和完整性检查；正式源码目前尚不存在。",
+        "path": "harness/github/archive.py",
+        "context_term_ids": [
+          "term.python",
+          "term.code_tree"
+        ]
+      },
+      "files": [
+        "harness/github/archive.py"
+      ],
+      "reason": "本部分属于 归档工具与完整性校验，须与其余部分一起审阅。",
+      "risk": "拟议节点，不是已存在的 Core 事实；只批准指定路径的方案。",
+      "checks": [
+        "逐文件来源哈希",
+        "历史文件原文不变",
+        "引用关系核验"
+      ],
+      "context_term_ids": [
+        "term.python",
+        "term.code_tree"
+      ],
+      "group_id": "HC05",
+      "group_title": "归档工具与完整性校验"
+    },
+    {
+      "view": "core",
+      "node_id": "g.archive_tool_test",
+      "operation": "add",
+      "parent_id": "g.code_tree",
+      "after": {
+        "type": "goal",
+        "title": "验证归档保真",
+        "description": "确保 dry-run、哈希和引用检查不改历史内容",
+        "context_term_ids": [
+          "term.code_tree"
+        ]
+      },
+      "files": [
+        "harness/github/work_test/test_archive_lifecycle.py"
+      ],
+      "reason": "本部分属于 归档工具与完整性校验，须与其余部分一起审阅。",
+      "risk": "拟议节点，不是已存在的 Core 事实；只批准指定路径的方案。",
+      "checks": [
+        "逐文件来源哈希",
+        "历史文件原文不变",
+        "引用关系核验"
+      ],
+      "context_term_ids": [
+        "term.code_tree"
+      ],
+      "group_id": "HC05",
+      "group_title": "归档工具与完整性校验"
+    },
+    {
+      "view": "core",
+      "node_id": "g.agent_execution_flow",
+      "operation": "change",
+      "parent_id": null,
+      "after": {
+        "title": "Release 前归档门槛",
+        "description": "拟将该目标对应的版本归档职责以可追溯方式纳入 Harness。"
+      },
+      "files": [
+        ".github/workflows/release-validation.yml"
+      ],
+      "reason": "在原有 Core 目标下组织治理变更；仅作为提案，不修改权威图。",
+      "risk": "不能误改科研事实或批准后直接发布。",
+      "checks": [
+        "现有 Core/Context 引用有效"
+      ],
+      "context_term_ids": [
+        "term.artifact"
+      ],
+      "group_id": "HC06",
+      "group_title": "Release 前归档门槛"
+    },
+    {
+      "view": "core",
+      "node_id": "g.archive_release_gate",
+      "operation": "add",
+      "parent_id": "g.agent_execution_flow",
+      "after": {
+        "type": "goal",
+        "title": "冻结前完成归档",
+        "description": "在固定版本 SHA 之前检查归档范围和批准状态",
+        "context_term_ids": [
+          "term.artifact"
+        ]
+      },
+      "files": [
+        ".github/workflows/release-validation.yml"
+      ],
+      "reason": "本部分属于 Release 前归档门槛，须与其余部分一起审阅。",
+      "risk": "拟议节点，不是已存在的 Core 事实；只批准指定路径的方案。",
+      "checks": [
+        "逐文件来源哈希",
+        "历史文件原文不变",
+        "引用关系核验"
+      ],
+      "context_term_ids": [
+        "term.artifact"
+      ],
+      "group_id": "HC06",
+      "group_title": "Release 前归档门槛"
+    },
+    {
+      "view": "core",
+      "node_id": "g.archive_release_doc",
+      "operation": "add",
+      "parent_id": "g.agent_execution_flow",
+      "after": {
+        "type": "goal",
+        "title": "更新发布指导",
+        "description": "将归档移入 Release Preparation 而非发布后自动提交",
+        "context_term_ids": [
+          "term.artifact"
+        ]
+      },
+      "files": [
+        "harness/github/development_doc/release-process.md"
+      ],
+      "reason": "本部分属于 Release 前归档门槛，须与其余部分一起审阅。",
+      "risk": "拟议节点，不是已存在的 Core 事实；只批准指定路径的方案。",
+      "checks": [
+        "逐文件来源哈希",
+        "历史文件原文不变",
+        "引用关系核验"
+      ],
+      "context_term_ids": [
+        "term.artifact"
+      ],
+      "group_id": "HC06",
+      "group_title": "Release 前归档门槛"
+    }
+  ]
+}
