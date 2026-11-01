@@ -9,6 +9,18 @@ coding agent, Cursor Skill, precheck script, GPU, or access to the execution mac
 The existing architecture boundaries, Work Plan writing standard, Universal
 Contracts, Work Order v3, Agent Flow and independent acceptance remain authoritative.
 
+## Human Check (default human review before GitHub edits)
+
+Human Check is **on by default**. Before changing source, configuration, docs, governance files or submitting a PR, the conversational assistant prepares a source- and Context-grounded written change report, alongside Atlas Before / Proposed After nodes. The report identifies exact source SHA, Core / Knowledge / Code / Environment / Context impact, file ownership, reason, risks, and checks. Proposed new Code nodes are not represented as implemented AST.
+
+**Each node is decided independently: there is no Approve Plan.** Approve / Deny / Unchecked affects only that item. An unrelated approved item may proceed when another is denied. Overlapping file ownership with a rejected or unchecked item must be split or revised rather than bypassed with broad file approval. Approval of a proposal is not approval of implementation, GPU execution, scientific findings, publication, or release.
+
+Proposal reports and decisions live outside tracked source at `experiment/_human_check/<id>/`. The authenticated local Atlas review updates only this proposal ledger, never Core/Knowledge/Code authority. Public static Atlas browser decisions are drafts, not authorization. A human may explicitly turn Human Check off using the local Atlas control, with an audit record; default remains on and all other governance/permission requirements remain in force. Source drift or revised scope requires refreshed node review.
+
+See [Human Check guide](../HUMAN_CHECK.md) for the manifest, local Atlas command and per-path `check` gate; attach the reviewed scope and provenance to the eventual PR without exposing local review keys.
+
+---
+
 ## Desk precheck
 
 Inspect only necessary source and available evidence. For a docs/UI task, look
