@@ -42,8 +42,12 @@ def approved_command(step, root):
     permissions = set(step.get("permissions", [step.get("permission")]))
     requirements = {
         "--allow-local-gpu": "gpu",
+        "--allow-gpu": "gpu",
+        "--allow-network": "network",
         "--allow-native-compute": "native",
+        "--allow-publish": "publish",
         "--approved": "publish",
+        "--execute": "network",
     }
     for flag, permission in requirements.items():
         if flag in argv and permission not in permissions:
