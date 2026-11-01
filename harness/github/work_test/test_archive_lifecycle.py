@@ -117,7 +117,7 @@ def test_archive_registry_serialization_and_sequential_numbering(tmp_path: Path)
         ),
         "mode": "move", "status": "archived", "version": "0.6.5",
     }
-    (tmp_path / archive.INDEX).parent.mkdir(parents=True)
+    (tmp_path / archive.INDEX).parent.mkdir(parents=True, exist_ok=True)
     (tmp_path / archive.INDEX).write_text(json.dumps(_index([row])))
     assert archive.read_index(tmp_path)["entries"][0] == row
     with pytest.raises(archive.ArchiveError, match="Duplicate"):
