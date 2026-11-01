@@ -1118,7 +1118,14 @@ def make_code(node: dict, children: dict, by_id: dict) -> dict:
     # Technical evidence belongs in description/attributes, not a second
     # paraphrase of the same sentence under "What this node does".
     description = " ".join(details) if details else (doc or summary)
-    additional_explanation = ""
+    # Concept-level narrative is authored bilingually in the curated Atlas
+    # catalog. Translate any distinct Chinese reader explanation from the
+    # reviewed English description instead of leaving an untranslated slot.
+    additional_explanation = (
+        node["english_description"]
+        if node.get("concept_group") and node.get("reader_explanation")
+        else ""
+    )
     if node["id"].startswith("code:configurations:tasks:"):
         task = node["id"].rsplit(":", 1)[-1]
         additional_explanation = (
