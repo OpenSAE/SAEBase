@@ -117,8 +117,11 @@ def check(plan_path, root=ROOT, check_contracts=True):
         if (
             not isinstance(step, dict)
             or step.get("id") in seen
-            or not step.get("id")
-            or not set(step.get("needs", [])) <= seen
+            or not isinstance(step.get("id"), str)
+            or re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]{0,63}", step["id"]) is None
+            or not isinstance(step.get("needs"), list)
+            or any(not isinstance(dep, str) for dep in step["needs"])
+            or not set(step["needs"]) <= seen
         ):
             raise PlanError("Invalid task DAG")
         allowed = {"local", "network", "gpu", "native", "publish"}
