@@ -174,3 +174,75 @@ def test_proposal_is_sealed_and_absent_nodes_are_not_implemented(workspace):
     assert not (workspace / "doc/code/code_tree.json").read_text().find(
         "code:module:saebase.new_feature"
     ) >= 0
+
+
+def test_loopback_atlas_persists_single_node_and_opt_out(workspace):
+    import threading
+    from urllib.error import HTTPError
+    from urllib.request import Request, urlopen
+
+    from harness.core.agent_review_server import create_server
+
+    hc.create(_manifest(), base_sha="a" * 40)
+    server = create_server("HC-Example-001", 0, human_check=True)
+    runner = threading.Thread(target=server.serve_forever, daemon=True)
+    runner.start()
+    origin = "http://127.0.0.1:" + str(server.server_address[1])
+
+    def fetch(path):
+        with urlopen(origin + path, timeout=5) as response:
+            return response.read().decode("utf-8")
+
+    def post(path, body, *, key=None):
+        payload = json.dumps(body).encode("utf-8")
+        req = Request(
+            origin + path, data=payload,
+            headers={
+                "Content-Type": "application/json", "Origin": origin,
+                "X-Atlas-Review-Key": key or "",
+            },
+            method="POST",
+        )
+        with urlopen(req, timeout=5) as response:
+            return json.loads(response.read())
+
+    try:
+        assert "Human Check" in fetch("/api/review/report")
+        state = json.loads(fetch("/api/review/state"))
+        assert state["plan"]["mode"] == "on"
+        with pytest.raises(HTTPError) as forbidden:
+            post("/api/review/decision", {
+                "revision": 0, "key": "knowledge:q.sae.methods",
+                "decision": "approved",
+            })
+        assert forbidden.value.code == 403
+        approved = post("/api/review/decision", {
+            "revision": 0, "key": "knowledge:q.sae.methods",
+            "decision": "approved",
+        }, key=server.review_key)
+        assert approved["plan"]["items"][2]["proposal_review"]["decision"] == "approved"
+        assert approved["plan"]["items"][0]["proposal_review"] is None
+        switched = post("/api/review/mode", {
+            "revision": 1, "enabled": False,
+        }, key=server.review_key)
+        assert switched["plan"]["opt_out"]["actor"] == "Human via local Atlas"
+        assert hc.load("HC-Example-001")["mode"] == "off"
+        with pytest.raises(HTTPError) as stale:
+            post("/api/review/mode", {
+                "revision": 1, "enabled": True,
+            }, key=server.review_key)
+        assert stale.value.code == 409
+        assert "Registry" in fetch("/api/review/report")
+    finally:
+        server.shutdown()
+        server.server_close()
+        runner.join(timeout=5)
+
+
+def test_authority_drift_invalidates_pre_edit_approval(workspace):
+    plan = hc.create(_manifest(), base_sha="f" * 40)
+    hc.decide(plan, "knowledge:q.sae.methods", "approved", actor="Human")
+    path = workspace / "harness/core/project_graph.json"
+    path.write_text('{"nodes":[],"edges":[]}', encoding="utf-8")
+    with pytest.raises(agent_flow.FlowError, match="Atlas authority drift"):
+        hc.allowed_paths(plan, ["tasks/capture/operation.py"], base_sha="f" * 40)
