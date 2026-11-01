@@ -30,6 +30,7 @@ MANUAL = {
     "saebase-v050-release-dispatch.yml",
     "saebase-v060-release-dispatch.yml",
     "saebase-v065-release-dispatch.yml",
+    "stage-d-evidence-release.yml",
 }
 
 

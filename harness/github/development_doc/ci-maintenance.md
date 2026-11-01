@@ -48,6 +48,10 @@ historically required job names and downloads its distribution artifacts.
 It requires explicit `PUBLISH-vX.Y.Z` confirmation for actual publication.
 Lightweight `main` CI cannot supply release evidence or automatically publish.
 
+The immutable Stage D compact evidence archive was already published on
+2026-10-16. Its historical release dispatcher is manual-only and never
+re-uploads assets after a lightweight CI success.
+
 The historical v0.4.0/v0.5.0/v0.6.0/v0.6.5 release dispatchers are now
 manual-only archived notices. They no longer listen for normal CI successes.
 
