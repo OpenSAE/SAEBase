@@ -37,6 +37,7 @@ jobs:
           echo "Release Validation for exact source $SOURCE_SHA"
 
   hydra-composition:
+    needs: source-verify
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
