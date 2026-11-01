@@ -39,6 +39,15 @@ def approved_command(step, root):
         raise PlanError("No arbitrary binary or shell expression allowed")
     if any(x in {"|", "&&", ";", "||", "`", "$("} for x in argv):
         raise PlanError("Shell syntax forbidden")
+    permissions = set(step.get("permissions", [step.get("permission")]))
+    requirements = {
+        "--allow-local-gpu": "gpu",
+        "--allow-native-compute": "native",
+        "--approved": "publish",
+    }
+    for flag, permission in requirements.items():
+        if flag in argv and permission not in permissions:
+            raise PlanError("Execution flag lacks declared permission: " + flag)
     return list(argv)
 
 
@@ -47,14 +56,14 @@ def plan_commands(plan, root, allowed):
     result = []
     for step in plan["steps"]:
         argv = approved_command(step, root)
-        permission = step["permission"]
+        permissions = step.get("permissions", [step.get("permission")])
         result.append(
             {
                 "id": step["id"],
                 "needs": step["needs"],
-                "permission": permission,
+                "permissions": permissions,
                 "on_failure": step.get("on_failure", "global_block"),
-                "status": "PLANNED" if permission in allowed else "NOT_AUTHORIZED",
+                "status": "PLANNED" if set(permissions) <= allowed else "NOT_AUTHORIZED",
                 "argv": argv,
             }
         )

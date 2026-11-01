@@ -116,3 +116,30 @@ def test_invalid_atlas_code_and_dag_fail_closed(tmp_path):
     (tmp_path / "harness/github/work_plan/from_human/WP23.md").unlink()
     with pytest.raises(life.PlanError):
         life.check(plan, root=tmp_path, check_contracts=False)
+
+
+def test_dispatch_permissions_are_source_bound(tmp_path):
+    from harness.github.work_plan.dispatch import approved_command, plan_commands
+
+    plan_path = _fixture(tmp_path)
+    life.check(plan_path, root=tmp_path, check_contracts=False)
+    source = tmp_path / "scripts/experiments/example.sh"
+    source.parent.mkdir(parents=True)
+    source.write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
+    plan = {
+        "steps": [
+            {"id": "setup", "needs": [], "permission": "local",
+             "command": ["python", "-m", "saebase.setup", "--help"]},
+            {"id": "run", "needs": ["setup"], "permissions": ["network", "gpu"],
+             "command": ["bash", "scripts/experiments/example.sh", "--allow-local-gpu"]},
+        ]
+    }
+    steps = plan_commands(plan, tmp_path, {"local", "network"})
+    assert steps[0]["status"] == "PLANNED"
+    assert steps[1]["status"] == "NOT_AUTHORIZED"
+    assert plan_commands(plan, tmp_path, {"local", "network", "gpu"})[1]["status"] == "PLANNED"
+    with pytest.raises(life.PlanError, match="lacks declared permission"):
+        approved_command(
+            {"permission": "local", "command": ["bash", "scripts/experiments/example.sh", "--allow-local-gpu"]},
+            tmp_path,
+        )

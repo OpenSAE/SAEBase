@@ -55,7 +55,7 @@ The fields below are references and predefined output slots, **not a duplicate c
   },
   "steps": [
     {"id": "setup", "needs": [], "permission": "local", "goal": "Check actual environment", "evidence": "setup receipt", "command": ["python", "-m", "saebase.setup", "--help"]},
-    {"id": "run", "needs": ["setup"], "permission": "gpu", "goal": "Real bounded experiment", "evidence": "run receipt", "command": ["bash", "scripts/experiments/example.sh", "full"]},
+    {"id": "run", "needs": ["setup"], "permissions": ["network", "gpu"], "goal": "Real bounded experiment", "evidence": "run receipt", "command": ["bash", "scripts/experiments/example.sh", "full"]},
     {"id": "audit", "needs": ["run"], "permission": "local", "goal": "Independent result audit", "evidence": "audit report", "command": ["python", "-m", "saebase.runtime.audit", "--help"]}
   ],
   "deliverables": [

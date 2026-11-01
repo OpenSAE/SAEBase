@@ -121,12 +121,19 @@ def check(plan_path, root=ROOT, check_contracts=True):
             or not set(step.get("needs", [])) <= seen
         ):
             raise PlanError("Invalid task DAG")
+        allowed = {"local", "network", "gpu", "native", "publish"}
+        permissions = step.get("permissions", [step.get("permission")])
         if (
-            step.get("permission") not in ("local", "network", "gpu", "native", "publish")
+            not isinstance(permissions, list)
+            or not permissions
+            or any(type(p) is not str or p not in allowed for p in permissions)
+            or len(permissions) != len(set(permissions))
             or not step.get("goal")
             or not step.get("evidence")
         ):
-            raise PlanError("Missing purpose, evidence or permission")
+            raise PlanError("Missing purpose, evidence or valid permissions")
+        if step.get("on_failure", "global_block") not in ("local_block", "global_block"):
+            raise PlanError("Unsupported failure policy")
         if plan["status"] == "approved" and not step.get("command"):
             raise PlanError("Approved executable step requires a concrete command")
         seen.add(step["id"])
