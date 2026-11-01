@@ -720,5 +720,717 @@
   "context": {
     "nodes": [],
     "edges": []
+  },
+  "core_context": {
+    "schema_version": 1,
+    "project": "SAEBase",
+    "kind": "core",
+    "revision_basis": "b7982c9fa002a5064d37000c571c678374d687b4",
+    "source_policy": "Only source-backed status; 'implemented' means implementation observed, not tested",
+    "primary_relations": [
+      "refines",
+      "addresses",
+      "decomposes"
+    ],
+    "notes": "SAEBase 当前分支的项目结构参考，保留真实源码证据。科研状态另行核验。",
+    "nodes": [
+      {
+        "id": "q.research",
+        "type": "question",
+        "title": "如何把科研项目变成可复现的系统？",
+        "description": "问题：数据、模型、任务、实验结果与研究理解如何在扩展过程中保持一致？",
+        "status": "partial",
+        "evidence": [
+          "README.md"
+        ],
+        "next": "明确结构合同并建立验证证据。",
+        "environment_refs": []
+      },
+      {
+        "id": "q.modularity",
+        "type": "question",
+        "title": "如何保持研究组件间清晰的边界？",
+        "description": "问题：新增 Dataset、Model、Task 时如何维持清晰边界与兼容性？",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "saebase/runner.py"
+        ],
+        "next": "为每个扩展点增加契约测试。",
+        "environment_refs": []
+      },
+      {
+        "id": "q.reproducibility",
+        "type": "question",
+        "title": "如何保证每次实验都能追溯？",
+        "description": "问题：实验目录、完整配置、运行条件和结果如何唯一关联？",
+        "status": "partial",
+        "evidence": [
+          "conf/config.yaml",
+          "saebase/runtime/summary_log.py"
+        ],
+        "next": "标准化结构化产物与运行元数据。",
+        "environment_refs": []
+      },
+      {
+        "id": "q.transparency",
+        "type": "question",
+        "title": "人和 Agent 怎样共同理解项目？",
+        "description": "问题：如何分离科学知识、代码实现与物理执行环境？",
+        "status": "implemented",
+        "evidence": [
+          "harness/core/project_graph.json"
+        ],
+        "next": "建立三棵可浏览且可验证的结构树。",
+        "environment_refs": []
+      },
+      {
+        "id": "q.mobility",
+        "type": "question",
+        "title": "如何跨设备重现和迁移实验？",
+        "description": "问题：如何在大文件迁移和硬件变化时保留完整的实验来源信息？",
+        "status": "partial",
+        "evidence": [
+          "conf/paths/default.yaml"
+        ],
+        "next": "采集硬件上下文并引入可校验的数据传输。",
+        "environment_refs": []
+      },
+      {
+        "id": "s.registry",
+        "type": "solve",
+        "title": "Registry 插件解耦",
+        "description": "方案：通过数据集、模型和任务三个插件注册表维护清晰的组件边界。",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "saebase/plugin_bootstrap.py"
+        ],
+        "next": "增加自动注册矩阵测试。",
+        "environment_refs": []
+      },
+      {
+        "id": "s.compatibility",
+        "type": "solve",
+        "title": "三层兼容性门控",
+        "description": "方案：NLP 数据集、LLM 模型与 SAE Task 的注册接口负责检查当前研究运行组合。",
+        "status": "implemented",
+        "evidence": [
+          "datasets/plugins.py",
+          "models/gemma2_2b_base/model_task_dataset_compatibility.py",
+          "tasks/sae_runtime.py"
+        ],
+        "next": "继续补充模型与任务组合的 CPU 回归检查。",
+        "environment_refs": []
+      },
+      {
+        "id": "s.hydra",
+        "type": "solve",
+        "title": "Hydra 配置与单一训练入口",
+        "description": "方案：用组合配置、固定 seed 和明确运行入口决定一次实验。",
+        "status": "implemented",
+        "evidence": [
+          "conf/config.yaml",
+          "saebase/runtime/train.py"
+        ],
+        "next": "按唯一实验标识管理输出目录和历史产物。",
+        "environment_refs": []
+      },
+      {
+        "id": "s.artifacts",
+        "type": "solve",
+        "title": "分层的实验产物协议",
+        "description": "方案：按 dataset/model/task/subtask/run 分类结果，维护唯一的运行声明与类型化文件夹。",
+        "status": "partial",
+        "evidence": [
+          "conf/config.yaml",
+          "saebase/runtime/experiment_paths.py",
+          "harness/experiments/validate.py"
+        ],
+        "next": "将运行路径与产物规范实施到 SAEBase Runtime。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "partial",
+          "explanation": "现状：实验路径协议已经在 SAEBase Runtime 实现，尚未完成真实 GPU 训练回归。 证据：saebase/runtime/experiment_paths.py、harness/experiments/validate.py。下一步：将运行路径与产物规范实施到 SAEBase Runtime。"
+        }
+      },
+      {
+        "id": "s.explainability",
+        "type": "solve",
+        "title": "三树协作的 Context 管理",
+        "description": "方案：知识树回答为什么，代码树回答怎样实现，环境树回答在哪里运行。",
+        "status": "implemented",
+        "evidence": [
+          "harness/core/project_graph.json",
+          "harness/visualization/index.html",
+          "harness/code/build.py",
+          "harness/knowledge/validate.py"
+        ],
+        "next": "用源数据生成动态交互视图。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "partial",
+          "explanation": "现状：三棵树与可交互浏览器已实现，科学描述仍需研究者维护。 证据：harness/visualization/index.html、harness/code/build.py、harness/knowledge/validate.py。下一步：用源数据生成动态交互视图。"
+        }
+      },
+      {
+        "id": "s.mobility",
+        "type": "solve",
+        "title": "环境探测与可校验文件传输",
+        "description": "方案：硬件快照与离线可审计的 B2/rclone 传输工具提供迁移依据。",
+        "status": "partial",
+        "evidence": [
+          "conf/paths/default.yaml",
+          "harness/environment/probe.py",
+          "harness/transfer/b2.py"
+        ],
+        "next": "先提供 dry-run，再在有凭据的设备测试。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "partial",
+          "explanation": "现状：环境探测与 B2 传输封装已实现，尚未核验用户真实远程仓库。 证据：harness/environment/probe.py、harness/transfer/b2.py。下一步：先提供 dry-run，再在有凭据的设备测试。"
+        }
+      },
+      {
+        "id": "g.registry",
+        "type": "goal",
+        "title": "可插拔组件注册",
+        "description": "目标：Dataset/Model/Task 注册映射可发现、可验证。",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "datasets/plugins.py",
+          "models/plugins.py",
+          "tasks/plugins.py"
+        ],
+        "next": "增加注册矩阵和 CPU 环境中的契约测试。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.dataset_gate",
+        "type": "goal",
+        "title": "Dataset 任务支持约束",
+        "description": "目标：依据 NLP 数据集及 SAE Task 的适配关系检验输入配置。",
+        "status": "implemented",
+        "evidence": [
+          "datasets/plugins.py"
+        ],
+        "next": "增加多任务组合负样例。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.model_gate",
+        "type": "goal",
+        "title": "Model 兼容约束",
+        "description": "目标：核验选定 LLM 模型与 SAE 任务、数据来源的兼容关系。",
+        "status": "implemented",
+        "evidence": [
+          "models/gemma2_2b_base/model_task_dataset_compatibility.py"
+        ],
+        "next": "在真实模型环境下核验 SAE 激活位置。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.pipeline",
+        "type": "goal",
+        "title": "Task 运行前检查",
+        "description": "目标：按 SAE Task 的执行协议校验模型、权重、输入及授权条件。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/sae_runtime.py"
+        ],
+        "next": "补充基于语义的最小断言。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.config",
+        "type": "goal",
+        "title": "完整配置可追溯",
+        "description": "目标：记录 Hydra 合成配置、种子和执行入口。",
+        "status": "implemented",
+        "evidence": [
+          "conf/config.yaml",
+          "saebase/runtime/train.py"
+        ],
+        "next": "使每次运行显式关联配置哈希。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.artifact_schema",
+        "type": "goal",
+        "title": "结果目录类型化",
+        "description": "目标：每个实验叶子包含 reports、metrics、tables、checkpoints、figures、logs、metadata、tmp。",
+        "status": "implemented",
+        "evidence": [
+          "conf/config.yaml",
+          "saebase/runtime/experiment_paths.py",
+          "harness/experiments/validate.py"
+        ],
+        "next": "实现公共目录初始化器。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "implemented",
+          "explanation": "现状：SAEBase Runtime 支持分层 task.path、结构化产物和按 Knowledge ID 命名的分析子目录。 证据：saebase/runtime/experiment_paths.py、tests/test_harness_contracts.py。下一步：实现公共目录初始化器。"
+        }
+      },
+      {
+        "id": "g.context",
+        "type": "goal",
+        "title": "结构化研究知识与证据",
+        "description": "目标：用稳定 ID、状态、证据、AND/OR 与依赖描述研究目标。",
+        "status": "implemented",
+        "evidence": [
+          "harness/core/project_graph.json",
+          "harness/knowledge/validate.py"
+        ],
+        "next": "增设 schema 校验和受控变更提案。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "implemented",
+          "explanation": "现状：Knowledge tree 的 question/solve/goal、AND/OR、证据和状态有机器可读图与校验器。 证据：doc/knowledge/context_graph.json、harness/knowledge/validate.py。下一步：增设 schema 校验和受控变更提案。"
+        }
+      },
+      {
+        "id": "g.code_tree",
+        "type": "goal",
+        "title": "可核验的类与函数结构图",
+        "description": "目标：从 Python AST 输出节点、继承、成员与调用，附带已有 Knowledge 链接。",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "harness/code/build.py",
+          "harness/code/diff.py",
+          "harness/visualization/app.js"
+        ],
+        "next": "实现生成器、差异比对与浏览器。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "implemented",
+          "explanation": "现状：自动 AST 提取、代码 Diff、静态浏览器及节点交互已接入并通过 CI。 证据：harness/code/build.py、harness/code/diff.py、tests/test_atlas_interactivity.cjs。下一步：实现生成器、差异比对与浏览器。"
+        }
+      },
+      {
+        "id": "g.env_tree",
+        "type": "goal",
+        "title": "机器环境快照",
+        "description": "目标：采集 CPU、内存、GPU、磁盘和执行环境，记录明确的观测结果。",
+        "status": "implemented",
+        "evidence": [
+          "conf/paths/default.yaml",
+          "harness/environment/probe.py",
+          "harness/environment/example.json"
+        ],
+        "next": "实现跨机器环境探测及对比。",
+        "environment_refs": [
+          "env.cpu",
+          "env.gpu",
+          "env.memory"
+        ],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "implemented",
+          "explanation": "现状：提供可观察机器 CPU/GPU/RAM 的探测器和明确标记虚构的示例树。 证据：harness/environment/probe.py、harness/environment/example.json。下一步：实现跨机器环境探测及对比。"
+        }
+      },
+      {
+        "id": "g.transfer",
+        "type": "goal",
+        "title": "数据备份与恢复",
+        "description": "目标：提供明确的来源、目标、校验和可恢复的大文件同步方案。",
+        "status": "partial",
+        "evidence": [
+          "conf/paths/default.yaml",
+          "harness/transfer/b2.py"
+        ],
+        "next": "先实现默认 dry-run 的 rclone 规划器。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "implemented",
+          "explanation": "现状：rclone/B2 复制、恢复与校验命令已包装，默认不实际传输。 证据：harness/transfer/b2.py。下一步：先实现默认 dry-run 的 rclone 规划器。"
+        }
+      },
+      {
+        "id": "g.recovery",
+        "type": "goal",
+        "title": "离线恢复实验",
+        "description": "目标：结合完整配置、模型权重和运行元数据重建实验。",
+        "status": "not_implemented",
+        "evidence": [
+          "saebase/runtime/summary_log.py"
+        ],
+        "next": "定义本地打包和验证边界。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.b2",
+        "type": "goal",
+        "title": "远程 B2 备份",
+        "description": "目标：用可校验传输备份大文件，通过机器本地凭据完成认证。",
+        "status": "partial",
+        "evidence": [
+          "conf/paths/default.yaml",
+          "harness/transfer/b2.py"
+        ],
+        "next": "引入 rclone 只读检查与 dry-run。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "partial",
+          "explanation": "现状：B2 传输命令预览与校验接口存在，但没有真实账号与成功备份证据。 证据：harness/transfer/b2.py。下一步：引入 rclone 只读检查与 dry-run。"
+        }
+      },
+      {
+        "id": "q.multi_domain",
+        "type": "question",
+        "title": "如何统一 LLM SAE 的多类研究任务？",
+        "description": "问题：模型、稀疏字典、Prompt 和七类 SAE 研究操作怎样共享可复用的组件结构？",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "saebase/api/features.py",
+          "tasks/sae_runtime.py"
+        ]
+      },
+      {
+        "id": "s.parallel_cores",
+        "type": "solve",
+        "title": "SAEBase 与 SAEBase Runtime 的统一任务接口",
+        "description": "方案：SAEBase 提供稀疏特征研究实现，SAEBase Runtime 组织科研执行与实验记录，共享已审计的模型、数据集和任务注册。",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "saebase/api/__init__.py",
+          "saebase/plugin_bootstrap.py",
+          "tasks/plugins.py"
+        ]
+      },
+      {
+        "id": "g.domain_families",
+        "type": "goal",
+        "title": "组织 NLP Dataset、LLM Model 与 SAE Task",
+        "description": "目标：按 NLP 数据集、LLM 模型与七类 SAE 操作分别组织实现和注册；保留 SAEBase 原有公共 API。",
+        "status": "implemented",
+        "evidence": [
+          "datasets/plugins.py",
+          "models/plugins.py",
+          "tasks/plugins.py"
+        ]
+      },
+      {
+        "id": "g.llm_capture",
+        "type": "goal",
+        "title": "LLM 特征捕获",
+        "description": "目标：SAEBase 在选定模型层读取真实激活，用稀疏自编码器编码特征并记录特征值与重建量。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/capture/task.py",
+          "saebase/api/features.py"
+        ]
+      },
+      {
+        "id": "g.llm_teacher_forcing",
+        "type": "goal",
+        "title": "LLM 教师强制干预",
+        "description": "目标：在固定输入上替换指定稀疏特征并重新计算模型输出，以测量干预对原始类别得分的影响。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/intervene/task.py",
+          "saebase/api/features.py"
+        ]
+      },
+      {
+        "id": "g.llm_generation",
+        "type": "goal",
+        "title": "LLM 生成时特征干预",
+        "description": "目标：在生成每个后续 token 时执行 SAEBase 特征编辑，并比较干预与基线生成的 token 序列。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/generate/task.py",
+          "tasks/intervene/backend/steering.py"
+        ]
+      },
+      {
+        "id": "g.llm_circuits",
+        "type": "goal",
+        "title": "LLM 电路分析",
+        "description": "目标：利用 SAEBase 的原生电路工具生成和保存有来源记录的特征关系图，实际执行需具备相应计算环境。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/circuits/task.py",
+          "tasks/circuits/backend/circuits.py"
+        ]
+      },
+      {
+        "id": "g.llm_explain",
+        "type": "goal",
+        "title": "LLM 特征自动解释",
+        "description": "目标：以研究者指定的生成器产生特征含义假设，再用独立输入上的特征激活记录验证解释预测。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/explain/task.py",
+          "tasks/explain/interpretation.py"
+        ]
+      },
+      {
+        "id": "g.llm_benchmark",
+        "type": "goal",
+        "title": "LLM SAE 基准评测",
+        "description": "目标：通过 SAEBase 基准运行器对指定模型、稀疏特征和数据记录计算可追溯指标。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/benchmark/task.py",
+          "tasks/benchmark/backend/runner.py"
+        ]
+      },
+      {
+        "id": "g.llm_sae_training",
+        "type": "goal",
+        "title": "LLM SAE 训练",
+        "description": "目标：通过 SAEBase 调用实际 SAE Lens 或 Sparsify 训练后端，并记录训练配置与检查点。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/train/task.py",
+          "tasks/train/backend/training.py"
+        ]
+      },
+      {
+        "id": "q.agent_flow",
+        "type": "question",
+        "title": "怎样审计 Agent 执行科研任务的过程？",
+        "description": "问题：如何在修改前预览 Knowledge、Code、Environment、Context 的变化，并在结果审计后让人类逐 Node 做出决定？",
+        "status": "partial",
+        "evidence": [
+          "harness/core/agent_flow.py"
+        ],
+        "next": "真实验收 GitHub PR 和本地审阅闭环后再提出通过。",
+        "environment_refs": []
+      },
+      {
+        "id": "s.agent_flow",
+        "type": "solve",
+        "title": "计划驱动的可审计人工审批流程",
+        "description": "方案：预先审计并展示红色节点，限制修改范围；代码审阅进入黄色；实测结果和人类决定决定最终接受绿色、保持黄色、重试红色或删除。",
+        "status": "partial",
+        "evidence": [
+          "harness/core/agent_flow.py",
+          "harness/core/agent_review_server.py",
+          "harness/visualization/knowledge.html"
+        ],
+        "next": "验证权限、结果对应关系、可视化批阅行为。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.agent_execution_flow",
+        "type": "goal",
+        "title": "Agent 执行任务的流程",
+        "description": "目标：外部 GitHub Work Plan → 审计和部署预览 → 人类授权 → 任务代码变更与统一审阅 → 真实实验及独立结果审计 → 人类逐节点审批四种归宿及可追溯报告。Core 与 Harness 规则对普通 Agent 只读屏蔽。",
+        "status": "partial",
+        "evidence": [
+          "harness/core/agent_flow.py",
+          "harness/core/agent_apply.py",
+          "harness/core/agent_flow.py",
+          "harness/visualization/app.js"
+        ],
+        "next": "本地真人评审和 GitHub 原生 Approved 事件尚需端到端验收。",
+        "environment_refs": []
+      }
+    ],
+    "edges": [
+      {
+        "source": "q.research",
+        "target": "q.modularity",
+        "type": "refines"
+      },
+      {
+        "source": "q.research",
+        "target": "q.reproducibility",
+        "type": "refines"
+      },
+      {
+        "source": "q.research",
+        "target": "q.transparency",
+        "type": "refines"
+      },
+      {
+        "source": "q.research",
+        "target": "q.mobility",
+        "type": "refines"
+      },
+      {
+        "source": "q.modularity",
+        "target": "s.registry",
+        "type": "addresses"
+      },
+      {
+        "source": "q.modularity",
+        "target": "s.compatibility",
+        "type": "addresses"
+      },
+      {
+        "source": "q.reproducibility",
+        "target": "s.hydra",
+        "type": "addresses"
+      },
+      {
+        "source": "q.reproducibility",
+        "target": "s.artifacts",
+        "type": "addresses"
+      },
+      {
+        "source": "q.transparency",
+        "target": "s.explainability",
+        "type": "addresses"
+      },
+      {
+        "source": "q.mobility",
+        "target": "s.mobility",
+        "type": "addresses"
+      },
+      {
+        "source": "s.registry",
+        "target": "g.registry",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.compatibility",
+        "target": "g.dataset_gate",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.compatibility",
+        "target": "g.model_gate",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.compatibility",
+        "target": "g.pipeline",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.hydra",
+        "target": "g.config",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.artifacts",
+        "target": "g.artifact_schema",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.explainability",
+        "target": "g.context",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.explainability",
+        "target": "g.code_tree",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.explainability",
+        "target": "g.env_tree",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.mobility",
+        "target": "g.transfer",
+        "type": "decomposes"
+      },
+      {
+        "source": "g.transfer",
+        "target": "g.recovery",
+        "type": "decomposes"
+      },
+      {
+        "source": "g.transfer",
+        "target": "g.b2",
+        "type": "decomposes"
+      },
+      {
+        "source": "q.research",
+        "target": "q.multi_domain",
+        "type": "refines"
+      },
+      {
+        "source": "q.multi_domain",
+        "target": "s.parallel_cores",
+        "type": "addresses"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.domain_families",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_capture",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_teacher_forcing",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_generation",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_circuits",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_explain",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_benchmark",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_sae_training",
+        "type": "decomposes"
+      },
+      {
+        "source": "q.research",
+        "target": "q.agent_flow",
+        "type": "refines"
+      },
+      {
+        "source": "q.agent_flow",
+        "target": "s.agent_flow",
+        "type": "addresses"
+      },
+      {
+        "source": "s.agent_flow",
+        "target": "g.agent_execution_flow",
+        "type": "decomposes"
+      }
+    ],
+    "title": "SAEBase · Project Architecture",
+    "purpose": "SAEBase 稀疏特征研究架构、LLM Task 与 Agent Harness 的结构化管理。",
+    "status_policy": "not_implemented / partial / implemented; for non-leaf nodes status is derived from every direct child",
+    "child_order": "Top to bottom as listed in edges; no explicit execution/dependency links"
   }
 }

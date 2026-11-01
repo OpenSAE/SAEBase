@@ -118,6 +118,7 @@ jobs:
           node harness/github/work_test/test_atlas_deep_navigation.cjs
           node harness/github/work_test/test_atlas_global_search.cjs
           node harness/github/work_test/test_atlas_hc_review_navigation.cjs
+          node harness/github/work_test/test_atlas_review_orphan_focus.cjs
 
   product-targeted:
     needs: changes

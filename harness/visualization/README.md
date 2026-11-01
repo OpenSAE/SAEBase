@@ -54,7 +54,7 @@ Atlas Code Tree 的节点名称必须是一句有内容的中文功能概括，�
 
 审阅不另开页面。**待审节点使用与普通节点完全相同的卡片、展开属性、方法签名、参数/返回值、公式、源码、Context 关系与 Details。** 只有状态底色不同：紫色 Unchecked、红色 Approve、灰色 Deny；红或灰可随时点击 Unchecked 恢复紫色。
 
-底部左侧是 All → Tree → Parent → Node 三级分类筛选，按源码树的 DFS 顺序排列。每个分类包含分段环形进度及红/灰/紫各自数量。四个箭头中，**内侧单箭头**是 Previous/Next Unchecked，**外侧双箭头**是强制 Previous/Next。Review 默认按 HC 组顺序浏览，先走完同一 HC 的全部关联节点，再进入下一组；每组在所有局部都浏览完后独立决定。不显示额外的 HC01/HC02 审阅框或 Next linked part 按钮。切换节点时自动展开分支及说明，轻度放大并居中；全部决定完成后显示 All done。快捷键为 Enter / Backspace / U，方向键 ← → 搜索未审阅，Shift+← → 强制相邻翻页；输入框焦点时不拦截快捷键。背景以轻量 CSS 网格缓慢移动，尊重 reduced-motion。
+底部左侧是 All → Tree → Parent → Node 三级分类筛选，按源码树的 DFS 顺序排列。每个分类包含分段环形进度及红/灰/紫各自数量。四个箭头中，**内侧单箭头**是强制 Previous/Next（直接切换相邻节点），**外侧双箭头**是带紫色边框的 Previous/Next Unchecked。Review 默认按 HC 组顺序浏览，先走完同一 HC 的全部关联节点，再进入下一组；每组在所有局部都浏览完后独立决定。不显示额外的 HC01/HC02 审阅框或 Next linked part 按钮。切换节点时自动展开分支及说明，轻度放大并居中；全部决定完成后显示 All done。快捷键为 Enter / Backspace / U，方向键 ← → 搜索未审阅，Shift+← → 强制相邻翻页；输入框焦点时不拦截快捷键。背景以轻量 CSS 网格缓慢移动，尊重 reduced-motion。
 
 - [四树演示](knowledge.html?review=OR-Atlas-MultiTree-Demo-20261026)：Knowledge → Code → Environment → Context，同一页面滑动切换，可查看方法签名、GPU facts 和术语别名。四项全都是测试提案，不自动改变代码或设备数据。
 - 本地实时写入：`python -m harness.core.agent_flow serve OR-Atlas-MultiTree-Demo-20261026 --port 8766`，使用终端显示的完整 URL
