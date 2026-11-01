@@ -40,12 +40,13 @@ node without switching tabs or visiting every related HC item first. Nodes
 remain browsed in their existing HC-first order. Shared files remain blocked
 until every related item is approved; older atomic group APIs remain available.
 
-**Share reviewed content:** the public Atlas "Share review" link opens a
-prefilled GitHub Issue containing the current browser-draft decisions and
-proposal identity. Only the human can submit it; the UI does not publish
-automatically. A connected agent can read the submitted issue. Browser-local
-drafts alone cannot be read by an agent, and the GitHub Issue is not a local
-authenticated approval. JSON export remains available. A failed
+**Share reviewed content:** the public Atlas has one localized **Send report /
+发送报告** link after the review decisions and status. It opens a prefilled
+GitHub Issue containing browser-draft decisions and the proposal identity.
+Only the human can submit it; the UI does not publish automatically. A connected
+agent can read the submitted issue. Browser-local drafts alone cannot be read
+by an agent. The issue is not a local authenticated approval. Duplicate export,
+disabled public toggle and broken Written report link are not displayed. A failed
 browser launch reports the verified URL instead. A remote/headless environment
 may still require port forwarding.
 

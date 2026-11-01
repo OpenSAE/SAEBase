@@ -22,7 +22,9 @@ const EXACT={
 "LLM 语言模型":"LLM language models","LLM 稀疏特征任务":"LLM sparse feature tasks",
 "具体数据集":"Specific datasets","具体模型":"Specific models","具体任务":"Specific tasks",
 "暂无经过验证的功能说明，请结合源代码审核。":"Source-linked description pending review.",
-"已有实现":"Implemented","待审阅":"Pending review","已批准":"Approved","已否决":"Denied"
+"已有实现":"Implemented","待审阅":"Pending review","已批准":"Approved","已否决":"Denied",
+"发送报告":"Send report","发送当前审阅报告":"Send current review report",
+"在 GitHub 确认并提交报告":"Review and submit the report on GitHub"
 };
 Object.assign(EXACT, {
   "收起节点属性": "Collapse node attributes",
@@ -94,6 +96,9 @@ Object.assign(EXACT, {
 const UI={"Guide":"Guide","Overview":"Overview","Details":"Details","Outline":"Outline","Fit":"Fit","Approve":"Approve","Deny":"Deny","Unchecked":"Unchecked","Partial":"Partial","Implemented":"Implemented","Not Implemented":"Not Implemented","Compare code changes":"Compare code changes","Find a node…":"Find a node…"};
 const ZH_UI={
 "Guide":"指南","Overview":"总览","Details":"详情","Outline":"目录","Fit":"适应画布",
+"Send report":"发送报告","Send current review report":"发送当前审阅报告",
+"Review and submit the report on GitHub":"在 GitHub 确认并提交报告",
+"All done":"全部完成","All Human Check review items are complete.":"所有 Human Check 节点均已审阅。",
 "Approve":"批准","Deny":"否决","Unchecked":"待审阅","Partial":"部分完成",
 "Implemented":"已实现","Not Implemented":"尚未实现",
 "Compare code changes":"比较代码变化","Find a node…":"搜索节点…",
