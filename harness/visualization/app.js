@@ -515,8 +515,9 @@
     const scopeLabel=$("atlasReviewGroupScope");
     if(scopeLabel){
       if(group){
-        scopeLabel.textContent=group.title+" · "+visited+"/"+group.item_keys.length+
-          " Atlas parts viewed"+(groupComplete?" · Ready to decide":" · Browse linked parts first");
+        $("atlasReviewGroupSelect").value=group.id;
+        $("atlasReviewGroupCount").textContent=visited+"/"+group.item_keys.length+
+          " reviewed"+(groupComplete?" · Ready":" · Keep browsing");
         scopeLabel.classList.remove("is-hidden");
       }else scopeLabel.classList.add("is-hidden");
     }
@@ -587,7 +588,37 @@
       if(review.plan.groups?.length && !$("atlasReviewGroupScope")){
         const scope=el("div","atlas-review-group-scope","");
         scope.id="atlasReviewGroupScope";
-        scope.setAttribute("role","status");
+        scope.setAttribute("role","group");
+        const selector=el("select","atlas-review-group-select");
+        selector.id="atlasReviewGroupSelect";
+        for(const item of review.plan.groups){
+          const option=el("option","",item.id+" · "+item.title);
+          option.value=item.id;
+          selector.appendChild(option);
+        }
+        selector.addEventListener("change",()=>{
+          const group=review.plan.groups.find(x=>x.id===selector.value);
+          if(!group)return;
+          const next=group.item_keys.find(key=>!review.plan.viewed?.[group.id]?.[key])||
+                     group.item_keys[0];
+          const target=review.plan.items.find(item=>item.key===next);
+          if(target)navigate(target.node_id,target.view,false);
+        });
+        scope.appendChild(selector);
+        const coverage=el("span","atlas-review-group-count","");
+        coverage.id="atlasReviewGroupCount";
+        scope.appendChild(coverage);
+        const next=el("button","atlas-review-group-next","Next linked part →");
+        next.id="atlasReviewGroupNext";next.type="button";
+        next.addEventListener("click",()=>{
+          const item=itemFor(config.focusId,config.view),group=item&&logicalReviewGroup(item.key);
+          if(!group)return;
+          const index=group.item_keys.indexOf(item.key);
+          const target=review.plan.items.find(x=>x.key===
+            group.item_keys[(index+1)%group.item_keys.length]);
+          if(target)navigate(target.node_id,target.view,false);
+        });
+        scope.appendChild(next);
         bar.prepend(scope);
       }
       let toggle=$("atlasHumanCheckToggle");
