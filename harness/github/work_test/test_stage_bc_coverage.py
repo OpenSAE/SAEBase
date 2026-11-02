@@ -9,10 +9,10 @@ import pytest
 import torch
 from torch import nn
 
-from saebase.sae.coverage import load_coverage
-from saebase.sae.registry import get_profile
-from saebase.sae.sparsify_adapter import SparsifyDenseAdapter
-from saebase.sae.loading import _phase_a_sae_lens_source
+from tasks.benchmark.coverage_contract import load_coverage
+from saebase.api.sae_profiles import get_profile
+from saebase.api.sparsify_adapter import SparsifyDenseAdapter
+from saebase.api.sae_loading import _phase_a_sae_lens_source
 
 CATALOG = Path(__file__).resolve().parents[3] / "conf" / "coverage" / "stage_bc.json"
 

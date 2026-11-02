@@ -41,7 +41,7 @@ def guarded(name, *args, **kwargs):
         raise ImportError('optional dependency was eagerly imported: ' + name)
     return base(name, *args, **kwargs)
 builtins.__import__ = guarded
-import saebase.sae.loading
+import saebase.api.sae_loading
 from saebase.api import capture_features, evaluate_edit
 print('minimal imports OK')
 """

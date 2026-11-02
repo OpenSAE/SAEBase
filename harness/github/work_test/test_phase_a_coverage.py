@@ -5,7 +5,7 @@ import importlib
 
 import pytest
 
-from saebase.sae.registry import get_profile
+from saebase.api.sae_profiles import get_profile
 from saebase.tools.phase_a_verify import TARGETS
 
 EXPECTED = {
@@ -83,7 +83,7 @@ def test_phase_a_requires_real_weights_for_evidence():
     ],
 )
 def test_exact_native_sae_source_paths(profile_key, layer, expected_repo, expected_path, converter):
-    from saebase.sae.loading import _phase_a_sae_lens_source
+    from saebase.api.sae_loading import _phase_a_sae_lens_source
 
     assert _phase_a_sae_lens_source(get_profile(profile_key), layer) == (
         expected_repo,

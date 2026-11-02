@@ -17,7 +17,7 @@ from saebase.registry import (
     list_registered_sae_keys,
     list_registered_task_keys,
 )
-from saebase.sae.registry import (
+from saebase.api.sae_profiles import (
     DEFAULT_SAE_FOR_MODEL,
     MODEL_KEYS,
     SAE_KEYS,

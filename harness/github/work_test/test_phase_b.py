@@ -333,7 +333,7 @@ def test_real_hf_hooks_wrapper_with_tiny_module_and_offset_replay():
 
 def test_registered_loader_rejects_hook_drift(monkeypatch):
     from saebase.api import load_registered
-    import saebase.sae.loading as loading
+    import saebase.api.sae_loading as loading
     base = TinyModel()
     sae = AffineSAE()
     meta = {
@@ -359,7 +359,7 @@ def test_loaded_identity_rejects_metadata_dim_drift():
 
 def test_registered_loader_fake_backend_complete_path(monkeypatch):
     from saebase.api import load_registered
-    import saebase.sae.loading as loading
+    import saebase.api.sae_loading as loading
     base, sae = TinyModel().eval(), AffineSAE().eval()
     base.last_hook = "blocks.3.hook_resid_post"
     metadata = {
