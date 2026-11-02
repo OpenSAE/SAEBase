@@ -41,7 +41,7 @@ assert(css.includes(".atlas-reader-diff-remove")&&
   css.includes(".atlas-reader-diff-add"),"red editorial additions/deletions");
 assert(!js.includes("threshold+=event.deltaY"),"reader must not exit on content-scroll boundary");
 assert(!js.includes("atlas-reader-hint"),"obsolete instruction microcopy absent");
-assert(js.includes('shell.dataset.reviewState=entry.reviewState || ""'),"Reader palette follows review");
+assert(js.includes('setReviewState(entry.reviewState || "")'),"Reader palette follows review");
 assert(css.includes('[data-review-state="unchecked"]')&&
   css.includes('[data-review-state="approved"]')&&
   css.includes('[data-review-state="denied"]'),"Reader highlights correspond to decision");
@@ -52,6 +52,8 @@ assert(app.includes('reviewTarget && reviewItem.operation==="change"'),
 assert(app.includes('!!options.toggle'),"explicit card click opens Add/Remove Reader");
 assert(app.includes('if(!shouldOpenReader)nodeReader?.close()'),
   "switching to Add/Remove dismisses a previous Reader");
+assert(app.includes('config.detailsOpen = !nodeReader || (!reviewTarget && !shouldOpenReader)'),
+  "graph-only Add/Remove navigation must not open the old detail drawer");
 assert(app.includes('if(decision!=="unchecked" && !nodeReader?.isOpen())'),
   "Reader remains visible after an approval, denial or reset");
 assert(app.includes('nodeReader.setReviewState(status)'),

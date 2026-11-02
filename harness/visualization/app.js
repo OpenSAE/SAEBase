@@ -1123,7 +1123,8 @@
       (!reviewTarget && nodeReader.isOpen())
     );
     if(!shouldOpenReader)nodeReader?.close();
-    config.detailsOpen = !nodeReader || !shouldOpenReader;
+    // A graph-only Add/Remove review should not open the legacy detail drawer.
+    config.detailsOpen = !nodeReader || (!reviewTarget && !shouldOpenReader);
     for (const key of ancestors(id)) config.expanded.add(key);
     if(reviewTarget){
       config.expanded.add(id);
