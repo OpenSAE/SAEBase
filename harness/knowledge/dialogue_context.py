@@ -3,6 +3,7 @@
 This is source-access evidence, not validation of the agent's prose or a grant of
 permission to edit, execute, network, download models, or disclose private data.
 """
+
 from __future__ import annotations
 
 import ast
@@ -41,7 +42,9 @@ def _safe_path(root: Path, name: str) -> Path:
     return target
 
 
-def _read(root: Path, name: str, allowed: frozenset[str]) -> tuple[dict[str, Any] | None, str | None, str]:
+def _read(
+    root: Path, name: str, allowed: frozenset[str]
+) -> tuple[dict[str, Any] | None, str | None, str]:
     if name not in allowed:
         return None, None, "BLOCKED_SCOPE"
     try:
@@ -84,16 +87,29 @@ def read_project_context(
             if data is not None:
                 try:
                     payload = json.loads(data["bytes"])
-                    found = next((x for x in payload[collection] if x.get("id") == identifier), None)
+                    found = next(
+                        (x for x in payload[collection] if x.get("id") == identifier), None
+                    )
                     if found is not None:
                         row["status"] = "READ"
                         row["source_revision"] = payload.get("schema_version")
                         row["value"] = {
-                            k: found[k] for k in (
-                                "id", "title", "type", "description", "term", "definition",
-                                "properties", "status", "source_evidence", "evidence",
-                                "context_term_ids", "term_ids",
-                            ) if k in found
+                            k: found[k]
+                            for k in (
+                                "id",
+                                "title",
+                                "type",
+                                "description",
+                                "term",
+                                "definition",
+                                "properties",
+                                "status",
+                                "source_evidence",
+                                "evidence",
+                                "context_term_ids",
+                                "term_ids",
+                            )
+                            if k in found
                         }
                     else:
                         row["status"] = "UNRESOLVED_ID"
@@ -110,8 +126,14 @@ def read_project_context(
                     try:
                         tree = ast.parse(data["bytes"].decode("utf-8"), filename=name)
                         row["value"] = {
-                            "functions": [n.name for n in tree.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))][:30],
-                            "classes": [n.name for n in tree.body if isinstance(n, ast.ClassDef)][:30],
+                            "functions": [
+                                n.name
+                                for n in tree.body
+                                if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+                            ][:30],
+                            "classes": [n.name for n in tree.body if isinstance(n, ast.ClassDef)][
+                                :30
+                            ],
                         }
                     except (ValueError, SyntaxError, UnicodeDecodeError):
                         row["status"] = "UNRESOLVED_SOURCE"
@@ -128,8 +150,14 @@ def read_project_context(
                         obj = json.loads(data["bytes"])
                         if not isinstance(obj, dict):
                             raise ValueError("invalid environment profile")
-                        row["status"] = "SYNTHETIC" if obj.get("synthetic") is True else (
-                            "OBSERVED_SNAPSHOT" if obj.get("captured_at_utc") else "UNRESOLVED_SOURCE"
+                        row["status"] = (
+                            "SYNTHETIC"
+                            if obj.get("synthetic") is True
+                            else (
+                                "OBSERVED_SNAPSHOT"
+                                if obj.get("captured_at_utc")
+                                else "UNRESOLVED_SOURCE"
+                            )
                         )
                         row["value"] = {
                             "synthetic": obj.get("synthetic"),
