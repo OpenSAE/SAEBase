@@ -37,3 +37,11 @@ Allowed statuses: PASS, FAIL, BLOCKED, PARTIAL, NOT_RUN, WARNING, HUMAN_DECISION
 Generate the filled copy using `python -m harness.github.work_plan.lifecycle complete --plan ... --receipt ... --output ...`; it uses exclusive creation, preserving the reviewed original and earlier reports. The separate generic Runtime Audit verifies file identities and integrity, while task-specific evaluators verify scientific meaning. Harness Acceptance and human approval remain separate.
 
 B2 may be the default authorized archive transport. Attach remote prefix, transfer configuration, per-file digest manifest, copy/check receipts and any privacy/license exclusions. Neither a successful upload nor an Atlas status automatically means scientific acceptance.
+
+## Run-level evidence audit (optional until installed and validated)
+
+The run manifest explicitly lists requested check IDs, type (`setup/precheck/worker/task/workplan`), and per-check JSON receipt paths. Each receipt carries the run ID, source SHA and an actual `PASS/FAIL/BLOCKED/NOT_RUN` execution status. Declare each receipt in the immutable `files` list with byte length and SHA-256. Missing, altered, undeclared, mismatched or extra unrequested claimed receipts do not count as evidence success.
+
+`saebase.runtime.audit_report.audit_run(run_root, manifest)` separates `evidence_status` from `execution_status`. A real failed or blocked computation may still have complete, honest evidence. After an evidence `PASS`, `saebase.runtime.audit_delivery.deliver(run_root, manifest, archive_dir, archive=True)` saves only declared run files into a uniquely named local archive. `archive=False` records `SKIPPED`; failure to verify evidence blocks archiving. Existing archives are never overwritten. B2 transfer is a separate, explicitly authorized workflow and does not follow from this flag.
+
+These interfaces verify receipt bytes and declared identities, not the scientific validity of a result. Until end-to-end Workplan wiring and source-verified release checks pass, they must not be labeled a completed automatic lifecycle.
