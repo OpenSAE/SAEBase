@@ -1,15 +1,17 @@
 {
   "schema": "saebase.workplan.node_impact.v1",
   "plan_id": "WP23",
-  "source_commit": "cfd14db67e855fffe09b037894e3e5a115c53d83",
+  "source_commit": "600d39d0ad27a875dfe414edfb2d3a04f87aa34e",
   "wp22_source_branch": "feat/qa-evaluation-500-v1",
   "wp22_source_head": "32c53e56abff3ece4fb2f7922cdbd57446ef8429",
   "source_status": "DESK_SOURCE_REVIEW_ONLY",
   "node_review_decision": "DEFER_NODE_DECISION",
   "source_write_review": {
     "required": true,
-    "status": "PENDING",
-    "reason": "WP23 introduces or edits actual product tests, worker implementation, CI and experiment scripts; exact-path Human Check/Work Order remains separate from node semantics."
+    "status": "APPROVED",
+    "reason": "The user reviewed the WP23 summary and enumerated source scope and expressly authorized continuing the workflow in this conversation on 2026-11-02. Only the audited exact paths are in scope; GPU/network/gated downloads/Native/B2/HF remain unapproved.",
+    "authorization": "User conversation 2026-11-02 — reviewed no issues, continue workflow",
+    "scope": "implementation_review.workstreams[].files[].path (20 enumerated paths only)"
   },
   "domains": [
     {
@@ -130,7 +132,7 @@
   "published_science": "NONE",
   "experiment_run": "NOT_RUN",
   "implementation_review": {
-    "status": "PENDING_EXACT_PATH_HUMAN_AUTHORIZATION",
+    "status": "APPROVED_EXACT_PATH_SCOPE_ONLY",
     "note": "These are proposed implementation paths, not approved node edits or previously observed new AST modules. CONDITIONAL_CHANGE may be omitted when existing Runtime API suffices. Source reviews remain independent of node HC.",
     "workstreams": [
       {
@@ -140,14 +142,14 @@
           {
             "path": "tasks/precheck/dataset_checks.py",
             "operation": "ADD",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "AFTER_REAL_AST_ONLY"
           },
           {
             "path": "tests/precheck/test_dataset_checks.py",
             "operation": "ADD",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "AFTER_REAL_AST_ONLY"
           }
@@ -160,21 +162,21 @@
           {
             "path": "tasks/precheck/model_checks.py",
             "operation": "ADD",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "AFTER_REAL_AST_ONLY"
           },
           {
             "path": "tasks/precheck/sae_checks.py",
             "operation": "CHANGE",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
           },
           {
             "path": "tests/precheck/test_model_sae_sites.py",
             "operation": "ADD",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "AFTER_REAL_AST_ONLY"
           }
@@ -187,42 +189,42 @@
           {
             "path": "tasks/precheck/compatibility_checks.py",
             "operation": "ADD",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "AFTER_REAL_AST_ONLY"
           },
           {
             "path": "tasks/precheck/operation.py",
             "operation": "CHANGE",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
           },
           {
             "path": "tasks/precheck/worker.py",
             "operation": "CHANGE",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
           },
           {
             "path": "tasks/precheck/report.py",
             "operation": "CHANGE",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
           },
           {
             "path": "conf/task/precheck.yaml",
             "operation": "CHANGE",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
           },
           {
             "path": "tests/precheck/test_component_matrix.py",
             "operation": "ADD",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "AFTER_REAL_AST_ONLY"
           }
@@ -235,28 +237,28 @@
           {
             "path": "scripts/workplan/wp023.sh",
             "operation": "ADD",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "AFTER_REAL_AST_ONLY"
           },
           {
             "path": "scripts/workplan/wp023_orchestrator.py",
             "operation": "ADD",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "AFTER_REAL_AST_ONLY"
           },
           {
             "path": "tests/workplan/wp23/test_handoff.py",
             "operation": "ADD",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "AFTER_REAL_AST_ONLY"
           },
           {
             "path": "tests/workplan/wp23/test_resume.py",
             "operation": "ADD",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "AFTER_REAL_AST_ONLY"
           }
@@ -269,21 +271,21 @@
           {
             "path": "saebase/runtime/audit_report.py",
             "operation": "CONDITIONAL_CHANGE",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
           },
           {
             "path": "saebase/runtime/audit_delivery.py",
             "operation": "CONDITIONAL_CHANGE",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
           },
           {
             "path": "tests/workplan/wp23/test_audit_handoff.py",
             "operation": "ADD",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "AFTER_REAL_AST_ONLY"
           }
@@ -296,14 +298,14 @@
           {
             "path": "tests/workplan/wp23/test_cpu_negative.py",
             "operation": "ADD",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "AFTER_REAL_AST_ONLY"
           },
           {
             "path": ".github/workflows/ci.yml",
             "operation": "CHANGE",
-            "permission": "PENDING",
+            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
             "node_semantics": "NO_AUTOMATIC_CHANGE",
             "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
           }
