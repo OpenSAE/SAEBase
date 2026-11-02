@@ -1,6 +1,7 @@
 """Negative checks for two independent Work Plan human-review deliverables."""
 
 import copy
+import json
 
 import pytest
 
@@ -115,3 +116,47 @@ def test_no_duplicate_domains():
     audit["domains"][1] = copy.deepcopy(audit["domains"][0])
     with pytest.raises(gate.ReviewGateError, match="repeated"):
         gate.check_impact(audit, "WP24")
+
+
+def test_versioned_workplan_lifecycle_enforces_dual_review(tmp_path):
+    from harness.github.work_plan import lifecycle as life
+
+    base_plan, summary, impact = example()
+
+    def put(name, payload):
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(payload if isinstance(payload, str) else json.dumps(payload),
+                        encoding="utf-8")
+
+    put("harness/core/project_graph.json", {"nodes": [{"id": "g.pipeline"}]})
+    put("doc/knowledge/context_graph.json", {"nodes": [{"id": "q.sae.methods"}]})
+    put("doc/knowledge/glossary.json", {"terms": [{"id": "term.sae"}]})
+    put("doc/knowledge/atlas_terms.json", {"terms": []})
+    put("saebase/runner.py", "def run(): pass\n")
+    put("conf/experiment/demo.yaml", "experiment:\n  name: demo\n")
+    intent = {"schema": "saebase.from_human.v1", "plan_id": "WP24",
+              "goal": "Deliver source-backed review", "scientific_motivation": "Reproducibility"}
+    fence = chr(96) * 3
+    put("harness/github/work_plan/from_human/WP24.md",
+        fence + "from-human-json\n" + json.dumps(intent) + "\n" + fence + "\n")
+    obj = {
+        "schema": "saebase.workplan.v1",
+        "plan_id": "WP24",
+        "status": "draft",
+        "from_human": "harness/github/work_plan/from_human/WP24.md",
+        "atlas": {"core_ids": ["g.pipeline"], "knowledge_ids": ["q.sae.methods"],
+                  "context_term_ids": ["term.sae"], "code_refs": ["saebase/runner.py"]},
+        "experiment": {"study_id": "demo", "config": "conf/experiment/demo.yaml"},
+        "steps": [{"id": "setup", "needs": [], "permission": "local",
+                   "goal": "Check source", "evidence": "source receipt"}],
+        "deliverables": [{"experiment": "E1", "metric": "source checks", "expected": "one"}],
+    }
+    path = "harness/github/work_plan/0.6.5_wp024_review_gate.md"
+    put(path, base_plan + "\n" + fence + "workplan-json\n" +
+        json.dumps(obj) + "\n" + fence + "\n")
+    with pytest.raises(FileNotFoundError):
+        life.check(path, root=tmp_path, check_contracts=False)
+    put("harness/github/work_plan/reviews/WP24/summary.md", summary)
+    put("harness/github/work_plan/reviews/WP24/node_impact.json", impact)
+    assert life.check(path, root=tmp_path, check_contracts=False)["plan_id"] == "WP24"
