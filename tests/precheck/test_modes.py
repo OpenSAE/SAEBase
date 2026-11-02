@@ -13,14 +13,16 @@ from tasks.precheck.operation import _selected_tasks, _budget, run_precheck
 
 
 def test_model_default_and_explicit_sae_selection():
-    model = OmegaConf.create({
-        "name": "gemma2_2b_base",
-        "sae_profiles": [
-            "gemma2_2b_pt_l25_canonical",
-            "gemma2_2b_it_scope_resid_l12",
-        ],
-        "default_saes": ["gemma2_2b_pt_l25_canonical"],
-    })
+    model = OmegaConf.create(
+        {
+            "name": "gemma2_2b_base",
+            "sae_profiles": [
+                "gemma2_2b_pt_l25_canonical",
+                "gemma2_2b_it_scope_resid_l12",
+            ],
+            "default_saes": ["gemma2_2b_pt_l25_canonical"],
+        }
+    )
     defaults = select_sites(model, "default")
     assert len(defaults) == 1
     assert defaults[0]["sae_key"] == "gemma2_2b_pt_l25_canonical"
@@ -40,7 +42,17 @@ def test_unconfigured_sae_model_is_not_silently_substituted():
 
 
 def test_modes_and_budgets_are_bounded():
-    task = OmegaConf.create({"task": {"mode": "task", "check_tasks": ["capture"], "max_seconds": 30, "max_samples": 2, "max_tokens": 8}})
+    task = OmegaConf.create(
+        {
+            "task": {
+                "mode": "task",
+                "check_tasks": ["capture"],
+                "max_seconds": 30,
+                "max_samples": 2,
+                "max_tokens": 8,
+            }
+        }
+    )
     assert _selected_tasks(task, "task") == ["capture"]
     assert _selected_tasks(task, "sae") == []
     assert _budget(task) == (30, 2, 8)
@@ -54,11 +66,13 @@ def test_modes_and_budgets_are_bounded():
 
 def test_precheck_configuration_does_not_execute_any_test(tmp_path: Path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    cfg = OmegaConf.create({
-        "dataset": {"name": "IOI"},
-        "model": {"name": "gemma2_2b_base", "sae_profiles": [], "default_saes": []},
-        "task": {"name": "precheck", "mode": "sae", "execute": False},
-    })
+    cfg = OmegaConf.create(
+        {
+            "dataset": {"name": "IOI"},
+            "model": {"name": "gemma2_2b_base", "sae_profiles": [], "default_saes": []},
+            "task": {"name": "precheck", "mode": "sae", "execute": False},
+        }
+    )
     outcome = run_precheck(cfg)
     assert outcome.ok is False
     assert outcome.summary["status"] == "NOT_RUN"
@@ -67,19 +81,27 @@ def test_precheck_configuration_does_not_execute_any_test(tmp_path: Path, monkey
 
 
 def test_blocked_report_has_actionable_diagnostics():
-    row = blocked(stage="setup", code="BLOCKED_ASSET", reason="Not cached",
-                  attempted=["local cache lookup"], repair="Authorize download or stage weights")
+    row = blocked(
+        stage="setup",
+        code="BLOCKED_ASSET",
+        reason="Not cached",
+        attempted=["local cache lookup"],
+        repair="Authorize download or stage weights",
+    )
     assert row["status"] == "BLOCKED"
     assert row["attempted"] and row["repair"] and row["retryable"]
     assert summarize([{"status": "PASS"}, row])["status"] == "BLOCKED"
     assert summarize([row, {"status": "FAIL"}])["status"] == "FAIL"
     assert summarize([])["status"] == "NOT_RUN"
-    unknown = error_result(RuntimeError("real model runtime failed"), stage="sae", attempted=["run"])
+    unknown = error_result(
+        RuntimeError("real model runtime failed"), stage="sae", attempted=["run"]
+    )
     assert unknown["status"] == "FAIL"
 
 
 def test_setup_is_preparation_only_and_no_smoke_module_exists():
     import saebase.setup.assets as assets
+
     assert not Path(assets.__file__).with_name("smoke.py").exists()
     receipt = assets.prepare_environment(required_modules=(), assets=[])
     assert receipt["status"] == "READY"

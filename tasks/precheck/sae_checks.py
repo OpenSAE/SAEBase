@@ -6,7 +6,9 @@ import hashlib
 from typing import Any
 
 
-def select_sites(model_cfg: Any, selection: Any, *, layer: int | None = None) -> list[dict[str, Any]]:
+def select_sites(
+    model_cfg: Any, selection: Any, *, layer: int | None = None
+) -> list[dict[str, Any]]:
     """Model-owned lists, never a second global SAE Registry.
 
     A free-text SAE key must still refer to a Model-owned profile. The legacy
@@ -26,20 +28,26 @@ def select_sites(model_cfg: Any, selection: Any, *, layer: int | None = None) ->
     else:
         chosen = list(selection)
     if not chosen:
-        raise ValueError(f"Model {model!r} has no default SAE; set model.default_saes or task.sae_list explicitly")
+        raise ValueError(
+            f"Model {model!r} has no default SAE; set model.default_saes or task.sae_list explicitly"
+        )
     rows = []
     seen = set()
     for entry in chosen:
         key = str(entry.get("sae", entry.get("key"))) if hasattr(entry, "get") else str(entry)
         if key not in available:
-            raise ValueError(f"SAE {key!r} is not in model {model!r} sae_profiles; configure that Model first")
+            raise ValueError(
+                f"SAE {key!r} is not in model {model!r} sae_profiles; configure that Model first"
+            )
         profile = get_profile(key)
         if model not in profile.allowed_model_keys():
             raise ValueError(f"SAE {key!r} does not support model {model!r}")
         requested = entry.get("layer", layer) if hasattr(entry, "get") else layer
         site_layer = int(requested) if requested is not None else int(profile.layers[-1])
         if site_layer not in profile.layers:
-            raise ValueError(f"SAE {key!r} supports layers {list(profile.layers)}, not {site_layer}")
+            raise ValueError(
+                f"SAE {key!r} supports layers {list(profile.layers)}, not {site_layer}"
+            )
         identity = (key, site_layer)
         if identity in seen:
             raise ValueError(f"Duplicate SAE check {identity}")
@@ -48,7 +56,9 @@ def select_sites(model_cfg: Any, selection: Any, *, layer: int | None = None) ->
     return rows
 
 
-def check_real_sae(*, model_key: str, sae_key: str, layer: int, prompt: str, device: str) -> dict[str, Any]:
+def check_real_sae(
+    *, model_key: str, sae_key: str, layer: int, prompt: str, device: str
+) -> dict[str, Any]:
     """Use real checkpoints and real tokens; neither fake activations nor random smoke."""
     import torch
     from saebase.api import capture_features, load_registered

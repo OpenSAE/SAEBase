@@ -14,7 +14,9 @@ def test_task_cannot_claim_pass_from_configured_only():
 
 def test_task_requires_real_typed_artifacts():
     with pytest.raises(RuntimeError, match="features"):
-        _validate_task("capture", {"status": "executed", "operation": "capture", "feature_count": 0})
+        _validate_task(
+            "capture", {"status": "executed", "operation": "capture", "feature_count": 0}
+        )
     with pytest.raises(RuntimeError, match="metric"):
         _validate_task("benchmark", {"status": "executed", "operation": "benchmark", "metrics": []})
 

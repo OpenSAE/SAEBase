@@ -86,8 +86,11 @@ def check(request: dict[str, Any]) -> dict[str, Any]:
             raise TypeError(f"Invalid worker kind: {kind}")
         return result
     except Exception as exc:
-        return error_result(exc, stage=f"{kind}:{request.get('operation', request.get('sae_key'))}",
-                            attempted=["isolated real worker invoked"])
+        return error_result(
+            exc,
+            stage=f"{kind}:{request.get('operation', request.get('sae_key'))}",
+            attempted=["isolated real worker invoked"],
+        )
 
 
 def main() -> int:

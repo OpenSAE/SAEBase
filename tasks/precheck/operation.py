@@ -44,7 +44,9 @@ def _selected_tasks(cfg: DictConfig, mode: str) -> list[str]:
     return tasks
 
 
-def _assets(cfg: DictConfig, sites: list[dict[str, Any]], tasks: list[str]) -> list[dict[str, str | None]]:
+def _assets(
+    cfg: DictConfig, sites: list[dict[str, Any]], tasks: list[str]
+) -> list[dict[str, str | None]]:
     from saebase.sae.registry import get_profile
 
     if not sites and not tasks:
@@ -64,7 +66,9 @@ def _assets(cfg: DictConfig, sites: list[dict[str, Any]], tasks: list[str]) -> l
     return list(unique.values())
 
 
-def _run_worker(request: dict[str, Any], *, label: str, timeout: int, allow_network: bool) -> dict[str, Any]:
+def _run_worker(
+    request: dict[str, Any], *, label: str, timeout: int, allow_network: bool
+) -> dict[str, Any]:
     from saebase.runtime.experiment_paths import ARTIFACT_DIRS
 
     root = Path.cwd() / "analysis" / "precheck_jobs" / label
@@ -83,17 +87,28 @@ def _run_worker(request: dict[str, Any], *, label: str, timeout: int, allow_netw
         env["TRANSFORMERS_OFFLINE"] = "1"
         env["HF_DATASETS_OFFLINE"] = "1"
     command = [
-        sys.executable, "-m", "tasks.precheck.worker",
-        "--input", str(inp), "--output", str(out),
+        sys.executable,
+        "-m",
+        "tasks.precheck.worker",
+        "--input",
+        str(inp),
+        "--output",
+        str(out),
     ]
     try:
         proc = subprocess.run(
-            command, cwd=root, env=env, capture_output=True,
-            text=True, timeout=timeout, check=False,
+            command,
+            cwd=root,
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            check=False,
         )
     except subprocess.TimeoutExpired:
         return blocked(
-            stage=label, code="BLOCKED_RESOURCE",
+            stage=label,
+            code="BLOCKED_RESOURCE",
             reason=f"Real worker exceeded {timeout}s",
             attempted=["isolated worker started", "wall-time budget enforced"],
             repair="Provide enough compute or explicitly raise the bounded Precheck time budget.",
@@ -110,7 +125,11 @@ def _run_worker(request: dict[str, Any], *, label: str, timeout: int, allow_netw
         }
     data = json.loads(out.read_text(encoding="utf-8"))
     if data.get("status") not in ("PASS", "FAIL", "BLOCKED"):
-        return error_result(ValueError("Invalid worker result state"), stage=label, attempted=["read worker receipt"])
+        return error_result(
+            ValueError("Invalid worker result state"),
+            stage=label,
+            attempted=["read worker receipt"],
+        )
     return {
         **data,
         "stage": label,
@@ -124,14 +143,17 @@ def _task_config(cfg: DictConfig, name: str, max_seconds: int, max_tokens: int) 
     original = OmegaConf.load(path)
     task = dict(cfg.task.get("task_configs", {}).get(name, {}))
     target = OmegaConf.merge(
-        cfg, original,
-        {"task": {
-            "name": name,
-            "execute": True,
-            "device": str(cfg.task.get("device", "cpu")),
-            "prompt": str(cfg.task.get("prompt", "")),
-            "timeout_seconds": max_seconds,
-        }},
+        cfg,
+        original,
+        {
+            "task": {
+                "name": name,
+                "execute": True,
+                "device": str(cfg.task.get("device", "cpu")),
+                "prompt": str(cfg.task.get("prompt", "")),
+                "timeout_seconds": max_seconds,
+            }
+        },
         {"task": task},
     )
     if name == "generate":
@@ -151,9 +173,12 @@ def _task_config(cfg: DictConfig, name: str, max_seconds: int, max_tokens: int) 
     if name == "train":
         plan = target.task.get("train_plan")
         if plan is None or int(plan.get("max_steps", max_seconds + 1)) > 2:
-            raise ValueError("Precheck Train requires a native TrainPlan bounded to at most two steps")
+            raise ValueError(
+                "Precheck Train requires a native TrainPlan bounded to at most two steps"
+            )
     if name not in ("train", "circuits") and (
-        target.task.get("sae_key") is None or str(target.task.get("sae_key")) == "gemma2_2b_pt_l25_canonical"
+        target.task.get("sae_key") is None
+        or str(target.task.get("sae_key")) == "gemma2_2b_pt_l25_canonical"
     ):
         defaults = list(cfg.model.get("default_saes", []))
         if defaults:
@@ -172,10 +197,13 @@ def run_precheck(cfg: DictConfig) -> EvaluationResult:
     max_seconds, max_samples, max_tokens = _budget(cfg)
     tasks = _selected_tasks(cfg, mode)
     if not bool(cfg.task.get("execute", False)):
-        rows.append({
-            "status": "NOT_RUN", "stage": "precheck",
-            "reason": "Set task.execute=true to perform any real checks.",
-        })
+        rows.append(
+            {
+                "status": "NOT_RUN",
+                "stage": "precheck",
+                "reason": "Set task.execute=true to perform any real checks.",
+            }
+        )
     else:
         sites: list[dict[str, Any]] = []
         if mode in ("sae", "all"):
@@ -184,7 +212,11 @@ def run_precheck(cfg: DictConfig) -> EvaluationResult:
                 if len(sites) > max_samples:
                     raise ValueError("Selected SAE sites exceed the max_samples check budget")
             except Exception as exc:
-                rows.append(error_result(exc, stage="sae_selection", attempted=["read Model-owned SAE choices"]))
+                rows.append(
+                    error_result(
+                        exc, stage="sae_selection", attempted=["read Model-owned SAE choices"]
+                    )
+                )
         setup_ok = True
         if bool(cfg.task.get("auto_setup", True)):
             try:
@@ -202,47 +234,76 @@ def run_precheck(cfg: DictConfig) -> EvaluationResult:
                     rows.append(prepared)
                     setup_ok = False
             except Exception as exc:
-                rows.append(error_result(exc, stage="setup", attempted=["Setup preparation requested"]))
+                rows.append(
+                    error_result(exc, stage="setup", attempted=["Setup preparation requested"])
+                )
                 setup_ok = False
         allowed = bool(cfg.task.get("allow_compute", False))
         device = str(cfg.task.get("device", "cpu"))
         if device.startswith("cuda") and not bool(cfg.task.get("allow_gpu", False)):
             allowed = False
         if (sites or tasks) and not allowed:
-            rows.append(blocked(
-                stage="authorization", code="BLOCKED_AUTH",
-                reason="Real compute not authorized for this Precheck",
-                attempted=["read explicit execution permissions"],
-                repair="Set task.allow_compute=true and, for CUDA, task.allow_gpu=true, with an explicit resource budget.",
-            ))
+            rows.append(
+                blocked(
+                    stage="authorization",
+                    code="BLOCKED_AUTH",
+                    reason="Real compute not authorized for this Precheck",
+                    attempted=["read explicit execution permissions"],
+                    repair="Set task.allow_compute=true and, for CUDA, task.allow_gpu=true, with an explicit resource budget.",
+                )
+            )
         if setup_ok and allowed:
             prompt = str(cfg.task.get("prompt", ""))
             for index, site in enumerate(sites):
                 request = {
-                    "kind": "sae", "model_key": model_key,
-                    "sae_key": site["sae_key"], "layer": site["layer"],
-                    "prompt": prompt, "device": device,
+                    "kind": "sae",
+                    "model_key": model_key,
+                    "sae_key": site["sae_key"],
+                    "layer": site["layer"],
+                    "prompt": prompt,
+                    "device": device,
                 }
-                rows.append(_run_worker(
-                    request, label=f"sae_{index:02d}", timeout=max_seconds,
-                    allow_network=bool(cfg.task.get("allow_network", False)),
-                ))
+                rows.append(
+                    _run_worker(
+                        request,
+                        label=f"sae_{index:02d}",
+                        timeout=max_seconds,
+                        allow_network=bool(cfg.task.get("allow_network", False)),
+                    )
+                )
             for index, name in enumerate(tasks):
                 try:
                     task_cfg = _task_config(cfg, name, max_seconds, max_tokens)
                     request = {"kind": "task", "operation": name, "config": task_cfg}
-                    rows.append(_run_worker(
-                        request, label=f"task_{index:02d}_{name}", timeout=max_seconds,
-                        allow_network=bool(cfg.task.get("allow_network", False)),
-                    ))
+                    rows.append(
+                        _run_worker(
+                            request,
+                            label=f"task_{index:02d}_{name}",
+                            timeout=max_seconds,
+                            allow_network=bool(cfg.task.get("allow_network", False)),
+                        )
+                    )
                 except Exception as exc:
-                    rows.append(error_result(exc, stage=f"task:{name}", attempted=["validate bounded Task configuration"]))
+                    rows.append(
+                        error_result(
+                            exc,
+                            stage=f"task:{name}",
+                            attempted=["validate bounded Task configuration"],
+                        )
+                    )
     summary = summarize(rows)
     payload = {
         "schema": "saebase.precheck.v1",
-        "model": model_key, "dataset": dataset_key, "mode": mode,
-        "budget": {"max_seconds_per_check": max_seconds, "max_samples": max_samples, "max_tokens": max_tokens},
-        "rows": rows, "summary": summary,
+        "model": model_key,
+        "dataset": dataset_key,
+        "mode": mode,
+        "budget": {
+            "max_seconds_per_check": max_seconds,
+            "max_samples": max_samples,
+            "max_tokens": max_tokens,
+        },
+        "rows": rows,
+        "summary": summary,
         "setup_is_not_a_test": True,
     }
     destination = Path.cwd() / "metadata" / "precheck_result.json"
@@ -256,8 +317,14 @@ def run_precheck(cfg: DictConfig) -> EvaluationResult:
         size = destination.stat().st_size
         manifest = {
             "schema": "saebase.artifact_manifest.v1",
-            "files": [{"path": "metadata/precheck_result.json", "bytes": size,
-                       "sha256": file_sha256(destination), "required": True}],
+            "files": [
+                {
+                    "path": "metadata/precheck_result.json",
+                    "bytes": size,
+                    "sha256": file_sha256(destination),
+                    "required": True,
+                }
+            ],
         }
         audit = audit_artifacts(Path.cwd(), manifest)
         (Path.cwd() / "metadata" / "precheck_audit.json").write_text(
@@ -267,10 +334,19 @@ def run_precheck(cfg: DictConfig) -> EvaluationResult:
             summary["status"] = "FAIL"
     except Exception as exc:
         summary["status"] = "FAIL"
-        rows.append(error_result(exc, stage="artifact_audit", attempted=["audit real report bytes"]))
+        rows.append(
+            error_result(exc, stage="artifact_audit", attempted=["audit real report bytes"])
+        )
     return EvaluationResult(
-        ok=summary["status"] == "PASS", task="precheck", evaluation=mode,
-        model_key=model_key, prompt_source=dataset_key,
-        summary=summary, per_prompt=[], meta=payload,
-        error=None if summary["status"] == "PASS" else "Some requested checks were not verified; see metadata/precheck_result.json",
+        ok=summary["status"] == "PASS",
+        task="precheck",
+        evaluation=mode,
+        model_key=model_key,
+        prompt_source=dataset_key,
+        summary=summary,
+        per_prompt=[],
+        meta=payload,
+        error=None
+        if summary["status"] == "PASS"
+        else "Some requested checks were not verified; see metadata/precheck_result.json",
     )

@@ -35,19 +35,52 @@ def error_result(exc: Exception, *, stage: str, attempted: list[str]) -> dict[st
     reason = f"{name}: {str(exc)[:900]}"
     msg = str(exc).lower()
     if isinstance(exc, PermissionError):
-        code, repair = "BLOCKED_AUTH", "Approve the specific operation and its GPU/network/external-service budget."
+        code, repair = (
+            "BLOCKED_AUTH",
+            "Approve the specific operation and its GPU/network/external-service budget.",
+        )
     elif isinstance(exc, (ModuleNotFoundError, ImportError)):
-        code, repair = "BLOCKED_DEPENDENCY", "Run Setup with explicitly authorized package installation, then retry."
+        code, repair = (
+            "BLOCKED_DEPENDENCY",
+            "Run Setup with explicitly authorized package installation, then retry.",
+        )
     elif isinstance(exc, (FileNotFoundError, IsADirectoryError)):
-        code, repair = "BLOCKED_ASSET", "Prepare the missing model, dataset, checkpoint, or configured input file."
+        code, repair = (
+            "BLOCKED_ASSET",
+            "Prepare the missing model, dataset, checkpoint, or configured input file.",
+        )
     elif "out of memory" in msg or "cuda unavailable" in msg or "no cuda" in msg:
-        code, repair = "BLOCKED_RESOURCE", "Choose a machine with enough available resources; do not substitute a different scientific configuration."
-    elif name == "UnsupportedCapability" or "not compatible" in msg or "unsupported" in msg or "sole registered" in msg:
-        code, repair = "BLOCKED_COMPATIBILITY", "Choose an actually compatible model, SAE site, backend or Task; no silent substitution."
-    elif isinstance(exc, ValueError) and any(
-        word in msg for word in ("missing", "provide", "require", "needs", "empty", "no default", "not registered", "not in model")
+        code, repair = (
+            "BLOCKED_RESOURCE",
+            "Choose a machine with enough available resources; do not substitute a different scientific configuration.",
+        )
+    elif (
+        name == "UnsupportedCapability"
+        or "not compatible" in msg
+        or "unsupported" in msg
+        or "sole registered" in msg
     ):
-        code, repair = "BLOCKED_CONFIGURATION", "Supply the missing explicit configuration, resource, or input and retry this check."
+        code, repair = (
+            "BLOCKED_COMPATIBILITY",
+            "Choose an actually compatible model, SAE site, backend or Task; no silent substitution.",
+        )
+    elif isinstance(exc, ValueError) and any(
+        word in msg
+        for word in (
+            "missing",
+            "provide",
+            "require",
+            "needs",
+            "empty",
+            "no default",
+            "not registered",
+            "not in model",
+        )
+    ):
+        code, repair = (
+            "BLOCKED_CONFIGURATION",
+            "Supply the missing explicit configuration, resource, or input and retry this check.",
+        )
     else:
         return {
             "status": "FAIL",
@@ -77,7 +110,10 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
         state = "FAIL"
     return {
         "status": state,
-        "counts": {s: sum(x.get("status") == s for x in rows) for s in ("PASS", "FAIL", "BLOCKED", "NOT_RUN")},
+        "counts": {
+            s: sum(x.get("status") == s for x in rows)
+            for s in ("PASS", "FAIL", "BLOCKED", "NOT_RUN")
+        },
         "checked": len(rows),
         "scientific_acceptance": "NOT_COVERED",
         "independent_harness_acceptance": "NOT_COVERED",
