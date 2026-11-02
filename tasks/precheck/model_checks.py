@@ -9,7 +9,11 @@ from tasks.precheck.report import error_result
 
 
 def check_real_model(
-    *, model_key: str, model_name: str, prompt: str, device: str,
+    *,
+    model_key: str,
+    model_name: str,
+    prompt: str,
+    device: str,
 ) -> dict[str, Any]:
     """Load actual model weights, tokenize real input and observe finite logits."""
     try:
@@ -40,6 +44,8 @@ def check_real_model(
             "scientific_acceptance": "NOT_COVERED",
         }
     except Exception as exc:
-        return error_result(exc, stage=f"model:{model_key}", attempted=[
-            "load real Model", "tokenize", "native forward", "verify logits"
-        ])
+        return error_result(
+            exc,
+            stage=f"model:{model_key}",
+            attempted=["load real Model", "tokenize", "native forward", "verify logits"],
+        )
