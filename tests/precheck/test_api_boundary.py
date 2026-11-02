@@ -15,7 +15,7 @@ def test_sae_capabilities_belong_to_shared_api_or_task():
     from saebase.api.sae_profiles import get_profile
     from saebase.api.sae_loading import load_model_and_sae
     from tasks.benchmark.activation_health import run_activation_health
-    from tasks.train.external_training import _saelens_train
+    from tasks.train.external_training import run_training
 
     assert callable(get_profile)
     assert callable(load_model_and_sae)
