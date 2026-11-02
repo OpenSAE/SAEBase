@@ -19,6 +19,7 @@ def example():
         "plan_id": "WP24",
         "source_commit": "a" * 40,
         "node_review_decision": "NO_NODE_CHANGE",
+        "human_check_review": {"status": "NOT_REQUIRED", "reason": "Every observed durable Atlas node remains semantically unchanged; therefore no Node Human Check is necessary."},
         "source_write_review": {"required": True, "status": "PENDING"},
         "domains": [
             {
@@ -101,6 +102,7 @@ def test_deferral_never_masquerades_as_no_change():
     with pytest.raises(gate.ReviewGateError, match="node-review decision"):
         gate.check_impact(audit, "WP24")
     audit["node_review_decision"] = "DEFER_NODE_DECISION"
+    audit["human_check_review"] = {"status": "NOT_REQUIRED_NOW", "reason": "The proposed module has not been implemented, so inspect actual AST and ownership after implementation.", "recheck_after_implementation": True}
     assert gate.check_impact(audit, "WP24")["node_review_decision"] == "DEFER_NODE_DECISION"
 
 
@@ -177,3 +179,53 @@ def test_versioned_workplan_lifecycle_enforces_dual_review(tmp_path):
     put("harness/github/work_plan/reviews/WP24/summary.md", summary)
     put("harness/github/work_plan/reviews/WP24/node_impact.json", impact)
     assert life.check(path, root=tmp_path, check_contracts=False)["plan_id"] == "WP24"
+
+
+def test_missing_human_check_disposition_is_blocked():
+    _, _, impact = example()
+    del impact["human_check_review"]
+    with pytest.raises(gate.ReviewGateError, match="Human Check decision"):
+        gate.check_impact(impact, "WP24")
+
+
+def test_no_node_check_requires_specific_reason():
+    _, _, impact = example()
+    impact["human_check_review"]["reason"] = "No."
+    with pytest.raises(gate.ReviewGateError, match="source-backed explanation"):
+        gate.check_impact(impact, "WP24")
+
+
+def test_deferral_must_require_ast_recheck():
+    _, _, impact = example()
+    item = impact["domains"][0]
+    item["decision"] = "DEFER"
+    item["feature_effect"] = "UNKNOWN"
+    impact["node_review_decision"] = "DEFER_NODE_DECISION"
+    impact["human_check_review"] = {
+        "status": "NOT_REQUIRED_NOW",
+        "reason": "A proposed new Code module has not yet been implemented and must be audited after its real AST exists.",
+        "recheck_after_implementation": False,
+    }
+    with pytest.raises(gate.ReviewGateError, match="AST recheck"):
+        gate.check_impact(impact, "WP24")
+
+
+def test_real_node_edit_needs_atlas_url():
+    _, _, impact = example()
+    item = impact["domains"][0]
+    item["decision"] = "CHANGE"
+    item["feature_effect"] = "CHANGED"
+    item["existing_nodes"] = ["g.pipeline"]
+    item["human_check_required"] = True
+    item["proposed_fields"] = {"description": "An independently evidenced reusable capability"}
+    impact["node_review_decision"] = "NODE_HUMAN_CHECK"
+    impact["human_check_review"] = {
+        "status": "REQUIRED",
+        "reason": "The existing node has a concrete durable responsibility change, requiring Atlas Human Check before edits.",
+    }
+    with pytest.raises(gate.ReviewGateError, match="Atlas review URL"):
+        gate.check_impact(impact, "WP24")
+    impact["human_check_review"]["review_url"] = (
+        "https://atheavenma.github.io/saebase/atlas/core.html?review=HC-Example"
+    )
+    assert gate.check_impact(impact, "WP24")["human_check_review"] == "REQUIRED"
