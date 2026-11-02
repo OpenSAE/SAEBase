@@ -610,6 +610,24 @@
     return "https://github.com/OpenSAE/SAEBase/issues/new?title="
       +encodeURIComponent(title)+"&body="+encodeURIComponent(body);
   }
+  function sendBrowserReview(event){
+    // Public GitHub Pages has no credential to create an issue itself.
+    // Navigate this tab to the prefilled GitHub submission form, avoiding
+    // blocked popups and inert '#' anchor reloads.
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    if(!review || review.editable)return;
+    try {
+      persistBrowserDraft();
+      const url=reviewHandoffURL();
+      if(!url.startsWith("https://github.com/OpenSAE/SAEBase/issues/new?"))
+        throw Error("GitHub report URL unavailable");
+      window.location.assign(url);
+    } catch(error) {
+      reviewError=error.message || "GitHub report could not be opened";
+      updateReviewBar();
+    }
+  }
   function maybeShowReviewDone(){
     if(!review?.plan?.items?.length || reviewDoneShown)return;
     if(review.plan.items.some(item=>proposalState(item)==="unchecked"))return;
@@ -657,7 +675,8 @@
     if(report){
       const url=reviewHandoffURL();
       report.classList.toggle("is-hidden",review.editable||!url);
-      if(url)report.href=url;
+      report.disabled=review.editable||!url;
+      // No href: explicit user click navigates to GitHub in the same tab.
       report.textContent=searchText("发送报告","Send report");
       report.setAttribute("aria-label",searchText("发送当前审阅报告","Send current review report"));
       report.title=searchText("在 GitHub 确认并提交报告","Review and submit the report on GitHub");
@@ -768,18 +787,7 @@
     $("atlasReviewApprove").addEventListener("click",()=>submitReview("approved"));
     $("atlasReviewDeny").addEventListener("click",()=>submitReview("denied"));
     $("atlasReviewUnchecked").addEventListener("click",()=>submitReview("unchecked"));
-    // Never navigate/reload the Atlas when sending a review. The native
-    // target=_blank link opens a separate GitHub issue draft on user click.
-    // Preserve the complete local decisions before opening that new tab.
-    $("atlasReviewSendReport")?.addEventListener("click",event=>{
-      if(review?.editable){event.preventDefault();return;}
-      event.stopPropagation();
-      try{persistBrowserDraft();}catch(error){
-        reviewError=error.message;
-        event.preventDefault();
-        updateReviewBar();
-      }
-    });
+    $("atlasReviewSendReport")?.addEventListener("click",sendBrowserReview);
     $("atlasReviewFilter").addEventListener("click",event=>{
       event.stopPropagation?.();
       reviewMenuOpen=!reviewMenuOpen;

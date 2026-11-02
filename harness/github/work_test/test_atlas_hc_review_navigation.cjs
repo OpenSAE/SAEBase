@@ -131,19 +131,45 @@ assert(!html.includes("atlasReviewExport"),"remove JSON export");
 assert(!app.includes("atlasReviewShare")&&!app.includes("atlasHumanCheckReport"),"no redundant report links");
 assert(app.includes('review.plan.kind==="human_check" && review.editable'),"hide nonfunctional public toggle");
 assert(app.includes('searchText("发送报告","Send report")'),"report label tracks language");
-assert(app.includes('report.href=url'),"report handoff must be functional");
+assert(!html.includes('id="atlasReviewSendReport" class="review-send-report is-hidden" href="#"'),
+  "report must not be a fragment link");
+assert(html.includes('id="atlasReviewSendReport" type="button"'),
+  "report is an explicit button, not a reloadable anchor");
+assert(app.includes("window.location.assign(url);"),
+  "report must navigate to a prefilled GitHub issue form in the current tab");
 assert(i18n.includes('"Send report":"发送报告"'),"English -> Chinese");
 assert(i18n.includes('"发送报告":"Send report"'),"Chinese -> English");
 assert(css.includes(".atlas-review-bar .review-send-report")&&css.includes("order:4"),"report positioning");
 require("./test_atlas_node_reader.cjs");
-assert(app.includes('event.stopPropagation();') &&
-  app.includes('"atlasReviewSendReport")?.addEventListener("click"'),
-  "report link must preserve the Atlas page and not bubble to graph navigation");
-assert(app.includes("try{persistBrowserDraft();}"),"send report persists current draft");
+assert(app.includes('"atlasReviewSendReport")?.addEventListener("click",sendBrowserReview)'),
+  "single send report handler is wired");
+assert(app.includes("persistBrowserDraft();"),"send report persists current draft");
 const palette=fs.readFileSync(path.join(__dirname,"../../visualization/atlas-theme.css"),"utf8");
 for(const state of ["unchecked","approved","denied"]){
   assert(palette.includes('node-selected .node-surface'),"selected node rules exist");
   assert(palette.includes('[data-review="'+state+'"].node-selected .node-surface'),
     "selected "+state+" retains the proper review color");
 }
-console.log("Atlas HC ordering, palette, report handoff and navigation passed");
+// Execute the real send handler. It must persist the receipt, then navigate
+// to the prefilled GitHub Issue form; never stay on the Atlas '#' fragment.
+let sentUrl="",persisted=0,prevented=0,stopped=0;
+mock.window={location:{assign:url=>{sentUrl=url;}}};
+mock.persistBrowserDraft=()=>{persisted++;};
+mock.updateReviewBar=()=>{};
+vm.runInContext(extract("sendBrowserReview","maybeShowReviewDone")+
+  "\nthis.send=sendBrowserReview;",mock,{timeout:1200});
+mock.send({preventDefault:()=>prevented++,stopPropagation:()=>stopped++});
+assert.equal(persisted,1,"preserve the existing browser receipt");
+assert.equal(prevented,1);
+assert.equal(stopped,1);
+assert(sentUrl.startsWith("https://github.com/OpenSAE/SAEBase/issues/new?"),
+  "the click must leave Atlas for the GitHub form");
+const destination=new URL(sentUrl);
+assert.equal(destination.searchParams.get("title"),
+  "Atlas Human Check decisions: HC-test-001");
+const issueBody=destination.searchParams.get("body");
+assert(issueBody.includes('"core:g.alpha": "approved"'),
+  "send must carry the user's latest decision");
+assert(issueBody.includes('"code:code:new": "unchecked"'),
+  "send must carry unchecked items too");
+console.log("Atlas HC ordering, palette and verified GitHub report redirect passed");
