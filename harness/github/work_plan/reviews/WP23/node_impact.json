@@ -1,17 +1,13 @@
 {
   "schema": "saebase.workplan.node_impact.v1",
   "plan_id": "WP23",
-  "source_commit": "600d39d0ad27a875dfe414edfb2d3a04f87aa34e",
-  "wp22_source_branch": "feat/qa-evaluation-500-v1",
-  "wp22_source_head": "32c53e56abff3ece4fb2f7922cdbd57446ef8429",
-  "source_status": "DESK_SOURCE_REVIEW_ONLY",
+  "source_commit": "d3e495406d32aa15960da615bbfacf2047e67559",
+  "source_status": "SOURCE_INSPECTED_PLAN_ONLY",
   "node_review_decision": "DEFER_NODE_DECISION",
   "source_write_review": {
     "required": true,
-    "status": "APPROVED",
-    "reason": "The user reviewed the WP23 summary and enumerated source scope and expressly authorized continuing the workflow in this conversation on 2026-11-02. Only the audited exact paths are in scope; GPU/network/gated downloads/Native/B2/HF remain unapproved.",
-    "authorization": "User conversation 2026-11-02 — reviewed no issues, continue workflow",
-    "scope": "implementation_review.workstreams[].files[].path (20 enumerated paths only)"
+    "status": "PENDING",
+    "reason": "Human approval of this revised scoped implementation is not yet given; document drafting authorization does not grant product source edits or any compute/network permission."
   },
   "domains": [
     {
@@ -20,22 +16,22 @@
       "feature_effect": "UNKNOWN",
       "source_paths": [
         "tasks/precheck/operation.py",
+        "tasks/precheck/worker.py",
         "tasks/precheck/sae_checks.py",
-        "saebase/api/sae_profiles.py"
+        "saebase/registry.py"
       ],
       "existing_nodes": [
-        "code:module:tasks.precheck.operation"
+        "g.code_tree"
       ],
-      "reason": "Existing Precheck execution and SAE encoding are real source-backed behavior. Planned independent Dataset/Model probes and compatibility workers may create new source interfaces, but their AST and unique responsibilities do not exist yet; defer any Code node change until observed implementation.",
+      "reason": "Current source contains an existing Precheck worker and SAE check, while independent dataset/model/pair APIs and the run coordinator are unimplemented. Recheck the actual AST after GitHub implementation before any Code node decision.",
       "proposed_fields": {},
       "human_check_required": false,
-      "code_display": "REGENERATE_FROM_OBSERVED_AST_AFTER_IMPLEMENTATION",
       "planned_paths": [
         "tasks/precheck/dataset_checks.py",
         "tasks/precheck/model_checks.py",
-        "tasks/precheck/compatibility_checks.py"
-      ],
-      "evidence_level": "VERIFIED_FROM_SOURCE_PLUS_UNIMPLEMENTED_PLAN"
+        "tasks/precheck/compatibility_checks.py",
+        "scripts/workplan/wp023_orchestrator.py"
+      ]
     },
     {
       "domain": "knowledge",
@@ -43,16 +39,15 @@
       "feature_effect": "UNCHANGED",
       "source_paths": [
         "doc/knowledge/context_graph.json",
-        "tasks/capture/operation.py"
+        "tasks/precheck/sae_checks.py"
       ],
       "existing_nodes": [
         "q.sae.methods",
         "q.sae.assets",
         "q.sae.capture"
       ],
-      "reason": "WP23 validates whether existing scientific operations can be run reproducibly; it does not introduce a new scientific hypothesis, evaluation definition, explanation evidence, or research result. Existing Knowledge descriptions and relationships retain their meaning.",
-      "proposed_fields": {},
-      "human_check_required": false
+      "reason": "The proposal checks truthful execution prerequisites, not a new scientific method or interpretation result; current Knowledge purposes remain intact.",
+      "proposed_fields": {}
     },
     {
       "domain": "environment",
@@ -60,14 +55,11 @@
       "feature_effect": "UNCHANGED",
       "source_paths": [
         "harness/environment/probe.py",
-        "saebase/setup/assets.py"
+        "conf/task/precheck.yaml"
       ],
-      "existing_nodes": [
-        "g.env_tree"
-      ],
-      "reason": "The plan will consume actual resource probes and permission controls, but does not alter the meaning of current-machine observations, hardware categories, or authorization semantics. Future machine snapshots remain per-run evidence, never durable tree edits.",
-      "proposed_fields": {},
-      "human_check_required": false
+      "existing_nodes": [],
+      "reason": "Environment probes and resource authorization are consumed by the planned checks, but their durable meanings and existing environment semantics do not change.",
+      "proposed_fields": {}
     },
     {
       "domain": "core",
@@ -75,19 +67,16 @@
       "feature_effect": "UNCHANGED",
       "source_paths": [
         "harness/core/project_graph.json",
-        "saebase/registry.py",
-        "models/plugins.py"
+        "saebase/registry.py"
       ],
       "existing_nodes": [
-        "g.pipeline",
         "g.dataset_gate",
         "g.model_gate",
         "g.registry",
-        "q.reproducibility"
+        "g.pipeline"
       ],
-      "reason": "The generic task precheck and Dataset/Model compatibility responsibilities are already represented by stable Core nodes. QA500 matrix sizes, feature site selections and test phases are a Workplan instance and do not change any Core node's abstract function or properties. The prior unapproved g.component_precheck proposal is not established as a distinct durable capability.",
-      "proposed_fields": {},
-      "human_check_required": false
+      "reason": "The existing core registration and component gating responsibilities remain authoritative; the bounded run selection is an execution configuration, not a Core change.",
+      "proposed_fields": {}
     },
     {
       "domain": "harness",
@@ -95,17 +84,14 @@
       "feature_effect": "UNCHANGED",
       "source_paths": [
         "AGENTS.md",
-        "harness/github/work_plan/WRITING_STANDARD.md",
-        "harness/github/HUMAN_CHECK.md"
+        "harness/github/work_plan/lifecycle.py",
+        "harness/github/work_plan/review_gate.py"
       ],
       "existing_nodes": [
-        "g.agent_execution_flow",
-        "g.code_tree"
+        "g.agent_execution_flow"
       ],
-      "reason": "WP23 uses the current plan, review and contract controls without changing their durable purposes. A separate user-directed governance PR updates authoring policy, and is assessed independently from this study; attaching its instructions to a Core node would conflate process governance with study scope.",
-      "proposed_fields": {},
-      "human_check_required": false,
-      "linked_governance_review": "policy/workplan-summary-node-impact-20261102"
+      "reason": "This independent plan follows current authoring, review and Agent Ready controls; it proposes no new governance control or execution authorization semantics.",
+      "proposed_fields": {}
     },
     {
       "domain": "context",
@@ -121,197 +107,14 @@
         "term.task",
         "term.sparse_autoencoder"
       ],
-      "reason": "Dataset, Model, SAE, Task, source revisions and audit receipts use existing vocabulary. No new enduring technical definition is required for QA500, and repeating its task parameters in Context would introduce a redundant and unstable definition.",
-      "proposed_fields": {},
-      "human_check_required": false
+      "reason": "Dataset, Model, Task, SAE, compatibility and evidence use existing technical concepts; no new permanent term definition is necessary.",
+      "proposed_fields": {}
     }
   ],
-  "preimplementation_note": "No Atlas node ADD/CHANGE/REMOVE is approved or proposed at planning stage. Reassess Code after observed AST source changes; if a genuinely independent durable capability appears, create separate HC with exact field and path diffs.",
-  "retired_unapproved_proposal": "HC-WP23-Component-Precheck-20261102",
-  "governance_dependency": "policy/workplan-summary-node-impact-20261102",
-  "published_science": "NONE",
-  "experiment_run": "NOT_RUN",
   "implementation_review": {
-    "status": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-    "note": "These are proposed implementation paths, not approved node edits or previously observed new AST modules. CONDITIONAL_CHANGE may be omitted when existing Runtime API suffices. Source reviews remain independent of node HC.",
-    "workstreams": [
-      {
-        "id": "component_dataset",
-        "responsibility": "Dataset real source, schema and record identity",
-        "files": [
-          {
-            "path": "tasks/precheck/dataset_checks.py",
-            "operation": "ADD",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "AFTER_REAL_AST_ONLY"
-          },
-          {
-            "path": "tests/precheck/test_dataset_checks.py",
-            "operation": "ADD",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "AFTER_REAL_AST_ONLY"
-          }
-        ]
-      },
-      {
-        "id": "component_model_sae",
-        "responsibility": "Model native forward and exact SAE-site checks",
-        "files": [
-          {
-            "path": "tasks/precheck/model_checks.py",
-            "operation": "ADD",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "AFTER_REAL_AST_ONLY"
-          },
-          {
-            "path": "tasks/precheck/sae_checks.py",
-            "operation": "CHANGE",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
-          },
-          {
-            "path": "tests/precheck/test_model_sae_sites.py",
-            "operation": "ADD",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "AFTER_REAL_AST_ONLY"
-          }
-        ]
-      },
-      {
-        "id": "compatibility_worker",
-        "responsibility": "Bounded compatibility, worker dispatch and status receipts",
-        "files": [
-          {
-            "path": "tasks/precheck/compatibility_checks.py",
-            "operation": "ADD",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "AFTER_REAL_AST_ONLY"
-          },
-          {
-            "path": "tasks/precheck/operation.py",
-            "operation": "CHANGE",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
-          },
-          {
-            "path": "tasks/precheck/worker.py",
-            "operation": "CHANGE",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
-          },
-          {
-            "path": "tasks/precheck/report.py",
-            "operation": "CHANGE",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
-          },
-          {
-            "path": "conf/task/precheck.yaml",
-            "operation": "CHANGE",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
-          },
-          {
-            "path": "tests/precheck/test_component_matrix.py",
-            "operation": "ADD",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "AFTER_REAL_AST_ONLY"
-          }
-        ]
-      },
-      {
-        "id": "wp23_orchestration",
-        "responsibility": "WP23-only execution coordination, identity and resume",
-        "files": [
-          {
-            "path": "scripts/workplan/wp023.sh",
-            "operation": "ADD",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "AFTER_REAL_AST_ONLY"
-          },
-          {
-            "path": "scripts/workplan/wp023_orchestrator.py",
-            "operation": "ADD",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "AFTER_REAL_AST_ONLY"
-          },
-          {
-            "path": "tests/workplan/wp23/test_handoff.py",
-            "operation": "ADD",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "AFTER_REAL_AST_ONLY"
-          },
-          {
-            "path": "tests/workplan/wp23/test_resume.py",
-            "operation": "ADD",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "AFTER_REAL_AST_ONLY"
-          }
-        ]
-      },
-      {
-        "id": "audit_integration",
-        "responsibility": "Run evidence integrity and local delivery",
-        "files": [
-          {
-            "path": "saebase/runtime/audit_report.py",
-            "operation": "CONDITIONAL_CHANGE",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
-          },
-          {
-            "path": "saebase/runtime/audit_delivery.py",
-            "operation": "CONDITIONAL_CHANGE",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
-          },
-          {
-            "path": "tests/workplan/wp23/test_audit_handoff.py",
-            "operation": "ADD",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "AFTER_REAL_AST_ONLY"
-          }
-        ]
-      },
-      {
-        "id": "ci_regression",
-        "responsibility": "CPU negative coverage and routed integration tests",
-        "files": [
-          {
-            "path": "tests/workplan/wp23/test_cpu_negative.py",
-            "operation": "ADD",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "AFTER_REAL_AST_ONLY"
-          },
-          {
-            "path": ".github/workflows/ci.yml",
-            "operation": "CHANGE",
-            "permission": "APPROVED_EXACT_PATH_SCOPE_ONLY",
-            "node_semantics": "NO_AUTOMATIC_CHANGE",
-            "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
-          }
-        ]
-      }
-    ],
-    "extra_paths": "Any WP22 feature branch fixes outside these listed paths require a separate exact-file review; do not quietly broaden scope."
-  }
+    "status": "PENDING_HUMAN_SOURCE_SCOPE_REVIEW",
+    "scope": "Named source paths in the draft only; no product-source modifications or runtime execution authorized."
+  },
+  "runtime_authorization": "NONE",
+  "scientific_execution": "NOT_RUN"
 }
