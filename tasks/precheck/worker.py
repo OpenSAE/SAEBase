@@ -61,8 +61,15 @@ def _validate_task(task: str, data: Any) -> None:
         metrics = data.get("metrics")
         if not isinstance(metrics, list) or not metrics:
             raise RuntimeError("Benchmark produced no real metric records")
-        if any(not isinstance(m, dict) or m.get("status") != "completed" or int(m.get("n_valid", 0)) < 1 for m in metrics):
-            raise ValueError("Benchmark PASS requires every selected metric completed with real valid samples")
+        if any(
+            not isinstance(m, dict)
+            or m.get("status") != "completed"
+            or int(m.get("n_valid", 0)) < 1
+            for m in metrics
+        ):
+            raise ValueError(
+                "Benchmark PASS requires every selected metric completed with real valid samples"
+            )
     elif task == "train":
         if not data.get("native") or not any(p.is_file() for p in Path("checkpoints").rglob("*")):
             raise RuntimeError("Train produced no native checkpoint")

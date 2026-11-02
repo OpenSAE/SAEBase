@@ -35,7 +35,9 @@ from models.r1_distill_llama8b.r1_distill_llama8b import SPEC as R1_DISTILL_LLAM
 from models.qwen35_9b.qwen35_9b import SPEC as QWEN35_9B_SPEC
 from models.qwen35_27b.qwen35_27b import SPEC as QWEN35_27B_SPEC
 
-LoaderKind = Literal["sae_lens", "eleutherai_topk_mlp", "qwen_resid_topk", "dictionary_learning", "sparsify_topk"]
+LoaderKind = Literal[
+    "sae_lens", "eleutherai_topk_mlp", "qwen_resid_topk", "dictionary_learning", "sparsify_topk"
+]
 TransferKind = Literal["none", "base_to_instruct"]
 
 _BASE_SPECS: dict[str, BaseModelSpec] = {
@@ -138,7 +140,8 @@ class SAEProfile:
     def transfer_meta(self) -> dict[str, str | None]:
         return {
             "release": self.sae_release,
-            "logical_sae_id": self.logical_sae_id or (
+            "logical_sae_id": self.logical_sae_id
+            or (
                 self.sae_id_template.format(L=self.layers[0])
                 if self.sae_id_template and self.layers
                 else None
@@ -171,7 +174,9 @@ _PROFILES: dict[str, SAEProfile] = {
         key="gpt2small_res_jb_l8",
         model_key="gpt2small",
         sae_release="gpt2-small-res-jb",
-        layers=(8,), hook_kind="hook_resid_pre", loader="sae_lens",
+        layers=(8,),
+        hook_kind="hook_resid_pre",
+        loader="sae_lens",
         logical_sae_id="blocks.8.hook_resid_pre",
         repo_id="jbloom/GPT2-Small-SAEs-Reformatted",
         notes="Original GPT-2 Small layer-8 residual SAE (24,576 latents).",
@@ -180,7 +185,9 @@ _PROFILES: dict[str, SAEProfile] = {
         key="gpt2small_fs_6144_l8",
         model_key="gpt2small",
         sae_release="gpt2-small-res-jb-feature-splitting",
-        layers=(8,), hook_kind="hook_resid_pre", loader="sae_lens",
+        layers=(8,),
+        hook_kind="hook_resid_pre",
+        loader="sae_lens",
         logical_sae_id="blocks.8.hook_resid_pre_6144",
         repo_id="jbloom/GPT2-Small-Feature-Splitting-Experiment-Layer-8",
         notes="Same GPT-2 layer-8 site, separately trained feature-splitting SAE (6,144 latents).",
@@ -189,7 +196,9 @@ _PROFILES: dict[str, SAEProfile] = {
         key="gpt2small_fs_12288_l8",
         model_key="gpt2small",
         sae_release="gpt2-small-res-jb-feature-splitting",
-        layers=(8,), hook_kind="hook_resid_pre", loader="sae_lens",
+        layers=(8,),
+        hook_kind="hook_resid_pre",
+        loader="sae_lens",
         logical_sae_id="blocks.8.hook_resid_pre_12288",
         repo_id="jbloom/GPT2-Small-Feature-Splitting-Experiment-Layer-8",
         notes="Optional M5 extended width, same layer-8 residual site (12,288 latents).",
@@ -198,7 +207,9 @@ _PROFILES: dict[str, SAEProfile] = {
         key="gpt2small_fs_24576_l8",
         model_key="gpt2small",
         sae_release="gpt2-small-res-jb-feature-splitting",
-        layers=(8,), hook_kind="hook_resid_pre", loader="sae_lens",
+        layers=(8,),
+        hook_kind="hook_resid_pre",
+        loader="sae_lens",
         logical_sae_id="blocks.8.hook_resid_pre_24576",
         repo_id="jbloom/GPT2-Small-Feature-Splitting-Experiment-Layer-8",
         notes="Optional M5 extended width, same layer-8 residual site (24,576 latents).",
@@ -207,7 +218,9 @@ _PROFILES: dict[str, SAEProfile] = {
         key="pythia70m_saebench_gated_l3",
         model_key="pythia70m",
         sae_release="sae_bench_pythia70m_sweep_gated_ctx128_0730",
-        layers=(3,), hook_kind="hook_resid_post", loader="sae_lens",
+        layers=(3,),
+        hook_kind="hook_resid_post",
+        loader="sae_lens",
         logical_sae_id="blocks.3.hook_resid_post__trainer_5",
         notes="SAEBench gated SAE checkpoint validated natively in M3; same layer as res-sm.",
     ),
@@ -619,12 +632,8 @@ _PROFILES: dict[str, SAEProfile] = {
         layers=(14,),
         hook_kind="hook_resid_post",
         loader="dictionary_learning",
-        sae_id_template=(
-            "saes_Qwen_Qwen3-1.7B_batch_top_k/resid_post_layer_{L}/trainer_2"
-        ),
-        sae_folder_template=(
-            "saes_Qwen_Qwen3-1.7B_batch_top_k/resid_post_layer_{L}/trainer_2"
-        ),
+        sae_id_template=("saes_Qwen_Qwen3-1.7B_batch_top_k/resid_post_layer_{L}/trainer_2"),
+        sae_folder_template=("saes_Qwen_Qwen3-1.7B_batch_top_k/resid_post_layer_{L}/trainer_2"),
         notes=(
             "Experiment 11b: adamkarvonen BatchTopK 65k k=80 at L14 trainer_2 "
             "(Neuronpedia 14-resid-batchtopk-65k__l0-80; eval L0≈89.5)."

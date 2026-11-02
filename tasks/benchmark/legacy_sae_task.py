@@ -20,6 +20,5 @@ class SAETask(TaskModule):
 
             return run_activation_health(cfg)
         raise ValueError(
-            f"Unknown task.evaluation={evaluation!r}. "
-            "Supported: ['activation_health']"
+            f"Unknown task.evaluation={evaluation!r}. Supported: ['activation_health']"
         )

@@ -33,6 +33,7 @@ def test_builtin_sae_profiles_are_parameters_not_registry_entries():
     assert "gemma2_2b_pt_l25_canonical" in registry.list_registered_sae_keys()
     assert registry.get_sae_plugin("gemma2_2b_base").profile_key == "gemma2_2b_pt_l25_canonical"
 
+
 def test_active_model_registry_is_small_and_family_bounded():
     from models.plugins import _HOOKED_KEYS, _LEGACY_KEYS, _ACTIVE_MODULES
     from saebase.registry import list_registered_model_keys, get_model_plugin

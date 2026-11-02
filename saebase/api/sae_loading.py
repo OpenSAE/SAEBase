@@ -80,9 +80,7 @@ def load_eleutherai_topk_mlp_sae(
 
     dev = device or require_cuda()
     cfg_path = hf_hub_download(repo_id=release, filename=f"{folder}/cfg.json")
-    weights_path = hf_hub_download(
-        repo_id=release, filename=f"{folder}/sae.safetensors"
-    )
+    weights_path = hf_hub_download(repo_id=release, filename=f"{folder}/sae.safetensors")
     raw_cfg = json.loads(Path(cfg_path).read_text(encoding="utf-8"))
     st = load_file(weights_path)
 
@@ -221,17 +219,26 @@ def _phase_a_sae_lens_source(profile: SAEProfile, layer: int) -> tuple[str, str,
     and Llama Scope uses hyperparams.json + checkpoints/final.safetensors.
     SAELens' named release directory may lag the public repositories.
     """
-    if profile.key in {"gemma270m_scope_resid", "gemma1b_scope_resid",
-                       "gemma3_4b_pt_scope_resid", "gemma3_4b_it_scope_resid"}:
+    if profile.key in {
+        "gemma270m_scope_resid",
+        "gemma1b_scope_resid",
+        "gemma3_4b_pt_scope_resid",
+        "gemma3_4b_it_scope_resid",
+    }:
         return (
             str(profile.repo_id),
             f"resid_post/{profile.sae_id(layer)}",
             "gemma_3_sae_huggingface_loader",
         )
-    if profile.key in {"r1_distill_llama8b_llamascope_l23",
-                       "r1_distill_llama8b_llamascope_l15_openr1"}:
-        return (str(profile.repo_id), str(profile.sae_folder(layer)),
-                "llama_scope_r1_distill_sae_huggingface_loader")
+    if profile.key in {
+        "r1_distill_llama8b_llamascope_l23",
+        "r1_distill_llama8b_llamascope_l15_openr1",
+    }:
+        return (
+            str(profile.repo_id),
+            str(profile.sae_folder(layer)),
+            "llama_scope_r1_distill_sae_huggingface_loader",
+        )
     if profile.key == "mistral7b_instruct_tc_l16_131k":
         return (str(profile.repo_id), ".", "sae_lens_huggingface_loader")
     if profile.key == "llama31_8b_lxr_8x":
@@ -260,6 +267,7 @@ def load_sae_for_profile(
         converter = None
         if converter_name is not None:
             from sae_lens.loading import pretrained_sae_loaders
+
             converter = getattr(pretrained_sae_loaders, converter_name)
         sae, cfg_dict, sparsity = load_sae_lens(
             release=source_release,
@@ -272,11 +280,13 @@ def load_sae_for_profile(
         # Recover the *published* expected activation norm from hyperparams.
         # The native loader already scales the JumpReLU threshold by the same
         # factor; fold only W_enc/W_dec/b_dec to match raw HF/TransformerLens h.
-        if profile.key == "llama31_8b_lxr_8x" and cfg_dict.get(
-            "normalize_activations"
-        ) == "expected_average_only_in":
+        if (
+            profile.key == "llama31_8b_lxr_8x"
+            and cfg_dict.get("normalize_activations") == "expected_average_only_in"
+        ):
             import math
             from huggingface_hub import hf_hub_download
+
             params = hf_hub_download(
                 repo_id=source_release,
                 filename=f"{source_id}/hyperparams.json",
@@ -384,37 +394,57 @@ def load_sae_for_profile(
                 "acceptance has been performed through SAEBase."
             )
         from sae_lens.loading import pretrained_sae_loaders
+
         converter = pretrained_sae_loaders.dictionary_learning_sae_huggingface_loader_1
         sae, cfg_dict, sparsity = load_sae_lens(
             release=str(profile.repo_id or profile.sae_release),
-            sae_id=str(folder or sae_id), device=dev, converter=converter,
+            sae_id=str(folder or sae_id),
+            device=dev,
+            converter=converter,
         )
         actual_hook = resolve_hook_name(sae, profile, layer)
         if actual_hook != hook_name:
             raise ValueError("dictionary_learning SAE source hook does not match layer")
         return sae, {
-            "sae_key": profile.key, "model_key": profile.model_key,
-            "model_name": profile.model_name, "layer": layer,
-            "sae_release": profile.sae_release, "sae_id": sae_id,
-            "hook_name": actual_hook, "loader": profile.loader,
-            "folder": folder, "cfg": cfg_dict, "sparsity": sparsity,
-            "d_in": int(sae.cfg.d_in), "d_sae": int(sae.cfg.d_sae),
+            "sae_key": profile.key,
+            "model_key": profile.model_key,
+            "model_name": profile.model_name,
+            "layer": layer,
+            "sae_release": profile.sae_release,
+            "sae_id": sae_id,
+            "hook_name": actual_hook,
+            "loader": profile.loader,
+            "folder": folder,
+            "cfg": cfg_dict,
+            "sparsity": sparsity,
+            "d_in": int(sae.cfg.d_in),
+            "d_sae": int(sae.cfg.d_sae),
             **profile.transfer_meta(),
         }
 
     if profile.loader == "sparsify_topk":
         from .sparsify_adapter import load_sparsify_topk
+
         sae, cfg_dict = load_sparsify_topk(
             repo_id=str(profile.repo_id or profile.sae_release),
-            hookpoint=str(folder or sae_id), hook_name=hook_name, device=dev,
+            hookpoint=str(folder or sae_id),
+            hook_name=hook_name,
+            device=dev,
         )
         return sae, {
-            "sae_key": profile.key, "model_key": profile.model_key,
-            "model_name": profile.model_name, "layer": layer,
-            "sae_release": profile.sae_release, "sae_id": sae_id,
-            "hook_name": hook_name, "loader": profile.loader,
-            "folder": folder, "cfg": cfg_dict, "sparsity": None,
-            "d_in": int(sae.cfg.d_in), "d_sae": int(sae.cfg.d_sae),
+            "sae_key": profile.key,
+            "model_key": profile.model_key,
+            "model_name": profile.model_name,
+            "layer": layer,
+            "sae_release": profile.sae_release,
+            "sae_id": sae_id,
+            "hook_name": hook_name,
+            "loader": profile.loader,
+            "folder": folder,
+            "cfg": cfg_dict,
+            "sparsity": None,
+            "d_in": int(sae.cfg.d_in),
+            "d_sae": int(sae.cfg.d_sae),
             **profile.transfer_meta(),
         }
 
@@ -466,9 +496,7 @@ def load_model_and_sae(
     return model, sae, meta
 
 
-def sae_encode_decode_smoke(
-    sae: Any, device: str, batch: int = 4
-) -> dict[str, float | int]:
+def sae_encode_decode_smoke(sae: Any, device: str, batch: int = 4) -> dict[str, float | int]:
     x = torch.randn(batch, sae.cfg.d_in, device=device)
     with torch.no_grad():
         z = sae.encode(x)

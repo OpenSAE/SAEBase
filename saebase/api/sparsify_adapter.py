@@ -4,6 +4,7 @@ Delegates TopK activation selection to the original sparsify SparseCoder.
 Only converts its native (values, indices) representation into a dense code
 vector for the existing SAEBase API; no trained weights are transformed.
 """
+
 from __future__ import annotations
 
 from types import SimpleNamespace
@@ -42,9 +43,7 @@ class SparsifyDenseAdapter(nn.Module):
             raise ValueError("invalid original Sparsify sparse code")
         if not torch.isfinite(values).all():
             raise ValueError("original Sparsify produced nonfinite activations")
-        dense = torch.zeros(
-            (len(x), self.cfg.d_sae), dtype=values.dtype, device=values.device
-        )
+        dense = torch.zeros((len(x), self.cfg.d_sae), dtype=values.dtype, device=values.device)
         dense.scatter_(1, indices.long(), values)
         return dense
 
