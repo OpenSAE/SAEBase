@@ -35,28 +35,8 @@ after identity patches, per-position logits, exact feature code provenance,
 sample grouping, original SAR/RSS estimators, and appropriate numerical
 tolerances pass on each targeted real model and checkpoint.
 
-## Measured acceleration and remaining limits
+## Backend acceptance
 
-- Opt-in GPU acceleration. The block-suffix replay
-  stays off unless `BatchEngine(..., enable_suffix_replay=True)` is set.
-  On the full Qwen3-1.7B Base layer-7 workload (25 rows, 7 edits, identity
-  replay included) the RTX 5070 median is 1.888 s versus 2.409 s for the
-  original hooks, 1.276x, metric max abs 0. Untested families keep the
-  original hook. See [workplan11_results.md](performance/workplan11_results.md).
-- 48-site live-model parity and cross-backend equivalence.
-- Generated-token steering is a separate protocol matrix, measured at 8, 32,
-  and 128 tokens on this GPU. Live HF SAE KV and fixed decoder-direction
-  vLLM/static generation both ran; they are not the 25×7 suffix result and
-  not the default. The legacy clean-history prototype still misses the
-  frozen bar on the first new token (layer 7 activation max abs 0.25).
-  See [workplan11_final_results.md](performance/workplan11_final_results.md).
-- interp-engine one-prompt SAE capture still does not match HF residuals,
-  logits, or TopK support. That single-prompt edit is not continuous
-  generated-token ablation.
-- Multi-GPU scheduling, dynamic model residency and production hosted GPU
-  serving; Research Lab's public endpoint remains read-only.
+A faster backend remains opt-in until equivalence checks have passed for each relevant model, checkpoint, token position and edit condition. Verify right-padding parity, identity edits, exact feature-code provenance, resource limits, interruption and resume, and recorded peak CUDA memory. Do not infer throughput, scientific validity or compatibility from a standalone microbenchmark.
 
-A production release should additionally test right-padding parity on each
-architecture, CUDA OOM injection, worker interruption/resume, pinned backend
-dependencies and clean installation. Do not enable a backend automatically
-until its advertised capabilities have passed the associated tests.
+For active benchmark and intervention interfaces, use the [Python API](python-api.md) and [Feature Interventions](feature-interventions.md). Hardware-specific timings belong to the measured run receipts, not the permanent implementation guide.

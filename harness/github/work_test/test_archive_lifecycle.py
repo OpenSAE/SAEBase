@@ -134,3 +134,16 @@ def test_archive_registry_serialization_and_sequential_numbering(tmp_path: Path)
     assert archive.read_index(tmp_path)["entries"][0] == row
     with pytest.raises(archive.ArchiveError, match="Duplicate"):
         archive.check(_index([row, dict(row, archived_path=row["archived_path"])]), tmp_path)
+
+
+
+def test_repository_migrations_are_real_moves_and_csv_archive_is_supported():
+    index = archive.read_index()
+    rows = [row for row in index["entries"] if row["mode"] == "move"]
+    assert len(rows) >= 19
+    for row in rows:
+        assert not (archive.ROOT / row["original_path"]).exists()
+        assert archive.path_blob(archive.ROOT, row["archived_path"]) == row["git_blob_sha"]
+    assert archive.archive_identity(
+        "harness/github/work_plan/archive/0.5.0/0.5.0_wp123_task_matrix.csv"
+    ) == ("0.5.0", "wp", 123)

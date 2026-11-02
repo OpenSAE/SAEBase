@@ -162,8 +162,8 @@ steered continuation. A separate unmodified continuation supplies a baseline.
 - EOS stops and max new-token limits are recorded. `max_context_tokens` can
   prevent an unsupported generation length.
 - The reference implementation uses full-prefix recomputation. Optional KV-cached
-  generated-token SAE edits and decoder-direction steering are measured under
-  separate execution protocols; see the [GPU performance report](performance/workplan11_final_results.md).
+  generated-token SAE edits and decoder-direction steering require separately
+  validated execution protocols and recorded, comparable measurements.
 - Both baseline and steered token ID sequences, stopping reasons and exact
   generation specs are written to the result store for reproducibility.
 

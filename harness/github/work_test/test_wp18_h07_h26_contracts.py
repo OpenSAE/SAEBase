@@ -16,16 +16,18 @@ def test_twenty_cases_are_frozen_with_positive_and_negative_checks():
     assert state["contracts"] >= 20
 
 
-def test_every_case_is_bound_by_workplan_and_io_contracts():
+def test_every_frozen_case_has_independent_catalog_and_io_contracts():
     specs = wp18_verify.load_spec()["cases"]
     for item in specs:
-        selection = registry.resolve(wp18_verify.PLAN, item["id"])
+        selection = wp18_verify._frozen_contract_selection(item)
         assert selection["contract_ids"]
         assert audit_selection(selection["contract_ids"], item["signals"]) == []
 
 
 def test_new_io_contracts_are_not_silently_dropped():
-    with_status = registry.resolve(wp18_verify.PLAN, "H23")["contract_ids"]
+    with_status = wp18_verify._frozen_contract_selection(
+        next(x for x in wp18_verify.load_spec()["cases"] if x["id"] == "H23")
+    )["contract_ids"]
     assert audit_selection(with_status, ["release_gate", "review_state"]) == []
     assert audit_selection(["CT-BASE"], ["release_gate"]) == ["CT-RELEASE"]
 

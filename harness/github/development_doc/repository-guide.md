@@ -17,15 +17,11 @@ SAEBase separates runnable examples, research code, published evidence and engin
 | [`saebase/assets/`](../assets) | Branding and workflow figures used in documentation | [Workflow diagram](../assets/figures/saebase_workflow.svg) |
 | [`harness/github/development_doc/`](index.md) | Tutorials, API details, scientific protocols and verified reports | [Documentation](index.md) |
 | [`saebase/tools/`](../../../saebase/tools/README.md) | Maintenance, verification and reproducible GPU experiment entrypoints | [Script guide](../../../saebase/tools/README.md) |
-| [`harness/github/work_plan/`](../work_plan/README.md) | Historical implementation plans and execution records | [Engineering history](../work_plan/README.md) |
+| [`harness/github/work_plan/`](../work_plan/README.md) | Current task planning and review controls | [Work Plan guidance](../work_plan/README.md) |
 
-## Reproducible evidence
+## Reproducibility
 
-The checked-in [model/SAE compatibility matrix](verified-model-matrix.md), [performance reports](performance/workplan11_final_results.md), and [Research Lab measurements](research-lab/results-20261020.md) describe distinct tested workloads. Reuse them with the original checkpoints, inputs and execution protocol recorded alongside each result.
-
-The [coverage evidence directory](../../../conf/coverage) contains versioned source records and checksums from earlier experiments. Internal schema IDs and archival filenames stay unchanged so existing measurement caches and prior releases remain interpretable. New users do not need them for the [Quick Start](../../../README.md#-quick-start).
-
-The older checkpoint, implementation and release notes remain available through the [historical documentation index](history.md). They are not additional setup steps.
+Current experiments bind the model, dataset, task, source commit, configuration and recorded outputs to a single run identity. Use the declared configurations and task APIs rather than an older engineering plan as execution authority.
 
 ## Check your checkout
 

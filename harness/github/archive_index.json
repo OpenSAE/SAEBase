@@ -18,8 +18,8 @@
       "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev002_release_matrix.md",
       "git_blob_sha": "c8264d64e762e47cce7352649f30b3d0d413bf92",
       "version": "0.2.0",
-      "mode": "copy_compat",
-      "reason": "Historical v0.2.0 M5 release; preserved legacy link",
+      "mode": "move",
+      "reason": "Historical v0.2.0 release matrix now detached from current distribution checks, retaining identical archived blob; Human Check issue #161.",
       "status": "archived"
     },
     {
@@ -27,8 +27,8 @@
       "archived_path": "harness/github/development_doc/archive/0.4.0/0.4.0_dev001_lab_evidence.json",
       "git_blob_sha": "1023e81b2b7b45d5455c0e29060b5150554bb47a",
       "version": "0.4.0",
-      "mode": "copy_compat",
-      "reason": "Source declares software_version=0.4.0 and is referenced by an active regression",
+      "mode": "move",
+      "reason": "v0.4.0-only historical evidence is detached from live CI after retiring dated release assertions; byte-identical copy preserved. HC #161.",
       "status": "archived"
     },
     {
@@ -93,7 +93,475 @@
       "mode": "move",
       "reason": "v0.5.0-specific historical assertions; removed from routine collection, recoverable by recorded source",
       "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/M0_ACCEPTANCE.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev003_api_acceptance.md",
+      "git_blob_sha": "3b299e8812936298561b7e51881497cdbf231a97",
+      "version": "0.2.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/M1_ACTIVATION_STORE.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev004_activation_store.md",
+      "git_blob_sha": "f2b3af64a55833aa1c173f18dfc47146b087ba94",
+      "version": "0.2.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/M2_BATCH_INTERVENTIONS.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev005_batch_interventions.md",
+      "git_blob_sha": "a72b067ebf3f14ecbd61a3adabfb1414deb5af42",
+      "version": "0.2.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/M3_UNIFIED_BENCHMARK.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev006_unified_benchmark.md",
+      "git_blob_sha": "e44638b75785ef4ffc0e5d5f49637aad3244a909",
+      "version": "0.2.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/M4_RELIABILITY.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev007_reliability_audit.md",
+      "git_blob_sha": "52b5453c097f1c5b7ed861a349edc6a13d14f11b",
+      "version": "0.2.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/PHASE_A.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev008_phase_alpha.md",
+      "git_blob_sha": "4bd157236eaed15ffa7e967d82a1767ee6197e6a",
+      "version": "0.2.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/PHASE_B.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev009_phase_beta.md",
+      "git_blob_sha": "0847012162be6e91be046b865a4099c86bcba9bd",
+      "version": "0.2.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/PHASE_B_VALIDATION.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev010_beta_validation.md",
+      "git_blob_sha": "13b38225b50dc8f85108d9666da384330b5b3ff3",
+      "version": "0.2.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/PHASE_C_VALIDATION.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev011_gamma_validation.md",
+      "git_blob_sha": "3f5fc7297ed2cd407e46e4c6bfb67495ecd1872f",
+      "version": "0.2.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/history.md",
+      "archived_path": "harness/github/development_doc/archive/0.5.0/0.5.0_dev001_history_index.md",
+      "git_blob_sha": "a4c31361778052e69ecf770c36792c066c854476",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/01_stage_d_gpu_acceptance.md",
+      "archived_path": "harness/github/work_plan/archive/0.3.0/0.3.0_wp001_stage_acceptance.md",
+      "git_blob_sha": "4bf6e0ef271a58d6633107e66e945f081f0445ef",
+      "version": "0.3.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/02_stage_d_completion.md",
+      "archived_path": "harness/github/work_plan/archive/0.3.0/0.3.0_wp002_stage_completion.md",
+      "git_blob_sha": "58ce7ef33779a056b3eb15720f1df88f093e8931",
+      "version": "0.3.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/03_gpu_evidence_recovery_and_extension_acceptance.md",
+      "archived_path": "harness/github/work_plan/archive/0.3.0/0.3.0_wp003_evidence_recovery.md",
+      "git_blob_sha": "24724c3daf7fa82f9c6daa33f682417627d22bd7",
+      "version": "0.3.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/06_research_lab_effects_context_real_evidence.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp001_lab_evidence.md",
+      "git_blob_sha": "cd7195333fedae9d9dede710a18cd12983d7286b",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/10_correctness_and_execution_optimization.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp002_execution_optimization.md",
+      "git_blob_sha": "ace28aad64acecd5eee7505354e7dcdb352d0fb9",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/16_web_vision_api_single_execution.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp003_web_vision.md",
+      "git_blob_sha": "4ac4627fd92f852549f16dd95c4a86975d284c8a",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/17_seven_playgrounds_agent_handoff.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp004_playground_handoff.md",
+      "git_blob_sha": "f7138e590d99e43584e2cf20d38332e77bc1b5ea",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/07_research_lab_final_product_redesign.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp005_lab_redesign.md",
+      "git_blob_sha": "8551b8615b77b673c6452d39d96775d80bb56483",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/09_gpu_performance_parity_and_release_acceptance.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp006_gpu_performance.md",
+      "git_blob_sha": "5d864ee591e28177656dd903d7bffbd5754aed80",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/11_final_gpu_validation_handoff.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp007_gpu_handoff.md",
+      "git_blob_sha": "6a37c1b9075e35719204ced14076630971b09d8d",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/11_high_throughput_engine_and_final_acceptance.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp008_throughput_engine.md",
+      "git_blob_sha": "d9f8029116294fe95fd4512e632da6eba5e877b2",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/12_core_function_assessment.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp009_core_assessment.md",
+      "git_blob_sha": "b1ec622df2b8e47eba28e20518300726206af75f",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/12_gpu00_agent_report_20261022.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp010_gpu_report.md",
+      "git_blob_sha": "141a395b8b5620979be6bb5161353ba6255a9fcf",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/12_gpu00_p0_parity_execution.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp011_parity_execution.md",
+      "git_blob_sha": "77782e1ba54095773575540bab1989b766b9868a",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/12_gpu_agent_handoff_protocol.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp012_agent_handoff.md",
+      "git_blob_sha": "1f5e91dfd6c07bc027277b43dea06f4091e7d197",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/12_p0_source_inventory_20261021.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp013_source_inventory.md",
+      "git_blob_sha": "581f448663cb48456d0068ef68025db3bd06e52f",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/12_p1_model_backend_implementation.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp014_backend_implementation.md",
+      "git_blob_sha": "077b52742abaad6697758921383a5de9c0d83d05",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/12_p2_feature_explorer.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp015_feature_explorer.md",
+      "git_blob_sha": "93c808b80b7a72f12fd577cfe9e5666b3b7a9113",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/12_p3_p8_consolidated_implementation.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp016_implementation_record.md",
+      "git_blob_sha": "22cc00d95991706fec2ae8ef612df0877b59c579",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/12_unified_interpretability_master_blueprint.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp017_interpretability_blueprint.md",
+      "git_blob_sha": "a1aa990e250ea12ec016b9072a226e1aa2d8be69",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/13_gpu_agent_real_environment_handoff.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp018_environment_handoff.md",
+      "git_blob_sha": "55544a27abde1b677e968ee5c2a04d65a1ff32e2",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/13_live02_small_handoff_and_publication.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp019_small_handoff.md",
+      "git_blob_sha": "a629fc499705effd6070fe3ac6ea4b33a132ac24",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/13_live02_small_inventory_note.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp020_inventory_note.md",
+      "git_blob_sha": "4a66ba511f996d15916d362b60587ebb8441bc15",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/13_live03_review_and_gallery.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp021_gallery_review.md",
+      "git_blob_sha": "8ab70749d808f98806a38bdfcf29fbdeb4c69ae6",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/13_live03_small_summary_note.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp022_summary_note.md",
+      "git_blob_sha": "b30363858721124c70415681179a6cbf47d3b604",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/13_real_environment_integration_and_deployment.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp023_environment_integration.md",
+      "git_blob_sha": "b1158e1886012da93461952c6a96a6690ca79183",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/14_gpu_agent_release_handoff.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp024_release_handoff.md",
+      "git_blob_sha": "9b67307be68ab1a9b4b30318557455b502bfa11f",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/14_gpu_receipt_review_20261022.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp025_receipt_review.md",
+      "git_blob_sha": "0b5368162704ec577fed484d99ac8a3f509f42e4",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/14_ship_first_release_plan.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp026_release_plan.md",
+      "git_blob_sha": "44089c491b4e47f87bc68e59086e5721a51aa4c8",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/15_complete_six_workflows_and_release.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp027_workflow_completion.md",
+      "git_blob_sha": "d0a8693dbe0b1551d42b7b4d58e978c057a00383",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/15_gpu_agent_completion_runbook.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp028_completion_runbook.md",
+      "git_blob_sha": "7cf92e106da9eb1c7bd5ac8a2c72a93799af62b8",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/15_gpu_asset_review.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp029_asset_review.md",
+      "git_blob_sha": "ee69533dfb6c6f38b76d833c0d463bfec5e23d5d",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/15_pre_release_remaining_handoff.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp030_remaining_handoff.md",
+      "git_blob_sha": "fc45ca78e7d22fe38ef567ad960cef9efdb78c65",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/12_gpu00_prompt_pairs.json",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp031_prompt_pairs.json",
+      "git_blob_sha": "9f376859844721532a1447cd9a7ccf83b386adbe",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/13_demo_prompt_candidates.json",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp032_prompt_candidates.json",
+      "git_blob_sha": "ee8a494c51500968653317cb8233ed1113b3c388",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/13_live_execution_matrix.csv",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp033_execution_matrix.csv",
+      "git_blob_sha": "f38debf7c93e346c2181ce78786b193c2e070c5c",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/14_release_scope.csv",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp034_release_scope.csv",
+      "git_blob_sha": "7343e4875b977c349ef61bb20ec0682b083d04cf",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/15_release_completion_matrix.csv",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp035_completion_matrix.csv",
+      "git_blob_sha": "78fbc19f7231104caec0d3ad4f6a6631833a347b",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_test/test_research_lab_v04_release.py",
+      "archived_path": "harness/github/work_test/archive/0.4.0/0.4.0_wt001_preview_release/test_research_lab_v04_release.py",
+      "git_blob_sha": "4e94d7408bb3ea1218972a972d9e5d611d86f4f8",
+      "version": "0.4.0",
+      "mode": "move",
+      "reason": "v0.4.0-only release/evidence assertions retired from live CI; replaced explicit check with current Research Lab functional adapters. Exact historical bytes preserved. Human review issue #161.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/performance/workplan09_results.md",
+      "archived_path": "harness/github/development_doc/archive/0.5.0/0.5.0_dev002_performance_pilot.md",
+      "git_blob_sha": "3d9aa59cb2c8bab388bf18d510599f282122ebbb",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Version-bound frozen performance measurement; no current active code dependency found; original blob preserved. HC Issue #161.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/performance/workplan10_results.md",
+      "archived_path": "harness/github/development_doc/archive/0.5.0/0.5.0_dev003_correctness_results.md",
+      "git_blob_sha": "819865581b6eddde9b0328bfde8b001544d0eaae",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Version-bound frozen performance measurement; no current active code dependency found; original blob preserved. HC Issue #161.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/performance/workplan11_results.md",
+      "archived_path": "harness/github/development_doc/archive/0.5.0/0.5.0_dev004_throughput_results.md",
+      "git_blob_sha": "901f182e772810d647070e1ead34318678398432",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Version-bound frozen performance measurement; no current active code dependency found; original blob preserved. HC Issue #161.",
+      "status": "archived"
     }
   ],
-  "notes": "All archive bytes retained unchanged. copy_compat entries keep old source link intentionally; only move entries delete their original path. Ambiguous version assignments stay unarchived."
+  "notes": "Exact-source historical moves approved by HC-History-Isolation-20261102 issue #161. Existing compatibility records remain where unapproved references exist. Historical contents unchanged."
 }

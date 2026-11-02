@@ -20,12 +20,35 @@ from pathlib import Path
 from harness.contracts import registry, wp19_reference, wp19_reference_ext
 
 ROOT = registry.ROOT
-PLAN = "harness/github/work_plan/19_harness_large_scale_examination_and_verifier_assurance.md"
 SPEC = ROOT / "harness/contracts/wp19_cases.json"
 RUNS = ROOT / "harness/tests/wp19/runs"
 RUN_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{3,63}$")
 READY = {f"H{i}" for i in range(27, 227)}
 ALL = {f"H{i}" for i in range(27, 227)}
+
+
+def _frozen_contract_selection(case: dict) -> dict:
+    """Validate immutable case requirements using the live contract catalog."""
+    data = registry.catalog()
+    known = {row["id"]: row for row in data["contracts"]}
+    tags = case["tags"]
+    contracts = list(dict.fromkeys(data["required_always"] + ["CT-ERROR"] + case["contracts"]))
+    if (
+        not isinstance(tags, list)
+        or not tags
+        or len(tags) != len(set(tags))
+        or not set(tags) <= set(data["task_tags"])
+    ):
+        raise ValueError("Invalid frozen case tags")
+    if not set(contracts) <= set(known) or len(case["contracts"]) != len(set(case["contracts"])):
+        raise ValueError("Unknown or duplicate frozen case contract")
+    for tag in tags:
+        if not any(
+            known[x]["enforcement"] == "conditional" and tag in known[x]["tags"]
+            for x in contracts
+        ):
+            raise ValueError("No contract covers frozen case tag: " + tag)
+    return {"tags": tags, "contract_ids": contracts}
 
 
 def load_spec() -> dict:
@@ -51,7 +74,7 @@ def check_spec() -> dict:
                 raise ValueError("Proposed case must not look qualified")
             continue
         case_id = case["id"]
-        selected = registry.resolve(PLAN, case_id)
+        selected = _frozen_contract_selection(case)
         if selected["tags"] != case["tags"]:
             raise ValueError("WP19 case tag mismatch")
         if set(selected["contract_ids"]) != set(
