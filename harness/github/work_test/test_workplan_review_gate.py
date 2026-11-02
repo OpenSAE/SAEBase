@@ -1,4 +1,5 @@
 """Negative checks for two independent Work Plan human-review deliverables."""
+
 import copy
 
 import pytest
@@ -51,7 +52,9 @@ def test_missing_section_is_blocked():
 def test_short_summary_is_blocked():
     _, summary, _ = example()
     with pytest.raises(gate.ReviewGateError, match="Overview"):
-        gate.check_summary(summary.replace("本次说明研究交付与人类审核范围" * 6, "摘要"), "WP24", list(range(1, 9)))
+        gate.check_summary(
+            summary.replace("本次说明研究交付与人类审核范围" * 6, "摘要"), "WP24", list(range(1, 9))
+        )
 
 
 def test_reference_only_never_requires_node_mutation():
@@ -65,8 +68,13 @@ def test_specific_workplan_cannot_become_durable_node_text():
     _, _, audit = example()
     audit["node_review_decision"] = "NODE_HUMAN_CHECK"
     row = audit["domains"][0]
-    row.update(decision="CHANGE", feature_effect="CHANGED", human_check_required=True,
-               existing_nodes=["g.pipeline"], proposed_fields={"properties": "WP23 QA500 pilot"})
+    row.update(
+        decision="CHANGE",
+        feature_effect="CHANGED",
+        human_check_required=True,
+        existing_nodes=["g.pipeline"],
+        proposed_fields={"properties": "WP23 QA500 pilot"},
+    )
     with pytest.raises(gate.ReviewGateError, match="specific"):
         gate.check_impact(audit, "WP24")
 
@@ -75,8 +83,12 @@ def test_changed_node_must_receive_human_check():
     _, _, audit = example()
     audit["node_review_decision"] = "NODE_HUMAN_CHECK"
     row = audit["domains"][0]
-    row.update(decision="CHANGE", feature_effect="CHANGED",
-               existing_nodes=["g.pipeline"], proposed_fields={"description": "A general new capability"})
+    row.update(
+        decision="CHANGE",
+        feature_effect="CHANGED",
+        existing_nodes=["g.pipeline"],
+        proposed_fields={"description": "A general new capability"},
+    )
     with pytest.raises(gate.ReviewGateError, match="independent Human Check"):
         gate.check_impact(audit, "WP24")
 
