@@ -28,8 +28,10 @@ def _digest(value: Any) -> str:
 
 def _artifact(root: Path, filename: str) -> Path:
     path = root / filename
-    if path.is_symlink() or not path.is_file() or not path.resolve().is_relative_to(root.resolve()):
-        raise ValueError(f"Invalid or missing frozen cohort artifact: {filename}")
+    if path.is_symlink() or not path.resolve().is_relative_to(root.resolve()):
+        raise ValueError(f"Unsafe frozen cohort artifact path: {filename}")
+    if not path.is_file():
+        raise FileNotFoundError(f"Frozen cohort artifact unavailable: {filename}")
     if path.stat().st_size > 64 * 1024 * 1024:
         raise ValueError(f"Frozen cohort artifact exceeds bounded Precheck read: {filename}")
     return path
