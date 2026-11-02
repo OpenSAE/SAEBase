@@ -1243,10 +1243,13 @@
       }
     ],
     "implementation_dependencies": {
-      "HC02": [
-        "HC03"
+      "HC01": [],
+      "HC02": [],
+      "HC03": [
+        "HC02"
       ],
       "HC04": [
+        "HC01",
         "HC02",
         "HC03"
       ],
