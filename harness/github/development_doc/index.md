@@ -6,6 +6,7 @@ Use this index to choose an existing interface or workflow, not a development mi
 
 - [Quick Start](../../../README.md#-quick-start) · [Getting Started](getting-started.md) · [First Experiment](first-experiment.md)
 - [Python API](python-api.md) · [API Reference](API.md) · [Examples](../../../saebase/examples/README.md) · [Troubleshooting](troubleshooting.md)
+- [Verified model and SAE matrix](verified-model-matrix.md) · [Model support](model-support.md)
 
 ## Supported workflows
 

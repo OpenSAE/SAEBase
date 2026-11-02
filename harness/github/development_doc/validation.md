@@ -2,6 +2,12 @@
 
 SAEBase distinguishes **what can be configured**, **what has run with real public weights**, and **what its scientific results establish**. A successful registry lookup or a synthetic smoke test is not proof of a real checkpoint evaluation.
 
+<!-- BEGIN VERIFIED_MODEL_SUPPORT -->
+## Verified model and SAE evaluations
+
+**18** selected model-SAE configurations, **48/48** real-checkpoint compatibility tests, **48/48** benchmark evaluations on 64 held-out prompt groups, and **48/48** reliability audits (2026-10-16). See the [per-layer reports](verified-model-matrix.md).
+<!-- END VERIFIED_MODEL_SUPPORT -->
+
 ## Current verification
 
 - Validate source and contracts with the [CI workflow](../../../.github/workflows/ci.yml) for a focused change.
