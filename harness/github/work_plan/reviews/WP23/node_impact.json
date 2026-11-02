@@ -6,8 +6,27 @@
   "node_review_decision": "DEFER_NODE_DECISION",
   "source_write_review": {
     "required": true,
-    "status": "PENDING",
-    "reason": "Human approval of this revised scoped implementation is not yet given; document drafting authorization does not grant product source edits or any compute/network permission."
+    "status": "APPROVED",
+    "reason": "The human approved proceeding with the independently redrafted WP23 design and its explicitly listed GitHub implementation paths in the conversation on 2026-11-02. Approval covers only reviewed source scope, not additional architecture, Atlas node mutation, network/GPU or publishing.",
+    "authorization": "Human conversational approval: 2026-11-02, '具体的问题上，这个没问题，你去做吧'",
+    "approved_paths": [
+      "tasks/precheck/dataset_checks.py",
+      "tests/precheck/test_dataset_checks.py",
+      "tasks/precheck/model_checks.py",
+      "tasks/precheck/sae_checks.py",
+      "tests/precheck/test_model_sae_sites.py",
+      "tasks/precheck/compatibility_checks.py",
+      "tasks/precheck/operation.py",
+      "tasks/precheck/worker.py",
+      "tasks/precheck/report.py",
+      "conf/task/precheck.yaml",
+      "tests/precheck/test_component_matrix.py",
+      "scripts/workplan/wp023.sh",
+      "scripts/workplan/wp023_orchestrator.py",
+      "tests/workplan/wp23/",
+      "saebase/runtime/audit_report.py",
+      "saebase/runtime/audit_delivery.py"
+    ]
   },
   "domains": [
     {
@@ -116,5 +135,11 @@
     "scope": "Named source paths in the draft only; no product-source modifications or runtime execution authorized."
   },
   "runtime_authorization": "NONE",
-  "scientific_execution": "NOT_RUN"
+  "scientific_execution": "NOT_RUN",
+  "human_check_review": {
+    "status": "NOT_REQUIRED_NOW",
+    "reason": "本轮尚无经过实际源码证实的长期 Atlas 节点增删改。Code 新模块仍属于拟实施内容，必须等真实 AST 和职责检查完成后重新审计；如发现实际节点变化，再进入 Atlas Human Check。现阶段不创建虚构节点。",
+    "recheck_after_implementation": true,
+    "review_url": null
+  }
 }
