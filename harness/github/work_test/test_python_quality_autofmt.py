@@ -1,4 +1,5 @@
 """Confirm staged-only Ruff formatting, safety and CI parity without installing Ruff."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -21,17 +22,23 @@ def test_staged_additions_only_and_no_frozen_files(monkeypatch, tmp_path):
     def run(args, **_):
         commands.append(args)
         return subprocess.CompletedProcess(
-            args, 0,
+            args,
+            0,
             stdout=b"added.py\0modified.py\0harness/tests/wp21/fixtures/locked.py\0",
         )
 
     monkeypatch.setattr(quality.subprocess, "run", run)
     assert quality.added_python_files() == ["added.py", "modified.py"]
     assert commands[0][:5] == [
-        "git", "diff", "--name-only", "--diff-filter=A", "-z",
+        "git",
+        "diff",
+        "--name-only",
+        "--diff-filter=A",
+        "-z",
     ]
     assert quality.added_python_files(include_modified=True) == [
-        "added.py", "modified.py",
+        "added.py",
+        "modified.py",
     ]
     assert "--diff-filter=AM" in commands[1]
 
@@ -80,7 +87,8 @@ def test_fails_closed_on_version_drift(monkeypatch):
 def test_no_files_needs_no_ruff_binary(monkeypatch):
     monkeypatch.setattr(quality, "added_python_files", lambda *_a, **_k: [])
     monkeypatch.setattr(
-        quality, "verify_ruff_version",
+        quality,
+        "verify_ruff_version",
         lambda: pytest.fail("Ruff must not run with empty selection"),
     )
     assert quality.verify_new_files() == 0
