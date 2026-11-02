@@ -34,6 +34,16 @@ Use `experiment/` Runtime paths, study-specific `reports/<run_id>/workplan_compl
 ## 8. Terminology and supporting sources
 Use existing Context definitions, reference exact Code/Knowledge paths and avoid new synonyms.
 
+
+## Workplan 起草后的双重 Human Review（模板附属要求）
+
+在提交 Draft 的首次审阅或实质修订后，生成两份**不写入任何 Node 正文/性质**的伴随材料：
+
+- `harness/github/work_plan/reviews/<WP-ID>/summary.md`：`## 概览` 以及与本模板正式 WP 的每个编号章节一一对应的 `## N.` 摘要。概览 40–100、每节 25–115、总体 400–950 个汉字，均须说明具体决定/输出/待决事项，先展示给用户。
+- `harness/github/work_plan/reviews/<WP-ID>/node_impact.json`：分别审计 Code（功能及展示源码）、Knowledge、Environment、Core、Harness、Context，明确 `NONE/ADD/CHANGE/REMOVE/DEFER` 和实际改变的字段/文件；不影响既有功能则保留节点，具体 Workplan 只做独立关联。
+
+使用 `python -m harness.github.work_plan.review_gate --plan ... --summary ... --impact ...` 检验格式；再按审计结论判断是否需要真正的 Node Human Check，源码写入授权独立判断。详见 [编写标准 §6A](WRITING_STANDARD.md)。
+
 ## 9. Structured bindings
 The fields below are references and predefined output slots, **not a duplicate copy of experiment parameters**. `status: approved` alone does not grant execution or publish permission.
 
