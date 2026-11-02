@@ -47,19 +47,38 @@ def _selected_tasks(cfg: DictConfig, mode: str) -> list[str]:
 def _assets(
     cfg: DictConfig, sites: list[dict[str, Any]], tasks: list[str]
 ) -> list[dict[str, str | None]]:
+    """Include Task-owned SAE requirements even in mode=task without SAE-only checks."""
     from saebase.api.sae_profiles import get_profile
 
     if not sites and not tasks:
         return []
     entries: list[dict[str, str | None]] = []
+    model_key = str(cfg.model.name)
     model_repo = str(cfg.model.get("pretrained_name") or "")
     if "/" in model_repo:
         entries.append({"repo_id": model_repo, "revision": cfg.model.get("revision")})
-    for site in sites:
-        profile = get_profile(site["sae_key"])
+
+    required_saes = [str(site["sae_key"]) for site in sites]
+    configs = cfg.task.get("task_configs", {})
+    for task_name in tasks:
+        if task_name not in ("capture", "intervene", "generate"):
+            continue
+        own_config = configs.get(task_name, {})
+        key = own_config.get("sae_key")
+        if not key:
+            defaults = list(cfg.model.get("default_saes", []))
+            key = defaults[0] if defaults else None
+        if key:
+            required_saes.append(str(key))
+
+    for sae_key in dict.fromkeys(required_saes):
+        profile = get_profile(sae_key)
+        if model_key not in profile.allowed_model_keys():
+            raise ValueError(f"Selected SAE {sae_key!r} does not support Model {model_key!r}")
         repo_id = str(profile.repo_id or "")
         if "/" in repo_id:
             entries.append({"repo_id": repo_id, "revision": None})
+
     unique = {}
     for entry in entries:
         unique[(entry["repo_id"], entry["revision"])] = entry
@@ -238,7 +257,11 @@ def run_precheck(cfg: DictConfig) -> EvaluationResult:
                 from saebase.setup.assets import prepare_environment
 
                 prepared = prepare_environment(
-                    required_modules=("huggingface_hub",) if (sites or tasks) else (),
+                    required_modules=(
+                        ("huggingface_hub", "sae_lens", "transformer_lens", "transformers")
+                        if (sites or any(t in ("capture", "intervene", "generate") for t in tasks))
+                        else ("huggingface_hub",) if tasks else ()
+                    ),
                     assets=_assets(cfg, sites, tasks),
                     allow_network=bool(cfg.task.get("allow_network", False)),
                     allow_install=bool(cfg.task.get("allow_install", False)),

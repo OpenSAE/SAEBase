@@ -135,3 +135,21 @@ def test_task_smoke_uses_model_default_sae_and_actual_site():
     cfg.task.task_configs = {"capture": {"layer": 7}}
     with pytest.raises(ValueError, match="invalid for SAE"):
         _task_config(cfg, "capture", 30, 8)
+
+
+def test_task_mode_setup_includes_owning_model_sae_checkpoint():
+    from tasks.precheck.operation import _assets
+
+    cfg = OmegaConf.create(
+        {
+            "model": {
+                "name": "qwen35_2b",
+                "pretrained_name": "Qwen/Qwen3.5-2B",
+                "default_saes": ["qwen35_2b_resid_w32k"],
+            },
+            "task": {"task_configs": {}},
+        }
+    )
+    repositories = {item["repo_id"] for item in _assets(cfg, [], ["capture"])}
+    assert "Qwen/Qwen3.5-2B" in repositories
+    assert "Qwen/SAE-Res-Qwen3.5-2B-Base-W32K-L0_50" in repositories
