@@ -10,6 +10,7 @@ from omegaconf import DictConfig
 
 from models.hf_hooks_backend import load_hf_hooks_model
 from models.hooked_lm_common import BaseModelSpec, HookedLMHandle
+from saebase.datasets.prompt_schema import behaviors_for_model
 
 _HUB = "Qwen/Qwen3.5-4B"
 _LOCAL = "/workspace/data/models/Qwen3.5-4B"
@@ -18,7 +19,6 @@ _candidates = (_HUB,)
 if Path(_LOCAL).joinpath("config.json").is_file():
     _candidates = (_LOCAL, _HUB)
 
-from saebase.datasets.prompt_schema import behaviors_for_model
 
 SPEC = BaseModelSpec(
     key="qwen35_4b",

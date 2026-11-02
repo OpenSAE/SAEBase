@@ -20,7 +20,7 @@ def test_sae_capabilities_belong_to_shared_api_or_task():
     assert callable(get_profile)
     assert callable(load_model_and_sae)
     assert callable(run_activation_health)
-    assert callable(run_external_training)
+    assert callable(run_training)
 
 
 def test_precheck_owns_all_real_sae_smoke_execution():

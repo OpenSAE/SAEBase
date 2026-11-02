@@ -8,6 +8,7 @@ from typing import Any
 from omegaconf import DictConfig
 
 from models.hooked_lm_common import BaseModelSpec, HookedLMHandle, load_from_spec
+from saebase.datasets.prompt_schema import behaviors_for_model
 
 _LOCAL = "/workspace/data/models/DeepSeek-R1-Distill-Llama-8B"
 _HUB = "deepseek-ai/DeepSeek-R1-Distill-Llama-8B"
@@ -17,7 +18,6 @@ _candidates = (_HUB,)
 if Path(_LOCAL).joinpath("config.json").is_file():
     _candidates = (_LOCAL, _HUB)
 
-from saebase.datasets.prompt_schema import behaviors_for_model
 
 SPEC = BaseModelSpec(
     key="r1_distill_llama8b",
