@@ -378,18 +378,73 @@ def execute_stage(
                 req.update(site)
             done.append(_call_worker(run_root, key, req, root))
     else:
+        from omegaconf import OmegaConf
+
         names = ("capture", "intervene", "generate", "benchmark")
+        # Use only a genuinely passed pair and its exact declared SAE Site.
+        selected = None
+        for pair in pairs:
+            if not pair["id"].startswith("sae_site_dataset:"):
+                continue
+            if _load_status(run_root, pair["id"])["status"] == "PASS":
+                selected = pair
+                break
         for name in names:
             key = "task:" + name
-            done.append(_store(run_root, key, {
-                "status": "BLOCKED",
-                "code": "BLOCKED_CONFIGURATION",
-                "reason": (
-                    "Native Task smoke requires an exact supported site, "
-                    "genuine Dataset sample and a bounded Task-owned run configuration; "
-                    "no unreviewed default is executed"
-                ),
-            }))
+            if auth(key, True):
+                done.append(_load_status(run_root, key))
+                continue
+            if selected is None:
+                done.append(_store(run_root, key, {
+                    "status": "BLOCKED", "code": "BLOCKED_DEPENDENCY",
+                    "reason": "No genuine compatible SAE Site and Dataset pair passed",
+                }))
+                continue
+            site = next(
+                row for row in sites if row["site_id"] == selected["site_id"]
+            )
+            model, dataset = site["model_key"], selected["dataset_id"]
+            if name == "benchmark":
+                done.append(_store(run_root, key, {
+                    "status": "BLOCKED", "code": "BLOCKED_CONFIGURATION",
+                    "reason": (
+                        "Benchmark requires a real bounded Task-owned benchmark_config; "
+                        "no unsupported benchmark protocol is synthesized"
+                    ),
+                }))
+                continue
+            from saebase.datasets.prompt_schema import is_available
+
+            if not is_available(dataset, model):
+                done.append(_store(run_root, key, {
+                    "status": "BLOCKED", "code": "BLOCKED_COMPATIBILITY",
+                    "reason": "Task-owned Dataset compatibility rejects this combination",
+                }))
+                continue
+            model_cfg = OmegaConf.load(root / "conf" / "model" / f"{model}.yaml")
+            dataset_cfg = OmegaConf.create({
+                "dataset": {
+                    "name": dataset,
+                    "data_path": str(root / "data" / dataset),
+                    "prompt_file": "",
+                }
+            })
+            task_cfg = OmegaConf.create({
+                "task": {
+                    "name": name, "execute": True, "device": "cuda",
+                    "sae_key": site["sae_key"], "layer": site["layer"],
+                    "prompt": _real_prompt(root, dataset, model),
+                    "feature_id": 0,
+                    "value": 1.0,
+                    "max_new_tokens": 8,
+                    "temperature": 0.0,
+                }
+            })
+            merged = OmegaConf.merge(model_cfg, dataset_cfg, task_cfg)
+            done.append(_call_worker(run_root, key, {
+                "kind": "task", "operation": name,
+                "config": OmegaConf.to_container(merged, resolve=True),
+            }, root))
     return {
         "stage": stage, "run_id": run_id,
         "requested": len(done),
