@@ -9,12 +9,14 @@ CI calls check mode and stays read-only; local pre-commit calls --fix.
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import subprocess
+import sys
 
 RUFF_VERSION = "0.15.22"
 FROZEN_PREFIX = "harness/tests/wp21/fixtures/"
+MAX_API_SOURCE_CHARS = 2_000_000
 
 
 def added_python_files(
@@ -85,9 +87,66 @@ def verify_new_files(
     return 1 if failed else 0
 
 
+
+def format_api_source(source: str, filename: str) -> str:
+    """Return Ruff-formatted, lint-clean Python for ONE pending GitHub API write.
+
+    Input/output use stdio and memory only: this function never stages, rewrites,
+    commits, or pushes a file. The caller still reviews the final exact-file diff
+    and separately obtains authorization to change the source.
+    """
+    if (
+        not isinstance(filename, str)
+        or not filename.endswith(".py")
+        or filename.startswith("-")
+        or "\\" in filename
+        or PurePosixPath(filename).is_absolute()
+        or PurePosixPath(filename).as_posix() != filename
+        or any(piece in ("", ".", "..") for piece in filename.split("/"))
+        or filename.startswith(FROZEN_PREFIX)
+    ):
+        raise ValueError("Expected a safe, unfrozen repository-relative .py filename")
+    if not isinstance(source, str) or len(source) > MAX_API_SOURCE_CHARS:
+        raise ValueError("Python input is missing or exceeds the 2 MB preparation limit")
+
+    verify_ruff_version()
+    formatted = subprocess.run(
+        ["ruff", "format", "--stdin-filename", filename, "-"],
+        input=source,
+        text=True,
+        capture_output=True,
+        check=False,
+        timeout=30,
+        encoding="utf-8",
+        cwd=Path(__file__).resolve().parents[2],
+    )
+    if formatted.returncode:
+        raise RuntimeError("Ruff formatting failed: " + formatted.stderr.strip()[-1200:])
+    result = formatted.stdout
+    for command in (
+        ["ruff", "check", "--stdin-filename", filename, "-"],
+        ["ruff", "format", "--check", "--stdin-filename", filename, "-"],
+    ):
+        verified = subprocess.run(
+            command,
+            input=result,
+            text=True,
+            capture_output=True,
+            check=False,
+            timeout=30,
+            encoding="utf-8",
+            cwd=Path(__file__).resolve().parents[2],
+        )
+        if verified.returncode:
+            detail = (verified.stdout + verified.stderr).strip()[-1200:]
+            raise RuntimeError(f"Ruff verification failed ({command[1]}): {detail}")
+    return result
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-sha", default=None, help="Existing PR base commit; otherwise staged")
+    parser.add_argument("--stdin", action="store_true", help="Format one source from stdin for GitHub API")
+    parser.add_argument("--filename", help="Exact repository-relative .py path for --stdin")
     parser.add_argument("--fix", action="store_true", help="Autoformat selected files before checking")
     parser.add_argument(
         "--include-modified",
@@ -95,6 +154,26 @@ def main() -> int:
         help="Also include modified Python files (explicit full-file reformat consent)",
     )
     args = parser.parse_args()
+    if args.stdin:
+        if not args.filename or args.fix or args.base_sha or args.include_modified:
+            parser.error("--stdin requires --filename and cannot combine with Git or fix options")
+        try:
+            binary_in = getattr(sys.stdin, "buffer", None)
+            if binary_in is not None:
+                source = binary_in.read(MAX_API_SOURCE_CHARS * 4 + 1).decode("utf-8")
+            else:
+                source = sys.stdin.read(MAX_API_SOURCE_CHARS + 1)
+            prepared = format_api_source(source, args.filename)
+            binary_out = getattr(sys.stdout, "buffer", None)
+            if binary_out is not None:
+                binary_out.write(prepared.encode("utf-8"))
+            else:
+                sys.stdout.write(prepared)
+            return 0
+        except (ValueError, RuntimeError, OSError, UnicodeError, subprocess.SubprocessError) as exc:
+            parser.exit(2, f"GitHub API Python source preparation blocked: {exc}\n")
+    if args.filename:
+        parser.error("--filename is only valid with --stdin")
     if args.fix and args.base_sha:
         parser.error("--fix --base-sha is disallowed: never rewrite committed PR sources")
     try:

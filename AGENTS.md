@@ -30,7 +30,16 @@ Ruff is a deterministic format/lint gate, not a substitute for tests. The exact 
 
 - Local Agent first stages **only human-authorized** new Python files, then runs `python saebase/tools/check_new_python_quality.py --fix`. Inspect the diff and re-stage only those files before committing. Existing modified Python files may be included *only* with explicit `--include-modified`, because Ruff rewrites entire files.
 - Once per fresh checkout, install `python -m pip install "ruff==0.15.22" "pre-commit>=4,<5"` and `pre-commit install` to run the same bounded formatter automatically during local commits. Missing tools or version mismatch fail closed with an installation hint, not a silent skip.
-- Agents writing via GitHub Contents API / connectors **bypass local Git hooks**. They must format their proposed Python bytes with this same Ruff version in a trusted temporary workspace **before the API write**; CI remains read-only and reports a formatting failure if this process was skipped. Do not enable an automatic CI push that can exceed reviewed file scopes or mutate frozen fixtures.
+- **GPT Agent with GitHub API / connector (including a fresh chat):** before EVERY Python `create_file` or `update_file`, take the complete proposed file text, then run the repository-owned stdin entrypoint (no Git working tree or staging required):
+
+  ```bash
+  python saebase/tools/check_new_python_quality.py --stdin \
+    --filename tasks/precheck/worker.py \
+    < candidate.py > candidate.formatted.py
+  ```
+
+  Replace `--filename` with the exact intended repository path. This reads only the proposed bytes and outputs **only** the formatted, lint-clean source on successful exit; all diagnostics go to stderr. Send `candidate.formatted.py`'s exact text, not `candidate.py`, to the GitHub API. Before updating an existing file, inspect the resulting full-file diff and do not accept unrelated formatting changes without scoped approval. This command does not grant source edit permission or execute the source.
+- This is a required **pre-write step**, not optional advice: use pinned Ruff `0.15.22`; if the GPT environment cannot execute it, stop the Python GitHub write and report `BLOCKED_FORMAT_TOOL` rather than bypassing it or pretending the new file passed. Local pre-commit cannot intercept a GitHub API call. The independent CI check stays read-only and remains mandatory; do not enable a CI bot that pushes unreviewed changes.
 - This formatting gate neither expands editable paths nor grants protected governance/GPU/network/publish permission. Never auto-format frozen WP21 fixtures, historical results, or unrelated Python files merely to make a check green.
 
 ## Human Check before GitHub changes
