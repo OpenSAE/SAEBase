@@ -27,8 +27,8 @@
       "archived_path": "harness/github/development_doc/archive/0.4.0/0.4.0_dev001_lab_evidence.json",
       "git_blob_sha": "1023e81b2b7b45d5455c0e29060b5150554bb47a",
       "version": "0.4.0",
-      "mode": "copy_compat",
-      "reason": "Source declares software_version=0.4.0 and is referenced by an active regression",
+      "mode": "move",
+      "reason": "v0.4.0-only historical evidence is detached from live CI after retiring dated release assertions; byte-identical copy preserved. HC #161.",
       "status": "archived"
     },
     {
@@ -533,6 +533,33 @@
       "version": "0.4.0",
       "mode": "move",
       "reason": "v0.4.0-only release/evidence assertions retired from live CI; replaced explicit check with current Research Lab functional adapters. Exact historical bytes preserved. Human review issue #161.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/performance/workplan09_results.md",
+      "archived_path": "harness/github/development_doc/archive/0.5.0/0.5.0_dev002_performance_pilot.md",
+      "git_blob_sha": "3d9aa59cb2c8bab388bf18d510599f282122ebbb",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Version-bound frozen performance measurement; no current active code dependency found; original blob preserved. HC Issue #161.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/performance/workplan10_results.md",
+      "archived_path": "harness/github/development_doc/archive/0.5.0/0.5.0_dev003_correctness_results.md",
+      "git_blob_sha": "819865581b6eddde9b0328bfde8b001544d0eaae",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Version-bound frozen performance measurement; no current active code dependency found; original blob preserved. HC Issue #161.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/performance/workplan11_results.md",
+      "archived_path": "harness/github/development_doc/archive/0.5.0/0.5.0_dev004_throughput_results.md",
+      "git_blob_sha": "901f182e772810d647070e1ead34318678398432",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Version-bound frozen performance measurement; no current active code dependency found; original blob preserved. HC Issue #161.",
       "status": "archived"
     }
   ],
