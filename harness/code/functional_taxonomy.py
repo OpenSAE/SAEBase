@@ -224,7 +224,6 @@ def organize_saebase_concepts(output: dict) -> dict:
 DETAIL_SCOPES = {
     "code:module:saebase.registry": "registry",
     "code:module:saebase.research_lab.backend.api": "lab_api",
-    "code:module:saebase.sae.stage_d": "sae_acceptance",
     "code:module:tasks.benchmark.stage_d": "benchmark_acceptance",
     "code:concrete:models": "model_families",
     "code:instance:tasks:benchmark": "benchmark_task",
