@@ -97,3 +97,6 @@ Reader 修订：阅读卡完整采用 Atlas 深色主题。阅读卡内滚轮只
 
 
 Human Check 阅读模式：仅 change 节点在审阅导航中自动打开左右对比；add/remove 只聚焦 Graph 节点，点击卡片本体才打开 Reader。阅读卡打开时批准/否决不自动跳走，紫/红/灰状态直接更新左右卡片边框、变化文字及外框，保持滚动位置；回到 Graph 后继续默认自动跳向下一待审节点。
+
+
+Human Check 审阅默认统一为 Graph Focus：Add、Remove、Change 的顺序切换均只定位到节点，点击节点才展开 Reader。点击 Approved 必须保存当前决定，关闭 Reader，再按原有 unchecked 顺序选中下一个待审节点，仍显示 Graph Focus。若没有待审节点，沿用 All done。Denied 和 Unchecked 保持其余既有行为。

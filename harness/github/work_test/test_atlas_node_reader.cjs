@@ -45,17 +45,20 @@ assert(js.includes('setReviewState(entry.reviewState || "")'),"Reader palette fo
 assert(css.includes('[data-review-state="unchecked"]')&&
   css.includes('[data-review-state="approved"]')&&
   css.includes('[data-review-state="denied"]'),"Reader highlights correspond to decision");
-// Add and Remove use Graph by default; clicking their node card explicitly
-// opens Reader, whereas Change opens a Before/After comparison automatically.
-assert(app.includes('reviewTarget && reviewItem.operation==="change"'),
-  "only Change defaults to the Reader");
-assert(app.includes('!!options.toggle'),"explicit card click opens Add/Remove Reader");
+// All three Human Check operations use the same Graph-first landing.
+assert(!app.includes('reviewTarget && reviewItem.operation==="change"'),
+  "Change must not open Reader automatically");
+assert(app.includes('!!options.toggle'),"explicit card click opens Reader");
 assert(app.includes('if(!shouldOpenReader)nodeReader?.close()'),
-  "switching to Add/Remove dismisses a previous Reader");
+  "Graph navigation dismisses any previous Reader");
 assert(app.includes('config.detailsOpen = !nodeReader || (!reviewTarget && !shouldOpenReader)'),
-  "graph-only Add/Remove navigation must not open the old detail drawer");
-assert(app.includes('if(decision!=="unchecked" && !nodeReader?.isOpen())'),
-  "Reader remains visible after an approval, denial or reset");
+  "Graph review does not open the old detail drawer");
+assert(app.includes('if(decision==="approved" ||'),
+  "approval always advances, even when Reader was open");
+assert(app.includes('nodeReader?.close();\n        const next=findUnchecked(1);'),
+  "approval closes Reader before selecting the next unchecked node");
+assert(app.includes('if(next>=0)reviewGo(next);'),
+  "approval navigates to the actual next unchecked node");
 assert(app.includes('nodeReader.setReviewState(status)'),
   "the review bar synchronizes live state on the active Reader");
 const setter=js.match(/    function setReviewState\(state\)\{[\s\S]*?\n    \}/);

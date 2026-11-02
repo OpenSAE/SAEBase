@@ -77,3 +77,6 @@ Review highlights are purple (Unchecked), red (Approved), and gray (Denied), inc
 
 
 Human Check Reader: navigating to Change opens its Before/After comparison automatically, whereas Add and Remove only focus the graph until their card is clicked. While the Reader is open, decisions do not auto-advance; purple/red/gray immediately update both comparison card borders, diff text and the Reader frame without resetting scroll. Graph-only review retains its next-unchecked advancement.
+
+
+Human Check navigation is Graph-first for Add, Remove and Change alike. A Reader opens only on an explicit node click. Approve saves the current decision, closes any open Reader and navigates to the next Unchecked node in the existing queue, shown in Graph Focus. All done is retained if none remains. Other Deny and Unchecked behavior is unchanged.

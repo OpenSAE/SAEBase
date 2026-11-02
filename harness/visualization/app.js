@@ -872,8 +872,12 @@
         render(false);
       }
       maybeShowReviewDone();
-      // Keep a purple-reset node visible. Approve/Deny advances within scope.
-      if(decision!=="unchecked" && !nodeReader?.isOpen()){
+      // Approval always advances to the next Unchecked node in Graph mode,
+      // even if the reviewer was reading a side-by-side Before/After.
+      // Denial keeps its existing Graph-only auto-advance behavior.
+      if(decision==="approved" ||
+         (decision==="denied" && !nodeReader?.isOpen())){
+        nodeReader?.close();
         const next=findUnchecked(1);
         reviewBusy=false;
         if(next>=0)reviewGo(next);
@@ -1114,16 +1118,15 @@
     config.query = "";
     $("search").value = "";
     config.outlineOpen = false;
-    // Only Change opens its comparison automatically. Add/Remove land on
-    // the actual graph node until the user explicitly opens its card.
+    // Every review operation (Add/Remove/Change) lands in the same compact
+    // Graph focus. Reader only opens on an explicit node-card interaction.
     const reviewItem=itemFor(id,target);
     const reviewTarget=!!reviewItem;
     const shouldOpenReader=!!nodeReader && (
-      !!options.toggle || (reviewTarget && reviewItem.operation==="change") ||
-      (!reviewTarget && nodeReader.isOpen())
+      !!options.toggle || (!reviewTarget && nodeReader.isOpen())
     );
     if(!shouldOpenReader)nodeReader?.close();
-    // A graph-only Add/Remove review should not open the legacy detail drawer.
+    // A review landing never opens the legacy detail drawer.
     config.detailsOpen = !nodeReader || (!reviewTarget && !shouldOpenReader);
     for (const key of ancestors(id)) config.expanded.add(key);
     if(reviewTarget){
