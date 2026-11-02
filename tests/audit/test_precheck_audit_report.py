@@ -1,4 +1,5 @@
 """Real byte-hash and receipt-negative coverage; no GPU or model download."""
+
 import hashlib
 import json
 
@@ -16,7 +17,9 @@ def _run(tmp_path, status="BLOCKED"):
         "schema": "saebase.artifact_manifest.v1",
         "run_id": "r1",
         "source_sha": "abc",
-        "files": [{"path": "receipt.json", "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)}],
+        "files": [
+            {"path": "receipt.json", "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)}
+        ],
         "checks": [{"id": "precheck:model1", "kind": "precheck", "receipt": "receipt.json"}],
     }
     return root, receipt, manifest
