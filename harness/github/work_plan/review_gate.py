@@ -3,6 +3,7 @@
 This is a documentation gate, NOT semantic correctness, source authorization,
 Human Check approval, real test execution, or scientific acceptance.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -70,18 +71,26 @@ def check_summary(summary: str, plan_id: str, plan_sections: list[int]) -> dict:
         counts[str(nums[index])] = n
     total = overview_n + sum(counts.values())
     _assert(400 <= total <= 950, "Summary requires 400–950 Chinese characters total")
-    return {"overview_characters": overview_n, "section_characters": counts, "total_characters": total}
+    return {
+        "overview_characters": overview_n,
+        "section_characters": counts,
+        "total_characters": total,
+    }
 
 
 def check_impact(data: dict, plan_id: str) -> dict:
     _assert(isinstance(data, dict), "Impact audit must be an object")
     _assert(data.get("schema") == "saebase.workplan.node_impact.v1", "Invalid impact schema")
     _assert(data.get("plan_id") == plan_id, "Impact audit plan mismatch")
-    _assert(re.fullmatch(r"[a-f0-9]{40}", str(data.get("source_commit", ""))) is not None,
-            "Impact audit must bind an exact source commit")
+    _assert(
+        re.fullmatch(r"[a-f0-9]{40}", str(data.get("source_commit", ""))) is not None,
+        "Impact audit must bind an exact source commit",
+    )
     entries = data.get("domains")
-    _assert(isinstance(entries, list) and len(entries) == len(DOMAINS),
-            "Exactly six explicit domain decisions required")
+    _assert(
+        isinstance(entries, list) and len(entries) == len(DOMAINS),
+        "Exactly six explicit domain decisions required",
+    )
     decisions: dict[str, str] = {}
     for item in entries:
         _assert(isinstance(item, dict), "Invalid domain decision")
@@ -90,13 +99,21 @@ def check_impact(data: dict, plan_id: str) -> dict:
         decision = item.get("decision")
         _assert(decision in DECISIONS, f"Invalid decision for {domain}")
         _assert(item.get("feature_effect") in FEATURE_EFFECTS, "Feature effect missing")
-        _assert(isinstance(item.get("source_paths"), list) and bool(item["source_paths"]),
-                "Each domain must cite source files")
-        _assert(all(isinstance(p, str) and p and not p.startswith("/")
-                    and ".." not in Path(p).parts for p in item["source_paths"]),
-                "Unsafe/invalid source path")
-        _assert(isinstance(item.get("reason"), str) and len(item["reason"].strip()) >= 20,
-                f"Source-grounded reason missing for {domain}")
+        _assert(
+            isinstance(item.get("source_paths"), list) and bool(item["source_paths"]),
+            "Each domain must cite source files",
+        )
+        _assert(
+            all(
+                isinstance(p, str) and p and not p.startswith("/") and ".." not in Path(p).parts
+                for p in item["source_paths"]
+            ),
+            "Unsafe/invalid source path",
+        )
+        _assert(
+            isinstance(item.get("reason"), str) and len(item["reason"].strip()) >= 20,
+            f"Source-grounded reason missing for {domain}",
+        )
         _assert(isinstance(item.get("existing_nodes"), list), "Existing node IDs must be listed")
         proposed = item.get("proposed_fields", {})
         _assert(isinstance(proposed, dict), "Proposed node fields must be a mapping")
@@ -104,40 +121,59 @@ def check_impact(data: dict, plan_id: str) -> dict:
             _assert(not proposed, f"{domain}: NONE cannot request changes to node fields")
         if decision in {"ADD", "CHANGE", "REMOVE"}:
             _assert(bool(proposed), f"{domain}: node change requires explicit fields")
-            _assert(item.get("human_check_required") is True,
-                    "A node mutation needs independent Human Check")
+            _assert(
+                item.get("human_check_required") is True,
+                "A node mutation needs independent Human Check",
+            )
             if decision == "CHANGE":
                 _assert(bool(item["existing_nodes"]), "CHANGE needs an existing node")
             for value in proposed.values():
                 if isinstance(value, str):
-                    _assert(not re.search(r"\bWP[0-9]+\b|\bQA500\b", value, flags=re.I),
-                            "Durable node text may not absorb a specific Work Plan or QA500")
+                    _assert(
+                        not re.search(r"\bWP[0-9]+\b|\bQA500\b", value, flags=re.I),
+                        "Durable node text may not absorb a specific Work Plan or QA500",
+                    )
         if decision == "DEFER":
             _assert(item.get("feature_effect") == "UNKNOWN", "DEFER must identify unknown impact")
         decisions[domain] = decision
     _assert(set(decisions) == DOMAINS, "Six domains must be covered exactly once")
     semantic = any(x in {"ADD", "CHANGE", "REMOVE"} for x in decisions.values())
-    expected = "NODE_HUMAN_CHECK" if semantic else (
-        "DEFER_NODE_DECISION" if "DEFER" in decisions.values() else "NO_NODE_CHANGE"
+    expected = (
+        "NODE_HUMAN_CHECK"
+        if semantic
+        else ("DEFER_NODE_DECISION" if "DEFER" in decisions.values() else "NO_NODE_CHANGE")
     )
     _assert(data.get("node_review_decision") == expected, "Incorrect node-review decision")
     source = data.get("source_write_review")
-    _assert(isinstance(source, dict)
-            and isinstance(source.get("required"), bool)
-            and source.get("status") in {"PENDING", "APPROVED", "NOT_REQUIRED"},
-            "Source-write review must be decided independently from node-review")
-    _assert(not source["required"] or source["status"] != "NOT_REQUIRED",
-            "Required source review cannot be NOT_REQUIRED")
-    return {"node_review_decision": expected, "domains": decisions,
-            "source_write_review": source["status"]}
+    _assert(
+        isinstance(source, dict)
+        and isinstance(source.get("required"), bool)
+        and source.get("status") in {"PENDING", "APPROVED", "NOT_REQUIRED"},
+        "Source-write review must be decided independently from node-review",
+    )
+    _assert(
+        not source["required"] or source["status"] != "NOT_REQUIRED",
+        "Required source review cannot be NOT_REQUIRED",
+    )
+    return {
+        "node_review_decision": expected,
+        "domains": decisions,
+        "source_write_review": source["status"],
+    }
 
 
 def validate(plan: Path, summary: Path, impact: Path) -> dict:
     plan_id, sections = _parse_plan(_read(plan))
     s = check_summary(_read(summary), plan_id, sections)
     a = check_impact(json.loads(_read(impact)), plan_id)
-    return {"status": "STRUCTURE_VALID_ONLY", "plan_id": plan_id, "summary": s, "impact": a,
-            "semantic_truth": "NOT_VERIFIED", "execution": "NOT_RUN"}
+    return {
+        "status": "STRUCTURE_VALID_ONLY",
+        "plan_id": plan_id,
+        "summary": s,
+        "impact": a,
+        "semantic_truth": "NOT_VERIFIED",
+        "execution": "NOT_RUN",
+    }
 
 
 def main() -> int:
