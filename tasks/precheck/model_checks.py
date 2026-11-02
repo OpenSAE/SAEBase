@@ -17,11 +17,12 @@ def check_real_model(
 ) -> dict[str, Any]:
     """Load actual model weights, tokenize real input and observe finite logits."""
     try:
+        if not isinstance(prompt, str) or not prompt.strip():
+            raise ValueError("Model Precheck requires real nonempty prompt")
+
         import torch
         from models.hooked_lm_common import load_hooked_model
 
-        if not isinstance(prompt, str) or not prompt.strip():
-            raise ValueError("Model Precheck requires real nonempty prompt")
         if device.startswith("cuda") and not torch.cuda.is_available():
             raise RuntimeError("BLOCKED_RESOURCE: CUDA unavailable")
         model = load_hooked_model(model_name, device=device)
