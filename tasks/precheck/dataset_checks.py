@@ -16,7 +16,10 @@ from tasks.precheck.report import blocked, error_result
 
 
 def check_dataset_artifact(
-    *, dataset_key: str, model_key: str, data_root: Path,
+    *,
+    dataset_key: str,
+    model_key: str,
+    data_root: Path,
     max_records: int = 500,
 ) -> dict[str, Any]:
     """Validate actual model-specific Dataset records with bounded reading."""
@@ -29,11 +32,13 @@ def check_dataset_artifact(
         get_dataset_plugin(dataset_key)
         from saebase.datasets.prompts import prompt_file, read_prompts
 
-        dataset_cfg = OmegaConf.create({
-            "name": dataset_key,
-            "data_path": str(Path(data_root) / dataset_key),
-            "prompt_file": "",
-        })
+        dataset_cfg = OmegaConf.create(
+            {
+                "name": dataset_key,
+                "data_path": str(Path(data_root) / dataset_key),
+                "prompt_file": "",
+            }
+        )
         path = prompt_file(dataset_cfg, model_key=model_key)
         if path.is_symlink() or not path.resolve().is_relative_to(Path(data_root).resolve()):
             raise ValueError("Unsafe Dataset artifact path")
@@ -49,9 +54,12 @@ def check_dataset_artifact(
             prompt = row.get("prompt")
             if not isinstance(prompt, str) or not prompt.strip():
                 raise ValueError("Dataset prompt missing")
-            sample_id = str(row.get("sample_id") or hashlib.sha256(
-                (json.dumps(row, sort_keys=True, ensure_ascii=False, default=str)).encode()
-            ).hexdigest())
+            sample_id = str(
+                row.get("sample_id")
+                or hashlib.sha256(
+                    (json.dumps(row, sort_keys=True, ensure_ascii=False, default=str)).encode()
+                ).hexdigest()
+            )
             ids.append(sample_id)
             prompts.append(hashlib.sha256(prompt.encode("utf-8")).hexdigest())
         if len(ids) != len(set(ids)) or len(prompts) != len(set(prompts)):
@@ -81,6 +89,7 @@ def check_dataset_artifact(
         )
     except Exception as exc:
         return error_result(
-            exc, stage=f"dataset:{dataset_key}:{model_key}",
+            exc,
+            stage=f"dataset:{dataset_key}:{model_key}",
             attempted=["read real Dataset records and verify identities"],
         )
