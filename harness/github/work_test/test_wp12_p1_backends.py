@@ -18,7 +18,7 @@ from saebase.api import (
     capture_block_components,
 )
 from saebase.api.model import UnsupportedCapability
-from saebase.sae.catalog import (
+from saebase.api.sae_catalog import (
     discover_official_scope_assets,
     registered_scope_assets,
 )

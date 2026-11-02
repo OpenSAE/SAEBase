@@ -1,7 +1,7 @@
 """Environment inventory, representative selection and measured time estimates.
 
-Setup does not claim a real model pass until an approved smoke has actually
-loaded that model. All speed estimates come from timed, observed pilot rows.
+Setup only inventories and prepares resources; it never runs a model or SAE test.
+All speed estimates come from previously measured external Precheck or pilot rows.
 """
 
 from __future__ import annotations

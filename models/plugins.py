@@ -1,91 +1,102 @@
-"""Built-in model and SAE plugin registration.
+"""Register the 15 active Model instances; historical Model adapters remain opt-in.
 
-Model implementations retain their historical models.* paths until a
-separately validated compatibility migration. Registration runs once
-through Python's import cache, even when a legacy shim is imported.
+A Model owns its default SAE choices in conf/model/*.yaml. SAE profiles
+are resources, not another core plugin registration.
 """
 
 from __future__ import annotations
 
 import importlib
 
-from omegaconf import DictConfig
+from saebase.registry import ModelPlugin, register_model
 
-from saebase.registry import register_model, register_sae
-from saebase.sae.registry import DEFAULT_SAE_FOR_MODEL, SAE_KEYS, get_profile
-
+# Active registration list, not a historical resource deletion list.
 _HOOKED_KEYS = (
+    "gemma270m",
+    "gemma1b",
+    "gemma2_2b_base",
+    "gemma2_9b_it",
+    "qwen3_1_7b_base",
+    "qwen35_2b",
+    "qwen35_4b",
+    "qwen35_9b",
     "gpt2small",
     "pythia70m",
     "pythia410m",
-    "gemma270m",
-    "gemma1b",
+    "llama31_8b",
+    "llama31_8b_instruct",
+    "mistral7b_instruct",
+    "r1_distill_llama8b",
+)
+
+_LEGACY_KEYS = frozenset({
     "gemma1b_it",
     "r1_distill_qwen15b",
-    "r1_distill_llama8b",
-    "gemma2_2b_base",
     "gemma2_2b_it",
     "qwen25_3b",
     "qwen25_3b_it",
     "gemma3_4b_pt",
     "gemma3_4b_it",
-    "llama31_8b",
-    "llama31_8b_instruct",
     "qwen3_8b",
     "qwen3_1_7b",
-    "qwen3_1_7b_base",
-    "mistral7b_instruct",
-    "qwen35_2b",
-    "qwen35_4b",
     "gemma2_9b_pt",
-    "gemma2_9b_it",
     "gemma3_12b_pt",
     "gemma3_12b_it",
-    "qwen35_9b",
     "gemma3_27b_pt",
     "gemma3_27b_it",
     "qwen35_27b",
-)
+})
+
+_ACTIVE_MODULES = {
+    "gemma270m": ("models.gemma.gemma3.gemma270m.compatibility", "models.gemma.gemma3.gemma270m.model"),
+    "gemma1b": ("models.gemma.gemma3.gemma1b.compatibility", "models.gemma.gemma3.gemma1b.model"),
+    "gemma2_2b_base": ("models.gemma.gemma2.gemma2_2b_base.compatibility", "models.gemma.gemma2.gemma2_2b_base.model"),
+    "gemma2_9b_it": ("models.gemma.gemma2.gemma2_9b_it.compatibility", "models.gemma.gemma2.gemma2_9b_it.model"),
+    "qwen3_1_7b_base": ("models.qwen.qwen3.qwen3_1_7b_base.compatibility", "models.qwen.qwen3.qwen3_1_7b_base.model"),
+    "qwen35_2b": ("models.qwen.qwen35.qwen35_2b.compatibility", "models.qwen.qwen35.qwen35_2b.model"),
+    "qwen35_4b": ("models.qwen.qwen35.qwen35_4b.compatibility", "models.qwen.qwen35.qwen35_4b.model"),
+    "qwen35_9b": ("models.qwen.qwen35.qwen35_9b.compatibility", "models.qwen.qwen35.qwen35_9b.model"),
+    "gpt2small": ("models.gpt2.gpt2.gpt2small.compatibility", "models.gpt2.gpt2.gpt2small.model"),
+    "pythia70m": ("models.pythia.pythia.pythia70m.compatibility", "models.pythia.pythia.pythia70m.model"),
+    "pythia410m": ("models.pythia.pythia.pythia410m.compatibility", "models.pythia.pythia.pythia410m.model"),
+    "llama31_8b": ("models.llama.llama31.llama31_8b.compatibility", "models.llama.llama31.llama31_8b.model"),
+    "llama31_8b_instruct": ("models.llama.llama31.llama31_8b_instruct.compatibility", "models.llama.llama31.llama31_8b_instruct.model"),
+    "mistral7b_instruct": ("models.mistral.mistral7b.mistral7b_instruct.compatibility", "models.mistral.mistral7b.mistral7b_instruct.model"),
+    "r1_distill_llama8b": ("models.llama.r1_distill.r1_distill_llama8b.compatibility", "models.llama.r1_distill.r1_distill_llama8b.model"),
+}
+
+
+def _load_plugin(compat_path: str, model_path: str, *, model_key: str) -> ModelPlugin:
+    compat = importlib.import_module(compat_path)
+    module = importlib.import_module(model_path)
+
+    def check(cfg):
+        name = str(cfg.task.name)
+        if name in {"capture", "intervene", "generate", "circuits", "explain", "benchmark", "train", "precheck"}:
+            if name in {"capture", "intervene", "generate"}:
+                from saebase.datasets.prompt_schema import assert_available
+                assert_available(str(cfg.dataset.name), model_key)
+            return None
+        return compat.assert_compatible(cfg)
+
+    return ModelPlugin(assert_compatible=check, construct=module.construct_lazy)
+
+
+def legacy_plugin(key: str) -> ModelPlugin:
+    """Resolve a historical Model explicitly without registering 30 defaults."""
+    if key not in _LEGACY_KEYS:
+        raise ValueError(f"Unknown legacy Model {key!r}")
+    return _load_plugin(
+        f"models.{key}.model_task_dataset_compatibility", f"models.{key}.{key}",
+        model_key=key,
+    )
 
 
 def _register_builtin_models() -> None:
-    def _register_hooked(key: str) -> None:
-        compat = importlib.import_module(f"models.{key}.model_task_dataset_compatibility")
-        module = importlib.import_module(f"models.{key}.{key}")
-        register_model(key, compat.assert_compatible, module.construct_lazy)
-
-    for hooked_key in _HOOKED_KEYS:
-        _register_hooked(hooked_key)
-
-    def _make_sae_assert(sae_key: str):
-        def assert_compatible(cfg: DictConfig) -> None:
-            profile = get_profile(sae_key)
-            model_key = str(cfg.model.name)
-            if model_key not in profile.allowed_model_keys():
-                raise ValueError(
-                    f"sae.name={sae_key!r} allows models "
-                    f"{sorted(profile.allowed_model_keys())}, got {model_key!r}"
-                )
-            layer = cfg.sae.get("layer")
-            if layer is not None and int(layer) not in profile.layers:
-                raise ValueError(
-                    f"sae.layer={layer} not in {sae_key} layers {list(profile.layers)}"
-                )
-
-        return assert_compatible
-
-    for sae_key in SAE_KEYS:
-        register_sae(sae_key, _make_sae_assert(sae_key), profile_key=sae_key)
-
-    def _assert_none_sae(cfg: DictConfig) -> None:
-        # Placeholder SAE key; task=sae rejects sae=none at config validation.
-        return None
-
-    register_sae("none", _assert_none_sae, profile_key="none")
-
-    for model_key, sae_key in DEFAULT_SAE_FOR_MODEL.items():
-        if model_key not in SAE_KEYS:
-            register_sae(model_key, _make_sae_assert(sae_key), profile_key=sae_key)
+    for key in _HOOKED_KEYS:
+        compat, module = _ACTIVE_MODULES[key]
+        plugin = _load_plugin(compat, module, model_key=key)
+        register_model(key, plugin.assert_compatible, plugin.construct)
 
 
 _register_builtin_models()

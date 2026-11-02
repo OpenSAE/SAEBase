@@ -159,8 +159,8 @@
       },
       "g.sae.sae_registry": {
         "title": "Select SAE configurations by checkpoint identity",
-        "summary": "The SAE registry resolves sparse dictionaries by model and SAE identities as implemented in saebase/sae/registry.py.",
-        "description": "The SAE registry resolves sparse dictionaries by model and SAE identities as implemented in saebase/sae/registry.py."
+        "summary": "The SAE registry resolves sparse dictionaries by model and SAE identities as implemented in saebase/api/sae_profiles.py.",
+        "description": "The SAE registry resolves sparse dictionaries by model and SAE identities as implemented in saebase/api/sae_profiles.py."
       },
       "s.sae.capture": {
         "title": "Capture SAE features from model activations",

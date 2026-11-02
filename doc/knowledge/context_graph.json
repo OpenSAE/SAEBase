@@ -32,7 +32,7 @@
       "evidence": [
         "datasets/artifacts.py",
         "models/gemma2_2b_base/gemma2_2b_base.py",
-        "saebase/sae/registry.py"
+        "saebase/api/sae_profiles.py"
       ],
       "term_ids": [
         "term.sae",
@@ -49,7 +49,7 @@
       "evidence": [
         "datasets/artifacts.py",
         "models/gemma2_2b_base/gemma2_2b_base.py",
-        "saebase/sae/registry.py"
+        "saebase/api/sae_profiles.py"
       ],
       "term_ids": [
         "term.sae",
@@ -93,10 +93,10 @@
       "id": "g.sae.sae_registry",
       "type": "goal",
       "title": "按 SAE 身份选择稀疏字典配置",
-      "description": "代码方法：按 SAE 身份选择稀疏字典配置。依据位于 saebase/sae/registry.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "description": "代码方法：按 SAE 身份选择稀疏字典配置。依据位于 saebase/api/sae_profiles.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
       "status": "implemented",
       "evidence": [
-        "saebase/sae/registry.py"
+        "saebase/api/sae_profiles.py"
       ],
       "term_ids": [
         "term.sae",

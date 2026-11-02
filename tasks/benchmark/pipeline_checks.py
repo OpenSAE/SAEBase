@@ -8,8 +8,8 @@ from saebase.datasets.artifacts import canonicalize_behavior
 from saebase.datasets.artifacts import assert_available
 from saebase.datasets.artifacts import load_manifest
 from saebase.registry import get_dataset_plugin, get_model_plugin, get_task_plugin
-from saebase.sae.contracts import assert_manifest_matches
-from saebase.sae.registry import get_profile
+from saebase.api.sae_contracts import assert_manifest_matches
+from saebase.api.sae_profiles import get_profile
 
 
 def _prompt_source_name(cfg: DictConfig) -> str:
@@ -20,7 +20,8 @@ def _prompt_source_name(cfg: DictConfig) -> str:
 
 def run_preflight(cfg: DictConfig) -> dict:
     """Validate registry gates + prompt artifact identity."""
-    get_task_plugin(str(cfg.task.name))
+    if str(cfg.task.name) != "sae":
+        get_task_plugin(str(cfg.task.name))
     ps_name = _prompt_source_name(cfg)
     get_dataset_plugin(ps_name).assert_task_supported(cfg)
     get_model_plugin(str(cfg.model.name)).assert_compatible(cfg)

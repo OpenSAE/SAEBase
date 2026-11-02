@@ -23,10 +23,10 @@ from saebase.benchmarks.report import write_report
 from saebase.benchmarks.results import atomic_json
 from saebase.benchmarks.runner import execute
 from saebase.reliability import AuditConfig, evaluate_m3, read_audit, write_audit
-from saebase.sae.coverage import load_coverage
-from saebase.sae.loading import load_model_and_sae
-from saebase.sae.registry import get_profile
-from saebase.sae.stage_d import (
+from tasks.benchmark.coverage_contract import load_coverage
+from saebase.api.sae_loading import load_model_and_sae
+from saebase.api.sae_profiles import get_profile
+from tasks.benchmark.stage_d import (
     POPULATION_MIN_EVAL_GROUPS,
     PROMPTS,
     PROTOCOL_POPULATION,
@@ -120,7 +120,7 @@ def run_site(
     if site.hook_name != profile.hook_name(layer):
         raise ValueError("loaded SAE hook disagrees with registry")
     loaded_name = meta.get("loaded_model_name")
-    from saebase.sae.stage_d import assert_host_matches_label
+    from tasks.benchmark.stage_d import assert_host_matches_label
 
     assert_host_matches_label(
         evaluation_host_model_key=evaluation_host,

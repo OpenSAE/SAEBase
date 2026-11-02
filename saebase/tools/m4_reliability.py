@@ -70,7 +70,7 @@ def main(argv=None) -> int:
     else:
         resolver = None
         if args.sae_only:
-            from saebase.sae.loading import load_sae_for_profile
+            from saebase.api.sae_loading import load_sae_for_profile
 
             def resolver(model_key, sae_key, layer):
                 return load_sae_for_profile(sae_key, layer, device="cpu")[0]

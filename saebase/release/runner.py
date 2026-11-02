@@ -26,7 +26,7 @@ from saebase.benchmarks.planner import build_plan
 from saebase.reliability import AuditConfig
 from saebase.reliability.runner import evaluate_m3
 from saebase.reliability.report import write_audit,read_audit
-from saebase.sae.registry import get_profile
+from saebase.api.sae_profiles import get_profile
 from saebase.store import fingerprint
 from .schema import MatrixConfig,MatrixTarget,STATUS_SCHEMA
 from .planner import plan_matrix
@@ -47,13 +47,13 @@ def _packages():
     return result
 
 def _default_model_loader(target:MatrixTarget,device:str):
-    from saebase.sae.loading import load_model_for_profile
+    from saebase.api.sae_loading import load_model_for_profile
     raw,loaded_name=load_model_for_profile(
         target.sae_keys[0],device=device,model_key_override=target.model_key)
     return ModelAdapter(raw),loaded_name
 
 def _default_sae_loader(target:MatrixTarget,key:str,device:str):
-    from saebase.sae.loading import load_sae_for_profile
+    from saebase.api.sae_loading import load_sae_for_profile
     sae,meta=load_sae_for_profile(key,target.site.layer,device=device)
     identity=SAEIdentity.from_loaded(sae=sae,metadata=meta,
                                       model_key=target.model_key)

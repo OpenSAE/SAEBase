@@ -119,7 +119,7 @@ def test_synthetic_matrix_same_hook_reuse_and_recovery(tmp_path):
 
 
 def test_m5_compatibility_registry_and_declared_source_cards():
-    from saebase.sae.registry import get_profile, MODEL_KEYS
+    from saebase.api.sae_profiles import get_profile, MODEL_KEYS
 
     assert "gpt2small" in MODEL_KEYS
     for name, site in (

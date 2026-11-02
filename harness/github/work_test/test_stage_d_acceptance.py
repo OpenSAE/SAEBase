@@ -9,8 +9,8 @@ from types import SimpleNamespace
 import pytest
 import torch
 
-from saebase.sae.coverage import load_coverage
-from saebase.sae.stage_d import (
+from tasks.benchmark.coverage_contract import load_coverage
+from tasks.benchmark.stage_d import (
     PRIOR_PAIR_VERIFIED,
     SCHEMA_ACCEPTANCE,
     build_final_matrix,
@@ -325,7 +325,7 @@ def test_matrix_dry_run_lists_44(tmp_path):
 
 
 def test_resolve_evaluation_host_auto_override_for_transfer():
-    from saebase.sae.stage_d import resolve_evaluation_host
+    from tasks.benchmark.stage_d import resolve_evaluation_host
 
     host, override = resolve_evaluation_host(
         catalog_model_key="gemma2_2b_it",
@@ -336,7 +336,7 @@ def test_resolve_evaluation_host_auto_override_for_transfer():
 
 
 def test_assert_host_rejects_base_labeled_as_it():
-    from saebase.sae.stage_d import assert_host_matches_label
+    from tasks.benchmark.stage_d import assert_host_matches_label
 
     with pytest.raises(ValueError, match="IT|instruct|base"):
         assert_host_matches_label(
@@ -346,7 +346,7 @@ def test_assert_host_rejects_base_labeled_as_it():
 
 
 def test_population_corpus_has_64_groups_and_no_overlap():
-    from saebase.sae.stage_d import (
+    from tasks.benchmark.stage_d import (
         DEFAULT_POPULATION_PATH,
         POPULATION_MIN_EVAL_GROUPS,
         load_population_corpus,
@@ -361,7 +361,7 @@ def test_population_corpus_has_64_groups_and_no_overlap():
 
 
 def test_population_flag_rejects_tiny_corpus(tmp_path):
-    from saebase.sae.stage_d import load_population_corpus
+    from tasks.benchmark.stage_d import load_population_corpus
 
     tiny = tmp_path / "tiny.jsonl"
     rows = [
@@ -530,7 +530,7 @@ def test_verify_evidence_fails_on_tampered_checksum(tmp_path):
 
 
 def test_rebuild_canonical_status_is_exactly_48(tmp_path):
-    from saebase.sae.stage_d import rebuild_canonical_status
+    from tasks.benchmark.stage_d import rebuild_canonical_status
 
     records = build_site_records(load_coverage(CATALOG))
     update_status(tmp_path, "bogus|extra|L0|blocks.0.hook_resid_pre", {"status": "failed_numeric"})

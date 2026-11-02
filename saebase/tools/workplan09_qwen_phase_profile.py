@@ -38,7 +38,7 @@ def main() -> None:
     import workplan09_gpu_pilot as pilot
     from saebase.api import ActivationSite, ModelAdapter, capture_features
     from saebase.interventions import BatchEngine, ResultWriter
-    from saebase.sae.loading import load_model_and_sae
+    from saebase.api.sae_loading import load_model_and_sae
     from saebase.store import sha256_state_dict
 
     raw, sae, _meta = load_model_and_sae("qwen3_1_7b_base_resid_w32k", 7, device="cuda")

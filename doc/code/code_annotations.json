@@ -63,7 +63,7 @@
       "summary": "SAE 特征读取和可控特征编辑 API。"
     },
     {
-      "path": "saebase/sae/registry.py",
+      "path": "saebase/api/sae_profiles.py",
       "context_ids": [
         "g.sae.sae_registry"
       ],

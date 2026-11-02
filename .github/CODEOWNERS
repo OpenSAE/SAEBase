@@ -6,7 +6,8 @@
 # Critical workflow and contract paths
 /.github/ @AtheavenMa
 /saebase/api/ @AtheavenMa
-/saebase/sae/ @AtheavenMa
+/tasks/precheck/ @AtheavenMa
+/tasks/benchmark/ @AtheavenMa
 /saebase/store/ @AtheavenMa
 /saebase/interventions/ @AtheavenMa
 /saebase/benchmarks/ @AtheavenMa

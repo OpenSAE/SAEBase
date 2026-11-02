@@ -17,8 +17,8 @@ from pathlib import Path
 import torch
 
 from saebase.api import ActivationSite, ModelAdapter, capture_features, edit_features
-from saebase.sae.loading import load_model_and_sae
-from saebase.sae.registry import get_profile
+from saebase.api.sae_loading import load_model_and_sae
+from saebase.api.sae_profiles import get_profile
 from saebase.store import sha256_state_dict
 
 

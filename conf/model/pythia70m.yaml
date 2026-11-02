@@ -4,3 +4,9 @@ model:
   pretrained_name: pythia-70m-deduped
   family: pythia
   device: cuda
+  # SAE resources owned by this Model, not an extra Registry.
+  sae_profiles:
+    - pythia70m_resid_sm
+    - pythia70m_saebench_gated_l3
+  default_saes:
+    - pythia70m_resid_sm

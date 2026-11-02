@@ -14,7 +14,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from saebase.sae.coverage import load_coverage, verify_cpu_sae_evidence
+from tasks.benchmark.coverage_contract import load_coverage, verify_cpu_sae_evidence
 
 CATALOG = Path(__file__).resolve().parents[2] / "conf" / "coverage" / "stage_bc.json"
 SCHEMA = "saebase.coverage.cpu_matrix_result.v2"

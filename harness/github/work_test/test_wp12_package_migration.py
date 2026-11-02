@@ -17,7 +17,7 @@ MOVED = {
     "saebase/interventions/research_edits.py",
     "saebase/interventions/ndif_adapter.py",
     "saebase/interventions/pyvene_adapter.py",
-    "saebase/sae/external_training.py",
+    "tasks/train/external_training.py",
 }
 
 

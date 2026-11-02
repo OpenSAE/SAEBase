@@ -44,7 +44,7 @@ ROLES = (
     ("tasks/benchmark/", "SAE benchmarking"),
     ("tasks/train/", "sparse autoencoder training"),
     ("tasks/", "research task execution"),
-    ("saebase/sae/", "SAE representation and checkpoints"),
+    ("saebase/api/sae_", "SAE representation and checkpoints"),
     ("saebase/api/", "feature-level research interfaces"),
     ("saebase/data/", "prompt and artifact compatibility"),
     ("saebase/store/", "feature cache and storage"),

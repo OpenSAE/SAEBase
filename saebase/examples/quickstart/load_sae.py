@@ -10,8 +10,8 @@ _ROOT = Path(__file__).resolve().parents[3]
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
-from saebase.sae.loading import load_sae_for_profile
-from saebase.sae.registry import get_profile
+from saebase.api.sae_loading import load_sae_for_profile
+from saebase.api.sae_profiles import get_profile
 
 
 def main() -> None:

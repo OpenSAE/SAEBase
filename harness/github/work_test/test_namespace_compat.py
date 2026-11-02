@@ -63,7 +63,7 @@ def test_legacy_plugin_paths_share_single_registration_state():
     assert legacy_models._HOOKED_KEYS is named_models._HOOKED_KEYS
     assert legacy_models._register_builtin_models is named_models._register_builtin_models
     assert legacy_tasks.SAETask is named_tasks.SAETask
-    assert "sae" in list_registered_task_keys()
+    assert "precheck" in list_registered_task_keys()
     assert "pythia70m" in list_registered_model_keys()
     assert "pythia70m_resid_sm" in list_registered_sae_keys()
 

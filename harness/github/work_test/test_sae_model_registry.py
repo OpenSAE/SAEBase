@@ -17,7 +17,7 @@ from saebase.registry import (
     list_registered_sae_keys,
     list_registered_task_keys,
 )
-from saebase.sae.registry import (
+from saebase.api.sae_profiles import (
     DEFAULT_SAE_FOR_MODEL,
     MODEL_KEYS,
     SAE_KEYS,
@@ -138,13 +138,16 @@ def test_config_rejects_unbundled_research_task():
 
 def test_plugins_register_sae_stack():
     ensure_plugins_loaded()
+    from saebase.registry import get_model_plugin
+
+    assert len(list_registered_model_keys()) == 15
     for k in MODEL_KEYS:
-        assert k in list_registered_model_keys()
+        assert get_model_plugin(k) is not None
     for k in SAE_KEYS:
         assert k in list_registered_sae_keys()
     assert "none" in list_registered_sae_keys()
-    assert "sae" in list_registered_task_keys()
-    assert list_registered_task_keys() == sorted({"sae", "capture", "intervene", "generate", "circuits", "explain", "benchmark", "train"})
+    assert "precheck" in list_registered_task_keys()
+    assert list_registered_task_keys() == sorted({"precheck", "capture", "intervene", "generate", "circuits", "explain", "benchmark", "train"})
 
 
 def test_r1_accepts_discovery_on_mmlu_pro():

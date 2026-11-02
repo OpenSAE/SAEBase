@@ -60,10 +60,11 @@ def test_no_forbidden_imports_in_active_packages():
 
 def test_sae_plugin_importable():
     from saebase.registry import get_task_plugin
-    from saebase.sae.task import SAETask
+    from tasks.benchmark.legacy_sae_task import SAETask
 
     task = SAETask()
     assert task.name == "sae"
-    assert get_task_plugin("sae").task_class is SAETask
+    from tasks.precheck.task import PrecheckTask
+    assert get_task_plugin("precheck").task_class is PrecheckTask
     for name in TASK_NAMES:
         assert get_task_plugin(name).task_class is not None

@@ -4,3 +4,8 @@ model:
   pretrained_name: Qwen/Qwen3.5-4B
   family: qwen
   device: cuda
+  # SAE resources owned by this Model, not an extra Registry.
+  sae_profiles:
+    - qwen35_4b_matryoshka_l15_65k
+  default_saes:
+    - qwen35_4b_matryoshka_l15_65k

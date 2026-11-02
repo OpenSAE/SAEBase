@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 
-from saebase.sae.coverage import CoverageEntry, load_coverage
+from tasks.benchmark.coverage_contract import CoverageEntry, load_coverage
 
 CATALOG = Path(__file__).resolve().parents[2] / "conf" / "coverage" / "stage_bc.json"
 
@@ -30,7 +30,7 @@ def probe_file_path(entry: CoverageEntry, layer: int) -> str | None:
     }:
         return p["source_file_id"].rstrip("/") + "/params.safetensors"
     if key == "gemma2_2b_pt_l25_canonical":
-        from saebase.sae.registry import get_profile
+        from saebase.api.sae_profiles import get_profile
 
         physical = get_profile(key).resolved_physical_path
         if physical:

@@ -4,3 +4,8 @@ model:
   pretrained_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
   family: qwen
   device: cuda
+  # SAE resources owned by this Model, not an extra Registry.
+  sae_profiles:
+    - r1_distill_qwen15b_resid_l20
+  default_saes:
+    - r1_distill_qwen15b_resid_l20

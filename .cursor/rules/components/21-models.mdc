@@ -1,13 +1,13 @@
 ---
 description: 语言模型与 SAE 权重的身份、兼容性与注册契约。
-globs: "models/**,saebase/sae/**,conf/model/**,conf/models_log.md"
+globs: "models/**,saebase/api/sae_*.py,conf/model/**,conf/models_log.md"
 alwaysApply: false
 ---
 
 # Model 边界
 
-- `models/<name>/` 包含具体模型的构建、适配和 Model × Task × Dataset 兼容性检查；不再增加领域分类目录层级。
-- SAEBase 原有模型与 SAE profiles 均保留，统一经 `models/plugins.py` 和 `saebase/registry.py` 注册。
-- `saebase/sae/registry.py` 保留来源、模型、层、Hook 和 SAE checkpoint 的准确身份及兼容关系。
+- `models/<family>/<series>/<model_key>/` 是活跃 Model 实现的权威位置；原路径只为兼容旧导入。
+- Model 通过 `models/plugins.py` 与 `saebase/registry.py` 注册；SAE 是 Model 自带的可配置资源，`model.default_saes` 声明默认检查列表。
+- `saebase/api/sae_profiles.py` 保留来源、模型、层、Hook 和 SAE checkpoint 的准确身份及兼容关系。
 - 公共构建与延迟加载放在 `models/` 的通用模块；不得平行创建第二套模型 Registry 或 Runtime。
 - 只在获批准的真实实验中下载或加载大模型，配置与插件检测保持 CPU 轻量。

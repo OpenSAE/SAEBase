@@ -4,7 +4,7 @@ from dataclasses import dataclass,field
 from pathlib import Path
 from typing import Any
 from saebase.api import ActivationSite
-from saebase.sae.registry import get_profile
+from saebase.api.sae_profiles import get_profile
 from saebase.store import fingerprint
 from saebase.benchmarks.registry import get_metric
 import json
@@ -23,7 +23,7 @@ class MatrixTarget:
     usage_note:str="Downloaded on demand; checkpoint weights are not redistributed."
 
     def __post_init__(self)->None:
-        from saebase.sae.registry import get_profile
+        from saebase.api.sae_profiles import get_profile
         if not self.model_key or not self.family or len(self.sae_keys)<2:
             raise ValueError("each model family needs at least two SAE checkpoints")
         if len(set(self.sae_keys))!=len(self.sae_keys):

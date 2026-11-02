@@ -23,7 +23,7 @@ import torch  # noqa: E402
 
 from saebase.api import ActivationSite, ModelAdapter, capture_features  # noqa: E402
 from saebase.interventions import Condition, apply_condition  # noqa: E402
-from saebase.sae.loading import load_model_and_sae  # noqa: E402
+from saebase.api.sae_loading import load_model_and_sae  # noqa: E402
 
 PROMPT = "The capital of France is"
 LAYER = 7

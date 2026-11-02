@@ -16,8 +16,8 @@ from pathlib import Path
 import torch
 
 from saebase.benchmarks.results import atomic_json
-from saebase.sae.coverage import load_coverage
-from saebase.sae.stage_d import (
+from tasks.benchmark.coverage_contract import load_coverage
+from tasks.benchmark.stage_d import (
     DEFAULT_MODEL_ORDER,
     build_final_matrix,
     build_site_records,
@@ -154,7 +154,7 @@ def main(argv=None) -> int:
     print(json.dumps(summary, indent=2))
     if args.dry_run:
         if args.finalize:
-            from saebase.sae.stage_d import rebuild_canonical_status
+            from tasks.benchmark.stage_d import rebuild_canonical_status
 
             rebuild_canonical_status(args.output, records)
             matrix = build_final_matrix(args.output, records)
@@ -231,7 +231,7 @@ def main(argv=None) -> int:
             )
 
     if args.finalize:
-        from saebase.sae.stage_d import rebuild_canonical_status
+        from tasks.benchmark.stage_d import rebuild_canonical_status
 
         rebuild_canonical_status(args.output, records)
         matrix = build_final_matrix(args.output, records)

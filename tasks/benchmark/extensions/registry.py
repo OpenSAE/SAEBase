@@ -42,7 +42,7 @@ def register_extension(bundle: ExtensionBundle) -> None:
     if bundle.name in _BUNDLES:
         raise ValueError(f"extension already registered: {bundle.name}")
     from saebase.registry import list_registered_model_keys
-    from saebase.sae.registry import SAE_KEYS, DEFAULT_SAE_FOR_MODEL
+    from saebase.api.sae_profiles import SAE_KEYS, DEFAULT_SAE_FOR_MODEL
     from tasks.benchmark.backend.registry import metric_specs, register_metric
 
     model_keys = [x.key for x in bundle.models]

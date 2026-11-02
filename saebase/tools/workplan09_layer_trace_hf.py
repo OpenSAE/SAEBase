@@ -21,7 +21,7 @@ sys.path.insert(0, str(ROOT))
 
 import torch  # noqa: E402
 
-from saebase.sae.loading import load_model_and_sae  # noqa: E402
+from saebase.api.sae_loading import load_model_and_sae  # noqa: E402
 
 OUT = Path("/workspace/experiments/performance/workplan09/rtx5070-20261021/gpu06")
 LAYER_SITE = 7

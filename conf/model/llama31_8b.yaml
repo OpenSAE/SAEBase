@@ -4,3 +4,8 @@ model:
   pretrained_name: meta-llama/Llama-3.1-8B
   family: llama
   device: cuda
+  # SAE resources owned by this Model, not an extra Registry.
+  sae_profiles:
+    - llama31_8b_lxr_8x
+  default_saes:
+    - llama31_8b_lxr_8x

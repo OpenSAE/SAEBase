@@ -22,7 +22,7 @@ from saebase.extensions import (
     load_external_pair,
     register_extension,
 )
-from saebase.sae.loading import load_sae_for_profile
+from saebase.api.sae_loading import load_sae_for_profile
 
 MODEL_REPO = "Qwen/Qwen3-1.7B-Base"
 MODEL_REVISION = "ea980cb0a6c2ae4b936e82123acc929f1cec04c1"

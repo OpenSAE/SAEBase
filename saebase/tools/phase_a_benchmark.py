@@ -18,7 +18,7 @@ from saebase.benchmarks import BenchmarkConfig, build_plan
 from saebase.benchmarks.runner import execute
 from saebase.benchmarks.report import write_report
 from saebase.reliability import AuditConfig, evaluate_m3, write_audit, read_audit
-from saebase.sae.loading import load_model_and_sae
+from saebase.api.sae_loading import load_model_and_sae
 from saebase.tools.phase_a_verify import TARGETS, PROMPTS
 
 

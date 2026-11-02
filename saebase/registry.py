@@ -1,4 +1,4 @@
-"""Central registries for prompt sources, models, SAE profiles, and tasks."""
+"""Core Dataset/Model/Task registration with compatibility SAE parameter lookup."""
 
 from __future__ import annotations
 
@@ -48,7 +48,7 @@ class ModelPlugin:
 
 @dataclass(frozen=True)
 class SAEPlugin:
-    """``sae.name`` → SAE profile lookup / validation hook."""
+    """Legacy SAE configuration lookup, not a core registered component."""
 
     assert_compatible: Callable[[DictConfig], None]
     profile_key: str
@@ -148,17 +148,43 @@ def get_prompt_source_plugin(name: str) -> PromptSourcePlugin:
 def get_model_plugin(name: str) -> ModelPlugin:
     _ensure_plugins()
     key = str(name)
-    if key not in _MODEL_REGISTRY:
-        raise ValueError(f"Unknown model.name: {key!r}")
-    return _MODEL_REGISTRY[key]
+    if key in _MODEL_REGISTRY:
+        return _MODEL_REGISTRY[key]
+    # Historical model adapters remain explicitly loadable for reproduction,
+    # without contributing to the small active Model registration list.
+    from models.plugins import _LEGACY_KEYS, legacy_plugin
+
+    if key in _LEGACY_KEYS:
+        return legacy_plugin(key)
+    raise ValueError(f"Unknown model.name: {key!r}")
 
 
 def get_sae_plugin(name: str) -> SAEPlugin:
     _ensure_plugins()
     key = str(name)
-    if key not in _SAE_REGISTRY:
-        raise ValueError(f"Unknown sae.name: {key!r}")
-    return _SAE_REGISTRY[key]
+    if key in _SAE_REGISTRY:
+        return _SAE_REGISTRY[key]  # Deprecated external compatibility extension.
+    if key == "none":
+        return SAEPlugin(assert_compatible=lambda cfg: None, profile_key="none")
+    # SAE is a Model-owned resource parameter, not a fourth core Registry.
+    from saebase.api.sae_profiles import get_profile
+
+    try:
+        profile = get_profile(key)
+    except KeyError as exc:
+        raise ValueError(f"Unknown sae.name: {key!r}") from exc
+
+    def check(cfg: DictConfig) -> None:
+        model = str(cfg.model.name)
+        if model not in profile.allowed_model_keys():
+            raise ValueError(
+                f"SAE {key!r} is incompatible with model {model!r}"
+            )
+        value = cfg.get("sae", {}).get("layer")
+        if value is not None and int(value) not in profile.layers:
+            raise ValueError(f"SAE {key!r} does not include layer {value}")
+
+    return SAEPlugin(assert_compatible=check, profile_key=profile.key)
 
 
 def get_task_plugin(name: str) -> TaskPlugin:
@@ -183,7 +209,10 @@ def list_registered_model_keys() -> list[str]:
 
 def list_registered_sae_keys() -> list[str]:
     _ensure_plugins()
-    return sorted(_SAE_REGISTRY.keys())
+    # Legacy public listing resolves Model-associated SAE profile parameters.
+    from saebase.api.sae_profiles import DEFAULT_SAE_FOR_MODEL, SAE_KEYS
+
+    return sorted(set(_SAE_REGISTRY) | set(SAE_KEYS) | set(DEFAULT_SAE_FOR_MODEL) | {"none"})
 
 
 def list_registered_task_keys() -> list[str]:

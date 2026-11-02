@@ -173,8 +173,8 @@ def test_dispatch_rejects_implicit_network_and_gpu_execution(tmp_path):
     from harness.github.work_plan.dispatch import approved_command
 
     for argv in (
-        ["python", "-m", "saebase.setup.smoke", "--allow-network"],
-        ["python", "-m", "saebase.setup.smoke", "--allow-gpu"],
+        ["python", "-m", "tasks.precheck.worker", "--allow-network"],
+        ["python", "-m", "tasks.precheck.worker", "--allow-gpu"],
         ["bash", "scripts/experiments/example.sh", "--execute"],
     ):
         if argv[0] == "bash":

@@ -16,8 +16,8 @@ import subprocess
 import sys
 from typing import Any
 
-from saebase.sae.loading import load_sae_for_profile
-from saebase.sae.registry import get_profile
+from saebase.api.sae_loading import load_sae_for_profile
+from saebase.api.sae_profiles import get_profile
 from saebase.store import sha256_state_dict
 
 

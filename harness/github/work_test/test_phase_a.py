@@ -109,8 +109,8 @@ def test_prepared_prompts_manifest_and_token_ids(tmp_path):
 
 
 def test_preflight_uses_requested_data_dir(tmp_path):
-    from saebase.sae.pipeline_checks import run_preflight
-    from saebase.sae.prompts import load_behavior_prompts
+    from tasks.benchmark.pipeline_checks import run_preflight
+    from saebase.datasets.legacy_prompts import load_behavior_prompts
 
     data = tmp_path / "custom_prompts"
     prepare_fake(data)
@@ -123,7 +123,7 @@ def test_preflight_uses_requested_data_dir(tmp_path):
 
 
 def test_complete_activation_health_and_json(tmp_path, monkeypatch):
-    import saebase.sae.activation_health as module
+    import tasks.benchmark.activation_health as module
 
     data = tmp_path / "outside_repo_data"
     _, model = prepare_fake(data)
@@ -234,7 +234,7 @@ def test_generator_wrapper_has_no_research_import():
 
 
 def test_activation_summary_with_all_failures_is_strict_json(tmp_path):
-    from saebase.sae.results import summarize_rows, write_run_summary
+    from tasks.benchmark.health_results import summarize_rows, write_run_summary
 
     summary = summarize_rows([{"ok": False, "prompt_idx": 0, "error": "bad hook"}])
     assert summary["l0_median"] is None
@@ -245,7 +245,7 @@ def test_activation_summary_with_all_failures_is_strict_json(tmp_path):
 
 
 def test_preflight_rejects_missing_manifest_mode(tmp_path):
-    from saebase.sae.pipeline_checks import run_preflight
+    from tasks.benchmark.pipeline_checks import run_preflight
 
     prepare_fake(tmp_path)
     with pytest.raises(ValueError, match="requires prepared prompts"):
@@ -253,7 +253,7 @@ def test_preflight_rejects_missing_manifest_mode(tmp_path):
 
 
 def test_pythia_sae_loading_accepts_multiple_sae_lens_return_shapes(monkeypatch):
-    import saebase.sae.loading as loading
+    import saebase.api.sae_loading as loading
 
     class SAEDouble:
         def eval(self):
@@ -303,14 +303,14 @@ def test_pythia_example_config_files_have_required_groups():
 
 
 def test_missing_external_batchtopk_loader_reports_boundary():
-    from saebase.sae.loading import load_sae_for_profile
+    from saebase.api.sae_loading import load_sae_for_profile
 
     with pytest.raises(RuntimeError, match="protocol-10 loader"):
         load_sae_for_profile("llama31_8b_instruct_andyrdt_l19_k64", 19, device="cpu")
 
 
 def test_legacy_sae_loader_tuple_handled(monkeypatch):
-    import saebase.sae.loading as loading
+    import saebase.api.sae_loading as loading
 
     class SAEDouble:
         def eval(self):

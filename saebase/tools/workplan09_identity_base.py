@@ -29,8 +29,8 @@ from saebase.interventions import (  # noqa: E402
     MeasurementSample,
     ResultWriter,
 )
-from saebase.sae.loading import load_model_and_sae  # noqa: E402
-from saebase.sae.registry import get_profile  # noqa: E402
+from saebase.api.sae_loading import load_model_and_sae  # noqa: E402
+from saebase.api.sae_profiles import get_profile  # noqa: E402
 from saebase.store import SampleRecord, TokenSelection, sha256_state_dict  # noqa: E402
 
 SITES = (

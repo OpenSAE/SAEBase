@@ -411,7 +411,7 @@ def _conditions_for(feature_ids: list[int], d_sae: int) -> list[Any]:
 
 def _load_pair(spec: dict[str, Any]) -> tuple[Any, Any, dict[str, Any]]:
     import torch
-    from saebase.sae.loading import load_model_and_sae
+    from saebase.api.sae_loading import load_model_and_sae
 
     free_b, _ = torch.cuda.mem_get_info()
     if free_b < 2 * 1024**3:
@@ -441,7 +441,7 @@ def _capture_store(
     store_root: Path,
 ) -> Path:
     from saebase.api import ActivationSite
-    from saebase.sae.registry import get_profile
+    from saebase.api.sae_profiles import get_profile
     from saebase.store import ActivationIdentity, ActivationWriter, collect_activations
 
     hook = get_profile(spec["sae_key"]).hook_name(int(spec["layer"]))
@@ -592,7 +592,7 @@ def _experiment(
 ) -> Any:
     from saebase.api import ActivationSite
     from saebase.interventions import ExperimentIdentity
-    from saebase.sae.registry import get_profile
+    from saebase.api.sae_profiles import get_profile
 
     hook = get_profile(spec["sae_key"]).hook_name(int(spec["layer"]))
     return ExperimentIdentity(
@@ -846,7 +846,7 @@ def cmd_role(spec: dict[str, Any], role: str) -> int:
             rows, pad = payload["rows"], int(payload["pad_token_id"])
         samples = _samples_from_token_rows(rows)
         from saebase.api import ActivationSite
-        from saebase.sae.registry import get_profile
+        from saebase.api.sae_profiles import get_profile
 
         hook = get_profile(spec["sae_key"]).hook_name(int(spec["layer"]))
         # Capture once on the candidate. The base encodes that same store.

@@ -60,7 +60,7 @@ def cmd_reference() -> int:
     import torch
     from saebase.api import ActivationSite, ModelAdapter, capture_features
     from saebase.interventions import Condition, apply_condition
-    from saebase.sae.loading import load_model_and_sae
+    from saebase.api.sae_loading import load_model_and_sae
 
     out = RUN / "gpu06"
     out.mkdir(parents=True, exist_ok=True)

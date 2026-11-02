@@ -30,7 +30,7 @@
       "why_it_matters": "SAE 特征需在模型与激活位置确定后解释。",
       "foundation": "doc/knowledge/foundations/sae_methods.md",
       "source_evidence": [
-        "saebase/sae/contracts.py"
+        "saebase/api/sae_contracts.py"
       ],
       "aliases": [
         "SAE",

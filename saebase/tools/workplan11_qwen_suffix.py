@@ -17,7 +17,7 @@ from saebase.api import ActivationSite, ModelAdapter, capture_features
 from saebase.interventions.clean_prefix import CLEAN_KV_REASON, CLEAN_KV_STATUS
 from saebase.interventions.operators import apply_condition
 from saebase.interventions.specs import Condition
-from saebase.sae.loading import load_sae_for_profile
+from saebase.api.sae_loading import load_sae_for_profile
 
 PROMPTS = (
     "The capital of France is",

@@ -1,6 +1,6 @@
 """No-download release matrix preflight; never claims unverified availability."""
 from __future__ import annotations
-from saebase.sae.registry import get_profile
+from saebase.api.sae_profiles import get_profile
 from .schema import MatrixConfig
 
 def plan_matrix(matrix:MatrixConfig)->dict:

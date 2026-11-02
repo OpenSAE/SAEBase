@@ -4,3 +4,8 @@ model:
   pretrained_name: pythia-410m-deduped
   family: pythia
   device: cuda
+  # SAE resources owned by this Model, not an extra Registry.
+  sae_profiles:
+    - pythia410m_mlp_topk
+  default_saes:
+    - pythia410m_mlp_topk

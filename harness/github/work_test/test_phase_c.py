@@ -349,7 +349,7 @@ def test_unmodified_module_loaded_explicitly(tmp_path):
 
 
 def test_configured_second_site_does_not_claim_downloads():
-    from saebase.sae.registry import get_profile
+    from saebase.api.sae_profiles import get_profile
 
     first = get_profile("pythia70m_resid_sm")
     second = get_profile("gemma270m_scope_resid")

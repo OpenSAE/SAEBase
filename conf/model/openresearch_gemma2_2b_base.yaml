@@ -4,3 +4,10 @@ model:
   hf_id: google/gemma-2-2b
   device: cpu
   lazy: true
+  # SAE resources owned by this Model, not an extra Registry.
+  sae_profiles:
+    - gemma2_2b_it_matryoshka_l12_32k
+    - gemma2_2b_it_scope_resid_l12
+    - gemma2_2b_pt_l25_canonical
+  default_saes:
+    - gemma2_2b_pt_l25_canonical

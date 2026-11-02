@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from saebase.sae.coverage import load_coverage, verify_cpu_sae_evidence
+from tasks.benchmark.coverage_contract import load_coverage, verify_cpu_sae_evidence
 from saebase.tools.phase_bc_aggregate import aggregate
 
 CATALOG = Path(__file__).resolve().parents[3] / "conf" / "coverage" / "stage_bc.json"
@@ -119,7 +119,7 @@ def test_aggregate_rejects_missing_or_duplicate_evidence(tmp_path):
 
 
 def test_gemma_9b_uses_an_upstream_mapped_real_checkpoint():
-    from saebase.sae.registry import get_profile
+    from saebase.api.sae_profiles import get_profile
 
     key = "gemma2_9b_pt_scope_resid"
     assert get_profile(key).sae_id(20) == "layer_20/width_16k/average_l0_58"

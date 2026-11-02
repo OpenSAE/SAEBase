@@ -19,7 +19,7 @@ GROUP_SUMMARIES = {
     "saebase": "按科研概念浏览特征表示、模型接口、因果干预、基准评测、训练与验证的真实实现。",
     "datasets": "组织 NLP Prompt、数据来源及其可追溯的版本化输入。",
     "models": "实现语言模型的加载、激活位置与任务兼容性检查。",
-    "tasks": "执行七类 LLM SAE 科研任务并保留原有 SAEBase 接口。",
+    "tasks": "执行 Precheck 与七类 LLM SAE 科研任务并保留原有公共接口。",
     "harness": "维护项目结构、代码树、科研术语、实验审阅与环境记录。",
 }
 MODULES = {
@@ -74,7 +74,7 @@ METHODS = {
 CONCRETE = {
     "datasets": ("NLP 数据集实现", "查看语言模型 Prompt 来源、读取和产物协议。"),
     "models": ("LLM 模型实现", "查看实际语言模型和任务兼容性。"),
-    "tasks": ("七类 LLM SAE 任务", "查看特征捕获、干预、生成、电路、解释、评测与训练。"),
+    "tasks": ("Precheck 与七类 SAE 科研任务", "统一环境检查入口与特征捕获、干预、生成、解释和训练。"),
 }
 # Reviewed task responsibilities. A task family, its plugin entry, and its
 # implementation are distinct concepts, even when all share the same operation.
@@ -92,16 +92,26 @@ MODEL_MODULE_RESPONSIBILITIES = {
 
 def model_module_role(path: str) -> tuple[str, str] | None:
     parts = PurePosixPath(path).parts
-    if len(parts) != 3 or parts[0] != "models":
+    if not parts or parts[0] != "models":
         return None
-    if parts[2] == parts[1] + ".py":
-        return MODEL_MODULE_RESPONSIBILITIES["model"]
-    if parts[2] == "model_task_dataset_compatibility.py":
-        return MODEL_MODULE_RESPONSIBILITIES["compatibility"]
+    if len(parts) == 5:
+        if parts[4] == "model.py":
+            return MODEL_MODULE_RESPONSIBILITIES["model"]
+        if parts[4] == "compatibility.py":
+            return MODEL_MODULE_RESPONSIBILITIES["compatibility"]
+    if len(parts) == 3:
+        if parts[2] == parts[1] + ".py":
+            return MODEL_MODULE_RESPONSIBILITIES["model"]
+        if parts[2] == "model_task_dataset_compatibility.py":
+            return MODEL_MODULE_RESPONSIBILITIES["compatibility"]
     return None
 
 
 TASK_INSTANCE_SEMANTICS = {
+    "precheck": (
+        "科研环境与 SAE/Task 真实检查",
+        "按 Model 默认 SAE、Task 列表和授权预算执行检查，逐项记录证据与阻塞原因。",
+    ),
     "capture": (
         "SAE 激活捕获与稀疏特征读取",
         "面向选定模型层采集真实激活，形成带有特征位置和重建信息的研究记录。",
@@ -132,6 +142,10 @@ TASK_INSTANCE_SEMANTICS = {
     ),
 }
 TASK_WRAPPER_SUMMARIES = {
+    "precheck": (
+        "绑定统一 Precheck 任务入口",
+        "PrecheckTask 按配置调度 SAE 基础检查与七类科研 Task 的真实最小执行。",
+    ),
     "capture": ("绑定激活捕获任务入口", "将 CaptureTask 注册为 capture 操作，交由统一运行器加载模型、SAE 和输入配置。"),
     "intervene": ("绑定教师强制干预任务入口", "将 InterveneTask 指向 intervene 操作；特征替换和 Logit 对比由具体执行模块负责。"),
     "generate": ("绑定生成干预任务入口", "通过 GenerateTask 声明 generate 操作，并将任务配置交给统一 SAE 运行接口。"),
@@ -141,6 +155,10 @@ TASK_WRAPPER_SUMMARIES = {
     "train": ("绑定 SAE 训练任务入口", "TrainTask 声明 train 操作，统一接收 Hydra 配置并交给训练实现。"),
 }
 TASK_IMPLEMENTATION_SUMMARIES = {
+    "precheck": (
+        "执行可配置的 SAE 与 Task 预检",
+        "调用纯准备 Setup 和隔离的真实检查，核查产物并汇总 PASS/FAIL/BLOCKED/NOT_RUN。",
+    ),
     "capture": ("提取激活特征及重建统计", "捕获指定 Hook 的 SAE 编码，返回活跃特征数、最强特征以及重建范数。"),
     "intervene": ("替换稀疏特征并测量输出变化", "对固定 Prompt 替换指定 SAE 特征，比较前后 Logit 并返回变化范数及候选 Token。"),
     "generate": ("比较逐步生成前后的特征干预", "把 Prompt 转成可定位的 Token 样本，构造特征编辑条件并调用逐步生成对照评估。"),
@@ -201,6 +219,7 @@ def source_excerpt(node: dict) -> str | None:
 
 
 TASK_CONFIGURATION_ROLES = {
+    "precheck": "SAE 与科研 Task 的真实检查",
     "capture": "SAE 激活捕获",
     "intervene": "教师强制特征干预",
     "generate": "特征引导文本生成",
@@ -273,11 +292,111 @@ def task_configuration_nodes(name: str, parent: str, nodes: list, edges: list) -
         edges.append({"source": group_id, "target": config_id, "type": "contains"})
 
 
+def _organize_model_hierarchy(nodes: list, edges: list) -> list:
+    """Use actual Family/Series/Model paths, while preserving explicit legacy Models."""
+    parent = "code:group:models"
+    modules = [
+        n for n in nodes
+        if n.get("kind") == "module" and str(n.get("path", "")).startswith("models/")
+    ]
+    current = {n["id"] for n in modules}
+    edges = [
+        edge for edge in edges
+        if not (edge["type"] == "contains" and edge["source"] == parent
+                and edge["target"] in current)
+    ]
+    if not modules:
+        return edges
+
+    def group(group_id: str, title: str, english: str, members: list) -> None:
+        if not members:
+            raise ValueError("Empty Model group: " + group_id)
+        evidence = list(dict.fromkeys(
+            path for m in members for path in (
+                [m["path"]] if m.get("path") else m.get("evidence", [])
+            )
+        ))
+        nodes.append({
+            "id": group_id,
+            "kind": "group",
+            "title": title,
+            "summary": title,
+            "description": title,
+            "english_title": english,
+            "english_summary": english,
+            "english_description": english,
+            "status": "implemented",
+            "presentation_only": True,
+            "source_symbol": "",
+            "context_term_ids": ["term.model"],
+            "evidence": evidence,
+        })
+
+    common = []
+    active = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+    legacy = defaultdict(list)
+    for node in modules:
+        parts = PurePosixPath(node["path"]).parts
+        if len(parts) == 2:
+            common.append(node)
+        elif len(parts) == 5:
+            active[parts[1]][parts[2]][parts[3]].append(node)
+        elif len(parts) == 3:
+            legacy[parts[1]].append(node)
+        else:
+            raise ValueError("Unexpected Model source layout: " + node["path"])
+
+    parent_id = "code:concrete:models"
+    group(parent_id, "LLM Model 与适配实现", "LLM Model implementations", modules)
+    edges.append({"source": parent, "target": parent_id, "type": "contains"})
+    for node in common:
+        edges.append({"source": parent_id, "target": node["id"], "type": "contains"})
+
+    for family, series_map in sorted(active.items()):
+        family_modules = [n for series in series_map.values() for items in series.values() for n in items]
+        family_id = "code:family:models:" + family
+        group(family_id, family + " 模型家族", family + " Model family", family_modules)
+        edges.append({"source": parent_id, "target": family_id, "type": "contains"})
+        for series, models in sorted(series_map.items()):
+            members = [n for items in models.values() for n in items]
+            series_id = family_id + ":" + series
+            group(series_id, series + " 系列", series + " Model series", members)
+            edges.append({"source": family_id, "target": series_id, "type": "contains"})
+            for key, model_modules in sorted(models.items()):
+                model_id = "code:instance:models:" + key
+                group(model_id, "加载 " + key + " 模型", "Load Model " + key, model_modules)
+                edges.append({"source": series_id, "target": model_id, "type": "contains"})
+                for node in model_modules:
+                    edges.append({"source": model_id, "target": node["id"], "type": "contains"})
+
+    if legacy:
+        members = [node for group_modules in legacy.values() for node in group_modules]
+        legacy_id = "code:legacy:models"
+        group(
+            legacy_id,
+            "历史 Model 兼容实现（按需显式加载）",
+            "Historical Model compatibility implementations",
+            members,
+        )
+        edges.append({"source": parent_id, "target": legacy_id, "type": "contains"})
+        for key, model_modules in sorted(legacy.items()):
+            model_id = "code:instance:models:" + key
+            group(model_id, "历史模型 " + key, "Historical Model " + key, model_modules)
+            edges.append({"source": legacy_id, "target": model_id, "type": "contains"})
+            for node in model_modules:
+                edges.append({"source": model_id, "target": node["id"], "type": "contains"})
+
+    return edges
+
+
 def concrete_groups(output: dict) -> None:
     """Group physical datasets, model adapters, and SAE tasks directly by component."""
     nodes = output["nodes"]
     edges = output["edges"]
     for area, (title, summary) in CONCRETE.items():
+        if area == "models":
+            edges = _organize_model_hierarchy(nodes, edges)
+            continue
         parent = "code:group:" + area
         instances = defaultdict(list)
         common = []
