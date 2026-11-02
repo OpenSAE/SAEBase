@@ -173,8 +173,8 @@ def test_dispatch_rejects_implicit_network_and_gpu_execution(tmp_path):
     from harness.github.work_plan.dispatch import approved_command
 
     for argv in (
-        ["python", "-m", "tasks.precheck.worker", "--allow-network"],
-        ["python", "-m", "tasks.precheck.worker", "--allow-gpu"],
+        ["python", "-m", "saebase.setup", "--allow-network"],
+        ["python", "-m", "saebase.setup", "--allow-gpu"],
         ["bash", "scripts/experiments/example.sh", "--execute"],
     ):
         if argv[0] == "bash":
@@ -183,3 +183,38 @@ def test_dispatch_rejects_implicit_network_and_gpu_execution(tmp_path):
             source.write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
         with pytest.raises(life.PlanError, match="lacks declared permission"):
             approved_command({"permission": "local", "command": argv}, tmp_path)
+
+
+def test_cross_workplan_requires_exact_human_approval(tmp_path):
+    plan = _fixture(tmp_path)
+    path = tmp_path / plan
+    text = path.read_text(encoding="utf-8")
+    path.write_text(text + "\nPrior WP22 is required for this run.\n", encoding="utf-8")
+    # Previously reviewed legacy plans remain readable; a new draft is gated.
+    assert life.check(plan, root=tmp_path, check_contracts=False)["plan_id"] == "WP23"
+    path.write_text(path.read_text().replace('"status": "reviewed"', '"status": "draft"'))
+    with pytest.raises(life.PlanError, match="Unapproved cross-WP"):
+        life.check(plan, root=tmp_path, check_contracts=False)
+    human = tmp_path / "harness/github/work_plan/from_human/WP23.md"
+    human.write_text(human.read_text().replace(
+        '"scientific_motivation": "Evidence for the research question"',
+        '"scientific_motivation": "Evidence for the research question", "cross_workplan_approvals": [{"wp_id": "WP22", "purpose": "historical record reference", "decision": "APPROVED"}]'
+    ))
+    assert life.check(plan, root=tmp_path, check_contracts=False)["plan_id"] == "WP23"
+
+
+def test_agent_ready_requires_complete_prepared_evidence(tmp_path):
+    plan = _fixture(tmp_path)
+    path = tmp_path / plan
+    data = path.read_text()
+    data = data.replace('"status": "reviewed"', '"status": "agent_ready", "plan_role": "local_agent"')
+    path.write_text(data)
+    with pytest.raises(life.PlanError, match="concrete command"):
+        life.check(plan, root=tmp_path, check_contracts=False)
+    data = data.replace('"goal": "Observe setup"', '"command": ["python", "-m", "saebase.setup", "--help"], "goal": "Observe setup"').replace('"goal": "Run frozen benchmark"', '"command": ["python", "-m", "saebase.runtime", "--help"], "goal": "Run frozen benchmark"')
+    path.write_text(data)
+    with pytest.raises(life.PlanError, match="source SHA"):
+        life.check(plan, root=tmp_path, check_contracts=False)
+    data = data.replace('"plan_role": "local_agent"', '"plan_role": "local_agent", "readiness": {"source_sha": "' + "a" * 40 + '", "offline_evidence": "offline.json", "integration_evidence": "integration.json", "ci_evidence": "ci.json"}')
+    path.write_text(data)
+    assert life.check(plan, root=tmp_path, check_contracts=False)["status"] == "agent_ready"

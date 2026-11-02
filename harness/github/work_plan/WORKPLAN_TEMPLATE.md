@@ -44,6 +44,12 @@ Use existing Context definitions, reference exact Code/Knowledge paths and avoid
 
 使用 `python -m harness.github.work_plan.review_gate --plan ... --summary ... --impact ...` 检验格式；再按审计结论判断是否需要真正的 Node Human Check，源码写入授权独立判断。详见 [编写标准 §6A](WRITING_STANDARD.md)。
 
+## Workplan 类型与本地交付
+
+Draft 可以是历史记录或尚待实现的工程方案（`plan_role: record` 或 `local_agent`）；不等同于已经准备完毕。阶段 7 必须由 GitHub 完成实际源码、默认配置、启动入口、依赖、测试和 CI，再申请 `agent_ready`。执行型 Workplan 的 `readiness` 应包含确切源码 SHA、入口及离线/集成/CI 证据；记录型不得调度。
+
+跨 WP 引用默认禁止。仅阅读历史记录不构成依赖；确需引用时，由人类按被引用 WP 和用途逐项批准，记录在当前 `from_human.cross_workplan_approvals`，不得由 Agent 自行继承。
+
 ## 9. Structured bindings
 The fields below are references and predefined output slots, **not a duplicate copy of experiment parameters**. `status: approved` alone does not grant execution or publish permission.
 
