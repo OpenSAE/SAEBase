@@ -75,7 +75,7 @@ jobs:
           python -m compileall -q harness/github/ci
       - name: Validate CI routing, security and release contracts
         run: |
-          python -m pytest -q             harness/github/work_test/test_ci_select_checks.py             harness/github/work_test/test_ci_lanes.py             harness/github/work_test/test_software_release_workflow_paths.py             harness/github/work_test/test_repository_architecture.py
+          python -m pytest -q             harness/github/work_test/test_ci_select_checks.py             harness/github/work_test/test_ci_lanes.py             harness/github/work_test/test_software_release_workflow_paths.py             harness/github/work_test/test_repository_architecture.py             harness/github/work_test/test_workplan_review_gate.py
 
   harness-targeted:
     needs: changes
