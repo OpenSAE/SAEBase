@@ -165,9 +165,11 @@
       // One explanation, not five competing prose fields. Prefer the proposed
       // property when present, and compare against the actual prior explanation.
       const explanation=data=>{
-        const raw=String(data.properties||data.description||data.summary||
-          data.reader_explanation||"").trim();
-        return raw.replace(/^(?:目标|问题|方案|研究问题|代码方法|现状)[：:]\s*/u,"");
+        const base=String(data.description||data.summary||
+          data.reader_explanation||"").trim().replace(
+            /^(?:目标|问题|方案|研究问题|代码方法|现状)[：:]\s*/u,"");
+        const properties=String(data.properties||"").trim();
+        return [base,properties].filter(Boolean).join("\n");
       };
       const shown=explanation(data),prior=explanation(otherData);
       const explanatory=section(scroll,L("说明","Explanation"));
