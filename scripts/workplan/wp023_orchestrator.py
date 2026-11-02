@@ -48,15 +48,8 @@ def inventory(root: Path = ROOT) -> dict[str, Any]:
                 if model not in profile.allowed_model_keys():
                     raise ValueError("SAE not owned by selected Model")
                 for layer in sorted(set(profile.layers)):
-                    sites.append(declared_site(
-                        model, profile.key, layer, profile.hook_name(layer)
-                    ))
+                    sites.append(declared_site(model, profile.key, layer, profile.hook_name(layer)))
             except (ValueError, KeyError, TypeError) as exc:
-                excluded.append({
-                    "model_key": model,
-                    "sae_key": str(key),
-                    "reason": str(exc)[:160],
-                })
         if not sites:
             excluded.append({"model_key": model, "reason": "No declared valid SAE Site"})
         selected.extend(sorted(sites, key=lambda item: item["site_id"])[:2])
