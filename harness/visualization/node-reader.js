@@ -312,6 +312,16 @@
         field(meta,L("风险","Risk"),entry.proposal.risk);
         field(meta,L("验收条件","Checks"),entry.proposal.checks);
         field(meta,L("涉及文件","Files"),entry.proposal.files);
+        // A Workplan is review provenance, never part of a durable node's
+        // explanation, properties, evidence or scientific status.
+        for(const ref of entry.proposal.workplans || []){
+          if(!ref || typeof ref.url!=="string" ||
+             !/^https:\/\/github\.com\/OpenSAE\/SAEBase\/blob\/[A-Za-z0-9._/-]+$/.test(ref.url))continue;
+          const a=element("a","atlas-reader-source-link",
+            (ref.id || "Workplan")+" · "+L("查看具体计划","View concrete workplan"));
+          a.href=ref.url;a.target="_blank";a.rel="noopener noreferrer";
+          meta.appendChild(a);
+        }
         cardWrap.appendChild(meta);
       }
       if(!same && entry.nodeRect)animateFromNode(cardWrap);
