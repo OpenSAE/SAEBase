@@ -34,6 +34,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Generate source-owned Atlas data
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           python harness/core/validate.py
           python harness/knowledge/validate.py
@@ -42,6 +43,24 @@ jobs:
           python harness/visualization/build_pages.py
           python harness/visualization/build_language.py
           python harness/visualization/package_site.py --output "$RUNNER_TEMP/atlas-web/atlas"
+      - name: Package existing Atlas UI with newly reviewed proposal snapshots
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          set -euo pipefail
+          python harness/core/validate.py
+          python harness/knowledge/validate.py
+          python harness/visualization/build_pages.py --check
+          python harness/visualization/package_site.py --output "$RUNNER_TEMP/atlas-web/atlas"
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json, os
+          path = Path(os.environ["RUNNER_TEMP"]) / "atlas-web/atlas/site-manifest.json"
+          obj = json.loads(path.read_text())
+          obj["graph_provenance"] = "committed_atlas_snapshot_not_new_AST_generation"
+          source = Path("harness/visualization/data.js").read_bytes()
+          obj["graph_snapshot_sha256"] = hashlib.sha256(source).hexdigest()
+          path.write_text(json.dumps(obj, sort_keys=True, indent=2) + "\\n")
+          PY
       - name: Checkout project-owned preview source
         uses: actions/checkout@v4
         with:
