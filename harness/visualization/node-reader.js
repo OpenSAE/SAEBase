@@ -167,7 +167,7 @@
       const explanation=data=>{
         const raw=String(data.properties||data.description||data.summary||
           data.reader_explanation||"").trim();
-        return raw.replace(/^(?:目标|问题|方案|研究问题|代码方法|现状)[：:]\\s*/u,"");
+        return raw.replace(/^(?:目标|问题|方案|研究问题|代码方法|现状)[：:]\s*/u,"");
       };
       const shown=explanation(data),prior=explanation(otherData);
       const explanatory=section(scroll,L("说明","Explanation"));
