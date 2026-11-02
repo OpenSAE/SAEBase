@@ -13,6 +13,6 @@ def run_task(cfg: DictConfig) -> EvaluationResult:
     if str(cfg.task.name) == "sae":
         # Legacy standalone CLI keeps its activation-health entrypoint without
         # occupying one of the eight current Task Registry keys.
-        from saebase.sae.task import SAETask
+        from tasks.benchmark.legacy_sae_task import SAETask
         return SAETask().run(cfg)
     return get_task_plugin(str(cfg.task.name)).task_class().run(cfg)

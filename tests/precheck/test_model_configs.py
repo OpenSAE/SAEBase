@@ -6,7 +6,7 @@ from importlib.resources import files
 
 from omegaconf import OmegaConf
 
-from saebase.sae.registry import get_profile
+from saebase.api.sae_profiles import get_profile
 
 
 def test_model_conf_sae_lists_are_resolvable():

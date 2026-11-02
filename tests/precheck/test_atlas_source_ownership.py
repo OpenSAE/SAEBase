@@ -24,9 +24,7 @@ def test_migrated_sae_code_tree_has_unambiguous_source_ownership():
 
 
 def test_reviewed_sae_semantics_use_real_migrated_source_paths():
-    spec = json.loads(
-        (ROOT / "harness/code/reviewed_semantics.json").read_text(encoding="utf-8")
-    )
+    spec = json.loads((ROOT / "harness/code/reviewed_semantics.json").read_text(encoding="utf-8"))
     for node_id, details in spec["nodes"].items():
         assert not node_id.startswith(("code:module:saebase.sae.", "code:method:saebase.sae."))
         assert not str(details.get("source_path", "")).startswith("saebase/sae/")

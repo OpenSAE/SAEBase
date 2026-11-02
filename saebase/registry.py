@@ -167,7 +167,7 @@ def get_sae_plugin(name: str) -> SAEPlugin:
     if key == "none":
         return SAEPlugin(assert_compatible=lambda cfg: None, profile_key="none")
     # SAE is a Model-owned resource parameter, not a fourth core Registry.
-    from saebase.sae.registry import get_profile
+    from saebase.api.sae_profiles import get_profile
 
     try:
         profile = get_profile(key)
@@ -210,7 +210,7 @@ def list_registered_model_keys() -> list[str]:
 def list_registered_sae_keys() -> list[str]:
     _ensure_plugins()
     # Legacy public listing resolves Model-associated SAE profile parameters.
-    from saebase.sae.registry import DEFAULT_SAE_FOR_MODEL, SAE_KEYS
+    from saebase.api.sae_profiles import DEFAULT_SAE_FOR_MODEL, SAE_KEYS
 
     return sorted(set(_SAE_REGISTRY) | set(SAE_KEYS) | set(DEFAULT_SAE_FOR_MODEL) | {"none"})
 
