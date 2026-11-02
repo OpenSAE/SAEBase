@@ -63,8 +63,10 @@ def plan_compatibility(
         if not isinstance(site, dict):
             raise ValueError("Invalid SAE site")
         normalized = declared_site(
-            site.get("model_key"), site.get("sae_key"),
-            site.get("layer"), site.get("hook_name"),
+            site.get("model_key"),
+            site.get("sae_key"),
+            site.get("layer"),
+            site.get("hook_name"),
         )
         if normalized["model_key"] not in known:
             raise ValueError("SAE site belongs to unselected Model")
@@ -90,20 +92,23 @@ def plan_compatibility(
             raise ValueError("Invalid component state")
         blocked = any(v in {"FAIL", "BLOCKED"} for v in states.values())
         pair_id = (
-            f"model_dataset:{model}:{dataset}" if site is None
+            f"model_dataset:{model}:{dataset}"
+            if site is None
             else f"sae_site_dataset:{site['site_id']}:{dataset}"
         )
-        pairs.append({
-            "id": pair_id,
-            "kind": kind,
-            "dataset_id": dataset,
-            "model_key": model,
-            "site_id": site["site_id"] if site else None,
-            "status": "BLOCKED" if blocked else "NOT_RUN",
-            "eligible": not blocked and all(v == "PASS" for v in states.values()),
-            "dependency_states": states,
-            "scientific_acceptance": "NOT_COVERED",
-        })
+        pairs.append(
+            {
+                "id": pair_id,
+                "kind": kind,
+                "dataset_id": dataset,
+                "model_key": model,
+                "site_id": site["site_id"] if site else None,
+                "status": "BLOCKED" if blocked else "NOT_RUN",
+                "eligible": not blocked and all(v == "PASS" for v in states.values()),
+                "dependency_states": states,
+                "scientific_acceptance": "NOT_COVERED",
+            }
+        )
 
     for model in model_keys:
         for dataset in data:
