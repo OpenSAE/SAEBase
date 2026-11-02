@@ -108,6 +108,10 @@ def model_module_role(path: str) -> tuple[str, str] | None:
 
 
 TASK_INSTANCE_SEMANTICS = {
+    "precheck": (
+        "科研环境与 SAE/Task 真实检查",
+        "按 Model 默认 SAE、Task 列表和授权预算执行检查，逐项记录证据与阻塞原因。",
+    ),
     "capture": (
         "SAE 激活捕获与稀疏特征读取",
         "面向选定模型层采集真实激活，形成带有特征位置和重建信息的研究记录。",
@@ -138,6 +142,10 @@ TASK_INSTANCE_SEMANTICS = {
     ),
 }
 TASK_WRAPPER_SUMMARIES = {
+    "precheck": (
+        "绑定统一 Precheck 任务入口",
+        "PrecheckTask 按配置调度 SAE 基础检查与七类科研 Task 的真实最小执行。",
+    ),
     "capture": ("绑定激活捕获任务入口", "将 CaptureTask 注册为 capture 操作，交由统一运行器加载模型、SAE 和输入配置。"),
     "intervene": ("绑定教师强制干预任务入口", "将 InterveneTask 指向 intervene 操作；特征替换和 Logit 对比由具体执行模块负责。"),
     "generate": ("绑定生成干预任务入口", "通过 GenerateTask 声明 generate 操作，并将任务配置交给统一 SAE 运行接口。"),
@@ -147,6 +155,10 @@ TASK_WRAPPER_SUMMARIES = {
     "train": ("绑定 SAE 训练任务入口", "TrainTask 声明 train 操作，统一接收 Hydra 配置并交给训练实现。"),
 }
 TASK_IMPLEMENTATION_SUMMARIES = {
+    "precheck": (
+        "执行可配置的 SAE 与 Task 预检",
+        "调用纯准备 Setup 和隔离的真实检查，核查产物并汇总 PASS/FAIL/BLOCKED/NOT_RUN。",
+    ),
     "capture": ("提取激活特征及重建统计", "捕获指定 Hook 的 SAE 编码，返回活跃特征数、最强特征以及重建范数。"),
     "intervene": ("替换稀疏特征并测量输出变化", "对固定 Prompt 替换指定 SAE 特征，比较前后 Logit 并返回变化范数及候选 Token。"),
     "generate": ("比较逐步生成前后的特征干预", "把 Prompt 转成可定位的 Token 样本，构造特征编辑条件并调用逐步生成对照评估。"),
@@ -207,6 +219,7 @@ def source_excerpt(node: dict) -> str | None:
 
 
 TASK_CONFIGURATION_ROLES = {
+    "precheck": "SAE 与科研 Task 的真实检查",
     "capture": "SAE 激活捕获",
     "intervene": "教师强制特征干预",
     "generate": "特征引导文本生成",
