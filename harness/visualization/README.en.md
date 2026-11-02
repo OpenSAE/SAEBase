@@ -80,3 +80,8 @@ Human Check Reader: navigating to Change opens its Before/After comparison autom
 
 
 Human Check navigation is Graph-first for Add, Remove and Change alike. A Reader opens only on an explicit node click. Approve saves the current decision, closes any open Reader and navigates to the next Unchecked node in the existing queue, shown in Graph Focus. All done is retained if none remains. Other Deny and Unchecked behavior is unchanged.
+
+
+### Three-step Atlas node reading
+
+Compact Graph (title only) → first node click enters Standard Graph at 1.05 zoom with summary/annotations, without opening Context/Details. Click the Standard card again to open the Reader. Reader entry takes 410ms (formerly 240ms); Back to graph or clicking uncovered graph background closes Reader back to the selected Standard node without activating a different node. Reader content retains native scrolling. All Reader edges (outer and inner) use the same selected-node border color, including live purple/red/gray Human Check decisions.

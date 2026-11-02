@@ -90,7 +90,7 @@
       panel.animate(reverse?
         [{opacity:1,transform:"none"},{opacity:.25,transform:from}]:
         [{opacity:.25,transform:from},{opacity:1,transform:"none"}],
-        {duration:240,easing:"cubic-bezier(.2,.8,.2,1)"});
+        {duration:reverse?220:410,easing:"cubic-bezier(.2,.8,.2,1)"});
     }
     function close() {
       if(!shell)return;
@@ -271,7 +271,8 @@
         cardWrap.addEventListener("wheel",onWheel,{passive:false});
         shell.addEventListener("keydown",event=>{
           if(event.key==="Escape"){
-            event.preventDefault();event.stopPropagation();close();
+            event.preventDefault();event.stopPropagation();
+            const onDismiss=current?.onDismiss;close();onDismiss?.();
           }
         });
       }else{
@@ -291,7 +292,9 @@
       const controls=element("div","atlas-reader-controls");
       const dismiss=element("button","atlas-reader-close",L("缩回 Graph","Back to graph"));
       dismiss.type="button";
-      dismiss.addEventListener("click",close);
+      dismiss.addEventListener("click",()=>{
+        const onDismiss=current?.onDismiss;close();onDismiss?.();
+      });
       controls.appendChild(dismiss);
       head.appendChild(controls);cardWrap.appendChild(head);
       const pages=element("div","atlas-reader-pages"+

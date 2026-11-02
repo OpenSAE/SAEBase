@@ -208,3 +208,18 @@ body.atlas-reader-active .toolbar{justify-content:flex-end}
 .atlas-reader-shell[data-review-state] .atlas-reader-attributes.is-changed{
  border-left-color:var(--hc-frame,#c5666b);
 }
+
+/* Reader frames inherit the same color as the selected Graph node.
+   Keep the two sides and the outer edge consistent in review and reading. */
+.atlas-reader-shell{
+ --reader-border:var(--hc-frame,#c6cacd);
+}
+.atlas-reader-shell[data-review-state="unchecked"]{--hc-frame:#9868d0}
+.atlas-reader-shell[data-review-state="approved"]{--hc-frame:#cf5265}
+.atlas-reader-shell[data-review-state="denied"]{--hc-frame:#8c97a2}
+.atlas-reader-shell .atlas-reader-panel,
+.atlas-reader-shell .atlas-reader-card,
+.atlas-reader-shell .atlas-reader-pages.is-compare .atlas-reader-card.is-before,
+.atlas-reader-shell .atlas-reader-pages.is-compare .atlas-reader-card.is-after{
+ border-color:var(--reader-border);
+}
