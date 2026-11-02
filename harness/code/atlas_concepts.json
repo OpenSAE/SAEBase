@@ -747,7 +747,8 @@
             "term.api"
           ],
           "patterns": [
-            "^(?:check_.*|verify_distribution|stage_d_archive|generate_model_support|release_candidate)\\.py$"
+            "^(?:check_.*|verify_distribution|stage_d_archive|generate_model_support|release_candidate)\\.py$",
+            "^verify_sae_resources\\.py$"
           ]
         },
         {
@@ -762,7 +763,8 @@
             "term.sae.capture"
           ],
           "patterns": [
-            "^(?:m0_.*|m1_.*|phase_bc_cpu_sae|wp12_p2_capture|workplan09_layer_trace_.*|workplan09_identity_.*)\\.py$"
+            "^(?:m0_.*|m1_.*|phase_bc_cpu_sae|wp12_p2_capture|workplan09_layer_trace_.*|workplan09_identity_.*)\\.py$",
+            "^sae_environment_inventory\\.py$"
           ]
         },
         {
