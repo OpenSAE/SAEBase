@@ -107,3 +107,31 @@ def test_setup_is_preparation_only_and_no_smoke_module_exists():
     assert receipt["status"] == "READY"
     assert receipt["scientific_test"] == "NOT_RUN"
     assert receipt["gpu_test"] == "NOT_RUN"
+
+
+def test_task_smoke_uses_model_default_sae_and_actual_site():
+    from tasks.precheck.operation import _task_config
+
+    cfg = OmegaConf.create(
+        {
+            "model": {
+                "name": "qwen35_2b",
+                "default_saes": ["qwen35_2b_resid_w32k"],
+            },
+            "dataset": {"name": "IOI"},
+            "seed": 1,
+            "task": {
+                "name": "precheck",
+                "mode": "task",
+                "device": "cpu",
+                "prompt": "Test input",
+                "task_configs": {},
+            },
+        }
+    )
+    native = _task_config(cfg, "capture", 30, 8)
+    assert native["task"]["sae_key"] == "qwen35_2b_resid_w32k"
+    assert native["task"]["layer"] == 20
+    cfg.task.task_configs = {"capture": {"layer": 7}}
+    with pytest.raises(ValueError, match="invalid for SAE"):
+        _task_config(cfg, "capture", 30, 8)

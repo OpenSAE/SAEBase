@@ -176,13 +176,28 @@ def _task_config(cfg: DictConfig, name: str, max_seconds: int, max_tokens: int) 
             raise ValueError(
                 "Precheck Train requires a native TrainPlan bounded to at most two steps"
             )
-    if name not in ("train", "circuits") and (
-        target.task.get("sae_key") is None
-        or str(target.task.get("sae_key")) == "gemma2_2b_pt_l25_canonical"
-    ):
+    # Shipped Task YAMLs were originally Gemma-specific. For a different
+    # Model, use its own default SAE and corresponding actual layer, unless
+    # the caller explicitly selected both parameters for this Task.
+    if name in ("capture", "intervene", "generate"):
+        from saebase.api.sae_profiles import get_profile
+
+        model_key = str(cfg.model.name)
+        is_explicit_sae = "sae_key" in task
+        is_explicit_layer = "layer" in task
         defaults = list(cfg.model.get("default_saes", []))
-        if defaults:
-            target.task.sae_key = defaults[0]
+        if not is_explicit_sae:
+            if not defaults:
+                raise ValueError(f"Model {model_key!r} has no default SAE for {name}")
+            target.task.sae_key = str(defaults[0])
+        key = str(target.task.sae_key)
+        profile = get_profile(key)
+        if model_key not in profile.allowed_model_keys():
+            raise ValueError(f"SAE {key!r} does not support model {model_key!r}")
+        if not is_explicit_layer:
+            target.task.layer = int(profile.layers[-1])
+        elif int(target.task.layer) not in profile.layers:
+            raise ValueError(f"Explicit layer {target.task.layer} is invalid for SAE {key!r}")
     return OmegaConf.to_container(target, resolve=True)
 
 
