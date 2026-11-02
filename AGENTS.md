@@ -26,7 +26,7 @@ A Work Plan may reference Core/Knowledge/Code/Environment/Context without changi
 
 ## Human Check before GitHub changes
 
-For conversational GitHub maintenance, use [Human Check](harness/github/HUMAN_CHECK.md) and the [Delivery Skill](.github/skills/saebase-delivery/SKILL.md) **before source edits or a PR**. Default is enabled. Generate one Context-grounded written report plus a five-tree Atlas proposed-change overlay; every node has an **independent** Approve / Deny / Unchecked decision, without a whole-plan approval. Denied/unreviewed node scopes do not authorize code changes; unrelated approved scopes may proceed. Only a human may explicitly opt out via the local Atlas review. This does not bypass protected changes, contracts, GPU/publish permissions, or independent verification.
+Before source edits or a PR, follow [Human Check](harness/github/HUMAN_CHECK.md) and the [Delivery Skill](.github/skills/saebase-delivery/SKILL.md). First distinguish **durable Atlas semantic changes** from a source-only modification. For genuine Node ADD/CHANGE/REMOVE, Human Check remains enabled and requires the existing Atlas overlay with independent Approve / Deny / Unchecked decisions (only humans can opt out through the authenticated local UI). For **NO_NODE_CHANGE**, do not fabricate a Node proposal: provide the source-backed impact audit and obtain explicit human review of the exact changed paths and PR diff before implementation/merge, with protected governance authorization retained. Neither route bypasses Contracts, Work Orders, GPU/network/publishing gates or independent verification.
 
 
 ## Conversational task planning
