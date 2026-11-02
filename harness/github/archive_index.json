@@ -561,6 +561,33 @@
       "mode": "move",
       "reason": "Version-bound frozen performance measurement; no current active code dependency found; original blob preserved. HC Issue #161.",
       "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/18_harness_exam_preflight_defects_and_gate_runbook.md",
+      "archived_path": "harness/github/work_plan/archive/0.6.5/0.6.5_wp006_exam_preflight.md",
+      "git_blob_sha": "9d9c1c75f800308912c0a5d1f302f9e7873a80c0",
+      "version": "0.6.5",
+      "mode": "move",
+      "reason": "Frozen standalone WP/exam input; exact source Git blob preserved. Original Human Check scope approved in issue #161; no current code/guide reference found.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/13_live_00_02_report_20261022.json",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp036_live_report.json",
+      "git_blob_sha": "ec1375348a11a32b1185e8cb4fe16e5b090cfb54",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Frozen standalone WP/exam input; exact source Git blob preserved. Original Human Check scope approved in issue #161; no current code/guide reference found.",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/LIVE-02-small-inventory.json",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp037_small_inventory.json",
+      "git_blob_sha": "8c9d433a2cc6c275e1cdf5a9ff6be4b8a49440fa",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Frozen standalone WP/exam input; exact source Git blob preserved. Original Human Check scope approved in issue #161; no current code/guide reference found.",
+      "status": "archived"
     }
   ],
   "notes": "Exact-source historical moves approved by HC-History-Isolation-20261102 issue #161. Existing compatibility records remain where unapproved references exist. Historical contents unchanged."
