@@ -1,39 +1,47 @@
-# WP23 · Agent Ready implementation audit
+# WP23 · Agent Ready 交付审计
 
-**Current decision: BLOCKED — not Agent Ready.** The merged product CI is valid software-regression evidence, but it is not an end-to-end verification of this Workplan. This report is a pre-handoff engineering gate, not a new Workplan, an Atlas node review, or approval to use any external resources.
+**判定：AGENT READY FOR LOCAL VALIDATION（软件交付已就绪，真实运行未验收）。**
 
-## Verified source facts
+## 交付边界
 
-- The independent entrypoint lives at `scripts/workplan/wp023.sh` and `scripts/workplan/wp023_orchestrator.py`. The shell previously displayed only two preparation stages, while the Python entrypoint declares further component and audit stages. The dedicated handoff-fix PR makes stage selection explicit and runs the Python module with a stable source-root import path.
-- `conf/experiment/wp23_precheck.yaml` explicitly says Draft and enumerates default objects/limits, but the orchestrator does not currently read these values to make actual check selection, token limits, or per-worker wall-time decisions. Its content digest is currently checked for source consistency, **not execution equivalence**.
-- `conf/task/precheck.yaml` retains a different, general-purpose default (`mode: sae`, `max_tokens: 32`, `max_seconds: 120`). A complete standalone handoff must reconcile actual configured behavior with its declared Workplan defaults without changing unrelated product behavior.
-- The full WP23 sequence calls for separate **Setup** and optional authorized **Asset Prepare**. The Python CLI currently provides `inspect/inventory/dataset/model/sae/compatibility/task/audit` but no dedicated setup or asset-preparation subcommand; no step command should be invented.
-- The Task stage explicitly returns `BLOCKED_CONFIGURATION` for the default Benchmark case; a successful native Benchmark smoke is not yet established. This must either be implemented with genuine task-owned bounded inputs and tests or reviewed as an explicitly blocked non-default capability, rather than asserted as PASS.
-- A component with a stored `BLOCKED_AUTH` receipt is treated as already recorded on resume. A later authorization does **not** currently cause it to rerun; configuration/asset/permission hashes are not comprehensively validated per receipt. This conflicts with the strict resumability and identity requirements of the plan.
-- The existing lightweight Product CI executes `tests/precheck/` but does **not** by itself execute the dedicated `tests/workplan/wp23/` integration tests or a full staged Run / Resume / Audit round trip.
-- The source-impact review is `DEFER_NODE_DECISION`. Implemented code must be re-audited against actual AST; any real durable Atlas change requires its own Human Check. Approved source paths and permissions do not automatically authorize additional paths or scientific workloads.
+WP23 是独立、通用的 SAEBase Dataset / Model / SAE / Compatibility / Task Precheck。它自己定义检查范围与配置，不从别的 Workplan 继承协议。GitHub 的责任是提供能执行检查的产品代码、实际 CLI 命令及离线软件测试；Local Agent 的责任是实际运行这些检查，检验 Resume、异常、收据、Audit 和真实资源适配。
 
-## Required closure before changing status to agent_ready
+“Agent Ready”不等于所有 Model、Dataset、SAE、Benchmark、Resume 已 PASS，更不等于科学结论。失效、超时、缺权重或缺许可都应成为如实记录的本地测试结果；不允许提前虚构成功。
 
-| Gate | What constitutes actual evidence | Current |
+## 已实现的交付项
+
+| 条目 | 现状 | GitHub 证据 |
 | --- | --- | --- |
-| G1 · Entry | Every step has a real CLI command, fail-closed flag/permission checks, consistent run ID and source-root imports | PARTIAL |
-| G2 · Defaults | The active runner reads WP23's own checked config and validates all default selectors/limits | BLOCKED |
-| G3 · Real workers | Dataset, Model, SAE, valid Pair and four default Tasks each reach genuine bounded Worker paths; missing assets yield truthful blockers | PARTIAL |
-| G4 · Setup | A real, separately permissioned Setup and asset-preparation entry without hidden network/GPU work | BLOCKED |
-| G5 · Resume | Identical source, data, model, SAE, site, parameters and authorization permit safe reuse; changed permissions/resources cause safe independent retry | BLOCKED |
-| G6 · Audit | Missing, altered, extra, crashed and timed-out receipts are handled, with four complete tables and immutable filled Workplan | NOT_INTEGRATION_VERIFIED |
-| G7 · Tests | Bounded negative and end-to-end smoke under exact-source CI, including `tests/workplan/wp23/`; no real-weight claim from mock | NOT_INTEGRATION_VERIFIED |
-| G8 · Review | Updated six-domain source impact, explicit Human Check disposition or verified URL, human-authorized exact implementation scope | PENDING |
-| G9 · Handoff | Exact commit SHA and **actual** offline/integration/CI evidence attached to `readiness`; every `steps[].command` runnable | BLOCKED |
+| 独立入口 | `bash scripts/workplan/wp023.sh` 有 setup / inspect / inventory / asset_prepare / dataset / model / sae / compatibility / task / audit / handoff / run / resume | Source SHA `37b7b4f96b77b60a908deef4fce59e65ac89e18a` |
+| 默认配置 | `conf/experiment/wp23_precheck.yaml` 定义自身目标规则、每 Pair 两条输入、最大 128 tokens / 180 seconds；入口拒绝与已实现常量不一致的配置 | 同源配置校验入口 |
+| 用户权限 | 默认无 GPU、无联网或下载、无发布；计算需要显式 `--allow-compute --allow-gpu`，网络/安装/下载各自显式开启 | `wp023.sh` |
+| 组件 | 独立 Dataset、Model Forward、SAE 和合法组合检查器已存在，实际权重验证在本地执行 | `tasks/precheck/`、`scripts/workplan/wp023_orchestrator.py` |
+| 收据与审计 | 每目标状态、四张 CSV、运行 manifest、Audit 和填写的 Workplan 路径已经实现 | `audit_and_handoff` |
+| 质量 | GitHub PR #158 / #164 / #165 的 Python 质量、Product 和 Harness 软件 CI 成功；这些不是 GPU 实测 | <https://github.com/OpenSAE/SAEBase/actions/runs/41415994491> |
+| Atlas | 六域复核表明没有当前要写入的长期节点描述/性质/关系修改，所以无需本轮 Node Human Check | `reviews/WP23/node_impact.json` |
 
-No G1–G9 gate can be satisfied merely by writing a plausible evidence string or turning a Draft into `agent_ready`. Hardware availability, network, gated assets, paid GPU and publishing remain separately human-authorized.
+## 明确留给 Local Agent 的测试与风险
 
-## Next implementation sequence
+- **真实 Precheck：**全部当前声明的 Dataset/Model/SAE Site、合法组合及有界真实 Task，逐项输出 PASS/FAIL/BLOCKED/NOT_RUN 和实际资源成本。
+- **Benchmark：**实际任务需要真实、有限的测量配置；当前默认可能明确报 `BLOCKED_CONFIGURATION`。这个结果须由 Local Agent 观察、记录并报告，不允许标为已经通过。
+- **Resume：**检查未完成中断、已验证结果复用及改变权限/资源后的重新运行。当前脚本对旧 `BLOCKED_AUTH` 采用保守策略：在权限变更时要求新 run ID，而不是错误复用旧阻塞；更细粒度恢复能力在真实测试中评价。
+- **Audit：**验证缺失、篡改、重复收据、不同 source/config SHA、部分阻塞的四表覆盖与报告生成。代码与单元测试存在不代表这些场景已经本地验证。
+- **权限：**本任务未自动授权真实 GPU、联网下载、受限资产、付费运行、Native 训练、B2 或公开发布。需要这些操作时，Local Agent 应按任务合同申请明确许可，缺少许可则记录 BLOCKED。
 
-1. Resolve G2/G4 and G1 with source-owned config parsing and precise standalone stage commands; preserve source path owners.
-2. Fix G5 with evidence-bound resume and explicit safe retries, then G3 with real bounded task input selection (including Benchmark) and independent receipt checks.
-3. Prove G6/G7 by replaying exact-file negative cases, interrupted runs, parameter drift, blocked resources and complete audit; inspect CI logs and independent source SHA.
-4. Re-audit G8 and finalize G9 **only** after all preceding gates have concrete successful evidence. Leave Workplan status `draft` or `reviewed` until then.
+## 给 Local Agent 的入口
 
-This report intentionally contains no references to other Workplans and grants no compute authority.
+首先同步确切源码，阅读 `AGENTS.md` 和 WP23 正式 Workplan。推荐先执行：
+
+```bash
+bash scripts/workplan/wp023.sh setup
+bash scripts/workplan/wp023.sh inspect
+bash scripts/workplan/wp023.sh run --run-id wp23_run_01
+```
+
+在明确获得 GPU/资源授权及准备实际资产之后，用**新的** run ID 运行：
+
+```bash
+bash scripts/workplan/wp023.sh run --run-id wp23_gpu_01 --allow-compute --allow-gpu
+```
+
+本次交付的完成定义是：所有入口和默认软件能力已由 GitHub 准备，真实运行、恢复和异常验证作为本地工作正式交接。Local Agent 不需自创脚本；真实执行暴露的缺陷应提交清晰收据，由 GitHub 侧按通用防复发规范继续修复，不得由 Agent 自行改变科学规则。
