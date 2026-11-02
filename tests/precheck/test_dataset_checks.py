@@ -137,18 +137,25 @@ def test_manifest_source_repo_mismatch_must_fail(tmp_path):
     assert _run(tmp_path)["status"] == "FAIL"
 
 
-
 def test_explicit_matrix_never_marks_compatibility_pass():
     from tasks.precheck.compatibility_checks import compatibility_matrix
 
     sources = ["boolq", "arc_challenge"]
     sites = [
-        {"model_key": "gemma270m", "sae_key": "gemma270m_scope_resid",
-         "layer": 5, "hook_name": "blocks.5.hook_resid_post",
-         "site_id": "gemma270m:gemma270m_scope_resid:L5"},
-        {"model_key": "gemma270m", "sae_key": "gemma270m_scope_resid",
-         "layer": 12, "hook_name": "blocks.12.hook_resid_post",
-         "site_id": "gemma270m:gemma270m_scope_resid:L12"},
+        {
+            "model_key": "gemma270m",
+            "sae_key": "gemma270m_scope_resid",
+            "layer": 5,
+            "hook_name": "blocks.5.hook_resid_post",
+            "site_id": "gemma270m:gemma270m_scope_resid:L5",
+        },
+        {
+            "model_key": "gemma270m",
+            "sae_key": "gemma270m_scope_resid",
+            "layer": 12,
+            "hook_name": "blocks.12.hook_resid_post",
+            "site_id": "gemma270m:gemma270m_scope_resid:L12",
+        },
     ]
     declared = compatibility_matrix(sources, sites)
     assert declared["models"] == 1
@@ -168,19 +175,27 @@ def test_explicit_matrix_never_marks_compatibility_pass():
     assert all(row["status"] == "NOT_RUN" for row in selected["pairs"])
     passed["dataset:boolq"] = {"status": "BLOCKED"}
     selected = compatibility_matrix(sources, sites, passed)
-    assert all(row["status"] == "BLOCKED" for row in selected["pairs"]
-               if row["dataset_id"] == "boolq")
-    assert all(row["status"] == "NOT_RUN" for row in selected["pairs"]
-               if row["dataset_id"] == "arc_challenge")
+    assert all(
+        row["status"] == "BLOCKED" for row in selected["pairs"] if row["dataset_id"] == "boolq"
+    )
+    assert all(
+        row["status"] == "NOT_RUN"
+        for row in selected["pairs"]
+        if row["dataset_id"] == "arc_challenge"
+    )
 
 
 def test_invalid_site_layer_and_duplicates_rejected():
     from tasks.precheck.compatibility_checks import compatibility_matrix
     import pytest
 
-    site = {"model_key": "gemma270m", "sae_key": "gemma270m_scope_resid",
-            "layer": 5, "hook_name": "blocks.5.hook_resid_post",
-            "site_id": "gemma270m:gemma270m_scope_resid:L5"}
+    site = {
+        "model_key": "gemma270m",
+        "sae_key": "gemma270m_scope_resid",
+        "layer": 5,
+        "hook_name": "blocks.5.hook_resid_post",
+        "site_id": "gemma270m:gemma270m_scope_resid:L5",
+    }
     with pytest.raises(ValueError, match="Duplicate Dataset"):
         compatibility_matrix(["boolq", "boolq"], [site])
     with pytest.raises(ValueError, match="Duplicate SAE Site"):
