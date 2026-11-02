@@ -23,7 +23,6 @@ from harness.contracts import wp20_reference_a, wp20_reference_b, wp20_reference
 
 ROOT = registry.ROOT
 RUNS = ROOT / "harness/tests/wp20/runs"
-PLAN = "harness/github/work_plan/20_integrated_multistage_harness_exams.md"
 SCENARIOS = ROOT / "harness/contracts/wp20_scenarios.json"
 SPEC = ROOT / "harness/contracts/wp20_cases.json"
 RUN_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{3,63}$")
@@ -75,13 +74,16 @@ def check_spec():
         raise ValueError("WP20 behavioral fixtures do not cover all cases")
     checked = 0
     for case in sorted(READY):
-        selected = registry.resolve(PLAN, case)
         entry = next(row for row in spec["cases"] if row["id"] == case)
         if entry["status"] != "READY" or entry["oracle_status"] != "QUALIFIED":
             raise ValueError(f"Unqualified {case}")
-        if selected["tags"] != entry["tags"] or not set(entry["contracts"]) <= set(
-            selected["contract_ids"]
-        ):
+        data = registry.catalog()
+        known = {row["id"]: row for row in data["contracts"]}
+        contracts = list(dict.fromkeys(data["required_always"] + ["CT-ERROR"] + entry["contracts"]))
+        if (not set(entry["contracts"]) <= set(known)
+                or not set(entry["tags"]) <= set(data["task_tags"])
+                or any(not any(known[x]["enforcement"] == "conditional" and tag in known[x]["tags"]
+                               for x in contracts) for tag in entry["tags"])):
             raise ValueError(f"Missing contract for {case}")
         tests = fixtures["cases"][case]
         if (

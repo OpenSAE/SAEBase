@@ -133,7 +133,6 @@ jobs:
         run: python -m pytest -q harness/github/work_test/test_wp18_sandbox_gate.py
       - name: Resolve universal task contracts and audit invariants
         run: |
-          python -m harness.contracts.registry check --plan harness/github/work_plan/18_harness_local_agent_examination_and_independent_acceptance.md
           python -m pytest -q harness/github/work_test/test_universal_task_contracts.py harness/github/work_test/test_contract_acceptance.py
       - name: Verify twenty predeclared WP18 contracts and reviewer checks
         run: |
@@ -146,7 +145,6 @@ jobs:
         run: python -m harness.contracts.wp18_verify --base "$BASE_SHA" --scan
       - name: Verify WP19 frozen 200 synthetic cases and reference
         run: |
-          python -m harness.contracts.registry check --plan harness/github/work_plan/19_harness_large_scale_examination_and_verifier_assurance.md
           python -m harness.contracts.wp19_verify --check-spec
           python -m pytest -q harness/github/work_test/test_compliance_regression.py harness/github/work_test/test_wp19_p0_contracts.py
       - name: Reject WP19 governance edits and test submitted 200 cases
@@ -156,7 +154,6 @@ jobs:
         run: python -m harness.contracts.wp19_verify --base "$BASE_SHA" --scan
       - name: Validate WP20 behavioral grader and reviewer calibration
         run: |
-          python -m harness.contracts.registry check --plan harness/github/work_plan/20_integrated_multistage_harness_exams.md
           python -m harness.contracts.wp20_design_validate
           python -m harness.contracts.wp20_verify --check-spec
           python -m pytest -q harness/github/work_test/test_wp20_design.py

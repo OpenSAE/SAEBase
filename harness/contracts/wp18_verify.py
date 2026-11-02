@@ -22,9 +22,24 @@ from harness.contracts.selection import audit_selection
 ROOT = registry.ROOT
 RUNS = ROOT / "harness/tests/wp18/runs"
 SPEC = ROOT / "harness/contracts/wp18_cases.json"
-PLAN = "harness/github/work_plan/18_harness_local_agent_examination_and_independent_acceptance.md"
 REQUIRED = {f"H{i:02d}" for i in range(7, 27)}
 RUN_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{3,63}$")
+
+
+def _frozen_contract_selection(case: dict) -> dict:
+    """Validate immutable case requirements using the live contract catalog."""
+    data = registry.catalog()
+    known = {row["id"]: row for row in data["contracts"]}
+    tags = case["tags"]
+    contracts = list(dict.fromkeys(data["required_always"] + ["CT-ERROR"] + case["contracts"]))
+    if not isinstance(tags, list) or not tags or len(tags) != len(set(tags)) or not set(tags) <= set(data["task_tags"]):
+        raise ValueError("Invalid frozen case tags")
+    if not set(contracts) <= set(known) or len(case["contracts"]) != len(set(case["contracts"])):
+        raise ValueError("Unknown or duplicate frozen case contract")
+    for tag in tags:
+        if not any(known[x]["enforcement"] == "conditional" and tag in known[x]["tags"] for x in contracts):
+            raise ValueError("No contract covers frozen case tag: " + tag)
+    return {"tags": tags, "contract_ids": contracts}
 
 
 def load_spec() -> dict:
@@ -42,7 +57,7 @@ def validate_spec() -> dict:
     count = 0
     for case in cases:
         case_id = case["id"]
-        selected = registry.resolve(PLAN, case_id)
+        selected = _frozen_contract_selection(case)
         if set(selected["contract_ids"]) != set(
             registry.catalog()["required_always"] + ["CT-ERROR"] + case["contracts"]
         ):

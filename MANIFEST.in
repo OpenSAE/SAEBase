@@ -11,6 +11,10 @@ recursive-include saebase/tools *.py
 prune data
 prune experiment
 prune .venv
+# Frozen historical files are Git/Release records, never package requirements.
+prune harness/github/development_doc/archive
+prune harness/github/work_plan/archive
+prune harness/github/work_test/archive
 global-exclude __pycache__ *.py[cod] .DS_Store
 
 # Stage D evidence lives in Git and the dedicated evidence release, not in pip packages.
