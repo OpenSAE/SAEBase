@@ -94,7 +94,7 @@ class CoverageEntry:
                 bands[band] = {"layer": None, "target_fraction": fraction}
                 continue
             # Zero-indexed layer depth; deterministic ties prefer lower layers.
-            closest = min(available, key=lambda l: (abs((l + 1) / self.n_layers - fraction), l))
+            closest = min(available, key=lambda layer: (abs((layer + 1) / self.n_layers - fraction), layer))
             available.remove(closest)
             bands[band] = {
                 "layer": closest,
@@ -136,7 +136,7 @@ class CoverageCatalog:
                     "size": entry.size,
                     "access": entry.access,
                     "bands": entry.depth_bands(),
-                    "checkpoints": [entry.source(l) for l in entry.selected_layers],
+                    "checkpoints": [entry.source(layer) for layer in entry.selected_layers],
                 }
             )
         return {

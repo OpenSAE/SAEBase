@@ -8,6 +8,8 @@ from omegaconf import DictConfig
 
 from models.hooked_lm_common import BaseModelSpec, HookedLMHandle, load_from_spec
 
+from saebase.datasets.prompt_schema import behaviors_for_model
+
 SPEC = BaseModelSpec(
     key="gemma2_9b_it",
     model_name="google/gemma-2-9b-it",
@@ -16,7 +18,6 @@ SPEC = BaseModelSpec(
     notes="Gemma-2 9B IT; native Scope residual at layers 9/20/31.",
 )
 
-from saebase.datasets.prompt_schema import behaviors_for_model
 
 SUPPORTED_BEHAVIORS: frozenset[str] = behaviors_for_model("gemma2_9b_it")
 

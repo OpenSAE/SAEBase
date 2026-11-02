@@ -8,6 +8,8 @@ from omegaconf import DictConfig
 
 from models.hooked_lm_common import BaseModelSpec, HookedLMHandle, load_from_spec
 
+from saebase.datasets.prompt_schema import behaviors_for_model
+
 SPEC = BaseModelSpec(
     key="llama31_8b_instruct",
     model_name="meta-llama/Llama-3.1-8B-Instruct",
@@ -16,7 +18,6 @@ SPEC = BaseModelSpec(
     notes="Llama-3.1 8B Instruct; andyrdt BatchTopK residual SAE L19 k=64.",
 )
 
-from saebase.datasets.prompt_schema import behaviors_for_model
 
 SUPPORTED_BEHAVIORS: frozenset[str] = behaviors_for_model("llama31_8b_instruct")
 

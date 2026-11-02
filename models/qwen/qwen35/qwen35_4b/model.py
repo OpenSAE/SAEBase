@@ -18,6 +18,8 @@ _candidates = (_HUB,)
 if Path(_LOCAL).joinpath("config.json").is_file():
     _candidates = (_LOCAL, _HUB)
 
+from saebase.datasets.prompt_schema import behaviors_for_model
+
 SPEC = BaseModelSpec(
     key="qwen35_4b",
     model_name=_HUB,
@@ -31,7 +33,6 @@ SPEC = BaseModelSpec(
     ),
 )
 
-from saebase.datasets.prompt_schema import behaviors_for_model
 
 SUPPORTED_BEHAVIORS: frozenset[str] = behaviors_for_model("qwen35_4b")
 

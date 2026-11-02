@@ -8,6 +8,8 @@ from omegaconf import DictConfig
 
 from models.hooked_lm_common import BaseModelSpec, HookedLMHandle, load_from_spec
 
+from saebase.datasets.prompt_schema import behaviors_for_model
+
 SPEC = BaseModelSpec(
     key="pythia410m",
     model_name="pythia-410m-deduped",
@@ -15,7 +17,6 @@ SPEC = BaseModelSpec(
     notes="EleutherAI Pythia-410M; MLP TopK SAEs (not residual sae_lens).",
 )
 
-from saebase.datasets.prompt_schema import behaviors_for_model
 
 SUPPORTED_BEHAVIORS: frozenset[str] = behaviors_for_model("pythia410m")
 

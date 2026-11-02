@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 from omegaconf import DictConfig
-from models.hooked_lm_common import BaseModelSpec, HookedLMHandle, load_from_spec
+from models.hooked_lm_common import BaseModelSpec, HookedLMHandle
 from models.hf_hooks_backend import load_hf_hooks_model
 import torch
 

@@ -10,6 +10,8 @@ from omegaconf import DictConfig
 from models.hf_hooks_backend import load_hf_hooks_model
 from models.hooked_lm_common import BaseModelSpec, HookedLMHandle
 
+from saebase.datasets.prompt_schema import behaviors_for_model
+
 SPEC = BaseModelSpec(
     key="qwen35_9b",
     model_name="Qwen/Qwen3.5-9B-Base",
@@ -21,7 +23,6 @@ SPEC = BaseModelSpec(
     ),
 )
 
-from saebase.datasets.prompt_schema import behaviors_for_model
 
 SUPPORTED_BEHAVIORS: frozenset[str] = behaviors_for_model("qwen35_9b")
 
