@@ -11,6 +11,10 @@ Universal Contracts、Work Order v3、Agent Flow 和所有独立审批机制继�
 
 ## Human Check（GitHub 修改前的默认人类审阅）
 
+**首先执行 Workplan 双重起草预审：**提供逐章节、人类可读且限定字数的摘要，以及 Code/Knowledge/Environment/Core/Harness/Context 六域源码影响审计（详见 [WRITING_STANDARD.md §6A](../work_plan/WRITING_STANDARD.md)）。只有确实涉及持久节点职责/性质/关系/源码实体的 ADD/CHANGE/REMOVE 才进入 Atlas Node Human Check；引用某节点或新增测试并不自动改变其功能。遇到 `NO_NODE_CHANGE` 时保留节点，对具体修改路径执行独立 PR/源码审阅；Code 尚未落地时可 `DEFER` 至真实 AST 可核验。不能制造节点绕过权限审核。
+
+
+
 默认 **开启**，在第一次修改仓库源码、配置、文档、治理文件或提交 PR **之前**完成。对话式 AI 先以当前精确 commit、已有 Core / Knowledge / Code / Environment / Context 节点与权威 Context 术语生成一份可读的修改报告，并从同一提案数据呈现 Atlas Before / Proposed After、原因、受影响文件、风险与验收条件。新 Code 节点仅为拟议节点，不可伪称已有 AST。
 
 **逐节点决定，不存在整体 Approve Plan。** 用户可对每个拟议改动单独 Approve / Deny / Unchecked；一个节点被拒绝不妨碍其他已批准、文件范围独立的节点实施。若同一文件同时对应已批准和未批准的改动，不能用文件级授权绕过未批准节点：该文件必须拆分或重新审阅。修改提案、源版本或允许范围发生变化，必须重新审核相关节点。Approve 只批准本节点明确声明的改动范围，不代表实现、实验通过、科学验证或发布。
