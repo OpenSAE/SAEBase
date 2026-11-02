@@ -417,8 +417,8 @@
         {
           "name": "audit_delivery",
           "title": "运行证据审计与本地归档",
-          "summary": "分别核对执行收据和证据完整性，并在证据通过后执行本地不可变归档。",
-          "description": "分别核对执行收据和证据完整性，并在证据通过后执行本地不可变归档。",
+          "summary": "核对执行收据和证据完整性，仅在审计通过后生成本地归档收据。",
+          "description": "核对执行收据和证据完整性，仅在审计通过后生成本地归档收据。",
           "en_title": "Run evidence audit and local delivery",
           "en_summary": "Verify run receipts independently from execution status and gate immutable local archives.",
           "en_description": "Verify run receipts independently from execution status and gate immutable local archives.",
