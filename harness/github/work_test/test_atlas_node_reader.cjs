@@ -51,8 +51,8 @@ assert(!app.includes('reviewTarget && reviewItem.operation==="change"'),
 assert(app.includes('!!options.toggle'),"explicit card click opens Reader");
 assert(app.includes('if(!shouldOpenReader)nodeReader?.close()'),
   "Graph navigation dismisses any previous Reader");
-assert(app.includes('config.detailsOpen = !nodeReader || (!reviewTarget && !shouldOpenReader)'),
-  "Graph review does not open the old detail drawer");
+assert(app.includes('config.detailsOpen = false;'),
+  "Graph node selection must hide the old Context/Details drawer");
 assert(app.includes('if(decision==="approved" ||'),
   "approval always advances, even when Reader was open");
 assert(app.includes('nodeReader?.close();\n        const next=findUnchecked(1);'),
