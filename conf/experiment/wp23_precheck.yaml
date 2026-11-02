@@ -1,9 +1,10 @@
 # @package _global_
-# WP23 own Draft acceptance selection, NOT an executable task configuration yet.
-# Generic Precheck defaults are implemented in conf/task/precheck.yaml after approval.
+# WP23 self-owned executable selection. All compute/network permissions stay opt-in.
+# A local Agent tests the actual model/data/SAE and recovery behavior.
+# This selection is checked by scripts/workplan/wp023.sh before every stage.
 experiment:
   name: wp23_component_precheck
-  status: draft
+  status: agent_ready
   execute: false
   inventory:
     dataset_source: active_dataset_registry
