@@ -103,11 +103,13 @@ def check_frozen_dataset(
                 raise ValueError("Frozen QA record is not an object")
             if record.get("dataset_id") != dataset_id or record.get("source_revision") != revision:
                 raise ValueError("Question does not match dataset and source revision")
+            if record.get("source_repo") != manifest.get("source_repo"):
+                raise ValueError("Question source repository differs from manifest")
             if (
-                record.get("source_repo") != manifest.get("source_repo")
-                or record.get("source_config") != manifest.get("source_config")
-            ) and manifest.get("source_config") is not None:
-                raise ValueError("Question source repo/config differs from manifest")
+                manifest.get("source_config") is not None
+                and record.get("source_config") != manifest.get("source_config")
+            ):
+                raise ValueError("Question source configuration differs from manifest")
             if record.get("source_split") != manifest.get("source_split"):
                 raise ValueError("Question split differs from frozen source")
             for name in ("sample_id", "prompt_sha256", "question", "answer"):
