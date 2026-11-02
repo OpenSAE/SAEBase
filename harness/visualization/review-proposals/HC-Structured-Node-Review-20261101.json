@@ -1195,7 +1195,8 @@
         "field_changes": "typed list with canonical field path + before/after values",
         "file_changes": "typed per-file add/change/remove/move with owner, role, source hashes and approval group",
         "review_metadata": "reason, risk, checks, authorization, not node body",
-        "observed_node": "regenerated from actual source after implementation, never assumed from proposal"
+        "observed_node": "regenerated from actual source after implementation, never assumed from proposal",
+        "derived_fields": "Actual implementation SHA, observed node status, runtime evidence, and last_change are only finalized after implementation; never blindly copied as new verification."
       },
       "required_checks": [
         "source snapshot is pinned to exact SHA and authority file digest",
@@ -1205,7 +1206,9 @@
         "node status remains independent of review decision",
         "evidence and status need actual source to advance",
         "reject stale or undeclared files; retain original reviewed records as immutable",
-        "unchanged data preserved explicitly and compared for source drift"
+        "unchanged data preserved explicitly and compared for source drift",
+        "historical last_change may be retained as history, but new revision metadata is written only after observed implementation and approval",
+        "every allowed source path has a structured file_changes record with its owner, existing blob identity and exact operation; unlisted paths are denied"
       ],
       "presentation": {
         "graph": "title and short summary of the proposed node, not approval instructions",
@@ -1288,73 +1291,62 @@
       "file_change_sample": [
         {
           "path": "harness/github/human_check.py",
-          "action": "change",
-          "owner": "Human Check proposal compiler",
-          "before_exists": true,
-          "after_exists": true,
-          "node_fields": [
-            "before_node",
-            "after_node",
-            "change_set",
-            "source_scope"
-          ],
-          "approval_scope": "HC01"
+          "operation": "change",
+          "owner": "Typed Human Check snapshot builder, authorization, report",
+          "approval_group": "HC01",
+          "before": {
+            "exists": true,
+            "git_blob_sha": "9cb4f004e42c90bb9a18dba90f61ec2723886787"
+          },
+          "after": {
+            "state": "PROPOSED",
+            "git_blob_sha": null
+          },
+          "changed_node_fields": [
+            "snapshot",
+            "field_changes",
+            "source_refs",
+            "file_changes"
+          ]
         },
         {
           "path": "harness/github/node_review_schema.py",
-          "action": "add",
-          "owner": "Typed node-review contract",
-          "before_exists": false,
-          "after_exists": false,
-          "planned": true,
-          "node_fields": [
-            "source_refs",
+          "operation": "add",
+          "owner": "Proposed shared typed node and file diff schema",
+          "approval_group": "HC01",
+          "before": {
+            "exists": false,
+            "git_blob_sha": null
+          },
+          "after": {
+            "state": "PROPOSED",
+            "git_blob_sha": null
+          },
+          "changed_node_fields": [
+            "snapshot",
             "field_changes",
-            "review_schema"
-          ],
-          "approval_scope": "HC01"
+            "source_refs",
+            "file_changes"
+          ]
         },
         {
           "path": "harness/visualization/node-reader.js",
-          "action": "change",
-          "owner": "Atlas Reader UI",
-          "before_exists": true,
-          "after_exists": true,
-          "node_fields": [
-            "implementation.files",
-            "evidence",
-            "relations",
-            "attributes"
-          ],
-          "approval_scope": "HC02"
-        },
-        {
-          "path": "harness/visualization/app.js",
-          "action": "change",
-          "owner": "Atlas proposal overlay",
-          "before_exists": true,
-          "after_exists": true,
-          "node_fields": [
-            "node_status",
-            "review_decision",
-            "field_source"
-          ],
-          "approval_scope": "HC02"
-        },
-        {
-          "path": "harness/visualization/ATLAS_AUTHORING_STANDARD.md",
-          "action": "change",
-          "owner": "Atlas node authoring contract",
-          "before_exists": true,
-          "after_exists": true,
-          "node_fields": [
-            "title",
-            "summary",
-            "description",
-            "evidence",
-            "scope"
-          ],
-          "approval_scope": "HC03"
+          "operation": "change",
+          "owner": "Before/After field and file review UI",
+          "approval_group": "HC02",
+          "before": {
+            "exists": true,
+            "git_blob_sha": "d994d410d0cdf17cc92321dca47708e2821c5880"
+          },
+          "after": {
+            "state": "PROPOSED",
+            "git_blob_sha": null
+          },
+          "changed_node_fields": [
+            "reader_sections",
+            "file_diff",
+            "node_status_vs_review_state"
+          ]
         }
       ],
       "review_metadata": {
@@ -1369,74 +1361,215 @@
     },
     "file_changes": [
       {
+        "path": "harness/github/HUMAN_CHECK.md",
+        "operation": "change",
+        "owner": "Human Check user/operator protocol",
+        "approval_group": "HC03",
+        "before": {
+          "exists": true,
+          "git_blob_sha": "7f74f4a608ca9f05c87251f1e279d3bbe0feae8c"
+        },
+        "after": {
+          "state": "PROPOSED",
+          "git_blob_sha": null
+        },
+        "changed_node_fields": [
+          "writing_standard",
+          "validation",
+          "regression"
+        ]
+      },
+      {
         "path": "harness/github/human_check.py",
-        "action": "change",
-        "owner": "Human Check proposal compiler",
-        "before_exists": true,
-        "after_exists": true,
-        "node_fields": [
-          "before_node",
-          "after_node",
-          "change_set",
-          "source_scope"
-        ],
-        "approval_scope": "HC01"
+        "operation": "change",
+        "owner": "Typed Human Check snapshot builder, authorization, report",
+        "approval_group": "HC01",
+        "before": {
+          "exists": true,
+          "git_blob_sha": "9cb4f004e42c90bb9a18dba90f61ec2723886787"
+        },
+        "after": {
+          "state": "PROPOSED",
+          "git_blob_sha": null
+        },
+        "changed_node_fields": [
+          "snapshot",
+          "field_changes",
+          "source_refs",
+          "file_changes"
+        ]
       },
       {
         "path": "harness/github/node_review_schema.py",
-        "action": "add",
-        "owner": "Typed node-review contract",
-        "before_exists": false,
-        "after_exists": false,
-        "planned": true,
-        "node_fields": [
-          "source_refs",
+        "operation": "add",
+        "owner": "Proposed shared typed node and file diff schema",
+        "approval_group": "HC01",
+        "before": {
+          "exists": false,
+          "git_blob_sha": null
+        },
+        "after": {
+          "state": "PROPOSED",
+          "git_blob_sha": null
+        },
+        "changed_node_fields": [
+          "snapshot",
           "field_changes",
-          "review_schema"
-        ],
-        "approval_scope": "HC01"
+          "source_refs",
+          "file_changes"
+        ]
       },
       {
-        "path": "harness/visualization/node-reader.js",
-        "action": "change",
-        "owner": "Atlas Reader UI",
-        "before_exists": true,
-        "after_exists": true,
-        "node_fields": [
-          "implementation.files",
-          "evidence",
-          "relations",
-          "attributes"
-        ],
-        "approval_scope": "HC02"
+        "path": "harness/github/work_test/test_atlas_node_reader.cjs",
+        "operation": "change",
+        "owner": "Reader comparison and file-diff tests",
+        "approval_group": "HC03",
+        "before": {
+          "exists": true,
+          "git_blob_sha": "fe12c5729a9c9151648909ef29da0604314525d1"
+        },
+        "after": {
+          "state": "PROPOSED",
+          "git_blob_sha": null
+        },
+        "changed_node_fields": [
+          "writing_standard",
+          "validation",
+          "regression"
+        ]
       },
       {
-        "path": "harness/visualization/app.js",
-        "action": "change",
-        "owner": "Atlas proposal overlay",
-        "before_exists": true,
-        "after_exists": true,
-        "node_fields": [
-          "node_status",
-          "review_decision",
-          "field_source"
-        ],
-        "approval_scope": "HC02"
+        "path": "harness/github/work_test/test_human_check.py",
+        "operation": "change",
+        "owner": "Snapshot, scope, provenance regression",
+        "approval_group": "HC03",
+        "before": {
+          "exists": true,
+          "git_blob_sha": "cc6bc688b0117f28ff968496650a5fcfb70fd970"
+        },
+        "after": {
+          "state": "PROPOSED",
+          "git_blob_sha": null
+        },
+        "changed_node_fields": [
+          "writing_standard",
+          "validation",
+          "regression"
+        ]
+      },
+      {
+        "path": "harness/visualization/ATLAS_AUTHORING_STANDARD.en.md",
+        "operation": "change",
+        "owner": "English authoring standard",
+        "approval_group": "HC03",
+        "before": {
+          "exists": true,
+          "git_blob_sha": "66ca74fed3cf1a0d57a392d347a52f939bc04f2b"
+        },
+        "after": {
+          "state": "PROPOSED",
+          "git_blob_sha": null
+        },
+        "changed_node_fields": [
+          "writing_standard",
+          "validation",
+          "regression"
+        ]
       },
       {
         "path": "harness/visualization/ATLAS_AUTHORING_STANDARD.md",
-        "action": "change",
-        "owner": "Atlas node authoring contract",
-        "before_exists": true,
-        "after_exists": true,
-        "node_fields": [
-          "title",
-          "summary",
-          "description",
-          "evidence",
-          "scope"
-        ],
-        "approval_scope": "HC03"
+        "operation": "change",
+        "owner": "Authoritative node content semantics and provenance rules",
+        "approval_group": "HC03",
+        "before": {
+          "exists": true,
+          "git_blob_sha": "44f01f6a8aa59b968e69e366600526a534f14989"
+        },
+        "after": {
+          "state": "PROPOSED",
+          "git_blob_sha": null
+        },
+        "changed_node_fields": [
+          "writing_standard",
+          "validation",
+          "regression"
+        ]
+      },
+      {
+        "path": "harness/visualization/README.md",
+        "operation": "change",
+        "owner": "Atlas reader operation guide",
+        "approval_group": "HC03",
+        "before": {
+          "exists": true,
+          "git_blob_sha": "2bec1959c2f1fb2244caeaf0e6355d96ecbf5248"
+        },
+        "after": {
+          "state": "PROPOSED",
+          "git_blob_sha": null
+        },
+        "changed_node_fields": [
+          "writing_standard",
+          "validation",
+          "regression"
+        ]
+      },
+      {
+        "path": "harness/visualization/app.js",
+        "operation": "change",
+        "owner": "Atlas review node projection and state separation",
+        "approval_group": "HC02",
+        "before": {
+          "exists": true,
+          "git_blob_sha": "958030ea9f00c751f670d8520b23f167ecff0cbf"
+        },
+        "after": {
+          "state": "PROPOSED",
+          "git_blob_sha": null
+        },
+        "changed_node_fields": [
+          "reader_sections",
+          "file_diff",
+          "node_status_vs_review_state"
+        ]
+      },
+      {
+        "path": "harness/visualization/node-reader.css",
+        "operation": "change",
+        "owner": "Structured comparison styling",
+        "approval_group": "HC02",
+        "before": {
+          "exists": true,
+          "git_blob_sha": "3dd7ffb7ab052cedfd96baff05c10d0b74f7a8bd"
+        },
+        "after": {
+          "state": "PROPOSED",
+          "git_blob_sha": null
+        },
+        "changed_node_fields": [
+          "reader_sections",
+          "file_diff",
+          "node_status_vs_review_state"
+        ]
+      },
+      {
+        "path": "harness/visualization/node-reader.js",
+        "operation": "change",
+        "owner": "Before/After field and file review UI",
+        "approval_group": "HC02",
+        "before": {
+          "exists": true,
+          "git_blob_sha": "d994d410d0cdf17cc92321dca47708e2821c5880"
+        },
+        "after": {
+          "state": "PROPOSED",
+          "git_blob_sha": null
+        },
+        "changed_node_fields": [
+          "reader_sections",
+          "file_diff",
+          "node_status_vs_review_state"
+        ]
       }
     ],
     "frozen_proposals": "Seven earlier refactor items and five Precheck/Audit items remain frozen. The immediately previous context-dialogue proposal is also not being implemented in this turn.",
@@ -1453,7 +1586,8 @@
     "review_notes": {
       "kind": "AUTHORING_PREVIEW",
       "old_ui_limit": "Current Reader only shows some v2 fields; after approval implementation must render full typed field/file differences. The separate manifest is the authority for the proposed contract, not a claimed implemented feature.",
-      "no_source_edit": true
+      "no_source_edit": true,
+      "file_changes_are_complete": true
     }
   }
 }
