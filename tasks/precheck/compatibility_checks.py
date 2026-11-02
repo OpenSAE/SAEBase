@@ -3,6 +3,7 @@
 This module does NOT perform compatibility tests or promote a selected target
 to PASS. Those decisions require actual isolated worker receipts.
 """
+
 from __future__ import annotations
 
 import re
@@ -78,26 +79,30 @@ def compatibility_matrix(
     for model in models:
         for dataset in keys:
             required = (f"dataset:{dataset}", f"model:{model}")
-            pairs.append({
-                "id": f"model_dataset:{model}:{dataset}",
-                "kind": "model_dataset",
-                "model_key": model,
-                "dataset_id": dataset,
-                "required_components": list(required),
-                **_precondition(required, supplied),
-            })
+            pairs.append(
+                {
+                    "id": f"model_dataset:{model}:{dataset}",
+                    "kind": "model_dataset",
+                    "model_key": model,
+                    "dataset_id": dataset,
+                    "required_components": list(required),
+                    **_precondition(required, supplied),
+                }
+            )
     for model, site in sites_flat:
         for dataset in keys:
             required = (f"dataset:{dataset}", f"model:{model}", f"sae:{site}")
-            pairs.append({
-                "id": f"sae_site_dataset:{site}:{dataset}",
-                "kind": "sae_site_dataset",
-                "site_id": site,
-                "model_key": model,
-                "dataset_id": dataset,
-                "required_components": list(required),
-                **_precondition(required, supplied),
-            })
+            pairs.append(
+                {
+                    "id": f"sae_site_dataset:{site}:{dataset}",
+                    "kind": "sae_site_dataset",
+                    "site_id": site,
+                    "model_key": model,
+                    "dataset_id": dataset,
+                    "required_components": list(required),
+                    **_precondition(required, supplied),
+                }
+            )
     return {
         "schema": "saebase.precheck.compatibility_targets.v1",
         "status": "PLAN_ONLY",
