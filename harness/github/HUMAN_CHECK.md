@@ -5,6 +5,16 @@ maintenance. It does **not** create a PR, edit source code, execute a model, or
 approve scientific findings. A typed proposal and the written report use the
 same immutable facts. Review only changes a local ignored ledger.
 
+## When Atlas Node review is genuinely needed
+
+The Work Plan drafting gate (`harness/github/work_plan/WRITING_STANDARD.md` §6A) must first inspect Code, Knowledge, Environment, Core, Harness and Context impact. An existing node being referenced by a task does not mean its persistent description, properties, file identity or actual Code interface changes. **Do not create a spurious node proposal to authorize source editing.**
+
+- `NODE_HUMAN_CHECK`: if a real durable Node ADD/CHANGE/REMOVE is justified, review only that node's exact Before/After fields, source ownership, parent/child relations and evidence through the existing Atlas interface. Experiment identity, WP number, cohort size and execution steps remain in the Work Plan.
+- `DEFER_NODE_DECISION`: when a new Python function/module or ownership does not yet exist in observable AST, defer Code node determination until implementation is verified. Do not claim an anticipated source entity as implemented.
+- `NO_NODE_CHANGE`: preserve all unaffected nodes and do not open a fake Atlas change. This is an *explicit audit conclusion*, not permission to write code.
+
+**Independent source-only authorization:** even with `NO_NODE_CHANGE` or `DEFER_NODE_DECISION`, the actual changed code, docs, CI, Harness or governance paths require explicit human approval of an exact-path proposal/PR diff and the existing protected-path permissions. A source-only review is **not** a node approval, and a node approval alone never approves unrelated paths. Record the source-review identity/status separately and do not merge if still pending. If a real source-only approval surface is inaccessible, report BLOCKED rather than inventing a node or claiming approval.
+
 ## Mandatory Atlas UI step
 
 Every Human Check MUST deliver a directly browsable Atlas review UI, not only
