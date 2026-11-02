@@ -1119,6 +1119,7 @@
     if (!target || !(reviewGraphs[target]?.nodes || DATA[target]?.nodes || []).some(n => n.id === id)) return false;
     const sameFocus = target===config.view && config.focusId===id;
     const wasExpanded = sameFocus && config.expandedAttributes.has(id);
+    const fromCompactCard=!!options.fromCard && densityMode()==="compact";
     if (target !== config.view && !activateView(target, {history:false}))
       return false;
     config.mode = "focus";
@@ -1135,11 +1136,14 @@
     );
     if(!shouldOpenReader)nodeReader?.close();
     // A review landing never opens the legacy detail drawer.
-    config.detailsOpen = !nodeReader || (!reviewTarget && !shouldOpenReader);
+    config.detailsOpen = false;
     for (const key of ancestors(id)) config.expanded.add(key);
     if(reviewTarget){
       config.expanded.add(id);
       config.zoom=1.1;
+      config.zoomInitialized=true;
+    }else if(fromCompactCard){
+      config.zoom=1.05;
       config.zoomInitialized=true;
     }
     config.expandedAttributes.clear();
@@ -1172,6 +1176,21 @@
   }
   function openCross(id) { navigate(id, locateView(id), false); }
 
+  function restoreStandardAfterReader() {
+    config.detailsOpen=false;
+    config.outlineOpen=false;
+    if(densityMode()!=="standard"){
+      config.zoom=1.05;
+      config.zoomInitialized=true;
+      render(false,true);
+      centerSelected();
+    }else setDrawerState();
+  }
+  function dismissReaderToStandard(){
+    if(!nodeReader?.isOpen())return;
+    nodeReader.close();
+    restoreStandardAfterReader();
+  }
   function showNodeReader() {
     if(!nodeReader || !config.focusId)return;
     const active=byId.get(config.focusId);
@@ -1220,6 +1239,7 @@
       relations:recorded,contextTerms,
       nodeRect:origin?.getBoundingClientRect?.()||null,
       onFollow:(id,view)=>navigate(id,view,false,{toggle:true}),
+      onDismiss:restoreStandardAfterReader,
       sourceHref,
       renderAttributes:(container,node)=>{
         for(const block of node.attributes||[])renderAttributeBlock(container,block,node);
@@ -1483,7 +1503,7 @@
       textLines(card,p.context,titleX,cy,17,"node-context-preview");
     }
     const onOpen = () => navigate(node.id,config.view,false,
-      {toggle:densityMode()!=="compact"});
+      {fromCard:true,toggle:densityMode()!=="compact"});
     if(p.expanded){
       const embedded=svg("foreignObject",{
         x:10,y:p.baseH+8,width:p.w-20,height:p.extraH-41,
@@ -2574,6 +2594,14 @@
     pathTrace.setAttribute("aria-label", "Full node ancestry");
     $("canvasWrap").parentNode.insertBefore(pathTrace, $("canvasWrap"));
     bindCanvasPan();
+    // Click the uncovered Graph to return from Reader to the currently
+    // selected annotated Standard node, not the node behind the pointer.
+    $("canvasWrap").addEventListener("click",event=>{
+      if(!nodeReader?.isOpen() || event.button!==0)return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      dismissReaderToStandard();
+    },true);
     installGlobalSearch();
     const copy=el("button","atlas-copy-focused is-hidden",
       searchText("复制链接","Copy link"));

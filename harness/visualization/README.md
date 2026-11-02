@@ -100,3 +100,11 @@ Human Check 阅读模式：仅 change 节点在审阅导航中自动打开左右
 
 
 Human Check 审阅默认统一为 Graph Focus：Add、Remove、Change 的顺序切换均只定位到节点，点击节点才展开 Reader。点击 Approved 必须保存当前决定，关闭 Reader，再按原有 unchecked 顺序选中下一个待审节点，仍显示 Graph Focus。若没有待审节点，沿用 All done。Denied 和 Unchecked 保持其余既有行为。
+
+
+### Atlas 节点三级阅读交互
+
+- 缩略模式（Graph 仅标题）：第一次点击节点，将视口放大到 Standard 密度，并显示当前节点注释/摘要；**不自动打开侧边 Context/Details**。
+- 标准模式（Graph 有注释）：再次点击同一节点才进入 Reader；原节点和 Graph 视口不被替换。
+- Reader：进入动画约 410ms（比原先 240ms 慢）。Back to graph 或点击阅读卡外的 Graph 背景都会回到同一节点的标准模式；背景点击不会误选其他 Graph 节点，卡内滚轮仍只滚动正文，卡外滚轮仍可缩放 Graph。
+- Reader 内外边框统一使用 Graph 被选中节点的边框颜色；Human Check 状态 Unchecked/Approved/Denied 仍分别为紫/红/灰。节点审阅决定和报告的现有行为不变。

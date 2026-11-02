@@ -77,4 +77,20 @@ for(const value of ["unchecked","approved","denied"]){
 }
 assert(css.includes('color:var(--hc-mark')&&css.includes('border-color:var(--hc-card'),
   "diff text and both reader frames share the live palette");
-console.log("SAEBase Atlas Reader: operation defaults and live HC palette PASS");
+assert(app.includes('fromCard:true,toggle:densityMode()!=="compact"'),
+  "first compact-card click must select Standard, second opens Reader");
+assert(app.includes('const fromCompactCard=!!options.fromCard && densityMode()==="compact"'),
+  "compact click must be detected before zoom changes");
+assert(app.includes("config.zoom=1.05;")&&app.includes("config.detailsOpen = false;"),
+  "Standard must display the node annotation without opening the Context side drawer");
+assert(app.includes('event.stopImmediatePropagation();')&&
+  app.includes('dismissReaderToStandard();'),
+  "background click dismisses without selecting a node behind it");
+assert(app.includes('function restoreStandardAfterReader()') &&
+  app.includes('if(densityMode()!=="standard")'),
+  "Reader exit normalizes Graph to annotated Standard density");
+assert(js.includes("onDismiss=current?.onDismiss;close();onDismiss?.();"),
+  "Back to graph and Escape both restore Standard");
+assert(js.includes('duration:reverse?220:410'),
+  "Reader opens more gently than 240ms");
+console.log("SAEBase Atlas: Compact → Standard → Reader and background exit PASS");
