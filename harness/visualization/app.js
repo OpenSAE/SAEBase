@@ -225,7 +225,8 @@
           id: item.node_id,
           kind: baseNode.kind || after.type || origin.type || "goal",
           title: (() => {
-            const original=after.title || origin.title || baseNode.title || item.node_id;
+            const original=item.operation==="source_review" && item.scope_title ?
+              item.scope_title : (after.title || origin.title || baseNode.title || item.node_id);
             const parentSymbol=item.parent_id?.startsWith("code:class:")
               ? item.parent_id.split(":").pop() : "";
             if(view==="code" && parentSymbol && !original.includes(parentSymbol))
@@ -492,7 +493,7 @@
                               branch.items,"parent:"+branch.key,leafContainer=>{
               for(const item of branch.items){
                 reviewCategoryRow(leafContainer,"node",item.key,
-                  reviewGraphs[item.view]?.nodes?.find(n=>n.id===item.node_id)?.title ||
+                  item.scope_title || reviewGraphs[item.view]?.nodes?.find(n=>n.id===item.node_id)?.title ||
                   item.after?.title||item.before?.title||item.node_id,
                   [item],null,null);
               }
@@ -1487,7 +1488,8 @@
     if(operation){
       const label={add:searchText("＋ 新增","＋ ADD"),
         remove:searchText("－ 删除","－ REMOVE"),
-        change:searchText("↔ 修改","↔ CHANGE")}[operation];
+        change:searchText("↔ 修改","↔ CHANGE"),
+        source_review:searchText("◎ 源文件审批","◎ SOURCE REVIEW")}[operation];
       if(label)card.appendChild(svg("text",{x:17,y:-6,
         class:"node-operation-label"},label));
     }

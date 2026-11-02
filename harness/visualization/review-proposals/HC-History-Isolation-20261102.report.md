@@ -28,7 +28,10 @@
 文件数量：5；具体逐文件清单见 `HC-History-Isolation-20261102.manifest.json` 和 `HC-History-Isolation-20261102.inventory.json`。约束：Release Tag 及 Blob SHA 作为来源证据；拒绝猜测不明确归属的版本；根目录反向扫描未登记档案；移除所有 archive 目录后产品检查仍可通过。
 
 ## Atlas Node 影响
-仅提出三个 Core 节点**性质**字段的独立提案：`q.transparency`、`s.agent_flow`、`q.reproducibility`。现有标题、说明、状态、证据、节点关系都不动。其余归档路径调整与源码修改属于 source-only 审批，不创建假 Code/Context/Knowledge 节点。
+
+五项全部是 **SOURCE REVIEW**：分别挂靠五个真实 Core 节点用于 Atlas 导航。审批只针对具体路径、风险及验收条件，不改变节点的标题、说明、性质、状态、证据或关系。无需虚构 Core/Code 节点变化。
+
+在公开 Pages 上的 Approve / Deny / Unchecked 仅是浏览器草稿，使用 Send report 显式提交才可交给维护者核验。此提案的发布不等于用户已批准任何实际迁移。
 
 ## 不变约束
 1. 历史原文的 Git Blob SHA 不变；Release Tag 仍是来源证据，不依据 WP 编号猜测版本。

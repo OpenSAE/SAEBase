@@ -112,8 +112,8 @@ def bundle(output: Path) -> dict:
         obsolete.unlink()
     review_index = []
     for source in sorted((HERE / "review-proposals").glob("*.json")):
-        if source.name.endswith(".manifest.json"):
-            continue  # Authoring manifests do not belong in the public UI.
+        if source.name.endswith((".manifest.json", ".inventory.json")):
+            continue  # A source inventory is not an Atlas review snapshot.
         review = json.loads(source.read_text(encoding="utf-8"))
         if review.get("plan", {}).get("id") != source.stem:
             raise ValueError("Invalid Atlas review snapshot: " + source.name)
