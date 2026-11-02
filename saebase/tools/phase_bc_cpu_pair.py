@@ -16,9 +16,9 @@ from datetime import datetime, timezone
 import torch
 
 from saebase.api import ActivationSite, ModelAdapter, capture_features, edit_features
-from saebase.sae.coverage import load_coverage
-from saebase.sae.loading import load_sae_for_profile, load_model_for_profile
-from saebase.sae.registry import get_profile
+from tasks.benchmark.coverage_contract import load_coverage
+from saebase.api.sae_loading import load_sae_for_profile, load_model_for_profile
+from saebase.api.sae_profiles import get_profile
 from saebase.store import sha256_state_dict
 from models.hf_hooks_backend import load_hf_hooks_model
 

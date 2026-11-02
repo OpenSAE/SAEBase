@@ -15,9 +15,9 @@ from pathlib import Path
 
 import torch
 
-from saebase.sae.coverage import load_coverage
-from saebase.sae.registry import get_profile
-from saebase.sae.stage_d import (
+from tasks.benchmark.coverage_contract import load_coverage
+from saebase.api.sae_profiles import get_profile
+from tasks.benchmark.stage_d import (
     PROMPTS,
     PROTOCOL_PAIR,
     append_attempt,
@@ -143,7 +143,7 @@ def run_one(
         record["cuda"] = torch.version.cuda
         if torch.cuda.is_available() and device.startswith("cuda"):
             record["gpu_name"] = torch.cuda.get_device_name(0)
-        from saebase.sae.stage_d import canonical_payload_sha256
+        from tasks.benchmark.stage_d import canonical_payload_sha256
 
         record.pop("artifact_sha256", None)
         record["artifact_sha256"] = canonical_payload_sha256(record)
@@ -187,7 +187,7 @@ def run_one(
             model_key=evaluation_host,
         )
         record["git_commit"] = git_commit
-        from saebase.sae.stage_d import canonical_payload_sha256
+        from tasks.benchmark.stage_d import canonical_payload_sha256
 
         record.pop("artifact_sha256", None)
         record["artifact_sha256"] = canonical_payload_sha256(record)

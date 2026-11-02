@@ -13,8 +13,8 @@ import argparse
 import json
 from pathlib import Path
 
-from saebase.sae.coverage import load_coverage
-from saebase.sae.stage_d import (
+from tasks.benchmark.coverage_contract import load_coverage
+from tasks.benchmark.stage_d import (
     build_site_records,
     file_sha256,
     load_status,
