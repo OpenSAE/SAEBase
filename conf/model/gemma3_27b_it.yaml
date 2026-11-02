@@ -4,3 +4,8 @@ model:
   pretrained_name: google/gemma-3-27b-it
   family: gemma
   device: cuda
+  # SAE resources owned by this Model, not an extra Registry.
+  sae_profiles:
+    - gemma3_27b_it_scope_resid
+  default_saes:
+    - gemma3_27b_it_scope_resid
