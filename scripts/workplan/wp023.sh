@@ -7,7 +7,7 @@ cd "$ROOT"
 export PYTHONPATH="$ROOT${PYTHONPATH:+:$PYTHONPATH}"
 
 usage() {
-  echo "Usage: bash scripts/workplan/wp023.sh <setup|inspect|inventory|asset_prepare|dataset|model|sae|compatibility|task|audit|run|resume> [--run-id ID] [--allow-compute] [--allow-gpu] [--allow-network] [--allow-install] [--allow-download] [--assets-json PATH] [--max-download-bytes N]" >&2
+  echo "Usage: bash scripts/workplan/wp023.sh <setup|inspect|inventory|asset_prepare|dataset|model|sae|compatibility|task|audit|handoff|run|resume> [--run-id ID] [--allow-compute] [--allow-gpu] [--allow-network] [--allow-install] [--allow-download] [--assets-json PATH] [--max-download-bytes N]" >&2
   exit 2
 }
 stage="${1:-}"
@@ -90,6 +90,19 @@ run_pipeline() {
   done
   # Audit always runs even when some checks returned truthful BLOCKED rows.
   invoke audit
+  verify_handoff
+}
+verify_handoff() {
+  local base="experiment/_studies/wp23_component_precheck/reports/$run_id"
+  local filename
+  for filename in inventory.json targets.json component_checks.csv compatibility_checks.csv task_checks.csv coverage_summary.csv artifact_manifest.json audit.json archive_receipt.json workplan_completed.md; do
+    if [[ ! -s "$base/$filename" ]]; then
+      echo "BLOCKED_HANDOFF: missing or empty $base/$filename" >&2
+      return 3
+    fi
+  done
+  echo "WP23 execution report available at $base/workplan_completed.md"
+  echo "Scientific acceptance and real native checks must be determined from receipts, not from this handoff check."
 }
 case "$stage" in
   setup) setup ;;
@@ -100,6 +113,7 @@ case "$stage" in
     resume_guard
     invoke "$stage"
     ;;
+  handoff) validate_defaults; verify_handoff ;;
   run|resume) run_pipeline ;;
   *) usage ;;
 esac
