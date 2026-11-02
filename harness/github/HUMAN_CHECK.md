@@ -13,6 +13,8 @@ The Work Plan drafting gate (`harness/github/work_plan/WRITING_STANDARD.md` §6A
 - `DEFER_NODE_DECISION`: when a new Python function/module or ownership does not yet exist in observable AST, defer Code node determination until implementation is verified. Do not claim an anticipated source entity as implemented.
 - `NO_NODE_CHANGE`: preserve all unaffected nodes and do not open a fake Atlas change. This is an *explicit audit conclusion*, not permission to write code.
 
+**Required authoring-review presentation:** every new or materially revised Workplan must display to the human either a real verified Atlas Human Check URL for genuine Node ADD/CHANGE/REMOVE or an explicit source-backed reason no Node Human Check is needed. `DEFER_NODE_DECISION` needs a written no-review-now explanation and mandatory AST reassessment after implementation. Encode the outcome in `human_check_review` within the six-domain audit. Missing UI/reason blocks the authoring review. Node decision and path-specific source authorization are independent.
+
 **Independent source-only authorization:** even with `NO_NODE_CHANGE` or `DEFER_NODE_DECISION`, the actual changed code, docs, CI, Harness or governance paths require explicit human approval of an exact-path proposal/PR diff and the existing protected-path permissions. A source-only review is **not** a node approval, and a node approval alone never approves unrelated paths. Record the source-review identity/status separately and do not merge if still pending. If a real source-only approval surface is inaccessible, report BLOCKED rather than inventing a node or claiming approval.
 
 ## Mandatory Atlas UI step
