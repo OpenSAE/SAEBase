@@ -137,6 +137,7 @@ jobs:
         run: |
           python -m pip check
           python -m pytest -q             harness/github/work_test/test_sae_model_registry.py             harness/github/work_test/test_hydra_first_run.py
+          python -m pytest -q tests/precheck
 
   ci-required:
     if: ${{ always() }}

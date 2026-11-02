@@ -83,7 +83,7 @@ def check(request: dict[str, Any]) -> dict[str, Any]:
                 "native_result": result,
             }
         else:
-            raise ValueError(f"Unsupported worker kind: {kind}")
+            raise TypeError(f"Invalid worker kind: {kind}")
         return result
     except Exception as exc:
         return error_result(exc, stage=f"{kind}:{request.get('operation', request.get('sae_key'))}",

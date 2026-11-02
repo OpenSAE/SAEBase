@@ -152,7 +152,9 @@ def _task_config(cfg: DictConfig, name: str, max_seconds: int, max_tokens: int) 
         plan = target.task.get("train_plan")
         if plan is None or int(plan.get("max_steps", max_seconds + 1)) > 2:
             raise ValueError("Precheck Train requires a native TrainPlan bounded to at most two steps")
-    if name not in ("train", "circuits") and target.task.get("sae_key") is None:
+    if name not in ("train", "circuits") and (
+        target.task.get("sae_key") is None or str(target.task.get("sae_key")) == "gemma2_2b_pt_l25_canonical"
+    ):
         defaults = list(cfg.model.get("default_saes", []))
         if defaults:
             target.task.sae_key = defaults[0]

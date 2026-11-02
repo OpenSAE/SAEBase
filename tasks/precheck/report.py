@@ -42,10 +42,10 @@ def error_result(exc: Exception, *, stage: str, attempted: list[str]) -> dict[st
         code, repair = "BLOCKED_ASSET", "Prepare the missing model, dataset, checkpoint, or configured input file."
     elif "out of memory" in msg or "cuda unavailable" in msg or "no cuda" in msg:
         code, repair = "BLOCKED_RESOURCE", "Choose a machine with enough available resources; do not substitute a different scientific configuration."
-    elif name == "UnsupportedCapability" or "not compatible" in msg or "unsupported" in msg:
+    elif name == "UnsupportedCapability" or "not compatible" in msg or "unsupported" in msg or "sole registered" in msg:
         code, repair = "BLOCKED_COMPATIBILITY", "Choose an actually compatible model, SAE site, backend or Task; no silent substitution."
     elif isinstance(exc, ValueError) and any(
-        word in msg for word in ("missing", "provide", "require", "empty", "no default", "not registered")
+        word in msg for word in ("missing", "provide", "require", "needs", "empty", "no default", "not registered", "not in model")
     ):
         code, repair = "BLOCKED_CONFIGURATION", "Supply the missing explicit configuration, resource, or input and retry this check."
     else:
