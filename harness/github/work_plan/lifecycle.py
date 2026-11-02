@@ -16,6 +16,53 @@ HUMAN = re.compile(r"```from-human-json\s*\n(.*?)\n```", re.S)
 STATUSES = frozenset(("PASS", "FAIL", "BLOCKED", "PARTIAL", "NOT_RUN", "WARNING", "HUMAN_DECISION"))
 
 
+CROSS_WP = re.compile(r"\\bWP[0-9]+\\b", re.I)
+
+
+def check_workplan_isolation(plan, text, intent):
+    """No cross-WP authority without human-approved exact purposes.
+
+    Historical reviewed/approved plans remain readable. New draft/Agent Ready
+    plans cannot import other Work Plans without explicit human decisions.
+    """
+    own = plan["plan_id"].upper()
+    referenced = {x.upper() for x in CROSS_WP.findall(text)} - {own}
+    approvals = intent.get("cross_workplan_approvals", [])
+    if not isinstance(approvals, list):
+        raise PlanError("Cross-WP approvals must be a list")
+    approved = set()
+    for row in approvals:
+        if not isinstance(row, dict):
+            raise PlanError("Invalid cross-WP approval")
+        wp, purpose, decision = row.get("wp_id"), row.get("purpose"), row.get("decision")
+        if not isinstance(wp, str) or not re.fullmatch(r"WP[0-9]+", wp, re.I) or not isinstance(purpose, str) or not purpose.strip() or decision != "APPROVED":
+            raise PlanError("Cross-WP reference requires explicit human approval and purpose")
+        approved.add(wp.upper())
+    if plan["status"] in ("draft", "agent_ready") and not referenced <= approved:
+        raise PlanError("Unapproved cross-WP reference: " + ", ".join(sorted(referenced - approved)))
+    return referenced
+
+
+def check_agent_ready(plan, root):
+    """Verify declared implementation evidence, not real GPU acceptance."""
+    if plan.get("plan_role") != "local_agent":
+        raise PlanError("Agent Ready requires local_agent plan role")
+    ready = plan.get("readiness")
+    if not isinstance(ready, dict) or not re.fullmatch(r"[a-f0-9]{40}", str(ready.get("source_sha", ""))):
+        raise PlanError("Agent Ready requires exact source SHA")
+    for field in ("offline_evidence", "integration_evidence", "ci_evidence"):
+        value = ready.get(field)
+        if not isinstance(value, str) or not value.strip():
+            raise PlanError("Agent Ready requires " + field)
+    for step in plan["steps"]:
+        if not step.get("command"):
+            raise PlanError("Agent Ready requires actual commands for every step")
+        from harness.github.work_plan.dispatch import approved_command
+        approved_command(step, root)
+    return True
+
+
+
 class PlanError(ValueError):
     """Unresolvable or inconsistent Work Plan."""
 
@@ -62,12 +109,13 @@ def check(plan_path, root=ROOT, check_contracts=True):
         or not plan_path.endswith(".md")
     ):
         raise PlanError("Only a repository Work Plan can be dispatched")
-    plan = block(source(root, plan_path).read_text(encoding="utf-8"), BLOCK)
+    plan_text = source(root, plan_path).read_text(encoding="utf-8")
+    plan = block(plan_text, BLOCK)
     if plan.get("schema") != "saebase.workplan.v1" or not re.fullmatch(
         r"WP[0-9]+", str(plan.get("plan_id", ""))
     ):
         raise PlanError("Invalid Work Plan identity")
-    if plan.get("status") not in ("draft", "reviewed", "approved"):
+    if plan.get("status") not in ("draft", "reviewed", "approved", "agent_ready"):
         raise PlanError("Missing review state")
     human = plan.get("from_human", "")
     if not isinstance(human, str) or not human.startswith("harness/github/work_plan/from_human/"):
@@ -80,6 +128,7 @@ def check(plan_path, root=ROOT, check_contracts=True):
         or not intent.get("scientific_motivation")
     ):
         raise PlanError("Human intent is missing or mismatched")
+    check_workplan_isolation(plan, plan_text, intent)
     known = {
         "core_ids": ids(root, "harness/core/project_graph.json", "nodes"),
         "knowledge_ids": ids(root, "doc/knowledge/context_graph.json", "nodes"),
@@ -137,7 +186,7 @@ def check(plan_path, root=ROOT, check_contracts=True):
             raise PlanError("Missing purpose, evidence or valid permissions")
         if step.get("on_failure", "global_block") not in ("local_block", "global_block"):
             raise PlanError("Unsupported failure policy")
-        if plan["status"] == "approved" and not step.get("command"):
+        if plan["status"] in ("approved", "agent_ready") and not step.get("command"):
             raise PlanError("Approved executable step requires a concrete command")
         seen.add(step["id"])
     if not seen or not plan.get("deliverables"):
@@ -150,6 +199,8 @@ def check(plan_path, root=ROOT, check_contracts=True):
             or not row.get("expected")
         ):
             raise PlanError("Incomplete result template")
+    if plan["status"] == "agent_ready":
+        check_agent_ready(plan, root)
     if check_contracts:
         from harness.contracts.registry import validate_plan
 
