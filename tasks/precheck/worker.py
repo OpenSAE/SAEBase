@@ -102,6 +102,89 @@ def check(request: dict[str, Any]) -> dict[str, Any]:
                 prompt=str(request["prompt"]),
                 device=str(request["device"]),
             )
+        elif kind == "dataset":
+            from tasks.precheck.dataset_checks import check_dataset_artifact
+
+            result = check_dataset_artifact(
+                dataset_key=str(request["dataset_key"]),
+                model_key=str(request["model_key"]),
+                data_root=Path(str(request["data_root"])),
+                max_records=int(request.get("max_records", 500)),
+            )
+        elif kind == "model":
+            from tasks.precheck.model_checks import check_real_model
+
+            result = check_real_model(
+                model_key=str(request["model_key"]),
+                model_name=str(request["model_name"]),
+                prompt=str(request["prompt"]),
+                device=str(request["device"]),
+            )
+        elif kind == "compatibility":
+            import hashlib
+
+            from saebase.datasets.prompts import read_prompts
+            from tasks.precheck.model_checks import check_real_model
+
+            data_path = Path(str(request["data_root"])) / str(request["dataset_key"])
+            cfg = OmegaConf.create({
+                "name": str(request["dataset_key"]),
+                "data_path": str(data_path),
+                "prompt_file": "",
+            })
+            rows = read_prompts(cfg, model_key=str(request["model_key"]))
+            budget = int(request.get("max_samples", 2))
+            if not 1 <= budget <= 2:
+                raise ValueError("Compatibility Precheck requires 1–2 real samples")
+            prompts = []
+            for item in rows:
+                value = item.get("prompt") if isinstance(item, dict) else None
+                if isinstance(value, str) and value.strip():
+                    prompts.append(value)
+                if len(prompts) >= budget:
+                    break
+            if not prompts:
+                raise ValueError("No real compatible prompt records")
+            observed = []
+            for prompt in prompts:
+                if request.get("site_id"):
+                    from tasks.precheck.sae_checks import check_real_sae
+
+                    check = check_real_sae(
+                        model_key=str(request["model_key"]),
+                        sae_key=str(request["sae_key"]),
+                        layer=int(request["layer"]),
+                        prompt=prompt,
+                        device=str(request["device"]),
+                    )
+                else:
+                    check = check_real_model(
+                        model_key=str(request["model_key"]),
+                        model_name=str(request["model_name"]),
+                        prompt=prompt,
+                        device=str(request["device"]),
+                    )
+                observed.append(check)
+            states = {row.get("status") for row in observed}
+            result = {
+                "status": (
+                    "FAIL" if "FAIL" in states else
+                    "BLOCKED" if "BLOCKED" in states else
+                    "PASS" if states == {"PASS"} else "FAIL"
+                ),
+                "scope": "bounded real pair native smoke; no scientific acceptance",
+                "target_id": str(request["target_id"]),
+                "dataset_key": str(request["dataset_key"]),
+                "model_key": str(request["model_key"]),
+                "site_id": request.get("site_id"),
+                "sample_count": len(prompts),
+                "prompt_sha256": [
+                    hashlib.sha256(item.encode("utf-8")).hexdigest()
+                    for item in prompts
+                ],
+                "results": observed,
+                "scientific_acceptance": "NOT_COVERED",
+            }
         elif kind == "task":
             from tasks.sae_runtime import execute_task
 
@@ -117,6 +200,9 @@ def check(request: dict[str, Any]) -> dict[str, Any]:
             }
         else:
             raise TypeError(f"Invalid worker kind: {kind}")
+        if isinstance(result, dict) and "run_id" in request:
+            result["run_id"] = str(request["run_id"])
+            result["source_sha"] = str(request.get("source_sha", ""))
         return result
     except Exception as exc:
         return error_result(
