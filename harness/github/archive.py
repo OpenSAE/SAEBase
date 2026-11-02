@@ -125,6 +125,19 @@ def check(index: dict, root: Path = ROOT, *, release_version: str | None = None)
             raise ArchiveError("Moved historical path still exists: " + source)
         if row["mode"] == "copy_compat" and path_blob(root, source) != observed:
             raise ArchiveError("Legacy compatibility source differs: " + source)
+    # A valid index must enumerate every archived file, not just validate the
+    # subset of files someone chose to register.
+    actual = set()
+    for owner in OWNERS.values():
+        archive_root = root / "harness" / "github" / owner / "archive"
+        if archive_root.is_dir():
+            for archived in archive_root.rglob("*"):
+                if archived.is_file():
+                    actual.add(archived.relative_to(root).as_posix())
+    extra = actual - targets
+    if extra:
+        raise ArchiveError("Unindexed archive files: " + ", ".join(sorted(extra)))
+
     if release_version:
         v = version_tuple(release_version)
         highest = max((version_tuple(e["version"]) for e in index["entries"]), default=(0, 0, 0))
