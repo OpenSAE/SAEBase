@@ -24,6 +24,10 @@ result=presentation({operation:"change",node:newItem,before:base,after:newItem})
 assert.equal(result.cards.length,2);
 assert.equal(result.cards[0].side,"before");
 assert.equal(result.cards[1].side,"after");
+result=presentation({operation:"source_review",node:base,before:base,after:base});
+assert.equal(result.operation,"source_review");
+assert.equal(result.cards.length,1,"source review must not invent node differences");
+assert.equal(result.cards[0].side,"after");
 assert(differs(base.description,newItem.description));
 assert(!differs(base.attributes,newItem.attributes));
 assert(app.includes('"node-operation-"+itemFor(node.id,config.view).operation'));
@@ -31,6 +35,18 @@ assert(app.includes("showNodeReader()")&&app.includes("nodeReader?.close()"));
 assert(js.includes("data.evidence")&&js.includes("renderAttributes"));
 assert(js.includes("event.deltaY")&&js.includes(".atlas-reader-scroll"));
 assert(html.includes("node-reader.js")&&html.includes("node-reader.css"));
+const sourceReview=JSON.parse(fs.readFileSync(path.join(root,"harness/visualization/review-proposals/HC-History-Isolation-20261102.json"),"utf8"));
+assert.equal(sourceReview.plan.items.length,5,"all five source scopes need review controls");
+assert.equal(sourceReview.plan.groups.length,5);
+for(const item of sourceReview.plan.items){
+  assert.equal(item.operation,"source_review");
+  assert.equal(item.before.title,item.after.title);
+  assert.equal(item.before.description,item.after.description);
+  assert(item.scope_title&&item.scope_description&&item.files.length);
+}
+assert(new Set(sourceReview.plan.items.map(item=>item.node_id)).size===5);
+assert(js.includes('entry.proposal.operation==="source_review"'),"source review metadata absent");
+assert(app.includes("◎ SOURCE REVIEW"),"source review label absent");
 assert(css.includes(".atlas-reader-pages.is-compare")&&css.includes(".atlas-reader-card.is-removing"));
 assert(css.includes("pointer-events:none")&&css.includes("pointer-events:auto"),
   "outside reader panel must pass wheel events to graph");
