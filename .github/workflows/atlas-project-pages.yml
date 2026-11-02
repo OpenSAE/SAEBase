@@ -59,7 +59,7 @@ jobs:
           obj["graph_provenance"] = "committed_atlas_snapshot_not_new_AST_generation"
           source = Path("harness/visualization/data.js").read_bytes()
           obj["graph_snapshot_sha256"] = hashlib.sha256(source).hexdigest()
-          path.write_text(json.dumps(obj, sort_keys=True, indent=2) + "\\n")
+          path.write_text(json.dumps(obj, sort_keys=True, indent=2) + "\n")
           PY
       - name: Checkout project-owned preview source
         uses: actions/checkout@v4
