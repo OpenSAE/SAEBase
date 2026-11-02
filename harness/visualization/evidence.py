@@ -17,7 +17,7 @@ CODE_TARGETS = {
     "s.hydra": "code:function:saebase.runtime.train:main",
     "g.registry": "code:function:saebase.registry:register_model",
     "g.dataset_gate": "code:function:saebase.registry:get_dataset_plugin",
-    "g.model_gate": "code:function:models.plugins:_load_plugin",
+    "g.model_gate": "code:function:saebase.registry:get_model_plugin",
     "g.pipeline": "code:function:saebase.runner:run_task",
     "g.config": "code:function:saebase.runtime.train:main",
     "g.artifact_schema": "code:function:saebase.runtime.experiment_paths:prepare_run",
