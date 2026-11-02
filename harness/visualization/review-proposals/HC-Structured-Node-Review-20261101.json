@@ -39,13 +39,13 @@
           "id": "g.context",
           "type": "goal",
           "title": "结构化研究知识与证据",
-          "description": "研究与工程节点以稳定 ID、类型、职责、状态、来源、实现文件及明确关联表达，形成可独立审阅的结构化信息。",
+          "description": "目标：以稳定 ID、状态、证据、AND/OR 与依赖描述研究目标，并分别呈现节点定义、关联和来源。",
           "status": "implemented",
           "evidence": [
             "harness/core/project_graph.json",
             "harness/knowledge/validate.py"
           ],
-          "next": "为节点变更提供完整前后快照、按字段差异与来源身份校验。",
+          "next": "建立结构化节点变更的字段快照、来源身份与文件归属校验。",
           "environment_refs": [],
           "last_change": {
             "date": "2026-10-25",
@@ -97,12 +97,12 @@
           "id": "q.transparency",
           "type": "question",
           "title": "人和 Agent 怎样共同理解项目？",
-          "description": "问题：人类怎样在同一节点的阅读界面中辨认职责、具体文件、关联、依据及版本差异？",
+          "description": "问题：人和 Agent 如何区分科研知识、代码实现与执行环境，并据此审阅节点字段与来源？",
           "status": "implemented",
           "evidence": [
             "harness/core/project_graph.json"
           ],
-          "next": "在 Human Check 中按字段比较完整 Before/After，并将审阅理由置于独立区域。",
+          "next": "在 Human Check 中呈现完整 Before/After，并单独显示字段差异与审阅理由。",
           "environment_refs": []
         },
         "files": [
@@ -152,7 +152,7 @@
           "id": "g.agent_execution_flow",
           "type": "goal",
           "title": "Agent 执行任务的流程",
-          "description": "目标：依据结构化节点内容与字段差异，独立审阅变更范围、执行证据和最终实现结果。",
+          "description": "目标：从 Work Plan 预审、节点与文件授权、任务实施到独立结果审计和人类决定，保持各阶段的证据与权限边界；普通 Agent 不得修改 Core 与 Harness 治理。",
           "status": "partial",
           "evidence": [
             "harness/core/agent_flow.py",
@@ -160,7 +160,7 @@
             "harness/core/agent_flow.py",
             "harness/visualization/app.js"
           ],
-          "next": "将节点结构规范、审阅数据、证据校验和来源差异联入原 Human Check 验收。",
+          "next": "将节点结构化差异、文件归属与实际实施结果纳入现有审批与审计流程。",
           "environment_refs": []
         },
         "files": [
@@ -986,13 +986,13 @@
           "id": "g.context",
           "type": "goal",
           "title": "结构化研究知识与证据",
-          "description": "研究与工程节点以稳定 ID、类型、职责、状态、来源、实现文件及明确关联表达，形成可独立审阅的结构化信息。",
+          "description": "目标：以稳定 ID、状态、证据、AND/OR 与依赖描述研究目标，并分别呈现节点定义、关联和来源。",
           "status": "implemented",
           "evidence": [
             "harness/core/project_graph.json",
             "harness/knowledge/validate.py"
           ],
-          "next": "为节点变更提供完整前后快照、按字段差异与来源身份校验。",
+          "next": "建立结构化节点变更的字段快照、来源身份与文件归属校验。",
           "environment_refs": [],
           "last_change": {
             "date": "2026-10-25",
@@ -1032,12 +1032,12 @@
           "id": "q.transparency",
           "type": "question",
           "title": "人和 Agent 怎样共同理解项目？",
-          "description": "问题：人类怎样在同一节点的阅读界面中辨认职责、具体文件、关联、依据及版本差异？",
+          "description": "问题：人和 Agent 如何区分科研知识、代码实现与执行环境，并据此审阅节点字段与来源？",
           "status": "implemented",
           "evidence": [
             "harness/core/project_graph.json"
           ],
-          "next": "在 Human Check 中按字段比较完整 Before/After，并将审阅理由置于独立区域。",
+          "next": "在 Human Check 中呈现完整 Before/After，并单独显示字段差异与审阅理由。",
           "environment_refs": []
         },
         "reason": "app.js 把 after 与当前节点松散合并，缺失项继承旧值，且把审批状态写成节点实现状态；Reader 已有字段 diff 能力，却没有完整的节点数据来源。",
@@ -1074,7 +1074,7 @@
           "id": "g.agent_execution_flow",
           "type": "goal",
           "title": "Agent 执行任务的流程",
-          "description": "目标：依据结构化节点内容与字段差异，独立审阅变更范围、执行证据和最终实现结果。",
+          "description": "目标：从 Work Plan 预审、节点与文件授权、任务实施到独立结果审计和人类决定，保持各阶段的证据与权限边界；普通 Agent 不得修改 Core 与 Harness 治理。",
           "status": "partial",
           "evidence": [
             "harness/core/agent_flow.py",
@@ -1082,7 +1082,7 @@
             "harness/core/agent_flow.py",
             "harness/visualization/app.js"
           ],
-          "next": "将节点结构规范、审阅数据、证据校验和来源差异联入原 Human Check 验收。",
+          "next": "将节点结构化差异、文件归属与实际实施结果纳入现有审批与审计流程。",
           "environment_refs": []
         },
         "reason": "ATLAS_AUTHORING_STANDARD 已区分 title/summary/description/evidence/source，但 Human Check 缺少完整的结构化审阅合同和字段层面反例。",
@@ -1236,7 +1236,7 @@
         "id": "g.agent_execution_flow",
         "type": "goal",
         "title": "Agent 执行任务的流程",
-        "description": "目标：依据结构化节点内容与字段差异，独立审阅变更范围、执行证据和最终实现结果。",
+        "description": "目标：从 Work Plan 预审、节点与文件授权、任务实施到独立结果审计和人类决定，保持各阶段的证据与权限边界；普通 Agent 不得修改 Core 与 Harness 治理。",
         "status": "partial",
         "evidence": [
           "harness/core/agent_flow.py",
@@ -1244,7 +1244,7 @@
           "harness/core/agent_flow.py",
           "harness/visualization/app.js"
         ],
-        "next": "将节点结构规范、审阅数据、证据校验和来源差异联入原 Human Check 验收。",
+        "next": "将节点结构化差异、文件归属与实际实施结果纳入现有审批与审计流程。",
         "environment_refs": []
       },
       "field_changes": [
@@ -1252,13 +1252,37 @@
           "field": "description",
           "operation": "replace",
           "before": "目标：外部 GitHub Work Plan → 审计和部署预览 → 人类授权 → 任务代码变更与统一审阅 → 真实实验及独立结果审计 → 人类逐节点审批四种归宿及可追溯报告。Core 与 Harness 规则对普通 Agent 只读屏蔽。",
-          "after": "目标：依据结构化节点内容与字段差异，独立审阅变更范围、执行证据和最终实现结果。"
+          "after": "目标：从 Work Plan 预审、节点与文件授权、任务实施到独立结果审计和人类决定，保持各阶段的证据与权限边界；普通 Agent 不得修改 Core 与 Harness 治理。"
         },
         {
           "field": "next",
           "operation": "replace",
           "before": "本地真人评审和 GitHub 原生 Approved 事件尚需端到端验收。",
-          "after": "将节点结构规范、审阅数据、证据校验和来源差异联入原 Human Check 验收。"
+          "after": "将节点结构化差异、文件归属与实际实施结果纳入现有审批与审计流程。"
+        },
+        {
+          "field": "implementation_files",
+          "operation": "proposal_only",
+          "before": [
+            {
+              "path": "harness/core/agent_flow.py",
+              "role": "existing execution flow",
+              "source_status": "OBSERVED"
+            }
+          ],
+          "after": [
+            {
+              "path": "harness/core/agent_flow.py",
+              "role": "existing execution flow",
+              "source_status": "OBSERVED"
+            },
+            {
+              "path": "harness/github/node_review_schema.py",
+              "role": "typed node review contract",
+              "source_status": "PROPOSED_ONLY"
+            }
+          ],
+          "note": "Illustrates a typed file diff; implementation_files are a proposed Reader projection, never written as confirmed Core evidence at preview time."
         }
       ],
       "file_change_sample": [
