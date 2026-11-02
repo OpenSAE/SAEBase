@@ -18,8 +18,8 @@
       "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev002_release_matrix.md",
       "git_blob_sha": "c8264d64e762e47cce7352649f30b3d0d413bf92",
       "version": "0.2.0",
-      "mode": "copy_compat",
-      "reason": "Historical v0.2.0 M5 release; preserved legacy link",
+      "mode": "move",
+      "reason": "Historical v0.2.0 release matrix now detached from current distribution checks, retaining identical archived blob; Human Check issue #161.",
       "status": "archived"
     },
     {
@@ -93,7 +93,160 @@
       "mode": "move",
       "reason": "v0.5.0-specific historical assertions; removed from routine collection, recoverable by recorded source",
       "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/M0_ACCEPTANCE.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev003_api_acceptance.md",
+      "git_blob_sha": "3b299e8812936298561b7e51881497cdbf231a97",
+      "version": "0.2.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/M1_ACTIVATION_STORE.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev004_activation_store.md",
+      "git_blob_sha": "f2b3af64a55833aa1c173f18dfc47146b087ba94",
+      "version": "0.2.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/M2_BATCH_INTERVENTIONS.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev005_batch_interventions.md",
+      "git_blob_sha": "a72b067ebf3f14ecbd61a3adabfb1414deb5af42",
+      "version": "0.2.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/M3_UNIFIED_BENCHMARK.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev006_unified_benchmark.md",
+      "git_blob_sha": "e44638b75785ef4ffc0e5d5f49637aad3244a909",
+      "version": "0.2.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/M4_RELIABILITY.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev007_reliability_audit.md",
+      "git_blob_sha": "52b5453c097f1c5b7ed861a349edc6a13d14f11b",
+      "version": "0.2.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/PHASE_A.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev008_phase_alpha.md",
+      "git_blob_sha": "4bd157236eaed15ffa7e967d82a1767ee6197e6a",
+      "version": "0.2.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/PHASE_B.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev009_phase_beta.md",
+      "git_blob_sha": "0847012162be6e91be046b865a4099c86bcba9bd",
+      "version": "0.2.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/PHASE_B_VALIDATION.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev010_beta_validation.md",
+      "git_blob_sha": "13b38225b50dc8f85108d9666da384330b5b3ff3",
+      "version": "0.2.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/PHASE_C_VALIDATION.md",
+      "archived_path": "harness/github/development_doc/archive/0.2.0/0.2.0_dev011_gamma_validation.md",
+      "git_blob_sha": "3f5fc7297ed2cd407e46e4c6bfb67495ecd1872f",
+      "version": "0.2.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/development_doc/history.md",
+      "archived_path": "harness/github/development_doc/archive/0.5.0/0.5.0_dev001_history_index.md",
+      "git_blob_sha": "a4c31361778052e69ecf770c36792c066c854476",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/01_stage_d_gpu_acceptance.md",
+      "archived_path": "harness/github/work_plan/archive/0.3.0/0.3.0_wp001_stage_acceptance.md",
+      "git_blob_sha": "4bf6e0ef271a58d6633107e66e945f081f0445ef",
+      "version": "0.3.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/02_stage_d_completion.md",
+      "archived_path": "harness/github/work_plan/archive/0.3.0/0.3.0_wp002_stage_completion.md",
+      "git_blob_sha": "58ce7ef33779a056b3eb15720f1df88f093e8931",
+      "version": "0.3.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/03_gpu_evidence_recovery_and_extension_acceptance.md",
+      "archived_path": "harness/github/work_plan/archive/0.3.0/0.3.0_wp003_evidence_recovery.md",
+      "git_blob_sha": "24724c3daf7fa82f9c6daa33f682417627d22bd7",
+      "version": "0.3.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/06_research_lab_effects_context_real_evidence.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp001_lab_evidence.md",
+      "git_blob_sha": "cd7195333fedae9d9dede710a18cd12983d7286b",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/10_correctness_and_execution_optimization.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp002_execution_optimization.md",
+      "git_blob_sha": "ace28aad64acecd5eee7505354e7dcdb352d0fb9",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/16_web_vision_api_single_execution.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp003_web_vision.md",
+      "git_blob_sha": "4ac4627fd92f852549f16dd95c4a86975d284c8a",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_plan/17_seven_playgrounds_agent_handoff.md",
+      "archived_path": "harness/github/work_plan/archive/0.5.0/0.5.0_wp004_playground_handoff.md",
+      "git_blob_sha": "f7138e590d99e43584e2cf20d38332e77bc1b5ea",
+      "version": "0.5.0",
+      "mode": "move",
+      "reason": "Release-tag provenance and historical record identity reviewed in HC-History-Isolation-20261102; original Git blob retained exactly (issue #161).",
+      "status": "archived"
     }
   ],
-  "notes": "All archive bytes retained unchanged. copy_compat entries keep old source link intentionally; only move entries delete their original path. Ambiguous version assignments stay unarchived."
+  "notes": "Exact-source historical moves approved by HC-History-Isolation-20261102 issue #161. Existing compatibility records remain where unapproved references exist. Historical contents unchanged."
 }
