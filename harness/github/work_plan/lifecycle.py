@@ -19,7 +19,7 @@ STATUSES = frozenset(("PASS", "FAIL", "BLOCKED", "PARTIAL", "NOT_RUN", "WARNING"
 CROSS_WP = re.compile(r"\\bWP[0-9]+\\b", re.I)
 
 
-def check_workplan_isolation(plan, text, intent):
+def check_workplan_isolation(plan, text, intent, *, versioned=False):
     """No cross-WP authority without human-approved exact purposes.
 
     Historical reviewed/approved plans remain readable. New draft/Agent Ready
@@ -38,7 +38,7 @@ def check_workplan_isolation(plan, text, intent):
         if not isinstance(wp, str) or not re.fullmatch(r"WP[0-9]+", wp, re.I) or not isinstance(purpose, str) or not purpose.strip() or decision != "APPROVED":
             raise PlanError("Cross-WP reference requires explicit human approval and purpose")
         approved.add(wp.upper())
-    if plan["status"] in ("draft", "agent_ready") and not referenced <= approved:
+    if (versioned or plan["status"] in ("draft", "agent_ready")) and not referenced <= approved:
         raise PlanError("Unapproved cross-WP reference: " + ", ".join(sorted(referenced - approved)))
     return referenced
 
@@ -128,7 +128,8 @@ def check(plan_path, root=ROOT, check_contracts=True):
         or not intent.get("scientific_motivation")
     ):
         raise PlanError("Human intent is missing or mismatched")
-    check_workplan_isolation(plan, plan_text, intent)
+    versioned = re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+_wp[0-9]{3}_[a-z]+_[a-z]+\.md", Path(plan_path).name) is not None
+    check_workplan_isolation(plan, plan_text, intent, versioned=versioned)
     known = {
         "core_ids": ids(root, "harness/core/project_graph.json", "nodes"),
         "knowledge_ids": ids(root, "doc/knowledge/context_graph.json", "nodes"),
