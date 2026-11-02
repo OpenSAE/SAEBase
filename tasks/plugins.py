@@ -3,6 +3,7 @@
 from saebase.registry import register_task
 from saebase.sae.task import SAETask
 from tasks.capture.task import CaptureTask
+from tasks.precheck.task import PrecheckTask
 from tasks.intervene.task import InterveneTask
 from tasks.generate.task import GenerateTask
 from tasks.circuits.task import CircuitsTask
@@ -11,7 +12,7 @@ from tasks.benchmark.task import BenchmarkTask
 from tasks.train.task import TrainTask
 
 for key, cls in (
-    ("sae", SAETask),
+    ("precheck", PrecheckTask),
     ("capture", CaptureTask),
     ("intervene", InterveneTask),
     ("generate", GenerateTask),

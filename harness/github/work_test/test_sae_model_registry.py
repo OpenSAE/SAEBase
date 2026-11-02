@@ -143,8 +143,8 @@ def test_plugins_register_sae_stack():
     for k in SAE_KEYS:
         assert k in list_registered_sae_keys()
     assert "none" in list_registered_sae_keys()
-    assert "sae" in list_registered_task_keys()
-    assert list_registered_task_keys() == sorted({"sae", "capture", "intervene", "generate", "circuits", "explain", "benchmark", "train"})
+    assert "precheck" in list_registered_task_keys()
+    assert list_registered_task_keys() == sorted({"precheck", "capture", "intervene", "generate", "circuits", "explain", "benchmark", "train"})
 
 
 def test_r1_accepts_discovery_on_mmlu_pro():
