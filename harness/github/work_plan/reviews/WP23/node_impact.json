@@ -1,9 +1,9 @@
 {
   "schema": "saebase.workplan.node_impact.v1",
   "plan_id": "WP23",
-  "source_commit": "d3e495406d32aa15960da615bbfacf2047e67559",
-  "source_status": "SOURCE_INSPECTED_PLAN_ONLY",
-  "node_review_decision": "DEFER_NODE_DECISION",
+  "source_commit": "37b7b4f96b77b60a908deef4fce59e65ac89e18a",
+  "source_status": "POST_IMPLEMENTATION_CODE_INSPECTED_LOCAL_RUNTIME_NOT_RUN",
+  "node_review_decision": "NO_NODE_CHANGE",
   "source_write_review": {
     "required": true,
     "status": "APPROVED",
@@ -31,26 +31,23 @@
   "domains": [
     {
       "domain": "code",
-      "decision": "DEFER",
-      "feature_effect": "UNKNOWN",
+      "decision": "NONE",
+      "feature_effect": "NEW",
       "source_paths": [
         "tasks/precheck/operation.py",
         "tasks/precheck/worker.py",
-        "tasks/precheck/sae_checks.py",
+        "tasks/precheck/dataset_checks.py",
+        "tasks/precheck/model_checks.py",
+        "tasks/precheck/compatibility_checks.py",
+        "scripts/workplan/wp023_orchestrator.py",
         "saebase/registry.py"
       ],
       "existing_nodes": [
         "g.code_tree"
       ],
-      "reason": "Current source contains an existing Precheck worker and SAE check, while independent dataset/model/pair APIs and the run coordinator are unimplemented. Recheck the actual AST after GitHub implementation before any Code node decision.",
+      "reason": "Current main now includes implemented independent Dataset and Model checks, compatibility planning, an isolated Worker, and a source-owned CLI/orchestrator. These source additions do not change the purpose, properties, description or relations of the existing durable Atlas Code tree node; no long-lived Atlas node edit is proposed. Real-run acceptance and source-display regeneration remain separate from node semantics.",
       "proposed_fields": {},
-      "human_check_required": false,
-      "planned_paths": [
-        "tasks/precheck/dataset_checks.py",
-        "tasks/precheck/model_checks.py",
-        "tasks/precheck/compatibility_checks.py",
-        "scripts/workplan/wp023_orchestrator.py"
-      ]
+      "human_check_required": false
     },
     {
       "domain": "knowledge",
@@ -131,15 +128,22 @@
     }
   ],
   "implementation_review": {
-    "status": "PENDING_HUMAN_SOURCE_SCOPE_REVIEW",
-    "scope": "Named source paths in the draft only; no product-source modifications or runtime execution authorized."
+    "status": "GITHUB_SOURCE_IMPLEMENTED_AND_CI_PASSED",
+    "scope": "Human-authorized WP23 Python checker, shell launch and run artifact paths; no Atlas mutation or runtime authorization.",
+    "source_evidence": [
+      "https://github.com/OpenSAE/SAEBase/pull/158",
+      "https://github.com/OpenSAE/SAEBase/pull/164",
+      "https://github.com/OpenSAE/SAEBase/pull/165"
+    ],
+    "software_ci_evidence": "https://github.com/OpenSAE/SAEBase/actions/runs/41415994491",
+    "real_runtime_status": "NOT_RUN_BY_GITHUB"
   },
   "runtime_authorization": "NONE",
   "scientific_execution": "NOT_RUN",
   "human_check_review": {
-    "status": "NOT_REQUIRED_NOW",
-    "reason": "本轮尚无经过实际源码证实的长期 Atlas 节点增删改。Code 新模块仍属于拟实施内容，必须等真实 AST 和职责检查完成后重新审计；如发现实际节点变化，再进入 Atlas Human Check。现阶段不创建虚构节点。",
-    "recheck_after_implementation": true,
-    "review_url": null
+    "status": "NOT_REQUIRED",
+    "reason": "已复核 main 中新增的通用 Precheck 模块及独立执行入口；本次没有改变 Atlas 既有节点的职责、性质、关系或说明，只是源码实现和 Workplan 执行绑定。因此不生成虚构的 Node Human Check。真实 GPU 与恢复问题由 Local Agent 测试，如发现需要长期节点语义变化再另行申请审阅。",
+    "review_url": null,
+    "recheck_after_implementation": false
   }
 }
