@@ -148,9 +148,15 @@ def get_prompt_source_plugin(name: str) -> PromptSourcePlugin:
 def get_model_plugin(name: str) -> ModelPlugin:
     _ensure_plugins()
     key = str(name)
-    if key not in _MODEL_REGISTRY:
-        raise ValueError(f"Unknown model.name: {key!r}")
-    return _MODEL_REGISTRY[key]
+    if key in _MODEL_REGISTRY:
+        return _MODEL_REGISTRY[key]
+    # Historical model adapters remain explicitly loadable for reproduction,
+    # without contributing to the small active Model registration list.
+    from models.plugins import _LEGACY_KEYS, legacy_plugin
+
+    if key in _LEGACY_KEYS:
+        return legacy_plugin(key)
+    raise ValueError(f"Unknown model.name: {key!r}")
 
 
 def get_sae_plugin(name: str) -> SAEPlugin:

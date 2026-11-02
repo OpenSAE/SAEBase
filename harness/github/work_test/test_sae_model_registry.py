@@ -138,8 +138,11 @@ def test_config_rejects_unbundled_research_task():
 
 def test_plugins_register_sae_stack():
     ensure_plugins_loaded()
+    from saebase.registry import get_model_plugin
+
+    assert len(list_registered_model_keys()) == 15
     for k in MODEL_KEYS:
-        assert k in list_registered_model_keys()
+        assert get_model_plugin(k) is not None
     for k in SAE_KEYS:
         assert k in list_registered_sae_keys()
     assert "none" in list_registered_sae_keys()
