@@ -280,7 +280,7 @@
       }
       const model=presentation(entry);
       shell.dataset.operation=model.operation;
-      shell.dataset.reviewState=entry.reviewState || "";
+      setReviewState(entry.reviewState || "");
       const head=element("header","atlas-reader-head");
       const title=element("div","atlas-reader-heading");
       title.appendChild(element("div","atlas-reader-eyebrow",
@@ -311,7 +311,12 @@
       if(!same)cardWrap.querySelector(".atlas-reader-scroll")?.scrollTo?.(0,0);
     }
     function isOpen(){return !!shell;}
-    return {open,close,isOpen};
+    function setReviewState(state){
+      if(!shell)return;
+      shell.dataset.reviewState=["unchecked","approved","denied"].includes(state)
+        ?state:"";
+    }
+    return {open,close,isOpen,setReviewState};
   }
   window.SAEBASE_ATLAS_NODE_READER={create,presentation,differs,diffSegments};
 })();

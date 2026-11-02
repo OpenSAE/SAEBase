@@ -41,8 +41,37 @@ assert(css.includes(".atlas-reader-diff-remove")&&
   css.includes(".atlas-reader-diff-add"),"red editorial additions/deletions");
 assert(!js.includes("threshold+=event.deltaY"),"reader must not exit on content-scroll boundary");
 assert(!js.includes("atlas-reader-hint"),"obsolete instruction microcopy absent");
-assert(js.includes('shell.dataset.reviewState=entry.reviewState || ""'),"Reader palette follows review");
+assert(js.includes('setReviewState(entry.reviewState || "")'),"Reader palette follows review");
 assert(css.includes('[data-review-state="unchecked"]')&&
   css.includes('[data-review-state="approved"]')&&
   css.includes('[data-review-state="denied"]'),"Reader highlights correspond to decision");
-console.log("SAEBase Atlas Node Reader editorial diff, state and wheel PASS");
+// Add and Remove use Graph by default; clicking their node card explicitly
+// opens Reader, whereas Change opens a Before/After comparison automatically.
+assert(app.includes('reviewTarget && reviewItem.operation==="change"'),
+  "only Change defaults to the Reader");
+assert(app.includes('!!options.toggle'),"explicit card click opens Add/Remove Reader");
+assert(app.includes('if(!shouldOpenReader)nodeReader?.close()'),
+  "switching to Add/Remove dismisses a previous Reader");
+assert(app.includes('config.detailsOpen = !nodeReader || (!reviewTarget && !shouldOpenReader)'),
+  "graph-only Add/Remove navigation must not open the old detail drawer");
+assert(app.includes('if(decision!=="unchecked" && !nodeReader?.isOpen())'),
+  "Reader remains visible after an approval, denial or reset");
+assert(app.includes('nodeReader.setReviewState(status)'),
+  "the review bar synchronizes live state on the active Reader");
+const setter=js.match(/    function setReviewState\(state\)\{[\s\S]*?\n    \}/);
+assert(setter,"Reader must expose state-only update");
+const stateHarness={shell:{dataset:{}}};
+vm.createContext(stateHarness);
+vm.runInContext(setter[0]+"\nthis.apply=setReviewState;",stateHarness,{timeout:1200});
+for(const value of ["unchecked","approved","denied","unchecked"]){
+  stateHarness.apply(value);
+  assert.equal(stateHarness.shell.dataset.reviewState,value,
+    "state toggle must update without closing or re-rendering Reader");
+}
+for(const value of ["unchecked","approved","denied"]){
+  const scope='.atlas-reader-shell[data-review-state="'+value+'"]';
+  assert(css.includes(scope),"missing review palette "+value);
+}
+assert(css.includes('color:var(--hc-mark')&&css.includes('border-color:var(--hc-card'),
+  "diff text and both reader frames share the live palette");
+console.log("SAEBase Atlas Reader: operation defaults and live HC palette PASS");

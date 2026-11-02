@@ -74,3 +74,6 @@ Reader revision: the card uses the existing dark Atlas palette. Wheel gestures *
 
 
 Review highlights are purple (Unchecked), red (Approved), and gray (Denied), including the selected node. The redundant Reader wheel hint is removed. Send report preserves the local browser draft and opens a separate GitHub issue tab on explicit click; it does not navigate or reset the Atlas page.
+
+
+Human Check Reader: navigating to Change opens its Before/After comparison automatically, whereas Add and Remove only focus the graph until their card is clicked. While the Reader is open, decisions do not auto-advance; purple/red/gray immediately update both comparison card borders, diff text and the Reader frame without resetting scroll. Graph-only review retains its next-unchecked advancement.
