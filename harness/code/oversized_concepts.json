@@ -250,7 +250,7 @@
           ],
           "patterns": [
             "^code:configurations:tasks:benchmark$",
-            "^tasks/benchmark/(?:activation_health|analyze|controlled_inputs|health_results|operation|pipeline_checks|stage_d|task)\\.py$"
+            "^tasks/benchmark/(?:activation_health|analyze|controlled_inputs|coverage_contract|health_results|legacy_sae_task|operation|pipeline_checks|stage_d|task)\\.py$"
           ]
         },
         {
