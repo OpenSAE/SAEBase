@@ -93,4 +93,36 @@ assert(js.includes("onDismiss=current?.onDismiss;close();onDismiss?.();"),
   "Back to graph and Escape both restore Standard");
 assert(js.includes('duration:reverse?220:410'),
   "Reader opens more gently than 240ms");
+// Regression: a single '说明' field replaces duplicate prose. The existing
+// red editorial del/ins renderer must be used for old vs proposed text.
+function element(tag){
+  const x={tag,children:[],dataset:{},textContent:"",className:"",
+    classList:{add(){},remove(){},toggle(){}},
+    appendChild(child){this.children.push(child);return child;},
+    setAttribute(){},addEventListener(){},querySelector(){return null;}};
+  return x;
+}
+const host=element("main");
+env.document={
+  createElement:element,documentElement:{lang:"zh"},
+  body:{classList:{add(){},remove(){}}},
+};
+const oldNode={id:"g.registry",title:"可插拔组件注册",
+  description:"目标：Dataset/Model/Task 注册映射可发现、可验证。",
+  next:"增加注册矩阵和 CPU 环境中的契约测试。"};
+const newNode={...oldNode,properties:"各组件类型拥有独立的注册映射，重复注册会被拒绝。"};
+create({host}).open({node:newNode,view:"core",operation:"change",
+  before:oldNode,after:newNode,review:true,reviewState:"unchecked"});
+function walk(node,acc=[]){acc.push(node);for(const child of node.children||[])walk(child,acc);return acc;}
+const all=walk(host);
+const prose=all.map(x=>x.textContent||"").join("\n");
+const sectionTitles=all.filter(x=>x.className==="atlas-reader-section-title").map(x=>x.textContent);
+assert.equal(sectionTitles.filter(x=>x==="说明").length,2,"one explanation per comparison side");
+assert(!sectionTitles.includes("完整说明")&&!sectionTitles.includes("下一步"));
+assert(!prose.includes("目标：")&&!prose.includes("增加注册矩阵"));
+assert(all.some(x=>x.tag==="del"&&x.className==="atlas-reader-diff-remove"),
+  "removed old wording must use the original highlighted strikeout");
+assert(all.some(x=>x.tag==="ins"&&x.className==="atlas-reader-diff-add"),
+  "new wording must use the original highlighted underline");
+
 console.log("SAEBase Atlas: Compact → Standard → Reader and background exit PASS");
