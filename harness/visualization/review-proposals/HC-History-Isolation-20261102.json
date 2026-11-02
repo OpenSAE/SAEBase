@@ -15,7 +15,7 @@
         "view": "core",
         "node_id": "q.transparency",
         "operation": "source_review",
-        "scope_title": "SC01 · Development Doc 历史文件及长期文档隔离",
+        "scope_title": "整理早期开发资料",
         "scope_description": "明确文档版本和最终内容；历史报告与当前指南不再相互依赖；保留 RELEASES 公开入口",
         "parent_id": null,
         "before": {
@@ -134,7 +134,7 @@
         "view": "core",
         "node_id": "s.agent_flow",
         "operation": "source_review",
-        "scope_title": "SC02 · Work Plan 冻结与历史引用断开",
+        "scope_title": "归档已经完成的工作计划",
         "scope_description": "冻结 01–21 原文/表格；当前 WP23 保持独立；现役 Agent 文档不得继承旧执行指令",
         "parent_id": null,
         "before": {
@@ -253,7 +253,7 @@
         "view": "core",
         "node_id": "q.agent_flow",
         "operation": "source_review",
-        "scope_title": "SC03 · 退出旧测试前的覆盖率与 CI 审查",
+        "scope_title": "检查旧测试是否仍需保留",
         "scope_description": "仅归档已退役版本专属测试；替换仍活跃的通用回归覆盖；避免 pytest 默认收集已归档测试",
         "parent_id": null,
         "before": {
@@ -400,7 +400,7 @@
         "view": "core",
         "node_id": "g.code_tree",
         "operation": "source_review",
-        "scope_title": "SC04 · 通用构建、发布和历史验证器解耦",
+        "scope_title": "解除软件对旧文件的依赖",
         "scope_description": "打包不用旧版文件作必需输入；新 release 不读取历史 Work Plan；历史考试用固定 Tag 独立复现；保留当前 API, CI 功能",
         "parent_id": null,
         "before": {
@@ -472,7 +472,7 @@
         "view": "core",
         "node_id": "q.reproducibility",
         "operation": "source_review",
-        "scope_title": "SC05 · 归档完整性、Release 版本映射与零依赖验证",
+        "scope_title": "核对归档来源与完整性",
         "scope_description": "Release Tag 及 Blob SHA 作为来源证据；拒绝猜测不明确归属的版本；根目录反向扫描未登记档案；移除所有 archive 目录后产品检查仍可通过",
         "parent_id": null,
         "before": {
@@ -523,41 +523,41 @@
     "groups": [
       {
         "id": "SC01",
-        "title": "Development Doc 历史文件及长期文档隔离",
+        "title": "整理早期开发资料",
         "item_keys": [
           "core:q.transparency"
         ]
       },
       {
         "id": "SC02",
-        "title": "Work Plan 冻结与历史引用断开",
+        "title": "归档已经完成的工作计划",
         "item_keys": [
           "core:s.agent_flow"
         ]
       },
       {
         "id": "SC03",
-        "title": "退出旧测试前的覆盖率与 CI 审查",
+        "title": "检查旧测试是否仍需保留",
         "item_keys": [
           "core:q.agent_flow"
         ]
       },
       {
         "id": "SC04",
-        "title": "通用构建、发布和历史验证器解耦",
+        "title": "解除软件对旧文件的依赖",
         "item_keys": [
           "core:g.code_tree"
         ]
       },
       {
         "id": "SC05",
-        "title": "归档完整性、Release 版本映射与零依赖验证",
+        "title": "核对归档来源与完整性",
         "item_keys": [
           "core:q.reproducibility"
         ]
       }
     ],
-    "preview_sha256": "d3e495406d32aa15960da615bbfacf2047e67559-five-source-scopes-v2",
+    "preview_sha256": "fe9f6a01d2b21c3d159195ac20143eec2290b15b-review-titles-v3",
     "created_for": "SOURCE-ONLY five-scope review; no Atlas Core/Code/Knowledge node mutation. Static Pages decisions are browser drafts requiring explicit submitted report."
   },
   "context": {

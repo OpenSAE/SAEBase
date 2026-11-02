@@ -46,7 +46,13 @@ for(const item of sourceReview.plan.items){
 }
 assert(new Set(sourceReview.plan.items.map(item=>item.node_id)).size===5);
 assert(js.includes('entry.proposal.operation==="source_review"'),"source review metadata absent");
-assert(app.includes("◎ SOURCE REVIEW"),"source review label absent");
+assert(!app.includes("◎ SOURCE REVIEW"),"source review must not add a top-left operation badge");
+assert(app.includes("const original=after.title || origin.title || baseNode.title || item.node_id;"),"source review must preserve the original Atlas node title");
+assert(js.includes('if(model.operation!=="source_review")'),"source review must not add a Reader top-left label");
+for(const item of sourceReview.plan.items){
+  assert(!/SC[0-9]|Source Review|Development Doc|Work Plan|Work Test|Release|CI/.test(item.scope_title),"review titles must be natural nontechnical Chinese");
+  assert(!item.scope_title.includes("·"));
+}
 assert(css.includes(".atlas-reader-pages.is-compare")&&css.includes(".atlas-reader-card.is-removing"));
 assert(css.includes("pointer-events:none")&&css.includes("pointer-events:auto"),
   "outside reader panel must pass wheel events to graph");
