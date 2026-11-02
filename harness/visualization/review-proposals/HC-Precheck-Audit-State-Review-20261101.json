@@ -320,7 +320,7 @@
         "after": {
           "type": "module",
           "title": "通用运行审计报告",
-          "description": "通用运行审计报告",
+          "description": "单次研究运行的审计信息汇总接口。",
           "path": "saebase/runtime/audit_report.py",
           "context_term_ids": [
             "term.artifact",
@@ -356,7 +356,7 @@
         "after": {
           "type": "module",
           "title": "审计后归档交付入口",
-          "description": "审计后归档交付入口",
+          "description": "审计通过后的本地归档交付接口。",
           "path": "saebase/runtime/audit_delivery.py",
           "context_term_ids": [
             "term.artifact",
