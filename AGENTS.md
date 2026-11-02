@@ -24,6 +24,15 @@ When a Harness, GitHub maintenance, or local-Agent execution workflow fails, beh
 
 A Work Plan may reference Core/Knowledge/Code/Environment/Context without changing them. Every new or materially revised Work Plan must first produce the regulated human-facing section summary and a source-backed six-domain node-impact audit described in [Work Plan authoring](harness/github/work_plan/WRITING_STANDARD.md). If the durable node responsibility is unchanged, **do not edit it** or create a synthetic Human Check change to justify project-specific tasks.
 
+## Python formatting before any local commit or GitHub API write
+
+Ruff is a deterministic format/lint gate, not a substitute for tests. The exact CI version is `ruff==0.15.22`; see `pyproject.toml` and `.github/workflows/ci.yml`. Do **not** discover formatting mistakes by waiting for a failed PR CI.
+
+- Local Agent first stages **only human-authorized** new Python files, then runs `python saebase/tools/check_new_python_quality.py --fix`. Inspect the diff and re-stage only those files before committing. Existing modified Python files may be included *only* with explicit `--include-modified`, because Ruff rewrites entire files.
+- Once per fresh checkout, install `python -m pip install "ruff==0.15.22" "pre-commit>=4,<5"` and `pre-commit install` to run the same bounded formatter automatically during local commits. Missing tools or version mismatch fail closed with an installation hint, not a silent skip.
+- Agents writing via GitHub Contents API / connectors **bypass local Git hooks**. They must format their proposed Python bytes with this same Ruff version in a trusted temporary workspace **before the API write**; CI remains read-only and reports a formatting failure if this process was skipped. Do not enable an automatic CI push that can exceed reviewed file scopes or mutate frozen fixtures.
+- This formatting gate neither expands editable paths nor grants protected governance/GPU/network/publish permission. Never auto-format frozen WP21 fixtures, historical results, or unrelated Python files merely to make a check green.
+
 ## Human Check before GitHub changes
 
 Before source edits or a PR, follow [Human Check](harness/github/HUMAN_CHECK.md) and the [Delivery Skill](.github/skills/saebase-delivery/SKILL.md). First distinguish **durable Atlas semantic changes** from a source-only modification. For genuine Node ADD/CHANGE/REMOVE, Human Check remains enabled and requires the existing Atlas overlay with independent Approve / Deny / Unchecked decisions (only humans can opt out through the authenticated local UI). For **NO_NODE_CHANGE**, do not fabricate a Node proposal: provide the source-backed impact audit and obtain explicit human review of the exact changed paths and PR diff before implementation/merge, with protected governance authorization retained. Neither route bypasses Contracts, Work Orders, GPU/network/publishing gates or independent verification.
