@@ -37,6 +37,7 @@ class LoadedResearchPair:
 
 def load_registered(
     *, sae_key: str, layer: int, device: str = "cpu", model_key: str | None = None,
+    require_patch: bool = True,
 ) -> LoadedResearchPair:
     """Load a bundled model/profile pair, with explicit site/provenance validation.
 
@@ -60,7 +61,8 @@ def load_registered(
         )
     adapter = ModelAdapter(model)
     adapter.capabilities.require("capture")
-    adapter.capabilities.require("patch")
+    if require_patch:
+        adapter.capabilities.require("patch")
     if adapter.backend == "hf_hooks":
         if identity.hook_name != f"blocks.{identity.layer}.hook_resid_post":
             raise UnsupportedCapability(

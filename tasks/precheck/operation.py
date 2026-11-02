@@ -229,6 +229,7 @@ def run_precheck(cfg: DictConfig) -> EvaluationResult:
                     allow_install=bool(cfg.task.get("allow_install", False)),
                     allow_download=bool(cfg.task.get("allow_download", False)),
                     max_download_bytes=int(cfg.task.get("max_download_bytes", 0)),
+                    install_timeout_seconds=max_seconds,
                 )
                 if prepared["status"] != "READY":
                     rows.append(prepared)

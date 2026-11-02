@@ -67,7 +67,9 @@ def check_real_sae(
         raise ValueError("Precheck requires a nonempty real prompt for SAE capture")
     if device.startswith("cuda") and not torch.cuda.is_available():
         raise RuntimeError("BLOCKED_RESOURCE: no CUDA device available")
-    pair = load_registered(sae_key=sae_key, layer=layer, model_key=model_key, device=device)
+    pair = load_registered(
+        sae_key=sae_key, layer=layer, model_key=model_key, device=device, require_patch=False
+    )
     snapshot = capture_features(pair.model, pair.sae, site=pair.site, prompt=prompt)
     h, z, rebuilt = snapshot.activation, snapshot.codes, snapshot.reconstruction
     if h.ndim != 1 or z.ndim != 1 or rebuilt.shape != h.shape:

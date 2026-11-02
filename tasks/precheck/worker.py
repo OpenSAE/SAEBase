@@ -40,17 +40,29 @@ def _validate_task(task: str, data: Any) -> None:
         if not isinstance(data.get("logit_delta_l2"), (float, int)):
             raise RuntimeError("Intervene did not return measured logit differences")
     elif task == "generate":
-        if not data.get("result"):
-            raise RuntimeError("Generate did not return a real baseline/edited result")
+        result = data.get("result")
+        if not isinstance(result, dict):
+            raise RuntimeError("Generate did not return a real generation trace")
+        for key in ("baseline_generated_token_ids", "steered_generated_token_ids"):
+            if not isinstance(result.get(key), list) or not result[key]:
+                raise RuntimeError(f"Generate missing real generated tokens: {key}")
+        if not isinstance(result.get("steered_steps"), list) or not result["steered_steps"]:
+            raise RuntimeError("Generate did not record real intervention steps")
     elif task == "circuits":
         if not data.get("native") or not list(Path("figures").rglob("*.*")):
             raise RuntimeError("Circuit tracer returned no real graph artifacts")
     elif task == "explain":
-        if not data.get("hypothesis"):
-            raise RuntimeError("Explain produced no hypothesis/heldout record")
+        hypothesis = data.get("hypothesis")
+        if not isinstance(hypothesis, dict) or hypothesis.get("status") != "heldout_tested":
+            raise ValueError("Explain PASS requires a real heldout predictor and tested result")
+        if not isinstance(hypothesis.get("heldout_score"), (int, float)):
+            raise RuntimeError("Explain heldout metric missing")
     elif task == "benchmark":
-        if not data.get("metrics") or int(data.get("metric_count", 0)) < 1:
+        metrics = data.get("metrics")
+        if not isinstance(metrics, list) or not metrics:
             raise RuntimeError("Benchmark produced no real metric records")
+        if any(not isinstance(m, dict) or m.get("status") != "completed" or int(m.get("n_valid", 0)) < 1 for m in metrics):
+            raise ValueError("Benchmark PASS requires every selected metric completed with real valid samples")
     elif task == "train":
         if not data.get("native") or not any(p.is_file() for p in Path("checkpoints").rglob("*")):
             raise RuntimeError("Train produced no native checkpoint")

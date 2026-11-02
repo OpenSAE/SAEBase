@@ -75,6 +75,8 @@ def error_result(exc: Exception, *, stage: str, attempted: list[str]) -> dict[st
             "no default",
             "not registered",
             "not in model",
+            "heldout",
+            "selected metric",
         )
     ):
         code, repair = (
