@@ -288,8 +288,9 @@
       setReviewState(entry.reviewState || "");
       const head=element("header","atlas-reader-head");
       const title=element("div","atlas-reader-heading");
-      title.appendChild(element("div","atlas-reader-eyebrow",
-        (entry.view||"Atlas").toUpperCase()+" / "+L(...names[model.operation])));
+      if(model.operation!=="source_review")
+        title.appendChild(element("div","atlas-reader-eyebrow",
+          (entry.view||"Atlas").toUpperCase()+" / "+L(...names[model.operation])));
       title.appendChild(element("div","atlas-reader-current-title",
         entry.node.title || entry.node.id));
       head.appendChild(title);
