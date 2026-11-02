@@ -144,7 +144,7 @@ def observations_for_metric(root,config,row,provenance,*,sae=None):
         if sae is None:
             return (),"SAE-only decoder opt-in required; no model forward is needed"
         import torch
-        from saebase.sae.contracts import reconstruction_stats
+        from saebase.api.sae_contracts import reconstruction_stats
         reader=_find_m1_codes(Path(root),row,provenance,config)
         activation=ShardedReader(reader.path.parents[1],verify_shards=True)
         prefix=f"{row['model_id']}/{row['site']['layer']}/{row['sae_id']}"

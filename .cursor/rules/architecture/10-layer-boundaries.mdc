@@ -6,17 +6,17 @@ alwaysApply: false
 
 # 唯一运行与注册链路
 
-- `saebase/registry.py` 是 Dataset、Model、SAE 和 Task 的唯一 Registry，`saebase/plugin_bootstrap.py` 按需加载组件注册。
+- `saebase/registry.py` 是 Dataset、Model 和 Task 的公共 Registry；SAE 作为 Model 关联资源参数管理，`saebase/plugin_bootstrap.py` 按需加载组件注册。
 - `datasets/plugins.py`、`models/plugins.py`、`tasks/plugins.py` 分别提交所属组件，不增加第二套注册体系。
 - `saebase/runtime/` 维护 Hydra 配置验证、执行环境、复现种子、运行路径和产物日志的通用语义。
-- 七类新任务从 `python -m saebase.runtime.train` 进入，经 `saebase/runner.py` 分发到 `tasks/<name>/`。
-- 原 `saebase` CLI 与 `saebase/api/`、`saebase/sae/`、`saebase/store/` 的科研算法接口维持兼容。
+- Precheck 与七类科研任务从 `python -m saebase.runtime.train` 进入，经 `saebase/runner.py` 分发到 `tasks/<name>/`。
+- 原 `saebase` CLI 与 `saebase/api/`、`tasks/benchmark/`、`saebase/store/` 的科研算法接口维持兼容。
 - `saebase/research_lab/` 是 Research Lab 前后端与证据浏览模块，具有独立的审核和发布权限边界。
 
 # Dataset、Model、Task 职责
 
 - `datasets/<name>/` 提供数据源、样本变换与可验证划分；`saebase/data/` 只保留兼容入口。
-- `models/<name>/` 提供模型构建与兼容性，原验证过的模型与 SAE profiles 不因目录迁移而删除。
+- `models/<family>/<series>/<model_key>/` 提供模型构建与兼容性，原验证过的模型与 SAE profiles 不因目录迁移而删除。
 - `tasks/<name>/` 提供具体捕获、干预、生成、电路、解释、评测或训练算法，不重新实现 Registry。
 - 不将具体 Dataset 或 Task 逻辑硬编码到 Runtime；Task 可以调用 `saebase/` 的通用 SAE API。
 - `conf/` 是配置声明；模型、数据、任务及运行默认值由 Hydra 合成值决定。

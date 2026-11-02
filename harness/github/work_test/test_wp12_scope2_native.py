@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 import torch
 
-from saebase.sae.scope2_native import (
+from saebase.api.scope2_native import (
     JumpReLURepresentation,
     _validate_source,
 )
@@ -107,7 +107,7 @@ def test_only_official_pinned_sources_allowed():
 def test_p6_native_transcoder_circuit_intervention_changes_real_logits():
     from torch import nn
 
-    from saebase.sae.scope2_native import ScopeIdentity
+    from saebase.api.scope2_native import ScopeIdentity
     from saebase.store import sha256_state_dict
     from saebase.circuits.transcoder_intervention import execute_transcoder_node
     from saebase.circuits.graph import GraphNode, GraphEdge, GraphRecord
@@ -195,7 +195,7 @@ def test_scope2_pinned_native_loader_reads_real_source_contract(monkeypatch, tmp
     import sys
     from types import ModuleType
 
-    from saebase.sae.scope2_native import load_official_scope2
+    from saebase.api.scope2_native import load_official_scope2
 
     cfg = {
         "hf_hook_point_in": "model.layers.12.pre_feedforward_layernorm.output",
@@ -253,7 +253,7 @@ def test_scope2_pinned_native_loader_reads_real_source_contract(monkeypatch, tmp
 def test_scope2_manifest_indexes_published_transcoder_crosscoder_clt():
     from types import SimpleNamespace
 
-    from saebase.sae.catalog import discover_official_scope_assets
+    from saebase.api.sae_catalog import discover_official_scope_assets
 
     names = [
         "transcoder/layer_12_width_65k_l0_medium_affine/params.safetensors",

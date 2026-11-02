@@ -4,3 +4,9 @@ model:
   pretrained_name: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
   family: llama
   device: cuda
+  # SAE resources owned by this Model, not an extra Registry.
+  sae_profiles:
+    - r1_distill_llama8b_llamascope_l15_openr1
+    - r1_distill_llama8b_llamascope_l23
+  default_saes:
+    - r1_distill_llama8b_llamascope_l23

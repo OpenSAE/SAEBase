@@ -32,7 +32,8 @@ def check(full: bool = False) -> list[str]:
             errors.append("Invalid Cursor skill " + str(skill))
     required = [
         "saebase/api/__init__.py",
-        "saebase/sae/__init__.py",
+        "saebase/api/sae_profiles.py",
+        "tasks/precheck/task.py",
         "saebase/data/__init__.py",
         "saebase/cli.py",
         "models/plugins.py",

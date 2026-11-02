@@ -4,3 +4,10 @@ model:
   pretrained_name: google/gemma-2-2b
   family: gemma2
   device: cuda
+  # Model-owned SAE resources for the Precheck selector.
+  sae_profiles:
+    - gemma2_2b_it_matryoshka_l12_32k
+    - gemma2_2b_it_scope_resid_l12
+    - gemma2_2b_pt_l25_canonical
+  default_saes:
+    - gemma2_2b_pt_l25_canonical

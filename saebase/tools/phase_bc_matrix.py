@@ -6,7 +6,7 @@ import argparse
 import json
 from pathlib import Path
 
-from saebase.sae.coverage import load_coverage
+from tasks.benchmark.coverage_contract import load_coverage
 
 
 def main(argv=None) -> int:

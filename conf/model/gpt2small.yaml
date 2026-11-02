@@ -4,3 +4,11 @@ model:
   pretrained_name: gpt2-small
   family: gpt2
   device: cuda
+  # SAE resources owned by this Model, not an extra Registry.
+  sae_profiles:
+    - gpt2small_fs_12288_l8
+    - gpt2small_fs_24576_l8
+    - gpt2small_fs_6144_l8
+    - gpt2small_res_jb_l8
+  default_saes:
+    - gpt2small_res_jb_l8

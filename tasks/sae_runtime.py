@@ -1,4 +1,4 @@
-"""Seven real SAEBase task entrypoints, sharing one Gemma-2 2B execution backbone.
+"""Seven real SAEBase Task entrypoints using configured Model/SAE resources.
 
 No model checkpoints are downloaded until task.execute=true. Every returned
 measurement originates in upstream SAEBase code; unavailable resources raise.
@@ -35,26 +35,35 @@ def _require_context(cfg: Any, operation: str) -> None:
 
     if operation not in TASK_NAMES or str(cfg.task.name) != operation:
         raise ValueError("Task name must match its registered operation")
-    if str(cfg.model.name) != MODEL_KEY:
-        raise ValueError("The sole registered LLM is gemma2_2b_base")
-    get_dataset_plugin(str(cfg.dataset.name)).assert_task_supported(cfg)
-    get_model_plugin(MODEL_KEY).assert_compatible(cfg)
+    data = get_dataset_plugin(str(cfg.dataset.name))
+    if operation in {"capture", "intervene", "generate", "circuits"} and not str(
+        _task(cfg, "prompt", "") or ""
+    ).strip():
+        data.assert_task_supported(cfg)
+    get_model_plugin(str(cfg.model.name)).assert_compatible(cfg)
 
 
 def _pair(cfg: Any):
     from saebase.api import load_registered
-    from saebase.sae.registry import get_profile
+    from saebase.api.sae_profiles import get_profile
 
-    key = str(_task(cfg, "sae_key", SAE_KEY))
-    layer = int(_task(cfg, "layer", 25))
+    model_key = str(cfg.model.name)
+    key = str(_task(cfg, "sae_key", "") or "")
+    if not key:
+        defaults = list(cfg.model.get("default_saes", []))
+        if not defaults:
+            raise ValueError(f"Model {model_key} has no default SAE configured")
+        key = str(defaults[0])
     profile = get_profile(key)
-    if profile.model_key != MODEL_KEY or layer not in profile.layers:
-        raise ValueError("Selected SAE layer must belong to Gemma-2 2B")
+    value = _task(cfg, "layer")
+    layer = int(value) if value is not None else int(profile.layers[-1])
+    if model_key not in profile.allowed_model_keys() or layer not in profile.layers:
+        raise ValueError(
+            f"Selected SAE {key}/{layer} is incompatible with model {model_key}"
+        )
     return load_registered(
-        sae_key=key,
-        layer=layer,
-        device=str(_task(cfg, "device", "cpu")),
-        model_key=MODEL_KEY,
+        sae_key=key, layer=layer,
+        device=str(_task(cfg, "device", "cpu")), model_key=model_key,
     )
 
 
@@ -113,7 +122,7 @@ def execute_task(
         return {
             "status": "configured_only",
             "operation": operation,
-            "model_key": MODEL_KEY,
+            "model_key": str(cfg.model.name),
             "dataset_key": str(cfg.dataset.name),
             "description": "Set task.execute=true and supply required runtime inputs to execute.",
         }

@@ -72,7 +72,7 @@ def smoke(dist_dir: Path) -> dict[str, str]:
                     "import saebase.cli, saebase.model_plugins, saebase.tasks.plugins; "
                     "import models.plugins, tasks.plugins, saebase.tools.m3_benchmark; "
                     "from saebase.registry import list_registered_task_keys; "
-                    "assert {'sae','capture','intervene','generate','circuits','explain','benchmark','train'}.issubset(set(list_registered_task_keys())); "
+                    "assert {'precheck','capture','intervene','generate','circuits','explain','benchmark','train'}.issubset(set(list_registered_task_keys())); "
                     "assert models.plugins._HOOKED_KEYS is saebase.model_plugins._HOOKED_KEYS; "
                     "assert tasks.plugins.SAETask is saebase.tasks.plugins.SAETask; "
                     "assert (files('conf')/'config.yaml').is_file(); "
@@ -100,7 +100,7 @@ def smoke(dist_dir: Path) -> dict[str, str]:
             raise AssertionError("Installed CLI did not enumerate the task registry")
         task_keys = {key.strip() for key in task_lines[0].removeprefix("Tasks: ").split(",")}
         expected_tasks = {
-            "sae",
+            "precheck",
             "capture",
             "intervene",
             "generate",

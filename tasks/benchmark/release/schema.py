@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 from saebase.api import ActivationSite
-from saebase.sae.registry import get_profile
+from saebase.api.sae_profiles import get_profile
 from saebase.store import fingerprint
 from tasks.benchmark.backend.registry import get_metric
 import json

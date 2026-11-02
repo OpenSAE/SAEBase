@@ -5,3 +5,8 @@ model:
   # Candidates tried by load_from_spec (in gemma1b_it.py): google official then unsloth.
   family: gemma
   device: cuda
+  # Model-owned SAE resources for the Precheck selector.
+  sae_profiles:
+    - gemma1b_it_l25_native_big
+  default_saes:
+    - gemma1b_it_l25_native_big

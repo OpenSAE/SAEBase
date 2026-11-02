@@ -21,7 +21,7 @@ import torch  # noqa: E402
 
 from models.hf_hooks_backend import HFHooksModel  # noqa: E402
 from saebase.api import ModelAdapter  # noqa: E402
-from saebase.sae.loading import load_model_and_sae  # noqa: E402
+from saebase.api.sae_loading import load_model_and_sae  # noqa: E402
 from workplan09_gpu_pilot import _build_token_rows, _samples_from_token_rows  # noqa: E402
 
 

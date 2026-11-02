@@ -6,7 +6,7 @@ from typing import Any
 
 from saebase.datasets.artifacts import canonicalize_behavior
 from saebase.datasets.artifacts import load_manifest, load_prompts
-from saebase.sae.contracts import assert_manifest_matches
+from saebase.api.sae_contracts import assert_manifest_matches
 
 
 def load_behavior_prompts(

@@ -16,7 +16,7 @@ sys.path.insert(0, str(ROOT))
 import torch  # noqa: E402
 from torch.nn.attention import SDPBackend, sdpa_kernel  # noqa: E402
 
-from saebase.sae.loading import load_model_and_sae  # noqa: E402
+from saebase.api.sae_loading import load_model_and_sae  # noqa: E402
 from workplan09_gpu_pilot import _build_token_rows, _samples_from_token_rows  # noqa: E402
 
 

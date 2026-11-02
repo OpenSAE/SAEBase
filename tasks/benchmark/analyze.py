@@ -6,7 +6,7 @@ from typing import Any
 
 import torch
 
-from saebase.sae.contracts import (
+from saebase.api.sae_contracts import (
     assert_activation_sae_shapes,
     assert_finite_tensors,
     assert_prompt_record,

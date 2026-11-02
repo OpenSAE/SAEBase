@@ -4,3 +4,8 @@ model:
   pretrained_name: Qwen/Qwen3-1.7B-Base
   family: qwen
   device: cuda
+  # SAE resources owned by this Model, not an extra Registry.
+  sae_profiles:
+    - qwen3_1_7b_base_resid_w32k
+  default_saes:
+    - qwen3_1_7b_base_resid_w32k

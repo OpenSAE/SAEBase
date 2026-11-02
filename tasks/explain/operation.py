@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any, Callable
 
-from tasks.sae_runtime import MODEL_KEY, _task
+from tasks.sae_runtime import _task
 
 
 def _explain(
@@ -47,7 +47,7 @@ def _explain(
     return {
         "status": "executed",
         "operation": "explain",
-        "model_key": MODEL_KEY,
+        "model_key": str(cfg.model.name),
         "hypothesis": response,
     }
 

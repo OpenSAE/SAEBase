@@ -10,7 +10,7 @@ from omegaconf import DictConfig, OmegaConf
 from models.hooked_lm_common import print_vram_gb
 from tasks.benchmark.health_results import EvaluationResult
 from tasks.benchmark.analyze import analyze_prompt_activation
-from saebase.sae.loading import load_model_and_sae
+from saebase.api.sae_loading import load_model_and_sae
 from tasks.benchmark.pipeline_checks import run_preflight
 from saebase.datasets.legacy_prompts import load_behavior_prompts
 from tasks.benchmark.health_results import summarize_rows, write_run_summary

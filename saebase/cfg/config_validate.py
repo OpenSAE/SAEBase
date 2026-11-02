@@ -16,7 +16,8 @@ def validate_common_cfg(cfg: DictConfig) -> None:
         raise ValueError("Missing cfg.seed")
     get_prompt_source_plugin(str(cfg.prompt_source.name))
     get_model_plugin(str(cfg.model.name))
-    get_task_plugin(str(cfg.task.name))
+    if str(cfg.task.name) != "sae":  # legacy standalone CLI only
+        get_task_plugin(str(cfg.task.name))
     get_sae_plugin(str(cfg.sae.name))
 
 

@@ -4,3 +4,8 @@ model:
   pretrained_name: gemma-3-270m
   family: gemma
   device: cuda
+  # Model-owned SAE resources for the Precheck selector.
+  sae_profiles:
+    - gemma270m_scope_resid
+  default_saes:
+    - gemma270m_scope_resid

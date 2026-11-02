@@ -15,7 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from saebase.api import capture_features, evaluate_edit, load_registered
-from saebase.sae.registry import get_profile
+from saebase.api.sae_profiles import get_profile
 
 
 def main():

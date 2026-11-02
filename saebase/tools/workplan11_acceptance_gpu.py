@@ -46,7 +46,7 @@ def synchronize() -> None:
 
 
 def load_pair():
-    from saebase.sae.loading import load_model_and_sae
+    from saebase.api.sae_loading import load_model_and_sae
 
     return load_model_and_sae(SAE_KEY, LAYER, device="cuda")
 
@@ -56,7 +56,7 @@ def e2e() -> None:
     from saebase.api import ActivationSite, ModelAdapter, capture_features
     from saebase.interventions import BatchEngine, ResultWriter, read_results
     from saebase.store import VerifiedCheckpointSession, sha256_state_dict
-    from saebase.sae.registry import get_profile
+    from saebase.api.sae_profiles import get_profile
 
     raw, sae, _ = load_pair()
     adapter = ModelAdapter(raw)
@@ -335,7 +335,7 @@ def vllm(backend: str) -> None:
             # Later entries fill missing pure-Python deps. Torch and vLLM
             # stay first because this process already imported them.
             sys.path.append(extra)
-    from saebase.sae.loading import load_sae_for_profile
+    from saebase.api.sae_loading import load_sae_for_profile
     from saebase.interventions.specs import Condition
     from saebase.vllm_backend.sae_interventions import InterpVLLMSAE
 

@@ -15,9 +15,9 @@ import platform
 
 import torch
 
-from saebase.sae.coverage import load_coverage
-from saebase.sae.loading import load_sae_for_profile
-from saebase.sae.registry import get_profile
+from tasks.benchmark.coverage_contract import load_coverage
+from saebase.api.sae_loading import load_sae_for_profile
+from saebase.api.sae_profiles import get_profile
 from saebase.store import sha256_state_dict
 
 DEFAULT_CATALOG = Path(__file__).resolve().parents[2] / "conf" / "coverage" / "stage_bc.json"

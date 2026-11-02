@@ -37,13 +37,14 @@ class LoadedResearchPair:
 
 def load_registered(
     *, sae_key: str, layer: int, device: str = "cpu", model_key: str | None = None,
+    require_patch: bool = True,
 ) -> LoadedResearchPair:
     """Load a bundled model/profile pair, with explicit site/provenance validation.
 
     Loads public weights on demand and requires model dependencies. Registration
     metadata does not by itself prove real checkpoint compatibility.
     """
-    from saebase.sae.loading import load_model_and_sae
+    from saebase.api.sae_loading import load_model_and_sae
 
     model, sae, metadata = load_model_and_sae(
         sae_key, layer, device=device, model_key_override=model_key
@@ -51,7 +52,7 @@ def load_registered(
     identity = SAEIdentity.from_loaded(
         sae=sae, metadata=metadata, model_key=model_key,
     )
-    from saebase.sae.registry import get_profile
+    from saebase.api.sae_profiles import get_profile
     expected_hook = get_profile(sae_key).hook_name(layer)
     if identity.hook_name != expected_hook:
         raise ValueError(
@@ -60,7 +61,8 @@ def load_registered(
         )
     adapter = ModelAdapter(model)
     adapter.capabilities.require("capture")
-    adapter.capabilities.require("patch")
+    if require_patch:
+        adapter.capabilities.require("patch")
     if adapter.backend == "hf_hooks":
         if identity.hook_name != f"blocks.{identity.layer}.hook_resid_post":
             raise UnsupportedCapability(

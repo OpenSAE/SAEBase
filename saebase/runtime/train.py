@@ -50,7 +50,11 @@ def main(cfg: DictConfig) -> Optional[float]:
     print(OmegaConf.to_yaml(cfg))
     from saebase.runner import run_task
 
-    run_task(cfg)
+    outcome = run_task(cfg)
+    if str(cfg.task.name) == "precheck":
+        print("Precheck:", outcome.summary)
+        if bool(cfg.task.get("execute", False)) and not outcome.ok:
+            raise RuntimeError(outcome.error or "Precheck did not PASS; inspect its report")
     return None
 
 

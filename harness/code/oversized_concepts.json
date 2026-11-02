@@ -168,72 +168,6 @@
       ]
     },
     {
-      "id": "code:module:saebase.sae.stage_d",
-      "match_on": "symbol",
-      "groups": [
-        {
-          "name": "site_plan",
-          "title": "SAE 站点身份与评测调度",
-          "summary": "定义模型、SAE、层位置的受测组合，并准备可执行计划。",
-          "description": "定义模型、SAE、层位置的受测组合，并准备可执行计划。",
-          "en_title": "SAE site identities and evaluation scheduling",
-          "en_summary": "Construct model-SAE-site identities and schedule compatible evaluation work.",
-          "en_description": "Construct model-SAE-site identities and schedule compatible evaluation work.",
-          "context_terms": [
-            "term.sae.benchmark"
-          ],
-          "patterns": [
-            "^(?:SiteKey|SiteRecord|build_site_records|schedule_sites|write_stage_d_targets|load_stage_d_targets|load_population_corpus|resolve_evaluation_host|assert_host_matches_label|acceptance_path)$"
-          ]
-        },
-        {
-          "name": "acceptance_ledger",
-          "title": "评测状态、失败与断点恢复",
-          "summary": "记录受测组合的运行尝试、结果状态和重试决策。",
-          "description": "记录受测组合的运行尝试、结果状态和重试决策。",
-          "en_title": "Acceptance ledger and resume decisions",
-          "en_summary": "Track evaluation attempts, recover state, and record accepted or failed runs.",
-          "en_description": "Track evaluation attempts, recover state, and record accepted or failed runs.",
-          "context_terms": [
-            "term.artifact"
-          ],
-          "patterns": [
-            "^(?:append_attempt|load_status|update_status|read_acceptance|write_acceptance|rebuild_canonical_status|failure_record|classify_exception)$"
-          ]
-        },
-        {
-          "name": "evidence_integrity",
-          "title": "校验和、来源与证据完整性",
-          "summary": "验证实验产物的哈希、可引用路径和断点身份。",
-          "description": "验证实验产物的哈希、可引用路径和断点身份。",
-          "en_title": "Hashes, provenance, and evidence integrity",
-          "en_summary": "Verify output hashes, source paths, and resumable acceptance identity.",
-          "en_description": "Verify output hashes, source paths, and resumable acceptance identity.",
-          "context_terms": [
-            "term.artifact"
-          ],
-          "patterns": [
-            "^(?:file_sha256|canonical_payload_sha256|write_checksums_manifest|redact_secrets|relative_under|resume_fingerprint_fields|should_skip_resume)$"
-          ]
-        },
-        {
-          "name": "pair_acceptance",
-          "title": "模型与 SAE 配对的数值验收",
-          "summary": "对实际模型站点执行配对验证并汇总最终覆盖矩阵。",
-          "description": "对实际模型站点执行配对验证并汇总最终覆盖矩阵。",
-          "en_title": "Model–SAE pair acceptance",
-          "en_summary": "Verify model and SAE pairing at an activation site and assemble final coverage results.",
-          "en_description": "Verify model and SAE pairing at an activation site and assemble final coverage results.",
-          "context_terms": [
-            "term.sae.benchmark"
-          ],
-          "patterns": [
-            "^(?:verify_pair_site|build_final_matrix)$"
-          ]
-        }
-      ]
-    },
-    {
       "id": "code:module:tasks.benchmark.stage_d",
       "match_on": "symbol",
       "groups": [
@@ -300,118 +234,6 @@
       ]
     },
     {
-      "id": "code:concrete:models",
-      "match_on": "path_or_id",
-      "groups": [
-        {
-          "name": "shared_adapters",
-          "title": "模型加载、Hook 与通用兼容接口",
-          "summary": "组织 Hugging Face、TransformerLens 与统一注册的模型适配。",
-          "description": "组织 Hugging Face、TransformerLens 与统一注册的模型适配。",
-          "en_title": "Shared model loading and Hook adapters",
-          "en_summary": "Load language-model backends, control activation Hooks, and check common contracts.",
-          "en_description": "Load language-model backends, control activation Hooks, and check common contracts.",
-          "context_terms": [
-            "term.llm",
-            "term.model"
-          ],
-          "patterns": [
-            "^models/[^/]+\\.py$"
-          ]
-        },
-        {
-          "name": "gemma_small",
-          "title": "Gemma 小模型与基础系列",
-          "summary": "管理 Gemma 早期基础规模的模型标识和任务适配。",
-          "description": "管理 Gemma 早期基础规模的模型标识和任务适配。",
-          "en_title": "Gemma small and foundation variants",
-          "en_summary": "Load early Gemma variants and check task-specific model compatibility.",
-          "en_description": "Load early Gemma variants and check task-specific model compatibility.",
-          "context_terms": [
-            "term.model"
-          ],
-          "patterns": [
-            "^code:instance:models:(?:gemma1b|gemma1b_it|gemma270m)$"
-          ]
-        },
-        {
-          "name": "gemma2",
-          "title": "Gemma-2 模型家族",
-          "summary": "组织 Gemma-2 各规模的基础与指令版本接口。",
-          "description": "组织 Gemma-2 各规模的基础与指令版本接口。",
-          "en_title": "Gemma-2 model family",
-          "en_summary": "Load Gemma-2 base and instruction-tuned variants across supported scales.",
-          "en_description": "Load Gemma-2 base and instruction-tuned variants across supported scales.",
-          "context_terms": [
-            "term.model"
-          ],
-          "patterns": [
-            "^code:instance:models:gemma2_.*$"
-          ]
-        },
-        {
-          "name": "gemma3",
-          "title": "Gemma-3 模型家族",
-          "summary": "组织 Gemma-3 模型权重、激活接口及任务兼容约束。",
-          "description": "组织 Gemma-3 模型权重、激活接口及任务兼容约束。",
-          "en_title": "Gemma-3 model family",
-          "en_summary": "Expose Gemma-3 base and instruction-tuned model adapters.",
-          "en_description": "Expose Gemma-3 base and instruction-tuned model adapters.",
-          "context_terms": [
-            "term.model"
-          ],
-          "patterns": [
-            "^code:instance:models:gemma3_.*$"
-          ]
-        },
-        {
-          "name": "qwen",
-          "title": "Qwen 模型家族",
-          "summary": "管理 Qwen 系列多代模型的加载及研究兼容接口。",
-          "description": "管理 Qwen 系列多代模型的加载及研究兼容接口。",
-          "en_title": "Qwen model family",
-          "en_summary": "Load Qwen model families and validate their research-task compatibility.",
-          "en_description": "Load Qwen model families and validate their research-task compatibility.",
-          "context_terms": [
-            "term.model"
-          ],
-          "patterns": [
-            "^code:instance:models:qwen.*$"
-          ]
-        },
-        {
-          "name": "gpt_pythia",
-          "title": "GPT-2 与 Pythia 研究模型",
-          "summary": "集中语言模型实验常用的 GPT-2 与 Pythia 适配。",
-          "description": "集中语言模型实验常用的 GPT-2 与 Pythia 适配。",
-          "en_title": "GPT-2 and Pythia research models",
-          "en_summary": "Provide baseline GPT-2 and Pythia model profiles for SAE studies.",
-          "en_description": "Provide baseline GPT-2 and Pythia model profiles for SAE studies.",
-          "context_terms": [
-            "term.model"
-          ],
-          "patterns": [
-            "^code:instance:models:(?:gpt2small|pythia410m|pythia70m)$"
-          ]
-        },
-        {
-          "name": "llama_mistral",
-          "title": "Llama、Mistral 与蒸馏模型",
-          "summary": "整合指令模型与蒸馏模型的加载、激活和兼容接口。",
-          "description": "整合指令模型与蒸馏模型的加载、激活和兼容接口。",
-          "en_title": "Llama, Mistral, and distilled models",
-          "en_summary": "Connect Llama, Mistral, and distilled variants to common research adapters.",
-          "en_description": "Connect Llama, Mistral, and distilled variants to common research adapters.",
-          "context_terms": [
-            "term.model"
-          ],
-          "patterns": [
-            "^code:instance:models:(?:llama.*|mistral.*|r1_distill_.*)$"
-          ]
-        }
-      ]
-    },
-    {
       "id": "code:instance:tasks:benchmark",
       "match_on": "path_or_id",
       "groups": [
@@ -428,7 +250,7 @@
           ],
           "patterns": [
             "^code:configurations:tasks:benchmark$",
-            "^tasks/benchmark/(?:activation_health|analyze|controlled_inputs|health_results|operation|pipeline_checks|stage_d|task)\\.py$"
+            "^tasks/benchmark/(?:activation_health|analyze|controlled_inputs|coverage_contract|health_results|legacy_sae_task|operation|pipeline_checks|stage_d|task)\\.py$"
           ]
         },
         {
