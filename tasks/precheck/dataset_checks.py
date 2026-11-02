@@ -3,6 +3,7 @@
 This tests local, previously prepared *real* QA records and their provenance.
 It does not download a dataset or treat a local file as proof of live Hub access.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -51,7 +52,9 @@ def check_frozen_dataset(
     if not isinstance(dataset_id, str) or not _DATASET_ID.fullmatch(dataset_id):
         return error_result(ValueError("Unsafe dataset identifier"), stage="dataset", attempted=[])
     if type(expected_count) is not int or not 1 <= expected_count <= 100_000:
-        return error_result(ValueError("Invalid dataset sample budget"), stage="dataset", attempted=[])
+        return error_result(
+            ValueError("Invalid dataset sample budget"), stage="dataset", attempted=[]
+        )
     root = Path(inputs_root) / dataset_id
     if not root.is_dir() or root.is_symlink():
         return blocked(
@@ -105,10 +108,9 @@ def check_frozen_dataset(
                 raise ValueError("Question does not match dataset and source revision")
             if record.get("source_repo") != manifest.get("source_repo"):
                 raise ValueError("Question source repository differs from manifest")
-            if (
-                manifest.get("source_config") is not None
-                and record.get("source_config") != manifest.get("source_config")
-            ):
+            if manifest.get("source_config") is not None and record.get(
+                "source_config"
+            ) != manifest.get("source_config"):
                 raise ValueError("Question source configuration differs from manifest")
             if record.get("source_split") != manifest.get("source_split"):
                 raise ValueError("Question split differs from frozen source")
