@@ -1,0 +1,1200 @@
+{
+  "plan": {
+    "schema": "saebase.human_check.v1",
+    "kind": "human_check",
+    "id": "HC-Agent-Context-Dialogue-20261101",
+    "goal": "让 SAEBase 本地 Agent 在与人类讨论项目时，严格使用本次任务实际获准且成功读取的 Context、Knowledge、Code 和 Environment；按现有文档/源码/环境证据说话，无法访问即说明，不提升编辑或治理权限。",
+    "base_sha": "66a997c8b7126c6f1a35ff3a107249603e5ba9ab",
+    "mode": "on",
+    "default_enabled": true,
+    "revision": 1,
+    "viewed": {},
+    "items": [
+      {
+        "key": "core:q.transparency",
+        "view": "core",
+        "node_id": "q.transparency",
+        "operation": "change",
+        "parent_id": null,
+        "before": {
+          "title": "人和 Agent 怎样共同理解项目？",
+          "description": "问题：如何分离科学知识、代码实现与物理执行环境？"
+        },
+        "after": {
+          "title": "人和 Agent 怎样共同理解项目？",
+          "description": "新增 Local Agent 的常驻人类对话约束：凡涉及 SAEBase 项目事实、定义、设计、科研结论、源码能力或环境状态，都先明确当前任务及访问范围，仅使用实际获准且成功读取的相关 Context/Knowledge/Code/Environment。用已有 Context 术语、ID 和适用条件组织解释，清晰区分用户目标、文档定义、代码实际实现、运行观测、未证实推断；没有资料时说明不可访问/未知，不冒称已读或已验证。普通寒暄或无需仓库事实的对话不强制文件读取。现有 Work Order 激活和 Core shield 不被绕过；当前任务只获准相关文档只读检索，不会提升编辑/GPU/网络/发布权限。"
+        },
+        "files": [
+          "AGENTS.md",
+          ".cursor/rules/core/00-core.mdc",
+          ".cursor/rules/core/10-context-selection.mdc",
+          ".cursor/rules/core/20-context-dialogue.mdc"
+        ],
+        "reason": "目前常驻规则规定任务中的 Context 选择，但尚未形成一致、可验证的 Agent 对人解释约束；需要与既有禁止无范围扫描 doc 的规则协调，避免自相矛盾。",
+        "risk": "强制读取不可访问文档造成死锁；全文灌入 Context；让旧记忆、未经核验推断冒充项目事实；越权解锁治理资料。",
+        "checks": [
+          "项目实质性断言只引用当前可读取的选定权威 Context/Code/Knowledge/Environment",
+          "无读取能力、越权或版本不符时明确 unknown/blocked，而非捏造来源",
+          "不要求每句套模板；只有相关信息才最小读取",
+          "旧 Work Order、Core 屏蔽、Agent Flow 和人类权限不被削弱"
+        ],
+        "context_term_ids": [
+          "term.context_tree",
+          "term.knowledge_tree",
+          "term.code_tree",
+          "term.environment_tree"
+        ],
+        "proposal_review": null
+      },
+      {
+        "key": "core:g.context",
+        "view": "core",
+        "node_id": "g.context",
+        "operation": "change",
+        "parent_id": null,
+        "before": {
+          "title": "结构化研究知识与证据",
+          "description": "目标：用稳定 ID、状态、证据、AND/OR 与依赖描述研究目标。"
+        },
+        "after": {
+          "title": "结构化研究知识与证据",
+          "description": "复用 doc/knowledge/context_graph.json、glossary.json、atlas_terms.json、context_attributes.json 与现有 Knowledge/Glossary 选择器；复用 doc/code/code_tree.json 与 code_annotations.json，并以实际许可范围中的 Python 源码校验 Code 事实。拟在 harness/knowledge/ 增加通用只读按需解析入口：接收当前任务可读范围、明确的 Context/Knowledge/Code ID，返回小规模节点/术语投影、来源路径、读取是否成功、源版本及校验摘要，不递归搜索或隐式升级权限。即便路径存在、词条出现在索引里，也不算已读取；内容过期或无法访问时标记 unresolved。Code Tree 是 AST 快照，不用它替代实际源码行为证据。"
+        },
+        "files": [
+          "harness/knowledge/dialogue_context.py",
+          "doc/code/README.md",
+          "doc/knowledge/README.md",
+          "doc/knowledge/CONTEXT_STYLE.md"
+        ],
+        "reason": "必须为本地 Agent 提供真实能够读取的、按任务范围约束的 Context 来源与文档入口，而不是单靠语言指令要求模型假装拥有全部背景。",
+        "risk": "路径或索引存在被误认为可读；读取到过期 Code Tree；无权限的 doc 子目录被无意遍历；新读取器变成第二套知识 Registry。",
+        "checks": [
+          "白名单可读且实际读取成功才进入可引用的 Context 投影",
+          "路径越界、拒绝访问、已删除或过期内容不形成 verified 断言",
+          "只复用现有权威资料和 selectors，不复制第二套术语/知识图",
+          "多问题只读所选节点而非默认整树；结果有路径、ID、版本、来源记录"
+        ],
+        "context_term_ids": [
+          "term.context_tree",
+          "term.code_tree",
+          "term.knowledge_tree",
+          "term.python"
+        ],
+        "proposal_review": null
+      },
+      {
+        "key": "core:g.env_tree",
+        "view": "core",
+        "node_id": "g.env_tree",
+        "operation": "change",
+        "parent_id": null,
+        "before": {
+          "title": "机器环境快照",
+          "description": "目标：采集 CPU、内存、GPU、磁盘和执行环境，记录明确的观测结果。"
+        },
+        "after": {
+          "title": "机器环境快照",
+          "description": "在 doc/environment/ 建立人类及 Agent 可读的 Environment 文档入口和访问说明，真实机器状态仍由已有 harness/environment/probe.py 在本机按需测量。环境信息引用实际可访问、明确授权的本次探测输出/摘要，记录采集时间、synthetic 标记、unknown 与可见性；不能把 harness/environment/example.json、GitHub 上的样例、旧服务器缓存或不可读取的本机快照当成当前执行环境。保留本地探测产物非公开、隐藏凭据和绝对路径的既有约束。"
+        },
+        "files": [
+          "doc/environment/README.md",
+          "harness/environment/README.md"
+        ],
+        "reason": "Code/Knowledge 已在 doc/ 但 Environment 当前在 harness/environment；需形成一致的文档导航，又不能复制或公开可能敏感的本机快照。",
+        "risk": "doc/ 中固化过期 GPU/路径/凭据；没有观察到 GPU 却推断无 GPU；绕过 .cursorignore 读取未授权本地文件。",
+        "checks": [
+          "doc/environment 只提供规范、可达入口及真实来源指针，不存共享机器机密",
+          "Probe 输出必须含采集时间、synthetic/unknown 及实际来源",
+          "未成功读取或未经允许探测的机器信息不得写成实测事实",
+          "无 nvidia-smi 时 GPU 状态为 unknown 而非 absent"
+        ],
+        "context_term_ids": [
+          "term.environment_tree",
+          "term.cpu",
+          "term.gpu",
+          "term.artifact"
+        ],
+        "proposal_review": null
+      },
+      {
+        "key": "core:g.agent_execution_flow",
+        "view": "core",
+        "node_id": "g.agent_execution_flow",
+        "operation": "change",
+        "parent_id": null,
+        "before": {
+          "title": "Agent 执行任务的流程",
+          "description": "目标：外部 GitHub Work Plan → 审计和部署预览 → 人类授权 → 任务代码变更与统一审阅 → 真实实验及独立结果审计 → 人类逐节点审批四种归宿及可追溯报告。Core 与 Harness 规则对普通 Agent 只读屏蔽。"
+        },
+        "after": {
+          "title": "Agent 执行任务的流程",
+          "description": "新增简短、可重用的 Context-grounded Dialogue Skill：先判断问题属于科研概念、源码行为、当前环境还是一般对话；确认 Work Order/用户明确提供的只读访问范围和现有 CT-TRUTH/CT-TRACE/CT-CONTEXT/CT-EVIDENCE 等合同适用性；针对明确问题调用最小 Context 投影并核对读取回执；再以自然中文解释，区分事实、推断与未知，必要时附 ID 和源码位置。工作单执行的 contract_receipt.json 继续记录实际阅读文件、ID 与未解决项；不要求记录隐藏推理、不创建新权限系统，也不把脚本执行通过称作回答语义被自动证明。"
+        },
+        "files": [
+          ".cursor/skills/workflow/context-grounded-dialogue/SKILL.md",
+          ".cursor/skills/workflow/run-work-order/SKILL.md",
+          "harness/github/development_doc/agent-delivery.md"
+        ],
+        "reason": "只有常驻 Rule 容易停留在提醒层面；复用现有 Work Order、Selectors 和 Contract 收据才能让本地 Agent 找得到入口并形成稳定的回答流程。",
+        "risk": "技能要求无权限读取治理文档；每轮对话被迫执行重量脚本；回答过度模板化；自述 read receipt 被误称客观观察证据。",
+        "checks": [
+          "用户指明具体项目问题时按可读范围选择 Knowledge/Code/Environment",
+          "工作单的 activation/required/optional 被严格执行，不为对话暗中扩权",
+          "Agent 用已有术语解释且不自动复述全部 Context",
+          "无法访问相关来源时先说明缺口并给出可授权的最小下一步"
+        ],
+        "context_term_ids": [
+          "term.context_tree",
+          "term.task",
+          "term.artifact"
+        ],
+        "proposal_review": null
+      },
+      {
+        "key": "core:g.code_tree",
+        "view": "core",
+        "node_id": "g.code_tree",
+        "operation": "change",
+        "parent_id": null,
+        "before": {
+          "title": "可核验的类与函数结构图",
+          "description": "目标：从 Python AST 输出节点、继承、成员与调用，附带已有 Knowledge 链接。"
+        },
+        "after": {
+          "title": "可核验的类与函数结构图",
+          "description": "新增独立的 CPU 负面验证与定向 CI：构造可读/不可读、存在但未授权、路径逃逸、无此 ID、过期 Code Tree、合成 Environment、探测失败、真实源码与 Context 结论冲突等输入，核查读取器输出和 Rule/Skill 的规范一致性。测试仅能证明来源选择器的可观察行为和规则完整，不声称 Hook 能监测全部自然语言回复，也不改写现有合同评价器、历史考卷或科研成果。"
+        },
+        "files": [
+          "harness/github/work_test/test_agent_dialogue_context.py",
+          "harness/github/work_test/test_agent_dialogue_scope.py",
+          ".github/workflows/ci.yml"
+        ],
+        "reason": "“严格参照可访问的 Context”必须有实际可复现的拒绝路径与回归，而不仅是文案；同时不虚报对任意模型答复的完全自动验证能力。",
+        "risk": "测试只测 happy path；测试用假文档却产出 Verified；CI 不收集；自动检测被误称能检查任意自然语言含义。",
+        "checks": [
+          "拒绝未授权路径、目录越界、假来源和伪 current machine 数据",
+          "规则和 Skill 规定的路径与实际文档入口一致",
+          "CI 实际执行新增 CPU 负面测试，不需下载模型",
+          "收据显示 source access，而非声称模型私有推理已经被验证"
+        ],
+        "context_term_ids": [
+          "term.code_tree",
+          "term.context_tree",
+          "term.artifact"
+        ],
+        "proposal_review": null
+      },
+      {
+        "key": "code:code:module:harness.knowledge.dialogue_context",
+        "view": "code",
+        "node_id": "code:module:harness.knowledge.dialogue_context",
+        "operation": "add",
+        "parent_id": null,
+        "before": null,
+        "after": {
+          "type": "module",
+          "path": "harness/knowledge/dialogue_context.py",
+          "title": "本地 Agent 的受控 Context 只读选择",
+          "description": "拟新增源码（尚不存在、尚未在 AST Code Tree 中验证）：按授权范围选择实际可访问的科研 Context、Code、Knowledge 来源与环境记录，提供可追溯的读取状态和最小必要投影。"
+        },
+        "files": [
+          "harness/knowledge/dialogue_context.py",
+          "doc/code/README.md",
+          "doc/knowledge/README.md",
+          "doc/knowledge/CONTEXT_STYLE.md"
+        ],
+        "reason": "必须为本地 Agent 提供真实能够读取的、按任务范围约束的 Context 来源与文档入口，而不是单靠语言指令要求模型假装拥有全部背景。",
+        "risk": "路径或索引存在被误认为可读；读取到过期 Code Tree；无权限的 doc 子目录被无意遍历；新读取器变成第二套知识 Registry。",
+        "checks": [
+          "白名单可读且实际读取成功才进入可引用的 Context 投影",
+          "路径越界、拒绝访问、已删除或过期内容不形成 verified 断言",
+          "只复用现有权威资料和 selectors，不复制第二套术语/知识图",
+          "多问题只读所选节点而非默认整树；结果有路径、ID、版本、来源记录"
+        ],
+        "context_term_ids": [
+          "term.context_tree",
+          "term.code_tree",
+          "term.knowledge_tree",
+          "term.python"
+        ],
+        "proposal_review": null
+      }
+    ],
+    "groups": [
+      {
+        "id": "HC01",
+        "title": "人类对话必须以可访问的 Context 为依据",
+        "item_keys": [
+          "core:q.transparency"
+        ]
+      },
+      {
+        "id": "HC02",
+        "title": "Code / Knowledge / Context 的只读可达入口",
+        "item_keys": [
+          "core:g.context",
+          "code:code:module:harness.knowledge.dialogue_context"
+        ]
+      },
+      {
+        "id": "HC03",
+        "title": "Environment 在 doc 中有入口但保持本机事实",
+        "item_keys": [
+          "core:g.env_tree"
+        ]
+      },
+      {
+        "id": "HC04",
+        "title": "Agent 对话 Skill 与 Work Order 衔接",
+        "item_keys": [
+          "core:g.agent_execution_flow"
+        ]
+      },
+      {
+        "id": "HC05",
+        "title": "负面测试、持续检查与来源诚实性",
+        "item_keys": [
+          "core:g.code_tree"
+        ]
+      }
+    ],
+    "preview_sha256": "66a997c8b7126c6f1a35ff3a107249603e5ba9ab",
+    "created_for": "Source-based proposal ONLY; no local approvals or source implementation. Published to existing five-tree Atlas review. Formal decisions require authenticated local human review; public Pages is browser draft."
+  },
+  "context": {
+    "nodes": [],
+    "edges": []
+  },
+  "core_context": {
+    "schema_version": 1,
+    "project": "SAEBase",
+    "kind": "core",
+    "revision_basis": "b7982c9fa002a5064d37000c571c678374d687b4",
+    "source_policy": "Only source-backed status; 'implemented' means implementation observed, not tested",
+    "primary_relations": [
+      "refines",
+      "addresses",
+      "decomposes"
+    ],
+    "notes": "SAEBase 当前分支的项目结构参考，保留真实源码证据。科研状态另行核验。",
+    "nodes": [
+      {
+        "id": "q.research",
+        "type": "question",
+        "title": "如何把科研项目变成可复现的系统？",
+        "description": "问题：数据、模型、任务、实验结果与研究理解如何在扩展过程中保持一致？",
+        "status": "partial",
+        "evidence": [
+          "README.md"
+        ],
+        "next": "明确结构合同并建立验证证据。",
+        "environment_refs": []
+      },
+      {
+        "id": "q.modularity",
+        "type": "question",
+        "title": "如何保持研究组件间清晰的边界？",
+        "description": "问题：新增 Dataset、Model、Task 时如何维持清晰边界与兼容性？",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "saebase/runner.py"
+        ],
+        "next": "为每个扩展点增加契约测试。",
+        "environment_refs": []
+      },
+      {
+        "id": "q.reproducibility",
+        "type": "question",
+        "title": "如何保证每次实验都能追溯？",
+        "description": "问题：实验目录、完整配置、运行条件和结果如何唯一关联？",
+        "status": "partial",
+        "evidence": [
+          "conf/config.yaml",
+          "saebase/runtime/summary_log.py"
+        ],
+        "next": "标准化结构化产物与运行元数据。",
+        "environment_refs": []
+      },
+      {
+        "id": "q.transparency",
+        "type": "question",
+        "title": "人和 Agent 怎样共同理解项目？",
+        "description": "问题：如何分离科学知识、代码实现与物理执行环境？",
+        "status": "implemented",
+        "evidence": [
+          "harness/core/project_graph.json"
+        ],
+        "next": "建立三棵可浏览且可验证的结构树。",
+        "environment_refs": []
+      },
+      {
+        "id": "q.mobility",
+        "type": "question",
+        "title": "如何跨设备重现和迁移实验？",
+        "description": "问题：如何在大文件迁移和硬件变化时保留完整的实验来源信息？",
+        "status": "partial",
+        "evidence": [
+          "conf/paths/default.yaml"
+        ],
+        "next": "采集硬件上下文并引入可校验的数据传输。",
+        "environment_refs": []
+      },
+      {
+        "id": "s.registry",
+        "type": "solve",
+        "title": "Registry 插件解耦",
+        "description": "方案：通过数据集、模型和任务三个插件注册表维护清晰的组件边界。",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "saebase/plugin_bootstrap.py"
+        ],
+        "next": "增加自动注册矩阵测试。",
+        "environment_refs": []
+      },
+      {
+        "id": "s.compatibility",
+        "type": "solve",
+        "title": "三层兼容性门控",
+        "description": "方案：NLP 数据集、LLM 模型与 SAE Task 的注册接口负责检查当前研究运行组合。",
+        "status": "implemented",
+        "evidence": [
+          "datasets/plugins.py",
+          "models/gemma2_2b_base/model_task_dataset_compatibility.py",
+          "tasks/sae_runtime.py"
+        ],
+        "next": "继续补充模型与任务组合的 CPU 回归检查。",
+        "environment_refs": []
+      },
+      {
+        "id": "s.hydra",
+        "type": "solve",
+        "title": "Hydra 配置与单一训练入口",
+        "description": "方案：用组合配置、固定 seed 和明确运行入口决定一次实验。",
+        "status": "implemented",
+        "evidence": [
+          "conf/config.yaml",
+          "saebase/runtime/train.py"
+        ],
+        "next": "按唯一实验标识管理输出目录和历史产物。",
+        "environment_refs": []
+      },
+      {
+        "id": "s.artifacts",
+        "type": "solve",
+        "title": "分层的实验产物协议",
+        "description": "方案：按 dataset/model/task/subtask/run 分类结果，维护唯一的运行声明与类型化文件夹。",
+        "status": "partial",
+        "evidence": [
+          "conf/config.yaml",
+          "saebase/runtime/experiment_paths.py",
+          "harness/experiments/validate.py"
+        ],
+        "next": "将运行路径与产物规范实施到 SAEBase Runtime。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "partial",
+          "explanation": "现状：实验路径协议已经在 SAEBase Runtime 实现，尚未完成真实 GPU 训练回归。 证据：saebase/runtime/experiment_paths.py、harness/experiments/validate.py。下一步：将运行路径与产物规范实施到 SAEBase Runtime。"
+        }
+      },
+      {
+        "id": "s.explainability",
+        "type": "solve",
+        "title": "三树协作的 Context 管理",
+        "description": "方案：知识树回答为什么，代码树回答怎样实现，环境树回答在哪里运行。",
+        "status": "implemented",
+        "evidence": [
+          "harness/core/project_graph.json",
+          "harness/visualization/index.html",
+          "harness/code/build.py",
+          "harness/knowledge/validate.py"
+        ],
+        "next": "用源数据生成动态交互视图。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "partial",
+          "explanation": "现状：三棵树与可交互浏览器已实现，科学描述仍需研究者维护。 证据：harness/visualization/index.html、harness/code/build.py、harness/knowledge/validate.py。下一步：用源数据生成动态交互视图。"
+        }
+      },
+      {
+        "id": "s.mobility",
+        "type": "solve",
+        "title": "环境探测与可校验文件传输",
+        "description": "方案：硬件快照与离线可审计的 B2/rclone 传输工具提供迁移依据。",
+        "status": "partial",
+        "evidence": [
+          "conf/paths/default.yaml",
+          "harness/environment/probe.py",
+          "harness/transfer/b2.py"
+        ],
+        "next": "先提供 dry-run，再在有凭据的设备测试。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "partial",
+          "explanation": "现状：环境探测与 B2 传输封装已实现，尚未核验用户真实远程仓库。 证据：harness/environment/probe.py、harness/transfer/b2.py。下一步：先提供 dry-run，再在有凭据的设备测试。"
+        }
+      },
+      {
+        "id": "g.registry",
+        "type": "goal",
+        "title": "可插拔组件注册",
+        "description": "目标：Dataset/Model/Task 注册映射可发现、可验证。",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "datasets/plugins.py",
+          "models/plugins.py",
+          "tasks/plugins.py"
+        ],
+        "next": "增加注册矩阵和 CPU 环境中的契约测试。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.dataset_gate",
+        "type": "goal",
+        "title": "Dataset 任务支持约束",
+        "description": "目标：依据 NLP 数据集及 SAE Task 的适配关系检验输入配置。",
+        "status": "implemented",
+        "evidence": [
+          "datasets/plugins.py"
+        ],
+        "next": "增加多任务组合负样例。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.model_gate",
+        "type": "goal",
+        "title": "Model 兼容约束",
+        "description": "目标：核验选定 LLM 模型与 SAE 任务、数据来源的兼容关系。",
+        "status": "implemented",
+        "evidence": [
+          "models/gemma2_2b_base/model_task_dataset_compatibility.py"
+        ],
+        "next": "在真实模型环境下核验 SAE 激活位置。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.pipeline",
+        "type": "goal",
+        "title": "Task 运行前检查",
+        "description": "目标：按 SAE Task 的执行协议校验模型、权重、输入及授权条件。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/sae_runtime.py"
+        ],
+        "next": "补充基于语义的最小断言。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.config",
+        "type": "goal",
+        "title": "完整配置可追溯",
+        "description": "目标：记录 Hydra 合成配置、种子和执行入口。",
+        "status": "implemented",
+        "evidence": [
+          "conf/config.yaml",
+          "saebase/runtime/train.py"
+        ],
+        "next": "使每次运行显式关联配置哈希。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.artifact_schema",
+        "type": "goal",
+        "title": "结果目录类型化",
+        "description": "目标：每个实验叶子包含 reports、metrics、tables、checkpoints、figures、logs、metadata、tmp。",
+        "status": "implemented",
+        "evidence": [
+          "conf/config.yaml",
+          "saebase/runtime/experiment_paths.py",
+          "harness/experiments/validate.py"
+        ],
+        "next": "实现公共目录初始化器。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "implemented",
+          "explanation": "现状：SAEBase Runtime 支持分层 task.path、结构化产物和按 Knowledge ID 命名的分析子目录。 证据：saebase/runtime/experiment_paths.py、tests/test_harness_contracts.py。下一步：实现公共目录初始化器。"
+        }
+      },
+      {
+        "id": "g.context",
+        "type": "goal",
+        "title": "结构化研究知识与证据",
+        "description": "目标：用稳定 ID、状态、证据、AND/OR 与依赖描述研究目标。",
+        "status": "implemented",
+        "evidence": [
+          "harness/core/project_graph.json",
+          "harness/knowledge/validate.py"
+        ],
+        "next": "增设 schema 校验和受控变更提案。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "implemented",
+          "explanation": "现状：Knowledge tree 的 question/solve/goal、AND/OR、证据和状态有机器可读图与校验器。 证据：doc/knowledge/context_graph.json、harness/knowledge/validate.py。下一步：增设 schema 校验和受控变更提案。"
+        }
+      },
+      {
+        "id": "g.code_tree",
+        "type": "goal",
+        "title": "可核验的类与函数结构图",
+        "description": "目标：从 Python AST 输出节点、继承、成员与调用，附带已有 Knowledge 链接。",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "harness/code/build.py",
+          "harness/code/diff.py",
+          "harness/visualization/app.js"
+        ],
+        "next": "实现生成器、差异比对与浏览器。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "implemented",
+          "explanation": "现状：自动 AST 提取、代码 Diff、静态浏览器及节点交互已接入并通过 CI。 证据：harness/code/build.py、harness/code/diff.py、tests/test_atlas_interactivity.cjs。下一步：实现生成器、差异比对与浏览器。"
+        }
+      },
+      {
+        "id": "g.env_tree",
+        "type": "goal",
+        "title": "机器环境快照",
+        "description": "目标：采集 CPU、内存、GPU、磁盘和执行环境，记录明确的观测结果。",
+        "status": "implemented",
+        "evidence": [
+          "conf/paths/default.yaml",
+          "harness/environment/probe.py",
+          "harness/environment/example.json"
+        ],
+        "next": "实现跨机器环境探测及对比。",
+        "environment_refs": [
+          "env.cpu",
+          "env.gpu",
+          "env.memory"
+        ],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "implemented",
+          "explanation": "现状：提供可观察机器 CPU/GPU/RAM 的探测器和明确标记虚构的示例树。 证据：harness/environment/probe.py、harness/environment/example.json。下一步：实现跨机器环境探测及对比。"
+        }
+      },
+      {
+        "id": "g.transfer",
+        "type": "goal",
+        "title": "数据备份与恢复",
+        "description": "目标：提供明确的来源、目标、校验和可恢复的大文件同步方案。",
+        "status": "partial",
+        "evidence": [
+          "conf/paths/default.yaml",
+          "harness/transfer/b2.py"
+        ],
+        "next": "先实现默认 dry-run 的 rclone 规划器。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "implemented",
+          "explanation": "现状：rclone/B2 复制、恢复与校验命令已包装，默认不实际传输。 证据：harness/transfer/b2.py。下一步：先实现默认 dry-run 的 rclone 规划器。"
+        }
+      },
+      {
+        "id": "g.recovery",
+        "type": "goal",
+        "title": "离线恢复实验",
+        "description": "目标：结合完整配置、模型权重和运行元数据重建实验。",
+        "status": "not_implemented",
+        "evidence": [
+          "saebase/runtime/summary_log.py"
+        ],
+        "next": "定义本地打包和验证边界。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.b2",
+        "type": "goal",
+        "title": "远程 B2 备份",
+        "description": "目标：用可校验传输备份大文件，通过机器本地凭据完成认证。",
+        "status": "partial",
+        "evidence": [
+          "conf/paths/default.yaml",
+          "harness/transfer/b2.py"
+        ],
+        "next": "引入 rclone 只读检查与 dry-run。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "partial",
+          "explanation": "现状：B2 传输命令预览与校验接口存在，但没有真实账号与成功备份证据。 证据：harness/transfer/b2.py。下一步：引入 rclone 只读检查与 dry-run。"
+        }
+      },
+      {
+        "id": "q.multi_domain",
+        "type": "question",
+        "title": "如何统一 LLM SAE 的多类研究任务？",
+        "description": "问题：模型、稀疏字典、Prompt 和七类 SAE 研究操作怎样共享可复用的组件结构？",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "saebase/api/features.py",
+          "tasks/sae_runtime.py"
+        ]
+      },
+      {
+        "id": "s.parallel_cores",
+        "type": "solve",
+        "title": "SAEBase 与 SAEBase Runtime 的统一任务接口",
+        "description": "方案：SAEBase 提供稀疏特征研究实现，SAEBase Runtime 组织科研执行与实验记录，共享已审计的模型、数据集和任务注册。",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "saebase/api/__init__.py",
+          "saebase/plugin_bootstrap.py",
+          "tasks/plugins.py"
+        ]
+      },
+      {
+        "id": "g.domain_families",
+        "type": "goal",
+        "title": "组织 NLP Dataset、LLM Model 与 SAE Task",
+        "description": "目标：按 NLP 数据集、LLM 模型与七类 SAE 操作分别组织实现和注册；保留 SAEBase 原有公共 API。",
+        "status": "implemented",
+        "evidence": [
+          "datasets/plugins.py",
+          "models/plugins.py",
+          "tasks/plugins.py"
+        ]
+      },
+      {
+        "id": "g.llm_capture",
+        "type": "goal",
+        "title": "LLM 特征捕获",
+        "description": "目标：SAEBase 在选定模型层读取真实激活，用稀疏自编码器编码特征并记录特征值与重建量。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/capture/task.py",
+          "saebase/api/features.py"
+        ]
+      },
+      {
+        "id": "g.llm_teacher_forcing",
+        "type": "goal",
+        "title": "LLM 教师强制干预",
+        "description": "目标：在固定输入上替换指定稀疏特征并重新计算模型输出，以测量干预对原始类别得分的影响。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/intervene/task.py",
+          "saebase/api/features.py"
+        ]
+      },
+      {
+        "id": "g.llm_generation",
+        "type": "goal",
+        "title": "LLM 生成时特征干预",
+        "description": "目标：在生成每个后续 token 时执行 SAEBase 特征编辑，并比较干预与基线生成的 token 序列。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/generate/task.py",
+          "tasks/intervene/backend/steering.py"
+        ]
+      },
+      {
+        "id": "g.llm_circuits",
+        "type": "goal",
+        "title": "LLM 电路分析",
+        "description": "目标：利用 SAEBase 的原生电路工具生成和保存有来源记录的特征关系图，实际执行需具备相应计算环境。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/circuits/task.py",
+          "tasks/circuits/backend/circuits.py"
+        ]
+      },
+      {
+        "id": "g.llm_explain",
+        "type": "goal",
+        "title": "LLM 特征自动解释",
+        "description": "目标：以研究者指定的生成器产生特征含义假设，再用独立输入上的特征激活记录验证解释预测。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/explain/task.py",
+          "tasks/explain/interpretation.py"
+        ]
+      },
+      {
+        "id": "g.llm_benchmark",
+        "type": "goal",
+        "title": "LLM SAE 基准评测",
+        "description": "目标：通过 SAEBase 基准运行器对指定模型、稀疏特征和数据记录计算可追溯指标。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/benchmark/task.py",
+          "tasks/benchmark/backend/runner.py"
+        ]
+      },
+      {
+        "id": "g.llm_sae_training",
+        "type": "goal",
+        "title": "LLM SAE 训练",
+        "description": "目标：通过 SAEBase 调用实际 SAE Lens 或 Sparsify 训练后端，并记录训练配置与检查点。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/train/task.py",
+          "tasks/train/backend/training.py"
+        ]
+      },
+      {
+        "id": "q.agent_flow",
+        "type": "question",
+        "title": "怎样审计 Agent 执行科研任务的过程？",
+        "description": "问题：如何在修改前预览 Knowledge、Code、Environment、Context 的变化，并在结果审计后让人类逐 Node 做出决定？",
+        "status": "partial",
+        "evidence": [
+          "harness/core/agent_flow.py"
+        ],
+        "next": "真实验收 GitHub PR 和本地审阅闭环后再提出通过。",
+        "environment_refs": []
+      },
+      {
+        "id": "s.agent_flow",
+        "type": "solve",
+        "title": "计划驱动的可审计人工审批流程",
+        "description": "方案：预先审计并展示红色节点，限制修改范围；代码审阅进入黄色；实测结果和人类决定决定最终接受绿色、保持黄色、重试红色或删除。",
+        "status": "partial",
+        "evidence": [
+          "harness/core/agent_flow.py",
+          "harness/core/agent_review_server.py",
+          "harness/visualization/knowledge.html"
+        ],
+        "next": "验证权限、结果对应关系、可视化批阅行为。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.agent_execution_flow",
+        "type": "goal",
+        "title": "Agent 执行任务的流程",
+        "description": "目标：外部 GitHub Work Plan → 审计和部署预览 → 人类授权 → 任务代码变更与统一审阅 → 真实实验及独立结果审计 → 人类逐节点审批四种归宿及可追溯报告。Core 与 Harness 规则对普通 Agent 只读屏蔽。",
+        "status": "partial",
+        "evidence": [
+          "harness/core/agent_flow.py",
+          "harness/core/agent_apply.py",
+          "harness/core/agent_flow.py",
+          "harness/visualization/app.js"
+        ],
+        "next": "本地真人评审和 GitHub 原生 Approved 事件尚需端到端验收。",
+        "environment_refs": []
+      }
+    ],
+    "edges": [
+      {
+        "source": "q.research",
+        "target": "q.modularity",
+        "type": "refines"
+      },
+      {
+        "source": "q.research",
+        "target": "q.reproducibility",
+        "type": "refines"
+      },
+      {
+        "source": "q.research",
+        "target": "q.transparency",
+        "type": "refines"
+      },
+      {
+        "source": "q.research",
+        "target": "q.mobility",
+        "type": "refines"
+      },
+      {
+        "source": "q.modularity",
+        "target": "s.registry",
+        "type": "addresses"
+      },
+      {
+        "source": "q.modularity",
+        "target": "s.compatibility",
+        "type": "addresses"
+      },
+      {
+        "source": "q.reproducibility",
+        "target": "s.hydra",
+        "type": "addresses"
+      },
+      {
+        "source": "q.reproducibility",
+        "target": "s.artifacts",
+        "type": "addresses"
+      },
+      {
+        "source": "q.transparency",
+        "target": "s.explainability",
+        "type": "addresses"
+      },
+      {
+        "source": "q.mobility",
+        "target": "s.mobility",
+        "type": "addresses"
+      },
+      {
+        "source": "s.registry",
+        "target": "g.registry",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.compatibility",
+        "target": "g.dataset_gate",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.compatibility",
+        "target": "g.model_gate",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.compatibility",
+        "target": "g.pipeline",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.hydra",
+        "target": "g.config",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.artifacts",
+        "target": "g.artifact_schema",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.explainability",
+        "target": "g.context",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.explainability",
+        "target": "g.code_tree",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.explainability",
+        "target": "g.env_tree",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.mobility",
+        "target": "g.transfer",
+        "type": "decomposes"
+      },
+      {
+        "source": "g.transfer",
+        "target": "g.recovery",
+        "type": "decomposes"
+      },
+      {
+        "source": "g.transfer",
+        "target": "g.b2",
+        "type": "decomposes"
+      },
+      {
+        "source": "q.research",
+        "target": "q.multi_domain",
+        "type": "refines"
+      },
+      {
+        "source": "q.multi_domain",
+        "target": "s.parallel_cores",
+        "type": "addresses"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.domain_families",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_capture",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_teacher_forcing",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_generation",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_circuits",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_explain",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_benchmark",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_sae_training",
+        "type": "decomposes"
+      },
+      {
+        "source": "q.research",
+        "target": "q.agent_flow",
+        "type": "refines"
+      },
+      {
+        "source": "q.agent_flow",
+        "target": "s.agent_flow",
+        "type": "addresses"
+      },
+      {
+        "source": "s.agent_flow",
+        "target": "g.agent_execution_flow",
+        "type": "decomposes"
+      }
+    ],
+    "title": "SAEBase · Project Architecture",
+    "purpose": "SAEBase 稀疏特征研究架构、LLM Task 与 Agent Harness 的结构化管理。",
+    "status_policy": "not_implemented / partial / implemented; for non-leaf nodes status is derived from every direct child",
+    "child_order": "Top to bottom as listed in edges; no explicit execution/dependency links"
+  },
+  "manifest": {
+    "id": "HC-Agent-Context-Dialogue-20261101",
+    "goal": "让 SAEBase 本地 Agent 在与人类讨论项目时，严格使用本次任务实际获准且成功读取的 Context、Knowledge、Code 和 Environment；按现有文档/源码/环境证据说话，无法访问即说明，不提升编辑或治理权限。",
+    "source_branch": "main",
+    "source_commit": "66a997c8b7126c6f1a35ff3a107249603e5ba9ab",
+    "scope": "New cross-project local-Agent conversation governance and controlled access, not a specific WP; no current runtime edit/authorization",
+    "items": [
+      {
+        "view": "core",
+        "node_id": "q.transparency",
+        "operation": "change",
+        "after": {
+          "title": "人和 Agent 怎样共同理解项目？",
+          "description": "新增 Local Agent 的常驻人类对话约束：凡涉及 SAEBase 项目事实、定义、设计、科研结论、源码能力或环境状态，都先明确当前任务及访问范围，仅使用实际获准且成功读取的相关 Context/Knowledge/Code/Environment。用已有 Context 术语、ID 和适用条件组织解释，清晰区分用户目标、文档定义、代码实际实现、运行观测、未证实推断；没有资料时说明不可访问/未知，不冒称已读或已验证。普通寒暄或无需仓库事实的对话不强制文件读取。现有 Work Order 激活和 Core shield 不被绕过；当前任务只获准相关文档只读检索，不会提升编辑/GPU/网络/发布权限。"
+        },
+        "files": [
+          "AGENTS.md",
+          ".cursor/rules/core/00-core.mdc",
+          ".cursor/rules/core/10-context-selection.mdc",
+          ".cursor/rules/core/20-context-dialogue.mdc"
+        ],
+        "reason": "目前常驻规则规定任务中的 Context 选择，但尚未形成一致、可验证的 Agent 对人解释约束；需要与既有禁止无范围扫描 doc 的规则协调，避免自相矛盾。",
+        "risk": "强制读取不可访问文档造成死锁；全文灌入 Context；让旧记忆、未经核验推断冒充项目事实；越权解锁治理资料。",
+        "checks": [
+          "项目实质性断言只引用当前可读取的选定权威 Context/Code/Knowledge/Environment",
+          "无读取能力、越权或版本不符时明确 unknown/blocked，而非捏造来源",
+          "不要求每句套模板；只有相关信息才最小读取",
+          "旧 Work Order、Core 屏蔽、Agent Flow 和人类权限不被削弱"
+        ],
+        "context_term_ids": [
+          "term.context_tree",
+          "term.knowledge_tree",
+          "term.code_tree",
+          "term.environment_tree"
+        ],
+        "group_id": "HC01",
+        "group_title": "人类对话必须以可访问的 Context 为依据"
+      },
+      {
+        "view": "core",
+        "node_id": "g.context",
+        "operation": "change",
+        "after": {
+          "title": "结构化研究知识与证据",
+          "description": "复用 doc/knowledge/context_graph.json、glossary.json、atlas_terms.json、context_attributes.json 与现有 Knowledge/Glossary 选择器；复用 doc/code/code_tree.json 与 code_annotations.json，并以实际许可范围中的 Python 源码校验 Code 事实。拟在 harness/knowledge/ 增加通用只读按需解析入口：接收当前任务可读范围、明确的 Context/Knowledge/Code ID，返回小规模节点/术语投影、来源路径、读取是否成功、源版本及校验摘要，不递归搜索或隐式升级权限。即便路径存在、词条出现在索引里，也不算已读取；内容过期或无法访问时标记 unresolved。Code Tree 是 AST 快照，不用它替代实际源码行为证据。"
+        },
+        "files": [
+          "harness/knowledge/dialogue_context.py",
+          "doc/code/README.md",
+          "doc/knowledge/README.md",
+          "doc/knowledge/CONTEXT_STYLE.md"
+        ],
+        "reason": "必须为本地 Agent 提供真实能够读取的、按任务范围约束的 Context 来源与文档入口，而不是单靠语言指令要求模型假装拥有全部背景。",
+        "risk": "路径或索引存在被误认为可读；读取到过期 Code Tree；无权限的 doc 子目录被无意遍历；新读取器变成第二套知识 Registry。",
+        "checks": [
+          "白名单可读且实际读取成功才进入可引用的 Context 投影",
+          "路径越界、拒绝访问、已删除或过期内容不形成 verified 断言",
+          "只复用现有权威资料和 selectors，不复制第二套术语/知识图",
+          "多问题只读所选节点而非默认整树；结果有路径、ID、版本、来源记录"
+        ],
+        "context_term_ids": [
+          "term.context_tree",
+          "term.code_tree",
+          "term.knowledge_tree",
+          "term.python"
+        ],
+        "group_id": "HC02",
+        "group_title": "Code / Knowledge / Context 的只读可达入口"
+      },
+      {
+        "view": "core",
+        "node_id": "g.env_tree",
+        "operation": "change",
+        "after": {
+          "title": "机器环境快照",
+          "description": "在 doc/environment/ 建立人类及 Agent 可读的 Environment 文档入口和访问说明，真实机器状态仍由已有 harness/environment/probe.py 在本机按需测量。环境信息引用实际可访问、明确授权的本次探测输出/摘要，记录采集时间、synthetic 标记、unknown 与可见性；不能把 harness/environment/example.json、GitHub 上的样例、旧服务器缓存或不可读取的本机快照当成当前执行环境。保留本地探测产物非公开、隐藏凭据和绝对路径的既有约束。"
+        },
+        "files": [
+          "doc/environment/README.md",
+          "harness/environment/README.md"
+        ],
+        "reason": "Code/Knowledge 已在 doc/ 但 Environment 当前在 harness/environment；需形成一致的文档导航，又不能复制或公开可能敏感的本机快照。",
+        "risk": "doc/ 中固化过期 GPU/路径/凭据；没有观察到 GPU 却推断无 GPU；绕过 .cursorignore 读取未授权本地文件。",
+        "checks": [
+          "doc/environment 只提供规范、可达入口及真实来源指针，不存共享机器机密",
+          "Probe 输出必须含采集时间、synthetic/unknown 及实际来源",
+          "未成功读取或未经允许探测的机器信息不得写成实测事实",
+          "无 nvidia-smi 时 GPU 状态为 unknown 而非 absent"
+        ],
+        "context_term_ids": [
+          "term.environment_tree",
+          "term.cpu",
+          "term.gpu",
+          "term.artifact"
+        ],
+        "group_id": "HC03",
+        "group_title": "Environment 在 doc 中有入口但保持本机事实"
+      },
+      {
+        "view": "core",
+        "node_id": "g.agent_execution_flow",
+        "operation": "change",
+        "after": {
+          "title": "Agent 执行任务的流程",
+          "description": "新增简短、可重用的 Context-grounded Dialogue Skill：先判断问题属于科研概念、源码行为、当前环境还是一般对话；确认 Work Order/用户明确提供的只读访问范围和现有 CT-TRUTH/CT-TRACE/CT-CONTEXT/CT-EVIDENCE 等合同适用性；针对明确问题调用最小 Context 投影并核对读取回执；再以自然中文解释，区分事实、推断与未知，必要时附 ID 和源码位置。工作单执行的 contract_receipt.json 继续记录实际阅读文件、ID 与未解决项；不要求记录隐藏推理、不创建新权限系统，也不把脚本执行通过称作回答语义被自动证明。"
+        },
+        "files": [
+          ".cursor/skills/workflow/context-grounded-dialogue/SKILL.md",
+          ".cursor/skills/workflow/run-work-order/SKILL.md",
+          "harness/github/development_doc/agent-delivery.md"
+        ],
+        "reason": "只有常驻 Rule 容易停留在提醒层面；复用现有 Work Order、Selectors 和 Contract 收据才能让本地 Agent 找得到入口并形成稳定的回答流程。",
+        "risk": "技能要求无权限读取治理文档；每轮对话被迫执行重量脚本；回答过度模板化；自述 read receipt 被误称客观观察证据。",
+        "checks": [
+          "用户指明具体项目问题时按可读范围选择 Knowledge/Code/Environment",
+          "工作单的 activation/required/optional 被严格执行，不为对话暗中扩权",
+          "Agent 用已有术语解释且不自动复述全部 Context",
+          "无法访问相关来源时先说明缺口并给出可授权的最小下一步"
+        ],
+        "context_term_ids": [
+          "term.context_tree",
+          "term.task",
+          "term.artifact"
+        ],
+        "group_id": "HC04",
+        "group_title": "Agent 对话 Skill 与 Work Order 衔接"
+      },
+      {
+        "view": "core",
+        "node_id": "g.code_tree",
+        "operation": "change",
+        "after": {
+          "title": "可核验的类与函数结构图",
+          "description": "新增独立的 CPU 负面验证与定向 CI：构造可读/不可读、存在但未授权、路径逃逸、无此 ID、过期 Code Tree、合成 Environment、探测失败、真实源码与 Context 结论冲突等输入，核查读取器输出和 Rule/Skill 的规范一致性。测试仅能证明来源选择器的可观察行为和规则完整，不声称 Hook 能监测全部自然语言回复，也不改写现有合同评价器、历史考卷或科研成果。"
+        },
+        "files": [
+          "harness/github/work_test/test_agent_dialogue_context.py",
+          "harness/github/work_test/test_agent_dialogue_scope.py",
+          ".github/workflows/ci.yml"
+        ],
+        "reason": "“严格参照可访问的 Context”必须有实际可复现的拒绝路径与回归，而不仅是文案；同时不虚报对任意模型答复的完全自动验证能力。",
+        "risk": "测试只测 happy path；测试用假文档却产出 Verified；CI 不收集；自动检测被误称能检查任意自然语言含义。",
+        "checks": [
+          "拒绝未授权路径、目录越界、假来源和伪 current machine 数据",
+          "规则和 Skill 规定的路径与实际文档入口一致",
+          "CI 实际执行新增 CPU 负面测试，不需下载模型",
+          "收据显示 source access，而非声称模型私有推理已经被验证"
+        ],
+        "context_term_ids": [
+          "term.code_tree",
+          "term.context_tree",
+          "term.artifact"
+        ],
+        "group_id": "HC05",
+        "group_title": "负面测试、持续检查与来源诚实性"
+      },
+      {
+        "view": "code",
+        "node_id": "code:module:harness.knowledge.dialogue_context",
+        "operation": "add",
+        "files": [
+          "harness/knowledge/dialogue_context.py",
+          "doc/code/README.md",
+          "doc/knowledge/README.md",
+          "doc/knowledge/CONTEXT_STYLE.md"
+        ],
+        "after": {
+          "type": "module",
+          "path": "harness/knowledge/dialogue_context.py",
+          "title": "本地 Agent 的受控 Context 只读选择",
+          "description": "拟新增源码（尚不存在、尚未在 AST Code Tree 中验证）：按授权范围选择实际可访问的科研 Context、Code、Knowledge 来源与环境记录，提供可追溯的读取状态和最小必要投影。"
+        },
+        "reason": "必须为本地 Agent 提供真实能够读取的、按任务范围约束的 Context 来源与文档入口，而不是单靠语言指令要求模型假装拥有全部背景。",
+        "risk": "路径或索引存在被误认为可读；读取到过期 Code Tree；无权限的 doc 子目录被无意遍历；新读取器变成第二套知识 Registry。",
+        "checks": [
+          "白名单可读且实际读取成功才进入可引用的 Context 投影",
+          "路径越界、拒绝访问、已删除或过期内容不形成 verified 断言",
+          "只复用现有权威资料和 selectors，不复制第二套术语/知识图",
+          "多问题只读所选节点而非默认整树；结果有路径、ID、版本、来源记录"
+        ],
+        "context_term_ids": [
+          "term.context_tree",
+          "term.code_tree",
+          "term.knowledge_tree",
+          "term.python"
+        ],
+        "group_id": "HC02",
+        "group_title": "Code / Knowledge / Context 的只读可达入口"
+      }
+    ],
+    "implementation_dependencies": {
+      "HC01": [],
+      "HC02": [
+        "HC01"
+      ],
+      "HC03": [
+        "HC01"
+      ],
+      "HC04": [
+        "HC02",
+        "HC03"
+      ],
+      "HC05": [
+        "HC02",
+        "HC03",
+        "HC04"
+      ]
+    },
+    "boundaries": {
+      "no_unapproved_doc_access": true,
+      "no_core_shield_bypass": true,
+      "no_full_tree_dump": true,
+      "source_success_required": true,
+      "no_context_treated_as_user_or_system_instruction": true,
+      "environment_observed_not_synthetic": true,
+      "no_new_component_registry": true,
+      "agent_self_report_is_not_proof_of_reading": true,
+      "pr_137_is_separate_draft": true
+    }
+  }
+}
