@@ -49,6 +49,11 @@ def error_result(exc: Exception, *, stage: str, attempted: list[str]) -> dict[st
             "BLOCKED_ASSET",
             "Prepare the missing model, dataset, checkpoint, or configured input file.",
         )
+    elif "blocked_validation:" in msg:
+        code, repair = (
+            "BLOCKED_VALIDATION",
+            "Complete the missing native scientific artifact validation for this Task, then rerun Precheck.",
+        )
     elif "out of memory" in msg or "cuda unavailable" in msg or "no cuda" in msg:
         code, repair = (
             "BLOCKED_RESOURCE",

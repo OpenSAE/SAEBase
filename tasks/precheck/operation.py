@@ -260,7 +260,9 @@ def run_precheck(cfg: DictConfig) -> EvaluationResult:
                     required_modules=(
                         ("huggingface_hub", "sae_lens", "transformer_lens", "transformers")
                         if (sites or any(t in ("capture", "intervene", "generate") for t in tasks))
-                        else ("huggingface_hub",) if tasks else ()
+                        else ("huggingface_hub",)
+                        if tasks
+                        else ()
                     ),
                     assets=_assets(cfg, sites, tasks),
                     allow_network=bool(cfg.task.get("allow_network", False)),

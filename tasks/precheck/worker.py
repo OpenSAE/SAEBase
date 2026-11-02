@@ -49,8 +49,14 @@ def _validate_task(task: str, data: Any) -> None:
         if not isinstance(result.get("steered_steps"), list) or not result["steered_steps"]:
             raise RuntimeError("Generate did not record real intervention steps")
     elif task == "circuits":
-        if not data.get("native") or not list(Path("figures").rglob("*.*")):
+        native = data.get("native")
+        if not isinstance(native, dict) or not list(Path("figures").rglob("*.*")):
             raise RuntimeError("Circuit tracer returned no real graph artifacts")
+        if native.get("native_json_requires_source_specific_converter"):
+            raise RuntimeError(
+                "BLOCKED_VALIDATION: Native circuit graph requires validated "
+                "source-specific conversion and node/edge checks before PASS"
+            )
     elif task == "explain":
         hypothesis = data.get("hypothesis")
         if not isinstance(hypothesis, dict) or hypothesis.get("status") != "heldout_tested":
@@ -71,8 +77,16 @@ def _validate_task(task: str, data: Any) -> None:
                 "Benchmark PASS requires every selected metric completed with real valid samples"
             )
     elif task == "train":
-        if not data.get("native") or not any(p.is_file() for p in Path("checkpoints").rglob("*")):
+        native = data.get("native")
+        if not isinstance(native, dict) or not any(
+            p.is_file() for p in Path("checkpoints").rglob("*")
+        ):
             raise RuntimeError("Train produced no native checkpoint")
+        if native.get("load_and_encode_verified") is not True:
+            raise RuntimeError(
+                "BLOCKED_VALIDATION: Native SAE checkpoint requires verified "
+                "reload and real encode/decode before PASS"
+            )
 
 
 def check(request: dict[str, Any]) -> dict[str, Any]:
