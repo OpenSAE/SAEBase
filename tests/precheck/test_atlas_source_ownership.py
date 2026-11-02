@@ -30,3 +30,25 @@ def test_reviewed_sae_semantics_use_real_migrated_source_paths():
     for node_id, details in spec["nodes"].items():
         assert not node_id.startswith(("code:module:saebase.sae.", "code:method:saebase.sae."))
         assert not str(details.get("source_path", "")).startswith("saebase/sae/")
+
+
+def test_live_atlas_models_use_family_series_model_hierarchy():
+    from harness.code.presentation import readable_code_tree
+
+    view = readable_code_tree(build())
+    ids = {node["id"] for node in view["nodes"]}
+    for item in (
+        "code:concrete:models",
+        "code:family:models:gemma",
+        "code:family:models:gemma:gemma2",
+        "code:instance:models:gemma2_2b_base",
+        "code:family:models:qwen:qwen35",
+        "code:instance:models:qwen35_2b",
+        "code:legacy:models",
+    ):
+        assert item in ids
+    edges = {(edge["source"], edge["target"]) for edge in view["edges"]}
+    assert (
+        "code:family:models:gemma:gemma2",
+        "code:instance:models:gemma2_2b_base",
+    ) in edges

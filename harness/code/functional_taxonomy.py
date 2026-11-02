@@ -30,9 +30,13 @@ REEXPORT_DOCSTRINGS = frozenset(
 
 
 def is_reexport_only(node: dict) -> bool:
+    description = str(node.get("description") or "").strip()
     return (
         node.get("kind") == "module"
-        and str(node.get("description") or "").strip() in REEXPORT_DOCSTRINGS
+        and (
+            description in REEXPORT_DOCSTRINGS
+            or description.startswith("Compatibility import; implementation belongs to models/")
+        )
     )
 
 
@@ -225,7 +229,6 @@ DETAIL_SCOPES = {
     "code:module:saebase.registry": "registry",
     "code:module:saebase.research_lab.backend.api": "lab_api",
     "code:module:tasks.benchmark.stage_d": "benchmark_acceptance",
-    "code:concrete:models": "model_families",
     "code:instance:tasks:benchmark": "benchmark_task",
 }
 
