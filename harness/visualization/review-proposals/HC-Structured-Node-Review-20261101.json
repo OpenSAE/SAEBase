@@ -1216,7 +1216,36 @@
         "review_footer": "minimal reason, risk and acceptance only; do not inject metadata into node body"
       },
       "language_policy": "Every authored node must read correctly once the proposal becomes a real node. No '拟新增/将修改' in title/summary/description; planned state lives in review metadata and source status.",
-      "legacy_compatibility": "Old v1 proposals remain immutable/read-only; no auto-migration of any currently frozen reviews."
+      "legacy_compatibility": "Old v1 proposals remain immutable/read-only; no auto-migration of any currently frozen reviews.",
+      "delivery": {
+        "canonical_ledger": "experiment/_human_check/<HC-ID>/review.json — sealed, authoritative plan: complete before/after snapshots, field_changes, file_changes, decisions",
+        "rendered_report": "experiment/_human_check/<HC-ID>/report.md — derived digest of field and file changes; review metadata is separate",
+        "public_preview": "harness/visualization/review-proposals/<HC-ID>.json — source-backed, read-only browser preview; no authenticated decisions",
+        "post_edit_evidence": "experiment/_human_check/<HC-ID>/observed.json — actual file/AST/graph after implementation and Proposed-vs-Observed reconciliation",
+        "no_parallel_truth": "All views are derived from sealed review.json and actual post-edit source; do not maintain competing manual node descriptions."
+      },
+      "lifecycle": [
+        "Read authoritative source for each tree at exact SHA; capture complete before_node and associated file identities.",
+        "Author a complete independent after_node in established source fields; record explicit planned file and relation changes separately.",
+        "Compute typed per-field add/remove/change/unchanged, reject stale or semantically empty changes, validate source and permission scopes.",
+        "Render graph/Reader using new-node content only; display old/new source files, identities, attributes and relations in structured sections.",
+        "Human approves specific nodes and file scopes, not a description of intentions; unchanged/unapproved scopes remain untouched.",
+        "After authorized edits, rebuild actual AST/graphs, derive observed_node, compare with approved after_node; report deviations for new review.",
+        "Update actual source-authority nodes and factual provenance only after validation; never auto-green science or copy old last_change as new evidence."
+      ],
+      "minimum_negative_tests": [
+        "Functional change modifies only description without changing any relevant structured information",
+        "After omits a former field but legacy renderer reintroduces it from Before",
+        "Before contains attributes or file references absent from snapshot",
+        "Proposed file is absent from file_changes or outside authorized scope",
+        "Proposed new file is displayed as implemented source",
+        "Approval state overwrites node's actual implementation/scientific status",
+        "Old source SHA or authority snapshot has changed",
+        "Source file moved but node path/evidence/Code references still point to old path",
+        "Approval claims a change whose after_node is identical to before_node",
+        "Change alters stable node meaning without new node identity or migration proposal",
+        "English tree fields missing or fallback copy is misreported as translated"
+      ]
     },
     "example": {
       "node_id": "g.agent_execution_flow",
