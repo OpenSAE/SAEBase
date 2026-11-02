@@ -12,6 +12,16 @@ Applies to new or materially updated Work Plans; preserve frozen historical exam
 
 Repository authority: [architecture boundaries](../../core/BOUNDARIES.en.md).
 
+## Independent Work Plans and Agent Ready
+
+**Phase 3 is drafting or recording:** a plan may describe prior evidence, historical outcomes or prospective implementation. Draft/reviewed does not imply executable software exists. Record-only plans need not become local-Agent tasks.
+
+**Phase 7 is GitHub implementation:** prior to a local-Agent handoff, the GitHub owner must implement and verify the actual shared modules, defaults, configuration, entrypoints, bounded workers, dependencies, resume/audit and tests. Do not leave unfinished framework development to an execution Agent.
+
+**Agent Ready:** only a `plan_role: local_agent` plan in `status: agent_ready` with exact source identity, real entrypoints, offline/integration and CI evidence may be dispatched. GPU/network/download/publication authorization remains independent.
+
+**No cross-WP references by default:** earlier plans may be read for historical context during authoring. Citing or inheriting a different WP's protocol, configurations, branch, results or execution prerequisites requires human approval for the exact referenced WP and purpose, recorded in the current plan's `from_human.cross_workplan_approvals`. A merged PR or Agent inference is not consent. Prefer canonical shared Registry/APIs. Frozen historical records remain unmodified.
+
 ## Intake, Atlas relationships, execution and delivery (new plans)
 
 Before drafting, retain confirmed human intent, scientific motivation, already-known Atlas IDs, resource and permission decisions, and open questions in [from_human/](from_human/README.md). Use existing Core and Knowledge nodes and Context term IDs; introduce new nodes only after independent review. During drafting use [WORKPLAN_TEMPLATE.md](WORKPLAN_TEMPLATE.md), binding one canonical experiment configuration, typed `workplan-json` references, the existing Contract IDs, a dependency DAG and predetermined result tables. After drafting, validate the plan with `python -m harness.github.work_plan.lifecycle validate --plan <path>` and the existing Contract registry, then review Atlas and source-path relationships.
