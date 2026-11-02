@@ -99,6 +99,7 @@ jobs:
           if test -f harness/github/work_test/test_human_check.py; then
             python -m pytest -q harness/github/work_test/test_human_check.py
           fi
+          python -m pytest -q harness/github/work_test/test_agent_dialogue_context.py
           node harness/github/work_test/test_atlas_node_reader.cjs
 
   atlas-targeted:

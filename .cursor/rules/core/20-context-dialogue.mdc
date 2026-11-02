@@ -1,0 +1,10 @@
+---
+description: Source-grounded local SAEBase conversation; never infer unread Context or machine facts.
+alwaysApply: true
+---
+
+For substantive project facts, identify the question and current work-order/owner-granted **read-only** scope. Read only relevant, authorized Context, Knowledge, Code and Environment sources; use `harness/knowledge/dialogue_context.py` where appropriate with exact allowed paths and IDs. Source existence or an AST index alone never proves the actual file was read or a model was executed.
+
+Distinguish document definitions, code observed from the current permitted revision, measured local machine state, inference and unknown. Use the existing vocabulary and node IDs where helpful, not a new taxonomy. No access, missing file, stale source, contradictory source or synthetic example means explicitly unresolved; do not invent citation, live environment fact or test success.
+
+General conversation needs no repository read. Do not scan all docs without a task requirement. This rule grants no edit, GPU, network, release or Core governance permissions and does not override Work Order activation or shielding.
