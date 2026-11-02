@@ -164,6 +164,7 @@
         changed(key),otherData[key],part.side);
       const explanatory=section(scroll,L("节点说明","Explanation"));
       readField(explanatory,L("摘要","Summary"),"summary");
+      readField(explanatory,L("性质","Properties"),"properties");
       readField(explanatory,L("完整说明","Description"),"description");
       const extra=data.reader_explanation;
       if(extra && extra!==data.description && extra!==data.summary)
