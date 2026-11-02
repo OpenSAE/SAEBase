@@ -1,34 +1,42 @@
 # @package _global_
-# WP23 DRAFT planning selection only: no executor reads this config yet.
-# QA500 frozen scientific selections MUST be read from the pinned WP22 sources.
+# WP23 own Draft acceptance selection, NOT an executable task configuration yet.
+# Generic Precheck defaults are implemented in conf/task/precheck.yaml after approval.
 experiment:
-  name: wp23_qa500_precheck
+  name: wp23_component_precheck
   status: draft
   execute: false
-  upstream:
-    repository: OpenSAE/SAEBase
-    branch: feat/qa-evaluation-500-v1
-    reviewed_head: 32c53e56abff3ece4fb2f7922cdbd57446ef8429
-    protocol: conf/experiment/qa500/protocol.json
-    datasets: conf/experiment/qa500/datasets.json
-    sites: conf/experiment/qa500/sites.json
-    assets_lock: conf/experiment/qa500/assets.lock.json
-  precheck_targets:
-    dataset_count: 10
-    model_count: 10
-    sae_site_count: 20
-    model_dataset_pairs: 100
-    sae_site_dataset_pairs: 200
-  bounds:
-    records_per_dataset_to_verify: 500
+  inventory:
+    dataset_source: active_dataset_registry
+    model_source: active_model_registry
+    sae_source: model_owned_explicit_profiles
+    sae_sites_per_model_max: 2
+    order: stable_registry_key
+    on_missing_component: BLOCKED
+    on_excess_targets: BLOCKED_RESOURCE
+  checks:
+    components: [inventory, dataset, model, sae_site]
+    combinations: [model_dataset, sae_site_dataset]
+    default_task_smokes: [capture, intervene, generate, benchmark]
+    optional_native_tasks: [circuits, explain, train]
+    require_real_assets: true
+    require_real_forward: true
     max_real_questions_per_pair: 2
-    execution_is_separately_authorized: true
+    max_tokens_per_worker: 128
+    max_seconds_per_worker: 180
+    allow_synthetic_pass: false
+  approval:
+    allow_network: false
+    allow_download: false
+    allow_gpu: false
+    allow_native: false
+    allow_publish: false
+    allow_remote_archive: false
+    require_explicit_total_budget: true
   output:
-    root: experiment/_studies/wp23_qa500_precheck
-    archive: local_only_if_audit_pass
-  forbidden:
-    - scientific_parameter_substitution
-    - implicit_network_or_gpu
-    - native_training_without_approval
-    - hf_publication
-    - automatic_b2_upload
+    root: experiment/_studies/wp23_component_precheck
+    per_target_receipts: true
+    four_matrices: true
+    manifest: true
+    independent_audit: true
+    completed_workplan: true
+    archive: local_only_after_evidence_audit
