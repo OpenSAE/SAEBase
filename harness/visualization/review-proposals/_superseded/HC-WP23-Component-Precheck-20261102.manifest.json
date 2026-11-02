@@ -55,5 +55,10 @@
         }
       ]
     }
-  ]
+  ],
+  "superseded": {
+    "reason": "WP23 source/node impact audit determined independent durable Core child was premature. Code node choice deferred until actual AST; existing node responsibilities unchanged.",
+    "replacement_review": "harness/github/work_plan/reviews/WP23/node_impact.json",
+    "retain_legacy_decisions": true
+  }
 }

@@ -13,9 +13,20 @@ Offline CI proves software checks only, not real GPU or scientific acceptance.
 
 Before implementing a new Work Plan, read [the Work Plan authoring standard](harness/github/work_plan/WRITING_STANDARD.en.md). Do not assume every remote branch is locally fetched; do not run a compute-intensive phase before environment, dependency and small-pilot checks succeed.
 
+## Process-first correction for Harness / GitHub / local Agents
+
+When a Harness, GitHub maintenance, or local-Agent execution workflow fails, behaves inconsistently, or is reported to violate project rules, **repair the process before patching the isolated symptom**. The governing written contracts take precedence over an ad-hoc instruction, a convenient workaround, or the urge to finish a specific Work Plan.
+
+1. **Stop and preserve evidence** of the contested action (source SHA, observed behavior, logs, proposal/review state). Do not automatically rewrite nodes, change approved scopes, restart GPU work, or relax a gate.
+2. **Read the applicable authorities first**: this file, `harness/core/BOUNDARIES.md`, `harness/github/HUMAN_CHECK.md`, `harness/github/work_plan/WRITING_STANDARD.md`, Atlas authoring standards and the active Work Order/Contracts as relevant. Identify the violated clause, conflicting implementations and missing enforcement.
+3. **If the human explicitly identifies a process violation**, first present a concrete, feasible **process-standardization change proposal**: root cause, normative change, exact owner/files, backward compatibility, negative tests, and approval/rollback implications. Discuss or confirm the governance solution with the human before returning to the original technical fix. Existing protected-governance/Human Check permissions still apply.
+4. **Then fix the specific problem together with the human** using the updated or confirmed process, scoped review decisions, and actual tests. Report what changed in the process separately from what was fixed in the task.
+
+A Work Plan may reference Core/Knowledge/Code/Environment/Context without changing them. Every new or materially revised Work Plan must first produce the regulated human-facing section summary and a source-backed six-domain node-impact audit described in [Work Plan authoring](harness/github/work_plan/WRITING_STANDARD.md). If the durable node responsibility is unchanged, **do not edit it** or create a synthetic Human Check change to justify project-specific tasks.
+
 ## Human Check before GitHub changes
 
-For conversational GitHub maintenance, use [Human Check](harness/github/HUMAN_CHECK.md) and the [Delivery Skill](.github/skills/saebase-delivery/SKILL.md) **before source edits or a PR**. Default is enabled. Generate one Context-grounded written report plus a five-tree Atlas proposed-change overlay; every node has an **independent** Approve / Deny / Unchecked decision, without a whole-plan approval. Denied/unreviewed node scopes do not authorize code changes; unrelated approved scopes may proceed. Only a human may explicitly opt out via the local Atlas review. This does not bypass protected changes, contracts, GPU/publish permissions, or independent verification.
+Before source edits or a PR, follow [Human Check](harness/github/HUMAN_CHECK.md) and the [Delivery Skill](.github/skills/saebase-delivery/SKILL.md). First distinguish **durable Atlas semantic changes** from a source-only modification. For genuine Node ADD/CHANGE/REMOVE, Human Check remains enabled and requires the existing Atlas overlay with independent Approve / Deny / Unchecked decisions (only humans can opt out through the authenticated local UI). For **NO_NODE_CHANGE**, do not fabricate a Node proposal: provide the source-backed impact audit and obtain explicit human review of the exact changed paths and PR diff before implementation/merge, with protected governance authorization retained. Neither route bypasses Contracts, Work Orders, GPU/network/publishing gates or independent verification.
 
 
 ## Conversational task planning

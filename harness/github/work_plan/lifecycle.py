@@ -154,6 +154,20 @@ def check(plan_path, root=ROOT, check_contracts=True):
         from harness.contracts.registry import validate_plan
 
         validate_plan(plan_path)
+    # New semver-named plans have two mandatory authoring-review artifacts.
+    # Historical unversioned frozen plans remain grandfathered.
+    if re.fullmatch(
+        r"[0-9]+\.[0-9]+\.[0-9]+_wp[0-9]{3}_[a-z]+_[a-z]+\.md",
+        Path(plan_path).name,
+    ):
+        from harness.github.work_plan.review_gate import validate as review_validate
+
+        reviews = root / "harness" / "github" / "work_plan" / "reviews" / plan["plan_id"]
+        review_validate(
+            root / plan_path,
+            reviews / "summary.md",
+            reviews / "node_impact.json",
+        )
     return plan
 
 

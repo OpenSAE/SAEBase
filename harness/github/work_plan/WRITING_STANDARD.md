@@ -55,6 +55,29 @@ git rev-parse HEAD
 
 起草后运行 `python -m harness.github.work_plan.lifecycle validate --plan <repo-relative-plan.md>` 和已有 `python -m harness.contracts.registry check --plan <plan>`，核对真实引用、上下游职责、执行 DAG、必要交付表、双语 Context 与 Atlas 来源。起草前后均需审阅关联，不能通过新增抽象节点满足检查。
 
+## 6A. Workplan 起草的两份强制预审交付（新增/实质修改均适用）
+
+起草 **Draft Workplan 正文之后、申请 Human Check 或任何源码实施之前**，必须分别完成以下两份材料；二者是工作计划的附属文档，不属于 Atlas 节点正文、性质或权威来源。未完成则 Workplan 保持 Draft，标注预审不合格。
+
+**A. 面向人类的结构化摘要** — `harness/github/work_plan/reviews/<WP-ID>/summary.md`
+
+- 顶部按 `# <WP-ID> · 人类审阅摘要`、`## 概览`、`## 1. …` 至 `## N. …` 的顺序书写；正文每个一级编号 Section 都对应原 Workplan 的一个主要 `## N.` 章节，数量和顺序一致。不得只概括总体目标而省略某个章节；内部子节可合并概括。
+- 概览 **40–100 个汉字**；每个章节摘要 **25–115 个汉字**；总体正文（不计 Markdown 标题、链接和代码标识中的非汉字字符）**400–950 个汉字**。计数按 Unicode 中日韩汉字，不按英文空格或 Markdown 字节数；主章节须整理为 5–12 个；超过 12 个时先按职责归并为可审阅的主章节，子章节仍完整保留，禁止删去实际任务或证据。此限制针对给人类的摘要，不约束详细 WP 正文。
+- 每节用自然语言陈述该章节的**决定、交付、验证或尚未解决的条件**；避免空泛标题复述、复制整段正文、混入已验证/未执行状态。概览必须明确目标、研究/工程价值和当前审批状态。
+- 正文先发给用户阅读；GitHub 文件用于记录和核对。Workplan 内容改变，摘要必须在同一审阅版本同步更新；不得从文件存在推断用户已读或批准。
+
+**B. 源码影响与 Atlas 变更决策审计** — `harness/github/work_plan/reviews/<WP-ID>/node_impact.json`
+
+- 对 **Code 功能与显示源码、Knowledge 内容、Environment 观测与控制、Core 架构、Harness 权限/流程、Context 定义** 六个领域逐一判断，核对真实 `main` 与目标分支源码、现存节点及引用，记录源版本、候选修改路径、现有节点、功能是否受影响、佐证、是否需 Human Check 及理由。
+- 逐个独立判断 `NONE / ADD / CHANGE / REMOVE / DEFER`。`NONE` 是正常、优先的决定：**仅调用或测试既有能力、或者 Node 的主要职责/性质未改变时，不修改既有节点**。实验编号、数据集数量、运行预算、测试步骤、期望结果等只属于 Workplan，不写进长期 Node 的 `title/summary/description/properties`。
+- `CHANGE` 仅在可观测的**抽象职责、输入/输出/约束、性质、真实源码归属**变化时选择，并明确是改说明、性质、所关联文件、还是需要刷新展示的真实代码。新独立能力才考虑 `ADD`；职责真实消失才考虑 `REMOVE`。不存在/未证实源码不能冒充已实现 Code AST，过时或不明确的影响使用 `DEFER`。
+- 实际代码发生变化但节点的主要功能保持原样：保持长期 Node 语义 `NONE`，**仅在实施后依据真实 AST 重新生成源码展示/文件映射**；这不等于计划阶段要编辑 Node。存在新的 Context 术语先查权威词典，确实无法复用时再单独提案。
+- 有确实必要的 `ADD/CHANGE/REMOVE` 才对受影响节点生成**独立、精确范围**的 Atlas Human Check，包含 Before/After、明确字段/文件和 Context 来源。**无节点变化时不得制造虚构节点来凑审批；明确写 `NO_NODE_CHANGE` 并提供审计报告。**
+- **源码修改授权是另一道独立门槛。** 即便 `NO_NODE_CHANGE`，更改受保护代码、Harness、Work Order、CI、GitHub 或发行配置仍需按其原有 Human Check/权限规则审阅精确路径。是否需要 Atlas 节点语义审阅与是否需要源码写入授权不能混为一谈。
+- 批准或拒绝分别附着于实际拟变更字段/路径；每次计划重大修改重新执行该审计。审计通过不代表软件实现、GPU 执行、科学验收或发布通过。
+
+交付顺序：Draft WP → 人类摘要与字数/Section 验证 → 源码影响审计与六域决策 → 仅有必要时的 Node Human Check / 其他源码授权 → 人类确认 → 执行与独立验收。运行 `python -m harness.github.work_plan.review_gate --plan <WP.md> --summary <summary.md> --impact <node_impact.json>` 检查**结构和已记录决策**；该脚本不能自动证明节点语义正确，仍需人类核查。
+
 ## 7. Setup、Audit 与已填写 Work Plan
 
 每个实际研究阶段明确 Setup 的样本、环境、网络和 GPU 授权；先测量真实执行速度，再按用户在 WP 确定的预算与阈值选择执行路径。代表性 Pilot 只是已执行组合的证据，不能替代全部模型和来源。计划外失败经通用 Audit 归因并分 local/global/human-decision，科研指标本身仍由所属 Task 的真实实现检查。失败记录与已完成结果不可覆盖。

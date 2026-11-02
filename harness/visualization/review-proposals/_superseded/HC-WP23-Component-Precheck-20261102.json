@@ -850,5 +850,10 @@
     "previous_invalid_proposal": "harness/visualization/review-proposals/_superseded/HC-WP23-QA500-Precheck-20261101.json",
     "science": "NOT_VERIFIED",
     "execution": "NONE"
+  },
+  "superseded": {
+    "reason": "WP23 source/node impact audit determined independent durable Core child was premature. Code node choice deferred until actual AST; existing node responsibilities unchanged.",
+    "replacement_review": "harness/github/work_plan/reviews/WP23/node_impact.json",
+    "retain_legacy_decisions": true
   }
 }
