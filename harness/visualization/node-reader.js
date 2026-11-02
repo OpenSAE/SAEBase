@@ -6,10 +6,10 @@
       document.documentElement.lang || "en").toLowerCase().startsWith("zh") ? zh : en;
   const names = {
     add:["新增节点","Add node"],remove:["删除节点","Remove node"],
-    change:["修改节点","Change node"],view:["节点阅读","Node reader"]
+    change:["修改节点","Change node"],source_review:["源文件审批","Source review"],view:["节点阅读","Node reader"]
   };
   function presentation(entry) {
-    const op = ["add","remove","change"].includes(entry.operation) ? entry.operation : "view";
+    const op = ["add","remove","change","source_review"].includes(entry.operation) ? entry.operation : "view";
     const cards = op === "change" && entry.before ?
       [{side:"before",data:entry.before},{side:"after",data:entry.after || entry.node}] :
       op === "remove" ? [{side:"before",data:entry.before || entry.node}] :
@@ -308,6 +308,13 @@
       cardWrap.appendChild(pages);
       if(entry.proposal){
         const meta=element("footer","atlas-reader-proposal");
+        if(entry.proposal.operation==="source_review"){
+          field(meta,L("审批范围","Source scope"),entry.proposal.scope_title);
+          field(meta,L("范围说明","Scope description"),entry.proposal.scope_description);
+          field(meta,L("节点变更","Node mutation"),
+            L("无。仅审阅文件范围，不改变任何 Atlas 节点字段。",
+              "None. Review file scope only; no Atlas node fields change."));
+        }
         field(meta,L("修改理由","Reason"),entry.proposal.reason);
         field(meta,L("风险","Risk"),entry.proposal.risk);
         field(meta,L("验收条件","Checks"),entry.proposal.checks);

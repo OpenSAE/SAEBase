@@ -148,7 +148,7 @@ def create(manifest: dict[str, Any], *, base_sha: str | None = None) -> dict[str
         if not isinstance(row, dict):
             raise atlas.FlowError("Invalid change item")
         view, node_id, operation = (row.get("view"), row.get("node_id"), row.get("operation"))
-        if view not in VIEWS or operation not in ("add", "change", "remove"):
+        if view not in VIEWS or operation not in ("add", "change", "remove", "source_review"):
             raise atlas.FlowError("Invalid Atlas change view or operation")
         if not isinstance(node_id, str) or not node_id or len(node_id) > 220:
             raise atlas.FlowError("Invalid node ID")
@@ -194,6 +194,13 @@ def create(manifest: dict[str, Any], *, base_sha: str | None = None) -> dict[str
             raise atlas.FlowError("Proposed nodes require an explanatory title and description")
         if operation == "remove" and after is not None:
             raise atlas.FlowError("Removed nodes cannot have new values")
+        if operation == "source_review":
+            if original is None or after != original:
+                raise atlas.FlowError("Source-only review cannot change an Atlas node")
+            if not isinstance(row.get("scope_title"), str) or not row["scope_title"].strip():
+                raise atlas.FlowError("Source-only review requires a scope title")
+            if not isinstance(row.get("scope_description"), str) or not row["scope_description"].strip():
+                raise atlas.FlowError("Source-only review requires a scope description")
         terms = row.get("context_term_ids", [])
         if (
             not isinstance(terms, list)
@@ -209,6 +216,8 @@ def create(manifest: dict[str, Any], *, base_sha: str | None = None) -> dict[str
                 "view": view,
                 "node_id": node_id,
                 "operation": operation,
+                "scope_title": row.get("scope_title"),
+                "scope_description": row.get("scope_description"),
                 "parent_id": row.get("parent_id"),
                 "before": atlas.brief(original),
                 "after": after,
