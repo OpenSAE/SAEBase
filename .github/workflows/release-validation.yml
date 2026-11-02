@@ -231,8 +231,8 @@ jobs:
           saebase --list
           saebase-check-env --mode core
           python -m saebase.sae.verify_registry --list
-      - name: Check v0.4.0 Research Lab release manifest and docs
-        run: python -m pytest -q harness/github/work_test/test_research_lab_v04_release.py
+      - name: Validate current Research Lab adapters and controlled methods
+        run: python -m pytest -q harness/github/work_test/test_research_lab_native_methods.py harness/github/work_test/test_research_lab_controlled_native.py
       - name: Run offline public API example
         run: python saebase/examples/quickstart/public_api_offline.py
       - name: Run persistent first experiment and reliability audit

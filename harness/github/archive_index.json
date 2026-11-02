@@ -525,6 +525,15 @@
       "mode": "move",
       "reason": "Historical work-plan record published by v0.5.0, immutable exact Blob SHA. Human-approved source-scope review issue #161; no active external reference located in source-search audit.",
       "status": "archived"
+    },
+    {
+      "original_path": "harness/github/work_test/test_research_lab_v04_release.py",
+      "archived_path": "harness/github/work_test/archive/0.4.0/0.4.0_wt001_preview_release/test_research_lab_v04_release.py",
+      "git_blob_sha": "4e94d7408bb3ea1218972a972d9e5d611d86f4f8",
+      "version": "0.4.0",
+      "mode": "move",
+      "reason": "v0.4.0-only release/evidence assertions retired from live CI; replaced explicit check with current Research Lab functional adapters. Exact historical bytes preserved. Human review issue #161.",
+      "status": "archived"
     }
   ],
   "notes": "Exact-source historical moves approved by HC-History-Isolation-20261102 issue #161. Existing compatibility records remain where unapproved references exist. Historical contents unchanged."
