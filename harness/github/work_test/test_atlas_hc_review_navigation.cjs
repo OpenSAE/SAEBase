@@ -136,4 +136,14 @@ assert(i18n.includes('"Send report":"发送报告"'),"English -> Chinese");
 assert(i18n.includes('"发送报告":"Send report"'),"Chinese -> English");
 assert(css.includes(".atlas-review-bar .review-send-report")&&css.includes("order:4"),"report positioning");
 require("./test_atlas_node_reader.cjs");
-console.log("Atlas HC ordering, immediate approval, handoff and navigation passed");
+assert(app.includes('event.stopPropagation();') &&
+  app.includes('"atlasReviewSendReport")?.addEventListener("click"'),
+  "report link must preserve the Atlas page and not bubble to graph navigation");
+assert(app.includes("try{persistBrowserDraft();}"),"send report persists current draft");
+const palette=fs.readFileSync(path.join(__dirname,"../../visualization/atlas-theme.css"),"utf8");
+for(const state of ["unchecked","approved","denied"]){
+  assert(palette.includes('node-selected .node-surface'),"selected node rules exist");
+  assert(palette.includes('[data-review="'+state+'"].node-selected .node-surface'),
+    "selected "+state+" retains the proper review color");
+}
+console.log("Atlas HC ordering, palette, report handoff and navigation passed");

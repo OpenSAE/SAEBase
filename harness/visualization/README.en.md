@@ -71,3 +71,6 @@ Public Pages decisions remain local browser drafts until the user explicitly sen
 
 
 Reader revision: the card uses the existing dark Atlas palette. Wheel gestures *inside* the card only scroll text, including at the bottom; wheels on the uncovered graph zoom out of the Reader. Redundant Focus breadcrumb strips are hidden while reading. In Change review, text is diffed by word or Chinese character: deletions are red with a strikethrough, insertions are red and underlined; unchanged text is neutral.
+
+
+Review highlights are purple (Unchecked), red (Approved), and gray (Denied), including the selected node. The redundant Reader wheel hint is removed. Send report preserves the local browser draft and opens a separate GitHub issue tab on explicit click; it does not navigate or reset the Atlas page.

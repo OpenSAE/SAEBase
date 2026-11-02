@@ -766,6 +766,18 @@
     $("atlasReviewApprove").addEventListener("click",()=>submitReview("approved"));
     $("atlasReviewDeny").addEventListener("click",()=>submitReview("denied"));
     $("atlasReviewUnchecked").addEventListener("click",()=>submitReview("unchecked"));
+    // Never navigate/reload the Atlas when sending a review. The native
+    // target=_blank link opens a separate GitHub issue draft on user click.
+    // Preserve the complete local decisions before opening that new tab.
+    $("atlasReviewSendReport")?.addEventListener("click",event=>{
+      if(review?.editable){event.preventDefault();return;}
+      event.stopPropagation();
+      try{persistBrowserDraft();}catch(error){
+        reviewError=error.message;
+        event.preventDefault();
+        updateReviewBar();
+      }
+    });
     $("atlasReviewFilter").addEventListener("click",event=>{
       event.stopPropagation?.();
       reviewMenuOpen=!reviewMenuOpen;
@@ -1185,6 +1197,7 @@
     nodeReader.open({
       review:!!review,node:active,view:config.view,
       operation:proposal?.operation||"view",proposal,before,after,
+      reviewState:proposal?proposalState(proposal):"",
       relations:recorded,contextTerms,
       nodeRect:origin?.getBoundingClientRect?.()||null,
       onFollow:(id,view)=>navigate(id,view,false,{toggle:true}),

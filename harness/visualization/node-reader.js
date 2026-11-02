@@ -280,6 +280,7 @@
       }
       const model=presentation(entry);
       shell.dataset.operation=model.operation;
+      shell.dataset.reviewState=entry.reviewState || "";
       const head=element("header","atlas-reader-head");
       const title=element("div","atlas-reader-heading");
       title.appendChild(element("div","atlas-reader-eyebrow",
@@ -288,8 +289,6 @@
         entry.node.title || entry.node.id));
       head.appendChild(title);
       const controls=element("div","atlas-reader-controls");
-      controls.appendChild(element("span","atlas-reader-hint",
-        L("卡内滚动阅读 · 卡外滚轮缩放 Graph","Scroll inside to read · wheel outside to zoom graph")));
       const dismiss=element("button","atlas-reader-close",L("缩回 Graph","Back to graph"));
       dismiss.type="button";
       dismiss.addEventListener("click",close);
