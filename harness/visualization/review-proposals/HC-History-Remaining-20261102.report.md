@@ -6,6 +6,9 @@
 
 ## 清理目前仍引用旧资料的项目说明
 
+- `harness/README.md`（补充来源）
+- `harness/github/assets/branding/README.md`（补充来源）
+
 删除或替代现役说明中的旧实施步骤、历史结果作为当前权威的链接，保留当前真实功能、示例和来源。
 
 - `README.md`
@@ -19,6 +22,8 @@
 
 ## 解除发布工具对旧文件的要求
 
+- `saebase/research_lab/tests/test_wp13_live03_gallery.py`（补充来源）
+
 去掉仍从历史文档或归档工作表读取执行规则的代码路径，用可执行当前合同或只读固定版本证据替代，防止软件发布和当前测试因归档失效。
 
 - `tasks/benchmark/release/gates.py`
@@ -29,6 +34,12 @@
 验收：不放宽当前发布、数据安全及校验规则；既有实验测量、评分、解析语义不变；已有功能测试仍通过；退役行为按 Release Tag 隔离。
 
 ## 更新当前考试和执行规范的入口
+
+- `harness/tests/wp21/EXAM_READY.md`（补充来源）
+- `harness/tests/wp21/AUDIT.md`（补充来源）
+- `harness/tests/wp21/WP21_2_HARDENING.md`（补充来源）
+- `harness/tests/wp21/runs/round01/README.md`（补充来源）
+- `harness/tests/wp21/runs/round02/README.md`（补充来源）
 
 现役 Agent 和考试规范不应强制读取冻结的 WP18–21 Markdown；保持历次考试数据不变。
 

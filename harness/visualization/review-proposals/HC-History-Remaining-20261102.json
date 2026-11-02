@@ -48,7 +48,9 @@
           "saebase/research_lab/README.md",
           "saebase/generate/README.md",
           "tasks/generate/backend/README.md",
-          "saebase/research_lab/frontend/index.html"
+          "saebase/research_lab/frontend/index.html",
+          "harness/README.md",
+          "harness/github/assets/branding/README.md"
         ],
         "reason": "删除或替代现役说明中的旧实施步骤、历史结果作为当前权威的链接，保留当前真实功能、示例和来源。",
         "risk": "只审批文件清理范围，不更改任何 Atlas Node 或可视化设置；落实要通过代码审阅与 CI。",
@@ -114,7 +116,8 @@
           "tasks/benchmark/release/gates.py",
           ".github/workflows/m5-release.yml",
           "saebase/tools/wp12_p8_acceptance.py",
-          "saebase/tools/stage_d_archive.py"
+          "saebase/tools/stage_d_archive.py",
+          "saebase/research_lab/tests/test_wp13_live03_gallery.py"
         ],
         "reason": "去掉仍从历史文档或归档工作表读取执行规则的代码路径，用可执行当前合同或只读固定版本证据替代，防止软件发布和当前测试因归档失效。",
         "risk": "只审批文件清理范围，不更改任何 Atlas Node 或可视化设置；落实要通过代码审阅与 CI。",
@@ -170,7 +173,12 @@
           "harness/tests/wp20/README.md",
           "harness/tests/wp21/README.md",
           "harness/tests/README.md",
-          ".cursor/rules/core/10-context-selection.mdc"
+          ".cursor/rules/core/10-context-selection.mdc",
+          "harness/tests/wp21/EXAM_READY.md",
+          "harness/tests/wp21/AUDIT.md",
+          "harness/tests/wp21/WP21_2_HARDENING.md",
+          "harness/tests/wp21/runs/round01/README.md",
+          "harness/tests/wp21/runs/round02/README.md"
         ],
         "reason": "现役 Agent 和考试规范不应强制读取冻结的 WP18–21 Markdown；保持历次考试数据不变。",
         "risk": "只审批文件清理范围，不更改任何 Atlas Node 或可视化设置；落实要通过代码审阅与 CI。",
@@ -262,7 +270,7 @@
         ]
       }
     ],
-    "preview_sha256": "e9659908992608a98244813a11363cfd90cbbc9f-source-scopes",
+    "preview_sha256": "e9659908992608a98244813a11363cfd90cbbc9f-source-scopes-v2",
     "created_for": "Read-only source-only review; old Atlas node facts unchanged; browser decisions require Send report."
   },
   "context": {
