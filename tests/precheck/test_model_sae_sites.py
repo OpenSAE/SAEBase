@@ -10,7 +10,8 @@ def test_empty_prompt_does_not_load_or_pass():
         prompt="",
         device="cpu",
     )
-    assert result["status"] == "FAIL"
+    assert result["status"] == "BLOCKED"
+    assert result["code"] == "BLOCKED_CONFIGURATION"
     assert (
         result["scientific_acceptance"] == "NOT_COVERED"
         if "scientific_acceptance" in result
