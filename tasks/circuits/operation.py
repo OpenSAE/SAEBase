@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from tasks.sae_runtime import MODEL_KEY, _task, _prompt, _fingerprint_prompt
+from tasks.sae_runtime import _task, _prompt, _fingerprint_prompt
 
 
 def _circuits(cfg: Any) -> dict[str, Any]:
@@ -35,7 +35,7 @@ def _circuits(cfg: Any) -> dict[str, Any]:
     return {
         "status": "executed",
         "operation": "circuits",
-        "model_key": MODEL_KEY,
+        "model_key": str(cfg.model.name),
         "prompt_sha256": _fingerprint_prompt(prompt),
         "native": details,
     }

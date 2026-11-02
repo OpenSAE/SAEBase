@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from tasks.sae_runtime import MODEL_KEY, _task
+from tasks.sae_runtime import _task
 
 
 def _benchmark(cfg: Any) -> dict[str, Any]:
@@ -16,15 +16,15 @@ def _benchmark(cfg: Any) -> dict[str, Any]:
     if not path.is_file():
         raise FileNotFoundError("Provide an existing SAEBase benchmark_config JSON/YAML")
     config = load_config(path)
-    if any(target.model_key != MODEL_KEY for target in config.targets):
-        raise ValueError("Benchmark targets must use Gemma-2 2B")
+    if any(target.model_key != str(cfg.model.name) for target in config.targets):
+        raise ValueError("Benchmark target model must match the selected Model")
     values = execute(
         config, Path.cwd() / "metrics", real=True, resume=bool(_task(cfg, "resume", True))
     )
     return {
         "status": "executed",
         "operation": "benchmark",
-        "model_key": MODEL_KEY,
+        "model_key": str(cfg.model.name),
         "benchmark_id": config.run_id,
         "metric_count": len(values),
         "metrics": [v.to_dict() if hasattr(v, "to_dict") else v for v in values],

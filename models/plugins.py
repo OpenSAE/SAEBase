@@ -66,10 +66,20 @@ _ACTIVE_MODULES = {
 }
 
 
-def _load_plugin(compat_path: str, model_path: str) -> ModelPlugin:
+def _load_plugin(compat_path: str, model_path: str, *, model_key: str) -> ModelPlugin:
     compat = importlib.import_module(compat_path)
     module = importlib.import_module(model_path)
-    return ModelPlugin(assert_compatible=compat.assert_compatible, construct=module.construct_lazy)
+
+    def check(cfg):
+        name = str(cfg.task.name)
+        if name in {"capture", "intervene", "generate", "circuits", "explain", "benchmark", "train", "precheck"}:
+            if name in {"capture", "intervene", "generate"}:
+                from saebase.datasets.prompt_schema import assert_available
+                assert_available(str(cfg.dataset.name), model_key)
+            return None
+        return compat.assert_compatible(cfg)
+
+    return ModelPlugin(assert_compatible=check, construct=module.construct_lazy)
 
 
 def legacy_plugin(key: str) -> ModelPlugin:
@@ -77,14 +87,15 @@ def legacy_plugin(key: str) -> ModelPlugin:
     if key not in _LEGACY_KEYS:
         raise ValueError(f"Unknown legacy Model {key!r}")
     return _load_plugin(
-        f"models.{key}.model_task_dataset_compatibility", f"models.{key}.{key}"
+        f"models.{key}.model_task_dataset_compatibility", f"models.{key}.{key}",
+        model_key=key,
     )
 
 
 def _register_builtin_models() -> None:
     for key in _HOOKED_KEYS:
         compat, module = _ACTIVE_MODULES[key]
-        plugin = _load_plugin(compat, module)
+        plugin = _load_plugin(compat, module, model_key=key)
         register_model(key, plugin.assert_compatible, plugin.construct)
 
 

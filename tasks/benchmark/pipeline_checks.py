@@ -20,7 +20,8 @@ def _prompt_source_name(cfg: DictConfig) -> str:
 
 def run_preflight(cfg: DictConfig) -> dict:
     """Validate registry gates + prompt artifact identity."""
-    get_task_plugin(str(cfg.task.name))
+    if str(cfg.task.name) != "sae":
+        get_task_plugin(str(cfg.task.name))
     ps_name = _prompt_source_name(cfg)
     get_dataset_plugin(ps_name).assert_task_supported(cfg)
     get_model_plugin(str(cfg.model.name)).assert_compatible(cfg)

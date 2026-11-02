@@ -14,7 +14,7 @@ def select_sites(
     A free-text SAE key must still refer to a Model-owned profile. The legacy
     profile table is used only to resolve current checkpoint and hook parameters.
     """
-    from saebase.sae.registry import get_profile
+    from saebase.api.sae_profiles import get_profile
 
     model = str(model_cfg.name)
     available = list(model_cfg.get("sae_profiles", []))

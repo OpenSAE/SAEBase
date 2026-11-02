@@ -47,7 +47,7 @@ def _selected_tasks(cfg: DictConfig, mode: str) -> list[str]:
 def _assets(
     cfg: DictConfig, sites: list[dict[str, Any]], tasks: list[str]
 ) -> list[dict[str, str | None]]:
-    from saebase.sae.registry import get_profile
+    from saebase.api.sae_profiles import get_profile
 
     if not sites and not tasks:
         return []
@@ -172,7 +172,7 @@ def _task_config(cfg: DictConfig, name: str, max_seconds: int, max_tokens: int) 
         )
     if name == "train":
         plan = target.task.get("train_plan")
-        if plan is None or int(plan.get("max_steps", max_seconds + 1)) > 2:
+        if plan is None or int(plan.get("steps", max_seconds + 1)) > 2:
             raise ValueError(
                 "Precheck Train requires a native TrainPlan bounded to at most two steps"
             )
