@@ -1,7 +1,14 @@
 # Atlas preview revision: 4eea31448d0372dd67496720dfa8900e0002ef94
 name: SAEBase project-owned Atlas website
 
+# Human Check proposals need an accessible Atlas page without asking the reviewer
+# to manually dispatch deployment. All other publishes stay explicitly manual.
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'harness/visualization/review-proposals/**'
+      - '.github/workflows/atlas-project-pages.yml'
   workflow_dispatch:
 
 permissions:
