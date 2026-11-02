@@ -3,6 +3,7 @@
 This module never uploads to B2, deletes sources or copies model checkpoints
 unless such files were individually declared in the authorized manifest.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -23,8 +24,10 @@ def deliver(
 ) -> dict[str, Any]:
     report = audit_run(run_root, manifest)
     run_id = manifest.get("run_id")
-    if not isinstance(run_id, str) or not run_id or not all(
-        c.isalnum() or c in "_-" for c in run_id
+    if (
+        not isinstance(run_id, str)
+        or not run_id
+        or not all(c.isalnum() or c in "_-" for c in run_id)
     ):
         raise ValueError("invalid run ID")
     result: dict[str, Any] = {
@@ -61,7 +64,9 @@ def deliver(
                         raise ValueError("declared file disappeared")
                     bundle.add(path, arcname=name, recursive=False)
         digest = hashlib.sha256(output.read_bytes()).hexdigest()
-        result.update(archive_status="ARCHIVED", archive_path=str(output), sha256=digest, files=files)
+        result.update(
+            archive_status="ARCHIVED", archive_path=str(output), sha256=digest, files=files
+        )
     except (OSError, ValueError):
         output.unlink(missing_ok=True)
         result["reason"] = "archive creation failed"
