@@ -85,7 +85,7 @@ def reference_stepper(model, sae, token_ids, max_tokens: int, feature_id: int):
 
 
 def load_hf_pair():
-    from saebase.sae.loading import load_model_and_sae
+    from saebase.api.sae_loading import load_model_and_sae
 
     return load_model_and_sae(SAE_KEY, LAYER, device="cuda")
 
@@ -243,7 +243,7 @@ def main() -> None:
         raw, sae, _ = load_hf_pair()
         tokenizer = raw
     else:
-        from saebase.sae.loading import load_sae_for_profile
+        from saebase.api.sae_loading import load_sae_for_profile
         from saebase.vllm_backend.sae_interventions import InterpVLLMSAE
 
         sae, _ = load_sae_for_profile(SAE_KEY, LAYER, device="cuda")

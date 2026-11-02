@@ -24,7 +24,7 @@ import torch  # noqa: E402
 
 from saebase.api import ModelAdapter  # noqa: E402
 from saebase.interventions import BatchEngine, Condition, ResultWriter  # noqa: E402
-from saebase.sae.loading import load_model_and_sae  # noqa: E402
+from saebase.api.sae_loading import load_model_and_sae  # noqa: E402
 from saebase.store import sha256_state_dict  # noqa: E402
 from workplan09_gpu_pilot import (  # noqa: E402
     TOLERANCES,

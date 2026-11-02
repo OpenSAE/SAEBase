@@ -38,7 +38,7 @@ def main() -> None:
     import workplan09_gpu_pilot as pilot
     from saebase.api import ActivationSite, ModelAdapter, capture_features
     from saebase.interventions import BatchEngine, ResultWriter
-    from saebase.sae.loading import load_model_and_sae
+    from saebase.api.sae_loading import load_model_and_sae
     from saebase.store import sha256_state_dict
 
     specs = {
@@ -58,7 +58,7 @@ def main() -> None:
         raise RuntimeError("model state hash cache did not repeat")
     rows, pad = pilot._build_token_rows(raw)
     samples = pilot._samples_from_token_rows(rows)
-    from saebase.sae.registry import get_profile
+    from saebase.api.sae_profiles import get_profile
 
     hook = get_profile(spec["sae_key"]).hook_name(int(spec["layer"]))
     site = ActivationSite(int(spec["layer"]), hook, samples[0].patch_position)

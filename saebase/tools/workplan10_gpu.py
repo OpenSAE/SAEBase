@@ -138,8 +138,8 @@ def main() -> None:
     from saebase.api import ActivationSite, ModelAdapter
     from saebase.api.features import _decode, snapshot_from_activation
     from saebase.interventions import BatchEngine, ResultWriter, apply_condition
-    from saebase.sae.loading import load_model_and_sae
-    from saebase.sae.registry import get_profile
+    from saebase.api.sae_loading import load_model_and_sae
+    from saebase.api.sae_profiles import get_profile
     from saebase.store import VerifiedCheckpointSession, sha256_state_dict
 
     specs = {
