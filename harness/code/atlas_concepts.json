@@ -52,21 +52,6 @@
           "patterns": [
             "^api/(?:component_analysis|components|features|fine_components|metadata|model|nnsight_local)\\.py$"
           ]
-        },
-        {
-          "name": "public_entry",
-          "title": "统一公开 API",
-          "summary": "导出经验证的公共能力并维持稳定科研接口。",
-          "description": "导出经验证的公共能力并维持稳定科研接口。",
-          "en_title": "Public API entrypoint",
-          "en_summary": "Expose the stable public research API and its checked entrypoints.",
-          "en_description": "Expose the stable public research API and its checked entrypoints.",
-          "context_terms": [
-            "term.api"
-          ],
-          "patterns": [
-            "^api/__init__\\.py$"
-          ]
         }
       ]
     },
