@@ -17,8 +17,8 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from tasks.benchmark.backend.results import atomic_json
-from saebase.sae.coverage import CoverageCatalog, load_coverage
-from saebase.sae.registry import get_profile
+from tasks.benchmark.coverage_contract import CoverageCatalog, load_coverage
+from saebase.api.sae_profiles import get_profile
 
 SCHEMA_TARGETS = "saebase.coverage.stage_d_targets.v1"
 SCHEMA_STATUS = "saebase.stage_d.status.v1"
@@ -652,7 +652,7 @@ def verify_pair_site(
     import torch
 
     from saebase.api import ActivationSite, ModelAdapter, capture_features, edit_features
-    from saebase.sae.loading import load_model_and_sae
+    from saebase.api.sae_loading import load_model_and_sae
     from saebase.store import sha256_state_dict
 
     profile = get_profile(sae_key)
@@ -761,7 +761,7 @@ def verify_pair_site(
     except Exception:
         model_dtype = "unknown"
     try:
-        from saebase.sae.registry import _BASE_SPECS
+        from saebase.api.sae_profiles import _BASE_SPECS
 
         host_repo = _BASE_SPECS[evaluation_host].model_name
     except Exception:

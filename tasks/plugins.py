@@ -1,7 +1,7 @@
 """Register all shipped SAEBase research tasks in one Registry."""
 
 from saebase.registry import register_task
-from saebase.sae.task import SAETask
+from tasks.benchmark.legacy_sae_task import SAETask
 from tasks.capture.task import CaptureTask
 from tasks.precheck.task import PrecheckTask
 from tasks.intervene.task import InterveneTask

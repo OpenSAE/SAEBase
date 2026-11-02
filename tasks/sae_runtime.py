@@ -43,7 +43,7 @@ def _require_context(cfg: Any, operation: str) -> None:
 
 def _pair(cfg: Any):
     from saebase.api import load_registered
-    from saebase.sae.registry import get_profile
+    from saebase.api.sae_profiles import get_profile
 
     key = str(_task(cfg, "sae_key", SAE_KEY))
     layer = int(_task(cfg, "layer", 25))
