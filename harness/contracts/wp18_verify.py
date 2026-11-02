@@ -32,12 +32,20 @@ def _frozen_contract_selection(case: dict) -> dict:
     known = {row["id"]: row for row in data["contracts"]}
     tags = case["tags"]
     contracts = list(dict.fromkeys(data["required_always"] + ["CT-ERROR"] + case["contracts"]))
-    if not isinstance(tags, list) or not tags or len(tags) != len(set(tags)) or not set(tags) <= set(data["task_tags"]):
+    if (
+        not isinstance(tags, list)
+        or not tags
+        or len(tags) != len(set(tags))
+        or not set(tags) <= set(data["task_tags"])
+    ):
         raise ValueError("Invalid frozen case tags")
     if not set(contracts) <= set(known) or len(case["contracts"]) != len(set(case["contracts"])):
         raise ValueError("Unknown or duplicate frozen case contract")
     for tag in tags:
-        if not any(known[x]["enforcement"] == "conditional" and tag in known[x]["tags"] for x in contracts):
+        if not any(
+            known[x]["enforcement"] == "conditional" and tag in known[x]["tags"]
+            for x in contracts
+        ):
             raise ValueError("No contract covers frozen case tag: " + tag)
     return {"tags": tags, "contract_ids": contracts}
 
