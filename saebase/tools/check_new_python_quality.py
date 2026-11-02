@@ -117,6 +117,8 @@ def format_api_source(source: str, filename: str) -> str:
         capture_output=True,
         check=False,
         timeout=30,
+        encoding="utf-8",
+        cwd=Path(__file__).resolve().parents[2],
     )
     if formatted.returncode:
         raise RuntimeError("Ruff formatting failed: " + formatted.stderr.strip()[-1200:])
@@ -132,6 +134,8 @@ def format_api_source(source: str, filename: str) -> str:
             capture_output=True,
             check=False,
             timeout=30,
+            encoding="utf-8",
+            cwd=Path(__file__).resolve().parents[2],
         )
         if verified.returncode:
             detail = (verified.stdout + verified.stderr).strip()[-1200:]
@@ -154,11 +158,19 @@ def main() -> int:
         if not args.filename or args.fix or args.base_sha or args.include_modified:
             parser.error("--stdin requires --filename and cannot combine with Git or fix options")
         try:
-            source = sys.stdin.read(MAX_API_SOURCE_CHARS + 1)
+            binary_in = getattr(sys.stdin, "buffer", None)
+            if binary_in is not None:
+                source = binary_in.read(MAX_API_SOURCE_CHARS * 4 + 1).decode("utf-8")
+            else:
+                source = sys.stdin.read(MAX_API_SOURCE_CHARS + 1)
             prepared = format_api_source(source, args.filename)
-            sys.stdout.write(prepared)
+            binary_out = getattr(sys.stdout, "buffer", None)
+            if binary_out is not None:
+                binary_out.write(prepared.encode("utf-8"))
+            else:
+                sys.stdout.write(prepared)
             return 0
-        except (ValueError, RuntimeError, OSError, subprocess.SubprocessError) as exc:
+        except (ValueError, RuntimeError, OSError, UnicodeError, subprocess.SubprocessError) as exc:
             parser.exit(2, f"GitHub API Python source preparation blocked: {exc}\n")
     if args.filename:
         parser.error("--filename is only valid with --stdin")
