@@ -1,0 +1,294 @@
+{
+  "id": "HC-History-Remaining-20261102",
+  "goal": "使现役 README、生成模块、发布工具、Agent Harness 与普通 CI 不再依赖历史文档，同时完整保留冻结 Release 证据。",
+  "default_enabled": true,
+  "base_sha": "e9659908992608a98244813a11363cfd90cbbc9f",
+  "created_for": "Separate approval required for paths excluded from earlier Human Check issue #161.",
+  "node_impact": "NO_NODE_CHANGE",
+  "source_review": {
+    "status": "PENDING_HUMAN_APPROVAL",
+    "groups": [
+      {
+        "id": "G01",
+        "title": "清理目前仍引用旧资料的项目说明",
+        "node": "q.transparency",
+        "paths": [
+          "README.md",
+          "README_cn.md",
+          "saebase/research_lab/README.md",
+          "saebase/generate/README.md",
+          "tasks/generate/backend/README.md",
+          "saebase/research_lab/frontend/index.html",
+          "harness/README.md",
+          "harness/github/assets/branding/README.md"
+        ],
+        "reason": "删除或替代现役说明中的旧实施步骤、历史结果作为当前权威的链接，保留当前真实功能、示例和来源。",
+        "checks": [
+          "只更新文字和历史链接；不得更改 Research Lab 页面交互及排版",
+          "现役功能描述保持真实",
+          "版本证据通过固定 Release/Tag 查阅"
+        ]
+      },
+      {
+        "id": "G02",
+        "title": "解除发布工具对旧文件的要求",
+        "node": "g.code_tree",
+        "paths": [
+          "tasks/benchmark/release/gates.py",
+          ".github/workflows/m5-release.yml",
+          "saebase/tools/wp12_p8_acceptance.py",
+          "saebase/tools/stage_d_archive.py",
+          "saebase/research_lab/tests/test_wp13_live03_gallery.py"
+        ],
+        "reason": "去掉仍从历史文档或归档工作表读取执行规则的代码路径，用可执行当前合同或只读固定版本证据替代，防止软件发布和当前测试因归档失效。",
+        "checks": [
+          "不放宽当前发布、数据安全及校验规则",
+          "既有实验测量、评分、解析语义不变",
+          "已有功能测试仍通过；退役行为按 Release Tag 隔离"
+        ]
+      },
+      {
+        "id": "G03",
+        "title": "更新当前考试和执行规范的入口",
+        "node": "s.agent_flow",
+        "paths": [
+          "harness/contracts/README.md",
+          "harness/contracts/wp20_design_validate.py",
+          "harness/tests/wp18/README.md",
+          "harness/tests/wp19/README.md",
+          "harness/tests/wp20/README.md",
+          "harness/tests/wp21/README.md",
+          "harness/tests/README.md",
+          ".cursor/rules/core/10-context-selection.mdc",
+          "harness/tests/wp21/EXAM_READY.md",
+          "harness/tests/wp21/AUDIT.md",
+          "harness/tests/wp21/WP21_2_HARDENING.md",
+          "harness/tests/wp21/runs/round01/README.md",
+          "harness/tests/wp21/runs/round02/README.md"
+        ],
+        "reason": "现役 Agent 和考试规范不应强制读取冻结的 WP18–21 Markdown；保持历次考试数据不变。",
+        "checks": [
+          "不修改任何冻结考试成绩、真实测试收据与标准答案",
+          "维持原有 Agent Harness 审批及安全规则",
+          "历史考试仅作为冻结版本复现，不作为新任务依赖"
+        ]
+      },
+      {
+        "id": "G04",
+        "title": "防止旧依赖重新进入当前代码",
+        "node": "q.reproducibility",
+        "paths": [
+          "saebase/tools/check_documentation.py",
+          "harness/github/work_test/test_repository_architecture.py",
+          ".github/workflows/ci.yml"
+        ],
+        "reason": "为非归档现役代码和持久化说明补上不依赖 Archive 的自动检查；历史文件独立接受完整性检查。",
+        "checks": [
+          "不影响既有 CI 选择规则和正常性能",
+          "静态扫描豁免只读历史收据、Release 固定版本来源",
+          "干净构建在删除 archive 目录副本后也能运行"
+        ]
+      }
+    ],
+    "source_identities": {
+      "README.md": "266f40d9bf03063d1aae73e1b531b2f5ed61c620",
+      "README_cn.md": "3553caaf9432bfebcf40062f905c6b6b11684962",
+      "saebase/research_lab/README.md": "e68362d2a2bff5143556fa17897aa5f967ee5f9b",
+      "saebase/generate/README.md": "bb89c6eeb3c5b13a1104a2d3600fdbf6e8377c97",
+      "tasks/generate/backend/README.md": "bb89c6eeb3c5b13a1104a2d3600fdbf6e8377c97",
+      "saebase/research_lab/frontend/index.html": "6a4360af9b86c54ca256e81636147df80a0832b4",
+      "tasks/benchmark/release/gates.py": "828115c29b921eb8523f80f5289aec556a553734",
+      ".github/workflows/m5-release.yml": "725560c358dfe182a9ece2ae20ebfc16aa8a812e",
+      "saebase/tools/wp12_p8_acceptance.py": "f6f634e1b8750122a11f1b8a305550c681315704",
+      "saebase/tools/stage_d_archive.py": "270c3dd5b793f5d6634a8ad45d04187ada18fa72",
+      "harness/contracts/README.md": "a106fc2451ec51a743b10c312f06ad834c64c59e",
+      "harness/contracts/wp20_design_validate.py": "a95ad9258971825fd1f08c3ff5aa1d665bb757e4",
+      "harness/tests/wp18/README.md": "7a8f940b420bab20823f544e696c664bf47099f2",
+      "harness/tests/wp19/README.md": "49b0066838e768502d8766a616cc84e2638ff8ee",
+      "harness/tests/wp20/README.md": "2007a46bdaba93448dbfc81a81b4c7a735e224a3",
+      "harness/tests/wp21/README.md": "607b3ac05fef3a131226bc8570104316fd8eaf7a",
+      "harness/tests/README.md": "ef4d9b1576d52380ae1f9a6a3a776d53fb2fb1e1",
+      ".cursor/rules/core/10-context-selection.mdc": "6e0df1ed174f83effd41550492eab5ffcf9cab23",
+      "saebase/tools/check_documentation.py": "7ea95653b54de5eb27dad1fe0e4b47e7124a64b2",
+      "harness/github/work_test/test_repository_architecture.py": "9c49b6bcd7aa319e202d48948b71b585ab028c2d",
+      ".github/workflows/ci.yml": "b12a5f81d7af90afcfeffa6aae4c3dcb23cc1130",
+      "harness/README.md": "b6a071a50635d188b10867bea5a1a73534283054",
+      "harness/github/assets/branding/README.md": "e6f82ba03b3732427aca5a98281cfb5167594bfb",
+      "saebase/research_lab/tests/test_wp13_live03_gallery.py": "13a67b3bdc3b72672bdd2a48113280ae892d401a",
+      "harness/tests/wp21/EXAM_READY.md": "6aba258275d5adfe7c1337507273e93e1044691d",
+      "harness/tests/wp21/AUDIT.md": "3ad8a8308aa193d5a24afebb0afd860d3fed6f56",
+      "harness/tests/wp21/WP21_2_HARDENING.md": "bcea581f20e3355fcb95f1b7326f7bcec4b73ab0",
+      "harness/tests/wp21/runs/round01/README.md": "01965e0d43a844445bbcb2339a8129c9de8a178b",
+      "harness/tests/wp21/runs/round02/README.md": "046ef2f19029faa6e2e7eb681f6369693adb5d70"
+    },
+    "prior_hc_issue": "https://github.com/OpenSAE/SAEBase/issues/161",
+    "earlier_impl_pr": "https://github.com/OpenSAE/SAEBase/pull/162"
+  },
+  "items": [
+    {
+      "view": "core",
+      "node_id": "q.transparency",
+      "operation": "source_review",
+      "scope_title": "清理目前仍引用旧资料的项目说明",
+      "scope_description": "删除或替代现役说明中的旧实施步骤、历史结果作为当前权威的链接，保留当前真实功能、示例和来源。",
+      "after": {
+        "id": "q.transparency",
+        "type": "question",
+        "title": "人和 Agent 怎样共同理解项目？",
+        "description": "问题：如何分离科学知识、代码实现与物理执行环境？",
+        "status": "implemented",
+        "evidence": [
+          "harness/core/project_graph.json"
+        ],
+        "next": "建立三棵可浏览且可验证的结构树。",
+        "environment_refs": []
+      },
+      "files": [
+        "README.md",
+        "README_cn.md",
+        "saebase/research_lab/README.md",
+        "saebase/generate/README.md",
+        "tasks/generate/backend/README.md",
+        "saebase/research_lab/frontend/index.html",
+        "harness/README.md",
+        "harness/github/assets/branding/README.md"
+      ],
+      "reason": "删除或替代现役说明中的旧实施步骤、历史结果作为当前权威的链接，保留当前真实功能、示例和来源。",
+      "risk": "只审批文件清理范围，不更改任何 Atlas Node 或可视化设置；落实要通过代码审阅与 CI。",
+      "checks": [
+        "只更新文字和历史链接；不得更改 Research Lab 页面交互及排版",
+        "现役功能描述保持真实",
+        "版本证据通过固定 Release/Tag 查阅"
+      ],
+      "context_term_ids": [],
+      "group_id": "G01",
+      "group_title": "清理目前仍引用旧资料的项目说明"
+    },
+    {
+      "view": "core",
+      "node_id": "g.code_tree",
+      "operation": "source_review",
+      "scope_title": "解除发布工具对旧文件的要求",
+      "scope_description": "去掉仍从历史文档或归档工作表读取执行规则的代码路径，用可执行当前合同或只读固定版本证据替代，防止软件发布和当前测试因归档失效。",
+      "after": {
+        "id": "g.code_tree",
+        "type": "goal",
+        "title": "可核验的类与函数结构图",
+        "description": "目标：从 Python AST 输出节点、继承、成员与调用，附带已有 Knowledge 链接。",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "harness/code/build.py",
+          "harness/code/diff.py",
+          "harness/visualization/app.js"
+        ],
+        "next": "实现生成器、差异比对与浏览器。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "implemented",
+          "explanation": "现状：自动 AST 提取、代码 Diff、静态浏览器及节点交互已接入并通过 CI。 证据：harness/code/build.py、harness/code/diff.py、tests/test_atlas_interactivity.cjs。下一步：实现生成器、差异比对与浏览器。"
+        }
+      },
+      "files": [
+        "tasks/benchmark/release/gates.py",
+        ".github/workflows/m5-release.yml",
+        "saebase/tools/wp12_p8_acceptance.py",
+        "saebase/tools/stage_d_archive.py",
+        "saebase/research_lab/tests/test_wp13_live03_gallery.py"
+      ],
+      "reason": "去掉仍从历史文档或归档工作表读取执行规则的代码路径，用可执行当前合同或只读固定版本证据替代，防止软件发布和当前测试因归档失效。",
+      "risk": "只审批文件清理范围，不更改任何 Atlas Node 或可视化设置；落实要通过代码审阅与 CI。",
+      "checks": [
+        "不放宽当前发布、数据安全及校验规则",
+        "既有实验测量、评分、解析语义不变",
+        "已有功能测试仍通过；退役行为按 Release Tag 隔离"
+      ],
+      "context_term_ids": [],
+      "group_id": "G02",
+      "group_title": "解除发布工具对旧文件的要求"
+    },
+    {
+      "view": "core",
+      "node_id": "s.agent_flow",
+      "operation": "source_review",
+      "scope_title": "更新当前考试和执行规范的入口",
+      "scope_description": "现役 Agent 和考试规范不应强制读取冻结的 WP18–21 Markdown；保持历次考试数据不变。",
+      "after": {
+        "id": "s.agent_flow",
+        "type": "solve",
+        "title": "计划驱动的可审计人工审批流程",
+        "description": "方案：预先审计并展示红色节点，限制修改范围；代码审阅进入黄色；实测结果和人类决定决定最终接受绿色、保持黄色、重试红色或删除。",
+        "status": "partial",
+        "evidence": [
+          "harness/core/agent_flow.py",
+          "harness/core/agent_review_server.py",
+          "harness/visualization/knowledge.html"
+        ],
+        "next": "验证权限、结果对应关系、可视化批阅行为。",
+        "environment_refs": []
+      },
+      "files": [
+        "harness/contracts/README.md",
+        "harness/contracts/wp20_design_validate.py",
+        "harness/tests/wp18/README.md",
+        "harness/tests/wp19/README.md",
+        "harness/tests/wp20/README.md",
+        "harness/tests/wp21/README.md",
+        "harness/tests/README.md",
+        ".cursor/rules/core/10-context-selection.mdc",
+        "harness/tests/wp21/EXAM_READY.md",
+        "harness/tests/wp21/AUDIT.md",
+        "harness/tests/wp21/WP21_2_HARDENING.md",
+        "harness/tests/wp21/runs/round01/README.md",
+        "harness/tests/wp21/runs/round02/README.md"
+      ],
+      "reason": "现役 Agent 和考试规范不应强制读取冻结的 WP18–21 Markdown；保持历次考试数据不变。",
+      "risk": "只审批文件清理范围，不更改任何 Atlas Node 或可视化设置；落实要通过代码审阅与 CI。",
+      "checks": [
+        "不修改任何冻结考试成绩、真实测试收据与标准答案",
+        "维持原有 Agent Harness 审批及安全规则",
+        "历史考试仅作为冻结版本复现，不作为新任务依赖"
+      ],
+      "context_term_ids": [],
+      "group_id": "G03",
+      "group_title": "更新当前考试和执行规范的入口"
+    },
+    {
+      "view": "core",
+      "node_id": "q.reproducibility",
+      "operation": "source_review",
+      "scope_title": "防止旧依赖重新进入当前代码",
+      "scope_description": "为非归档现役代码和持久化说明补上不依赖 Archive 的自动检查；历史文件独立接受完整性检查。",
+      "after": {
+        "id": "q.reproducibility",
+        "type": "question",
+        "title": "如何保证每次实验都能追溯？",
+        "description": "问题：实验目录、完整配置、运行条件和结果如何唯一关联？",
+        "status": "partial",
+        "evidence": [
+          "conf/config.yaml",
+          "saebase/runtime/summary_log.py"
+        ],
+        "next": "标准化结构化产物与运行元数据。",
+        "environment_refs": []
+      },
+      "files": [
+        "saebase/tools/check_documentation.py",
+        "harness/github/work_test/test_repository_architecture.py",
+        ".github/workflows/ci.yml"
+      ],
+      "reason": "为非归档现役代码和持久化说明补上不依赖 Archive 的自动检查；历史文件独立接受完整性检查。",
+      "risk": "只审批文件清理范围，不更改任何 Atlas Node 或可视化设置；落实要通过代码审阅与 CI。",
+      "checks": [
+        "不影响既有 CI 选择规则和正常性能",
+        "静态扫描豁免只读历史收据、Release 固定版本来源",
+        "干净构建在删除 archive 目录副本后也能运行"
+      ],
+      "context_term_ids": [],
+      "group_id": "G04",
+      "group_title": "防止旧依赖重新进入当前代码"
+    }
+  ]
+}
