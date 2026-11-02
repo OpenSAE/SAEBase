@@ -24,6 +24,14 @@ CODE_TARGETS = {
 }
 TERM_TARGETS = {}
 
+# Re-export-only compatibility shims are hidden from the public Code Tree.
+# Resolve this historical source reference to its current implementation,
+# without changing the original Knowledge node or fabricating a code symbol.
+CANONICAL_SOURCE_PATHS = {
+    "models/gemma2_2b_base/gemma2_2b_base.py":
+        "models/gemma/gemma2/gemma2_2b_base/model.py",
+}
+
 
 # Core infrastructure code sits in Harness and is imported directly from real
 # source. It is a separate module from the production Code Tree's default scope.
@@ -123,7 +131,8 @@ def sae_method_evidence(node: dict, code_symbols: dict) -> dict | None:
     explicit without inventing a public callable signature.
     """
     paths = [str(p).split(":", 1)[0] for p in node.get("evidence", [])]
-    for path in paths:
+    for original_path in paths:
+        path = CANONICAL_SOURCE_PATHS.get(original_path, original_path)
         candidates = [symbol for symbol in code_symbols.values() if symbol.get("path") == path]
         if not candidates:
             continue
