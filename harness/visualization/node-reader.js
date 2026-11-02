@@ -110,7 +110,7 @@
       if(value === undefined || value === null || value === "")return;
       if(Array.isArray(value) && !value.length)return;
       const row=element("div","atlas-reader-field"+(changed?" is-changed":""));
-      row.appendChild(element("div","atlas-reader-field-label",label));
+      if(label)row.appendChild(element("div","atlas-reader-field-label",label));
       const body=element("div","atlas-reader-field-value");
       if(changed)appendDiff(body,side==="before"?value:comparison,
         side==="before"?comparison:value,side);
@@ -162,16 +162,17 @@
       const changed=key=>operation==="change" && differs(data[key],otherData[key]);
       const readField=(root,label,key)=>field(root,label,data[key],
         changed(key),otherData[key],part.side);
-      const explanatory=section(scroll,L("节点说明","Explanation"));
-      readField(explanatory,L("摘要","Summary"),"summary");
-      readField(explanatory,L("性质","Properties"),"properties");
-      readField(explanatory,L("完整说明","Description"),"description");
-      const extra=data.reader_explanation;
-      if(extra && extra!==data.description && extra!==data.summary)
-        readField(explanatory,L("详细解释","Detailed explanation"),"reader_explanation");
-      readField(explanatory,L("研究意义","Why this matters"),"why_it_matters");
-      readField(explanatory,L("下一步","Next step"),"next");
-      readField(explanatory,L("别名","Aliases"),"aliases");
+      // One explanation, not five competing prose fields. Prefer the proposed
+      // property when present, and compare against the actual prior explanation.
+      const explanation=data=>{
+        const raw=String(data.properties||data.description||data.summary||
+          data.reader_explanation||"").trim();
+        return raw.replace(/^(?:目标|问题|方案|研究问题|代码方法|现状)[：:]\\s*/u,"");
+      };
+      const shown=explanation(data),prior=explanation(otherData);
+      const explanatory=section(scroll,L("说明","Explanation"));
+      field(explanatory,"",shown,operation==="change"&&differs(shown,prior),
+        prior,part.side);
       const hasAttributes=Array.isArray(data.attributes) && data.attributes.length;
       if(data.signature || data.source_symbol || data.path || hasAttributes ||
          data.facts || data.technical_description){
