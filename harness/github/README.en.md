@@ -9,3 +9,8 @@ Prefer `scripts/workplan/<id>.sh` or `scripts/<dataset>/<model>/<task>/<sub_name
 ## Work Plan standard
 
 All new development plans follow the [authoring standard](work_plan/WRITING_STANDARD.en.md), including real dependency resolution, owned file paths, exact commands and independent acceptance.
+
+## Workplan isolation and Agent Ready
+
+Phase 3 can draft or document historical evidence; Phase 7 implements and validates the actual code, defaults, entrypoints and tests. Only an independently verified Agent Ready local-Agent plan is executable. Cross-WP references, protocol or configuration inheritance and execution dependencies require explicit per-WP, per-purpose human approval in the current from_human record. Reading past records grants no dependency permission. Frozen records remain unchanged.
+
