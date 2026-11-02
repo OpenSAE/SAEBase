@@ -9,7 +9,7 @@ on:
     paths:
       - 'harness/visualization/review-proposals/**'
       - 'harness/visualization/evidence.py'
-      - 'harness/code/semantic_projection.py'
+      - 'harness/code/**'
       - '.github/workflows/atlas-project-pages.yml'
   workflow_dispatch:
 
