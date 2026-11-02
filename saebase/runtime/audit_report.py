@@ -3,6 +3,7 @@
 The manifest is explicit: the caller must enumerate requested checks and report
 paths. Never infer PASS from the presence of a downloaded/configured resource.
 """
+
 from __future__ import annotations
 
 import json
@@ -16,9 +17,13 @@ EXPECTED_KINDS = frozenset({"setup", "precheck", "worker", "task", "workplan"})
 
 
 def _source(root: Path, name: str) -> Path:
-    if (not isinstance(name, str) or not name or "\\" in name or
-            PurePosixPath(name).is_absolute() or
-            any(p in ("", ".", "..") for p in name.split("/"))):
+    if (
+        not isinstance(name, str)
+        or not name
+        or "\\" in name
+        or PurePosixPath(name).is_absolute()
+        or any(p in ("", ".", "..") for p in name.split("/"))
+    ):
         raise ValueError("invalid receipt path")
     actual = (root / name).resolve(strict=False)
     if not actual.is_relative_to(root.resolve()):
@@ -40,8 +45,7 @@ def audit_run(root: Path, manifest: dict[str, Any]) -> dict[str, Any]:
         if not isinstance(item, dict):
             raise ValueError("invalid requested check")
         cid, kind, path = item.get("id"), item.get("kind"), item.get("receipt")
-        if (not isinstance(cid, str) or not cid or cid in seen or
-                kind not in EXPECTED_KINDS):
+        if not isinstance(cid, str) or not cid or cid in seen or kind not in EXPECTED_KINDS:
             raise ValueError("invalid or repeated check identity")
         seen.add(cid)
         row: dict[str, Any] = {"id": cid, "kind": kind, "receipt": path, "status": "MISSING"}
@@ -59,8 +63,9 @@ def audit_run(root: Path, manifest: dict[str, Any]) -> dict[str, Any]:
                 raise ValueError("run identity mismatch")
             row["status"] = state
             row["source_sha"] = receipt.get("source_sha")
-            if (manifest.get("source_sha") and
-                    receipt.get("source_sha") != manifest.get("source_sha")):
+            if manifest.get("source_sha") and receipt.get("source_sha") != manifest.get(
+                "source_sha"
+            ):
                 raise ValueError("source identity mismatch")
             if path not in {x.get("path") for x in manifest["files"]}:
                 raise ValueError("receipt omitted from artifact manifest")
@@ -79,10 +84,14 @@ def audit_run(root: Path, manifest: dict[str, Any]) -> dict[str, Any]:
         "evidence_status": evidence_status,
         "artifact_status": artifact_status,
         "execution_status": (
-            "FAIL" if any(x["status"] == "FAIL" for x in rows)
-            else "BLOCKED" if any(x["status"] == "BLOCKED" for x in rows)
-            else "NOT_RUN" if any(x["status"] == "NOT_RUN" for x in rows)
-            else "PASS" if all(x["status"] == "PASS" for x in rows)
+            "FAIL"
+            if any(x["status"] == "FAIL" for x in rows)
+            else "BLOCKED"
+            if any(x["status"] == "BLOCKED" for x in rows)
+            else "NOT_RUN"
+            if any(x["status"] == "NOT_RUN" for x in rows)
+            else "PASS"
+            if all(x["status"] == "PASS" for x in rows)
             else "UNKNOWN"
         ),
         "checks": rows,
