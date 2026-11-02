@@ -86,6 +86,12 @@ git rev-parse HEAD
 - **源码修改授权是另一道独立门槛。** 即便 `NO_NODE_CHANGE`，更改受保护代码、Harness、Work Order、CI、GitHub 或发行配置仍需按其原有 Human Check/权限规则审阅精确路径。是否需要 Atlas 节点语义审阅与是否需要源码写入授权不能混为一谈。
 - 批准或拒绝分别附着于实际拟变更字段/路径；每次计划重大修改重新执行该审计。审计通过不代表软件实现、GPU 执行、科学验收或发布通过。
 
+**C. Human Check 审阅入口或免审理由（起草审阅强制项）**
+
+每次起草审阅必须向人类明确展示结论：需要 Node Human Check 时，给出经核验、真实可打开的 Atlas 审阅入口、待审节点和审批状态；不需要时，明确说明为什么长期节点没有实质增删改。若 Code 功能尚未实现或 AST 无法核验，结论只能是“当前不需要，实施后重新审计”，不是永久免审。
+
+将这一决定写入 `reviews/<WP-ID>/node_impact.json` 的 `human_check_review`，含 `status` 和具体 `reason`；需要审阅时必须有真实 `review_url`，待实现影响判断时须设 `recheck_after_implementation=true`。不能编造 UI 链接，不得仅给六域审计而省略该判断。无明确结论的新版 WP 起草审阅判为 BLOCKED。源码精确路径的 `source_write_review` 仍独立审批。
+
 交付顺序：Draft WP → 人类摘要与字数/Section 验证 → 源码影响审计与六域决策 → 仅有必要时的 Node Human Check / 其他源码授权 → 人类确认 → 执行与独立验收。运行 `python -m harness.github.work_plan.review_gate --plan <WP.md> --summary <summary.md> --impact <node_impact.json>` 检查**结构和已记录决策**；该脚本不能自动证明节点语义正确，仍需人类核查。
 
 ## 7. Setup、Audit 与已填写 Work Plan

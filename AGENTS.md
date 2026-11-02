@@ -42,6 +42,10 @@ Ruff is a deterministic format/lint gate, not a substitute for tests. The exact 
 - This is a required **pre-write step**, not optional advice: use pinned Ruff `0.15.22`; if the GPT environment cannot execute it, stop the Python GitHub write and report `BLOCKED_FORMAT_TOOL` rather than bypassing it or pretending the new file passed. Local pre-commit cannot intercept a GitHub API call. The independent CI check stays read-only and remains mandatory; do not enable a CI bot that pushes unreviewed changes.
 - This formatting gate neither expands editable paths nor grants protected governance/GPU/network/publish permission. Never auto-format frozen WP21 fixtures, historical results, or unrelated Python files merely to make a check green.
 
+## Mandatory Workplan Human Check disposition
+
+Every new or materially revised Workplan review must explicitly present a verified Atlas review link for an actual Node ADD/CHANGE/REMOVE, or a concrete reason why Node Human Check is not required. Deferred Code/AST changes require a no-review-now explanation and post-implementation audit, not permanent clearance. Store the disposition in the six-domain impact artifact and validate its structure. Source code approvals remain separate, and imaginary Atlas links are forbidden.
+
 ## Human Check before GitHub changes
 
 Before source edits or a PR, follow [Human Check](harness/github/HUMAN_CHECK.md) and the [Delivery Skill](.github/skills/saebase-delivery/SKILL.md). First distinguish **durable Atlas semantic changes** from a source-only modification. For genuine Node ADD/CHANGE/REMOVE, Human Check remains enabled and requires the existing Atlas overlay with independent Approve / Deny / Unchecked decisions (only humans can opt out through the authenticated local UI). For **NO_NODE_CHANGE**, do not fabricate a Node proposal: provide the source-backed impact audit and obtain explicit human review of the exact changed paths and PR diff before implementation/merge, with protected governance authorization retained. Neither route bypasses Contracts, Work Orders, GPU/network/publishing gates or independent verification.

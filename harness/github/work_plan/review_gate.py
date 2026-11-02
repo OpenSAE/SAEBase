@@ -144,6 +144,36 @@ def check_impact(data: dict, plan_id: str) -> dict:
         else ("DEFER_NODE_DECISION" if "DEFER" in decisions.values() else "NO_NODE_CHANGE")
     )
     _assert(data.get("node_review_decision") == expected, "Incorrect node-review decision")
+    hc = data.get("human_check_review")
+    _assert(isinstance(hc, dict), "Human Check decision must be shown in draft review")
+    reason = hc.get("reason")
+    _assert(
+        isinstance(reason, str) and len(reason.strip()) >= 20,
+        "Human Check requires a specific source-backed explanation",
+    )
+    if expected == "NODE_HUMAN_CHECK":
+        _assert(hc.get("status") == "REQUIRED", "Node changes require Human Check")
+        url = hc.get("review_url")
+        _assert(
+            isinstance(url, str)
+            and url.startswith("https://")
+            and "/atlas/" in url
+            and "review=" in url,
+            "Human Check requires a verified Atlas review URL",
+        )
+    elif expected == "DEFER_NODE_DECISION":
+        _assert(
+            hc.get("status") == "NOT_REQUIRED_NOW"
+            and hc.get("recheck_after_implementation") is True,
+            "Deferred Code needs an explicit no-review-now reason and AST recheck",
+        )
+        _assert(not hc.get("review_url"), "Deferred Code cannot claim a live Node review")
+    else:
+        _assert(
+            hc.get("status") == "NOT_REQUIRED",
+            "No node changes require explicit Human Check nonrequirement",
+        )
+        _assert(not hc.get("review_url"), "Do not provide a spurious Human Check URL")
     source = data.get("source_write_review")
     _assert(
         isinstance(source, dict)
@@ -157,6 +187,7 @@ def check_impact(data: dict, plan_id: str) -> dict:
     )
     return {
         "node_review_decision": expected,
+        "human_check_review": hc["status"],
         "domains": decisions,
         "source_write_review": source["status"],
     }
