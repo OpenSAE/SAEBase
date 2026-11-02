@@ -48,12 +48,7 @@ historically required job names and downloads its distribution artifacts.
 It requires explicit `PUBLISH-vX.Y.Z` confirmation for actual publication.
 Lightweight `main` CI cannot supply release evidence or automatically publish.
 
-The immutable Stage D compact evidence archive was already published on
-2026-10-16. Its historical release dispatcher is manual-only and never
-re-uploads assets after a lightweight CI success.
-
-The historical v0.4.0/v0.5.0/v0.6.0/v0.6.5 release dispatchers are now
-manual-only archived notices. They no longer listen for normal CI successes.
+Prior software releases and their verification artifacts are immutable. Current CI does not reuse old release checks as evidence for new code.
 
 ## Other scheduled or manual integrations
 
@@ -64,9 +59,7 @@ RSS `0b321851e7b79564bf72656e1dbcaaca513048d8`.
 [Upstream Compatibility Watch](../../../.github/workflows/upstream-compatibility.yml)
 still checks floating upstream sources weekly; it is not a release proof.
 
-Real M0/M1/M2 Pythia, native SAEBench, M3/M4, M5 matrix, Stage B/C and
-Phase A CPU/GPU probes retain their explicit manual entrypoints and evidence
-requirements. Software release CI never asserts new GPU scientific results
+Specialized real-checkpoint probes have their own explicit execution and evidence requirements. Software release CI never asserts new GPU scientific results
 without real independent evidence.
 
 Atlas source snapshot regeneration and browser-validated Pages deployment
