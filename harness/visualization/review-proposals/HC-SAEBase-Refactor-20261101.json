@@ -1,0 +1,1438 @@
+{
+  "plan": {
+    "schema": "saebase.human_check.v1",
+    "kind": "human_check",
+    "id": "HC-SAEBase-Refactor-20261101",
+    "goal": "SAEBase 模块职责整改：Model 默认 SAE、准备专用 Setup、可配置 SAE/Task/All Precheck 与可诊断的真实检查；不触及具体研究协议和历史实验证据。",
+    "base_sha": "56feeb110b4037f96f28193bc29ede436080fed2",
+    "mode": "on",
+    "default_enabled": true,
+    "revision": 1,
+    "viewed": {},
+    "items": [
+      {
+        "key": "core:g.model_gate",
+        "view": "core",
+        "node_id": "g.model_gate",
+        "operation": "change",
+        "parent_id": null,
+        "before": {
+          "title": "Model 兼容约束",
+          "description": "目标：核验选定 LLM 模型与 SAE 任务、数据来源的兼容关系。"
+        },
+        "after": {
+          "title": "Model 兼容约束",
+          "description": "每个 Model 配置自己的默认 SAE 列表及 checkpoint、layer/hook 来源；Precheck 读取 default、all 或显式 SAE 选择，不使用独立核心 SAE Registry。先验证单模型样例，Family/Series/Model 的全量迁移和具体裁剪名单须另行逐路径审阅。"
+        },
+        "files": [
+          "models/plugins.py",
+          "models/gemma2_2b_base/gemma2_2b_base.py",
+          "models/gemma2_2b_base/sae_profiles.yaml",
+          "tests/model/test_default_saes.py"
+        ],
+        "reason": "落实 Context 中可复用 Model/Dataset/Task、科研真实性和职责边界；该提案仅涉及声明的路径。",
+        "risk": "SAE 身份来源不一致、旧别名破坏、超范围裁剪",
+        "checks": [
+          "默认 SAE 列表解析与显式覆盖",
+          "已有模型注册 Key 不变",
+          "未纳入本次精确路径的模型不得改动"
+        ],
+        "context_term_ids": [
+          "term.model",
+          "term.registry",
+          "term.sparse_autoencoder"
+        ],
+        "proposal_review": null
+      },
+      {
+        "key": "core:g.env_tree",
+        "view": "core",
+        "node_id": "g.env_tree",
+        "operation": "change",
+        "parent_id": null,
+        "before": {
+          "title": "机器环境快照",
+          "description": "目标：采集 CPU、内存、GPU、磁盘和执行环境，记录明确的观测结果。"
+        },
+        "after": {
+          "title": "机器环境快照",
+          "description": "Setup 只执行依赖和资源准备、下载/缓存、硬件信息收集；原 Setup smoke 移到 Precheck，不执行模型前向、SAE 编解码或 Task 测试。网络/GPU 授权和预算必须显式。"
+        },
+        "files": [
+          "saebase/setup/workflow.py",
+          "saebase/setup/__main__.py",
+          "saebase/setup/smoke.py",
+          "saebase/setup/assets.py",
+          "tests/setup/test_prepare_only.py"
+        ],
+        "reason": "落实 Context 中可复用 Model/Dataset/Task、科研真实性和职责边界；该提案仅涉及声明的路径。",
+        "risk": "准备阶段误启动计算，或下载失败时无法恢复",
+        "checks": [
+          "Setup 不执行任何 smoke 或 pilot",
+          "缺资源可准备，缺权限明确 BLOCKED",
+          "干净安装和幂等缓存验证"
+        ],
+        "context_term_ids": [
+          "term.environment_tree",
+          "term.model",
+          "term.sparse_autoencoder"
+        ],
+        "proposal_review": null
+      },
+      {
+        "key": "core:g.pipeline",
+        "view": "core",
+        "node_id": "g.pipeline",
+        "operation": "change",
+        "parent_id": null,
+        "before": {
+          "title": "Task 运行前检查",
+          "description": "目标：按 SAE Task 的执行协议校验模型、权重、输入及授权条件。"
+        },
+        "after": {
+          "title": "Task 运行前检查",
+          "description": "替换旧 sae Task 为 precheck，配置 mode=sae/task/all、sae_list=default/all/explicit、所选 tasks、预算与 auto_setup。SAE 基础检查统一在 Precheck；BLOCKED 必须记录阻塞阶段、错误、已尝试修复、下一步和可恢复条件。"
+        },
+        "files": [
+          "tasks/plugins.py",
+          "tasks/precheck/__init__.py",
+          "tasks/precheck/task.py",
+          "tasks/precheck/operation.py",
+          "tasks/precheck/sae_checks.py",
+          "tasks/precheck/report.py",
+          "conf/task/precheck.yaml",
+          "tests/precheck/test_modes.py",
+          "tests/precheck/test_diagnostics.py"
+        ],
+        "reason": "落实 Context 中可复用 Model/Dataset/Task、科研真实性和职责边界；该提案仅涉及声明的路径。",
+        "risk": "把配置态当执行通过；自动重试改变科研参数；阻塞诊断不具体",
+        "checks": [
+          "模式选择与默认列表回归",
+          "阻塞、失败和未执行严格区分",
+          "结果包含真实来源和可重试子项"
+        ],
+        "context_term_ids": [
+          "term.task",
+          "term.sparse_autoencoder",
+          "term.artifact"
+        ],
+        "proposal_review": null
+      },
+      {
+        "key": "core:q.multi_domain",
+        "view": "core",
+        "node_id": "q.multi_domain",
+        "operation": "change",
+        "parent_id": null,
+        "before": {
+          "title": "如何统一 LLM SAE 的多类研究任务？",
+          "description": "问题：模型、稀疏字典、Prompt 和七类 SAE 研究操作怎样共享可复用的组件结构？"
+        },
+        "after": {
+          "title": "如何统一 LLM SAE 的多类研究任务？",
+          "description": "Precheck 调用七类 Task 的现有实现和各自不同的最小检查；只测试请求的兼容组合。不强求所有 Task 使用现成 SAE，Train 可从零训练，Circuits 使用真实所需资源；不允许模拟真实执行结果。"
+        },
+        "files": [
+          "tasks/sae_runtime.py",
+          "tasks/capture/operation.py",
+          "tasks/intervene/operation.py",
+          "tasks/generate/operation.py",
+          "tasks/circuits/operation.py",
+          "tasks/explain/operation.py",
+          "tasks/benchmark/operation.py",
+          "tasks/train/operation.py",
+          "tests/precheck/test_task_smokes.py"
+        ],
+        "reason": "落实 Context 中可复用 Model/Dataset/Task、科研真实性和职责边界；该提案仅涉及声明的路径。",
+        "risk": "现有 Gemma 硬编码与 Task 特有条件导致假兼容或假阳性",
+        "checks": [
+          "任务按实际能力声明前提",
+          "恒等干预与真实 hook 验证",
+          "Train checkpoint 重载；解释区分 discovery/heldout"
+        ],
+        "context_term_ids": [
+          "term.task",
+          "term.feature_capture",
+          "term.benchmark",
+          "term.sae_training"
+        ],
+        "proposal_review": null
+      },
+      {
+        "key": "core:g.code_tree",
+        "view": "core",
+        "node_id": "g.code_tree",
+        "operation": "change",
+        "parent_id": null,
+        "before": {
+          "title": "可核验的类与函数结构图",
+          "description": "目标：从 Python AST 输出节点、继承、成员与调用，附带已有 Knowledge 链接。"
+        },
+        "after": {
+          "title": "可核验的类与函数结构图",
+          "description": "先把 SAE 加载、适配、Profile 与健康测量按 Model、API、Benchmark、Train 的职责迁移，修复调用者并验证发布包，再删除 saebase/sae；禁止直接改名为 Precheck 或丢失旧功能。需要修改未列出的调用者时重新审阅路径。"
+        },
+        "files": [
+          "saebase/sae/README.md",
+          "saebase/sae/__init__.py",
+          "saebase/sae/activation_health.py",
+          "saebase/sae/analyze.py",
+          "saebase/sae/catalog.py",
+          "saebase/sae/contracts.py",
+          "saebase/sae/coverage.py",
+          "saebase/sae/env_check.py",
+          "saebase/sae/external_training.py",
+          "saebase/sae/loading.py",
+          "saebase/sae/pipeline_checks.py",
+          "saebase/sae/prompts.py",
+          "saebase/sae/registry.py",
+          "saebase/sae/results.py",
+          "saebase/sae/scope2_clt.py",
+          "saebase/sae/scope2_native.py",
+          "saebase/sae/sparsify_adapter.py",
+          "saebase/sae/stage_d.py",
+          "saebase/sae/task.py",
+          "saebase/sae/verify_registry.py",
+          "saebase/api/__init__.py",
+          "saebase/api/sae_loading.py",
+          "saebase/registry.py",
+          "saebase/plugin_bootstrap.py",
+          "saebase/model_plugins.py",
+          "saebase/tasks/plugins.py",
+          "tasks/benchmark/activation_health.py",
+          "tests/api/test_sae_loading.py"
+        ],
+        "reason": "落实 Context 中可复用 Model/Dataset/Task、科研真实性和职责边界；该提案仅涉及声明的路径。",
+        "risk": "公开导入路径断裂、profile 身份丢失、历史工具/包测试失败",
+        "checks": [
+          "逐调用点迁移后无 saebase.sae 导入",
+          "旧测量由 Benchmark 保留",
+          "wheel 安装与真实能力分开验收"
+        ],
+        "context_term_ids": [
+          "term.api",
+          "term.sparse_autoencoder",
+          "term.code_tree"
+        ],
+        "proposal_review": null
+      },
+      {
+        "key": "core:q.reproducibility",
+        "view": "core",
+        "node_id": "q.reproducibility",
+        "operation": "change",
+        "parent_id": null,
+        "before": {
+          "title": "如何保证每次实验都能追溯？",
+          "description": "问题：实验目录、完整配置、运行条件和结果如何唯一关联？"
+        },
+        "after": {
+          "title": "如何保证每次实验都能追溯？",
+          "description": "更新配置、安装包测试、定向 CI、文档和真实 Atlas Code/Context 映射；不改动历史科学证据。所有受保护的 Harness 结构变动仍需单独治理许可。"
+        },
+        "files": [
+          "README.md",
+          "pyproject.toml",
+          "saebase/tools/check_installed_wheel.py",
+          "harness/code/atlas_concepts.json",
+          "harness/github/work_test/test_sae_model_registry.py",
+          "tests/precheck/test_report_schema.py"
+        ],
+        "reason": "落实 Context 中可复用 Model/Dataset/Task、科研真实性和职责边界；该提案仅涉及声明的路径。",
+        "risk": "新增 tests 未被 CI 收集；Atlas 指向旧源码；把离线检查误称真实通过",
+        "checks": [
+          "新测试实际接入 CI",
+          "安装 wheel 后导入与入口有效",
+          "五树节点只引用真实代码与现有 Context"
+        ],
+        "context_term_ids": [
+          "term.registry",
+          "term.code_tree",
+          "term.artifact"
+        ],
+        "proposal_review": null
+      },
+      {
+        "key": "code:code:module:tasks.precheck.operation",
+        "view": "code",
+        "node_id": "code:module:tasks.precheck.operation",
+        "operation": "add",
+        "parent_id": null,
+        "before": null,
+        "after": {
+          "type": "module",
+          "title": "可配置科研 Precheck 任务入口",
+          "description": "拟新增 SAE、Task、All 三种真实检查模式的调用入口，不代表源码已经存在。",
+          "path": "tasks/precheck/operation.py",
+          "context_term_ids": [
+            "term.task",
+            "term.sparse_autoencoder"
+          ]
+        },
+        "files": [
+          "tasks/plugins.py",
+          "tasks/precheck/__init__.py",
+          "tasks/precheck/task.py",
+          "tasks/precheck/operation.py",
+          "tasks/precheck/sae_checks.py",
+          "tasks/precheck/report.py",
+          "conf/task/precheck.yaml",
+          "tests/precheck/test_modes.py",
+          "tests/precheck/test_diagnostics.py"
+        ],
+        "reason": "拟议 Code 节点，待实现后以真实 AST 核验；复用现有模块职责。",
+        "risk": "把配置态当执行通过；自动重试改变科研参数；阻塞诊断不具体",
+        "checks": [
+          "模式选择与默认列表回归",
+          "阻塞、失败和未执行严格区分",
+          "结果包含真实来源和可重试子项"
+        ],
+        "context_term_ids": [
+          "term.task",
+          "term.sparse_autoencoder"
+        ],
+        "proposal_review": null
+      },
+      {
+        "key": "code:code:module:saebase.api.sae_loading",
+        "view": "code",
+        "node_id": "code:module:saebase.api.sae_loading",
+        "operation": "add",
+        "parent_id": null,
+        "before": null,
+        "after": {
+          "type": "module",
+          "title": "公共 SAE 资源加载入口",
+          "description": "拟承接旧 saebase/sae/loading.py 的通用加载职责，避免科研 Task 依赖 Precheck。",
+          "path": "saebase/api/sae_loading.py",
+          "context_term_ids": [
+            "term.api",
+            "term.sparse_autoencoder"
+          ]
+        },
+        "files": [
+          "saebase/sae/README.md",
+          "saebase/sae/__init__.py",
+          "saebase/sae/activation_health.py",
+          "saebase/sae/analyze.py",
+          "saebase/sae/catalog.py",
+          "saebase/sae/contracts.py",
+          "saebase/sae/coverage.py",
+          "saebase/sae/env_check.py",
+          "saebase/sae/external_training.py",
+          "saebase/sae/loading.py",
+          "saebase/sae/pipeline_checks.py",
+          "saebase/sae/prompts.py",
+          "saebase/sae/registry.py",
+          "saebase/sae/results.py",
+          "saebase/sae/scope2_clt.py",
+          "saebase/sae/scope2_native.py",
+          "saebase/sae/sparsify_adapter.py",
+          "saebase/sae/stage_d.py",
+          "saebase/sae/task.py",
+          "saebase/sae/verify_registry.py",
+          "saebase/api/__init__.py",
+          "saebase/api/sae_loading.py",
+          "saebase/registry.py",
+          "saebase/plugin_bootstrap.py",
+          "saebase/model_plugins.py",
+          "saebase/tasks/plugins.py",
+          "tasks/benchmark/activation_health.py",
+          "tests/api/test_sae_loading.py"
+        ],
+        "reason": "拟议 Code 节点，待实现后以真实 AST 核验；复用现有模块职责。",
+        "risk": "公开导入路径断裂、profile 身份丢失、历史工具/包测试失败",
+        "checks": [
+          "逐调用点迁移后无 saebase.sae 导入",
+          "旧测量由 Benchmark 保留",
+          "wheel 安装与真实能力分开验收"
+        ],
+        "context_term_ids": [
+          "term.api",
+          "term.sparse_autoencoder"
+        ],
+        "proposal_review": null
+      }
+    ],
+    "groups": [
+      {
+        "id": "HC01",
+        "title": "Model 自带默认 SAE 列表（先验证样例）",
+        "item_keys": [
+          "core:g.model_gate"
+        ]
+      },
+      {
+        "id": "HC02",
+        "title": "Setup 只准备，不执行测试",
+        "item_keys": [
+          "core:g.env_tree"
+        ]
+      },
+      {
+        "id": "HC03",
+        "title": "Precheck 三种模式与详细报告",
+        "item_keys": [
+          "core:g.pipeline",
+          "code:code:module:tasks.precheck.operation"
+        ]
+      },
+      {
+        "id": "HC04",
+        "title": "七类 Task 各自的真实最小检查",
+        "item_keys": [
+          "core:q.multi_domain"
+        ]
+      },
+      {
+        "id": "HC05",
+        "title": "迁移公共 SAE 实现，最后解散旧目录",
+        "item_keys": [
+          "core:g.code_tree",
+          "code:code:module:saebase.api.sae_loading"
+        ]
+      },
+      {
+        "id": "HC06",
+        "title": "定向回归、安装包与 Atlas 更新",
+        "item_keys": [
+          "core:q.reproducibility"
+        ]
+      }
+    ],
+    "preview_sha256": "HC-SAEBase-Refactor-20261101-proposal-v1",
+    "created_for": "Public Atlas proposal preview only; not a source implementation or authenticated decision."
+  },
+  "context": {
+    "nodes": [],
+    "edges": []
+  },
+  "core_context": {
+    "schema_version": 1,
+    "project": "SAEBase",
+    "kind": "core",
+    "revision_basis": "b7982c9fa002a5064d37000c571c678374d687b4",
+    "source_policy": "Only source-backed status; 'implemented' means implementation observed, not tested",
+    "primary_relations": [
+      "refines",
+      "addresses",
+      "decomposes"
+    ],
+    "notes": "SAEBase 当前分支的项目结构参考，保留真实源码证据。科研状态另行核验。",
+    "nodes": [
+      {
+        "id": "q.research",
+        "type": "question",
+        "title": "如何把科研项目变成可复现的系统？",
+        "description": "问题：数据、模型、任务、实验结果与研究理解如何在扩展过程中保持一致？",
+        "status": "partial",
+        "evidence": [
+          "README.md"
+        ],
+        "next": "明确结构合同并建立验证证据。",
+        "environment_refs": []
+      },
+      {
+        "id": "q.modularity",
+        "type": "question",
+        "title": "如何保持研究组件间清晰的边界？",
+        "description": "问题：新增 Dataset、Model、Task 时如何维持清晰边界与兼容性？",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "saebase/runner.py"
+        ],
+        "next": "为每个扩展点增加契约测试。",
+        "environment_refs": []
+      },
+      {
+        "id": "q.reproducibility",
+        "type": "question",
+        "title": "如何保证每次实验都能追溯？",
+        "description": "问题：实验目录、完整配置、运行条件和结果如何唯一关联？",
+        "status": "partial",
+        "evidence": [
+          "conf/config.yaml",
+          "saebase/runtime/summary_log.py"
+        ],
+        "next": "标准化结构化产物与运行元数据。",
+        "environment_refs": []
+      },
+      {
+        "id": "q.transparency",
+        "type": "question",
+        "title": "人和 Agent 怎样共同理解项目？",
+        "description": "问题：如何分离科学知识、代码实现与物理执行环境？",
+        "status": "implemented",
+        "evidence": [
+          "harness/core/project_graph.json"
+        ],
+        "next": "建立三棵可浏览且可验证的结构树。",
+        "environment_refs": []
+      },
+      {
+        "id": "q.mobility",
+        "type": "question",
+        "title": "如何跨设备重现和迁移实验？",
+        "description": "问题：如何在大文件迁移和硬件变化时保留完整的实验来源信息？",
+        "status": "partial",
+        "evidence": [
+          "conf/paths/default.yaml"
+        ],
+        "next": "采集硬件上下文并引入可校验的数据传输。",
+        "environment_refs": []
+      },
+      {
+        "id": "s.registry",
+        "type": "solve",
+        "title": "Registry 插件解耦",
+        "description": "方案：通过数据集、模型和任务三个插件注册表维护清晰的组件边界。",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "saebase/plugin_bootstrap.py"
+        ],
+        "next": "增加自动注册矩阵测试。",
+        "environment_refs": []
+      },
+      {
+        "id": "s.compatibility",
+        "type": "solve",
+        "title": "三层兼容性门控",
+        "description": "方案：NLP 数据集、LLM 模型与 SAE Task 的注册接口负责检查当前研究运行组合。",
+        "status": "implemented",
+        "evidence": [
+          "datasets/plugins.py",
+          "models/gemma2_2b_base/model_task_dataset_compatibility.py",
+          "tasks/sae_runtime.py"
+        ],
+        "next": "继续补充模型与任务组合的 CPU 回归检查。",
+        "environment_refs": []
+      },
+      {
+        "id": "s.hydra",
+        "type": "solve",
+        "title": "Hydra 配置与单一训练入口",
+        "description": "方案：用组合配置、固定 seed 和明确运行入口决定一次实验。",
+        "status": "implemented",
+        "evidence": [
+          "conf/config.yaml",
+          "saebase/runtime/train.py"
+        ],
+        "next": "按唯一实验标识管理输出目录和历史产物。",
+        "environment_refs": []
+      },
+      {
+        "id": "s.artifacts",
+        "type": "solve",
+        "title": "分层的实验产物协议",
+        "description": "方案：按 dataset/model/task/subtask/run 分类结果，维护唯一的运行声明与类型化文件夹。",
+        "status": "partial",
+        "evidence": [
+          "conf/config.yaml",
+          "saebase/runtime/experiment_paths.py",
+          "harness/experiments/validate.py"
+        ],
+        "next": "将运行路径与产物规范实施到 SAEBase Runtime。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "partial",
+          "explanation": "现状：实验路径协议已经在 SAEBase Runtime 实现，尚未完成真实 GPU 训练回归。 证据：saebase/runtime/experiment_paths.py、harness/experiments/validate.py。下一步：将运行路径与产物规范实施到 SAEBase Runtime。"
+        }
+      },
+      {
+        "id": "s.explainability",
+        "type": "solve",
+        "title": "三树协作的 Context 管理",
+        "description": "方案：知识树回答为什么，代码树回答怎样实现，环境树回答在哪里运行。",
+        "status": "implemented",
+        "evidence": [
+          "harness/core/project_graph.json",
+          "harness/visualization/index.html",
+          "harness/code/build.py",
+          "harness/knowledge/validate.py"
+        ],
+        "next": "用源数据生成动态交互视图。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "partial",
+          "explanation": "现状：三棵树与可交互浏览器已实现，科学描述仍需研究者维护。 证据：harness/visualization/index.html、harness/code/build.py、harness/knowledge/validate.py。下一步：用源数据生成动态交互视图。"
+        }
+      },
+      {
+        "id": "s.mobility",
+        "type": "solve",
+        "title": "环境探测与可校验文件传输",
+        "description": "方案：硬件快照与离线可审计的 B2/rclone 传输工具提供迁移依据。",
+        "status": "partial",
+        "evidence": [
+          "conf/paths/default.yaml",
+          "harness/environment/probe.py",
+          "harness/transfer/b2.py"
+        ],
+        "next": "先提供 dry-run，再在有凭据的设备测试。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "partial",
+          "explanation": "现状：环境探测与 B2 传输封装已实现，尚未核验用户真实远程仓库。 证据：harness/environment/probe.py、harness/transfer/b2.py。下一步：先提供 dry-run，再在有凭据的设备测试。"
+        }
+      },
+      {
+        "id": "g.registry",
+        "type": "goal",
+        "title": "可插拔组件注册",
+        "description": "目标：Dataset/Model/Task 注册映射可发现、可验证。",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "datasets/plugins.py",
+          "models/plugins.py",
+          "tasks/plugins.py"
+        ],
+        "next": "增加注册矩阵和 CPU 环境中的契约测试。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.dataset_gate",
+        "type": "goal",
+        "title": "Dataset 任务支持约束",
+        "description": "目标：依据 NLP 数据集及 SAE Task 的适配关系检验输入配置。",
+        "status": "implemented",
+        "evidence": [
+          "datasets/plugins.py"
+        ],
+        "next": "增加多任务组合负样例。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.model_gate",
+        "type": "goal",
+        "title": "Model 兼容约束",
+        "description": "目标：核验选定 LLM 模型与 SAE 任务、数据来源的兼容关系。",
+        "status": "implemented",
+        "evidence": [
+          "models/gemma2_2b_base/model_task_dataset_compatibility.py"
+        ],
+        "next": "在真实模型环境下核验 SAE 激活位置。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.pipeline",
+        "type": "goal",
+        "title": "Task 运行前检查",
+        "description": "目标：按 SAE Task 的执行协议校验模型、权重、输入及授权条件。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/sae_runtime.py"
+        ],
+        "next": "补充基于语义的最小断言。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.config",
+        "type": "goal",
+        "title": "完整配置可追溯",
+        "description": "目标：记录 Hydra 合成配置、种子和执行入口。",
+        "status": "implemented",
+        "evidence": [
+          "conf/config.yaml",
+          "saebase/runtime/train.py"
+        ],
+        "next": "使每次运行显式关联配置哈希。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.artifact_schema",
+        "type": "goal",
+        "title": "结果目录类型化",
+        "description": "目标：每个实验叶子包含 reports、metrics、tables、checkpoints、figures、logs、metadata、tmp。",
+        "status": "implemented",
+        "evidence": [
+          "conf/config.yaml",
+          "saebase/runtime/experiment_paths.py",
+          "harness/experiments/validate.py"
+        ],
+        "next": "实现公共目录初始化器。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "implemented",
+          "explanation": "现状：SAEBase Runtime 支持分层 task.path、结构化产物和按 Knowledge ID 命名的分析子目录。 证据：saebase/runtime/experiment_paths.py、tests/test_harness_contracts.py。下一步：实现公共目录初始化器。"
+        }
+      },
+      {
+        "id": "g.context",
+        "type": "goal",
+        "title": "结构化研究知识与证据",
+        "description": "目标：用稳定 ID、状态、证据、AND/OR 与依赖描述研究目标。",
+        "status": "implemented",
+        "evidence": [
+          "harness/core/project_graph.json",
+          "harness/knowledge/validate.py"
+        ],
+        "next": "增设 schema 校验和受控变更提案。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "implemented",
+          "explanation": "现状：Knowledge tree 的 question/solve/goal、AND/OR、证据和状态有机器可读图与校验器。 证据：doc/knowledge/context_graph.json、harness/knowledge/validate.py。下一步：增设 schema 校验和受控变更提案。"
+        }
+      },
+      {
+        "id": "g.code_tree",
+        "type": "goal",
+        "title": "可核验的类与函数结构图",
+        "description": "目标：从 Python AST 输出节点、继承、成员与调用，附带已有 Knowledge 链接。",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "harness/code/build.py",
+          "harness/code/diff.py",
+          "harness/visualization/app.js"
+        ],
+        "next": "实现生成器、差异比对与浏览器。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "implemented",
+          "explanation": "现状：自动 AST 提取、代码 Diff、静态浏览器及节点交互已接入并通过 CI。 证据：harness/code/build.py、harness/code/diff.py、tests/test_atlas_interactivity.cjs。下一步：实现生成器、差异比对与浏览器。"
+        }
+      },
+      {
+        "id": "g.env_tree",
+        "type": "goal",
+        "title": "机器环境快照",
+        "description": "目标：采集 CPU、内存、GPU、磁盘和执行环境，记录明确的观测结果。",
+        "status": "implemented",
+        "evidence": [
+          "conf/paths/default.yaml",
+          "harness/environment/probe.py",
+          "harness/environment/example.json"
+        ],
+        "next": "实现跨机器环境探测及对比。",
+        "environment_refs": [
+          "env.cpu",
+          "env.gpu",
+          "env.memory"
+        ],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "implemented",
+          "explanation": "现状：提供可观察机器 CPU/GPU/RAM 的探测器和明确标记虚构的示例树。 证据：harness/environment/probe.py、harness/environment/example.json。下一步：实现跨机器环境探测及对比。"
+        }
+      },
+      {
+        "id": "g.transfer",
+        "type": "goal",
+        "title": "数据备份与恢复",
+        "description": "目标：提供明确的来源、目标、校验和可恢复的大文件同步方案。",
+        "status": "partial",
+        "evidence": [
+          "conf/paths/default.yaml",
+          "harness/transfer/b2.py"
+        ],
+        "next": "先实现默认 dry-run 的 rclone 规划器。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "implemented",
+          "explanation": "现状：rclone/B2 复制、恢复与校验命令已包装，默认不实际传输。 证据：harness/transfer/b2.py。下一步：先实现默认 dry-run 的 rclone 规划器。"
+        }
+      },
+      {
+        "id": "g.recovery",
+        "type": "goal",
+        "title": "离线恢复实验",
+        "description": "目标：结合完整配置、模型权重和运行元数据重建实验。",
+        "status": "not_implemented",
+        "evidence": [
+          "saebase/runtime/summary_log.py"
+        ],
+        "next": "定义本地打包和验证边界。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.b2",
+        "type": "goal",
+        "title": "远程 B2 备份",
+        "description": "目标：用可校验传输备份大文件，通过机器本地凭据完成认证。",
+        "status": "partial",
+        "evidence": [
+          "conf/paths/default.yaml",
+          "harness/transfer/b2.py"
+        ],
+        "next": "引入 rclone 只读检查与 dry-run。",
+        "environment_refs": [],
+        "last_change": {
+          "date": "2026-10-25",
+          "before": "planned",
+          "after": "partial",
+          "explanation": "现状：B2 传输命令预览与校验接口存在，但没有真实账号与成功备份证据。 证据：harness/transfer/b2.py。下一步：引入 rclone 只读检查与 dry-run。"
+        }
+      },
+      {
+        "id": "q.multi_domain",
+        "type": "question",
+        "title": "如何统一 LLM SAE 的多类研究任务？",
+        "description": "问题：模型、稀疏字典、Prompt 和七类 SAE 研究操作怎样共享可复用的组件结构？",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "saebase/api/features.py",
+          "tasks/sae_runtime.py"
+        ]
+      },
+      {
+        "id": "s.parallel_cores",
+        "type": "solve",
+        "title": "SAEBase 与 SAEBase Runtime 的统一任务接口",
+        "description": "方案：SAEBase 提供稀疏特征研究实现，SAEBase Runtime 组织科研执行与实验记录，共享已审计的模型、数据集和任务注册。",
+        "status": "implemented",
+        "evidence": [
+          "saebase/registry.py",
+          "saebase/api/__init__.py",
+          "saebase/plugin_bootstrap.py",
+          "tasks/plugins.py"
+        ]
+      },
+      {
+        "id": "g.domain_families",
+        "type": "goal",
+        "title": "组织 NLP Dataset、LLM Model 与 SAE Task",
+        "description": "目标：按 NLP 数据集、LLM 模型与七类 SAE 操作分别组织实现和注册；保留 SAEBase 原有公共 API。",
+        "status": "implemented",
+        "evidence": [
+          "datasets/plugins.py",
+          "models/plugins.py",
+          "tasks/plugins.py"
+        ]
+      },
+      {
+        "id": "g.llm_capture",
+        "type": "goal",
+        "title": "LLM 特征捕获",
+        "description": "目标：SAEBase 在选定模型层读取真实激活，用稀疏自编码器编码特征并记录特征值与重建量。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/capture/task.py",
+          "saebase/api/features.py"
+        ]
+      },
+      {
+        "id": "g.llm_teacher_forcing",
+        "type": "goal",
+        "title": "LLM 教师强制干预",
+        "description": "目标：在固定输入上替换指定稀疏特征并重新计算模型输出，以测量干预对原始类别得分的影响。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/intervene/task.py",
+          "saebase/api/features.py"
+        ]
+      },
+      {
+        "id": "g.llm_generation",
+        "type": "goal",
+        "title": "LLM 生成时特征干预",
+        "description": "目标：在生成每个后续 token 时执行 SAEBase 特征编辑，并比较干预与基线生成的 token 序列。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/generate/task.py",
+          "tasks/intervene/backend/steering.py"
+        ]
+      },
+      {
+        "id": "g.llm_circuits",
+        "type": "goal",
+        "title": "LLM 电路分析",
+        "description": "目标：利用 SAEBase 的原生电路工具生成和保存有来源记录的特征关系图，实际执行需具备相应计算环境。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/circuits/task.py",
+          "tasks/circuits/backend/circuits.py"
+        ]
+      },
+      {
+        "id": "g.llm_explain",
+        "type": "goal",
+        "title": "LLM 特征自动解释",
+        "description": "目标：以研究者指定的生成器产生特征含义假设，再用独立输入上的特征激活记录验证解释预测。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/explain/task.py",
+          "tasks/explain/interpretation.py"
+        ]
+      },
+      {
+        "id": "g.llm_benchmark",
+        "type": "goal",
+        "title": "LLM SAE 基准评测",
+        "description": "目标：通过 SAEBase 基准运行器对指定模型、稀疏特征和数据记录计算可追溯指标。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/benchmark/task.py",
+          "tasks/benchmark/backend/runner.py"
+        ]
+      },
+      {
+        "id": "g.llm_sae_training",
+        "type": "goal",
+        "title": "LLM SAE 训练",
+        "description": "目标：通过 SAEBase 调用实际 SAE Lens 或 Sparsify 训练后端，并记录训练配置与检查点。",
+        "status": "implemented",
+        "evidence": [
+          "tasks/train/task.py",
+          "tasks/train/backend/training.py"
+        ]
+      },
+      {
+        "id": "q.agent_flow",
+        "type": "question",
+        "title": "怎样审计 Agent 执行科研任务的过程？",
+        "description": "问题：如何在修改前预览 Knowledge、Code、Environment、Context 的变化，并在结果审计后让人类逐 Node 做出决定？",
+        "status": "partial",
+        "evidence": [
+          "harness/core/agent_flow.py"
+        ],
+        "next": "真实验收 GitHub PR 和本地审阅闭环后再提出通过。",
+        "environment_refs": []
+      },
+      {
+        "id": "s.agent_flow",
+        "type": "solve",
+        "title": "计划驱动的可审计人工审批流程",
+        "description": "方案：预先审计并展示红色节点，限制修改范围；代码审阅进入黄色；实测结果和人类决定决定最终接受绿色、保持黄色、重试红色或删除。",
+        "status": "partial",
+        "evidence": [
+          "harness/core/agent_flow.py",
+          "harness/core/agent_review_server.py",
+          "harness/visualization/knowledge.html"
+        ],
+        "next": "验证权限、结果对应关系、可视化批阅行为。",
+        "environment_refs": []
+      },
+      {
+        "id": "g.agent_execution_flow",
+        "type": "goal",
+        "title": "Agent 执行任务的流程",
+        "description": "目标：外部 GitHub Work Plan → 审计和部署预览 → 人类授权 → 任务代码变更与统一审阅 → 真实实验及独立结果审计 → 人类逐节点审批四种归宿及可追溯报告。Core 与 Harness 规则对普通 Agent 只读屏蔽。",
+        "status": "partial",
+        "evidence": [
+          "harness/core/agent_flow.py",
+          "harness/core/agent_apply.py",
+          "harness/core/agent_flow.py",
+          "harness/visualization/app.js"
+        ],
+        "next": "本地真人评审和 GitHub 原生 Approved 事件尚需端到端验收。",
+        "environment_refs": []
+      }
+    ],
+    "edges": [
+      {
+        "source": "q.research",
+        "target": "q.modularity",
+        "type": "refines"
+      },
+      {
+        "source": "q.research",
+        "target": "q.reproducibility",
+        "type": "refines"
+      },
+      {
+        "source": "q.research",
+        "target": "q.transparency",
+        "type": "refines"
+      },
+      {
+        "source": "q.research",
+        "target": "q.mobility",
+        "type": "refines"
+      },
+      {
+        "source": "q.modularity",
+        "target": "s.registry",
+        "type": "addresses"
+      },
+      {
+        "source": "q.modularity",
+        "target": "s.compatibility",
+        "type": "addresses"
+      },
+      {
+        "source": "q.reproducibility",
+        "target": "s.hydra",
+        "type": "addresses"
+      },
+      {
+        "source": "q.reproducibility",
+        "target": "s.artifacts",
+        "type": "addresses"
+      },
+      {
+        "source": "q.transparency",
+        "target": "s.explainability",
+        "type": "addresses"
+      },
+      {
+        "source": "q.mobility",
+        "target": "s.mobility",
+        "type": "addresses"
+      },
+      {
+        "source": "s.registry",
+        "target": "g.registry",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.compatibility",
+        "target": "g.dataset_gate",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.compatibility",
+        "target": "g.model_gate",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.compatibility",
+        "target": "g.pipeline",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.hydra",
+        "target": "g.config",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.artifacts",
+        "target": "g.artifact_schema",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.explainability",
+        "target": "g.context",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.explainability",
+        "target": "g.code_tree",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.explainability",
+        "target": "g.env_tree",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.mobility",
+        "target": "g.transfer",
+        "type": "decomposes"
+      },
+      {
+        "source": "g.transfer",
+        "target": "g.recovery",
+        "type": "decomposes"
+      },
+      {
+        "source": "g.transfer",
+        "target": "g.b2",
+        "type": "decomposes"
+      },
+      {
+        "source": "q.research",
+        "target": "q.multi_domain",
+        "type": "refines"
+      },
+      {
+        "source": "q.multi_domain",
+        "target": "s.parallel_cores",
+        "type": "addresses"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.domain_families",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_capture",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_teacher_forcing",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_generation",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_circuits",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_explain",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_benchmark",
+        "type": "decomposes"
+      },
+      {
+        "source": "s.parallel_cores",
+        "target": "g.llm_sae_training",
+        "type": "decomposes"
+      },
+      {
+        "source": "q.research",
+        "target": "q.agent_flow",
+        "type": "refines"
+      },
+      {
+        "source": "q.agent_flow",
+        "target": "s.agent_flow",
+        "type": "addresses"
+      },
+      {
+        "source": "s.agent_flow",
+        "target": "g.agent_execution_flow",
+        "type": "decomposes"
+      }
+    ],
+    "title": "SAEBase · Project Architecture",
+    "purpose": "SAEBase 稀疏特征研究架构、LLM Task 与 Agent Harness 的结构化管理。",
+    "status_policy": "not_implemented / partial / implemented; for non-leaf nodes status is derived from every direct child",
+    "child_order": "Top to bottom as listed in edges; no explicit execution/dependency links"
+  },
+  "manifest": {
+    "id": "HC-SAEBase-Refactor-20261101",
+    "goal": "SAEBase 模块职责整改：Model 默认 SAE、准备专用 Setup、可配置 SAE/Task/All Precheck 与可诊断的真实检查；不触及具体研究协议和历史实验证据。",
+    "created_for": "Source-grounded pre-implementation Human Check; no code writes or runtime permissions; each change independent.",
+    "items": [
+      {
+        "view": "core",
+        "node_id": "g.model_gate",
+        "operation": "change",
+        "after": {
+          "title": "Model 兼容约束",
+          "description": "每个 Model 配置自己的默认 SAE 列表及 checkpoint、layer/hook 来源；Precheck 读取 default、all 或显式 SAE 选择，不使用独立核心 SAE Registry。先验证单模型样例，Family/Series/Model 的全量迁移和具体裁剪名单须另行逐路径审阅。"
+        },
+        "files": [
+          "models/plugins.py",
+          "models/gemma2_2b_base/gemma2_2b_base.py",
+          "models/gemma2_2b_base/sae_profiles.yaml",
+          "tests/model/test_default_saes.py"
+        ],
+        "reason": "落实 Context 中可复用 Model/Dataset/Task、科研真实性和职责边界；该提案仅涉及声明的路径。",
+        "risk": "SAE 身份来源不一致、旧别名破坏、超范围裁剪",
+        "checks": [
+          "默认 SAE 列表解析与显式覆盖",
+          "已有模型注册 Key 不变",
+          "未纳入本次精确路径的模型不得改动"
+        ],
+        "context_term_ids": [
+          "term.model",
+          "term.registry",
+          "term.sparse_autoencoder"
+        ],
+        "group_id": "HC01",
+        "group_title": "Model 自带默认 SAE 列表（先验证样例）"
+      },
+      {
+        "view": "core",
+        "node_id": "g.env_tree",
+        "operation": "change",
+        "after": {
+          "title": "机器环境快照",
+          "description": "Setup 只执行依赖和资源准备、下载/缓存、硬件信息收集；原 Setup smoke 移到 Precheck，不执行模型前向、SAE 编解码或 Task 测试。网络/GPU 授权和预算必须显式。"
+        },
+        "files": [
+          "saebase/setup/workflow.py",
+          "saebase/setup/__main__.py",
+          "saebase/setup/smoke.py",
+          "saebase/setup/assets.py",
+          "tests/setup/test_prepare_only.py"
+        ],
+        "reason": "落实 Context 中可复用 Model/Dataset/Task、科研真实性和职责边界；该提案仅涉及声明的路径。",
+        "risk": "准备阶段误启动计算，或下载失败时无法恢复",
+        "checks": [
+          "Setup 不执行任何 smoke 或 pilot",
+          "缺资源可准备，缺权限明确 BLOCKED",
+          "干净安装和幂等缓存验证"
+        ],
+        "context_term_ids": [
+          "term.environment_tree",
+          "term.model",
+          "term.sparse_autoencoder"
+        ],
+        "group_id": "HC02",
+        "group_title": "Setup 只准备，不执行测试"
+      },
+      {
+        "view": "core",
+        "node_id": "g.pipeline",
+        "operation": "change",
+        "after": {
+          "title": "Task 运行前检查",
+          "description": "替换旧 sae Task 为 precheck，配置 mode=sae/task/all、sae_list=default/all/explicit、所选 tasks、预算与 auto_setup。SAE 基础检查统一在 Precheck；BLOCKED 必须记录阻塞阶段、错误、已尝试修复、下一步和可恢复条件。"
+        },
+        "files": [
+          "tasks/plugins.py",
+          "tasks/precheck/__init__.py",
+          "tasks/precheck/task.py",
+          "tasks/precheck/operation.py",
+          "tasks/precheck/sae_checks.py",
+          "tasks/precheck/report.py",
+          "conf/task/precheck.yaml",
+          "tests/precheck/test_modes.py",
+          "tests/precheck/test_diagnostics.py"
+        ],
+        "reason": "落实 Context 中可复用 Model/Dataset/Task、科研真实性和职责边界；该提案仅涉及声明的路径。",
+        "risk": "把配置态当执行通过；自动重试改变科研参数；阻塞诊断不具体",
+        "checks": [
+          "模式选择与默认列表回归",
+          "阻塞、失败和未执行严格区分",
+          "结果包含真实来源和可重试子项"
+        ],
+        "context_term_ids": [
+          "term.task",
+          "term.sparse_autoencoder",
+          "term.artifact"
+        ],
+        "group_id": "HC03",
+        "group_title": "Precheck 三种模式与详细报告"
+      },
+      {
+        "view": "core",
+        "node_id": "q.multi_domain",
+        "operation": "change",
+        "after": {
+          "title": "如何统一 LLM SAE 的多类研究任务？",
+          "description": "Precheck 调用七类 Task 的现有实现和各自不同的最小检查；只测试请求的兼容组合。不强求所有 Task 使用现成 SAE，Train 可从零训练，Circuits 使用真实所需资源；不允许模拟真实执行结果。"
+        },
+        "files": [
+          "tasks/sae_runtime.py",
+          "tasks/capture/operation.py",
+          "tasks/intervene/operation.py",
+          "tasks/generate/operation.py",
+          "tasks/circuits/operation.py",
+          "tasks/explain/operation.py",
+          "tasks/benchmark/operation.py",
+          "tasks/train/operation.py",
+          "tests/precheck/test_task_smokes.py"
+        ],
+        "reason": "落实 Context 中可复用 Model/Dataset/Task、科研真实性和职责边界；该提案仅涉及声明的路径。",
+        "risk": "现有 Gemma 硬编码与 Task 特有条件导致假兼容或假阳性",
+        "checks": [
+          "任务按实际能力声明前提",
+          "恒等干预与真实 hook 验证",
+          "Train checkpoint 重载；解释区分 discovery/heldout"
+        ],
+        "context_term_ids": [
+          "term.task",
+          "term.feature_capture",
+          "term.benchmark",
+          "term.sae_training"
+        ],
+        "group_id": "HC04",
+        "group_title": "七类 Task 各自的真实最小检查"
+      },
+      {
+        "view": "core",
+        "node_id": "g.code_tree",
+        "operation": "change",
+        "after": {
+          "title": "可核验的类与函数结构图",
+          "description": "先把 SAE 加载、适配、Profile 与健康测量按 Model、API、Benchmark、Train 的职责迁移，修复调用者并验证发布包，再删除 saebase/sae；禁止直接改名为 Precheck 或丢失旧功能。需要修改未列出的调用者时重新审阅路径。"
+        },
+        "files": [
+          "saebase/sae/README.md",
+          "saebase/sae/__init__.py",
+          "saebase/sae/activation_health.py",
+          "saebase/sae/analyze.py",
+          "saebase/sae/catalog.py",
+          "saebase/sae/contracts.py",
+          "saebase/sae/coverage.py",
+          "saebase/sae/env_check.py",
+          "saebase/sae/external_training.py",
+          "saebase/sae/loading.py",
+          "saebase/sae/pipeline_checks.py",
+          "saebase/sae/prompts.py",
+          "saebase/sae/registry.py",
+          "saebase/sae/results.py",
+          "saebase/sae/scope2_clt.py",
+          "saebase/sae/scope2_native.py",
+          "saebase/sae/sparsify_adapter.py",
+          "saebase/sae/stage_d.py",
+          "saebase/sae/task.py",
+          "saebase/sae/verify_registry.py",
+          "saebase/api/__init__.py",
+          "saebase/api/sae_loading.py",
+          "saebase/registry.py",
+          "saebase/plugin_bootstrap.py",
+          "saebase/model_plugins.py",
+          "saebase/tasks/plugins.py",
+          "tasks/benchmark/activation_health.py",
+          "tests/api/test_sae_loading.py"
+        ],
+        "reason": "落实 Context 中可复用 Model/Dataset/Task、科研真实性和职责边界；该提案仅涉及声明的路径。",
+        "risk": "公开导入路径断裂、profile 身份丢失、历史工具/包测试失败",
+        "checks": [
+          "逐调用点迁移后无 saebase.sae 导入",
+          "旧测量由 Benchmark 保留",
+          "wheel 安装与真实能力分开验收"
+        ],
+        "context_term_ids": [
+          "term.api",
+          "term.sparse_autoencoder",
+          "term.code_tree"
+        ],
+        "group_id": "HC05",
+        "group_title": "迁移公共 SAE 实现，最后解散旧目录"
+      },
+      {
+        "view": "core",
+        "node_id": "q.reproducibility",
+        "operation": "change",
+        "after": {
+          "title": "如何保证每次实验都能追溯？",
+          "description": "更新配置、安装包测试、定向 CI、文档和真实 Atlas Code/Context 映射；不改动历史科学证据。所有受保护的 Harness 结构变动仍需单独治理许可。"
+        },
+        "files": [
+          "README.md",
+          "pyproject.toml",
+          "saebase/tools/check_installed_wheel.py",
+          "harness/code/atlas_concepts.json",
+          "harness/github/work_test/test_sae_model_registry.py",
+          "tests/precheck/test_report_schema.py"
+        ],
+        "reason": "落实 Context 中可复用 Model/Dataset/Task、科研真实性和职责边界；该提案仅涉及声明的路径。",
+        "risk": "新增 tests 未被 CI 收集；Atlas 指向旧源码；把离线检查误称真实通过",
+        "checks": [
+          "新测试实际接入 CI",
+          "安装 wheel 后导入与入口有效",
+          "五树节点只引用真实代码与现有 Context"
+        ],
+        "context_term_ids": [
+          "term.registry",
+          "term.code_tree",
+          "term.artifact"
+        ],
+        "group_id": "HC06",
+        "group_title": "定向回归、安装包与 Atlas 更新"
+      },
+      {
+        "view": "code",
+        "node_id": "code:module:tasks.precheck.operation",
+        "operation": "add",
+        "after": {
+          "type": "module",
+          "title": "可配置科研 Precheck 任务入口",
+          "description": "拟新增 SAE、Task、All 三种真实检查模式的调用入口，不代表源码已经存在。",
+          "path": "tasks/precheck/operation.py",
+          "context_term_ids": [
+            "term.task",
+            "term.sparse_autoencoder"
+          ]
+        },
+        "files": [
+          "tasks/plugins.py",
+          "tasks/precheck/__init__.py",
+          "tasks/precheck/task.py",
+          "tasks/precheck/operation.py",
+          "tasks/precheck/sae_checks.py",
+          "tasks/precheck/report.py",
+          "conf/task/precheck.yaml",
+          "tests/precheck/test_modes.py",
+          "tests/precheck/test_diagnostics.py"
+        ],
+        "reason": "拟议 Code 节点，待实现后以真实 AST 核验；复用现有模块职责。",
+        "risk": "把配置态当执行通过；自动重试改变科研参数；阻塞诊断不具体",
+        "checks": [
+          "模式选择与默认列表回归",
+          "阻塞、失败和未执行严格区分",
+          "结果包含真实来源和可重试子项"
+        ],
+        "context_term_ids": [
+          "term.task",
+          "term.sparse_autoencoder"
+        ],
+        "group_id": "HC03",
+        "group_title": "Precheck 三种模式与详细报告"
+      },
+      {
+        "view": "code",
+        "node_id": "code:module:saebase.api.sae_loading",
+        "operation": "add",
+        "after": {
+          "type": "module",
+          "title": "公共 SAE 资源加载入口",
+          "description": "拟承接旧 saebase/sae/loading.py 的通用加载职责，避免科研 Task 依赖 Precheck。",
+          "path": "saebase/api/sae_loading.py",
+          "context_term_ids": [
+            "term.api",
+            "term.sparse_autoencoder"
+          ]
+        },
+        "files": [
+          "saebase/sae/README.md",
+          "saebase/sae/__init__.py",
+          "saebase/sae/activation_health.py",
+          "saebase/sae/analyze.py",
+          "saebase/sae/catalog.py",
+          "saebase/sae/contracts.py",
+          "saebase/sae/coverage.py",
+          "saebase/sae/env_check.py",
+          "saebase/sae/external_training.py",
+          "saebase/sae/loading.py",
+          "saebase/sae/pipeline_checks.py",
+          "saebase/sae/prompts.py",
+          "saebase/sae/registry.py",
+          "saebase/sae/results.py",
+          "saebase/sae/scope2_clt.py",
+          "saebase/sae/scope2_native.py",
+          "saebase/sae/sparsify_adapter.py",
+          "saebase/sae/stage_d.py",
+          "saebase/sae/task.py",
+          "saebase/sae/verify_registry.py",
+          "saebase/api/__init__.py",
+          "saebase/api/sae_loading.py",
+          "saebase/registry.py",
+          "saebase/plugin_bootstrap.py",
+          "saebase/model_plugins.py",
+          "saebase/tasks/plugins.py",
+          "tasks/benchmark/activation_health.py",
+          "tests/api/test_sae_loading.py"
+        ],
+        "reason": "拟议 Code 节点，待实现后以真实 AST 核验；复用现有模块职责。",
+        "risk": "公开导入路径断裂、profile 身份丢失、历史工具/包测试失败",
+        "checks": [
+          "逐调用点迁移后无 saebase.sae 导入",
+          "旧测量由 Benchmark 保留",
+          "wheel 安装与真实能力分开验收"
+        ],
+        "context_term_ids": [
+          "term.api",
+          "term.sparse_autoencoder"
+        ],
+        "group_id": "HC05",
+        "group_title": "迁移公共 SAE 实现，最后解散旧目录"
+      }
+    ]
+  }
+}
