@@ -113,10 +113,300 @@ def prepare_inventory(run_id: str, root: Path = ROOT) -> dict[str, Any]:
     }
 
 
+def _run_root(run_id: str, root: Path) -> Path:
+    if not RUN_ID.fullmatch(run_id):
+        raise ValueError("Invalid run ID")
+    path = root / "experiment" / "_studies" / "wp23_component_precheck" / "reports" / run_id
+    if not path.is_dir():
+        raise FileNotFoundError("Run inventory has not been initialized")
+    return path
+
+
+def _identity(run_root: Path) -> tuple[str, dict[str, Any]]:
+    current = json.loads((run_root / "inventory.json").read_text(encoding="utf-8"))
+    run_id = run_root.name
+    if current.get("run_id") != run_id:
+        raise ValueError("Run inventory identity mismatch")
+    root = run_root.parents[4]
+    sha = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=root, capture_output=True,
+        text=True, check=False, timeout=20,
+    )
+    if sha.returncode or sha.stdout.strip() != current.get("source_sha"):
+        raise ValueError("Source commit changed; cannot resume this run")
+    if hashlib.sha256(
+        (root / "conf/experiment/wp23_precheck.yaml").read_bytes()
+    ).hexdigest() != current.get("config_sha256"):
+        raise ValueError("Configuration changed; a new run is required")
+    return current["source_sha"], current
+
+
+def _receipt_path(run_root: Path, key: str) -> Path:
+    label = hashlib.sha256(key.encode("utf-8")).hexdigest()[:24]
+    return run_root / "receipts" / (label + ".json")
+
+
+def _store(run_root: Path, key: str, value: dict[str, Any]) -> dict[str, Any]:
+    path = _receipt_path(run_root, key)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    result = {
+        **value,
+        "target_id": key,
+        "run_id": run_root.name,
+        "source_sha": json.loads((run_root / "inventory.json").read_text())["source_sha"],
+    }
+    if path.exists():
+        existing = json.loads(path.read_text(encoding="utf-8"))
+        if existing.get("run_id") != result["run_id"] or existing.get("source_sha") != result["source_sha"] or existing.get("target_id") != key:
+            raise ValueError("Resume receipt identity mismatch")
+        return existing
+    with path.open("x", encoding="utf-8") as stream:
+        json.dump(result, stream, ensure_ascii=False, indent=2, allow_nan=False)
+        stream.write("\n")
+    return result
+
+
+def _load_status(run_root: Path, key: str) -> dict[str, Any]:
+    path = _receipt_path(run_root, key)
+    if not path.is_file():
+        return {"status": "NOT_RUN"}
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if value.get("target_id") != key or value.get("run_id") != run_root.name:
+        raise ValueError("Invalid existing receipt")
+    return value
+
+
+def _call_worker(
+    run_root: Path, key: str, request: dict[str, Any], root: Path,
+    *, max_seconds: int = 180,
+) -> dict[str, Any]:
+    previous = _load_status(run_root, key)
+    if previous["status"] != "NOT_RUN":
+        return previous
+    work = run_root / "worker_requests"
+    work.mkdir(parents=True, exist_ok=True)
+    digest = hashlib.sha256(key.encode("utf-8")).hexdigest()[:24]
+    request_path = work / (digest + ".input.json")
+    output_path = work / (digest + ".output.json")
+    if request_path.exists() or output_path.exists():
+        raise ValueError("Incomplete or mismatched previous Worker request; manual audit needed")
+    with request_path.open("x", encoding="utf-8") as stream:
+        json.dump(request, stream, ensure_ascii=False, indent=2)
+        stream.write("\n")
+    import os
+    env = os.environ.copy()
+    env["HF_HUB_OFFLINE"] = "1"
+    env["TRANSFORMERS_OFFLINE"] = "1"
+    env["HF_DATASETS_OFFLINE"] = "1"
+    command = [
+        "python", "-m", "tasks.precheck.worker", "--input",
+        str(request_path), "--output", str(output_path),
+    ]
+    try:
+        proc = subprocess.run(
+            command, cwd=root, env=env, capture_output=True,
+            text=True, timeout=max_seconds, check=False,
+        )
+        if output_path.is_file():
+            result = json.loads(output_path.read_text(encoding="utf-8"))
+            if result.get("status") not in {"PASS", "FAIL", "BLOCKED"}:
+                raise ValueError("Invalid Worker result")
+            result["worker_exit_code"] = proc.returncode
+        else:
+            result = {
+                "status": "FAIL", "code": "WORKER_NO_RECEIPT",
+                "reason": "Worker exited without a result receipt",
+                "worker_exit_code": proc.returncode,
+            }
+    except subprocess.TimeoutExpired:
+        result = {
+            "status": "BLOCKED", "code": "BLOCKED_RESOURCE",
+            "reason": "Worker exceeded exact wall-time budget",
+        }
+    return _store(run_root, key, result)
+
+
+def _model_meta(root: Path, key: str) -> str:
+    from omegaconf import OmegaConf
+
+    cfg = OmegaConf.load(root / "conf" / "model" / (key + ".yaml"))
+    if str(cfg.model.name) != key:
+        raise ValueError("Model config identity mismatch")
+    return str(cfg.model.pretrained_name)
+
+
+def _real_prompt(root: Path, dataset: str, model: str) -> str:
+    from omegaconf import OmegaConf
+    from saebase.datasets.prompts import read_prompts
+
+    cfg = OmegaConf.create({
+        "name": dataset,
+        "data_path": str(root / "data" / dataset),
+        "prompt_file": "",
+    })
+    rows = read_prompts(cfg, model_key=model)
+    prompt = rows[0].get("prompt") if rows else None
+    if not isinstance(prompt, str) or not prompt.strip():
+        raise ValueError("No real Dataset prompt available")
+    return prompt
+
+
+def execute_stage(
+    run_id: str, stage: str, root: Path = ROOT, *,
+    allow_compute: bool = False, allow_gpu: bool = False,
+) -> dict[str, Any]:
+    """Run a bounded component stage without modifying any product source."""
+    run_root = _run_root(run_id, root)
+    sha, inv = _identity(run_root)
+    pairs = json.loads((run_root / "targets.json").read_text())["pairs"]
+    datasets, models, sites = inv["dataset_keys"], inv["model_keys"], inv["sae_sites"]
+    if stage not in {"dataset", "model", "sae", "compatibility", "task"}:
+        raise ValueError("Unknown execution stage")
+
+    def auth(key: str, gpu: bool) -> dict[str, Any] | None:
+        if not allow_compute or (gpu and not allow_gpu):
+            return _store(run_root, key, {
+                "status": "BLOCKED", "code": "BLOCKED_AUTH",
+                "reason": "Real compute/GPU not explicitly authorized",
+            })
+        return None
+
+    done = []
+    if stage == "dataset":
+        for dataset in datasets:
+            key = f"dataset:{dataset}"
+            if _load_status(run_root, key)["status"] != "NOT_RUN":
+                done.append(_load_status(run_root, key))
+                continue
+            # Dataset artifacts are legitimately model-specific. A Dataset is
+            # available if at least one source-owned real cohort can be checked.
+            actual = None
+            for model in models:
+                from omegaconf import OmegaConf
+                from saebase.datasets.prompts import prompt_file
+
+                cfg = OmegaConf.create({
+                    "name": dataset,
+                    "data_path": str(root / "data" / dataset),
+                    "prompt_file": "",
+                })
+                try:
+                    prompt_file(cfg, model_key=model)
+                    actual = model
+                    break
+                except (FileNotFoundError, ValueError):
+                    continue
+            if actual is None:
+                done.append(_store(run_root, key, {
+                    "status": "BLOCKED", "code": "BLOCKED_ASSET",
+                    "reason": "No prepared genuine Dataset artifact is present",
+                }))
+            else:
+                done.append(_call_worker(
+                    run_root, key, {
+                        "kind": "dataset", "dataset_key": dataset,
+                        "model_key": actual, "data_root": str(root / "data"),
+                    }, root,
+                ))
+    elif stage == "model":
+        for model in models:
+            key = f"model:{model}"
+            if auth(key, True):
+                done.append(_load_status(run_root, key))
+                continue
+            done.append(_call_worker(
+                run_root, key, {
+                    "kind": "model", "model_key": model,
+                    "model_name": _model_meta(root, model),
+                    "prompt": "The capital of France is", "device": "cuda",
+                }, root,
+            ))
+    elif stage == "sae":
+        for site in sites:
+            key = "sae:" + site["site_id"]
+            if auth(key, True):
+                done.append(_load_status(run_root, key))
+                continue
+            if _load_status(run_root, "model:" + site["model_key"])["status"] != "PASS":
+                done.append(_store(run_root, key, {
+                    "status": "BLOCKED", "code": "BLOCKED_DEPENDENCY",
+                    "reason": "Parent real Model Forward has not passed",
+                }))
+                continue
+            done.append(_call_worker(
+                run_root, key, {
+                    "kind": "sae", "model_key": site["model_key"],
+                    "sae_key": site["sae_key"], "layer": site["layer"],
+                    "prompt": "The capital of France is", "device": "cuda",
+                }, root,
+            ))
+    elif stage == "compatibility":
+        from tasks.precheck.compatibility_checks import plan_compatibility
+
+        parents = {
+            target: _load_status(run_root, target)
+            for target in (
+                [f"dataset:{v}" for v in datasets] +
+                [f"model:{v}" for v in models] +
+                [f"sae:{v['site_id']}" for v in sites]
+            )
+        }
+        matrix = plan_compatibility(datasets, models, sites, parents)
+        sites_by_id = {site["site_id"]: site for site in sites}
+        for pair in matrix["pairs"]:
+            key = pair["id"]
+            if not pair["eligible"]:
+                done.append(_store(run_root, key, {
+                    "status": "BLOCKED" if pair["status"] == "BLOCKED" else "NOT_RUN",
+                    "reason": "Component prerequisite not verified",
+                    "dependency_states": pair["dependency_states"],
+                }))
+                continue
+            if auth(key, True):
+                done.append(_load_status(run_root, key))
+                continue
+            site = sites_by_id.get(pair["site_id"])
+            req = {
+                "kind": "compatibility", "target_id": key,
+                "dataset_key": pair["dataset_id"],
+                "model_key": pair["model_key"],
+                "model_name": _model_meta(root, pair["model_key"]),
+                "data_root": str(root / "data"),
+                "max_samples": 2, "device": "cuda",
+            }
+            if site is not None:
+                req.update(site)
+            done.append(_call_worker(run_root, key, req, root))
+    else:
+        names = ("capture", "intervene", "generate", "benchmark")
+        for name in names:
+            key = "task:" + name
+            done.append(_store(run_root, key, {
+                "status": "BLOCKED",
+                "code": "BLOCKED_CONFIGURATION",
+                "reason": (
+                    "Native Task smoke requires an exact supported site, "
+                    "genuine Dataset sample and a bounded Task-owned run configuration; "
+                    "no unreviewed default is executed"
+                ),
+            }))
+    return {
+        "stage": stage, "run_id": run_id,
+        "requested": len(done),
+        "status_counts": {
+            kind: sum(x.get("status") == kind for x in done)
+            for kind in ("PASS", "FAIL", "BLOCKED", "NOT_RUN")
+        },
+        "source_sha": sha,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("stage", choices=("inspect", "inventory"))
+    parser.add_argument("stage", choices=("inspect", "inventory", "dataset", "model", "sae", "compatibility", "task"))
     parser.add_argument("--run-id", default="")
+    parser.add_argument("--allow-compute", action="store_true")
+    parser.add_argument("--allow-gpu", action="store_true")
     args = parser.parse_args()
     if args.stage == "inspect":
         data = inventory()
@@ -134,7 +424,10 @@ def main() -> int:
         return 0
     if not args.run_id:
         parser.error("--run-id required for inventory")
-    result = prepare_inventory(args.run_id)
+    result = (prepare_inventory(args.run_id) if args.stage == "inventory" else
+              execute_stage(args.run_id, args.stage,
+                            allow_compute=args.allow_compute,
+                            allow_gpu=args.allow_gpu))
     print(json.dumps(result, ensure_ascii=False))
     return 0
 
