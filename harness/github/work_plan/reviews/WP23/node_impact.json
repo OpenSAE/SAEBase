@@ -128,5 +128,188 @@
   "retired_unapproved_proposal": "HC-WP23-Component-Precheck-20261102",
   "governance_dependency": "policy/workplan-summary-node-impact-20261102",
   "published_science": "NONE",
-  "experiment_run": "NOT_RUN"
+  "experiment_run": "NOT_RUN",
+  "implementation_review": {
+    "status": "PENDING_EXACT_PATH_HUMAN_AUTHORIZATION",
+    "note": "These are proposed implementation paths, not approved node edits or previously observed new AST modules. CONDITIONAL_CHANGE may be omitted when existing Runtime API suffices. Source reviews remain independent of node HC.",
+    "workstreams": [
+      {
+        "id": "component_dataset",
+        "responsibility": "Dataset real source, schema and record identity",
+        "files": [
+          {
+            "path": "tasks/precheck/dataset_checks.py",
+            "operation": "ADD",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "AFTER_REAL_AST_ONLY"
+          },
+          {
+            "path": "tests/precheck/test_dataset_checks.py",
+            "operation": "ADD",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "AFTER_REAL_AST_ONLY"
+          }
+        ]
+      },
+      {
+        "id": "component_model_sae",
+        "responsibility": "Model native forward and exact SAE-site checks",
+        "files": [
+          {
+            "path": "tasks/precheck/model_checks.py",
+            "operation": "ADD",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "AFTER_REAL_AST_ONLY"
+          },
+          {
+            "path": "tasks/precheck/sae_checks.py",
+            "operation": "CHANGE",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
+          },
+          {
+            "path": "tests/precheck/test_model_sae_sites.py",
+            "operation": "ADD",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "AFTER_REAL_AST_ONLY"
+          }
+        ]
+      },
+      {
+        "id": "compatibility_worker",
+        "responsibility": "Bounded compatibility, worker dispatch and status receipts",
+        "files": [
+          {
+            "path": "tasks/precheck/compatibility_checks.py",
+            "operation": "ADD",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "AFTER_REAL_AST_ONLY"
+          },
+          {
+            "path": "tasks/precheck/operation.py",
+            "operation": "CHANGE",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
+          },
+          {
+            "path": "tasks/precheck/worker.py",
+            "operation": "CHANGE",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
+          },
+          {
+            "path": "tasks/precheck/report.py",
+            "operation": "CHANGE",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
+          },
+          {
+            "path": "conf/task/precheck.yaml",
+            "operation": "CHANGE",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
+          },
+          {
+            "path": "tests/precheck/test_component_matrix.py",
+            "operation": "ADD",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "AFTER_REAL_AST_ONLY"
+          }
+        ]
+      },
+      {
+        "id": "wp23_orchestration",
+        "responsibility": "WP23-only execution coordination, identity and resume",
+        "files": [
+          {
+            "path": "scripts/workplan/wp023.sh",
+            "operation": "ADD",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "AFTER_REAL_AST_ONLY"
+          },
+          {
+            "path": "scripts/workplan/wp023_orchestrator.py",
+            "operation": "ADD",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "AFTER_REAL_AST_ONLY"
+          },
+          {
+            "path": "tests/workplan/wp23/test_handoff.py",
+            "operation": "ADD",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "AFTER_REAL_AST_ONLY"
+          },
+          {
+            "path": "tests/workplan/wp23/test_resume.py",
+            "operation": "ADD",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "AFTER_REAL_AST_ONLY"
+          }
+        ]
+      },
+      {
+        "id": "audit_integration",
+        "responsibility": "Run evidence integrity and local delivery",
+        "files": [
+          {
+            "path": "saebase/runtime/audit_report.py",
+            "operation": "CONDITIONAL_CHANGE",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
+          },
+          {
+            "path": "saebase/runtime/audit_delivery.py",
+            "operation": "CONDITIONAL_CHANGE",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
+          },
+          {
+            "path": "tests/workplan/wp23/test_audit_handoff.py",
+            "operation": "ADD",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "AFTER_REAL_AST_ONLY"
+          }
+        ]
+      },
+      {
+        "id": "ci_regression",
+        "responsibility": "CPU negative coverage and routed integration tests",
+        "files": [
+          {
+            "path": "tests/workplan/wp23/test_cpu_negative.py",
+            "operation": "ADD",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "AFTER_REAL_AST_ONLY"
+          },
+          {
+            "path": ".github/workflows/ci.yml",
+            "operation": "CHANGE",
+            "permission": "PENDING",
+            "node_semantics": "NO_AUTOMATIC_CHANGE",
+            "code_display": "PRESERVE_EXISTING_UNTIL_OBSERVED_DIFF"
+          }
+        ]
+      }
+    ],
+    "extra_paths": "Any WP22 feature branch fixes outside these listed paths require a separate exact-file review; do not quietly broaden scope."
+  }
 }
