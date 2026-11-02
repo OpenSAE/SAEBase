@@ -1,0 +1,59 @@
+{
+  "id": "HC-WP23-Component-Precheck-20261102",
+  "goal": "仅审阅 g.pipeline 下一个独立的通用组件预检子节点，保留上层 Core 语义；WP23 作为外部工作计划关联，不进入任何节点的正文或性质。",
+  "default_enabled": true,
+  "created_for": "One proposed Core child, not existing implementation; no source writes or GPU execution authorized.",
+  "items": [
+    {
+      "view": "core",
+      "node_id": "g.component_precheck",
+      "operation": "add",
+      "parent_id": "g.pipeline",
+      "after": {
+        "id": "g.component_precheck",
+        "type": "goal",
+        "title": "研究组件的系统性预检",
+        "description": "目标：对选定的 Dataset、Model、SAE 与 Task 及其兼容组合进行独立的资源、接口和最小真实执行检查，输出可追溯的逐项状态与诊断记录。",
+        "properties": "按明确配置限定检查对象和资源预算；保留输入与权重身份、检查结果和失败原因；独立组件的检查结果互不冒充。",
+        "status": "not_implemented",
+        "evidence": [],
+        "environment_refs": [],
+        "context_term_ids": [
+          "term.dataset",
+          "term.model",
+          "term.sparse_autoencoder",
+          "term.task"
+        ]
+      },
+      "files": [
+        "harness/core/project_graph.json"
+      ],
+      "reason": "该节点仅表示通用组件级 Precheck 能力，与上层现有 Task 运行前检查构成明确父子关系；具体 WP23 检测矩阵和阶段只通过下方 Workplan 关联引用。",
+      "risk": "这是尚未实现的独立功能节点提案；批准节点结构不能证明真实组件检测通过，也不能授予修改 Precheck 生产代码的权限。",
+      "checks": [
+        "父节点 g.pipeline 的标题、说明、性质、状态、关系和证据保持原样",
+        "新节点说明及性质只有通用输入、检查行为和输出，不含 WP 编号、QA500、数量或冻结实验参数",
+        "新节点状态为 not_implemented，真实执行证据缺失不算 PASS",
+        "WP23 在单独的 Workplan 关联显示，不能当作源码或科研结果证据",
+        "实际实现和源码路径修改另按 Workplan 及 Human Check 审核"
+      ],
+      "context_term_ids": [
+        "term.dataset",
+        "term.model",
+        "term.sparse_autoencoder",
+        "term.task"
+      ],
+      "group_id": "HC01",
+      "group_title": "通用组件 Precheck 子功能及独立 Workplan 引用",
+      "workplans": [
+        {
+          "id": "WP23",
+          "url": "https://github.com/OpenSAE/SAEBase/blob/plan/wp23-systematic-precheck-20261101/harness/github/work_plan/0.6.5_wp023_qa_precheck.md",
+          "title": "Systematic Dataset / Model / SAE Precheck",
+          "relation": "planned_application",
+          "status": "DRAFT"
+        }
+      ]
+    }
+  ]
+}
