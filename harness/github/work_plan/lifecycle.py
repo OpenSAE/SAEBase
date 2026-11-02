@@ -16,7 +16,7 @@ HUMAN = re.compile(r"```from-human-json\s*\n(.*?)\n```", re.S)
 STATUSES = frozenset(("PASS", "FAIL", "BLOCKED", "PARTIAL", "NOT_RUN", "WARNING", "HUMAN_DECISION"))
 
 
-CROSS_WP = re.compile(r"\\bWP[0-9]+\\b", re.I)
+CROSS_WP = re.compile(r"\bWP[0-9]+\b", re.I)
 
 
 def check_workplan_isolation(plan, text, intent, *, versioned=False):
