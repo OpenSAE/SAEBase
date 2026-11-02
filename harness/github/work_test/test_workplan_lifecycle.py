@@ -173,8 +173,8 @@ def test_dispatch_rejects_implicit_network_and_gpu_execution(tmp_path):
     from harness.github.work_plan.dispatch import approved_command
 
     for argv in (
-        ["python", "-m", "tasks.precheck.worker", "--allow-network"],
-        ["python", "-m", "tasks.precheck.worker", "--allow-gpu"],
+        ["python", "-m", "saebase.setup", "--allow-network"],
+        ["python", "-m", "saebase.setup", "--allow-gpu"],
         ["bash", "scripts/experiments/example.sh", "--execute"],
     ):
         if argv[0] == "bash":
@@ -209,7 +209,7 @@ def test_agent_ready_requires_complete_prepared_evidence(tmp_path):
     data = path.read_text()
     data = data.replace('"status": "reviewed"', '"status": "agent_ready", "plan_role": "local_agent"')
     path.write_text(data)
-    with pytest.raises(life.PlanError, match="actual commands"):
+    with pytest.raises(life.PlanError, match="concrete command"):
         life.check(plan, root=tmp_path, check_contracts=False)
     data = data.replace('"goal": "Observe setup"', '"command": ["python", "-m", "saebase.setup", "--help"], "goal": "Observe setup"').replace('"goal": "Run frozen benchmark"', '"command": ["python", "-m", "saebase.runtime", "--help"], "goal": "Run frozen benchmark"')
     path.write_text(data)
