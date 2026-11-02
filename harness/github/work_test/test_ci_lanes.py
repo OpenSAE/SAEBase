@@ -25,7 +25,6 @@ MANUAL = {
     "stage-bc-gemma9b-recheck.yml",
     "stage-bc-source-head.yml",
     "saebase-atlas-snapshot.yml",
-    "atlas-project-pages.yml",
     "research-lab-v04-release-dispatch.yml",
     "saebase-v050-release-dispatch.yml",
     "saebase-v060-release-dispatch.yml",
@@ -52,6 +51,11 @@ def test_pr_and_main_use_only_lightweight_ci():
     assert auto_pr == {"ci.yml"}
     for name in MANUAL:
         assert set(workflow(name)["on"]) == {"workflow_dispatch"}, name
+    atlas = workflow("atlas-project-pages.yml")
+    assert set(atlas["on"]) == {"workflow_dispatch", "push"}
+    assert atlas["on"]["push"]["branches"] == ["main"]
+    assert "harness/visualization/review-proposals/**" in atlas["on"]["push"]["paths"]
+    assert "pull_request" not in atlas["on"]
     research = workflow("research-regression.yml")
     assert set(research["on"]) == {"workflow_call", "workflow_dispatch"}
     ci = workflow("ci.yml")
