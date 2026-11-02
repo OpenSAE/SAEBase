@@ -14,7 +14,7 @@
   <script defer src="../harness/visualization/atlas-structure.js?v=research-hierarchy-20261026"></script>
   <script defer src="../harness/visualization/atlas-public-balance.js?v=context-cleanup-20261028"></script>
   <script defer src="../harness/visualization/node-reader.js?v=hc-reader-live-state-20261101"></script>
-  <script defer src="../harness/visualization/app.js?v=hc-graph-first-20261101"></script>
+  <script defer src="../harness/visualization/app.js?v=hc-report-redirect-20261101"></script>
   <script defer src="../harness/visualization/locale-data.js?v=saebase-bilingual-20261027"></script>
   <script defer src="../harness/visualization/locale-runtime.js?v=saebase-bilingual-20261027"></script>
   <script defer src="../harness/visualization/i18n.js?v=hc-report-i18n-20261101"></script>
@@ -88,7 +88,7 @@
               <button id="atlasReviewUnchecked" class="review-unchecked" title="Reset to Unchecked · U">Unchecked <kbd>U</kbd></button>
             </div>
             <span id="atlasReviewMessage" class="review-message" aria-live="polite">Unchecked</span>
-            <a id="atlasReviewSendReport" class="review-send-report is-hidden" href="#" target="_blank" rel="noopener noreferrer" aria-label="Send report" title="Send report">Send report</a>
+            <button id="atlasReviewSendReport" type="button" class="review-send-report is-hidden" aria-label="Send report" title="Send report">Send report</button>
           </div>
           <div class="status-legend" id="statusLegend" role="note" aria-label="Node status colors: Not Implemented red, Partial yellow, Implemented green">
             <span class="legend-item"><i class="legend-swatch not-implemented" aria-hidden="true"></i>Not Implemented</span>
