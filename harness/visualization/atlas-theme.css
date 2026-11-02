@@ -330,3 +330,26 @@ button:focus-visible,a:focus-visible,input:focus-visible,.graph-node:focus-visib
 @media(max-width:730px){
   .atlas-relations-shortcut{font-size:10px;min-width:74px;padding:0 6px}
 }
+
+/* Human Check palette wins over generic hover/selection/expanded styles. */
+#diagram .graph-node[data-review="unchecked"] .node-surface,
+#diagram .graph-node[data-review="unchecked"].node-selected .node-surface{
+ fill:#241a2c;stroke:#9868d0;stroke-width:2.8;
+ filter:drop-shadow(0 0 8px #8255b56a);
+}
+#diagram .graph-node[data-review="approved"] .node-surface,
+#diagram .graph-node[data-review="approved"].node-selected .node-surface{
+ fill:#291b20;stroke:#cf5265;stroke-width:2.8;
+ filter:drop-shadow(0 0 8px #bb46566a);
+}
+#diagram .graph-node[data-review="denied"] .node-surface,
+#diagram .graph-node[data-review="denied"].node-selected .node-surface{
+ fill:#22262a;stroke:#8c97a2;stroke-width:2.8;
+ filter:drop-shadow(0 0 8px #78818b6a);
+}
+#diagram .graph-node[data-review].node-selected .node-surface{
+ stroke-width:4;filter:drop-shadow(0 0 13px var(--review-glow,#8255b5b0));
+}
+#diagram .graph-node[data-review="unchecked"]{--review-glow:#8255b5a0}
+#diagram .graph-node[data-review="approved"]{--review-glow:#bb4656a0}
+#diagram .graph-node[data-review="denied"]{--review-glow:#78818ba0}

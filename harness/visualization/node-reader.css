@@ -23,7 +23,6 @@
 .atlas-reader-current-title{font-size:16px;font-weight:690;line-height:1.5;
  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .atlas-reader-controls{display:flex;align-items:center;gap:16px;flex:none}
-.atlas-reader-hint{font-size:11px;color:#9ea7af}
 .atlas-reader-close{
  border:1px solid #6c757c;background:#282d32;color:#f0f3f5;
  border-radius:8px;padding:9px 14px;font-weight:650;white-space:nowrap;cursor:pointer;
@@ -98,7 +97,6 @@
  .atlas-reader-pages.is-compare{flex-direction:column;overflow-y:auto}
  .atlas-reader-pages.is-compare .atlas-reader-card{min-height:290px;overflow:visible}
  .atlas-reader-pages.is-compare .atlas-reader-scroll{max-height:260px}
- .atlas-reader-hint{display:none}
  .atlas-reader-proposal{max-height:75px}
 }
 @media(max-width:730px){
@@ -160,3 +158,14 @@ body.atlas-reader-active #atlasPathTrace,
 body.atlas-reader-active #breadcrumb,
 body.atlas-reader-active .toolbar .navigation{display:none!important}
 body.atlas-reader-active .toolbar{justify-content:flex-end}
+
+/* The Reader matches the Human Check decision color. */
+.atlas-reader-shell[data-review-state="unchecked"] .atlas-reader-panel{
+ border-color:#8255b5;box-shadow:0 22px 70px #000b,0 0 0 1px #8255b5b0;
+}
+.atlas-reader-shell[data-review-state="approved"] .atlas-reader-panel{
+ border-color:#bb4656;box-shadow:0 22px 70px #000b,0 0 0 1px #bb4656b0;
+}
+.atlas-reader-shell[data-review-state="denied"] .atlas-reader-panel{
+ border-color:#78818b;box-shadow:0 22px 70px #000b,0 0 0 1px #78818bb0;
+}

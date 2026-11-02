@@ -40,4 +40,9 @@ assert(css.includes(".atlas-reader-diff-remove")&&
   css.includes("text-decoration:line-through")&&
   css.includes(".atlas-reader-diff-add"),"red editorial additions/deletions");
 assert(!js.includes("threshold+=event.deltaY"),"reader must not exit on content-scroll boundary");
-console.log("SAEBase Atlas Node Reader editorial diff and wheel boundary PASS");
+assert(!js.includes("atlas-reader-hint"),"obsolete instruction microcopy absent");
+assert(js.includes('shell.dataset.reviewState=entry.reviewState || ""'),"Reader palette follows review");
+assert(css.includes('[data-review-state="unchecked"]')&&
+  css.includes('[data-review-state="approved"]')&&
+  css.includes('[data-review-state="denied"]'),"Reader highlights correspond to decision");
+console.log("SAEBase Atlas Node Reader editorial diff, state and wheel PASS");
