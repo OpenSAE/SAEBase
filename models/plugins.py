@@ -9,10 +9,7 @@ from __future__ import annotations
 
 import importlib
 
-from omegaconf import DictConfig
-
-from saebase.registry import register_model, register_sae
-from saebase.sae.registry import DEFAULT_SAE_FOR_MODEL, SAE_KEYS, get_profile
+from saebase.registry import register_model
 
 _HOOKED_KEYS = (
     "gpt2small",
@@ -56,36 +53,6 @@ def _register_builtin_models() -> None:
 
     for hooked_key in _HOOKED_KEYS:
         _register_hooked(hooked_key)
-
-    def _make_sae_assert(sae_key: str):
-        def assert_compatible(cfg: DictConfig) -> None:
-            profile = get_profile(sae_key)
-            model_key = str(cfg.model.name)
-            if model_key not in profile.allowed_model_keys():
-                raise ValueError(
-                    f"sae.name={sae_key!r} allows models "
-                    f"{sorted(profile.allowed_model_keys())}, got {model_key!r}"
-                )
-            layer = cfg.sae.get("layer")
-            if layer is not None and int(layer) not in profile.layers:
-                raise ValueError(
-                    f"sae.layer={layer} not in {sae_key} layers {list(profile.layers)}"
-                )
-
-        return assert_compatible
-
-    for sae_key in SAE_KEYS:
-        register_sae(sae_key, _make_sae_assert(sae_key), profile_key=sae_key)
-
-    def _assert_none_sae(cfg: DictConfig) -> None:
-        # Placeholder SAE key; task=sae rejects sae=none at config validation.
-        return None
-
-    register_sae("none", _assert_none_sae, profile_key="none")
-
-    for model_key, sae_key in DEFAULT_SAE_FOR_MODEL.items():
-        if model_key not in SAE_KEYS:
-            register_sae(model_key, _make_sae_assert(sae_key), profile_key=sae_key)
 
 
 _register_builtin_models()
