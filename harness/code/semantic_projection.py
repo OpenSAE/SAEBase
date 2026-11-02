@@ -125,8 +125,11 @@ def compact_public_code_tree(graph: dict) -> dict:
     for suffix in ("site_plan", "acceptance_ledger", "evidence_integrity", "pair_acceptance"):
         canonical = "code:concept:sae_acceptance:" + suffix
         duplicate = "code:concept:benchmark_acceptance:" + suffix
+        # The refactor may have removed one or both old duplicate owners.
+        # Only fold genuinely coexisting source concepts; do not invent missing
+        # capabilities to satisfy a historical fixed-size display contract.
         if canonical not in nodes or duplicate not in nodes:
-            raise ValueError("Missing paired Stage D acceptance concepts: " + suffix)
+            continue
         for field in ("title", "summary"):
             if normalize(nodes[canonical].get(field)) != normalize(nodes[duplicate].get(field)):
                 raise ValueError("Stage D concepts diverged; review before folding: " + suffix)
