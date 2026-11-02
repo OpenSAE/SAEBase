@@ -79,7 +79,7 @@ def execute(plan_path, run_id, allowed, *, root=ROOT):
     plan = check(plan_path, root=root)
     if plan["status"] not in ("approved", "agent_ready"):
         raise PlanError("Unapproved Work Plan cannot run")
-    if re.fullmatch(r"[0-9]+\\.[0-9]+\\.[0-9]+_wp[0-9]{3}_[a-z]+_[a-z]+\\.md", plan_path.rsplit("/", 1)[-1]) and plan["status"] != "agent_ready":
+    if re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+_wp[0-9]{3}_[a-z]+_[a-z]+\.md", plan_path.rsplit("/", 1)[-1]) and plan["status"] != "agent_ready":
         raise PlanError("Versioned local Agent Work Plan requires Agent Ready handoff")
     if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]{1,63}", run_id):
         raise PlanError("Invalid unique run ID")
