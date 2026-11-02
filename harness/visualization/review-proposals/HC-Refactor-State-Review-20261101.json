@@ -408,7 +408,7 @@
         "after": {
           "type": "module",
           "title": "可配置科研 Precheck 任务入口",
-          "description": "可配置科研 Precheck 任务入口",
+          "description": "按当前配置调度 SAE 与研究 Task 的最小真实检查。",
           "path": "tasks/precheck/operation.py",
           "context_term_ids": [
             "term.task",
@@ -450,7 +450,7 @@
         "after": {
           "type": "module",
           "title": "公共 SAE 资源加载入口",
-          "description": "公共 SAE 资源加载入口",
+          "description": "模型与 SAE 的公共资源加载接口。",
           "path": "saebase/api/sae_loading.py",
           "context_term_ids": [
             "term.api",
