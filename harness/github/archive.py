@@ -21,7 +21,7 @@ SEMVER = re.compile(r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$")
 SHORT_NAME = re.compile(r"^[a-z]+_[a-z]+$")
 DOC_NAME = re.compile(
     r"^(?P<version>\d+\.\d+\.\d+)_(?P<kind>dev|wp)(?P<seq>\d{3})_"
-    r"(?P<slug>[a-z]+_[a-z]+)(?P<suffix>\.en\.md|\.md|\.json)$"
+    r"(?P<slug>[a-z]+_[a-z]+)(?P<suffix>\.en\.md|\.md|\.json|\.csv)$"
 )
 TEST_DIR = re.compile(
     r"^(?P<version>\d+\.\d+\.\d+)_wt(?P<seq>\d{3})_"

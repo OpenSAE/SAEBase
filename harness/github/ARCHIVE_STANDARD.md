@@ -21,8 +21,8 @@ revalidated against newer WP/WT writing rules**.
 
 | Archive type | File or folder pattern | Example |
 | --- | --- | --- |
-| Dev | `<semver>_dev<NNN>_<word>_<word>.md/json` | `0.6.5_dev001_gpu_accept.md` |
-| WP | `<semver>_wp<NNN>_<word>_<word>.md` | `0.6.5_wp001_qa_smoke.md` |
+| Dev | `<semver>_dev<NNN>_<word>_<word>.md/json/csv` | `0.6.5_dev001_gpu_accept.md` |
+| WP | `<semver>_wp<NNN>_<word>_<word>.md/json/csv` | `0.6.5_wp001_qa_smoke.md` |
 | WT | `<semver>_wt<NNN>_<word>_<word>/` | `0.6.5_wt001_qa_smoke/test_run.py` |
 
 The two final words are short, lowercase ASCII words; numbers are 001–999.
@@ -72,6 +72,8 @@ re-execute or reinterpret frozen historical experiments.
 5. Run Full Release Validation against that final source SHA. Release
    validation refuses an unprepared newer version. No archive automation
    writes files after the release's full validation.
+
+Current documentation and production/CI validation must not depend on archived files. Archived records are accessed via immutable Git/Release identities only; the standalone archive checker may inspect them. Before removing legacy paths, audit every active reference, including documents outside harness/github. Files with unresolved version or still-needed compatibility paths remain BLOCKED, not falsely marked as migrated.
 
 The archived reports are reference material, not input to subsequent
 strict WP/WT authoring standards. New/current documents and executable
