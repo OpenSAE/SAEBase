@@ -476,7 +476,7 @@ def sae_assets(model_key: str = "") -> dict[str, Any]:
     width/L0 values stay null; no checkpoint weight is loaded or invented.
     """
     try:
-        from saebase.sae.catalog import registered_catalog_json
+        from saebase.api.sae_catalog import registered_catalog_json
     except (ImportError, ModuleNotFoundError):
         known_sources = {
             "gemma270m": "google/gemma-scope-2-270m-pt",

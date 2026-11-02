@@ -30,7 +30,7 @@ if str(ROOT) not in sys.path:
 from saebase.api import capture_features, evaluate_edit, load_registered
 from saebase.datasets.SimpleCopying.prepare import prepare_for_model
 from saebase.datasets.prompt_store import load_manifest, load_prompts
-from saebase.sae.registry import get_profile
+from saebase.api.sae_profiles import get_profile
 
 MODEL_KEY = "pythia70m"
 SAE_KEY = "pythia70m_resid_sm"
