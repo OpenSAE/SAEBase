@@ -336,7 +336,7 @@
         "after": {
           "type": "module",
           "title": "本地 Agent 的受控 Context 只读选择",
-          "description": "本地 Agent 的受控 Context 只读选择",
+          "description": "科研 Context 的受控只读选择接口。",
           "path": "harness/knowledge/dialogue_context.py",
           "context_term_ids": [
             "term.context_tree",
