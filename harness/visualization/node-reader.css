@@ -169,3 +169,42 @@ body.atlas-reader-active .toolbar{justify-content:flex-end}
 .atlas-reader-shell[data-review-state="denied"] .atlas-reader-panel{
  border-color:#78818b;box-shadow:0 22px 70px #000b,0 0 0 1px #78818bb0;
 }
+
+/* A single live Human Check palette drives both comparison cards, the
+   editorial diff marks, field accents, and the Reader outline. */
+.atlas-reader-shell[data-review-state="unchecked"]{
+ --hc-mark:#d3a8ff;--hc-frame:#8255b5;--hc-card:#9871cd;
+ --hc-tint:rgba(130,85,181,.17);
+}
+.atlas-reader-shell[data-review-state="approved"]{
+ --hc-mark:#ff96a0;--hc-frame:#bb4656;--hc-card:#cf5969;
+ --hc-tint:rgba(187,70,86,.15);
+}
+.atlas-reader-shell[data-review-state="denied"]{
+ --hc-mark:#c4ccd3;--hc-frame:#78818b;--hc-card:#929ba6;
+ --hc-tint:rgba(120,129,139,.17);
+}
+.atlas-reader-shell[data-review-state] .atlas-reader-panel{
+ border-color:var(--hc-frame,#565b63);
+ box-shadow:0 22px 70px #000b,0 0 0 1px var(--hc-frame,#565b63);
+}
+.atlas-reader-shell[data-review-state] .atlas-reader-pages.is-compare .atlas-reader-card{
+ border-color:var(--hc-card,#565e65);
+}
+.atlas-reader-shell[data-review-state] .atlas-reader-pages.is-compare .atlas-reader-card-side,
+.atlas-reader-shell[data-review-state] .atlas-reader-diff-add,
+.atlas-reader-shell[data-review-state] .atlas-reader-diff-remove{
+ color:var(--hc-mark,#ff8b94);
+}
+.atlas-reader-shell[data-review-state] .atlas-reader-diff-add,
+.atlas-reader-shell[data-review-state] .atlas-reader-diff-remove{
+ background:var(--hc-tint,rgba(194,60,72,.13));
+ text-decoration-color:var(--hc-mark,#ff727c);
+}
+.atlas-reader-shell[data-review-state] .atlas-reader-field.is-changed{
+ border-left-color:var(--hc-frame,#c5666b);
+ background:var(--hc-tint,rgba(147,49,59,.09));
+}
+.atlas-reader-shell[data-review-state] .atlas-reader-attributes.is-changed{
+ border-left-color:var(--hc-frame,#c5666b);
+}

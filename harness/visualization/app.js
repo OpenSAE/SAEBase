@@ -664,6 +664,8 @@
     }
     const currentItem=items[current];
     const status=proposalState(currentItem);
+    // Update presentation-only colors without rebuilding Reader or resetting scroll.
+    if(nodeReader?.isOpen() && currentItem)nodeReader.setReviewState(status);
     $("atlasReviewApprove").classList.toggle("chosen",status==="approved");
     $("atlasReviewDeny").classList.toggle("chosen",status==="denied");
     $("atlasReviewUnchecked").classList.toggle("chosen",status==="unchecked");
@@ -871,7 +873,7 @@
       }
       maybeShowReviewDone();
       // Keep a purple-reset node visible. Approve/Deny advances within scope.
-      if(decision!=="unchecked"){
+      if(decision!=="unchecked" && !nodeReader?.isOpen()){
         const next=findUnchecked(1);
         reviewBusy=false;
         if(next>=0)reviewGo(next);
@@ -1112,11 +1114,17 @@
     config.query = "";
     $("search").value = "";
     config.outlineOpen = false;
-    config.detailsOpen = !nodeReader || !(options.toggle || review || nodeReader.isOpen());
+    // Only Change opens its comparison automatically. Add/Remove land on
+    // the actual graph node until the user explicitly opens its card.
+    const reviewItem=itemFor(id,target);
+    const reviewTarget=!!reviewItem;
+    const shouldOpenReader=!!nodeReader && (
+      !!options.toggle || (reviewTarget && reviewItem.operation==="change") ||
+      (!reviewTarget && nodeReader.isOpen())
+    );
+    if(!shouldOpenReader)nodeReader?.close();
+    config.detailsOpen = !nodeReader || !shouldOpenReader;
     for (const key of ancestors(id)) config.expanded.add(key);
-    // Review navigation lands on the actual node in normal Focus mode.
-    const reviewTarget=!!review?.plan?.items?.some(item=>
-      item.node_id===id && item.view===target);
     if(reviewTarget){
       config.expanded.add(id);
       config.zoom=1.1;
@@ -1136,8 +1144,7 @@
     render(false,true);
     centerSelected();
     if(review){updateReviewBar();queueReviewVisit();}
-    if(nodeReader && (reviewTarget || options.toggle || nodeReader.isOpen()))
-      showNodeReader();
+    if(shouldOpenReader)showNodeReader();
     return true;
   }
   function overview(push) {
