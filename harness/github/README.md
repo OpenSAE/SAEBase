@@ -42,3 +42,16 @@ Development Doc、Work Plan、Work Test 的历史记录按各自所有权保存�
 产生只读候选，再在 Atlas Human Check 的关联节点中逐项审阅。只有
 获批范围才可迁移；归档后经过 [Release Validation](../../.github/workflows/release-validation.yml)
 的 SHA 固定验收。
+
+## Local Agent 的 Python 格式自动修复
+
+首次使用仅需安装轻量工具和本地钩子（不加载模型/GPU）：
+
+```bash
+python -m pip install "ruff==0.15.22" "pre-commit>=4,<5"
+pre-commit install
+```
+
+本地 Agent 在**只暂存已授权变更**后运行 `python saebase/tools/check_new_python_quality.py --fix`，再核对差异并重新暂存；正常 `git commit` 也会自动格式化已暂存的新增 Python 文件（文件被修改时，Git hook 会要求重新暂存并再提交一次）。既有大文件只有经明确允许才运行 `--include-modified`，避免全文件无关的格式化差异。CI 继续用同一 Ruff 版本只读检查。
+
+**GitHub API 写入不经过本地钩子。** 线上协作 Agent 必须先在受控环境用同版 Ruff 格式化将要上传的 Python 文本，再调用 GitHub 文件写入工具，不能依赖远程 CI 自动代为修改仓库。若工具不可用，则明示阻塞，不允许跳过格式检查或禁用质量门禁。

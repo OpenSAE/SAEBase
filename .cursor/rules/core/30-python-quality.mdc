@@ -1,0 +1,8 @@
+---
+description: Before local Python commits, format only explicitly authorized staged Python files with the pinned CI Ruff.
+alwaysApply: true
+---
+
+When changing Python as part of an approved Work Order or source edit, stage ONLY authorized paths first. Before `git commit`, run `python saebase/tools/check_new_python_quality.py --fix` on newly staged files, inspect its diff and re-stage only those paths. For existing modified modules, request explicit scope for `--include-modified` before any whole-file reformat. On a fresh machine, install `ruff==0.15.22` and `pre-commit>=4,<5`, then `pre-commit install`.
+
+Do not bypass formatting, change CI quality policy, rewrite frozen WP21 fixtures, or run a repository-wide formatter. CI does not fix code. GitHub API file writes bypass local hooks: format proposed Python content with Ruff 0.15.22 *before* API submission. If the tool is missing, report BLOCKED and ask for an authorized setup action; never claim formatting passed.

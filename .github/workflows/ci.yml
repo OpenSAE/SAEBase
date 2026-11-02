@@ -57,7 +57,7 @@ jobs:
           cache: pip
           cache-dependency-path: pyproject.toml
       - name: Install lightweight CI inspection tools
-        run: python -m pip install -q "ruff>=0.12,<0.16" "PyYAML>=6" "pytest>=7"
+        run: python -m pip install -q "ruff==0.15.22" "PyYAML>=6" "pytest>=7"
       - name: Verify Python syntax and new-file formatting
         shell: bash
         env:
@@ -75,7 +75,7 @@ jobs:
           python -m compileall -q harness/github/ci
       - name: Validate CI routing, security and release contracts
         run: |
-          python -m pytest -q             harness/github/work_test/test_ci_select_checks.py             harness/github/work_test/test_ci_lanes.py             harness/github/work_test/test_software_release_workflow_paths.py             harness/github/work_test/test_repository_architecture.py             harness/github/work_test/test_workplan_review_gate.py
+          python -m pytest -q             harness/github/work_test/test_ci_select_checks.py             harness/github/work_test/test_ci_lanes.py             harness/github/work_test/test_software_release_workflow_paths.py             harness/github/work_test/test_repository_architecture.py             harness/github/work_test/test_workplan_review_gate.py             harness/github/work_test/test_python_quality_autofmt.py
 
   harness-targeted:
     needs: changes
