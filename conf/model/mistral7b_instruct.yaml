@@ -4,3 +4,8 @@ model:
   pretrained_name: mistralai/Mistral-7B-Instruct-v0.1
   family: mistral
   device: cuda
+  # SAE resources owned by this Model, not an extra Registry.
+  sae_profiles:
+    - mistral7b_instruct_tc_l16_131k
+  default_saes:
+    - mistral7b_instruct_tc_l16_131k

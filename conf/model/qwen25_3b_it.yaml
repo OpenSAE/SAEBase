@@ -4,3 +4,6 @@ model:
   pretrained_name: Qwen/Qwen2.5-3B-Instruct
   family: qwen
   device: cuda
+  # SAE resources owned by this Model, not an extra Registry.
+  sae_profiles: []
+  default_saes: []
