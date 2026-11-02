@@ -12,7 +12,7 @@ from torch import nn
 
 from saebase.interventions.research_edits import Edit, EditPlan, ModuleEdit, compare_module_edits
 from saebase.benchmarks.native_comparisons import ComparisonPoint, compare_sae_points
-from saebase.sae.external_training import (
+from tasks.train.external_training import (
     TrainPlan,
     _sparsify_command,
     register_checkpoint,
@@ -149,7 +149,7 @@ def test_p5_resume_is_not_confused_with_weight_finetuning(tmp_path):
     with pytest.raises(ValueError, match="new output cannot resume"):
         # The normal native training route must not silently start a new
         # optimizer from a published checkpoint when resume was requested.
-        from saebase.sae.external_training import run_training
+        from tasks.train.external_training import run_training
 
         run_training(resumed, output=tmp_path / "fresh", approved=True)
 

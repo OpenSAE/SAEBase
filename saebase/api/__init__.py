@@ -44,7 +44,7 @@ def load_registered(
     Loads public weights on demand and requires model dependencies. Registration
     metadata does not by itself prove real checkpoint compatibility.
     """
-    from saebase.sae.loading import load_model_and_sae
+    from saebase.api.sae_loading import load_model_and_sae
 
     model, sae, metadata = load_model_and_sae(
         sae_key, layer, device=device, model_key_override=model_key
@@ -52,7 +52,7 @@ def load_registered(
     identity = SAEIdentity.from_loaded(
         sae=sae, metadata=metadata, model_key=model_key,
     )
-    from saebase.sae.registry import get_profile
+    from saebase.api.sae_profiles import get_profile
     expected_hook = get_profile(sae_key).hook_name(layer)
     if identity.hook_name != expected_hook:
         raise ValueError(

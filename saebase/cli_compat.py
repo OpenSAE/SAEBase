@@ -14,7 +14,7 @@ import runpy
 import sys
 
 from saebase.runtime import verify_runtime
-from saebase.sae.registry import DEFAULT_SAE_FOR_MODEL, SAE_KEYS, get_profile
+from saebase.api.sae_profiles import DEFAULT_SAE_FOR_MODEL, SAE_KEYS, get_profile
 from saebase.datasets.artifact_layout import BEHAVIOR_ALIASES
 
 
