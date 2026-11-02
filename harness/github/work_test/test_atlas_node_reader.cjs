@@ -120,9 +120,17 @@ const sectionTitles=all.filter(x=>x.className==="atlas-reader-section-title").ma
 assert.equal(sectionTitles.filter(x=>x==="说明").length,2,"one explanation per comparison side");
 assert(!sectionTitles.includes("完整说明")&&!sectionTitles.includes("下一步"));
 assert(!prose.includes("目标：")&&!prose.includes("增加注册矩阵"));
-assert(all.some(x=>x.tag==="del"&&x.className==="atlas-reader-diff-remove"),
-  "removed old wording must use the original highlighted strikeout");
+assert(!all.some(x=>x.tag==="del"&&x.className==="atlas-reader-diff-remove"),
+  "adding properties must not falsely strike out unchanged original explanation");
 assert(all.some(x=>x.tag==="ins"&&x.className==="atlas-reader-diff-add"),
-  "new wording must use the original highlighted underline");
+  "added properties must use the original highlighted underline");
+// Separately verify that genuine removal still uses original strikeout.
+const revisedNode={...newNode,description:"注册组件可按名称查询。"};
+const changedHost=element("main");
+create({host:changedHost}).open({node:revisedNode,view:"core",operation:"change",
+  before:oldNode,after:revisedNode,review:true,reviewState:"unchecked"});
+assert(walk(changedHost).some(x=>x.tag==="del"&&
+  x.className==="atlas-reader-diff-remove"),
+  "genuine deleted text must retain the original highlighted strikeout");
 
 console.log("SAEBase Atlas: Compact → Standard → Reader and background exit PASS");
