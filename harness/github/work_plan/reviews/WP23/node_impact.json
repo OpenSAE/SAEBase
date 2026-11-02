@@ -1,0 +1,132 @@
+{
+  "schema": "saebase.workplan.node_impact.v1",
+  "plan_id": "WP23",
+  "source_commit": "cfd14db67e855fffe09b037894e3e5a115c53d83",
+  "wp22_source_branch": "feat/qa-evaluation-500-v1",
+  "wp22_source_head": "32c53e56abff3ece4fb2f7922cdbd57446ef8429",
+  "source_status": "DESK_SOURCE_REVIEW_ONLY",
+  "node_review_decision": "DEFER_NODE_DECISION",
+  "source_write_review": {
+    "required": true,
+    "status": "PENDING",
+    "reason": "WP23 introduces or edits actual product tests, worker implementation, CI and experiment scripts; exact-path Human Check/Work Order remains separate from node semantics."
+  },
+  "domains": [
+    {
+      "domain": "code",
+      "decision": "DEFER",
+      "feature_effect": "UNKNOWN",
+      "source_paths": [
+        "tasks/precheck/operation.py",
+        "tasks/precheck/sae_checks.py",
+        "saebase/api/sae_profiles.py"
+      ],
+      "existing_nodes": [
+        "code:module:tasks.precheck.operation"
+      ],
+      "reason": "Existing Precheck execution and SAE encoding are real source-backed behavior. Planned independent Dataset/Model probes and compatibility workers may create new source interfaces, but their AST and unique responsibilities do not exist yet; defer any Code node change until observed implementation.",
+      "proposed_fields": {},
+      "human_check_required": false,
+      "code_display": "REGENERATE_FROM_OBSERVED_AST_AFTER_IMPLEMENTATION",
+      "planned_paths": [
+        "tasks/precheck/dataset_checks.py",
+        "tasks/precheck/model_checks.py",
+        "tasks/precheck/compatibility_checks.py"
+      ],
+      "evidence_level": "VERIFIED_FROM_SOURCE_PLUS_UNIMPLEMENTED_PLAN"
+    },
+    {
+      "domain": "knowledge",
+      "decision": "NONE",
+      "feature_effect": "UNCHANGED",
+      "source_paths": [
+        "doc/knowledge/context_graph.json",
+        "tasks/capture/operation.py"
+      ],
+      "existing_nodes": [
+        "q.sae.methods",
+        "q.sae.assets",
+        "q.sae.capture"
+      ],
+      "reason": "WP23 validates whether existing scientific operations can be run reproducibly; it does not introduce a new scientific hypothesis, evaluation definition, explanation evidence, or research result. Existing Knowledge descriptions and relationships retain their meaning.",
+      "proposed_fields": {},
+      "human_check_required": false
+    },
+    {
+      "domain": "environment",
+      "decision": "NONE",
+      "feature_effect": "UNCHANGED",
+      "source_paths": [
+        "harness/environment/probe.py",
+        "saebase/setup/assets.py"
+      ],
+      "existing_nodes": [
+        "g.env_tree"
+      ],
+      "reason": "The plan will consume actual resource probes and permission controls, but does not alter the meaning of current-machine observations, hardware categories, or authorization semantics. Future machine snapshots remain per-run evidence, never durable tree edits.",
+      "proposed_fields": {},
+      "human_check_required": false
+    },
+    {
+      "domain": "core",
+      "decision": "NONE",
+      "feature_effect": "UNCHANGED",
+      "source_paths": [
+        "harness/core/project_graph.json",
+        "saebase/registry.py",
+        "models/plugins.py"
+      ],
+      "existing_nodes": [
+        "g.pipeline",
+        "g.dataset_gate",
+        "g.model_gate",
+        "g.registry",
+        "q.reproducibility"
+      ],
+      "reason": "The generic task precheck and Dataset/Model compatibility responsibilities are already represented by stable Core nodes. QA500 matrix sizes, feature site selections and test phases are a Workplan instance and do not change any Core node's abstract function or properties. The prior unapproved g.component_precheck proposal is not established as a distinct durable capability.",
+      "proposed_fields": {},
+      "human_check_required": false
+    },
+    {
+      "domain": "harness",
+      "decision": "NONE",
+      "feature_effect": "UNCHANGED",
+      "source_paths": [
+        "AGENTS.md",
+        "harness/github/work_plan/WRITING_STANDARD.md",
+        "harness/github/HUMAN_CHECK.md"
+      ],
+      "existing_nodes": [
+        "g.agent_execution_flow",
+        "g.code_tree"
+      ],
+      "reason": "WP23 uses the current plan, review and contract controls without changing their durable purposes. A separate user-directed governance PR updates authoring policy, and is assessed independently from this study; attaching its instructions to a Core node would conflate process governance with study scope.",
+      "proposed_fields": {},
+      "human_check_required": false,
+      "linked_governance_review": "policy/workplan-summary-node-impact-20261102"
+    },
+    {
+      "domain": "context",
+      "decision": "NONE",
+      "feature_effect": "UNCHANGED",
+      "source_paths": [
+        "doc/knowledge/glossary.json",
+        "doc/knowledge/atlas_terms.json"
+      ],
+      "existing_nodes": [
+        "term.dataset",
+        "term.model",
+        "term.task",
+        "term.sparse_autoencoder"
+      ],
+      "reason": "Dataset, Model, SAE, Task, source revisions and audit receipts use existing vocabulary. No new enduring technical definition is required for QA500, and repeating its task parameters in Context would introduce a redundant and unstable definition.",
+      "proposed_fields": {},
+      "human_check_required": false
+    }
+  ],
+  "preimplementation_note": "No Atlas node ADD/CHANGE/REMOVE is approved or proposed at planning stage. Reassess Code after observed AST source changes; if a genuinely independent durable capability appears, create separate HC with exact field and path diffs.",
+  "retired_unapproved_proposal": "HC-WP23-Component-Precheck-20261102",
+  "governance_dependency": "policy/workplan-summary-node-impact-20261102",
+  "published_science": "NONE",
+  "experiment_run": "NOT_RUN"
+}
