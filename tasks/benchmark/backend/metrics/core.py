@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from saebase.store import ShardedReader
 from saebase.api.features import _decode, _sae_dimensions
-from saebase.sae.contracts import reconstruction_stats
+from saebase.api.sae_contracts import reconstruction_stats
 
 
 def calculate_core(activation_path, code_path, sae, *, sample_ids):
