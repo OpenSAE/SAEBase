@@ -123,6 +123,7 @@ jobs:
                   assert (base/tree/"app.js").exists()
           PY
       - name: Verify preview in Chromium and save review screenshots
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           python -m pip install -q playwright
           python -m playwright install --with-deps chromium
@@ -180,7 +181,18 @@ jobs:
                           resource = urljoin(url, asset)
                           with urlopen(Request(resource, headers={"User-Agent": "SAEBase-Pages-verify"}), timeout=15) as result:
                               assert result.status == 200 and result.read(1), f"Missing static asset: {resource}"
-                  print("Public SAEBase Atlas verified across six pages and assets:", base)
+                  # Public proposal-only updates must deliver the actual review JSON.
+                  import json
+                  index_url = urljoin(base, "atlas/review-proposals/index.json")
+                  with urlopen(Request(index_url, headers={"User-Agent": "SAEBase-Pages-verify"}), timeout=15) as result:
+                      reviewed = json.load(result)
+                  assert reviewed.get("reviews"), "Atlas review index is empty"
+                  for row in reviewed["reviews"]:
+                      item_url = urljoin(base, "atlas/review-proposals/" + row["file"])
+                      with urlopen(Request(item_url, headers={"User-Agent": "SAEBase-Pages-verify"}), timeout=15) as result:
+                          snapshot = json.load(result)
+                      assert snapshot.get("plan", {}).get("id") == row["id"], "Review snapshot identity mismatch"
+                  print("Public SAEBase Atlas verified across six pages, assets and review proposals:", base)
                   break
               except Exception as exc:
                   error = f"{type(exc).__name__}: {exc}"
