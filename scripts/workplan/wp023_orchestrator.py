@@ -401,9 +401,170 @@ def execute_stage(
     }
 
 
+def audit_and_handoff(run_id: str, root: Path = ROOT) -> dict[str, Any]:
+    """Finalize honest coverage, source evidence and the filled Workplan."""
+    import csv
+    from saebase.runtime.audit import file_sha256
+    from saebase.runtime.audit_report import audit_run
+    from saebase.runtime.audit_delivery import deliver
+    from harness.github.work_plan.lifecycle import completed
+
+    run_root = _run_root(run_id, root)
+    sha, inv = _identity(run_root)
+    targets = json.loads((run_root / "targets.json").read_text())["pairs"]
+    components = (
+        [f"dataset:{x}" for x in inv["dataset_keys"]]
+        + [f"model:{x}" for x in inv["model_keys"]]
+        + [f"sae:{x['site_id']}" for x in inv["sae_sites"]]
+    )
+    pair_keys = [x["id"] for x in targets]
+    task_keys = [f"task:{x}" for x in ("capture", "intervene", "generate", "benchmark")]
+    all_keys = components + pair_keys + task_keys
+    if len(all_keys) != len(set(all_keys)):
+        raise ValueError("Repeated declared component or compatibility target")
+    rows = []
+    for key in all_keys:
+        value = _load_status(run_root, key)
+        if value["status"] == "NOT_RUN" and not _receipt_path(run_root, key).exists():
+            value = _store(run_root, key, {
+                "status": "NOT_RUN", "reason": "Target was not executed",
+            })
+        rows.append({
+            "target_id": key, "status": value["status"],
+            "code": value.get("code", ""),
+            "reason": value.get("reason", ""),
+            "receipt": "receipts/" + _receipt_path(run_root, key).name,
+        })
+    by_key = {row["target_id"]: row for row in rows}
+
+    def csv_write(name: str, selected: list[dict[str, Any]]) -> None:
+        with (run_root / name).open("x", encoding="utf-8", newline="") as output:
+            writer = csv.DictWriter(
+                output, fieldnames=["target_id", "status", "code", "reason", "receipt"],
+            )
+            writer.writeheader()
+            writer.writerows(selected)
+
+    csv_write("component_checks.csv", [by_key[k] for k in components])
+    csv_write("compatibility_checks.csv", [by_key[k] for k in pair_keys])
+    csv_write("task_checks.csv", [by_key[k] for k in task_keys])
+    grouped = []
+    for group, keys in (
+        ("dataset", components[:len(inv["dataset_keys"])]),
+        ("model", [x for x in components if x.startswith("model:")]),
+        ("sae", [x for x in components if x.startswith("sae:")]),
+        ("compatibility", pair_keys), ("task", task_keys),
+    ):
+        counts = {status: sum(by_key[k]["status"] == status for k in keys)
+                  for status in ("PASS", "FAIL", "BLOCKED", "NOT_RUN")}
+        grouped.append({"group": group, "declared": len(keys), **counts})
+    with (run_root / "coverage_summary.csv").open("x", encoding="utf-8", newline="") as output:
+        writer = csv.DictWriter(
+            output, fieldnames=["group", "declared", "PASS", "FAIL", "BLOCKED", "NOT_RUN"],
+        )
+        writer.writeheader()
+        writer.writerows(grouped)
+
+    def manifest_for(paths: list[Path]) -> dict[str, Any]:
+        return {
+            "schema": "saebase.artifact_manifest.v1",
+            "run_id": run_id, "source_sha": sha,
+            "files": [
+                {
+                    "path": str(path.relative_to(run_root)),
+                    "bytes": path.stat().st_size,
+                    "sha256": file_sha256(path),
+                    "required": True,
+                }
+                for path in sorted(paths)
+            ],
+            "checks": [
+                {
+                    "id": key,
+                    "kind": "task" if key.startswith("task:") else "precheck",
+                    "receipt": "receipts/" + _receipt_path(run_root, key).name,
+                }
+                for key in all_keys
+            ],
+        }
+
+    receipts = [_receipt_path(run_root, key) for key in all_keys]
+    csv_paths = [
+        run_root / name for name in (
+            "component_checks.csv", "compatibility_checks.csv",
+            "task_checks.csv", "coverage_summary.csv",
+        )
+    ]
+    initial = audit_run(run_root, manifest_for(receipts + csv_paths))
+    groups = {
+        "E1": [k for k in components if k.startswith("dataset:")],
+        "E2": [k for k in components if k.startswith("model:")],
+        "E3": [k for k in components if k.startswith("sae:")],
+        "E4": [k for k in pair_keys if k.startswith("model_dataset:")],
+        "E5": [k for k in pair_keys if k.startswith("sae_site_dataset:")],
+        "E6": task_keys,
+    }
+    evidence = {
+        "E1": "component_checks.csv", "E2": "component_checks.csv",
+        "E3": "component_checks.csv", "E4": "compatibility_checks.csv",
+        "E5": "compatibility_checks.csv", "E6": "task_checks.csv",
+        "E7": "audit.json",
+    }
+    results = {}
+    for name, keys in groups.items():
+        values = [by_key[k]["status"] for k in keys]
+        status = (
+            "FAIL" if "FAIL" in values else
+            "BLOCKED" if "BLOCKED" in values else
+            "NOT_RUN" if "NOT_RUN" in values else
+            "PASS" if values else "NOT_RUN"
+        )
+        results[name] = {
+            "status": status, "value": sum(v == "PASS" for v in values),
+            "notes": f"PASS {sum(v == 'PASS' for v in values)}/{len(values)}; native scientific acceptance not covered",
+            "evidence": evidence[name],
+        }
+    results["E7"] = {
+        "status": "PASS" if initial["evidence_status"] == "PASS" else "BLOCKED",
+        "value": len(rows), "notes": "Evidence completeness is distinct from execution success",
+        "evidence": evidence["E7"],
+    }
+    run_receipt = {
+        "schema": "saebase.workplan.run.v1",
+        "plan_id": "WP23", "run_id": run_id, "source_commit": sha,
+        "results": results,
+    }
+    completed_path = run_root / "workplan_completed.md"
+    completed_plan = completed(
+        "harness/github/work_plan/0.6.5_wp023_qa_precheck.md",
+        run_receipt, root=root,
+    )
+    completed_path.write_text(completed_plan, encoding="utf-8")
+    manifest = manifest_for(receipts + csv_paths + [completed_path])
+    report = audit_run(run_root, manifest)
+    (run_root / "artifact_manifest.json").write_text(
+        json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8",
+    )
+    (run_root / "audit.json").write_text(
+        json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8",
+    )
+    delivered = deliver(run_root, manifest, run_root / "archive", archive=False)
+    (run_root / "archive_receipt.json").write_text(
+        json.dumps(delivered, indent=2, ensure_ascii=False) + "\n", encoding="utf-8",
+    )
+    return {
+        "status": report["execution_status"],
+        "evidence_status": report["evidence_status"],
+        "scientific_acceptance": "NOT_COVERED",
+        "run_id": run_id, "report_root": str(run_root),
+        "checked_targets": len(rows),
+        "archive_status": delivered["archive_status"],
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("stage", choices=("inspect", "inventory", "dataset", "model", "sae", "compatibility", "task"))
+    parser.add_argument("stage", choices=("inspect", "inventory", "dataset", "model", "sae", "compatibility", "task", "audit"))
     parser.add_argument("--run-id", default="")
     parser.add_argument("--allow-compute", action="store_true")
     parser.add_argument("--allow-gpu", action="store_true")
@@ -425,6 +586,7 @@ def main() -> int:
     if not args.run_id:
         parser.error("--run-id required for inventory")
     result = (prepare_inventory(args.run_id) if args.stage == "inventory" else
+              audit_and_handoff(args.run_id) if args.stage == "audit" else
               execute_stage(args.run_id, args.stage,
                             allow_compute=args.allow_compute,
                             allow_gpu=args.allow_gpu))
