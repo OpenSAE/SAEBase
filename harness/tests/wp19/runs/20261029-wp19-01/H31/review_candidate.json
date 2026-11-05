@@ -1,0 +1,80 @@
+{
+  "schema": "saebase.wp19.review_candidate.v1",
+  "run_id": "20261029-wp19-01",
+  "case_id": "H31",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "e94da4dc3ec73c4e93ac99a01ce159e94ac2bfb2",
+  "source_content_sha256": "ade9889ac2a61e5452fccc82fde5074e4cce91e88ced6c09b4a34bbb58d75a96",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp19.runs.20261029-wp19-01.H31.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H31.implementation",
+      "title": {
+        "zh": "信号拒绝",
+        "en": "Signal refusal"
+      },
+      "summary": {
+        "zh": "未知信号、未知合同或重复名称时抛出。",
+        "en": "Raised for an unknown signal, unknown contract, or duplicated name."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H31/implementation.py",
+      "line": 50,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H31/implementation.py:50"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H31.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H31.implementation",
+      "title": {
+        "zh": "漏选报告",
+        "en": "Missing-selection report"
+      },
+      "summary": {
+        "zh": "列出信号要求但尚未选中的合同编号。",
+        "en": "Lists contract ids required by signals but not yet selected."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H31/implementation.py",
+      "line": 54,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H31/implementation.py:54"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H31.implementation:_words",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H31.implementation",
+      "title": {
+        "zh": "封闭词表",
+        "en": "Closed vocabulary"
+      },
+      "summary": {
+        "zh": "只接受词表中的唯一非空字符串。",
+        "en": "Accepts only unique nonempty strings from a closed vocabulary."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H31/implementation.py",
+      "line": 63,
+      "signature": "def _words(values: object, known: set[str]) -> list[str]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H31/implementation.py:63"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; Observed AST was not rebuilt",
+    "independent acceptance was not run",
+    "nodes remain unchecked",
+    "H47-H226 remain PROPOSED and were not implemented"
+  ]
+}

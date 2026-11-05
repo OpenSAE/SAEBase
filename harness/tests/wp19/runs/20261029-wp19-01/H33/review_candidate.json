@@ -1,0 +1,80 @@
+{
+  "schema": "saebase.wp19.review_candidate.v1",
+  "run_id": "20261029-wp19-01",
+  "case_id": "H33",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "e94da4dc3ec73c4e93ac99a01ce159e94ac2bfb2",
+  "source_content_sha256": "63a465b89e251a5da8ffe613b761aad925b06ecf9f64a27413e21f0642b67cbf",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp19.runs.20261029-wp19-01.H33.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H33.implementation",
+      "title": {
+        "zh": "绑定拒绝",
+        "en": "Binding refusal"
+      },
+      "summary": {
+        "zh": "空绑定或未注册编号不能当作新版已验证。",
+        "en": "An empty binding or unregistered id cannot count as newly verified."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H33/implementation.py",
+      "line": 31,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H33/implementation.py:31"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H33.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H33.implementation",
+      "title": {
+        "zh": "历史绑定",
+        "en": "Historical binding"
+      },
+      "summary": {
+        "zh": "空值记为 legacy_unbound，非空已知列表才是 bound。",
+        "en": "A null binding is legacy_unbound. Only a nonempty known list is bound."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H33/implementation.py",
+      "line": 35,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H33/implementation.py:35"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H33.implementation:_ids",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H33.implementation",
+      "title": {
+        "zh": "绑定编号",
+        "en": "Binding ids"
+      },
+      "summary": {
+        "zh": "读取唯一已注册编号，空列表交给上层处理。",
+        "en": "Reads unique registered ids. An empty list is handled by the caller."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H33/implementation.py",
+      "line": 48,
+      "signature": "def _ids(values: object) -> list[str]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H33/implementation.py:48"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; Observed AST was not rebuilt",
+    "independent acceptance was not run",
+    "nodes remain unchecked",
+    "H47-H226 remain PROPOSED and were not implemented"
+  ]
+}

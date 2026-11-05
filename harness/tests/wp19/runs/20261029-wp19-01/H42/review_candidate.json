@@ -1,0 +1,80 @@
+{
+  "schema": "saebase.wp19.review_candidate.v1",
+  "run_id": "20261029-wp19-01",
+  "case_id": "H42",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "e94da4dc3ec73c4e93ac99a01ce159e94ac2bfb2",
+  "source_content_sha256": "e911a69ed386be60c6ba9f2d17a09b77a5c05b6f36ee9949b34b4a04d1245f07",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp19.runs.20261029-wp19-01.H42.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H42.implementation",
+      "title": {
+        "zh": "项目拒绝",
+        "en": "Project refusal"
+      },
+      "summary": {
+        "zh": "非 SAEBase 项目、重复编号或残缺对象时抛出。",
+        "en": "Raised for a non-SAEBase project, a duplicate id, or a malformed object."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H42/implementation.py",
+      "line": 6,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H42/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H42.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H42.implementation",
+      "title": {
+        "zh": "项目隔离",
+        "en": "Project isolation"
+      },
+      "summary": {
+        "zh": "全部对象属于 SAEBase 时返回排序编号。",
+        "en": "Returns sorted ids when every object belongs to SAEBase."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H42/implementation.py",
+      "line": 10,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H42/implementation.py:10"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H42.implementation:_object",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H42.implementation",
+      "title": {
+        "zh": "单个对象",
+        "en": "One object"
+      },
+      "summary": {
+        "zh": "读取带非空编号的 SAEBase 对象。",
+        "en": "Reads one SAEBase object with a nonempty id."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H42/implementation.py",
+      "line": 28,
+      "signature": "def _object(item: object) -> str",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H42/implementation.py:28"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; Observed AST was not rebuilt",
+    "independent acceptance was not run",
+    "nodes remain unchecked",
+    "H47-H226 remain PROPOSED and were not implemented"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "positive": [
+    {
+      "input": {
+        "claims": [
+          {
+            "source": "left",
+            "value": ""
+          },
+          {
+            "source": "right",
+            "value": ""
+          }
+        ]
+      },
+      "expected": {
+        "status": "consistent",
+        "sources": [
+          "left",
+          "right"
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "claims": [
+          {
+            "source": "left",
+            "value": "x"
+          },
+          {
+            "source": "right",
+            "value": 1
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "claims": []
+      }
+    }
+  ]
+}

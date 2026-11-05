@@ -1,0 +1,80 @@
+{
+  "schema": "saebase.wp19.review_candidate.v1",
+  "run_id": "20261029-wp19-01",
+  "case_id": "H27",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "e94da4dc3ec73c4e93ac99a01ce159e94ac2bfb2",
+  "source_content_sha256": "3c6c8835290467dee43ae4d839acde294e18f7d3873f1b2102a9379662a17b46",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp19.runs.20261029-wp19-01.H27.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H27.implementation",
+      "title": {
+        "zh": "选择拒绝",
+        "en": "Selection refusal"
+      },
+      "summary": {
+        "zh": "未知或重复合同编号时抛出。",
+        "en": "Raised for an unknown or duplicated contract id."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H27/implementation.py",
+      "line": 32,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H27/implementation.py:32"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H27.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H27.implementation",
+      "title": {
+        "zh": "常驻并集",
+        "en": "Always-on union"
+      },
+      "summary": {
+        "zh": "把五项常驻合同并入所选编号并排序。",
+        "en": "Unions the five always-on contracts with the selected ids and sorts them."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H27/implementation.py",
+      "line": 36,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H27/implementation.py:36"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H27.implementation:_ids",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H27.implementation",
+      "title": {
+        "zh": "合同编号",
+        "en": "Contract ids"
+      },
+      "summary": {
+        "zh": "只接受目录中已有的唯一编号。",
+        "en": "Accepts only unique ids that already exist in the catalog."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H27/implementation.py",
+      "line": 43,
+      "signature": "def _ids(values: object) -> list[str]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H27/implementation.py:43"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; Observed AST was not rebuilt",
+    "independent acceptance was not run",
+    "nodes remain unchecked",
+    "H47-H226 remain PROPOSED and were not implemented"
+  ]
+}

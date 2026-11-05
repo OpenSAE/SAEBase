@@ -1,0 +1,59 @@
+{
+  "schema": "saebase.wp19.review_candidate.v1",
+  "run_id": "20261029-wp19-01",
+  "case_id": "H30",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "e94da4dc3ec73c4e93ac99a01ce159e94ac2bfb2",
+  "source_content_sha256": "d4cfa2fc8268d20f9a19ab0166d705ecc6f3b3fb62950e78ae1fcdd2aa16ecb0",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp19.runs.20261029-wp19-01.H30.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H30.implementation",
+      "title": {
+        "zh": "版本拒绝",
+        "en": "Version refusal"
+      },
+      "summary": {
+        "zh": "缺版本、非字符串或两边不一致时抛出。",
+        "en": "Raised when a version is missing, not a string, or the two sides disagree."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H30/implementation.py",
+      "line": 6,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H30/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H30.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H30.implementation",
+      "title": {
+        "zh": "版本核对",
+        "en": "Version match"
+      },
+      "summary": {
+        "zh": "两边非空字符串完全相同时返回 matched。",
+        "en": "Returns matched when both nonempty strings are identical."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H30/implementation.py",
+      "line": 10,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H30/implementation.py:10"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; Observed AST was not rebuilt",
+    "independent acceptance was not run",
+    "nodes remain unchecked",
+    "H47-H226 remain PROPOSED and were not implemented"
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "schema": "saebase.wp19.review_candidate.v1",
+  "run_id": "20261029-wp19-01",
+  "case_id": "H41",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "e94da4dc3ec73c4e93ac99a01ce159e94ac2bfb2",
+  "source_content_sha256": "2ba6c1fb09174dcf396ccfc57507c422b0a3138c9683b3cdcc259ab395754587",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp19.runs.20261029-wp19-01.H41.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H41.implementation",
+      "title": {
+        "zh": "引用拒绝",
+        "en": "Reference refusal"
+      },
+      "summary": {
+        "zh": "空编号、非字符串或重复编号时抛出。",
+        "en": "Raised when an id is empty, not a string, or duplicated."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H41/implementation.py",
+      "line": 6,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H41/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H41.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H41.implementation",
+      "title": {
+        "zh": "已知未知",
+        "en": "Known and unknown"
+      },
+      "summary": {
+        "zh": "把引用分成已存在和未解析两组。",
+        "en": "Splits references into ids that exist and ids that stay unresolved."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H41/implementation.py",
+      "line": 10,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H41/implementation.py:10"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp19.runs.20261029-wp19-01.H41.implementation:_ids",
+      "parent_id": "code:module:harness.tests.wp19.runs.20261029-wp19-01.H41.implementation",
+      "title": {
+        "zh": "上下文编号",
+        "en": "Context ids"
+      },
+      "summary": {
+        "zh": "接受唯一非空字符串，不编造替代编号。",
+        "en": "Accepts unique nonempty strings and does not invent a replacement id."
+      },
+      "path": "harness/tests/wp19/runs/20261029-wp19-01/H41/implementation.py",
+      "line": 22,
+      "signature": "def _ids(values: object) -> list[str]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp19/runs/20261029-wp19-01/H41/implementation.py:22"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; Observed AST was not rebuilt",
+    "independent acceptance was not run",
+    "nodes remain unchecked",
+    "H47-H226 remain PROPOSED and were not implemented"
+  ]
+}

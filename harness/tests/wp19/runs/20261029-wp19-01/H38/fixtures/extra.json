@@ -1,0 +1,41 @@
+{
+  "positive": [
+    {
+      "input": {
+        "paths": [
+          "saebase/registry.py",
+          "conf/config.yaml"
+        ]
+      },
+      "expected": {
+        "allowed": [
+          "conf/config.yaml",
+          "saebase/registry.py"
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "paths": [
+          ".cursor/hooks/guard_shell.py"
+        ]
+      }
+    },
+    {
+      "input": {
+        "paths": [
+          "/etc/passwd"
+        ]
+      }
+    },
+    {
+      "input": {
+        "paths": [
+          "harness/contracts/catalog.json"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "positive": [
+    {
+      "input": {
+        "ids": [
+          "CT-NAMESPACE",
+          "CT-ERROR"
+        ]
+      },
+      "expected": {
+        "ids": [
+          "CT-ERROR",
+          "CT-NAMESPACE"
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "ids": [
+          "ct-base"
+        ]
+      }
+    },
+    {
+      "input": {
+        "ids": [
+          "CT-ERROR",
+          "CT-ERROR"
+        ]
+      }
+    }
+  ]
+}

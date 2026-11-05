@@ -1,0 +1,43 @@
+{
+  "positive": [
+    {
+      "input": {
+        "required": [
+          "term.span"
+        ],
+        "read": [
+          "term.span"
+        ]
+      },
+      "expected": {
+        "selected": [
+          "term.span"
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "required": [
+          "term.span",
+          "term.span"
+        ],
+        "read": [
+          "term.span"
+        ]
+      }
+    },
+    {
+      "input": {
+        "required": [
+          "term.span"
+        ],
+        "read": [
+          "term.span",
+          "term.span"
+        ]
+      }
+    }
+  ]
+}

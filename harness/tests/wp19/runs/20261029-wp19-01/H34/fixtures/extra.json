@@ -1,0 +1,36 @@
+{
+  "positive": [
+    {
+      "input": {
+        "action": "sandbox_write",
+        "authorized": true
+      },
+      "expected": {
+        "allowed": true
+      }
+    },
+    {
+      "input": {
+        "action": "governance_write",
+        "authorized": false
+      },
+      "expected": {
+        "allowed": false
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "action": "sandbox_write",
+        "authorized": 0
+      }
+    },
+    {
+      "input": {
+        "action": "sandbox",
+        "authorized": false
+      }
+    }
+  ]
+}

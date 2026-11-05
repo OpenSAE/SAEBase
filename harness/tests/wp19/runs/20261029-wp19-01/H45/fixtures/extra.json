@@ -1,0 +1,27 @@
+{
+  "positive": [
+    {
+      "input": {
+        "path": "notes/west.md",
+        "exists": false
+      },
+      "expected": {
+        "status": "unresolved"
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "path": "",
+        "exists": true
+      }
+    },
+    {
+      "input": {
+        "path": "notes/west.md",
+        "exists": 1
+      }
+    }
+  ]
+}

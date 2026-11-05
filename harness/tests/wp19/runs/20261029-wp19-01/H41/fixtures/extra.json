@@ -1,0 +1,41 @@
+{
+  "positive": [
+    {
+      "input": {
+        "known": [
+          "k1"
+        ],
+        "references": [
+          "k2"
+        ]
+      },
+      "expected": {
+        "resolved": [],
+        "unresolved": [
+          "k2"
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "known": [
+          ""
+        ],
+        "references": []
+      }
+    },
+    {
+      "input": {
+        "known": [
+          "k1"
+        ],
+        "references": [
+          "k1",
+          "k1"
+        ]
+      }
+    }
+  ]
+}

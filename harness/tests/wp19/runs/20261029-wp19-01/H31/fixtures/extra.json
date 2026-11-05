@@ -1,0 +1,56 @@
+{
+  "positive": [
+    {
+      "input": {
+        "selected": [
+          "CT-EVIDENCE"
+        ],
+        "signals": [
+          "source_reference",
+          "file_evidence"
+        ]
+      },
+      "expected": {
+        "missing": []
+      }
+    },
+    {
+      "input": {
+        "selected": [
+          "CT-BASE"
+        ],
+        "signals": [
+          "source_ast",
+          "review_state"
+        ]
+      },
+      "expected": {
+        "missing": [
+          "CT-AST",
+          "CT-REVIEW"
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "selected": [
+          "CT-MISSING"
+        ],
+        "signals": [
+          "source_ast"
+        ]
+      }
+    },
+    {
+      "input": {
+        "selected": [
+          "CT-BASE",
+          "CT-BASE"
+        ],
+        "signals": []
+      }
+    }
+  ]
+}

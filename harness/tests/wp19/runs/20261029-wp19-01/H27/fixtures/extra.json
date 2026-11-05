@@ -1,0 +1,40 @@
+{
+  "positive": [
+    {
+      "input": {
+        "selected": [
+          "CT-LOCALE",
+          "CT-DATA"
+        ]
+      },
+      "expected": {
+        "contracts": [
+          "CT-BASE",
+          "CT-CHECK",
+          "CT-DATA",
+          "CT-LOCALE",
+          "CT-SCOPE",
+          "CT-TRACE",
+          "CT-TRUTH"
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "selected": [
+          "CT-LOCALE"
+        ],
+        "extra": true
+      }
+    },
+    {
+      "input": {
+        "selected": [
+          ""
+        ]
+      }
+    }
+  ]
+}

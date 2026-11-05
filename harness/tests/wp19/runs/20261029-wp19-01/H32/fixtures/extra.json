@@ -1,0 +1,47 @@
+{
+  "positive": [
+    {
+      "input": {
+        "groups": [
+          [
+            "CT-AST"
+          ],
+          [
+            "CT-AST",
+            "CT-ENV"
+          ]
+        ]
+      },
+      "expected": {
+        "contracts": [
+          "CT-AST",
+          "CT-BASE",
+          "CT-CHECK",
+          "CT-ENV",
+          "CT-SCOPE",
+          "CT-TRACE",
+          "CT-TRUTH"
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "groups": [
+          [
+            "CT-AST",
+            "CT-AST"
+          ]
+        ]
+      }
+    },
+    {
+      "input": {
+        "groups": [
+          null
+        ]
+      }
+    }
+  ]
+}
