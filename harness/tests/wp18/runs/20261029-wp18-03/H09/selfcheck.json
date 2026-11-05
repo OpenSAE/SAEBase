@@ -1,0 +1,53 @@
+{
+  "commands": [
+    "/usr/bin/python3 -m harness.contracts.registry resolve --plan harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md --case H09",
+    "/usr/bin/python3 -m pytest -p no:cacheprovider -q harness/tests/wp18/runs/20261029-wp18-03/H09/test_implementation.py",
+    "/usr/bin/python3 -m harness.contracts.wp18_verify --case H09 --run-dir harness/tests/wp18/runs/20261029-wp18-03/H09"
+  ],
+  "exit_codes": [
+    0,
+    0,
+    0
+  ],
+  "tests_passed": 6,
+  "tests_failed": 0,
+  "not_run": [
+    "python harness/code/build.py --include-harness",
+    "python harness/code/diff.py",
+    "U01-U12 independent fixtures",
+    "harness/tests/wp18/acceptance/20261029-wp18-03",
+    "python -m harness.contracts.acceptance"
+  ],
+  "verifier": {
+    "passed": 4,
+    "failed": 0,
+    "technical_only": true,
+    "human_approved": false,
+    "checks": [
+      {
+        "name": "nested",
+        "passed": true
+      },
+      {
+        "name": "nonsecret",
+        "passed": true
+      },
+      {
+        "name": "no_payload",
+        "passed": true
+      },
+      {
+        "name": "wrong_shape",
+        "passed": true
+      }
+    ]
+  },
+  "observed_failures": [
+    {
+      "command": "python3 -m pytest -p no:cacheprovider -q harness/tests/wp18/runs/20261029-wp18-03",
+      "exit_code": 2,
+      "observed": "pytest stopped during collection with import file mismatch. Every case file is named test_implementation.py, which this run keeps because the WP18 directory contract requires that filename.",
+      "followed_by": "The same tests were run one case file at a time, and those commands exited 0."
+    }
+  ]
+}

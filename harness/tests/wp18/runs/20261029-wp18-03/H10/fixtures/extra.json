@@ -1,0 +1,100 @@
+{
+  "positive": [
+    {
+      "input": {
+        "nodes": [
+          {
+            "id": "p",
+            "parent_id": null,
+            "tree_id": "yard",
+            "order": 0
+          },
+          {
+            "id": "k",
+            "parent_id": "p",
+            "tree_id": "yard",
+            "order": 2
+          },
+          {
+            "id": "m",
+            "parent_id": "p",
+            "tree_id": "yard",
+            "order": 1
+          },
+          {
+            "id": "q",
+            "parent_id": null,
+            "tree_id": "lane",
+            "order": 1
+          }
+        ],
+        "scope": "tree",
+        "target": "lane"
+      },
+      "expected": {
+        "order": [
+          "q"
+        ]
+      }
+    },
+    {
+      "input": {
+        "nodes": [
+          {
+            "id": "p",
+            "parent_id": null,
+            "tree_id": "yard",
+            "order": 0
+          },
+          {
+            "id": "m",
+            "parent_id": "p",
+            "tree_id": "yard",
+            "order": 1
+          }
+        ],
+        "scope": "node",
+        "target": "m"
+      },
+      "expected": {
+        "order": [
+          "m"
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "nodes": [
+          {
+            "id": "p",
+            "parent_id": null,
+            "tree_id": "yard",
+            "order": 0
+          },
+          {
+            "id": "m",
+            "parent_id": "p",
+            "tree_id": "lane",
+            "order": 1
+          }
+        ],
+        "scope": "all"
+      }
+    },
+    {
+      "input": {
+        "nodes": [
+          {
+            "id": "p",
+            "parent_id": "missing",
+            "tree_id": "yard",
+            "order": false
+          }
+        ],
+        "scope": "all"
+      }
+    }
+  ]
+}

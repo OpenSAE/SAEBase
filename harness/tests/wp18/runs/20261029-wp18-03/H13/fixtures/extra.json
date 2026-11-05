@@ -1,0 +1,75 @@
+{
+  "positive": [
+    {
+      "input": {
+        "records": [
+          {
+            "id": "row-en",
+            "project": "SAEBase",
+            "title": {
+              "zh": "路径样本",
+              "en": "Path sample"
+            },
+            "summary": {
+              "zh": "检查一条相对路径",
+              "en": ""
+            },
+            "description": {
+              "zh": "保留原始标识",
+              "en": "Keeps the original identifier"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "defects": [
+          "row-en:summary.en:missing"
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "records": [
+          {
+            "id": "row-copy",
+            "title": {
+              "zh": "路径样本",
+              "en": "Path sample"
+            },
+            "summary": {
+              "zh": "路径样本",
+              "en": "Checks one path"
+            },
+            "description": {
+              "zh": "保留原始标识",
+              "en": "Keeps the identifier"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "records": [
+          {
+            "id": "row-bad",
+            "title": {
+              "zh": "路径样本",
+              "en": "English translation unavailable"
+            },
+            "summary": {
+              "zh": "检查一条相对路径",
+              "en": "Checks one path"
+            },
+            "description": {
+              "zh": "保留原始标识",
+              "en": "Keeps the identifier"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

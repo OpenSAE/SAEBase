@@ -1,0 +1,79 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-03",
+  "case_id": "H12",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "071cfcc4556173333de8e8da0ebdfa08da8b28f7",
+  "source_content_sha256": "169738f0eb9a64200102a914f12af51944f5ea19a5dc5c3f5825e00360cc4ca5",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-03.H12.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H12.implementation",
+      "title": {
+        "zh": "接口拒绝",
+        "en": "Interface rejection"
+      },
+      "summary": {
+        "zh": "重复 id 或非字符串签名被拒绝，不生成猜测节点。",
+        "en": "Duplicate ids and non-string signatures are rejected. No guessed node is created."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H12/implementation.py",
+      "line": 6,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H12/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H12.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H12.implementation",
+      "title": {
+        "zh": "签名差异",
+        "en": "Signature delta"
+      },
+      "summary": {
+        "zh": "按 id 比较两侧签名，输出排序后的新增、删除和变更。",
+        "en": "Compares signatures by id and returns sorted added, removed, and changed ids."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H12/implementation.py",
+      "line": 10,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H12/implementation.py:10"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H12.implementation:_side",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H12.implementation",
+      "title": {
+        "zh": "单侧索引",
+        "en": "One-side index"
+      },
+      "summary": {
+        "zh": "把一侧节点收成 id 到精确签名的映射，输入顺序不参与比较。",
+        "en": "Collects one side into an id-to-signature map. Input order does not affect the comparison."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H12/implementation.py",
+      "line": 24,
+      "signature": "def _side(values: object) -> dict[str, str]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H12/implementation.py:24"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; harness/code/build.py was not run to produce Observed",
+    "independent acceptance was not run",
+    "nodes remain unchecked"
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-03",
+  "case_id": "H07",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "071cfcc4556173333de8e8da0ebdfa08da8b28f7",
+  "source_content_sha256": "8e329fa564cd0532c3dfc3cac799c219ae5d7a8c22b048be13baffddd869c7a9",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-03.H07.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H07.implementation",
+      "title": {
+        "zh": "路径拒绝",
+        "en": "Path rejection"
+      },
+      "summary": {
+        "zh": "路径清单不合法时抛出，并且不会因此打开文件。",
+        "en": "Raised for an illegal path list. Raising it does not open a file."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H07/implementation.py",
+      "line": 6,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H07/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H07.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H07.implementation",
+      "title": {
+        "zh": "路径清单入口",
+        "en": "Path-list entry"
+      },
+      "summary": {
+        "zh": "只接受 paths 字段，并返回排序后的相对路径。",
+        "en": "Accepts only the paths field and returns the relative paths in sorted order."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H07/implementation.py",
+      "line": 10,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H07/implementation.py:10"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H07.implementation:_paths",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H07.implementation",
+      "title": {
+        "zh": "相对路径句法",
+        "en": "Relative-path syntax"
+      },
+      "summary": {
+        "zh": "在任何文件访问之前拒绝绝对路径、父目录、空段、反斜杠和重复项。",
+        "en": "Rejects absolute paths, parents, empty segments, backslashes, and duplicates before any file access."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H07/implementation.py",
+      "line": 17,
+      "signature": "def _paths(values: object) -> list[str]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H07/implementation.py:17"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; harness/code/build.py was not run to produce Observed",
+    "independent acceptance was not run",
+    "nodes remain unchecked"
+  ]
+}

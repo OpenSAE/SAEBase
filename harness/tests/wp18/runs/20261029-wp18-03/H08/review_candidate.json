@@ -1,0 +1,79 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-03",
+  "case_id": "H08",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "071cfcc4556173333de8e8da0ebdfa08da8b28f7",
+  "source_content_sha256": "3e17b328ccc68b3cfb8d605e86bf49d4c18262ee93da0580ba434bc40f0c838e",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-03.H08.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H08.implementation",
+      "title": {
+        "zh": "声明拒绝",
+        "en": "Claim rejection"
+      },
+      "summary": {
+        "zh": "来源声明不完整或越界时抛出，路径字符串本身不算已核实。",
+        "en": "Raised when a claim is incomplete or escapes. A path-shaped string is not verified provenance."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H08/implementation.py",
+      "line": 6,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H08/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H08.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H08.implementation",
+      "title": {
+        "zh": "证据分流",
+        "en": "Evidence split"
+      },
+      "summary": {
+        "zh": "只有布尔真值的 observed 进入 resolved，其余进入 unresolved。",
+        "en": "Only a boolean true observed flag goes to resolved. Every other accepted claim stays unresolved."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H08/implementation.py",
+      "line": 10,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H08/implementation.py:10"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H08.implementation:_claim",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H08.implementation",
+      "title": {
+        "zh": "单条来源",
+        "en": "One source claim"
+      },
+      "summary": {
+        "zh": "核对 id、仓库相对引用和行号，并要求 observed 是布尔值。",
+        "en": "Checks the id, repo-relative reference, and line number, and requires observed to be boolean."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H08/implementation.py",
+      "line": 32,
+      "signature": "def _claim(claim: object) -> tuple[str, bool]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H08/implementation.py:32"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; harness/code/build.py was not run to produce Observed",
+    "independent acceptance was not run",
+    "nodes remain unchecked"
+  ]
+}

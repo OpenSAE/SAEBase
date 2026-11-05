@@ -1,0 +1,79 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-03",
+  "case_id": "H24",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "071cfcc4556173333de8e8da0ebdfa08da8b28f7",
+  "source_content_sha256": "ca7d040e3905ea3b9e0c178d9d002d54c9cb00e67c1b51da0f2e97923641c090",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-03.H24.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H24.implementation",
+      "title": {
+        "zh": "恢复拒绝",
+        "en": "Resume rejection"
+      },
+      "summary": {
+        "zh": "run、配置、数据或 seed 任一不一致都不能恢复。",
+        "en": "Any mismatch in run, config, dataset, or seed blocks resume."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H24/implementation.py",
+      "line": 11,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H24/implementation.py:11"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H24.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H24.implementation",
+      "title": {
+        "zh": "恢复核对",
+        "en": "Resume check"
+      },
+      "summary": {
+        "zh": "两侧身份完全一致时返回 resume true，不合并别的运行。",
+        "en": "Returns resume true when both identities match. It does not merge another run."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H24/implementation.py",
+      "line": 15,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H24/implementation.py:15"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H24.implementation:_identity",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H24.implementation",
+      "title": {
+        "zh": "四字段身份",
+        "en": "Four-field identity"
+      },
+      "summary": {
+        "zh": "读取 run_id、config_sha、dataset_sha 和整数 seed。",
+        "en": "Reads run_id, config_sha, dataset_sha, and an integer seed."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H24/implementation.py",
+      "line": 26,
+      "signature": "def _identity(value: object) -> dict[str, object]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H24/implementation.py:26"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; harness/code/build.py was not run to produce Observed",
+    "independent acceptance was not run",
+    "nodes remain unchecked"
+  ]
+}

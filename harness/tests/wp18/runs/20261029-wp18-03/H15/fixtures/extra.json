@@ -1,0 +1,52 @@
+{
+  "positive": [
+    {
+      "input": {
+        "limit": {
+          "samples": 3,
+          "gpu_minutes": 0
+        },
+        "request": {
+          "samples": 3,
+          "gpu_minutes": 0
+        },
+        "gpu_authorized": false
+      },
+      "expected": {
+        "allowed": true,
+        "remaining": {
+          "samples": 0,
+          "gpu_minutes": 0
+        }
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "limit": {
+          "samples": true,
+          "gpu_minutes": 0
+        },
+        "request": {
+          "samples": 1,
+          "gpu_minutes": 0
+        },
+        "gpu_authorized": false
+      }
+    },
+    {
+      "input": {
+        "limit": {
+          "samples": 4,
+          "gpu_minutes": 2
+        },
+        "request": {
+          "samples": 1,
+          "gpu_minutes": 0
+        },
+        "gpu_authorized": "yes"
+      }
+    }
+  ]
+}

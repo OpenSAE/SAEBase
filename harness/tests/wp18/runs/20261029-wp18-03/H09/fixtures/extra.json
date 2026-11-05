@@ -1,0 +1,37 @@
+{
+  "positive": [
+    {
+      "input": {
+        "payload": {
+          "password": "fixture-token-h09",
+          "note": "/var/private/bench",
+          "count": 1,
+          "ready": false
+        }
+      },
+      "expected": {
+        "payload": {
+          "password": "[REDACTED]",
+          "note": "[REDACTED]",
+          "count": 1,
+          "ready": false
+        }
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "payload": "fixture-token-h09"
+      }
+    },
+    {
+      "input": {
+        "payload": {
+          "token": "fixture-token-h09"
+        },
+        "extra": 1
+      }
+    }
+  ]
+}

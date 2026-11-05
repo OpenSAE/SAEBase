@@ -1,0 +1,60 @@
+{
+  "positive": [
+    {
+      "input": {
+        "jobs": [
+          {
+            "id": "pack",
+            "needs": [
+              "lint",
+              "type"
+            ]
+          },
+          {
+            "id": "type",
+            "needs": []
+          },
+          {
+            "id": "lint",
+            "needs": []
+          }
+        ]
+      },
+      "expected": {
+        "order": [
+          "lint",
+          "type",
+          "pack"
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "jobs": [
+          {
+            "id": "lint",
+            "needs": [
+              "lint"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "jobs": [
+          {
+            "id": "lint",
+            "needs": []
+          },
+          {
+            "id": "lint",
+            "needs": []
+          }
+        ]
+      }
+    }
+  ]
+}

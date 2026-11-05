@@ -1,0 +1,79 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-03",
+  "case_id": "H25",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "071cfcc4556173333de8e8da0ebdfa08da8b28f7",
+  "source_content_sha256": "88e9a61a339ae66970da452eab530f557e25682a854616b94878b5139493f912",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-03.H25.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H25.implementation",
+      "title": {
+        "zh": "批次拒绝",
+        "en": "Batch rejection"
+      },
+      "summary": {
+        "zh": "空 id、重复 id 或非法值会拒绝整批，不悄悄去重。",
+        "en": "An empty id, duplicate id, or illegal value rejects the whole batch. Nothing is silently deduplicated."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H25/implementation.py",
+      "line": 6,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H25/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H25.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H25.implementation",
+      "title": {
+        "zh": "批次排序",
+        "en": "Batch ordering"
+      },
+      "summary": {
+        "zh": "按 id 排序返回全部条目，输入顺序不改变结果。",
+        "en": "Returns every item sorted by id. Input order does not change the result."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H25/implementation.py",
+      "line": 10,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H25/implementation.py:10"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H25.implementation:_item",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H25.implementation",
+      "title": {
+        "zh": "单个条目",
+        "en": "One batch item"
+      },
+      "summary": {
+        "zh": "保留非空 id 和原始标量值。",
+        "en": "Keeps a nonempty id and its original scalar value."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H25/implementation.py",
+      "line": 30,
+      "signature": "def _item(value: object) -> dict[str, object]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H25/implementation.py:30"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; harness/code/build.py was not run to produce Observed",
+    "independent acceptance was not run",
+    "nodes remain unchecked"
+  ]
+}

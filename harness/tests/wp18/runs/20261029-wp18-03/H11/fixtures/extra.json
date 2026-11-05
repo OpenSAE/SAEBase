@@ -1,0 +1,72 @@
+{
+  "positive": [
+    {
+      "input": {
+        "nodes": [
+          {
+            "id": "north",
+            "term_ids": [
+              "span"
+            ]
+          },
+          {
+            "id": "south",
+            "term_ids": [
+              "span"
+            ]
+          }
+        ],
+        "terms": [
+          {
+            "id": "span",
+            "node_ids": [
+              "north",
+              "south"
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "linked": [
+          "north:span",
+          "south:span"
+        ]
+      }
+    }
+  ],
+  "negative": [
+    {
+      "input": {
+        "nodes": [
+          {
+            "id": "north",
+            "term_ids": []
+          }
+        ],
+        "terms": [
+          {
+            "id": "span",
+            "node_ids": [
+              "north"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "nodes": [
+          {
+            "id": "north",
+            "term_ids": []
+          },
+          {
+            "id": "north",
+            "term_ids": []
+          }
+        ],
+        "terms": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "schema": "saebase.wp18.review_candidate.v1",
+  "run_id": "20261029-wp18-03",
+  "case_id": "H10",
+  "project": "SAEBase",
+  "provisional": true,
+  "base_sha": "071cfcc4556173333de8e8da0ebdfa08da8b28f7",
+  "source_content_sha256": "2178eaf891967168e2f02d286975c50d9e99113e47ea64aea17e0fe53a8c83a7",
+  "changes": [
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:class:harness.tests.wp18.runs.20261029-wp18-03.H10.implementation:InputError",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H10.implementation",
+      "title": {
+        "zh": "图拒绝",
+        "en": "Graph rejection"
+      },
+      "summary": {
+        "zh": "缺父节点、跨树、环或未知范围都会拒绝，不会补出一个节点。",
+        "en": "Missing parents, cross-tree links, cycles, and unknown scopes are rejected. No node is invented."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H10/implementation.py",
+      "line": 6,
+      "signature": "class InputError(ValueError)",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H10/implementation.py:6"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H10.implementation:solve",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H10.implementation",
+      "title": {
+        "zh": "范围选择",
+        "en": "Scope selection"
+      },
+      "summary": {
+        "zh": "按 all、tree、parent、node 选择同一张图上的 DFS 起点。",
+        "en": "Selects the DFS start on one graph for all, tree, parent, or node scope."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H10/implementation.py",
+      "line": 10,
+      "signature": "def solve(payload: dict) -> dict",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H10/implementation.py:10"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H10.implementation:_graph",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H10.implementation",
+      "title": {
+        "zh": "父边索引",
+        "en": "Parent index"
+      },
+      "summary": {
+        "zh": "为每个节点登记唯一父边，并按 order 再按 id 排列兄弟节点。",
+        "en": "Records one parent edge per node and orders siblings by order, then by id."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H10/implementation.py",
+      "line": 41,
+      "signature": "def _graph(values: object) -> tuple[dict[str, dict[str, object]], dict[str, list[str]], list[str]]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H10/implementation.py:41"
+      ]
+    },
+    {
+      "view": "code",
+      "operation": "add",
+      "node_id": "code:function:harness.tests.wp18.runs.20261029-wp18-03.H10.implementation:_walk",
+      "parent_id": "code:module:harness.tests.wp18.runs.20261029-wp18-03.H10.implementation",
+      "title": {
+        "zh": "先序遍历",
+        "en": "Preorder walk"
+      },
+      "summary": {
+        "zh": "从选定根开始先序遍历，重复访问视为环。",
+        "en": "Walks preorder from the selected roots. A repeated visit is a cycle."
+      },
+      "path": "harness/tests/wp18/runs/20261029-wp18-03/H10/implementation.py",
+      "line": 89,
+      "signature": "def _walk(roots: list[str], children: dict[str, list[str]]) -> list[str]",
+      "status": "unchecked",
+      "evidence": [
+        "harness/tests/wp18/runs/20261029-wp18-03/H10/implementation.py:89"
+      ]
+    }
+  ],
+  "unresolved": [
+    "expected_code_diff is a prediction; harness/code/build.py was not run to produce Observed",
+    "independent acceptance was not run",
+    "nodes remain unchecked"
+  ]
+}
