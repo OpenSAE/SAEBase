@@ -1,0 +1,18 @@
+{
+  "synthetic": true,
+  "nodes": [
+    {
+      "id": "exam.node.span",
+      "term_ids": ["exam.term.span"],
+      "source_evidence": "sources/north-note.md:2"
+    }
+  ],
+  "glossary": [
+    {
+      "id": "exam.term.span",
+      "related_node_ids": ["exam.node.span"],
+      "aliases": ["span label"],
+      "source_evidence": "sources/term-note.md:1"
+    }
+  ]
+}

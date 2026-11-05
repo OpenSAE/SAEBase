@@ -1,0 +1,132 @@
+{
+  "added_ids": [
+    "code:class:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:TreeShapeError",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:_accept_tree",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:_contains_cycle",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:_edge_rows",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:compare_code_trees",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:_fixture",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:_load",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:test_bad_graphs_raise_without_inventing_nodes",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:test_candidate_matches_ast",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:test_reordering_reports_nothing",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:test_signature_and_structure_are_exact",
+    "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation",
+    "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation"
+  ],
+  "removed_ids": [],
+  "changed": [],
+  "edges_added": [
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:_accept_tree",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:_contains_cycle",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:compare_code_trees",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:_accept_tree",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:compare_code_trees",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:_edge_rows",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:test_bad_graphs_raise_without_inventing_nodes",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:_fixture",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:test_bad_graphs_raise_without_inventing_nodes",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:test_reordering_reports_nothing",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:_fixture",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:test_reordering_reports_nothing",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:test_signature_and_structure_are_exact",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:_fixture",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:test_signature_and_structure_are_exact",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:group:harness",
+      "target": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:harness",
+      "target": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation",
+      "target": "code:class:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:TreeShapeError",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:_accept_tree",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:_contains_cycle",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:_edge_rows",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.implementation:compare_code_trees",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:_fixture",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:_load",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:test_bad_graphs_raise_without_inventing_nodes",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:test_candidate_matches_ast",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:test_reordering_reports_nothing",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H02.test_implementation:test_signature_and_structure_are_exact",
+      "type": "contains"
+    }
+  ],
+  "edges_removed": []
+}

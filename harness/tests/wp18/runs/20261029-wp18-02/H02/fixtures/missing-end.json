@@ -1,0 +1,9 @@
+{
+  "synthetic": true,
+  "nodes": [
+    {"id": "code:module:exam.packet", "signature": "", "project": "SAEBase"}
+  ],
+  "edges": [
+    {"source": "code:module:exam.packet", "type": "contains", "target": "code:function:exam.packet:missing_span"}
+  ]
+}

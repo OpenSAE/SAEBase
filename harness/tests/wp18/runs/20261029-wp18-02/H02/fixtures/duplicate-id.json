@@ -1,0 +1,8 @@
+{
+  "synthetic": true,
+  "nodes": [
+    {"id": "code:function:exam.packet:north_span", "signature": "def north_span()", "project": "SAEBase"},
+    {"id": "code:function:exam.packet:north_span", "signature": "def north_span(x: int)", "project": "SAEBase"}
+  ],
+  "edges": []
+}

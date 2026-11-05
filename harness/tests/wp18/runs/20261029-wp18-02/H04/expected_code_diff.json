@@ -1,0 +1,122 @@
+{
+  "added_ids": [
+    "code:class:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:EnvironmentRefusal",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_private_text",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_public_text",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_sensitive_key",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_walk",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:normalize_environment",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation:_load",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation:test_candidate_matches_ast",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation:test_missing_gpu_stays_unknown",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation:test_nested_secrets_do_not_survive",
+    "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation:test_unsupported_values_fail_closed",
+    "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation",
+    "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation"
+  ],
+  "removed_ids": [],
+  "changed": [],
+  "edges_added": [
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_walk",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_private_text",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_walk",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_public_text",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_walk",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_sensitive_key",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:normalize_environment",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_walk",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation:test_missing_gpu_stays_unknown",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation:test_nested_secrets_do_not_survive",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation:test_unsupported_values_fail_closed",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation:_load",
+      "type": "calls"
+    },
+    {
+      "source": "code:group:harness",
+      "target": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation",
+      "type": "contains"
+    },
+    {
+      "source": "code:group:harness",
+      "target": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation",
+      "target": "code:class:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:EnvironmentRefusal",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_private_text",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_public_text",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_sensitive_key",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:_walk",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.implementation:normalize_environment",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation:_load",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation:test_candidate_matches_ast",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation:test_missing_gpu_stays_unknown",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation:test_nested_secrets_do_not_survive",
+      "type": "contains"
+    },
+    {
+      "source": "code:module:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation",
+      "target": "code:function:harness.tests.wp18.runs.20261029-wp18-02.H04.test_implementation:test_unsupported_values_fail_closed",
+      "type": "contains"
+    }
+  ],
+  "edges_removed": []
+}

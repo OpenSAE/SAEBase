@@ -1,0 +1,84 @@
+{
+  "schema": "saebase.harness.contract_receipt.v1",
+  "registry_version": "1.0.0",
+  "case_id": "H06",
+  "contract_ids": [
+    "CT-BASE",
+    "CT-SCOPE",
+    "CT-TRUTH",
+    "CT-CHECK",
+    "CT-TRACE",
+    "CT-ERROR",
+    "CT-LOCALE",
+    "CT-AST",
+    "CT-INTERFACE"
+  ],
+  "task_signals": [
+    "bilingual_fields",
+    "source_ast"
+  ],
+  "selection_audit": [],
+  "source_sha": "95e42deb2994b9a08e56ed14417ac3eb12ae3cbb",
+  "head_sha": "unavailable",
+  "context_paths": [
+    ".cursor/rules/core/00-core.mdc",
+    ".cursor/rules/core/10-context-selection.mdc",
+    ".cursor/skills/workflow/run-work-order/SKILL.md",
+    "harness/code/build.py",
+    "harness/contracts/README.md",
+    "harness/contracts/catalog.json",
+    "harness/contracts/registry.py",
+    "harness/contracts/selection.py",
+    "harness/contracts/trace.py",
+    "harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md",
+    "harness/tests/README.md",
+    "harness/tests/wp18/README.md"
+  ],
+  "edited_paths": [
+    "harness/tests/wp18/runs/20261029-wp18-02/H06/contract_receipt.json",
+    "harness/tests/wp18/runs/20261029-wp18-02/H06/expected_code_diff.json",
+    "harness/tests/wp18/runs/20261029-wp18-02/H06/fixtures/rows.json",
+    "harness/tests/wp18/runs/20261029-wp18-02/H06/implementation.py",
+    "harness/tests/wp18/runs/20261029-wp18-02/H06/report.md",
+    "harness/tests/wp18/runs/20261029-wp18-02/H06/review_candidate.json",
+    "harness/tests/wp18/runs/20261029-wp18-02/H06/selfcheck.json",
+    "harness/tests/wp18/runs/20261029-wp18-02/H06/test_implementation.py"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "harness.contracts.registry",
+        "resolve",
+        "--plan",
+        "harness/github_work_plan/18_harness_local_agent_examination_and_independent_acceptance.md",
+        "--case",
+        "H06"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "pytest",
+        "-p",
+        "no:cacheprovider",
+        "-q",
+        "harness/tests/wp18/runs/20261029-wp18-02/H06/test_implementation.py"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "unresolved": [
+    "head_sha unavailable until the delivery commit exists",
+    "expected_code_diff is a prediction; observed AST was not rebuilt",
+    "independent acceptance was not run"
+  ],
+  "self_test": {
+    "passed": 3,
+    "failed": 0,
+    "external_acceptance": "not_run"
+  }
+}
