@@ -1,22 +1,32 @@
+# SAEBase's single master configuration. Component groups contain only their own settings.
 defaults:
-  - prompt_source: simple_copying
-  - model: pythia70m
-  - sae: pythia70m_resid_sm
-  - evaluation: activation_health
+  - dataset: ioi
+  - model: openresearch_gemma2_2b_base
   - paths: default
+  - task: capture
   - experiment: default
-  - task: sae
+  # Hydra's default file handler creates ${output_dir}/train.log before
+  # saebase.runtime.prepare_run. That empty file is then treated as a prior artifact.
+  # Console logging leaves a clean leaf; task logs still go under logs/.
+  - override hydra/job_logging: stdout
   - _self_
 
-seed: 1
+# Random seed for LLM SAE runs
+seed: 42
 
+# Run-directory cleanup is independent of the selected research task.
+runtime:
+  mode: null  # null defaults to new; also accepts resume and overwrite
+  clear_experiment_leaf: true
+
+# Leaf directory name: ${experiment.sub_name}_${seed}; existing runs require explicit intent.
 exp_run_leaf: ${experiment.sub_name}_${seed}
 
 hydra:
   run:
-    dir: ${paths.root}/experiment/${prompt_source.name}/${model.name}/${sae.name}/${task.name}/${exp_run_leaf}
+    dir: ${paths.root}/experiment/${saebase_run_component:dataset}/${saebase_run_component:model}/${task.path}/${exp_run_leaf}
   sweep:
-    dir: ${paths.root}/experiment/multirun/${prompt_source.name}/${model.name}/${sae.name}/${task.name}/${now:%Y-%m-%d}_${now:%H-%M-%S}
+    dir: ${paths.root}/experiment/${saebase_run_component:dataset}/${saebase_run_component:model}/${task.path}/_sweeps/${now:%Y-%m-%d}_${now:%H-%M-%S}
     subdir: ${hydra.job.num}
   job:
     chdir: true

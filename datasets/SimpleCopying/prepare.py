@@ -7,8 +7,8 @@ from typing import Any
 
 from saebase.datasets.SimpleCopying.SimpleCopying import generate_copying_prompts
 from saebase.datasets.SimpleCopying.tokenize import attach_token_ids, filter_logit_diff
-from saebase.datasets.prompt_schema import assert_available, make_manifest
-from saebase.datasets.prompt_store import save_prompts
+from saebase.datasets.artifacts import assert_available, make_manifest
+from saebase.datasets.artifacts import save_prompts
 
 
 def prepare_for_model(

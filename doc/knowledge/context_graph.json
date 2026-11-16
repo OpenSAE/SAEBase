@@ -422,10 +422,10 @@
       "description": "研究问题：如何以受控指标和可靠性对照比较 SAE？ 相关方法具有源码接口，科学效果和边界条件仍需独立评估。",
       "status": "partial",
       "evidence": [
-        "tasks/benchmark/backend/runner.py",
+        "tasks/benchmark/execution/runner.py",
         "tasks/benchmark/reliability/runner.py",
         "tasks/benchmark/integrations/sar.py",
-        "tasks/benchmark/integrations/rss.py"
+        "tasks/benchmark/methods/rss.py"
       ],
       "term_ids": [
         "term.sae",
@@ -440,10 +440,10 @@
       "description": "评测执行、统计复核和 SAR/RSS 适配有真实代码；实验结论仍需对应结果。",
       "status": "implemented",
       "evidence": [
-        "tasks/benchmark/backend/runner.py",
+        "tasks/benchmark/execution/runner.py",
         "tasks/benchmark/reliability/runner.py",
         "tasks/benchmark/integrations/sar.py",
-        "tasks/benchmark/integrations/rss.py"
+        "tasks/benchmark/methods/rss.py"
       ],
       "term_ids": [
         "term.sae",
@@ -455,10 +455,10 @@
       "id": "g.sae.benchmark_runner",
       "type": "goal",
       "title": "组织指定 SAE 与样本的基准执行",
-      "description": "代码方法：组织指定 SAE 与样本的基准执行。依据位于 tasks/benchmark/backend/runner.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "description": "代码方法：组织指定 SAE 与样本的基准执行。依据位于 tasks/benchmark/execution/runner.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
       "status": "implemented",
       "evidence": [
-        "tasks/benchmark/backend/runner.py"
+        "tasks/benchmark/execution/runner.py"
       ],
       "term_ids": [
         "term.sae",
@@ -504,10 +504,10 @@
       "id": "g.sae.rss_adapter",
       "type": "goal",
       "title": "适配 RSS 特征响应评测",
-      "description": "代码方法：适配 RSS 特征响应评测。依据位于 tasks/benchmark/integrations/rss.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
+      "description": "代码方法：适配 RSS 特征响应评测。依据位于 tasks/benchmark/methods/rss.py；此节点记录可用接口，科学结果依照独立实验证据判断。",
       "status": "implemented",
       "evidence": [
-        "tasks/benchmark/integrations/rss.py"
+        "tasks/benchmark/methods/rss.py"
       ],
       "term_ids": [
         "term.sae",

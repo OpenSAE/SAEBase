@@ -103,8 +103,9 @@ def load_external_pair(
     model_key: str,
     sae_key: str,
     layer: int,
-    device: str = "cpu",
+    device: str = "auto",
     probe_tokens: torch.Tensor | None = None,
+    require_patch: bool = True,
 ) -> LoadedExternalPair:
     """Load explicitly registered providers. A token probe is optional.
 
@@ -112,6 +113,9 @@ def load_external_pair(
     never certifies checkpoint provenance, scientific quality or population
     reliability. Full model/SAE acceptance remains a separate protocol.
     """
+    from models.loading_policy import resolve_device
+
+    device = resolve_device(device)
     model_spec = external_model(model_key)
     sae_spec = external_sae(sae_key)
     if model_spec is None or sae_spec is None:
@@ -135,7 +139,8 @@ def load_external_pair(
         else ModelAdapter(loaded_model, backend=model_spec.backend)
     )
     adapter.capabilities.require("capture")
-    adapter.capabilities.require("patch")
+    if require_patch:
+        adapter.capabilities.require("patch")
 
     sae = sae_spec.factory(device)
     config = getattr(sae, "cfg", None)
@@ -190,5 +195,6 @@ def load_external_pair(
             or not bool(torch.isfinite(decoded).all())
         ):
             raise ValueError("SAE decode must return finite [1, d_in] activations")
-        adapter.assert_identity_patch(tokens=probe_tokens, site=sae_spec.site)
+        if require_patch:
+            adapter.assert_identity_patch(tokens=probe_tokens, site=sae_spec.site)
     return LoadedExternalPair(adapter, sae, identity, "probe_passed_not_checkpoint_certified")

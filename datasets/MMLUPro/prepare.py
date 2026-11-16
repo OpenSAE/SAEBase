@@ -1,14 +1,16 @@
 """Prepare MMLU-Pro artifacts for a registry model_key."""
 
 from __future__ import annotations
+from functools import partial
+from saebase.datasets.public_sources import select_public_samples
 
 from pathlib import Path
 from typing import Any, Sequence
 
 from saebase.datasets.MMLUPro.MMLUPro import HF_DATASET_NAME, build_prompt_items
 from saebase.datasets.MMLUPro.tokenize import attach_token_ids
-from saebase.datasets.prompt_schema import assert_available, make_manifest
-from saebase.datasets.prompt_store import save_prompts
+from saebase.datasets.artifacts import assert_available, make_manifest
+from saebase.datasets.artifacts import save_prompts
 
 
 def prepare_for_model(
@@ -82,3 +84,6 @@ def prepare_for_model(
         },
     )
     return save_prompts(kept, manifest, data_root=data_root)
+
+
+select_samples = partial(select_public_samples, "MMLUPro")

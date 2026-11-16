@@ -1,14 +1,16 @@
 """Prepare CounterFact artifacts for a registry model_key."""
 
 from __future__ import annotations
+from functools import partial
+from saebase.datasets.public_sources import select_public_samples
 
 from pathlib import Path
 from typing import Any
 
 from saebase.datasets.CounterFact.CounterFact import load_raw_counterfact
 from saebase.datasets.CounterFact.tokenize import filter_with_model
-from saebase.datasets.prompt_schema import assert_available, make_manifest
-from saebase.datasets.prompt_store import save_prompts
+from saebase.datasets.artifacts import assert_available, make_manifest
+from saebase.datasets.artifacts import save_prompts
 
 
 def prepare_for_model(
@@ -43,3 +45,6 @@ def prepare_for_model(
         source="datasets.CounterFact.prepare",
     )
     return save_prompts(kept, manifest, data_root=data_root)
+
+
+select_samples = partial(select_public_samples, "CounterFact")

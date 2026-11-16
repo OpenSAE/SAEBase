@@ -17,7 +17,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from . import core, published_records, wp15_records
+from . import core, published_records, generation_steering_records
 from .private_api import router as private_router
 from .feature_store import feature_store_count
 from . import explore
@@ -450,7 +450,7 @@ def wp12_record(category: str, record_id: str) -> dict[str, Any]:
 def wp15_record(name: str) -> dict[str, Any]:
     """Recorded local measurements. Prompt text and explanations are not included."""
     try:
-        return wp15_records.load_record(name)
+        return generation_steering_records.load_record(name)
     except ValueError as exc:
         raise HTTPException(404, str(exc)) from exc
 

@@ -2,18 +2,13 @@
 
 from __future__ import annotations
 
-import importlib
 import json
 from pathlib import Path
 from typing import Any
 
 import torch
 
-from models.hooked_lm_common import (
-    load_hooked_model,
-    load_hooked_model_with_candidates,
-    require_cuda,
-)
+from models.loading_policy import resolve_device
 from models.hf_compat import import_sae_lens
 from saebase.api.sae_profiles import SAEProfile, get_profile
 
@@ -34,7 +29,7 @@ def load_sae_lens(
     converter: Any | None = None,
 ) -> tuple[Any, dict, Any]:
     SAE = import_sae_lens().SAE
-    dev = device or require_cuda()
+    dev = resolve_device(device)
     legacy = getattr(SAE, "from_pretrained_with_cfg_and_sparsity", None)
     loader = legacy if callable(legacy) else SAE.from_pretrained
     kwargs = {"release": release, "sae_id": sae_id, "device": dev}
@@ -78,7 +73,7 @@ def load_eleutherai_topk_mlp_sae(
     from huggingface_hub import hf_hub_download
     from safetensors.torch import load_file
 
-    dev = device or require_cuda()
+    dev = resolve_device(device)
     cfg_path = hf_hub_download(repo_id=release, filename=f"{folder}/cfg.json")
     weights_path = hf_hub_download(repo_id=release, filename=f"{folder}/sae.safetensors")
     raw_cfg = json.loads(Path(cfg_path).read_text(encoding="utf-8"))
@@ -133,7 +128,7 @@ def load_qwen_resid_topk_sae(
     # Hugging Face is only needed for remote checkpoint loading.
     from huggingface_hub import hf_hub_download
 
-    dev = device or require_cuda()
+    dev = resolve_device(device)
     fname = filename or f"layer{int(layer)}.sae.pt"
     weights_path = hf_hub_download(repo_id=release, filename=fname, revision=revision)
     blob = torch.load(weights_path, map_location="cpu", weights_only=False)
@@ -224,6 +219,8 @@ def _phase_a_sae_lens_source(profile: SAEProfile, layer: int) -> tuple[str, str,
         "gemma1b_scope_resid",
         "gemma3_4b_pt_scope_resid",
         "gemma3_4b_it_scope_resid",
+        "gemma3_12b_pt_scope_resid",
+        "gemma3_12b_it_scope_resid",
     }:
         return (
             str(profile.repo_id),
@@ -234,6 +231,12 @@ def _phase_a_sae_lens_source(profile: SAEProfile, layer: int) -> tuple[str, str,
         "r1_distill_llama8b_llamascope_l23",
         "r1_distill_llama8b_llamascope_l15_openr1",
     }:
+        from sae_lens.loading.pretrained_saes_directory import get_pretrained_saes_directory
+
+        entry = get_pretrained_saes_directory().get(profile.sae_release)
+        if entry is not None and profile.sae_id(layer) in entry.saes_map:
+            # Preserve the official per-site activation scaling and Neuronpedia ID.
+            return profile.sae_release, profile.sae_id(layer), None
         return (
             str(profile.repo_id),
             str(profile.sae_folder(layer)),
@@ -250,6 +253,70 @@ def _phase_a_sae_lens_source(profile: SAEProfile, layer: int) -> tuple[str, str,
     return profile.sae_release, profile.sae_id(layer), None
 
 
+def resolve_sae_source(profile: SAEProfile, layer: int) -> dict:
+    """One resource binding for the loader, precheck and published explanations.
+
+    Explicit catalog releases identify publisher entries independently of a Hub
+    organization's display name. Direct loaders keep their existing converters.
+    """
+    declared_neuronpedia_id = getattr(profile, "neuronpedia_id", None)
+    if profile.loader != "sae_lens":
+        return {
+            "repo": profile.repo_id,
+            "folder": profile.sae_folder(layer),
+            "neuronpedia_id": declared_neuronpedia_id,
+        }
+    release, sae_id, converter = _phase_a_sae_lens_source(profile, layer)
+    source = {
+        "release": release,
+        "sae_id": sae_id,
+        "converter": converter,
+        "repo": profile.repo_id,
+        "folder": profile.sae_folder(layer),
+        "neuronpedia_id": declared_neuronpedia_id,
+    }
+    from sae_lens.loading.pretrained_saes_directory import get_pretrained_saes_directory
+
+    catalog = get_pretrained_saes_directory()
+    catalog_release = getattr(profile, "catalog_release", None) or release
+    template = getattr(profile, "catalog_sae_id_template", None)
+    catalog_id = template.format(L=layer) if template else sae_id
+    entry = catalog.get(catalog_release)
+    if entry is None or catalog_id not in entry.saes_map:
+        matches = [
+            (candidate, key)
+            for candidate in catalog.values()
+            if candidate.repo_id == release
+            for key, folder in candidate.saes_map.items()
+            if folder == sae_id
+        ]
+        if matches:
+            bindings = {
+                (candidate.repo_id, candidate.saes_map[key], candidate.neuronpedia_id.get(key))
+                for candidate, key in matches
+            }
+            if len(bindings) != 1:
+                raise ValueError("Conflicting catalog resource bindings for selected SAE")
+            entry, catalog_id = matches[0]
+        else:
+            if getattr(profile, "catalog_release", None):
+                raise ValueError(f"SAE catalog entry missing: {catalog_release}/{catalog_id}")
+            return source
+    if converter is not None:
+        source["sae_id"] = entry.saes_map[catalog_id]
+    published_id = entry.neuronpedia_id.get(catalog_id)
+    if declared_neuronpedia_id and published_id and declared_neuronpedia_id != published_id:
+        raise ValueError("SAE profile and upstream catalog disagree on Neuronpedia identity")
+    source.update(
+        repo=entry.repo_id,
+        folder=entry.saes_map[catalog_id],
+        neuronpedia_id=published_id or declared_neuronpedia_id,
+        catalog_release=catalog_release,
+        catalog_sae_id=catalog_id,
+    )
+    return source
+
+
 def load_sae_for_profile(
     sae_key: str,
     layer: int,
@@ -257,13 +324,18 @@ def load_sae_for_profile(
     revision: str | None = None,
 ) -> tuple[Any, dict[str, Any]]:
     profile = get_profile(sae_key)
-    dev = device or require_cuda()
+    dev = resolve_device(device)
     hook_name = profile.hook_name(layer)
     sae_id = profile.sae_id(layer)
     folder = profile.sae_folder(layer)
 
     if profile.loader == "sae_lens":
-        source_release, source_id, converter_name = _phase_a_sae_lens_source(profile, layer)
+        source = resolve_sae_source(profile, layer)
+        source_release, source_id, converter_name = (
+            source["release"],
+            source["sae_id"],
+            source["converter"],
+        )
         converter = None
         if converter_name is not None:
             from sae_lens.loading import pretrained_sae_loaders
@@ -313,6 +385,7 @@ def load_sae_for_profile(
             "sae_id": sae_id,
             "resolved_source_release": source_release,
             "resolved_source_sae_id": source_id,
+            "source": source,
             "hook_name": hook_name,
             "hook_note": (
                 profile.hook_note.replace("{L}", str(layer))
@@ -327,7 +400,7 @@ def load_sae_for_profile(
             "sparsity": sparsity,
             "d_in": int(sae.cfg.d_in),
             "d_sae": int(sae.cfg.d_sae),
-            **profile.transfer_meta(),
+            **profile.transfer_meta(layer),
         }
         return sae, meta
 
@@ -367,6 +440,7 @@ def load_sae_for_profile(
             model_name=profile.model_name,
             device=dev,
             filename=sae_id,
+            k=profile.top_k,
             revision=revision,
         )
         meta = {
@@ -419,7 +493,7 @@ def load_sae_for_profile(
             "sparsity": sparsity,
             "d_in": int(sae.cfg.d_in),
             "d_sae": int(sae.cfg.d_sae),
-            **profile.transfer_meta(),
+            **profile.transfer_meta(layer),
         }
 
     if profile.loader == "sparsify_topk":
@@ -445,7 +519,7 @@ def load_sae_for_profile(
             "sparsity": None,
             "d_in": int(sae.cfg.d_in),
             "d_sae": int(sae.cfg.d_sae),
-            **profile.transfer_meta(),
+            **profile.transfer_meta(layer),
         }
 
     raise ValueError(f"Unknown loader kind: {profile.loader!r}")
@@ -463,21 +537,13 @@ def load_model_for_profile(
     """
     profile = get_profile(sae_key)
     mk = model_key_override or profile.model_key
-    try:
-        mod = importlib.import_module(f"models.{mk}.{mk}")
-        handle = mod.load_model(device=device)
-        return handle.model, handle.loaded_name
-    except ModuleNotFoundError as exc:
-        # Only fall back when the requested model wrapper itself is absent.
-        # A missing dependency inside a present wrapper should retain its name.
-        if exc.name not in {f"models.{mk}", f"models.{mk}.{mk}"}:
-            raise
+    from saebase.registry import get_model_plugin
+    from omegaconf import OmegaConf
 
-    candidates = profile.model_candidates or (profile.model_name,)
-    if len(candidates) == 1:
-        model = load_hooked_model(candidates[0], device=device)
-        return model, candidates[0]
-    return load_hooked_model_with_candidates(candidates, device=device)
+    handle = get_model_plugin(mk).load_model(
+        OmegaConf.create({"model": {"name": mk, "device": device}})
+    )
+    return handle.model, handle.loaded_name
 
 
 def load_model_and_sae(
@@ -487,7 +553,7 @@ def load_model_and_sae(
     *,
     model_key_override: str | None = None,
 ) -> tuple[Any, Any, dict[str, Any]]:
-    dev = device or require_cuda()
+    dev = resolve_device(device)
     model, loaded_name = load_model_for_profile(
         sae_key, device=dev, model_key_override=model_key_override
     )

@@ -1,6 +1,6 @@
 name: Real Pythia Smoke Acceptance (manual)
 
-# M0/M1/M2 original acceptance merged from three opt-in commit-marker workflows.
+# Explicit reference, activation-cache and intervention acceptance suites.
 on:
   workflow_dispatch:
     inputs:
@@ -8,8 +8,8 @@ on:
         description: Real CPU acceptance suite
         required: true
         type: choice
-        options: [m0, m1, m2, all]
-        default: m0
+        options: [reference, activation-cache, interventions, all]
+        default: reference
 
 permissions:
   contents: read
@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: ${{ fromJSON(inputs.suite == 'all' && '["m0","m1","m2"]' || format('["{0}"]', inputs.suite)) }}
+        suite: ${{ fromJSON(inputs.suite == 'all' && '["reference","activation-cache","interventions"]' || format('["{0}"]', inputs.suite)) }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -30,12 +30,12 @@ jobs:
           python-version: "3.11"
       - name: Install checkpoint-capable analysis runtime
         run: |
-          python -m pip install -e ".[analysis]"
+          python -m pip install -e ".[analysis,dev]"
           python -m pip check
           saebase-check-env --mode analysis
-      - name: Require frozen M0 reference for M1/M2
-        if: matrix.suite != 'm0'
-        run: test -f harness/github/work_test/fixtures/m0_reference_public.json
+      - name: Require frozen checkpoint reference for activation caches and intervention measurements
+        if: matrix.suite != 'reference'
+        run: test -f tests/product/fixtures/m0_reference_public.json
       - name: Run original real-checkpoint acceptance
         shell: bash
         env:
@@ -44,50 +44,50 @@ jobs:
         run: |
           set -euo pipefail
           case "${{ matrix.suite }}" in
-            m0)
-              DEVICE=cpu N_GENERATE=120 MIN_KEPT=5 N_PROMPTS=3 \
-                OUT_DIR="$RUNNER_TEMP/saebase-m0" \
-                DATA_DIR="$RUNNER_TEMP/saebase-m0/data" \
-                bash scripts/m0_real_smoke.sh
+            reference)
+              python -m saebase.api.reference --device cpu \
+                --n-generate 120 --min-kept 5 --n-prompts 3 \
+                --data-dir "$RUNNER_TEMP/saebase-reference/data" \
+                --output "$RUNNER_TEMP/saebase-reference/checkpoint_reference.json"
               ;;
-            m1)
-              python scripts/m1_real_smoke.py \
-                --m0-reference harness/github/work_test/fixtures/m0_reference_public.json \
-                --cache-root "$RUNNER_TEMP/m1-store" \
-                --output "$RUNNER_TEMP/m1-results/m1_reference.json"
+            activation-cache)
+              python -m tests.product.test_activation_store \
+                --reference tests/product/fixtures/m0_reference_public.json \
+                --cache-root "$RUNNER_TEMP/activation-cache-store" \
+                --output "$RUNNER_TEMP/activation-cache-results/activation_cache.json"
               ;;
-            m2)
-              python scripts/m2_real_smoke.py \
-                --m0-reference harness/github/work_test/fixtures/m0_reference_public.json \
-                --cache-root "$RUNNER_TEMP/m2-cache" \
-                --output "$RUNNER_TEMP/m2-results/m2_reference.json"
+            interventions)
+              python -m tests.product.test_feature_interventions \
+                --reference tests/product/fixtures/m0_reference_public.json \
+                --cache-root "$RUNNER_TEMP/interventions-cache" \
+                --output "$RUNNER_TEMP/interventions-results/intervention_measurements.json"
               ;;
             *)
               echo "Unknown acceptance suite" >&2
               exit 2
               ;;
           esac
-      - name: Preserve M0 real checkpoint evidence
-        if: always() && matrix.suite == 'm0'
+      - name: Preserve real checkpoint reference evidence
+        if: always() && matrix.suite == 'reference'
         uses: actions/upload-artifact@v4
         with:
-          name: saebase-m0-reference
-          path: ${{ runner.temp }}/saebase-m0/
+          name: saebase-checkpoint-reference
+          path: ${{ runner.temp }}/saebase-reference/
           if-no-files-found: warn
           retention-days: 14
-      - name: Preserve M1 real cache evidence
-        if: always() && matrix.suite == 'm1'
+      - name: Preserve real activation-cache evidence
+        if: always() && matrix.suite == 'activation-cache'
         uses: actions/upload-artifact@v4
         with:
-          name: saebase-m1-reference
-          path: ${{ runner.temp }}/m1-results/
+          name: saebase-activation-cache-reference
+          path: ${{ runner.temp }}/activation-cache-results/
           if-no-files-found: warn
           retention-days: 14
-      - name: Preserve M2 real intervention evidence
-        if: always() && matrix.suite == 'm2'
+      - name: Preserve real intervention evidence
+        if: always() && matrix.suite == 'interventions'
         uses: actions/upload-artifact@v4
         with:
-          name: saebase-m2-reference
-          path: ${{ runner.temp }}/m2-results/
+          name: saebase-interventions-reference
+          path: ${{ runner.temp }}/interventions-results/
           if-no-files-found: warn
           retention-days: 14

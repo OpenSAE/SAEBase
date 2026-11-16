@@ -58,7 +58,7 @@ TEMPLATE = "{a} {b} {a}"
 
 
 def default_data_dir() -> str:
-    from saebase.datasets.artifact_layout import DEFAULT_DATA_ROOT
+    from saebase.datasets.artifacts import DEFAULT_DATA_ROOT
 
     return str(DEFAULT_DATA_ROOT / "SimpleCopying")
 

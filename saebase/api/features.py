@@ -155,11 +155,14 @@ def _decode(
     """
     single = codes.ndim == 1
     z = codes.unsqueeze(0) if single else codes
+    z = _sae_input(sae, z)
     mu, std = ln_mu, ln_std
     if mu is None and std is None and activation is not None and _sae_uses_layer_norm(sae):
         h = activation.unsqueeze(0) if activation.ndim == 1 else activation
         h = _sae_input(sae, h)
         mu, std = _layer_norm_stats(h)
+    if mu is not None and std is not None:
+        mu, std = mu.to(z.device), std.to(z.device)
     with _restore_ln_stats(sae, mu, std):
         result = sae.decode(z)
     if not isinstance(result, torch.Tensor) or result.ndim != 2 or result.shape[-1] != d_in:
@@ -169,6 +172,31 @@ def _decode(
     if not bool(torch.isfinite(result).all()):
         raise ValueError("SAE decoder produced non-finite values")
     return result[0] if single else result
+
+
+@torch.no_grad()
+def encode_activations(sae: Any, activations: torch.Tensor) -> torch.Tensor:
+    """Native tokenwise encoding, with validation and cleanup of temporary LN stats."""
+    d_in, d_sae = _sae_dimensions(sae)
+    architecture = str(getattr(sae.cfg, "architecture", "")).lower().replace("_", "")
+    if "batchtopk" in architecture:
+        from .model import UnsupportedCapability
+
+        raise UnsupportedCapability(
+            "Whiten requires tokenwise encoding; BatchTopK needs its own normalization protocol"
+        )
+    if activations.ndim != 2 or activations.shape[1] != d_in:
+        raise ValueError("Expected [tokens, d_in] activations")
+    with _restore_ln_stats(sae, None, None):
+        codes = sae.encode(_sae_input(sae, activations))
+        if not isinstance(codes, torch.Tensor) or tuple(codes.shape) != (
+            activations.shape[0],
+            d_sae,
+        ):
+            raise ValueError("SAE encoding must preserve the token axis")
+        if not bool(torch.isfinite(codes).all()):
+            raise ValueError("SAE encoding contains non-finite values")
+        return codes.detach()
 
 
 @torch.no_grad()

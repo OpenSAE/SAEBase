@@ -1,5 +1,13 @@
 # Scientific Context Writing Conventions
 
+## Purpose and main functions
+
+Explain how to describe scientific questions, methods, goals, terminology and source evidence clearly.
+
+## Scope
+
+Use when maintaining scientific graph text and its actual source references.
+
 ## Distinct responsibilities
 
 Core describes project architecture. Knowledge describes scientific goals. The Glossary defines terminology. Code Tree describes actual Python entities. Every assertion uses a stable ID and traceable source.
@@ -18,7 +26,7 @@ A node card defaults to a concise explanation, with technical details available 
 
 ## Matching actual source entities
 
-Implementation descriptions must cite files that exist in the repository. Function details include parameter names, meanings, types, defaults, return values, and a source-backed code excerpt. Class details include member attributes and all defined methods. Source citations use repository-relative paths and line numbers.
+Implementation descriptions cite existing source and first explain concrete inputs, actions, results and callers. Interface references provide parameter meanings, types, defaults, returned content and implementation details according to their actual readers. Class and method details belong in references that need them. Source citations use repository-relative paths and line numbers.
 
 ## Equations, figures, and evidence
 
@@ -28,12 +36,8 @@ Each equation must state its applicable scope. Diagrams illustrate concrete comp
 
 Public research trees concentrate on implemented methods. Status belongs to each node independently; a partial child does not automatically change a parent. Children follow the recorded top-to-bottom reading order. Terminology links use stable `term_ids` in [glossary.json](glossary.json).
 
-## Checks
+## Using checks
 
-```bash
-python harness/knowledge/validate.py
-python harness/knowledge/context_attributes.py
-python harness/visualization/export.py
-```
+Use the explicitly bound ResearchHarness when the task calls for knowledge or Atlas checks. Its `src/harness/knowledge/knowledge.md` explains knowledge structure and terminology maintenance for changes to those inputs; `src/harness/core/visualization/visualization.md` explains graph generation and display for Atlas work. Resolve the central root through `.researchharness/central.json` and use its existing interfaces.
 
-The exporter checks that descriptive text and interface evidence refer to actual source.
+Describe the affected node, actual evidence and next action when a check identifies a problem. Apply corrections within the current authorization and preserve the research claim's original meaning.

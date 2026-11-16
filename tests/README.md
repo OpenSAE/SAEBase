@@ -1,5 +1,15 @@
-# Product and integration tests
+# 产品与集成测试
 
-Keep new product tests under this top-level directory when a component does not already own a local suite. Prefer `tests/workplan/<id>/`, `tests/<dataset>/<model>/<task>/<sub_name>/` or `tests/experiments/<study>/`, with justified extensions.
+## 目的和主要功能
 
-Independent Harness governance regression remains in `harness/github/work_test/`; isolated Agent exams remain in `harness/tests/`. See [architecture rules](../harness/core/BOUNDARIES.en.md).
+说明测试的归属、选择与实际结果的使用，帮助维护者确认受影响功能。
+
+## 适用范围
+
+用于新增、维护或选择 SAEBase 软件测试；检查范围采用根 AGENTS.md 和当前任务要求。
+
+`tests/product/` 保存产品回归，其他专项测试围绕对应功能组织；Research Lab 保留自身局部测试。`tests/codex/` 检查客户端与中央接入，科研核心的普通软件检查使用项目自身接口。
+
+按实际输入和下游使用选择场景。保存功能同时检查重新读取和产物定位，实际相关的失败或部分完成检查原因、影响及继续方法。优先复用已有场景，修复进入正式模块；临时排查代码完成用途后清理。
+
+ResearchHarness 的中央管理测试保存在中央 `src/agent/tests/`，由对应维护任务选择。历史测验按其原日期、源码和资料来源阅读。

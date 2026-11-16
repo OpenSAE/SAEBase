@@ -1,9 +1,10 @@
-"""Import-light dependency checks scoped to the requested SAEBase capability."""
+"""Import-light dependency queries and an explicit environment inspection command."""
 
 from __future__ import annotations
 
-from importlib.util import find_spec
+import argparse
 import sys
+from importlib.util import find_spec
 from typing import Literal
 
 Mode = Literal["core", "analysis", "generation"]
@@ -77,3 +78,21 @@ def __getattr__(name: str):
 
         return verify_training_runtime
     raise AttributeError(name)
+
+
+def main():
+    p = argparse.ArgumentParser(description="Inspect SAEBase dependencies")
+    p.add_argument("--mode", choices=("core", "analysis", "generation"), default="analysis")
+    a = p.parse_args()
+    print_python_identity()
+    missing = missing_packages(a.mode)
+    for mod, package in required_packages(a.mode):
+        print(f"[{'missing' if any(x[0] == mod for x in missing) else 'ok'}] {mod} ({package})")
+    if missing:
+        extra = {"core": ".", "analysis": ".[analysis]", "generation": ".[generation]"}[a.mode]
+        print(f'[env] Install from the repository: python -m pip install -e "{extra}"')
+        return 1
+    print(
+        f"[env] {a.mode} dependency probes passed (checkpoint download and GPU runtime not tested)"
+    )
+    return 0

@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        model: [gemma270m, gemma1b, gemma2_2b, qwen35_2b, qwen3_8b, llama31_8b]
+        model: [gemma270m, gemma1b, gemma2_2b_base, qwen35_2b, qwen3_8b, llama31_8b]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -35,7 +35,7 @@ jobs:
           OMP_NUM_THREADS: '2'
           TOKENIZERS_PARALLELISM: 'false'
         run: |
-          python scripts/phase_a_sae_only.py --model "${{ matrix.model }}" \
+          python -m tasks.precheck.checkpoint --model "${{ matrix.model }}" \
             --output "$RUNNER_TEMP/phase-a"
       - name: Preserve loaded SAE weight evidence or exact failure
         if: always()

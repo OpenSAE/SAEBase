@@ -41,6 +41,7 @@ class HFHooksModelCfg:
     device: str
     n_layers: int
     model_name: str
+    n_ctx: int | None = None
 
 
 class HFHooksModel(HFLogitsModel):
@@ -64,6 +65,7 @@ class HFHooksModel(HFLogitsModel):
             device=str(device),
             n_layers=int(self.cfg.n_layers),
             model_name=str(model_name),
+            n_ctx=self.cfg.n_ctx,
         )
 
     @property
@@ -166,7 +168,7 @@ class HFHooksModel(HFLogitsModel):
         layer: int,
         patches: dict[int, torch.Tensor],
         *,
-        readout_offset: int = 0,
+        readout_offset: int | None = 0,
     ) -> torch.Tensor:
         """Forward with residual patches; return logits at readout_offset [vocab]."""
         if not isinstance(input_ids, torch.Tensor):
@@ -196,8 +198,9 @@ class HFHooksModel(HFLogitsModel):
             out = self._model(input_ids=input_ids)
         finally:
             handle.remove()
-        logits = out.logits[0, _offset_to_index(seq_len, int(readout_offset))]
-        return logits
+        if readout_offset is None:
+            return out.logits
+        return out.logits[0, _offset_to_index(seq_len, int(readout_offset))]
 
     def supports_suffix_replay(self) -> bool:
         """True when early blocks can be skipped without changing later-block inputs.

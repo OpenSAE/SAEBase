@@ -191,7 +191,7 @@ def _boundary_digests_for(
 class BatchEngine:
     """Execute cross-product samples x conditions with bounded patch microbatches.
 
-    Optional M1 activation and code readers bypass the initial live capture and
+    Optional cached activation and code readers bypass the initial live capture and
     encoding. Their provenance must match the live model/SAE states. Model
     forwards for downstream logits are *still necessary* after patching.
     """
@@ -295,7 +295,7 @@ class BatchEngine:
             z = self.sae.encode(_sae_input(self.sae, h).unsqueeze(0))[0]
         else:
             c = self.code_reader.get(record.sample_id)
-            # M1 code records deliberately include the SHA-256 digest of the
+            # cached code records deliberately include the SHA-256 digest of the
             # *source activation data* to detect stale codes after a repair.
             source = np.asarray(a.values, dtype=np.float32)
             source_hash = hashlib.sha256(source.tobytes(order="C")).hexdigest()

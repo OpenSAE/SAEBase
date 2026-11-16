@@ -1,4 +1,4 @@
-"""M2 experimental interfaces for bounded batch SAE feature interventions."""
+"""batch intervention experimental interfaces for bounded batch SAE feature interventions."""
 
 from .specs import Condition, MeasurementSample, ExperimentIdentity, measurement_id
 from .operators import apply_condition

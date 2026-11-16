@@ -1,5 +1,13 @@
 # 科研 Context 表达规范
 
+## 目的和主要功能
+
+说明怎样清楚表达科研问题、方法、目标、术语及其来源。
+
+## 适用范围
+
+用于维护科研图文字、术语和对应的真实实现依据。
+
 ## 统一语义
 
 Core 描述项目架构。Knowledge 描述具体科研目标。Glossary 定义术语。Code Tree 提供实际 Python 实体。每种知识使用稳定 ID 和可追溯来源。
@@ -16,7 +24,7 @@ Core 描述项目架构。Knowledge 描述具体科研目标。Glossary 定义�
 
 ## 对应实体代码
 
-涉及实现的概念必须引用**真实存在的源码**。函数说明包括参数名称、含义、数据类型、默认值、返回值名称、返回含义与主要代码。类说明包括成员属性以及类中定义的全部方法；方法详情提供相同的参数、返回值与实现说明。来源使用仓库相对路径和代码行号。
+涉及实现的概念引用真实源码，先说明处理对象、具体功能、结果与调用关系。维护接口详情时，按使用需要提供参数含义、类型、默认值、返回内容和对应实现；类与方法的细节用于实际需要查看这些内容的资料。来源使用仓库相对路径和代码行号。
 
 ## 公式与图示
 
@@ -26,12 +34,8 @@ Core 描述项目架构。Knowledge 描述具体科研目标。Glossary 定义�
 
 公开科研树集中呈现已有实现。每个节点的状态由该节点的证据独立决定；partial 不沿父链传播。节点排列采用从上到下的阅读次序。所有术语使用 `term_ids` 引用 [glossary.json](glossary.json)。科研目标与对应实现通过稳定 ID 建立关联。
 
-## 校验
+## 按任务检查资料
 
-```bash
-python harness/knowledge/validate.py
-python harness/knowledge/context_attributes.py
-python harness/visualization/export.py
-```
+用户要求知识或 Atlas 检查时，通过 `.researchharness/central.json` 定位 ResearchHarness。`src/harness/knowledge/knowledge.md` 说明知识结构与术语维护，适用于相关输入的修改；`src/harness/core/visualization/visualization.md` 说明图生成与展示，适用于 Atlas 工作。使用对应模块的实际接口。
 
-导出器会检查肯定式叙述以及接口说明的来源关系。
+检查发现问题时，定位具体节点、依据与处理动作，在本次授权内完成修正，保留科研断言的实际含义。

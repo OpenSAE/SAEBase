@@ -2,7 +2,7 @@
 
 🌍 语言：[English](README.md) | [中文](README_cn.md) &nbsp; [![CI](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml)
 
-**软件版本：** [v0.6.5 — Auditable Agent Research Workflows](harness/github/development_doc/releases/v0.6.5.md) · [Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Python API](harness/github/development_doc/python-api.md)
+**软件版本：** [v0.7.0 — Component Workflows and Reusable Experiments](doc/code/development/releases/v0.7.0.md) · [Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Python API](doc/code/development/python-api.md)
 
 **SAEBase** 帮助研究者理解和评估语言模型中的稀疏自编码器（SAE），探索特征、测量特征干预对模型行为的影响，并组织可复现的实验。Research Harness 进一步支持编程 Agent 在明确范围内执行任务，让结果可追溯、可独立验证。
 
@@ -31,7 +31,7 @@
 SAEBase 将预训练模型、SAE 字典、激活测量、受控特征干预、基准评测和可靠性分析连接为可复用的研究流程。
 
 <p align="center">
-  <img src="harness/github/assets/figures/saebase_workflow.svg" alt="SAEBase 模型、激活提取、SAE 特征干预、评测与报告流程" width="1080"/>
+  <img src="doc/code/assets/figures/saebase_workflow.svg" alt="SAEBase 模型、激活提取、SAE 特征干预、评测与报告流程" width="1080"/>
 </p>
 
 **一次提取，多 SAE 评估。** 在相同的模型层位上，通过身份校验的激活缓存可以由兼容的 SAE checkpoint 复用，避免重复执行模型前向。
@@ -49,7 +49,7 @@ SAEBase 将预训练模型、SAE 字典、激活测量、受控特征干预、�
 
 [Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) 提供可浏览的 SAE 研究结果、特征测量、干预案例和实验报告，并区分已记录的真实结果、演示案例与新计算。执行新输入的真实模型推理，需要单独配置运行环境及相应权重。
 
-[打开 Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [评估数据集](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation) · [实验结果与方法](harness/github/development_doc/research-lab/results-20261020.md)
+[打开 Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [评估数据集](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation) · [实验结果与方法](doc/code/development/research-lab/results-20261020.md)
 
 ## 🚀 快速开始
 
@@ -62,19 +62,28 @@ git clone https://github.com/OpenSAE/SAEBase.git
 cd SAEBase
 python -m pip install -e .
 
-python saebase/examples/quickstart/public_api_offline.py
-python saebase/examples/quickstart/first_experiment.py --output runs/first-experiment
+python scripts/examples/first_experiment.py --dry-run
+python scripts/examples/first_experiment.py --output runs/first-experiment
 ```
 
 第一个示例展示激活提取和 SAE 特征编辑。第二个示例使用两个小型合成 SAE，生成 `report.html`、`summary.csv` 和可靠性分析报告。命令会打印具体输出路径，可以直接用浏览器打开 HTML 报告。
 
 ### 2. 使用真实模型和 SAE
 
+SAEBase 统一使用 [conf/config.yaml](conf/config.yaml) 组合模型、数据集和任务。下面的命令只展示配置，不加载权重或执行评测：
+
+```bash
+saebase task=capture --cfg job
+saebase task=benchmark --cfg job
+```
+
+通过 `model=... dataset=... task=...` 选择组件，再填写所选任务的参数。所有任务平级，Benchmark 不管理其他任务。详见[当前架构](doc/code/development/current-architecture.md)。
+
 安装可选的模型分析依赖，然后运行 Pythia-70M 示例。该示例需要下载公开的模型与 SAE 权重。
 
 ```bash
 python -m pip install -e ".[analysis]"
-python saebase/examples/interventions/pythia_feature_edit.py
+python -m saebase.api.reference --device cpu
 ```
 
 也可以直接使用 Python API：
@@ -99,11 +108,11 @@ effect = evaluate_edit(
 print(float(effect.logit_delta.float().norm()))
 ```
 
-这段代码保留两个特征贡献，移除另两个，并输出下一个 token 的 logits 变化幅度。其他模型、token 位置和编辑操作参见 [Python API](harness/github/development_doc/python-api.md) 和 [模型注册表](harness/github/development_doc/model-support.md)。
+这段代码保留两个特征贡献，移除另两个，并输出下一个 token 的 logits 变化幅度。其他模型、token 位置和编辑操作参见 [Python API](doc/code/development/python-api.md) 和 [模型注册表](doc/code/development/model-support.md)。
 
 ### 3. 与编程 Agent 协作
 
-在编程 Agent 环境中打开 SAEBase 源码仓库，从 [Harness 指南](harness/README.md)开始。提出需要完成的科研任务，确认允许修改的范围，再由独立审阅流程检查真实执行行为及产物证据。**完整 Harness 随源码仓库提供**；单独安装 Python wheel 主要提供 SAEBase 软件接口。
+在编程 Agent 环境中打开源码仓库，从 [AGENTS.md](AGENTS.md)了解组件职责和当前[开发模式](doc/code/development/development-modes.md)：密集开发直接落实用户目标并执行相关检查，常规模式使用显式绑定的中央工具。项目管理和 Atlas 任务通过 [Harness 指南](.agents/skills/researchharness/SKILL.md)选择 ResearchHarness 能力。SAEBase 科研核心独立安装运行。
 
 ## 🔬 研究工作流
 
@@ -111,10 +120,10 @@ SAEBase 将模型测量与后续统计分析分开，方便按需要组合。
 
 | 目标 | 可运行的示例 | 详细文档 |
 | --- | --- | --- |
-| 提取并复用激活 | [Activation Store](saebase/examples/activations/activation_store.py) | [激活存储](harness/github/development_doc/activation-store.md) |
-| 测试特征干预 | [Batch Interventions](saebase/examples/interventions/batch_interventions.py) | [特征编辑与 Steering](harness/github/development_doc/feature-interventions.md) |
-| 基准与可靠性分析 | [First Experiment](saebase/examples/quickstart/first_experiment.py) | [Benchmark](harness/github/development_doc/benchmarking.md) · [Reliability](harness/github/development_doc/reliability.md) |
-| 接入研究方法 | [Research Examples](saebase/examples/research_integrations/README.md) | [SAR、RSS、Localization 和 SAEBench](harness/github/development_doc/research-integrations.md) |
+| 提取并复用激活 | [Activation Store](doc/code/development/activation-store.md) | [激活存储](doc/code/development/activation-store.md) |
+| 测试特征干预 | [Batch Interventions](doc/code/development/feature-interventions.md) | [特征编辑与 Steering](doc/code/development/feature-interventions.md) |
+| 基准与可靠性分析 | [First Experiment](scripts/examples/first_experiment.py) | [Benchmark](doc/code/development/benchmarking.md) · [Reliability](doc/code/development/reliability.md) |
+| 接入研究方法 | [Research Examples](doc/code/development/research-integrations.md) | [SAR、RSS、Localization 和 SAEBench](doc/code/development/research-integrations.md) |
 
 特征编辑可以保留 SAE 尚未重构出来的激活部分：
 
@@ -126,23 +135,23 @@ edited_activation = original_activation + decode(edited_codes) - decode(original
 
 ### ⚡ 运行性能
 
-SAEBase 为重复模型评测和特征干预提供可选加速功能。具体实测结果、硬件条件和适用范围参见[性能报告](harness/github/development_doc/performance/workplan11_final_results.md)。
+SAEBase 为重复模型评测和特征干预提供可选加速功能。具体实测结果、硬件条件和适用范围参见[性能报告](doc/code/development/performance/workplan11_final_results.md)。
 
 ## 🧠 模型与 SAE 支持
 
 <!-- BEGIN VERIFIED_MODEL_SUPPORT -->
-**已验证的模型与 SAE（2026-10-16）。** 覆盖 **18** 组模型与 SAE 配置（270M-9B），**48/48** 个选定层位通过真实权重兼容性检查，**48/48** 个完成基于 64 组独立留出提示的基准评估，**48/48** 个完成统计可靠性审计。详见[模型支持与逐层验证结果](harness/github/development_doc/verified-model-matrix.md)。
+**已验证的模型与 SAE（2026-10-16）。** 覆盖 **18** 组模型与 SAE 配置（270M-9B），**48/48** 个选定层位通过真实权重兼容性检查，**48/48** 个完成基于 64 组独立留出提示的基准评估，**48/48** 个完成统计可靠性审计。详见[模型支持与逐层验证结果](doc/code/development/verified-model-matrix.md)。
 <!-- END VERIFIED_MODEL_SUPPORT -->
 
-[模型与 SAE 验证矩阵](harness/github/development_doc/verified-model-matrix.md) · [验证方法](harness/github/development_doc/validation.md)
+[模型与 SAE 验证矩阵](doc/code/development/verified-model-matrix.md) · [验证方法](doc/code/development/validation.md)
 
 ## 📚 文档
 
-[入门指南](harness/github/development_doc/getting-started.md) · [Python API](harness/github/development_doc/python-api.md) · [示例](saebase/examples/README.md) · [Research Lab](saebase/research_lab/README.md) · [文档目录](harness/github/development_doc/index.md)
+[入门指南](doc/code/development/getting-started.md) · [Python API](doc/code/development/python-api.md) · [示例](doc/code/development/first-experiment.md) · [Research Lab](saebase/research_lab/README.md) · [文档目录](doc/code/development/index.md)
 
-查看源码：[SAEBase API](saebase/) · [Models](models/) · [Datasets](datasets/) · [Tasks](tasks/) · [Harness](harness/README.md) · [配置](conf/) · [仓库目录指南](harness/github/development_doc/repository-guide.md)。
+查看源码：[SAEBase API](saebase/) · [Models](models/) · [Datasets](datasets/) · [Tasks](tasks/) · [Harness](.agents/skills/researchharness/SKILL.md) · [配置](conf/) · [仓库目录指南](doc/code/development/repository-guide.md)。
 
-[参与贡献](.github/CONTRIBUTING.md) · [更新记录](harness/github/development_doc/CHANGELOG.md) · [引用信息](CITATION.cff) · [Apache-2.0 许可证](LICENSE) · [安全说明](.github/SECURITY.md)
+[参与贡献](.github/CONTRIBUTING.md) · [更新记录](doc/code/development/CHANGELOG.md) · [引用信息](CITATION.cff) · [Apache-2.0 许可证](LICENSE) · [安全说明](.github/SECURITY.md)
 
 ---
 
@@ -150,3 +159,5 @@ SAEBase 为重复模型评测和特征干预提供可选加速功能。具体实
   <em>Building open foundations for understanding and evaluating LLMs.</em><br>
   <a href="https://github.com/OpenSAE">OpenSAE</a> · <a href="https://github.com/OpenSAE/SAEBase/issues">Issues</a>
 </p>
+
+[当前架构与接口迁移](doc/code/development/current-architecture.md) · [接口迁移](doc/code/development/interface-migration.md)

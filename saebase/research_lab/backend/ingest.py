@@ -46,11 +46,7 @@ def normalize(source: str, row: dict[str, Any]) -> dict[str, Any]:
     candidates = None
     candidate_texts = None
     reference_answers = None
-    if source == "wikitext103":
-        prompt = _text(row.get("text"), "text")
-        group = _text(row.get("article_id") or row.get("document_id"), "article_id")
-        raw_id = raw_id or hashlib.sha256(prompt.encode()).hexdigest()[:20]
-    elif source == "tinystories":
+    if source == "tinystories":
         prompt = _text(row.get("text"), "text")
         group = raw_id or hashlib.sha256(prompt.encode()).hexdigest()[:20]
         raw_id = raw_id or group

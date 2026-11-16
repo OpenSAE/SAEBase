@@ -17,7 +17,7 @@ from typing import Any
 
 from .core import PLATFORM, canonical_json, read_json
 
-LOCK_PATH = PLATFORM / "data" / "source_lock_v1.json"
+LOCK_PATH = PLATFORM / "data" / "source_lock.json"
 SCHEMA = "opensae.corpus_source_lock.v1"
 
 

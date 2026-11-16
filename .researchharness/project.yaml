@@ -1,0 +1,18 @@
+schema_version: 2
+project_id: saebase
+display_name: SAEBase
+code_roots:
+- saebase
+- datasets
+- models
+- tasks
+paths:
+  knowledge: doc/knowledge/context_graph.json
+  context: doc/knowledge/glossary.json
+  atlas_terms: doc/knowledge/atlas_terms.json
+  context_attributes: doc/knowledge/context_attributes.json
+  code_annotations: doc/code/code_annotations.json
+  concepts: doc/code/atlas/atlas_concepts.json
+  reviewed_semantics: doc/code/atlas/reviewed_semantics.json
+  oversized_concepts: doc/code/atlas/oversized_concepts.json
+  architecture: doc/code/project_architecture.json

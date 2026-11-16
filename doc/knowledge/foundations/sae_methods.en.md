@@ -9,7 +9,7 @@ This document provides terminology and evidence for the LLM SAE methods represen
 - **Generation intervention:** Apply feature changes during autoregressive generation and compare baseline and edited continuations. Evidence: `tasks/generate/operation.py`.
 - **Circuit analysis:** Investigate candidate causal paths using source-identified model components and intervention tracing interfaces. Evidence: `tasks/circuits/backend/circuits.py`.
 - **Automatic explanation:** Propose feature explanations from examples and test them on separate data. Evidence: `tasks/explain/interpretation.py`.
-- **SAE benchmarking:** Run reconstruction, interventions, controlled comparisons, reliability checks, and SAR/RSS adapters. Evidence: `tasks/benchmark/backend/runner.py`, `tasks/benchmark/integrations/sar.py`, `tasks/benchmark/integrations/rss.py`.
+- **SAE benchmarking:** Run reconstruction, interventions, controlled comparisons, reliability checks, and SAR/RSS adapters. Evidence: `tasks/benchmark/execution/runner.py`, `tasks/benchmark/integrations/sar.py`, `tasks/benchmark/methods/rss.py`.
 - **SAE training:** Train sparse autoencoders through the native training interfaces. Evidence: `tasks/train/backend/training.py`.
 - **Models and prompts:** Identify model checkpoints and traceable prompt artifacts. Evidence: `models/gemma2_2b_base/gemma2_2b_base.py`, `datasets/artifacts.py`.
 

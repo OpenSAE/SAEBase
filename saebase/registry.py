@@ -21,6 +21,67 @@ class TaskModule(ABC):
     @abstractmethod
     def run(self, cfg: DictConfig) -> EvaluationResult: ...
 
+    def validate_cfg(self, cfg: DictConfig) -> None:
+        """Check task parameters without loading resources or writing artifacts."""
+
+    def run_validated(self, cfg: DictConfig) -> EvaluationResult:
+        """Execute a configuration already accepted by this task."""
+        return self.run(cfg)
+
+    def prepare_execution(self, cfg: DictConfig) -> dict:
+        """Task-owned preparation; no scientific computation by default."""
+        return {"status": "PASS", "scope": "validated task configuration"}
+
+    def read_result(self, folder, manifest: dict) -> dict:
+        """Apply Task-owned result updates without changing historical records."""
+        return manifest
+
+    supports_multiple_models = False
+
+    def supports_run_resume(self, cfg: DictConfig) -> bool:
+        """Declare a task-owned recovery protocol; directory existence is insufficient."""
+        return False
+
+    def continuation_configuration(self, configuration: dict) -> dict:
+        """Normalize only Task-declared compatible defaults for continuation checks."""
+        return configuration
+
+    def continuation_action(self, result: EvaluationResult) -> str:
+        """Task-owned completion policy; inspection never authorizes cache reuse."""
+        return "skip" if result.status == "executed" and result.exit_code == 0 else "retry"
+
+    def required_result_artifacts(self, result: EvaluationResult) -> list[dict]:
+        """Declare files needed to consume this result, without reading their contents."""
+        return result.summary.get("required_artifacts", [])
+
+    def compare_results(self, left, right, *, pairs=None) -> dict:
+        return {"supported": False, "reason": f"Task {self.name} has no result comparison adapter"}
+
+
+def selected_models(cfg: DictConfig) -> list[DictConfig]:
+    """Read the global model selection without constructing models or dispatching tasks."""
+    from omegaconf import OmegaConf
+
+    model = cfg.get("model")
+    if not OmegaConf.is_dict(model):
+        raise ValueError("cfg.model must contain a component name or explicit members")
+    if "members" in model:
+        if "name" in model:
+            raise ValueError("Select model.name or model.members, not both")
+        if not OmegaConf.is_list(model.members) or not model.members:
+            raise ValueError("model.members must be a nonempty list")
+        models = list(model.members)
+    else:
+        models = [model]
+    if any(
+        not OmegaConf.is_dict(item) or not isinstance(item.get("name"), str) or not item.name
+        for item in models
+    ):
+        raise ValueError("Every selected model must contain a component name")
+    if len({item.name for item in models}) != len(models):
+        raise ValueError("Duplicate global model selections")
+    return models
+
 
 @dataclass(frozen=True)
 class PromptSourcePlugin:
@@ -36,14 +97,24 @@ class DatasetPlugin:
     setup: Callable[[Any, DictConfig, Any], None]
     assert_task_supported: Callable[[DictConfig], None]
     eval_split_note: Callable[[Any], str]
+    prepare: Callable[..., Any] | None = None
+    select_samples: Callable[..., Any] | None = None
 
 
 @dataclass(frozen=True)
 class ModelPlugin:
-    """``model.name`` → compatibility gate + lazy construction metadata."""
+    """Model-owned metadata construction and explicit resource loading."""
 
     assert_compatible: Callable[[DictConfig], None]
     construct: Callable[[DictConfig], Any]
+    load: Callable[[DictConfig], Any] | None = None
+
+    def load_model(self, cfg: DictConfig) -> Any:
+        """Load resources; existing external constructors remain compatible."""
+        from models.loading_policy import resolve_config_devices
+
+        resolve_config_devices(cfg)
+        return (self.load or self.construct)(cfg)
 
 
 @dataclass(frozen=True)
@@ -111,10 +182,13 @@ def register_model(
     name: str,
     assert_compatible: Callable[[DictConfig], None],
     construct: Callable[[DictConfig], Any],
+    load: Callable[[DictConfig], Any] | None = None,
 ) -> None:
     if name in _MODEL_REGISTRY:
         raise ValueError(f"register_model: {name!r} is already registered")
-    _MODEL_REGISTRY[name] = ModelPlugin(assert_compatible=assert_compatible, construct=construct)
+    _MODEL_REGISTRY[name] = ModelPlugin(
+        assert_compatible=assert_compatible, construct=construct, load=load
+    )
 
 
 def register_sae(
@@ -150,12 +224,6 @@ def get_model_plugin(name: str) -> ModelPlugin:
     key = str(name)
     if key in _MODEL_REGISTRY:
         return _MODEL_REGISTRY[key]
-    # Historical model adapters remain explicitly loadable for reproduction,
-    # without contributing to the small active Model registration list.
-    from models.plugins import _LEGACY_KEYS, legacy_plugin
-
-    if key in _LEGACY_KEYS:
-        return legacy_plugin(key)
     raise ValueError(f"Unknown model.name: {key!r}")
 
 
@@ -177,9 +245,7 @@ def get_sae_plugin(name: str) -> SAEPlugin:
     def check(cfg: DictConfig) -> None:
         model = str(cfg.model.name)
         if model not in profile.allowed_model_keys():
-            raise ValueError(
-                f"SAE {key!r} is incompatible with model {model!r}"
-            )
+            raise ValueError(f"SAE {key!r} is incompatible with model {model!r}")
         value = cfg.get("sae", {}).get("layer")
         if value is not None and int(value) not in profile.layers:
             raise ValueError(f"SAE {key!r} does not include layer {value}")
@@ -220,10 +286,14 @@ def list_registered_task_keys() -> list[str]:
     return sorted(_TASK_REGISTRY.keys())
 
 
-def register_dataset(name: str, setup, assert_task_supported, eval_split_note) -> None:
+def register_dataset(
+    name: str, setup, assert_task_supported, eval_split_note, prepare=None, select_samples=None
+) -> None:
     if name in _DATASET_REGISTRY:
         raise ValueError(f"Dataset already registered: {name}")
-    _DATASET_REGISTRY[name] = DatasetPlugin(setup, assert_task_supported, eval_split_note)
+    _DATASET_REGISTRY[name] = DatasetPlugin(
+        setup, assert_task_supported, eval_split_note, prepare, select_samples
+    )
 
 
 def register_dataset_alias(alias: str, canonical: str) -> None:

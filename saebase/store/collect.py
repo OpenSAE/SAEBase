@@ -1,4 +1,5 @@
 """Collect explicit token sites, then reuse cached activations across SAEs."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
@@ -22,8 +23,9 @@ class CollectionStats:
 
 
 @torch.no_grad()
-def capture_selected(model: ModelAdapter, *, tokens: torch.Tensor,
-                     site: ActivationSite, positions: tuple[int, ...]) -> torch.Tensor:
+def capture_selected(
+    model: ModelAdapter, *, tokens: torch.Tensor, site: ActivationSite, positions: tuple[int, ...]
+) -> torch.Tensor:
     """One model forward per sample for any number of activation positions.
 
     HF block-output adapter supports a batched offset request; TL uses a
@@ -32,8 +34,10 @@ def capture_selected(model: ModelAdapter, *, tokens: torch.Tensor,
     model.capabilities.require("capture")
     ids = model.tokens(tokens=tokens)
     model._assert_site(site, ids)
-    if not positions or len(set(positions)) != len(positions) or any(
-        type(pos) is not int or pos < 0 or pos >= ids.shape[1] for pos in positions
+    if (
+        not positions
+        or len(set(positions)) != len(positions)
+        or any(type(pos) is not int or pos < 0 or pos >= ids.shape[1] for pos in positions)
     ):
         raise ValueError("positions must be distinct valid absolute token indices")
     if model.backend == "transformer_lens":
@@ -47,19 +51,28 @@ def capture_selected(model: ModelAdapter, *, tokens: torch.Tensor,
     else:
         offsets = [ids.shape[1] - 1 - pos for pos in positions]
         result = model.model.get_resid(ids, site.layer, offsets)
-    if (not isinstance(result, torch.Tensor) or result.ndim != 2
-            or result.shape[0] != len(positions) or result.shape[1] < 1
-            or not bool(torch.isfinite(result).all())):
+    if (
+        not isinstance(result, torch.Tensor)
+        or result.ndim != 2
+        or result.shape[0] != len(positions)
+        or result.shape[1] < 1
+        or not bool(torch.isfinite(result).all())
+    ):
         raise RuntimeError("model capture must return finite [n_positions, width] tensor")
     return result.detach().clone()
 
 
 @torch.no_grad()
-def collect_activations(model: ModelAdapter, samples: Iterable[SampleRecord],
-                        writer: ActivationWriter, *, site: ActivationSite) -> CollectionStats:
+def collect_activations(
+    model: ModelAdapter,
+    samples: Iterable[SampleRecord],
+    writer: ActivationWriter,
+    *,
+    site: ActivationSite,
+) -> CollectionStats:
     """Append only missing samples. A second run makes zero model calls.
 
-    M1's existing ModelAdapter does not forward attention masks to backends.
+    The existing ModelAdapter does not forward attention masks to backends.
     Live collection therefore permits unpadded inputs or right-side padding
     only; the causal model's requested positions precede the padding.
     """
@@ -94,10 +107,16 @@ def collect_activations(model: ModelAdapter, samples: Iterable[SampleRecord],
 
 
 @torch.no_grad()
-def encode_from_store(activation_path: str | Path, sae: Any,
-                      identity: CodeIdentity, *, layout: str = "csr",
-                      max_rows: int = 256, shard_target_bytes: int = 128 * 1024 * 1024,
-                      repair_corruption: bool = False) -> tuple[Path, CollectionStats]:
+def encode_from_store(
+    activation_path: str | Path,
+    sae: Any,
+    identity: CodeIdentity,
+    *,
+    layout: str = "csr",
+    max_rows: int = 256,
+    shard_target_bytes: int = 128 * 1024 * 1024,
+    repair_corruption: bool = False,
+) -> tuple[Path, CollectionStats]:
     """Encode cached activations without a model forward.
 
     The SAE must have deterministic inference (per-token / fixed-threshold).
@@ -107,7 +126,11 @@ def encode_from_store(activation_path: str | Path, sae: Any,
     if reader.kind != "activations" or reader.width != identity.d_in:
         raise ValueError("SAE input dimension does not match activation cache")
     cfg = getattr(sae, "cfg", None)
-    if cfg is None or int(getattr(cfg, "d_in", -1)) != identity.d_in or int(getattr(cfg, "d_sae", -1)) != identity.d_sae:
+    if (
+        cfg is None
+        or int(getattr(cfg, "d_in", -1)) != identity.d_in
+        or int(getattr(cfg, "d_sae", -1)) != identity.d_sae
+    ):
         raise ValueError("loaded SAE dimensions differ from CodeIdentity")
     if not callable(getattr(sae, "encode", None)):
         raise TypeError("sae.encode() is required")
@@ -119,8 +142,13 @@ def encode_from_store(activation_path: str | Path, sae: Any,
     except (AttributeError, StopIteration, TypeError):
         device, dtype = torch.device("cpu"), torch.float32
     written = reused = rows = 0
-    with CodeWriter(activation_path, identity, layout=layout, shard_target_bytes=shard_target_bytes,
-                    repair_corruption=repair_corruption) as writer:
+    with CodeWriter(
+        activation_path,
+        identity,
+        layout=layout,
+        shard_target_bytes=shard_target_bytes,
+        repair_corruption=repair_corruption,
+    ) as writer:
         # Encode all uncached rows from each bounded read batch together.
         # CodeIdentity restricts this path to per-token or fixed-threshold
         # inference, so combining unrelated prompt rows is semantically safe.
@@ -148,13 +176,15 @@ def encode_from_store(activation_path: str | Path, sae: Any,
             for _ln_name in ("ln_mu", "ln_std"):
                 if hasattr(sae, _ln_name):
                     delattr(sae, _ln_name)
-            if (not isinstance(encoded, torch.Tensor)
-                    or encoded.shape != (len(matrix), identity.d_sae)
-                    or not bool(torch.isfinite(encoded).all())):
+            if (
+                not isinstance(encoded, torch.Tensor)
+                or encoded.shape != (len(matrix), identity.d_sae)
+                or not bool(torch.isfinite(encoded).all())
+            ):
                 raise RuntimeError("sae.encode must return finite [n_positions, d_sae]")
             start_row = 0
             for sample, code_record, n_rows in pending:
-                values = encoded[start_row:start_row + n_rows]
+                values = encoded[start_row : start_row + n_rows]
                 start_row += n_rows
                 if writer.append(code_record, values):
                     written += 1

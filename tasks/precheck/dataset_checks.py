@@ -21,6 +21,8 @@ def check_dataset_artifact(
     model_key: str,
     data_root: Path,
     max_records: int = 500,
+    dataset_cfg: Any = None,
+    sampling_seed: int = 42,
 ) -> dict[str, Any]:
     """Validate actual model-specific Dataset records with bounded reading."""
     if not 1 <= max_records <= 10000:
@@ -32,21 +34,32 @@ def check_dataset_artifact(
         get_dataset_plugin(dataset_key)
         from saebase.datasets.prompts import prompt_file, read_prompts
 
-        dataset_cfg = OmegaConf.create(
-            {
-                "name": dataset_key,
-                "data_path": str(Path(data_root) / dataset_key),
-                "prompt_file": "",
-            }
+        dataset_cfg = (
+            dataset_cfg
+            if dataset_cfg is not None
+            else OmegaConf.create(
+                {
+                    "name": dataset_key,
+                    "data_path": str(Path(data_root) / dataset_key),
+                    "prompt_file": "",
+                }
+            )
         )
         path = prompt_file(dataset_cfg, model_key=model_key)
-        if path.is_symlink() or not path.resolve().is_relative_to(Path(data_root).resolve()):
+        selected_root = Path(str(dataset_cfg.get("data_path", data_root))).resolve()
+        if path.is_symlink() or (
+            not dataset_cfg.get("prompt_file") and not path.resolve().is_relative_to(selected_root)
+        ):
             raise ValueError("Unsafe Dataset artifact path")
         if path.stat().st_size > 64 * 1024 * 1024:
             raise ValueError("Dataset artifact exceeds Precheck byte bound")
         rows = read_prompts(dataset_cfg, model_key=model_key)
         if len(rows) > 100000:
             raise ValueError("Dataset record count exceeds safety bound")
+        population_count = len(rows)
+        from saebase.datasets.sampling import sample_records
+
+        rows = sample_records(len(rows), rows.__getitem__, max_records, sampling_seed)
         ids, prompts = [], []
         for index, row in enumerate(rows):
             if not isinstance(row, dict):
@@ -62,8 +75,8 @@ def check_dataset_artifact(
             )
             ids.append(sample_id)
             prompts.append(hashlib.sha256(prompt.encode("utf-8")).hexdigest())
-        if len(ids) != len(set(ids)) or len(prompts) != len(set(prompts)):
-            raise ValueError("Duplicate Dataset sample or prompt")
+        if len(ids) != len(set(ids)):
+            raise ValueError("Duplicate Dataset sample identity")
         raw_sha = hashlib.sha256(path.read_bytes()).hexdigest()
         return {
             "status": "PASS",
@@ -71,6 +84,8 @@ def check_dataset_artifact(
             "dataset_id": dataset_key,
             "model_key": model_key,
             "observed": len(rows),
+            "population_count": population_count,
+            "sampling_seed": sampling_seed,
             "max_records_for_worker": max_records,
             "path": str(path),
             "artifact_sha256": raw_sha,

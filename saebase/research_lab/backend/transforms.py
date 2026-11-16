@@ -23,7 +23,7 @@ from .readouts import input_anchor
 
 SCHEMA = "opensae.rss.variant_proposals.v1"
 SETTINGS = ("local_format", "instruction_wrapper", "context_wrapper")
-PROSE_CONTINUATION = {"wikitext103", "tinystories"}
+PROSE_CONTINUATION = {"tinystories"}
 CODE_PREFIX = {"humaneval"}
 
 PREFIX_SETS = (

@@ -1,0 +1,80 @@
+# 目的和主要功能：保存数据集的公共默认值及具名预设。
+# 适用范围：Hydra 组件选择，以及 conf.load_group 的直接读取。
+defaults:
+  input_format: text
+  data_path: ${paths.data_dir}/${dataset.name}
+  prompt_file: ''
+  batch_size: 8
+  num_workers: 0
+  pin_memory: false
+presets:
+  arc_challenge:
+    name: ARCChallenge
+    source_config: ARC-Challenge
+    sample_count: 500
+    sampling_seed: 42
+    use_original_split: false
+  bbh:
+    name: BBH
+    sample_count: 500
+    sampling_seed: 42
+    use_original_split: false
+  counterfact:
+    name: CounterFact
+    sample_count: 500
+    sampling_seed: 42
+    use_original_split: false
+  greater_than:
+    name: GreaterThan
+  gsm8k:
+    name: GSM8K
+    source_config: main
+    sample_count: 500
+    sampling_seed: 42
+    use_original_split: false
+  harmbench:
+    name: HarmBench
+    sample_count: 500
+    sampling_seed: 42
+    use_original_split: false
+  hotpotqa:
+    name: HotpotQA
+    sample_count: 500
+    sampling_seed: 42
+    use_original_split: false
+    source_config: distractor
+  humaneval:
+    name: HumanEval
+    source_config: openai_humaneval
+    sample_count: 500
+    sampling_seed: 42
+    use_original_split: false
+  ioi:
+    name: IOI
+    sample_count: 500
+    sampling_seed: 42
+    use_original_split: false
+  mmlu_pro:
+    name: MMLUPro
+    sample_count: 500
+    sampling_seed: 42
+    use_original_split: false
+  ravel:
+    name: RAVEL
+    source_config: city
+    sample_count: 500
+    sampling_seed: 42
+    use_original_split: false
+  simple_copying:
+    name: SimpleCopying
+  truthfulqa:
+    name: TruthfulQA
+    source_config: multiple_choice
+    sample_count: 500
+    sampling_seed: 42
+    use_original_split: false
+  xstest:
+    name: XSTest
+    sample_count: 500
+    sampling_seed: 42
+    use_original_split: false

@@ -2,21 +2,25 @@
 # Setup only prepares assets; Precheck owns every real test.
 task:
   name: precheck
+  resource_only: false  # True: load/probe only the SAE, without a language model.
+  extensions: []  # Explicit installed entry-point names; no automatic discovery.
   path: precheck
   execute: false
+  worker_mode: isolated  # in_process only for trusted batches with an outer process timeout.
   mode: sae             # sae | task | all
   sae_list: default     # default | all | list of Model-owned SAE keys
   check_tasks: []       # subset of capture/intervene/generate/circuits/explain/benchmark/train
-  prompt: "The capital of France is"
-  device: cpu
+  prompt: ''  # Empty checks the selected Dataset; explicit text checks that text.
+  device: auto
   auto_setup: true
-  allow_compute: false
-  allow_gpu: false
-  allow_network: false
-  allow_install: false
-  allow_download: false
-  allow_native: false
-  max_download_bytes: 0
+  allow_network: true
+  allow_install: true
+  allow_download: true
+  max_download_bytes: 17179869184  # 16 GiB of missing files, not entire SAE collections.
+  prepare_timeout_seconds: 1800
+  dataset_prepare_timeout_seconds: 1800
+  check_sample_count: 32  # Real input probes; independent of Dataset cohort size.
+  sampling_seed: 42
   max_seconds: 120
   max_samples: 2
   max_tokens: 32

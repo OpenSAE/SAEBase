@@ -1,34 +1,37 @@
-"""Reconstruct M4 observation units from verified M3/M1/M2 artifacts only.
+"""Reconstruct reliability audit observation units from verified benchmark, activation-cache and intervention artifacts only.
 
-No pretrained model loads; no forward passes; original M3 metric rows immutable.
+No pretrained model loads; no forward passes; original benchmark metric rows immutable.
 """
 
 from __future__ import annotations
-from pathlib import Path
+
 import json
 import math
+from pathlib import Path
+
 import numpy as np
 
 from saebase.api import ActivationSite
-from tasks.benchmark.backend import BenchmarkConfig
-from tasks.benchmark.backend.results import read_metrics
-from tasks.intervene.backend import ExperimentIdentity, read_results
 from saebase.store import ShardedReader, resolve_positions, sha256_state_dict
+from tasks.benchmark.execution.schema import BenchmarkConfig
+from tasks.benchmark.results.metrics import read_metrics
+from tasks.intervene.backend import ExperimentIdentity, read_results
+
 from .schema import Observation
 
 
 def _read_config(root: Path):
     config = BenchmarkConfig.from_dict(json.loads((root / "resolved_config.json").read_text()))
     if config.run_id != root.name:
-        raise ValueError("M3 run directory does not match frozen configuration ID")
+        raise ValueError("benchmark run directory does not match frozen configuration ID")
     return config
 
 
-def _read_m3(root, *, localization_paper=None):
+def _read_benchmark(root, *, localization_paper=None):
     root = Path(root)
     config = _read_config(root)
     rows = read_metrics(root, config.run_id)
-    from tasks.benchmark.backend.runner import validate_external_sources
+    from tasks.benchmark.results.validation import validate_external_sources
 
     validate_external_sources(config, rows, root=root, localization_paper=localization_paper)
     provenance = json.loads((root / "provenance.json").read_text())
@@ -49,12 +52,12 @@ def _id_from_manifest(manifest):
     )
 
 
-def _find_m2(root, metric, provenance):
+def _find_measurement_journal(root, metric, provenance):
     m = metric
     prefix = f"{m['model_id']}/{m['site']['layer']}/{m['sae_id']}"
     expected = provenance.get(prefix)
     if not expected:
-        raise ValueError(f"missing M3 checkpoint provenance for {prefix}")
+        raise ValueError(f"missing benchmark checkpoint provenance for {prefix}")
     source = root.parent / "_cache" / "m2"
     matches = []
     for candidate in sorted(source.glob("*/*/manifest.json")):
@@ -69,23 +72,25 @@ def _find_m2(root, metric, provenance):
             and identity.get("site") == m["site"]
         ):
             ident = _id_from_manifest(meta)
-            rows = read_results(candidate.parent, ident)  # M2 verifies shards and row identities
+            rows = read_results(
+                candidate.parent, ident
+            )  # The measurement reader verifies shards and row identities
             by_id = {r["measurement_id"]: r for r in rows}
             if all(ref in by_id for ref in m["measurement_refs"]):
                 matches.append(by_id)
     if len(matches) != 1:
         raise ValueError(
-            f"expected one verified M2 journal for {m['metric_id']}: found {len(matches)}"
+            f"expected one verified batch intervention journal for {m['metric_id']}: found {len(matches)}"
         )
     return [matches[0][ref] for ref in m["measurement_refs"]]
 
 
-def _find_m1_codes(root, metric, provenance, config):
+def _find_code_cache(root, metric, provenance, config):
     m = metric
     prefix = f"{m['model_id']}/{m['site']['layer']}/{m['sae_id']}"
     expected = provenance.get(prefix)
     if not expected:
-        raise ValueError("missing M3 model/SAE provenance for M1 code extraction")
+        raise ValueError("missing benchmark model/SAE provenance for cached code extraction")
     matches = []
     for path in sorted((root.parent / "_cache" / "m1").glob("*/codes/*/manifest.json")):
         meta = json.loads(path.read_text())
@@ -105,15 +110,15 @@ def _find_m1_codes(root, metric, provenance, config):
         if all(reader.has(s.record.sample_id) for s in config.samples):
             matches.append(reader)
     if len(matches) != 1:
-        raise ValueError(f"expected one verified M1 code cache: found {len(matches)}")
+        raise ValueError(f"expected one verified SAE code cache: found {len(matches)}")
     return matches[0]
 
 
 def observations_for_metric(root, config, row, provenance, *, sae=None):
-    """Build exactly the M3 observation set for a supported audited metric."""
+    """Build exactly the benchmark observation set for a supported audited metric."""
     metric = row["metric_id"]
     if row["status"] != "completed":
-        return (), f"M3 metric status is {row['status']}"
+        return (), f"benchmark metric status is {row['status']}"
     if row["split"] == "mixed":
         return (), "mixed dataset splits cannot share an audit population"
     samples = {s.record.sample_id: s for s in config.samples}
@@ -121,7 +126,7 @@ def observations_for_metric(root, config, row, provenance, *, sae=None):
     if metric.startswith("intervention."):
         if not row.get("condition_id") or not row.get("measurement_refs"):
             return (), "intervention raw source references unavailable"
-        raw = _find_m2(Path(root), row, provenance)
+        raw = _find_measurement_journal(Path(root), row, provenance)
         for item in raw:
             sid = item["sample_id"]
             sample = samples.get(sid)
@@ -132,14 +137,16 @@ def observations_for_metric(root, config, row, provenance, *, sae=None):
                 or item["condition_name"] != row["condition_id"]
             ):
                 raise ValueError(
-                    "M2 source sample/condition identity disagrees with M3 configuration"
+                    "batch intervention source sample/condition identity disagrees with benchmark configuration"
                 )
             if sample.record.split != row["split"] or not sample.record.prompt_group_id:
-                raise ValueError("M4 requires split-matched nonempty prompt_group_id")
+                raise ValueError(
+                    "reliability audit requires split-matched nonempty prompt_group_id"
+                )
             name = metric.removeprefix("intervention.")
             value = item["metrics"].get(name)
             if type(value) not in (int, float) or not math.isfinite(value):
-                raise ValueError(f"invalid M2 value for {metric}")
+                raise ValueError(f"invalid batch intervention value for {metric}")
             out.append(
                 Observation(
                     row["model_id"],
@@ -156,20 +163,24 @@ def observations_for_metric(root, config, row, provenance, *, sae=None):
                 )
             )
     elif metric == "core.l0":
-        reader = _find_m1_codes(Path(root), row, provenance, config)
+        reader = _find_code_cache(Path(root), row, provenance, config)
         for sample in config.samples:
             if sample.record.split != row["split"] or not sample.record.prompt_group_id:
-                raise ValueError("M4 requires split-matched nonempty prompt_group_id")
+                raise ValueError(
+                    "reliability audit requires split-matched nonempty prompt_group_id"
+                )
             stored = reader.get(sample.record.sample_id)
             if stored.positions != resolve_positions(sample.record):
-                raise ValueError("M1 stored token positions disagree with M3 config")
-            # M1 added source_activation_sha256, intentionally not identical
+                raise ValueError(
+                    "activation/code cache stored token positions disagree with benchmark config"
+                )
+            # activation/code cache added source_activation_sha256, intentionally not identical
             # to original SampleRecord; verify every other metadata field.
             actual = stored.record.to_dict()
             expected = sample.record.to_dict()
             for key in expected:
                 if key != "source_activation_sha256" and actual[key] != expected[key]:
-                    raise ValueError(f"M1 code sample identity mismatch: {key}")
+                    raise ValueError(f"cached code sample identity mismatch: {key}")
             for pos, z in zip(stored.positions, np.asarray(stored.values)):
                 out.append(
                     Observation(
@@ -189,23 +200,28 @@ def observations_for_metric(root, config, row, provenance, *, sae=None):
         if sae is None:
             return (), "SAE-only decoder opt-in required; no model forward is needed"
         import torch
+
         from saebase.api.sae_contracts import reconstruction_stats
 
-        reader = _find_m1_codes(Path(root), row, provenance, config)
+        reader = _find_code_cache(Path(root), row, provenance, config)
         activation = ShardedReader(reader.path.parents[1], verify_shards=True)
         prefix = f"{row['model_id']}/{row['site']['layer']}/{row['sae_id']}"
         if sha256_state_dict(sae) != provenance[prefix]["sae_state_sha256"]:
-            raise ValueError("SAE decoder checkpoint differs from the frozen M3 weight identity")
+            raise ValueError(
+                "SAE decoder checkpoint differs from the frozen benchmark weight identity"
+            )
         param = next(sae.parameters())
         for sample in config.samples:
             if sample.record.split != row["split"] or not sample.record.prompt_group_id:
-                raise ValueError("M4 requires split-matched nonempty prompt_group_id")
+                raise ValueError(
+                    "reliability audit requires split-matched nonempty prompt_group_id"
+                )
             source = activation.get(sample.record.sample_id)
             code = reader.get(sample.record.sample_id)
             if source.positions != code.positions or source.positions != resolve_positions(
                 sample.record
             ):
-                raise ValueError("M1 activation/code token selection mismatch")
+                raise ValueError("cached activation/code token selection mismatch")
             with torch.no_grad():
                 z = torch.as_tensor(
                     np.asarray(code.values, dtype=np.float32),
@@ -215,7 +231,7 @@ def observations_for_metric(root, config, row, provenance, *, sae=None):
                 reconstructed = sae.decode(z).detach().float().cpu().numpy()
             original = np.asarray(source.values, dtype=np.float64)
             if reconstructed.shape != original.shape:
-                raise ValueError("M1 decoded SAE reconstruction has wrong shape")
+                raise ValueError("activation/code cache decoded SAE reconstruction has wrong shape")
             for pos, h, recon in zip(source.positions, original, reconstructed):
                 stat = reconstruction_stats(
                     torch.as_tensor(h, dtype=torch.float64),
@@ -241,13 +257,16 @@ def observations_for_metric(root, config, row, provenance, *, sae=None):
                     )
                 )
     else:
-        return (), f"no raw group-observation adapter for {metric}; original M3 result unchanged"
+        return (
+            (),
+            f"no raw group-observation adapter for {metric}; original benchmark result unchanged",
+        )
     if len(out) != row["n_valid"]:
         raise ValueError(
-            f"{metric} raw sample count {len(out)} differs from M3 n_valid {row['n_valid']}"
+            f"{metric} raw sample count {len(out)} differs from benchmark n_valid {row['n_valid']}"
         )
     if not out or abs(
         sum(x.value * x.unit_count for x in out) / sum(x.unit_count for x in out) - row["value"]
     ) > max(1e-5, 1e-5 * abs(row["value"])):
-        raise ValueError(f"{metric} raw estimate does not reproduce M3 summary")
+        raise ValueError(f"{metric} raw estimate does not reproduce benchmark summary")
     return tuple(out), None

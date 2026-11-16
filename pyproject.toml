@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "opensae-saebase"
-version = "0.6.5"
+version = "0.7.0"
 description = "Research infrastructure for sparse autoencoder evaluation and interventions"
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
@@ -28,7 +28,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+lab = ["fastapi>=0.115,<1", "uvicorn>=0.30,<1"]
 analysis = [
+    "neuronpedia>=1.2.1,<2",
     "transformer-lens>=2.0",
     "sae-lens>=4.0",
     "transformers>=4.40",
@@ -40,6 +42,7 @@ analysis = [
     "tqdm>=4.65",
 ]
 generation = [
+    "neuronpedia>=1.2.1,<2",
     "transformer-lens>=2.0",
     "sae-lens>=4.0",
     "transformers>=4.40",
@@ -54,6 +57,7 @@ generation = [
 ]
 # Separate optional workers. Do not co-install every research backend by default.
 tl4 = [
+    "neuronpedia>=1.2.1,<2",
     "transformer-lens>=4.0,<5",
     "sae-lens>=6.0,<7",
     "transformers>=4.40",
@@ -71,8 +75,6 @@ saebase-intervene = "saebase.cli:intervene"
 saebase-benchmark = "saebase.cli:benchmark"
 saebase-audit = "saebase.cli:audit"
 saebase-ground-truth = "saebase.cli:ground_truth"
-saebase-release-matrix = "saebase.cli:release_matrix"
-saebase-release-gate = "saebase.cli:release_gate"
 
 [project.urls]
 Repository = "https://github.com/OpenSAE/SAEBase"
@@ -94,7 +96,7 @@ saebase = ["**/*.md", "**/*.yaml", "**/*.json", "**/*.html", "**/*.css", "**/*.j
 models = ["**/*.json", "**/*.yaml"]
 
 [tool.pytest.ini_options]
-testpaths = ["harness/github/work_test"]
+testpaths = ["tests"]
 # Frozen versioned WT archives must not be reinterpreted by future test suites.
 norecursedirs = ["archive"]
 

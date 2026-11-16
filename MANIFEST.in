@@ -2,19 +2,20 @@ include README.md README_cn.md LICENSE CITATION.cff
 include requirements.txt
 recursive-include .github *.yml *.md
 recursive-include conf *.yaml *.md *.json
-recursive-include harness/github/development_doc *.md *.json *.cff NOTICE
+recursive-include doc/code/development *.md *.json *.cff NOTICE
 recursive-include saebase *.md
-recursive-include harness/github/work_test *.py
-recursive-include harness/github/work_test/fixtures *.json
-recursive-include saebase/examples *.py *.sh
-recursive-include saebase/tools *.py
+include tests/__init__.py
+recursive-include tests/product *.py
+recursive-include tests/product/fixtures *.json
+recursive-include tests/fixtures *.py
+recursive-include scripts/examples *.py
+recursive-include scripts *.py
 prune data
 prune experiment
 prune .venv
 # Frozen historical files are Git/Release records, never package requirements.
-prune harness/github/development_doc/archive
-prune harness/github/work_plan/archive
-prune harness/github/work_test/archive
+prune doc/code/development/archive
+prune tests/product/archive
 global-exclude __pycache__ *.py[cod] .DS_Store
 
 # Stage D evidence lives in Git and the dedicated evidence release, not in pip packages.
@@ -22,3 +23,4 @@ recursive-exclude conf/coverage/stage_d_evidence *
 
 recursive-include datasets *.py
 recursive-include saebase/research_lab *.html *.css *.js *.json
+recursive-include doc/code/assets *.svg *.png

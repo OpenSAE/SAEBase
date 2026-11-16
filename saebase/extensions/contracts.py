@@ -12,10 +12,10 @@ from pathlib import Path
 from typing import Any, Callable
 
 from saebase.api.model import ActivationSite
-from saebase.benchmarks.schema import MetricSpec
+from tasks.benchmark.execution.schema import MetricSpec
 
 API_VERSION = 1
-ENTRY_POINT_GROUP = "opensae.saebase.extensions.v1"
+ENTRY_POINT_GROUP = "opensae.saebase.extensions"
 _KEY = re.compile(r"ext\.[a-z][a-z0-9_]+(?:\.[a-z][a-z0-9_]*)+")
 _DTYPES = frozenset({"float16", "float32", "float64", "bfloat16"})
 _NORMALIZATIONS = frozenset({"none", "layer_norm", "unit_norm", "folded", "custom"})
@@ -55,11 +55,20 @@ class ExternalModel:
     hooks: tuple[HookSpec, ...]
     factory: Callable[[str], Any] = field(repr=False)
     backend: str = "auto"
+    capabilities: tuple[str, ...] | None = None
 
     def __post_init__(self) -> None:
         _key(self.key)
         _nonempty(self.source, "model source")
         _revision(self.revision, "model revision")
+        if self.capabilities is not None and (
+            not isinstance(self.capabilities, tuple)
+            or any(
+                name not in {"capture", "patch", "forward", "generate"}
+                for name in self.capabilities
+            )
+        ):
+            raise ValueError("External capabilities must be an explicit supported tuple")
         if not callable(self.factory):
             raise TypeError("model factory must be callable")
         if not isinstance(self.hooks, tuple) or not self.hooks:

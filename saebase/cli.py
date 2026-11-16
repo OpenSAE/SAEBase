@@ -1,9 +1,4 @@
-"""Stable CLI entrypoints under the saebase namespace.
-
-The original activation-health command is preserved in saebase.cli_compat. Import the
-command implementation only when the corresponding CLI is invoked, so
-ordinary saebase imports do not require optional analysis backends.
-"""
+"""Current CLI entrypoints; optional scientific backends load only when selected."""
 
 from __future__ import annotations
 
@@ -15,36 +10,28 @@ def _dispatch(module: str) -> object:
 
 
 def main() -> object:
-    return _dispatch("saebase.cli_compat")
+    return _dispatch("saebase.runtime.train")
 
 
 def prepare_prompts() -> object:
-    return _dispatch("saebase.tools.sae_prepare_prompts")
+    return _dispatch("saebase.datasets.prepare")
 
 
 def check_env() -> object:
-    return _dispatch("saebase.tools.check_env")
+    return _dispatch("saebase.runtime")
 
 
 def intervene() -> object:
-    return _dispatch("saebase.tools.m2_batch")
+    return _dispatch("tasks.intervene.cli")
 
 
 def benchmark() -> object:
-    return _dispatch("saebase.tools.m3_benchmark")
+    return _dispatch("tasks.benchmark.cli")
 
 
 def audit() -> object:
-    return _dispatch("saebase.tools.m4_reliability")
+    return _dispatch("tasks.benchmark.reliability.cli")
 
 
 def ground_truth() -> object:
-    return _dispatch("saebase.tools.m4_ground_truth")
-
-
-def release_matrix() -> object:
-    return _dispatch("saebase.tools.m5_release_matrix")
-
-
-def release_gate() -> object:
-    return _dispatch("saebase.tools.m5_release_gate")
+    return _dispatch("tasks.benchmark.reliability.controls_cli")

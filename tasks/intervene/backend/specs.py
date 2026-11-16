@@ -1,4 +1,4 @@
-"""Versioned, deterministic experiment definitions for M2 interventions."""
+"""Versioned, deterministic experiment definitions for batch interventions."""
 
 from __future__ import annotations
 
@@ -71,15 +71,17 @@ class MeasurementSample:
 
     def __post_init__(self) -> None:
         if not isinstance(self.record, SampleRecord):
-            raise TypeError("record must be an M1 SampleRecord")
+            raise TypeError("record must be a SampleRecord")
         if len(resolve_positions(self.record)) != 1:
-            raise ValueError("M2 requires exactly one patch position per measurement sample")
+            raise ValueError(
+                "batch intervention requires exactly one patch position per measurement sample"
+            )
         if type(self.readout_position) is not int:
             raise ValueError("readout_position must be an integer")
         mask = self.record.attention_mask or (1,) * len(self.record.token_ids)
         # Current adapters do not accept explicit attention masks; left padding unsupported.
         if 1 in mask and tuple(mask) != (1,) * sum(mask) + (0,) * (len(mask) - sum(mask)):
-            raise ValueError("M2 supports unpadded or right-padded inputs only")
+            raise ValueError("batch intervention supports unpadded or right-padded inputs only")
         length = sum(mask)
         if not -length <= self.readout_position < length:
             raise ValueError("readout position is outside valid tokens")

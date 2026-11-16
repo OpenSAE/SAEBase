@@ -25,7 +25,7 @@ jobs:
           OMP_NUM_THREADS: '2'
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          python scripts/phase_bc_cpu_sae.py \
+          python -m tasks.precheck.checkpoint --coverage-catalog conf/coverage/stage_bc.json \
             --sae-key gemma2_9b_pt_scope_resid --layer 20 \
             --output "$RUNNER_TEMP/stage-bc-fixed"
       - name: Upload real SAE checksum and encode/decode acceptance

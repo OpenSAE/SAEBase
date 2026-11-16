@@ -6,15 +6,17 @@ from typing import FrozenSet
 
 from omegaconf import DictConfig
 
-from saebase.datasets.artifact_layout import BEHAVIOR_ALIASES, canonicalize_behavior
-from saebase.datasets.prompt_schema import assert_available
-from saebase.cfg.contracts import assert_prompt_source_in, assert_task_in
+from saebase.datasets.artifacts import BEHAVIOR_ALIASES, canonicalize_behavior
+from saebase.datasets.artifacts import assert_available
+from saebase.runtime.cfg.contracts import assert_prompt_source_in, assert_task_in
 from saebase.registry import register_prompt_source, register_prompt_source_alias, register_dataset
 
-_TASKS_SAE: FrozenSet[str] = frozenset({"sae"})
-_TASKS_DISCOVERY: FrozenSet[str] = frozenset({"sae", "discovery", "logic_chain"})
+_TASKS_SAE: FrozenSet[str] = frozenset({"benchmark"})
+_TASKS_DISCOVERY: FrozenSet[str] = frozenset(
+    {"benchmark", "capture", "intervene", "generate", "circuits", "explain", "train"}
+)
 _TASKS_STEER: FrozenSet[str] = frozenset(
-    {"sae", "discovery", "logic_chain", "vllm_sae_steer", "pair_interaction", "ordered_steering"}
+    {"benchmark", "capture", "intervene", "generate", "circuits", "explain", "train"}
 )
 
 _BEHAVIORS = (
@@ -82,9 +84,25 @@ def _register_builtin_prompt_sources() -> None:
 _register_builtin_prompt_sources()
 
 
-NLP_NAMES = ("CounterFact", "GreaterThan", "IOI", "MMLUPro", "SimpleCopying")
+NLP_NAMES = (
+    "HotpotQA",
+    "BBH",
+    "CounterFact",
+    "GreaterThan",
+    "IOI",
+    "MMLUPro",
+    "SimpleCopying",
+    "RAVEL",
+    "ARCChallenge",
+    "GSM8K",
+    "HumanEval",
+    "TruthfulQA",
+    "HarmBench",
+    "XSTest",
+)
 SAE_TASKS = frozenset(
     {
+        "precheck",
         "capture",
         "intervene",
         "generate",
@@ -96,11 +114,50 @@ SAE_TASKS = frozenset(
 )
 
 
+PUBLIC_DATASETS = frozenset(
+    [
+        "BBH",
+        "RAVEL",
+        "ARCChallenge",
+        "GSM8K",
+        "HumanEval",
+        "TruthfulQA",
+        "HarmBench",
+        "XSTest",
+        "HotpotQA",
+    ]
+)
+
+
+def _dataset_module(name):
+    import importlib
+
+    suffix = "" if name in PUBLIC_DATASETS else ".prepare"
+    return importlib.import_module(f"saebase.datasets.{name}{suffix}")
+
+
 def _register_builtin_datasets() -> None:
+    def preparation(name):
+        def prepare(model_key, model, **parameters):
+            import inspect
+
+            operation = _dataset_module(name).prepare_for_model
+            if "n_generate" not in inspect.signature(operation).parameters:
+                parameters["max_items"] = parameters.pop("n_generate")
+            return operation(model_key, model, **parameters)
+
+        return prepare
+
     def setup_nlp(dm, cfg, stage=None):
         from saebase.datasets.prompts import read_prompts
 
         records = read_prompts(cfg.dataset, model_key=str(cfg.model.name))
+        dm.observation_set = records
+        if "sample_count" in cfg.dataset and not cfg.dataset.get("use_original_split", False):
+            dm.train_set = records if str(cfg.task.name) == "train" else []
+            dm.val_set = []
+            dm.test_set = records if str(cfg.task.name) != "train" else []
+            return
         dm.train_set = [item for item in records if str(item.get("split", "train")) == "train"]
         dm.val_set = [item for item in records if item.get("split") in ("val", "validation")]
         dm.test_set = [item for item in records if item.get("split") in ("test", "held_out")]
@@ -109,6 +166,20 @@ def _register_builtin_datasets() -> None:
 
     def check_nlp(cfg):
         name, task = str(cfg.dataset.name), str(cfg.task.name)
+        if name in {
+            "HotpotQA",
+            "BBH",
+            "RAVEL",
+            "ARCChallenge",
+            "GSM8K",
+            "HumanEval",
+            "TruthfulQA",
+            "HarmBench",
+            "XSTest",
+        }:
+            policy = _dataset_module(name)
+            if task not in policy.SUPPORTED_TASKS:
+                raise ValueError(f"Dataset {name} has no native protocol for task {task}")
         if name not in NLP_NAMES or task not in SAE_TASKS:
             raise ValueError(f"NLP dataset {name!r} supports SAEBase tasks, received {task!r}")
         from saebase.datasets.artifacts import assert_available
@@ -121,8 +192,25 @@ def _register_builtin_datasets() -> None:
             "no validation or test set is inferred from training prompts."
         )
 
+    def selection(name):
+        def select(cfg, **parameters):
+
+            module = _dataset_module(name)
+            return module.select_samples(cfg, **parameters)
+
+        return select
+
     for name in NLP_NAMES:
-        register_dataset(name, setup_nlp, check_nlp, nlp_split_note)
+        register_dataset(
+            name,
+            setup_nlp,
+            check_nlp,
+            nlp_split_note,
+            prepare=preparation(name),
+            select_samples=selection(name)
+            if name not in {"GreaterThan", "SimpleCopying"}
+            else None,
+        )
 
 
 _register_builtin_datasets()

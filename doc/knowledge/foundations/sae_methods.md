@@ -9,7 +9,7 @@
 - 生成干预：在生成过程中执行干预，对照基线续写及干预后的输出。代码依据：`tasks/generate/operation.py`。
 - 电路分析：使用有来源的模型组件和干预追踪接口分析候选因果路径。代码依据：`tasks/circuits/backend/circuits.py`。
 - 自动解释：根据示例生成特征解释假设，通过独立样本检验其行为。代码依据：`tasks/explain/interpretation.py`。
-- SAE 基准：执行指标、重建、干预、可靠性及 SAR/RSS 的实验适配接口。代码依据：`tasks/benchmark/backend/runner.py`、`tasks/benchmark/integrations/sar.py`、`tasks/benchmark/integrations/rss.py`。
+- SAE 基准：执行指标、重建、干预、可靠性及 SAR/RSS 的实验适配接口。代码依据：`tasks/benchmark/execution/runner.py`、`tasks/benchmark/integrations/sar.py`、`tasks/benchmark/methods/rss.py`。
 - SAE 训练：通过原生训练接口执行 SAE 训练与参数配置。代码依据：`tasks/train/backend/training.py`。
 - 模型与 Prompt：以明确模型身份及可追溯 Prompt 产物维护输入。代码依据：`models/gemma2_2b_base/gemma2_2b_base.py`、`datasets/NLP/artifacts.py`。
 

@@ -1,24 +1,21 @@
 """Conditional Localize reliability and descriptive cross-SAE comparisons.
 
 One complete Boolean factorial grid is ONE input population, not 2**n
-independent observations. Do not apply M4 prompt-group bootstrap to its states.
+independent observations. Do not apply reliability audit prompt-group bootstrap to its states.
 Finite-pair repetitions assess Monte Carlo estimation stability, not generalization.
 """
 
 from __future__ import annotations
 
+import math
 from collections import defaultdict
 from itertools import combinations
 from typing import Any
-import math
 
 import numpy as np
 
-from tasks.benchmark.backend.adapters.localization import (
-    grid_from_artifact,
-    validate_localization_result,
-)
-from tasks.benchmark.integrations.localization import _original_localize
+from tasks.benchmark.methods.localization import _original_localize
+from tasks.benchmark.results.localization import grid_from_artifact, validate_localization_result
 
 
 def audit_localization(
@@ -31,7 +28,9 @@ def audit_localization(
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """Verify full curve, rerun native paired estimates on cached codes only."""
     data = validate_localization_result(root, config, row, paper=paper)
-    grid = grid_from_artifact(root, data)  # verifies the original M1 source shards
+    grid = grid_from_artifact(
+        root, data
+    )  # verifies the original activation/code cache source shards
     native = _original_localize(paper)
     exact = np.asarray(data["curve"], dtype=np.float64)
     W = data["total_variance"]

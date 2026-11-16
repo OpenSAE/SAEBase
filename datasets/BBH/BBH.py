@@ -97,7 +97,7 @@ print(len(rows), file=sys.stderr)
 
 
 def default_data_dir() -> str:
-    from saebase.datasets.artifact_layout import DEFAULT_DATA_ROOT
+    from saebase.datasets.artifacts import DEFAULT_DATA_ROOT
 
     return str(DEFAULT_DATA_ROOT / "BBH")
 
@@ -144,7 +144,9 @@ def build_prompt_items(
         cache = Path(default_data_dir()) / "hf_cache.jsonl"
         if cache.is_file():
             rows = [
-                json.loads(l) for l in cache.read_text(encoding="utf-8").splitlines() if l.strip()
+                json.loads(line)
+                for line in cache.read_text(encoding="utf-8").splitlines()
+                if line.strip()
             ]
         if not rows:
             try:

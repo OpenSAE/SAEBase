@@ -169,6 +169,11 @@ class ModelAdapter:
             raise ValueError("tokens must have shape [1, length] with length >= 1")
         if tokens.dtype not in {torch.int32, torch.int64}:
             raise TypeError("tokens must contain integer token IDs")
+        limit = getattr(getattr(self.model, "cfg", None), "n_ctx", None)
+        if isinstance(limit, int) and tokens.shape[1] > limit:
+            raise UnsupportedCapability(
+                f"Input has {tokens.shape[1]} tokens; the model execution context window is {limit}"
+            )
         # Keep tokens aligned with the model even if a caller supplied CPU ids.
         try:
             device = next(self.model.parameters()).device
@@ -200,9 +205,7 @@ class ModelAdapter:
             # TransformerLens. Reject unknown names *before* patch execution.
             get_point = getattr(self.model, "get_hook_point", None)
             if callable(get_point) and get_point(site.hook_name) is None:
-                raise UnsupportedCapability(
-                    f"model has no fireable hook {site.hook_name!r}"
-                )
+                raise UnsupportedCapability(f"model has no fireable hook {site.hook_name!r}")
         return pos
 
     @torch.no_grad()
@@ -212,21 +215,43 @@ class ModelAdapter:
         pos = _index(ids.shape[1], readout_position)
         return _as_logits(self.model(ids), token_index=pos, length=ids.shape[1])
 
+    def _cached_sequence(self, ids, site):
+        # Capture only needs activations. Unembedding can allocate a full
+        # vocabulary weight transpose/logits even when its result is discarded.
+        import inspect
+
+        parameters = inspect.signature(self.model.run_with_cache).parameters
+        options = {"names_filter": site.hook_name}
+        forward = getattr(self.model, "forward", None)
+        accepts_output_selection = "return_type" in parameters or (
+            callable(forward) and "return_type" in inspect.signature(forward).parameters
+        )
+        if accepts_output_selection:
+            options["return_type"] = None
+        if (
+            callable(forward)
+            and "stop_at_layer" in inspect.signature(forward).parameters
+            and site.hook_name.startswith(f"blocks.{site.layer}.")
+        ):
+            options["stop_at_layer"] = site.layer + 1
+        _, cache = self.model.run_with_cache(ids, **options)
+        if site.hook_name not in cache:
+            raise RuntimeError(f"hook {site.hook_name!r} missing from model cache")
+        activation = cache[site.hook_name]
+        if not isinstance(activation, torch.Tensor) or activation.ndim != 3:
+            raise RuntimeError("expected hook activation shape [batch, seq, d_model]")
+        if activation.shape[:2] != ids.shape:
+            raise RuntimeError("hook activation batch/sequence does not match tokens")
+        return activation[0]
+
     @torch.no_grad()
     def capture(self, *, tokens: torch.Tensor, site: ActivationSite) -> torch.Tensor:
         self.capabilities.require("capture")
         ids = self._tokens(prompt=None, tokens=tokens)
         pos = self._assert_site(site, ids)
         if self.backend == "transformer_lens":
-            _, cache = self.model.run_with_cache(ids, names_filter=site.hook_name)
-            if site.hook_name not in cache:
-                raise RuntimeError(f"hook {site.hook_name!r} missing from model cache")
-            activation = cache[site.hook_name]
-            if not isinstance(activation, torch.Tensor) or activation.ndim != 3:
-                raise RuntimeError("expected hook activation shape [batch, seq, d_model]")
-            if activation.shape[:2] != ids.shape:
-                raise RuntimeError("hook activation batch/sequence does not match tokens")
-            out = activation[0, pos]
+            activation = self._cached_sequence(ids, site)
+            out = activation[pos]
         else:
             offset = int(ids.shape[1] - 1 - pos)
             h = self.model.get_resid(ids, site.layer, [offset])
@@ -235,6 +260,20 @@ class ModelAdapter:
             out = h[0]
         if out.ndim != 1 or not bool(torch.isfinite(out).all()):
             raise RuntimeError("captured activation must be finite and one-dimensional")
+        return out.detach().clone()
+
+    @torch.no_grad()
+    def capture_sequence(self, *, tokens: torch.Tensor, site: ActivationSite) -> torch.Tensor:
+        """Capture every real token at one site, preserving input order and dtype."""
+        self.capabilities.require("capture")
+        ids = self._tokens(prompt=None, tokens=tokens)
+        self._assert_site(site, ids)
+        if self.backend == "transformer_lens":
+            out = self._cached_sequence(ids, site)
+        else:
+            out = self.model.get_resid(ids, site.layer, list(range(ids.shape[1] - 1, -1, -1)))
+        if out.ndim != 2 or out.shape[0] != ids.shape[1] or not bool(torch.isfinite(out).all()):
+            raise RuntimeError("Sequence capture must return finite [tokens, d_model] activations")
         return out.detach().clone()
 
     def supports_capture_with_logits(self) -> bool:
@@ -332,6 +371,76 @@ class ModelAdapter:
                 f"hook {site.hook_name!r} fired {fired} times; expected exactly once"
             )
         return _as_logits(output, token_index=readout, length=ids.shape[1])
+
+    @torch.no_grad()
+    def answer_token_logprobs(self, *, prompt_tokens, answer_tokens, site=None, activation=None):
+        """Teacher-force every answer token; patch only a fixed prompt position.
+
+        Answers are separately tokenized continuations. No EOS is appended and
+        no answer activation is used to select SAE features.
+        """
+        self.capabilities.require("forward")
+        prompt = self.tokens(tokens=prompt_tokens)
+        answer = self.tokens(tokens=answer_tokens)
+        ids = torch.cat((prompt, answer[:, :-1]), dim=1)
+        limit = getattr(getattr(self.model, "cfg", None), "n_ctx", None)
+        if limit is None:
+            limit = getattr(
+                getattr(getattr(self.model, "_model", None), "config", None),
+                "max_position_embeddings",
+                None,
+            )
+        if isinstance(limit, int) and ids.shape[1] > limit:
+            raise UnsupportedCapability(
+                "Complete prompt and canonical answer exceed the model context window"
+            )
+        if activation is None:
+            output = self.model(ids)
+        else:
+            self.capabilities.require("patch")
+            pos = self._assert_site(site, prompt)
+            if activation.ndim != 1 or not bool(torch.isfinite(activation).all()):
+                raise ValueError("Answer patch activation must be a finite vector")
+            if self.backend == "hf_hooks":
+                output = self.model.run_with_patch(
+                    ids, site.layer, {ids.shape[1] - 1 - pos: activation}, readout_offset=None
+                )
+            else:
+                fired = 0
+
+                def patch(hidden, hook=None, **kwargs):
+                    nonlocal fired
+                    fired += 1
+                    if (
+                        hidden.ndim != 3
+                        or hidden.shape[:2] != ids.shape
+                        or hidden.shape[-1] != activation.numel()
+                    ):
+                        raise ValueError(
+                            "Answer patch hook dimensions differ from the selected prompt site"
+                        )
+                    value = hidden.clone()
+                    value[0, pos] = activation.to(device=hidden.device, dtype=hidden.dtype)
+                    return value
+
+                output = self.model.run_with_hooks(ids, fwd_hooks=[(site.hook_name, patch)])
+                if fired != 1:
+                    raise UnsupportedCapability(
+                        f"Answer patch hook fired {fired} times; expected once"
+                    )
+        logits = output.logits if hasattr(output, "logits") else output
+        if (
+            not isinstance(logits, torch.Tensor)
+            or logits.ndim != 3
+            or logits.shape[:2] != ids.shape
+        ):
+            raise ValueError("Answer scoring requires logits of shape [1, sequence, vocab]")
+        if bool((answer < 0).any()) or int(answer.max()) >= logits.shape[-1]:
+            raise ValueError("Answer token IDs exceed the model vocabulary")
+        selected = logits[0, prompt.shape[1] - 1 :].float()
+        if not bool(torch.isfinite(selected).all()):
+            raise ValueError("Answer logits are non-finite")
+        return selected.log_softmax(-1).gather(1, answer[0, :, None].to(selected.device)).squeeze(1)
 
     @torch.no_grad()
     def assert_identity_patch(

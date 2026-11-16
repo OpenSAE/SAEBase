@@ -1,40 +1,49 @@
-"""Lightweight Hydra config checks before training (no full schema migration)."""
+"""Validate common selections and delegate method-specific parameters to their task.
+
+No checkpoint is loaded and no training parameter is required for unrelated tasks.
+"""
 
 from __future__ import annotations
-
 from omegaconf import DictConfig, OmegaConf
+from saebase.registry import TaskModule, get_model_plugin, get_task_plugin, selected_models
 
-from saebase.registry import get_dataset_plugin, get_model_plugin, get_task_plugin
 
+def validate_hydra_cfg(cfg: DictConfig) -> TaskModule:
+    from models.loading_policy import resolve_config_devices
 
-def validate_hydra_cfg(cfg: DictConfig) -> None:
-    """Fail fast on missing top-level groups, unknown registry keys, and bad scalars."""
-    required = ("dataset", "model", "train", "task", "paths", "experiment", "seed")
-    missing = [k for k in required if k not in cfg]
+    required = ("model", "dataset", "task", "paths", "experiment", "seed")
+    missing = [key for key in required if key not in cfg]
     if missing:
         raise ValueError(f"Missing top-level config keys: {missing}")
+    for group in ("task",):
+        if not OmegaConf.is_config(cfg[group]) or "name" not in cfg[group]:
+            raise ValueError(f"cfg.{group} must contain a component name")
+    from saebase.extensions.registry import external_model
+    from tasks.sae_runtime import load_requested_extensions
 
-    if not OmegaConf.is_config(cfg.dataset) or "name" not in cfg.dataset:
-        raise ValueError("cfg.dataset must be a config node with ``name``")
-    if not OmegaConf.is_config(cfg.model) or "name" not in cfg.model:
-        raise ValueError("cfg.model must be a config node with ``name``")
-    if not OmegaConf.is_config(cfg.task) or "name" not in cfg.task:
-        raise ValueError("cfg.task must be a config node with ``name``")
+    load_requested_extensions(cfg)
 
-    ds_name = str(cfg.dataset.name)
-    model_name = str(cfg.model.name)
-    task_name = str(cfg.task.name)
+    plugin = get_task_plugin(str(cfg.task.name))
+    task = plugin.task_class()
+    models = selected_models(cfg)
+    if len(models) > 1 and not task.supports_multiple_models:
+        raise ValueError(f"Task {cfg.task.name} does not support multiple models")
+    for model in models:
+        if external_model(str(model.name)) is None:
+            get_model_plugin(str(model.name))
+    if (
+        not OmegaConf.is_dict(cfg.dataset)
+        or not isinstance(cfg.dataset.get("name"), str)
+        or not cfg.dataset.name
+    ):
+        raise ValueError("cfg.dataset must contain a component name")
+    if type(cfg.seed) is not int or cfg.seed < 0:
+        raise ValueError("seed must be a nonnegative integer")
+    if "sample_count" in cfg.dataset:
+        from saebase.datasets.selection import validate_selection
 
-    get_dataset_plugin(ds_name)
-    get_model_plugin(model_name)
-    get_task_plugin(task_name)
-
-    if "max_epochs" not in cfg.train:
-        raise ValueError("cfg.train.max_epochs is required")
-    me = cfg.train.max_epochs
-    try:
-        me_int = int(me)
-    except (TypeError, ValueError) as exc:
-        raise ValueError(f"cfg.train.max_epochs must be an integer, got {me!r}") from exc
-    if me_int < 1:
-        raise ValueError(f"cfg.train.max_epochs must be >= 1, got {me_int}")
+        validate_selection(cfg.dataset)
+    effective = OmegaConf.create(OmegaConf.to_container(cfg, resolve=False))
+    resolve_config_devices(effective)
+    task.validate_cfg(effective)
+    return task

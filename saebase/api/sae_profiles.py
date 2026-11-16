@@ -5,35 +5,35 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
-from models.gemma1b.gemma1b import SPEC as GEMMA1B_SPEC
-from models.gemma1b_it.gemma1b_it import SPEC as GEMMA1B_IT_SPEC
-from models.gpt2small.gpt2small import SPEC as GPT2SMALL_SPEC
-from models.gemma270m.gemma270m import SPEC as GEMMA270M_SPEC
-from models.gemma2_2b_base.gemma2_2b_base import SPEC as GEMMA2_2B_BASE_SPEC
-from models.gemma2_2b_it.gemma2_2b_it import SPEC as GEMMA2_2B_IT_SPEC
-from models.gemma2_9b_it.gemma2_9b_it import SPEC as GEMMA2_9B_IT_SPEC
-from models.gemma2_9b_pt.gemma2_9b_pt import SPEC as GEMMA2_9B_PT_SPEC
-from models.gemma3_4b_it.gemma3_4b_it import SPEC as GEMMA3_4B_IT_SPEC
-from models.gemma3_4b_pt.gemma3_4b_pt import SPEC as GEMMA3_4B_PT_SPEC
-from models.gemma3_12b_it.gemma3_12b_it import SPEC as GEMMA3_12B_IT_SPEC
-from models.gemma3_12b_pt.gemma3_12b_pt import SPEC as GEMMA3_12B_PT_SPEC
-from models.gemma3_27b_it.gemma3_27b_it import SPEC as GEMMA3_27B_IT_SPEC
-from models.gemma3_27b_pt.gemma3_27b_pt import SPEC as GEMMA3_27B_PT_SPEC
+from models.gemma.gemma3.specs import gemma1b_SPEC as GEMMA1B_SPEC
+from models.gemma.gemma3.specs import gemma1b_it_SPEC as GEMMA1B_IT_SPEC
+from models.gpt2.gpt2.specs import gpt2small_SPEC as GPT2SMALL_SPEC
+from models.gemma.gemma3.specs import gemma270m_SPEC as GEMMA270M_SPEC
+from models.gemma.gemma2.specs import gemma2_2b_base_SPEC as GEMMA2_2B_BASE_SPEC
+from models.gemma.gemma2.specs import gemma2_2b_it_SPEC as GEMMA2_2B_IT_SPEC
+from models.gemma.gemma2.specs import gemma2_9b_it_SPEC as GEMMA2_9B_IT_SPEC
+from models.gemma.gemma2.specs import gemma2_9b_pt_SPEC as GEMMA2_9B_PT_SPEC
+from models.gemma.gemma3.specs import gemma3_4b_it_SPEC as GEMMA3_4B_IT_SPEC
+from models.gemma.gemma3.specs import gemma3_4b_pt_SPEC as GEMMA3_4B_PT_SPEC
+from models.gemma.gemma3.specs import gemma3_12b_it_SPEC as GEMMA3_12B_IT_SPEC
+from models.gemma.gemma3.specs import gemma3_12b_pt_SPEC as GEMMA3_12B_PT_SPEC
+from models.gemma.gemma3.specs import gemma3_27b_it_SPEC as GEMMA3_27B_IT_SPEC
+from models.gemma.gemma3.specs import gemma3_27b_pt_SPEC as GEMMA3_27B_PT_SPEC
 from models.hooked_lm_common import BaseModelSpec
-from models.llama31_8b.llama31_8b import SPEC as LLAMA31_8B_SPEC
-from models.llama31_8b_instruct.llama31_8b_instruct import SPEC as LLAMA31_8B_INSTRUCT_SPEC
-from models.pythia410m.pythia410m import SPEC as PYTHIA410M_SPEC
-from models.pythia70m.pythia70m import SPEC as PYTHIA70M_SPEC
-from models.qwen3_8b.qwen3_8b import SPEC as QWEN3_8B_SPEC
-from models.qwen3_1_7b.qwen3_1_7b import SPEC as QWEN3_1_7B_SPEC
-from models.qwen3_1_7b_base.qwen3_1_7b_base import SPEC as QWEN3_1_7B_BASE_SPEC
-from models.mistral7b_instruct.mistral7b_instruct import SPEC as MISTRAL7B_INSTRUCT_SPEC
-from models.qwen35_4b.qwen35_4b import SPEC as QWEN35_4B_SPEC
-from models.qwen35_2b.qwen35_2b import SPEC as QWEN35_2B_SPEC
-from models.r1_distill_qwen15b.r1_distill_qwen15b import SPEC as R1_DISTILL_QWEN15B_SPEC
-from models.r1_distill_llama8b.r1_distill_llama8b import SPEC as R1_DISTILL_LLAMA8B_SPEC
-from models.qwen35_9b.qwen35_9b import SPEC as QWEN35_9B_SPEC
-from models.qwen35_27b.qwen35_27b import SPEC as QWEN35_27B_SPEC
+from models.llama.llama31.specs import llama31_8b_SPEC as LLAMA31_8B_SPEC
+from models.llama.llama31.specs import llama31_8b_instruct_SPEC as LLAMA31_8B_INSTRUCT_SPEC
+from models.pythia.pythia.specs import pythia410m_SPEC as PYTHIA410M_SPEC
+from models.pythia.pythia.specs import pythia70m_SPEC as PYTHIA70M_SPEC
+from models.qwen.qwen3.specs import qwen3_8b_SPEC as QWEN3_8B_SPEC
+from models.qwen.qwen3.specs import qwen3_1_7b_SPEC as QWEN3_1_7B_SPEC
+from models.qwen.qwen3.specs import qwen3_1_7b_base_SPEC as QWEN3_1_7B_BASE_SPEC
+from models.mistral.mistral7b.specs import mistral7b_instruct_SPEC as MISTRAL7B_INSTRUCT_SPEC
+from models.qwen.qwen35.specs import qwen35_4b_SPEC as QWEN35_4B_SPEC
+from models.qwen.qwen35.specs import qwen35_2b_SPEC as QWEN35_2B_SPEC
+from models.qwen.r1_distill.specs import r1_distill_qwen15b_SPEC as R1_DISTILL_QWEN15B_SPEC
+from models.llama.r1_distill.specs import r1_distill_llama8b_SPEC as R1_DISTILL_LLAMA8B_SPEC
+from models.qwen.qwen35.specs import qwen35_9b_SPEC as QWEN35_9B_SPEC
+from models.qwen.qwen35.specs import qwen35_27b_SPEC as QWEN35_27B_SPEC
 
 LoaderKind = Literal[
     "sae_lens", "eleutherai_topk_mlp", "qwen_resid_topk", "dictionary_learning", "sparsify_topk"
@@ -87,12 +87,16 @@ class SAEProfile:
     notes: str = ""
     logical_sae_id: str | None = None
     resolved_physical_path: str | None = None
+    top_k: int = 50
     repo_id: str | None = None
     trained_on_model_key: str | None = None
     target_model_key: str | None = None
     transfer_kind: TransferKind = "none"
     hook_note: str = ""
     sae_id_by_layer: tuple[tuple[int, str], ...] = ()
+    catalog_release: str | None = None
+    catalog_sae_id_template: str | None = None
+    neuronpedia_id: str | None = None
 
     @property
     def base(self) -> BaseModelSpec:
@@ -137,18 +141,21 @@ class SAEProfile:
             return None
         return self.sae_folder_template.format(L=layer)
 
-    def transfer_meta(self) -> dict[str, str | None]:
+    def transfer_meta(self, layer: int | None = None) -> dict[str, str | None]:
+        if layer is not None:
+            self._assert_layer(layer)
+        selected_layer = self.layers[0] if layer is None else layer
         return {
             "release": self.sae_release,
             "logical_sae_id": self.logical_sae_id
             or (
-                self.sae_id_template.format(L=self.layers[0])
+                self.sae_id_template.format(L=selected_layer)
                 if self.sae_id_template and self.layers
                 else None
             ),
             "resolved_physical_path": self.resolved_physical_path
             or (
-                self.sae_folder_template.format(L=self.layers[0])
+                self.sae_folder_template.format(L=selected_layer)
                 if self.sae_folder_template and self.layers
                 else None
             ),
@@ -201,7 +208,7 @@ _PROFILES: dict[str, SAEProfile] = {
         loader="sae_lens",
         logical_sae_id="blocks.8.hook_resid_pre_12288",
         repo_id="jbloom/GPT2-Small-Feature-Splitting-Experiment-Layer-8",
-        notes="Optional M5 extended width, same layer-8 residual site (12,288 latents).",
+        notes="Optional extended SAE width, same layer-8 residual site (12,288 latents).",
     ),
     "gpt2small_fs_24576_l8": SAEProfile(
         key="gpt2small_fs_24576_l8",
@@ -212,7 +219,7 @@ _PROFILES: dict[str, SAEProfile] = {
         loader="sae_lens",
         logical_sae_id="blocks.8.hook_resid_pre_24576",
         repo_id="jbloom/GPT2-Small-Feature-Splitting-Experiment-Layer-8",
-        notes="Optional M5 extended width, same layer-8 residual site (24,576 latents).",
+        notes="Optional extended SAE width, same layer-8 residual site (24,576 latents).",
     ),
     "pythia70m_saebench_gated_l3": SAEProfile(
         key="pythia70m_saebench_gated_l3",
@@ -222,7 +229,7 @@ _PROFILES: dict[str, SAEProfile] = {
         hook_kind="hook_resid_post",
         loader="sae_lens",
         logical_sae_id="blocks.3.hook_resid_post__trainer_5",
-        notes="SAEBench gated SAE checkpoint validated natively in M3; same layer as res-sm.",
+        notes="SAEBench gated SAE checkpoint validated with the native benchmark; same layer as res-sm.",
     ),
     "pythia70m_resid_sm": SAEProfile(
         key="pythia70m_resid_sm",
@@ -268,7 +275,7 @@ _PROFILES: dict[str, SAEProfile] = {
         target_model_key="gemma1b",
         transfer_kind="none",
     ),
-    # P0 Gemma-3 1B layer-25 PT-transfer (main coordinate system).
+    # Primary Gemma-3 1B layer-25 PT-transfer (main coordinate system).
     "gemma1b_pt_l25_transfer_big": SAEProfile(
         key="gemma1b_pt_l25_transfer_big",
         model_key="gemma1b",
@@ -278,7 +285,7 @@ _PROFILES: dict[str, SAEProfile] = {
         loader="sae_lens",
         sae_id_template="layer_{L}_width_16k_l0_big",
         sae_folder_template="resid_post_all/layer_{L}_width_16k_l0_big",
-        notes="P0 PT SAE; primary transfer profile for base↔IT contrasts.",
+        notes="PT SAE; primary transfer profile for base↔IT contrasts.",
         repo_id="google/gemma-scope-2-1b-pt",
         trained_on_model_key="gemma1b",
         target_model_key="gemma1b_it",
@@ -294,7 +301,7 @@ _PROFILES: dict[str, SAEProfile] = {
         loader="sae_lens",
         sae_id_template="layer_{L}_width_16k_l0_small",
         sae_folder_template="resid_post_all/layer_{L}_width_16k_l0_small",
-        notes="P0 sensitivity PT SAE (l0_small).",
+        notes="Sensitivity PT SAE (l0_small).",
         repo_id="google/gemma-scope-2-1b-pt",
         trained_on_model_key="gemma1b",
         target_model_key="gemma1b_it",
@@ -310,7 +317,7 @@ _PROFILES: dict[str, SAEProfile] = {
         loader="sae_lens",
         sae_id_template="layer_{L}_width_16k_l0_big",
         sae_folder_template="resid_post_all/layer_{L}_width_16k_l0_big",
-        notes="P0 native IT SAE for diagnosis only; not primary coordinate.",
+        notes="Native IT SAE for diagnosis only; not primary coordinate.",
         repo_id="google/gemma-scope-2-1b-it",
         trained_on_model_key="gemma1b_it",
         target_model_key="gemma1b_it",
@@ -350,7 +357,7 @@ _PROFILES: dict[str, SAEProfile] = {
         repo_id="fnlp/Llama-Scope-R1-Distill",
         hook_note="blocks.23.hook_resid_post (post-MLP residual)",
     ),
-    # P0 Gemma-2-2B canonical layer-25.
+    # Primary Gemma-2-2B canonical layer-25.
     "gemma2_2b_pt_l25_canonical": SAEProfile(
         key="gemma2_2b_pt_l25_canonical",
         model_key="gemma2_2b_base",
@@ -360,7 +367,7 @@ _PROFILES: dict[str, SAEProfile] = {
         loader="sae_lens",
         sae_id_template="layer_{L}/width_16k/canonical",
         resolved_physical_path="layer_25/width_16k/average_l0_116",
-        notes="P0 primary Gemma-2 canonical residual SAE (L0≈116).",
+        notes="Primary Gemma-2 canonical residual SAE (L0≈116).",
         logical_sae_id="layer_25/width_16k/canonical",
         repo_id="google/gemma-scope-2b-pt-res",
         trained_on_model_key="gemma2_2b_base",
@@ -397,6 +404,8 @@ _PROFILES: dict[str, SAEProfile] = {
     "llama31_8b_lxr_8x": SAEProfile(
         key="llama31_8b_lxr_8x",
         model_key="llama31_8b",
+        catalog_release="llama_scope_lxr_8x",
+        catalog_sae_id_template="l{L}r_8x",
         sae_release="OpenMOSS-Team/Llama3_1-8B-Base-LXR-8x",
         layers=(8, 16, 21, 27),
         hook_kind="hook_resid_post",
@@ -609,6 +618,18 @@ _PROFILES: dict[str, SAEProfile] = {
         repo_id="Qwen/SAE-Res-Qwen3-1.7B-Base-W32K-L0_50",
         notes="Official Qwen Scope Base TopK-50 residual (32k); distinct from Qwen3-1.7B chat.",
     ),
+    "qwen3_1_7b_base_resid_w32k_l0_100": SAEProfile(
+        key="qwen3_1_7b_base_resid_w32k_l0_100",
+        model_key="qwen3_1_7b_base",
+        sae_release="Qwen/SAE-Res-Qwen3-1.7B-Base-W32K-L0_100",
+        layers=(7, 14, 18, 23),
+        hook_kind="hook_resid_post",
+        loader="qwen_resid_topk",
+        top_k=100,
+        sae_id_template="layer{L}.sae.pt",
+        repo_id="Qwen/SAE-Res-Qwen3-1.7B-Base-W32K-L0_100",
+        notes="Official Qwen Scope Base TopK-100 residual (32k); distinct from Qwen3-1.7B chat.",
+    ),
     "mistral7b_instruct_tc_l16_131k": SAEProfile(
         key="mistral7b_instruct_tc_l16_131k",
         model_key="mistral7b_instruct",
@@ -694,6 +715,7 @@ _PROFILES: dict[str, SAEProfile] = {
             "Inference uses calibrated global threshold."
         ),
         repo_id="decoderesearch/qwen-3.5-saes",
+        neuronpedia_id="qwen3.5-4b/15-res-matryoshka-65k",
         hook_note="blocks.15.hook_resid_post",
     ),
 }

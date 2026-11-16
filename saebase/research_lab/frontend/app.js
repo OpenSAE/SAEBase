@@ -494,6 +494,10 @@
         append(row, "h3", "", (record.kind || "analysis").toUpperCase() + " · " + (record.site_id || "specified experiment"));
         append(row, "p", "", record.description || record.protocol_id || "View protocol and source before interpretation.");
         append(row, "span", "status-pill", record.status || "status not supplied");
+        if (record.completion) {
+          append(row, "p", "quiet", "Task completion: " + record.completion.status +
+            " · evaluated " + record.completion.evaluated + " / " + record.completion.requested);
+        }
       });
     } catch (error) { errorMessage(target, error); }
   }
@@ -783,6 +787,10 @@
         const row = append(target, "div", "record");
         append(row, "strong", "", item.metric || "Native metric");
         append(row, "p", "quiet", item.points + " matched SAE points · exact source review");
+        if (item.completion) {
+          append(row, "p", "quiet", "Task completion: " + item.completion.status +
+            " · evaluated " + item.completion.evaluated + " / " + item.completion.requested);
+        }
         const button = append(row, "button", "btn tiny", "View comparison");
         button.type = "button";
         button.addEventListener("click", function () { showBenchmark(item.id); });

@@ -12,6 +12,22 @@ from typing import Any
 import torch
 
 
+def _context_window(model_name: str, hf_model: Any | None) -> int:
+    from models.loading_policy import execution_context_window
+
+    if hf_model is not None:
+        config = hf_model.config
+    else:
+        from transformers import AutoConfig
+        from transformer_lens.loading_from_pretrained import get_official_model_name
+
+        config = AutoConfig.from_pretrained(get_official_model_name(model_name))
+    window = execution_context_window(config)
+    if window is None:
+        raise ValueError("Model configuration does not declare its native context window")
+    return window
+
+
 def boot_transformerlens(
     model_name: str,
     *,
@@ -31,10 +47,11 @@ def boot_transformerlens(
     from models.hf_compat import import_transformer_lens
 
     tl = import_transformer_lens()
+    window = _context_window(model_name, hf_model)
     legacy = getattr(tl, "HookedTransformer", None)
     if legacy is not None:
         loader = legacy.from_pretrained_no_processing if no_processing else legacy.from_pretrained
-        kwargs: dict[str, Any] = {"device": device}
+        kwargs: dict[str, Any] = {"device": device, "n_ctx": window}
         if dtype is not None:
             kwargs["dtype"] = dtype
         if hf_model is not None:
@@ -64,6 +81,9 @@ def boot_transformerlens(
             compatibility(no_processing=False)
         engine = "transformer_bridge_local"
 
+    # The bridge exposes the same context setting used by tokenization and the
+    # public answer-scoring API. Legacy attention buffers were sized above.
+    model.cfg.n_ctx = window
     model.eval()
     for parameter in model.parameters():
         parameter.requires_grad_(False)

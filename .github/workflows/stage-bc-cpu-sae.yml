@@ -42,7 +42,7 @@ jobs:
         env:
           HF_HUB_DISABLE_TELEMETRY: '1'
         run: |
-          python scripts/phase_bc_source_metadata.py --output "$RUNNER_TEMP/stage-bc-source.json"
+          python -m tasks.benchmark.sites.catalog sources --output "$RUNNER_TEMP/stage-bc-source.json"
       - name: Upload remote source-file metadata and unresolved paths
         if: always()
         uses: actions/upload-artifact@v4
@@ -80,7 +80,7 @@ jobs:
           TOKENIZERS_PARALLELISM: 'false'
           OMP_NUM_THREADS: '2'
         run: |
-          python scripts/phase_bc_cpu_sae.py \
+          python -m tasks.precheck.checkpoint --coverage-catalog conf/coverage/stage_bc.json \
             --sae-key '${{ matrix.sae_key }}' --layer '${{ matrix.layer }}' \
             --output "$RUNNER_TEMP/stage-bc-evidence"
       - name: Upload genuine CPU SAE checkpoint results
@@ -126,7 +126,7 @@ jobs:
         run: python -m pip install -e .
       - name: Validate source identity, weights digest and finite CPU calculations
         run: |
-          python scripts/phase_bc_aggregate.py \
+          python -m tasks.benchmark.sites.catalog aggregate \
             --source-dir stage-bc-results --output stage_bc_cpu_result.json
 
       - uses: actions/upload-artifact@v4

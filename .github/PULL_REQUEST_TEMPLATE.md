@@ -1,34 +1,17 @@
-## Summary
+## 问题与修改效果
 
-What capability or bug does this change address?
+说明具体问题、触发场景，以及修改后怎样使用这项功能。
 
-## Validation
+## 实现与结果使用
 
-- [ ] Offline regression tests passed
-- [ ] Public API compatibility checked
-- [ ] Model/SAE/hook provenance documented where relevant
-- [ ] Checkpoint-dependent or GPU-only verification status stated
-- [ ] Third-party source attribution reviewed
+说明主要实现归属、复用的公共能力和受影响的调用者。功能新增或变化时，说明调用者怎样取得并使用结果；保存的内容如何重新读取；实际相关的失败或部分完成如何支持后续处理。
 
-## Code quality
+## 相关依据
 
-- [ ] New Python modules pass Ruff lint and formatting; changed adopted modules pass type checks.
-- [ ] No unrelated formatting or changes to scientific metrics and cached schema behavior.
+记录用于判断本次修改的输入、观察结果与依据。按改动选择相关的软件检查；模型、SAE、样本划分、指标或协议变化时提供对应来源与科研验证。需要补足的条件说明实际影响和处理方法。
 
-See [Code Quality](harness/github/development_doc/code-quality.md) for local commands. Unmodified legacy modules are not required to pass repository-wide lint.
+## 接口与资料迁移
 
-## Architecture and file ownership
+说明受影响的公开接口、配置、保存格式和调用方式，以及对应的迁移方法。文档、依赖、打包或持续集成随实际变化更新。
 
-- [ ] All newly added and renamed files have a clearly documented owner.
-- [ ] Existing reusable implementations and registries were considered before adding a component.
-- [ ] Scripts/tests follow Work Plan or experiment-oriented grouping, or the exception is justified.
-- [ ] Shared components do not depend on a particular experiment.
-- [ ] Configuration, packaging, docs, links and CI references were checked.
-
-## Work Plan / Agent execution readiness
-
-- [ ] Files are grouped by existing component ownership, without a new study framework.
-- [ ] Exact branch fetch and checkout works with a single-branch origin refspec.
-- [ ] Dependency resolver, transitive version pins, pip check and minimal smoke were verified.
-- [ ] Generated metadata and virtualenv artifacts are excluded from source changes.
-- [ ] A small pilot, resource budget, failure receipt and independent acceptance gate are defined.
+贡献方法见 [贡献说明](CONTRIBUTING.md)，代码质量工具见 [代码质量说明](../doc/code/development/code-quality.md)。

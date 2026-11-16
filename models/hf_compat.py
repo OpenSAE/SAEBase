@@ -1,6 +1,6 @@
 """Explicit imports for Hugging Face and TransformerLens integrations.
 
-SAEBase's prompt modules live under ``saebase.data``.  The top-level
+SAEBase's prompt modules live under ``saebase.datasets``.  The top-level
 ``datasets`` name therefore belongs unambiguously to Hugging Face; loading
 the model stack never edits ``sys.path`` or the global ``sys.modules`` cache.
 """

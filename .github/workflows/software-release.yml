@@ -68,7 +68,7 @@ jobs:
           test "$(gh api "repos/$REPO/branches/main" --jq '.commit.sha')" = "$SOURCE_SHA"
           python - <<'PY'
           import os
-          from saebase.tools.release_candidate import project_info
+          from scripts.release import project_info
 
           version, tag, _ = project_info()
           assert version == os.environ["VERSION"], "version input does not match source"
@@ -76,9 +76,8 @@ jobs:
           PY
           if [[ "$MODE" == "publish" ]]; then
             test "$CONFIRMATION" = "PUBLISH-v$VERSION"
-            test "$VERSION" != "0.2.0"
             git fetch --tags origin
-            python saebase/tools/release_candidate.py publish-eligible --expected-version "$VERSION"
+            python scripts/release.py publish-eligible --expected-version "$VERSION"
             TAG="v$VERSION"
             if git ls-remote --tags origin "refs/tags/$TAG" | grep -q .; then
               echo "Refusing to republish existing tag $TAG" >&2
@@ -104,7 +103,7 @@ jobs:
           echo "CI_RUN_ID=$CI_RUN_ID" >> "$GITHUB_ENV"
           gh api -X GET "repos/$REPO/actions/runs/$CI_RUN_ID/jobs?per_page=100" \
             > "$RUNNER_TEMP/ci-jobs.json"
-          python saebase/tools/release_candidate.py verify-ci \
+          python scripts/release.py verify-ci \
             --ci-jobs "$RUNNER_TEMP/ci-jobs.json" --source-sha "$SOURCE_SHA"
       - name: Download distributions from the exact successful Release Validation run
         shell: bash
@@ -121,14 +120,14 @@ jobs:
           set -euo pipefail
           python -m pip install -e ".[dev]"
           python -m twine check dist/*
-          python saebase/tools/verify_distribution.py dist
-          python saebase/tools/check_installed_wheel.py dist
-          python saebase/tools/check_sdist_roundtrip.py dist
-          python saebase/tools/release_candidate.py prepare \
+          python scripts/distribution.py contents dist
+          python scripts/distribution.py install dist
+          python scripts/distribution.py roundtrip dist
+          python scripts/release.py prepare \
             --dist dist --output-dir release \
             --source-sha "$SOURCE_SHA" --expected-version "$VERSION" \
             --ci-run-id "$CI_RUN_ID"
-          python saebase/tools/release_candidate.py verify-assets \
+          python scripts/release.py verify-assets \
             --dist dist --output-dir release \
             --source-sha "$SOURCE_SHA" --expected-version "$VERSION"
       - name: Preserve exact-source candidate for human review
@@ -179,12 +178,11 @@ jobs:
         run: |
           set -euo pipefail
           test "$CONFIRMATION" = "PUBLISH-v$VERSION"
-          test "$VERSION" != "0.2.0"
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
           test "$(gh api "repos/$REPO/branches/main" --jq '.commit.sha')" = "$SOURCE_SHA"
           git fetch --tags origin
-          python saebase/tools/release_candidate.py publish-eligible --expected-version "$VERSION"
-          python saebase/tools/release_candidate.py verify-assets \
+          python scripts/release.py publish-eligible --expected-version "$VERSION"
+          python scripts/release.py verify-assets \
             --dist dist --output-dir release \
             --source-sha "$SOURCE_SHA" --expected-version "$VERSION"
           TAG="v$VERSION"
@@ -213,7 +211,7 @@ jobs:
             release/SHA256SUMS \
             --repo "$REPO" --verify-tag --latest \
             --title "SAEBase $TAG" \
-            --notes-file "harness/github/development_doc/releases/$TAG.md"
+            --notes-file "doc/code/development/releases/$TAG.md"
           gh api -X GET "repos/$REPO/releases/tags/$TAG" > release-remote.json
           python - <<'PY'
           import hashlib

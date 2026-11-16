@@ -21,6 +21,7 @@ def test_model_default_and_explicit_sae_selection():
                 "gemma2_2b_it_scope_resid_l12",
             ],
             "default_saes": ["gemma2_2b_pt_l25_canonical"],
+            "default_layers": {"gemma2_2b_pt_l25_canonical": 25},
         }
     )
     defaults = select_sites(model, "default")
@@ -117,6 +118,7 @@ def test_task_smoke_uses_model_default_sae_and_actual_site():
             "model": {
                 "name": "qwen35_2b",
                 "default_saes": ["qwen35_2b_resid_w32k"],
+                "default_layers": {"qwen35_2b_resid_w32k": 20},
             },
             "dataset": {"name": "IOI"},
             "seed": 1,
@@ -133,7 +135,7 @@ def test_task_smoke_uses_model_default_sae_and_actual_site():
     assert native["task"]["sae_key"] == "qwen35_2b_resid_w32k"
     assert native["task"]["layer"] == 20
     cfg.task.task_configs = {"capture": {"layer": 7}}
-    with pytest.raises(ValueError, match="invalid for SAE"):
+    with pytest.raises(ValueError, match="Invalid layer"):
         _task_config(cfg, "capture", 30, 8)
 
 
@@ -146,6 +148,7 @@ def test_task_mode_setup_includes_owning_model_sae_checkpoint():
                 "name": "qwen35_2b",
                 "pretrained_name": "Qwen/Qwen3.5-2B",
                 "default_saes": ["qwen35_2b_resid_w32k"],
+                "default_layers": {"qwen35_2b_resid_w32k": 20},
             },
             "task": {"task_configs": {}},
         }

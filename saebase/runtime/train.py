@@ -35,27 +35,66 @@ def _saebase_repo_root() -> str:
 
 
 OmegaConf.register_new_resolver("saebase_repo_root", _saebase_repo_root, replace=True)
+from saebase.runtime.experiment_paths import hydra_run_component  # noqa: E402
+
+OmegaConf.register_new_resolver("saebase_run_component", hydra_run_component, replace=True)
 
 
-@hydra.main(version_base=None, config_path="../../conf", config_name="sae_research")
+@hydra.main(version_base=None, config_path="../../conf", config_name="config")
 def main(cfg: DictConfig) -> Optional[float]:
     verify_training_runtime(
         context="saebase.runtime.train",
         profile="llm",
     )
-    validate_hydra_cfg(cfg)
-    from saebase.runtime.experiment_paths import prepare_run
+    outcome = execute_run(cfg, Path.cwd())
+    print("Task:", outcome.status, "completion:", outcome.completion)
+    if outcome.exit_code:
+        import sys
 
-    prepare_run(cfg, Path.cwd())
-    print(OmegaConf.to_yaml(cfg))
-    from saebase.runner import run_task
-
-    outcome = run_task(cfg)
-    if str(cfg.task.name) == "precheck":
-        print("Precheck:", outcome.summary)
-        if bool(cfg.task.get("execute", False)) and not outcome.ok:
-            raise RuntimeError(outcome.error or "Precheck did not PASS; inspect its report")
+        for issue in outcome.diagnostics:
+            print(f"{issue.get('stage', outcome.task)}: {issue['reason']}", file=sys.stderr)
+            for step in issue.get("next_steps", []):
+                print(f"Next: {step}", file=sys.stderr)
+        raise SystemExit(outcome.exit_code)
     return None
+
+
+def execute_run(cfg: DictConfig, folder: Path):
+    """One shared lifecycle for CLI and integration tests, with records before failure exits."""
+    import traceback
+    from saebase.runner import run_task
+    from saebase.seed import apply_seed
+    from saebase.runtime.experiment_paths import prepare_run, run_session
+    from saebase.runtime.experiment_results import record_run
+
+    task = validate_hydra_cfg(cfg)
+    from models.loading_policy import resolve_config_devices
+
+    resolve_config_devices(cfg)
+    with run_session(cfg, folder):
+        prepare_run(cfg, folder)
+        if cfg.get("runtime", {}).get("mode") == "resume":
+            from saebase.runtime.experiment_results import inspect_run, read_run
+            from saebase.results import EvaluationResult
+
+            if inspect_run(folder, expected_cfg=cfg)["action"] == "skip":
+                return EvaluationResult(**read_run(folder)["result"])
+        apply_seed(int(cfg.seed))
+        try:
+            outcome = run_task(cfg, task=task)
+        except Exception as exc:
+            record_run(
+                folder,
+                cfg,
+                error={
+                    "type": type(exc).__name__,
+                    "message": str(exc),
+                    "traceback": traceback.format_exc(),
+                },
+            )
+            raise
+        record_run(folder, cfg, result=outcome)
+        return outcome
 
 
 if __name__ == "__main__":

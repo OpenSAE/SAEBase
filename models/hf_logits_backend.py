@@ -15,6 +15,7 @@ class HFLogitsModelCfg:
     device: str
     n_layers: int
     model_name: str
+    n_ctx: int | None = None
 
 
 class HFLogitsModel:
@@ -32,11 +33,14 @@ class HFLogitsModel:
     ) -> None:
         self._model = model
         self.tokenizer = tokenizer
+        from models.loading_policy import execution_context_window
+
         n_layers = int(getattr(model.config, "num_hidden_layers", -1))
         self.cfg = HFLogitsModelCfg(
             device=str(device),
             n_layers=n_layers,
             model_name=str(model_name),
+            n_ctx=execution_context_window(model.config),
         )
 
     def state_dict(self, *args, **kwargs):
@@ -58,7 +62,9 @@ class HFLogitsModel:
         ids = torch.tensor([encoded], dtype=torch.long, device=self.cfg.device)
         return ids
 
-    def __call__(self, input_ids: torch.Tensor) -> torch.Tensor:
+    def __call__(self, input_ids: torch.Tensor | str) -> torch.Tensor:
+        if isinstance(input_ids, str):
+            input_ids = self.to_tokens(input_ids)
         if not isinstance(input_ids, torch.Tensor):
             raise TypeError(f"input_ids must be Tensor, got {type(input_ids).__name__}")
         dev = self.cfg.device

@@ -1,25 +1,19 @@
-"""Shard-friendly, read-only SQLite browsing index for real SAE observations.
-
-Use when the compact JSON index becomes too large. This is a derived,
-checksum-verified *browsing* index, not the lossless scientific activation
-store. Never rederive SAR/RSS measurements from its top saebase.examples.
-
-The immutable database is written from real, checkpoint-identity-matched
-measurement rows and remains unavailable to readers until the manifest and
-source DB are finalized.
-"""
+"""Index local feature observations and prepare source-bound trace metadata."""
 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import os
 import sqlite3
-from pathlib import Path
+from collections import Counter
 from functools import lru_cache
+from pathlib import Path
 from typing import Any, Iterable
 
+from . import explore
 from .core import (
     InvalidEvidence,
     canonical_json,
@@ -32,7 +26,9 @@ from .core import (
 from .ingest import _atomic_bytes, _raw_jsonl
 
 SCHEMA = "opensae.feature_sqlite.v1"
+
 DATABASE = "features.sqlite3"
+
 MAX_EXAMPLES = 8
 
 DDL = """
@@ -392,5 +388,102 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
-if __name__ == "__main__":
-    raise SystemExit(main())
+MAX_FILES = 32
+
+MAX_JSON_BYTES = 8 * 1024 * 1024
+
+
+def _sha(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _read_traces(folder: Path) -> list[tuple[Path, str, dict[str, Any]]]:
+    if not folder.is_dir() or folder.is_symlink():
+        raise ValueError("A real private source directory is required")
+    found: list[tuple[Path, str, dict[str, Any]]] = []
+    for path in sorted(folder.rglob("*.json")):
+        if path.is_symlink() or not path.is_file():
+            raise ValueError("No symlinked source files are accepted")
+        if path.stat().st_size > MAX_JSON_BYTES:
+            raise ValueError("Oversized raw trace; refuse silent truncation")
+        record = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(record, dict) or not {
+            "site_id",
+            "sample_id",
+            "tokens",
+            "model_sha256",
+            "sae_sha256",
+        }.issubset(record):
+            continue
+        digest = _sha(path)
+        # Validate all scientific identity/token/code claims locally WITHOUT
+        # granting actual publication approval or mutating raw flags.
+        trial = {**record, "public_text_reviewed": True, "rights_reviewed": True}
+        explore._valid_trace(trial, explore._sites())
+        found.append((path, digest, record))
+        if len(found) > MAX_FILES:
+            raise ValueError("WP13 demo exceeds the current 32-trace viewer limit")
+    if not found:
+        raise ValueError("No genuine complete source-bound token traces found")
+    ids = [(r["site_id"], r["sample_id"]) for _, _, r in found]
+    if len(ids) != len(set(ids)):
+        raise ValueError("Duplicate original site/sample identities")
+    return found
+
+
+def _metadata(rows: list[tuple[Path, str, dict[str, Any]]]) -> dict[str, Any]:
+    sites = Counter(r["site_id"] for _, _, r in rows)
+    splits = Counter(r["split"] for _, _, r in rows)
+    return {
+        "schema": "opensae.wp13.small_gpu_handoff.v1",
+        "source": "real_local_sae_traces_not_independently_certified",
+        "public_release": False,
+        "trace_count": len(rows),
+        "token_count": sum(len(r["tokens"]) for _, _, r in rows),
+        "observed_nonzero_codes": sum(
+            len(token["features"]) for _, _, r in rows for token in r["tokens"]
+        ),
+        "sites": dict(sorted(sites.items())),
+        "split_counts": dict(sorted(splits.items())),
+        "reviewed_excerpt_count": sum(
+            int(r.get("public_text_reviewed") is True) for _, _, r in rows
+        ),
+        "traces": [
+            {
+                "sample_id": record["sample_id"],
+                "site_id": record["site_id"],
+                "prompt_group_id": record["prompt_group_id"],
+                "prompt_sha256": record["prompt_sha256"],
+                "private_file_sha256": sha,
+                "split": record["split"],
+                "token_count": len(record["tokens"]),
+                "nonzero_codes": sum(len(t["features"]) for t in record["tokens"]),
+            }
+            for _, sha, record in rows
+        ],
+        "privacy": "No prompt text, raw codes or model weights included.",
+    }
+
+
+def _observations(traces: list[dict[str, Any]]):
+    for record in traces:
+        for token in record["tokens"]:
+            for code in token["features"]:
+                yield {
+                    "site_id": record["site_id"],
+                    "model_sha256": record["model_sha256"],
+                    "sae_sha256": record["sae_sha256"],
+                    "source_type": "real_checkpoint",
+                    "feature_id": code["feature_id"],
+                    "token_position": token["position"],
+                    "activation": code["activation"],
+                    "prompt_group_id": record["prompt_group_id"],
+                    "sample_id": record["sample_id"],
+                    "token_text": token["text"],
+                    "text_excerpt": record["prompt_text"][:700],
+                    "public_text_reviewed": True,
+                }

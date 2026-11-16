@@ -1,27 +1,35 @@
-"""Audit frozen M3 outputs; never calls the model or modifies M3 metrics."""
+"""Audit frozen benchmark outputs; never calls the model or modifies benchmark metrics."""
 
 from __future__ import annotations
+
 from collections import defaultdict
-from pathlib import Path
-from itertools import combinations
 from dataclasses import replace
+from itertools import combinations
+from pathlib import Path
 
-from .schema import AuditConfig
-from .observations import _read_m3, observations_for_metric
-from .bootstrap import bootstrap_metric, paired_bootstrap, sample_size_curve
-from .ranking import rank_stability
+from tasks.benchmark.reliability.bootstrap import (
+    bootstrap_metric,
+    paired_bootstrap,
+    sample_size_curve,
+)
+
 from .localization import audit_localization, compare_localization
+from .observations import _read_benchmark, observations_for_metric
+from .ranking import rank_stability
+from .schema import AuditConfig
 
 
-def evaluate_m3(
+def evaluate_benchmark(
     root: str | Path, cfg: AuditConfig, *, sae_resolver=None, localization_paper=None
 ) -> dict:
     root = Path(root)
-    config, metrics, provenance = _read_m3(root, localization_paper=localization_paper)
+    config, metrics, provenance = _read_benchmark(root, localization_paper=localization_paper)
     if cfg.metric_ids:
         unknown = set(cfg.metric_ids) - set(x["metric_id"] for x in metrics)
         if unknown:
-            raise ValueError(f"M4 audit requests metrics absent from M3: {sorted(unknown)}")
+            raise ValueError(
+                f"reliability audit requests metrics absent from benchmark: {sorted(unknown)}"
+            )
     entries = []
     localization_entries = []
     localization_items = []
@@ -38,7 +46,7 @@ def evaluate_m3(
                         "sae_id": m["sae_id"],
                         "metric_id": m["metric_id"],
                         "status": "blocked",
-                        "reason": f"M3 metric status is {m['status']}",
+                        "reason": f"benchmark metric status is {m['status']}",
                     }
                 )
                 continue

@@ -633,10 +633,10 @@
       ],
       "category": "platform",
       "source_evidence": [
-        "tasks/benchmark/backend/runner.py"
+        "tasks/benchmark/execution/runner.py"
       ],
       "why_it_matters": "帮助准确理解科研组件的职责、输入和输出。",
-      "foundation": "tasks/benchmark/backend/runner.py"
+      "foundation": "tasks/benchmark/execution/runner.py"
     },
     {
       "id": "term.sae_training",

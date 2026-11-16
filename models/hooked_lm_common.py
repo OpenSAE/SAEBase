@@ -49,44 +49,14 @@ class HookedLMHandle:
 
 def require_cuda() -> str:
     if not torch.cuda.is_available():
-        raise RuntimeError(
-            "Hooked LM models require CUDA; torch.cuda.is_available() is False."
-        )
+        raise RuntimeError("Hooked LM models require CUDA; torch.cuda.is_available() is False.")
     return "cuda"
 
 
 def _default_load_kwargs(model_name: str) -> dict[str, Any]:
-    """Memory-safe defaults for Gemma loads on modest host RAM / VRAM.
+    from models.loading_policy import default_load_kwargs
 
-    ``from_pretrained`` post-processing for gemma-3-1b can OOM ~15GB hosts;
-    skip processing but keep float32 so logit filtering stays finite.
-    Gemma-2-2B uses float16 to fit 16GB with SAE headroom.
-    Larger Gemma-3 / Llama / Qwen checkpoints default to bfloat16.
-    Quantized HF checkpoints are allowed when VRAM is tight (8-bit / 4-bit).
-    """
-    name = model_name.lower()
-    if "gemma-3-1b" in name:
-        return {"no_processing": True, "dtype": torch.float32}
-    if "qwen2.5-1.5b" in name or "deepseek-r1-distill-qwen-1.5b" in name:
-        return {"dtype": torch.float32}
-    if "gemma-2-2b" in name:
-        return {"dtype": torch.float16}
-    if any(
-        tok in name
-        for tok in (
-            "gemma-3-4b",
-            "gemma-3-12b",
-            "gemma-3-27b",
-            "gemma-2-9b",
-            "llama-3.1-8b",
-            "deepseek-r1-distill-llama-8b",
-            "qwen3",
-            "qwen3.5",
-            "mistral-7b",
-        )
-    ):
-        return {"no_processing": True, "dtype": torch.bfloat16}
-    return {}
+    return default_load_kwargs(model_name)
 
 
 def load_hooked_model(
@@ -101,20 +71,24 @@ def load_hooked_model(
 ) -> Any:
     from models.transformerlens_backend import boot_transformerlens
 
-    dev = device or require_cuda()
+    from models.loading_policy import resolve_device
+
+    dev = resolve_device(device)
     defaults = _default_load_kwargs(architecture_name or model_name)
     use_no_processing = (
-        defaults.get("no_processing", False)
-        if no_processing is None
-        else bool(no_processing)
+        defaults.get("no_processing", False) if no_processing is None else bool(no_processing)
     )
     use_dtype = defaults.get("dtype") if dtype is None else dtype
     # Architecture name must be recognized by the selected TL model system;
     # hf_model/tokenizer may refer to the weights of a separate source mirror.
     load_name = architecture_name or model_name
     model, _ = boot_transformerlens(
-        load_name, device=dev, dtype=use_dtype,
-        no_processing=use_no_processing, hf_model=hf_model, tokenizer=tokenizer,
+        load_name,
+        device=dev,
+        dtype=use_dtype,
+        no_processing=use_no_processing,
+        hf_model=hf_model,
+        tokenizer=tokenizer,
     )
     return model
 
@@ -187,9 +161,7 @@ def load_hooked_model_with_candidates(
                 del hf_model
                 gc.collect()
             errors.append(f"{name}: {type(exc).__name__}: {str(exc)[:200]}")
-    raise RuntimeError(
-        "Could not load any model candidate.\n" + "\n".join(errors)
-    )
+    raise RuntimeError("Could not load any model candidate.\n" + "\n".join(errors))
 
 
 def load_from_spec(

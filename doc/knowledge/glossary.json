@@ -229,7 +229,7 @@
       "why_it_matters": "可追溯的评测协议支持 SAE 和研究方法间的公平比较。",
       "foundation": "doc/knowledge/foundations/sae_methods.md",
       "source_evidence": [
-        "tasks/benchmark/backend/runner.py"
+        "tasks/benchmark/execution/runner.py"
       ],
       "aliases": [
         "SAE benchmark",

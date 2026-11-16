@@ -37,9 +37,9 @@ jobs:
           TOKENIZERS_PARALLELISM: 'false'
           HF_HUB_DISABLE_TELEMETRY: '1'
         run: |
-          python scripts/phase_bc_cpu_pair.py \
+          python -m tasks.precheck.sae_checks \
             --sae-key '${{ matrix.sae_key }}' --output "$RUNNER_TEMP/stage-bc"
-      - name: Run genuine M3 Benchmark and M4 Reliability
+      - name: Run genuine Benchmark and Reliability
         if: steps.probe.outcome == 'success'
         env:
           OMP_NUM_THREADS: '2'
@@ -47,9 +47,9 @@ jobs:
           TOKENIZERS_PARALLELISM: 'false'
           HF_HUB_DISABLE_TELEMETRY: '1'
         run: |
-          python scripts/phase_bc_cpu_benchmark.py \
+          python -m tasks.benchmark.cli --pair-protocol cpu_pair --real \
             --sae-key '${{ matrix.sae_key }}' --output "$RUNNER_TEMP/stage-bc-m3m4"
-      - name: Upload real M3/M4 benchmark evidence
+      - name: Upload benchmark and reliability evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:

@@ -56,3 +56,33 @@ def test_native_circuits_and_train_require_semantic_validation(tmp_path, monkeyp
                 "native": {"checkpoints_need_registration": True},
             },
         )
+
+
+def test_real_sae_worker_probes_every_requested_sample(monkeypatch):
+    import tasks.precheck.sae_checks as checks
+    from tasks.sae_runtime import _ACTIVE_PAIR
+
+    calls = []
+
+    def measured(**kwargs):
+        calls.append(kwargs["prompt"])
+        return {"status": "PASS"}
+
+    monkeypatch.setattr(checks, "check_real_sae", measured)
+    token = _ACTIVE_PAIR.set(object())
+    try:
+        result = check(
+            {
+                "kind": "sae",
+                "model_key": "synthetic",
+                "sae_key": "synthetic",
+                "layer": 0,
+                "device": "cpu",
+                "prompt": "0",
+                "prompts": [str(i) for i in range(32)],
+            }
+        )
+    finally:
+        _ACTIVE_PAIR.reset(token)
+    assert result["status"] == "PASS" and result["observed"] == 32
+    assert calls == [str(i) for i in range(32)]

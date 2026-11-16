@@ -1,4 +1,4 @@
-"""Typed, runnable SAE edits and native PyTorch interventions for native task P3.
+"""Typed, runnable SAE edits and native PyTorch interventions for the intervention task.
 
 The two modes are deliberately distinct: SAE code changes preserve the
 reconstruction residual; PyTorch hooks operate on native module tensors.

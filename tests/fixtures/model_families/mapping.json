@@ -1,0 +1,212 @@
+{
+  "gemma1b": {
+    "model": "models.gemma.gemma3.gemma1b.model",
+    "compat": "models.gemma.gemma3.gemma1b.compatibility",
+    "series": "models.gemma.gemma3",
+    "canonical": "models.gemma.gemma3.gemma1b.model",
+    "active": true
+  },
+  "gemma1b_it": {
+    "model": "models.gemma.gemma3.gemma1b_it.model",
+    "compat": "models.gemma.gemma3.gemma1b_it.compatibility",
+    "series": "models.gemma.gemma3",
+    "canonical": "models.gemma.gemma3.gemma1b_it.model",
+    "active": false
+  },
+  "gemma270m": {
+    "model": "models.gemma.gemma3.gemma270m.model",
+    "compat": "models.gemma.gemma3.gemma270m.compatibility",
+    "series": "models.gemma.gemma3",
+    "canonical": "models.gemma.gemma3.gemma270m.model",
+    "active": true
+  },
+  "gemma2_2b_base": {
+    "model": "models.gemma.gemma2.gemma2_2b_base.model",
+    "compat": "models.gemma.gemma2.gemma2_2b_base.compatibility",
+    "series": "models.gemma.gemma2",
+    "canonical": "models.gemma.gemma2.gemma2_2b_base.model",
+    "active": true
+  },
+  "gemma2_2b_it": {
+    "model": "models.gemma.gemma2.gemma2_2b_it.model",
+    "compat": "models.gemma.gemma2.gemma2_2b_it.compatibility",
+    "series": "models.gemma.gemma2",
+    "canonical": "models.gemma.gemma2.gemma2_2b_it.model",
+    "active": false
+  },
+  "gemma2_9b_it": {
+    "model": "models.gemma.gemma2.gemma2_9b_it.model",
+    "compat": "models.gemma.gemma2.gemma2_9b_it.compatibility",
+    "series": "models.gemma.gemma2",
+    "canonical": "models.gemma.gemma2.gemma2_9b_it.model",
+    "active": true
+  },
+  "gemma2_9b_pt": {
+    "model": "models.gemma.gemma2.gemma2_9b_pt.model",
+    "compat": "models.gemma.gemma2.gemma2_9b_pt.compatibility",
+    "series": "models.gemma.gemma2",
+    "canonical": "models.gemma.gemma2.gemma2_9b_pt.model",
+    "active": false
+  },
+  "gemma3_12b_it": {
+    "model": "models.gemma.gemma3.gemma3_12b_it.model",
+    "compat": "models.gemma.gemma3.gemma3_12b_it.compatibility",
+    "series": "models.gemma.gemma3",
+    "canonical": "models.gemma.gemma3.gemma3_12b_it.model",
+    "active": false
+  },
+  "gemma3_12b_pt": {
+    "model": "models.gemma.gemma3.gemma3_12b_pt.model",
+    "compat": "models.gemma.gemma3.gemma3_12b_pt.compatibility",
+    "series": "models.gemma.gemma3",
+    "canonical": "models.gemma.gemma3.gemma3_12b_pt.model",
+    "active": false
+  },
+  "gemma3_27b_it": {
+    "model": "models.gemma.gemma3.gemma3_27b_it.model",
+    "compat": "models.gemma.gemma3.gemma3_27b_it.compatibility",
+    "series": "models.gemma.gemma3",
+    "canonical": "models.gemma.gemma3.gemma3_27b_it.model",
+    "active": false
+  },
+  "gemma3_27b_pt": {
+    "model": "models.gemma.gemma3.gemma3_27b_pt.model",
+    "compat": "models.gemma.gemma3.gemma3_27b_pt.compatibility",
+    "series": "models.gemma.gemma3",
+    "canonical": "models.gemma.gemma3.gemma3_27b_pt.model",
+    "active": false
+  },
+  "gemma3_4b_it": {
+    "model": "models.gemma.gemma3.gemma3_4b_it.model",
+    "compat": "models.gemma.gemma3.gemma3_4b_it.compatibility",
+    "series": "models.gemma.gemma3",
+    "canonical": "models.gemma.gemma3.gemma3_4b_it.model",
+    "active": false
+  },
+  "gemma3_4b_pt": {
+    "model": "models.gemma.gemma3.gemma3_4b_pt.model",
+    "compat": "models.gemma.gemma3.gemma3_4b_pt.compatibility",
+    "series": "models.gemma.gemma3",
+    "canonical": "models.gemma.gemma3.gemma3_4b_pt.model",
+    "active": false
+  },
+  "gpt2small": {
+    "model": "models.gpt2.gpt2.gpt2small.model",
+    "compat": "models.gpt2.gpt2.gpt2small.compatibility",
+    "series": "models.gpt2.gpt2",
+    "canonical": "models.gpt2.gpt2.gpt2small.model",
+    "active": true
+  },
+  "llama31_8b": {
+    "model": "models.llama.llama31.llama31_8b.model",
+    "compat": "models.llama.llama31.llama31_8b.compatibility",
+    "series": "models.llama.llama31",
+    "canonical": "models.llama.llama31.llama31_8b.model",
+    "active": true
+  },
+  "llama31_8b_instruct": {
+    "model": "models.llama.llama31.llama31_8b_instruct.model",
+    "compat": "models.llama.llama31.llama31_8b_instruct.compatibility",
+    "series": "models.llama.llama31",
+    "canonical": "models.llama.llama31.llama31_8b_instruct.model",
+    "active": true
+  },
+  "mistral7b_instruct": {
+    "model": "models.mistral.mistral7b.mistral7b_instruct.model",
+    "compat": "models.mistral.mistral7b.mistral7b_instruct.compatibility",
+    "series": "models.mistral.mistral7b",
+    "canonical": "models.mistral.mistral7b.mistral7b_instruct.model",
+    "active": true
+  },
+  "pythia410m": {
+    "model": "models.pythia.pythia.pythia410m.model",
+    "compat": "models.pythia.pythia.pythia410m.compatibility",
+    "series": "models.pythia.pythia",
+    "canonical": "models.pythia.pythia.pythia410m.model",
+    "active": true
+  },
+  "pythia70m": {
+    "model": "models.pythia.pythia.pythia70m.model",
+    "compat": "models.pythia.pythia.pythia70m.compatibility",
+    "series": "models.pythia.pythia",
+    "canonical": "models.pythia.pythia.pythia70m.model",
+    "active": true
+  },
+  "qwen25_3b": {
+    "model": "models.qwen.qwen25.qwen25_3b.model",
+    "compat": "models.qwen.qwen25.qwen25_3b.compatibility",
+    "series": "models.qwen.qwen25",
+    "canonical": "models.qwen.qwen25.qwen25_3b.model",
+    "active": false
+  },
+  "qwen25_3b_it": {
+    "model": "models.qwen.qwen25.qwen25_3b_it.model",
+    "compat": "models.qwen.qwen25.qwen25_3b_it.compatibility",
+    "series": "models.qwen.qwen25",
+    "canonical": "models.qwen.qwen25.qwen25_3b_it.model",
+    "active": false
+  },
+  "qwen35_27b": {
+    "model": "models.qwen.qwen35.qwen35_27b.model",
+    "compat": "models.qwen.qwen35.qwen35_27b.compatibility",
+    "series": "models.qwen.qwen35",
+    "canonical": "models.qwen.qwen35.qwen35_27b.model",
+    "active": false
+  },
+  "qwen35_2b": {
+    "model": "models.qwen.qwen35.qwen35_2b.model",
+    "compat": "models.qwen.qwen35.qwen35_2b.compatibility",
+    "series": "models.qwen.qwen35",
+    "canonical": "models.qwen.qwen35.qwen35_2b.model",
+    "active": true
+  },
+  "qwen35_4b": {
+    "model": "models.qwen.qwen35.qwen35_4b.model",
+    "compat": "models.qwen.qwen35.qwen35_4b.compatibility",
+    "series": "models.qwen.qwen35",
+    "canonical": "models.qwen.qwen35.qwen35_4b.model",
+    "active": true
+  },
+  "qwen35_9b": {
+    "model": "models.qwen.qwen35.qwen35_9b.model",
+    "compat": "models.qwen.qwen35.qwen35_9b.compatibility",
+    "series": "models.qwen.qwen35",
+    "canonical": "models.qwen.qwen35.qwen35_9b.model",
+    "active": true
+  },
+  "qwen3_1_7b": {
+    "model": "models.qwen.qwen3.qwen3_1_7b.model",
+    "compat": "models.qwen.qwen3.qwen3_1_7b.compatibility",
+    "series": "models.qwen.qwen3",
+    "canonical": "models.qwen.qwen3.qwen3_1_7b.model",
+    "active": false
+  },
+  "qwen3_1_7b_base": {
+    "model": "models.qwen.qwen3.qwen3_1_7b_base.model",
+    "compat": "models.qwen.qwen3.qwen3_1_7b_base.compatibility",
+    "series": "models.qwen.qwen3",
+    "canonical": "models.qwen.qwen3.qwen3_1_7b_base.model",
+    "active": true
+  },
+  "qwen3_8b": {
+    "model": "models.qwen.qwen3.qwen3_8b.model",
+    "compat": "models.qwen.qwen3.qwen3_8b.compatibility",
+    "series": "models.qwen.qwen3",
+    "canonical": "models.qwen.qwen3.qwen3_8b.model",
+    "active": false
+  },
+  "r1_distill_llama8b": {
+    "model": "models.llama.r1_distill.r1_distill_llama8b.model",
+    "compat": "models.llama.r1_distill.r1_distill_llama8b.compatibility",
+    "series": "models.llama.r1_distill",
+    "canonical": "models.llama.r1_distill.r1_distill_llama8b.model",
+    "active": true
+  },
+  "r1_distill_qwen15b": {
+    "model": "models.qwen.r1_distill.r1_distill_qwen15b.model",
+    "compat": "models.qwen.r1_distill.r1_distill_qwen15b.compatibility",
+    "series": "models.qwen.r1_distill",
+    "canonical": "models.qwen.r1_distill.r1_distill_qwen15b.model",
+    "active": false
+  }
+}

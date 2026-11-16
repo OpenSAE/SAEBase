@@ -10,12 +10,18 @@ import json
 from pathlib import Path
 from typing import Any
 
-
 SCHEMA_VERSION = 1
 SCHEMA_VERSION_PAIRED = 2
 ARTIFACT_VERSION = "v1"
 
 BEHAVIOR_DIRS: dict[str, str] = {
+    "HotpotQA": "HotpotQA",
+    "RAVEL": "RAVEL",
+    "GSM8K": "GSM8K",
+    "HumanEval": "HumanEval",
+    "TruthfulQA": "TruthfulQA",
+    "HarmBench": "HarmBench",
+    "XSTest": "XSTest",
     "CounterFact": "CounterFact",
     "IOI": "IOI",
     "GreaterThan": "GreaterThan",
@@ -31,6 +37,20 @@ BEHAVIOR_DIRS: dict[str, str] = {
 }
 
 BEHAVIOR_ALIASES: dict[str, str] = {
+    "HotpotQA": "HotpotQA",
+    "hotpotqa": "HotpotQA",
+    "RAVEL": "RAVEL",
+    "ravel": "RAVEL",
+    "GSM8K": "GSM8K",
+    "gsm8k": "GSM8K",
+    "HumanEval": "HumanEval",
+    "humaneval": "HumanEval",
+    "TruthfulQA": "TruthfulQA",
+    "truthfulqa": "TruthfulQA",
+    "HarmBench": "HarmBench",
+    "harmbench": "HarmBench",
+    "XSTest": "XSTest",
+    "xstest": "XSTest",
     "counterfact": "CounterFact",
     "CounterFact": "CounterFact",
     "ioi": "IOI",
@@ -62,10 +82,21 @@ BEHAVIOR_ALIASES: dict[str, str] = {
     "LiveCodeBench": "LiveCodeBench",
 }
 
-# Package-relative default: <SAEBase>/data
-DEFAULT_DATA_ROOT = Path(__file__).resolve().parents[2] / "data"
-# Protocol / Hydra run artifacts (gitignore); not prompt artifacts.
-DEFAULT_EXPERIMENT_ROOT = Path(__file__).resolve().parents[2] / "experiment"
+
+def _default_workspace_root() -> Path:
+    """Use the source checkout for editable installs; cwd for installed wheels.
+
+    Physical sources live in top-level datasets/ in a checkout, while installed
+    distributions place them in saebase/datasets/ to avoid shadowing HF datasets.
+    Writing experimental output into site-packages is never a useful default.
+    """
+    directory = Path(__file__).resolve().parent
+    return Path.cwd().resolve() if directory.parent.name == "saebase" else directory.parent
+
+
+# Prompt and experimental outputs share a workspace root, not a Python package root.
+DEFAULT_DATA_ROOT = _default_workspace_root() / "data"
+DEFAULT_EXPERIMENT_ROOT = _default_workspace_root() / "experiment"
 
 
 def canonicalize_behavior(name: str) -> str:
@@ -167,10 +198,60 @@ _11B_BEHAVIORS: frozenset[str] = _LOGIC_BEHAVIORS | _11B_TARGET_EXTRA
 
 # Central capability matrix (do not import from model modules).
 MODEL_BEHAVIOR_MATRIX: dict[str, frozenset[str]] = {
+    "gpt2small": frozenset({"CounterFact", "SimpleCopying", "SubjectVerbAgreement"}),
+    "pythia70m": frozenset({"CounterFact", "SimpleCopying", "SubjectVerbAgreement"}),
+    "pythia410m": frozenset({"SimpleCopying", "SubjectVerbAgreement"}),
+    "gemma270m": frozenset({"SimpleCopying", "SubjectVerbAgreement"}),
+    "gemma1b": _LOGIC_BEHAVIORS,
+    "gemma1b_it": _LOGIC_BEHAVIORS,
+    "r1_distill_qwen15b": _LOGIC_BEHAVIORS,
+    "r1_distill_llama8b": _11B_BEHAVIORS,
     "gemma2_2b_base": _LOGIC_BEHAVIORS,
+    "gemma2_2b_it": _11B_BEHAVIORS,
+    "qwen25_3b": _LOGIC_BEHAVIORS,
+    "qwen25_3b_it": _LOGIC_BEHAVIORS,
+    "gemma3_4b_pt": _LOGIC_BEHAVIORS,
+    "gemma3_4b_it": _LOGIC_BEHAVIORS,
+    "llama31_8b": _LOGIC_BEHAVIORS,
+    "llama31_8b_instruct": _EXP10_BEHAVIORS,
+    "qwen3_8b": _LOGIC_BEHAVIORS,
+    "qwen3_1_7b": _11B_BEHAVIORS,
+    "qwen3_1_7b_base": _LOGIC_BEHAVIORS,
+    "mistral7b_instruct": _LOGIC_BEHAVIORS,
+    "qwen35_2b": _LOGIC_BEHAVIORS,
+    "qwen35_4b": _11B_BEHAVIORS,
+    "gemma2_9b_pt": _LOGIC_BEHAVIORS,
+    "gemma2_9b_it": _EXP10_BEHAVIORS,
+    "gemma3_12b_pt": _LOGIC_BEHAVIORS,
+    "gemma3_12b_it": _LOGIC_BEHAVIORS,
+    "qwen35_9b": _LOGIC_BEHAVIORS,
+    "gemma3_27b_pt": _LOGIC_BEHAVIORS,
+    "gemma3_27b_it": _LOGIC_BEHAVIORS,
+    "qwen35_27b": _LOGIC_BEHAVIORS,
 }
 
-TEXT_BEHAVIORS: frozenset[str] = _LOGIC_BEHAVIORS | _REASONING_BENCHS
+# Prompt capture is defined for these text sources on every implemented LM.
+# This declares input compatibility, not validated model accuracy or benchmark support.
+_CAPTURE_BEHAVIORS = frozenset(
+    (
+        "HotpotQA",
+        "BBH",
+        "RAVEL",
+        "ARCChallenge",
+        "GSM8K",
+        "HumanEval",
+        "TruthfulQA",
+        "HarmBench",
+        "XSTest",
+        "IOI",
+        "CounterFact",
+        "MMLUPro",
+    )
+)
+MODEL_BEHAVIOR_MATRIX = {
+    key: values | _CAPTURE_BEHAVIORS for key, values in MODEL_BEHAVIOR_MATRIX.items()
+}
+TEXT_BEHAVIORS: frozenset[str] = _LOGIC_BEHAVIORS | _REASONING_BENCHS | _CAPTURE_BEHAVIORS
 
 
 def behaviors_for_model(model_key: str) -> frozenset[str]:
@@ -274,14 +355,15 @@ def load_manifest(
     model_key: str,
     *,
     data_root: str | Path | None = None,
+    version: str = ARTIFACT_VERSION,
 ) -> dict[str, Any]:
     beh = canonicalize_behavior(behavior)
     assert_available(beh, model_key)
-    path = manifest_path(beh, model_key, data_root=data_root)
+    path = manifest_path(beh, model_key, data_root=data_root, version=version)
     if not path.is_file():
         raise FileNotFoundError(
             f"Prompt manifest not found for {beh}/{model_key}: {path}. "
-            "Run saebase/tools/sae_prepare_prompts.py first."
+            "Run datasets/prepare.py first."
         )
     manifest = json.loads(path.read_text(encoding="utf-8"))
     if str(manifest.get("model_key")) != str(model_key):
@@ -301,12 +383,13 @@ def load_prompts(
     model_key: str,
     *,
     data_root: str | Path | None = None,
+    version: str = ARTIFACT_VERSION,
     require_manifest: bool = True,
 ) -> list[dict[str, Any]]:
     beh = canonicalize_behavior(behavior)
     if require_manifest:
-        load_manifest(beh, model_key, data_root=data_root)
-    path = prompts_path(beh, model_key, data_root=data_root)
+        load_manifest(beh, model_key, data_root=data_root, version=version)
+    path = prompts_path(beh, model_key, data_root=data_root, version=version)
     if not path.is_file():
         raise FileNotFoundError(f"Prompt artifact not found for {beh}/{model_key}: {path}")
     rows: list[dict[str, Any]] = []

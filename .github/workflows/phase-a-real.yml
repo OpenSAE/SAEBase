@@ -53,7 +53,7 @@ jobs:
           TOKENIZERS_PARALLELISM: 'false'
           OMP_NUM_THREADS: '2'
         run: |
-          python scripts/phase_a_verify.py --model "${{ inputs.model }}"             --device "${{ inputs.device }}" --output "$RUNNER_TEMP/phase-a"
+          python -m tasks.precheck.sae_checks --model "${{ inputs.model }}"             --device "${{ inputs.device }}" --output "$RUNNER_TEMP/phase-a"
       - name: Upload verified real-checkpoint evidence
         if: always()
         uses: actions/upload-artifact@v4

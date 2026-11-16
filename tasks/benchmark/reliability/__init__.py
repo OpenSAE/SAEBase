@@ -1,8 +1,13 @@
-"""M4 reliability audit. Never modifies a benchmark metric or its raw observations."""
+"""Reliability analysis. Never modifies a benchmark metric or its raw observations."""
+
+from tasks.benchmark.reliability.bootstrap import (
+    bootstrap_metric,
+    group_samples,
+    paired_bootstrap,
+    sample_size_curve,
+)
 
 from .schema import AuditConfig, Observation
-from .bootstrap import bootstrap_metric, paired_bootstrap, sample_size_curve
-from .resampling import group_samples
 
 __all__ = [
     "AuditConfig",
@@ -12,10 +17,14 @@ __all__ = [
     "sample_size_curve",
     "group_samples",
 ]
-from .runner import evaluate_m3
-from .report import write_audit, read_audit
+from tasks.benchmark.results.audit import read_audit, write_audit
 
-__all__ += ["evaluate_m3", "write_audit", "read_audit"]
-from .ground_truth_report import evaluate_ground_truth, append_ground_truth  # noqa: E402 - import ordering follows runtime/bootstrap contract
+from .runner import evaluate_benchmark
+
+__all__ += ["evaluate_benchmark", "write_audit", "read_audit"]
+from tasks.benchmark.reliability.controls import (  # noqa: E402
+    append_ground_truth,
+    evaluate_ground_truth,
+)
 
 __all__ += ["evaluate_ground_truth", "append_ground_truth"]

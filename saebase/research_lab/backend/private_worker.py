@@ -1,11 +1,8 @@
-"""Execute one real, hash-identified teacher-forced SAE job privately.
-
-Only owner-scoped hashes are returned by the HTTP API. The native worker
-runs on the user's machine, which must have original model/SAE weights.
-"""
+"""Provide local Lab execution and its explicit command-line operation."""
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import os
@@ -30,9 +27,9 @@ def _source_commit() -> str:
 
 def _generate(pair, site: dict, prompt: str, spec: dict) -> dict:
     from saebase.api import ActivationSite
-    from saebase.interventions.specs import Condition, MeasurementSample
-    from saebase.interventions.steering import GenerationSpec, compare_steered_generation
     from saebase.store.identity import SampleRecord, TokenSelection
+    from tasks.intervene.backend.specs import Condition, MeasurementSample
+    from tasks.intervene.backend.steering import GenerationSpec, compare_steered_generation
 
     started = time.perf_counter()
     token_ids = pair.model.tokens(prompt=prompt)
@@ -122,7 +119,7 @@ def _edit_activation(pair, site: dict, prompt: str, feature_ids: list[int]) -> t
 def execute_one(*, root: Path, device: str = "cuda") -> dict:
     from saebase.api import load_registered
     from saebase.store import sha256_state_dict
-    from saebase.interventions.research_edits import Edit, EditPlan, compare_sae_edits
+    from tasks.intervene.native.interventions import Edit, EditPlan, compare_sae_edits
 
     if os.environ.get("OPENSAE_ENABLE_PRIVATE_JOBS") != "1":
         raise PermissionError("Local private worker is disabled")
@@ -147,7 +144,7 @@ def execute_one(*, root: Path, device: str = "cuda") -> dict:
         if spec["max_new_tokens"]:
             result = _generate(pair, site, prompt, spec)
         elif op == "inspect":
-            from saebase.explore import capture_prompt_trace
+            from tasks.capture.explore import capture_prompt_trace
 
             trace = capture_prompt_trace(
                 sae_key=site["sae"],
@@ -235,3 +232,22 @@ def execute_one(*, root: Path, device: str = "cuda") -> dict:
             error_code="WORKER_EXECUTION_FAILED",
         )
         return {"job_id": jid, "status": "failed", "error_code": "WORKER_EXECUTION_FAILED"}
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--device", choices=("cuda", "cpu"), default="cuda")
+    arguments = parser.parse_args(argv)
+    root = os.environ.get("OPENSAE_PRIVATE_DATA")
+    if not root or not Path(root).is_absolute() or not Path(root).is_dir():
+        parser.error("An existing absolute OPENSAE_PRIVATE_DATA directory is required")
+    if os.environ.get("OPENSAE_ENABLE_PRIVATE_JOBS") != "1":
+        parser.error("OPENSAE_ENABLE_PRIVATE_JOBS must be explicitly set to 1")
+
+    report = execute_one(root=Path(root), device=arguments.device)
+    print(json.dumps(report, sort_keys=True))
+    return 1 if report.get("status") == "failed" else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

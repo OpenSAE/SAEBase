@@ -1,74 +1,57 @@
-# SAEBase agent instructions
+# SAEBase 工作说明
 
-Before changing files read [the Harness overview](harness/README.en.md), [repository architecture](harness/core/BOUNDARIES.en.md), [GitHub workspace](harness/github/README.en.md), [Agent Flow](harness/core/AGENT_FLOW.en.md), and relevant [universal contracts](harness/contracts/README.md).
+## 目的和主要功能
 
-1. Search existing modules, registries and configurations before adding files.
-2. Separate general framework capabilities from particular Dataset, Model, Task or Experiment instances. Shared modules must not depend on a particular experiment.
-3. Keep configuration in `conf/`, launch scripts under `scripts/`, product tests under `tests/`, and runtime outputs under `experiment/`.
-4. Prefer scripts/tests grouped by Work Plan or Dataset/Model/Task/Sub-name. These are extensible conventions with ownership justification.
-5. Declare new/moved files, owner, dependencies, reuse alternatives, tests and evidence in the PR. New repository root modules and changes to shared architecture require separate approval.
-6. A path-edit authorization is not permission to change architecture or protected governance. Historical results and acceptance remain unchanged without independent evidence.
+说明科研软件的职责、工作模式和开发方法，帮助智能助手直接完成用户任务。
 
-Offline CI proves software checks only, not real GPU or scientific acceptance.
+## 适用范围
 
-Before implementing a new Work Plan, read [the Work Plan authoring standard](harness/github/work_plan/WRITING_STANDARD.en.md). Do not assume every remote branch is locally fetched; do not run a compute-intensive phase before environment, dependency and small-pilot checks succeed.
+适用于 SAEBase 的阅读、开发和维护。先读取 `.researchharness/mode.json`，再按任务读取相关源码、局部 AGENTS.md 和技能。
 
-## Process-first correction for Harness / GitHub / local Agents
+## 工作模式
 
-When a Harness, GitHub maintenance, or local-Agent execution workflow fails, behaves inconsistently, or is reported to violate project rules, **repair the process before patching the isolated symptom**. The governing written contracts take precedence over an ad-hoc instruction, a convenient workaround, or the urge to finish a specific Work Plan.
+- `mode=intensive` 为密集开发模式：按用户目标直接修改、重构、执行必要检查并修复问题。修改前人工审阅默认关闭，中央计划、Flow、临时维护授权和开发命令审批暂停，持续到用户主动切回。源码、Runtime、CI 和项目开发配置均属于正常开发对象。
+- `mode=regular` 或模式文件缺失时采用常规模式：使用 `.agents/skills/researchharness/SKILL.md` 接入中央管理并执行相应审阅与授权流程。
+- 模式切换使用 `rh --harness-root /workspace/ResearchHarness --project saebase mode set intensive` 或 `mode set regular`，查询使用 `mode status`。
+- 下载模型、正式训练、真实数据传输、远程推送、发布和 Atlas 正式替换依据用户对相应操作的授权执行。
 
-1. **Stop and preserve evidence** of the contested action (source SHA, observed behavior, logs, proposal/review state). Do not automatically rewrite nodes, change approved scopes, restart GPU work, or relax a gate.
-2. **Read the applicable authorities first**: this file, `harness/core/BOUNDARIES.md`, `harness/github/HUMAN_CHECK.md`, `harness/github/work_plan/WRITING_STANDARD.md`, Atlas authoring standards and the active Work Order/Contracts as relevant. Identify the violated clause, conflicting implementations and missing enforcement.
-3. **If the human explicitly identifies a process violation**, first present a concrete, feasible **process-standardization change proposal**: root cause, normative change, exact owner/files, backward compatibility, negative tests, and approval/rollback implications. Discuss or confirm the governance solution with the human before returning to the original technical fix. Existing protected-governance/Human Check permissions still apply.
-4. **Then fix the specific problem together with the human** using the updated or confirmed process, scoped review decisions, and actual tests. Report what changed in the process separately from what was fixed in the task.
+## 围绕目的完成任务
 
-A Work Plan may reference Core/Knowledge/Code/Environment/Context without changing them. Every new or materially revised Work Plan must first produce the regulated human-facing section summary and a source-backed six-domain node-impact audit described in [Work Plan authoring](harness/github/work_plan/WRITING_STANDARD.md). If the durable node responsibility is unchanged, **do not edit it** or create a synthetic Human Check change to justify project-specific tasks.
+- 先明确用户需要的结果和完成条件，查找既有实现及直接调用者，在已有授权内主动完成调查、判断和处理。简单任务直接实施；复杂任务按实际交付说明依赖和涉及文件。需要人类决定时，提供已查明的事实、具体选择及影响。
+- 制定新增或修改功能时，先选定结果的实际使用场景，明确哪个调用者或后续任务要用它完成什么，再确定检查步骤、返回内容和保存方式。需要长期保留的信息，同时设计查找、读取、产物定位及后续处理。模型、数据、任务及共同支持按各自用途落实；已有记录和接口优先复用。
+- 完成条件包括实际使用结果：正常完成时能取得并使用所需内容；遇到当前功能实际相关的失败、受阻或部分完成时，后续任务能依据所保存的具体事实、影响和处理建议继续工作。原因待查时保留已知事实与下一步定位方法。
+- 阅读围绕当前问题展开。区分文档定义、实际代码行为、运行观测和推断；来源与版本按任务需要记录。历史结果和合成样本记录各自来源。
+- 先修复实际故障。新增防范措施应有当前代码中的具体发生路径、实际后果及相称成本。
+- 每种事实由明确的模块负责确定，后续调用复用结果。常规检查集中在输入和共享接口等关键位置。
+- 临时排查得到的解决方式进入负责该行为的正式代码，清理已完成用途的临时检查和重复判断。结果说明实际影响与后续行动。
+- 修复通过用户正常使用的入口交付，完成范围依据本次任务确定。
+- 连续开发和维护任务使用一份简短执行记录。优先续写已有任务文档；新记录放 `experiment/maintenance/<时间>_<用途>/execution.md`，与临时文件分开。开头说明背景、目标和整体思路，按时间追加重要行动与判断，结束后总结效果、AI 的意见及后续建议；暂停时写明继续位置。结果文件通过已有路径关联。
 
-## Generalizable failure prevention for Harness and GitHub workflows
+## 目录与职责
 
-**Mandatory on every Harness or GitHub execution error, failed check, or workflow defect, even when the immediate symptom has an easy fix:** determine whether the root cause can recur in another Work Plan, PR, agent session, CI job, repository path, machine, or task. Do not treat an isolated passing rerun or a one-off patch as a durable correction.
+- `datasets/`、`models/`、`tasks/` 保存科研组件；`saebase/registry.py` 和 `saebase/runner.py` 负责统一登记与分发。
+- `saebase/api/` 提供通用模型和 SAE 操作；`saebase/runtime/` 维护共同配置、运行路径和记录。复用已有接口，跨组件能力依据实际调用需求设计。
+- `scripts/examples/` 保存完整可运行演示，`tests/fixtures/` 保存合成组件，教学说明归 `doc/code/development/`。
+- `conf/` 保存配置，`scripts/` 保存软件发布、分发、文档和代码检查入口，`tests/` 保存产品测试。业务逻辑归负责模块，脚本和工具调用正式实现。
+- `doc/knowledge/` 保存科研知识与术语，`doc/code/` 保存架构和源码资料，`doc/code/development/` 保存开发说明。`experiment/` 保存运行产物和临时调试输出。
+- `AGENTS.md` 保存共同规则和各目录的具体职责；`.agents/skills/` 保存项目特有的接入与实验方法；`.codex/` 保存客户端配置、权限接入和按需诊断。
+- ResearchHarness 保存通用管理程序、环境资料、正式计划、审阅和历史归档。用户要求正式计划时，使用显式绑定的中央 `src/harness/core/work_plan/workplan.md`；日常方案在对话中说明。SAEBase 科研软件独立安装运行。
+- `saebase/research_lab/` 按用户重新提出的维护任务处理，日常 Dataset、Model、Task 开发聚焦当前使用的组件。
 
-1. **Classify and preserve evidence.** Capture the exact source SHA, command, input, failure output, affected owner and permission boundary. Distinguish an isolated data/configuration problem from a reusable failure in a shared rule, default, contract, validator, script, CI, agent instruction, or workflow. If generalizability is uncertain, say so; do not label a guess as established fact.
-2. **Propose a prevention mechanism.** For a potentially generalizable failure, describe its root cause, other affected scenarios, and at least one smallest-scoped **systemic prevention option** (such as a shared validation rule, preflight gate, standardized default, safer API, test fixture, regression test, or actionable process instruction). State the owner, exact proposed paths, compatibility impact, acceptance evidence and rollback. A local symptom fix by itself does **not** close this obligation.
-3. **When the mechanism and root cause are well supported:** if the change is within already authorized paths, roles and budgets, implement the reusable prevention together with the immediate repair; add a targeted **negative regression test** that reproduces the failure, and validate both the original case and at least one distinct applicable scenario. Report the general fix separately from the local patch, including exact commit/CI evidence. Do not wait for another human answer solely because the technical diagnosis is clear and the modification is already authorized.
-4. **When uncertain, risky, or outside the granted scope:** present the evidence, competing explanations, concrete prevention alternatives, risks and requested approval to the human **before** making the shared or protected change. A high-confidence technical diagnosis never overrides Human Check, protected governance, source-path authorizations, frozen research parameters, security boundaries, or GPU/network/publishing permissions.
-5. **Verify durable closure.** Record which recurrence is now blocked, where the preventive rule/check lives, and which tests prove it; otherwise explicitly say `PREVENTION_NOT_YET_VERIFIED` and keep the general problem open. A clean CI run on one commit does not prove every real environment or scientific workload.
+## 检查与科研结果
 
-This rule is in addition to the process-first requirement above. Treat formatting errors, test-status classification mismatches, missing dependency checks, inconsistent command entrypoints, incorrect defaults and CI routing failures as candidates for generalization rather than automatically categorizing them as unrelated local incidents.
+常规检查集中在少数关键位置，后续流程复用已经保证的结果。针对具体问题开展临时检查，查明后将解决能力纳入正式代码，使同类问题得到自动处理，并清理已完成用途的临时检查。
 
-## Python formatting before any local commit or GitHub API write
+本次新增的测试脚本和辅助代码按持续用途处理：有持续用途的纳入正式实现或长期测试；已完成临时使命的删除。本次生成的临时输入和测试缓存随任务清理。保留的检查应帮助后续执行直接使用已有保证，减少重复判断和人工介入。
 
-Ruff is a deterministic format/lint gate, not a substitute for tests. The exact CI version is `ruff==0.15.22`; see `pyproject.toml` and `.github/workflows/ci.yml`. Do **not** discover formatting mistakes by waiting for a failed PR CI.
+检查范围与实际改动相称。局部修改选择能确认本次功能结果的相关检查；已有结果足以回答问题时直接使用。新增或重复执行测试，应解决当前具体问题。项目级检查用于现有 CI、发布准备或明确需要整体检查的任务。客户端接入、配置变更或相关故障时按需执行 `python .codex/hooks/preflight.py`。
 
-- Local Agent first stages **only human-authorized** new Python files, then runs `python saebase/tools/check_new_python_quality.py --fix`. Inspect the diff and re-stage only those files before committing. Existing modified Python files may be included *only* with explicit `--include-modified`, because Ruff rewrites entire files.
-- Once per fresh checkout, install `python -m pip install "ruff==0.15.22" "pre-commit>=4,<5"` and `pre-commit install` to run the same bounded formatter automatically during local commits. Missing tools or version mismatch fail closed with an installation hint, not a silent skip.
-- **GPT Agent with GitHub API / connector (including a fresh chat):** before EVERY Python `create_file` or `update_file`, take the complete proposed file text, then run the repository-owned stdin entrypoint (no Git working tree or staging required):
+Python 使用 Ruff `0.15.22`。提交前只暂存本次改动，新增文件使用 `python scripts/quality.py --fix`；既有文件按明确范围使用 `--include-modified`。通过 GitHub 接口写入 Python 时，使用同一工具的 `--stdin --filename <准确路径>` 检查实际内容。CI 负责只读检查。
 
-  ```bash
-  python saebase/tools/check_new_python_quality.py --stdin \
-    --filename tasks/precheck/worker.py \
-    < candidate.py > candidate.formatted.py
-  ```
+模型与 SAE 身份、权重、数据划分、指标、数值精度和历史结果保持来源清楚。涉及其语义变化时明确说明并执行相关检查。工作资料记录软件检查、真实实验和独立验收各自确认的事实与依据。
 
-  Replace `--filename` with the exact intended repository path. This reads only the proposed bytes and outputs **only** the formatted, lint-clean source on successful exit; all diagnostics go to stderr. Send `candidate.formatted.py`'s exact text, not `candidate.py`, to the GitHub API. Before updating an existing file, inspect the resulting full-file diff and do not accept unrelated formatting changes without scoped approval. This command does not grant source edit permission or execute the source.
-- This is a required **pre-write step**, not optional advice: use pinned Ruff `0.15.22`; if the GPT environment cannot execute it, stop the Python GitHub write and report `BLOCKED_FORMAT_TOOL` rather than bypassing it or pretending the new file passed. Local pre-commit cannot intercept a GitHub API call. The independent CI check stays read-only and remains mandatory; do not enable a CI bot that pushes unreviewed changes.
-- This formatting gate neither expands editable paths nor grants protected governance/GPU/network/publish permission. Never auto-format frozen WP21 fixtures, historical results, or unrelated Python files merely to make a check green.
+## 书写与交流
 
-## Mandatory Workplan Human Check disposition
+共同的措辞与交流规则采用 ResearchHarness 根 AGENTS.md 的“书写、解释与对话原则”，其中“交流信息的选择”统一规定对话内容的取舍。按本项目 `.researchharness/central.json` 中的 `harness_root` 定位中央文件并读取该章节。
 
-Every new or materially revised Workplan review must explicitly present a verified Atlas review link for an actual Node ADD/CHANGE/REMOVE, or a concrete reason why Node Human Check is not required. Deferred Code/AST changes require a no-review-now explanation and post-implementation audit, not permanent clearance. Store the disposition in the six-domain impact artifact and validate its structure. Source code approvals remain separate, and imaginary Atlas links are forbidden.
-
-## Human Check before GitHub changes
-
-Before source edits or a PR, follow [Human Check](harness/github/HUMAN_CHECK.md) and the [Delivery Skill](.github/skills/saebase-delivery/SKILL.md). First distinguish **durable Atlas semantic changes** from a source-only modification. For genuine Node ADD/CHANGE/REMOVE, Human Check remains enabled and requires the existing Atlas overlay with independent Approve / Deny / Unchecked decisions (only humans can opt out through the authenticated local UI). For **NO_NODE_CHANGE**, do not fabricate a Node proposal: provide the source-backed impact audit and obtain explicit human review of the exact changed paths and PR diff before implementation/merge, with protected governance authorization retained. Neither route bypasses Contracts, Work Orders, GPU/network/publishing gates or independent verification.
-
-
-## Conversational task planning
-
-For planning, task decomposition, ownership review or multi-PR coordination,
-use [SAEBase Delivery](.github/skills/saebase-delivery/SKILL.md) and the
-[GitHub collaboration principles](harness/github/development_doc/agent-delivery.en.md).
-A conversational assistant can apply the skill using repository source context;
-it does not need a Cursor Skill, local precheck runner, Work Order, or GPU.
-Actual source edits and experimental execution still obey existing Harness
-permissions, Work Plans, Contracts, and independent acceptance.
+SAEBase 的功能、阶段、报错和报告以实际用途命名；模型名称、数学记号和历史格式标识按其原义保留。Markdown 与面向用户的说明使用中文，代码和通用技术名称保留其实际写法。

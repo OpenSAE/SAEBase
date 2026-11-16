@@ -1,0 +1,116 @@
+"""Optional integration tests against untouched SAR/RSS paper sources.
+
+Set SAEBASE_SAR_SOURCE and SAEBASE_RSS_SOURCE to the original checkout dirs.
+These tests require no model downloads and are skipped for standalone installs.
+"""
+
+from __future__ import annotations
+
+import os
+from pathlib import Path
+
+import numpy as np
+import pytest
+
+from saebase.api import ActivationSite, ModelAdapter
+from saebase.api.paper_sources import load_paper_module
+from tasks.benchmark.methods import collect_rss_features, evaluate_rss
+from tasks.capture.sar import evaluate_sar
+from tests.fixtures.synthetic import ResearchToyModel, ResearchToySAE
+
+
+def _source(name: str) -> Path:
+    path = os.getenv(f"SAEBASE_{name.upper()}_SOURCE")
+    if not path:
+        pytest.skip(f"set SAEBASE_{name.upper()}_SOURCE to the original {name}.py or checkout")
+    return Path(path)
+
+
+def test_original_sar_module_with_saebase_patching():
+    paper = load_paper_module(_source("sar"), paper="sar")
+    model = ModelAdapter(ResearchToyModel().eval())
+    sae = ResearchToySAE().eval()
+    result = evaluate_sar(
+        model,
+        sae,
+        site=ActivationSite(0, "blocks.0.hook_resid_post"),
+        paper=paper,
+        prompt="2 3 4",
+        readout=lambda z: z[0] - z[1],
+        K=3,
+        M=80,
+        n_fit=55,
+        seed=3,
+    )
+    assert result.metrics["sar1"] == pytest.approx(0.2156495440166672, abs=1e-6)
+    assert result.metrics["sar2"] < 1e-8
+    assert result.metrics["rho2"] == pytest.approx(1.0, abs=1e-6)
+    assert result.metrics["rank2"] > result.metrics["rank1"]
+    assert np.array_equal(result.feature_ids, [1, 6, 0])
+
+
+def test_original_rss_module_with_saebase_capture():
+    paper = load_paper_module(_source("rss"), paper="rss")
+    model = ModelAdapter(ResearchToyModel().eval())
+    sae = ResearchToySAE().eval()
+    result = evaluate_rss(
+        collect_rss_features(
+            model,
+            sae,
+            site=ActivationSite(0, "blocks.0.hook_resid_post"),
+            clean_prompt="1 2 3",
+            selection_variants=[f"1 2 {x}" for x in range(4, 9)],
+            held_out_variants=[f"1 2 {x}" for x in range(9, 14)],
+        ),
+        paper=paper,
+        rho=0.8,
+        kappa=0.8,
+        M=20,
+        K=5,
+    )
+    assert result.support.tolist() == [3, 0, 1, 4, 5]
+    assert result.direction.tolist() == [1, 1, 1, 1, 1]
+    assert result.mean_rss == pytest.approx(0.513370703458786, rel=1e-5)
+    assert np.allclose(result.held_out_rates, 1.0)
+
+
+def test_public_api_nonfinal_position_preserves_residual():
+    import json
+
+    import torch
+
+    from saebase.api import (
+        SAEIdentity,
+        capture_features,
+        coalition_replacements,
+        edit_features,
+        evaluate_edit,
+    )
+    from tests.fixtures.synthetic import TinyModel, TinySAE
+
+    model = ModelAdapter(TinyModel().eval())
+    sae = TinySAE().eval()
+    site = ActivationSite(layer=0, hook_name="blocks.0.hook_resid_post", position=-2)
+    identity = SAEIdentity.for_custom(
+        sae=sae,
+        model_key="tiny",
+        checkpoint="local-synthetic-demo",
+        hook_name=site.hook_name,
+        layer=site.layer,
+    )
+    snapshot = capture_features(model, sae, site=site, prompt="3 5 7")
+    replacements = coalition_replacements(
+        snapshot.codes, selected_indices=[0, 1], retained_indices=[1]
+    )
+    patch = edit_features(sae, snapshot, replacements=replacements)
+    result = evaluate_edit(model, sae, site=site, prompt="3 5 7", replacements=replacements)
+    assert torch.allclose(patch.activation - snapshot.residual, sae.decode(patch.codes[None])[0])
+    assert not torch.allclose(result.baseline_logits, result.edited_logits)
+    record = {
+        "site": {"hook_name": site.hook_name, "layer": site.layer, "token_position": site.position},
+        "sae_identity": identity.to_dict(),
+        "baseline_logits": result.baseline_logits.tolist(),
+        "edited_logits": result.edited_logits.tolist(),
+        "logit_delta": result.logit_delta.tolist(),
+    }
+    print(json.dumps(record, indent=2))

@@ -2,11 +2,14 @@
 # Each task is model/dataset independent; compose selections through Hydra.
 task:
   name: benchmark
+  extensions: []  # Explicit installed entry-point names; no automatic discovery.
   path: benchmark
   execute: false
-  sae_key: gemma2_2b_pt_l25_canonical
-  layer: 25
-  device: cpu
+  sae_key: null
+  layer: null
+  device: auto
   prompt: ''
+  evaluation: null
   benchmark_config: ''
+  protocol: null  # Metric/method parameters; model and dataset remain global selections.
   resume: true

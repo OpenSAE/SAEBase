@@ -1,203 +1,35 @@
-# Atlas preview revision: 4eea31448d0372dd67496720dfa8900e0002ef94
-name: SAEBase project-owned Atlas website
-
-# Human Check proposals need an accessible Atlas page without asking the reviewer
-# to manually dispatch deployment. All other publishes stay explicitly manual.
+name: Deploy centrally published Atlas snapshot
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'harness/visualization/review-proposals/**'
-      - 'harness/visualization/evidence.py'
-      - 'harness/code/**'
-      - '.github/workflows/atlas-project-pages.yml'
   workflow_dispatch:
-
 permissions:
   contents: read
   pages: write
   id-token: write
-
-concurrency:
-  group: saebase-project-pages
-  cancel-in-progress: true
-
 jobs:
-  build:
+  verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Generate source-owned Atlas data
-        if: ${{ github.event_name == 'workflow_dispatch' }}
+      - name: Verify existing central publication without rebuilding
         run: |
-          python harness/core/validate.py
-          python harness/knowledge/validate.py
-          python harness/code/build.py
-          python harness/visualization/export.py
-          python harness/visualization/build_pages.py
-          python harness/visualization/build_language.py
-          python harness/visualization/package_site.py --output "$RUNNER_TEMP/atlas-web/atlas"
-      - name: Package existing Atlas UI with newly reviewed proposal snapshots
-        if: ${{ github.event_name == 'push' }}
-        run: |
-          set -euo pipefail
-          python harness/core/validate.py
-          python harness/knowledge/validate.py
-          python harness/visualization/build_pages.py --check
-          python harness/visualization/package_site.py --output "$RUNNER_TEMP/atlas-web/atlas"
-          python - <<'PY'
+          python - <<'PYTHON'
+          import json
           from pathlib import Path
-          import hashlib, json, os
-          path = Path(os.environ["RUNNER_TEMP"]) / "atlas-web/atlas/site-manifest.json"
-          obj = json.loads(path.read_text())
-          obj["graph_provenance"] = "committed_atlas_snapshot_not_new_AST_generation"
-          source = Path("harness/visualization/data.js").read_bytes()
-          obj["graph_snapshot_sha256"] = hashlib.sha256(source).hexdigest()
-          path.write_text(json.dumps(obj, sort_keys=True, indent=2) + "\n")
-          PY
-      - name: Checkout project-owned preview source
-        uses: actions/checkout@v4
+          record = json.loads(Path("atlas/publication.json").read_text())
+          assert record["project_id"] == "saebase" and record["status"] == "reviewed"
+          PYTHON
+          cd atlas
+          sha256sum --check SHA256SUMS
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
         with:
-          ref: main
-          path: preview-source
-          fetch-depth: 1
-      - name: Build project-owned preview without modifying stable Atlas
-        env:
-          ROOT: ${{ runner.temp }}/atlas-web
-        run: |
-          python - <<'PY'
-          import os, shutil, subprocess, re
-          from pathlib import Path
-          root = Path(os.environ["ROOT"])
-          stable = root / "atlas"
-          preview = root / "preview"
-          shutil.copytree(stable, preview)
-          source = Path("preview-source/harness/visualization")
-          sha = subprocess.check_output(
-              ["git", "-C", "preview-source", "rev-parse", "--short=12", "HEAD"],
-              text=True).strip()
-          for asset in ("app.js", "atlas-theme.css", "i18n.js"):
-              shutil.copy2(source / asset, preview / asset)
-          for name in ("index", "core", "knowledge", "code", "environment", "context"):
-              html = preview.joinpath(name + ".html")
-              value = html.read_text(encoding="utf-8")
-              value = re.sub(r'(\./(?:app|i18n)\.js|\./atlas-theme\.css)\?v=[^"]+',
-                  lambda m: m.group(1) + "?v=" + sha, value)
-              value = value.replace("</head>",
-                  '  <meta name="robots" content="noindex, nofollow">\n</head>', 1)
-              html.write_text(value, encoding="utf-8")
-          (root/"index.html").write_text(
-              '<!doctype html><meta charset="utf-8">'
-              '<meta http-equiv="refresh" content="0;url=./atlas/index.html">'
-              '<title>SAEBase Atlas</title><a href="./atlas/index.html">Open SAEBase Atlas</a>',
-              encoding="utf-8")
-          (root/".nojekyll").touch()
-          assert (preview/"code.html").exists()
-          assert "atlas-theme.css?v=" + sha in (preview/"code.html").read_text()
-          print("Project Atlas preview at /preview/code.html",sha)
-          PY
-      - name: Verify packaged JavaScript and file references
-        env:
-          ROOT: ${{ runner.temp }}/atlas-web
-        run: |
-          node --check "$ROOT/atlas/app.js"
-          node --check "$ROOT/preview/app.js"
-          node --check "$ROOT/preview/i18n.js"
-          python - <<'PY'
-          import os
-          from pathlib import Path
-          base = Path(os.environ["ROOT"])
-          for tree in ("atlas", "preview"):
-              for view in ("index", "core", "knowledge", "code", "environment", "context"):
-                  p = base / tree / (view+".html")
-                  html = p.read_text()
-                  assert "data-bootstrap.js" in html
-                  assert "atlas-theme.css" in html
-                  assert "app.js" in html
-                  assert (base/tree/"app.js").exists()
-          PY
-      - name: Verify preview in Chromium and save review screenshots
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: |
-          python -m pip install -q playwright
-          python -m playwright install --with-deps chromium
-          python -m http.server 8765 --bind 127.0.0.1 --directory "$RUNNER_TEMP/atlas-web" >/tmp/atlas-preview-server.log 2>&1 &
-          python preview-source/harness/visualization/check_visual21_preview.py
-      - name: Store screenshots for design review
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: saebase-visual21-review
-          path: atlas-preview-screenshots/
-          if-no-files-found: ignore
-      - name: Configure SAEBase GitHub Pages
-        uses: actions/configure-pages@v5
-      - name: Upload SAEBase Pages artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: ${{ runner.temp }}/atlas-web
+          path: atlas/
   deploy:
+    needs: verify
     runs-on: ubuntu-latest
-    needs: build
     environment:
       name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - id: deploy
-        uses: actions/deploy-pages@v4
-      - name: Verify deployed Atlas pages and live assets
-        env:
-          PAGES_URL: ${{ steps.deploy.outputs.page_url }}
-        run: |
-          python - <<'PY'
-          import os
-          import re
-          import time
-          from urllib.parse import urljoin
-          from urllib.request import Request, urlopen
-
-          base = os.environ["PAGES_URL"].rstrip("/") + "/"
-          pages = ("index", "core", "knowledge", "code", "environment", "context")
-          error = ""
-          for attempt in range(18):
-              try:
-                  for view in pages:
-                      url = urljoin(base, f"atlas/{view}.html") + f"?probe={attempt}"
-                      with urlopen(Request(url, headers={"User-Agent": "SAEBase-Pages-verify"}), timeout=15) as response:
-                          assert response.status == 200, f"{url}: HTTP {response.status}"
-                          html = response.read(20000).decode("utf-8")
-                      assert "SAEBase" in html and "app.js" in html, f"Not an Atlas view: {url}"
-                      assert "data.js" in html or "data-bootstrap.js" in html, f"No graph: {url}"
-                      links = re.findall(r'(?:src|href)="([^"]+)"', html)
-                      for needed in ("app.js", "style.css"):
-                          asset = next((value for value in links if needed in value), None)
-                          assert asset, f"Missing {needed} in {url}"
-                          resource = urljoin(url, asset)
-                          with urlopen(Request(resource, headers={"User-Agent": "SAEBase-Pages-verify"}), timeout=15) as result:
-                              assert result.status == 200 and result.read(1), f"Missing static asset: {resource}"
-                  # Public proposal-only updates must deliver the actual review JSON.
-                  import json
-                  index_url = urljoin(base, "atlas/review-proposals/index.json")
-                  with urlopen(Request(index_url, headers={"User-Agent": "SAEBase-Pages-verify"}), timeout=15) as result:
-                      reviewed = json.load(result)
-                  assert reviewed.get("reviews"), "Atlas review index is empty"
-                  for row in reviewed["reviews"]:
-                      item_url = urljoin(base, "atlas/review-proposals/" + row["file"])
-                      with urlopen(Request(item_url, headers={"User-Agent": "SAEBase-Pages-verify"}), timeout=15) as result:
-                          snapshot = json.load(result)
-                      assert snapshot.get("plan", {}).get("id") == row["id"], "Review snapshot identity mismatch"
-                  print("Public SAEBase Atlas verified across six pages, assets and review proposals:", base)
-                  break
-              except Exception as exc:
-                  error = f"{type(exc).__name__}: {exc}"
-                  print(f"Pages probe {attempt+1}/18: {error}", flush=True)
-                  time.sleep(5)
-          else:
-              raise SystemExit("Real GitHub Pages Atlas is not accessible: " + error)
-          PY
+      - uses: actions/deploy-pages@v4
+        id: deployment

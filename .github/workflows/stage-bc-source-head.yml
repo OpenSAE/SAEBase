@@ -27,7 +27,7 @@ jobs:
         env:
           HF_HUB_DISABLE_TELEMETRY: '1'
         run: |
-          python scripts/phase_bc_source_metadata.py --output "$RUNNER_TEMP/stage-bc-source.json"
+          python -m tasks.benchmark.sites.catalog sources --output "$RUNNER_TEMP/stage-bc-source.json"
       - name: Upload exact file presence and unresolved metadata
         if: always()
         uses: actions/upload-artifact@v4

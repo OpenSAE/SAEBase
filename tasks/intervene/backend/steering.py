@@ -30,6 +30,7 @@ class GenerationSpec:
     top_k: int | None = None
     eos_token_ids: tuple[int, ...] = ()
     max_context_tokens: int | None = None
+    stop_at_context_limit: bool = False
 
     def __post_init__(self) -> None:
         if type(self.max_new_tokens) is not int or self.max_new_tokens < 1:
@@ -52,6 +53,8 @@ class GenerationSpec:
             type(self.max_context_tokens) is not int or self.max_context_tokens < 1
         ):
             raise ValueError("max_context_tokens must be positive")
+        if type(self.stop_at_context_limit) is not bool:
+            raise ValueError("stop_at_context_limit must be boolean")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -61,6 +64,7 @@ class GenerationSpec:
             "top_k": self.top_k,
             "eos_token_ids": list(self.eos_token_ids),
             "max_context_tokens": self.max_context_tokens,
+            "stop_at_context_limit": self.stop_at_context_limit,
         }
 
 
@@ -125,6 +129,9 @@ def compare_steered_generation(
     model.capabilities.require("forward")
     model.capabilities.require("capture")
     model.capabilities.require("patch")
+    from .observations import current_observations
+
+    observations = current_observations(model, sae)
     original = sample.tokens
     if (
         spec.max_context_tokens is not None
@@ -132,6 +139,7 @@ def compare_steered_generation(
     ):
         raise ValueError("requested generation exceeds the configured context limit")
     eos = set(spec.eos_token_ids)
+    native_limit = getattr(getattr(model.model, "cfg", None), "n_ctx", None)
     result: dict[str, Any] = {}
     for label, steered in (("baseline", False), ("steered", True)):
         seed_material = hashlib.sha256(f"{spec.seed}:{sample.record.key}".encode()).digest()
@@ -141,20 +149,35 @@ def compare_steered_generation(
         current = list(original)
         generated: list[int] = []
         steps: list[dict[str, Any]] = []
+        context_stopped = False
         for step in range(spec.max_new_tokens):
+            if (
+                spec.stop_at_context_limit
+                and isinstance(native_limit, int)
+                and len(current) > native_limit
+            ):
+                context_stopped = True
+                break
             input_ids = model.tokens(tokens=torch.tensor([current], dtype=torch.long))
             if steered:
                 position = len(current) - 1
                 current_site = ActivationSite(site.layer, site.hook_name, position)
-                snapshot = capture_features(model, sae, site=current_site, tokens=input_ids)
+                if observations is None:
+                    snapshot = capture_features(model, sae, site=current_site, tokens=input_ids)
+                    clean = None
+                else:
+                    snapshot, clean = observations.observe(input_ids, current_site)
                 patch = apply_condition(sae, snapshot, condition)
-                logits = model.patch_logits(
-                    tokens=input_ids,
-                    site=current_site,
-                    activation=patch.activation,
-                    readout_position=-1,
-                )
-                clean = model.forward_logits(tokens=input_ids, readout_position=-1)
+                if observations is None:
+                    logits = model.patch_logits(
+                        tokens=input_ids,
+                        site=current_site,
+                        activation=patch.activation,
+                        readout_position=-1,
+                    )
+                    clean = model.forward_logits(tokens=input_ids, readout_position=-1)
+                else:
+                    logits = observations.patch(snapshot, patch.activation)
                 feature_id = condition.feature_ids[0] if condition.feature_ids else None
                 activation = None
                 if feature_id is not None:
@@ -166,7 +189,11 @@ def compare_steered_generation(
                 effect["position"] = position
                 steps.append(effect)
             else:
-                logits = model.forward_logits(tokens=input_ids, readout_position=-1)
+                if observations is None:
+                    logits = model.forward_logits(tokens=input_ids, readout_position=-1)
+                else:
+                    current_site = ActivationSite(site.layer, site.hook_name, len(current) - 1)
+                    _, logits = observations.observe(input_ids, current_site)
             tok = _sample(logits, spec, rng=rng)
             generated.append(tok)
             current.append(tok)
@@ -174,7 +201,11 @@ def compare_steered_generation(
                 break
         result[label + "_generated_token_ids"] = generated
         result[label + "_stop_reason"] = (
-            "eos" if generated and generated[-1] in eos else "max_new_tokens"
+            "context_limit"
+            if context_stopped
+            else "eos"
+            if generated and generated[-1] in eos
+            else "max_new_tokens"
         )
         if steered:
             result["steered_steps"] = steps

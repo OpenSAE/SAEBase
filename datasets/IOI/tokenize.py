@@ -33,7 +33,9 @@ def attach_token_ids(items: list[dict[str, str]], model: Any) -> list[dict[str, 
     return kept
 
 
-def filter_argmax(items: list[dict[str, Any]], model: Any) -> list[dict[str, Any]]:
+def filter_argmax(
+    items: list[dict[str, Any]], model: Any, *, max_kept: int | None = None
+) -> list[dict[str, Any]]:
     import torch  # noqa: PLC0415
 
     kept: list[dict[str, Any]] = []
@@ -42,6 +44,8 @@ def filter_argmax(items: list[dict[str, Any]], model: Any) -> list[dict[str, Any
             logits = model(ex["prompt"])[0, -1]
         if int(logits.argmax().item()) == int(ex["tok_io"]):
             kept.append(ex)
+            if max_kept is not None and len(kept) >= max_kept:
+                break
     return kept
 
 
@@ -50,6 +54,7 @@ def filter_with_model(
     model: Any,
     *,
     min_kept: int = 100,
+    max_kept: int | None = None,
 ) -> tuple[list[dict[str, Any]], str]:
-    kept = filter_argmax(items, model)
+    kept = filter_argmax(items, model, max_kept=max_kept)
     return kept, "argmax_correct"

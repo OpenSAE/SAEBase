@@ -11,8 +11,8 @@ from saebase.datasets.GreaterThan.tokenize import (
     filter_greedy_in_greater,
     strategy_for_model_key,
 )
-from saebase.datasets.prompt_schema import assert_available, make_manifest
-from saebase.datasets.prompt_store import save_prompts
+from saebase.datasets.artifacts import assert_available, make_manifest
+from saebase.datasets.artifacts import save_prompts
 
 
 def prepare_for_model(

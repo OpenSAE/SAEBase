@@ -1,7 +1,7 @@
 """Allowlisted local explanation generator.
 
 Hydra YAML cannot store a Python callable. ``task.generator=saebase_generate``
-selects this function. It calls ``saebase.generate.generate`` and does not eval
+selects this function. It calls ``tasks.generate.backend.generate`` and does not eval
 configuration text, import vLLM directly, or call an external paid API.
 
 ``heldout_score`` is computed by the caller from SAE activations. This function
@@ -36,7 +36,7 @@ def saebase_generate(cfg: object) -> Callable[[list[str]], str]:
         )
         if len(ask) > 4000:
             raise ValueError("Explanation prompt exceeds 4000 characters")
-        from saebase.generate import generate
+        from tasks.generate.backend import generate
 
         rows = generate(
             [ask],
@@ -51,7 +51,7 @@ def saebase_generate(cfg: object) -> Callable[[list[str]], str]:
         )
         text = str(rows[0].get("text") or "").strip()
         if not text:
-            raise RuntimeError("saebase.generate returned no text")
+            raise RuntimeError("tasks.generate.backend returned no text")
         return text[:800]
 
     return generator

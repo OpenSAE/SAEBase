@@ -6,7 +6,7 @@ from typing import Any
 
 import torch
 
-from saebase.datasets.artifact_layout import canonicalize_behavior
+from saebase.datasets.artifacts import canonicalize_behavior
 
 
 def assert_manifest_matches(

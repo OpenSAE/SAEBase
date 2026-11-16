@@ -63,13 +63,7 @@ def audit_source(
     exported = acquire(
         dataset_id,
         source_file,
-        max_raw_rows=(
-            35000
-            if dataset_id == "squad"
-            else 20000
-            if dataset_id == "wikitext103"
-            else max_raw_rows
-        ),
+        max_raw_rows=(35000 if dataset_id == "squad" else max_raw_rows),
         source_revision=pinned_revision,
     )
     release = freeze_dataset(
@@ -199,7 +193,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--max-raw-rows", type=int, default=2500)
     parser.add_argument("--revisions", type=Path, help="Optional JSON dataset_id -> 40-hex SHA")
     parser.add_argument(
-        "--source-lock", type=Path, help="Use frozen source commits from source_lock_v1.json"
+        "--source-lock", type=Path, help="Use frozen source commits from source_lock.json"
     )
     args = parser.parse_args(argv)
     if args.revisions and args.source_lock:

@@ -27,7 +27,7 @@ class AuditConfig:
 
     def __post_init__(self):
         if self.schema != SCHEMA:
-            raise ValueError("incompatible M4 config schema")
+            raise ValueError("incompatible reliability audit config schema")
         if not self.evaluation_seeds or len(set(self.evaluation_seeds)) != len(
             self.evaluation_seeds
         ):
@@ -128,7 +128,9 @@ class Observation:
             "sample_id",
         ):
             if not isinstance(getattr(self, key), str) or not getattr(self, key).strip():
-                raise ValueError(f"missing {key}; M4 never assumes independent ungrouped prompts")
+                raise ValueError(
+                    f"missing {key}; reliability audit never assumes independent ungrouped prompts"
+                )
         if type(self.value) not in (float, int) or not math.isfinite(self.value):
             raise ValueError("observation value must be finite")
         if type(self.unit_count) is not int or self.unit_count < 1:

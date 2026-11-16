@@ -11,26 +11,9 @@ import hashlib
 import json
 import re
 from pathlib import Path
-from typing import Iterable
 
 from .core import canonical_json, dataset_catalog
 from .ingest import _atomic_bytes
-
-
-def group_wikitext(lines: Iterable[dict]):
-    article = None
-    seq = 0
-    for row in lines:
-        text = str(row.get("text", ""))
-        compact = text.strip()
-        if compact.startswith("= ") and compact.endswith(" =") and not compact.startswith("= ="):
-            article = hashlib.sha256(compact.encode("utf-8")).hexdigest()[:20]
-            seq = 0
-            continue
-        if article is None or len(compact) < 60:
-            continue
-        yield {"id": article + ":" + str(seq), "article_id": article, "text": compact}
-        seq += 1
 
 
 def acquire(
@@ -77,10 +60,7 @@ def acquire(
     if entry["config"]:
         options["name"] = entry["config"]
     stream = load_dataset(**options)
-    # WikiText is a LINE-LEVEL corpus. Shuffling raw lines first would detach
-    # passages from article headers and forge source-group identities.
-    if source != "wikitext103":
-        stream = stream.shuffle(seed=seed, buffer_size=2048)
+    stream = stream.shuffle(seed=seed, buffer_size=2048)
 
     def capped():
         for i, row in enumerate(stream):
@@ -90,7 +70,7 @@ def acquire(
                 raise ValueError("Expected source JSON object")
             yield row
 
-    rows = group_wikitext(capped()) if source == "wikitext103" else capped()
+    rows = capped()
     content = b"".join(canonical_json(row) for row in rows)
     if not content:
         raise ValueError("Empty export from pinned upstream data")
@@ -103,13 +83,9 @@ def acquire(
         "split": entry["split"],
         "resolved_revision": revision,
         "shuffle_seed": seed,
-        "shuffle_buffer_size": 0 if source == "wikitext103" else 2048,
+        "shuffle_buffer_size": 2048,
         "max_raw_rows": max_raw_rows,
-        "sampling_scope": (
-            "bounded original-order article extraction; deterministic group-ranked selection"
-            if source == "wikitext103"
-            else "bounded shuffled stream; not uniform across whole source"
-        ),
+        "sampling_scope": "bounded shuffled stream; not uniform across whole source",
         "source_export_sha256": hashlib.sha256(content).hexdigest(),
         "license_reviewed": False,
         "human_reviewed": False,

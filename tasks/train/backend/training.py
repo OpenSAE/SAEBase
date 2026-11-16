@@ -1,4 +1,4 @@
-"""P5 bounded native SAELens and Sparsify execution, checkpoint registration.
+"""Bounded native SAELens and Sparsify execution, checkpoint registration.
 
 Never substitutes a home-built trainer for SAELens/Sparsify. Local snapshot
 paths and permission must be supplied to keep dataset/model identity stable.
@@ -100,7 +100,9 @@ class TrainPlan:
             1 <= self.steps <= (200000 if allow_large else 200)
             and 1 <= self.max_examples <= (100_000_000 if allow_large else 10000)
         ):
-            raise PermissionError("Large C2/C3 training needs separate authorization")
+            raise PermissionError(
+                "Training exceeds the step/example budget; extended limits require allow_large=True"
+            )
         if self.backend == "sparsify" and self.max_examples > self.steps * self.batch_size:
             raise ValueError(
                 "Sparsify trains on dataset examples, not a step limit; max_examples "
@@ -109,7 +111,7 @@ class TrainPlan:
         if self.distributed_gpus < 1 or self.distributed_gpus > 16:
             raise ValueError("GPU world size outside supported bounds")
         if self.distributed_gpus > 1 and not allow_large:
-            raise PermissionError("Multi-GPU C3 training requires explicit approval")
+            raise PermissionError("Multi-GPU training requires allow_large=True")
         if self.device not in {"cuda", "cpu"}:
             raise ValueError("Only local device execution is supported")
         if self.resume_checkpoint is not None and not Path(self.resume_checkpoint).is_dir():

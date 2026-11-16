@@ -93,8 +93,10 @@ def build_compute_plan(
     ):
         raise ValueError("Inconsistent deep-analysis coverage")
     datasets = _dataset_releases(root)
-    if len(datasets) != 10 or sum(s["count"] for s in datasets) not in range(0, 501):
-        raise ValueError("Expected ten curated source datasets")
+    catalog = dataset_catalog()["sources"]
+    target_count = sum(row["target"] for row in catalog)
+    if len(datasets) != len(catalog) or not 0 <= sum(s["count"] for s in datasets) <= target_count:
+        raise ValueError("Curated source population does not match the active catalog")
     jobs: list[dict[str, Any]] = []
     for dataset in datasets:
         for task, targets in (
@@ -186,7 +188,7 @@ def build_compute_plan(
         },
         "statuses": statuses,
         "estimated_sar_coalition_measurements_if_all_frozen": (
-            len(sar) * 500 * coverage["coalition_per_prompt"]
+            len(sar) * target_count * coverage["coalition_per_prompt"]
         ),
         "estimate_note": "Logical coalition evaluations only; excludes controls, prompts, retries and token costs",
         "jobs": jobs,

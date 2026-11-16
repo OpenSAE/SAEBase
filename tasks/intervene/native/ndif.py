@@ -1,4 +1,4 @@
-"""P7 genuinely remote NNsight trace opt-in.
+"""Remote NNsight trace opt-in.
 
 Never turns a local simulation or self-hosted worker into an NDIF success.
 The user supplies an authorized NNsight model instance deployed on NDIF.

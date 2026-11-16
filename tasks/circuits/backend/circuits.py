@@ -1,4 +1,4 @@
-"""P6 native circuit-tracer CLI wrapper and typed graph data preservation.
+"""Native circuit-tracer CLI wrapper and typed graph data preservation.
 
 Native attribution must actually run upstream. Pruning, node annotations and
 a drawn graph cannot stand in for the gradient computation or intervention.
@@ -337,9 +337,10 @@ def run_native_circuit_tracer(
     max_feature_nodes: int | None = None,
     batch_size: int | None = None,
     lazy_encoder: bool = False,
+    validate_only: bool = False,
 ) -> dict:
     """Use original circuit-tracer CLI, without starting its web server."""
-    if not approved:
+    if not approved and not validate_only:
         raise PermissionError("GPU circuit attribution requires explicit authorization")
     if not isinstance(prompt, str) or not 1 <= len(prompt) <= 2000:
         raise ValueError("Short explicit prompt required")
@@ -354,7 +355,7 @@ def run_native_circuit_tracer(
             "Transcoder source must be an approved native shortcut, pinned repo, or local directory"
         )
     if not 30 <= timeout_seconds <= 7200:
-        raise ValueError("C1 GPU time budget required")
+        raise ValueError("GPU time budget must be between 30 and 7200 seconds")
     if offload is not None and offload not in {"cpu", "disk"}:
         raise ValueError("Official circuit-tracer offload is cpu or disk")
     if dtype is not None and dtype not in {
@@ -372,6 +373,8 @@ def run_native_circuit_tracer(
         raise ValueError("Feature-node cap must stay inside the official limit")
     if batch_size is not None and (type(batch_size) is not int or not 1 <= batch_size <= 256):
         raise ValueError("Backward batch size must stay inside the official default range")
+    if validate_only:
+        return {"status": "configured_only", "transcoder_set": transcoder_set}
     if output.exists():
         raise FileExistsError("Do not overwrite an existing original graph")
     if shutil.which("circuit-tracer") is None:

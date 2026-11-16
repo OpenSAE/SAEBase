@@ -14,11 +14,12 @@ from .features import (
     FeatureSnapshot,
     InterventionResult,
     capture_features,
+    encode_activations,
     coalition_replacements,
     edit_features,
     evaluate_edit,
 )
-from .component_analysis import BlockComponents, capture_block_components
+from .components import BlockComponents, capture_block_components
 from .nnsight_local import NNsightLocal, TraceLocation
 from .metadata import SAEIdentity
 from .model import ActivationSite, ModelAdapter, ModelCapabilities, UnsupportedCapability
@@ -36,7 +37,11 @@ class LoadedResearchPair:
 
 
 def load_registered(
-    *, sae_key: str, layer: int, device: str = "cpu", model_key: str | None = None,
+    *,
+    sae_key: str,
+    layer: int,
+    device: str = "auto",
+    model_key: str | None = None,
     require_patch: bool = True,
 ) -> LoadedResearchPair:
     """Load a bundled model/profile pair, with explicit site/provenance validation.
@@ -50,14 +55,16 @@ def load_registered(
         sae_key, layer, device=device, model_key_override=model_key
     )
     identity = SAEIdentity.from_loaded(
-        sae=sae, metadata=metadata, model_key=model_key,
+        sae=sae,
+        metadata=metadata,
+        model_key=model_key,
     )
     from saebase.api.sae_profiles import get_profile
+
     expected_hook = get_profile(sae_key).hook_name(layer)
     if identity.hook_name != expected_hook:
         raise ValueError(
-            f"Loaded SAE hook {identity.hook_name!r} differs from "
-            f"registered site {expected_hook!r}"
+            f"Loaded SAE hook {identity.hook_name!r} differs from registered site {expected_hook!r}"
         )
     adapter = ModelAdapter(model)
     adapter.capabilities.require("capture")
@@ -72,9 +79,23 @@ def load_registered(
 
 
 __all__ = [
-    "ActivationSite", "ModelAdapter", "ModelCapabilities", "UnsupportedCapability",
-    "SAEIdentity", "LoadedResearchPair", "load_registered",
-    "BlockComponents", "capture_block_components", "NNsightLocal", "TraceLocation",
-    "FeatureSnapshot", "FeaturePatch", "InterventionResult",
-    "capture_features", "edit_features", "coalition_replacements", "evaluate_edit",
+    "ActivationSite",
+    "ModelAdapter",
+    "ModelCapabilities",
+    "UnsupportedCapability",
+    "SAEIdentity",
+    "LoadedResearchPair",
+    "load_registered",
+    "BlockComponents",
+    "capture_block_components",
+    "NNsightLocal",
+    "TraceLocation",
+    "FeatureSnapshot",
+    "FeaturePatch",
+    "InterventionResult",
+    "capture_features",
+    "encode_activations",
+    "edit_features",
+    "coalition_replacements",
+    "evaluate_edit",
 ]

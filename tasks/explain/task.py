@@ -1,6 +1,7 @@
 """SAEBase automatic feature-explanation task, requiring a real generator."""
 
 from __future__ import annotations
+from saebase.results import EvaluationResult
 from tasks.sae_runtime import SAEOperationTask, execute_task
 
 
@@ -11,5 +12,8 @@ class ExplainTask(SAEOperationTask):
         self.generator = generator
         self.predictor = predictor
 
-    def run(self, cfg):
-        return execute_task(self.OPERATION, cfg, generator=self.generator, predictor=self.predictor)
+    def run_validated(self, cfg) -> EvaluationResult:
+        payload = execute_task(
+            self.OPERATION, cfg, generator=self.generator, predictor=self.predictor, validated=True
+        )
+        return EvaluationResult.from_payload(self.OPERATION, cfg, payload)

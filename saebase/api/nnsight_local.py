@@ -238,7 +238,7 @@ class NNsightLocal:
         """Gradient of the sum of a downstream Tensor, via native NNsight.
 
         Explicitly local and autograd-capable only. The objective is a simple
-        numerical smoke; research-specific objectives belong in P4/P6.
+        numerical smoke; research-specific objectives belong in the benchmark and circuits tasks.
         """
         with self.model.trace(inputs):
             activation = _target(self.model, location)

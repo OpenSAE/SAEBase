@@ -42,7 +42,7 @@ def register_extension(bundle: ExtensionBundle) -> None:
     if bundle.name in _BUNDLES:
         raise ValueError(f"extension already registered: {bundle.name}")
     from saebase.registry import list_registered_model_keys, list_registered_sae_keys
-    from saebase.benchmarks.registry import metric_specs, register_metric
+    from tasks.benchmark.metrics.registry import metric_specs, register_metric
 
     model_keys = [x.key for x in bundle.models]
     sae_keys = [x.key for x in bundle.saes]
@@ -120,6 +120,19 @@ def discover_extensions(names: Iterable[str]) -> tuple[str, ...]:
 
 def external_model(key: str) -> ExternalModel | None:
     return _MODELS.get(key)
+
+
+def ensure_extensions(names: Iterable[str]) -> tuple[str, ...]:
+    """Idempotent explicit task/worker discovery using the existing shared state."""
+    requested = tuple(names)
+    if any(not isinstance(name, str) or not name for name in requested):
+        raise ValueError("Extension names must be nonempty strings")
+    if len(set(requested)) != len(requested):
+        raise ValueError("Duplicate requested extension names")
+    pending = [name for name in requested if name not in _DISCOVERED]
+    if pending:
+        discover_extensions(pending)
+    return requested
 
 
 def external_sae(key: str) -> ExternalSAE | None:

@@ -124,7 +124,7 @@ def check_candidate(document: dict[str, Any]) -> dict[str, Any]:
 def to_saebase_design(document: dict[str, Any]) -> Any:
     """Convert to the existing original SAEBase type, without rewriting it."""
     checked = check_candidate(document)
-    from saebase.data import BinaryFactor, ControlledInputDesign
+    from saebase.datasets.controlled_inputs import BinaryFactor, ControlledInputDesign
 
     factors = tuple(
         BinaryFactor(factor["name"], tuple(factor["levels"])) for factor in checked["factors"]

@@ -49,20 +49,16 @@ def test_actual_repository_evidence_is_unchanged_and_joinable():
     )
 
 
-def test_data_registry_has_ten_unique_50_target_sources():
+def test_data_registry_has_nine_unique_50_target_sources_after_removal():
     cat = core.dataset_catalog()
-    assert len(cat["sources"]) == 10
-    assert len({x["id"] for x in cat["sources"]}) == 10
+    assert len(cat["sources"]) == 9
+    assert len({x["id"] for x in cat["sources"]}) == 9
+    assert "wikitext103" not in {x["id"] for x in cat["sources"]}
     assert all(x["target"] == 50 and x["license"] == "review_required" for x in cat["sources"])
 
 
 def test_supported_input_renderers_do_not_leak_gold_answers():
     fixtures = {
-        "wikitext103": {
-            "article_id": "article-1",
-            "id": "w1",
-            "text": "A fictional encyclopedia paragraph.",
-        },
         "tinystories": {"id": "ts1", "text": "Once upon a time the children went outside."},
         "squad": {
             "id": "s1",
@@ -403,8 +399,8 @@ def test_source_group_sampling_ignores_input_record_iteration_order():
     ]
     raw[71]["text"] = raw[12]["text"]
     raw[73]["text"] = raw[18]["text"]
-    one = select_records("wikitext103", raw)
-    two = select_records("wikitext103", list(reversed(raw)))
+    one = select_records("tinystories", raw)
+    two = select_records("tinystories", list(reversed(raw)))
     assert one == two
     assert len({x["prompt"] for x in one}) == 50
 
@@ -548,7 +544,7 @@ def test_cpu_rss_adapter_respects_held_out_variant_ids(tmp_path):
         )
 
 
-def test_cpu_plan_has_exact_632_jobs_without_claiming_execution(tmp_path):
+def test_cpu_plan_tracks_active_sources_without_claiming_execution(tmp_path):
     from backend.plan import build_compute_plan
 
     plan = build_compute_plan(root=tmp_path)
@@ -556,16 +552,16 @@ def test_cpu_plan_has_exact_632_jobs_without_claiming_execution(tmp_path):
     assert plan["site_count"] == 48
     assert plan["site_count_with_full_weight_hashes"] == 45
     assert plan["job_counts"] == {
-        "capture": 480,
-        "intervention": 60,
-        "sar": 30,
-        "rss": 60,
+        "capture": 432,
+        "intervention": 54,
+        "sar": 27,
+        "rss": 54,
         "localization": 2,
     }
-    assert len(plan["jobs"]) == 632
-    assert plan["statuses"] == {"blocked": 632}
-    assert plan["estimated_sar_coalition_measurements_if_all_frozen"] == 576000
-    assert len({job["job_id"] for job in plan["jobs"]}) == 632
+    assert len(plan["jobs"]) == 569
+    assert plan["statuses"] == {"blocked": 569}
+    assert plan["estimated_sar_coalition_measurements_if_all_frozen"] == 518400
+    assert len({job["job_id"] for job in plan["jobs"]}) == 569
     assert all(job["execution"] == "not_run" for job in plan["jobs"])
     assert all("prompt" not in job["spec"] for job in plan["jobs"])
 
@@ -584,7 +580,7 @@ def test_cpu_plan_unblocks_only_pinned_reviewed_data_and_complete_sites(tmp_path
     )
     plan = build_compute_plan(root=tmp_path)
     assert plan["statuses"]["ready_for_external_gpu_operator"] == 45
-    assert plan["statuses"]["blocked"] == 587
+    assert plan["statuses"]["blocked"] == 524
     assert (
         len(
             [
@@ -707,7 +703,7 @@ def test_rss_variant_builder_supports_all_ten_sources_as_unreviewed_proposals():
         if source == "humaneval":
             assert variants["transform_family"] == "python_comment_and_whitespace"
             assert all(v["text"].lstrip().startswith(("#", "def")) for v in variants["variants"])
-        if source in ("wikitext103", "tinystories"):
+        if source == "tinystories":
             assert variants["transform_family"] == "prose_continuation"
     with pytest.raises(ValueError, match="exactly|once|Anchor"):
         build_variants(
@@ -893,54 +889,11 @@ def test_synthetic_control_is_not_presented_as_real_sae_data():
         synthetic_reference_codes(make_candidate("real_model_six_factor_design"))
 
 
-def test_wikitext_raw_lines_preserve_original_article_membership(monkeypatch, tmp_path):
-    """Raw-line shuffling before grouping would attach passages to wrong articles."""
-    import types
+def test_removed_source_cannot_be_acquired(tmp_path):
     from backend.acquire import acquire
 
-    lines = [
-        {"text": "= Alpha ="},
-        {"text": "A" * 95},
-        {"text": "= Beta ="},
-        {"text": "B" * 95},
-        {"text": "= Gamma ="},
-        {"text": "C" * 95},
-    ]
-
-    class Stream:
-        def __iter__(self):
-            return iter(lines)
-
-        def shuffle(self, **kwargs):
-            raise AssertionError("Line-level WikiText must not be shuffled")
-
-    class FakeApi:
-        def dataset_info(self, *, repo_id, revision=None):
-            assert repo_id == "Salesforce/wikitext"
-            if revision is not None:
-                assert revision == "f" * 40
-            return types.SimpleNamespace(sha="f" * 40)
-
-    def load_dataset(**kwargs):
-        assert kwargs["revision"] == "f" * 40
-        assert kwargs["name"] == "wikitext-103-raw-v1"
-        return Stream()
-
-    monkeypatch.setitem(sys.modules, "datasets", types.SimpleNamespace(load_dataset=load_dataset))
-    monkeypatch.setitem(sys.modules, "huggingface_hub", types.SimpleNamespace(HfApi=FakeApi))
-    target = tmp_path / "wikitext.jsonl"
-    result = acquire(
-        "wikitext103",
-        target,
-        max_raw_rows=100,
-        source_revision="f" * 40,
-    )
-    entries = [json.loads(line) for line in target.read_text(encoding="utf-8").splitlines()]
-    assert len(entries) == 3
-    assert entries[0]["article_id"] != entries[1]["article_id"]
-    assert entries[1]["article_id"] != entries[2]["article_id"]
-    assert result["shuffle_buffer_size"] == 0
-    assert result["resolved_revision"] == "f" * 40
+    with pytest.raises(ValueError, match="Unknown public dataset"):
+        acquire("wikitext103", tmp_path / "removed.jsonl", max_raw_rows=100)
 
 
 def test_redacted_cpu_audit_never_releases_unreviewed_prompt_text(tmp_path, monkeypatch):
@@ -1008,7 +961,10 @@ def test_redacted_corpus_lock_verification_rejects_changed_content():
     import hashlib
     from backend.corpus_lock import verify_corpus_lock
 
-    dataset_ids = [row["id"] for row in core.dataset_catalog()["sources"]]
+    from backend.corpus_lock import LOCK_PATH
+
+    # The historical lock retains its original ten sources after component removal.
+    dataset_ids = [row["dataset_id"] for row in json.loads(LOCK_PATH.read_text())["sources"]]
     rows = []
     frozen = []
     for dataset_id in dataset_ids:

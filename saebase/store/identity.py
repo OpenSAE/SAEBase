@@ -70,7 +70,7 @@ def _state_signature(items: list[tuple[str, torch.Tensor]]) -> tuple:
 def _hash_items(items: list[tuple[str, torch.Tensor]]) -> str:
     digest = hashlib.sha256()
     for name, value in items:
-        tensor = value.detach().contiguous().cpu()
+        tensor = value.detach().cpu().contiguous()
         digest.update(
             json.dumps(
                 [name, str(tensor.dtype), list(tensor.shape)], separators=(",", ":")
@@ -81,7 +81,7 @@ def _hash_items(items: list[tuple[str, torch.Tensor]]) -> str:
 
 
 def sha256_state_dict(module: Any) -> str:
-    """Hash the complete sorted loaded state, identical to M0's reference format.
+    """Hash the complete sorted loaded state using the checkpoint reference format.
 
     Every call reads the current tensor bytes. Nothing is cached. A matching
     storage address or ``_version`` is not a content checksum.

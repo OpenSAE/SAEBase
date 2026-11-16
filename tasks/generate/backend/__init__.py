@@ -2,8 +2,7 @@
 
 Unique entry: ``generate()``. vLLM 装在当前解释器里，直接调用。
 改层走 ``python -m tasks.generate.backend.nnsight_worker``。
-HuggingFace packed decode stays in
-``tasks.03_logic_chain_validation.hf_runtime``，不会被静默选中。
+Feature edits use the task-owned intervention implementation.
 """
 
 from tasks.generate.backend.api import (

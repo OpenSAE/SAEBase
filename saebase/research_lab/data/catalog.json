@@ -4,17 +4,6 @@
   "default_seed": 20261018,
   "sources": [
     {
-      "id": "wikitext103",
-      "label": "WikiText-103",
-      "repo": "Salesforce/wikitext",
-      "config": "wikitext-103-raw-v1",
-      "split": "train",
-      "kind": "continuation",
-      "group": "article",
-      "target": 50,
-      "license": "review_required"
-    },
-    {
       "id": "tinystories",
       "label": "TinyStories",
       "repo": "roneneldan/TinyStories",

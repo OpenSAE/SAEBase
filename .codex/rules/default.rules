@@ -1,0 +1,5 @@
+# Additional escalation restrictions, not project instructions or a shell sandbox.
+prefix_rule(pattern = ["sudo"], decision = "forbidden", justification = "Host administration requires a separate human session")
+prefix_rule(pattern = ["git", "push"], decision = "prompt", justification = "Publishing needs explicit approval")
+prefix_rule(pattern = ["git", "reset", "--hard"], decision = "forbidden", justification = "Do not discard user changes")
+prefix_rule(pattern = ["git", "clean"], decision = "forbidden", justification = "Do not discard untracked user files")

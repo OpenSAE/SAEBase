@@ -1,12 +1,20 @@
 """Pair-aligned ranking stability; never rank contextual SAR/RSS and unrelated metrics."""
 
 from __future__ import annotations
+
 import itertools
+
 import numpy as np
 
-from tasks.benchmark.backend.registry import get_metric
-from .resampling import group_samples, group_sums, estimate_with_draws, draw_group_indices
-from .schema import Observation, AuditConfig
+from tasks.benchmark.metrics.registry import get_metric
+from tasks.benchmark.reliability.bootstrap import (
+    draw_group_indices,
+    estimate_with_draws,
+    group_samples,
+    group_sums,
+)
+
+from .schema import AuditConfig, Observation
 
 
 def rank_stability(by_sae: dict[str, list[Observation]], cfg: AuditConfig) -> dict:

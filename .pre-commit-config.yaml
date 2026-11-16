@@ -1,24 +1,21 @@
-# One-time local setup: python -m pip install "ruff==0.15.22" "pre-commit>=4,<5"
-# Then: pre-commit install; stage new Python files before committing.
-# Existing modules are admitted to lint and type checking incrementally.
+# 目的和主要功能：在提交时检查实际变更的 Python 文件。
+# 适用范围：安装 pre-commit 后按文件范围执行格式与类型检查。
 repos:
   - repo: local
     hooks:
       - id: ruff-adopted
         name: Ruff on adopted core modules
-        entry: ruff check saebase/seed.py saebase/data/artifact_layout.py saebase/data/prompt_schema.py saebase/benchmarks/registry.py
+        entry: ruff check
         language: system
-        pass_filenames: false
-        always_run: true
+        files: ^(saebase/seed\.py|datasets/artifacts\.py|tasks/benchmark/backend/registry\.py)$
       - id: mypy-adopted
         name: Mypy on adopted core modules
-        entry: mypy --config-file pyproject.toml saebase/seed.py saebase/data/artifact_layout.py saebase/data/prompt_schema.py saebase/benchmarks/registry.py
+        entry: mypy --config-file pyproject.toml
         language: system
-        pass_filenames: false
-        always_run: true
+        files: ^(saebase/seed\.py|datasets/artifacts\.py|tasks/benchmark/backend/registry\.py)$
       - id: ruff-new
         name: Autoformat staged new Python with pinned Ruff, then check lint
-        entry: python saebase/tools/check_new_python_quality.py --fix
+        entry: python scripts/quality.py --fix
         language: system
         pass_filenames: false
         always_run: true
