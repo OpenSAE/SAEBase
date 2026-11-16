@@ -146,5 +146,3 @@ SAEBase 为重复模型评测和特征干预提供可选加速功能。具体实
   <em>Building open foundations for understanding and evaluating LLMs.</em><br>
   <a href="https://github.com/OpenSAE">OpenSAE</a> · <a href="https://github.com/OpenSAE/SAEBase/issues">Issues</a>
 </p>
-
-[当前架构与接口迁移](doc/code/development/current-architecture.md) · [接口迁移](doc/code/development/interface-migration.md)

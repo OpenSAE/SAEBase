@@ -146,5 +146,3 @@ Explore the code: [SAEBase API](saebase/) · [Models](models/) · [Datasets](dat
   <em>Building open foundations for understanding and evaluating LLMs.</em><br>
   <a href="https://github.com/OpenSAE">OpenSAE</a> · <a href="https://github.com/OpenSAE/SAEBase/issues">Issues</a>
 </p>
-
-[Current architecture and interface migration](doc/code/development/current-architecture.md) · [接口迁移](doc/code/development/interface-migration.md)
