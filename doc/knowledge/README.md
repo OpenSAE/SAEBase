@@ -4,6 +4,6 @@ Knowledge Tree 只组织语言模型稀疏特征研究。当前包括模型与 S
 
 研究问题由稳定 ID、独立状态和真实源码证据维护。Code Tree 基于 Python AST；Context Tree 使用 [glossary.json](glossary.json) 统一术语。实现存在只说明接口具备可核查的源码依据，实验有效性需独立证明。
 
-[SAE 方法说明](foundations/sae_methods.md) · [Knowledge Tree](https://atheavenma.github.io/opensae/saebase/atlas/knowledge.html)
+[SAE 方法说明](foundations/sae_methods.md)
 
 [主要探究的配置](primary_research_configuration.md)：约定使用的十个模型及 SAE、十二个数据集，以及当前 SAR 的筛选、采样和汇报方式。

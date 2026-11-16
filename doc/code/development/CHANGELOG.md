@@ -7,7 +7,6 @@
 - Publish the current local SAEBase implementation as the complete repository contents.
 - Organize datasets, model and SAE adapters, peer research tasks, configuration, runtime, and storage around their component responsibilities.
 - Include capture selection, whitening, SAR and exhaustive interaction workflows, together with experiment recording, diagnostics and reusable-run lookup.
-- Keep research execution independent of the separately installed ResearchHarness management services.
 - Distribute the selected source checkout; local data, experiment output, caches, machine bindings and external skill links are excluded.
 
 

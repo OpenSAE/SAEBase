@@ -4,27 +4,14 @@
 
 **软件版本：** [v0.7.0 — Component Workflows and Reusable Experiments](doc/code/development/releases/v0.7.0.md) · [Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Python API](doc/code/development/python-api.md)
 
-**SAEBase** 帮助研究者理解和评估语言模型中的稀疏自编码器（SAE），探索特征、测量特征干预对模型行为的影响，并组织可复现的实验。Research Harness 进一步支持编程 Agent 在明确范围内执行任务，让结果可追溯、可独立验证。
+**SAEBase** 帮助研究者理解和评估语言模型中的稀疏自编码器（SAE），探索特征、测量特征干预对模型行为的影响，并组织可复现的实验。
 
 <p align="center">
-  <a href="https://opensae.github.io/SAEBase/atlas/index.html"><b>🧭 Atlas</b></a> &nbsp; | &nbsp;
   <a href="https://huggingface.co/spaces/OpenSAE/SAEBase"><b>🤗 Research Lab</b></a> &nbsp; | &nbsp;
   <a href="https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation"><b>🤗 Evaluation Dataset</b></a>
 </p>
 
 ---
-
-## 🧭 Research Harness
-
-**让 AI Agent 参与 SAE 科研工程，同时让研究者掌握目标、决策和验证过程。** SAEBase Harness 为 Agent 提供明确的任务范围，让代码修改连接到真实科研接口，并支持独立检查实际执行结果。
-
-| Atlas 视图 | 内容 |
-| --- | --- |
-| [**Core**](https://opensae.github.io/SAEBase/atlas/core.html) | 项目架构和科研工作流管理。 |
-| [**Knowledge**](https://opensae.github.io/SAEBase/atlas/knowledge.html) | 科研问题及其关联。 |
-| [**Code**](https://opensae.github.io/SAEBase/atlas/code.html) | 真实源码与代码结构。 |
-| [**Environment**](https://opensae.github.io/SAEBase/atlas/environment.html) | 计算资源与运行环境。 |
-| [**Context**](https://opensae.github.io/SAEBase/atlas/context.html) | 术语与项目概念。 |
 
 ## 🧭 概览
 
@@ -112,7 +99,7 @@ print(float(effect.logit_delta.float().norm()))
 
 ### 3. 与编程 Agent 协作
 
-在编程 Agent 环境中打开源码仓库，从 [AGENTS.md](AGENTS.md)了解组件职责和当前[开发模式](doc/code/development/development-modes.md)：密集开发直接落实用户目标并执行相关检查，常规模式使用显式绑定的中央工具。项目管理和 Atlas 任务通过 [Harness 指南](.agents/skills/researchharness/SKILL.md)选择 ResearchHarness 能力。SAEBase 科研核心独立安装运行。
+在编程 Agent 环境中打开源码仓库，从 [AGENTS.md](AGENTS.md) 了解组件职责与开发方法。SAEBase 科研核心独立安装运行。
 
 ## 🔬 研究工作流
 
@@ -149,7 +136,7 @@ SAEBase 为重复模型评测和特征干预提供可选加速功能。具体实
 
 [入门指南](doc/code/development/getting-started.md) · [Python API](doc/code/development/python-api.md) · [示例](doc/code/development/first-experiment.md) · [Research Lab](saebase/research_lab/README.md) · [文档目录](doc/code/development/index.md)
 
-查看源码：[SAEBase API](saebase/) · [Models](models/) · [Datasets](datasets/) · [Tasks](tasks/) · [Harness](.agents/skills/researchharness/SKILL.md) · [配置](conf/) · [仓库目录指南](doc/code/development/repository-guide.md)。
+查看源码：[SAEBase API](saebase/) · [Models](models/) · [Datasets](datasets/) · [Tasks](tasks/) · [配置](conf/) · [仓库目录指南](doc/code/development/repository-guide.md)。
 
 [参与贡献](.github/CONTRIBUTING.md) · [更新记录](doc/code/development/CHANGELOG.md) · [引用信息](CITATION.cff) · [Apache-2.0 许可证](LICENSE) · [安全说明](.github/SECURITY.md)
 

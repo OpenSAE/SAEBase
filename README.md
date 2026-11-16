@@ -4,27 +4,14 @@
 
 **Software version:** [v0.7.0 — Component Workflows and Reusable Experiments](doc/code/development/releases/v0.7.0.md) · [Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Python API](doc/code/development/python-api.md)
 
-**SAEBase** helps researchers study sparse autoencoders (SAEs) in language models. Explore features, test how feature edits affect model behavior, and build reproducible experiments. Its Research Harness also helps coding agents carry out scoped work with traceable evidence and independent review.
+**SAEBase** helps researchers study sparse autoencoders (SAEs) in language models. Explore features, test how feature edits affect model behavior, and build reproducible experiments.
 
 <p align="center">
-  <a href="https://opensae.github.io/SAEBase/atlas/index.html"><b>🧭 Atlas</b></a> &nbsp; | &nbsp;
   <a href="https://huggingface.co/spaces/OpenSAE/SAEBase"><b>🤗 Research Lab</b></a> &nbsp; | &nbsp;
   <a href="https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation"><b>🤗 Evaluation Dataset</b></a>
 </p>
 
 ---
-
-## 🧭 Research Harness
-
-**Build SAE experiments with AI agents while keeping decisions and evidence under your control.** The SAEBase Harness gives coding agents a clear task scope, connects their work to real research code, and supports independent checks of what actually ran.
-
-| Atlas view | What you can explore |
-| --- | --- |
-| [**Core**](https://opensae.github.io/SAEBase/atlas/core.html) | Project architecture and research workflow management. |
-| [**Knowledge**](https://opensae.github.io/SAEBase/atlas/knowledge.html) | Research questions and their relationships. |
-| [**Code**](https://opensae.github.io/SAEBase/atlas/code.html) | Source implementations and code structure. |
-| [**Environment**](https://opensae.github.io/SAEBase/atlas/environment.html) | Computing resources and execution environments. |
-| [**Context**](https://opensae.github.io/SAEBase/atlas/context.html) | Terminology and project concepts. |
 
 ## 🧭 Overview
 
@@ -112,7 +99,7 @@ This removes two selected feature contributions and reports the change in next-t
 
 ### 3. Work with a coding agent
 
-Open the source checkout in your coding-agent environment and start with [AGENTS.md](AGENTS.md). It describes component responsibilities and the selected [development mode](doc/code/development/development-modes.md): intensive development directly implements the user's goal and runs relevant checks; regular mode uses the explicitly bound central tools. Choose ResearchHarness for project management and Atlas tasks through the [Harness guide](.agents/skills/researchharness/SKILL.md). SAEBase's core Python software runs independently.
+Open the source checkout in your coding-agent environment and start with [AGENTS.md](AGENTS.md) for component responsibilities and development guidance. SAEBase's core Python software runs independently.
 
 ## 🔬 Research Workflows
 
@@ -149,7 +136,7 @@ SAEBase includes optional optimizations for repeated model evaluations and featu
 
 [Getting Started](doc/code/development/getting-started.md) · [Python API](doc/code/development/python-api.md) · [Examples](doc/code/development/first-experiment.md) · [Research Lab](saebase/research_lab/README.md) · [Full documentation](doc/code/development/index.md)
 
-Explore the code: [SAEBase API](saebase/) · [Models](models/) · [Datasets](datasets/) · [Tasks](tasks/) · [Harness](.agents/skills/researchharness/SKILL.md) · [Configuration](conf/) · [Repository Guide](doc/code/development/repository-guide.md).
+Explore the code: [SAEBase API](saebase/) · [Models](models/) · [Datasets](datasets/) · [Tasks](tasks/) · [Configuration](conf/) · [Repository Guide](doc/code/development/repository-guide.md).
 
 [Contributing](.github/CONTRIBUTING.md) · [Changelog](doc/code/development/CHANGELOG.md) · [Citation](CITATION.cff) · [Apache-2.0 License](LICENSE) · [Security](.github/SECURITY.md)
 
