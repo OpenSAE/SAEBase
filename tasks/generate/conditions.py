@@ -61,6 +61,8 @@ def compare_prompt_conditions(
     seed: int = 0,
     temperature: float = 0.0,
     stop_at_context_limit: bool = False,
+    measured_runs=None,
+    original_snapshot=None,
 ) -> dict:
     sample, texts = _sample(pair.model, prompt, sample_id)
     if feature_id is None:
@@ -70,7 +72,9 @@ def compare_prompt_conditions(
     else:
         from saebase.api import capture_features
 
-        snapshot = capture_features(pair.model, pair.sae, site=pair.site, prompt=prompt)
+        snapshot = original_snapshot or capture_features(
+            pair.model, pair.sae, site=pair.site, prompt=prompt
+        )
         position, activation = -1, float(snapshot.codes[feature_id].float().item())
     site = ActivationSite(pair.identity.layer, pair.identity.hook_name, position)
     spec = GenerationSpec(
@@ -103,9 +107,13 @@ def compare_prompt_conditions(
     )
     decode = pair.model.model.tokenizer.decode
     runs = []
-    for condition in conditions:
-        result = compare_steered_generation(
-            pair.model, pair.sae, site=site, sample=sample, condition=condition, spec=spec
+    for index, condition in enumerate(conditions):
+        result = (
+            measured_runs[index]
+            if measured_runs is not None
+            else compare_steered_generation(
+                pair.model, pair.sae, site=site, sample=sample, condition=condition, spec=spec
+            )
         )
         runs.append(
             {

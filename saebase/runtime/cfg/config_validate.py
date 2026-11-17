@@ -39,6 +39,11 @@ def validate_hydra_cfg(cfg: DictConfig) -> TaskModule:
         raise ValueError("cfg.dataset must contain a component name")
     if type(cfg.seed) is not int or cfg.seed < 0:
         raise ValueError("seed must be a nonnegative integer")
+    if cfg.get("runtime", {}).get("numerics", "native") not in {"native", "vllm"}:
+        raise ValueError("runtime.numerics must be native or vllm")
+    threads = cfg.get("runtime", {}).get("cpu_threads")
+    if threads is not None and (type(threads) is not int or threads < 1):
+        raise ValueError("runtime.cpu_threads must be a positive integer")
     if "sample_count" in cfg.dataset:
         from saebase.datasets.selection import validate_selection
 

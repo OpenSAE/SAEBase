@@ -79,3 +79,21 @@ Generate 默认 `task.stop_at_context_limit=true`：保持模型原有 prompt to
 SAR四格搜索默认口径已修正：`--gain` 默认不设置额外概率增幅门槛。基线概率与接近程度仍由 `--minimum`、`--spread` 控制；入选需11高于最高基线、实测I为正，并按实测logprob交互I降序排列。每题展示I最大的合格候选，两行概率分别为平均token概率与答案联合概率，最后一列分别计算各自的11减最高基线。历史显式 `--gain 0.05` 搜索结果保留原阈值含义。
 
 CaptureMatrix 支持 `matrix.dataset_overrides`，用于独立设置本批的实际观测题数等 Dataset 参数；`task.sar.cohort_filter.reference_sample_count` 继续独立控制筛选参考题数量。
+
+## 任务性能预检与工程执行
+
+Precheck 新增 `task.mode=performance`，支持 Capture、Intervene、Generate 的真实小规模吞吐搜索与数值控制；标准任务通过 `task.performance.enabled=true` 自动启用。候选 batch 搜索含预热/重复测量、OOM记录与退让、显存余量、精度拒绝及最优实测候选选择；收益按原配置的标量基准比较，既有观察复用设置保持一致。配置与报告说明见 `tasks/precheck/README.md`。
+
+Capture 使用已验证的 TL/HF 前缀缓存、状态去重、原生解码基准复用、向量化 I 排名；Intervene/Generate 使用公共观测、条件批处理及重复前缀的经检查尾层重放。生成仍按各轨迹完整前缀执行；精度、权重、特征选择和答案指标保持原定义。性能 JSON/Markdown 分离首次调优与真实样本耗时，提供耗时分布、候选速度/显存/误差及回本工作量。
+
+Capture/Intervene/Generate与Precheck共用模型执行层的批次一致性策略；vllm策略下评分、浮点指标和离散输出严格一致，不通过则报告预检失败，不将标量回退当成修复。默认batch候选扩至64，Capture控制状态最多64。标准答案评分、特征筛选与I的数学定义保持，数值策略写入运行来源。
+
+工程默认值统一：普通Runtime与矩阵worker均在加载前应用`runtime.cpu_threads=4`，限制Torch和BLAS计算线程；Intervene/Generate默认开启已验证的观测复用。子进程线程环境由Runtime集中设置，结果和性能报告记录实际线程池及环境。精度、稳定Attention、显存余量、现有顺序调度和Triton计算路径沿用已验证设置。配置、职责及来源见[工程默认值](../doc/code/development/batch-invariant-execution.md#工程默认值)。
+
+Capture答案评分为HF和TL统一前层缓存复用；原生评分仍作每题对照。答案batch缓存按完整序列长度的2次幂桶和控制状态数分组，同一已加载pair在预检及各Capture模式间共享；OOM降档会更新后续选择。显存候选先释放未使用缓存再测峰值。题目、筛选、指标及零误差验收条件保持；Qwen v5数值结果按模型身份单独迁移。
+
+## RSS 对照捕获（2026-11-16）
+
+`capture mode=rss` 接受显式 clean prompt、`task.rss.contexts` 与可信本地原版 `task.rss.source`。设置 `filter=all`，在同一个末尾目标 token 提取完整 codes，直接运行原始 RSS selector。RSS 输入仅为激活差值；解释在选集与数值候选确定后查询。context 候选遍历全部未选中特征，要求 recurrence < rho、本变体正变化 > tau、变化至少为其他变体最大绝对变化五倍，按本变体变化降序保存全部候选。候选与解释的语义匹配是后续展示判断，不属于 RSS 算法。
+
+输出 `rss_case.json`、`rss_activations.npz`、`rss_case.md`，共同任务入口另保存 `metadata/capture_result.json`。`scripts/RSS/run_contrast.py` 复用 CaptureTask 运行五个鲜明上下文，首先处理香蕉面包，随后保存其余 23 个 demo 候选。

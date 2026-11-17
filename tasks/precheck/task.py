@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 
 from saebase.registry import TaskModule
 from saebase.results import EvaluationResult
@@ -20,6 +20,31 @@ class PrecheckTask(TaskModule):
             validate_selection(cfg.dataset)
         load_requested_extensions(cfg)
         mode = str(cfg.task.get("mode", "sae"))
+        if mode == "performance":
+            from saebase.runtime.performance import settings
+
+            settings(cfg)
+            if any(
+                name not in {"capture", "intervene", "generate"}
+                for name in cfg.task.get("check_tasks", [])
+            ):
+                raise ValueError("Performance Precheck supports capture, intervene and generate")
+            targets = list(cfg.task.get("check_tasks", []))
+            if len(set(targets)) != len(targets):
+                raise ValueError("Performance check_tasks must be unique")
+            selection = cfg.task.get("sae_list", "default")
+            if selection == "all" or (OmegaConf.is_list(selection) and len(selection) != 1):
+                raise ValueError(
+                    "Performance Precheck selects one SAE/site; run different resources separately"
+                )
+            modes = list(cfg.task.get("capture_modes", ["whiten", "non_whiten", "g_s", "I"]))
+            if (
+                not modes
+                or len(set(modes)) != len(modes)
+                or set(modes) - {"whiten", "non_whiten", "g_s", "I", "sar"}
+            ):
+                raise ValueError("capture_modes must contain distinct registered Capture modes")
+            return
         if cfg.task.get("resource_only", False) and mode != "sae":
             raise ValueError("resource_only prepares SAE resources; use precheck mode=sae")
         tasks = _selected_tasks(cfg, mode)
@@ -74,6 +99,10 @@ class PrecheckTask(TaskModule):
         return self.run_validated(cfg)
 
     def run_validated(self, cfg: DictConfig) -> EvaluationResult:
+        if cfg.task.get("mode") == "performance":
+            from tasks.precheck.performance import run_performance_precheck
+
+            return run_performance_precheck(cfg)
         from tasks.precheck.operation import run_precheck
 
         return run_precheck(cfg)

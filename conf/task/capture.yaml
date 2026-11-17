@@ -12,7 +12,7 @@ task:
   output_scope: last_token  # Or all_tokens: complete native sparse codes at each token.
   max_tokens: 128
   max_active_per_token: 256
-  mode: whiten  # non_whiten | whiten | g_s | sar (regression) | I (exhaustive)
+  mode: whiten  # non_whiten | whiten | g_s | sar (regression) | I (exhaustive) | rss
   whiten_chunk_size: 256  # Native SAE tokenwise encoding batch; statistics use FP64.
   filter: 10  # 'all': all SAE features, no filtering; integer: SAR rules then this many candidates.
   capture_count: null  # Output features/pairs; null follows filter, including 'all'.
@@ -41,6 +41,15 @@ task:
     target_token_id: null  # For an explicit task.prompt; dataset labels otherwise.
     reference_token_id: null
     require_affine_decode: true
+  rss:
+    source: null  # Trusted local upstream rss.py; for this case study: scripts/RSS/rss.py.
+    contexts: []  # Each full variant is context + space + task.prompt.
+    M: 400
+    K: 20
+    rho: 0.8
+    kappa: 0.8
+    tau: 0.00001
+    dominance_ratio: 5.0  # Display candidates only; never an input to RSS.
   neuronpedia:
     enabled: true
     allow_network: true
@@ -49,3 +58,17 @@ task:
     total_timeout_seconds: 120
     max_download_bytes: 67108864
     max_uncompressed_bytes: 268435456
+
+  performance:
+    enabled: true
+    batch_size: auto
+    batch_sizes: [1, 2, 4, 8, 16, 32, 64]
+    warmup: 1
+    repeats: 3
+    probe_samples: 3
+    probe_states: 64
+    max_seconds: 120
+    atol: 1.0e-6  # runtime.numerics=vllm enforces zero tolerance.
+    logit_atol: 1.0e-4
+    rtol: 0.0
+    memory_fraction: 0.9

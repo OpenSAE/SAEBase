@@ -66,7 +66,9 @@ def execute_run(cfg: DictConfig, folder: Path):
     from saebase.seed import apply_seed
     from saebase.runtime.experiment_paths import prepare_run, run_session
     from saebase.runtime.experiment_results import record_run
+    from models.numerics import bind_configuration
 
+    bind_configuration(cfg)
     task = validate_hydra_cfg(cfg)
     from models.loading_policy import resolve_config_devices
 

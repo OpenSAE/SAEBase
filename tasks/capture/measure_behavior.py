@@ -6,7 +6,7 @@ from pathlib import Path
 
 import numpy as np
 
-from saebase.api import edit_features
+from saebase.api import edit_features, UnsupportedCapability
 from tasks.capture.answer import prepare_answer_readout
 from tasks.capture.behavior import choose_pair, rank_singles
 from tasks.capture.selection import output_count, settings
@@ -16,6 +16,9 @@ def measure_behavior(cfg, pair, snapshot, prompt, *, sample, feature_ids, contex
     from tasks.capture.sar_mode import behavior
 
     mode = cfg.task.mode
+    from saebase.runtime.performance import settings as performance_settings, stage
+
+    performance = performance_settings(cfg)
     ids = list(feature_ids)
     if mode == "I":
         maximum = cfg.task.get("sar", {}).get("max_exhaustive_features", 16)
@@ -44,14 +47,30 @@ def measure_behavior(cfg, pair, snapshot, prompt, *, sample, feature_ids, contex
     else:
         states = np.arange(1 << len(ids), dtype=np.int64)
         masks = ((states[:, None] >> np.arange(len(ids))) & 1).astype(bool)
-    responses = np.empty(len(masks), dtype=np.float64)
-    for index, mask in enumerate(masks):
-        remove = {int(fid): 0.0 for fid, retained in zip(ids, mask) if not retained}
-        responses[index] = (
-            float(score(edit_features(pair.sae, snapshot, replacements=remove).activation))
-            if remove
-            else full
-        )
+    optimization = None
+    if performance["enabled"]:
+        from tasks.capture.performance import evaluate_edits, prepare_activations
+
+        with stage("feature_edits"):
+            activations, inverse, edit_info = prepare_activations(pair.sae, snapshot, ids, masks)
+        try:
+            values, optimization = evaluate_edits(
+                pair, snapshot, activations, answer_ids, readout_activation, score, performance
+            )
+        except UnsupportedCapability as exc:
+            values = np.asarray([float(score(value)) for value in activations])
+            optimization = {"selected": False, "execution": "original_scalar", "reason": str(exc)}
+        responses = values[inverse]
+        optimization.update(edit_info)
+    else:
+        responses = np.empty(len(masks), dtype=np.float64)
+        for index, mask in enumerate(masks):
+            remove = {int(fid): 0.0 for fid, retained in zip(ids, mask) if not retained}
+            responses[index] = (
+                float(score(edit_features(pair.sae, snapshot, replacements=remove).activation))
+                if remove
+                else full
+            )
     if not np.isfinite(responses).all() or np.any(responses > 0):
         raise ValueError(
             "Canonical answer scores must be finite, nonpositive mean log probabilities"
@@ -70,6 +89,9 @@ def measure_behavior(cfg, pair, snapshot, prompt, *, sample, feature_ids, contex
         else {"enabled": False},
         "activation_dtype": str(snapshot.activation.dtype),
     }
+    from models.numerics import identity as numerical_identity
+
+    identity["numerics"] = numerical_identity()
     key = hashlib.sha256(
         json.dumps({"prompt": prompt, "identity": identity}, sort_keys=True).encode()
     ).hexdigest()
@@ -96,6 +118,7 @@ def measure_behavior(cfg, pair, snapshot, prompt, *, sample, feature_ids, contex
         "feature_ids": ids,
         "full_response": full,
         "measured_states": len(masks),
+        **({"performance": optimization} if optimization is not None else {}),
         "artifact": {
             "path": str(path.relative_to(Path.cwd())),
             "bytes": path.stat().st_size,
@@ -110,7 +133,8 @@ def measure_behavior(cfg, pair, snapshot, prompt, *, sample, feature_ids, contex
             candidates=ranking,
         )
     else:
-        ranked = choose_pair(ids, responses, len(answer_ids), return_ranking=True)
+        with stage("interaction_ranking"):
+            ranked = choose_pair(ids, responses, len(answer_ids), return_ranking=True)
         pairs = [
             {**row, "feature_ids": row["pair_ids"], "coefficient": row["interaction"]}
             for row in ranked

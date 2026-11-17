@@ -15,6 +15,46 @@ def probabilities(g, token_count):
 
 
 def choose_pair(ids, scores, token_count, *, return_ranking=False):
+    if return_ranking:
+        import numpy as np
+
+        values = np.asarray(scores, dtype=np.float64)
+        backgrounds = np.arange(len(values))
+        ranking = []
+        for i, j in combinations(range(len(ids)), 2):
+            bits = (1 << i) | (1 << j)
+            valid = backgrounds[(backgrounds & bits) == 0]
+            interactions = (
+                values[valid | bits]
+                - values[valid | (1 << i)]
+                - values[valid | (1 << j)]
+                + values[valid]
+            )
+            # argmax preserves the original first-background tie break.
+            index = int(np.argmax(interactions))
+            background = int(valid[index])
+            states = {
+                "00": background,
+                "10": background | (1 << i),
+                "01": background | (1 << j),
+                "11": background | bits,
+            }
+            g = {name: float(values[state]) for name, state in states.items()}
+            ranking.append(
+                {
+                    "pair_ids": [ids[i], ids[j]],
+                    "interaction": float(interactions[index]),
+                    "g": g,
+                    "states": states,
+                    "background": {
+                        str(fid): (background >> k) & 1
+                        for k, fid in enumerate(ids)
+                        if k not in (i, j)
+                    },
+                    "probabilities": probabilities(g, token_count),
+                }
+            )
+        return sorted(ranking, key=lambda row: -row["interaction"])
     per_pair = {}
     best = None
     qualified = None

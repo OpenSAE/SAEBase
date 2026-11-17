@@ -32,6 +32,18 @@ def automatic_precheck(cfg):
     check.task.prompt = str(cfg.task.get("prompt", "") or "")
     check.task.max_seconds = 300
     check.task.task_configs = {name: OmegaConf.to_container(cfg.task, resolve=True)}
+    from saebase.runtime.performance import settings
+
+    if (
+        settings(cfg)["enabled"]
+        and name in {"capture", "intervene", "generate"}
+        and cfg.dataset.get("samples") is None
+    ):
+        check.task.mode = "performance"
+        check.task.check_tasks = [name]
+        check.task.performance = OmegaConf.to_container(cfg.task.performance, resolve=True)
+        if name == "capture":
+            check.task.capture_modes = [str(cfg.task.get("mode", "whiten"))]
     if _ACTIVE_PAIR.get() is not None or (
         cfg.model.get("name")
         and external_model(str(cfg.model.name)) is not None
@@ -57,6 +69,10 @@ def automatic_precheck(cfg):
         os.chdir(origin)
     receipt = destination / "metadata" / "precheck_result.json"
     if result.ok:
+        if check.task.mode == "performance":
+            from saebase.runtime.performance import remember_recommendations
+
+            remember_recommendations(result.summary.get("records", []))
         return None, str(receipt)
     return EvaluationResult(
         ok=False,

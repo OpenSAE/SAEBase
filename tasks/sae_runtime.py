@@ -193,8 +193,9 @@ def loaded_pair_session(pair):
     fingerprints = _PAIR_FINGERPRINTS.set({})
     try:
         from saebase.api.neuronpedia import annotation_session
+        from saebase.runtime.performance import policy_scope
 
-        with annotation_session():
+        with annotation_session(), policy_scope():
             yield
         lease = _PAIR_FINGERPRINTS.get().get("lease")
         if lease is not None:

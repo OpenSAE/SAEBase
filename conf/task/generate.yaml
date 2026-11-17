@@ -25,4 +25,18 @@ task:
   inline_results: true  # False keeps full rows in reports/generate_features.jsonl.
   continue_on_error: false
   conditions: null  # Optional list of native intervention conditions.
-  reuse_prompt_observations: false  # Exact full-prefix reuse within each prompt; no KV cache.
+  reuse_prompt_observations: true  # Exact full-prefix reuse within each prompt; no KV cache.
+
+  performance:
+    enabled: true
+    batch_size: auto
+    batch_sizes: [1, 2, 4, 8, 16, 32, 64]
+    warmup: 1
+    repeats: 3
+    probe_samples: 3
+    probe_states: 64
+    max_seconds: 120
+    atol: 1.0e-6  # runtime.numerics=vllm enforces zero tolerance.
+    logit_atol: 1.0e-4
+    rtol: 0.0
+    memory_fraction: 0.9

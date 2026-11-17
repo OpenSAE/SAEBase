@@ -270,6 +270,9 @@ class CaptureMatrix:
         with open_dict(cfg.model):
             cfg.model.merge_with(self.MODEL_OVERRIDES.get(key, {}))
         resolve_config_devices(cfg)
+        from models.numerics import bind_configuration
+
+        bind_configuration(cfg)
         return cfg
 
     def child(self, key, *, offload_unused_layers=False):
@@ -299,6 +302,11 @@ class CaptureMatrix:
             start = time.time()
             cfg = config(self.DATASETS[0][1], "capture")
             try:
+                from models.numerics import configure_task
+                from saebase.runtime.environment import configure_worker
+
+                configure_worker(cfg)
+                configure_task(cfg)
                 selection = resolve_sae(cfg.model, sae, layer, operation="capture")
                 pair = load_selection(selection, "cuda")
                 save(
@@ -481,7 +489,6 @@ class CaptureMatrix:
                 log,
                 cwd=self.ROOT,
                 timeout=self.TIMEOUT or None,
-                environment={"OMP_NUM_THREADS": "4", "MKL_NUM_THREADS": "4"},
             )
             save(self.REPORT / f"process-{model}.json", outcome)
         return self.summarize()

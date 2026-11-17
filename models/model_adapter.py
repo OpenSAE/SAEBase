@@ -30,6 +30,9 @@ class ModelAdapter:
         from models.loading_policy import resolve_device
 
         device = resolve_device(device)
+        from models.numerics import configure
+
+        configure(device=device)
         options = dict(self.options)
         if self.local_alias:
             local, architecture = self.local_alias

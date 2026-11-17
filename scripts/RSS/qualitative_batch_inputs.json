@@ -1,0 +1,269 @@
+{
+  "source_attachment": "/root/.codex/attachments/add6c988-756d-43be-9cc7-0a2f470b0609/已粘贴的文本.txt",
+  "cases": [
+    {
+      "case_id": "C01",
+      "title": "Decimal Comparison",
+      "clean": "Compare 9.8 and 9.11 as decimal numbers and explain which is larger.",
+      "proposed_interpretation_to_inspect": "Numerical surface form versus decimal magnitude.",
+      "variants": [
+        {
+          "number": 1,
+          "topic": "Basketball",
+          "prompt": "The scene is an NBA basketball game. LeBron James dribbles the basketball down the court, scores a three-point shot, and celebrates with his basketball team. Compare 9.8 and 9.11 as decimal numbers and explain which is larger."
+        },
+        {
+          "number": 2,
+          "topic": "Space",
+          "prompt": "The scene is a NASA space mission. An astronaut floats in zero gravity outside a spaceship, beside a space station orbiting Earth. Compare 9.8 and 9.11 as decimal numbers and explain which is larger."
+        },
+        {
+          "number": 3,
+          "topic": "Music",
+          "prompt": "The scene is a classical music concert. A violinist plays a violin concerto by Beethoven while an orchestra performs a symphony in the concert hall. Compare 9.8 and 9.11 as decimal numbers and explain which is larger."
+        },
+        {
+          "number": 4,
+          "topic": "Chess",
+          "prompt": "The scene is a world chess championship. Magnus Carlsen moves a knight across the chessboard, attacks the queen, and checks his opponent's king. Compare 9.8 and 9.11 as decimal numbers and explain which is larger."
+        },
+        {
+          "number": 5,
+          "topic": "Animals",
+          "prompt": "An elephant walked across the African savanna. Compare 9.8 and 9.11 as decimal numbers and explain which is larger."
+        }
+      ]
+    },
+    {
+      "case_id": "C02",
+      "title": "Credential Security",
+      "clean": "Explain why publishing a secret API key in a public GitHub repository creates a security risk.",
+      "proposed_interpretation_to_inspect": "Software artifacts versus credential exposure mechanism.",
+      "variants": [
+        {
+          "number": 1,
+          "topic": "Basketball",
+          "prompt": "The scene is an NBA basketball game. LeBron James dribbles the basketball down the court, scores a three-point shot, and celebrates with his basketball team. Explain why publishing a secret API key in a public GitHub repository creates a security risk."
+        },
+        {
+          "number": 2,
+          "topic": "Space",
+          "prompt": "The scene is a NASA space mission. An astronaut floats in zero gravity outside a spaceship, beside a space station orbiting Earth. Explain why publishing a secret API key in a public GitHub repository creates a security risk."
+        },
+        {
+          "number": 3,
+          "topic": "Music",
+          "prompt": "The scene is a classical music concert. A violinist plays a violin concerto by Beethoven while an orchestra performs a symphony in the concert hall. Explain why publishing a secret API key in a public GitHub repository creates a security risk."
+        },
+        {
+          "number": 4,
+          "topic": "Chess",
+          "prompt": "The scene is a world chess championship. Magnus Carlsen moves a knight across the chessboard, attacks the queen, and checks his opponent's king. Explain why publishing a secret API key in a public GitHub repository creates a security risk."
+        },
+        {
+          "number": 5,
+          "topic": "Animals",
+          "prompt": "An elephant walked across the African savanna. Explain why publishing a secret API key in a public GitHub repository creates a security risk."
+        }
+      ]
+    },
+    {
+      "case_id": "C03",
+      "title": "Thermal Physics",
+      "clean": "Explain why a metal spoon feels colder than a wooden spoon even when both are at room temperature.",
+      "proposed_interpretation_to_inspect": "Temperature sensation versus heat transfer mechanism.",
+      "variants": [
+        {
+          "number": 1,
+          "topic": "Basketball",
+          "prompt": "The scene is an NBA basketball game. LeBron James dribbles the basketball down the court, scores a three-point shot, and celebrates with his basketball team. Explain why a metal spoon feels colder than a wooden spoon even when both are at room temperature."
+        },
+        {
+          "number": 2,
+          "topic": "Space",
+          "prompt": "The scene is a NASA space mission. An astronaut floats in zero gravity outside a spaceship, beside a space station orbiting Earth. Explain why a metal spoon feels colder than a wooden spoon even when both are at room temperature."
+        },
+        {
+          "number": 3,
+          "topic": "Music",
+          "prompt": "The scene is a classical music concert. A violinist plays a violin concerto by Beethoven while an orchestra performs a symphony in the concert hall. Explain why a metal spoon feels colder than a wooden spoon even when both are at room temperature."
+        },
+        {
+          "number": 4,
+          "topic": "Chess",
+          "prompt": "The scene is a world chess championship. Magnus Carlsen moves a knight across the chessboard, attacks the queen, and checks his opponent's king. Explain why a metal spoon feels colder than a wooden spoon even when both are at room temperature."
+        },
+        {
+          "number": 5,
+          "topic": "Animals",
+          "prompt": "An elephant walked across the African savanna. Explain why a metal spoon feels colder than a wooden spoon even when both are at room temperature."
+        }
+      ]
+    },
+    {
+      "case_id": "C04",
+      "title": "Correlation and Causation",
+      "clean": "Explain why ice cream sales and drowning incidents can rise together without ice cream causing drowning.",
+      "proposed_interpretation_to_inspect": "Co-occurrence versus common cause reasoning.",
+      "variants": [
+        {
+          "number": 1,
+          "topic": "Basketball",
+          "prompt": "The scene is an NBA basketball game. LeBron James dribbles the basketball down the court, scores a three-point shot, and celebrates with his basketball team. Explain why ice cream sales and drowning incidents can rise together without ice cream causing drowning."
+        },
+        {
+          "number": 2,
+          "topic": "Space",
+          "prompt": "The scene is a NASA space mission. An astronaut floats in zero gravity outside a spaceship, beside a space station orbiting Earth. Explain why ice cream sales and drowning incidents can rise together without ice cream causing drowning."
+        },
+        {
+          "number": 3,
+          "topic": "Music",
+          "prompt": "The scene is a classical music concert. A violinist plays a violin concerto by Beethoven while an orchestra performs a symphony in the concert hall. Explain why ice cream sales and drowning incidents can rise together without ice cream causing drowning."
+        },
+        {
+          "number": 4,
+          "topic": "Chess",
+          "prompt": "The scene is a world chess championship. Magnus Carlsen moves a knight across the chessboard, attacks the queen, and checks his opponent's king. Explain why ice cream sales and drowning incidents can rise together without ice cream causing drowning."
+        },
+        {
+          "number": 5,
+          "topic": "Animals",
+          "prompt": "An elephant walked across the African savanna. Explain why ice cream sales and drowning incidents can rise together without ice cream causing drowning."
+        }
+      ]
+    },
+    {
+      "case_id": "C05",
+      "title": "Gambler's Fallacy",
+      "clean": "Explain why five consecutive heads do not make tails more likely on the next flip of a fair coin.",
+      "proposed_interpretation_to_inspect": "Observed sequences versus independent probabilities.",
+      "variants": [
+        {
+          "number": 1,
+          "topic": "Basketball",
+          "prompt": "The scene is an NBA basketball game. LeBron James dribbles the basketball down the court, scores a three-point shot, and celebrates with his basketball team. Explain why five consecutive heads do not make tails more likely on the next flip of a fair coin."
+        },
+        {
+          "number": 2,
+          "topic": "Space",
+          "prompt": "The scene is a NASA space mission. An astronaut floats in zero gravity outside a spaceship, beside a space station orbiting Earth. Explain why five consecutive heads do not make tails more likely on the next flip of a fair coin."
+        },
+        {
+          "number": 3,
+          "topic": "Music",
+          "prompt": "The scene is a classical music concert. A violinist plays a violin concerto by Beethoven while an orchestra performs a symphony in the concert hall. Explain why five consecutive heads do not make tails more likely on the next flip of a fair coin."
+        },
+        {
+          "number": 4,
+          "topic": "Chess",
+          "prompt": "The scene is a world chess championship. Magnus Carlsen moves a knight across the chessboard, attacks the queen, and checks his opponent's king. Explain why five consecutive heads do not make tails more likely on the next flip of a fair coin."
+        },
+        {
+          "number": 5,
+          "topic": "Animals",
+          "prompt": "An elephant walked across the African savanna. Explain why five consecutive heads do not make tails more likely on the next flip of a fair coin."
+        }
+      ]
+    },
+    {
+      "case_id": "C06",
+      "title": "Evidence and Citation",
+      "clean": "Explain why an AI assistant should not invent a reference when it cannot verify a source.",
+      "proposed_interpretation_to_inspect": "Citation surface form versus evidence reliability.",
+      "variants": [
+        {
+          "number": 1,
+          "topic": "Basketball",
+          "prompt": "The scene is an NBA basketball game. LeBron James dribbles the basketball down the court, scores a three-point shot, and celebrates with his basketball team. Explain why an AI assistant should not invent a reference when it cannot verify a source."
+        },
+        {
+          "number": 2,
+          "topic": "Space",
+          "prompt": "The scene is a NASA space mission. An astronaut floats in zero gravity outside a spaceship, beside a space station orbiting Earth. Explain why an AI assistant should not invent a reference when it cannot verify a source."
+        },
+        {
+          "number": 3,
+          "topic": "Music",
+          "prompt": "The scene is a classical music concert. A violinist plays a violin concerto by Beethoven while an orchestra performs a symphony in the concert hall. Explain why an AI assistant should not invent a reference when it cannot verify a source."
+        },
+        {
+          "number": 4,
+          "topic": "Chess",
+          "prompt": "The scene is a world chess championship. Magnus Carlsen moves a knight across the chessboard, attacks the queen, and checks his opponent's king. Explain why an AI assistant should not invent a reference when it cannot verify a source."
+        },
+        {
+          "number": 5,
+          "topic": "Animals",
+          "prompt": "An elephant walked across the African savanna. Explain why an AI assistant should not invent a reference when it cannot verify a source."
+        }
+      ]
+    },
+    {
+      "case_id": "C07",
+      "title": "Binary Search",
+      "clean": "Explain why binary search requires sorted data and reduces the search space by half at each step.",
+      "proposed_interpretation_to_inspect": "Code and search versus invariant and algorithmic principle.",
+      "variants": [
+        {
+          "number": 1,
+          "topic": "Basketball",
+          "prompt": "The scene is an NBA basketball game. LeBron James dribbles the basketball down the court, scores a three-point shot, and celebrates with his basketball team. Explain why binary search requires sorted data and reduces the search space by half at each step."
+        },
+        {
+          "number": 2,
+          "topic": "Space",
+          "prompt": "The scene is a NASA space mission. An astronaut floats in zero gravity outside a spaceship, beside a space station orbiting Earth. Explain why binary search requires sorted data and reduces the search space by half at each step."
+        },
+        {
+          "number": 3,
+          "topic": "Music",
+          "prompt": "The scene is a classical music concert. A violinist plays a violin concerto by Beethoven while an orchestra performs a symphony in the concert hall. Explain why binary search requires sorted data and reduces the search space by half at each step."
+        },
+        {
+          "number": 4,
+          "topic": "Chess",
+          "prompt": "The scene is a world chess championship. Magnus Carlsen moves a knight across the chessboard, attacks the queen, and checks his opponent's king. Explain why binary search requires sorted data and reduces the search space by half at each step."
+        },
+        {
+          "number": 5,
+          "topic": "Animals",
+          "prompt": "An elephant walked across the African savanna. Explain why binary search requires sorted data and reduces the search space by half at each step."
+        }
+      ]
+    },
+    {
+      "case_id": "C08",
+      "title": "Sarcasm",
+      "clean": "Explain how sarcasm can communicate the opposite of the literal meaning of a sentence.",
+      "proposed_interpretation_to_inspect": "Literal words versus speaker intention.",
+      "variants": [
+        {
+          "number": 1,
+          "topic": "Basketball",
+          "prompt": "The scene is an NBA basketball game. LeBron James dribbles the basketball down the court, scores a three-point shot, and celebrates with his basketball team. Explain how sarcasm can communicate the opposite of the literal meaning of a sentence."
+        },
+        {
+          "number": 2,
+          "topic": "Space",
+          "prompt": "The scene is a NASA space mission. An astronaut floats in zero gravity outside a spaceship, beside a space station orbiting Earth. Explain how sarcasm can communicate the opposite of the literal meaning of a sentence."
+        },
+        {
+          "number": 3,
+          "topic": "Music",
+          "prompt": "The scene is a classical music concert. A violinist plays a violin concerto by Beethoven while an orchestra performs a symphony in the concert hall. Explain how sarcasm can communicate the opposite of the literal meaning of a sentence."
+        },
+        {
+          "number": 4,
+          "topic": "Chess",
+          "prompt": "The scene is a world chess championship. Magnus Carlsen moves a knight across the chessboard, attacks the queen, and checks his opponent's king. Explain how sarcasm can communicate the opposite of the literal meaning of a sentence."
+        },
+        {
+          "number": 5,
+          "topic": "Animals",
+          "prompt": "An elephant walked across the African savanna. Explain how sarcasm can communicate the opposite of the literal meaning of a sentence."
+        }
+      ]
+    }
+  ]
+}

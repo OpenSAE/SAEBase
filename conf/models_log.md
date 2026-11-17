@@ -42,3 +42,9 @@
 最终层由模型实际层数确定，索引为 `model.cfg.n_layers - 1`。量化加载按所选模型与任务的真实支持判断。完整 SAE 与层位选择读取 `conf/sae/`、所属模型配置和 `saebase/api/sae_profiles.py`；已有真实观测见[模型支持资料](../doc/code/development/model-support.md)。
 
 Qwen3.5 4B 使用 `conf/runtime/environments.yaml` 中的 Qwen3.5 专用解释器；L15 Matryoshka SAE 显式绑定 Neuronpedia `qwen3.5-4b/15-res-matryoshka-65k`。来源仍核对仓库和物理目录；本地声明与上游目录冲突时拒绝加载解释。
+
+HF residual adapter 新增独立编辑的批量尾层重放；缓存捕获在选定 decoder 层停止。优化由任务性能预检验证数值后采用，暂不支持的结构保留原生执行并记录原因；不改变模型/SAE身份、权重或数值精度。
+
+GPU科研执行增加统一数值策略：标准Runtime使用`runtime.numerics=vllm`，模型加载前设置，固定工作进程内的计算策略；复用vLLM0.27.1的CUDA/BLAS设置、矩阵乘法和log-softmax，以及较新固定版本的softmax；保留低精度输入的FP32累积语义，HF Attention使用Torch现成math后端。`native`显式复现历史数值路径。权重身份保持，数值策略作为独立来源写入结果与归一化身份；Runtime在续跑比较前绑定计算版本，避免复用旧版结果。设计、上游commit及验收记录见[批量评分的一致性与加速](../doc/code/development/batch-invariant-execution.md)。
+
+Qwen3.5 GPU数值策略升级为独立v5：复用vLLM/FLA固定行累加内核，替换Transformers 5.23.0 GDN中的CUDA cumsum，消除真实输入的batch差异。Qwen旧结果单独保留并重算，其他模型继续v4。HF尾层重放复用已准备hidden，避免答案评分再次计算前层。来源、许可证与验证见上述设计文档及`saebase/_vendor/gdn_source.json`。

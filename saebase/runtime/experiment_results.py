@@ -71,11 +71,18 @@ def _result_paths(payload: dict, root: Path, *, reading=False) -> dict:
     value = copy.deepcopy(payload)
     root = root.resolve()
     old_root = None
-    candidates = [value.get("artifact_paths", {}).get("result"), value.get("summary", {}).get("result_path")]
+    candidates = [
+        value.get("artifact_paths", {}).get("result"),
+        value.get("summary", {}).get("result_path"),
+    ]
     for candidate in candidates:
         if candidate:
             path = Path(candidate)
-            if path.is_absolute() and path.parent.name == "metadata" and path.name == f"{value.get('task')}_result.json":
+            if (
+                path.is_absolute()
+                and path.parent.name == "metadata"
+                and path.name == f"{value.get('task')}_result.json"
+            ):
                 old_root = path.parent.parent
                 break
 
@@ -90,7 +97,9 @@ def _result_paths(payload: dict, root: Path, *, reading=False) -> dict:
                 return raw
         return str(root / path) if reading else path.as_posix()
 
-    value["artifact_paths"] = {key: reference(raw) for key, raw in value.get("artifact_paths", {}).items()}
+    value["artifact_paths"] = {
+        key: reference(raw) for key, raw in value.get("artifact_paths", {}).items()
+    }
     summary = value.get("summary", {})
     for key in ("result_path", "samples_path", "explanations_path"):
         if summary.get(key):
@@ -212,9 +221,17 @@ def inspect_run(folder: str | Path, *, expected_cfg=None) -> dict:
 
             def comparable(cfg):
                 value = _configuration(cfg)
-                value.pop("runtime", None)
+                runtime = value.pop("runtime", {})
+                # Mode/cleanup are operational. Arithmetic changes the
+                # scientific result and must not be ignored when resuming.
+                numerics = None
+                if runtime.get("numerics", "native") != "native":
+                    numerics = {
+                        "numerics": runtime["numerics"],
+                        "numerics_protocol": runtime.get("numerics_protocol"),
+                    }
                 value.pop("experiment", None)
-                return task.continuation_configuration(value)
+                return task.continuation_configuration(value), numerics
 
             if comparable(manifest["configuration"]) != comparable(expected_cfg):
                 return {

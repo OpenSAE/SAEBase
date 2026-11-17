@@ -16,7 +16,61 @@ import sys
 import threading
 
 
-PACKAGES = ("torch", "transformers", "huggingface-hub", "tokenizers", "sae-lens")
+PACKAGES = ("torch", "transformers", "huggingface-hub", "tokenizers", "sae-lens", "threadpoolctl")
+THREAD_VARIABLES = (
+    "OMP_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "NUMEXPR_NUM_THREADS",
+)
+_THREADPOOL_LIMITER = None
+
+
+def worker_environment(cpu_threads=4):
+    """Bound independent CPU pools in research workers; explicit Runtime settings win."""
+    if type(cpu_threads) is not int or cpu_threads < 1:
+        raise ValueError("runtime.cpu_threads must be a positive integer")
+    return {
+        **dict.fromkeys(THREAD_VARIABLES, str(cpu_threads)),
+        "TOKENIZERS_PARALLELISM": "false",
+    }
+
+
+def configure_worker(cfg):
+    """Apply CPU settings before model loading, including already-loaded BLAS pools.
+
+    Configuration-only calls and legacy configurations keep the host untouched.
+    CUDA arithmetic belongs to models.numerics, independently of CPU scheduling.
+    """
+    if not cfg.get("task", {}).get("execute", False):
+        return
+    count = cfg.get("runtime", {}).get("cpu_threads")
+    if count is None:
+        return
+    from threadpoolctl import threadpool_limits
+    import torch
+
+    global _THREADPOOL_LIMITER
+    os.environ.update(worker_environment(count))
+    torch.set_num_threads(count)
+    _THREADPOOL_LIMITER = threadpool_limits(limits=count)
+
+
+def worker_snapshot():
+    """Save the effective CPU execution settings rather than only the request."""
+    from threadpoolctl import threadpool_info
+    import torch
+
+    return {
+        "torch_threads": torch.get_num_threads(),
+        "threadpools": [
+            {key: pool.get(key) for key in ("internal_api", "prefix", "num_threads")}
+            for pool in threadpool_info()
+        ],
+        "environment": {
+            key: os.environ.get(key) for key in (*THREAD_VARIABLES, "TOKENIZERS_PARALLELISM")
+        },
+    }
 
 
 def snapshot_environment(architectures=()):
@@ -45,12 +99,15 @@ def snapshot_environment(architectures=()):
         "base_prefix": sys.base_prefix,
         "packages": packages,
         "architectures": supported,
+        "worker_environment": {
+            key: os.environ.get(key) for key in (*THREAD_VARIABLES, "TOKENIZERS_PARALLELISM")
+        },
     }
 
 
 def child_environment(python, extra=None):
     """Build child-only variables, removing inherited Python package search overrides."""
-    environment = {**os.environ, **(extra or {})}
+    environment = {**os.environ, **worker_environment(), **(extra or {})}
     for key in ("PYTHONHOME", "PYTHONPATH", "CONDA_PREFIX"):
         environment.pop(key, None)
     prefix = Path(python).parent.parent

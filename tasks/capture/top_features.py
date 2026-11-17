@@ -159,6 +159,15 @@ def capture_top_cohort(cfg, pair):
                 raise ValueError("Saved capture model/SAE/site/ranking differs from this task")
             if identity.get("model_sha256") != model_sha or identity.get("sae_sha256") != sae_sha:
                 raise ValueError("Saved capture checkpoint fingerprints differ or are missing")
+            from models.numerics import identity as numerical_identity
+
+            saved_policy = identity.get("numerics", {}).get(
+                "protocol_id", "saebase.native_numerics.v1"
+            )
+            if saved_policy != numerical_identity()["protocol_id"]:
+                raise ValueError(
+                    "Saved capture uses a different numerical policy; recapture with this worker's policy"
+                )
         else:
             snapshot = snapshots.get((row["sample_id"], prompt))
             if snapshot is None:

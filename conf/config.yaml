@@ -18,6 +18,8 @@ seed: 42
 runtime:
   mode: null  # null defaults to new; also accepts resume and overwrite
   clear_experiment_leaf: true
+  numerics: vllm  # One stable GPU policy for precheck and tasks; native reproduces the old policy.
+  cpu_threads: 4  # Bound Torch/BLAS CPU pools; uses the same setting in direct and matrix runs.
 
 # Leaf directory name: ${experiment.sub_name}_${seed}; existing runs require explicit intent.
 exp_run_leaf: ${experiment.sub_name}_${seed}

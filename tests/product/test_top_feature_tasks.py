@@ -64,6 +64,20 @@ def test_each_feature_is_a_fresh_single_edit(corpus, monkeypatch, operation):
     assert result["required_artifacts"][0]["sha256"]
 
 
+def test_saved_capture_cannot_cross_numerical_policies(corpus, monkeypatch, tmp_path):
+    from tasks.capture.operation import execute
+
+    cfg, pair = corpus
+    cfg.task.top_feature_num = 2
+    execute(cfg)
+    cfg.task.feature_selection = "capture_top"
+    cfg.task.feature_ranking = "whiten"
+    cfg.task.capture_source = str(tmp_path)
+    monkeypatch.setattr("models.numerics.identity", lambda: {"protocol_id": "different-policy"})
+    with pytest.raises(ValueError, match="different numerical policy"):
+        list(capture_top_cohort(cfg, pair))
+
+
 def test_saved_whiten_reused_without_refitting_and_rejects_wrong_weights(
     corpus, monkeypatch, tmp_path
 ):

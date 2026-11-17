@@ -1,0 +1,11 @@
+{
+  "vllm_commit": "6e448d0ea9bf3d88d898b65449ca6dc2aec170ac",
+  "vllm_path": "vllm/third_party/flash_linear_attention/ops/cumsum.py",
+  "vllm_source_sha256": "d818215669b451868823202ac0bcea77e7a9d75957254c7c1060a73a55dc39b6",
+  "kernel": "chunk_local_cumsum_scalar_kernel",
+  "kernel_changes": "Body unchanged; remove autotuning/heuristics and launch fixed num_warps=1, IS_VARLEN=False through adapter.",
+  "hf_version": "5.23.0",
+  "hf_path": "/workspace/envs/saebase/qwen35/lib/python3.12/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py",
+  "hf_source_sha256": "1a475c45d900e0bfb06b9b245257d7f3234fd247474fcbd3363b03430e504a68",
+  "hf_changes": "Copy torch_chunk_gated_delta_rule without hub decorators; replace decay.cumsum(dim=3) with fixed-row upstream scan."
+}

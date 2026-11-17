@@ -16,12 +16,14 @@ _ACTIVE = ContextVar("saebase_prompt_observations", default=None)
 
 
 class PromptObservations:
-    def __init__(self, pair, max_entries=64):
+    def __init__(self, pair, max_entries=64, suffix_cache=False):
         self.pair = pair
         self.max_entries = max_entries
         self.clean = OrderedDict()
         self.edited = OrderedDict()
         self.verified = set()
+        self.suffix_cache = suffix_cache
+        self.replays = OrderedDict()
 
     def _key(self, tokens, site):
         return (
@@ -36,7 +38,7 @@ class PromptObservations:
         if key not in self.clean:
             snapshot = capture_features(self.pair.model, self.pair.sae, site=site, tokens=tokens)
             logits = self.pair.model.forward_logits(tokens=tokens, readout_position=-1)
-            self.clean[key] = (snapshot, logits)
+            self.clean[key] = (snapshot, logits.detach().clone())
             if len(self.clean) > self.max_entries:
                 self.clean.popitem(last=False)
         self.clean.move_to_end(key)
@@ -49,12 +51,36 @@ class PromptObservations:
             activation.detach().contiguous().cpu().view(torch.uint8).numpy().tobytes(),
         )
         if key not in self.edited:
-            self.edited[key] = self.pair.model.patch_logits(
-                tokens=snapshot.tokens,
-                site=snapshot.site,
-                activation=activation,
-                readout_position=-1,
-            )
+
+            def native():
+                return self.pair.model.patch_logits(
+                    tokens=snapshot.tokens,
+                    site=snapshot.site,
+                    activation=activation,
+                    readout_position=-1,
+                )
+
+            prefix_key = self._key(snapshot.tokens, snapshot.site)
+            if self.suffix_cache:
+                from saebase.api.replay import SiteReplay
+
+                if prefix_key not in self.replays:
+                    replay = SiteReplay(self.pair.model, snapshot.tokens, snapshot.site)
+                    candidate = replay.logits(activation[None])[0, -1]
+                    reference = native()
+                    valid = torch.allclose(candidate.float(), reference.float(), atol=1e-6, rtol=0)
+                    self.replays[prefix_key] = replay if valid else None
+                    self.edited[key] = candidate if valid else reference
+                    if len(self.replays) > self.max_entries:
+                        self.replays.popitem(last=False)
+                else:
+                    replay = self.replays[prefix_key]
+                    self.edited[key] = (
+                        replay.logits(activation[None])[0, -1] if replay is not None else native()
+                    )
+            else:
+                self.edited[key] = native()
+            self.edited[key] = self.edited[key].detach().clone()
             if len(self.edited) > self.max_entries:
                 self.edited.popitem(last=False)
         self.edited.move_to_end(key)
@@ -86,12 +112,13 @@ def current_observations(model, sae):
 
 
 @contextmanager
-def prompt_observation_session(pair, enabled):
+def prompt_observation_session(pair, enabled, *, suffix_cache=False):
     if not enabled:
-        yield
+        yield None
         return
-    token = _ACTIVE.set(PromptObservations(pair))
+    observations = PromptObservations(pair, suffix_cache=suffix_cache)
+    token = _ACTIVE.set(observations)
     try:
-        yield
+        yield observations
     finally:
         _ACTIVE.reset(token)

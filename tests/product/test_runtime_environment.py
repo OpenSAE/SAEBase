@@ -113,3 +113,49 @@ def test_nonzero_child_exit_preserves_failure_and_next_default_run(environments,
     )
     assert failed["exit_code"] == 7 and following["exit_code"] == 0
     assert following["environment"]["prefix"] == sys.prefix
+
+
+@pytest.mark.parametrize("threads", [4, 8])
+def test_worker_configuration_limits_preloaded_cpu_pools(environments, tmp_path, threads):
+    config, _ = environments
+    before = dict(os.environ)
+    source = f"""
+import json, numpy as np, torch
+from omegaconf import OmegaConf
+from threadpoolctl import threadpool_limits, threadpool_info
+from saebase.runtime.environment import configure_worker, worker_snapshot
+matrix = np.arange(64, dtype=float).reshape(8, 8)
+expected = matrix @ matrix
+limit = threadpool_limits(limits=12)
+assert all(pool['num_threads'] == 12 for pool in threadpool_info())
+configure_worker(OmegaConf.create({{'task': {{'execute': True}}, 'runtime': {{'cpu_threads': {threads}}}}}))
+assert np.array_equal(expected, matrix @ matrix)
+assert not torch.cuda.is_initialized()
+print(json.dumps(worker_snapshot()))
+"""
+    log = tmp_path / "cpu-pools.log"
+    result = run_model("ordinary", ["-c", source], log, cwd=tmp_path, config=config)
+    assert result["exit_code"] == 0, log.read_text()
+    observed = json.loads(log.read_text())
+    assert observed["torch_threads"] == threads
+    assert observed["threadpools"] and all(
+        pool["num_threads"] == threads for pool in observed["threadpools"]
+    )
+    assert observed["environment"]["OPENBLAS_NUM_THREADS"] == str(threads)
+    assert observed["environment"]["TOKENIZERS_PARALLELISM"] == "false"
+    assert result["environment"]["worker_environment"]["OMP_NUM_THREADS"] == "4"
+    assert dict(os.environ) == before
+
+
+def test_configuration_only_and_legacy_calls_leave_cpu_settings_untouched(monkeypatch):
+    from omegaconf import OmegaConf
+    from saebase.runtime.environment import configure_worker
+
+    def unexpected(*args, **kwargs):
+        raise AssertionError("CPU settings must remain untouched")
+
+    monkeypatch.setattr("torch.set_num_threads", unexpected)
+    before = dict(os.environ)
+    configure_worker(OmegaConf.create({"task": {"execute": False}, "runtime": {"cpu_threads": 4}}))
+    configure_worker(OmegaConf.create({"task": {"execute": True}}))
+    assert dict(os.environ) == before

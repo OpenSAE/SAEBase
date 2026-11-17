@@ -70,6 +70,12 @@ def prepare_answer_readout(
         )
     ):
         hidden = pair.model.model(scoring_tokens, stop_at_layer=snapshot.site.layer + 1).detach()
+    elif (
+        answer_backend == "full_context_tail"
+        and pair.model.backend == "hf_hooks"
+        and pair.model.model.supports_suffix_replay()
+    ):
+        hidden = pair.model.model.cache_site_hidden(scoring_tokens, snapshot.site.layer)
     readout_activation = (
         hidden[0, snapshot.tokens.shape[1] - 1].detach()
         if hidden is not None
@@ -109,22 +115,33 @@ def prepare_answer_readout(
     if hidden is not None:
         from saebase.api import edit_features
 
-        tail = ContextTailScorer(
-            pair.model.model,
-            hidden,
-            answer_tokens.to(hidden.device),
-            snapshot.tokens.shape[1],
-            snapshot.site.layer + 1,
-        )
-
-        def cached(activation):
-            return tail(
-                answer_patch(
-                    snapshot.activation,
-                    readout_activation,
-                    snapshot.activation if activation is None else activation,
-                )
+        if pair.model.backend == "transformer_lens":
+            tail = ContextTailScorer(
+                pair.model.model,
+                hidden,
+                answer_tokens.to(hidden.device),
+                snapshot.tokens.shape[1],
+                snapshot.site.layer + 1,
             )
+
+            def cached(activation):
+                return tail(
+                    answer_patch(
+                        snapshot.activation,
+                        readout_activation,
+                        snapshot.activation if activation is None else activation,
+                    )
+                )
+        else:
+            from tasks.capture.performance import AnswerReplay
+
+            tail = AnswerReplay(
+                pair, snapshot, answer_ids, readout_activation, prepared_hidden=hidden
+            )
+
+            def cached(activation):
+                value = snapshot.activation if activation is None else activation
+                return float(tail(value.unsqueeze(0), 1)[0])
 
         removed = edit_features(
             pair.sae, snapshot, replacements={int(i): 0.0 for i in feature_ids}
@@ -136,6 +153,7 @@ def prepare_answer_readout(
         if error > 1e-7:
             raise ValueError(f"Full-context tail differs from native full answer scoring: {error}")
         readout.update(execution="full_context_tail", cache_validation={"max_abs_error": error})
+        cached.prepared_hidden = hidden
         return cached, answer_ids, readout_activation
     if answer_backend == "auto":
         from saebase.api.answer_cache import FrozenPrefixAnswerReadout

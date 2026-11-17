@@ -48,6 +48,47 @@ def wrapper():
     return HFHooksModel(TinyStack().eval(), None, model_name="tiny-stack", device="cpu")
 
 
+def test_hf_answer_tail_matches_full_and_reuses_the_prepared_prefix(monkeypatch):
+    from saebase.api import capture_features, edit_features
+    from tasks.capture.answer import prepare_answer_readout, answer_patch
+    from tasks.capture.performance import AnswerReplay
+    from tests.fixtures.synthetic import ResearchToySAE
+
+    raw = wrapper()
+    raw.tokenizer = SimpleNamespace(
+        encode=lambda text, add_special_tokens: [int(x) for x in text.split()]
+    )
+    pair = SimpleNamespace(model=ModelAdapter(raw), sae=ResearchToySAE())
+    site = ActivationSite(0, "blocks.0.hook_resid_post")
+    snapshot = capture_features(pair.model, pair.sae, site=site, tokens=torch.tensor([[1, 2, 3]]))
+    readout = {"reference": {"text": "4 5", "prefix": " "}}
+    score, answer_ids, reference = prepare_answer_readout(
+        pair, snapshot, "1 2 3", readout, feature_ids=[0, 1], answer_backend="full_context_tail"
+    )
+    assert readout["execution"] == "full_context_tail"
+    edited = edit_features(pair.sae, snapshot, replacements={0: 0.0}).activation
+    native = (
+        pair.model.answer_token_logprobs(
+            prompt_tokens=snapshot.tokens,
+            answer_tokens=torch.tensor([answer_ids]),
+            site=site,
+            activation=answer_patch(snapshot.activation, reference, edited),
+        )
+        .double()
+        .mean()
+    )
+    assert abs(score(edited) - float(native)) < 1e-7
+
+    def unexpected(*args):
+        raise AssertionError("The prepared prefix must not be recomputed")
+
+    monkeypatch.setattr(raw, "cache_site_hidden", unexpected)
+    replay = AnswerReplay(
+        pair, snapshot, answer_ids, reference, prepared_hidden=score.prepared_hidden
+    )
+    assert replay(edited.unsqueeze(0), 1)[0] == score(edited)
+
+
 def test_identity_and_early_edit_match_full_hook():
     model = wrapper()
     ids = torch.tensor([[1, 2, 3, 4]])

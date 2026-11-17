@@ -96,8 +96,8 @@ def neuronpedia_settings(cfg) -> dict:
 
 def capture_mode(cfg):
     mode = cfg.get("task", {}).get("mode", "non_whiten")
-    if not isinstance(mode, str) or mode not in {"non_whiten", "whiten", "sar", "g_s", "I"}:
-        raise ValueError("task.mode must be non_whiten, whiten, g_s, sar or I")
+    if not isinstance(mode, str) or mode not in {"non_whiten", "whiten", "sar", "g_s", "I", "rss"}:
+        raise ValueError("task.mode must be non_whiten, whiten, g_s, sar, I or rss")
     size = cfg.get("task", {}).get("whiten_chunk_size", 256)
     if type(size) is not int or size < 1:
         raise ValueError("task.whiten_chunk_size must be a positive integer")
@@ -149,6 +149,7 @@ def input_identity(pair, snapshot, prompt: str, cfg: Any) -> dict[str, Any] | No
     """Describe measured inputs; unsupported custom state remains explicitly unknown."""
     from saebase.store import fingerprint
     from tasks.sae_runtime import pair_state_fingerprints
+    from models.numerics import identity as numerical_identity
 
     try:
         tokens = snapshot.tokens.detach().cpu().tolist()
@@ -157,6 +158,7 @@ def input_identity(pair, snapshot, prompt: str, cfg: Any) -> dict[str, Any] | No
             "schema": "saebase.task_input.v1",
             "task": "capture",
             "protocol_id": "saebase.capture.v1",
+            "numerics": numerical_identity(),
             "model_sha256": model_sha,
             "sae_sha256": sae_sha,
             "data_sha256": fingerprint(
@@ -189,6 +191,8 @@ def _capture(
     sample=None,
     sar_context=None,
 ) -> dict[str, Any]:
+    from saebase.runtime.performance import stage
+
     top_feature_num = capture_top_feature_num(cfg)
     mode = capture_mode(cfg)
     if mode in {"sar", "g_s", "I"}:
@@ -210,11 +214,12 @@ def _capture(
         from tasks.capture.explore import capture_prompt_result
 
         return capture_prompt_result(cfg, pair, prompt, sample)
-    snapshot = (
-        snapshot
-        if snapshot is not None
-        else capture_features(pair.model, pair.sae, site=pair.site, prompt=prompt)
-    )
+    with stage("activation_capture_and_encode"):
+        snapshot = (
+            snapshot
+            if snapshot is not None
+            else capture_features(pair.model, pair.sae, site=pair.site, prompt=prompt)
+        )
     codes = snapshot.codes.detach().float().cpu()
     top_ids = torch.topk(
         codes.abs(), k=min(top_feature_num or codes.numel(), codes.numel())
@@ -235,7 +240,8 @@ def _capture(
     candidates = top_ids
     if modern:
         sar_context = prepare_filter(cfg) if sar_context is None else sar_context
-        candidates = candidate_ids(cfg, pair, codes, normalization, sar_context, options)
+        with stage("candidate_filter_and_ranking"):
+            candidates = candidate_ids(cfg, pair, codes, normalization, sar_context, options)
         top_ids = candidates[: output_count(cfg, len(candidates))]
     sar = None
     single = None
@@ -289,7 +295,8 @@ def _capture(
                 )
                 or candidates[: output_count(cfg, len(candidates))]
             )
-    annotation, descriptions = annotate_features(pair, active_ids + top_ids, options)
+    with stage("feature_explanations"):
+        annotation, descriptions = annotate_features(pair, active_ids + top_ids, options)
 
     def feature(index):
         feature = {
@@ -418,6 +425,10 @@ def _capture(
 
 def execute(cfg: Any) -> dict[str, Any]:
     mode = capture_mode(cfg)
+    if mode == "rss":
+        from tasks.capture.rss_mode import execute as execute_rss
+
+        return execute_rss(cfg)
     scope = cfg.task.get("output_scope", "last_token")
     if scope not in {"last_token", "all_tokens"}:
         raise ValueError("output_scope must be last_token or all_tokens")
@@ -461,6 +472,13 @@ def validate_cfg(cfg: Any) -> None:
     from tasks.sae_runtime import validate_sae_selection
 
     mode = capture_mode(cfg)
+    if mode == "rss":
+        from tasks.capture.rss_mode import settings
+
+        settings(cfg)
+        neuronpedia_settings(cfg)
+        validate_sae_selection(cfg)
+        return
     capture_top_feature_num(cfg)
     neuronpedia_settings(cfg)
     if mode == "sar":

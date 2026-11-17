@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import time
 from pathlib import Path
 
 
@@ -31,6 +32,7 @@ def _prepare_ioi(cfg, pair):
 
 
 def capture_dataset(cfg, *, sar_context=None):
+    from saebase.runtime.performance import current, stage
     from tasks.capture.operation import _capture, _pair, capture_mode
     from tasks.sae_runtime import loaded_pair_session, pair_state_fingerprints
     from saebase.datasets.selection import select_dataset
@@ -131,15 +133,18 @@ def capture_dataset(cfg, *, sar_context=None):
         }
 
     with ledger.open("x") as output, loaded_pair_session(pair):
-        model_sha, sae_sha = pair_state_fingerprints(pair)
+        with stage("checkpoint_identity"):
+            model_sha, sae_sha = pair_state_fingerprints(pair)
         try:
             if needs_whiten:
                 from tasks.capture.selection import fit_reference
 
-                normalization, snapshots = fit_reference(
-                    cfg, pair, cohort_rows, sar_context, Path.cwd() / "metadata"
-                )
+                with stage("reference_normalization_and_frequency"):
+                    normalization, snapshots = fit_reference(
+                        cfg, pair, cohort_rows, sar_context, Path.cwd() / "metadata"
+                    )
             for row in selection:
+                sample_started = time.perf_counter()
                 raw_seen += 1
                 prompt = str(row.get("prompt", ""))
                 digest.update(
@@ -173,7 +178,8 @@ def capture_dataset(cfg, *, sar_context=None):
                             )
                         if sar_context is not None:
                             inputs["sar_context"] = sar_context
-                        result = _capture(cfg, **inputs)
+                        with stage("capture_sample"):
+                            result = _capture(cfg, **inputs)
                         sar_artifacts.extend(result.get("required_artifacts", []))
                         status = (
                             "blocked"
@@ -233,10 +239,18 @@ def capture_dataset(cfg, *, sar_context=None):
                                 ),
                             }
                         )
-                output.write(json.dumps(entry, ensure_ascii=False, allow_nan=False) + "\n")
+                with stage("sample_serialization_and_write"):
+                    output.write(json.dumps(entry, ensure_ascii=False, allow_nan=False) + "\n")
                 counts[status] += 1
                 ledger_rows += 1
-                if raw_seen % 100 == 0:
+                if current() is not None:
+                    current().sample(
+                        row["sample_id"],
+                        time.perf_counter() - sample_started,
+                        status=status,
+                        timing_scope="question processing and ledger serialization; shared normalization timed separately",
+                    )
+                if current() is not None or raw_seen % 100 == 0:
                     output.flush()
                     write_json(progress, report())
             selection_exhausted = True
@@ -280,6 +294,8 @@ def capture_dataset(cfg, *, sar_context=None):
         expected=captured,
         unit="sample",
     )
+    from models.numerics import identity as numerical_identity
+
     return {
         **report(),
         "mode": mode,
@@ -325,6 +341,7 @@ def capture_dataset(cfg, *, sar_context=None):
             else []
         ),
         "input_identity": {
+            "numerics": numerical_identity(),
             "schema": "saebase.task_input.v1",
             "task": "capture",
             "protocol_id": "saebase.capture.dataset.I.v1"

@@ -42,3 +42,13 @@ python -m saebase.runtime.train task=capture task.execute=true task.mode=non_whi
 模型和数据集仍通过标准model、dataset配置选择。要复现此前五个QA数据集的固定题目和Llama L21配置，使用`scripts/SAR/run_capture.py`；已有50题的离线复核使用`scripts/SAR/check_capture_reproduction.py`。
 
 批量运行 `python -m tasks.capture.matrix` 时，矩阵配置的 `matrix.dataset_overrides` 合并到每个数据集预设。例如 `dataset_overrides: {sample_count: 100, sampling_seed: 42}` 将本批各格设为100题，不改变数据集公共默认值。模式通过 `--capture-mode` 指定。
+
+正式 Capture 默认开启 `task.performance.enabled=true`。Precheck 先做对应模式的真实性能探针，执行器按精度约束选择尾层缓存与状态 batch；`performance.enabled=false` 保留原标量方式。每题耗时与共享标准化、筛选、解释、前向、排名、写入等阶段分别记录。I 去重后仍保存完整1024状态响应；额外记录真正执行的独立 code 状态数。具体预算、报告及数值阈值见 `tasks/precheck/README.md` 的“性能预检与自动调优”。
+
+## RSS：固定目标与新增上下文
+
+设置 `task.mode=rss`、`task.filter=all`、`task.output_scope=last_token`，提供 `task.prompt`、`task.rss.contexts` 和可信本地原版 `task.rss.source`。默认 RSS 参数为 `M=400, K=20, rho=kappa=0.8, tau=1e-5`。每个 variant 为 `context + 空格 + clean prompt`，在目标最后一个 token 上读取完整原始 SAE codes。
+
+`rss_case.md` 提供 RSS 全部选集及数值上集中于各 variant 的解释候选；`rss_case.json` 保存原始解释、recurrence、方向、排除原因；`rss_activations.npz` 保存完整 clean、variants 和 delta。展示候选要求 recurrence < rho、正变化 > tau、相对其他变体至少五倍，并按变化幅度排序，保留所有符合数值条件的特征。语义是否对应具体上下文由阅读解释判断。
+
+本次五个鲜明上下文的临时完整入口：`python scripts/RSS/run_contrast.py`。该脚本使用 RSS 公开 demo 的 GPT-2 加载设置，通过 `CaptureTask.run` 生成每一个案例，输出到新的 `experiment/RSS/` 目录。

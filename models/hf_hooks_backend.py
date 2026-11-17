@@ -58,6 +58,9 @@ class HFHooksModel(HFLogitsModel):
         device: str,
     ) -> None:
         super().__init__(model, tokenizer, model_name=model_name, device=device)
+        from models.numerics import configure_model
+
+        configure_model(model, device=device)
         # Suffix replay replaces block forwards. Every entry that runs the
         # module takes this lock so a second caller cannot observe the stubs.
         self._forward_lock = RLock()
@@ -224,8 +227,8 @@ class HFHooksModel(HFLogitsModel):
         n = int(layer)
         if not 0 <= n < len(layers):
             raise ValueError(f"layer {layer} outside suffix-replay stack")
-        if hidden.ndim != 3 or hidden.shape[0] != 1:
-            raise ValueError("site hidden must have shape [1, seq, d_model]")
+        if hidden.ndim != 3 or hidden.shape[0] < 1:
+            raise ValueError("site hidden must have shape [batch, seq, d_model]")
         saved: list[tuple[Any, Any]] = []
 
         def emit(_hidden_states: Any, *args: Any, **kwargs: Any) -> torch.Tensor:
@@ -281,11 +284,50 @@ class HFHooksModel(HFLogitsModel):
             raise RuntimeError("suffix replay logits do not match the prompt length")
         return captured["resid"].clone(), output.logits.detach().clone()
 
+    @_hold_forward
     @torch.no_grad()
     def cache_site_hidden(self, input_ids: torch.Tensor, layer: int) -> torch.Tensor:
         """Full-sequence block output at ``layer``, shape ``[1, seq, d_model]``."""
-        hidden, _logits = self.cache_site_with_logits(input_ids, layer)
-        return hidden
+        self._decoder_layers()
+        if input_ids.ndim != 2 or input_ids.shape[0] != 1:
+            raise ValueError("suffix cache requires one unpadded prefix")
+
+        class Captured(Exception):
+            pass
+
+        saved = {}
+
+        def capture(_module, _args, output):
+            hidden = output[0] if isinstance(output, tuple) else output
+            saved["hidden"] = hidden.detach().clone()
+            raise Captured
+
+        handle = self._layer_module(layer).register_forward_hook(capture)
+        try:
+            try:
+                self._model(input_ids=input_ids.to(self.cfg.device))
+            except Captured:
+                pass
+        finally:
+            handle.remove()
+        if "hidden" not in saved:
+            raise RuntimeError("prefix did not reach the selected cache site")
+        return saved["hidden"]
+
+    @_hold_forward
+    @torch.no_grad()
+    def all_logits_from_site_hidden(self, input_ids, layer, hidden):
+        """Replay an identical-length batch of independent cached residual edits."""
+        if input_ids.ndim != 2 or hidden.shape[:2] != input_ids.shape:
+            raise ValueError("Cached hidden and token batch must have matching axes")
+        if not bool(torch.isfinite(hidden).all()):
+            raise ValueError("Cached hidden is non-finite")
+        injector = self._inject_site_hidden(layer, hidden)
+        next(injector)
+        try:
+            return self._model(input_ids=input_ids).logits
+        finally:
+            injector.close()
 
     @_hold_forward
     @torch.no_grad()

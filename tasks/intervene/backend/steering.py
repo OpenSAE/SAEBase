@@ -80,7 +80,13 @@ def _distribution_shift(
     edited_prob = torch.softmax(edited_f, -1)
     clean_top = int(clean_f.argmax().item())
     edited_top = int(edited_f.argmax().item())
-    rank = int((torch.argsort(edited_f, descending=True) == clean_top).nonzero()[0].item())
+    target = edited_f[clean_top]
+    if int((edited_f == target).sum().item()) == 1:
+        # A unique value's rank needs a count, not a full vocabulary sort.
+        rank = int((edited_f > target).sum().item())
+    else:
+        # Preserve the reference's exact tie order, including bf16 ties.
+        rank = int((torch.argsort(edited_f, descending=True) == clean_top).nonzero()[0].item())
     return {
         "feature_id": feature_id,
         "feature_activation": activation,

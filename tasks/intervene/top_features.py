@@ -59,6 +59,7 @@ def run_top_features(cfg, operation, measure):
     from tasks.sae_runtime import _pair, loaded_pair_session
     from saebase.results import completion_summary
     from saebase.runtime.experiment_results import write_json
+    from saebase.runtime.performance import settings as performance_settings, current, stage
 
     pair = _pair(cfg)
     directory = Path.cwd() / "reports"
@@ -98,7 +99,8 @@ def run_top_features(cfg, operation, measure):
         return hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
 
     with loaded_pair_session(pair):
-        selected_rows = list(capture_top_cohort(cfg, pair))
+        with stage("feature_selection"):
+            selected_rows = list(capture_top_cohort(cfg, pair))
         requested = len(selected_rows) * int(cfg.task.get("top_feature_num", 10))
         valid_ids = {
             measurement_id(row, rank, feature)
@@ -111,6 +113,31 @@ def run_top_features(cfg, operation, measure):
             )
         with ledger.open("a" if resuming else "x") as stream:
             for selected in selected_rows:
+                sample_started = time.monotonic()
+                prepared = None
+                prepared_seconds = None
+                if performance_settings(cfg)["enabled"] and not resuming:
+                    from tasks.intervene.performance import measure_features
+
+                    try:
+                        prepared, _ = measure_features(cfg, operation, selected, pair, measure)
+                        prepared_seconds = (time.monotonic() - sample_started) / len(
+                            selected["top_features"]
+                        )
+                    except Exception as exc:
+                        from saebase.api import UnsupportedCapability
+
+                        if not isinstance(exc, UnsupportedCapability) and not cfg.task.get(
+                            "continue_on_error", False
+                        ):
+                            raise
+                        if current() is not None:
+                            current().experiments.append(
+                                {
+                                    "optimization_fallback": f"{type(exc).__name__}: {exc}",
+                                    "execution": "original per-feature loop",
+                                }
+                            )
                 results = []
                 with prompt_observation_session(
                     pair, cfg.task.get("reuse_prompt_observations", False)
@@ -155,7 +182,11 @@ def run_top_features(cfg, operation, measure):
                             }
                             began = time.monotonic()
                             try:
-                                entry["result"] = measure(child, prompt=selected["prompt"])
+                                entry["result"] = (
+                                    prepared[rank - 1]
+                                    if prepared is not None
+                                    else measure(child, prompt=selected["prompt"])
+                                )
                                 entry["status"] = "completed"
                                 completed += 1
                             except Exception as exc:
@@ -172,7 +203,15 @@ def run_top_features(cfg, operation, measure):
                                 gc.collect()
                                 if torch.cuda.is_available():
                                     torch.cuda.empty_cache()
-                            entry["seconds"] = time.monotonic() - began
+                            entry["seconds"] = (
+                                prepared_seconds
+                                if prepared_seconds is not None
+                                else time.monotonic() - began
+                            )
+                            if prepared_seconds is not None:
+                                entry["seconds_kind"] = (
+                                    "amortized question compute, including any tuning, divided by feature count"
+                                )
                             stream.write(
                                 json.dumps(entry, ensure_ascii=False, allow_nan=False) + "\n"
                             )
@@ -208,6 +247,13 @@ def run_top_features(cfg, operation, measure):
                         ),
                     }
                 )
+                if current() is not None:
+                    current().sample(
+                        selected["sample_id"],
+                        time.monotonic() - sample_started,
+                        feature_comparisons=len(selected["top_features"]),
+                        timing_scope="whole question including tuning and ledger I/O; feature selection timed separately",
+                    )
         if set(previous) - valid_ids:
             raise ValueError(
                 "Feature checkpoint contains measurements outside this cohort/protocol"

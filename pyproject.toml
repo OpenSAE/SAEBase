@@ -22,6 +22,7 @@ classifiers = [
 # Lightweight offline API and registration; real checkpoint downloads are opt-in.
 dependencies = [
     "numpy>=1.24",
+    "threadpoolctl>=3.1,<4",
     "torch>=2.0",
     "hydra-core>=1.3,<2",
     "omegaconf>=2.3,<3",
@@ -92,7 +93,7 @@ exclude = ["tests*", "examples*"]
 
 [tool.setuptools.package-data]
 conf = ["**/*.yaml", "**/*.yml", "**/*.md", "**/*.json"]
-saebase = ["**/*.md", "**/*.yaml", "**/*.json", "**/*.html", "**/*.css", "**/*.js"]
+saebase = ["**/*.md", "**/*.yaml", "**/*.json", "**/*.html", "**/*.css", "**/*.js", "_vendor/VLLM_LICENSE", "_vendor/FLA_LICENSE"]
 models = ["**/*.json", "**/*.yaml"]
 
 [tool.pytest.ini_options]

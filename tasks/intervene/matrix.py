@@ -68,6 +68,9 @@ class FeatureTaskMatrix:
                 cfg.task.max_new_tokens = int(self.plan.get("max_new_tokens", 8))
                 cfg.task.temperature = 0.0
         resolve_config_devices(cfg)
+        from models.numerics import bind_configuration
+
+        bind_configuration(cfg)
         return cfg
 
     def cell_path(self, name, key, task):
@@ -184,6 +187,11 @@ class FeatureTaskMatrix:
         with initialize_config_module(version_base=None, config_module="conf"):
             cfg = self.cfg(model, self.plan.datasets[0], task)
             try:
+                from models.numerics import configure_task
+                from saebase.runtime.environment import configure_worker
+
+                configure_worker(cfg)
+                configure_task(cfg)
                 pair = load_selection(
                     resolve_sae(cfg.model, model.sae_key, model.layer, operation=task), "cuda"
                 )

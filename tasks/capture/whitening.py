@@ -140,6 +140,9 @@ def fit_normalization(cfg, pair, rows, directory):
         "hook_name": pair.site.hook_name,
         "whiten_chunk_size": chunk_size,
     }
+    from models.numerics import identity as numerical_identity
+
+    identity["numerics"] = numerical_identity()
     artifact = directory / "capture_normalization.npz"
     temporary = artifact.with_suffix(".tmp.npz")
     np.savez_compressed(
