@@ -1,17 +1,17 @@
-## 问题与修改效果
+## Question and modification effects
 
-说明具体问题、触发场景，以及修改后怎样使用这项功能。
+Describe specific issues, trigger scenes and how this function will be used with modifications.
 
-## 实现与结果使用
+## Achievement and Results Use
 
-说明主要实现归属、复用的公共能力和受影响的调用者。功能新增或变化时，说明调用者怎样取得并使用结果；保存的内容如何重新读取；实际相关的失败或部分完成如何支持后续处理。
+Describes how the result is obtained and used by the caller when the function is added or changed; how the content saved is rereaded; and how the actual underlying failure or partial completion supports follow-up.
 
-## 相关依据
+## Relevant basis
 
-记录用于判断本次修改的输入、观察结果与依据。按改动选择相关的软件检查；模型、SAE、样本划分、指标或协议变化时提供对应来源与科研验证。需要补足的条件说明实际影响和处理方法。
+The record is used to determine the input, observation and basis of the change. The software check is selected by the change; the corresponding source and scientific validation is provided when the model, SAE, sample classification, indicator or protocol changes.
 
-## 接口与资料迁移
+## Interface and data migration
 
-说明受影响的公开接口、配置、保存格式和调用方式，以及对应的迁移方法。文档、依赖、打包或持续集成随实际变化更新。
+Describe the public interface, configuration, preservation format and mode of call affected, as well as the appropriate migration method. The document, dependence, packing or continuous integration is updated with actual changes.
 
-贡献方法见 [贡献说明](CONTRIBUTING.md)，代码质量工具见 [代码质量说明](../doc/code/development/code-quality.md)。
+The method of contribution can be found in [Statement of contribution](CONTRIBUTING.md), and the code quality tool in [Statement of code quality](../doc/code/documentation/source/development/code-quality.md)).

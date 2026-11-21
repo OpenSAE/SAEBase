@@ -1,8 +1,8 @@
 # 🧱 SAEBase: SAE Research Tools and Agent Workflows
 
-🌍 Languages: [English](README.md) | [中文](README_cn.md) &nbsp; [![CI](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml)
+🌍 Languages: [English](README.md) | [中文](doc/code/translated/README.md) &nbsp; [![CI](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml)
 
-**Software version:** [v0.7.0 — Component Workflows and Reusable Experiments](doc/code/development/releases/v0.7.0.md) · [Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Python API](doc/code/development/python-api.md)
+**Software version:** [v0.8.0 — Research Components and Experiment Workflows](doc/code/documentation/source/development/releases/v0.8.0.md) · [Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Python API](doc/code/documentation/source/development/python-api.md)
 
 **SAEBase** helps researchers study sparse autoencoders (SAEs) in language models. Explore features, test how feature edits affect model behavior, and build reproducible experiments.
 
@@ -18,7 +18,7 @@
 SAEBase connects pretrained models, SAE dictionaries, activation measurements, controlled feature interventions, benchmarks, and reliability analysis in one reusable workflow.
 
 <p align="center">
-  <img src="doc/code/assets/figures/saebase_workflow.svg" alt="SAEBase: models and inputs, reusable activation capture, SAE feature edits, benchmarking and reports" width="1080"/>
+  <img src="doc/code/documentation/source/assets/figures/saebase_workflow.svg" alt="SAEBase: models and inputs, reusable activation capture, SAE feature edits, benchmarking and reports" width="1080"/>
 </p>
 
 **Capture once, evaluate multiple SAEs.** Verified activations can be reused across compatible SAE checkpoints at the same model site, without repeating the language-model forward pass.
@@ -36,13 +36,13 @@ SAEBase connects pretrained models, SAE dictionaries, activation measurements, c
 
 The [Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) lets you browse recorded SAE research results, feature measurements, intervention examples, and reports. Recorded results are distinguished from illustrative examples and new computations. Fresh model inference requires a separately configured runtime and appropriate weights.
 
-[Open the Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Evaluation Dataset](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation) · [Measured results and methods](doc/code/development/research-lab/results-20261020.md)
+[Open the Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Evaluation Dataset](https://huggingface.co/datasets/OpenSAE/SAEBase-Evaluation) · [Measured results and methods](doc/code/documentation/source/development/research-lab/results-20261020.md)
 
 ## 🚀 Quick Start
 
 ### 1. Install and run a complete example
 
-Use Python 3.11 or 3.12. The first examples run on CPU without downloading model checkpoints.
+Use Python 3.11 or 3.12. SAEBase installs and runs on its own. ResearchHarness is optional and provides shared maintenance skills, local resource bindings, and structure review. The first examples run on CPU without downloading model checkpoints.
 
 ```bash
 git clone https://github.com/OpenSAE/SAEBase.git
@@ -53,7 +53,7 @@ python scripts/examples/first_experiment.py --dry-run
 python scripts/examples/first_experiment.py --output runs/first-experiment
 ```
 
-The first Python example demonstrates activation capture and a feature edit. The second example evaluates two small synthetic SAEs and writes `report.html`, `summary.csv` and a reliability report. It prints the exact output paths so you can open the HTML report in a browser.
+The first command previews the planned evaluation of two synthetic SAEs. The second runs the evaluation and writes `report.html`, `summary.csv`, and a reliability report. It prints the output paths so you can open the HTML report in a browser.
 
 ### 2. Try a real model and SAE
 
@@ -64,7 +64,7 @@ saebase task=capture --cfg job
 saebase task=benchmark --cfg job
 ```
 
-Select components with `model=... dataset=... task=...`, then supply the selected task's parameters. Benchmark does not manage other tasks. See the [current architecture](doc/code/development/current-architecture.md).
+Select components with `model=... dataset=... task=...`, then supply the selected task's parameters. Benchmark does not manage other tasks. See the [current architecture](doc/code/documentation/source/development/current-architecture.md).
 
 Install the optional model dependencies, then run the provided Pythia-70M example. This downloads public model and SAE weights.
 
@@ -95,7 +95,7 @@ effect = evaluate_edit(
 print(float(effect.logit_delta.float().norm()))
 ```
 
-This removes two selected feature contributions and reports the change in next-token logits. For other checkpoints, token selection and editing operations, see the [Python API](doc/code/development/python-api.md) and [model registry](doc/code/development/model-support.md).
+This removes two selected feature contributions and reports the change in next-token logits. For other checkpoints, token selection and editing operations, see the [Python API](doc/code/documentation/source/development/python-api.md) and [model registry](doc/code/documentation/source/development/model-support.md).
 
 ### 3. Work with a coding agent
 
@@ -107,10 +107,10 @@ SAEBase separates what gets measured from how the results are analyzed.
 
 | Goal | Runnable example | Guide |
 | --- | --- | --- |
-| Capture and reuse activations | [Activation store](doc/code/development/activation-store.md) | [Capture and storage](doc/code/development/activation-store.md) |
-| Test feature interventions | [Batch interventions](doc/code/development/feature-interventions.md) | [Feature editing and steering](doc/code/development/feature-interventions.md) |
-| Benchmark and audit results | [First experiment](scripts/examples/first_experiment.py) | [Benchmarking](doc/code/development/benchmarking.md) · [Reliability](doc/code/development/reliability.md) |
-| Integrate research methods | [Research examples](doc/code/development/research-integrations.md) | [SAR, RSS, Localization and SAEBench](doc/code/development/research-integrations.md) |
+| Capture and reuse activations | [Activation store](doc/code/documentation/source/development/activation-store.md) | [Capture and storage](doc/code/documentation/source/development/activation-store.md) |
+| Test feature interventions | [Batch interventions](doc/code/documentation/source/development/feature-interventions.md) | [Feature editing and steering](doc/code/documentation/source/development/feature-interventions.md) |
+| Benchmark and audit results | [First experiment](scripts/examples/first_experiment.py) | [Benchmarking](doc/code/documentation/source/development/benchmarking.md) · [Reliability](doc/code/documentation/source/development/reliability.md) |
+| Integrate research methods | [Research examples](doc/code/documentation/source/development/research-integrations.md) | [SAR, RSS, Localization and SAEBench](doc/code/documentation/source/development/research-integrations.md) |
 
 Feature edits can preserve the part of an activation not reconstructed by the SAE:
 
@@ -122,23 +122,25 @@ Full SAE reconstruction is a separate experimental control. Reliability estimate
 
 ### ⚡ Performance
 
-SAEBase includes optional optimizations for repeated model evaluations and feature interventions. Results and hardware conditions are documented separately in the [performance report](doc/code/development/performance/workplan11_final_results.md).
+SAEBase includes optional optimizations for repeated model evaluations and feature interventions. Results and hardware conditions are documented separately in the [performance report](doc/code/documentation/source/development/performance/workplan11_final_results.md).
 
 ## 🧠 Model and SAE Support
 
 <!-- BEGIN VERIFIED_MODEL_SUPPORT -->
-**Verified checkpoints (2026-10-16).** Across **18** model-SAE configurations (270M-9B), **48/48** selected model/layer sites passed real-checkpoint compatibility tests, **48/48** completed benchmark evaluations on 64 held-out prompt groups, and **48/48** completed reliability audits. See the [verified model and SAE matrix](doc/code/development/verified-model-matrix.md).
+**Verified checkpoints (2026-10-16).** Across **18** model-SAE configurations (270M-9B), **48/48** selected model/layer sites passed real-checkpoint compatibility tests, **48/48** completed benchmark evaluations on 64 held-out prompt groups, and **48/48** completed reliability audits. See the [verified model and SAE matrix](doc/code/documentation/source/development/verified-model-matrix.md).
 <!-- END VERIFIED_MODEL_SUPPORT -->
 
-[Model/SAE matrix](doc/code/development/verified-model-matrix.md) · [Validation methods](doc/code/development/validation.md)
+[Model/SAE matrix](doc/code/documentation/source/development/verified-model-matrix.md) · [Validation methods](doc/code/documentation/source/development/validation.md)
 
 ## 📚 Documentation
 
-[Getting Started](doc/code/development/getting-started.md) · [Python API](doc/code/development/python-api.md) · [Examples](doc/code/development/first-experiment.md) · [Research Lab](saebase/research_lab/README.md) · [Full documentation](doc/code/development/index.md)
+[Project documentation](doc/README.md) covers components, configuration, experiment reports, terminology, and execution environments.
 
-Explore the code: [SAEBase API](saebase/) · [Models](models/) · [Datasets](datasets/) · [Tasks](tasks/) · [Configuration](conf/) · [Repository Guide](doc/code/development/repository-guide.md).
+[Getting Started](doc/code/documentation/source/development/getting-started.md) · [Python API](doc/code/documentation/source/development/python-api.md) · [Examples](doc/code/documentation/source/development/first-experiment.md) · [Research Lab](base/research_lab/README.md) · [Full documentation](doc/code/documentation/source/development/index.md)
 
-[Contributing](.github/CONTRIBUTING.md) · [Changelog](doc/code/development/CHANGELOG.md) · [Citation](CITATION.cff) · [Apache-2.0 License](LICENSE) · [Security](.github/SECURITY.md)
+Explore the code: [SAEBase API](base/) · [Models](models/) · [Datasets](datasets/) · [Tasks](tasks/) · [Configuration](conf/) · [Repository Guide](doc/code/documentation/source/development/repository-guide.md).
+
+[Contributing](.github/CONTRIBUTING.md) · [Changelog](doc/code/documentation/source/development/CHANGELOG.md) · [Citation](CITATION.cff) · [Apache-2.0 License](LICENSE) · [Security](.github/SECURITY.md)
 
 ---
 

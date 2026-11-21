@@ -95,7 +95,7 @@ def test_hydra_compose_standalone_sae():
     pytest.importorskip("hydra")
     from pathlib import Path
     from hydra import compose, initialize_config_dir
-    from saebase.runtime.cfg.config_validate import validate_hydra_cfg
+    from saebase.runtime.configuration.config_validate import validate_hydra_cfg
 
     ensure_plugins_loaded()
     conf = Path(__file__).resolve().parents[2] / "conf"
@@ -108,7 +108,7 @@ def test_hydra_compose_standalone_sae():
                 "model=pythia70m",
                 "+sae=pythia70m_resid_sm",
                 "+prompt_source=simple_copying",
-                "task.evaluation=activation_health",
+                "task.benchmark.evaluation=activation_health",
                 "sae.layer=3",
                 "paths.data_dir=/tmp/saebase-prepared",
             ],
@@ -118,11 +118,16 @@ def test_hydra_compose_standalone_sae():
     assert cfg.prompt_source.name == "SimpleCopying"
     assert cfg.sae.layer == 3
     assert cfg.paths.data_dir == "/tmp/saebase-prepared"
+    preset = conf / "tasks" / "benchmark" / "task.yaml"
+    assert not (conf / "evaluation").exists()
+    assert cfg.evaluation == OmegaConf.load(preset).evaluation
+    # This missing path must stay unused during configuration-only runs.
+    assert validate_hydra_cfg(cfg).run_validated(cfg).status == "configured_only"
 
 
 def test_config_rejects_unbundled_research_task():
     import pytest
-    from saebase.runtime.cfg.config_validate import validate_hydra_cfg
+    from saebase.runtime.configuration.config_validate import validate_hydra_cfg
 
     cfg = OmegaConf.create(
         {

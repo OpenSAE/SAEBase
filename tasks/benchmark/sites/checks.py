@@ -317,7 +317,7 @@ def verify_pair_site(
 
 ROOT = Path(__file__).resolve().parents[3]
 
-CATALOG = ROOT / "conf" / "coverage" / "stage_bc.json"
+CATALOG = ROOT / "conf/tasks/benchmark/task.yaml#site_catalog"
 
 
 def _git_commit() -> str:

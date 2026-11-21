@@ -61,7 +61,7 @@ def native_pilot(job: NativePilot) -> dict[str, Any]:
         "HF_HUB_DISABLE_TELEMETRY": "1",
     }
     proc = subprocess.run(
-        [sys.executable, "-m", "tasks.benchmark.methods.saebench_worker"],
+        [sys.executable, "-m", "tasks.benchmark.methods.sae_benchmark_worker"],
         cwd=job.repo_root,
         env=env,
         capture_output=True,

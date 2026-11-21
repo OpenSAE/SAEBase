@@ -1,50 +1,50 @@
-# 工程维护与批次入口
+# Engineering maintenance and batch entrances
 
-## 目的和主要功能
+## Purpose
 
-说明软件发布、分发、文档、代码检查与具体批次启动的使用方式。
+Description of how the software is used for its distribution, distribution, documentation, code checking and specific batch start-up.
 
-## 适用范围
+## Scope
 
-用于软件工程维护与本页列出的批次启动；科研方法和科研结果判断由所属 Task 负责。
+For software engineering maintenance and batch start-up as listed on this page; scientific methods and scientific results will be judged by the parent Task.
 
-工程操作使用四个入口，共用各自的读取、处理和报告程序：
+The engineering operation uses four portals to share their respective reading, processing and reporting procedures:
 
-| 文件 | 主要操作 |
+| File | Main Operations |
 | --- | --- |
-| `release.py` | 软件版本、来源、发布条件与资产登记 |
-| `distribution.py` | `contents` 检查包内容，`install` 检查仓库外安装，`roundtrip` 从源码包重建并检查 |
-| `documentation.py` | `--check` 检查文档链接；`support --check` 或 `support --write` 根据评测证据检查或更新支持说明 |
-| `quality.py` | 选定代码的格式和静态检查；`select --base <提交> --head <提交>` 选择持续集成检查 |
+| `release.py` | Software version, source, conditions for issuance and asset register |
+| `distribution.py` | `contents` Check package contents, `install` Check outside the warehouse installation, `roundtrip` Rebuild and inspect from the source package |
+| `documentation.py` | `--check` Check Document Link.`conf --check` or `conf --write` Check the relative path responsible for the source code and update the path, current value and readable default values in the parameter document.`support --check` or `support --write` Check or update supporting statements based on assessed evidence. |
+| `quality.py` | Format and static check of selected codes; `select --base <commit> --head <commit>` Select to continue integration check |
 
-科研参数转换归所属任务命令，数据准备使用 `saebase-prepare-prompts`。工程开发的完整用法见[贡献指南](../.github/CONTRIBUTING.md)。下文介绍已有批次启动。
+The scientific parameters are converted to the mission command under which the data are prepared using `saebase-prepare-prompts`. For the full use of the project development, see [Contribution Guide](../.github/CONTRIBUTING.md)].
 
-普通矩阵、whiten 和 SAR 队列共用 `saebase/runtime/environment.py` 启动模型子进程。
-本机解释器和关键依赖版本统一配置在 `conf/runtime/environments.yaml`；默认使用
-`/venv/main/bin/python`，Qwen3.5 使用 `/workspace/envs/saebase/qwen35/bin/python`。
-Runtime 在加载权重前检查依赖版本及所需模型架构，检查不通过时保留明确的失败记录。
-直接使用矩阵的 `--model` 参数时也会选择对应环境。
+Normal matrix, whiten and SAR queues share `base/runtime/environment.py` to start the model subprocess.
+Current and Key Dependency Versions Harmonized Configuration at `conf/base/runtime/runtime.yaml`; Default use
+`/venv/main/bin/python`, Qwen3.5 with `/workspace/envs/saebase/qwen35/bin/python`.
+Runtime checks the version-dependent and the required model structure before weighting, and maintains a clear record of failure when the check is not passed.
+The corresponding environment is also selected when using the `--model` parameter of the matrix directly.
 
-主进程保持原有环境，子进程结束后继续使用默认环境运行其他模型。正常结束、报错、
-超时和收到停止信号时均清理本次创建的进程组。每个模型日志旁保存
-`run-<model>.environment.json`，包含解释器、依赖版本和实际包位置；每条实验的
-`metadata/manifest.json` 同时记录实际运行环境。环境本体与依赖清单保存在
-`/workspace/envs/saebase/`，实验目录保存测量和运行记录。
+The main process stays in the same environment and continues to run other models after the subprocess has ended using default environments.
+Clears the process group that is created when time is exceeded and when you receive the stop signal. Saves it next to each model log
+`run-<model>.environment.json`, containing interpreter, dependent version and actual package location; per experiment
+The `metadata/manifest.json` also records the actual operating environment.
+`/workspace/envs/saebase/`, the catalogue keeps a record of measurements and operations.
 
-新的 capture 批次使用正式能力：
+The new Capture batch uses formal capacity:
 
 ```bash
-python -m tasks.capture.matrix --config conf/experiment/capture_matrix.yaml --capture-mode whiten --tag my_whiten_batch
+python -m tasks.capture.matrix --config conf/tasks/capture/task.yaml --capture-mode whiten --tag my_whiten_batch
 ```
 
-批次配置只列本次模型/SAE、数据集选择和执行预算。每个组合仍通过 SAEBase 的 `conf/config.yaml` 与公共 Runtime 运行，自动先 precheck，再 capture。批次复用每个模型的加载会话，并保留失败组合和可继续执行的记录。
+Batch configurations are shown only for this model/SAE, data set selection and execution budget. Each group is still running with the public Runtime by SAEBase `conf/config.yaml`, automatically precheck, and then capture. Batching is reloaded with each model's loaded session and keeps a record of failed combinations and possible continuation.
 
-批次调度由 `tasks.capture.matrix` 维护。配置选择模型、SAE、数据集和预算，各组合通过正式 Runtime 与 Precheck 执行。
+Batch movements are maintained by `tasks.capture.matrix`. Configure selection models, SAEs, data sets and budgets, and the combinations are executed through official Runtime and Precheck.
 
 
-## GPU 空闲后运行 Capture 矩阵
+## GPU free run Capture matrix
 
-`capture_queue.py` 调用正式的 `tasks.capture.matrix`，读取指定矩阵配置中的 Dataset 和 Model/SAE/层位选择。每个模型启动前等待外部计算进程全部离开 GPU，显存占用不超过 1024 MiB、利用率不超过 5%，并连续保持至少 300 秒（5 分钟）；命令行不接受低于 300 秒的门槛；`--wait-pid` 还可等待指定在用批次退出，避免模型切换间隙抢占显卡。探测失败时继续等待。
+`capture_queue.py` Call formal. `tasks.capture.matrix`,Reads the specified matrix configuration Dataset and Model/SAE/Layer selection. Waiting for the external calculation process to leave before each model is started GPU,Visible occupancy does not exceed 1024 MiB,No more than utilization 5%,And keep it at least continuously. 300 seconds(5 min; command line does not accept below 300 Threshold;`--wait-pid` You can also wait to specify that you will exit in batches to avoid the model switching gap to the graphic card..
 
 ```bash
 python -u scripts/capture_queue.py \
@@ -54,15 +54,15 @@ python -u scripts/capture_queue.py \
   --readout answer_mean_logprob
 ```
 
-默认选 16 个特征、抽 384 个子集，其中 256 个拟合、128 个留出；Dataset 仍使用各自已有的固定样本选择。`answer_mean_logprob` 对标准答案全部 token 做 teacher forcing，计算平均条件 log probability。选择题使用正确选项正文，GSM8K 使用最终答案，HumanEval 使用原始标准代码补全；题目输入与特征选择不加入答案。没有标准回答的记录（包括当前 HarmBench、XSTest）标为 unsupported，不能充作成功测量。
+Default selection of 16 features, 384 subsets, of which 256 are proposed and 128 are set aside; Dataset still uses its own fixed sample selection. `answer_mean_logprob` Token do all standard answers toteacher forcing, calculation of average conditions log probability. The selection uses the correct option text, GSM8K uses the final answer, HumanEval uses the original standard code to complete it; entry and feature selection do not add to the answer. The record with no standard answer (including the current HarmBench, XST) is unsuppleted and cannot be used as a successful measure.
 
-运行产物仍保存到 `experiment/<dataset>/<model>/capture/<tag>_<seed>/`。报告目录保存 `effective_matrix.yaml`、`launch_history.jsonl`、`status.json`、各模型日志和逐组合完成记录。查看批次时先读取逐组合完成情况及原因，再使用对应运行的正式结果判断可复用内容；日志用于定位实际错误。维护调度与报告功能时，保证这些记录能够支持继续批次和找到所需产物。再次启动相同配置会读取已有完成记录；失败组合保留旧目录并创建新尝试。模型间串行执行，SAR 需要完整后续网络，关闭普通 capture 的尾层卸载。默认不设置单模型的总时限；可用 `--model-timeout-seconds` 设置正数，超时只终止本脚本创建的进程组并继续后续模型。
+Run the product to save to `experiment/<Data Set>/<Model>/capture/<Test Name>/`.The name of the experiment is different from the capture mode, and an actual mode catalogue is added at the end.,`sar_answer_matrix` It's... SAR Member writing `experiment/<Data Set>/<Model>/capture/sar_answer_matrix/sar/`.Feeds are saved in the effective configuration. Report directory saves `effective_matrix.yaml`,`launch_history.jsonl`,`status.json`,Model logs and group-by-group completion records. Read group-by-group completions and reasons when viewing batches, then judge re-useable content using the official results of the corresponding operation; logs are used to locate actual errors. Maintaining the schedule and reporting function to ensure that these records support the continuation of batches and find the desired product. Restarting the same configuration will read completed records; failure grouping retains old directories and create new attempts., SAR We need a complete follow-up network. We need to shut down normal. capture . The default does not set the total time frame for a single model; available `--model-timeout-seconds` Set positive numbers to terminate process groups created by scripts only over time and continue with follow-up models.
 
-`--check-config` 只检查所有组合，不加载权重、不执行原版估计器或等待 GPU。用于 tmux 时将标准输出和错误重定向到相应 capture `_tmp/` 下；用 `tmux attach -t <会话名>` 查看进度。
+`--check-config` Checks only all combinations without load weight, without executing the original estimater or waiting for GPU. For tmux, directs the standard output and error re-direction to the log directory running at the corresponding batch; views progress with `tmux attach -t <session_name>`.
 
-`capture_queue.py --capture-mode sar` 使用原版 SAR 源码；`--capture-mode whiten` 和 `--capture-mode non_whiten` 使用对应捕获方式。组合数量来自配置，队列共用正式矩阵调度。
+`capture_queue.py --capture-mode sar` Use the original SAR source code; `--capture-mode whiten` and `--capture-mode non_whiten` to use the appropriate capture method. The number of combinations comes from configurations, and queues share the official matrix schedule.
 
 
-## 可运行演示
+## Runable Presentation
 
-`scripts/examples/first_experiment.py` 使用合成模型完成评测、统计与报告，支持 `--dry-run` 和 `--output`。`scripts/examples/external_providers.py` 展示模型、SAE和指标的登记与实际消费。演示在源码环境运行，合成组件由 `tests/fixtures/synthetic.py` 提供，通用调用见[首次实验教程](../doc/code/development/first-experiment.md)。
+`scripts/examples/first_experiment.py` Assessment, statistics and reporting using synthetic models, supported `--dry-run` and `--output`.`scripts/examples/external_providers.py` Show Model, SAE and the registration and actual consumption of the indicator. `tests/fixtures/synthetic.py` Provision, General Call.[The first experimental course.](../doc/code/documentation/source/development/first-experiment.md).

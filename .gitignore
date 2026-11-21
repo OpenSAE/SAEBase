@@ -44,4 +44,3 @@ experiments/
 
 # Instance-local central workspace binding
 .researchharness/central.json
-.researchharness/mode.json

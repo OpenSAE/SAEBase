@@ -1,55 +1,55 @@
-# SAEBase 贡献与开发
+# SAEBase Contribution and Development
 
-## 目的和主要功能
+## Purpose
 
-说明代码、文档和科研接口的维护方式，以及面向 GitHub 的贡献与发布入口。
+Description of the maintenance of codes, documents and scientific interfaces, as well as the contribution to GitHub and the release portal.
 
-## 适用范围
+## Scope
 
-适用于 SAEBase 开发和外部贡献。智能助手按根 AGENTS.md 的当前工作模式及用户任务执行；公开贡献使用下述 GitHub 流程。
+Applies to SAEBASe development and external contributions. Smart assistant works according to the root AGENTS.md 's current working pattern and user tasks; public contribution uses the GitHub process described below.
 
-## 完成一项修改
+## Complete one change
 
-围绕一个具体问题修改现有负责模块。制定功能方案时，说明调用者或后续研究将怎样使用结果，据此安排输入、检查、返回信息及需保存的资料；保存与读取同时设计，相关失败情形提供具体原因、影响和后续处理方法。保持模型、SAE、数据划分和结果来源清楚。目录职责和测试原则统一采用根 AGENTS.md。
+When developing the functional programme, indicate how the caller or follow-up study will use the results to arrange for the input, inspection, return of information and information to be stored; maintain and read together with design, where the failure provides the specific cause, impact and follow-up. Maintain the model, SAE, data disaggregation and results source.
 
-选用能确认本次功能结果的现有检查，需要补充时使用最小输入。辅助代码按持续用途纳入正式实现或长期测试，完成临时用途的代码随任务清理。
+Select an existing check that will confirm the result of this function, using the minimum input when supplemented. The secondary code is incorporated into the formal realization or long-term test as a continuous use, and the code that completes the temporary use is cleared as task.
 
-开发环境按需安装 `python -m pip install -e ".[dev,quality]"`。局部开发运行相关测试，项目级验证由持续集成、发布准备或具体任务安排。文档修改检查实际变化的内容与链接，已有文档检查入口是 `python scripts/documentation.py --check`。
+Development environment needs-based installation `python -m pip install -e ".[dev,quality]"`.Local development of running tests, project-level validation is a continuous integration, release preparation or task-specific arrangement. Document modification checks the content and links of actual changes. `python scripts/documentation.py --check`.
 
-## 公开贡献
+## Public contributions
 
-问题单用于报告问题和讨论需求，拉取请求用于提交可供维护者合并的代码。按贡献需要提供问题背景、实现效果、实际检查结果和涉及的模型或数据来源。
+Questionnaires are used to report problems and discuss needs and to extract requests for the submission of codes that can be consolidated by the maintainer.
 
-新公共接口使用 `saebase.api` 与 `saebase.cli`。接口或持久化格式变化时，同步迁移实际调用者并说明影响。安装与资源布局见[打包说明](../doc/code/development/packaging.md)。
+Use new public interface `saebase.api` with `saebase.cli`.Synchronizes the actual caller and describes the impact when interfaces or lasting changes in format.[Packing instructions](../doc/code/documentation/source/development/packaging.md).
 
-## 科研与软件结果
+## Scientific research and software results
 
-合成输入用于检查软件行为；真实权重、数据和科研协议的结论以实际运行结果为依据。第三方源码保留其来源与许可。
+Synthetic input is used to check software behaviour; true weights, data and scientific agreement conclusions are based on the results of the actual operation. Third-party source code retains its source and licence.
 
-## 发布与质量工具
+## Dissemination and quality tool
 
-软件发布按明确的发布任务执行，参见[软件发布流程](../doc/code/development/release-process.md)。版本、发布说明和实际发布产物保持一致。
+The software release is carried out in accordance with a clear release assignment, see [the software release process](../doc/code/documentation/source/development/release-process.md)]. Versions, release notes and actual release products are consistent.
 
-[代码质量说明](../doc/code/development/code-quality.md)说明局部格式与类型检查；[持续集成说明](../doc/code/development/ci-maintenance.md)说明日常检查、中央接入与发布验证的用途。
+[Code Quality Description](../doc/code/documentation/source/development/code-quality.md)Description of local format and type check;[Ongoing integration statement](../doc/code/documentation/source/development/ci-maintenance.md)Description of the purpose of day-to-day inspections, central access and release of certification.
 
-## 文档与代码审阅
+## Document & Code Review
 
-功能说明直接解释处理对象、输入、计算、输出和使用方法，必要术语结合实际对象解释。现行操作在对应模块集中维护，其他文档按阅读需要连接它；README 介绍能力，任务说明保存协议，执行记录保存一次维护的过程。
+The functional description directly explains the treatment of objects, input, calculate, output and use methods, and the necessary terminology is interpreted in conjunction with the actual object. The current operation is centrally maintained in the corresponding module, which other documents need to be connected to by reading; the README introduction capability, the mission statement preservation protocol, and the process of record-keeping once maintained.
 
-拉取请求围绕具体问题及实际使用审阅。检查真实调用、保存后读取、未完成原因与后续处理，接口变化同步处理调用者。CODEOWNERS 指定路径的审阅责任，仓库保护设置决定合并要求；维护者读取当前分支与适用持续集成结果，再按本次贡献处理。完整发布采用软件发布流程。
+Checks the real call, save and read after, cause uncompleted and follow-up, the interface changes to process the caller in a synchronized fashion. CODEOWNERS assigns review responsibility for the path, and the warehouse protection settings decide on the request to merge; the maintainer reads the results of the current branch and the application of the continuous integration and then processes the contribution.
 
 
-## 科研与工程操作的归属
+## Attribution of scientific research and engineering operations
 
-数据准备使用 `saebase-prepare-prompts`，环境查询使用 `saebase-check-env`。科研流程和检查分别进入对应 Task；数值参考使用 `python -m saebase.api.reference`，真实配对检查使用 `python -m tasks.precheck.sae_checks`。评测短协议通过 `saebase-benchmark --pair-protocol cpu_pair --sae-key <名称> --real --device cpu` 或 `--pair-protocol reference_pair --model <名称> --real` 选择，参数保存于 `conf/benchmark/catalog.yaml`。这些短协议保存自己的输入数量、预算与统计方式。
+Data are prepared using `saebase-prepare-prompts` for environmental queries `saebase-check-env`. Scientific processes and inspections enter the corresponding Task; numerical references use `python -m saebase.api.reference`, and real pair checks use `python -m tasks.precheck.sae_checks`. Short appliance protocols are selected by `saebase-benchmark --pair-protocol cpu_pair --sae-key <name> --real --device cpu` or `--pair-protocol reference_pair --model <name> --real` and parameters are saved at `conf/tasks/precheck/task.yaml`. These short protocols save their own input quantities, budgets and statistics.
 
-工程维护使用以下四个入口：
+Project maintenance uses the following four entry points:
 
-- `python scripts/quality.py`：选定代码的格式和静态检查；`select --base <提交> --head <提交>` 选择持续集成检查。
-- `python scripts/documentation.py --check`：文档链接；`support --check` 或 `support --write` 读取评测证据并检查或更新支持表格。
-- `python scripts/distribution.py contents|install|roundtrip <目录>`：分别检查分发内容、仓库外安装和源码包重建。
-- `python scripts/release.py --help`：版本来源、发布条件和资产登记。
+- `python scripts/quality.py`: Format and static check of selected codes; `select --base <commit> --head <commit>` Select to continue integration check.
+- `python scripts/documentation.py --check`: Document link; `support --check` or `support --write` to read the assessment evidence and check or update the supporting form.
+- `python scripts/distribution.py contents|install|roundtrip <directory>`: Separately check distribution, installation outside the warehouse and re-establishment of the source package.
+- `python scripts/release.py --help`: Version source, conditions for publication and asset register.
 
-已保存的评测证据使用 `python -m tasks.benchmark.results.archive --help`；具体运行的指标和身份核对使用 `python -m tasks.benchmark.results.evidence --output <运行目录>`。来源文件查询使用 `python -m tasks.benchmark.sites.catalog sources --output <文件>`。中央查询直接使用明确绑定的 `rh` 命令；中央引擎身份的指定验收归集成测试。
+Use of saved assessment evidence `python -m tasks.benchmark.results.archive --help`;Use of specific operational indicators and identification checks `python -m tasks.benchmark.results.evidence --output <Run Directory>`.Source Query Usage `python -m tasks.benchmark.sites.catalog sources --output <File>`.Central Query Use explicitly bound `rh` commands;a specified acceptance and integration test for central engine identity.
 
-Lab 的解释、私有执行、公开包准备和电路展示接入由各自后端提供，依次使用 `python -m saebase.research_lab.backend.auto_interp_local`、`private_worker`、`publish bundle` 和 `published_records` 对应模块的帮助。
+Lab interpretation, private execution, public package preparation and circuit display access is provided at their respective backends, using the help of the corresponding modules `python -m saebase.research_lab.backend.auto_interp_local`, `private_worker`, `publish bundle` and `published_records` in turn.

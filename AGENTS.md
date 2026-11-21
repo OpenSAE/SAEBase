@@ -1,59 +1,105 @@
-# SAEBase 工作说明
+# SAEBase Job Description
 
-## 目的和主要功能
+## Purpose
 
-说明科研软件的职责、工作模式和开发方法，帮助智能助手直接完成用户任务。
+Description of the duties and methods of development of scientific software to assist smart assistants in their user assignments.
 
-## 适用范围
+## Scope
 
-适用于 SAEBase 的阅读、开发和维护。先读取 `.researchharness/mode.json`，再按任务读取相关源码、局部 AGENTS.md 和技能。
+Read, develop and maintain for SAEBase. Read the source code and local description on a mission, starting with the project README, relying on a statement and a formal command.
 
-## 工作模式
+## Mandate
 
-- `mode=intensive` 为密集开发模式：按用户目标直接修改、重构、执行必要检查并修复问题。修改前人工审阅默认关闭，中央计划、Flow、临时维护授权和开发命令审批暂停，持续到用户主动切回。源码、Runtime、CI 和项目开发配置均属于正常开发对象。
-- `mode=regular` 或模式文件缺失时采用常规模式：使用 `.agents/skills/researchharness/SKILL.md` 接入中央管理并执行相应审阅与授权流程。
-- 模式切换使用 `rh --harness-root /workspace/ResearchHarness --project saebase mode set intensive` 或 `mode set regular`，查询使用 `mode status`。
-- 下载模型、正式训练、真实数据传输、远程推送、发布和 Atlas 正式替换依据用户对相应操作的授权执行。
+- This operation is carried out according to current mandate and operational identity. Reading and discussion is limited to reading and drafting, and development and maintenance is carried out within a user-defined range. Project code review, formal planning and collaborative authorization follows the project GitHub process.
+- Download models, formal training, real data transmission, remote transfer, release and Atlas Official replacements are carried out on the basis of the user ' s delegation of authority for the corresponding operation.
 
-## 围绕目的完成任务
+## Fulfilling the mission around its purpose
 
-- 先明确用户需要的结果和完成条件，查找既有实现及直接调用者，在已有授权内主动完成调查、判断和处理。简单任务直接实施；复杂任务按实际交付说明依赖和涉及文件。需要人类决定时，提供已查明的事实、具体选择及影响。
-- 获准的常规实现由助手连续完成，局部工程方案依据已定目标、实际收益和维护代价选择。涉及指标含义、研究用途、样本选择或算力投入的新取舍时，结合已有决定说明具体差异、实际影响和建议，与用户对齐后推进相应工作。
-- 涉及研究结果的使用方式或功能价值的较大调整时，尽早用代表性题目、特征对照或报告片段帮助用户判断实际用途；采用已有结果或获准的小规模实验，并依据反馈调整后续实现和展示。额外实验按当前任务授权执行。
-- 制定新增或修改功能时，先选定结果的实际使用场景，明确哪个调用者或后续任务要用它完成什么，再确定检查步骤、返回内容和保存方式。需要长期保留的信息，同时设计查找、读取、产物定位及后续处理。模型、数据、任务及共同支持按各自用途落实；已有记录和接口优先复用。
-- 完成条件包括实际使用结果：正常完成时能取得并使用所需内容；遇到当前功能实际相关的失败、受阻或部分完成时，后续任务能依据所保存的具体事实、影响和处理建议继续工作。原因待查时保留已知事实与下一步定位方法。
-- 阅读围绕当前问题展开。区分文档定义、实际代码行为、运行观测和推断；来源与版本按任务需要记录。历史结果和合成样本记录各自来源。
-- 先修复实际故障。新增防范措施应有当前代码中的具体发生路径、实际后果及相称成本。
-- 每种事实由明确的模块负责确定，后续调用复用结果。常规检查集中在输入和共享接口等关键位置。
-- 临时排查得到的解决方式进入负责该行为的正式代码，清理已完成用途的临时检查和重复判断。结果说明实际影响与后续行动。
-- 修复通过用户正常使用的入口交付，完成范围依据本次任务确定。
-- 连续开发和维护任务使用一份简短执行记录。优先续写已有任务文档；新记录放 `experiment/maintenance/<时间>_<用途>/execution.md`，与临时文件分开。开头说明背景、目标和整体思路，按时间追加重要行动与判断，结束后总结效果、AI 的意见及后续建议；暂停时写明继续位置。结果文件通过已有路径关联。
+- The project changes are based on the physical access, configuration and inspection of the warehouse. Access to ResearchHarness allows the central engineering agreement to check the shared layout, pre-check and delivery agreements, and from `src/project/saebase/README.md` the corresponding realization of these agreements in the project.
 
-## 目录与职责
+- First, the results and conditions of completion required by the user are identified, the actual and direct callers are identified, and investigations, judgements and processing are done on their own initiative and within the delegated authority. Simple tasks are carried out directly; complex tasks are based on actual delivery and involve documents. When human decisions are needed, the facts, specific options and implications identified are provided.
+- Accomplished routines are carried out by assistants on a continuous basis, and local engineering options are selected on the basis of defined objectives, actual benefits and maintenance costs.
+- When it comes to larger adjustments in the use or functional value of research results, the user is assisted to judge the actual use as early as possible with representative topics, features or reporting clips; small-scale experiments with available or approved results are used, and follow-up and presentation is adjusted on the basis of feedback. Additional experiments are carried out in accordance with current mandates.
+- When new or modified functions are developed, the actual use of the results is selected, the caller or subsequent mission is identified, and the inspection steps, the return of content and the way they are stored are determined. Information needs to be kept for long periods of time, while the search, reading, product location and subsequent processing is designed. Models, data, tasks and common support are implemented according to their respective uses; records and interfaces are available for priority reuse.
+- The conditions for completion include the actual results of use: the required content is available and used when normal completion occurs; and the follow-up task can continue on the basis of the specific facts, implications and recommendations kept. The reasons for this remain known and the next way to locate.
+- Read around the current problem. Distinguishing between document definition, actual code behaviour, operational observations and extrapolations; sources and versions are recorded as required by the mission. Historical results and synthetic samples are recorded as their respective sources.
+- The additional precautions should be specific to the current code’s path of occurrence, the actual consequences and the corresponding costs.
+- Each fact is determined by a clear module, followed by a reuse result. Regular checks focus on key locations such as input and shared interface.
+- The solution obtained by the temporary check goes into the official code responsible for the act, cleans up the provisional check and duplicates the judgement of the completed use. The results show the actual impact and follow-up.
+- The scope of the restoration, which is to be completed on the basis of this task, is to be determined through the normal user-used access delivery.
+- Continuous development and maintenance missions leave an implementation record at `doc/code/maintenance/<maintenance_topic>/execution.md`, giving priority to the continuation of existing records on the same subject. Dates and implementation markers are included in the body of the text and are entered in the [maintenance index](doc/maintenance.md)]. The records begin with a background, objectives and holistic approach, add key actions and judgements over time, and conclude with results, AI comments and follow-up recommendations.
 
-- `datasets/`、`models/`、`tasks/` 保存科研组件；`saebase/registry.py` 和 `saebase/runner.py` 负责统一登记与分发。
-- `saebase/api/` 提供通用模型和 SAE 操作；`saebase/runtime/` 维护共同配置、运行路径和记录。复用已有接口，跨组件能力依据实际调用需求设计。
-- `scripts/examples/` 保存完整可运行演示，`tests/fixtures/` 保存合成组件，教学说明归 `doc/code/development/`。
-- `conf/` 保存配置，`scripts/` 保存软件发布、分发、文档和代码检查入口，`tests/` 保存产品测试。业务逻辑归负责模块，脚本和工具调用正式实现。
-- `doc/knowledge/` 保存科研知识与术语，`doc/code/` 保存架构和源码资料，`doc/code/development/` 保存开发说明。`experiment/` 保存运行产物和临时调试输出。
-- `AGENTS.md` 保存共同规则和各目录的具体职责；`.agents/skills/` 保存项目特有的接入与实验方法；`.codex/` 保存客户端配置、权限接入和按需诊断。
-- ResearchHarness 保存通用管理程序、环境资料、正式计划、审阅和历史归档。用户要求正式计划时，使用显式绑定的中央 `src/harness/core/work_plan/workplan.md`；日常方案在对话中说明。SAEBase 科研软件独立安装运行。
-- `saebase/research_lab/` 按用户重新提出的维护任务处理，日常 Dataset、Model、Task 开发聚焦当前使用的组件。
+## Contents and duties
 
-## 检查与科研结果
+- `datasets/`, `models/`, `tasks/` for the preservation of scientific components; `base/application/registry.py` and `base/application/runner.py` for the uniform registration and distribution.
+- `base/interfaces/` provides common models and SAE operations; `base/runtime/` maintains co-configuration, run paths and records. Re-use existing interfaces, and cross-component capabilities are designed on the basis of actual call needs.
+- `scripts/examples/` Saves a full runable demonstration, `tests/fixtures/` Saves a composite component, with a teaching note at `doc/code/documentation/source/development/`.
+- `conf/` Save Configuration, `scripts/` Save software release, distribution, document and code check entrance, `tests/` Save product testing. Business logic goes to the responsible module, scripts and tools are formally implemented.
+- `doc/knowledge/` Preservation of scientific knowledge and terminology, `doc/code/` Preservation of architecture and source code information, `doc/code/documentation/source/development/` Preservation of development notes, `doc/code/maintenance/` Preservation and maintenance of implementation records. `experiment/` is dedicated to scientific experiments and their implementation records.
+- `AGENTS.md` Preservation of project rules and catalogue duties, `.agents/skills/` Preservation of project access and maintenance skills.
+- The SAEBase maintains the scientific source code, the operational entrance and the results of the experiment.
+- `saebase/research_lab/` Processes according to the user's renewed maintenance task, daily Dataset, Model, Task develops components that focus on current uses.
 
-常规检查集中在少数关键位置，后续流程复用已经保证的结果。针对具体问题开展临时检查，查明后将解决能力纳入正式代码，使同类问题得到自动处理，并清理已完成用途的临时检查。
+## Configure maintenance
 
-本次新增的测试脚本和辅助代码按持续用途处理：有持续用途的纳入正式实现或长期测试；已完成临时使命的删除。本次生成的临时输入和测试缓存随任务清理。保留的检查应帮助后续执行直接使用已有保证，减少重复判断和人工介入。
+The configuration path under `conf/` is organized along the first two levels of the responsible source relative directory. Each configuration branch retains only one file, with the in-depth responsibilities expressed in the name section of the document. The exception is that the root of the project is configured `conf/config.yaml`. All new, modified, moved, removed or deployed configurations must be `tests/test_configuration.py`. Automatically run `python -m scripts.documentation conf --write` sync `doc/conf.md`, CI and release steps to verify the synchronized results. Synchronize the text when parameters, behaviour and conditions of use change.
 
-检查范围与实际改动相称。局部修改选择能确认本次功能结果的相关检查；已有结果足以回答问题时直接使用。新增或重复执行测试，应解决当前具体问题。项目级检查用于现有 CI、发布准备或明确需要整体检查的任务。客户端接入、配置变更或相关故障时按需执行 `python .codex/hooks/preflight.py`。
+## Inspection and scientific findings
 
-Python 使用 Ruff `0.15.22`。提交前只暂存本次改动，新增文件使用 `python scripts/quality.py --fix`；既有文件按明确范围使用 `--include-modified`。通过 GitHub 接口写入 Python 时，使用同一工具的 `--stdin --filename <准确路径>` 检查实际内容。CI 负责只读检查。
+Regular inspections are concentrated in a few key locations, and follow-up processes are re-enacted.
 
-模型与 SAE 身份、权重、数据划分、指标、数值精度和历史结果保持来源清楚。涉及其语义变化时明确说明并执行相关检查。工作资料记录软件检查、真实实验和独立验收各自确认的事实与依据。
+This new test script and support code is processed on a continuous basis: there is a continuing use for inclusion in formal realization or long-term testing; temporary mission deletion has been completed. The temporary input and test cache generated this time follows task clean-up.
 
-## 书写与交流
+The scope of the check corresponds to the actual changes. The selected partial modifications confirm the relevant inspection of the functional results; the results are sufficient to be used directly to answer the question.
 
-共同的措辞与交流规则采用 ResearchHarness 根 AGENTS.md 的“书写、解释与对话原则”，其中“交流信息的选择”统一规定对话内容的取舍。按本项目 `.researchharness/central.json` 中的 `harness_root` 定位中央文件并读取该章节。
+Python use Ruff `0.15.22`.Save only this change while the new document is used before submission `python scripts/quality.py --fix`;Existing documents are used in a clear range `--include-modified`.passed GitHub Interface Writing Python , using the same tool `--stdin --filename <Accurate Path>` Check the actual contents. CI Read-only check..
 
-SAEBase 的功能、阶段、报错和报告以实际用途命名；模型名称、数学记号和历史格式标识按其原义保留。Markdown 与面向用户的说明使用中文，代码和通用技术名称保留其实际写法。
+The model maintains a clear source with SAE identity, weight, data disaggregation, indicators, numerical precision and historical results.
+
+## Writing and communication
+
+When you access ResearchHarness, you can use its root AGENTS.md for co-maintenance.
+
+The functions, phases, errors and reports of SAEBase are named for their actual use; model names, mathematical logs and historical format identifiers are retained in their original meaning. Markdown and user-oriented descriptions are in Chinese, and codes and generic technical names are retained in their actual writings.
+
+<!-- researchharness:projects -->
+## ResearchHarness optional access
+
+The project README, the relying list and the public entry points provide an independent installation, configuration and operation mode.
+The item in this access log is marked as `saebase`,The central entrance is `../ResearchHarness`,Shared skills are on. Relative paths are analysed from the root of the project. `src/project/maintained/saebase/README.md`,Access to the project ' s engineering experience.
+Engineering maintenance follows the physical entry and call relationship of the project.
+The project code reviews, plans and authorizes the continuation of the project ' s GitHub process and current session authorization.
+Humans provide research purposes, experience feedback and input preferences, and assistants take on engineering judgement and continuous processing within their delegated authority.
+When `maintain-knowledge` is enabled, it can be used to organize research and reflections that are worth long-term preservation.
+The project access is queryed by `rh projects status saebase`, and the user switch command is applied by `rh projects set`.
+This machine data and Python selects the query by `rh projects resources saebase`.
+
+The project access description is at `.agents/skills/researchharness/SKILL.md`.
+
+### Daily maintenance and light authentication
+
+When a maintenance request is received, skills are selected in accordance with the actual responsibilities in the public entry point. Read the corresponding `SKILL.md` and implement the applicable steps before editing, running or configuration changes are made.
+
+| Maintain content | First-reading skills |
+| --- | --- |
+| Project-wide access, inspection or cross-component maintenance | [`maintain-project`](.agents/skills/maintain-project/SKILL.md) |
+| Access, configuration synthesis, distribution of components or common operation | [`maintain-base`](.agents/skills/maintain-base/SKILL.md) |
+| Dataset, sample reading, labeling, sorting or cache | [`maintain-dataset`](.agents/skills/maintain-dataset/SKILL.md) |
+| Model, variant, construction or weight load | [`maintain-model`](.agents/skills/maintain-model/SKILL.md) |
+| Task calculation, pre-check, indicator or outcome interface | [`maintain-task`](.agents/skills/maintain-task/SKILL.md) |
+| Open Parameters, Defaults, Configure Presets or Overwrite Orders | [`maintain-conf`](.agents/skills/maintain-conf/SKILL.md) |
+| Configure, run, restore or read the results of a single experiment | [`maintain-experiment`](.agents/skills/maintain-experiment/SKILL.md) |
+| Independent script, test, document or external file | [`maintain-optional`](.agents/skills/maintain-optional/SKILL.md) |
+| Code review, duplicate realization or functional gap | [`maintain-code`](.agents/skills/maintain-code/SKILL.md) |
+| One-time clean-up and temporary engineering work | [`maintain-tmp`](.agents/skills/maintain-tmp/SKILL.md) |
+| Assessment and maintenance skills per se | [`maintain-skill`](.agents/skills/maintain-skill/SKILL.md) |
+| Collating and preserving research knowledge and thinking | [`maintain-knowledge`](.agents/skills/maintain-knowledge/SKILL.md) |
+
+The light verification is enabled by ** after the change has been completed. ** runs the minimum inspection associated with the change from the actual entry. The structural, naming or document attribution changes are repeated at `rh projects layout check`, the whole project is accepted at `rh projects project check`, the experimental and precheck evidence is used at `rh projects experiment check` and `rh projects precheck check`. Behavior change prioritizes the light testing, configuration preview or precheck already available on the project, using the resource and boundary input available on the machine. Downloading, installation, official scientific operations and large-scale calculations are carried out according to mandate.
+
+When delivered, describe the entry point, the behaviour covered and the results of the physical inspection.
+<!-- /researchharness:projects -->
+
+## Document Sync
+
+From [Item documents](doc/README.md) Commands, open parameters, dependability, outcome interfaces, and indicator changes are updated with the description. The experimental report refers to the current configuration and existing product. The function reviews the actual entry, configuration and results in the document; the function changes are stated at the time of delivery, the basis of the check and the impact on the existing use..

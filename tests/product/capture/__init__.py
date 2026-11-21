@@ -1,0 +1,1 @@
+"""Product tests for capture."""

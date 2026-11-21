@@ -10,7 +10,7 @@ import os
 import random
 from pathlib import Path
 
-from tasks.benchmark.methods.saebench import import_native
+from tasks.benchmark.methods.sae_benchmark import import_native
 
 RELEASE = "sae_bench_pythia70m_sweep_gated_ctx128_0730"
 

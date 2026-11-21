@@ -1,10 +1,12 @@
 """SAEBase generative intervention task."""
 
-from tasks.sae_runtime import SAEOperationTask
+from saebase.runtime.configuration.task_options import task_value
+
+from saebase.runtime.sae_operations import SAEOperationTask
 
 
 class GenerateTask(SAEOperationTask):
     OPERATION = "generate"
 
     def supports_run_resume(self, cfg):
-        return cfg.task.get("feature_selection") == "capture_top"
+        return task_value(cfg.task, "feature_selection") == "capture_top"

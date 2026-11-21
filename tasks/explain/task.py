@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from saebase.results import EvaluationResult
-from tasks.sae_runtime import SAEOperationTask, execute_task
+from saebase.runtime.sae_operations import SAEOperationTask, execute_task
 
 
 class ExplainTask(SAEOperationTask):

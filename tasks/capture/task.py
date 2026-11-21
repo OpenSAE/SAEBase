@@ -1,38 +1,68 @@
 """SAEBase live capture task."""
 
-from tasks.sae_runtime import SAEOperationTask
+from tasks.capture.configuration import capture_section, migrate_capture_task
+from saebase.runtime.sae_operations import SAEOperationTask
 
 
 class CaptureTask(SAEOperationTask):
     OPERATION = "capture"
 
     def continuation_configuration(self, configuration):
+        from tasks.capture.selection import active_whiten
+
         value = dict(configuration)
-        task = dict(value["task"])
-        task.setdefault("output_scope", "last_token")
-        if task["output_scope"] == "all_tokens":
-            task.setdefault("max_tokens", 128)
-            task.setdefault("max_active_per_token", 256)
+        task = migrate_capture_task(value["task"])
+        sections = task.setdefault("capture", {})
+        sections.setdefault("output_scope", "last_token")
+        if sections["output_scope"] == "all_tokens":
+            sections.setdefault("max_tokens", 128)
+            sections.setdefault("max_active_per_token", 256)
         else:
-            task.pop("max_tokens", None)
-            task.pop("max_active_per_token", None)
-        task.setdefault("mode", "non_whiten")
-        task.setdefault("whiten_chunk_size", 256)
-        filtered = type(task.get("filter")) is int
-        if task["mode"] not in {"sar", "g_s", "I"} and not filtered:
-            task.pop("sar", None)
+            sections.pop("max_tokens", None)
+            sections.pop("max_active_per_token", None)
+        mode = sections.setdefault("mode", "non_whiten")
+        sections.setdefault("whiten_chunk_size", 256)
+        filtered = type(capture_section(task, "selection").get("candidate_count")) is int
+        for section, active in {
+            "output": mode != "rss",
+            "answer": mode in {"sar", "g_s", "I"},
+            "sar": mode == "sar",
+            "i": mode == "I",
+            "g_s": mode == "g_s" and not active_whiten(task),
+            "rss": mode == "rss",
+        }.items():
+            if not active:
+                sections.pop(section, None)
+        if active_whiten(task):
+            sections["selection"].pop("feature_selection", None)
+            if mode == "I" and "i" in sections:
+                sections["i"].pop("feature_selection", None)
+                sections["i"].pop("g_s_shortfall", None)
+        if mode not in {"sar", "g_s", "I"} and not filtered and "selection" in sections:
+            selection = sections["selection"]
+            if "candidate_count" in selection:
+                sections["selection"] = {"candidate_count": selection["candidate_count"]}
+            else:
+                sections.pop("selection")
+        from tasks.capture.model_answer import settings as answer_settings
+
+        sections["model_answer"] = answer_settings({"task": task})
         if (
             not filtered
-            and task["mode"] not in {"whiten", "g_s", "I"}
+            and mode not in {"whiten", "g_s", "I"}
             and not (
-                task["mode"] == "sar" and task.get("sar", {}).get("feature_selection") == "whiten"
+                mode == "sar"
+                and capture_section(task, "selection").get("feature_selection") == "whiten"
             )
         ):
-            task.pop("whiten_chunk_size", None)
+            sections.pop("whiten_chunk_size", None)
         return {**value, "task": task}
 
     def continuation_action(self, result):
         summary = result.summary
+        answer_stage = summary.get("stages", {}).get("model_answer")
+        if answer_stage is not None and answer_stage.get("status") != "complete":
+            return "retry"
         if (
             summary.get("mode") == "sar"
             and summary.get("sar", {}).get("identity", {}).get("algorithm") != "exhaustive"
@@ -65,8 +95,7 @@ class CaptureTask(SAEOperationTask):
                 type(expected) is int
                 and expected > 0
                 and stage.get("status") == "complete"
-                and stage.get("evaluated" if summary.get("mode") == "sar" else "completed")
-                == expected
+                and stage.get("evaluated", stage.get("completed")) == expected
                 and summary.get("selection_exhausted") is True
                 and summary.get("sample_count") == summary.get("ledger_rows") == expected
             )
@@ -100,7 +129,10 @@ class CaptureTask(SAEOperationTask):
     def read_result(self, folder, manifest):
         from tasks.capture.annotations import read_result
 
-        return read_result(folder, manifest)
+        from tasks.capture.model_answer import project
+
+        updated = read_result(folder, manifest)
+        return project(folder, updated)
 
     def refresh_annotations(self, folder):
         from tasks.capture.annotations import refresh_annotations
@@ -116,3 +148,27 @@ class CaptureTask(SAEOperationTask):
         from tasks.capture.report import export_report
 
         return export_report(folder)
+
+    def refresh_model_answers(self, folder):
+        """Complete only original model answers, preserving recorded features."""
+        from tasks.capture.model_answer import refresh
+
+        return refresh(folder)
+
+    def run_validated(self, cfg):
+        from pathlib import Path
+        import json
+        from saebase.results import EvaluationResult
+
+        root = Path.cwd()
+        manifest_path = root / "metadata/manifest.json"
+        if cfg.get("runtime", {}).get("mode") == "resume" and manifest_path.exists():
+            manifest = json.loads(manifest_path.read_text())
+            result = manifest.get("result") or {}
+            stages = result.get("summary", {}).get("stages", {})
+            stage = stages.get("capture") or stages.get("features_and_annotations", {})
+            if stage.get("status") == "complete":
+                self.refresh_model_answers(root)
+                updated = self.read_result(root, manifest)
+                return EvaluationResult(**updated["result"])
+        return super().run_validated(cfg)

@@ -2,38 +2,39 @@
 
 from __future__ import annotations
 
+from saebase.runtime.configuration.task_options import task_value
+
 from typing import Any
 
-from tasks.sae_runtime import _task, _pair, _prompt, _fingerprint_prompt
+from saebase.runtime.sae_operations import _task, _pair, _prompt, _fingerprint_prompt
 
 
 def _generative(cfg: Any, *, prompt: str | None = None) -> dict[str, Any]:
-    from tasks.intervene.backend.steering import GenerationSpec, compare_steered_generation
-    from tasks.intervene.backend.specs import Condition, MeasurementSample
+    from tasks.intervene.editing.steering import GenerationSpec, compare_steered_generation
+    from tasks.intervene.editing.specs import Condition, MeasurementSample
     from saebase.store import SampleRecord, TokenSelection
 
     pair = _pair(cfg)
     prompt = _prompt(cfg) if prompt is None else prompt
-    if cfg.task.get(
-        "feature_selection", "configured"
-    ) == "last_active_content_token" or cfg.task.get("conditions"):
+    if task_value(cfg.task, "feature_selection", "configured"
+    ) == "last_active_content_token" or task_value(cfg.task, "conditions"):
         from tasks.generate.conditions import compare_prompt_conditions
         from saebase.results import completion_summary
         from omegaconf import OmegaConf
 
-        conditions = cfg.task.get("conditions")
+        conditions = task_value(cfg.task, "conditions")
         result = compare_prompt_conditions(
             pair,
             prompt,
             "prompt-" + _fingerprint_prompt(prompt)[:16],
-            int(cfg.task.get("max_new_tokens", 8)),
+            int(task_value(cfg.task, "max_new_tokens", 8)),
             feature_id=None
-            if cfg.task.get("feature_selection") == "last_active_content_token"
-            else cfg.task.get("feature_id", 0),
+            if task_value(cfg.task, "feature_selection") == "last_active_content_token"
+            else task_value(cfg.task, "feature_id", 0),
             conditions=OmegaConf.to_container(conditions, resolve=True) if conditions else None,
             seed=int(cfg.seed),
-            temperature=float(cfg.task.get("temperature", 0.0)),
-            stop_at_context_limit=cfg.task.get("stop_at_context_limit", True),
+            temperature=float(task_value(cfg.task, "temperature", 0.0)),
+            stop_at_context_limit=task_value(cfg.task, "stop_at_context_limit", True),
         )
         return {
             "status": "executed",
@@ -69,7 +70,7 @@ def _generative(cfg: Any, *, prompt: str | None = None) -> dict[str, Any]:
         max_new_tokens=int(_task(cfg, "max_new_tokens", 8)),
         seed=int(cfg.seed),
         temperature=float(_task(cfg, "temperature", 0.0)),
-        stop_at_context_limit=cfg.task.get("stop_at_context_limit", True),
+        stop_at_context_limit=task_value(cfg.task, "stop_at_context_limit", True),
     )
     result = compare_steered_generation(
         pair.model,
@@ -101,7 +102,7 @@ def _generative(cfg: Any, *, prompt: str | None = None) -> dict[str, Any]:
 
 
 def execute(cfg: Any) -> dict[str, Any]:
-    if cfg.task.get("feature_selection", "configured") == "capture_top":
+    if task_value(cfg.task, "feature_selection", "configured") == "capture_top":
         from tasks.intervene.top_features import run_top_features
 
         return run_top_features(cfg, "generate", _generative)
@@ -110,23 +111,23 @@ def execute(cfg: Any) -> dict[str, Any]:
 
 def validate_cfg(cfg: Any) -> None:
     """Validate this Task at its input boundary, before resource loading."""
-    from tasks.sae_runtime import validate_sae_selection
-    from tasks.intervene.backend.specs import Condition
-    from tasks.intervene.backend.steering import GenerationSpec
+    from saebase.runtime.sae_operations import validate_sae_selection
+    from tasks.intervene.editing.specs import Condition
+    from tasks.intervene.editing.steering import GenerationSpec
 
     Condition(
         "generation_feature_edit",
-        str(cfg.task.get("intervention", "add")),
-        (cfg.task.get("feature_id", 0),),
-        cfg.task.get("value", 1.0),
+        str(task_value(cfg.task, "intervention", "add")),
+        (task_value(cfg.task, "feature_id", 0),),
+        task_value(cfg.task, "value", 1.0),
     )
     GenerationSpec(
-        max_new_tokens=cfg.task.get("max_new_tokens", 8),
+        max_new_tokens=task_value(cfg.task, "max_new_tokens", 8),
         seed=cfg.seed,
-        temperature=cfg.task.get("temperature", 0.0),
-        stop_at_context_limit=cfg.task.get("stop_at_context_limit", True),
+        temperature=task_value(cfg.task, "temperature", 0.0),
+        stop_at_context_limit=task_value(cfg.task, "stop_at_context_limit", True),
     )
-    if cfg.task.get("feature_selection", "configured") not in {
+    if task_value(cfg.task, "feature_selection", "configured") not in {
         "configured",
         "last_active_content_token",
         "capture_top",
@@ -137,8 +138,8 @@ def validate_cfg(cfg: Any) -> None:
     from tasks.capture.top_features import validate_top_selection
 
     validate_top_selection(cfg)
-    if cfg.task.get("conditions"):
-        for row in cfg.task.conditions:
+    if task_value(cfg.task, "conditions"):
+        for row in task_value(cfg.task, "conditions"):
             Condition(
                 row.name,
                 row.operation,
@@ -147,7 +148,7 @@ def validate_cfg(cfg: Any) -> None:
                         "feature_ids",
                         ()
                         if row.operation in {"identity", "reconstruction"}
-                        else (cfg.task.get("feature_id", 0),),
+                        else (task_value(cfg.task, "feature_id", 0),),
                     )
                 ),
                 row.get("value", 0.0),

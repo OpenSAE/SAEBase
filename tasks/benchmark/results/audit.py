@@ -104,7 +104,7 @@ def read_audit(root: str | Path) -> dict:
         raise ValueError("reliability audit content identity mismatch")
     truth = report.get("ground_truth")
     if truth is not None:
-        from tasks.benchmark.methods.sar import source_identity
+        from tasks.benchmark.methods.response_surface import source_identity
 
         for paper in ("sar", "rss"):
             source = truth["source_provenance"][paper]

@@ -36,7 +36,7 @@ def parse_args(argv: list[str] | None = None):
     p.add_argument("--evaluation", default=None)
     p.add_argument("--n-prompts", type=int, default=5)
     p.add_argument("--prompt-format", default=None)
-    p.add_argument("--sub-path", default="basic")
+    p.add_argument("--sub-path", default="activation_health")
     p.add_argument(
         "--data-dir",
         "--data-root",
@@ -61,7 +61,7 @@ def _prompt_source_group(name: str) -> str:
     from saebase.datasets.artifacts import canonicalize_behavior
 
     canonical = canonicalize_behavior(name)
-    # These are the canonical-to-Hydra groups shipped in conf/prompt_source/.
+    # These are the canonical-to-Hydra groups shipped in conf/datasets/catalog.yaml.
     group = next(
         (
             alias
@@ -111,7 +111,7 @@ def build_overrides(args: argparse.Namespace, caller: Path) -> list[str]:
         "+evaluation=activation_health",
         "task=benchmark",
         "task.execute=true",
-        "task.evaluation=activation_health",
+        "task.benchmark.evaluation=activation_health",
         f"evaluation.n_prompts={args.n_prompts}",
         f"evaluation.device={args.device}",
         f"model.device={args.device}",

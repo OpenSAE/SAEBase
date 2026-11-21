@@ -16,8 +16,8 @@ def test_repository_docs_have_valid_relative_navigation():
     _, broken = validate()
     assert not broken
     paths = {
-        "doc/code/development/first-experiment.md",
-        "doc/code/development/troubleshooting.md",
+        "doc/code/documentation/source/development/first-experiment.md",
+        "doc/code/documentation/source/development/troubleshooting.md",
         ".github/CONTRIBUTING.md",
         ".github/CONTRIBUTING.md",
         ".github/CODEOWNERS",
@@ -27,8 +27,8 @@ def test_repository_docs_have_valid_relative_navigation():
 
 def test_relative_link_checker_detects_bad_paths(tmp_path):
     guide = tmp_path / "README.md"
-    guide.write_text("[tutorial](doc/code/development/missing.md)\n", encoding="utf-8")
-    assert missing_links(guide, tmp_path) == ["README.md:1: doc/code/development/missing.md"]
+    guide.write_text("[tutorial](doc/code/documentation/source/development/missing.md)\n", encoding="utf-8")
+    assert missing_links(guide, tmp_path) == ["README.md:1: doc/code/documentation/source/development/missing.md"]
     (tmp_path / "doc" / "code/development").mkdir(parents=True)
     (tmp_path / "doc" / "code/development" / "missing.md").write_text(
         "# Present\n", encoding="utf-8"
@@ -48,7 +48,7 @@ def test_issue_forms_and_code_owners_are_present():
     assert options["blank_issues_enabled"] is True
     codeowners = (ROOT / ".github" / "CODEOWNERS").read_text(encoding="utf-8")
     assert "* @AtheavenMa" in codeowners
-    assert "/saebase/extensions/ @AtheavenMa" in codeowners
+    assert "/base/extensions/ @AtheavenMa" in codeowners
 
 
 def _run_first_experiment(tmp_path, *arguments):

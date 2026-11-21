@@ -21,9 +21,9 @@ ENTRYPOINTS = {
     "saebase": ("main", "saebase.runtime.train"),
     "saebase-prepare-prompts": ("prepare_prompts", "saebase.datasets.prepare"),
     "saebase-check-env": ("check_env", "saebase.runtime"),
-    "saebase-intervene": ("intervene", "tasks.intervene.cli"),
-    "saebase-benchmark": ("benchmark", "tasks.benchmark.cli"),
-    "saebase-audit": ("audit", "tasks.benchmark.reliability.cli"),
+    "saebase-intervene": ("intervene", "tasks.intervene.commands"),
+    "saebase-benchmark": ("benchmark", "tasks.benchmark.commands"),
+    "saebase-audit": ("audit", "tasks.benchmark.reliability.commands"),
     "saebase-ground-truth": ("ground_truth", "tasks.benchmark.reliability.controls_cli"),
 }
 
@@ -70,9 +70,6 @@ def test_components_share_the_public_registry():
 
 
 def test_source_manifest_keeps_evidence_in_git_but_out_of_distribution():
-    manifest = (ROOT / "MANIFEST.in").read_text(encoding="utf-8")
-    packaging = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
-    assert "recursive-exclude conf/coverage/stage_d_evidence *" in manifest
-    excluded = packaging["tool"]["setuptools"]["exclude-package-data"]["conf"]
-    assert "coverage/stage_d_evidence/*" in excluded
-    assert (ROOT / "conf/coverage/stage_d_evidence/final/stage_d_final_matrix.json").is_file()
+    manifest = (ROOT / "doc/code/distribution/source/manifest.in").read_text(encoding="utf-8")
+    assert "recursive-exclude assets/history_experiment/benchmark_evidence/files/stage_d_evidence *" in manifest
+    assert (ROOT / "assets/history_experiment/benchmark_evidence/files/stage_d_evidence/final/stage_d_final_matrix.json").is_file()

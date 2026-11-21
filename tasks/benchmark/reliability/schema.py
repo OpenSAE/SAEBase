@@ -1,12 +1,14 @@
 """Immutable grouped evaluation contracts; training seeds are not evaluation seeds."""
 
 from __future__ import annotations
-from dataclasses import dataclass, asdict
-from pathlib import Path
-from typing import Any, Mapping
+
 import json
 import math
+from dataclasses import asdict, dataclass
+from pathlib import Path
+from typing import Any, Mapping
 
+from conf import read_configuration
 from saebase.store import fingerprint
 
 SCHEMA = "saebase.m4.audit.config.v1"
@@ -83,16 +85,7 @@ class AuditConfig:
 
     @classmethod
     def load(cls, path: str | Path) -> "AuditConfig":
-        path = Path(path)
-        if path.suffix == ".json":
-            data = json.loads(path.read_text(encoding="utf-8"))
-        elif path.suffix in {".yml", ".yaml"}:
-            import yaml
-
-            data = yaml.safe_load(path.read_text(encoding="utf-8"))
-        else:
-            raise ValueError("audit config needs JSON or YAML")
-        return cls.from_dict(data)
+        return cls.from_dict(read_configuration(path))
 
     @property
     def config_id(self) -> str:

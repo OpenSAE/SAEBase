@@ -6,8 +6,11 @@ import json
 from pathlib import Path
 from typing import Any
 
+from conf import configuration_location, read_configuration
 from saebase.results import completion_summary
-from tasks.sae_runtime import _task, input_path
+from saebase.runtime.configuration.task_options import task_value
+from saebase.runtime.experiment_paths import configured_experiment_name
+from saebase.runtime.sae_operations import _task, input_path
 
 
 def configured_benchmark(cfg: Any):
@@ -23,31 +26,27 @@ def configured_benchmark(cfg: Any):
     protocol = _task(cfg, "protocol")
     source = _task(cfg, "benchmark_config", "")
     if protocol is not None and source:
-        raise ValueError("Select task.protocol or a task parameter file, not both")
+        raise ValueError("Select task.benchmark.protocol or a task parameter file, not both")
     path = input_path(source) if source else None
     if protocol is not None:
         raw = OmegaConf.to_container(protocol, resolve=True)
     else:
-        if path is None or not path.is_file():
+        if path is None or not configuration_location(path)[0].is_file():
             raise FileNotFoundError(
-                "Provide task.protocol or an existing task.benchmark_config parameter file"
+                "Provide task.benchmark.protocol or an existing task.benchmark.benchmark_config parameter file"
             )
-        raw = (
-            json.loads(path.read_text())
-            if path.suffix == ".json"
-            else OmegaConf.to_container(OmegaConf.load(path), resolve=True)
-        )
+        raw = read_configuration(path, resolve=True)
     selectors = {"targets", "dataset", "model", "models", "prompts"}
     if not isinstance(raw, dict):
         raise ValueError("Benchmark method parameters must be an object")
     if (protocol is not None and set(raw) & selectors) or set(raw) & {"model", "models"}:
         raise ValueError(
-            "task.protocol contains method parameters only; select model and dataset globally"
+            "task.benchmark.protocol contains method parameters only; select model and dataset globally"
         )
     if not set(raw) & selectors:
         from saebase.datasets.prompts import read_measurement_samples
 
-        from tasks.sae_runtime import resolve_sae
+        from saebase.runtime.sae_operations import resolve_sae
 
         targets = []
         for model in models:
@@ -64,7 +63,7 @@ def configured_benchmark(cfg: Any):
             )
         raw = {
             "schema": "saebase.benchmark.config.v1",
-            "name": cfg.experiment.sub_name,
+            "name": configured_experiment_name(cfg) or "metric_evaluation",
             **raw,
             "targets": targets,
             "dataset": {"id": cfg.dataset.name, "samples": read_measurement_samples(cfg.dataset)},
@@ -270,20 +269,20 @@ def execute(cfg: Any) -> dict[str, Any]:
 
 def validate_cfg(cfg: Any) -> None:
     """Validate this Task at its input boundary, before resource loading."""
-    from tasks.sae_runtime import validate_fields
+    from saebase.runtime.sae_operations import validate_fields
 
     validate_fields(cfg, integers=(("layer", 0),), booleans=("resume",))
-    if cfg.task.get("evaluation") == "activation_health":
+    if task_value(cfg.task, "evaluation") == "activation_health":
         return
-    if cfg.task.get("benchmark_config") or cfg.task.get("protocol") is not None:
+    if task_value(cfg.task, "benchmark_config") or task_value(cfg.task, "protocol") is not None:
         configured_benchmark(cfg)
     elif cfg.task.get("execute", False):
-        raise ValueError("Provide task.protocol or task.benchmark_config before execution")
+        raise ValueError("Provide task.benchmark.protocol or task.benchmark.benchmark_config before execution")
 
 
 def prepare_execution(cfg: Any) -> dict:
     """Prepare the selected protocol without running the research calculation."""
-    if cfg.task.get("evaluation") == "activation_health":
+    if task_value(cfg.task, "evaluation") == "activation_health":
         from tasks.benchmark.metrics.health import run_preflight
 
         run_preflight(cfg)

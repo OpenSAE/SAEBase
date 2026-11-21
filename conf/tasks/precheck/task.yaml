@@ -1,0 +1,105 @@
+# @package _global_
+# Setup only prepares assets; Precheck owns every real test.
+task:
+  name: precheck
+  extensions: []  # Explicit installed entry-point names; no automatic discovery.
+  execute: false
+  prompt: ''  # Empty checks the selected Dataset; explicit text checks that text.
+  device: auto
+  performance:
+    enabled: true
+    batch_size: auto
+    batch_sizes: [1, 2, 4, 8, 16, 32, 64]
+    warmup: 1
+    repeats: 3
+    probe_samples: 3
+    probe_states: 64
+    max_seconds: 120
+    memory_fraction: 0.9
+  precheck:
+    resource_only: false  # True: load/probe only the SAE, without a language model.
+    worker_mode: isolated  # in_process only for trusted batches with an outer process timeout.
+    mode: sae             # sae | task | all | performance
+    sae_list: default     # default | all | list of Model-owned SAE keys
+    check_tasks: []       # subset of capture/intervene/generate/circuits/explain/benchmark/train
+    auto_setup: true
+    allow_network: true
+    allow_install: true
+    allow_download: true
+    max_download_bytes: 17179869184  # 16 GiB of missing files, not entire SAE collections.
+    prepare_timeout_seconds: 1800
+    dataset_prepare_timeout_seconds: 1800
+    check_sample_count: 32  # Real input probes; independent of Dataset cohort size.
+    sampling_seed: 42
+    max_seconds: 120
+    max_samples: 2
+    max_tokens: 32
+
+    task_configs: {}  # Actual task overrides for performance checks.
+
+sae_checks:
+  # Purpose: named real-pair checks and bounded benchmark protocols.
+  # Scope: explicitly selected precheck and benchmark executions.
+  defaults:
+    max_measurements: 24
+    seed: 0
+    tolerance: 0.01
+    sample_batch: 1
+    microbatch: 1
+    audit:
+      evaluation_seeds:
+      - 0
+      - 1
+      - 2
+      bootstrap_replicates: 32
+      metric_ids:
+      - core.l0
+      - intervention.logit_delta_l2
+  presets:
+    cpu_pair:
+      audit_count: 3
+      prompts:
+      - The capital of France is
+      - The scientist explained the experiment.
+      device: cpu
+      max_activation_rows: 16
+      sample_sizes:
+      - 2
+      - 3
+      condition_name: active_feature_ablation
+    reference_pair:
+      prompts:
+      - The capital of France is
+      - A scientist explained the results carefully.
+      - Small birds fly across the morning sky.
+      model_key: qwen35_2b
+      max_activation_rows: 24
+      sample_sizes:
+      - 2
+      - 3
+      condition_name: feature-ablation
+  reference_pairs:
+    gemma270m:
+      sae_key: gemma270m_scope_resid
+      layer: 5
+      width: 640
+    gemma1b:
+      sae_key: gemma1b_scope_resid
+      layer: 13
+      width: 1152
+    gemma2_2b:
+      sae_key: gemma2_2b_pt_l25_canonical
+      layer: 25
+      width: 2304
+    qwen35_2b:
+      sae_key: qwen35_2b_resid_w32k
+      layer: 12
+      width: 2048
+    qwen3_8b:
+      sae_key: qwen3_8b_resid_w64k
+      layer: 18
+      width: 4096
+    llama31_8b:
+      sae_key: llama31_8b_lxr_8x
+      layer: 16
+      width: 4096

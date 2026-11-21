@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -27,29 +28,38 @@ def _run(cwd: Path, *overrides: str) -> subprocess.CompletedProcess[str]:
     )
 
 
-def _leaf(cwd: Path, sub_name: str, seed: str) -> Path:
-    return cwd / "experiment" / "IOI" / "gemma2_2b_base" / "capture" / f"{sub_name}_{seed}"
+def _leaf(cwd: Path, sub_name: str) -> Path:
+    return cwd / "experiment" / "IOI" / "gemma2_2b_base" / "capture" / sub_name
 
 
 def test_clean_default_entry_creates_leaf_without_log_redirect(tmp_path: Path):
-    result = _run(tmp_path, "experiment.sub_name=d1clean", "seed=11")
+    result = _run(tmp_path, "experiment.sub_name=prompt_capture", "seed=11")
     assert result.returncode == 0, result.stderr
-    leaf = _leaf(tmp_path, "d1clean", "11")
+    leaf = _leaf(tmp_path, "prompt_capture")
     assert (leaf / "metadata" / "manifest.json").is_file()
     assert not (leaf / "train.log").exists()
     assert "hydra.job_logging" not in " ".join(result.args)
 
 
-def test_same_run_id_is_refused_and_different_seed_is_independent(tmp_path: Path):
-    first = _run(tmp_path, "experiment.sub_name=d1same", "seed=11")
-    assert first.returncode == 0, first.stderr
-    second = _run(tmp_path, "experiment.sub_name=d1same", "seed=11")
-    assert second.returncode != 0
-    assert "FileExistsError" in second.stderr or "artifacts" in second.stderr
-    assert (_leaf(tmp_path, "d1same", "11") / "metadata" / "manifest.json").is_file()
-    other = _run(tmp_path, "experiment.sub_name=d1same", "seed=12")
-    assert other.returncode == 0, other.stderr
-    assert (_leaf(tmp_path, "d1same", "12") / "metadata" / "manifest.json").is_file()
+def test_same_purpose_preserves_repeated_executions(tmp_path: Path):
+    import tarfile
+    from saebase.runtime.experiment_results import list_executions
+
+    folder = _leaf(tmp_path, "activation_stability")
+    for seed in (11, 12, 12):
+        result = _run(tmp_path, "experiment.sub_name=activation_stability", f"seed={seed}")
+        assert result.returncode == 0, result.stderr
+        archive_marker = folder / "reports" / "execution_note.txt"
+        record_id = json.loads((folder / "metadata/manifest.json").read_text())["execution_id"]
+        archive_marker.write_text(record_id)
+    records = list_executions(folder)
+    assert len(records) == 3
+    assert len({r["execution_id"] for r in records}) == 3
+    assert sorted(r["seed"] for r in records) == [11, 12, 12]
+    for record in records:
+        if not record["current"]:
+            with tarfile.open(record["storage"]) as archive:
+                assert archive.extractfile("reports/execution_note.txt").read().decode() == record["execution_id"]
 
 
 def test_failed_task_keeps_the_run_leaf(tmp_path: Path):
@@ -61,14 +71,14 @@ def test_failed_task_keeps_the_run_leaf(tmp_path: Path):
         tmp_path,
         "task=explain",
         "task.execute=true",
-        "task.approved=true",
-        f"task.discovery_file={discovery}",
-        f"task.heldout_file={heldout}",
-        "experiment.sub_name=d1fail",
+        "task.explain.approved=true",
+        f"task.explain.discovery_file={discovery}",
+        f"task.explain.heldout_file={heldout}",
+        "experiment.sub_name=answer_attribution",
         "seed=13",
     )
     assert result.returncode != 0
-    leaf = tmp_path / "experiment" / "IOI" / "gemma2_2b_base" / "explain" / "d1fail_13"
+    leaf = tmp_path / "experiment" / "IOI" / "gemma2_2b_base" / "explain" / "answer_attribution"
     assert (leaf / "metadata" / "manifest.json").is_file()
     assert not (leaf / "train.log").exists()
     assert "generator" in result.stderr.lower() or "RuntimeError" in result.stderr
@@ -80,3 +90,21 @@ def test_openresearch_config_disables_hydra_file_log(name: str):
     assert "override hydra/job_logging: stdout" in text
     assert "max_epochs:" not in text
     assert "mode: null" in text
+
+
+def test_default_experiment_name_reflects_actual_capture_method(tmp_path: Path):
+    result = _run(tmp_path, "task.capture.mode=non_whiten", "experiment.run_id=answer_stability")
+    assert result.returncode == 0, result.stderr
+    run = _leaf(tmp_path, "non_whiten") / "answer_stability"
+    manifest = json.loads((run / "metadata" / "manifest.json").read_text())
+    assert manifest["configuration"]["experiment"] == {
+        "sub_name": "non_whiten",
+        "run_id": "answer_stability",
+    }
+
+
+def test_invalid_experiment_name_is_rejected_before_creating_run(tmp_path: Path):
+    result = _run(tmp_path, "experiment.sub_name=qa_capture_expansion_20261119")
+    assert result.returncode != 0
+    assert "one to three lowercase words" in result.stderr
+    assert not (tmp_path / "experiment").exists()

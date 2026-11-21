@@ -7,6 +7,8 @@ service. The returned record is private until reviewed for redistribution.
 
 from __future__ import annotations
 
+from saebase.runtime.configuration.task_options import task_value
+
 import hashlib
 from typing import Any
 
@@ -102,7 +104,7 @@ def capture_prompt_trace(
                 ),
             }
         )
-    from tasks.sae_runtime import pair_state_fingerprints
+    from saebase.runtime.sae_operations import pair_state_fingerprints
 
     model_sha, sae_sha = pair_state_fingerprints(pair)
     reconstruction = sae.decode(codes)[-1]
@@ -147,15 +149,15 @@ def capture_prompt_result(cfg, pair, prompt, sample=None):
         split=(sample or {}).get("split") or "discovery",
         prompt_group_id=(sample or {}).get("prompt_group_id")
         or (sample or {}).get("sample_id", "local-group"),
-        max_tokens=int(cfg.task.get("max_tokens", 128)),
-        max_active_per_token=int(cfg.task.get("max_active_per_token", 256)),
+        max_tokens=int(task_value(cfg.task, "max_tokens", 128)),
+        max_active_per_token=int(task_value(cfg.task, "max_active_per_token", 256)),
     )
     ids = {feature["feature_id"] for token in trace["tokens"] for feature in token["features"]}
     codes = torch.zeros(pair.identity.d_sae, dtype=torch.float32)
     for feature in trace["tokens"][-1]["features"]:
         codes[feature["feature_id"]] = feature["activation"]
     top_ids = torch.topk(
-        codes.abs(), min(capture_top_feature_num(cfg), codes.numel())
+        codes.abs(), min(capture_top_feature_num(cfg) or codes.numel(), codes.numel())
     ).indices.tolist()
     info, descriptions = annotate_features(
         pair, sorted(ids | set(top_ids)), neuronpedia_settings(cfg)

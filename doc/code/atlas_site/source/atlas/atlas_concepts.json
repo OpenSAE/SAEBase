@@ -1,0 +1,2731 @@
+{
+  "schema": "atlas.source_structure.v1",
+  "project_id": "saebase",
+  "assessment": "SOURCE_ASSESSED; component consolidation reflected in current module ownership",
+  "directories": {
+    "datasets": {
+      "title": "Prompt 数据集",
+      "summary": "组织Prompt 数据集范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Prompt datasets",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Prompt datasets."
+    },
+    "datasets/BBH": {
+      "title": "Prompt 数据集 · BBH",
+      "summary": "组织Prompt 数据集 · BBH范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Prompt datasets / BBH",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Prompt datasets / BBH."
+    },
+    "datasets/CounterFact": {
+      "title": "Prompt 数据集 · CounterFact",
+      "summary": "组织Prompt 数据集 · CounterFact范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Prompt datasets / CounterFact",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Prompt datasets / CounterFact."
+    },
+    "datasets/GreaterThan": {
+      "title": "Prompt 数据集 · GreaterThan",
+      "summary": "组织Prompt 数据集 · GreaterThan范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Prompt datasets / GreaterThan",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Prompt datasets / GreaterThan."
+    },
+    "datasets/IOI": {
+      "title": "Prompt 数据集 · IOI",
+      "summary": "组织Prompt 数据集 · IOI范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Prompt datasets / IOI",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Prompt datasets / IOI."
+    },
+    "datasets/MMLUPro": {
+      "title": "Prompt 数据集 · MMLUPro",
+      "summary": "组织Prompt 数据集 · MMLUPro范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Prompt datasets / MMLUPro",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Prompt datasets / MMLUPro."
+    },
+    "datasets/SimpleCopying": {
+      "title": "Prompt 数据集 · SimpleCopying",
+      "summary": "组织Prompt 数据集 · SimpleCopying范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Prompt datasets / SimpleCopying",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Prompt datasets / SimpleCopying."
+    },
+    "datasets/SubjectVerbAgreement": {
+      "title": "Prompt 数据集 · SubjectVerbAgreement",
+      "summary": "组织Prompt 数据集 · SubjectVerbAgreement范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Prompt datasets / SubjectVerbAgreement",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Prompt datasets / SubjectVerbAgreement."
+    },
+    "saebase": {
+      "title": "SAEBase 科研基础库",
+      "summary": "组织SAEBase 科研基础库范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "SAEBase research library",
+      "en_summary": "Own the immediate source packages, capability modules and support files for SAEBase research library."
+    },
+    "saebase/api": {
+      "title": "SAEBase 科研基础库 · 公共科研接口",
+      "summary": "组织SAEBase 科研基础库 · 公共科研接口范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "SAEBase research library / Public research interfaces",
+      "en_summary": "Own the immediate source packages, capability modules and support files for SAEBase research library / Public research interfaces."
+    },
+    "saebase/runtime/cfg": {
+      "title": "SAEBase 科研基础库 · 运行基础设施 · 配置约定",
+      "summary": "组织SAEBase 科研基础库 · 运行基础设施 · 配置约定范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "SAEBase research library / Execution infrastructure / Configuration contracts",
+      "en_summary": "Own the immediate source packages, capability modules and support files for SAEBase research library / Execution infrastructure / Configuration contracts."
+    },
+    "tasks/circuits/backend": {
+      "title": "科研任务 · 因果电路 · 执行后端",
+      "summary": "组织科研任务 · 因果电路 · 执行后端范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Research tasks / Causal circuits / Execution backends",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Research tasks / Causal circuits / Execution backends."
+    },
+    "saebase/datasets": {
+      "title": "SAEBase 科研基础库 · Prompt 数据集",
+      "summary": "组织SAEBase 科研基础库 · Prompt 数据集范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "SAEBase research library / Prompt datasets",
+      "en_summary": "Own the immediate source packages, capability modules and support files for SAEBase research library / Prompt datasets."
+    },
+    "saebase/datasets/BBH": {
+      "title": "SAEBase 科研基础库 · 数据兼容接口 · BBH",
+      "summary": "组织SAEBase 科研基础库 · 数据兼容接口 · BBH范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "SAEBase research library / Data compatibility interfaces / BBH",
+      "en_summary": "Own the immediate source packages, capability modules and support files for SAEBase research library / Data compatibility interfaces / BBH."
+    },
+    "saebase/datasets/CounterFact": {
+      "title": "SAEBase 科研基础库 · 数据兼容接口 · CounterFact",
+      "summary": "组织SAEBase 科研基础库 · 数据兼容接口 · CounterFact范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "SAEBase research library / Data compatibility interfaces / CounterFact",
+      "en_summary": "Own the immediate source packages, capability modules and support files for SAEBase research library / Data compatibility interfaces / CounterFact."
+    },
+    "saebase/datasets/GreaterThan": {
+      "title": "SAEBase 科研基础库 · 数据兼容接口 · GreaterThan",
+      "summary": "组织SAEBase 科研基础库 · 数据兼容接口 · GreaterThan范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "SAEBase research library / Data compatibility interfaces / GreaterThan",
+      "en_summary": "Own the immediate source packages, capability modules and support files for SAEBase research library / Data compatibility interfaces / GreaterThan."
+    },
+    "saebase/datasets/IOI": {
+      "title": "SAEBase 科研基础库 · 数据兼容接口 · IOI",
+      "summary": "组织SAEBase 科研基础库 · 数据兼容接口 · IOI范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "SAEBase research library / Data compatibility interfaces / IOI",
+      "en_summary": "Own the immediate source packages, capability modules and support files for SAEBase research library / Data compatibility interfaces / IOI."
+    },
+    "saebase/datasets/MMLUPro": {
+      "title": "SAEBase 科研基础库 · 数据兼容接口 · MMLUPro",
+      "summary": "组织SAEBase 科研基础库 · 数据兼容接口 · MMLUPro范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "SAEBase research library / Data compatibility interfaces / MMLUPro",
+      "en_summary": "Own the immediate source packages, capability modules and support files for SAEBase research library / Data compatibility interfaces / MMLUPro."
+    },
+    "saebase/datasets/SimpleCopying": {
+      "title": "SAEBase 科研基础库 · 数据兼容接口 · SimpleCopying",
+      "summary": "组织SAEBase 科研基础库 · 数据兼容接口 · SimpleCopying范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "SAEBase research library / Data compatibility interfaces / SimpleCopying",
+      "en_summary": "Own the immediate source packages, capability modules and support files for SAEBase research library / Data compatibility interfaces / SimpleCopying."
+    },
+    "saebase/datasets/SubjectVerbAgreement": {
+      "title": "SAEBase 科研基础库 · 数据兼容接口 · SubjectVerbAgreement",
+      "summary": "组织SAEBase 科研基础库 · 数据兼容接口 · SubjectVerbAgreement范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "SAEBase research library / Data compatibility interfaces / SubjectVerbAgreement",
+      "en_summary": "Own the immediate source packages, capability modules and support files for SAEBase research library / Data compatibility interfaces / SubjectVerbAgreement."
+    },
+    "saebase/extensions": {
+      "title": "科研任务 · 基准评测任务 · 研究扩展",
+      "summary": "组织科研任务 · 基准评测任务 · 研究扩展范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Research tasks / Benchmark task / Research extensions",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Research tasks / Benchmark task / Research extensions."
+    },
+    "tasks/generate/backend": {
+      "title": "科研任务 · 生成控制 · 执行后端",
+      "summary": "组织科研任务 · 生成控制 · 执行后端范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Research tasks / Generation control / Execution backends",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Research tasks / Generation control / Execution backends."
+    },
+    "tasks/intervene/backend": {
+      "title": "科研任务 · 干预任务 · 执行后端",
+      "summary": "组织科研任务 · 干预任务 · 执行后端范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Research tasks / Intervention task / Execution backends",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Research tasks / Intervention task / Execution backends."
+    },
+    "tasks/benchmark/comparison": {
+      "title": "模型与SAE比较",
+      "summary": "组织多模型和SAE的匹配评测与比较结果。",
+      "en_title": "Comparison",
+      "en_summary": "Compare current model/SAE targets using benchmarks and grouped reliability analysis."
+    },
+    "tasks/benchmark/reliability": {
+      "title": "统计分析与科研对照",
+      "summary": "读取样本组观测，计算不确定性、匹配比较与已知对照。",
+      "en_title": "Reliability",
+      "en_summary": "Reliability analysis. Never modifies a benchmark metric or its raw observations."
+    },
+    "saebase/research_lab": {
+      "title": "SAEBase 科研基础库 · Research Lab",
+      "summary": "组织SAEBase 科研基础库 · Research Lab范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "SAEBase research library / Research Lab",
+      "en_summary": "Own the immediate source packages, capability modules and support files for SAEBase research library / Research Lab."
+    },
+    "saebase/research_lab/backend": {
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端",
+      "summary": "组织SAEBase 科研基础库 · Research Lab · 执行后端范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "Own the immediate source packages, capability modules and support files for SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/tests": {
+      "title": "SAEBase 科研基础库 · Research Lab · 软件验收依据",
+      "summary": "组织SAEBase 科研基础库 · Research Lab · 软件验收依据范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "SAEBase research library / Research Lab / Software acceptance evidence",
+      "en_summary": "Own the immediate source packages, capability modules and support files for SAEBase research library / Research Lab / Software acceptance evidence."
+    },
+    "saebase/runtime": {
+      "title": "SAEBase 科研基础库 · 运行基础设施",
+      "summary": "组织SAEBase 科研基础库 · 运行基础设施范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "SAEBase research library / Execution infrastructure",
+      "en_summary": "Own the immediate source packages, capability modules and support files for SAEBase research library / Execution infrastructure."
+    },
+    "saebase/runtime/training": {
+      "title": "SAEBase 科研基础库 · 运行基础设施 · 训练基础设施",
+      "summary": "组织SAEBase 科研基础库 · 运行基础设施 · 训练基础设施范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "SAEBase research library / Execution infrastructure / Training infrastructure",
+      "en_summary": "Own the immediate source packages, capability modules and support files for SAEBase research library / Execution infrastructure / Training infrastructure."
+    },
+    "saebase/setup": {
+      "title": "SAEBase 科研基础库 · 环境与研究准备",
+      "summary": "组织SAEBase 科研基础库 · 环境与研究准备范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "SAEBase research library / Environment and study setup",
+      "en_summary": "Own the immediate source packages, capability modules and support files for SAEBase research library / Environment and study setup."
+    },
+    "saebase/store": {
+      "title": "SAEBase 科研基础库 · 激活与特征存储",
+      "summary": "组织SAEBase 科研基础库 · 激活与特征存储范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "SAEBase research library / Activation and feature storage",
+      "en_summary": "Own the immediate source packages, capability modules and support files for SAEBase research library / Activation and feature storage."
+    },
+    "tasks": {
+      "title": "科研任务",
+      "summary": "组织科研任务范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Research tasks",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Research tasks."
+    },
+    "tasks/benchmark": {
+      "title": "科研任务 · 基准评测任务",
+      "summary": "组织科研任务 · 基准评测任务范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Research tasks / Benchmark task",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Research tasks / Benchmark task."
+    },
+    "tasks/capture": {
+      "title": "科研任务 · 激活捕获任务",
+      "summary": "组织科研任务 · 激活捕获任务范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Research tasks / Activation capture task",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Research tasks / Activation capture task."
+    },
+    "tasks/circuits": {
+      "title": "科研任务 · 因果电路",
+      "summary": "组织科研任务 · 因果电路范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Research tasks / Causal circuits",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Research tasks / Causal circuits."
+    },
+    "tasks/explain": {
+      "title": "科研任务 · 解释任务",
+      "summary": "组织科研任务 · 解释任务范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Research tasks / Explanation task",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Research tasks / Explanation task."
+    },
+    "tasks/generate": {
+      "title": "科研任务 · 生成控制",
+      "summary": "组织科研任务 · 生成控制范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Research tasks / Generation control",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Research tasks / Generation control."
+    },
+    "tasks/intervene": {
+      "title": "科研任务 · 干预任务",
+      "summary": "组织科研任务 · 干预任务范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Research tasks / Intervention task",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Research tasks / Intervention task."
+    },
+    "tasks/intervene/native": {
+      "title": "科研任务 · 干预任务 · 原生执行接口",
+      "summary": "组织科研任务 · 干预任务 · 原生执行接口范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Research tasks / Intervention task / Native execution interfaces",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Research tasks / Intervention task / Native execution interfaces."
+    },
+    "tasks/precheck": {
+      "title": "科研任务 · 执行前核验",
+      "summary": "组织科研任务 · 执行前核验范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Research tasks / Execution preflight",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Research tasks / Execution preflight."
+    },
+    "tasks/train": {
+      "title": "科研任务 · 训练任务",
+      "summary": "组织科研任务 · 训练任务范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Research tasks / Training task",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Research tasks / Training task."
+    },
+    "tasks/train/backend": {
+      "title": "科研任务 · 训练任务 · 执行后端",
+      "summary": "组织科研任务 · 训练任务 · 执行后端范围内的直接子目录、独立模块与技术支持文件。",
+      "en_title": "Research tasks / Training task / Execution backends",
+      "en_summary": "Own the immediate source packages, capability modules and support files for Research tasks / Training task / Execution backends."
+    },
+    "models": {
+      "role": "capability",
+      "title": "语言模型适配",
+      "summary": "组织公共后端、模型家族及系列共享能力。",
+      "en_title": "Language model adapters",
+      "en_summary": "Own canonical model families and common backends."
+    },
+    "models/gemma": {
+      "role": "capability",
+      "title": "gemma",
+      "summary": "组织 gemma 范围内的规范系列及共享模型声明。",
+      "en_title": "gemma",
+      "en_summary": "Own canonical series declarations and shared capabilities for gemma."
+    },
+    "models/gemma/gemma2": {
+      "role": "capability",
+      "title": "gemma · gemma2",
+      "summary": "组织 gemma · gemma2 范围内的规范系列及共享模型声明。",
+      "en_title": "gemma · gemma2",
+      "en_summary": "Own canonical series declarations and shared capabilities for gemma · gemma2."
+    },
+    "models/gemma/gemma3": {
+      "role": "capability",
+      "title": "gemma · gemma3",
+      "summary": "组织 gemma · gemma3 范围内的规范系列及共享模型声明。",
+      "en_title": "gemma · gemma3",
+      "en_summary": "Own canonical series declarations and shared capabilities for gemma · gemma3."
+    },
+    "models/gpt2": {
+      "role": "capability",
+      "title": "gpt2",
+      "summary": "组织 gpt2 范围内的规范系列及共享模型声明。",
+      "en_title": "gpt2",
+      "en_summary": "Own canonical series declarations and shared capabilities for gpt2."
+    },
+    "models/gpt2/gpt2": {
+      "role": "capability",
+      "title": "gpt2 · gpt2",
+      "summary": "组织 gpt2 · gpt2 范围内的规范系列及共享模型声明。",
+      "en_title": "gpt2 · gpt2",
+      "en_summary": "Own canonical series declarations and shared capabilities for gpt2 · gpt2."
+    },
+    "models/llama": {
+      "role": "capability",
+      "title": "llama",
+      "summary": "组织 llama 范围内的规范系列及共享模型声明。",
+      "en_title": "llama",
+      "en_summary": "Own canonical series declarations and shared capabilities for llama."
+    },
+    "models/llama/llama31": {
+      "role": "capability",
+      "title": "llama · llama31",
+      "summary": "组织 llama · llama31 范围内的规范系列及共享模型声明。",
+      "en_title": "llama · llama31",
+      "en_summary": "Own canonical series declarations and shared capabilities for llama · llama31."
+    },
+    "models/llama/r1_distill": {
+      "role": "capability",
+      "title": "llama · r1_distill",
+      "summary": "组织 llama · r1_distill 范围内的规范系列及共享模型声明。",
+      "en_title": "llama · r1_distill",
+      "en_summary": "Own canonical series declarations and shared capabilities for llama · r1_distill."
+    },
+    "models/mistral": {
+      "role": "capability",
+      "title": "mistral",
+      "summary": "组织 mistral 范围内的规范系列及共享模型声明。",
+      "en_title": "mistral",
+      "en_summary": "Own canonical series declarations and shared capabilities for mistral."
+    },
+    "models/mistral/mistral7b": {
+      "role": "capability",
+      "title": "mistral · mistral7b",
+      "summary": "组织 mistral · mistral7b 范围内的规范系列及共享模型声明。",
+      "en_title": "mistral · mistral7b",
+      "en_summary": "Own canonical series declarations and shared capabilities for mistral · mistral7b."
+    },
+    "models/pythia": {
+      "role": "capability",
+      "title": "pythia",
+      "summary": "组织 pythia 范围内的规范系列及共享模型声明。",
+      "en_title": "pythia",
+      "en_summary": "Own canonical series declarations and shared capabilities for pythia."
+    },
+    "models/pythia/pythia": {
+      "role": "capability",
+      "title": "pythia · pythia",
+      "summary": "组织 pythia · pythia 范围内的规范系列及共享模型声明。",
+      "en_title": "pythia · pythia",
+      "en_summary": "Own canonical series declarations and shared capabilities for pythia · pythia."
+    },
+    "models/qwen": {
+      "role": "capability",
+      "title": "qwen",
+      "summary": "组织 qwen 范围内的规范系列及共享模型声明。",
+      "en_title": "qwen",
+      "en_summary": "Own canonical series declarations and shared capabilities for qwen."
+    },
+    "models/qwen/qwen25": {
+      "role": "capability",
+      "title": "qwen · qwen25",
+      "summary": "组织 qwen · qwen25 范围内的规范系列及共享模型声明。",
+      "en_title": "qwen · qwen25",
+      "en_summary": "Own canonical series declarations and shared capabilities for qwen · qwen25."
+    },
+    "models/qwen/qwen3": {
+      "role": "capability",
+      "title": "qwen · qwen3",
+      "summary": "组织 qwen · qwen3 范围内的规范系列及共享模型声明。",
+      "en_title": "qwen · qwen3",
+      "en_summary": "Own canonical series declarations and shared capabilities for qwen · qwen3."
+    },
+    "models/qwen/qwen35": {
+      "role": "capability",
+      "title": "qwen · qwen35",
+      "summary": "组织 qwen · qwen35 范围内的规范系列及共享模型声明。",
+      "en_title": "qwen · qwen35",
+      "en_summary": "Own canonical series declarations and shared capabilities for qwen · qwen35."
+    },
+    "models/qwen/r1_distill": {
+      "role": "capability",
+      "title": "qwen · r1_distill",
+      "summary": "组织 qwen · r1_distill 范围内的规范系列及共享模型声明。",
+      "en_title": "qwen · r1_distill",
+      "en_summary": "Own canonical series declarations and shared capabilities for qwen · r1_distill."
+    },
+    "scripts": {
+      "title": "工程与批次操作入口",
+      "summary": "组织软件维护操作与已有批次任务入口。",
+      "en_title": "Engineering and batch entrypoints",
+      "en_summary": "Organize software maintenance and existing batch task entrypoints."
+    },
+    "tasks/benchmark/execution": {
+      "title": "评测执行",
+      "summary": "读取所选协议，形成计算计划并复用缓存执行实际测量。",
+      "en_title": "Execution",
+      "en_summary": "Configure, plan and execute scientific benchmarks using task-owned implementations."
+    },
+    "tasks/benchmark/metrics": {
+      "title": "评测指标",
+      "summary": "登记和计算通用指标，执行激活健康评测。",
+      "en_title": "Metrics",
+      "en_summary": "Purpose: Register and query metric definitions used by benchmark planning and execution.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/methods": {
+      "title": "科研方法接入",
+      "summary": "取得所选方法的输入并调用原始估计程序，保存科研来源。",
+      "en_title": "Methods",
+      "en_summary": "Purpose: Import native SAEBench measurements with their model, SAE and upstream source identity.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/sites": {
+      "title": "位点检查与批次执行",
+      "summary": "选择模型、SAE和层位，进行检查、排程、恢复与记录。",
+      "en_title": "Sites",
+      "en_summary": "Purpose: Declare selected model SAE sites, plan their order and inspect checkpoint coverage and sources.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/results": {
+      "title": "评测结果读取与报告",
+      "summary": "保存和读取测量、曲线、统计报告及来源明确的证据资料包。",
+      "en_title": "Results",
+      "en_summary": "Purpose: Construct metric records and save, read and compare their append-only measurement ledger.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    }
+  },
+  "modules": {
+    "saebase/__init__.py": {
+      "source_sha256": "a473136306d3b0218d3350d6cabfea5ec944cac0002c5ced1172c2899fda89bb",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "saebase"
+    },
+    "saebase/api/__init__.py": {
+      "source_sha256": "29174b25b54fb5044590fe203f7c29aefcc8ff33ea4fb988ab8400181c8fede7",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 公共科研接口：模型与 SAE 联合加载",
+      "summary": "按登记配置装配模型、SAE 与配对来源记录；适用范围为SAEBase 科研基础库 · 公共科研接口。",
+      "en_title": "Model and SAE pair loading — SAEBase research library / Public research interfaces",
+      "en_summary": "This module owns model and sae pair loading in SAEBase research library / Public research interfaces."
+    },
+    "saebase/api/components.py": {
+      "source_sha256": "cda86e5840ed95a9525afe727e60eabae570bd84b35f0469cda4a1dc170a86bf",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "模型组件贡献捕获",
+      "summary": "取得块残差、注意力头和 MLP 神经元的贡献，保留各自的计算条件。",
+      "en_title": "Block residual contributions — SAEBase research library / Public research interfaces",
+      "en_summary": "This module owns block residual contributions in SAEBase research library / Public research interfaces."
+    },
+    "saebase/api/features.py": {
+      "source_sha256": "9d6cab39a66f46b601096761554f2d9c27c9c8afb294b0a6f8f7d1a58cc09696",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 公共科研接口：SAE 特征捕获与编辑",
+      "summary": "编码模型激活并比较特征编辑后的行为；适用范围为SAEBase 科研基础库 · 公共科研接口。",
+      "en_title": "SAE feature capture and editing — SAEBase research library / Public research interfaces",
+      "en_summary": "This module owns sae feature capture and editing in SAEBase research library / Public research interfaces."
+    },
+    "saebase/api/metadata.py": {
+      "source_sha256": "fa4654e0421e054ef491459bd9cd6c1eced09525fddcd293ab39ac2ff861399b",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 公共科研接口：SAE 观测位置来源记录",
+      "summary": "序列化模型、层与 SAE 观测位置的身份；适用范围为SAEBase 科研基础库 · 公共科研接口。",
+      "en_title": "SAE site provenance — SAEBase research library / Public research interfaces",
+      "en_summary": "This module owns sae site provenance in SAEBase research library / Public research interfaces."
+    },
+    "saebase/api/model.py": {
+      "source_sha256": "d29614d245b8dddebf614e34b188fa9bfee2b80267a6e4ac20b90e1507356085",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 公共科研接口：模型规格与加载",
+      "summary": "声明权重候选、模型规格与构建入口；适用范围为SAEBase 科研基础库 · 公共科研接口。",
+      "en_title": "Model specification and loading — SAEBase research library / Public research interfaces",
+      "en_summary": "This module owns model specification and loading in SAEBase research library / Public research interfaces."
+    },
+    "saebase/api/nnsight_local.py": {
+      "source_sha256": "50c5387803d99383bcac4ae5cd44e65afcfb37966ec0289882d40074b0eb7577",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 公共科研接口：本地 NNsight 执行",
+      "summary": "在已有 NNsight 模型上连接激活读取与编辑；适用范围为SAEBase 科研基础库 · 公共科研接口。",
+      "en_title": "Local NNsight execution — SAEBase research library / Public research interfaces",
+      "en_summary": "This module owns local nnsight execution in SAEBase research library / Public research interfaces."
+    },
+    "saebase/api/sae_catalog.py": {
+      "source_sha256": "ac64428757f577ccf63e32dcc3ec4473dfce0b5717be92c9f554be85ead9be4b",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 公共科研接口：SAE 资源目录",
+      "summary": "索引已登记的 SAE 资产与官方资源身份；适用范围为SAEBase 科研基础库 · 公共科研接口。",
+      "en_title": "SAE asset catalog — SAEBase research library / Public research interfaces",
+      "en_summary": "This module owns sae asset catalog in SAEBase research library / Public research interfaces."
+    },
+    "saebase/api/sae_contracts.py": {
+      "source_sha256": "8d0a9ab9ad6c71f45c26924924072a94f45af0f5729b7f8d07b5a1a7502ea61e",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 公共科研接口：Prompt 与 SAE 运行合同",
+      "summary": "核验输入产物和 SAE 激活健康检查的合同；适用范围为SAEBase 科研基础库 · 公共科研接口。",
+      "en_title": "Prompt and SAE runtime contracts — SAEBase research library / Public research interfaces",
+      "en_summary": "This module owns prompt and sae runtime contracts in SAEBase research library / Public research interfaces."
+    },
+    "saebase/api/sae_loading.py": {
+      "source_sha256": "32a32157b75edcb545954cb8c03c3821ea7e0bd3bccd01d9809721897b9977cd",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 公共科研接口：按配置加载 SAE",
+      "summary": "按 SAE 配置选择加载器并核对资源身份；适用范围为SAEBase 科研基础库 · 公共科研接口。",
+      "en_title": "Profile-driven SAE loading — SAEBase research library / Public research interfaces",
+      "en_summary": "This module owns profile-driven sae loading in SAEBase research library / Public research interfaces."
+    },
+    "saebase/api/sae_profiles.py": {
+      "source_sha256": "87f1941b5d25c42c4bc732ae193372a770edb1971a4451c321361554f634dc96",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 公共科研接口：SAE 配置登记",
+      "summary": "独立于基础模型登记 SAE 规格与位置；适用范围为SAEBase 科研基础库 · 公共科研接口。",
+      "en_title": "SAE profile registration — SAEBase research library / Public research interfaces",
+      "en_summary": "This module owns sae profile registration in SAEBase research library / Public research interfaces."
+    },
+    "saebase/api/scope2_clt.py": {
+      "source_sha256": "e842ab2d26d701fcbc8f49d1c53789cd7c44e1388caf4f4ba76675a73e8b59db",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 公共科研接口：跨层 Transcoder 代数",
+      "summary": "装配 Scope 2 跨层 Transcoder 的分片运算；适用范围为SAEBase 科研基础库 · 公共科研接口。",
+      "en_title": "Cross-layer transcoder algebra — SAEBase research library / Public research interfaces",
+      "en_summary": "This module owns cross-layer transcoder algebra in SAEBase research library / Public research interfaces."
+    },
+    "saebase/api/scope2_native.py": {
+      "source_sha256": "5a9091b29502f92802e6bed4616c13251653f91b5a73223fcdd51c33f830c567",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 公共科研接口：Scope 2 原生权重加载",
+      "summary": "读取 JumpReLU、Transcoder 与 Crosscoder 的原生参数；适用范围为SAEBase 科研基础库 · 公共科研接口。",
+      "en_title": "Native Scope 2 loading — SAEBase research library / Public research interfaces",
+      "en_summary": "This module owns native scope 2 loading in SAEBase research library / Public research interfaces."
+    },
+    "saebase/api/sparsify_adapter.py": {
+      "source_sha256": "01d8e7504856370c243ba0a18ac45b93c1c784a7f0e3c3e570d3d60795fde831",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 公共科研接口：Sparsify 稠密编码适配",
+      "summary": "将原生 Sparsify 检查点接入统一编码接口；适用范围为SAEBase 科研基础库 · 公共科研接口。",
+      "en_title": "Sparsify dense-code adapter — SAEBase research library / Public research interfaces",
+      "en_summary": "This module owns sparsify dense-code adapter in SAEBase research library / Public research interfaces."
+    },
+    "tasks/benchmark/execution/__init__.py": {
+      "source_sha256": "1994c3f4274ea56bffe80df002064841736f8212d199f84cfd53e7f675201026",
+      "role": "support",
+      "owner": "tasks/benchmark/execution",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测执行：__init__",
+      "summary": "读取所选协议，形成计算计划并复用缓存执行实际测量。",
+      "en_title": "  init  ",
+      "en_summary": "Configure, plan and execute scientific benchmarks using task-owned implementations."
+    },
+    "tasks/benchmark/methods/__init__.py": {
+      "source_sha256": "ea622c4f60c49c8e74b422bc273c162dd7612cc34351c81d9c25669dc1ca2832",
+      "role": "support",
+      "owner": "tasks/benchmark/methods",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "科研方法接入：__init__",
+      "summary": "取得所选方法的输入并调用原始估计程序，保存科研来源。",
+      "en_title": "  init  ",
+      "en_summary": "Purpose: provide methods operations. Scope: the owning SAEBase benchmark, demonstration or test component."
+    },
+    "tasks/benchmark/methods/saebench_custom.py": {
+      "source_sha256": "7393104ab56198662e4c759a6feb6ec65865a5ed02ffa64440c57c3877d732c7",
+      "role": "capability",
+      "owner": "tasks/benchmark/methods",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "科研方法接入：saebench_custom",
+      "summary": "取得所选方法的输入并调用原始估计程序，保存科研来源。",
+      "en_title": "saebench custom",
+      "en_summary": "Purpose: Run explicitly selected custom SAE evaluations in the upstream SAEBench environment.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/methods/localization.py": {
+      "source_sha256": "11baf1f60d70ae61ef3f6edb2ebc9d7947821844194ac3ebd22e49a09a19ae6d",
+      "role": "capability",
+      "owner": "tasks/benchmark/methods",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "科研方法接入：localization",
+      "summary": "取得所选方法的输入并调用原始估计程序，保存科研来源。",
+      "en_title": "localization",
+      "en_summary": "Purpose: Build controlled feature grids and invoke the original localization estimator under a selected benchmark protocol.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/methods/sar.py": {
+      "source_sha256": "be7639a1d4e7bacba617849fddc362e6bbd4c019f64249bbd1004b95633e4100",
+      "role": "capability",
+      "owner": "tasks/benchmark/methods",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "科研方法接入：sar",
+      "summary": "取得所选方法的输入并调用原始估计程序，保存科研来源。",
+      "en_title": "sar",
+      "en_summary": "Invoke the Capture-owned SAR estimator from a frozen benchmark protocol."
+    },
+    "tasks/benchmark/methods/saebench.py": {
+      "source_sha256": "35deaf7558b1b229dbca6b78cff391908c5dc710f36531ff10b5cffa19c8dc63",
+      "role": "capability",
+      "owner": "tasks/benchmark/methods",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "科研方法接入：saebench",
+      "summary": "取得所选方法的输入并调用原始估计程序，保存科研来源。",
+      "en_title": "saebench",
+      "en_summary": "Purpose: Import native SAEBench measurements with their model, SAE and upstream source identity.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/metrics/__init__.py": {
+      "source_sha256": "fabaddf23d9b771a56b35ea65e2d0cbc6447986f225f5c1fdaa6e04331fe9c5f",
+      "role": "support",
+      "owner": "tasks/benchmark/metrics",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测指标：__init__",
+      "summary": "登记和计算通用指标，执行激活健康评测。",
+      "en_title": "  init  ",
+      "en_summary": "Purpose: organize benchmark metrics. Scope: the corresponding task operations."
+    },
+    "tasks/benchmark/metrics/core.py": {
+      "source_sha256": "8e140bde8c3ef1e9ff8f6917055e63d96a6bc5e603220196375d45b992df06ed",
+      "role": "capability",
+      "owner": "tasks/benchmark/metrics",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测指标：core",
+      "summary": "登记和计算通用指标，执行激活健康评测。",
+      "en_title": "core",
+      "en_summary": "Purpose: provide core operations. Scope: the owning SAEBase benchmark, demonstration or test component."
+    },
+    "tasks/benchmark/metrics/intervention.py": {
+      "source_sha256": "7e07d97ea4d4a50112d51b63271409ae8bd71106816cbb7bfd21b8f352e35b31",
+      "role": "capability",
+      "owner": "tasks/benchmark/metrics",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测指标：intervention",
+      "summary": "登记和计算通用指标，执行激活健康评测。",
+      "en_title": "intervention",
+      "en_summary": "Purpose: provide intervention operations. Scope: the owning SAEBase benchmark, demonstration or test component."
+    },
+    "tasks/benchmark/metrics/reconstruction.py": {
+      "source_sha256": "902bcfe2159e96f1cc0fcd3ef632afb0d1dd94771108ead46e3d0395fc073143",
+      "role": "capability",
+      "owner": "tasks/benchmark/metrics",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测指标：reconstruction",
+      "summary": "登记和计算通用指标，执行激活健康评测。",
+      "en_title": "reconstruction",
+      "en_summary": "Purpose: provide reconstruction operations. Scope: the owning SAEBase benchmark, demonstration or test component."
+    },
+    "tasks/benchmark/methods/saebench_runner.py": {
+      "source_sha256": "e62443983a9fae164ce8f5b1070444d8c92e69c0e5e7e09d84dcf1687c58b51a",
+      "role": "capability",
+      "owner": "tasks/benchmark/methods",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "科研方法接入：saebench_runner",
+      "summary": "取得所选方法的输入并调用原始估计程序，保存科研来源。",
+      "en_title": "saebench runner",
+      "en_summary": "Purpose: Execute the pinned upstream SAEBench pilot and compare matched-source SAE measurements.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/execution/planner.py": {
+      "source_sha256": "b2a49065c1ab7e324cb8a94b336c114305088fd8847eb0e06d26e5337f82980c",
+      "role": "capability",
+      "owner": "tasks/benchmark/execution",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测执行：planner",
+      "summary": "读取所选协议，形成计算计划并复用缓存执行实际测量。",
+      "en_title": "planner",
+      "en_summary": "Purpose: Build the measurement plan and resource estimates for a selected benchmark protocol.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/metrics/registry.py": {
+      "source_sha256": "cdb78914eb55e3873b510b75aa15e2c8e29c72c32d4485439293420baa41e49f",
+      "role": "capability",
+      "owner": "tasks/benchmark/metrics",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测指标：registry",
+      "summary": "登记和计算通用指标，执行激活健康评测。",
+      "en_title": "registry",
+      "en_summary": "Purpose: Register and query metric definitions used by benchmark planning and execution.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/results/report.py": {
+      "source_sha256": "b7efc30ff07b9d4c541c0144c11feea1a578c9d37e4f8cc17edcab7a57d17838",
+      "role": "capability",
+      "owner": "tasks/benchmark/results",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测结果读取与报告：report",
+      "summary": "保存和读取测量、曲线、统计报告及来源明确的证据资料包。",
+      "en_title": "report",
+      "en_summary": "Purpose: Render saved benchmark measurements as portable tables and HTML reports.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/results/metrics.py": {
+      "source_sha256": "5213380445b13f7f3a84db89f931467871bf7349162d71b90a085c82393a185f",
+      "role": "capability",
+      "owner": "tasks/benchmark/results",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测结果读取与报告：metrics",
+      "summary": "保存和读取测量、曲线、统计报告及来源明确的证据资料包。",
+      "en_title": "metrics",
+      "en_summary": "Purpose: Construct metric records and save, read and compare their append-only measurement ledger.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/execution/runner.py": {
+      "source_sha256": "18a9852ce78dc086263cc5c5e8bff5bc73a6b89ddd8885722ffcc70384739a30",
+      "role": "capability",
+      "owner": "tasks/benchmark/execution",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测执行：runner",
+      "summary": "读取所选协议，形成计算计划并复用缓存执行实际测量。",
+      "en_title": "runner",
+      "en_summary": "Purpose: Execute frozen benchmark protocols using activation caches, interventions and method-specific evaluators.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/execution/schema.py": {
+      "source_sha256": "0e068eb23320369dcf82e48430d2d667fbc93f25b1ef16c4b76b5f338090b83d",
+      "role": "capability",
+      "owner": "tasks/benchmark/execution",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测执行：schema",
+      "summary": "读取所选协议，形成计算计划并复用缓存执行实际测量。",
+      "en_title": "schema",
+      "en_summary": "Purpose: Describe immutable benchmark inputs, targets, metric rows and deterministic run identities.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "saebase/runtime/cfg/__init__.py": {
+      "source_sha256": "909c5f17bda758e2c688905cfc7d35dee4305c500805b042cd49d0b7a02e7556",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "saebase/runtime/cfg"
+    },
+    "saebase/runtime/cfg/config_validate.py": {
+      "source_sha256": "1d5b5429cfe3203cda4b8208555ae36a46f951ea9ca626d2ee6b3a1cd59d5de2",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 运行基础设施 · 配置约定：Hydra 配置预检",
+      "summary": "在执行前检查配置字段和组合约定；适用范围为SAEBase 科研基础库 · 运行基础设施 · 配置约定。",
+      "en_title": "Hydra configuration checks — SAEBase research library / Execution infrastructure / Configuration contracts",
+      "en_summary": "This module owns hydra configuration checks in SAEBase research library / Execution infrastructure / Configuration contracts."
+    },
+    "saebase/runtime/cfg/contracts.py": {
+      "source_sha256": "68b9061469e168bc6cb5bbf17dfe0167ec747e230004e8b608d799895f8d19f2",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 运行基础设施 · 配置约定：共享组件合同",
+      "summary": "声明跨组件的数据字段、约束与调用约定；适用范围为SAEBase 科研基础库 · 运行基础设施 · 配置约定。",
+      "en_title": "Shared component contracts — SAEBase research library / Execution infrastructure / Configuration contracts",
+      "en_summary": "This module owns shared component contracts in SAEBase research library / Execution infrastructure / Configuration contracts."
+    },
+    "tasks/circuits/backend/__init__.py": {
+      "source_sha256": "a0ebc71da47816d327c9bf786a88e6903e2bfab2a9c624148d05998a9c89bf62",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "tasks/circuits/backend"
+    },
+    "tasks/circuits/backend/clt_intervene.py": {
+      "source_sha256": "fa5f7dd0cd80a9eba67ca30f45eab49b496932228da1b3da3e31b693f8077eb0",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 因果电路 · 执行后端：原生跨层特征编辑",
+      "summary": "将真实 CLT 编辑应用到模型下游层；适用范围为科研任务 · 因果电路 · 执行后端。",
+      "en_title": "Native cross-layer feature edits — Research tasks / Causal circuits / Execution backends",
+      "en_summary": "This module owns native cross-layer feature edits in Research tasks / Causal circuits / Execution backends."
+    },
+    "tasks/circuits/backend/circuits.py": {
+      "source_sha256": "c0365fc98439007e157b64361601346b26be4d77a55624e1f10d25e550de3f8c",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 因果电路 · 执行后端：原生电路追踪与图记录",
+      "summary": "调用原生追踪接口并保留类型化图数据；适用范围为科研任务 · 因果电路 · 执行后端。",
+      "en_title": "Native circuit tracing — Research tasks / Causal circuits / Execution backends",
+      "en_summary": "This module owns native circuit tracing in Research tasks / Causal circuits / Execution backends."
+    },
+    "tasks/circuits/backend/circuit_intervene.py": {
+      "source_sha256": "165117d34ec93f8af4ca158e8c8bd9a572e1a51ea31269caf312c193f66d423c",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 因果电路 · 执行后端：原生电路特征编辑",
+      "summary": "通过明确绑定的 Transcoder 执行特征编辑；适用范围为科研任务 · 因果电路 · 执行后端。",
+      "en_title": "Native circuit feature editing — Research tasks / Causal circuits / Execution backends",
+      "en_summary": "This module owns native circuit feature editing in Research tasks / Causal circuits / Execution backends."
+    },
+    "saebase/cli.py": {
+      "source_sha256": "743893ada206d7d053462c0068d05dd03e242ccc3fd3b8080d446d863b2df95b",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库：公共命令行接口",
+      "summary": "解释命令参数并调度已有科研操作；适用范围为SAEBase 科研基础库。",
+      "en_title": "Public command-line interface — SAEBase research library",
+      "en_summary": "This module owns public command-line interface in SAEBase research library."
+    },
+    "saebase/datasets/__init__.py": {
+      "source_sha256": "1758160904df93bd2620c0c21d326c6b6ea60f89dfe3c02aa557b11f97b8b878",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "saebase/datasets"
+    },
+    "datasets/artifacts.py": {
+      "source_sha256": "ba21f3222690dae395b528fa3c0e6d3e215e801862e7e2a5cd4ffa619fef182d",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "提示产物身份与读写",
+      "summary": "统一数据名称、可用条件、产物路径以及提示记录的保存和读取。",
+      "en_title": "Prompt artifact layout — SAEBase research library / Data compatibility interfaces",
+      "en_summary": "This module owns prompt artifact layout in SAEBase research library / Data compatibility interfaces."
+    },
+    "tests/fixtures/synthetic.py": {
+      "source_sha256": "3483824d65c46b06b089ebe0418f0bd78eef6635ba2e876e0e7b37721401274a",
+      "role": "support",
+      "reason": "合成示例共享的玩具模型与输入固定在独立模块，供示例复用。",
+      "owner": "tests/fixtures"
+    },
+    "scripts/examples/external_providers.py": {
+      "source_sha256": "24d88b59401cd0a44ba266f578a2e433af49c488379e8351ff767967afbba95a",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 使用示例 · 研究扩展：合成扩展提供者示例",
+      "summary": "用玩具组件演示外部模型、SAE 与指标接口；适用范围为SAEBase 科研基础库 · 使用示例 · 研究扩展。",
+      "en_title": "Synthetic extension example — SAEBase research library / Usage examples / Research extensions",
+      "en_summary": "This module owns synthetic extension example in SAEBase research library / Usage examples / Research extensions."
+    },
+    "scripts/examples/first_experiment.py": {
+      "source_sha256": "14430dda2335657bd2be556ff65b901ca7a9e7e14b593420f467884b6f4bc08b",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 使用示例 · 快速上手示例：合成首次实验示例",
+      "summary": "组合玩具模型与两个 SAE 演示基准和可靠性报告；适用范围为SAEBase 科研基础库 · 使用示例 · 快速上手示例。",
+      "en_title": "Synthetic first experiment — SAEBase research library / Usage examples / Quickstart examples",
+      "en_summary": "This module owns synthetic first experiment in SAEBase research library / Usage examples / Quickstart examples."
+    },
+    "tasks/capture/explore.py": {
+      "source_sha256": "4a8df38aebc2152140d94d938b7a494e90fe1b05a6b541f76c65b98bf9298e93",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 激活捕获任务：Prompt 稀疏特征探索",
+      "summary": "将选定 Prompt 转为带位置记录的稀疏特征轨迹；适用范围为科研任务 · 激活捕获任务。",
+      "en_title": "Prompt feature exploration — Research tasks / Activation capture task",
+      "en_summary": "This module owns prompt feature exploration in Research tasks / Activation capture task."
+    },
+    "saebase/extensions/__init__.py": {
+      "source_sha256": "a43c76ff20930e6e3f4958f3628c452147b0f480352fd8e027e7e0f2a7099977",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "saebase/extensions"
+    },
+    "saebase/extensions/contracts.py": {
+      "source_sha256": "bb4ead6183ad1e9f3b31bee979c9b9a2e8bdf9cc034c27ab18cbb15c07b823bf",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 基准评测任务 · 研究扩展：共享组件合同",
+      "summary": "声明跨组件的数据字段、约束与调用约定；适用范围为科研任务 · 基准评测任务 · 研究扩展。",
+      "en_title": "Shared component contracts — Research tasks / Benchmark task / Research extensions",
+      "en_summary": "This module owns shared component contracts in Research tasks / Benchmark task / Research extensions."
+    },
+    "saebase/extensions/metrics.py": {
+      "source_sha256": "c26c5067096a9aa2dc9caa360704bc7c785b367a9e08aaa3e5eb851c540dc28d",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 基准评测任务 · 研究扩展：外部指标执行核验",
+      "summary": "核验外部指标来源并执行选定指标适配；适用范围为科研任务 · 基准评测任务 · 研究扩展。",
+      "en_title": "External metric verification — Research tasks / Benchmark task / Research extensions",
+      "en_summary": "This module owns external metric verification in Research tasks / Benchmark task / Research extensions."
+    },
+    "saebase/extensions/registry.py": {
+      "source_sha256": "e2ec089a6edd1ec7c8dc43c4f8f3410e18231e1b66e7a451ad5aef81092727c5",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 基准评测任务 · 研究扩展：组件登记与查询",
+      "summary": "按明确身份登记组件并查询已有绑定；适用范围为科研任务 · 基准评测任务 · 研究扩展。",
+      "en_title": "Component registry — Research tasks / Benchmark task / Research extensions",
+      "en_summary": "This module owns component registry in Research tasks / Benchmark task / Research extensions."
+    },
+    "saebase/extensions/runtime.py": {
+      "source_sha256": "54b438d99329a8342222d9f3979e709f4d610b3128439591a2d4a6113ed90d2a",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 基准评测任务 · 研究扩展：组件加载与运行约定",
+      "summary": "装配已选组件并核验运行时形状与位置；适用范围为科研任务 · 基准评测任务 · 研究扩展。",
+      "en_title": "Component loading runtime — Research tasks / Benchmark task / Research extensions",
+      "en_summary": "This module owns component loading runtime in Research tasks / Benchmark task / Research extensions."
+    },
+    "tasks/generate/backend/__init__.py": {
+      "source_sha256": "366ffbb52b730953033e90e238584fa42775915feb4c30bff6ed7c46d8b4fe7b",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "tasks/generate/backend"
+    },
+    "tasks/generate/backend/api.py": {
+      "source_sha256": "1cfea51934af29b7328a977720d5a4c0ea82c0387d3f2ecdd04bfd36588df411",
+      "role": "support",
+      "reason": "兼容导入与属性转发保留原路径，功能实现归属规范模块。",
+      "owner": "tasks/generate/backend"
+    },
+    "tasks/generate/backend/engine.py": {
+      "source_sha256": "30db2b06b371a4859c63c5dd0849074e43f87dc284412407ac3e432fad07b56b",
+      "role": "support",
+      "reason": "兼容导入与属性转发保留原路径，功能实现归属规范模块。",
+      "owner": "tasks/generate/backend"
+    },
+    "tasks/generate/backend/gpu.py": {
+      "source_sha256": "7bc4ec494f1377ec05f5d7925252cdad13a8902b09c6f4cfdcc80fbf1ed7c085",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 生成控制 · 执行后端：生成资源释放",
+      "summary": "释放当前生成器持有的进程与设备资源；适用范围为科研任务 · 生成控制 · 执行后端。",
+      "en_title": "Generation resource cleanup — Research tasks / Generation control / Execution backends",
+      "en_summary": "This module owns generation resource cleanup in Research tasks / Generation control / Execution backends."
+    },
+    "tasks/generate/backend/launch.py": {
+      "source_sha256": "34e3f0aeda084d43a8d37b8dc9baeeb225215d2735646b639d655c9deeeb4d4c",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 生成控制 · 执行后端：隔离 Worker 启动",
+      "summary": "用当前解释器构建 Worker 参数与运行环境；适用范围为科研任务 · 生成控制 · 执行后端。",
+      "en_title": "Isolated worker launch — Research tasks / Generation control / Execution backends",
+      "en_summary": "This module owns isolated worker launch in Research tasks / Generation control / Execution backends."
+    },
+    "tasks/generate/backend/nnsight_worker.py": {
+      "source_sha256": "cf8e78ddd553f61e2231bcd5a3be2215e89d840c96d8d1ad6984593975e87581",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 生成控制 · 执行后端：NNsight 生成 Worker",
+      "summary": "在独立 Worker 中连接模型 Hook 与逐步生成；适用范围为科研任务 · 生成控制 · 执行后端。",
+      "en_title": "NNsight generation worker — Research tasks / Generation control / Execution backends",
+      "en_summary": "This module owns nnsight generation worker in Research tasks / Generation control / Execution backends."
+    },
+    "tasks/generate/backend/server.py": {
+      "source_sha256": "47c253bcc664b809a871c01b901a16bbff85a29dc71b15b4bc64d9df0e478020",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 生成控制 · 执行后端：生成服务生命周期",
+      "summary": "维护选定生成服务的启动、健康检查与请求；适用范围为科研任务 · 生成控制 · 执行后端。",
+      "en_title": "Generation server lifecycle — Research tasks / Generation control / Execution backends",
+      "en_summary": "This module owns generation server lifecycle in Research tasks / Generation control / Execution backends."
+    },
+    "tasks/generate/backend/settings.py": {
+      "source_sha256": "25f437f1d519f278a80aa727418466f79d6f231c37acdbb6574e4cd8b93e14e6",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 生成控制 · 执行后端：生成后端参数",
+      "summary": "集中定义端口、显存比例和后端进程选项；适用范围为科研任务 · 生成控制 · 执行后端。",
+      "en_title": "Generation backend settings — Research tasks / Generation control / Execution backends",
+      "en_summary": "This module owns generation backend settings in Research tasks / Generation control / Execution backends."
+    },
+    "tasks/generate/backend/vllm.py": {
+      "source_sha256": "50d0096e3f9a5e29f527d9280d1e4c6f5038fbf44decf3c5003f465a167ad74a",
+      "role": "support",
+      "reason": "兼容导入与属性转发保留原路径，功能实现归属规范模块。",
+      "owner": "tasks/generate/backend"
+    },
+    "tasks/benchmark/methods/rss.py": {
+      "source_sha256": "d13ec5556d8dcd16f108750c0ba802ee35b5cfbb4f576bb514f1f8598af3b524",
+      "role": "capability",
+      "owner": "tasks/benchmark/methods",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "科研方法接入：rss",
+      "summary": "取得所选方法的输入并调用原始估计程序，保存科研来源。",
+      "en_title": "rss",
+      "en_summary": "Purpose: Acquire disjoint selection and held-out feature observations and invoke the original RSS estimator.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/intervene/backend/__init__.py": {
+      "source_sha256": "43fc21a888c209e79b97f81903d43958f5b8b3ad08dfdd6f1b64353aaefce875",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "tasks/intervene/backend"
+    },
+    "tasks/intervene/backend/clean_prefix.py": {
+      "source_sha256": "92d4dc1fb374d646b30b7ef833454dc2078d51c067dcedd5a2b3b506ab344769",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 干预任务 · 执行后端：干净前缀特征编辑",
+      "summary": "基于原始前缀计算特征编辑后的输出；适用范围为科研任务 · 干预任务 · 执行后端。",
+      "en_title": "Clean-prefix feature editing — Research tasks / Intervention task / Execution backends",
+      "en_summary": "This module owns clean-prefix feature editing in Research tasks / Intervention task / Execution backends."
+    },
+    "tasks/intervene/backend/engine.py": {
+      "source_sha256": "7fabf3961cdb0d7c1602894fc986b76c423da0bb7d12bacc1d8ad6db00954fe4",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 干预任务 · 执行后端：有界执行引擎",
+      "summary": "组织任务批次、资源预算及执行状态；适用范围为科研任务 · 干预任务 · 执行后端。",
+      "en_title": "Bounded execution engine — Research tasks / Intervention task / Execution backends",
+      "en_summary": "This module owns bounded execution engine in Research tasks / Intervention task / Execution backends."
+    },
+    "tasks/intervene/backend/hf_cached_steering.py": {
+      "source_sha256": "d185eb4a08c9ef6b91baa58c05e40ee34d72bbbc673c717c7e345ab9f1214070",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 干预任务 · 执行后端：KV 缓存实时特征编辑",
+      "summary": "在每个新增 Token 上应用 SAE 编辑并保留缓存状态；适用范围为科研任务 · 干预任务 · 执行后端。",
+      "en_title": "KV-cached live feature editing — Research tasks / Intervention task / Execution backends",
+      "en_summary": "This module owns kv-cached live feature editing in Research tasks / Intervention task / Execution backends."
+    },
+    "tasks/intervene/backend/kv_cache_exact.py": {
+      "source_sha256": "dce6928052d448b3feaae732ddc45a0f1eacb15d6973aa80f9c7b98da6c6f52a",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 干预任务 · 执行后端：干净前缀 KV 一致性",
+      "summary": "核对缓存解码与参考特征编辑的逐步一致性；适用范围为科研任务 · 干预任务 · 执行后端。",
+      "en_title": "Clean-prefix KV parity — Research tasks / Intervention task / Execution backends",
+      "en_summary": "This module owns clean-prefix kv parity in Research tasks / Intervention task / Execution backends."
+    },
+    "tasks/intervene/native/ndif.py": {
+      "source_sha256": "80035b12fba1a9ad5ff96b0bcb01b959fed7e1404952285b238d783eb93ab94d",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 干预任务 · 原生执行接口：远程 NNsight 选择入口",
+      "summary": "按明确选择连接远程轨迹捕获接口；适用范围为科研任务 · 干预任务 · 原生执行接口。",
+      "en_title": "Remote NNsight opt-in — Research tasks / Intervention task / Native execution interfaces",
+      "en_summary": "This module owns remote nnsight opt-in in Research tasks / Intervention task / Native execution interfaces."
+    },
+    "tasks/intervene/backend/operators.py": {
+      "source_sha256": "3d64e71e26562a7b67f7fc0904bca829846db67cc775d24f5a67ddea50db5b4f",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 干预任务 · 执行后端：特征空间编辑算子",
+      "summary": "按指定重建残差约定应用特征操作；适用范围为科研任务 · 干预任务 · 执行后端。",
+      "en_title": "Feature-space edit operators — Research tasks / Intervention task / Execution backends",
+      "en_summary": "This module owns feature-space edit operators in Research tasks / Intervention task / Execution backends."
+    },
+    "tasks/intervene/native/pyvene.py": {
+      "source_sha256": "fd223c32536bb7c4b59985485004e033cf56eb8fbc996698cd8e360e232697f7",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 干预任务 · 原生执行接口：原生 Pyvene 组合干预",
+      "summary": "组合表示位置并执行原生序列化干预；适用范围为科研任务 · 干预任务 · 原生执行接口。",
+      "en_title": "Native Pyvene composition — Research tasks / Intervention task / Native execution interfaces",
+      "en_summary": "This module owns native pyvene composition in Research tasks / Intervention task / Native execution interfaces."
+    },
+    "tasks/intervene/native/interventions.py": {
+      "source_sha256": "b040dede115e3e94b7a46ce5e69db06b6023bd004966dd773c591bf76758327d",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 干预任务 · 原生执行接口：原生特征与组件干预",
+      "summary": "组织实际 SAE 编辑及模型组件干预条件；适用范围为科研任务 · 干预任务 · 原生执行接口。",
+      "en_title": "Native feature and component edits — Research tasks / Intervention task / Native execution interfaces",
+      "en_summary": "This module owns native feature and component edits in Research tasks / Intervention task / Native execution interfaces."
+    },
+    "tasks/intervene/backend/results.py": {
+      "source_sha256": "476ba3226d5fe98a025d7a4e4411933aa2774316e2008995dbbb267c9940c449",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 干预任务 · 执行后端：结构化结果与持久化",
+      "summary": "保存结果身份、测量记录与校验信息；适用范围为科研任务 · 干预任务 · 执行后端。",
+      "en_title": "Structured result persistence — Research tasks / Intervention task / Execution backends",
+      "en_summary": "This module owns structured result persistence in Research tasks / Intervention task / Execution backends."
+    },
+    "tasks/intervene/backend/specs.py": {
+      "source_sha256": "6cb1a23e4cba57b53af71e1dd3aa0b8cb738b54cdbdb63f2a691ef8094257783",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 干预任务 · 执行后端：可复现干预定义",
+      "summary": "定义实验条件、样本和测量身份；适用范围为科研任务 · 干预任务 · 执行后端。",
+      "en_title": "Reproducible intervention definitions — Research tasks / Intervention task / Execution backends",
+      "en_summary": "This module owns reproducible intervention definitions in Research tasks / Intervention task / Execution backends."
+    },
+    "tasks/intervene/backend/steering.py": {
+      "source_sha256": "90e00825bbebc54df2c30153f30f9ef689217a3052523d034f38a8546610a99b",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 干预任务 · 执行后端：逐 Token 特征引导",
+      "summary": "比较参考生成与逐步特征引导的行为；适用范围为科研任务 · 干预任务 · 执行后端。",
+      "en_title": "Token-wise feature steering — Research tasks / Intervention task / Execution backends",
+      "en_summary": "This module owns token-wise feature steering in Research tasks / Intervention task / Execution backends."
+    },
+    "models/plugins.py": {
+      "source_sha256": "c26eea8d7b6584a902842bc2ff6dd0b42be57b3925fcf5a8be2004351961699c",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "语言模型适配：内置插件登记",
+      "summary": "将随项目提供的组件绑定到统一 Registry；适用范围为语言模型适配。",
+      "en_title": "Built-in plugin registration — Language-model adapters",
+      "en_summary": "This module owns built-in plugin registration in Language-model adapters."
+    },
+    "saebase/plugin_bootstrap.py": {
+      "source_sha256": "03cc3e29f3406ad41a2db9bea46219ca454daec1398169ea5a5650f670897531",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库：数据组件插件发现",
+      "summary": "按明确登记载入数据组件插件；适用范围为SAEBase 科研基础库。",
+      "en_title": "Dataset plugin discovery — SAEBase research library",
+      "en_summary": "This module owns dataset plugin discovery in SAEBase research library."
+    },
+    "saebase/registry.py": {
+      "source_sha256": "833c602261d804e448544c8d8ceeffe4df0702c257722cddc41605a495e75d75",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库：组件登记与查询",
+      "summary": "按明确身份登记组件并查询已有绑定；适用范围为SAEBase 科研基础库。",
+      "en_title": "Component registry — SAEBase research library",
+      "en_summary": "This module owns component registry in SAEBase research library."
+    },
+    "tasks/benchmark/comparison/__init__.py": {
+      "source_sha256": "dfd60bd2061ff716c259a98e6f024b169efae01ff96d3becbd6f106ef9516b17",
+      "role": "support",
+      "owner": "tasks/benchmark/comparison",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "模型与SAE比较：__init__",
+      "summary": "组织多模型和SAE的匹配评测与比较结果。",
+      "en_title": "  init  ",
+      "en_summary": "Compare current model/SAE targets using benchmarks and grouped reliability analysis."
+    },
+    "tasks/benchmark/comparison/planner.py": {
+      "source_sha256": "cca18423ca3f95f195d77465593988fb4b7d835a4add04032a3c4433706182ed",
+      "role": "capability",
+      "owner": "tasks/benchmark/comparison",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "模型与SAE比较：planner",
+      "summary": "组织多模型和SAE的匹配评测与比较结果。",
+      "en_title": "planner",
+      "en_summary": "No-download model comparison preflight; never claims unverified availability."
+    },
+    "tasks/benchmark/comparison/runner.py": {
+      "source_sha256": "0b69a06e329f2267e2ab48f19c08149b31221036ecf56056a5bba8d5228d765f",
+      "role": "capability",
+      "owner": "tasks/benchmark/comparison",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "模型与SAE比较：runner",
+      "summary": "组织多模型和SAE的匹配评测与比较结果。",
+      "en_title": "runner",
+      "en_summary": "Cross-model benchmarking and reliability analysis with shared caches and resumable runs.\n\nNo external checkpoints are bundled, no score is collapsed across metrics,\nand import-only/report-only modes never load model weights."
+    },
+    "tasks/benchmark/comparison/schema.py": {
+      "source_sha256": "e73c2360724200e7c60b7217901964da3a06b7440794241f9ef05075c237ad6b",
+      "role": "capability",
+      "owner": "tasks/benchmark/comparison",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "模型与SAE比较：schema",
+      "summary": "组织多模型和SAE的匹配评测与比较结果。",
+      "en_title": "schema",
+      "en_summary": "Strict, immutable and reproducible Model comparison model comparison schema."
+    },
+    "tasks/benchmark/reliability/__init__.py": {
+      "source_sha256": "30fff0c8388a5a1914f8d1e08e373cc12938951c1ab7759ede32fdd244cb3947",
+      "role": "support",
+      "owner": "tasks/benchmark/reliability",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "统计分析与科研对照：__init__",
+      "summary": "读取样本组观测，计算不确定性、匹配比较与已知对照。",
+      "en_title": "  init  ",
+      "en_summary": "Reliability analysis. Never modifies a benchmark metric or its raw observations."
+    },
+    "tasks/benchmark/reliability/bootstrap.py": {
+      "source_sha256": "595a0cdf8518359128da863fc96c1e018bc650a4249f4823d6323a0673e57a7b",
+      "role": "capability",
+      "owner": "tasks/benchmark/reliability",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "统计分析与科研对照：bootstrap",
+      "summary": "读取样本组观测，计算不确定性、匹配比较与已知对照。",
+      "en_title": "bootstrap",
+      "en_summary": "Purpose: Resample complete prompt groups and estimate fixed-metric or paired comparison uncertainty.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/reliability/controls.py": {
+      "source_sha256": "76395f10630dbcedaaf862c2bd949c2d695d39d1bf60d6c89b67a2044089e951",
+      "role": "capability",
+      "owner": "tasks/benchmark/reliability",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "统计分析与科研对照：controls",
+      "summary": "读取样本组观测，计算不确定性、匹配比较与已知对照。",
+      "en_title": "controls",
+      "en_summary": "Purpose: Evaluate analytical SAR and RSS controls and report original-method numerical agreement.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/reliability/ground_truth.py": {
+      "source_sha256": "ed4c343abeab20bc1869661d397020453a334f8311ee544a9bfe49a988e4e4b7",
+      "role": "capability",
+      "owner": "tasks/benchmark/reliability",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "统计分析与科研对照：ground_truth",
+      "summary": "读取样本组观测，计算不确定性、匹配比较与已知对照。",
+      "en_title": "ground truth",
+      "en_summary": "Purpose: Construct known feature factors and evaluate matching and controlled degradation.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/reliability/localization.py": {
+      "source_sha256": "3e113dfd30931b3766fa25d70fd8d5de4bd001518dba8e96094fb83aa0415468",
+      "role": "capability",
+      "owner": "tasks/benchmark/reliability",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "统计分析与科研对照：localization",
+      "summary": "读取样本组观测，计算不确定性、匹配比较与已知对照。",
+      "en_title": "localization",
+      "en_summary": "Conditional Localize reliability and descriptive cross-SAE comparisons.\n\nOne complete Boolean factorial grid is ONE input population, not 2**n\nindependent observations. Do not apply reliability audit prompt-group bootstrap to its states.\nFinite-pair repetitions assess Monte Carlo estimation stability, not generalization."
+    },
+    "tasks/benchmark/reliability/observations.py": {
+      "source_sha256": "100b8d308fe4f1715306af629ed52b230c2ca46c48d1dea3f3e26491625834d7",
+      "role": "capability",
+      "owner": "tasks/benchmark/reliability",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "统计分析与科研对照：observations",
+      "summary": "读取样本组观测，计算不确定性、匹配比较与已知对照。",
+      "en_title": "observations",
+      "en_summary": "Reconstruct reliability audit observation units from verified benchmark, activation-cache and intervention artifacts only.\n\nNo pretrained model loads; no forward passes; original benchmark metric rows immutable."
+    },
+    "tasks/benchmark/reliability/ranking.py": {
+      "source_sha256": "2720cca1715b125f96bdf48f7d8730094b1c07ef006e30c3dc6fe888e75d67d9",
+      "role": "capability",
+      "owner": "tasks/benchmark/reliability",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "统计分析与科研对照：ranking",
+      "summary": "读取样本组观测，计算不确定性、匹配比较与已知对照。",
+      "en_title": "ranking",
+      "en_summary": "Pair-aligned ranking stability; never rank contextual SAR/RSS and unrelated metrics."
+    },
+    "tasks/benchmark/results/audit.py": {
+      "source_sha256": "c27cd7cb2b027204cafb83d30945d1dd6682f1939402b33ec0d409acb5c92b09",
+      "role": "capability",
+      "owner": "tasks/benchmark/results",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测结果读取与报告：audit",
+      "summary": "保存和读取测量、曲线、统计报告及来源明确的证据资料包。",
+      "en_title": "audit",
+      "en_summary": "Purpose: Save, read and render grouped statistical analysis with recorded observation identities.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/reliability/runner.py": {
+      "source_sha256": "19951910d6a4d4932318c78b5d185baaac4cb1cad5c99b435cd352f3bcb1c5e7",
+      "role": "capability",
+      "owner": "tasks/benchmark/reliability",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "统计分析与科研对照：runner",
+      "summary": "读取样本组观测，计算不确定性、匹配比较与已知对照。",
+      "en_title": "runner",
+      "en_summary": "Audit frozen benchmark outputs; never calls the model or modifies benchmark metrics."
+    },
+    "tasks/benchmark/reliability/schema.py": {
+      "source_sha256": "5fdab17bcdea2dd208baf01381e222b19bf435bbfb4339d678cd5eac7fc75604",
+      "role": "capability",
+      "owner": "tasks/benchmark/reliability",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "统计分析与科研对照：schema",
+      "summary": "读取样本组观测，计算不确定性、匹配比较与已知对照。",
+      "en_title": "schema",
+      "en_summary": "Immutable grouped evaluation contracts; training seeds are not evaluation seeds."
+    },
+    "saebase/research_lab/__init__.py": {
+      "source_sha256": "09a7791c949633aa465b37d3ccd35545899adbba2295b59f11afefb9c8edcaad",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "saebase/research_lab"
+    },
+    "saebase/research_lab/backend/__init__.py": {
+      "source_sha256": "7ff930ef239499fa94ec4d591c3f233221d311149c25599db245d40d670d25a7",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "saebase/research_lab/backend"
+    },
+    "saebase/research_lab/backend/acquire.py": {
+      "source_sha256": "5b2eab1d8ec5416a106b39a4e4e628cbee62d403a8646267a49cef83e2fcc02c",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：数据源获取接口",
+      "summary": "声明选定数据源获取与来源校验步骤；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Dataset acquisition interfaces — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns dataset acquisition interfaces in SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/backend/api.py": {
+      "source_sha256": "2be493d2d0823bfaff452d0f2646c0c4bfa93e4aa5570e93c0a2cd560be8529f",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：生成接口合同",
+      "summary": "声明生成参数、输出与后端调用约定；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Generation API contracts — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns generation api contracts in SAEBase research library / Research Lab / Execution backends."
+    },
+    "tasks/explain/interpretation.py": {
+      "source_sha256": "8fcc55b8118245a1679d307dde00ee5e9feb51ed292a392257e583000a3b595d",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：自动特征解释流程",
+      "summary": "组织候选解释、预测与留出评测记录；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Automatic feature interpretation — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns automatic feature interpretation in SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/backend/auto_interp_local.py": {
+      "source_sha256": "dff5420dfa16a55aa06b8532d81f0de3645d7bc34fa447ee82fb58ec30d75198",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 研究核验工具：本地特征解释命令",
+      "summary": "对选定激活样本组织解释生成与检查；适用范围为SAEBase 科研基础库 · 研究核验工具。",
+      "en_title": "Local feature interpretation command — SAEBase research library / Research verification tools",
+      "en_summary": "This module owns local feature interpretation command in SAEBase research library / Research verification tools."
+    },
+    "saebase/research_lab/backend/controlled_designs.py": {
+      "source_sha256": "4e20e45681d2986b221f5c14a1d015ffc4fed7546496b29a6e5d3bc46d9bbeff",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：受控 Prompt 设计",
+      "summary": "构造研究条件组合并记录设计身份；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Controlled prompt designs — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns controlled prompt designs in SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/backend/core.py": {
+      "source_sha256": "e26e360cb56b5604f5bd750f13906d0e26bb6d588ea01c63589fc9e196ddc930",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：Token 加权健康指标",
+      "summary": "从激活与编码记录计算 SAE 健康指标；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Token-weighted health metrics — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns token-weighted health metrics in SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/backend/corpus_lock.py": {
+      "source_sha256": "508710585d6a3b7b587df72b1c31427074b70db50a9c35b26243e1b1e9c78b19",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：输入语料锁定",
+      "summary": "固定输入语料的版本与内容身份；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Input corpus locking — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns input corpus locking in SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/backend/explore.py": {
+      "source_sha256": "06e3cd5085ed4aaf2beed79adaed0ba4104b156e0f0d595a08d065e9c3f99a2e",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：Prompt 稀疏特征探索",
+      "summary": "将选定 Prompt 转为带位置记录的稀疏特征轨迹；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Prompt feature exploration — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns prompt feature exploration in SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/backend/feature_store.py": {
+      "source_sha256": "c4410446336a310d01152e27885b29bf0f980757a5877882ea4540ae822ad780",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：研究特征持久化",
+      "summary": "保存任务需要的特征记录及其来源；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Research feature persistence — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns research feature persistence in SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/backend/ingest.py": {
+      "source_sha256": "943c68e6b463a98d8e7a2e1ba6f61527f824d5c8c66a9ca1a9d5f02378b053ce",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：研究输入入库",
+      "summary": "验证输入记录并建立可追溯的入库信息；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Research input ingestion — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns research input ingestion in SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/backend/jobs.py": {
+      "source_sha256": "529678427be88b5bd33268f4b007f04cbe2974c5cddff3107bc1433f5130c3cb",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：持久化任务状态机",
+      "summary": "在持久化队列中维护研究任务的状态与转换；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Durable job state machine — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns durable job state machine in SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/backend/methods.py": {
+      "source_sha256": "3a975d87fb1c3f69ba6cdee77a23cc226d92e4c4c8b5a5cc7912a5ab0fa84da8",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：原始方法适配",
+      "summary": "连接原始 SAR、RSS 与局部性方法的输入输出；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Original estimator adapters — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns original estimator adapters in SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/backend/near_duplicates.py": {
+      "source_sha256": "b8f8bc90411f0194061b2b0d12cd30af10b2188978b1827d10f0fd5c126a67c6",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：Prompt 近重复筛查",
+      "summary": "在 CPU 上比较已选输入的词法近重复关系；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Prompt near-duplicate screening — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns prompt near-duplicate screening in SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/backend/plan.py": {
+      "source_sha256": "7638f206689ef26fcfd2f32b2e03d3b9acb6aca8effbc1e8570f682be0d2e471",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：研究任务计划编译",
+      "summary": "将选定研究输入编译为确定性执行计划；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Research work-plan compilation — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns research work-plan compilation in SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/backend/private_api.py": {
+      "source_sha256": "75ff5b2968db7112845118b9bc9b5718e981bf9c3bbddc7490e0d98321580c30",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：私有任务 API",
+      "summary": "通过现有持久化队列提供选定私有任务接口；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Private job API — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns private job api in SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/backend/private_worker.py": {
+      "source_sha256": "7294bcae97c683011a3777375ad8cd57bd16222d04ccff1eb1660905d04fa1ff",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 研究核验工具：私有研究任务命令",
+      "summary": "在选定认证主机上启动一个明确研究任务；适用范围为SAEBase 科研基础库 · 研究核验工具。",
+      "en_title": "Private research job command — SAEBase research library / Research verification tools",
+      "en_summary": "This module owns private research job command in SAEBase research library / Research verification tools."
+    },
+    "saebase/research_lab/backend/publish.py": {
+      "source_sha256": "a17f39f963f74cf4b828e4a83655d66f0025899c0de122606b06d6d1665856a5",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 研究核验工具：经审阅交接包准备",
+      "summary": "整理选定任务交接及同意范围内的研究资料；适用范围为SAEBase 科研基础库 · 研究核验工具。",
+      "en_title": "Reviewed handoff bundle preparation — SAEBase research library / Research verification tools",
+      "en_summary": "This module owns reviewed handoff bundle preparation in SAEBase research library / Research verification tools."
+    },
+    "saebase/research_lab/backend/published_records.py": {
+      "source_sha256": "a0461ad2d070653907434610aff05ffa701db4c6096922455ef0f1fb5184683e",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 研究核验工具：Gemma 电路图导入",
+      "summary": "读取原生图并保留适于浏览的类型化副本；适用范围为SAEBase 科研基础库 · 研究核验工具。",
+      "en_title": "Gemma circuit graph import — SAEBase research library / Research verification tools",
+      "en_summary": "This module owns gemma circuit graph import in SAEBase research library / Research verification tools."
+    },
+    "saebase/research_lab/backend/readouts.py": {
+      "source_sha256": "99b48b6ed99a3897b1ad07d130a58839563f2ac69f9313b224075a4ddc17cce3",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：任务读出与输入对齐",
+      "summary": "定义研究读出与输入样本对齐合同；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Task readouts and input alignment — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns task readouts and input alignment in SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/backend/source_audit.py": {
+      "source_sha256": "851fe875fad2da3b027d470948f4b1d674cc9a53fc9777856e398e0011c4f342",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：输入数据来源审计",
+      "summary": "核对登记数据集的来源身份与结构；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Input source audit — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns input source audit in SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/backend/transforms.py": {
+      "source_sha256": "34024b55b23c9324d91af97cd95a3c208e7ecddadb8aca55b57add01d8f9fe1f",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：Prompt 变体提案",
+      "summary": "生成具有身份记录的输入变体候选；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Prompt variant proposals — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns prompt variant proposals in SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/backend/variant_audit.py": {
+      "source_sha256": "57bdcf36f2340534406f91aba247b33f2a56e3e927891e0a91ce91a48116bf7e",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：Prompt 变体身份审计",
+      "summary": "汇总输入变体关系与来源核验记录；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Prompt variant identity audit — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns prompt variant identity audit in SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/backend/generation_steering_records.py": {
+      "source_sha256": "7a5e165f6dc64c4418313c7a2242883dfde529e32546544d56d5b1a421717ead",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · Research Lab · 执行后端：电路测量记录读取",
+      "summary": "读取已有电路实验的测量卡片；适用范围为SAEBase 科研基础库 · Research Lab · 执行后端。",
+      "en_title": "Circuit measurement records — SAEBase research library / Research Lab / Execution backends",
+      "en_summary": "This module owns circuit measurement records in SAEBase research library / Research Lab / Execution backends."
+    },
+    "saebase/research_lab/tests/test_feature_explorer.py": {
+      "source_sha256": "a16a62918dfd1696d7aef64cb5ba6c968c897a09ebe4619a83ca2b1eb6f18f89",
+      "role": "support",
+      "reason": "软件验收依据按测试模块保留，归属对应研究模块。",
+      "owner": "saebase/research_lab/tests"
+    },
+    "saebase/research_lab/tests/test_platform.py": {
+      "source_sha256": "d3580142955280ad3d7dfd9b70f86b175e45e97b8a5f13abf7133ccc9e769d59",
+      "role": "support",
+      "reason": "软件验收依据按测试模块保留，归属对应研究模块。",
+      "owner": "saebase/research_lab/tests"
+    },
+    "saebase/research_lab/tests/test_feature_explanations.py": {
+      "source_sha256": "4cc2c7c663d9f40fd8616ecf697cecfd3818c8e68e80bb6213e1f62cb22a2a7b",
+      "role": "support",
+      "reason": "软件验收依据按测试模块保留，归属对应研究模块。",
+      "owner": "saebase/research_lab/tests"
+    },
+    "saebase/research_lab/tests/test_private_measurement_visibility.py": {
+      "source_sha256": "504b24132f402696534b2ec201f74628566ff46471fe3e4fdfbfa53d7927931d",
+      "role": "support",
+      "reason": "软件验收依据按测试模块保留，归属对应研究模块。",
+      "owner": "saebase/research_lab/tests"
+    },
+    "saebase/research_lab/tests/test_public_result_bundles.py": {
+      "source_sha256": "e75eadbc5ab7940d35f781af70acf8899fb8f2544c40a4a0cab5e9f1006cfb19",
+      "role": "support",
+      "reason": "软件验收依据按测试模块保留，归属对应研究模块。",
+      "owner": "saebase/research_lab/tests"
+    },
+    "saebase/research_lab/tests/test_generation_steering_records.py": {
+      "source_sha256": "31eee283a079a31418c94b789844033ed715346b052b65278f1263af31e91272",
+      "role": "support",
+      "reason": "软件验收依据按测试模块保留，归属对应研究模块。",
+      "owner": "saebase/research_lab/tests"
+    },
+    "saebase/results.py": {
+      "source_sha256": "b85beb6efaf138c5087c8f30ddbdd40427d870f60a71ac0bf8cc2d1600d8fad3",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库：结构化结果与持久化",
+      "summary": "保存结果身份、测量记录与校验信息；适用范围为SAEBase 科研基础库。",
+      "en_title": "Structured result persistence — SAEBase research library",
+      "en_summary": "This module owns structured result persistence in SAEBase research library."
+    },
+    "saebase/runner.py": {
+      "source_sha256": "ba1058a193ed7b304bd5b2cbff7a0aeedefc0db680482f6eed76655469b35ab9",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库：任务调度与执行",
+      "summary": "按选定配置调用已登记操作并组织执行结果；适用范围为SAEBase 科研基础库。",
+      "en_title": "Task dispatch and execution — SAEBase research library",
+      "en_summary": "This module owns task dispatch and execution in SAEBase research library."
+    },
+    "saebase/runtime/__init__.py": {
+      "source_sha256": "3d05408d1682b4a2a870a7fb36f89fede31aa37abae460900833b56196014144",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 研究核验工具：依赖可用性诊断",
+      "summary": "读取依赖元信息并说明当前安装条件；适用范围为SAEBase 科研基础库 · 研究核验工具。",
+      "en_title": "Dependency availability diagnostics — SAEBase research library / Research verification tools",
+      "en_summary": "This module owns dependency availability diagnostics in SAEBase research library / Research verification tools."
+    },
+    "saebase/runtime/audit.py": {
+      "source_sha256": "9ef2999d018e8d63cad7a562f4f1a354f5ebbe6643908cfb6acb0604b5e942a4",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 运行基础设施：运行产物完整性审计",
+      "summary": "核对运行产物的内容身份与不可变记录；适用范围为SAEBase 科研基础库 · 运行基础设施。",
+      "en_title": "Run artifact integrity audit — SAEBase research library / Execution infrastructure",
+      "en_summary": "This module owns run artifact integrity audit in SAEBase research library / Execution infrastructure."
+    },
+    "saebase/runtime/experiment_paths.py": {
+      "source_sha256": "94bef78bc66905e28a1f39f7e6da2873729074f2b651d88e27016d6f99dbbad9",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 运行基础设施：实验产物目录合同",
+      "summary": "按任务层级生成并核对实验产物位置；适用范围为SAEBase 科研基础库 · 运行基础设施。",
+      "en_title": "Experiment artifact paths — SAEBase research library / Execution infrastructure",
+      "en_summary": "This module owns experiment artifact paths in SAEBase research library / Execution infrastructure."
+    },
+    "saebase/runtime/hardware.py": {
+      "source_sha256": "ec6a4edf854bbd53ae376c505475e9b79472923cc4aa3560c29b3c2cb3359088",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 运行基础设施：硬件能力清单",
+      "summary": "收集科研任务选择所需的设备与后端信息；适用范围为SAEBase 科研基础库 · 运行基础设施。",
+      "en_title": "Hardware capability inventory — SAEBase research library / Execution infrastructure",
+      "en_summary": "This module owns hardware capability inventory in SAEBase research library / Execution infrastructure."
+    },
+    "saebase/runtime/runtime_check.py": {
+      "source_sha256": "052be88782d45d62445fd8bdb05e0f52ca323a51609a4228daef09895a70d458",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 运行基础设施：依赖与运行前检查",
+      "summary": "在加载研究后端前检查所需依赖；适用范围为SAEBase 科研基础库 · 运行基础设施。",
+      "en_title": "Runtime dependency checks — SAEBase research library / Execution infrastructure",
+      "en_summary": "This module owns runtime dependency checks in SAEBase research library / Execution infrastructure."
+    },
+    "saebase/runtime/summary_log.py": {
+      "source_sha256": "0a74740d9fb983df3f232398075ae75c03a5e4a6b95edb4eb6a841872234f36a",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 运行基础设施：实验摘要日志",
+      "summary": "组织任务通用的摘要记录与执行信息；适用范围为SAEBase 科研基础库 · 运行基础设施。",
+      "en_title": "Experiment summary logging — SAEBase research library / Execution infrastructure",
+      "en_summary": "This module owns experiment summary logging in SAEBase research library / Execution infrastructure."
+    },
+    "saebase/runtime/train.py": {
+      "source_sha256": "b7da5c2aada85063c092e7f890f7f93ce99dd1903c0786c2442ee9618bf9e7f6",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 运行基础设施：Hydra 训练入口",
+      "summary": "组合训练配置并进入已有训练流程；适用范围为SAEBase 科研基础库 · 运行基础设施。",
+      "en_title": "Hydra training entry — SAEBase research library / Execution infrastructure",
+      "en_summary": "This module owns hydra training entry in SAEBase research library / Execution infrastructure."
+    },
+    "saebase/runtime/training/__init__.py": {
+      "source_sha256": "69fa7ce0ff16c1e51548740a22d246e842f8d228bd4818fe6e5685f7eb279da7",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "saebase/runtime/training"
+    },
+    "saebase/runtime/training/schedulers.py": {
+      "source_sha256": "53fd5737c74979f627de87d38b4cc27968d64ff4828dd663668e3cb55faca903",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 运行基础设施 · 训练基础设施：学习率预热与衰减",
+      "summary": "按训练步数计算预热和余弦学习率；适用范围为SAEBase 科研基础库 · 运行基础设施 · 训练基础设施。",
+      "en_title": "Learning-rate scheduling — SAEBase research library / Execution infrastructure / Training infrastructure",
+      "en_summary": "This module owns learning-rate scheduling in SAEBase research library / Execution infrastructure / Training infrastructure."
+    },
+    "saebase/runtime/training/seed.py": {
+      "source_sha256": "4688cfeca37037986c4b23bb8859cb161fe434fa98d8b43a3ce7b0a379473942",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 运行基础设施 · 训练基础设施：随机性与复现设置",
+      "summary": "统一设置研究过程的随机性来源；适用范围为SAEBase 科研基础库 · 运行基础设施 · 训练基础设施。",
+      "en_title": "Reproducibility seed policy — SAEBase research library / Execution infrastructure / Training infrastructure",
+      "en_summary": "This module owns reproducibility seed policy in SAEBase research library / Execution infrastructure / Training infrastructure."
+    },
+    "saebase/runtime/training/standard_lightning.py": {
+      "source_sha256": "cdf499e9936f27b2f42163aeb96e66c42b11c269aff1e259439b21f3b77e6308",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 运行基础设施 · 训练基础设施：Lightning 训练装配",
+      "summary": "组合日志、检查点和 Trainer 参数；适用范围为SAEBase 科研基础库 · 运行基础设施 · 训练基础设施。",
+      "en_title": "Lightning training assembly — SAEBase research library / Execution infrastructure / Training infrastructure",
+      "en_summary": "This module owns lightning training assembly in SAEBase research library / Execution infrastructure / Training infrastructure."
+    },
+    "saebase/runtime/training/training_callbacks.py": {
+      "source_sha256": "e6618dc89add63d32bb300a9ee44222ac5e7b5799fe152cfd62d14044e539e02",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 运行基础设施 · 训练基础设施：训练过程回调",
+      "summary": "记录训练时间估计与验证损失历史；适用范围为SAEBase 科研基础库 · 运行基础设施 · 训练基础设施。",
+      "en_title": "Training progress callbacks — SAEBase research library / Execution infrastructure / Training infrastructure",
+      "en_summary": "This module owns training progress callbacks in SAEBase research library / Execution infrastructure / Training infrastructure."
+    },
+    "saebase/seed.py": {
+      "source_sha256": "23d77cb016ac4803d9f772b89ab28b18ff3970ff5f9d4eb683d17e4c5efb76e5",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库：随机性与复现设置",
+      "summary": "统一设置研究过程的随机性来源；适用范围为SAEBase 科研基础库。",
+      "en_title": "Reproducibility seed policy — SAEBase research library",
+      "en_summary": "This module owns reproducibility seed policy in SAEBase research library."
+    },
+    "saebase/setup/__init__.py": {
+      "source_sha256": "b8acb0cefa205c9a72dbbb01a55af0cacc08590c70925cf3e76298d79f17aa91",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "saebase/setup"
+    },
+    "saebase/setup/__main__.py": {
+      "source_sha256": "38cc3c5bb719549a44ed532877bc5a3ce27d79f9a57bfc654eeb11822a9715dc",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 环境与研究准备：研究准备命令入口",
+      "summary": "解释准备参数并调用选定 Dataset 与 SAE 配置；适用范围为SAEBase 科研基础库 · 环境与研究准备。",
+      "en_title": "Study setup command — SAEBase research library / Environment and study setup",
+      "en_summary": "This module owns study setup command in SAEBase research library / Environment and study setup."
+    },
+    "saebase/setup/assets.py": {
+      "source_sha256": "07c933f70d7b2806975f0dd8a70d3047f00e47ce271e40f58b9c08b5fcd79e74",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 环境与研究准备：依赖与缓存资产准备",
+      "summary": "按选定配置准备已有依赖与缓存资源；适用范围为SAEBase 科研基础库 · 环境与研究准备。",
+      "en_title": "Dependency and cached-asset setup — SAEBase research library / Environment and study setup",
+      "en_summary": "This module owns dependency and cached-asset setup in SAEBase research library / Environment and study setup."
+    },
+    "saebase/setup/workflow.py": {
+      "source_sha256": "0c6d6cc9c4560daa8cc7f5c5a5a3b35041d633a46517435f15bcf34b98ec72cc",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 环境与研究准备：研究准备工作流",
+      "summary": "结合环境清单与代表配置估计准备步骤；适用范围为SAEBase 科研基础库 · 环境与研究准备。",
+      "en_title": "Study preparation workflow — SAEBase research library / Environment and study setup",
+      "en_summary": "This module owns study preparation workflow in SAEBase research library / Environment and study setup."
+    },
+    "saebase/store/__init__.py": {
+      "source_sha256": "d3167d0a77b2d1e730a80e50bab0ce8ae283b7291f418578c553096d4c875c39",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "saebase/store"
+    },
+    "saebase/store/collect.py": {
+      "source_sha256": "30fb226c0c7804675d5e7d55f33238ef621fe76126c5472f39b5161af306834f",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 激活与特征存储：激活与编码缓存采集",
+      "summary": "按明确 Token 位置采集激活并复用跨 SAE 缓存；适用范围为SAEBase 科研基础库 · 激活与特征存储。",
+      "en_title": "Activation and code collection — SAEBase research library / Activation and feature storage",
+      "en_summary": "This module owns activation and code collection in SAEBase research library / Activation and feature storage."
+    },
+    "saebase/store/identity.py": {
+      "source_sha256": "4c6968d014aa643d2ca8eb05ea6d542fb62d395c9653ea04bd3403bd29e23688",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 激活与特征存储：缓存身份与 Token 定位",
+      "summary": "定义版本化缓存身份及精确 Token 选择；适用范围为SAEBase 科研基础库 · 激活与特征存储。",
+      "en_title": "Cache identity and token sites — SAEBase research library / Activation and feature storage",
+      "en_summary": "This module owns cache identity and token sites in SAEBase research library / Activation and feature storage."
+    },
+    "saebase/store/shards.py": {
+      "source_sha256": "732fa4f51f02bd0832890d807c0c11a2b169b9668a810bfeb2e8ed048ad25748",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 激活与特征存储：分片数组与稀疏存储",
+      "summary": "以可恢复分片保存激活和无损稀疏编码；适用范围为SAEBase 科研基础库 · 激活与特征存储。",
+      "en_title": "Sharded array and sparse storage — SAEBase research library / Activation and feature storage",
+      "en_summary": "This module owns sharded array and sparse storage in SAEBase research library / Activation and feature storage."
+    },
+    "tasks/plugins.py": {
+      "source_sha256": "2fe2f5f8e7ef977e05e1faee64f9ec406d4c754f6a54f9c966d54cc6cbef2f79",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务：内置插件登记",
+      "summary": "将随项目提供的组件绑定到统一 Registry；适用范围为科研任务。",
+      "en_title": "Built-in plugin registration — Research tasks",
+      "en_summary": "This module owns built-in plugin registration in Research tasks."
+    },
+    "tests/product/runtime/test_encoding_performance.py": {
+      "source_sha256": "ad4161266728aafee92a12bf281441a0ffab5b4582ebfdf9d5193e30903b3167",
+      "role": "capability",
+      "reason": "依据当前实现及其实际调用者整理功能归属。",
+      "title": "编码性能测量",
+      "summary": "在固定输入与编码器下比较批次大小的耗时与吞吐。",
+      "en_title": "Measure encoding batch performance",
+      "en_summary": "Measure encoding batch performance."
+    },
+    "scripts/documentation.py": {
+      "source_sha256": "02df8ad97842c4f1537da966b4d14e366dbc1c8087d300c57dfc5e121a3a49c1",
+      "role": "capability",
+      "reason": "依据当前实现及其实际调用者整理功能归属。",
+      "title": "工程文档维护",
+      "summary": "检查本地文档链接，并根据评测证据生成模型支持说明。",
+      "en_title": "Maintain software documentation",
+      "en_summary": "Maintain software documentation."
+    },
+    "scripts/distribution.py": {
+      "source_sha256": "e5c0f6bb0326761967a5834e0e7a2baf67a24ee8e178adfa7294a223163cb709",
+      "role": "capability",
+      "reason": "依据当前实现及其实际调用者整理功能归属。",
+      "title": "软件分发检查",
+      "summary": "检查包内容、仓库外安装和源码包重建。",
+      "en_title": "Inspect software distributions",
+      "en_summary": "Inspect software distributions."
+    },
+    "scripts/quality.py": {
+      "source_sha256": "aa7992ab6f7c06f38e48df17c25b20d6fd723bd667a1ebed3cc1b4f5cae6a9ce",
+      "role": "capability",
+      "reason": "依据当前实现及其实际调用者整理功能归属。",
+      "title": "开发变更检查",
+      "summary": "格式化和检查选定源码，并依据变更文件选择持续集成检查。",
+      "en_title": "Check selected source changes",
+      "en_summary": "Check selected source changes."
+    },
+    "saebase/api/reference.py": {
+      "source_sha256": "4446add19efc5e852ef19f4349fb00b56202e81f666707ab6e140019bd006ea8",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 研究核验工具：参考捕获与编辑验收入口",
+      "summary": "定义 Pythia 参考捕获、编辑及来源核验流程；适用范围为SAEBase 科研基础库 · 研究核验工具。",
+      "en_title": "Reference capture acceptance — SAEBase research library / Research verification tools",
+      "en_summary": "This module owns reference capture acceptance in SAEBase research library / Research verification tools."
+    },
+    "tests/product/test_activation_store.py": {
+      "source_sha256": "e89c197792b81b79427c1a72fc19c0b20afec3d8e82cc9b6a97987474eff911d",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 研究核验工具：激活缓存验收入口",
+      "summary": "定义真实缓存产物与参考执行结果的比较；适用范围为SAEBase 科研基础库 · 研究核验工具。",
+      "en_title": "Activation-cache acceptance — SAEBase research library / Research verification tools",
+      "en_summary": "This module owns activation-cache acceptance in SAEBase research library / Research verification tools."
+    },
+    "tests/product/test_feature_interventions.py": {
+      "source_sha256": "20b366bc2a64b86f86a9a0a1eb6da7818bc2dc30f9aacac4d182dde28fdd8480",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 研究核验工具：批量干预与缓存验收入口",
+      "summary": "定义 Pythia 批次执行、缓存与参考结果比较；适用范围为SAEBase 科研基础库 · 研究核验工具。",
+      "en_title": "Batch and cache acceptance — SAEBase research library / Research verification tools",
+      "en_summary": "This module owns batch and cache acceptance in SAEBase research library / Research verification tools."
+    },
+    "tasks/benchmark/cli.py": {
+      "source_sha256": "7c1489623ecb2660226dd3cb15b575ffdaef77107d64066f44fd3f76850e5fa1",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "SAEBase 科研基础库 · 研究核验工具：Stage B CPU 基准入口",
+      "summary": "定义选定配对的 CPU 基准与可靠性验收；适用范围为SAEBase 科研基础库 · 研究核验工具。",
+      "en_title": "Stage B CPU benchmark — SAEBase research library / Research verification tools",
+      "en_summary": "This module owns stage b cpu benchmark in SAEBase research library / Research verification tools."
+    },
+    "tasks/precheck/sae_checks.py": {
+      "source_sha256": "8ea2d84f1fe86303c818fb6d91e94b35c5655e5a6898cbcd9864b7d463baee2b",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 执行前核验：SAE 编码重建预检",
+      "summary": "检查选定 SAE 站点的实际捕获、编码与重建；适用范围为科研任务 · 执行前核验。",
+      "en_title": "SAE encode-decode preflight — Research tasks / Execution preflight",
+      "en_summary": "This module owns sae encode-decode preflight in Research tasks / Execution preflight."
+    },
+    "tasks/benchmark/sites/catalog.py": {
+      "source_sha256": "2f8056a4be8d1083b9c4c32f45f913cbc9e531c388b04ef931e030a48648eb07",
+      "role": "capability",
+      "owner": "tasks/benchmark/sites",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "位点检查与批次执行：catalog",
+      "summary": "选择模型、SAE和层位，进行检查、排程、恢复与记录。",
+      "en_title": "catalog",
+      "en_summary": "Purpose: Declare selected model SAE sites, plan their order and inspect checkpoint coverage and sources.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/results/archive.py": {
+      "source_sha256": "9c296870e24ba4fe67e7b49332427dc7fb9aeea4883b251d32eb1e0ca1e954a9",
+      "role": "capability",
+      "owner": "tasks/benchmark/results",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测结果读取与报告：archive",
+      "summary": "保存和读取测量、曲线、统计报告及来源明确的证据资料包。",
+      "en_title": "archive",
+      "en_summary": "Purpose: Package and independently verify recorded benchmark evidence and its original raw archives.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "scripts/release.py": {
+      "source_sha256": "9cb7f210ab861003412cacea381e129485a5f9ddc16d1b72525e9c24729ec168",
+      "role": "capability",
+      "reason": "依据当前实现及其实际调用者整理功能归属。",
+      "title": "软件发布",
+      "summary": "确认版本、源码身份、发布条件与分发资产。",
+      "en_title": "Prepare software releases",
+      "en_summary": "Prepare software releases."
+    },
+    "datasets/prepare.py": {
+      "source_sha256": "c5a9883929b8450d65acd2c07ece76fad6477109ff140d24fffd7ffb6ff43fd9",
+      "role": "capability",
+      "reason": "依据当前实现及其实际调用者整理功能归属。",
+      "title": "数据准备入口",
+      "summary": "按选定的数据集与模型准备可读取的样本和来源记录。",
+      "en_title": "Prepare selected dataset prompts",
+      "en_summary": "Prepare selected dataset prompts."
+    },
+    "tasks/generate/backend/decoder_steering.py": {
+      "source_sha256": "1f9e89755c6379dbf156eaa4dd322ff0447e3d73759b5fa2c921440aa13e6959",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 生成控制 · vLLM 编辑后端：缓存解码方向引导",
+      "summary": "用 SAE 解码方向连接 KV 缓存生成；适用范围为科研任务 · 生成控制 · vLLM 编辑后端。",
+      "en_title": "Cached decoder-direction steering — Research tasks / Generation control / vLLM editing backend",
+      "en_summary": "This module owns cached decoder-direction steering in Research tasks / Generation control / vLLM editing backend."
+    },
+    "tasks/generate/backend/sae_interventions.py": {
+      "source_sha256": "d06bf027e93e6bacce3c4dc5407e653e70c4f7f3cf0fd67ad8d7b0c2586d8043",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 生成控制 · vLLM 编辑后端：vLLM 特征干预",
+      "summary": "在原生 Hook 后端应用 SAE 特征编辑；适用范围为科研任务 · 生成控制 · vLLM 编辑后端。",
+      "en_title": "vLLM feature interventions — Research tasks / Generation control / vLLM editing backend",
+      "en_summary": "This module owns vllm feature interventions in Research tasks / Generation control / vLLM editing backend."
+    },
+    "datasets/BBH/BBH.py": {
+      "source_sha256": "c510481720154bb7751783eaf339af1a338436f3f782727d582d6405f3ed5d59",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · BBH：BBH 数据读取",
+      "summary": "提供当前数据集的 Prompt 记录与来源接口；适用范围为Prompt 数据集 · BBH。",
+      "en_title": "BBH dataset loading — Prompt datasets / BBH",
+      "en_summary": "This module owns bbh dataset loading in Prompt datasets / BBH."
+    },
+    "datasets/BBH/__init__.py": {
+      "source_sha256": "3bdeffcd57b7992302750b11c00342978946bcf9f5af1be76d5264ef2bf4c039",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "datasets/BBH"
+    },
+    "datasets/CounterFact/CounterFact.py": {
+      "source_sha256": "3a0aa4573199b826a5fbbb419840a618bdc5cb4d34f1fcfdf254a21c6d358eac",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · CounterFact：CounterFact 数据读取",
+      "summary": "提供当前数据集的 Prompt 记录与来源接口；适用范围为Prompt 数据集 · CounterFact。",
+      "en_title": "CounterFact dataset loading — Prompt datasets / CounterFact",
+      "en_summary": "This module owns counterfact dataset loading in Prompt datasets / CounterFact."
+    },
+    "datasets/CounterFact/__init__.py": {
+      "source_sha256": "b2b33351e45a8fac7c9a4714ffddb1c560411a60a52b636e0638879a3aedec78",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "datasets/CounterFact"
+    },
+    "datasets/CounterFact/prepare.py": {
+      "source_sha256": "e914f0b23b824183e1915dcf68167c8287b74f676bf9065e959982937b54c5ba",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · CounterFact：数据准备与来源清单",
+      "summary": "准备选定数据记录并保存来源 manifest；适用范围为Prompt 数据集 · CounterFact。",
+      "en_title": "Dataset preparation — Prompt datasets / CounterFact",
+      "en_summary": "This module owns dataset preparation in Prompt datasets / CounterFact."
+    },
+    "datasets/CounterFact/tokenize.py": {
+      "source_sha256": "4aaa950b699ae83090cb73f427745038eb1b121c32693f2068f946b2e4452208",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · CounterFact：数据 Token 化",
+      "summary": "将已准备输入转为任务需要的 Token 产物；适用范围为Prompt 数据集 · CounterFact。",
+      "en_title": "Dataset tokenization — Prompt datasets / CounterFact",
+      "en_summary": "This module owns dataset tokenization in Prompt datasets / CounterFact."
+    },
+    "datasets/GreaterThan/GreaterThan.py": {
+      "source_sha256": "93d6d9a4a0759e23a3ebea6af1bd72fc8617afa6ce512941fe17bedb37b5184d",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · GreaterThan：GreaterThan 数据读取",
+      "summary": "提供当前数据集的 Prompt 记录与来源接口；适用范围为Prompt 数据集 · GreaterThan。",
+      "en_title": "GreaterThan dataset loading — Prompt datasets / GreaterThan",
+      "en_summary": "This module owns greaterthan dataset loading in Prompt datasets / GreaterThan."
+    },
+    "datasets/GreaterThan/__init__.py": {
+      "source_sha256": "a025f7b03af460be48426d4a81b44ec813f1c864baae03ae3b48a9c1b81908bc",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "datasets/GreaterThan"
+    },
+    "datasets/GreaterThan/prepare.py": {
+      "source_sha256": "5d45b87c5b1aaf07c7e537a2ae4fa0d72701ff853c418fcee78412da77055860",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · GreaterThan：数据准备与来源清单",
+      "summary": "准备选定数据记录并保存来源 manifest；适用范围为Prompt 数据集 · GreaterThan。",
+      "en_title": "Dataset preparation — Prompt datasets / GreaterThan",
+      "en_summary": "This module owns dataset preparation in Prompt datasets / GreaterThan."
+    },
+    "datasets/GreaterThan/tokenize.py": {
+      "source_sha256": "5ab15f462713d8b06dede0dce371512a1110a6265ca4e0defc56c381dfd8d0d6",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · GreaterThan：数据 Token 化",
+      "summary": "将已准备输入转为任务需要的 Token 产物；适用范围为Prompt 数据集 · GreaterThan。",
+      "en_title": "Dataset tokenization — Prompt datasets / GreaterThan",
+      "en_summary": "This module owns dataset tokenization in Prompt datasets / GreaterThan."
+    },
+    "datasets/IOI/IOI.py": {
+      "source_sha256": "a738f30e54b8fb0a6583c0228a03a05335a77a11cb2bd488291c3e3ce6b490cd",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · IOI：IOI 数据读取",
+      "summary": "提供当前数据集的 Prompt 记录与来源接口；适用范围为Prompt 数据集 · IOI。",
+      "en_title": "IOI dataset loading — Prompt datasets / IOI",
+      "en_summary": "This module owns ioi dataset loading in Prompt datasets / IOI."
+    },
+    "datasets/IOI/__init__.py": {
+      "source_sha256": "d99e0a33184962da57d21d73a8b123be8d5ca8324b4ce38d57ac4ea190661170",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "datasets/IOI"
+    },
+    "datasets/IOI/prepare.py": {
+      "source_sha256": "c29835ee1e549efaf9673ca04118eacf4718c59c4761102a58314cceee72fa60",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · IOI：数据准备与来源清单",
+      "summary": "准备选定数据记录并保存来源 manifest；适用范围为Prompt 数据集 · IOI。",
+      "en_title": "Dataset preparation — Prompt datasets / IOI",
+      "en_summary": "This module owns dataset preparation in Prompt datasets / IOI."
+    },
+    "datasets/IOI/tokenize.py": {
+      "source_sha256": "7262329f50bf155ca18b517b9924d26e6038ade268fc4cb976b52af4f820a297",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · IOI：数据 Token 化",
+      "summary": "将已准备输入转为任务需要的 Token 产物；适用范围为Prompt 数据集 · IOI。",
+      "en_title": "Dataset tokenization — Prompt datasets / IOI",
+      "en_summary": "This module owns dataset tokenization in Prompt datasets / IOI."
+    },
+    "datasets/MMLUPro/MMLUPro.py": {
+      "source_sha256": "0b7a6bac7038b86061f0a2b807ed781ca8623556117ad2a09a009fa5e1c8b1c4",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · MMLUPro：MMLUPro 数据读取",
+      "summary": "提供当前数据集的 Prompt 记录与来源接口；适用范围为Prompt 数据集 · MMLUPro。",
+      "en_title": "MMLUPro dataset loading — Prompt datasets / MMLUPro",
+      "en_summary": "This module owns mmlupro dataset loading in Prompt datasets / MMLUPro."
+    },
+    "datasets/MMLUPro/__init__.py": {
+      "source_sha256": "ef3fed14ec7dca993a60f95467befd0260f8bd2d8913b92d45fafe9bb3ed9900",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "datasets/MMLUPro"
+    },
+    "datasets/MMLUPro/prepare.py": {
+      "source_sha256": "f3f0cf1dd1bc4bad43110b5082e870579c97bb4ee098c2dcac184c32de965c4b",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · MMLUPro：数据准备与来源清单",
+      "summary": "准备选定数据记录并保存来源 manifest；适用范围为Prompt 数据集 · MMLUPro。",
+      "en_title": "Dataset preparation — Prompt datasets / MMLUPro",
+      "en_summary": "This module owns dataset preparation in Prompt datasets / MMLUPro."
+    },
+    "datasets/MMLUPro/tokenize.py": {
+      "source_sha256": "807cef6e444c748ed704af592cb804f6c891c91d7663f3ccc2b05ac1a45a6672",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · MMLUPro：数据 Token 化",
+      "summary": "将已准备输入转为任务需要的 Token 产物；适用范围为Prompt 数据集 · MMLUPro。",
+      "en_title": "Dataset tokenization — Prompt datasets / MMLUPro",
+      "en_summary": "This module owns dataset tokenization in Prompt datasets / MMLUPro."
+    },
+    "datasets/SimpleCopying/SimpleCopying.py": {
+      "source_sha256": "32c325762d41fb3773cd43f0694a1cfe4b07d40a8034a5dfa75e3ecf77cdf6e1",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · SimpleCopying：SimpleCopying 数据读取",
+      "summary": "提供当前数据集的 Prompt 记录与来源接口；适用范围为Prompt 数据集 · SimpleCopying。",
+      "en_title": "SimpleCopying dataset loading — Prompt datasets / SimpleCopying",
+      "en_summary": "This module owns simplecopying dataset loading in Prompt datasets / SimpleCopying."
+    },
+    "datasets/SimpleCopying/__init__.py": {
+      "source_sha256": "986dbe3e8e3da92681bcd2e5f66bef2ccf7bad5bcf6503b547bff471b9b87e42",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "datasets/SimpleCopying"
+    },
+    "datasets/SimpleCopying/prepare.py": {
+      "source_sha256": "9c590b727da5dcaac050a78cdd65fc108ee1fbcd62b94b0eeec926fdc632d8fe",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · SimpleCopying：数据准备与来源清单",
+      "summary": "准备选定数据记录并保存来源 manifest；适用范围为Prompt 数据集 · SimpleCopying。",
+      "en_title": "Dataset preparation — Prompt datasets / SimpleCopying",
+      "en_summary": "This module owns dataset preparation in Prompt datasets / SimpleCopying."
+    },
+    "datasets/SimpleCopying/tokenize.py": {
+      "source_sha256": "4894b8b61945c2dae2983966506338e6feb58193f34dd83744b9ddbce4272dce",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · SimpleCopying：数据 Token 化",
+      "summary": "将已准备输入转为任务需要的 Token 产物；适用范围为Prompt 数据集 · SimpleCopying。",
+      "en_title": "Dataset tokenization — Prompt datasets / SimpleCopying",
+      "en_summary": "This module owns dataset tokenization in Prompt datasets / SimpleCopying."
+    },
+    "datasets/SubjectVerbAgreement/SubjectVerbAgreement.py": {
+      "source_sha256": "31a0cbf05af29966c4f084bf8f412c04189c045894d0094f262ec000bc4b9b76",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · SubjectVerbAgreement：SubjectVerbAgreement 数据读取",
+      "summary": "提供当前数据集的 Prompt 记录与来源接口；适用范围为Prompt 数据集 · SubjectVerbAgreement。",
+      "en_title": "SubjectVerbAgreement dataset loading — Prompt datasets / SubjectVerbAgreement",
+      "en_summary": "This module owns subjectverbagreement dataset loading in Prompt datasets / SubjectVerbAgreement."
+    },
+    "datasets/SubjectVerbAgreement/__init__.py": {
+      "source_sha256": "c35d69ce483cf313753da0c743cacce5988f2225b28d57b581eb369f9e3a4d39",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "datasets/SubjectVerbAgreement"
+    },
+    "datasets/SubjectVerbAgreement/prepare.py": {
+      "source_sha256": "7c8d187e85d30c8ac06ab29e0d1e845b25e144452628a78cd29a094be62a4d62",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · SubjectVerbAgreement：数据准备与来源清单",
+      "summary": "准备选定数据记录并保存来源 manifest；适用范围为Prompt 数据集 · SubjectVerbAgreement。",
+      "en_title": "Dataset preparation — Prompt datasets / SubjectVerbAgreement",
+      "en_summary": "This module owns dataset preparation in Prompt datasets / SubjectVerbAgreement."
+    },
+    "datasets/SubjectVerbAgreement/tokenize.py": {
+      "source_sha256": "66ec06305f743b5f1e65638abaed437fd678c661b408f6ca1601adb0314685ea",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集 · SubjectVerbAgreement：数据 Token 化",
+      "summary": "将已准备输入转为任务需要的 Token 产物；适用范围为Prompt 数据集 · SubjectVerbAgreement。",
+      "en_title": "Dataset tokenization — Prompt datasets / SubjectVerbAgreement",
+      "en_summary": "This module owns dataset tokenization in Prompt datasets / SubjectVerbAgreement."
+    },
+    "datasets/datamodule.py": {
+      "source_sha256": "82270a44988b6582f4d701aabd8448e522843cd38d0a002df94af8d8a714cf3a",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集：Lightning 数据装配",
+      "summary": "通过 Registry 装配已选 Dataset 与数据加载器；适用范围为Prompt 数据集。",
+      "en_title": "Lightning data assembly — Prompt datasets",
+      "en_summary": "This module owns lightning data assembly in Prompt datasets."
+    },
+    "datasets/legacy_prompts.py": {
+      "source_sha256": "f9c84c07f1c1ebf09a2e312460c63fb87e8a1ba95f1de0c48a8237a5f1266de5",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集：历史 Prompt 参数兼容",
+      "summary": "将历史数据参数适配到当前 Prompt 来源；适用范围为Prompt 数据集。",
+      "en_title": "Legacy prompt compatibility — Prompt datasets",
+      "en_summary": "This module owns legacy prompt compatibility in Prompt datasets."
+    },
+    "datasets/plugins.py": {
+      "source_sha256": "e5588d3a68f578e1039039e1edd3c1fe466683b81f1ef3bf6e9439eb5182fd9f",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集：内置插件登记",
+      "summary": "将随项目提供的组件绑定到统一 Registry；适用范围为Prompt 数据集。",
+      "en_title": "Built-in plugin registration — Prompt datasets",
+      "en_summary": "This module owns built-in plugin registration in Prompt datasets."
+    },
+    "datasets/prompts.py": {
+      "source_sha256": "20be64a718f3adcc7c22d899866d06ba6bf73f910f350450ce40b6f0067d9891",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "Prompt 数据集：Prompt 记录加载",
+      "summary": "读取选定来源的实际 Prompt 记录；适用范围为Prompt 数据集。",
+      "en_title": "Prompt record loading — Prompt datasets",
+      "en_summary": "This module owns prompt record loading in Prompt datasets."
+    },
+    "tasks/__init__.py": {
+      "source_sha256": "82bf61d417d3d6c805faa98185885ed31183f8033fbcf4d8a30a76842320a258",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "tasks"
+    },
+    "tasks/benchmark/__init__.py": {
+      "source_sha256": "c5292c01a14b4414b57c4a8887cec765be74760f1e13e2804e956265cf72e454",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "tasks/benchmark"
+    },
+    "tasks/benchmark/metrics/health.py": {
+      "source_sha256": "8130438d16393e3cd62acb60fcaab891c92defa6ea8359b1376cd5b265edb44b",
+      "role": "capability",
+      "owner": "tasks/benchmark/metrics",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测指标：health",
+      "summary": "登记和计算通用指标，执行激活健康评测。",
+      "en_title": "health",
+      "en_summary": "Purpose: check prepared inputs, measure SAE activation health and summarize observed reconstructions.\n\nScope: the registered activation-health evaluation and its per-prompt result readers."
+    },
+    "tasks/benchmark/operation.py": {
+      "source_sha256": "3b3bd347d0dc88c83e86decbfc6b222150a982f2e7b6338058b66c6f224188dc",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 基准评测任务：具体科研任务编排",
+      "summary": "读取选定任务配置并连接对应的实际实现；适用范围为科研任务 · 基准评测任务。",
+      "en_title": "Concrete research task orchestration — Research tasks / Benchmark task",
+      "en_summary": "This module owns concrete research task orchestration in Research tasks / Benchmark task."
+    },
+    "tasks/benchmark/task.py": {
+      "source_sha256": "21f21752fc86b4338bcdb77cd583ef36a04ce36a05b0154f26de4dc90962cc30",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 基准评测任务：科研任务插件绑定",
+      "summary": "将具体任务类与统一运行器的操作绑定；适用范围为科研任务 · 基准评测任务。",
+      "en_title": "Research task plugin binding — Research tasks / Benchmark task",
+      "en_summary": "This module owns research task plugin binding in Research tasks / Benchmark task."
+    },
+    "tasks/capture/__init__.py": {
+      "source_sha256": "cdb1c5327d6ee5409eb3d0719ab61cdc3731c4f1ce03646176130ad01d72d00f",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "tasks/capture"
+    },
+    "tasks/capture/operation.py": {
+      "source_sha256": "aeb33b877b286f6b19a217d0debda7a184887d51fffd7121a7f7ce4ca87335f1",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 激活捕获任务：具体科研任务编排",
+      "summary": "读取选定任务配置并连接对应的实际实现；适用范围为科研任务 · 激活捕获任务。",
+      "en_title": "Concrete research task orchestration — Research tasks / Activation capture task",
+      "en_summary": "This module owns concrete research task orchestration in Research tasks / Activation capture task."
+    },
+    "tasks/capture/task.py": {
+      "source_sha256": "cf62ce6eafd9d6a55be156317ec9d79cf8122e419dc4b4fa535617d431aaba99",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 激活捕获任务：科研任务插件绑定",
+      "summary": "将具体任务类与统一运行器的操作绑定；适用范围为科研任务 · 激活捕获任务。",
+      "en_title": "Research task plugin binding — Research tasks / Activation capture task",
+      "en_summary": "This module owns research task plugin binding in Research tasks / Activation capture task."
+    },
+    "tasks/circuits/__init__.py": {
+      "source_sha256": "6797dbfb7d85768cb6626fafad3e4fa08802305408fc17cfa216baf52386804c",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "tasks/circuits"
+    },
+    "tasks/circuits/operation.py": {
+      "source_sha256": "8f76ab825e80a3b60c12d0b34e04cf46fddf52b0354da6e9f662c12f347ddd26",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 因果电路：具体科研任务编排",
+      "summary": "读取选定任务配置并连接对应的实际实现；适用范围为科研任务 · 因果电路。",
+      "en_title": "Concrete research task orchestration — Research tasks / Causal circuits",
+      "en_summary": "This module owns concrete research task orchestration in Research tasks / Causal circuits."
+    },
+    "tasks/circuits/task.py": {
+      "source_sha256": "1c3f5e51b362bb962c733900f0b44778bb16b8092f26c8d16dc59cbe4cf2f794",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 因果电路：科研任务插件绑定",
+      "summary": "将具体任务类与统一运行器的操作绑定；适用范围为科研任务 · 因果电路。",
+      "en_title": "Research task plugin binding — Research tasks / Causal circuits",
+      "en_summary": "This module owns research task plugin binding in Research tasks / Causal circuits."
+    },
+    "tasks/explain/__init__.py": {
+      "source_sha256": "7d92daa710d4b618fb763fb4c26fb41ef6557f63a081774d6e841d3b3621449a",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "tasks/explain"
+    },
+    "tasks/explain/local_generator.py": {
+      "source_sha256": "44b8e2ebd9eadae03e4d226e8bdb65ed81e6fc77a23deffe4bb2f3e6d8c6170a",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 解释任务：本地解释生成器",
+      "summary": "按允许列表调用本地特征解释生成接口；适用范围为科研任务 · 解释任务。",
+      "en_title": "Local explanation generator — Research tasks / Explanation task",
+      "en_summary": "This module owns local explanation generator in Research tasks / Explanation task."
+    },
+    "tasks/explain/operation.py": {
+      "source_sha256": "6732d6ce7a6ce3dba67a643bab741885352fa3b48b6938297dde8d7606269e18",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 解释任务：具体科研任务编排",
+      "summary": "读取选定任务配置并连接对应的实际实现；适用范围为科研任务 · 解释任务。",
+      "en_title": "Concrete research task orchestration — Research tasks / Explanation task",
+      "en_summary": "This module owns concrete research task orchestration in Research tasks / Explanation task."
+    },
+    "tasks/explain/task.py": {
+      "source_sha256": "3b6987b67b544bf874fcbaf9563997e35b881ceed7d622be0d43799838872d5d",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 解释任务：科研任务插件绑定",
+      "summary": "将具体任务类与统一运行器的操作绑定；适用范围为科研任务 · 解释任务。",
+      "en_title": "Research task plugin binding — Research tasks / Explanation task",
+      "en_summary": "This module owns research task plugin binding in Research tasks / Explanation task."
+    },
+    "tasks/generate/__init__.py": {
+      "source_sha256": "b3934cea353320a8ee7f94368f559f593e513b4e531654588a6e412a51a8f426",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "tasks/generate"
+    },
+    "tasks/generate/operation.py": {
+      "source_sha256": "4f6299e216bba9b008541af6430a4798d6c072adead73ab6cf2377bc87729455",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 生成控制：具体科研任务编排",
+      "summary": "读取选定任务配置并连接对应的实际实现；适用范围为科研任务 · 生成控制。",
+      "en_title": "Concrete research task orchestration — Research tasks / Generation control",
+      "en_summary": "This module owns concrete research task orchestration in Research tasks / Generation control."
+    },
+    "tasks/generate/task.py": {
+      "source_sha256": "67e11d81767abd434ff1907c6e449954983cd3d79efbc98d9f0fdcc75bef8095",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 生成控制：科研任务插件绑定",
+      "summary": "将具体任务类与统一运行器的操作绑定；适用范围为科研任务 · 生成控制。",
+      "en_title": "Research task plugin binding — Research tasks / Generation control",
+      "en_summary": "This module owns research task plugin binding in Research tasks / Generation control."
+    },
+    "tasks/intervene/__init__.py": {
+      "source_sha256": "0bc814a575afbb283a9f3e6fc410c8447554bf8c0e3cd4a3bc72097d988237e6",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "tasks/intervene"
+    },
+    "tasks/intervene/operation.py": {
+      "source_sha256": "42cc32c8bcb2b80ec773434f4ce332b83e014dc059f31303a8ab6545ecc8fe50",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 干预任务：具体科研任务编排",
+      "summary": "读取选定任务配置并连接对应的实际实现；适用范围为科研任务 · 干预任务。",
+      "en_title": "Concrete research task orchestration — Research tasks / Intervention task",
+      "en_summary": "This module owns concrete research task orchestration in Research tasks / Intervention task."
+    },
+    "tasks/intervene/task.py": {
+      "source_sha256": "acdd3fd8f0fcaa1212b220d8df245b7a940fa0783f0c99488b7e5bf6b9872880",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 干预任务：科研任务插件绑定",
+      "summary": "将具体任务类与统一运行器的操作绑定；适用范围为科研任务 · 干预任务。",
+      "en_title": "Research task plugin binding — Research tasks / Intervention task",
+      "en_summary": "This module owns research task plugin binding in Research tasks / Intervention task."
+    },
+    "tasks/precheck/__init__.py": {
+      "source_sha256": "b0d8983d2f207f90d7d48451a6ae9376c04f2a500091b99efcba5678b683e89c",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "tasks/precheck"
+    },
+    "tasks/precheck/compatibility_checks.py": {
+      "source_sha256": "38428badf66638f220bdea08ff4a628452119c5d45578453dc9005e008748c96",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 执行前核验：有界兼容目标计划",
+      "summary": "生成来源明确的模型与任务兼容检查目标；适用范围为科研任务 · 执行前核验。",
+      "en_title": "Bounded compatibility planning — Research tasks / Execution preflight",
+      "en_summary": "This module owns bounded compatibility planning in Research tasks / Execution preflight."
+    },
+    "tasks/precheck/dataset_checks.py": {
+      "source_sha256": "c501f2381c8af7ca6ab49f1b3335cdf5a17ecf82bc5ae92aaac69aaab76c3ac4",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 执行前核验：Prompt 产物完整性检查",
+      "summary": "核对本地已准备数据的文件身份与字段；适用范围为科研任务 · 执行前核验。",
+      "en_title": "Prompt artifact integrity checks — Research tasks / Execution preflight",
+      "en_summary": "This module owns prompt artifact integrity checks in Research tasks / Execution preflight."
+    },
+    "tasks/precheck/model_checks.py": {
+      "source_sha256": "925341840725155e26cb2a3e11db63fb3157d3c2d3428c412be6b6e222a78f45",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 执行前核验：独立模型前向预检",
+      "summary": "在选定输入上检查实际模型前向执行；适用范围为科研任务 · 执行前核验。",
+      "en_title": "Model forward preflight — Research tasks / Execution preflight",
+      "en_summary": "This module owns model forward preflight in Research tasks / Execution preflight."
+    },
+    "tasks/precheck/operation.py": {
+      "source_sha256": "f2ba42b1c1ae7b5954460dc419d4c9f9489e673658d075bb774aba8e4eef8950",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 执行前核验：具体科研任务编排",
+      "summary": "读取选定任务配置并连接对应的实际实现；适用范围为科研任务 · 执行前核验。",
+      "en_title": "Concrete research task orchestration — Research tasks / Execution preflight",
+      "en_summary": "This module owns concrete research task orchestration in Research tasks / Execution preflight."
+    },
+    "tasks/precheck/report.py": {
+      "source_sha256": "0d70eea62e3e5b0858316a88438db9d05ebc9b9701e835d8641a2894c903b117",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 执行前核验：可携带结果报告",
+      "summary": "将已有结果组织为可核对的表格和报告；适用范围为科研任务 · 执行前核验。",
+      "en_title": "Portable result reports — Research tasks / Execution preflight",
+      "en_summary": "This module owns portable result reports in Research tasks / Execution preflight."
+    },
+    "tasks/precheck/task.py": {
+      "source_sha256": "d23bfdf019aab875e1ae94d8183a75b3a12a72392239738b1c3eda28d2645128",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 执行前核验：科研任务插件绑定",
+      "summary": "将具体任务类与统一运行器的操作绑定；适用范围为科研任务 · 执行前核验。",
+      "en_title": "Research task plugin binding — Research tasks / Execution preflight",
+      "en_summary": "This module owns research task plugin binding in Research tasks / Execution preflight."
+    },
+    "tasks/precheck/worker.py": {
+      "source_sha256": "6ced44fe3b2bf50a3b597a06f4f2e9618a4c194c42243579ce142e7854661185",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 执行前核验：隔离预检 Worker",
+      "summary": "在隔离进程和预算内执行选定检查；适用范围为科研任务 · 执行前核验。",
+      "en_title": "Isolated preflight worker — Research tasks / Execution preflight",
+      "en_summary": "This module owns isolated preflight worker in Research tasks / Execution preflight."
+    },
+    "tasks/sae_runtime.py": {
+      "source_sha256": "09b02e53aff37fcdf067b97b036ce898d8813ab6c5953b4982495541ebbbc313",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务：七类 SAE 操作公共运行器",
+      "summary": "核验模型、SAE 与 Prompt 并分派具体任务；适用范围为科研任务。",
+      "en_title": "Shared SAE operation runtime — Research tasks",
+      "en_summary": "This module owns shared sae operation runtime in Research tasks."
+    },
+    "tasks/train/__init__.py": {
+      "source_sha256": "1b3bc069e2f0a66b993971e344497b76464e0e8430e73171a0043a37d7168c32",
+      "role": "support",
+      "reason": "包初始化与接口导出保持导入边界，随所属目录维护。",
+      "owner": "tasks/train"
+    },
+    "tasks/train/backend/training.py": {
+      "source_sha256": "0d3734d4f00dd7b7690ca5cc5f98a3f88862d26bc73b27b5a5dfac8adc6113c2",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 训练任务：外部训练后端适配",
+      "summary": "连接 SAELens 与 Sparsify 的计划、恢复和检查点登记；适用范围为科研任务 · 训练任务。",
+      "en_title": "External training adapters — Research tasks / Training task",
+      "en_summary": "This module owns external training adapters in Research tasks / Training task."
+    },
+    "tasks/train/operation.py": {
+      "source_sha256": "0f9260aeef0e02c4ecf2bc6e1f07bcd8f6bafc1a5efec26d4f4ead27baec6faa",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 训练任务：具体科研任务编排",
+      "summary": "读取选定任务配置并连接对应的实际实现；适用范围为科研任务 · 训练任务。",
+      "en_title": "Concrete research task orchestration — Research tasks / Training task",
+      "en_summary": "This module owns concrete research task orchestration in Research tasks / Training task."
+    },
+    "tasks/train/task.py": {
+      "source_sha256": "67718714a25103c8f1fb1e2b0a48e9b53aaea36d8be06bb6d876268f24651f7b",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "科研任务 · 训练任务：科研任务插件绑定",
+      "summary": "将具体任务类与统一运行器的操作绑定；适用范围为科研任务 · 训练任务。",
+      "en_title": "Research task plugin binding — Research tasks / Training task",
+      "en_summary": "This module owns research task plugin binding in Research tasks / Training task."
+    },
+    "models/__init__.py": {
+      "role": "support",
+      "owner": "models",
+      "reason": "包初始化与导出接口随所属家族或系列维护。",
+      "source_sha256": "f595170543414e2940dd4407eaefd208101da10bfe4b9af983c1ac28c6b53977"
+    },
+    "models/build.py": {
+      "source_sha256": "696a01d6889a1a40b9c06712b69795a651076d0aa111f9acf039862fb815e20b",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "语言模型适配：模型构建与公共接口",
+      "summary": "按配置构建模型对象并核对公共调用约定；适用范围为语言模型适配。",
+      "en_title": "Model construction interfaces — Language-model adapters",
+      "en_summary": "This module owns model construction interfaces in Language-model adapters."
+    },
+    "models/gemma/__init__.py": {
+      "role": "support",
+      "owner": "models/gemma",
+      "reason": "包初始化与导出接口随所属家族或系列维护。",
+      "source_sha256": "97a603859bb5a32198c184acb599bb61c4c217f26fc68eab8882e3fbdb75db20"
+    },
+    "models/gemma/gemma2/__init__.py": {
+      "role": "support",
+      "owner": "models/gemma/gemma2",
+      "reason": "包初始化与导出接口随所属家族或系列维护。",
+      "source_sha256": "2e2b13150bc24a29c7e2cabde6711c55429ed31a95407edeb7f23d3fda2ed432"
+    },
+    "models/gemma/gemma2/specs.py": {
+      "role": "capability",
+      "reason": "当前实现由该模块直接维护，调用者共用这份实现。",
+      "source_sha256": "e74e7a73b7e0d7506b3bb90296875e744bfe83682c32573dea6a5d8ee2389915"
+    },
+    "models/gemma/gemma3/__init__.py": {
+      "role": "support",
+      "owner": "models/gemma/gemma3",
+      "reason": "包初始化与导出接口随所属家族或系列维护。",
+      "source_sha256": "2e2b13150bc24a29c7e2cabde6711c55429ed31a95407edeb7f23d3fda2ed432"
+    },
+    "models/gemma/gemma3/specs.py": {
+      "role": "capability",
+      "reason": "当前实现由该模块直接维护，调用者共用这份实现。",
+      "source_sha256": "4b7dc93197ea401a93a4f1403fdab401f48d05519f1145f2ba19302643459dda"
+    },
+    "models/gpt2/__init__.py": {
+      "role": "support",
+      "owner": "models/gpt2",
+      "reason": "包初始化与导出接口随所属家族或系列维护。",
+      "source_sha256": "97a603859bb5a32198c184acb599bb61c4c217f26fc68eab8882e3fbdb75db20"
+    },
+    "models/gpt2/gpt2/__init__.py": {
+      "role": "support",
+      "owner": "models/gpt2/gpt2",
+      "reason": "包初始化与导出接口随所属家族或系列维护。",
+      "source_sha256": "2e2b13150bc24a29c7e2cabde6711c55429ed31a95407edeb7f23d3fda2ed432"
+    },
+    "models/gpt2/gpt2/specs.py": {
+      "role": "capability",
+      "reason": "当前实现由该模块直接维护，调用者共用这份实现。",
+      "source_sha256": "eff7a99b83d5e941d659d90488ae49adfdfd4522f49b15f7fa38cca7ddab87ae"
+    },
+    "models/hf_compat.py": {
+      "source_sha256": "b8597f1a977c65b0edd6be9f0647c42591cd2c842336425402e357a351c8d61e",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "语言模型适配：Hugging Face 兼容处理",
+      "summary": "协调已有模型配置与后端接口约定；适用范围为语言模型适配。",
+      "en_title": "Hugging Face compatibility — Language-model adapters",
+      "en_summary": "This module owns hugging face compatibility in Language-model adapters."
+    },
+    "models/hf_datasets_bridge.py": {
+      "source_sha256": "a25b1bf87815c4e04c255a402bb89106c4f5110b0d430b31daca394380ad830d",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "语言模型适配：Hugging Face 数据桥接",
+      "summary": "将已有数据来源接入统一 Prompt 接口；适用范围为语言模型适配。",
+      "en_title": "Hugging Face dataset bridge — Language-model adapters",
+      "en_summary": "This module owns hugging face dataset bridge in Language-model adapters."
+    },
+    "models/hf_hooks_backend.py": {
+      "source_sha256": "c841e11ab1482a4b0b0679fe8f92aa4e5ab216bc4d1fb72f6782986d87bfc495",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "语言模型适配：Hugging Face Hook 后端",
+      "summary": "连接模型 Hook 的激活读取与编辑；适用范围为语言模型适配。",
+      "en_title": "Hugging Face hook backend — Language-model adapters",
+      "en_summary": "This module owns hugging face hook backend in Language-model adapters."
+    },
+    "models/hf_logits_backend.py": {
+      "source_sha256": "fddf54790d81485f6bf9379fb99ca0670a38d72385cc152c71ff7beaf99639ab",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "语言模型适配：Hugging Face Logit 后端",
+      "summary": "通过模型前向计算提供输出分数与编辑接口；适用范围为语言模型适配。",
+      "en_title": "Hugging Face logit backend — Language-model adapters",
+      "en_summary": "This module owns hugging face logit backend in Language-model adapters."
+    },
+    "models/hooked_lm_common.py": {
+      "source_sha256": "767636e85c9e691a3cac48b8c4b430e98c56a9e78935140080339c4abd2d627b",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "语言模型适配：模型规格共享合同",
+      "summary": "定义模型规格与 Hook 位置的公共约定；适用范围为语言模型适配。",
+      "en_title": "Shared hooked-model contracts — Language-model adapters",
+      "en_summary": "This module owns shared hooked-model contracts in Language-model adapters."
+    },
+    "models/llama/__init__.py": {
+      "role": "support",
+      "owner": "models/llama",
+      "reason": "包初始化与导出接口随所属家族或系列维护。",
+      "source_sha256": "97a603859bb5a32198c184acb599bb61c4c217f26fc68eab8882e3fbdb75db20"
+    },
+    "models/llama/llama31/__init__.py": {
+      "role": "support",
+      "owner": "models/llama/llama31",
+      "reason": "包初始化与导出接口随所属家族或系列维护。",
+      "source_sha256": "2e2b13150bc24a29c7e2cabde6711c55429ed31a95407edeb7f23d3fda2ed432"
+    },
+    "models/llama/llama31/specs.py": {
+      "role": "capability",
+      "reason": "当前实现由该模块直接维护，调用者共用这份实现。",
+      "source_sha256": "91fa12f3bfc92c2d411cbffc81e3502ec0ae90d53351f082de6423006a443816"
+    },
+    "models/llama/r1_distill/__init__.py": {
+      "role": "support",
+      "owner": "models/llama/r1_distill",
+      "reason": "包初始化与导出接口随所属家族或系列维护。",
+      "source_sha256": "2e2b13150bc24a29c7e2cabde6711c55429ed31a95407edeb7f23d3fda2ed432"
+    },
+    "models/llama/r1_distill/specs.py": {
+      "role": "capability",
+      "reason": "当前实现由该模块直接维护，调用者共用这份实现。",
+      "source_sha256": "456071664609ed8ce7102f95b49cd32cb71c043ad3dedc91f7ac3976c06e3e35"
+    },
+    "models/loading_policy.py": {
+      "role": "capability",
+      "title": "模型精度与权重处理策略",
+      "summary": "按既有优先顺序保存模型架构的精度与权重处理选择。",
+      "en_title": "Model precision and processing policies",
+      "en_summary": "This module owns model precision and processing policies for explicitly selected models.",
+      "reason": "按既有优先顺序保存模型架构的精度与权重处理选择。",
+      "source_sha256": "78d22a88dfd994ece72914174816255a1b88fcd1e7f0f6350829881963f04494"
+    },
+    "models/mistral/__init__.py": {
+      "role": "support",
+      "owner": "models/mistral",
+      "reason": "包初始化与导出接口随所属家族或系列维护。",
+      "source_sha256": "97a603859bb5a32198c184acb599bb61c4c217f26fc68eab8882e3fbdb75db20"
+    },
+    "models/mistral/mistral7b/__init__.py": {
+      "role": "support",
+      "owner": "models/mistral/mistral7b",
+      "reason": "包初始化与导出接口随所属家族或系列维护。",
+      "source_sha256": "2e2b13150bc24a29c7e2cabde6711c55429ed31a95407edeb7f23d3fda2ed432"
+    },
+    "models/mistral/mistral7b/specs.py": {
+      "role": "capability",
+      "reason": "当前实现由该模块直接维护，调用者共用这份实现。",
+      "source_sha256": "11c3ee62432f5a6a3682d589fd7819c37aa7c16360778bcfead402d801991d12"
+    },
+    "models/model_adapter.py": {
+      "role": "capability",
+      "title": "共享模型构建与惰性接口",
+      "summary": "按显式规格与加载选择复用构建、设备参数及惰性接口。",
+      "en_title": "Shared model construction",
+      "en_summary": "This module owns shared model construction for explicitly selected models.",
+      "reason": "按显式规格与加载选择复用构建、设备参数及惰性接口。",
+      "source_sha256": "7221296cdd62ffe790a6541fd49c87ae6dae22d89de15d75aa4df0a8c23c92ff"
+    },
+    "models/pythia/__init__.py": {
+      "role": "support",
+      "owner": "models/pythia",
+      "reason": "包初始化与导出接口随所属家族或系列维护。",
+      "source_sha256": "97a603859bb5a32198c184acb599bb61c4c217f26fc68eab8882e3fbdb75db20"
+    },
+    "models/pythia/pythia/__init__.py": {
+      "role": "support",
+      "owner": "models/pythia/pythia",
+      "reason": "包初始化与导出接口随所属家族或系列维护。",
+      "source_sha256": "2e2b13150bc24a29c7e2cabde6711c55429ed31a95407edeb7f23d3fda2ed432"
+    },
+    "models/pythia/pythia/specs.py": {
+      "role": "capability",
+      "reason": "当前实现由该模块直接维护，调用者共用这份实现。",
+      "source_sha256": "ccf60b84b7892ed35f06929435d410b3d86d02c444a2d630dccb749486b6df7b"
+    },
+    "models/qwen/__init__.py": {
+      "role": "support",
+      "owner": "models/qwen",
+      "reason": "包初始化与导出接口随所属家族或系列维护。",
+      "source_sha256": "97a603859bb5a32198c184acb599bb61c4c217f26fc68eab8882e3fbdb75db20"
+    },
+    "models/qwen/qwen25/__init__.py": {
+      "role": "support",
+      "owner": "models/qwen/qwen25",
+      "reason": "包初始化与导出接口随所属家族或系列维护。",
+      "source_sha256": "533ae2353158b8d5bce838984b5962e2683e700410d2ea9e4024a143a7870b1e"
+    },
+    "models/qwen/qwen25/specs.py": {
+      "role": "capability",
+      "reason": "当前实现由该模块直接维护，调用者共用这份实现。",
+      "source_sha256": "4c4f43c4a24d7b25d7e6f3a7918ec457ed3e13828c8a6a993f6adbbfc66c043e"
+    },
+    "models/qwen/qwen3/__init__.py": {
+      "role": "support",
+      "owner": "models/qwen/qwen3",
+      "reason": "包初始化与导出接口随所属家族或系列维护。",
+      "source_sha256": "2e2b13150bc24a29c7e2cabde6711c55429ed31a95407edeb7f23d3fda2ed432"
+    },
+    "models/qwen/qwen3/specs.py": {
+      "role": "capability",
+      "reason": "当前实现由该模块直接维护，调用者共用这份实现。",
+      "source_sha256": "c22b53b396a530a889613f0d7bf2acbea1e6a0514f6c615423259d1e6f2ead4a"
+    },
+    "models/qwen/qwen35/__init__.py": {
+      "role": "support",
+      "owner": "models/qwen/qwen35",
+      "reason": "包初始化与导出接口随所属家族或系列维护。",
+      "source_sha256": "2e2b13150bc24a29c7e2cabde6711c55429ed31a95407edeb7f23d3fda2ed432"
+    },
+    "models/qwen/qwen35/specs.py": {
+      "role": "capability",
+      "reason": "当前实现由该模块直接维护，调用者共用这份实现。",
+      "source_sha256": "5f37cb3ce508fa879cd727cd42ac3d6896b630efab22e43d04799108d6583a6b"
+    },
+    "models/qwen/r1_distill/__init__.py": {
+      "role": "support",
+      "owner": "models/qwen/r1_distill",
+      "reason": "包初始化与导出接口随所属家族或系列维护。",
+      "source_sha256": "533ae2353158b8d5bce838984b5962e2683e700410d2ea9e4024a143a7870b1e"
+    },
+    "models/qwen/r1_distill/specs.py": {
+      "role": "capability",
+      "reason": "当前实现由该模块直接维护，调用者共用这份实现。",
+      "source_sha256": "cb8a15515625ca08f48c0cdf6878f9dc2723c885cd54b10fdd3c58337ac2c80a"
+    },
+    "models/transformerlens_backend.py": {
+      "source_sha256": "061a911b268d42e6d5f3e556585627b3a79f86c76e126c90d5ea726f0f8fc271",
+      "role": "capability",
+      "reason": "源码实际定义该模块的函数、类型、参数合同或执行编排，作为独立职责维护。",
+      "title": "语言模型适配：TransformerLens 模型后端",
+      "summary": "选择实际模型系统与权重处理方式；适用范围为语言模型适配。",
+      "en_title": "TransformerLens model backend — Language-model adapters",
+      "en_summary": "This module owns transformerlens model backend in Language-model adapters."
+    },
+    "tasks/benchmark/metrics/health_cli.py": {
+      "source_sha256": "b6386521c65661799e18360df65d83ea24e9b64b3d7d99864701f5e8b94d23ca",
+      "role": "capability",
+      "owner": "tasks/benchmark/metrics",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测指标：health_cli",
+      "summary": "登记和计算通用指标，执行激活健康评测。",
+      "en_title": "health cli",
+      "en_summary": "Evaluate activation health through the current benchmark task.\n\nTypical usage::\n\n  python -m tasks.benchmark.metrics.health_cli --model pythia70m --prompt-source SimpleCopying     --sae pythia70m_resid_sm --layer 3 --data-dir ./data --device cpu"
+    },
+    "tasks/benchmark/methods/saebench_worker.py": {
+      "source_sha256": "ad7335c1348d0edcfbd333c49e1f87fd2177636e5745651f78431778e067ac34",
+      "role": "capability",
+      "owner": "tasks/benchmark/methods",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "科研方法接入：saebench_worker",
+      "summary": "取得所选方法的输入并调用原始估计程序，保存科研来源。",
+      "en_title": "saebench worker",
+      "en_summary": "Purpose: Execute the frozen native SAEBench protocol in its dedicated subprocess environment.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/reliability/cli.py": {
+      "source_sha256": "bbc8eb7d01fdc97d1e98e15151d17f8f7f1773f552294239bee47fddec95015f",
+      "role": "capability",
+      "owner": "tasks/benchmark/reliability",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "统计分析与科研对照：cli",
+      "summary": "读取样本组观测，计算不确定性、匹配比较与已知对照。",
+      "en_title": "cli",
+      "en_summary": "Audit a completed SAE benchmark from its verified activation and intervention caches."
+    },
+    "tasks/benchmark/reliability/controls_cli.py": {
+      "source_sha256": "33c6c3c5dd7ce0c7c962b95721a3c46edba8cb9c72d02ba8f5ef9b32caae066a",
+      "role": "capability",
+      "owner": "tasks/benchmark/reliability",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "统计分析与科研对照：controls_cli",
+      "summary": "读取样本组观测，计算不确定性、匹配比较与已知对照。",
+      "en_title": "controls cli",
+      "en_summary": "Run independent analytical and known-factor SAR/RSS ground-truth controls."
+    },
+    "tasks/benchmark/sites/records.py": {
+      "source_sha256": "26a57a0d7082012285c7c02cbabd76196a33302c3d713547d3874cf98da2312f",
+      "role": "capability",
+      "owner": "tasks/benchmark/sites",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "位点检查与批次执行：records",
+      "summary": "选择模型、SAE和层位，进行检查、排程、恢复与记录。",
+      "en_title": "records",
+      "en_summary": "Purpose: Save site attempts, acceptance records and resumable status, then build the final evaluation matrix.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/sites/checks.py": {
+      "source_sha256": "49636ed733f0bfb8297ddbd85658cafcdafdbbc60554e95ca81779d006c8c250",
+      "role": "capability",
+      "owner": "tasks/benchmark/sites",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "位点检查与批次执行：checks",
+      "summary": "选择模型、SAE和层位，进行检查、排程、恢复与记录。",
+      "en_title": "checks",
+      "en_summary": "Purpose: Verify a selected real model SAE site, record numerical acceptance and organize its bounded execution.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/sites/runner.py": {
+      "source_sha256": "98c7117f957dadb05ef76dc29f5e7d88edbfe00b02fbc29db8dfc5dd9973a933",
+      "role": "capability",
+      "owner": "tasks/benchmark/sites",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "位点检查与批次执行：runner",
+      "summary": "选择模型、SAE和层位，进行检查、排程、恢复与记录。",
+      "en_title": "runner",
+      "en_summary": "Purpose: Run the selected site benchmark and statistical analysis with frozen selection and evaluation samples.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/sites/matrix.py": {
+      "source_sha256": "a6330dfbcd9a608aa4d246e1883cd9f28b0d410fabd61ab31cae6c1c2dd321ae",
+      "role": "capability",
+      "owner": "tasks/benchmark/sites",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "位点检查与批次执行：matrix",
+      "summary": "选择模型、SAE和层位，进行检查、排程、恢复与记录。",
+      "en_title": "matrix",
+      "en_summary": "Purpose: Schedule selected sites and continue batch evaluation from its recorded status.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/sites/__init__.py": {
+      "source_sha256": "9de043f3a06220886bae7bdd4bb13b92733ae58ce377e783c4e4efdc9145e488",
+      "role": "support",
+      "owner": "tasks/benchmark/sites",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "位点检查与批次执行：__init__",
+      "summary": "选择模型、SAE和层位，进行检查、排程、恢复与记录。",
+      "en_title": "  init  ",
+      "en_summary": "Purpose: organize benchmark sites. Scope: the corresponding task operations."
+    },
+    "tasks/benchmark/results/validation.py": {
+      "source_sha256": "9094f72344d07704b7ab9ee7f2f7e89cd324bdd8306d2f84fd2da20e2b4c2fe4",
+      "role": "capability",
+      "owner": "tasks/benchmark/results",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测结果读取与报告：validation",
+      "summary": "保存和读取测量、曲线、统计报告及来源明确的证据资料包。",
+      "en_title": "validation",
+      "en_summary": "Purpose: Validate saved external-method results against their actual source files and scientific protocol.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/results/localization.py": {
+      "source_sha256": "c71afd2cd5f28d03bbbc03a6767b589e663f20993f9599410f768fdc5e1f9d81",
+      "role": "capability",
+      "owner": "tasks/benchmark/results",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测结果读取与报告：localization",
+      "summary": "保存和读取测量、曲线、统计报告及来源明确的证据资料包。",
+      "en_title": "localization",
+      "en_summary": "Purpose: Read localization curves, reconstruct frozen code grids and check their source and protocol identity.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/results/evidence.py": {
+      "source_sha256": "bea96ed538d798e0a69ba7634bcd6a0ab34967706abf2c4ab49b9629bfb0bdf7",
+      "role": "capability",
+      "owner": "tasks/benchmark/results",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测结果读取与报告：evidence",
+      "summary": "保存和读取测量、曲线、统计报告及来源明确的证据资料包。",
+      "en_title": "evidence",
+      "en_summary": "Purpose: Read site evaluation evidence, compare numeric records and summarize support from actual completed measurements.\n\nScope: the corresponding benchmark execution, result consumer or explicit component check."
+    },
+    "tasks/benchmark/results/__init__.py": {
+      "source_sha256": "978bf101e36c1c889f5be721843f465ff3a7da493b6806bc808203cdb5d361df",
+      "role": "support",
+      "owner": "tasks/benchmark/results",
+      "reason": "归属依据当前源码和实际调用关系。",
+      "title": "评测结果读取与报告：__init__",
+      "summary": "保存和读取测量、曲线、统计报告及来源明确的证据资料包。",
+      "en_title": "  init  ",
+      "en_summary": "Purpose: organize benchmark results. Scope: the corresponding task operations."
+    }
+  }
+}

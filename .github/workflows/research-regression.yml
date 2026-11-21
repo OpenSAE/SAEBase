@@ -41,7 +41,7 @@ jobs:
         env:
           SAEBASE_SAR_SOURCE: originals/sar/sar.py
           SAEBASE_RSS_SOURCE: originals/rss/rss.py
-        run: python -m pytest -q tests/product/test_reference_sae_contracts.py tests/product/test_research_method_adapters.py
+        run: python -m pytest -q tests/product/model_adapters/test_reference_sae_contracts.py tests/product/research/test_research_method_adapters.py
 
   synthetic-ground-truth:
     runs-on: ubuntu-latest
@@ -69,9 +69,9 @@ jobs:
           SAEBASE_RSS_SOURCE: originals/rss/rss.py
         run: |
           set -euo pipefail
-          python -m pytest -q tests/product/test_synthetic_controls.py
+          python -m pytest -q tests/product/interventions/test_synthetic_controls.py
           saebase-ground-truth \
-            --config conf/reliability/evaluate_synthetic_controls.json \
+            --config conf/tasks/benchmark/task.yaml#presets.m4_ground_truth \
             --sar-source originals/sar/sar.py \
             --rss-source originals/rss/rss.py \
             --output "$RUNNER_TEMP/ground-truth.json"

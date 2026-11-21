@@ -112,7 +112,7 @@ def freeze_config(args, report):
     from omegaconf import OmegaConf
     import hashlib
 
-    cfg = OmegaConf.load(args.config)
+    cfg = OmegaConf.masked_copy(OmegaConf.load(args.config), ["matrix"])
     matrix = cfg.matrix
     if not matrix.models or not matrix.datasets:
         raise ValueError("Capture matrix requires model and dataset selections")
@@ -200,12 +200,12 @@ def freeze_config(args, report):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", type=Path, default=ROOT / "conf/experiment/capture_matrix.yaml")
+    parser.add_argument("--config", type=Path, default=ROOT / "conf/tasks/capture/task.yaml")
     parser.add_argument("--sar-source", type=Path)
     parser.add_argument(
         "--capture-mode", choices=["sar", "whiten", "non_whiten", "g_s", "I"], default="sar"
     )
-    parser.add_argument("--report-dir", type=Path, required=True)
+    parser.add_argument("--report-dir", type=Path)
     parser.add_argument("--tag", required=True)
     parser.add_argument("--gpu", default="0")
     parser.add_argument("--wait-pid", action="append", type=int, default=[])
@@ -254,13 +254,16 @@ def main(argv=None):
         k = args.filter if type(args.filter) is int else args.top_feature_num or 10
         if k < 2 or args.n_fit < 1 + k + k * (k - 1) // 2 or args.coalitions - args.n_fit < 2:
             parser.error("SAR coalition budget must cover the pairwise design and held-out set")
-    report = args.report_dir.resolve()
+    from tasks.capture.matrix import CaptureMatrix
+
+    report = CaptureMatrix(
+        args.config, root=ROOT, tag=args.tag, mode=args.capture_mode, report=args.report_dir
+    ).REPORT
     report.mkdir(parents=True, exist_ok=True)
     with (report / "queue.lock").open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         config, _ = freeze_config(args, report)
         # Compose and validate every cell without loading model weights or the estimator.
-        from tasks.capture.matrix import CaptureMatrix
         from hydra import initialize_config_module
         from tasks.capture.operation import validate_cfg
 

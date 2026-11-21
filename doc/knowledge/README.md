@@ -1,9 +1,17 @@
-# SAEBase Scientific Knowledge
+# SAEBase Scientific Concepts and Terminology
 
-Knowledge Tree 只组织语言模型稀疏特征研究。当前包括模型与 SAE 资产、Prompt 数据、特征捕获、教师强制干预、生成、因果电路、自动解释、基准可靠性与 SAE 训练。
+## Purpose
 
-研究问题由稳定 ID、独立状态和真实源码证据维护。Code Tree 基于 Python AST；Context Tree 使用 [glossary.json](glossary.json) 统一术语。实现存在只说明接口具备可核查的源码依据，实验有效性需独立证明。
+Concepts, terminology and project engagements used in the study of the location of rare characteristics.
 
-[SAE 方法说明](foundations/sae_methods.md)
+## Scope
 
-[主要探究的配置](primary_research_configuration.md)：约定使用的十个模型及 SAE、十二个数据集，以及当前 SAR 的筛选、采样和汇报方式。
+For the understanding of experiments, models and thin-codifier terminology, and for the verification of the basis of implementation.
+
+Knowledge Tree only organises slurling characterization studies of language models. Current coverage includes models and SAE assets, Prompt data, feature capture, teacher intervention, generation, causal circuits, automatic interpretation, baseline reliability and SAE training.
+
+The issue of the study is maintained by stable ID, independent status, and real source-code evidence. Code Tree is based on Python AST; Context Tree uses [glossary.json](../code/atlas_site/source/knowledge/glossary.json) common terminology. Achieving presence only indicates that the interface has a verifiable source basis and that the validity of the experiment needs to be independently demonstrated.
+
+[SAE Methodological note](foundations/sae_methods.md)(It's an explanation for the characterization experiment. SAE Method, e.g., to see how the diluted code indicates that the model is activated)
+
+[The configuration of the main inquiry](primary_research_configuration.md)(Recording of major research packages and captured batches that have been implemented, suitable for cross-checking layers, questions and ranges, e.g., check 100 The four capture methods for comparison: the 10 models agreed upon and the SAE,12 data sets, and current SAR screening, sampling and reporting modalities.

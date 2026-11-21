@@ -4,12 +4,15 @@ Owns representative input selection, task-specific work units and reports.
 Reference cohort sizes are reduced only inside clearly marked probe runs.
 """
 
+from saebase.runtime.configuration.task_options import merge_task_overrides, task_owner, task_value
+
 from pathlib import Path
 import os
 import time
 import json
 import traceback
 from contextlib import ExitStack
+from conf import load_task
 from omegaconf import OmegaConf
 
 from saebase.results import EvaluationResult
@@ -32,32 +35,37 @@ def run_performance_precheck(cfg):
             },
         )
     from saebase.registry import get_task_plugin
-    from tasks.sae_runtime import resolve_sae, load_selection, loaded_pair_session
+    from saebase.runtime.sae_operations import resolve_sae, load_selection, loaded_pair_session
     from models.numerics import configure_task
 
     configure_task(cfg)
 
     options = settings(cfg)
-    targets = list(cfg.task.get("check_tasks") or ["capture", "intervene", "generate"])
+    targets = list(task_value(cfg.task, "check_tasks") or ["capture", "intervene", "generate"])
     root = Path.cwd()
     records = []
     started = time.perf_counter()
     raw_cfg = OmegaConf.to_container(cfg, resolve=True)
-    overrides = cfg.task.get("task_configs", {})
+    overrides = task_value(cfg.task, "task_configs", {})
     pair = None
     with ExitStack() as resources:
         for target in targets:
             modes = (
-                list(cfg.task.get("capture_modes", ["whiten", "non_whiten", "g_s", "I"]))
+                list(task_value(cfg.task, "capture_modes", ["whiten", "non_whiten", "g_s", "I"]))
                 if target == "capture"
                 else [None]
             )
             for mode in modes:
                 name = target + ("_" + mode if mode else "")
                 child = OmegaConf.create(raw_cfg)
-                child.task = OmegaConf.merge(
-                    OmegaConf.load(Path(__file__).parents[2] / "conf/task" / f"{target}.yaml").task,
-                    overrides.get(target, {}),
+                task_override = overrides.get(target, {})
+                if target == "capture":
+                    from tasks.capture.configuration import migrate_capture_task
+
+                    task_override = migrate_capture_task(task_override)
+                child.task = merge_task_overrides(
+                    load_task(target).task,
+                    task_override,
                 )
                 OmegaConf.set_struct(child, False)
                 child.task.performance = OmegaConf.to_container(cfg.task.performance, resolve=True)
@@ -65,31 +73,37 @@ def run_performance_precheck(cfg):
                 child.task.performance.enabled = True
                 child.task.execute = True
                 if mode is not None:
-                    child.task.mode = mode
-                if cfg.task.get("sae_list") not in (None, "default", "all"):
-                    entry = (
-                        cfg.task.sae_list
-                        if isinstance(cfg.task.sae_list, str)
-                        else cfg.task.sae_list[0]
-                    )
+                    task_owner(child.task).mode = mode
+                sae_list = task_value(cfg.task, "sae_list")
+                if sae_list not in (None, "default", "all"):
+                    entry = sae_list if isinstance(sae_list, str) else sae_list[0]
                     child.task.sae_key = (
                         entry.get("sae", entry.get("key")) if hasattr(entry, "get") else entry
                     )
                     if hasattr(entry, "get") and entry.get("layer") is not None:
                         child.task.layer = entry.layer
-                child.dataset.sample_count = options["probe_samples"]
-                if "sar" in child.task:
-                    child.task.sar.cohort_filter.reference_sample_count = options["probe_samples"]
+                explicit_samples = task_value(child.task, "sample_ids")
+                if explicit_samples is not None:
+                    explicit_samples = list(explicit_samples)[: options["probe_samples"]]
+                    task_owner(child.task).sample_ids = explicit_samples
+                if explicit_samples is None:
+                    child.dataset.sample_count = options["probe_samples"]
+                    if target == "capture":
+                        child.task.capture.selection.cohort_filter.reference_sample_count = options[
+                            "probe_samples"
+                        ]
                 if target in {"intervene", "generate"}:
-                    child.task.feature_selection = "capture_top"
-                    child.task.inline_results = False
+                    task_owner(child.task).feature_selection = "capture_top"
+                    task_owner(child.task).inline_results = False
                 folder = root / "tmp/performance" / name
                 folder.mkdir(parents=True, exist_ok=True)
                 for directory in ["reports", "metadata", "logs", "tmp", "figures"]:
                     (folder / directory).mkdir(exist_ok=True)
                 record = {
                     "task": name,
-                    "probe_questions_requested": options["probe_samples"],
+                    "probe_questions_requested": len(explicit_samples)
+                    if explicit_samples is not None
+                    else options["probe_samples"],
                     "scientific_acceptance": False,
                     "cohort_scope": "bounded performance probe; not the production research cohort",
                 }
@@ -202,13 +216,13 @@ def run_performance_precheck(cfg):
         },
     )
     lines = [
-        "# 性能预检报告",
+        "# Performance precheck report",
         "",
-        f"状态：{payload['status']}；总耗时：{payload['seconds']:.2f} 秒。",
+        f"Status:{payload['status']};Total time-consuming:{payload['seconds']:.2f} seconds.",
         "",
-        "以下为真实小规模探针，不是生产批次结果。每题计时包括调优开销；共享预处理与阶段耗时单独列出。",
+        "The following are real small-scale probes, not batch results..",
         "",
-        "| 任务 | 状态 | 单位 | 数量 | 平均秒 | P50 | P95 | 最大秒 |",
+        "| Tasks | Status | Units | Number | Average seconds | P50 | P95 | Max. sec |",
         "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |",
     ]
     for row in records:
@@ -218,11 +232,11 @@ def run_performance_precheck(cfg):
             )
     lines += [
         "",
-        "## 扣除首次调优后的每题耗时",
+        "## Less time spent on each topic after the first modulation",
         "",
-        "保留每题缓存准备、数值控制和写入；共享加载与参考统计见阶段记录。少量探针的分位数仅描述本次测量。",
+        "Keeps each issue of cache preparation, numerical control and writing; shares the load and reference statistics for the record of the reference phase. The fractions of a small number of probes describe only this measurement.",
         "",
-        "| 任务 | 数量 | 平均秒 | P50 | P95 | 最小 | 最大 |",
+        "| Tasks | Number | Average seconds | P50 | P95 | Min | Max |",
         "| --- | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
     for row in records:
@@ -235,9 +249,9 @@ def run_performance_precheck(cfg):
             )
     lines += [
         "",
-        "## 实测优化收益",
+        "## Optimizing benefits",
         "",
-        "| 任务 | 优化 | 选中batch | 实测加速倍数 | 数值检查 |",
+        "| Tasks | Optimization | Select batch | Measured acceleration multiplier | Numerical Check |",
         "| --- | --- | ---: | ---: | --- |",
     ]
     for row in records:
@@ -245,15 +259,15 @@ def run_performance_precheck(cfg):
             if "speedup" in trial:
                 optimization = trial.get("optimization", trial.get("optimizations", []))
                 lines.append(
-                    f"| {row['task']} | {optimization} | {trial.get('selected_batch_size')} | {trial['speedup']:.3f} | {'通过并采用' if trial.get('selected') else '无可采用的更快候选，保留原配置'} |"
+                    f"| {row['task']} | {optimization} | {trial.get('selected_batch_size')} | {trial['speedup']:.3f} | {'Adopted and adopted' if trial.get('selected') else 'No use for faster candidates, keep the original configuration'} |"
                 )
         if row.get("error"):
-            lines += ["", row["task"] + "：" + row["error"]]
+            lines += ["", row["task"] + ":" + row["error"]]
     lines += [
         "",
-        "## 阶段耗时",
+        "## Phase time-consuming",
         "",
-        "| 任务 | 阶段 | 次数 | 总秒 | 平均秒 | P95秒 |",
+        "| Tasks | Phase | Number | Total seconds | Average seconds | P95 seconds |",
         "| --- | --- | ---: | ---: | ---: | ---: |",
     ]
     for row in records:
@@ -263,9 +277,9 @@ def run_performance_precheck(cfg):
             )
     lines += [
         "",
-        "## 调优成本",
+        "## Mitigating costs",
         "",
-        "| 任务 | 调优总秒 | 基准秒/单位 | 选中秒/单位 | 预计回本单位数 |",
+        "| Tasks | Tunnel total seconds | Benchmark seconds/Units | Select seconds/Units | Expected return to unit |",
         "| --- | ---: | ---: | ---: | ---: |",
     ]
     for row in records:
@@ -275,13 +289,13 @@ def run_performance_precheck(cfg):
                 chosen = base / trial["speedup"]
                 units = trial.get("break_even_units")
                 lines.append(
-                    f"| {row['task']} | {trial.get('total_tuning_seconds', trial['search_seconds']):.3f} | {base:.5f} | {chosen:.5f} | {round(units, 1) if units is not None else '无实测收益'} |"
+                    f"| {row['task']} | {trial.get('total_tuning_seconds', trial['search_seconds']):.3f} | {base:.5f} | {chosen:.5f} | {round(units, 1) if units is not None else 'No measured gain'} |"
                 )
     lines += [
         "",
-        "加速倍数比较相同输入、相同工作量的参考实现与选中候选；缓存准备、搜索和完整样本耗时另见JSON。批量改变浮点结果时会拒绝该候选；OOM候选会记录并停止向更大batch搜索。",
+        "Accelerator multiple comparison of the same input, reference achievement for the same workload and candidate; Cache preparation, search and complete sample time; see also JSON.Batch change of the float result will reject the candidate; OOM Candidatures will be recorded and stopped for larger. batch Search.",
         "",
-        "完整的阶段耗时、P90/P99、逐样本数据、每个候选的速度/显存/误差及失败原因均保存在performance_precheck.json。",
+        "Complete phase time-consuming, P90/P99,Sample-by-sampling data, speed per candidate/Visibility/Both the error and the cause of the failure are stored in performance_precheck.json.",
     ]
     (root / "reports/performance_precheck.md").write_text("\n".join(lines) + "\n")
     return EvaluationResult(

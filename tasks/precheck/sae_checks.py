@@ -29,7 +29,7 @@ def select_sites(
     A free-text SAE key must still refer to a Model-owned profile. The legacy
     profile table is used only to resolve current checkpoint and hook parameters.
     """
-    from tasks.sae_runtime import resolve_sae
+    from saebase.runtime.sae_operations import resolve_sae
 
     available = list(model_cfg.get("sae_profiles", []))
     defaults = list(model_cfg.get("default_saes", []))
@@ -42,7 +42,7 @@ def select_sites(
     else:
         chosen = list(selection)
     if not chosen:
-        raise ValueError("Model has no default SAE; provide model.default_saes or task.sae_list")
+        raise ValueError("Model has no default SAE; provide model.default_saes or task.precheck.sae_list")
     rows = []
     seen = set()
     for entry in chosen:
@@ -74,7 +74,7 @@ def check_real_sae(
     from omegaconf import OmegaConf
 
     from saebase.api import capture_features
-    from tasks.sae_runtime import load_selection, resolve_sae
+    from saebase.runtime.sae_operations import load_selection, resolve_sae
 
     if not prompt or not prompt.strip():
         raise ValueError("Precheck requires a nonempty real prompt for SAE capture")
@@ -179,18 +179,16 @@ def _check_protocol(name):
 
 
 def _reference_targets():
-    from importlib.resources import files
+    from conf import bundled_configuration, read_configuration
 
-    from omegaconf import OmegaConf
-
-    raw = OmegaConf.load(files("conf") / "benchmark/catalog.yaml").reference_pairs
-    return {name: (p.sae_key, int(p.layer), int(p.width)) for name, p in raw.items()}
+    raw = read_configuration(bundled_configuration("tasks/precheck/task.yaml", "sae_checks.reference_pairs"))
+    return {name: (p["sae_key"], int(p["layer"]), int(p["width"])) for name, p in raw.items()}
 
 
 TARGETS = _reference_targets()
 PROMPTS = tuple(_check_protocol("reference_pair").prompts)
 CPU_PROMPTS = tuple(_check_protocol("cpu_pair").prompts)
-CATALOG = Path(__file__).resolve().parents[2] / "conf/coverage/stage_bc.json"
+CATALOG = Path(__file__).resolve().parents[2] / "conf/tasks/benchmark/task.yaml#site_catalog"
 
 
 def measure_pair(model, sae, site, prompts, *, width=None, tolerance=0.01):

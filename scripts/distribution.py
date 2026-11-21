@@ -17,102 +17,109 @@ from pathlib import Path
 NEEDED_WHEEL = {
     "saebase/api/__init__.py",
     "saebase/datasets/plugins.py",
-    "tasks/benchmark/reliability/cli.py",
+    "tasks/benchmark/reliability/commands.py",
     "conf/config.yaml",
-    "conf/prompt_source/catalog.yaml",
+    "conf/base/runtime/runtime.yaml",
+    "conf/tasks/capture/task.yaml",
+    "assets/dataset_cohorts/stage_d/files/stage_d_population.jsonl",
+    "conf/datasets/catalog.yaml",
     "tasks/precheck/task.py",
     "saebase/extensions/metrics.py",
-    "saebase/api/sae_loading.py",
+    "saebase/api/sae_adapters/sae_loading.py",
     "tasks/benchmark/metrics/health_cli.py",
     "tasks/benchmark/execution/runner.py",
     "saebase/extensions/registry.py",
-    "saebase/api/sae_profiles.py",
-    "tasks/intervene/cli.py",
+    "saebase/api/sae_adapters/sae_profiles.py",
+    "tasks/intervene/commands.py",
     "tasks/benchmark/comparison/schema.py",
-    "conf/sae/catalog.yaml",
-    "tasks/intervene/backend/specs.py",
+    "conf/base/interfaces/sae_profiles.yaml",
+    "tasks/intervene/editing/specs.py",
     "conf/__init__.py",
     "saebase/store/shards.py",
-    "tasks/benchmark/methods/rss.py",
-    "tasks/benchmark/cli.py",
+    "tasks/benchmark/methods/stable_support.py",
+    "tasks/benchmark/commands.py",
     "tasks/plugins.py",
     "saebase/__init__.py",
-    "conf/interventions/pythia_feature_edits.json",
-    "tasks/capture/sar.py",
+    "conf/tasks/intervene/task.yaml",
+    "tasks/capture/response_surface.py",
     "saebase/extensions/contracts.py",
     "tasks/benchmark/reliability/controls_cli.py",
     "models/plugins.py",
     "saebase/store/__init__.py",
     "saebase/api/paper_sources.py",
-    "conf/evaluation/activation_health.yaml",
+    "conf/tasks/benchmark/task.yaml",
     "saebase/store/collect.py",
-    "models/gpt2/gpt2/specs.py",
+    "models/gpt_family/gpt2_series/specs.py",
     "tasks/benchmark/execution/planner.py",
-    "conf/benchmark/model_comparison.json",
-    "saebase/datasets/artifacts.py",
-    "conf/benchmark/model_comparison_gpt2.json",
+    "saebase/datasets/prompt_collection/artifacts.py",
     "saebase/api/features.py",
-    "tasks/intervene/backend/steering.py",
-    "tasks/intervene/backend/engine.py",
-    "tasks/intervene/backend/operators.py",
-    "saebase/datasets/datamodule.py",
-    "conf/task/precheck.yaml",
+    "tasks/intervene/editing/steering.py",
+    "tasks/intervene/editing/engine.py",
+    "tasks/intervene/editing/operators.py",
+    "saebase/datasets/prompt_collection/data_module.py",
+    "conf/tasks/precheck/task.yaml",
     "tasks/capture/sar_mode.py",
     "tasks/benchmark/reliability/runner.py",
     "tasks/benchmark/reliability/__init__.py",
     "saebase/extensions/runtime.py",
-    "tasks/generate/backend/decoder_steering.py",
+    "tasks/generate/serving/decoder_steering.py",
     "saebase/runtime/experiment_results.py",
-    "tasks/generate/backend/engine.py",
-    "tasks/intervene/backend/results.py",
-    "saebase/cli.py",
+    "tasks/generate/serving/engine.py",
+    "tasks/intervene/editing/results.py",
+    "saebase/commands.py",
     "tasks/benchmark/reliability/ground_truth.py",
-    "conf/model/catalog.yaml",
+    "conf/models/catalog.yaml",
     "tasks/precheck/operation.py",
-    "tasks/generate/backend/sae_interventions.py",
+    "tasks/generate/serving/sae_interventions.py",
     "saebase/extensions/__init__.py",
     "saebase/store/identity.py",
     "tasks/benchmark/results/metrics.py",
-    "tasks/intervene/backend/__init__.py",
-    "saebase/datasets/prepare.py",
+    "tasks/intervene/editing/__init__.py",
+    "saebase/datasets/prompt_collection/prepare.py",
     "tasks/benchmark/execution/__init__.py",
-    "conf/dataset/catalog.yaml",
 }
 
-NEEDED_SDIST = (
-    NEEDED_WHEEL
-    - {
-        "saebase/datasets/prepare.py",
-        "saebase/datasets/plugins.py",
-        "saebase/datasets/artifacts.py",
-        "saebase/datasets/datamodule.py",
-    }
+SOURCE_ROOTS = {
+    "saebase/api/": "base/interfaces/",
+    "saebase/extensions/": "base/extensions/",
+    "saebase/runtime/": "base/runtime/",
+    "saebase/store/": "base/store/",
+    "saebase/datasets/": "datasets/",
+    "saebase/": "base/application/",
+}
+NEEDED_SDIST = frozenset(
+    "base/configuration/__init__.py" if path == "conf/__init__.py" else next(
+        (source + path.removeprefix(installed) for installed, source in SOURCE_ROOTS.items() if path.startswith(installed)),
+        path,
+    )
+    for path in NEEDED_WHEEL
 ) | {
-    "datasets/prepare.py",
+    "base/runtime/experiment_results.py",
+    "datasets/prompt_collection/prepare.py",
     "datasets/plugins.py",
-    "datasets/artifacts.py",
-    "datasets/datamodule.py",
-    "tests/product/test_model_comparison.py",
+    "datasets/prompt_collection/artifacts.py",
+    "datasets/prompt_collection/data_module.py",
+    "tests/product/benchmarks/test_model_comparison.py",
     "pyproject.toml",
     "README.md",
-    "README_cn.md",
+    "doc/code/translated/README.md",
     "LICENSE",
-    "doc/code/development/legal/NOTICE",
+    "doc/code/documentation/source/development/legal/NOTICE",
     ".github/CONTRIBUTING.md",
     ".github/SECURITY.md",
-    "doc/code/development/CHANGELOG.md",
+    "doc/code/documentation/source/development/CHANGELOG.md",
     "CITATION.cff",
-    "MANIFEST.in",
+    "doc/code/distribution/source/manifest.in",
     ".github/workflows/ci.yml",
-    "doc/code/development/RELEASE_CHECKLIST.md",
-    "doc/code/development/PROVENANCE.md",
-    "doc/code/development/API.md",
-    "tests/product/test_reference_model_coverage.py",
-    "tests/product/test_model_site_evaluation.py",
+    "doc/code/documentation/source/development/RELEASE_CHECKLIST.md",
+    "doc/code/documentation/source/development/PROVENANCE.md",
+    "doc/code/documentation/source/development/API.md",
+    "tests/product/model_adapters/test_reference_model_coverage.py",
+    "tests/product/benchmarks/test_model_site_evaluation.py",
     "tests/product/test_activation_store.py",
     "tests/product/test_feature_interventions.py",
-    "tests/product/fixtures/m0_reference_public.json",
-    "doc/code/development/activation-store.md",
+    "tests/fixtures/m0_reference_public.json",
+    "doc/code/documentation/source/development/activation-store.md",
     ".github/workflows/real-smoke.yml",
     ".github/workflows/research-regression.yml",
     ".github/workflows/upstream-compatibility.yml",
@@ -120,13 +127,13 @@ NEEDED_SDIST = (
     "scripts/release.py",
     "scripts/distribution.py",
     "scripts/quality.py",
-    "doc/code/development/release-process.md",
+    "doc/code/documentation/source/development/release-process.md",
     "tests/product/test_release_candidate.py",
-    "doc/code/development/extensions.md",
-    "tests/product/test_external_extensions.py",
+    "doc/code/documentation/source/development/extensions.md",
+    "tests/product/distribution/test_external_extensions.py",
     "scripts/examples/external_providers.py",
-    "doc/code/development/first-experiment.md",
-    "doc/code/development/troubleshooting.md",
+    "doc/code/documentation/source/development/first-experiment.md",
+    "doc/code/documentation/source/development/troubleshooting.md",
     ".github/CONTRIBUTING.md",
     ".github/CONTRIBUTING.md",
     "scripts/documentation.py",
@@ -135,7 +142,7 @@ NEEDED_SDIST = (
     ".github/ISSUE_TEMPLATE/model_sae_support.yml",
     ".github/ISSUE_TEMPLATE/feature_request.yml",
     "tests/product/test_feature_interventions.py",
-    "doc/code/development/feature-interventions.md",
+    "doc/code/documentation/source/development/feature-interventions.md",
 }
 
 BAD_PARTS = {"__pycache__", ".pytest_cache", ".venv", ".git"}
@@ -182,7 +189,7 @@ def validate(dist_dir: Path) -> dict[str, object]:
         forbidden_wheel = sorted(
             p
             for p in wheel_files
-            if p.startswith("conf/coverage/stage_d_evidence/")
+            if p.startswith("assets/history_experiment/benchmark_evidence/files/stage_d_evidence/")
             or p.startswith("harness/github/work_plan/")
             or p.endswith((".safetensors", ".pt", ".pth", ".ckpt"))
         )
@@ -214,8 +221,11 @@ def validate(dist_dir: Path) -> dict[str, object]:
             raise AssertionError("Distribution identity mismatch")
         if "License-Expression: Apache-2.0" not in metadata:
             raise AssertionError("Wheel license metadata missing")
-        for group in ("model", "sae", "dataset", "prompt_source"):
-            resource = f"conf/{group}/catalog.yaml"
+        for resource in (
+            "conf/models/catalog.yaml",
+            "conf/base/interfaces/sae_profiles.yaml",
+            "conf/datasets/catalog.yaml",
+        ):
             if resource not in wheel_files or not z.read(resource).strip():
                 raise AssertionError(f"Missing or empty component catalog: {resource}")
     with tarfile.open(sdists[0], "r:gz") as archive:
@@ -226,7 +236,7 @@ def validate(dist_dir: Path) -> dict[str, object]:
             if len(segments) < 2:
                 continue
             rest = segments[1:]
-            if rest[:3] == ("conf", "coverage", "stage_d_evidence") or (
+            if rest[:4] == ("assets", "history_experiment", "benchmark_evidence", "files") or (
                 rest and rest[0] == "work_plan"
             ):
                 raise AssertionError(f"Archived experimental evidence in sdist: {member.name}")
@@ -301,14 +311,14 @@ def smoke(dist_dir: Path) -> dict[str, str]:
                     "import saebase, conf; "
                     "from saebase.api import ModelAdapter, ActivationSite; "
                     "import saebase.cli, models.plugins, tasks.plugins; "
-                    "import models.plugins, tasks.plugins, tasks.benchmark.cli; "
+                    "import models.plugins, tasks.plugins, tasks.benchmark.commands; "
                     "from saebase.registry import list_registered_task_keys; "
                     "assert {'precheck','capture','intervene','generate','circuits','explain','benchmark','train'}.issubset(set(list_registered_task_keys())); "
                     "assert callable(tasks.plugins.BenchmarkTask); "
                     "assert (files('conf')/'config.yaml').is_file(); "
                     "import saebase.runtime.train, saebase.datasets.plugins; "
-                    "assert (files('conf')/'benchmark'/'model_comparison.json').is_file(); "
-                    ""
+                    "from tasks.benchmark.comparison.schema import load_matrix; "
+                    "load_matrix(conf.bundled_configuration('tasks/benchmark/task.yaml', 'presets.model_comparison')); "
                     "assert 'pythia70m_resid_sm' in conf.group_names('sae'); "
                     "from saebase.cli import main as cli_main; assert callable(cli_main); "
                     "print(Path(saebase.__file__).resolve()); "

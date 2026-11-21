@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from saebase.runtime.configuration.task_options import task_value
+
 from typing import Any
 
-from tasks.sae_runtime import _task, _pair, _prompt, _fingerprint_prompt
+from saebase.runtime.sae_operations import _task, _pair, _prompt, _fingerprint_prompt
 
 
 def _teacher_forced(cfg: Any, *, prompt: str | None = None) -> dict[str, Any]:
@@ -15,7 +17,7 @@ def _teacher_forced(cfg: Any, *, prompt: str | None = None) -> dict[str, Any]:
     prompt = _prompt(cfg) if prompt is None else prompt
     feature_id = int(_task(cfg, "feature_id", 0))
     target_value = float(_task(cfg, "value", 0.0))
-    from tasks.intervene.backend.observations import current_observations
+    from tasks.intervene.editing.observations import current_observations
 
     observations = current_observations(pair.model, pair.sae)
     if observations is not None:
@@ -64,11 +66,11 @@ def _teacher_forced(cfg: Any, *, prompt: str | None = None) -> dict[str, Any]:
 
 
 def execute(cfg: Any) -> dict[str, Any]:
-    if cfg.task.get("feature_selection", "configured") == "capture_top":
+    if task_value(cfg.task, "feature_selection", "configured") == "capture_top":
         from tasks.intervene.top_features import run_top_features
 
         return run_top_features(cfg, "intervene", _teacher_forced)
-    if cfg.task.get("protocol") is not None:
+    if task_value(cfg.task, "protocol") is not None:
         from pathlib import Path
 
         from tasks.intervene.batch import configured_plan, run_batch
@@ -79,7 +81,7 @@ def execute(cfg: Any) -> dict[str, Any]:
 
 def validate_cfg(cfg: Any) -> None:
     """Validate this Task at its input boundary, before resource loading."""
-    from tasks.sae_runtime import validate_fields, validate_sae_selection
+    from saebase.runtime.sae_operations import validate_fields, validate_sae_selection
 
     validate_fields(
         cfg,
@@ -90,10 +92,10 @@ def validate_cfg(cfg: Any) -> None:
     validate_sae_selection(cfg)
     from tasks.capture.top_features import validate_top_selection
 
-    if cfg.task.get("feature_selection", "configured") not in {"configured", "capture_top"}:
+    if task_value(cfg.task, "feature_selection", "configured") not in {"configured", "capture_top"}:
         raise ValueError("feature_selection must be configured or capture_top")
     validate_top_selection(cfg)
-    if cfg.task.get("protocol") is not None:
+    if task_value(cfg.task, "protocol") is not None:
         from tasks.intervene.batch import configured_plan, parse_plan
 
         parse_plan(configured_plan(cfg))

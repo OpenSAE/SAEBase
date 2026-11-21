@@ -7,7 +7,7 @@ import math
 import torch
 
 from saebase.api import ActivationSite, ModelAdapter
-from tasks.intervene.backend import MeasurementSample
+from tasks.intervene.editing import MeasurementSample
 
 
 @torch.no_grad()

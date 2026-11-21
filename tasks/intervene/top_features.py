@@ -7,6 +7,8 @@ identity match; failures stay explicit and can be retried on resume.
 
 from __future__ import annotations
 
+from saebase.runtime.configuration.task_options import task_owner, task_value
+
 import hashlib
 import json
 from pathlib import Path
@@ -54,9 +56,9 @@ def _load_checkpoint(path):
 
 
 def run_top_features(cfg, operation, measure):
-    from tasks.intervene.backend.observations import prompt_observation_session
+    from tasks.intervene.editing.observations import prompt_observation_session
     from tasks.capture.top_features import capture_top_cohort
-    from tasks.sae_runtime import _pair, loaded_pair_session
+    from saebase.runtime.sae_operations import _pair, loaded_pair_session
     from saebase.results import completion_summary
     from saebase.runtime.experiment_results import write_json
     from saebase.runtime.performance import settings as performance_settings, current, stage
@@ -68,19 +70,19 @@ def run_top_features(cfg, operation, measure):
     progress = Path.cwd() / "metadata" / f"{operation}_progress.json"
     resuming = cfg.get("runtime", {}).get("mode") == "resume"
     previous = _load_checkpoint(ledger) if resuming and ledger.exists() else {}
-    inline = cfg.task.get("inline_results", True)
+    inline = task_value(cfg.task, "inline_results", True)
     samples, states = [], []
     completed = reused = failed = 0
     started = time.monotonic()
     protocol = {
         "operation": operation,
-        "value": cfg.task.get("value", 0 if operation == "intervene" else 1),
-        "intervention": cfg.task.get("intervention"),
+        "value": task_value(cfg.task, "value", 0 if operation == "intervene" else 1),
+        "intervention": task_value(cfg.task, "intervention"),
         "seed": int(cfg.seed),
-        "max_new_tokens": cfg.task.get("max_new_tokens"),
-        "temperature": cfg.task.get("temperature"),
-        "verify_identity": cfg.task.get("verify_identity", True),
-        "stop_at_context_limit": cfg.task.get("stop_at_context_limit", True)
+        "max_new_tokens": task_value(cfg.task, "max_new_tokens"),
+        "temperature": task_value(cfg.task, "temperature"),
+        "verify_identity": task_value(cfg.task, "verify_identity", True),
+        "stop_at_context_limit": task_value(cfg.task, "stop_at_context_limit", True)
         if operation == "generate"
         else None,
     }
@@ -101,7 +103,7 @@ def run_top_features(cfg, operation, measure):
     with loaded_pair_session(pair):
         with stage("feature_selection"):
             selected_rows = list(capture_top_cohort(cfg, pair))
-        requested = len(selected_rows) * int(cfg.task.get("top_feature_num", 10))
+        requested = len(selected_rows) * int(task_value(cfg.task, "top_feature_num", 10))
         valid_ids = {
             measurement_id(row, rank, feature)
             for row in selected_rows
@@ -127,8 +129,7 @@ def run_top_features(cfg, operation, measure):
                     except Exception as exc:
                         from saebase.api import UnsupportedCapability
 
-                        if not isinstance(exc, UnsupportedCapability) and not cfg.task.get(
-                            "continue_on_error", False
+                        if not isinstance(exc, UnsupportedCapability) and not task_value(cfg.task, "continue_on_error", False
                         ):
                             raise
                         if current() is not None:
@@ -140,7 +141,7 @@ def run_top_features(cfg, operation, measure):
                             )
                 results = []
                 with prompt_observation_session(
-                    pair, cfg.task.get("reuse_prompt_observations", False)
+                    pair, task_value(cfg.task, "reuse_prompt_observations", False)
                 ):
                     for rank, feature in enumerate(selected["top_features"], 1):
                         uid = measurement_id(selected, rank, feature)
@@ -151,16 +152,16 @@ def run_top_features(cfg, operation, measure):
                             state = {"status": "completed"}
                         else:
                             child = OmegaConf.create(OmegaConf.to_container(cfg, resolve=True))
-                            child.task.feature_selection = "configured"
-                            child.task.feature_id = feature["feature_id"]
+                            task_owner(child.task).feature_selection = "configured"
+                            task_owner(child.task).feature_id = feature["feature_id"]
                             child.task.prompt = selected["prompt"]
                             if operation == "generate":
-                                child.task.conditions = [
+                                task_owner(child.task).conditions = [
                                     {
                                         "name": f"feature_{feature['feature_id']}",
-                                        "operation": cfg.task.get("intervention", "add"),
+                                        "operation": task_value(cfg.task, "intervention", "add"),
                                         "feature_ids": [feature["feature_id"]],
-                                        "value": cfg.task.get("value", 1.0),
+                                        "value": task_value(cfg.task, "value", 1.0),
                                     }
                                 ]
                             entry = {
@@ -190,7 +191,7 @@ def run_top_features(cfg, operation, measure):
                                 entry["status"] = "completed"
                                 completed += 1
                             except Exception as exc:
-                                if not cfg.task.get("continue_on_error", False):
+                                if not task_value(cfg.task, "continue_on_error", False):
                                     raise
                                 import gc
                                 import torch
@@ -268,8 +269,8 @@ def run_top_features(cfg, operation, measure):
         "layer": pair.site.layer,
         "site": pair.site.hook_name,
         "feature_selection": "capture_top",
-        "feature_ranking": cfg.task.get("feature_ranking", "non_whiten"),
-        "top_feature_num": int(cfg.task.get("top_feature_num", 10)),
+        "feature_ranking": task_value(cfg.task, "feature_ranking", "non_whiten"),
+        "top_feature_num": int(task_value(cfg.task, "top_feature_num", 10)),
         "independent_feature_edits": True,
         "samples": samples,
         "samples_path": str(ledger),

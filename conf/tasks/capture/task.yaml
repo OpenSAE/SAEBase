@@ -1,0 +1,277 @@
+# @package _global_
+# Each task is model/dataset independent; compose selections through Hydra.
+task:
+  name: capture
+  extensions: []  # Explicit installed entry-point names; no automatic discovery.
+  execute: false
+  sae_key: null
+  layer: null
+  device: auto
+  prompt: ''
+  capture:
+    sample_ids: null  # Optional observation subset; preserves the full reference cohort.
+    output_scope: last_token  # Or all_tokens: complete native sparse codes at each token.
+    max_tokens: 128
+    max_active_per_token: 256
+    mode: whiten  # non_whiten | whiten | g_s | sar (regression) | I (exhaustive) | rss
+    whiten_chunk_size: 256  # Native SAE tokenwise encoding batch; statistics use FP64.
+    neuronpedia:
+      enabled: true
+      allow_network: true
+      cache_dir: null  # Uses XDG_CACHE_HOME/saebase/neuronpedia or ~/.cache/saebase/neuronpedia.
+      timeout_seconds: 15
+      total_timeout_seconds: 120
+      max_download_bytes: 67108864
+      max_uncompressed_bytes: 268435456
+
+    model_answer:
+      max_new_tokens: 256  # Unedited continuation of the exact captured input; always recorded.
+      batch_size: 8  # Group equal-length inputs; reuse the loaded model and upstream KV cache.
+    output:
+      feature_count: null  # Output features/pairs; null follows the candidate count.
+    selection:
+      candidate_policy: active_whiten  # Shared per-question selection, or legacy mode-specific selection.
+      candidate_count: 20  # 'all' uses all features; a positive integer limits candidates.
+      feature_filter:
+        enabled: true  # Reused by all numeric-filter Capture modes.
+        min_native_nonzero_fraction: 0.01  # Neuronpedia corpus frequency, not amplitude.
+        density_strict: true  # Exclude only densities strictly above the threshold.
+      cohort_filter:
+        enabled: true  # Exclude frequent last-token z > threshold when numeric filter is used.
+        reference_sample_count: 100  # Reference questions for mean/std and frequency; SAR uses dataset.sample_count.
+        zscore_threshold: 1.0
+        min_question_fraction: 0.5  # Inclusive: at least this fraction of all selected questions.
+      feature_selection: whiten  # Candidate ranking for legacy g_s/SAR/I.
+    answer:
+      backend: full_context_tail  # Complete-context tail verified against native full scoring.
+      reference_text: null  # Explicit canonical text for task.prompt; Dataset references otherwise.
+    g_s:
+      candidate_count: 100  # Legacy Whiten Top N before scoring single deletions by g(S).
+    i:
+      feature_selection: whiten  # Legacy I candidate ranking; null inherits selection.
+      g_s_shortfall: available  # Legacy g_s candidates: available | relax_filters.
+      max_exhaustive_features: 16  # Validate the finite exhaustive candidate pool before measurement.
+    sar:
+      source: null  # Explicit trusted local original sar.py (or its checkout directory).
+      top_pairs: 0  # Positive values also report pairwise fit coefficients.
+      pair_ranking: signed  # mode=sar only; mode=I always uses largest signed measured I.
+      M: 384
+      n_fit: 256
+      p: 0.5
+      readout: answer_mean_logprob  # Surrogate also supports logit_difference.
+      readout_position: -1
+      target_token_id: null  # For an explicit task.prompt; dataset labels otherwise.
+      reference_token_id: null
+      require_affine_decode: true
+    rss:
+      source: null  # Trusted local upstream rss.py; for this case study: tasks/capture/scoring/stable_support.py.
+      contexts: []  # Each full variant is context + space + task.prompt.
+      M: 400
+      K: 20
+      rho: 0.8
+      kappa: 0.8
+      tau: 0.00001
+      report:
+        dominance_ratio: 5.0  # Required ratio for display candidates.
+  performance:
+    enabled: true
+    batch_size: auto
+    batch_sizes: [1, 2, 4, 8, 16, 32, 64]
+    warmup: 1
+    repeats: 3
+    probe_samples: 3
+    probe_states: 64
+    max_seconds: 120
+    memory_fraction: 0.9
+
+# Explicit research batch selections; availability is owned by the component Registry.
+matrix:
+  models:
+  - model: gpt2small
+    sae_key: gpt2small_res_jb_l8
+    layer: 8
+  - model: gemma2_2b_base
+    sae_key: gemma2_2b_pt_l25_canonical
+    layer: 25
+  - model: gemma1b
+    sae_key: gemma1b_scope_resid
+    layer: 13
+  - model: gemma3_4b_pt
+    sae_key: gemma3_4b_pt_scope_resid
+    layer: 17
+  - model: gemma3_12b_it
+    offload_unused_layers: true
+    sae_key: gemma3_12b_it_scope_resid
+    layer: 24
+  - model: llama31_8b
+    sae_key: llama31_8b_lxr_8x
+    layer: 16
+  - model: qwen3_1_7b_base
+    sae_key: qwen3_1_7b_base_resid_w32k_l0_100
+    layer: 14
+  - model: qwen3_8b
+    sae_key: qwen3_8b_resid_w64k
+    layer: 18
+  - model: qwen35_9b
+    sae_key: qwen35_9b_resid_w64k
+    layer: 16
+  - model: r1_distill_llama8b
+    sae_key: r1_distill_llama8b_llamascope_l23
+    layer: 23
+  datasets:
+  - hotpotqa
+  - bbh
+  - ioi
+  - ravel
+  - counterfact
+  - arc_challenge
+  - mmlu_pro
+  - gsm8k
+  - humaneval
+  - truthfulqa
+  - harmbench
+  - xstest
+  seed: 42
+  model_timeout_seconds: 86400
+
+sar_filter_policy:
+  version: 2
+  punctuation_rules:
+    punctuation: \bpunctuation\b
+    colon_semicolon: \b(?:colons?|semicolons?)\b
+    comma: \bcommas?\b
+    apostrophe: \bapostrophes?\b
+    quotation_marks: \b(?:quotation marks?|quote marks?|double quotes?|single quotes?|inverted
+      commas?)\b
+    parentheses_brackets: \b(?:parentheses|parenthesis|parenthetical|brackets?)\b
+    hyphen_dash: \b(?:hyphens?|em[ -]?dashes?|en[ -]?dashes?)\b
+    ellipsis: \b(?:ellipsis|ellipses)\b
+    question_exclamation_marks: \b(?:question marks?|exclamation (?:marks?|points?))\b
+    full_stop_period: \bfull stops?\b|\b(?:sentence[- ]ending|punctuation) periods?\b|\bperiods?
+      (?:as punctuation|at the end of sentences)\b
+    sentence_boundary: \bsentence (?:boundaries|endings?|termination)\b|\bend[- ]of[-
+      ]sentence (?:markers?|punctuation)\b
+    syntax_braces_slash: \b(?:braces?|slashes?|dashes?)\b.{0,60}\b(?:punctuation|syntax|delimiters?|text|sentences?)\b|\b(?:punctuation|syntax|delimiters?)\b.{0,60}\b(?:braces?|slashes?|dashes?)\b
+  structural_rules:
+    function_word_class: \b(?:prepositions?|pronouns?|conjunctions?|determiners?|function
+      words?|auxiliary verbs?|modal verbs?)\b
+    grammatical_article: \b(?:definite|indefinite) articles?\b|\barticles? (?:and|or)
+      (?:prepositions?|pronouns?|determiners?)\b
+    natural_language_grammar: \b(?:grammar|grammatical|syntactic|syntax|parts? of
+      speech)\b
+    sentence_structure: \bsentence (?:structures?|construction|patterns?)\b|\b(?:relative|subordinate|subordinating|main|adverbial|conditional)
+      clauses?\b
+    verb_morphology: \b(?:verb tenses?|past tense|present tense|future tense|perfect
+      tense|conjugations?|inflections?|subject[- ]verb agreement)\b|\bforms? of (?:the
+      )?verb\s+[\"\u201c\u2018\x27]?(?:to\s+)?(?:be|have|do)\b
+    generic_question_form: \b(?:interrogative|question forms?|question structures?|question
+      phrases?|yes[- ]no questions?|rhetorical questions?)\b|\bquestions? (?:in|and)
+      dialogue\b
+    reported_speech_structure: \b(?:reported speech|direct speech|indirect speech|quotative
+      constructions?)\b
+    layout_only: \b(?:whitespace|white space|line breaks?|newlines?|indentation)\b
+  named_function_words:
+  - a
+  - about
+  - above
+  - across
+  - after
+  - against
+  - along
+  - although
+  - am
+  - among
+  - an
+  - and
+  - are
+  - as
+  - at
+  - be
+  - because
+  - been
+  - before
+  - being
+  - between
+  - but
+  - by
+  - can
+  - could
+  - despite
+  - did
+  - do
+  - does
+  - during
+  - for
+  - from
+  - had
+  - has
+  - have
+  - he
+  - her
+  - him
+  - his
+  - i
+  - if
+  - in
+  - into
+  - is
+  - it
+  - its
+  - may
+  - me
+  - might
+  - must
+  - my
+  - near
+  - nor
+  - not
+  - of
+  - 'on'
+  - onto
+  - or
+  - our
+  - over
+  - shall
+  - she
+  - should
+  - so
+  - that
+  - the
+  - their
+  - them
+  - these
+  - they
+  - this
+  - those
+  - though
+  - through
+  - throughout
+  - to
+  - under
+  - unless
+  - us
+  - was
+  - we
+  - were
+  - what
+  - whereas
+  - which
+  - while
+  - who
+  - whom
+  - whose
+  - will
+  - with
+  - within
+  - without
+  - would
+  - yet
+  - you
+  - your
+  min_native_nonzero_fraction: 0.5
+  matching_semantics: Filter explicit punctuation, function-word classes, named function
+    words, natural-language grammar, generic question forms, reported-speech structure,
+    and whitespace layout. Programming syntax alone and topical/proper nouns are not
+    automatically classified as linguistic structure.
+  origin: SAR/to_ziye/filtering/policy.json; v2 rules, applied to the selected SAE
+    source

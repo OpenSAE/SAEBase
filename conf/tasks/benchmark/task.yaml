@@ -1,0 +1,1577 @@
+# @package _global_
+# Each task is model/dataset independent; compose selections through Hydra.
+task:
+  name: benchmark
+  extensions: []  # Explicit installed entry-point names; no automatic discovery.
+  execute: false
+  sae_key: null
+  layer: null
+  device: auto
+  prompt: ''
+  resume: true
+  benchmark:
+    evaluation: null
+    benchmark_config: ''
+    protocol: null  # Metric/method parameters; model and dataset remain global selections.
+
+evaluation:
+  name: activation_health
+  n_prompts: 5
+  device: cuda
+  require_prepared_prompts: true
+
+presets:
+  model_comparison:
+    schema: saebase.model_comparison
+    status_schema: saebase.model_comparison.results
+    name: SAEBase  cross-family real release acceptance
+    targets:
+    - model_key: pythia70m
+      family: pythia
+      site:
+        layer: 3
+        hook_name: blocks.3.hook_resid_post
+      sae_keys:
+      - pythia70m_resid_sm
+      - pythia70m_saebench_gated_l3
+      model_card: https://huggingface.co/EleutherAI/pythia-70m-deduped
+      sae_cards:
+        pythia70m_resid_sm: https://huggingface.co/ctigges/pythia-70m-deduped__res-sm_processed
+        pythia70m_saebench_gated_l3: https://github.com/adamkarvonen/SAEBench
+    - model_key: gpt2small
+      family: gpt2
+      site:
+        layer: 8
+        hook_name: blocks.8.hook_resid_pre
+      sae_keys:
+      - gpt2small_res_jb_l8
+      - gpt2small_fs_6144_l8
+      model_card: https://huggingface.co/openai-community/gpt2
+      sae_cards:
+        gpt2small_res_jb_l8: https://huggingface.co/jbloom/GPT2-Small-SAEs-Reformatted
+        gpt2small_fs_6144_l8: https://huggingface.co/jbloom/GPT2-Small-Feature-Splitting-Experiment-Layer-8
+    prompts:
+    - The city is full of beautiful buildings.
+    - The weather was warm and sunny yesterday.
+    - The scientist wrote the results on paper.
+    - A small animal ran across the quiet garden.
+    - The teacher explained the lesson to students.
+    - The river flows through the mountains.
+    metrics:
+    - core.l0
+    - core.reconstruction_mse
+    - core.fvu
+    - core.explained_variance
+    - intervention.logit_delta_l2
+    - intervention.kl_baseline_to_edited
+    conditions:
+    - name: identity
+      operation: identity
+    - name: reconstruction
+      operation: reconstruction
+    seed: 0
+    max_measurements: 128
+    max_runtime_seconds: 2400
+    max_token_count: 80
+    bootstrap_replicates: 64
+  model_comparison_gpt2:
+    schema: saebase.model_comparison
+    status_schema: saebase.model_comparison.results
+    name: Model comparison optional extended GPT2 widths and Pythia checkpoints
+    targets:
+    - model_key: pythia70m
+      family: pythia
+      site:
+        layer: 3
+        hook_name: blocks.3.hook_resid_post
+      sae_keys:
+      - pythia70m_resid_sm
+      - pythia70m_saebench_gated_l3
+      model_card: https://huggingface.co/EleutherAI/pythia-70m-deduped
+      sae_cards:
+        pythia70m_resid_sm: https://huggingface.co/ctigges/pythia-70m-deduped__res-sm_processed
+        pythia70m_saebench_gated_l3: https://github.com/adamkarvonen/SAEBench
+    - model_key: gpt2small
+      family: gpt2
+      site:
+        layer: 8
+        hook_name: blocks.8.hook_resid_pre
+      sae_keys:
+      - gpt2small_res_jb_l8
+      - gpt2small_fs_6144_l8
+      - gpt2small_fs_12288_l8
+      - gpt2small_fs_24576_l8
+      model_card: https://huggingface.co/openai-community/gpt2
+      sae_cards:
+        gpt2small_res_jb_l8: https://huggingface.co/jbloom/GPT2-Small-SAEs-Reformatted
+        gpt2small_fs_6144_l8: https://huggingface.co/jbloom/GPT2-Small-Feature-Splitting-Experiment-Layer-8
+        gpt2small_fs_12288_l8: https://huggingface.co/jbloom/GPT2-Small-Feature-Splitting-Experiment-Layer-8
+        gpt2small_fs_24576_l8: https://huggingface.co/jbloom/GPT2-Small-Feature-Splitting-Experiment-Layer-8
+    prompts:
+    - The city is full of beautiful buildings.
+    - The weather was warm and sunny yesterday.
+    - The scientist wrote the results on paper.
+    - A small animal ran across the quiet garden.
+    - The teacher explained the lesson to students.
+    - The river flows through the mountains.
+    metrics:
+    - core.l0
+    - core.reconstruction_mse
+    - core.fvu
+    - intervention.logit_delta_l2
+    - intervention.kl_baseline_to_edited
+    conditions:
+    - name: identity
+      operation: identity
+    - name: reconstruction
+      operation: reconstruction
+    seed: 0
+    max_measurements: 128
+    max_runtime_seconds: 3600
+    max_token_count: 80
+    bootstrap_replicates: 64
+  pythia_benchmark_smoke:
+    schema: saebase.benchmark.config.v1
+    name: Pythia M3 bounded smoke
+    targets:
+    - model_key: pythia70m
+      sae_keys:
+      - pythia70m_resid_sm
+      layer: 3
+      hook_name: blocks.3.hook_resid_post
+    dataset:
+      id: m0-example-tokens
+      samples:
+      - sample_id: m0-smoke-1
+        token_ids:
+        - 40587
+        - 37083
+        - 15458
+        prompt_group_id: m0-1
+        split: test
+        target_token_id: 1
+        reference_token_id: 0
+    metrics:
+    - core.l0
+    - core.reconstruction_mse
+    - core.fvu
+    - intervention.logit_delta_l2
+    - intervention.kl_baseline_to_edited
+    conditions:
+    - name: identity
+      operation: identity
+    - name: reconstruction
+      operation: reconstruction
+    seed: 0
+    max_measurements: 16
+    max_activation_rows: 8
+    tolerance: 0.01
+  pythia_grouped_benchmark:
+    schema: saebase.benchmark.config.v1
+    name: M4 Pythia-70M real grouped audit smoke
+    targets:
+    - model_key: pythia70m
+      sae_keys:
+      - pythia70m_resid_sm
+      layer: 3
+      hook_name: blocks.3.hook_resid_post
+    dataset:
+      id: m0-three-frozen-reference-prompts
+      samples:
+      - sample_id: simple_copying-000000
+        token_ids:
+        - 40587
+        - 37083
+        - 15458
+        prompt_group_id: m0-group-000
+        split: test
+        target_token_id: 1
+        reference_token_id: 0
+      - sample_id: simple_copying-000002
+        token_ids:
+        - 6300
+        - 249
+        - 29040
+        - 20839
+        prompt_group_id: m0-group-002
+        split: test
+        target_token_id: 1
+        reference_token_id: 0
+      - sample_id: simple_copying-000003
+        token_ids:
+        - 53
+        - 50177
+        - 38150
+        - 308
+        - 50177
+        prompt_group_id: m0-group-003
+        split: test
+        target_token_id: 1
+        reference_token_id: 0
+    metrics:
+    - core.l0
+    - core.reconstruction_mse
+    - core.fvu
+    - core.explained_variance
+    - intervention.logit_delta_l2
+    - intervention.kl_baseline_to_edited
+    conditions:
+    - name: identity
+      operation: identity
+    - name: reconstruction
+      operation: reconstruction
+    seed: 0
+    max_measurements: 16
+    max_activation_rows: 16
+    tolerance: 0.01
+    sample_batch: 1
+  m4_ground_truth:
+    schema: saebase.m4.audit.config.v1
+    evaluation_seeds:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    bootstrap_replicates: 128
+    confidence: 0.95
+    sample_sizes:
+    - 32
+    - 64
+    - 128
+    top_k: 1
+    training_seed: null
+    metric_ids: []
+  pythia_reliability_audit:
+    schema: saebase.m4.audit.config.v1
+    evaluation_seeds:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    bootstrap_replicates: 96
+    confidence: 0.95
+    sample_sizes:
+    - 2
+    - 3
+    - 32
+    - 128
+    - 512
+    top_k: 1
+    training_seed: null
+    metric_ids:
+    - core.l0
+    - core.reconstruction_mse
+    - core.fvu
+    - core.explained_variance
+    - intervention.logit_delta_l2
+    - intervention.kl_baseline_to_edited
+
+site_catalog:
+  schema: saebase.coverage.stage_bc.v1
+  objective: Representative open model/SAE coverage with exact layer topology, source
+    files and independent real-weight status
+  model_pair_work: CPU only for small ungated models; all large/Gemma gated model
+    pairs deferred to D
+  targets:
+  - model_key: gemma270m
+    sae_key: gemma270m_scope_resid
+    size: 270M
+    n_layers: 18
+    architecture: jumprelu
+    selected_layers:
+    - 5
+    - 9
+    - 12
+    cpu_probe_layers:
+    - 5
+    - 9
+    access: gated_model
+    tier: core
+    model_pair_cpu_candidate: false
+  - model_key: gemma1b
+    sae_key: gemma1b_scope_resid
+    size: 1B
+    n_layers: 26
+    architecture: jumprelu
+    selected_layers:
+    - 7
+    - 13
+    - 17
+    cpu_probe_layers:
+    - 7
+    - 13
+    access: gated_model
+    tier: core
+    model_pair_cpu_candidate: false
+  - model_key: gemma2_2b_base
+    sae_key: gemma2_2b_pt_l25_canonical
+    size: 2B
+    n_layers: 26
+    architecture: jumprelu
+    selected_layers:
+    - 13
+    - 25
+    cpu_probe_layers:
+    - 25
+    access: gated_model
+    tier: core
+    model_pair_cpu_candidate: false
+  - model_key: qwen35_2b
+    sae_key: qwen35_2b_resid_w32k
+    size: 2B
+    n_layers: 24
+    architecture: topk
+    selected_layers:
+    - 6
+    - 12
+    - 15
+    - 20
+    cpu_probe_layers:
+    - 12
+    access: open
+    tier: core
+    model_pair_cpu_candidate: false
+  - model_key: qwen3_8b
+    sae_key: qwen3_8b_resid_w64k
+    size: 8B
+    n_layers: 36
+    architecture: topk
+    selected_layers:
+    - 9
+    - 18
+    - 23
+    - 31
+    cpu_probe_layers:
+    - 18
+    access: large_model
+    tier: core
+    model_pair_cpu_candidate: false
+  - model_key: llama31_8b
+    sae_key: llama31_8b_lxr_8x
+    size: 8B
+    n_layers: 32
+    architecture: jumprelu
+    selected_layers:
+    - 8
+    - 16
+    - 21
+    - 27
+    cpu_probe_layers:
+    - 16
+    access: gated_large_model
+    tier: core
+    model_pair_cpu_candidate: false
+  - model_key: pythia410m
+    sae_key: pythia410m_mlp_topk
+    size: 410M
+    n_layers: 24
+    architecture: topk
+    selected_layers:
+    - 4
+    - 12
+    - 20
+    cpu_probe_layers:
+    - 4
+    - 12
+    access: open
+    tier: core
+    model_pair_cpu_candidate: true
+  - model_key: qwen3_1_7b_base
+    sae_key: qwen3_1_7b_base_resid_w32k
+    size: 1.7B
+    n_layers: 28
+    architecture: topk
+    selected_layers:
+    - 7
+    - 14
+    - 18
+    - 23
+    cpu_probe_layers:
+    - 7
+    - 14
+    access: open
+    tier: core
+    model_pair_cpu_candidate: true
+  - model_key: r1_distill_qwen15b
+    sae_key: r1_distill_qwen15b_resid_l20
+    size: 1.5B
+    n_layers: 28
+    architecture: topk
+    selected_layers:
+    - 20
+    cpu_probe_layers:
+    - 20
+    access: open
+    tier: core
+    model_pair_cpu_candidate: true
+  - model_key: gemma3_4b_pt
+    sae_key: gemma3_4b_pt_scope_resid
+    size: 4B
+    n_layers: 34
+    architecture: jumprelu
+    selected_layers:
+    - 9
+    - 17
+    - 22
+    - 29
+    cpu_probe_layers:
+    - 17
+    access: gated_model
+    tier: core
+    model_pair_cpu_candidate: false
+  - model_key: gemma3_4b_it
+    sae_key: gemma3_4b_it_scope_resid
+    size: 4B
+    n_layers: 34
+    architecture: jumprelu
+    selected_layers:
+    - 9
+    - 17
+    - 22
+    - 29
+    cpu_probe_layers:
+    - 17
+    access: gated_model
+    tier: core
+    model_pair_cpu_candidate: false
+  - model_key: mistral7b_instruct
+    sae_key: mistral7b_instruct_tc_l16_131k
+    size: 7B
+    n_layers: 32
+    architecture: topk
+    selected_layers:
+    - 16
+    cpu_probe_layers: []
+    access: large_sae_4gb
+    tier: core
+    model_pair_cpu_candidate: false
+  - model_key: gemma2_9b_pt
+    sae_key: gemma2_9b_pt_scope_resid
+    size: 9B
+    n_layers: 42
+    architecture: jumprelu
+    selected_layers:
+    - 9
+    - 20
+    - 31
+    cpu_probe_layers:
+    - 20
+    access: large_model
+    tier: core
+    model_pair_cpu_candidate: false
+  - model_key: qwen35_9b
+    sae_key: qwen35_9b_resid_w64k
+    size: 9B
+    n_layers: 32
+    architecture: topk
+    selected_layers:
+    - 8
+    - 16
+    - 21
+    - 27
+    cpu_probe_layers:
+    - 16
+    access: large_model
+    tier: core
+    model_pair_cpu_candidate: false
+  - model_key: r1_distill_llama8b
+    sae_key: r1_distill_llama8b_llamascope_l23
+    size: 8B
+    n_layers: 32
+    architecture: jumprelu
+    selected_layers:
+    - 23
+    cpu_probe_layers:
+    - 23
+    access: large_model
+    tier: core
+    model_pair_cpu_candidate: false
+  - model_key: qwen3_1_7b
+    sae_key: qwen3_1_7b_ak_resid_l14_65k
+    size: 1.7B
+    n_layers: 28
+    architecture: batchtopk
+    selected_layers:
+    - 14
+    cpu_probe_layers:
+    - 14
+    access: open
+    tier: architecture
+    model_pair_cpu_candidate: false
+  - model_key: gemma2_2b_it
+    sae_key: gemma2_2b_it_matryoshka_l12_32k
+    size: 2B
+    n_layers: 26
+    architecture: matryoshka_batchtopk
+    selected_layers:
+    - 12
+    cpu_probe_layers:
+    - 12
+    access: gated_model
+    tier: architecture
+    model_pair_cpu_candidate: false
+  - model_key: qwen35_4b
+    sae_key: qwen35_4b_matryoshka_l15_65k
+    size: 4B
+    n_layers: 32
+    architecture: matryoshka_batchtopk
+    selected_layers:
+    - 15
+    cpu_probe_layers:
+    - 15
+    access: large_model
+    tier: architecture
+    model_pair_cpu_candidate: false
+site_targets:
+  join_keys:
+  - model_key
+  - sae_key
+  - layer
+  - hook_name
+  - checkpoint_sha
+  model_order:
+  - qwen35_2b
+  - pythia410m
+  - qwen3_1_7b_base
+  - qwen3_1_7b
+  - qwen35_4b
+  - qwen3_8b
+  - mistral7b_instruct
+  - r1_distill_llama8b
+  - qwen35_9b
+  - gemma270m
+  - gemma1b
+  - gemma2_2b_base
+  - gemma2_2b_it
+  - gemma3_4b_pt
+  - gemma3_4b_it
+  - llama31_8b
+  - gemma2_9b_pt
+  - r1_distill_qwen15b
+  n_sites: 48
+  prior_pair_verified:
+  - layer: 4
+    model_key: pythia410m
+    sae_key: pythia410m_mlp_topk
+  - layer: 12
+    model_key: qwen35_2b
+    sae_key: qwen35_2b_resid_w32k
+  - layer: 7
+    model_key: qwen3_1_7b_base
+    sae_key: qwen3_1_7b_base_resid_w32k
+  - layer: 20
+    model_key: r1_distill_qwen15b
+    sae_key: r1_distill_qwen15b_resid_l20
+  schema: saebase.coverage.stage_d_targets.v1
+  sites:
+  - acceptance_path: null
+    access: gated_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.5.hook_resid_post
+    last_attempt_utc: null
+    layer: 5
+    model_key: gemma270m
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-2-270m-pt
+    sae_key: gemma270m_scope_resid
+    sae_state_sha256: null
+    size: 270M
+    skip_by_default: false
+    source_file_id: resid_post/layer_5_width_65k_l0_medium
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: gated_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.9.hook_resid_post
+    last_attempt_utc: null
+    layer: 9
+    model_key: gemma270m
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-2-270m-pt
+    sae_key: gemma270m_scope_resid
+    sae_state_sha256: null
+    size: 270M
+    skip_by_default: false
+    source_file_id: resid_post/layer_9_width_65k_l0_medium
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: gated_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.12.hook_resid_post
+    last_attempt_utc: null
+    layer: 12
+    model_key: gemma270m
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-2-270m-pt
+    sae_key: gemma270m_scope_resid
+    sae_state_sha256: null
+    size: 270M
+    skip_by_default: false
+    source_file_id: resid_post/layer_12_width_65k_l0_medium
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: gated_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.7.hook_resid_post
+    last_attempt_utc: null
+    layer: 7
+    model_key: gemma1b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-2-1b-pt
+    sae_key: gemma1b_scope_resid
+    sae_state_sha256: null
+    size: 1B
+    skip_by_default: false
+    source_file_id: resid_post/layer_7_width_16k_l0_medium
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: gated_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.13.hook_resid_post
+    last_attempt_utc: null
+    layer: 13
+    model_key: gemma1b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-2-1b-pt
+    sae_key: gemma1b_scope_resid
+    sae_state_sha256: null
+    size: 1B
+    skip_by_default: false
+    source_file_id: resid_post/layer_13_width_16k_l0_medium
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: gated_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.17.hook_resid_post
+    last_attempt_utc: null
+    layer: 17
+    model_key: gemma1b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-2-1b-pt
+    sae_key: gemma1b_scope_resid
+    sae_state_sha256: null
+    size: 1B
+    skip_by_default: false
+    source_file_id: resid_post/layer_17_width_16k_l0_medium
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: gated_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.13.hook_resid_post
+    last_attempt_utc: null
+    layer: 13
+    model_key: gemma2_2b_base
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-2b-pt-res
+    sae_key: gemma2_2b_pt_l25_canonical
+    sae_state_sha256: null
+    size: 2B
+    skip_by_default: false
+    source_file_id: layer_13/width_16k/canonical
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: gated_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.25.hook_resid_post
+    last_attempt_utc: null
+    layer: 25
+    model_key: gemma2_2b_base
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-2b-pt-res
+    sae_key: gemma2_2b_pt_l25_canonical
+    sae_state_sha256: null
+    size: 2B
+    skip_by_default: false
+    source_file_id: layer_25/width_16k/canonical
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: open
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: d1_calibration
+    hook_name: blocks.6.hook_resid_post
+    last_attempt_utc: null
+    layer: 6
+    model_key: qwen35_2b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: Qwen/SAE-Res-Qwen3.5-2B-Base-W32K-L0_50
+    sae_key: qwen35_2b_resid_w32k
+    sae_state_sha256: null
+    size: 2B
+    skip_by_default: false
+    source_file_id: layer6.sae.pt
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: open
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: d1_calibration
+    hook_name: blocks.12.hook_resid_post
+    last_attempt_utc: null
+    layer: 12
+    model_key: qwen35_2b
+    model_state_sha256: null
+    prior_pair_verified: true
+    repo_id: Qwen/SAE-Res-Qwen3.5-2B-Base-W32K-L0_50
+    sae_key: qwen35_2b_resid_w32k
+    sae_state_sha256: null
+    size: 2B
+    skip_by_default: true
+    source_file_id: layer12.sae.pt
+    status: skipped_prior
+    tier: core
+  - acceptance_path: null
+    access: open
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: d1_calibration
+    hook_name: blocks.15.hook_resid_post
+    last_attempt_utc: null
+    layer: 15
+    model_key: qwen35_2b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: Qwen/SAE-Res-Qwen3.5-2B-Base-W32K-L0_50
+    sae_key: qwen35_2b_resid_w32k
+    sae_state_sha256: null
+    size: 2B
+    skip_by_default: false
+    source_file_id: layer15.sae.pt
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: open
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: d1_calibration
+    hook_name: blocks.20.hook_resid_post
+    last_attempt_utc: null
+    layer: 20
+    model_key: qwen35_2b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: Qwen/SAE-Res-Qwen3.5-2B-Base-W32K-L0_50
+    sae_key: qwen35_2b_resid_w32k
+    sae_state_sha256: null
+    size: 2B
+    skip_by_default: false
+    source_file_id: layer20.sae.pt
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: large_model
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: large
+    hook_name: blocks.9.hook_resid_post
+    last_attempt_utc: null
+    layer: 9
+    model_key: qwen3_8b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: Qwen/SAE-Res-Qwen3-8B-Base-W64K-L0_50
+    sae_key: qwen3_8b_resid_w64k
+    sae_state_sha256: null
+    size: 8B
+    skip_by_default: false
+    source_file_id: layer9.sae.pt
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: large_model
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: large
+    hook_name: blocks.18.hook_resid_post
+    last_attempt_utc: null
+    layer: 18
+    model_key: qwen3_8b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: Qwen/SAE-Res-Qwen3-8B-Base-W64K-L0_50
+    sae_key: qwen3_8b_resid_w64k
+    sae_state_sha256: null
+    size: 8B
+    skip_by_default: false
+    source_file_id: layer18.sae.pt
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: large_model
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: large
+    hook_name: blocks.23.hook_resid_post
+    last_attempt_utc: null
+    layer: 23
+    model_key: qwen3_8b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: Qwen/SAE-Res-Qwen3-8B-Base-W64K-L0_50
+    sae_key: qwen3_8b_resid_w64k
+    sae_state_sha256: null
+    size: 8B
+    skip_by_default: false
+    source_file_id: layer23.sae.pt
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: large_model
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: large
+    hook_name: blocks.31.hook_resid_post
+    last_attempt_utc: null
+    layer: 31
+    model_key: qwen3_8b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: Qwen/SAE-Res-Qwen3-8B-Base-W64K-L0_50
+    sae_key: qwen3_8b_resid_w64k
+    sae_state_sha256: null
+    size: 8B
+    skip_by_default: false
+    source_file_id: layer31.sae.pt
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: gated_large_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.8.hook_resid_post
+    last_attempt_utc: null
+    layer: 8
+    model_key: llama31_8b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: OpenMOSS-Team/Llama3_1-8B-Base-LXR-8x
+    sae_key: llama31_8b_lxr_8x
+    sae_state_sha256: null
+    size: 8B
+    skip_by_default: false
+    source_file_id: Llama3_1-8B-Base-L8R-8x
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: gated_large_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.16.hook_resid_post
+    last_attempt_utc: null
+    layer: 16
+    model_key: llama31_8b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: OpenMOSS-Team/Llama3_1-8B-Base-LXR-8x
+    sae_key: llama31_8b_lxr_8x
+    sae_state_sha256: null
+    size: 8B
+    skip_by_default: false
+    source_file_id: Llama3_1-8B-Base-L16R-8x
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: gated_large_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.21.hook_resid_post
+    last_attempt_utc: null
+    layer: 21
+    model_key: llama31_8b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: OpenMOSS-Team/Llama3_1-8B-Base-LXR-8x
+    sae_key: llama31_8b_lxr_8x
+    sae_state_sha256: null
+    size: 8B
+    skip_by_default: false
+    source_file_id: Llama3_1-8B-Base-L21R-8x
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: gated_large_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.27.hook_resid_post
+    last_attempt_utc: null
+    layer: 27
+    model_key: llama31_8b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: OpenMOSS-Team/Llama3_1-8B-Base-LXR-8x
+    sae_key: llama31_8b_lxr_8x
+    sae_state_sha256: null
+    size: 8B
+    skip_by_default: false
+    source_file_id: Llama3_1-8B-Base-L27R-8x
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: open
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: open_small
+    hook_name: blocks.4.hook_mlp_out
+    last_attempt_utc: null
+    layer: 4
+    model_key: pythia410m
+    model_state_sha256: null
+    prior_pair_verified: true
+    repo_id: EleutherAI/sae-pythia-410m-65k
+    sae_key: pythia410m_mlp_topk
+    sae_state_sha256: null
+    size: 410M
+    skip_by_default: true
+    source_file_id: layers.4.mlp
+    status: skipped_prior
+    tier: core
+  - acceptance_path: null
+    access: open
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: open_small
+    hook_name: blocks.12.hook_mlp_out
+    last_attempt_utc: null
+    layer: 12
+    model_key: pythia410m
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: EleutherAI/sae-pythia-410m-65k
+    sae_key: pythia410m_mlp_topk
+    sae_state_sha256: null
+    size: 410M
+    skip_by_default: false
+    source_file_id: layers.12.mlp
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: open
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: open_small
+    hook_name: blocks.20.hook_mlp_out
+    last_attempt_utc: null
+    layer: 20
+    model_key: pythia410m
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: EleutherAI/sae-pythia-410m-65k
+    sae_key: pythia410m_mlp_topk
+    sae_state_sha256: null
+    size: 410M
+    skip_by_default: false
+    source_file_id: layers.20.mlp
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: open
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: open_small
+    hook_name: blocks.7.hook_resid_post
+    last_attempt_utc: null
+    layer: 7
+    model_key: qwen3_1_7b_base
+    model_state_sha256: null
+    prior_pair_verified: true
+    repo_id: Qwen/SAE-Res-Qwen3-1.7B-Base-W32K-L0_50
+    sae_key: qwen3_1_7b_base_resid_w32k
+    sae_state_sha256: null
+    size: 1.7B
+    skip_by_default: true
+    source_file_id: layer7.sae.pt
+    status: skipped_prior
+    tier: core
+  - acceptance_path: null
+    access: open
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: open_small
+    hook_name: blocks.14.hook_resid_post
+    last_attempt_utc: null
+    layer: 14
+    model_key: qwen3_1_7b_base
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: Qwen/SAE-Res-Qwen3-1.7B-Base-W32K-L0_50
+    sae_key: qwen3_1_7b_base_resid_w32k
+    sae_state_sha256: null
+    size: 1.7B
+    skip_by_default: false
+    source_file_id: layer14.sae.pt
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: open
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: open_small
+    hook_name: blocks.18.hook_resid_post
+    last_attempt_utc: null
+    layer: 18
+    model_key: qwen3_1_7b_base
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: Qwen/SAE-Res-Qwen3-1.7B-Base-W32K-L0_50
+    sae_key: qwen3_1_7b_base_resid_w32k
+    sae_state_sha256: null
+    size: 1.7B
+    skip_by_default: false
+    source_file_id: layer18.sae.pt
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: open
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: open_small
+    hook_name: blocks.23.hook_resid_post
+    last_attempt_utc: null
+    layer: 23
+    model_key: qwen3_1_7b_base
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: Qwen/SAE-Res-Qwen3-1.7B-Base-W32K-L0_50
+    sae_key: qwen3_1_7b_base_resid_w32k
+    sae_state_sha256: null
+    size: 1.7B
+    skip_by_default: false
+    source_file_id: layer23.sae.pt
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: open
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: open_small
+    hook_name: blocks.20.hook_resid_post
+    last_attempt_utc: null
+    layer: 20
+    model_key: r1_distill_qwen15b
+    model_state_sha256: null
+    prior_pair_verified: true
+    repo_id: analist/sae-r1-distill-qwen-1.5b-resid-l20-reasoning
+    sae_key: r1_distill_qwen15b_resid_l20
+    sae_state_sha256: null
+    size: 1.5B
+    skip_by_default: true
+    source_file_id: resid_post_layer20
+    status: skipped_prior
+    tier: core
+  - acceptance_path: null
+    access: gated_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.9.hook_resid_post
+    last_attempt_utc: null
+    layer: 9
+    model_key: gemma3_4b_pt
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-2-4b-pt
+    sae_key: gemma3_4b_pt_scope_resid
+    sae_state_sha256: null
+    size: 4B
+    skip_by_default: false
+    source_file_id: resid_post/layer_9_width_65k_l0_medium
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: gated_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.17.hook_resid_post
+    last_attempt_utc: null
+    layer: 17
+    model_key: gemma3_4b_pt
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-2-4b-pt
+    sae_key: gemma3_4b_pt_scope_resid
+    sae_state_sha256: null
+    size: 4B
+    skip_by_default: false
+    source_file_id: resid_post/layer_17_width_65k_l0_medium
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: gated_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.22.hook_resid_post
+    last_attempt_utc: null
+    layer: 22
+    model_key: gemma3_4b_pt
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-2-4b-pt
+    sae_key: gemma3_4b_pt_scope_resid
+    sae_state_sha256: null
+    size: 4B
+    skip_by_default: false
+    source_file_id: resid_post/layer_22_width_65k_l0_medium
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: gated_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.29.hook_resid_post
+    last_attempt_utc: null
+    layer: 29
+    model_key: gemma3_4b_pt
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-2-4b-pt
+    sae_key: gemma3_4b_pt_scope_resid
+    sae_state_sha256: null
+    size: 4B
+    skip_by_default: false
+    source_file_id: resid_post/layer_29_width_65k_l0_medium
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: gated_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.9.hook_resid_post
+    last_attempt_utc: null
+    layer: 9
+    model_key: gemma3_4b_it
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-2-4b-it
+    sae_key: gemma3_4b_it_scope_resid
+    sae_state_sha256: null
+    size: 4B
+    skip_by_default: false
+    source_file_id: resid_post/layer_9_width_65k_l0_medium
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: gated_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.17.hook_resid_post
+    last_attempt_utc: null
+    layer: 17
+    model_key: gemma3_4b_it
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-2-4b-it
+    sae_key: gemma3_4b_it_scope_resid
+    sae_state_sha256: null
+    size: 4B
+    skip_by_default: false
+    source_file_id: resid_post/layer_17_width_65k_l0_medium
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: gated_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.22.hook_resid_post
+    last_attempt_utc: null
+    layer: 22
+    model_key: gemma3_4b_it
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-2-4b-it
+    sae_key: gemma3_4b_it_scope_resid
+    sae_state_sha256: null
+    size: 4B
+    skip_by_default: false
+    source_file_id: resid_post/layer_22_width_65k_l0_medium
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: gated_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.29.hook_resid_post
+    last_attempt_utc: null
+    layer: 29
+    model_key: gemma3_4b_it
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-2-4b-it
+    sae_key: gemma3_4b_it_scope_resid
+    sae_state_sha256: null
+    size: 4B
+    skip_by_default: false
+    source_file_id: resid_post/layer_29_width_65k_l0_medium
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: large_sae_4gb
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: large
+    hook_name: blocks.16.hook_mlp_out
+    last_attempt_utc: null
+    layer: 16
+    model_key: mistral7b_instruct
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: tylercosgrove/mistral-7b-sparse-autoencoder-layer16
+    sae_key: mistral7b_instruct_tc_l16_131k
+    sae_state_sha256: null
+    size: 7B
+    skip_by_default: false
+    source_file_id: .
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: large_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: large
+    hook_name: blocks.9.hook_resid_post
+    last_attempt_utc: null
+    layer: 9
+    model_key: gemma2_9b_pt
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-9b-pt-res
+    sae_key: gemma2_9b_pt_scope_resid
+    sae_state_sha256: null
+    size: 9B
+    skip_by_default: false
+    source_file_id: layer_9/width_16k/average_l0_51
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: large_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: large
+    hook_name: blocks.20.hook_resid_post
+    last_attempt_utc: null
+    layer: 20
+    model_key: gemma2_9b_pt
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-9b-pt-res
+    sae_key: gemma2_9b_pt_scope_resid
+    sae_state_sha256: null
+    size: 9B
+    skip_by_default: false
+    source_file_id: layer_20/width_16k/average_l0_58
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: large_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: large
+    hook_name: blocks.31.hook_resid_post
+    last_attempt_utc: null
+    layer: 31
+    model_key: gemma2_9b_pt
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: google/gemma-scope-9b-pt-res
+    sae_key: gemma2_9b_pt_scope_resid
+    sae_state_sha256: null
+    size: 9B
+    skip_by_default: false
+    source_file_id: layer_31/width_16k/average_l0_35
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: large_model
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: large
+    hook_name: blocks.8.hook_resid_post
+    last_attempt_utc: null
+    layer: 8
+    model_key: qwen35_9b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: Qwen/SAE-Res-Qwen3.5-9B-Base-W64K-L0_50
+    sae_key: qwen35_9b_resid_w64k
+    sae_state_sha256: null
+    size: 9B
+    skip_by_default: false
+    source_file_id: layer8.sae.pt
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: large_model
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: large
+    hook_name: blocks.16.hook_resid_post
+    last_attempt_utc: null
+    layer: 16
+    model_key: qwen35_9b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: Qwen/SAE-Res-Qwen3.5-9B-Base-W64K-L0_50
+    sae_key: qwen35_9b_resid_w64k
+    sae_state_sha256: null
+    size: 9B
+    skip_by_default: false
+    source_file_id: layer16.sae.pt
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: large_model
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: large
+    hook_name: blocks.21.hook_resid_post
+    last_attempt_utc: null
+    layer: 21
+    model_key: qwen35_9b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: Qwen/SAE-Res-Qwen3.5-9B-Base-W64K-L0_50
+    sae_key: qwen35_9b_resid_w64k
+    sae_state_sha256: null
+    size: 9B
+    skip_by_default: false
+    source_file_id: layer21.sae.pt
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: large_model
+    architecture: topk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: large
+    hook_name: blocks.27.hook_resid_post
+    last_attempt_utc: null
+    layer: 27
+    model_key: qwen35_9b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: Qwen/SAE-Res-Qwen3.5-9B-Base-W64K-L0_50
+    sae_key: qwen35_9b_resid_w64k
+    sae_state_sha256: null
+    size: 9B
+    skip_by_default: false
+    source_file_id: layer27.sae.pt
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: large_model
+    architecture: jumprelu
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: large
+    hook_name: blocks.23.hook_resid_post
+    last_attempt_utc: null
+    layer: 23
+    model_key: r1_distill_llama8b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: fnlp/Llama-Scope-R1-Distill
+    sae_key: r1_distill_llama8b_llamascope_l23
+    sae_state_sha256: null
+    size: 8B
+    skip_by_default: false
+    source_file_id: 400M-Slimpajama-400M-OpenR1-Math-220k/L23R
+    status: registered
+    tier: core
+  - acceptance_path: null
+    access: open
+    architecture: batchtopk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: open_small
+    hook_name: blocks.14.hook_resid_post
+    last_attempt_utc: null
+    layer: 14
+    model_key: qwen3_1_7b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: adamkarvonen/qwen3-1.7b-saes
+    sae_key: qwen3_1_7b_ak_resid_l14_65k
+    sae_state_sha256: null
+    size: 1.7B
+    skip_by_default: false
+    source_file_id: saes_Qwen_Qwen3-1.7B_batch_top_k/resid_post_layer_14/trainer_2
+    status: registered
+    tier: architecture
+  - acceptance_path: null
+    access: gated_model
+    architecture: matryoshka_batchtopk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: gated
+    hook_name: blocks.12.hook_resid_post
+    last_attempt_utc: null
+    layer: 12
+    model_key: gemma2_2b_it
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: chanind/gemma-2-2b-batch-topk-matryoshka-saes-w-32k-l0-40
+    sae_key: gemma2_2b_it_matryoshka_l12_32k
+    sae_state_sha256: null
+    size: 2B
+    skip_by_default: false
+    source_file_id: blocks.12.hook_resid_post
+    status: registered
+    tier: architecture
+  - acceptance_path: null
+    access: large_model
+    architecture: matryoshka_batchtopk
+    checkpoint_sha: null
+    error: null
+    error_type: null
+    execution_wave: open_small
+    hook_name: blocks.15.hook_resid_post
+    last_attempt_utc: null
+    layer: 15
+    model_key: qwen35_4b
+    model_state_sha256: null
+    prior_pair_verified: false
+    repo_id: decoderesearch/qwen-3.5-saes
+    sae_key: qwen35_4b_matryoshka_l15_65k
+    sae_state_sha256: null
+    size: 4B
+    skip_by_default: false
+    source_file_id: qwen-3.5-4b/btk-mat-layer-15-k-100
+    status: registered
+    tier: architecture
+  source_catalog_schema: saebase.coverage.stage_bc.v1

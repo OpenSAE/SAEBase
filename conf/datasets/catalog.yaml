@@ -1,0 +1,160 @@
+# Purpose: dataset selection and prompt preparation defaults and presets.
+# Scope: dataset preparation and Hydra component selection.
+
+dataset:
+  # Purpose and main function: Public defaults and name presets for the preservation of data sets.
+  # Scope: Hydra Component selection, and conf.load_group Direct Read.
+  defaults:
+    data_path: ${paths.data_dir}/${dataset.name}
+    prompt_file: ''
+  presets:
+    arc_challenge:
+      name: ARCChallenge
+      source_config: ARC-Challenge
+      sample_count: 500
+      sampling_seed: 42
+      use_original_split: false
+    bbh:
+      name: BBH
+      sample_count: 500
+      sampling_seed: 42
+      use_original_split: false
+    counterfact:
+      name: CounterFact
+      sample_count: 500
+      sampling_seed: 42
+      use_original_split: false
+    greater_than:
+      name: GreaterThan
+    gsm8k:
+      name: GSM8K
+      source_config: main
+      sample_count: 500
+      sampling_seed: 42
+      use_original_split: false
+    harmbench:
+      name: HarmBench
+      sample_count: 500
+      sampling_seed: 42
+      use_original_split: false
+    hotpotqa:
+      name: HotpotQA
+      sample_count: 500
+      sampling_seed: 42
+      use_original_split: false
+      source_config: distractor
+    humaneval:
+      name: HumanEval
+      source_config: openai_humaneval
+      sample_count: 500
+      sampling_seed: 42
+      use_original_split: false
+    ioi:
+      name: IOI
+      sample_count: 500
+      sampling_seed: 42
+      use_original_split: false
+    mmlu_pro:
+      name: MMLUPro
+      sample_count: 500
+      sampling_seed: 42
+      use_original_split: false
+    ravel:
+      name: RAVEL
+      source_config: city
+      sample_count: 500
+      sampling_seed: 42
+      use_original_split: false
+    simple_copying:
+      name: SimpleCopying
+    truthfulqa:
+      name: TruthfulQA
+      source_config: multiple_choice
+      sample_count: 500
+      sampling_seed: 42
+      use_original_split: false
+    xstest:
+      name: XSTest
+      sample_count: 500
+      sampling_seed: 42
+      use_original_split: false
+
+prompt_source:
+  # Purpose and main function: Save public defaults and name presets of the source of the hint.
+  # Scope: Hydra Component selection, and conf.load_group Direct Read.
+  defaults: {}
+  presets:
+    arc_challenge:
+      name: ARCChallenge
+      data_path: ${paths.data_dir}/ARCChallenge
+    bbh:
+      name: BBH
+      data_path: ${paths.data_dir}/BBH
+      prepare:
+        n_generate: 80
+        min_kept: 10
+        seed: 0
+        source_path: /workspace/data/BBH
+    counterfact:
+      name: CounterFact
+      data_path: ${paths.data_dir}/CounterFact
+      prepare:
+        n_generate: 300
+        min_kept: 20
+        seed: 0
+    gpqa_extended:
+      name: GPQAExtended
+      data_path: ${paths.data_dir}/GPQAExtended
+    greater_than:
+      name: GreaterThan
+      data_path: ${paths.data_dir}/GreaterThan
+      prepare:
+        n_generate: 300
+        min_kept: 20
+        seed: 0
+    ioi:
+      name: IOI
+      data_path: ${paths.data_dir}/IOI
+      prepare:
+        n_generate: 300
+        min_kept: 20
+        seed: 0
+    livecodebench:
+      name: LiveCodeBench
+      data_path: ${paths.data_dir}/LiveCodeBench
+    math500:
+      name: MATH500
+      data_path: ${paths.data_dir}/MATH500
+    medqa:
+      name: MedQA
+      data_path: ${paths.data_dir}/MedQA
+    mmlu_pro:
+      name: MMLUPro
+      data_path: ${paths.data_dir}/MMLUPro
+      prepare:
+        n_generate: 300
+        min_kept: 20
+        seed: 0
+        split: test
+        categories: all
+        n_shot: 0
+        scoring: direct
+        max_prompt_tokens: 2048
+        drop_na_options: true
+        balance_per_category: false
+        source_path: /workspace/data/MMLU-Pro
+        hf_name: TIGER-Lab/MMLU-Pro
+    simple_copying:
+      name: SimpleCopying
+      data_path: ${paths.data_dir}/SimpleCopying
+      prepare:
+        n_generate: 300
+        min_kept: 20
+        seed: 0
+    subject_verb_agreement:
+      name: SubjectVerbAgreement
+      data_path: ${paths.data_dir}/SubjectVerbAgreement
+      prepare:
+        n_generate: 300
+        min_kept: 20
+        seed: 0

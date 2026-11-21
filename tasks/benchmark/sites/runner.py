@@ -33,9 +33,9 @@ from tasks.benchmark.sites.records import relative_under, update_status
 
 ROOT = Path(__file__).resolve().parents[3]
 
-CATALOG = ROOT / "conf" / "coverage" / "stage_bc.json"
+CATALOG = ROOT / "conf/tasks/benchmark/task.yaml#site_catalog"
 
-DEFAULT_POPULATION = ROOT / "conf" / "coverage" / "stage_d_population.jsonl"
+DEFAULT_POPULATION = ROOT / "assets/dataset_cohorts/stage_d/files/stage_d_population.jsonl"
 
 
 def _write_token_ledger(

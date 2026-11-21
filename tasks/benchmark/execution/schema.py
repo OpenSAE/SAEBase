@@ -11,9 +11,10 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Mapping
 
+from conf import read_configuration
 from saebase.api import ActivationSite
 from saebase.store import SampleRecord, fingerprint
-from tasks.intervene.backend import Condition, MeasurementSample
+from tasks.intervene.editing import Condition, MeasurementSample
 
 CONFIG_SCHEMA = "saebase.benchmark.config.v1"
 
@@ -348,17 +349,4 @@ class BenchmarkConfig:
 
 
 def load_config(path: str | Path) -> BenchmarkConfig:
-    path = Path(path)
-    if path.suffix.lower() == ".json":
-        data = json.loads(path.read_text(encoding="utf-8"))
-    elif path.suffix.lower() in {".yaml", ".yml"}:
-        try:
-            import yaml
-        except ImportError as exc:
-            raise RuntimeError(
-                "YAML configs require the optional PyYAML dependency; JSON is always supported"
-            ) from exc
-        data = yaml.safe_load(path.read_text(encoding="utf-8"))
-    else:
-        raise ValueError("benchmark config must be .json, .yaml or .yml")
-    return BenchmarkConfig.from_dict(data)
+    return BenchmarkConfig.from_dict(read_configuration(path))

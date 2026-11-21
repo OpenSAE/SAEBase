@@ -453,7 +453,7 @@ def test_dense_and_sparse_code_layouts_can_coexist(tmp_path):
 
 def test_frozen_m0_reference_fixture_is_actual_verified_public_checkpoint_data():
     reference = json.loads(
-        (Path(__file__).parent / "fixtures/m0_reference_public.json").read_text()
+        (Path(__file__).resolve().parents[1] / "fixtures/m0_reference_public.json").read_text()
     )
     assert reference["schema"] == "saebase.m0.reference.v1"
     assert reference["real_checkpoint_validated"] is True

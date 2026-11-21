@@ -1,54 +1,106 @@
-# Capture筛选、观测数量与答案评分
+# Capture screening, number of observations and answer scores
 
-## 目的和适用范围
+## Purpose and scope of application
 
-说明正式Capture的候选筛选、输出数量和四种末token模式。运行入口为`python -m saebase.runtime.train task=capture`，配置位于`conf/task/capture.yaml`，结果由`CaptureTask.read_samples`和`export_report`读取。
+Describes the common selection, output and results of five end-word capture modes. The running entrance is `saebase task=capture`, configured at `conf/tasks/capture/task.yaml`, and the results are read at `CaptureTask.read_samples` and `export_report`.
 
-## 参数
+## Parameters
 
-- `task.filter=10`：默认应用已有SAR语义／原生密度及参考题高频过滤，再按对应模式选择10个候选。
-- `task.filter=all`：跳过上述过滤，使用全部SAE特征。Whiten仍排除std=0的特征。
-- `task.capture_count=null`：默认输出数量跟随filter；filter=all时对应全部可用结果。可以单独设为1、5等数字；单特征模式的数字不得超过数字filter的候选数。SAR输出的是pair数，可以超过候选特征数，最多为候选间不同pair的数量。
-- `task.top_feature_num`：保留旧的输出数量别名；显式capture_count优先。新配置推荐使用capture_count。
-- `task.sar.cohort_filter.reference_sample_count=100`：筛选参考题数量，独立于候选／输出特征数量。
-- `dataset.sample_count`：实际观测题目数量，保持Dataset原有配置。
+- `task.capture.selection.candidate_policy=active_whiten`: The five models share the same process. First, the terminologies, primary active density and reference frequency filters should be used, and then the current end phrases should be kept as non-zero-activated and reference standard deviations greater than zero, sorted in absolute z-score.
+- `task.capture.selection.candidate_count=20`: The maximum number of candidates. Use the actual number when it is insufficient. Zero candidates keep the original answer and filtering record and have been omitted from the Markdown and HTML reports. I or SAR records the undefined reasons for less than two candidates.
+- `task.capture.selection.candidate_count=all`: Skip the above filter and use all SAE features. Whitan still excludes std=0.
+- `task.capture.g_s.candidate_count=100`: Independent primary range for replicating g(S) under `candidate_policy=legacy`.
+- `task.capture.output.feature_count=null`: 10 by default for the new formulation of g_s, with the remaining mode default output numbers corresponding to all available results at the time of filter; filter=all. The number of a single feature mode cannot exceed the number of candidates for the number filter. The SAR output is the number of pairs, which exceeds the number of candidates, up to the number of different pairs.
+- `task.capture.selection.cohort_filter.reference_sample_count=100`: Number of filtering references, independent of the number of candidate/output features.
+- `dataset.sample_count`: Number of actual observation topics maintained in the current configuration of Dataset.
 
-语义／密度规则复用`tasks/capture/sar_filter.py`；mean/std使用参考题全部prompt token，频率规则使用参考题末token的有符号z值，默认z>1的题目比例达到50%时排除。各项过滤细节仍可在task.sar.feature_filter、cohort_filter中设置。std=0排除，不设正数std下限。
+The semantic/density rule is repeated at `tasks/capture/sar_filter.py`; mean/std uses all prompt token, the frequency rule is marked as z at the end of the reference title, and the default z>1 is excluded when it reaches 50% of the subject. Filter details can still be set in the tsk.capture.select.feature_filter, cohort_filter. std=0 is excluded without a positive std lower limit.
 
-## Capture模式
+## Capture Mode
 
-- `mode=whiten`：在过滤允许的特征中，按|zscore|排序。
-- `mode=non_whiten`：在过滤允许的特征中，按|native activation|排序。
-- `mode=g_s`：候选默认按|zscore|取得，逐个清零一个候选，其余所有特征保持原值；按删除后标准答案的平均token log概率g降序输出。delta_g为删除后g减原始全保留g。
-- `mode=I`：穷举候选全部保留mask，对每个pair遍历其他候选的所有固定背景，计算I=g11−g10−g01+g00，每对取最大I后按原值降序输出。10个候选对应1024个状态、45对×256背景。mask、g、背景和来源保存到NPZ及结果JSON。
+- `mode=whiten`: Presentation by the shared candidate in absolute z-score.
+- `mode=non_whiten`: Reorder in the same candidate pool by the absolute active natural value.
+- `mode=g_s`: A candidate in the Zero Pool each, with the rest of the characteristics remaining in the original value. The average token logarithmic probability drops in the deleted standard answer. `delta_g` minus the original rating for the deleted rating.
+- `mode=I`: All candidates remain on the list, calculating I =g11-g10-g01+g00 for all fixed backgrounds of each pair running through the other candidates, with the original value down after each maximum I. Ten candidates correspond to 1024 states, 45-x256 background. Mask, g, background and source are saved to NPZ and result JSON.
 
-g(S)和I模式默认对标准答案进行teacher forcing，不加EOS；改变的是原prompt最后一个token在选定SAE位置的激活，保留原重构残差。`answer_backend=full_context_tail`缓存完整序列的下层激活，使用相同batch/序列形状计算尾层，并与原生完整前向核对；不支持该尾层接口的后端使用完整前向。
+The g(S) and I mode defaults the standard answers to test forcing without EOS; the change is the activation of the last token of the original prompt at the selected SAE position and the retention of the original refactor's defects. The lower layer of the `answer_backend=full_context_tail` cache complete sequence is activated, the tail layer is calculated using the same cascading/sequence shape and checked with the original whole front; the back end of the tail layer interface is not supported with the complete forward.
 
-`mode=sar`使用原SAR抽样回归方式，需要显式可信的sar.py；其pair系数与穷举四格I是两种指标。穷举候选数默认上限16，过大候选集合会在测量前明确报错，不能用回归预测冒充全遍历。`filter=all`用于大型SAE的穷举SAR时同样受此上限约束。
+Use of the original SAR sample regression method `mode=sar` requires a visible and credible sar.py; its pair coefficient is two indicators, as is the count of four quartz I. The default upper limit of 16 for the number of candidates, the too large pool of candidates will clearly report errors prior to the measurement, and the return prediction cannot be used as a full-time basis. `filter=all` The same ceiling is applied to the large SAE's count of SARs.
 
-未包含新filter字段的历史调用保留旧的候选／输出行为。下游干预／生成调用显式传入filter、capture_count时会转交Capture；没有这些字段的历史任务继续沿用已有选择，避免改变已启动批次。`output_scope=all_tokens`属于原生稀疏轨迹接口，使用filter=all及其max_active_per_token参数。
+Captures set the candidate pool separately from the output number. Interventions and the generation of filters and output configurations that can be fed into the capture can be used to reuse the same candidate selection. History configurations are read from their original number fields. `task.capture.output_scope=all_tokens` Saves word-by-word trails, uses `task.capture.selection.candidate_count=all` and controls the number of features saved by `task.capture.max_active_per_token`.
 
-## 使用
+## use
 
 ```bash
-# 默认筛选10个，输出10个whiten特征
+# Default not exceeding primary active density 1% Most filtered features 20 One. Whiten Features
 python -m saebase.runtime.train task=capture task.execute=true
-# 同一候选池，仅输出g(S)最高的一项
-python -m saebase.runtime.train task=capture task.execute=true task.mode=g_s task.filter=10 task.capture_count=1
-# 不过滤，输出原始activation第一名
-python -m saebase.runtime.train task=capture task.execute=true task.mode=non_whiten task.filter=all task.capture_count=1
+# Same candidate pool, output only g(S)The highest one.
+python -m saebase.runtime.train task=capture task.execute=true task.capture.mode=g_s task.capture.selection.candidate_count=10 task.capture.output.feature_count=1
+# Do not filter, output original activation Number one.
+python -m saebase.runtime.train task=capture task.execute=true task.capture.mode=non_whiten task.capture.selection.candidate_count=all task.capture.output.feature_count=1
 ```
 
-模型和数据集仍通过标准model、dataset配置选择。要复现此前五个QA数据集的固定题目和Llama L21配置，使用`scripts/SAR/run_capture.py`；已有50题的离线复核使用`scripts/SAR/check_capture_reproduction.py`。
+Models and data sets are still selected through standard model, dataset configurations. The fixed title of the five previous QA data sets and the Llama L21 configuration are reproduced using `scripts/response_surface/run_capture.py`; 50 issues have been reviewed offline `scripts/response_surface/check_capture_reproduction.py`.
 
-批量运行 `python -m tasks.capture.matrix` 时，矩阵配置的 `matrix.dataset_overrides` 合并到每个数据集预设。例如 `dataset_overrides: {sample_count: 100, sampling_seed: 42}` 将本批各格设为100题，不改变数据集公共默认值。模式通过 `--capture-mode` 指定。
+Reruns the historical candidate policy with `task.capture.selection.candidate_policy=legacy` and following the previously run filtered overlay. The default density rule excludes features that are stricter than 1% and can be adjusted by `task.capture.selection.feature_filter.min_native_nonzero_fraction` and `task.capture.selection.feature_filter.density_strict`.
 
-正式 Capture 默认开启 `task.performance.enabled=true`。Precheck 先做对应模式的真实性能探针，执行器按精度约束选择尾层缓存与状态 batch；`performance.enabled=false` 保留原标量方式。每题耗时与共享标准化、筛选、解释、前向、排名、写入等阶段分别记录。I 去重后仍保存完整1024状态响应；额外记录真正执行的独立 code 状态数。具体预算、报告及数值阈值见 `tasks/precheck/README.md` 的“性能预检与自动调优”。
+The `paper.sar` and `paper.design` of the original paper continue to be used internally for the preparation and sequencing of the `tasks.capture.response_surface.fit_responses` model measurements and saved scoring. When the full I status rating of the same questions, candidates, standard answers, equal weights and numerical agreements is available, the `paper.coalitions` may be used to draw the corresponding score and avoid duplication of forwards; the same user is responsible for preserving the results of the original group of Hashi, the character order and the complete status check, and for identifying the origin of the marker.
 
-## RSS：固定目标与新增上下文
+When SAR uses a standard answer rating and opens performance, sample combinations repeat the original editor of g(S)/I, state weighting, tail cache and autobatch rating; sample scheme and original regression are maintained. For each question `sar.performance` save selection and rating time, use the original standard measure when closing. n_fit must cover at least `1+K+K*(K-1)/2` regression parameters; K=32 requires at least 529 groups to be combined.
 
-设置 `task.mode=rss`、`task.filter=all`、`task.output_scope=last_token`，提供 `task.prompt`、`task.rss.contexts` 和可信本地原版 `task.rss.source`。默认 RSS 参数为 `M=400, K=20, rho=kappa=0.8, tau=1e-5`。每个 variant 为 `context + 空格 + clean prompt`，在目标最后一个 token 上读取完整原始 SAE codes。
+When running the batch `python -m tasks.capture.matrix`, the matrix configuration `matrix.dataset_overrides` is combined into each data set preset. For example `dataset_overrides: {sample_count: 100, sampling_seed: 42}` sets the grids of this batch to 100 questions without changing the public default of the data set. The mode is specified by `--capture-mode`.
 
-`rss_case.md` 提供 RSS 全部选集及数值上集中于各 variant 的解释候选；`rss_case.json` 保存原始解释、recurrence、方向、排除原因；`rss_activations.npz` 保存完整 clean、variants 和 delta。展示候选要求 recurrence < rho、正变化 > tau、相对其他变体至少五倍，并按变化幅度排序，保留所有符合数值条件的特征。语义是否对应具体上下文由阅读解释判断。
+Official Capture Default Open `task.performance.enabled=true`.Precheck First, do the authentic performance probe for the corresponding mode. Executor selects the tail layer cache and state according to the precision constraint. batch;`performance.enabled=false` Keeps the original amount. Each item takes time and is recorded separately at the sharing stage of standardization, screening, interpretation, forwarding, ranking, writing, etc.. I Save complete after reset. 1024 Status response; extra recording of genuinely executed independence code Number of states. For specific budgets, reports and value thresholds, see `tasks/precheck/README.md` "Performance precheck and auto-modification"”.
 
-本次五个鲜明上下文的临时完整入口：`python scripts/RSS/run_contrast.py`。该脚本使用 RSS 公开 demo 的 GPT-2 加载设置，通过 `CaptureTask.run` 生成每一个案例，输出到新的 `experiment/RSS/` 目录。
+## RSS: Fixed Target and Added Context
+
+Sets `task.capture.mode=rss`, `task.capture.selection.candidate_count=all`, `task.capture.output_scope=last_token` to provide `task.prompt`, `task.capture.rss.contexts` and a trusted local original version `task.capture.rss.source`. Default RSS parameter is `M=400, K=20, rho=kappa=0.8, tau=1e-5`. Each varant is `context + space + clean prompt` and read the full original SAE codes on the last token target.
+
+`rss_case.md` Provides a full selection of RSS and values focused on variant's explanation candidate; `rss_case.json` Saves original explanation, recurrence, direction, exclusion cause; `rss_activations.npz` Saves the full clean, variants and delta. Shows the candidacy requirement recurrence < rho, positive change > tau, at least five times more than other variables, and maintains, in order of magnitude of change, all characteristics that meet the value requirements.
+
+This is a temporary complete entry of five distinct contexts: `python scripts/stable_support/run_contrast.py`. The script is based on the RSS Open Demo GPT-2 loading settings, which generate each case through `CaptureTask.run` and output to the new `experiment/authored_contexts/` directory.
+
+
+## & Under Old Policy I Press g(S) to select a candidate
+
+The following settings are used for `task.capture.selection.candidate_policy=legacy`.
+
+`task.capture.i.feature_selection=g_s`Change only I Candidature source: After a separate clean-up of all non-zero features that are filtered g(S)Before remove`task.capture.selection.candidate_count`One, and then a list of selected. K It's a signature. 2^K State. Use the actual number when the candidate is short and record`sar.preselection.selected_count`.g(S)The selection uses standard data set answers. This fact is saved with behavioural identity. Capture And return. SAR Follow original Sorting; I Current Default`whiten`,Visible`null`Inherit common candidate sorting configuration.
+
+
+When? I It's... g(S)When the number of candidate pools is not up,`task.capture.i.g_s_shortfall=available`(Use actual number by default;`relax_filters`First, the reference group frequency filter on the subject is relaxed on an ad hoc basis, then the semantic and primary density filter is relaxed when it is still insufficient, and the remaining non-zero features are pressed. g(S)Quantity. The original filtering configuration and other topics are maintained; the original number of candidates for each issue, the actual scoring pool, and`relaxed_filters`Save in`sar.preselection.pool_filtering`.Return specific errors when all non-zero features are still insufficient and keep non-zero bounds.
+
+
+## Each Capture Auto-System Original Answer
+
+All task modes (`non_whiten`, `whiten`, `g_s`, `sar`, `I`, `rss`) and `all_tokens` observations are accompanied by original model answers without feature intervention. Enter the full original tip and actual token of this capture, with no separate chat templates or standard answers. Directly repeat the upstream generation method of the loaded model and KV Cache; respond with a greedy decode.g(S) and I still rate the standard answers to the original definition.
+
+- `task.capture.model_answer.max_new_tokens=256`: Default generation of up to 256 new characters.
+- `task.capture.model_answer.batch_size=8`: Generate by the same input length, with a maximum of eight inputs.
+- Each `result.model_answer` saves `text`, generates `token_ids`, `status`, `finish_reason`, `truncated`, the actual weight and hint token identity, and the cache recovery. The single input results save the same field directly. RSS saves `variant_model_answers` for each context variant.
+- Saves the generated text when the word or model context cap is reached and marks the cut; this is an original continuation and has not been automatically extracted from the final option or rating. Generates failed to record errors individually, preserves the successful capture feature and marks the response stage as incomplete.
+- The data set detail is still at `reports/capture_samples.jsonl`; a summary of `stages.model_answer` reflects whether the response phase has been completed. JSON, Markdown and HTML feature reports read model answers.
+- Caches are located on item `data/_shared/model_answers/` and are reused by actual model weight, tokenizer, precise input token, numerical policy and production conditions; not related to mode, SAE layer and feature ranking.
+
+Capture is available to supplement only model answers and to keep the original feature and the interactive file unchanged:
+
+```python
+from tasks.capture.task import CaptureTask
+
+capture = CaptureTask()
+capture.refresh_model_answers("/absolute/path/to/capture_run")
+rows = list(capture.read_samples("/absolute/path/to/capture_run"))
+```
+
+The additional results are written in `reports/capture_model_answers.json` and `metadata/capture_model_answer_update.json`, and the official reading access is automatically merged. When you do so, check the actual weights and the original input identity. When the new experiment is completed at the feature stage and the answer is not completed, you can use `runtime.mode=resume` only for the original configuration; the above-mentioned supplementary interface is used when the historical operation cannot continue directly due to a change in source identity.
+
+
+## & Independent primary range for g(S) under old strategy
+
+```bash
+python -m saebase.runtime.train task=capture task.execute=true task.capture.mode=g_s task.capture.selection.candidate_policy=legacy task.capture.g_s.candidate_count=100 task.capture.output.feature_count=10
+```
+
+`task.capture.g_s.candidate_count` controls the Whiten primary range n for positive integers; final output continues to be controlled by `task.capture.output.feature_count`, omitting the current mode of output of 10, with no greater than n. Adopts the existing Whiten filtering and standard deviation rules, including keeping the original active candidate 0 and z-score valid. For each candidate, it is only zero and all the remaining features remain the same; preserves the full single feature score and displays Top10 in descending order by g(S). `g_s.preselection` and measures the identity record Whiten primary selection method, request n and actual candidate.
+
+This setting only affects the g_s mode. I still uses its own candidate strategy. History does not state that the formulation of the g_s-specific section is read by the shared candidate configuration that is saved; old and new candidates are distinguished in the running identity, and the old test results remain in their original calibre.

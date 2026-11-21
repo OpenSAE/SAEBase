@@ -30,7 +30,7 @@ from saebase.store import (  # noqa: E402
     fingerprint,
     sha256_state_dict,
 )
-from tasks.intervene.backend import (
+from tasks.intervene.editing import (
     BatchEngine,
     Condition,
     ExperimentIdentity,
@@ -45,7 +45,7 @@ from tasks.intervene.backend import (
     read_results,
     run_steering,
 )
-from tasks.intervene.backend.reference import (
+from tasks.intervene.editing.reference import (
     compare_reference_activation_probe,  # noqa: E402 - script bootstrap
 )
 from tests.fixtures.synthetic import ResearchToyModel, ResearchToySAE
@@ -432,10 +432,10 @@ def test_configurable_cli_dry_run_requires_no_remote_weights(tmp_path):
     import subprocess
     from pathlib import Path
 
-    conf = Path(__file__).resolve().parents[2] / "conf/interventions/pythia_feature_edits.json"
+    conf = Path(__file__).resolve().parents[2] / "conf/tasks/intervene/task.yaml#presets.pythia_feature_edits"
     repo = Path(__file__).resolve().parents[2]
     r = subprocess.run(
-        [sys.executable, "tasks/intervene/cli.py", "--config", str(conf), "--dry-run"],
+        [sys.executable, "tasks/intervene/commands.py", "--config", str(conf), "--dry-run"],
         cwd=repo,
         capture_output=True,
         text=True,
@@ -446,7 +446,7 @@ def test_configurable_cli_dry_run_requires_no_remote_weights(tmp_path):
     assert obj["measurements"] == 4 and obj["steering_total_max_generated_tokens"] == 6
     assert not (repo / "experiment/m2").exists()
     r = subprocess.run(
-        [sys.executable, "tasks/intervene/cli.py", "--config", str(conf)],
+        [sys.executable, "tasks/intervene/commands.py", "--config", str(conf)],
         cwd=repo,
         capture_output=True,
         text=True,
@@ -459,7 +459,7 @@ def test_m0_probe_uses_recorded_atol_and_rtol_and_rejects_drift():
     """Fixed absolute-only thresholds incorrectly rejected valid checkpoint reference comparisons."""
     import numpy as np
 
-    from tasks.intervene.backend.reference import compare_reference_activation_probe
+    from tasks.intervene.editing.reference import compare_reference_activation_probe
 
     ref = np.array([5.0, -2.0, 0.0002, 0.0])
     # A 1.2e-4 change is legitimate at a reference magnitude of 5,
@@ -487,7 +487,7 @@ def test_m0_probe_uses_recorded_atol_and_rtol_and_rejects_drift():
 def test_m0_public_reference_has_recorded_tolerances():
     from pathlib import Path
 
-    source = Path(__file__).resolve().parent / "fixtures/m0_reference_public.json"
+    source = Path(__file__).resolve().parents[1] / "fixtures/m0_reference_public.json"
     record = json.loads(source.read_text())
     assert record["real_checkpoint_validated"] is True
     assert record["tolerances"] == {"atol": 1e-4, "rtol": 1e-4}

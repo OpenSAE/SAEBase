@@ -1,15 +1,19 @@
-# 源码结构与功能说明
+# Source-code structure and functional description
 
-## 目的和主要功能
+## Purpose
 
-介绍源码树、源码说明和科研概念的关联，帮助维护者定位实现及其用途。
+A description of the linkages between the source tree, the source description and the scientific concept helps maintainers to position and use them.
 
-## 适用范围
+## Scope
 
-用于读取或维护 `doc/code/` 的源码结构与标注资料。实际修改依据当前源码和项目工作模式。
+The source structure and label information used to read or maintain `doc/code/`. Actual changes are based on the current source code and project working model.
 
-`code_tree.json` 保存源码语法结构，`code_annotations.json` 保存源码用途和相关知识标识。`context_ids` 关联项目知识，`core_ids` 关联中央管理，`project_architecture_ids` 关联项目自身架构。说明以实际源码和已知依据为准；含义待查时保留具体位置和后续定位线索。
+`code_tree.json` Save source syntax structure, `code_annotations.json` Save source code uses and associated knowledge identifiers. `context_ids` Associated project knowledge, `core_ids` Associated central management, `project_architecture_ids` Associated project own structure. Description is based on actual source code and known basis; specific location and subsequent location trails are maintained when meaning is to be checked.
 
-维护功能说明时，直接写清该实现处理什么、完成什么、产生什么以及谁使用结果。参数和实现细节用于需要查看这些信息的接口资料，整体说明先解释职责和协作。
+The functional statement of maintenance is directly defined what is to be achieved, what is to be accomplished, what is to be produced and who uses the results. Parameters and details of realization are used for interfaces that require access to this information, with an overall explanation of responsibilities and collaboration.
 
-[当前架构](development/current-architecture.md)说明各组件职责，[开发文档](development/index.md)提供具体使用入口。需要中央源码图或 Atlas 时，通过 `.researchharness/central.json` 定位 ResearchHarness，按其源码与可视化说明处理。
+When read, read the location module along the configuration, distribution and results from the normal operating entry. The structure describes how models, data and tasks are exchanged, and the development of an index provides a way to find, validate and release by work. [The current structure](documentation/source/development/current-architecture.md)] [Develop document](documentation/source/development/index.md)]
+
+## Project structure and extraction
+
+View the floor description to track configuration, distribution of components and writing of the results, for example, by locating the actual task selection from the main entrance. [The base layer](../base.md) needs to generate the structure, entering the code repository model from the available `extract-structure` skills, selecting the root, scope and source version of the project; and recording the results and the version for long-term access on this page.

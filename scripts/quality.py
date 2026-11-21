@@ -215,7 +215,7 @@ def classify(paths: Iterable[str], *, unknown_diff: bool = False) -> dict[str, b
             or path.endswith("/AGENTS.md")
         ):
             result["harness"] = True
-        elif path.startswith("doc/code/development/"):
+        elif path.startswith("doc/code/documentation/source/development/"):
             continue
         elif path.startswith(("harness/", "doc/knowledge/", "doc/code/", "atlas/")):
             result["atlas"] = True
@@ -247,7 +247,7 @@ def classify(paths: Iterable[str], *, unknown_diff: bool = False) -> dict[str, b
                 "tests/",
                 "scripts/",
             )
-        ) or path in ("pyproject.toml", "setup.py", "MANIFEST.in", "requirements.txt"):
+        ) or path in ("pyproject.toml", "setup.py", "doc/code/distribution/source/manifest.in", "requirements.txt"):
             result["product"] = True
         if (
             path.startswith(".github/workflows/")
@@ -276,10 +276,10 @@ def classify(paths: Iterable[str], *, unknown_diff: bool = False) -> dict[str, b
         ) or path in {
             "AGENTS.md",
             "README.md",
-            "README_cn.md",
+            "doc/code/translated/README.md",
             "LICENSE",
             "CITATION.cff",
-            "MANIFEST.in",
+            "doc/code/distribution/source/manifest.in",
             "pyproject.toml",
             "setup.py",
             "requirements.txt",

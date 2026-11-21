@@ -7,8 +7,8 @@ Automatic selection is explicit; the default generate Task keeps its configured 
 from __future__ import annotations
 import torch
 from saebase.api import ActivationSite
-from tasks.intervene.backend.specs import Condition, MeasurementSample
-from tasks.intervene.backend.steering import GenerationSpec, compare_steered_generation
+from tasks.intervene.editing.specs import Condition, MeasurementSample
+from tasks.intervene.editing.steering import GenerationSpec, compare_steered_generation
 from saebase.store.identity import SampleRecord, TokenSelection
 
 SPECIAL = {"<bos>", "<eos>", "<pad>", "<unk>", "<start_of_turn>", "<end_of_turn>"}

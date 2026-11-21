@@ -15,6 +15,7 @@ from typing import Iterable
 
 import torch
 
+from conf import read_configuration
 from tasks.benchmark.results.metrics import atomic_json
 from tasks.benchmark.sites.catalog import (
     DEFAULT_MODEL_ORDER,
@@ -26,12 +27,11 @@ from tasks.benchmark.sites.checks import run_one
 from tasks.benchmark.sites.records import (
     build_final_matrix,
     load_site_evaluation_targets,
-    write_site_evaluation_targets,
 )
 
 ROOT = Path(__file__).resolve().parents[3]
 
-CATALOG = ROOT / "conf" / "coverage" / "stage_bc.json"
+CATALOG = ROOT / "conf/tasks/benchmark/task.yaml#site_catalog"
 
 
 def schedule_sites(
@@ -118,12 +118,9 @@ def write_environment(output: Path) -> dict:
 
 
 def ensure_targets(output: Path) -> Path:
-    targets = ROOT / "conf" / "coverage" / "stage_d_targets.json"
-    if not targets.exists():
-        write_site_evaluation_targets(targets)
-    # Mirror into the run directory for provenance.
-    payload = json.loads(targets.read_text(encoding="utf-8"))
-    atomic_json(output / "stage_d_targets.json", payload)
+    payload = read_configuration(ROOT / "conf/tasks/benchmark/task.yaml#site_targets")
+    targets = output / "stage_d_targets.json"
+    atomic_json(targets, payload)
     plan = load_coverage(CATALOG).plan()
     atomic_json(output / "catalog_snapshot.json", plan)
     return targets

@@ -4,6 +4,8 @@ Baseline calls the unoptimized public task operation. Every timed candidate
 processes identical features and, for generation, identical token budgets/seeds.
 """
 
+from saebase.runtime.configuration.task_options import task_owner, task_value
+
 import numpy as np
 import torch
 import time
@@ -55,16 +57,16 @@ def children(cfg, selected, operation):
     values = []
     for feature in selected["top_features"]:
         child = OmegaConf.create(OmegaConf.to_container(cfg, resolve=True))
-        child.task.feature_selection = "configured"
+        task_owner(child.task).feature_selection = "configured"
         child.task.prompt = selected["prompt"]
-        child.task.feature_id = feature["feature_id"]
+        task_owner(child.task).feature_id = feature["feature_id"]
         if operation == "generate":
-            child.task.conditions = [
+            task_owner(child.task).conditions = [
                 {
                     "name": f"feature_{feature['feature_id']}",
-                    "operation": cfg.task.get("intervention", "add"),
+                    "operation": task_value(cfg.task, "intervention", "add"),
                     "feature_ids": [feature["feature_id"]],
-                    "value": cfg.task.get("value", 1.0),
+                    "value": task_value(cfg.task, "value", 1.0),
                 }
             ]
         values.append(child)
@@ -79,35 +81,35 @@ def _prepare_features(cfg, operation, selected, pair, measure):
         snapshot = capture_features(pair.model, pair.sae, site=pair.site, prompt=prompt)
 
     def baseline():
-        from tasks.intervene.backend.observations import prompt_observation_session
+        from tasks.intervene.editing.observations import prompt_observation_session
 
-        with prompt_observation_session(pair, cfg.task.get("reuse_prompt_observations", False)):
+        with prompt_observation_session(pair, task_value(cfg.task, "reuse_prompt_observations", False)):
             return [measure(child, prompt=prompt) for child in configs]
 
     if operation == "generate":
         from tasks.generate.conditions import _sample, compare_prompt_conditions
-        from tasks.generate.backend.native_batch import compare_many
-        from tasks.intervene.backend.specs import Condition
-        from tasks.intervene.backend.steering import GenerationSpec
+        from tasks.generate.serving.native_batch import compare_many
+        from tasks.intervene.editing.specs import Condition
+        from tasks.intervene.editing.steering import GenerationSpec
         from saebase.results import completion_summary
-        from tasks.sae_runtime import _fingerprint_prompt
+        from saebase.runtime.sae_operations import _fingerprint_prompt
 
         sample_id = "prompt-" + _fingerprint_prompt(prompt)[:16]
         sample, _ = _sample(pair.model, prompt, sample_id)
         conditions = [
             Condition(
-                f"feature_{child.task.feature_id}",
-                str(cfg.task.get("intervention", "add")),
-                (int(child.task.feature_id),),
-                float(cfg.task.get("value", 1.0)),
+                f"feature_{task_owner(child.task).feature_id}",
+                str(task_value(cfg.task, "intervention", "add")),
+                (int(task_owner(child.task).feature_id),),
+                float(task_value(cfg.task, "value", 1.0)),
             )
             for child in configs
         ]
         spec = GenerationSpec(
-            max_new_tokens=int(cfg.task.max_new_tokens),
+            max_new_tokens=int(task_value(cfg.task, "max_new_tokens")),
             seed=int(cfg.seed),
-            temperature=float(cfg.task.temperature),
-            stop_at_context_limit=cfg.task.get("stop_at_context_limit", True),
+            temperature=float(task_value(cfg.task, "temperature")),
+            stop_at_context_limit=task_value(cfg.task, "stop_at_context_limit", True),
         )
 
         def candidate(batch):
@@ -119,8 +121,8 @@ def _prepare_features(cfg, operation, selected, pair, measure):
                     prompt,
                     sample_id,
                     spec.max_new_tokens,
-                    feature_id=int(child.task.feature_id),
-                    conditions=OmegaConf.to_container(child.task.conditions),
+                    feature_id=int(task_owner(child.task).feature_id),
+                    conditions=OmegaConf.to_container(task_owner(child.task).conditions),
                     seed=spec.seed,
                     temperature=spec.temperature,
                     stop_at_context_limit=spec.stop_at_context_limit,
@@ -150,19 +152,19 @@ def _prepare_features(cfg, operation, selected, pair, measure):
             "full_prefix_recompute_no_stale_kv",
         ]
     else:
-        from tasks.intervene.backend.observations import prompt_observation_session
+        from tasks.intervene.editing.observations import prompt_observation_session
 
         replay = SiteReplay(pair.model, snapshot.tokens, pair.site)
         patches = [
             edit_features(
                 pair.sae,
                 snapshot,
-                replacements={int(child.task.feature_id): float(child.task.value)},
+                replacements={int(task_owner(child.task).feature_id): float(task_owner(child.task).value)},
             )
             for child in configs
         ]
         baseline_logits = pair.model.forward_logits(tokens=snapshot.tokens, readout_position=-1)
-        if cfg.task.get("verify_identity", True):
+        if task_value(cfg.task, "verify_identity", True):
             pair.model.assert_identity_patch(tokens=snapshot.tokens, site=pair.site)
 
         def candidate(batch):
@@ -212,7 +214,7 @@ def measure_features(cfg, operation, selected, pair, measure):
         pair.identity.model_key,
         (snapshot.tokens.shape[1] + 63) // 64,
         len(configs),
-        cfg.task.get("max_new_tokens"),
+        task_value(cfg.task, "max_new_tokens"),
     )
     policies = getattr(recorder, "policies", {}) if recorder is not None else {}
     preparation_warmup_seconds = 0.0

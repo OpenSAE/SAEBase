@@ -188,7 +188,7 @@ def check(request: dict[str, Any]) -> dict[str, Any]:
             checks = []
             from contextlib import nullcontext
 
-            from tasks.sae_runtime import (
+            from saebase.runtime.sae_operations import (
                 _ACTIVE_PAIR,
                 load_selection,
                 loaded_pair_session,
@@ -344,7 +344,7 @@ def check(request: dict[str, Any]) -> dict[str, Any]:
             result = task.prepare_execution(cfg)
             result = {**result, "task": request["operation"], "scientific_computation": "NOT_RUN"}
         elif kind == "task":
-            from tasks.sae_runtime import execute_task
+            from saebase.runtime.sae_operations import execute_task
 
             name = str(request["operation"])
             cfg = OmegaConf.create(request["config"])

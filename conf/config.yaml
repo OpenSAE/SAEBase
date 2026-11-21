@@ -16,19 +16,17 @@ seed: 42
 
 # Run-directory cleanup is independent of the selected research task.
 runtime:
+  device: auto  # Shared model placement for the normal task dispatcher.
   mode: null  # null defaults to new; also accepts resume and overwrite
-  clear_experiment_leaf: true
   numerics: vllm  # One stable GPU policy for precheck and tasks; native reproduces the old policy.
   cpu_threads: 4  # Bound Torch/BLAS CPU pools; uses the same setting in direct and matrix runs.
 
-# Leaf directory name: ${experiment.sub_name}_${seed}; existing runs require explicit intent.
-exp_run_leaf: ${experiment.sub_name}_${seed}
-
 hydra:
   run:
-    dir: ${paths.root}/experiment/${saebase_run_component:dataset}/${saebase_run_component:model}/${task.path}/${exp_run_leaf}
+    dir: ${saebase_run_path:leaf}
   sweep:
-    dir: ${paths.root}/experiment/${saebase_run_component:dataset}/${saebase_run_component:model}/${task.path}/_sweeps/${now:%Y-%m-%d}_${now:%H-%M-%S}
-    subdir: ${hydra.job.num}
+    dir: ${saebase_run_path:leaf}
+    subdir: .
+  output_subdir: null
   job:
     chdir: true

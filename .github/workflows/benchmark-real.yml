@@ -25,16 +25,16 @@ jobs:
           TOKENIZERS_PARALLELISM: 'false'
         run: |
           set -euo pipefail
-          saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --dry-run
-          saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --real --output "$RUNNER_TEMP/m3"
-          saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --real --resume --output "$RUNNER_TEMP/m3"
-          saebase-benchmark --config conf/benchmark/pythia_benchmark_smoke.json --report-only --output "$RUNNER_TEMP/m3"
+          saebase-benchmark --config conf/tasks/benchmark/task.yaml#presets.pythia_benchmark_smoke --dry-run
+          saebase-benchmark --config conf/tasks/benchmark/task.yaml#presets.pythia_benchmark_smoke --real --output "$RUNNER_TEMP/m3"
+          saebase-benchmark --config conf/tasks/benchmark/task.yaml#presets.pythia_benchmark_smoke --real --resume --output "$RUNNER_TEMP/m3"
+          saebase-benchmark --config conf/tasks/benchmark/task.yaml#presets.pythia_benchmark_smoke --report-only --output "$RUNNER_TEMP/m3"
           python - <<'PY'
           from pathlib import Path
           from tasks.benchmark.execution import load_config
           from tasks.benchmark.results.metrics import read_metrics
           import os
-          cfg=load_config('conf/benchmark/pythia_benchmark_smoke.json')
+          cfg=load_config('conf/tasks/benchmark/task.yaml#presets.pythia_benchmark_smoke')
           root=Path(os.environ['RUNNER_TEMP'])/'m3'/cfg.run_id
           rows=read_metrics(root,cfg.run_id)
           assert len(rows)==7, len(rows)
@@ -43,7 +43,7 @@ jobs:
           # benchmark must preserve measured L0 and reconstruction MSE, not merely
           # produce finite but arbitrary scores.
           import json
-          ref=json.loads(Path('tests/product/fixtures/m0_reference_public.json').read_text())
+          ref=json.loads(Path('tests/fixtures/m0_reference_public.json').read_text())
           original=next(x for x in ref['samples'] if x['token_ids']==[40587,37083,15458])
           by_id={r['metric_id']:r['value'] for r in rows if r['condition_id'] is None}
           assert by_id['core.l0']==original['codes_l0']

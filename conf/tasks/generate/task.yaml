@@ -1,0 +1,38 @@
+# @package _global_
+# Each task is model/dataset independent; compose selections through Hydra.
+task:
+  name: generate
+  extensions: []  # Explicit installed entry-point names; no automatic discovery.
+  execute: false
+  sae_key: null
+  layer: null
+  device: auto
+  prompt: ''
+  resume: true
+  performance:
+    enabled: true
+    batch_size: auto
+    batch_sizes: [1, 2, 4, 8, 16, 32, 64]
+    warmup: 1
+    repeats: 3
+    probe_samples: 3
+    probe_states: 64
+    max_seconds: 120
+    memory_fraction: 0.9
+  generate:
+    feature_id: 0
+    intervention: add
+    value: 1.0
+    max_new_tokens: 8
+    temperature: 0.0
+    stop_at_context_limit: true  # Keep the original prompt; stop with a recorded reason at the native limit.
+
+    feature_selection: configured  # configured | last_active_content_token | capture_top
+    top_feature_num: 10
+    feature_ranking: whiten  # non_whiten | whiten: select once from the original prompt.
+    capture_source: null  # Optional saved capture run with exact prompt/checkpoint/site/ranking matches.
+    whiten_chunk_size: 256
+    inline_results: true  # False keeps full rows in reports/generate_features.jsonl.
+    continue_on_error: false
+    conditions: null  # Optional list of native intervention conditions.
+    reuse_prompt_observations: true  # Exact full-prefix reuse within each prompt; no KV cache.

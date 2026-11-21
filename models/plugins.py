@@ -12,15 +12,15 @@ from models.model_adapter import ModelAdapter
 SERIES_MODULES = (
     "models.gemma.gemma3.specs",
     "models.gemma.gemma2.specs",
-    "models.gpt2.gpt2.specs",
+    "models.gpt_family.gpt2_series.specs",
     "models.llama.llama31.specs",
-    "models.mistral.mistral7b.specs",
+    "models.mistral.mistral_series_7b.specs",
     "models.pythia.pythia.specs",
-    "models.qwen.qwen25.specs",
-    "models.qwen.qwen35.specs",
-    "models.qwen.qwen3.specs",
+    "models.qwen_family.qwen_series_25.specs",
+    "models.qwen_family.qwen_series_35.specs",
+    "models.qwen_family.qwen_series_3.specs",
     "models.llama.r1_distill.specs",
-    "models.qwen.r1_distill.specs",
+    "models.qwen_family.r1_distill.specs",
 )
 MODEL_MODULES = {}
 _ADAPTERS = {}

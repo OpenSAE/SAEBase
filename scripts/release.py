@@ -37,7 +37,7 @@ BANNED_SUFFIX = {".safetensors", ".ckpt", ".pth", ".pkl", ".gguf", ".pt"}
 
 BANNED_NAME = {".env", "id_rsa", "id_ed25519"}
 
-EVIDENCE_PREFIX = "conf/coverage/stage_d_evidence/"
+EVIDENCE_PREFIX = "assets/history_experiment/benchmark_evidence/files/stage_d_evidence/"
 
 
 def sha256_file(path: Path) -> str:
@@ -82,10 +82,10 @@ def project_info(root: Path = ROOT) -> tuple[str, str, dict[str, str]]:
     declared = _static_version((root / "saebase" / "__init__.py").read_text(encoding="utf-8"))
     if declared != version:
         raise ValueError("pyproject.toml and saebase.__version__ disagree")
-    changelog = (root / "doc/code/development/CHANGELOG.md").read_text(encoding="utf-8")
+    changelog = (root / "doc/code/documentation/source/development/CHANGELOG.md").read_text(encoding="utf-8")
     if re.search(rf"^##[ \t]+{re.escape(version)}(?=\s|$)", changelog, re.M) is None:
         raise ValueError(f"CHANGELOG.md lacks a release heading for {version}")
-    notes = root / "doc/code/development" / "releases" / f"v{version}.md"
+    notes = root / "doc/code/documentation/source/development" / "releases" / f"v{version}.md"
     if not notes.is_file() or not notes.read_text(encoding="utf-8").strip():
         raise ValueError(f"release notes missing for v{version}")
     entrypoints = project["scripts"]
@@ -143,7 +143,7 @@ def inspect_distributions(
             raise ValueError("no installed console scripts")
         if dict(parser.items("console_scripts")) != entrypoints:
             raise ValueError("installed console scripts differ from source project")
-        if "saebase/cli.py" not in names or "conf/config.yaml" not in names:
+        if "base/application/cli.py" not in names or "conf/config.yaml" not in names:
             raise ValueError("wheel lacks public API or runtime Hydra configuration")
 
     with tarfile.open(sdist, "r:gz") as archive:
@@ -157,7 +157,7 @@ def inspect_distributions(
                 names.append(member.name)
         root_path = f"opensae_saebase-{version}/"
         configs = [n for n in names if n == root_path + "pyproject.toml"]
-        versions = [n for n in names if n == root_path + "saebase/__init__.py"]
+        versions = [n for n in names if n == root_path + "base/application/__init__.py"]
         if len(configs) != 1 or len(versions) != 1:
             raise ValueError("sdist lacks version metadata or package init")
         src_project = tomllib.loads(archive.extractfile(configs[0]).read().decode("utf-8"))[
@@ -169,8 +169,8 @@ def inspect_distributions(
             raise ValueError("sdist package version differs from wheel")
         for required in (
             "LICENSE",
-            "doc/code/development/CHANGELOG.md",
-            f"doc/code/development/releases/v{version}.md",
+            "doc/code/documentation/source/development/CHANGELOG.md",
+            f"doc/code/documentation/source/development/releases/v{version}.md",
         ):
             if root_path + required not in names:
                 raise ValueError(f"sdist missing release source: {required}")
@@ -232,7 +232,7 @@ def prepare(
         else "not independently checked by this offline command",
         "software_license": "Apache-2.0",
         "distribution_artifacts": artifacts,
-        "release_notes": f"doc/code/development/releases/{tag}.md",
+        "release_notes": f"doc/code/documentation/source/development/releases/{tag}.md",
         "model_or_sae_weights_included": False,
         "scientific_scope": (
             "software packaging/API/integration checks; no new real checkpoint "

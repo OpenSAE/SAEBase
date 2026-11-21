@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+from saebase.runtime.configuration.task_options import task_value
+
 import json
 from typing import Any, Callable
 
-from tasks.sae_runtime import _task, input_path
+from saebase.runtime.sae_operations import _task, input_path
 
 
 def _explain(
@@ -16,13 +18,13 @@ def _explain(
     from tasks.explain.interpretation import propose_interpretation
 
     if not bool(_task(cfg, "approved", False)):
-        raise PermissionError("Auto-explanation needs task.approved=true")
+        raise PermissionError("Auto-explanation needs task.explain.approved=true")
     if generator is None:
         generator = _allowlisted_generator(cfg)
     if generator is None:
         raise RuntimeError(
             "Supply a real inference provider with ExplainTask(generator=callable) "
-            "or task.generator=saebase_generate. "
+            "or task.explain.generator=saebase_generate. "
             "The task will not invent an explanation or call a paid service implicitly."
         )
     discovery_path = input_path(_task(cfg, "discovery_file", ""))
@@ -75,7 +77,7 @@ def execute(cfg: Any, generator=None, predictor=None) -> dict[str, Any]:
 
 def validate_cfg(cfg: Any) -> None:
     """Validate this Task at its input boundary, before resource loading."""
-    from tasks.sae_runtime import validate_fields, validate_native_selection
+    from saebase.runtime.sae_operations import validate_fields, validate_native_selection
 
     validate_native_selection(cfg)
     validate_fields(
@@ -84,13 +86,13 @@ def validate_cfg(cfg: Any) -> None:
         numbers=(("authorized_budget_usd", 0), ("estimated_cost_usd", 0)),
         booleans=("approved",),
     )
-    if cfg.task.get("generator", "") not in ("", "saebase_generate"):
+    if task_value(cfg.task, "generator", "") not in ("", "saebase_generate"):
         raise ValueError("Unsupported explanation generator")
-    if cfg.task.get("estimated_cost_usd", 0) > cfg.task.get("authorized_budget_usd", 0):
+    if task_value(cfg.task, "estimated_cost_usd", 0) > task_value(cfg.task, "authorized_budget_usd", 0):
         raise ValueError("Explanation cost exceeds its authorized budget")
     if cfg.task.get("execute", False):
         for field in ("discovery_file", "heldout_file"):
-            if not input_path(cfg.task.get(field, "")).is_file():
+            if not input_path(task_value(cfg.task, field, "")).is_file():
                 raise FileNotFoundError(f"Provide an existing task.{field}")
 
 
@@ -99,10 +101,10 @@ def prepare_execution(cfg: Any) -> dict:
     generator = _allowlisted_generator(cfg)
     if generator is None:
         raise ValueError(
-            "Configure task.generator=saebase_generate or supply ExplainTask(generator=callable)"
+            "Configure task.explain.generator=saebase_generate or supply ExplainTask(generator=callable)"
         )
     for field in ("discovery_file", "heldout_file"):
-        rows = json.loads(input_path(cfg.task[field]).read_text())
+        rows = json.loads(input_path(task_value(cfg.task, field)).read_text())
         if not isinstance(rows, list) or not rows:
             raise ValueError(f"task.{field} must contain nonempty example records")
     return {

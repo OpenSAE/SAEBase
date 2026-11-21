@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+from saebase.runtime.configuration.task_options import task_value
+
 from typing import Any
 import os
 from pathlib import Path
 
-from tasks.sae_runtime import _pair, _prompt, _fingerprint_prompt
+from tasks.capture.configuration import capture_section
+from saebase.runtime.sae_operations import _pair, _prompt, _fingerprint_prompt
 
 
 def offload_capture_tail(pair):
@@ -57,9 +60,9 @@ def offload_capture_tail(pair):
 
 
 def neuronpedia_settings(cfg) -> dict:
-    raw = cfg.task.get("neuronpedia", {})
+    raw = task_value(cfg.task, "neuronpedia", {})
     if not hasattr(raw, "get"):
-        raise ValueError("task.neuronpedia must contain annotation settings")
+        raise ValueError("task.capture.neuronpedia must contain annotation settings")
     values = {
         "enabled": raw.get("enabled", True),
         "allow_network": raw.get("allow_network", True),
@@ -75,7 +78,7 @@ def neuronpedia_settings(cfg) -> dict:
         )
     for key in ("enabled", "allow_network"):
         if type(values[key]) is not bool:
-            raise ValueError(f"task.neuronpedia.{key} must be a boolean")
+            raise ValueError(f"task.capture.neuronpedia.{key} must be a boolean")
     for key in (
         "timeout_seconds",
         "total_timeout_seconds",
@@ -83,9 +86,9 @@ def neuronpedia_settings(cfg) -> dict:
         "max_uncompressed_bytes",
     ):
         if type(values[key]) is not int or values[key] < 1:
-            raise ValueError(f"task.neuronpedia.{key} must be a positive integer")
+            raise ValueError(f"task.capture.neuronpedia.{key} must be a positive integer")
     if not isinstance(values["cache_dir"], str) or not values["cache_dir"].strip():
-        raise ValueError("task.neuronpedia.cache_dir must be a path")
+        raise ValueError("task.capture.neuronpedia.cache_dir must be a path")
     if any(
         os.environ.get(key, "").lower() in {"1", "true", "yes"}
         for key in ("HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE", "HF_DATASETS_OFFLINE")
@@ -95,28 +98,31 @@ def neuronpedia_settings(cfg) -> dict:
 
 
 def capture_mode(cfg):
-    mode = cfg.get("task", {}).get("mode", "non_whiten")
+    task = cfg.get("task", {})
+    mode = task_value(task, "mode", "non_whiten")
     if not isinstance(mode, str) or mode not in {"non_whiten", "whiten", "sar", "g_s", "I", "rss"}:
-        raise ValueError("task.mode must be non_whiten, whiten, g_s, sar, I or rss")
-    size = cfg.get("task", {}).get("whiten_chunk_size", 256)
+        raise ValueError("task.capture.mode must be non_whiten, whiten, g_s, sar, I or rss")
+    size = task_value(task, "whiten_chunk_size", 256)
     if type(size) is not int or size < 1:
-        raise ValueError("task.whiten_chunk_size must be a positive integer")
-    raw = cfg.get("task", {}).get("sar", {})
+        raise ValueError("task.capture.whiten_chunk_size must be a positive integer")
+    raw = capture_section(task, "sar")
     if mode == "sar" and raw.get("algorithm", "surrogate") != "surrogate":
         raise ValueError(
-            "mode=sar is the regression method; use task.mode=I for exhaustive interaction"
+            "mode=sar is the regression method; use task.capture.mode=I for exhaustive interaction"
         )
     if mode == "I":
-        maximum = raw.get("max_exhaustive_features", 16)
+        from tasks.capture.selection import active_whiten
+
+        maximum = capture_section(task, "i").get("max_exhaustive_features", 16)
         if type(maximum) is not int or maximum < 2:
-            raise ValueError("task.sar.max_exhaustive_features must be an integer >= 2")
-        limit = cfg.task.get("filter")
-        if type(limit) is int and not 2 <= limit <= maximum:
-            raise ValueError("mode=I requires 2 <= task.filter <= max_exhaustive_features")
+            raise ValueError("task.capture.i.max_exhaustive_features must be an integer >= 2")
+        limit = capture_section(task, "selection").get("candidate_count")
+        if type(limit) is int and not active_whiten(task) and not 2 <= limit <= maximum:
+            raise ValueError(
+                "mode=I requires 2 <= task.capture.selection.candidate_count <= max_exhaustive_features"
+            )
     if mode in {"g_s", "I"}:
-        if raw.get("readout", "answer_mean_logprob") != "answer_mean_logprob":
-            raise ValueError("g_s and I require answer_mean_logprob")
-        if raw.get("answer_backend", "full_sequence") not in {
+        if capture_section(task, "answer").get("backend", "full_sequence") not in {
             "full_sequence",
             "full_context_tail",
             "auto",
@@ -128,27 +134,30 @@ def capture_mode(cfg):
 def capture_top_feature_num(cfg: Any) -> int | None:
     """Validate the requested feature count before loading model resources."""
     if "top_k" in cfg.task:
-        raise ValueError("task.top_k was renamed to task.top_feature_num")
+        raise ValueError("task.top_k was renamed to task.capture.output.feature_count")
+    # The original single-count API required a positive integer when used alone.
+    task = cfg.task
     if (
-        "filter" in cfg.task
-        or "capture_count" in cfg.task
-        or cfg.task.get("mode") == "g_s"
-        or cfg.task.get("mode") == "I"
+        "top_feature_num" in task
+        and "capture" not in task
+        and "filter" not in task
+        and "capture_count" not in task
+        and task_value(task, "mode") not in {"g_s", "I"}
     ):
-        from tasks.capture.selection import settings
+        count = task.top_feature_num
+        if type(count) is not int or count < 1:
+            raise ValueError("task.top_feature_num must be a positive integer")
+        return count
+    from tasks.capture.selection import settings
 
-        value = settings(cfg)["capture_count"]
-        return None if value == "all" else value
-    value = cfg.task.get("top_feature_num", 10)
-    if type(value) is not int or value < 1:
-        raise ValueError("task.top_feature_num must be a positive integer")
-    return value
+    value = settings(cfg)["capture_count"]
+    return None if value == "all" else value
 
 
 def input_identity(pair, snapshot, prompt: str, cfg: Any) -> dict[str, Any] | None:
     """Describe measured inputs; unsupported custom state remains explicitly unknown."""
     from saebase.store import fingerprint
-    from tasks.sae_runtime import pair_state_fingerprints
+    from saebase.runtime.sae_operations import pair_state_fingerprints
     from models.numerics import identity as numerical_identity
 
     try:
@@ -181,7 +190,7 @@ def input_identity(pair, snapshot, prompt: str, cfg: Any) -> dict[str, Any] | No
         return None
 
 
-def _capture(
+def _capture_features(
     cfg: Any,
     *,
     pair=None,
@@ -210,7 +219,7 @@ def _capture(
 
     pair = _pair(cfg) if pair is None else pair
     prompt = _prompt(cfg) if prompt is None else prompt
-    if cfg.task.get("output_scope", "last_token") == "all_tokens":
+    if task_value(cfg.task, "output_scope", "last_token") == "all_tokens":
         from tasks.capture.explore import capture_prompt_result
 
         return capture_prompt_result(cfg, pair, prompt, sample)
@@ -232,20 +241,37 @@ def _capture(
         if mode != "non_whiten":
             top_ids = white_ids
             active_ids.sort(key=lambda index: (-abs(float(whitened[index])), index))
-    from tasks.capture.selection import candidate_ids, output_count, prepare_filter, settings
+    from tasks.capture.selection import (
+        active_whiten,
+        candidate_ids,
+        output_count,
+        prepare_filter,
+        settings,
+        undefined_reason,
+    )
 
     selection = settings(cfg)
     exhaustive = mode == "I"
     modern = selection["explicit"] or mode == "g_s" or exhaustive
     candidates = top_ids
+    shared_selection = active_whiten(cfg.task)
+    candidate_shortfall = None
     if modern:
         sar_context = prepare_filter(cfg) if sar_context is None else sar_context
         with stage("candidate_filter_and_ranking"):
             candidates = candidate_ids(cfg, pair, codes, normalization, sar_context, options)
-        top_ids = candidates[: output_count(cfg, len(candidates))]
+        display = (
+            sorted(candidates, key=lambda index: (-abs(float(codes[index])), index))
+            if shared_selection and mode == "non_whiten"
+            else candidates
+        )
+        top_ids = display[: output_count(cfg, len(display))]
+        minimum = 2 if mode in {"I", "sar"} else 1
+        if shared_selection and len(candidates) < minimum:
+            candidate_shortfall = f"{mode} requires at least {minimum} eligible active features; found {len(candidates)}"
     sar = None
     single = None
-    if exhaustive or mode == "g_s":
+    if candidate_shortfall is None and (exhaustive or mode == "g_s"):
         from tasks.capture.measure_behavior import measure_behavior
 
         measured = measure_behavior(
@@ -256,12 +282,13 @@ def _capture(
             top_ids = [item["feature_id"] for item in single["top_features"]]
         else:
             sar = measured
+            candidates = sar["feature_ids"]
             top_ids = list(
                 dict.fromkeys(
                     index for item in sar["pairwise"]["top_pairs"] for index in item["feature_ids"]
                 )
             )
-    elif mode == "sar":
+    elif candidate_shortfall is None and mode == "sar":
         from tasks.capture.sar_mode import measure_sar, prepare_sar
         from tasks.capture.sar_filter import select_features
 
@@ -321,10 +348,10 @@ def _capture(
         for item in sar["pairwise"]["top_pairs"]:
             item["features"] = [feature(i) for i in item["feature_ids"]]
             item["interpretation"] = (
-                "固定其他候选背景下的实测四格交互g11−g10−g01+g00；每对取背景中的最大值。"
+                "Sets a four-temporal interaction in other candidate settings g11−g10−g01+g00;Maximum value per pair of background."
                 if exhaustive
-                else "二阶拟合中，两特征同时保留产生的额外贡献；正值提高目标行为评分，负值降低评分。"
-                "这是组合干预的拟合说明，特征本身的公开解释来自 Neuronpedia。"
+                else "In the second stage, the two characteristics are retained together with the additional contribution; positive value increases the target behaviour rating and negative value down the rating."
+                "It’s a description of the combination of interventions, and it’s a public explanation of the characteristics themselves. Neuronpedia."
             )
 
     work = [{"status": "completed"}]
@@ -354,10 +381,10 @@ def _capture(
             identity["g_s"] = single["identity"]
         if modern:
             identity["selection"] = selection
-    if mode == "whiten" and not top_ids:
+    if reason := undefined_reason({"candidate_shortfall": candidate_shortfall, "sar": sar or {}}):
+        work.append({"status": "undefined", "reason": reason})
+    elif mode == "whiten" and not top_ids:
         work.append({"status": "undefined", "reason": "All features have zero population variance"})
-    if sar is not None and sar["status"] == "undefined":
-        work.append({"status": "undefined", "reason": "SAR coalition behavior has zero variance"})
     filter_artifacts = [
         sar_context[key]["artifact"]
         for key in ("feature_filter_identity", "cohort_filter_identity")
@@ -398,9 +425,12 @@ def _capture(
         else "absolute_native_activation",
         "selection": selection,
         "candidate_feature_ids": candidates,
+        **({"candidate_shortfall": candidate_shortfall} if candidate_shortfall else {}),
         "feature_filter": sar_context.get("feature_filter_identity") if sar_context else None,
         "cohort_filter": sar_context.get("cohort_filter_identity") if sar_context else None,
-        "ranking_status": "undefined" if mode == "whiten" and not top_ids else "defined",
+        "ranking_status": "undefined"
+        if candidate_shortfall or (mode == "whiten" and not top_ids)
+        else "defined",
         "normalization": normalization.identity if normalization is not None else None,
         "capture_format_version": 2,
         "status": "executed",
@@ -423,21 +453,43 @@ def _capture(
     }
 
 
+def _capture(cfg, *, pair=None, prompt=None, model_answer=None, **kwargs):
+    """Every task-level feature observation includes the unedited continuation."""
+    from tasks.capture.model_answer import answers, attach
+
+    pair = _pair(cfg) if pair is None else pair
+    prompt = _prompt(cfg) if prompt is None else prompt
+    from saebase.runtime.sae_operations import loaded_pair_session
+
+    with loaded_pair_session(pair):
+        result = _capture_features(cfg, pair=pair, prompt=prompt, **kwargs)
+        answer = answers(cfg, pair, [prompt])[0] if model_answer is None else model_answer
+        return attach(result, answer)
+
+
 def execute(cfg: Any) -> dict[str, Any]:
+    from tasks.capture.model_answer import settings as answer_settings
+
+    answer_settings(cfg)
     mode = capture_mode(cfg)
     if mode == "rss":
         from tasks.capture.rss_mode import execute as execute_rss
 
         return execute_rss(cfg)
-    scope = cfg.task.get("output_scope", "last_token")
+    scope = task_value(cfg.task, "output_scope", "last_token")
     if scope not in {"last_token", "all_tokens"}:
         raise ValueError("output_scope must be last_token or all_tokens")
     if scope == "all_tokens" and mode != "non_whiten":
         raise ValueError("all_tokens currently records native activations; choose mode=non_whiten")
-    if scope == "all_tokens" and cfg.task.get("filter", "all") != "all":
-        raise ValueError("all_tokens records native sparse codes; use task.filter=all")
+    if (
+        scope == "all_tokens"
+        and capture_section(cfg.task, "selection").get("candidate_count", "all") != "all"
+    ):
+        raise ValueError(
+            "all_tokens records native sparse codes; use task.capture.selection.candidate_count=all"
+        )
     if scope == "all_tokens":
-        from tasks.sae_runtime import validate_fields
+        from saebase.runtime.sae_operations import validate_fields
 
         validate_fields(cfg, integers=(("max_tokens", 1), ("max_active_per_token", 1)))
     capture_top_feature_num(cfg)
@@ -469,8 +521,11 @@ def execute(cfg: Any) -> dict[str, Any]:
 
 def validate_cfg(cfg: Any) -> None:
     """Validate this Task at its input boundary, before resource loading."""
-    from tasks.sae_runtime import validate_sae_selection
+    from saebase.runtime.sae_operations import validate_sae_selection
 
+    from tasks.capture.model_answer import settings as answer_settings
+
+    answer_settings(cfg)
     mode = capture_mode(cfg)
     if mode == "rss":
         from tasks.capture.rss_mode import settings
@@ -490,8 +545,6 @@ def validate_cfg(cfg: Any) -> None:
     if mode in {"g_s", "I"}:
         from tasks.capture.sar_mode import behavior
 
-        if cfg.task.get("sar", {}).get("readout", "answer_mean_logprob") != "answer_mean_logprob":
-            raise ValueError("g_s and I require answer_mean_logprob")
         if str(cfg.task.get("prompt", "") or "").strip():
             behavior(cfg)
     from tasks.capture.selection import prepare_filter, needs_normalization
@@ -499,7 +552,10 @@ def validate_cfg(cfg: Any) -> None:
     if (
         mode == "whiten"
         or needs_normalization(cfg, prepare_filter(cfg))
-        or (mode == "sar" and cfg.task.sar.get("feature_selection") == "whiten")
+        or (
+            mode == "sar"
+            and capture_section(cfg.task, "selection").get("feature_selection") == "whiten"
+        )
         or not str(cfg.task.get("prompt", "") or "").strip()
     ):
         from saebase.datasets.selection import validate_selection

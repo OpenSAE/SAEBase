@@ -1,0 +1,32 @@
+# Purpose: select interpreters and define shared input and run defaults.
+# Scope: local model launches and Hydra runtime composition.
+
+environments:
+  # Pilot interpreter and identified key dependent version; by Runtime Harmonization of selection and inspection.
+  default:
+    python: /venv/main/bin/python
+    packages:
+      torch: 2.11.0+cu128
+      transformers: 4.57.6
+      huggingface-hub: 0.36.2
+      tokenizers: 0.22.2
+  models:
+    qwen35_9b: &qwen35
+      python: /workspace/envs/saebase/qwen35/bin/python
+      packages:
+        torch: 2.11.0+cu128
+        transformers: 5.23.0
+        huggingface-hub: 1.33.0
+        tokenizers: 0.23.3
+      architectures: [qwen3_5]
+    qwen35_4b: *qwen35
+    qwen35_2b: *qwen35
+    qwen35_27b: *qwen35
+
+paths:
+  root: ${hydra:runtime.cwd}
+  data_dir: ${paths.root}/data
+
+experiment:
+  sub_name: null
+  run_id: null

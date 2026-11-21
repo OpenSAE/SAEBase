@@ -16,6 +16,7 @@ import tarfile
 import tempfile
 from pathlib import Path, PurePosixPath
 
+from conf import read_configuration
 from tasks.benchmark.results.evidence import (
     EVIDENCE,
     ROOT,
@@ -30,12 +31,12 @@ SNAPSHOT = "stage-d-evidence-20261016"
 MANIFEST_NAME = "BUNDLE_MANIFEST.json"
 
 SUPPORT_FILES = (
-    Path("conf/coverage/stage_bc.json"),
-    Path("conf/coverage/stage_b_cpu_verified.json"),
-    Path("conf/coverage/stage_c_cpu_verified.json"),
-    Path("conf/coverage/stage_d_population.jsonl"),
-    Path("doc/code/development/verified-model-matrix.md"),
-    Path("doc/code/development/stage-d-evidence-archive.md"),
+    Path("conf/tasks/benchmark/task.yaml"),
+    Path("assets/history_experiment/benchmark_evidence/files/stage_b_cpu_verified.json"),
+    Path("assets/history_experiment/benchmark_evidence/files/stage_c_cpu_verified.json"),
+    Path("assets/dataset_cohorts/stage_d/files/stage_d_population.jsonl"),
+    Path("doc/code/documentation/source/development/verified-model-matrix.md"),
+    Path("doc/code/documentation/source/development/stage-d-evidence-archive.md"),
     Path("tasks/benchmark/results/archive.py"),
     Path("tasks/benchmark/results/evidence.py"),
 )
@@ -76,7 +77,7 @@ def verify_checksums(root: Path) -> int:
 def verify_compact(root: Path = ROOT) -> dict:
     root = root.resolve()
     n_hashed = verify_checksums(root)
-    cat = json_obj(root / "conf/coverage/stage_bc.json")
+    cat = read_configuration(root / "conf/tasks/benchmark/task.yaml#site_catalog")
     final = json_obj(root / EVIDENCE / "final/stage_d_final_matrix.json")
     status = json_obj(root / EVIDENCE / "status.json")
     raw = json_obj(root / EVIDENCE / "final/raw_run_archive_index.json")

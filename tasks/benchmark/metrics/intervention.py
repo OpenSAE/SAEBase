@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 
-from tasks.intervene.backend import read_results
+from tasks.intervene.editing import read_results
 
 
 def calculate_interventions(path, identity, *, conditions):

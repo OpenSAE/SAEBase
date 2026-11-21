@@ -1,0 +1,15 @@
+# @package _global_
+# Each task is model/dataset independent; compose selections through Hydra.
+task:
+  name: circuits
+  extensions: []  # Explicit installed entry-point names; no automatic discovery.
+  execute: false
+  sae_key: null
+  layer: null
+  device: auto
+  prompt: ''
+  timeout_seconds: 1800
+  circuits:
+    approved: false
+    transcoder_set: gemma
+    slug: gemma2b-trace

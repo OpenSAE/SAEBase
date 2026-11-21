@@ -1,6 +1,6 @@
 """SAEBase train sae task."""
 
-from tasks.sae_runtime import SAEOperationTask
+from saebase.runtime.sae_operations import SAEOperationTask
 
 
 class TrainTask(SAEOperationTask):

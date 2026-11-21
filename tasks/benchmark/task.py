@@ -5,8 +5,10 @@ The selected evaluation owns its numerical and artifact protocol.
 
 from __future__ import annotations
 
+from saebase.runtime.configuration.task_options import task_value
+
 from saebase.results import EvaluationResult
-from tasks.sae_runtime import SAEOperationTask
+from saebase.runtime.sae_operations import SAEOperationTask
 
 
 class BenchmarkTask(SAEOperationTask):
@@ -14,11 +16,11 @@ class BenchmarkTask(SAEOperationTask):
     supports_multiple_models = True
 
     def supports_run_resume(self, cfg) -> bool:
-        return cfg.task.get("evaluation") != "activation_health"
+        return task_value(cfg.task, "evaluation") != "activation_health"
 
     def validate_cfg(self, cfg) -> None:
         super().validate_cfg(cfg)
-        if cfg.task.get("evaluation") == "activation_health":
+        if task_value(cfg.task, "evaluation") == "activation_health":
             from saebase.registry import get_prompt_source_plugin, get_sae_plugin
 
             for group in ("prompt_source", "sae", "evaluation"):
@@ -35,11 +37,13 @@ class BenchmarkTask(SAEOperationTask):
         return compare_benchmark_runs(left, right, pairs=pairs)
 
     def run_validated(self, cfg) -> EvaluationResult:
-        if cfg.task.get("evaluation") == "activation_health":
+        if task_value(cfg.task, "evaluation") == "activation_health":
+            if not cfg.task.get("execute", False):
+                return super().run_validated(cfg)
             from tasks.benchmark.metrics.health import run_activation_health
 
             return run_activation_health(cfg)
-        configured = cfg.task.get("benchmark_config") or cfg.task.get("protocol") is not None
+        configured = task_value(cfg.task, "benchmark_config") or task_value(cfg.task, "protocol") is not None
         if configured and not cfg.task.get("execute", False):
             from saebase.runtime.experiment_paths import run_components
             from tasks.benchmark.operation import configured_benchmark, resolved_protocol

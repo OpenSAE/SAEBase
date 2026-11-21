@@ -1,8 +1,20 @@
-# 目的和主要功能：在提交时检查实际变更的 Python 文件。
-# 适用范围：安装 pre-commit 后按文件范围执行格式与类型检查。
+# Purpose and main function: to check actual changes when submitting Python File.
+# Scope of application: installation pre-commit then check by format and type of document range.
 repos:
   - repo: local
     hooks:
+      - id: synchronize-conf-doc
+        name: Validate configuration paths and update doc/conf.md
+        entry: python -m scripts.documentation conf --write
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: check-conf
+        name: Check configuration structure, keys and documentation
+        entry: python -m pytest -q -p no:cacheprovider tests/test_configuration.py
+        language: system
+        pass_filenames: false
+        always_run: true
       - id: ruff-adopted
         name: Ruff on adopted core modules
         entry: ruff check

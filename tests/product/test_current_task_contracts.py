@@ -7,7 +7,7 @@ from types import SimpleNamespace
 import pytest
 from omegaconf import OmegaConf
 from saebase.results import EvaluationResult
-from saebase.runtime.cfg.config_validate import validate_hydra_cfg
+from saebase.runtime.configuration.config_validate import validate_hydra_cfg
 
 
 def config(task="capture"):

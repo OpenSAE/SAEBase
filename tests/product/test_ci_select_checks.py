@@ -26,7 +26,7 @@ def test_main_push_uses_union_not_one_category():
         [
             "tasks/capture/operation.py",
             "harness/core/agent_flow.py",
-            "doc/knowledge/glossary.json",
+            "doc/code/atlas_site/source/knowledge/glossary.json",
             "pyproject.toml",
         ]
     )
@@ -47,7 +47,7 @@ def test_docs_only_do_not_install_analysis():
     assert not any(
         classify(["README.md", "AGENTS.md", ".agents/skills/add-task/SKILL.md"]).values()
     )
-    docs = classify(["doc/code/development/note.md"])
+    docs = classify(["doc/code/documentation/source/development/note.md"])
     assert not any(docs.values())
 
 

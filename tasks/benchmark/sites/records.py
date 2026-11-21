@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
+from conf import read_configuration
 from saebase.api.sae_profiles import get_profile
 from tasks.benchmark.results.metrics import atomic_json
 from tasks.benchmark.sites.catalog import (
@@ -37,7 +38,7 @@ def write_site_evaluation_targets(
     """Materialize the Stage D overlay from the B/C catalog."""
     if catalog is None:
         root = Path(__file__).resolve().parents[3]
-        catalog = load_coverage(root / "conf" / "coverage" / "stage_bc.json")
+        catalog = load_coverage(root / "conf/tasks/benchmark/task.yaml#site_catalog")
     records = build_site_records(catalog)
     payload = {
         "schema": SCHEMA_TARGETS,
@@ -57,7 +58,7 @@ def write_site_evaluation_targets(
 
 
 def load_site_evaluation_targets(path: Path) -> list[SiteRecord]:
-    raw = json.loads(path.read_text(encoding="utf-8"))
+    raw = read_configuration(path)
     if raw.get("schema") != SCHEMA_TARGETS:
         raise ValueError("invalid stage_d_targets schema")
     records = [SiteRecord.from_dict(x) for x in raw["sites"]]
@@ -94,7 +95,7 @@ def rebuild_canonical_status(
     """Rewrite status.json to exactly the 48 catalog keys; archive extras."""
     if records is None:
         root = Path(__file__).resolve().parents[3]
-        records = build_site_records(load_coverage(root / "conf" / "coverage" / "stage_bc.json"))
+        records = build_site_records(load_coverage(root / "conf/tasks/benchmark/task.yaml#site_catalog"))
     expected = {r.key.id: r for r in records}
     if len(expected) != 48:
         raise ValueError(f"expected 48 sites, got {len(expected)}")

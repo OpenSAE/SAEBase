@@ -35,7 +35,7 @@ jobs:
           saebase-check-env --mode analysis
       - name: Require frozen checkpoint reference for activation caches and intervention measurements
         if: matrix.suite != 'reference'
-        run: test -f tests/product/fixtures/m0_reference_public.json
+        run: test -f tests/fixtures/m0_reference_public.json
       - name: Run original real-checkpoint acceptance
         shell: bash
         env:
@@ -52,13 +52,13 @@ jobs:
               ;;
             activation-cache)
               python -m tests.product.test_activation_store \
-                --reference tests/product/fixtures/m0_reference_public.json \
+                --reference tests/fixtures/m0_reference_public.json \
                 --cache-root "$RUNNER_TEMP/activation-cache-store" \
                 --output "$RUNNER_TEMP/activation-cache-results/activation_cache.json"
               ;;
             interventions)
               python -m tests.product.test_feature_interventions \
-                --reference tests/product/fixtures/m0_reference_public.json \
+                --reference tests/fixtures/m0_reference_public.json \
                 --cache-root "$RUNNER_TEMP/interventions-cache" \
                 --output "$RUNNER_TEMP/interventions-results/intervention_measurements.json"
               ;;

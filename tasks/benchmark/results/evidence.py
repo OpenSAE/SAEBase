@@ -11,9 +11,11 @@ import json
 import re
 from pathlib import Path, PurePosixPath
 
+from conf import read_configuration
+
 ROOT = Path(__file__).resolve().parents[3]
 
-EVIDENCE = Path("conf/coverage/stage_d_evidence")
+EVIDENCE = Path("assets/history_experiment/benchmark_evidence/files/stage_d_evidence")
 
 
 def digest(path: Path) -> str:
@@ -47,7 +49,7 @@ def _relative_file(root: Path, relative: str) -> Path:
     return path
 
 
-CATALOG = ROOT / "conf" / "coverage" / "stage_bc.json"
+CATALOG = ROOT / "conf/tasks/benchmark/task.yaml#site_catalog"
 
 
 def _mean_from_metrics(
@@ -205,7 +207,7 @@ def site_main(argv=None) -> int:
     return 0
 
 
-EVIDENCE_REL = Path("conf/coverage/stage_d_evidence")
+EVIDENCE_REL = Path("assets/history_experiment/benchmark_evidence/files/stage_d_evidence")
 
 
 def _evidence_file(root: Path, rel: str) -> Path:
@@ -315,7 +317,7 @@ def validate_data(catalog: dict, final: dict, status: dict, root: Path) -> dict:
 
 def load_support(root: Path = ROOT) -> dict:
     return validate_data(
-        json_obj(root / "conf/coverage/stage_bc.json"),
+        read_configuration(root / "conf/tasks/benchmark/task.yaml#site_catalog"),
         json_obj(root / EVIDENCE_REL / "final/stage_d_final_matrix.json"),
         json_obj(root / EVIDENCE_REL / "status.json"),
         root,

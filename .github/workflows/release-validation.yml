@@ -1,5 +1,5 @@
-# 目的和主要功能：验证指定源码提交的软件功能、安装与发布产物。
-# 适用范围：明确选择当前 main 提交的手动发布验证任务。
+# Purpose and main function: Validation of software functionality, installation and release products submitted by the specified source code.
+# Scope of application: clear selection of current main Submitted Manually Launch Authentication Tasks.
 name: Release Validation
 permissions:
   contents: read
@@ -59,8 +59,7 @@ jobs:
     - name: Install local integration test dependencies
       run: python -m pip install -e ".[dev]"
     - name: Check local integration adapters without rebuilding Atlas
-      run: |-
-        python -m pytest -q tests/codex tests/integration
+      run: python -m pytest -q tests/integration
   offline-tests:
     needs: source-verify
     runs-on: ubuntu-latest
@@ -114,7 +113,7 @@ jobs:
         saebase-check-env --mode core
         python -c "from saebase.api.sae_profiles import list_profiles; print([p.key for p in list_profiles()])"
     - name: Run offline public API example
-      run: python -m pytest -q tests/product/test_reference_sae_contracts.py -k nonfinal_position
+      run: python -m pytest -q tests/product/model_adapters/test_reference_sae_contracts.py -k nonfinal_position
     - name: Run persistent first experiment and reliability audit
       run: python scripts/examples/first_experiment.py --output "$RUNNER_TEMP/saebase-first-experiment"
     - name: Run external extension demo without model downloads
@@ -157,7 +156,9 @@ jobs:
         cache: pip
         cache-dependency-path: pyproject.toml
     - name: Install build tools
-      run: python -m pip install build twine
+      run: python -m pip install build twine "PyYAML>=6" "pytest>=7"
+    - name: Require synchronized configuration before packaging
+      run: python -m pytest -q tests/test_configuration.py
     - name: Build wheel and source distribution
       run: python -m build
     - name: Verify archives and metadata
@@ -215,13 +216,13 @@ jobs:
     - name: Install scoped development quality tools
       run: python -m pip install -e ".[dev,quality]"
     - name: Ruff on adopted modules
-      run: ruff check saebase/seed.py datasets/artifacts.py datasets/artifacts.py tasks/benchmark/metrics/registry.py
+      run: ruff check base/application/seed.py datasets/prompt_collection/artifacts.py datasets/prompt_collection/artifacts.py tasks/benchmark/metrics/registry.py
     - name: Check maintained task adapter formatting
       run: |
         ruff check tasks/generate/conditions.py tasks/capture/explore.py tasks/benchmark/methods/saebench_worker.py
         ruff format --check tasks/generate/conditions.py tasks/capture/explore.py tasks/benchmark/methods/saebench_worker.py
     - name: Mypy on adopted modules
-      run: mypy --config-file pyproject.toml saebase/seed.py datasets/artifacts.py datasets/artifacts.py tasks/benchmark/metrics/registry.py
+      run: mypy --config-file pyproject.toml base/application/seed.py datasets/prompt_collection/artifacts.py datasets/prompt_collection/artifacts.py tasks/benchmark/metrics/registry.py
     - name: Enforce lint and formatting on new Python files
       shell: bash
       env:

@@ -1,5 +1,8 @@
 """Capture one clean target and its context variants with the original RSS selector."""
 
+from saebase.runtime.configuration.task_options import task_value
+
+from tasks.capture.configuration import capture_section
 from pathlib import Path
 import hashlib
 import runpy
@@ -15,9 +18,9 @@ DEFAULTS = {"M": 400, "K": 20, "rho": 0.8, "kappa": 0.8, "tau": 1e-5}
 
 
 def settings(cfg):
-    from tasks.sae_runtime import input_path
+    from saebase.runtime.sae_operations import input_path
 
-    raw = cfg.task.get("rss", {})
+    raw = capture_section(cfg.task, "rss")
     source = raw.get("source")
     contexts = list(raw.get("contexts", []))
     if (
@@ -26,26 +29,35 @@ def settings(cfg):
         or not all(isinstance(x, str) and x.strip() for x in contexts)
     ):
         raise ValueError(
-            "mode=rss requires task.rss.source and at least two nonempty task.rss.contexts"
+            "mode=rss requires task.capture.rss.source and at least two nonempty task.capture.rss.contexts"
         )
     if not str(cfg.task.get("prompt", "") or "").strip():
         raise ValueError("mode=rss requires an explicit task.prompt for the shared target")
     if (
-        cfg.task.get("filter", "all") != "all"
-        or cfg.task.get("output_scope", "last_token") != "last_token"
+        capture_section(cfg.task, "selection").get("candidate_count", "all") != "all"
+        or task_value(cfg.task, "output_scope", "last_token") != "last_token"
     ):
         raise ValueError(
-            "RSS captures complete last-token codes; set task.filter=all and output_scope=last_token"
+            "RSS captures complete last-token codes; set task.capture.selection.candidate_count=all and output_scope=last_token"
         )
     return {
         "source": input_path(source),
         "contexts": contexts,
         "parameters": {k: raw.get(k, v) for k, v in DEFAULTS.items()},
-        "dominance_ratio": float(raw.get("dominance_ratio", 5.0)),
+        "dominance_ratio": float(raw.get("report", {}).get("dominance_ratio", 5.0)),
     }
 
 
-def measure(pair, prompt, contexts, source, parameters=None, dominance_ratio=5.0, variants=None):
+def measure(
+    pair,
+    prompt,
+    contexts,
+    source,
+    parameters=None,
+    dominance_ratio=5.0,
+    variants=None,
+    clean_snapshot=None,
+):
     """Select purely from activations before any explanation lookup."""
     parameters = dict(DEFAULTS if parameters is None else parameters)
     source = Path(source)
@@ -56,9 +68,13 @@ def measure(pair, prompt, contexts, source, parameters=None, dominance_ratio=5.0
     raw_model = getattr(pair.model.model, "_model", pair.model.model)
     raw_model.eval()
     with torch.inference_mode():
-        snapshots = [
-            capture_features(pair.model, pair.sae, site=pair.site, prompt=p)
-            for p in [prompt, *variants]
+        base = (
+            clean_snapshot
+            if clean_snapshot is not None
+            else capture_features(pair.model, pair.sae, site=pair.site, prompt=prompt)
+        )
+        snapshots = [base] + [
+            capture_features(pair.model, pair.sae, site=pair.site, prompt=p) for p in variants
         ]
     codes = np.stack([s.codes.detach().float().cpu().numpy() for s in snapshots])
     delta = codes[1:] - codes[0]
@@ -145,11 +161,19 @@ def annotate(pair, result, options):
 
 
 def markdown(result):
-    lines = ["# RSS 对照案例", "", f"Clean：{result['clean_prompt']}", ""]
+    lines = ["# RSS Contrast cases", "", f"Clean:{result['clean_prompt']}", ""]
     lines += [f"- V{i}: {p}" for i, p in enumerate(result["variants"], 1)]
+    lines += ["", "Model Original Answer:", "", result.get("model_answer", {}).get("text", "Not Generated")]
+    for i, answer in enumerate(result.get("variant_model_answers", []), 1):
+        lines += [
+            "",
+            f"V{i} Model Original Answer({answer['status']}):",
+            "",
+            answer.get("text", str(answer.get("error", ""))),
+        ]
     lines += [
         "",
-        "## 表 A：原始 RSS 选中的全部特征",
+        "## Table A:Original RSS All Selected Features",
         "",
         "| Feature | ΔV1 | ΔV2 | ΔV3 | ΔV4 | ΔV5 | recurrence | Neuronpedia explanation |",
         "| --- | --- | --- | --- | --- | --- | --- | --- |",
@@ -157,21 +181,21 @@ def markdown(result):
     lines += [feature_row(r) for r in result["rss_features"]]
     lines += [
         "",
-        "## 表 B 候选：激活集中于一个变体且 recurrence < 0.8",
+        "## Table B Candidate: Activation focused on one variant and recurrence < 0.8",
         "",
-        "所有未选中特征中按该变体的绝对变化排序，要求本变体增加 > tau 且至少为其他变体最大变化的五倍。候选尚需根据解释判断语义；微小变化照实保留，不能仅凭比例当成强响应。",
+        "All unselected features are sorted by the absolute change of the variant, requiring this variant to be added > tau The candidate needs to judge the semantics based on the interpretation..",
         "",
     ]
     for group in result["context_candidates"]:
         lines += [
-            f"### V{group['variant']}：{group['context']}",
+            f"### V{group['variant']}:{group['context']}",
             "",
             "| Feature | ΔV1 | ΔV2 | ΔV3 | ΔV4 | ΔV5 | recurrence | Neuronpedia explanation |",
             "| --- | --- | --- | --- | --- | --- | --- | --- |",
         ]
         lines += [feature_row(r) for r in group["features"]]
         if not group["features"]:
-            lines += ["", "无符合数值条件的候选。"]
+            lines += ["", "No candidate with numerical criteria."]
         lines += [""]
     return "\n".join(lines) + "\n"
 
@@ -179,7 +203,7 @@ def markdown(result):
 def feature_row(row):
     annotation = row.get("annotation", {})
     descriptions = (
-        "; ".join(e["description"] for e in annotation.get("explanations", [])) or "暂无解释"
+        "; ".join(e["description"] for e in annotation.get("explanations", [])) or "There’s no explanation."
     )
     descriptions = descriptions.replace("|", "\\|").replace("\n", " ")
     values = " | ".join(f"{x:+.6g}" for x in row["delta"])
@@ -190,12 +214,21 @@ def feature_row(row):
 
 
 def execute(cfg):
-    from tasks.sae_runtime import _pair, _prompt
+    from saebase.runtime.sae_operations import _pair, _prompt
     from tasks.capture.operation import neuronpedia_settings
 
     options = settings(cfg)
     pair = _pair(cfg)
     result, codes, delta = measure(pair, _prompt(cfg), **options)
+    from saebase.runtime.sae_operations import pair_state_fingerprints, _fingerprint_prompt
+
+    model_sha, _ = pair_state_fingerprints(pair)
+    result["input_identity"] = {"model_sha256": model_sha}
+    result["prompt_sha256"] = _fingerprint_prompt(result["clean_prompt"])
+    from tasks.capture.model_answer import answers, attach
+
+    continuations = answers(cfg, pair, [result["clean_prompt"], *result["variants"]])
+    result["variant_model_answers"] = continuations[1:]
     np.savez_compressed("rss_activations.npz", clean=codes[0], variants=codes[1:], delta=delta)
     write_json(Path("rss_case.json"), result)
     annotate(pair, result, neuronpedia_settings(cfg))
@@ -219,6 +252,12 @@ def execute(cfg):
         ],
         unit="capture and annotation",
     )
+    attach(result, continuations[0], extra_answers=continuations[1:])
+    from tasks.capture.model_answer import summary as answer_summary
+
+    result["stages"]["variant_model_answers"] = answer_summary(continuations[1:])
+    write_json(Path("rss_case.json"), result)
+    Path("rss_case.md").write_text(markdown(result))
     result["required_artifacts"] = [
         {"path": p} for p in ("rss_case.json", "rss_case.md", "rss_activations.npz")
     ]

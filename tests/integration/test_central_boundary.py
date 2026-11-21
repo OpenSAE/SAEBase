@@ -20,22 +20,22 @@ def check_central(action, root=ROOT, *, expected_engine=None):
     if not central_root and binding.is_file():
         central_root = json.loads(binding.read_text())["harness_root"]
     if not central_root:
-        raise RuntimeError("请通过 RH_HARNESS_ROOT 或 .researchharness/central.json 指定中央工作区")
+        raise RuntimeError("Please pass. RH_HARNESS_ROOT or .researchharness/central.json Assign Central Workspaces")
     try:
         from harness.central import load_harness
         from harness.cli import main
     except ImportError as exc:
-        raise RuntimeError("当前环境尚未安装 ResearchHarness，中央查询需要该程序") from exc
+        raise RuntimeError("The current environment is not installed ResearchHarness,Central query requires this program") from exc
     if expected_engine is not None:
         from harness.runtime import engine_identity
 
         expected = json.loads(Path(expected_engine).read_text())
         if engine_identity() != expected:
-            raise RuntimeError("当前中央引擎与本次指定验收版本不一致")
+            raise RuntimeError("The current central engine is not in line with this specified acceptance version")
     context = load_harness(central_root)
     project = context.project("saebase")
     if project.root != root.resolve():
-        raise RuntimeError("中央登记的 SAEBase 路径与当前项目目录不同")
+        raise RuntimeError("Central registration SAEBase Different path to current project directory")
     args = ["--harness-root", str(context.root), "--project", project.project_id]
     return main(args + [action])
 
@@ -80,14 +80,14 @@ def test_active_workflows_call_existing_product_tests_and_no_retired_generators(
 
 def test_missing_central_workspace_fails_with_actionable_diagnostic(monkeypatch, tmp_path):
     monkeypatch.delenv("RH_HARNESS_ROOT", raising=False)
-    with pytest.raises(RuntimeError, match="指定中央工作区"):
+    with pytest.raises(RuntimeError, match="Assign Central Workspaces"):
         check_central("validate", root=tmp_path)
 
 
 def test_scientific_install_does_not_supply_management_engine(monkeypatch):
     monkeypatch.setenv("RH_HARNESS_ROOT", "/explicitly-provisioned-central")
     monkeypatch.setitem(sys.modules, "harness", None)
-    with pytest.raises(RuntimeError, match="尚未安装 ResearchHarness"):
+    with pytest.raises(RuntimeError, match="Not installed ResearchHarness"):
         check_central("validate")
 
 
@@ -131,5 +131,5 @@ def test_status_uses_current_engine_and_version_acceptance_is_explicit(tmp_path,
     assert calls[0][-1] == "status"
     expected = tmp_path / "engine.json"
     expected.write_text(json.dumps({"version": "selected-for-acceptance"}))
-    with pytest.raises(RuntimeError, match="指定验收版本不一致"):
+    with pytest.raises(RuntimeError, match="Discrepancies in assigned acceptance version"):
         check_central("status", root=tmp_path, expected_engine=expected)

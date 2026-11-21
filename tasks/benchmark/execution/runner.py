@@ -27,9 +27,9 @@ from saebase.store import (
 from tasks.benchmark.execution.planner import build_plan
 from tasks.benchmark.execution.schema import BenchmarkConfig
 from tasks.benchmark.methods.localization import parse_localization_options, run_localization
-from tasks.benchmark.methods.rss import run_rss
-from tasks.benchmark.methods.saebench import _import_saebench
-from tasks.benchmark.methods.sar import run_sar
+from tasks.benchmark.methods.stable_support import run_rss
+from tasks.benchmark.methods.sae_benchmark import _import_saebench
+from tasks.benchmark.methods.response_surface import run_sar
 from tasks.benchmark.metrics.core import calculate_core
 from tasks.benchmark.metrics.intervention import calculate_interventions
 from tasks.benchmark.metrics.reconstruction import loss_recovered, target_nll
@@ -37,7 +37,7 @@ from tasks.benchmark.metrics.registry import get_metric
 from tasks.benchmark.results.metrics import _metric, read_metrics, store_results
 from tasks.benchmark.results.report import write_report
 from tasks.benchmark.results.validation import validate_external_sources
-from tasks.intervene.backend import BatchEngine, ExperimentIdentity, ResultWriter, RunBudget
+from tasks.intervene.editing import BatchEngine, ExperimentIdentity, ResultWriter, RunBudget
 
 
 def _identity(config, target, model, sae):

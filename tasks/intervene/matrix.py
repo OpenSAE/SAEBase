@@ -7,6 +7,8 @@ cell/model cannot prevent independent peers from running. Status is persisted.
 
 from __future__ import annotations
 
+from saebase.runtime.configuration.task_options import task_owner
+
 import argparse
 import fcntl
 import hashlib
@@ -23,13 +25,38 @@ from saebase.runtime.experiment_results import write_json as save
 
 
 class FeatureTaskMatrix:
-    def __init__(self, config, root, report):
+    def __init__(self, config, root, report=None):
         self.config = Path(config).resolve()
         self.root = Path(root).resolve()
-        self.report = Path(report).resolve()
+        from saebase.runtime.experiment_paths import experiment_name, matrix_report
+
         self.plan = OmegaConf.load(self.config).matrix
-        self.tag = str(self.plan.tag)
+        self.tag = experiment_name(self.plan.tag)
+        self.selection_name = "feature_selection"
+        self.report = (
+            Path(report).resolve()
+            if report
+            else matrix_report(self.root, "intervene", self.tag)
+        )
+        self.ranking = str(self.plan.get("feature_ranking", "whiten"))
+        self.count = self.plan.get("feature_count", 10)
+        if self.ranking not in {"whiten", "non_whiten"} or type(self.count) is not int or self.count < 1:
+            raise ValueError("Feature matrix requires a supported ranking and positive feature_count")
+        self.intervention_value = float(self.plan.get("intervention_value", 0.0))
+        generation = self.plan.get("generation", {})
+        self.generation = {
+            "intervention": generation.get("intervention", "ablate"),
+            "max_new_tokens": generation.get("max_new_tokens", self.plan.get("max_new_tokens", 8)),
+            "temperature": generation.get("temperature", 0.0),
+        }
+        # Preserve the previous source candidate for older matrix recipes.
+        self.capture_source_tag = self.plan.get("capture_source_tag", "cohort_ranking")
         self.report.mkdir(parents=True, exist_ok=True)
+        save(self.report / "scope.json", {
+            "datasets": [str(load_group("dataset", alias).dataset.name) for alias in self.plan.datasets],
+            "models": [row.model for row in self.plan.models],
+            "tasks": list(self.plan.get("tasks", ["intervene", "generate"])),
+        })
         (self.report / "cells").mkdir(exist_ok=True)
         (self.report / "inputs").mkdir(exist_ok=True)
 
@@ -52,21 +79,21 @@ class FeatureTaskMatrix:
             ],
         )
         if operation == "capture":
-            cfg.task.mode = "whiten"
-            cfg.task.neuronpedia.enabled = False
-            cfg.task.neuronpedia.allow_network = False
+            task_owner(cfg.task).mode = self.ranking
+            cfg.task.capture.selection.candidate_count = self.count
+            cfg.task.capture.output.feature_count = self.count
+            task_owner(cfg.task).neuronpedia.enabled = False
+            task_owner(cfg.task).neuronpedia.allow_network = False
         else:
-            cfg.task.feature_selection = "capture_top"
-            cfg.task.feature_ranking = "whiten"
-            cfg.task.top_feature_num = 10
-            cfg.task.value = 0.0
-            cfg.task.inline_results = False
-            cfg.task.continue_on_error = True
-            cfg.task.reuse_prompt_observations = True
+            task_owner(cfg.task).feature_selection = "capture_top"
+            task_owner(cfg.task).feature_ranking = self.ranking
+            task_owner(cfg.task).top_feature_num = self.count
+            task_owner(cfg.task).value = self.intervention_value
+            task_owner(cfg.task).inline_results = False
+            task_owner(cfg.task).continue_on_error = True
+            task_owner(cfg.task).reuse_prompt_observations = True
             if operation == "generate":
-                cfg.task.intervention = "ablate"
-                cfg.task.max_new_tokens = int(self.plan.get("max_new_tokens", 8))
-                cfg.task.temperature = 0.0
+                task_owner(cfg.task).update(self.generation)
         resolve_config_devices(cfg)
         from models.numerics import bind_configuration
 
@@ -76,15 +103,10 @@ class FeatureTaskMatrix:
     def cell_path(self, name, key, task):
         return self.report / "cells" / f"{name}--{key}--{task}.json"
 
-    def leaf(self, name, key, task, tag=None):
-        return (
-            self.root
-            / "experiment"
-            / name
-            / key
-            / task
-            / f"{tag or self.tag}_{self.plan.get('seed', 42)}"
-        )
+    def leaf(self, name, key, task, tag=None, role=None):
+        from saebase.runtime.experiment_paths import member_directory
+
+        return member_directory(self.root, name, key, task, tag or self.tag, role)
 
     def freeze_inputs(self, cfg, pair):
         from saebase.datasets.selection import select_dataset
@@ -113,6 +135,7 @@ class FeatureTaskMatrix:
         if not ledger.is_file():
             return False
         found = set()
+        ranking = "absolute_zscore" if self.ranking == "whiten" else "absolute_native_activation"
         for line in ledger.open():
             result = json.loads(line).get("result", {})
             identity = result.get("input_identity") or {}
@@ -130,35 +153,32 @@ class FeatureTaskMatrix:
             )
             if (
                 actual == expected
-                and result.get("ranking") == "absolute_zscore"
+                and result.get("ranking", "absolute_native_activation") == ranking
                 and identity.get("model_sha256") == hashes[0]
                 and identity.get("sae_sha256") == hashes[1]
-                and len(result.get("top_features", [])) >= 10
+                and len(result.get("top_features", [])) >= self.count
             ):
                 found.add(result["prompt_sha256"])
         return all(hashlib.sha256(r["prompt"].encode()).hexdigest() in found for r in rows)
 
     def source(self, model, alias, cfg, pair, hashes, rows):
         candidates = [
-            self.leaf(cfg.dataset.name, model.model, "capture", self.tag + "_selection"),
-            self.leaf(cfg.dataset.name, model.model, "capture", "whiten_matrix_20261114"),
+            self.leaf(cfg.dataset.name, model.model, "capture", self.selection_name),
         ]
+        if self.capture_source_tag:
+            candidates.append(self.leaf(cfg.dataset.name, model.model, "capture", self.capture_source_tag, self.ranking))
         for folder in candidates:
             if self.compatible_source(folder, rows, pair, hashes):
                 return folder
         capture_cfg = self.cfg(model, alias, "capture")
         capture_cfg.dataset = OmegaConf.create(OmegaConf.to_container(cfg.dataset, resolve=True))
-        capture_cfg.experiment.sub_name = self.tag + "_selection"
-        folder = candidates[0]
-        if (folder / "metadata/manifest.json").exists():
-            index = 1
-            while folder.with_name(f"{self.tag}_selection_attempt{index}_42").exists():
-                index += 1
-            folder = folder.with_name(f"{self.tag}_selection_attempt{index}_42")
-            capture_cfg.experiment.sub_name = folder.name.rsplit("_", 1)[0]
+        capture_cfg.experiment.sub_name = self.selection_name
+        from saebase.runtime.experiment_paths import run_leaf
+
+        folder = run_leaf(capture_cfg)
         self.execute(capture_cfg, folder)
         if not self.compatible_source(folder, rows, pair, hashes):
-            raise RuntimeError(f"Capture did not produce all requested Top 10 rankings: {folder}")
+            raise RuntimeError(f"Capture did not produce all requested Top {self.count} rankings: {folder}")
         return folder
 
     def execute(self, cfg, folder):
@@ -174,7 +194,7 @@ class FeatureTaskMatrix:
 
     def worker(self, key, task):
         from hydra import initialize_config_module
-        from tasks.sae_runtime import (
+        from saebase.runtime.sae_operations import (
             loaded_pair_session,
             resolve_sae,
             load_selection,
@@ -235,18 +255,11 @@ class FeatureTaskMatrix:
                     name = str(cfg.dataset.name)
                     record = self.cell_path(name, key, task)
                     folder = self.leaf(name, key, task)
-                    if record.exists():
-                        old = json.loads(record.read_text())
-                        if old.get("status") == "complete":
-                            continue
-                        folder = Path(old.get("run_dir", folder))
-                        cfg.experiment.sub_name = folder.name.rsplit("_", 1)[0]
                     cell = {
                         "dataset": name,
                         "model": key,
                         "task": task,
                         "layer": int(model.layer),
-                        "run_dir": str(folder),
                         "status": "running",
                         "started_at": time.time(),
                     }
@@ -254,10 +267,9 @@ class FeatureTaskMatrix:
                     try:
                         rows = self.freeze_inputs(cfg, pair)
                         cell["selected_questions"] = len(rows)
-                        cell["requested_measurements"] = len(rows) * 10
+                        cell["requested_measurements"] = len(rows) * self.count
                         source = self.source(model, alias, cfg, pair, hashes, rows)
-                        cfg.task.capture_source = str(source)
-                        cell["capture_source"] = str(source)
+                        task_owner(cfg.task).capture_source = str(source)
                         if (folder / "metadata/manifest.json").exists():
                             state = inspect_run(folder, expected_cfg=cfg)
                             if state["action"] == "skip":
@@ -351,7 +363,9 @@ class FeatureTaskMatrix:
                             "status": "pending",
                         }
                     )
-                    folder = Path(cell.get("run_dir", self.leaf(name, model.model, task)))
+                    folder = self.leaf(name, model.model, task)
+                    cell.pop("run_dir", None)
+                    cell.pop("capture_source", None)
                     progress = folder / "metadata" / f"{task}_progress.json"
                     if progress.exists():
                         cell["progress"] = json.loads(progress.read_text())
@@ -375,13 +389,16 @@ class FeatureTaskMatrix:
         }
         save(self.report / "summary.json", result)
         lines = [
-            "# 主要探究配置：Intervene / Generate 进度",
+            "# Intervention and generation of batch progress",
             "",
-            "配置：whiten Top 10，逐特征清零，generate 贪心生成8 token；10模型×12数据集×2任务。",
+            f"Sort {self.ranking},Each {self.count} Candidates, value of intervention {self.intervention_value}."
+            f"Generate most {self.generation['max_new_tokens']} Character, Temperature {self.generation['temperature']}."
+            f"{len(self.plan.models)} A model,{len(self.plan.datasets)} Data sets,"
+            f"{len(self.plan.tasks)} A mission..",
             "",
-            "当前进程：" + str(active),
+            "Current process:" + str(active),
             "",
-            "| 任务 | 已完成特征实验 | 完成数据集×模型单元 | 当前失败特征实验 |",
+            "| Tasks | Qualification experiment completed | Complete Data Set×Model Modules | Current Failed Feature Experiment |",
             "| --- | --- | --- | --- |",
         ]
         for task, total in totals.items():
@@ -390,14 +407,14 @@ class FeatureTaskMatrix:
             )
         lines += [
             "",
-            "| 模型 | 数据集 | 任务 | 状态 | 已完成/计划特征数 |",
+            "| Model | Data Set | Tasks | Status | Completed/Number of planned features |",
             "| --- | --- | --- | --- | --- |",
         ]
         for cell in cells:
             if cell["status"] != "pending":
                 stat = cell.get("progress", {})
                 lines.append(
-                    f"| {cell['model']} | {cell['dataset']} | {cell['task']} | {cell['status']} | {stat.get('completed', 0)}/{cell.get('requested_measurements', '待准备')} |"
+                    f"| {cell['model']} | {cell['dataset']} | {cell['task']} | {cell['status']} | {stat.get('completed', 0)}/{cell.get('requested_measurements', 'I’ll be ready.')} |"
                 )
         (self.report / "progress_zh.md").write_text("\n".join(lines) + "\n")
         return result
@@ -405,7 +422,7 @@ class FeatureTaskMatrix:
     def run(self):
         with (self.report / "controller.lock").open("a") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            env_config = OmegaConf.load(self.root / "conf/runtime/environments.yaml")
+            env_config = OmegaConf.load(self.root / "conf/base/runtime/runtime.yaml").environments
             for attempt in range(int(self.plan.get("max_passes", 2))):
                 for task in self.plan.tasks:
                     for model in self.plan.models:
@@ -467,9 +484,9 @@ class FeatureTaskMatrix:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", default="conf/experiment/feature_tasks_matrix.yaml")
+    parser.add_argument("--config", default="conf/tasks/intervene/task.yaml")
     parser.add_argument("--root", default=str(Path.cwd()))
-    parser.add_argument("--report", required=True)
+    parser.add_argument("--report")
     parser.add_argument("--worker")
     parser.add_argument("--task", choices=["intervene", "generate"])
     args = parser.parse_args()

@@ -1,10 +1,12 @@
 """Task-owned batched feature edits using the existing measurement engine."""
 
 from __future__ import annotations
+
+from saebase.runtime.configuration.task_options import task_value
 from dataclasses import asdict
 from pathlib import Path
 from saebase.store import SampleRecord, TokenSelection, sha256_state_dict
-from tasks.intervene.backend import (
+from tasks.intervene.editing import (
     BatchEngine,
     Condition,
     ExperimentIdentity,
@@ -110,11 +112,11 @@ def parse_plan(config: dict):
 def configured_plan(cfg):
     from omegaconf import OmegaConf
 
-    raw = OmegaConf.to_container(cfg.task.protocol, resolve=True)
+    raw = OmegaConf.to_container(task_value(cfg.task, "protocol"), resolve=True)
     reserved = {"model_key", "sae_key", "layer", "samples"} & set(raw)
     if reserved:
         raise ValueError("Select resources globally and provide inputs in dataset.samples")
-    from tasks.sae_runtime import resolve_sae
+    from saebase.runtime.sae_operations import resolve_sae
 
     selected = resolve_sae(
         cfg.model, cfg.task.get("sae_key"), cfg.task.get("layer"), operation="intervene"

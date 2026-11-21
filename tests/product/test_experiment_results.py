@@ -55,6 +55,34 @@ def test_error_record_preserves_the_failure(tmp_path):
     assert result["error"]["type"] == "ValueError"
 
 
+def test_read_run_resolves_known_historical_artifacts_in_current_run(tmp_path):
+    import json
+
+    cfg = config()
+    cfg.task.name = "benchmark"
+    result = EvaluationResult.from_payload("benchmark", cfg, {"status": "executed"})
+    record_run(tmp_path, cfg, result=result)
+    manifest = tmp_path / "metadata/manifest.json"
+    saved = json.loads(manifest.read_text())
+    old_result = "/old/experiment/local/custom/benchmark/prior/metadata/benchmark_result.json"
+    saved["result"]["summary"]["result_path"] = old_result
+    saved["result"]["artifact_paths"] = {
+        "result": old_result,
+        "precheck": "tmp/automatic_precheck/metadata/precheck_result.json",
+    }
+    manifest.write_text(json.dumps(saved))
+    current_result = tmp_path / "metadata/benchmark_result.json"
+    receipt = tmp_path / "metadata/automatic_precheck/metadata/precheck_result.json"
+    receipt.parent.mkdir(parents=True)
+    for path in (current_result, receipt):
+        path.write_text("{}")
+
+    found = read_run(tmp_path)["result"]
+    assert found["summary"]["result_path"] == str(current_result)
+    assert found["artifact_paths"] == {"result": str(current_result), "precheck": str(receipt)}
+    assert json.loads(manifest.read_text()) == saved
+
+
 def test_metric_comparison_checks_the_task_owned_ledger(tmp_path):
     import hashlib
     import json
@@ -147,7 +175,7 @@ def test_result_asset_remains_usable_after_moving_run(tmp_path, monkeypatch):
     import shutil
 
     from saebase.runtime.experiment_results import inspect_run
-    from tasks.sae_runtime import _maybe_save
+    from saebase.runtime.sae_operations import _maybe_save
 
     source = tmp_path / "original"
     source.mkdir()

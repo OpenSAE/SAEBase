@@ -10,8 +10,8 @@ from tasks.benchmark.methods.localization import (
     evaluate_localization,
     localization_grid_from_code_store,
 )
-from tasks.benchmark.methods.rss import RSSFeatures, RSSResult, collect_rss_features, evaluate_rss
-from tasks.capture.sar import SARResult, evaluate_sar
+from tasks.benchmark.methods.stable_support import RSSFeatures, RSSResult, collect_rss_features, evaluate_rss
+from tasks.capture.response_surface import SARResult, evaluate_sar
 
 __all__ = [
     "LocalizationGrid",

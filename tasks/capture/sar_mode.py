@@ -6,6 +6,9 @@ Dataset owns prompts/labels, capture owns coalition measurements and artifacts.
 
 from __future__ import annotations
 
+from saebase.runtime.configuration.task_options import task_value
+from tasks.capture.configuration import capture_section
+
 import hashlib
 import math
 import json
@@ -14,7 +17,7 @@ from pathlib import Path
 import numpy as np
 
 from saebase.api.paper_sources import load_paper_module
-from tasks.sae_runtime import input_path
+from saebase.runtime.sae_operations import input_path
 
 PROTOCOL = "saebase.capture.sar.affine_residual_preserving.v1"
 
@@ -23,67 +26,81 @@ def sar_settings(cfg):
     """Check the full protocol without importing source or loading weights."""
     from tasks.capture.operation import capture_top_feature_num
 
-    raw = cfg.task.get("sar", {})
+    raw = capture_section(cfg.task, "sar")
     if not hasattr(raw, "get"):
-        raise ValueError("task.sar must contain SAR settings")
+        raise ValueError("task.capture.sar must contain SAR settings")
     source = raw.get("source")
     if not isinstance(source, str) or not source.strip():
-        raise ValueError("task.sar.source must name the trusted original sar.py")
+        raise ValueError("task.capture.sar.source must name the trusted original sar.py")
     source = input_path(source)
     if source.is_dir():
         source = source / "sar.py"
     if source.name != "sar.py" or not source.is_file():
-        raise ValueError(f"task.sar.source is not an existing sar.py: {source}")
-    from tasks.capture.selection import settings
+        raise ValueError(f"task.capture.sar.source is not an existing sar.py: {source}")
+    from tasks.capture.selection import active_whiten, settings
 
     filtered = settings(cfg)["filter"]
     K = filtered if type(filtered) is int else capture_top_feature_num(cfg)
-    if "filter" in cfg.task and filtered == "all":
+    if "candidate_count" in capture_section(cfg.task, "selection") and filtered == "all":
         K = None
-    selection = raw.get("feature_selection", "native_activation")
+    selection = (
+        "whiten"
+        if active_whiten(cfg.task)
+        else capture_section(cfg.task, "selection").get("feature_selection", "native_activation")
+    )
     if selection not in {"native_activation", "whiten"}:
-        raise ValueError("task.sar.feature_selection must be native_activation or whiten")
+        raise ValueError(
+            "task.capture.selection.feature_selection must be native_activation or whiten"
+        )
     top_pairs = raw.get("top_pairs", 0)
     if type(top_pairs) is not int or top_pairs < 0:
-        raise ValueError("task.sar.top_pairs must be a nonnegative integer")
+        raise ValueError("task.capture.sar.top_pairs must be a nonnegative integer")
     pair_ranking = raw.get("pair_ranking", "absolute")
     if pair_ranking not in {"absolute", "signed"}:
-        raise ValueError("task.sar.pair_ranking must be absolute or signed")
-    answer_backend = raw.get("answer_backend", "full_sequence")
+        raise ValueError("task.capture.sar.pair_ranking must be absolute or signed")
+    answer_backend = capture_section(cfg.task, "answer").get("backend", "full_sequence")
     if answer_backend not in {"full_sequence", "auto", "full_context_tail"}:
-        raise ValueError("task.sar.answer_backend must be full_sequence, full_context_tail or auto")
+        raise ValueError(
+            "task.capture.answer.backend must be full_sequence, full_context_tail or auto"
+        )
     if K is not None and K < 2:
-        raise ValueError("SAR requires task.top_feature_num >= 2")
+        raise ValueError("SAR requires at least two candidate features")
     M, n_fit = raw.get("M", 384), raw.get("n_fit", 256)
     if type(M) is not int or type(n_fit) is not int or not 2 <= n_fit <= M - 2:
-        raise ValueError("task.sar requires integer M/n_fit and at least two fit/held rows")
+        raise ValueError("task.capture.sar requires integer M/n_fit and at least two fit/held rows")
     parameters = 1 + K + K * (K - 1) // 2 if K is not None else None
     if parameters is not None and n_fit < parameters:
-        raise ValueError(f"task.sar.n_fit must cover {parameters} pairwise coefficients")
+        raise ValueError(f"task.capture.sar.n_fit must cover {parameters} pairwise coefficients")
     p = raw.get("p", 0.5)
     if type(p) not in (int, float) or not math.isfinite(p) or not 0 < p < 1:
-        raise ValueError("task.sar.p must be finite and between zero and one")
+        raise ValueError("task.capture.sar.p must be finite and between zero and one")
     if raw.get("readout", "logit_difference") not in {"logit_difference", "answer_mean_logprob"}:
-        raise ValueError("task.sar.readout must be logit_difference or answer_mean_logprob")
+        raise ValueError("task.capture.sar.readout must be logit_difference or answer_mean_logprob")
     position = raw.get("readout_position", -1)
     if type(position) is not int:
-        raise ValueError("task.sar.readout_position must be an integer")
+        raise ValueError("task.capture.sar.readout_position must be an integer")
     affine = raw.get("require_affine_decode", True)
     if type(affine) is not bool:
-        raise ValueError("task.sar.require_affine_decode must be boolean")
+        raise ValueError("task.capture.sar.require_affine_decode must be boolean")
     seed = cfg.get("seed", 0)
     if type(seed) is not int or seed < 0:
         raise ValueError("SAR requires a nonnegative integer seed")
     from tasks.capture.sar_filter import filter_settings, cohort_filter_settings
 
-    feature_filter = filter_settings(raw.get("feature_filter", {}))
-    cohort_filter = cohort_filter_settings(raw.get("cohort_filter", {}))
+    feature_filter = filter_settings(
+        capture_section(cfg.task, "selection").get("feature_filter", {})
+    )
+    cohort_filter = cohort_filter_settings(
+        capture_section(cfg.task, "selection").get("cohort_filter", {})
+    )
     if cohort_filter["enabled"] and selection != "whiten":
-        raise ValueError("SAR cohort filtering requires task.sar.feature_selection=whiten")
+        raise ValueError(
+            "SAR cohort filtering requires task.capture.selection.feature_selection=whiten"
+        )
     for key in ("target_token_id", "reference_token_id"):
         value = raw.get(key)
         if value is not None and (type(value) is not int or value < 0):
-            raise ValueError(f"task.sar.{key} must be a nonnegative integer")
+            raise ValueError(f"task.capture.sar.{key} must be a nonnegative integer")
     return {
         "source": str(source),
         "K": K,
@@ -105,11 +122,13 @@ def sar_settings(cfg):
 def behavior(cfg, sample=None):
     """Use explicit per-record token IDs; never infer a target from model output."""
     row = sample or {}
-    raw = cfg.task.get("sar", {})
-    default_readout = (
-        "answer_mean_logprob" if cfg.task.get("mode") in {"g_s", "I"} else "logit_difference"
-    )
-    if raw.get("readout", default_readout) == "answer_mean_logprob":
+    if task_value(cfg.task, "mode") in {"g_s", "I"}:
+        raw = {}
+        readout = "answer_mean_logprob"
+    else:
+        raw = capture_section(cfg.task, "sar")
+        readout = raw.get("readout", "logit_difference")
+    if readout == "answer_mean_logprob":
         from saebase.datasets.answers import reference_answer
 
         if any(raw.get(key) is not None for key in ("target_token_id", "reference_token_id")):
@@ -120,11 +139,12 @@ def behavior(cfg, sample=None):
             raise ValueError(
                 "answer_mean_logprob scores the complete answer, not a readout_position"
             )
-        if raw.get("answer") is not None:
-            row = {**row, "reference_answer": raw["answer"]}
+        answer = capture_section(cfg.task, "answer").get("reference_text")
+        if answer is not None:
+            row = {**row, "reference_answer": answer}
         reference = reference_answer(row, str(cfg.get("dataset", {}).get("name", "explicit")))
-        if raw.get("answer") is not None:
-            reference["source_field"] = "task.sar.answer"
+        if answer is not None:
+            reference["source_field"] = "task.capture.answer.reference_text"
         return {
             "name": "answer_mean_logprob",
             "reference": reference,
@@ -163,7 +183,7 @@ def behavior(cfg, sample=None):
 def prepare_sar(cfg):
     """Load the explicitly selected original estimator once per capture run."""
     settings = sar_settings(cfg)
-    if cfg.task.get("filter") == "all":
+    if capture_section(cfg.task, "selection").get("candidate_count") == "all":
         settings["feature_filter"]["enabled"] = False
         settings["cohort_filter"]["enabled"] = False
     source = Path(settings["source"])
@@ -180,7 +200,7 @@ def measure_sar(
     cfg, pair, snapshot, prompt, *, sample=None, context=None, feature_ids=None, normalization=None
 ):
     """Measure one captured sample and save raw arrays under its run directory."""
-    from tasks.capture.sar import evaluate_sar
+    from tasks.capture.response_surface import evaluate_sar
 
     readout = behavior(cfg, sample)
     context = prepare_sar(cfg) if context is None else context
@@ -189,10 +209,12 @@ def measure_sar(
     required = 1 + k + k * (k - 1) // 2
     if settings["n_fit"] < required:
         raise ValueError(f"Surrogate SAR needs at least {required} fitting rows for {k} candidates")
-    from tasks.capture.selection import output_count
+    from tasks.capture.selection import active_whiten, output_count
 
     top_pairs = (
-        output_count(cfg, k * (k - 1) // 2) if "filter" in cfg.task else settings["top_pairs"]
+        output_count(cfg, k * (k - 1) // 2)
+        if "candidate_count" in capture_section(cfg.task, "selection")
+        else settings["top_pairs"]
     )
     source = Path(settings["source"])
     if hashlib.sha256(source.read_bytes()).hexdigest() != context["source_sha256"]:
@@ -223,6 +245,29 @@ def measure_sar(
             raise ValueError("SAR behavior token IDs exceed the model vocabulary")
         return logits[target] - logits[reference]
 
+    from saebase.runtime.performance import settings as performance_settings
+
+    performance = performance_settings(cfg)
+    optimization = {}
+    coalition_readout = None
+    if activation_readout is not None and performance["enabled"]:
+        from tasks.capture.measure_behavior import score_masks
+
+        def coalition_readout(selected, masks, clean):
+            responses, info = score_masks(
+                pair,
+                snapshot,
+                selected,
+                masks,
+                activation_readout,
+                answer_ids,
+                readout_activation,
+                clean,
+                performance,
+            )
+            optimization.update(info or {})
+            return responses
+
     result = evaluate_sar(
         pair.model,
         pair.sae,
@@ -243,6 +288,7 @@ def measure_sar(
         feature_ids=feature_ids,
         top_pairs=top_pairs,
         pair_ranking=settings["pair_ranking"],
+        coalition_readout=coalition_readout,
     )
     if hashlib.sha256(source.read_bytes()).hexdigest() != context["source_sha256"]:
         raise ValueError("SAR estimator source changed during measurement")
@@ -255,7 +301,9 @@ def measure_sar(
         "protocol_id": protocol,
         "source": settings["source"],
         "source_sha256": context["source_sha256"],
-        "selection": "absolute_zscore; stable feature ID ties"
+        "selection": "nonzero native activation; absolute_zscore; stable feature ID ties"
+        if active_whiten(cfg.task)
+        else "absolute_zscore; stable feature ID ties"
         if settings["feature_selection"] == "whiten"
         else "absolute_native_activation; stable feature ID ties",
         **({"normalization": normalization.identity} if normalization is not None else {}),
@@ -330,6 +378,7 @@ def measure_sar(
         "identity": identity,
         "status": "undefined" if result.metrics.get("var") == 0 else "completed",
         "undefined_metrics": undefined,
+        **({"performance": optimization} if optimization else {}),
         "artifact": {
             "path": str(path.relative_to(Path.cwd())),
             "bytes": path.stat().st_size,

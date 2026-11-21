@@ -26,14 +26,14 @@ def test_all_task_defaults_share_gpu_first_placement(monkeypatch, available, exp
 
 def test_component_defaults_do_not_force_a_device():
     root = Path(__file__).resolve().parents[2]
-    for directory, key in [("conf/model", "model"), ("conf/task", "task")]:
-        for path in (root / directory).glob("*.yaml"):
+    for directory, key in [("conf/models", "model"), ("conf/tasks", "task")]:
+        for path in (root / directory).rglob("*.yaml"):
             cfg = OmegaConf.load(path)
             if key in cfg and "device" in cfg[key]:
                 assert cfg[key].device == "auto", str(path)
 
 
-@pytest.mark.parametrize("owner", ["task", "model"])
+@pytest.mark.parametrize("owner", ["runtime", "task", "model"])
 @pytest.mark.parametrize("device", ["cpu", "cuda:1"])
 def test_explicit_device_propagates_to_automatic_peer(monkeypatch, owner, device):
     monkeypatch.setattr(
@@ -42,6 +42,7 @@ def test_explicit_device_propagates_to_automatic_peer(monkeypatch, owner, device
         lambda: pytest.fail("Explicit placement must not probe CUDA"),
     )
     cfg = OmegaConf.create({"task": {"device": "auto"}, "model": {"device": "auto"}})
+    cfg.runtime = {"device": "auto"}
     cfg[owner].device = device
     assert policy.resolve_config_devices(cfg) == device
     assert cfg.model.device == cfg.task.device == device

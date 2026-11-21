@@ -13,7 +13,7 @@ from typing import Any
 import numpy as np
 
 from saebase.api.paper_sources import load_paper_module
-from tasks.benchmark.methods.sar import source_identity
+from tasks.benchmark.methods.response_surface import source_identity
 from tasks.benchmark.reliability.ground_truth import evaluate_degradation, make_factors
 from tasks.benchmark.reliability.schema import AuditConfig
 

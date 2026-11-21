@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from conf import read_configuration
 from saebase.api import ActivationSite
 from saebase.api.sae_profiles import get_profile
 from saebase.store import fingerprint
-from tasks.benchmark.metrics.registry import get_metric
+from tasks.benchmark.execution import get_metric
 
 MATRIX_SCHEMA = "saebase.model_comparison"
 STATUS_SCHEMA = "saebase.model_comparison.results"
@@ -92,7 +92,7 @@ class MatrixConfig:
             self.conditions
         ):
             raise ValueError("unique intervention conditions required")
-        from tasks.intervene.backend import Condition
+        from tasks.intervene.editing import Condition
 
         for cond in self.conditions:
             Condition(
@@ -206,13 +206,4 @@ class MatrixConfig:
 
 
 def load_matrix(path: str | Path) -> MatrixConfig:
-    file = Path(path)
-    if file.suffix == ".json":
-        obj = json.loads(file.read_text(encoding="utf-8"))
-    elif file.suffix in {".yml", ".yaml"}:
-        import yaml
-
-        obj = yaml.safe_load(file.read_text(encoding="utf-8"))
-    else:
-        raise ValueError("Model comparison matrix requires JSON/YAML")
-    return MatrixConfig.from_dict(obj)
+    return MatrixConfig.from_dict(read_configuration(path))

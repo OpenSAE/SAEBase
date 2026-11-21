@@ -27,7 +27,7 @@ def validate_external_sources(
     Model/SAE weights are not loaded; only the exact trusted local source files
     named in the immutable experiment configuration are fingerprinted.
     """
-    from tasks.benchmark.methods.sar import source_identity
+    from tasks.benchmark.methods.response_surface import source_identity
 
     for row in rows:
         if row.get("status") != "completed":

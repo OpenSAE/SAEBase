@@ -6,9 +6,10 @@ from typing import FrozenSet
 
 from omegaconf import DictConfig
 
+from saebase.datasets import dataset_source_module
 from saebase.datasets.artifacts import BEHAVIOR_ALIASES, canonicalize_behavior
 from saebase.datasets.artifacts import assert_available
-from saebase.runtime.cfg.contracts import assert_prompt_source_in, assert_task_in
+from saebase.runtime.configuration.contracts import assert_prompt_source_in, assert_task_in
 from saebase.registry import register_prompt_source, register_prompt_source_alias, register_dataset
 
 _TASKS_SAE: FrozenSet[str] = frozenset({"benchmark"})
@@ -133,7 +134,7 @@ def _dataset_module(name):
     import importlib
 
     suffix = "" if name in PUBLIC_DATASETS else ".prepare"
-    return importlib.import_module(f"saebase.datasets.{name}{suffix}")
+    return importlib.import_module(dataset_source_module(name) + suffix)
 
 
 def _register_builtin_datasets() -> None:

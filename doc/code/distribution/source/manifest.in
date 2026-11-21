@@ -1,0 +1,31 @@
+include README.md doc/code/translated/README.md LICENSE CITATION.cff
+include requirements.txt
+recursive-include .github *.yml *.md
+recursive-include conf *.yaml *.md
+include assets/dataset_cohorts/stage_d/files/stage_d_population.jsonl
+include doc/conf.md
+recursive-include doc/code/documentation/source/development *.md *.json *.cff NOTICE
+recursive-include base/runtime *.py *.md
+recursive-include base *.py *.md
+include tests/__init__.py
+recursive-include tests/product *.py
+include tests/fixtures/m0_reference_public.json
+recursive-include tests/fixtures *.py
+recursive-include scripts/examples *.py
+recursive-include scripts *.py
+prune data
+prune experiment
+prune .venv
+# Frozen historical files are Git/Release records, never package requirements.
+prune doc/code/documentation/source/development/archive
+prune tests/product/archive
+global-exclude __pycache__ *.py[cod] .DS_Store
+
+# Stage D evidence lives in Git and the dedicated evidence release, not in pip packages.
+recursive-exclude assets/history_experiment/benchmark_evidence/files/stage_d_evidence *
+
+recursive-include datasets *.py
+recursive-include assets/research_lab/application/files *.txt *.json Dockerfile
+recursive-include doc/code/research_lab/source *.html *.css *.js
+recursive-include third_party/accelerator_kernels *.py *.json *_LICENSE
+recursive-include doc/code/documentation/source/assets *.svg *.png

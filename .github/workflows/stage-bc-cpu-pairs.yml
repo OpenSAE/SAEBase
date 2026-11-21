@@ -47,7 +47,7 @@ jobs:
           TOKENIZERS_PARALLELISM: 'false'
           HF_HUB_DISABLE_TELEMETRY: '1'
         run: |
-          python -m tasks.benchmark.cli --pair-protocol cpu_pair --real \
+          python -m tasks.benchmark.commands --pair-protocol cpu_pair --real \
             --sae-key '${{ matrix.sae_key }}' --output "$RUNNER_TEMP/stage-bc-m3m4"
       - name: Upload benchmark and reliability evidence
         if: always()

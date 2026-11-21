@@ -82,7 +82,7 @@ def main(argv=None) -> int:
     layer = args.layer
     if layer is None:
         config = load_group("model", profile.model_key).model
-        from tasks.sae_runtime import resolve_sae
+        from saebase.runtime.sae_operations import resolve_sae
 
         layer = resolve_sae(config, profile.key).layer
     try:

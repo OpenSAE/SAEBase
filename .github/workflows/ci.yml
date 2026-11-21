@@ -1,5 +1,5 @@
-# 目的和主要功能：按变更执行项目内的接口、资料和科研功能检查。
-# 适用范围：推送、拉取请求和手动日常检查。
+# Purpose and main function: inspection of interfaces, information and scientific functions within the project as implemented by change.
+# Scope of application: delivery, removal requests and manual daily inspections.
 name: CI
 permissions:
   contents: read
@@ -60,11 +60,13 @@ jobs:
         else
           echo "No trustworthy baseline; run conservative source checks."
         fi
-        python -m compileall -q .codex/hooks scripts
+        python -m compileall -q scripts
+    - name: Check configuration paths, task keys and documentation
+      run: python -m pytest -q tests/test_configuration.py
     - name: Check current documentation links
       run: python scripts/documentation.py --check
     - name: Validate CI routing, security and release contracts
-      run: python -m pytest -q tests/product/test_ci_select_checks.py tests/product/test_software_release_workflow_paths.py tests/product/test_python_quality_autofmt.py
+      run: python -m pytest -q tests/product/test_ci_select_checks.py tests/product/test_software_release_workflow_paths.py tests/product/distribution/test_python_quality_autofmt.py
   harness-targeted:
     needs: changes
     if: ${{ needs.changes.outputs.harness == 'true' }}
@@ -108,9 +110,9 @@ jobs:
       run: |
         python -m pip check
         python -m pytest -q tests/product/test_sae_model_registry.py tests/product/test_hydra_first_run.py tests/product/test_device_selection.py
-        python -m pytest -q tests/precheck/test_api_boundary.py tests/precheck/test_auto_preparation.py tests/precheck/test_component_matrix.py tests/precheck/test_dataset_checks.py tests/precheck/test_model_configs.py tests/precheck/test_model_families.py tests/precheck/test_model_sae_sites.py tests/precheck/test_modes.py tests/precheck/test_worker.py
-        python -m pytest -q tests/product/test_current_task_contracts.py tests/product/test_experiment_results.py tests/product/test_activation_store.py tests/product/test_feature_interventions.py tests/product/test_benchmark_execution.py tests/product/test_reliability_bootstrap.py
-        python -m pytest -q tests/product/test_task_owned_workflows.py tests/product/test_capture_whitening.py tests/product/test_capture_continuation.py tests/product/test_fixed_dataset_cohort.py tests/product/test_public_dataset_sources.py tests/product/test_capture_configuration.py tests/product/test_neuronpedia_capture.py tests/product/test_execution_lifecycle.py tests/product/test_benchmark_launch.py tests/product/test_installed_distribution.py
+        python -m pytest -q tests/product/precheck/test_api_boundary.py tests/product/precheck/test_auto_preparation.py tests/product/precheck/test_component_matrix.py tests/product/precheck/test_dataset_checks.py tests/product/precheck/test_model_configs.py tests/product/precheck/test_model_families.py tests/product/precheck/test_model_sae_sites.py tests/product/precheck/test_modes.py tests/product/precheck/test_worker.py
+        python -m pytest -q tests/product/test_current_task_contracts.py tests/product/test_experiment_results.py tests/product/test_activation_store.py tests/product/test_feature_interventions.py tests/product/benchmarks/test_benchmark_execution.py tests/product/benchmarks/test_reliability_bootstrap.py
+        python -m pytest -q tests/product/runtime/test_task_owned_workflows.py tests/product/capture/test_capture_whitening.py tests/product/capture/test_capture_continuation.py tests/product/benchmarks/test_fixed_dataset_cohort.py tests/product/benchmarks/test_public_dataset_sources.py tests/product/capture/test_capture_configuration.py tests/product/capture/test_neuronpedia_capture.py tests/product/runtime/test_execution_lifecycle.py tests/product/benchmarks/test_benchmark_launch.py tests/product/distribution/test_installed_distribution.py
   ci-required:
     if: ${{ always() }}
     needs:

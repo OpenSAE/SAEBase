@@ -1,0 +1,38 @@
+{
+  "clean": "Explain how to bake a standard banana bread loaf in a conventional oven, including the ingredients, preparation, and baking steps.",
+  "variants": [
+    {
+      "variant": 1,
+      "topic": "Basketball",
+      "prompt": "A basketball rolled across the court.\n\nExplain how to bake a standard banana bread loaf in a conventional oven, including the ingredients, preparation, and baking steps.",
+      "prefix": "A basketball rolled across the court."
+    },
+    {
+      "variant": 2,
+      "topic": "Space",
+      "prompt": "A spacecraft orbited the Moon.\n\nExplain how to bake a standard banana bread loaf in a conventional oven, including the ingredients, preparation, and baking steps.",
+      "prefix": "A spacecraft orbited the Moon."
+    },
+    {
+      "variant": 3,
+      "topic": "Music",
+      "prompt": "A violinist played a concert.\n\nExplain how to bake a standard banana bread loaf in a conventional oven, including the ingredients, preparation, and baking steps.",
+      "prefix": "A violinist played a concert."
+    },
+    {
+      "variant": 4,
+      "topic": "Chess",
+      "prompt": "A chess player moved a knight.\n\nExplain how to bake a standard banana bread loaf in a conventional oven, including the ingredients, preparation, and baking steps.",
+      "prefix": "A chess player moved a knight."
+    },
+    {
+      "variant": 5,
+      "topic": "Animals",
+      "prompt": "An elephant walked across the savanna.\n\nExplain how to bake a standard banana bread loaf in a conventional oven, including the ingredients, preparation, and baking steps.",
+      "prefix": "An elephant walked across the savanna."
+    }
+  ],
+  "separator": "\n\n",
+  "source_attachment": "/root/.codex/attachments/c5be19b6-4219-4f1c-9a76-a39881735cb6/已粘贴的文本.txt",
+  "source_sha256": "84e4043bb2c6c75da371a8290e716e78ec0abf6fb37786a69ef856dcead056f0"
+}

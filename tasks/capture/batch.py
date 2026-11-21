@@ -6,11 +6,15 @@ receipts survive partial failures; summaries never equate a first row with EOF.
 
 from __future__ import annotations
 
+from saebase.runtime.configuration.task_options import task_value
+
 import hashlib
 import json
 import os
 import time
 from pathlib import Path
+
+from tasks.capture.configuration import capture_section
 
 
 def _prepare_ioi(cfg, pair):
@@ -34,10 +38,11 @@ def _prepare_ioi(cfg, pair):
 def capture_dataset(cfg, *, sar_context=None):
     from saebase.runtime.performance import current, stage
     from tasks.capture.operation import _capture, _pair, capture_mode
-    from tasks.sae_runtime import loaded_pair_session, pair_state_fingerprints
+    from saebase.runtime.sae_operations import loaded_pair_session, pair_state_fingerprints
     from saebase.datasets.selection import select_dataset
     from saebase.runtime.experiment_results import write_json
 
+    task = cfg.get("task", {})
     mode = capture_mode(cfg)
     if mode == "sar" and sar_context is None:
         from tasks.capture.sar_mode import prepare_sar
@@ -73,10 +78,11 @@ def capture_dataset(cfg, *, sar_context=None):
             loaded_model_name=pair.identity.loaded_model_name,
             seed=int(cfg.seed),
         )
+    task = cfg.get("task", {})
     mode = capture_mode(cfg)
     normalization = None
     snapshots = None
-    from tasks.capture.selection import needs_normalization
+    from tasks.capture.selection import needs_normalization, undefined_reason
 
     needs_whiten = needs_normalization(cfg, sar_context)
     cohort_rows = list(selection) if needs_whiten else None
@@ -84,6 +90,9 @@ def capture_dataset(cfg, *, sar_context=None):
         from tasks.capture.selection import reference_rows
 
         cohort_rows = reference_rows(cfg, pair, cohort_rows, sar_context)
+    from tasks.capture.selection import observed_selection
+
+    selection = observed_selection(selection, task_value(task, "sample_ids"))
     query = str(cfg.get("task", {}).get("prompt", "") or "").strip()
     if needs_whiten and query:
         from saebase.datasets.selection import SampleSelection
@@ -116,6 +125,8 @@ def capture_dataset(cfg, *, sar_context=None):
     stream_error = None
     sources = {}
     sar_artifacts = []
+    model_answers = {}
+    annotation_items = []
 
     def report():
         return {
@@ -143,7 +154,10 @@ def capture_dataset(cfg, *, sar_context=None):
                     normalization, snapshots = fit_reference(
                         cfg, pair, cohort_rows, sar_context, Path.cwd() / "metadata"
                     )
-            for row in selection:
+            from tasks.capture.model_answer import answer_rows
+
+            for row, answer in answer_rows(cfg, pair, selection):
+                model_answers[row["sample_id"]] = answer
                 sample_started = time.perf_counter()
                 raw_seen += 1
                 prompt = str(row.get("prompt", ""))
@@ -170,7 +184,12 @@ def capture_dataset(cfg, *, sar_context=None):
                 else:
                     attempted += 1
                     try:
-                        inputs = {"pair": pair, "prompt": prompt, "sample": row}
+                        inputs = {
+                            "pair": pair,
+                            "prompt": prompt,
+                            "sample": row,
+                            "model_answer": model_answers[row["sample_id"]],
+                        }
                         if needs_whiten:
                             inputs.update(
                                 snapshot=snapshots.get((row["sample_id"], prompt)),
@@ -180,12 +199,14 @@ def capture_dataset(cfg, *, sar_context=None):
                             inputs["sar_context"] = sar_context
                         with stage("capture_sample"):
                             result = _capture(cfg, **inputs)
+                        model_answers[row["sample_id"]] = result.get("model_answer", answer)
                         sar_artifacts.extend(result.get("required_artifacts", []))
+                        undefined = undefined_reason(result)
                         status = (
                             "blocked"
                             if result["completion"]["status"] != "complete"
                             else "undefined"
-                            if result.get("sar", {}).get("status") == "undefined"
+                            if undefined
                             else "completed"
                         )
                         annotation = result["neuronpedia"]
@@ -212,6 +233,8 @@ def capture_dataset(cfg, *, sar_context=None):
                             "status": status,
                             "result": result,
                         }
+                        if status == "undefined":
+                            entry["reason"] = undefined
                     except Exception as exc:
                         from saebase.datasets.answers import ReferenceAnswerUnavailable
                         from saebase.api import UnsupportedCapability
@@ -234,13 +257,30 @@ def capture_dataset(cfg, *, sar_context=None):
                                 "status": status,
                                 "reason": f"{row['sample_id']}: "
                                 + (
-                                    entry.get("error", {}).get("message")
+                                    entry.get("reason")
+                                    or entry.get("error", {}).get("message")
+                                    or result.get("model_answer", {})
+                                    .get("error", {})
+                                    .get("message")
                                     or "Published feature annotations incomplete"
                                 ),
                             }
                         )
                 with stage("sample_serialization_and_write"):
                     output.write(json.dumps(entry, ensure_ascii=False, allow_nan=False) + "\n")
+                if "result" in entry:
+                    feature_completion = (
+                        entry["result"]
+                        .get("stages", {})
+                        .get("features_and_annotations", entry["result"]["completion"])
+                    )
+                    annotation_items.append(
+                        {
+                            "status": "completed"
+                            if feature_completion["status"] == "complete"
+                            else "blocked"
+                        }
+                    )
                 counts[status] += 1
                 ledger_rows += 1
                 if current() is not None:
@@ -271,7 +311,7 @@ def capture_dataset(cfg, *, sar_context=None):
                 {
                     "status": status,
                     **(
-                        {"reason": "SAR coalition behavior has zero variance"}
+                        {"reason": "Capture measurement is undefined; see sample records"}
                         if status == "undefined"
                         else {}
                     ),
@@ -288,13 +328,9 @@ def capture_dataset(cfg, *, sar_context=None):
     capture_counts = {**counts, "completed": counts["completed"] + counts["blocked"], "blocked": 0}
     captured = capture_counts["completed"] + capture_counts["undefined"]
     capture_stage = summarize(capture_counts)
-    annotation_stage = completion_summary(
-        [{"status": "completed"}] * (counts["completed"] + counts["undefined"])
-        + [{"status": "blocked"}] * counts["blocked"],
-        expected=captured,
-        unit="sample",
-    )
+    annotation_stage = completion_summary(annotation_items, expected=captured, unit="sample")
     from models.numerics import identity as numerical_identity
+    from tasks.capture.model_answer import summary as answer_summary
 
     return {
         **report(),
@@ -314,7 +350,11 @@ def capture_dataset(cfg, *, sar_context=None):
         "completion": completion,
         "source_error": stream_error,
         "error": stream_error["message"] if stream_error else None,
-        "stages": {"capture": capture_stage, "annotation": annotation_stage},
+        "stages": {
+            "capture": capture_stage,
+            "annotation": annotation_stage,
+            "model_answer": answer_summary(list(model_answers.values())),
+        },
         "required_artifacts": sar_artifacts
         + [{"path": "reports/capture_samples.jsonl", "bytes": ledger.stat().st_size}]
         + (
@@ -352,16 +392,16 @@ def capture_dataset(cfg, *, sar_context=None):
             if mode == "whiten"
             else "saebase.capture.dataset.v1",
             "execution": {
-                "output_scope": cfg.get("task", {}).get("output_scope", "last_token"),
+                "output_scope": task_value(cfg.get("task", {}), "output_scope", "last_token"),
                 "capture_mode": mode,
-                "top_feature_num": cfg.get("task", {}).get("top_feature_num", 10),
+                "top_feature_num": task_value(cfg.get("task", {}), "top_feature_num", 10),
                 "sar_algorithm": "exhaustive"
                 if mode == "I"
                 else "surrogate"
                 if mode == "sar"
                 else None,
-                "filter": cfg.task.get("filter", "all"),
-                "capture_count": cfg.task.get("capture_count"),
+                "filter": capture_section(task, "selection").get("candidate_count", "all"),
+                "capture_count": capture_section(task, "output").get("feature_count"),
             },
             "normalization": normalization.identity if normalization is not None else None,
             **(
@@ -377,7 +417,7 @@ def capture_dataset(cfg, *, sar_context=None):
                 "hook_name": pair.site.hook_name,
                 **(
                     {"selection": "all_prompt_tokens"}
-                    if cfg.get("task", {}).get("output_scope") == "all_tokens"
+                    if task_value(cfg.get("task", {}), "output_scope") == "all_tokens"
                     else {"position": -1}
                 ),
             },

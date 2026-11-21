@@ -164,7 +164,7 @@ def run_custom(
     args = [
         sys.executable,
         "-m",
-        "tasks.benchmark.methods.saebench_custom",
+        "tasks.benchmark.methods.sae_benchmark_custom",
         "--worker",
         "--upstream",
         str(upstream),

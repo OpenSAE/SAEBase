@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from conf import configuration_location, read_configuration
 from saebase.api.sae_profiles import get_profile
 
 SCHEMA = "saebase.coverage.stage_bc.v1"
@@ -158,7 +159,7 @@ class CoverageCatalog:
 
 
 def load_coverage(path: str | Path) -> CoverageCatalog:
-    src = json.loads(Path(path).read_text(encoding="utf-8"))
+    src = read_configuration(path)
     if not isinstance(src, dict) or src.get("schema") != SCHEMA:
         raise ValueError("invalid coverage catalog schema")
     valid_fields = set(CoverageEntry.__dataclass_fields__)
@@ -233,7 +234,7 @@ def verify_cpu_sae_evidence(catalog: CoverageCatalog, record: dict[str, Any]) ->
     }
 
 
-CATALOG = Path(__file__).resolve().parents[3] / "conf/coverage/stage_bc.json"
+CATALOG = Path(__file__).resolve().parents[3] / "conf/tasks/benchmark/task.yaml#site_catalog"
 
 CPU_RESULT_SCHEMA = "saebase.coverage.cpu_matrix_result.v2"
 
@@ -289,10 +290,16 @@ def aggregate(
     passed = sorted(x for x, v in base.items() if v["status"] == "sae_checkpoint_verified_only")
     blocked = sorted(x for x, v in base.items() if v["status"] != "sae_checkpoint_verified_only")
     results = [{**base[key]} for key in sorted(base)]
+    path, section = configuration_location(catalog_path)
+    catalog_bytes = (
+        json.dumps(read_configuration(catalog_path), sort_keys=True).encode()
+        if section
+        else path.read_bytes()
+    )
     return {
         "schema": CPU_RESULT_SCHEMA,
         "kind": "original_SAE_weights_only_not_model_SAE_pair_verification",
-        "catalog_sha256": hashlib.sha256(catalog_path.read_bytes()).hexdigest(),
+        "catalog_sha256": hashlib.sha256(catalog_bytes).hexdigest(),
         "expected": len(expected),
         "with_artifact": len(base),
         "sae_only_verified": len(passed),
@@ -472,7 +479,7 @@ PROTOCOL_POPULATION = "stage_d.population.v1"
 POPULATION_MIN_EVAL_GROUPS = 64
 
 DEFAULT_POPULATION_PATH = (
-    Path(__file__).resolve().parents[3] / "conf" / "coverage" / "stage_d_population.jsonl"
+    Path(__file__).resolve().parents[3] / "assets/dataset_cohorts/stage_d/files/stage_d_population.jsonl"
 )
 
 STATUS_VALUES = frozenset(

@@ -1,15 +1,36 @@
-# 运行环境资料
+# Operational environmental information
 
-## 目的和主要功能
+## Purpose
 
-说明本机解释器、依赖和资源资料的来源，帮助复用实验环境和定位运行条件问题。
+Description of the source of the in-house interpreter, reliance on and resource information to assist in the re-use of the experimental environment and positioning operating conditions.
 
-## 适用范围
+## Scope
 
-用于了解实验记录中的实际环境，或按用户要求采集、比较环境资料。
+Used to understand the actual environment in the experimental records, or to collect and compare environmental information according to user requirements.
 
-当前科研运行的解释器与依赖选择由 `conf/runtime/environments.yaml` 和 `saebase/runtime/environment.py` 维护。运行记录保存实际解释器、依赖版本及来源，读取时结合记录时间和进程范围使用。
+## Run independently
 
-中央环境采集与比较由 ResearchHarness 提供。通过 `.researchharness/central.json` 的 `harness_root` 找到 `src/harness/environment/environment.md`；该说明介绍环境快照的采集、保存、选择和比较，适用于明确要求维护环境资料的任务。按该入口和授权选定快照，保留采集时间、来源及合成示例身份。
+Select Python 3.11 or 3.12 from the project root directory to execute `python -m pip install -e .`. Select the model backend and the preparation weights required for the task. The data directory can be selected by the item `paths.data_dir` parameter, running the record-keeping current interpreter, relying version and source. [Quick Start](../code/translated/README.md#-quick_start)]
 
-运行条件缺失时定位具体依赖、设备或解释器及其影响，在已授权范围内处理；后续任务复用负责模块已经确定的环境事实。
+After installation, the configuration can be synthesized from the project root directory using the following commands, and the synthetic data example can generate an evaluation plan. Both commands rely on basic installation.
+
+```bash
+saebase task=capture --cfg job
+python scripts/examples/first_experiment.py --dry-run
+```
+
+The first should list the selected data set, model and catch parameters. The second should list the synthetic prompt group, the model and the thin self-codator combination, and the planned number of times. The equipment, the dependent version and the performance status of the real check point can be checked against the corresponding experiment at `metadata/manifest.json`. [The experimental report](../experiment.md)]
+
+## Optional ResearchHarness access
+
+After access, you can bind the engine Python and the data and call the original entrance to SAEBASE via `rh projects run`.
+
+If you need to collect the machine and process environment separately, you can run `rh utils probe --output <snapshot_path>`. When you have two snapshots, you can use `rh utils compare <old_snapshot> <new_snapshot>` to check for changes in the conditions of dependence and equipment.
+
+When operational conditions are missing, the specific dependencies, equipment or interpreter and its effects are processed within the delegated authority; environmental facts have been established by the re-use of the responsible module for the follow-up mission.
+
+## Project Dependency and Operating Conditions
+
+Baseline installation depends on [project configuration](../../pyproject.toml). Model environment selection is available [model operating environment configuration](../../conf/base/runtime/runtime.yaml), as compared to the actual interpreter of the operating inventory and the dependent version.
+
+The 2B, 4B, 9B and 27B formulations in Qwen3.5 use a special interpreter. The batch entrance selects the interpreter by model and checks `qwen3_5` support for Transformers. The single run needs to be started with an interpreter in the formulation, e.g. `/workspace/envs/saebase/qwen35/bin/python -m saebase.runtime.train model=qwen35_2b --cfg job`.

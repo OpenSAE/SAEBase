@@ -1,0 +1,39 @@
+# User-Specify: 5 It’s natural. QA × 4 Model × 4 Plant Capture;Both observations and screening references 500 Questions, not enough, all.
+matrix:
+  models:
+  - model: llama31_8b
+    sae_key: llama31_8b_lxr_8x
+    layer: 21
+  - model: qwen35_4b
+    sae_key: qwen35_4b_matryoshka_l15_65k
+    layer: 15
+  - model: gpt2small
+    sae_key: gpt2small_res_jb_l8
+    layer: 8
+  - model: gemma3_4b_pt
+    sae_key: gemma3_4b_pt_scope_resid
+    layer: 17
+  datasets:
+  - gsm8k
+  - mmlu_pro
+  - arc_challenge
+  - truthfulqa
+  - bbh
+  seed: 42
+  model_timeout_seconds: 0
+  dataset_overrides:
+    sample_count: 500
+    sampling_seed: 42
+  task_overrides:
+    filter: 10
+    capture_count: 10
+    sar:
+      cohort_filter:
+        reference_sample_count: 500
+      answer_backend: full_context_tail
+    neuronpedia:
+      enabled: true
+      total_timeout_seconds: 600
+      timeout_seconds: 30
+      max_download_bytes: 268435456
+      max_uncompressed_bytes: 2147483648

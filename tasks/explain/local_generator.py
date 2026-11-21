@@ -1,7 +1,7 @@
 """Allowlisted local explanation generator.
 
-Hydra YAML cannot store a Python callable. ``task.generator=saebase_generate``
-selects this function. It calls ``tasks.generate.backend.generate`` and does not eval
+Hydra YAML cannot store a Python callable. ``task.explain.generator=saebase_generate``
+selects this function. It calls ``tasks.generate.serving.generate`` and does not eval
 configuration text, import vLLM directly, or call an external paid API.
 
 ``heldout_score`` is computed by the caller from SAE activations. This function
@@ -12,18 +12,18 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from tasks.sae_runtime import _task
+from saebase.runtime.sae_operations import _task
 
 
 def saebase_generate(cfg: object) -> Callable[[list[str]], str]:
     if not bool(_task(cfg, "approved", False)):
-        raise PermissionError("Auto-explanation needs task.approved=true")
+        raise PermissionError("Auto-explanation needs task.explain.approved=true")
     max_new = _task(cfg, "generator_max_new_tokens", 24)
     if type(max_new) is not int or not 1 <= max_new <= 64:
         raise ValueError("generator_max_new_tokens must be an integer from 1 to 64")
     model = str(_task(cfg, "generator_model", "") or "").strip()
     if not model:
-        raise ValueError("task.generator_model must name the local or cached model")
+        raise ValueError("task.explain.generator_model must name the local or cached model")
     dtype = str(_task(cfg, "generator_dtype", "bfloat16"))
     if dtype not in {"float32", "float16", "bfloat16"}:
         raise ValueError("generator_dtype must be float32, float16, or bfloat16")
@@ -36,7 +36,7 @@ def saebase_generate(cfg: object) -> Callable[[list[str]], str]:
         )
         if len(ask) > 4000:
             raise ValueError("Explanation prompt exceeds 4000 characters")
-        from tasks.generate.backend import generate
+        from tasks.generate.serving import generate
 
         rows = generate(
             [ask],
@@ -51,7 +51,7 @@ def saebase_generate(cfg: object) -> Callable[[list[str]], str]:
         )
         text = str(rows[0].get("text") or "").strip()
         if not text:
-            raise RuntimeError("tasks.generate.backend returned no text")
+            raise RuntimeError("tasks.generate.serving returned no text")
         return text[:800]
 
     return generator

@@ -15,7 +15,7 @@ from saebase.api import ActivationSite
 from saebase.store import ShardedReader, resolve_positions, sha256_state_dict
 from tasks.benchmark.execution.schema import BenchmarkConfig
 from tasks.benchmark.results.metrics import read_metrics
-from tasks.intervene.backend import ExperimentIdentity, read_results
+from tasks.intervene.editing import ExperimentIdentity, read_results
 
 from .schema import Observation
 

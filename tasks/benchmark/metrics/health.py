@@ -5,6 +5,8 @@ Scope: the registered activation-health evaluation and its per-prompt result rea
 
 from __future__ import annotations
 
+from saebase.runtime.configuration.task_options import task_value
+
 import gc
 import json
 from pathlib import Path
@@ -132,7 +134,7 @@ def run_preflight(cfg: DictConfig) -> dict:
     ps_name = _prompt_source_name(cfg)
     availability_check = assert_available
     manifest_loader = load_manifest
-    if str(cfg.task.name) == "sae" or cfg.task.get("evaluation") == "activation_health":
+    if str(cfg.task.name) == "sae" or task_value(cfg.task, "evaluation") == "activation_health":
         # The standalone compatibility CLI uses the existing PromptSource
         # contract; canonical Dataset plugins accept the current Task names.
         if str(cfg.task.name) == "sae":
@@ -177,7 +179,7 @@ def run_preflight(cfg: DictConfig) -> dict:
     if not require:
         raise ValueError(
             "activation_health in Phase A requires prepared prompts and a manifest; "
-            "run datasets/prepare.py first"
+            "run datasets/prompt_collection/prepare.py first"
         )
 
     data_root = cfg.paths.get("data_dir") if "paths" in cfg else None
@@ -193,7 +195,7 @@ def run_preflight(cfg: DictConfig) -> dict:
         layer = cfg.sae.get("layer")
     if layer is None and "evaluation" in cfg:
         layer = cfg.evaluation.get("layer")
-    from tasks.sae_runtime import resolve_sae
+    from saebase.runtime.sae_operations import resolve_sae
 
     selected = resolve_sae(cfg.model, sae_key, layer, operation="precheck")
     layer = selected.layer
@@ -209,7 +211,7 @@ def run_preflight(cfg: DictConfig) -> dict:
         "manifest": manifest,
         "profile": profile,
         "hook_name": profile.hook_name(layer),
-        "evaluation": str(cfg.task.get("evaluation", "activation_health")),
+        "evaluation": str(task_value(cfg.task, "evaluation", "activation_health")),
     }
 
 
