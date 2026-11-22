@@ -63,3 +63,8 @@ experiments/
 /experiment/
 
 /.github/
+
+# Public repository contents
+/.*/
+/assets/*
+!/assets/research_lab/
