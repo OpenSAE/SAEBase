@@ -9,8 +9,6 @@ import sys
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
-from tasks.benchmark.results.evidence import EVIDENCE_REL, load_support
-
 ROOT = Path(__file__).resolve().parents[1]
 
 LINK = re.compile(r"!?\[[^\]\n]+\]\((<[^>]+>|[^)\s]+)(?:\s+\"[^\"]+\")?\)")
@@ -97,6 +95,8 @@ END = "<!-- END VERIFIED_MODEL_SUPPORT -->"
 
 
 def render_table(s: dict) -> str:
+    from tasks.benchmark.results.evidence import EVIDENCE_REL
+
     lines = [
         f"**Verified model and SAE coverage ({s['date']}):** {s['profiles']} "
         f"selected model-SAE configurations across {s['total']} layer sites. "
@@ -115,7 +115,7 @@ def render_table(s: dict) -> str:
             label = f"L{row['layer']}"
             report = row.get("m3m4_summary")
             layers.append(
-                f"[{label}](../../../{EVIDENCE_REL.as_posix()}/{report})" if report else label
+                f"[{label}](../../../../../{EVIDENCE_REL.as_posix()}/{report})" if report else label
             )
 
         def count(field):
@@ -152,7 +152,7 @@ def render_blocks(s: dict) -> dict[str, str]:
             f"(270M-9B),**{pair}** The selected layer is checked for real weight compatibility,"
             f"**{bench}** _Other Organiser 64 Group independent and prompt baseline assessment,"
             f"**{rel}** Audits of statistical reliability completed."
-            "[Model support and layer-by-layer validation results](doc/code/documentation/source/development/verified-model-matrix.md)."
+            "[Model support and layer-by-layer validation results](../documentation/source/development/verified-model-matrix.md)."
         ),
         "doc/code/documentation/source/development/model-support.md": (
             "## Verified checkpoints and layers\n\n"
@@ -191,6 +191,8 @@ def replace_block(content: str, replacement: str, name: str) -> str:
 
 
 def generate(*, check: bool, root: Path = ROOT) -> list[str]:
+    from tasks.benchmark.results.evidence import load_support
+
     changed = []
     for name, block in render_blocks(load_support(root)).items():
         path = root / name

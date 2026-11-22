@@ -16,8 +16,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .core import canonical_json
-from .ingest import _atomic_bytes
+from saebase.research_lab.backend.core import canonical_json
+from saebase.research_lab.backend.ingest import _atomic_bytes
 
 SCHEMA = "opensae.controlled_six_factor_inputs.v1"
 DESIGNS: dict[str, tuple[tuple[str, tuple[str, str]], ...]] = {

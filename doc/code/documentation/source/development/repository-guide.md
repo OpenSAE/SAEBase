@@ -22,7 +22,7 @@ SAEBase separates runnable examples, research code, published evidence and engin
 | [`doc/code/documentation/source/assets/`](../assets/) | Branding and workflow figures used in documentation | [Workflow diagram](../assets/figures/saebase_workflow.svg) |
 | [`doc/code/documentation/source/development/`](index.md) | Tutorials, API details, scientific protocols and verified reports | [Documentation](index.md) |
 | [`scripts/`](../../../../../.github/CONTRIBUTING.md) | Software release, distribution, document and code check access | [Script guide](../../../../../.github/CONTRIBUTING.md) |
-| [Central access](../../../../../AGENTS.md) | Use of shared skills, querying of in-house resources and reading of structural results | [Project statement of work](../../../../../AGENTS.md) |
+| [Project maintenance portal](../../../../../AGENTS.md) | Choose to maintain online or offline, locate shared skills and in-house resources | [Offline manual](../../../../../AGENTS.md) |
 
 ## Reproducibility
 

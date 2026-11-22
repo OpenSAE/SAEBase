@@ -8,7 +8,7 @@ A description of the linkages between the source tree, the source description an
 
 The source structure and label information used to read or maintain `doc/code/`. Actual changes are based on the current source code and project working model.
 
-`code_tree.json` Save source syntax structure, `code_annotations.json` Save source code uses and associated knowledge identifiers. `context_ids` Associated project knowledge, `core_ids` Associated central management, `project_architecture_ids` Associated project own structure. Description is based on actual source code and known basis; specific location and subsequent location trails are maintained when meaning is to be checked.
+`code_tree.json` Save source syntax structure, `code_annotations.json` Save source code uses and associated knowledge identifiers. `context_ids` Associated project knowledge, `core_ids` Associated central management, `project_architecture_ids` Associated project own structure. Description is based on actual source code and known basis; specific location and subsequent location trails are maintained when meaning is to be found.
 
 The functional statement of maintenance is directly defined what is to be achieved, what is to be accomplished, what is to be produced and who uses the results. Parameters and details of realization are used for interfaces that require access to this information, with an overall explanation of responsibilities and collaboration.
 
@@ -16,4 +16,4 @@ When read, read the location module along the configuration, distribution and re
 
 ## Project structure and extraction
 
-View the floor description to track configuration, distribution of components and writing of the results, for example, by locating the actual task selection from the main entrance. [The base layer](../base.md) needs to generate the structure, entering the code repository model from the available `extract-structure` skills, selecting the root, scope and source version of the project; and recording the results and the version for long-term access on this page.
+View the floor description to track configuration, distribution of components and writing of results, for example, by locating the actual task selection from the main entrance. [The base layer](../base.md) needs to generate a structure, enters the code repository model from the available `extract-structure` skills and selects the root, scope and source version of the project; the results and the version for long-term access are recorded on this page.

@@ -7,6 +7,9 @@ import os
 
 from omegaconf import OmegaConf
 
+from saebase.datasets.artifacts import PREPARED_ASSET, prepared_dataset_root
+from saebase.runtime.experiment_results import historical_run_path
+
 
 def limit(value):
     return "all" if value == "all" else int(value)
@@ -31,12 +34,14 @@ def main():
     root = Path(__file__).resolve().parents[2]
     plan = json.loads((root / "assets/history_experiment/response_surface/files/plan.json").read_text())
     cfg = OmegaConf.load(
-        root
-        / "experiment"
-        / args.dataset
-        / plan["model"]
-        / "capture/reference_additivity/metadata/config.yaml"
+        historical_run_path(
+            root / "experiment" / args.dataset / plan["model"]
+            / "capture/reference_additivity/metadata/config.yaml"
+        )
     )
+    cfg.paths.root = str(root)
+    cfg.paths.data_dir = str(root / PREPARED_ASSET)
+    cfg.dataset.data_path = str(prepared_dataset_root(cfg.paths.data_dir, args.dataset))
     old_task = cfg.task
     cfg.task = OmegaConf.load(root / "conf/tasks/capture/task.yaml").task
     for key in ("sae_key", "layer", "device", "neuronpedia"):

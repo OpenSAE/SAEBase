@@ -170,7 +170,7 @@ def main():
             )
     lines += [
         "",
-        review.get("context_summary", "Numerical uniqueness and semantic match to separate judgement; candidate not selected in the main list remains all."),
+        review.get("context_summary", "Numerical uniqueness and semantic matching separate judgement; candidate not selected in the main table remains in full."),
     ]
     (root / "context_candidates.md").write_text("\n".join(lines) + "\n")
     case["qualitative_review"] = review

@@ -24,8 +24,8 @@ environments:
     qwen35_27b: *qwen35
 
 paths:
-  root: ${hydra:runtime.cwd}
-  data_dir: ${paths.root}/data
+  root: ${saebase_workspace:}
+  data_dir: ${saebase_data_dir:${paths.root}}
 
 experiment:
   sub_name: null

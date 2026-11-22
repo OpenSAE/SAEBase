@@ -365,7 +365,7 @@ def test_benchmark_cli_reports_incomplete_work_and_exit_two(tmp_path, monkeypatc
     monkeypatch.setattr(
         "tasks.precheck.gate.automatic_precheck", lambda cfg: (None, "synthetic-precheck")
     )
-    assert cli.main(["--config", str(path), "--real", "--output", str(tmp_path)]) == 2
+    assert cli.main(["--config", str(path), "--real", "--device", "cpu", "--output", str(tmp_path)]) == 2
     assert json.loads(capsys.readouterr().out)["completion"]["counts"]["blocked"] == 1
 
 

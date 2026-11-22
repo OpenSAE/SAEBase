@@ -4,8 +4,9 @@ from pathlib import Path
 import shutil
 
 from setuptools import find_namespace_packages, setup
+from setuptools.command.build import build as _build
 from setuptools.command.build_py import build_py as _build_py
-from setuptools.command.editable_wheel import editable_wheel as _editable_wheel
+from setuptools.command.editable_wheel import _LinkTree, _empty_dir, editable_wheel as _editable_wheel
 from setuptools.command.egg_info import egg_info as _egg_info, manifest_maker
 
 
@@ -25,8 +26,22 @@ PACKAGE_DIRS = {
 }
 
 
+class build(_build):
+    """Keep generated build trees with local packaging metadata."""
+
+    def initialize_options(self):
+        super().initialize_options()
+        self.build_base = ".build/package"
+
+
 class egg_info(_egg_info):
     """Read the source distribution manifest from its documented build directory."""
+
+    def finalize_options(self):
+        if self.egg_base is None:
+            Path(".build").mkdir(exist_ok=True)
+            self.egg_base = ".build"
+        super().finalize_options()
 
     def find_sources(self):
         maker = manifest_maker(self.distribution)
@@ -44,6 +59,12 @@ class editable_wheel(_editable_wheel):
         super().finalize_options()
         if self.mode is None:
             self.mode = "strict"
+
+    def _select_strategy(self, name, tag, build_lib):
+        if self.mode.lower() != "strict":
+            return super()._select_strategy(name, tag, build_lib)
+        link_tree = _empty_dir(Path(self.project_dir, ".build", f"__editable__.{name}-{tag}"))
+        return _LinkTree(self.distribution, name, link_tree, build_lib)
 
 
 class build_py(_build_py):
@@ -90,4 +111,8 @@ for package, location in PACKAGE_DIRS.items():
     exclude = ("service", "service.*") if package == "saebase.research_lab" else ()
     packages.extend(f"{package}.{name}" for name in find_namespace_packages(location, exclude=exclude))
 
-setup(cmdclass={"build_py": build_py, "egg_info": egg_info, "editable_wheel": editable_wheel}, packages=packages, package_dir=PACKAGE_DIRS)
+setup(
+    cmdclass={"build": build, "build_py": build_py, "egg_info": egg_info, "editable_wheel": editable_wheel},
+    packages=packages,
+    package_dir=PACKAGE_DIRS,
+)

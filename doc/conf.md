@@ -34,6 +34,8 @@ View the synthetic configuration from the root of the project `saebase task=capt
 
 The main formulation defaults `dataset=ioi`, `model=openresearch_gemma2_2b_base` and `task=capture`. For example, you want `dataset=bbh` for data and `task.capture.mode=non_whiten` for the capture method.
 
+For configuration-only runs with registered components, each invocation gets a separate record. See the [experiment records guide](experiment.md) for the manifest and result readers.
+
 ### 1.1 Operating methods, equipment and numerical strategies
 
 | Settings | Default value | Behaviour |
@@ -569,7 +571,7 @@ The following are automatically updated from the actual configuration file. The 
 
 [Open Full File](../base/configuration/__init__.py)
 
-<!-- SHA256: 771bb03a25d8b45cd65c6e22aed68bce73cab8180a0bd962d3d0a215b7986e99 -->
+<!-- SHA256: 85e92e4d642a16cb905ddbe058ff4d064dd4b1a6a26f653ad23710542cdb9303 -->
 <pre>&quot;&quot;&quot;Named component configurations for source and installed SAEBase.
 
 Catalogs keep shared defaults once. Hydra owns selection and composition;
@@ -582,12 +584,54 @@ from pathlib import Path
 import yaml
 from omegaconf import OmegaConf
 
+
+def workspace_at(directory: Path) -&gt; bool:
+    &quot;&quot;&quot;Recognize a source workspace independently of the launch directory.&quot;&quot;&quot;
+    return (
+        (directory / &quot;pyproject.toml&quot;).is_file()
+        and (directory / &quot;base/application/commands.py&quot;).is_file()
+        and (directory / &quot;conf/config.yaml&quot;).is_file()
+    )
+
+
 def configuration_root() -&gt; Path:
     &quot;&quot;&quot;Locate physical recipes in a checkout and data files in distributions.&quot;&quot;&quot;
     source = Path(__file__).resolve().parents[2]
-    if (source / &quot;pyproject.toml&quot;).is_file() and (source / &quot;conf/config.yaml&quot;).is_file():
+    if workspace_at(source):
         return source / &quot;conf&quot;
     return Path(__file__).absolute().parent
+
+
+def launch_directory() -&gt; Path:
+    &quot;&quot;&quot;Return the caller&#x27;s directory before Hydra changes into the run directory.&quot;&quot;&quot;
+    from hydra.core.hydra_config import HydraConfig
+    from hydra.utils import get_original_cwd
+
+    return Path(get_original_cwd() if HydraConfig.initialized() else Path.cwd()).resolve()
+
+
+def default_workspace() -&gt; str | None:
+    &quot;&quot;&quot;Prefer the caller&#x27;s SAEBase checkout, then the checkout supplying the package.&quot;&quot;&quot;
+    launch = launch_directory()
+    for directory in (launch, *launch.parents, configuration_root().parent):
+        if workspace_at(directory):
+            return str(directory)
+    return None
+
+
+def _default_data_directory(root: str | None) -&gt; str | None:
+    return str(((launch_directory() / root).resolve() / &quot;assets/dataset_preparation/prompt_sets/files&quot;).resolve()) if root is not None else None
+
+
+def _prepared_dataset_dir(root: str, name: str) -&gt; str:
+    from saebase.datasets.artifacts import prepared_dataset_root
+
+    return str(prepared_dataset_root(root, name))
+
+
+OmegaConf.register_new_resolver(&quot;saebase_prepared_dir&quot;, _prepared_dataset_dir, replace=True)
+OmegaConf.register_new_resolver(&quot;saebase_workspace&quot;, default_workspace, replace=True)
+OmegaConf.register_new_resolver(&quot;saebase_data_dir&quot;, _default_data_directory, replace=True)
 
 
 CATALOG_PATHS = {
@@ -873,7 +917,7 @@ presets:
 
 [Open Full File](../conf/base/runtime/runtime.yaml)
 
-<!-- SHA256: a9637958ed5144f2d8d835655bc777d8f3aa31893e4fbba98e07529471b97afe -->
+<!-- SHA256: 149ecfbe3cbaef811fa63f0dcb8d4ef42a1bcb46284d978c0c961d0b36bf95d9 -->
 <pre># Purpose: select interpreters and define shared input and run defaults.
 # Scope: local model launches and Hydra runtime composition.
 
@@ -900,8 +944,8 @@ environments:
     qwen35_27b: *qwen35
 
 paths:
-  root: ${hydra:runtime.cwd}
-  data_dir: ${paths.root}/data
+  root: ${saebase_workspace:}
+  data_dir: ${saebase_data_dir:${paths.root}}
 
 experiment:
   sub_name: null
@@ -955,7 +999,7 @@ hydra:
 
 [Open Full File](../conf/datasets/catalog.yaml)
 
-<!-- SHA256: 1d8959a273f725169e133f38292278c7597a9fa5890624c82dbeb5563b99c38a -->
+<!-- SHA256: 9cf19111f843e586de1cb050a79345abdfe71e0573e3fa897b85d0579a9012c3 -->
 <pre># Purpose: dataset selection and prompt preparation defaults and presets.
 # Scope: dataset preparation and Hydra component selection.
 
@@ -963,7 +1007,7 @@ dataset:
   # Purpose and main function: Public defaults and name presets for the preservation of data sets.
   # Scope: Hydra Component selection, and conf.load_group Direct Read.
   defaults:
-    data_path: ${paths.data_dir}/${dataset.name}
+    data_path: ${saebase_prepared_dir:${paths.data_dir},${dataset.name}}
     prompt_file: &#x27;&#x27;
   presets:
     arc_challenge:
@@ -1044,10 +1088,10 @@ prompt_source:
   presets:
     arc_challenge:
       name: ARCChallenge
-      data_path: ${paths.data_dir}/ARCChallenge
+      data_path: ${saebase_prepared_dir:${paths.data_dir},ARCChallenge}
     bbh:
       name: BBH
-      data_path: ${paths.data_dir}/BBH
+      data_path: ${saebase_prepared_dir:${paths.data_dir},BBH}
       prepare:
         n_generate: 80
         min_kept: 10
@@ -1055,40 +1099,40 @@ prompt_source:
         source_path: /workspace/data/BBH
     counterfact:
       name: CounterFact
-      data_path: ${paths.data_dir}/CounterFact
+      data_path: ${saebase_prepared_dir:${paths.data_dir},CounterFact}
       prepare:
         n_generate: 300
         min_kept: 20
         seed: 0
     gpqa_extended:
       name: GPQAExtended
-      data_path: ${paths.data_dir}/GPQAExtended
+      data_path: ${saebase_prepared_dir:${paths.data_dir},GPQAExtended}
     greater_than:
       name: GreaterThan
-      data_path: ${paths.data_dir}/GreaterThan
+      data_path: ${saebase_prepared_dir:${paths.data_dir},GreaterThan}
       prepare:
         n_generate: 300
         min_kept: 20
         seed: 0
     ioi:
       name: IOI
-      data_path: ${paths.data_dir}/IOI
+      data_path: ${saebase_prepared_dir:${paths.data_dir},IOI}
       prepare:
         n_generate: 300
         min_kept: 20
         seed: 0
     livecodebench:
       name: LiveCodeBench
-      data_path: ${paths.data_dir}/LiveCodeBench
+      data_path: ${saebase_prepared_dir:${paths.data_dir},LiveCodeBench}
     math500:
       name: MATH500
-      data_path: ${paths.data_dir}/MATH500
+      data_path: ${saebase_prepared_dir:${paths.data_dir},MATH500}
     medqa:
       name: MedQA
-      data_path: ${paths.data_dir}/MedQA
+      data_path: ${saebase_prepared_dir:${paths.data_dir},MedQA}
     mmlu_pro:
       name: MMLUPro
-      data_path: ${paths.data_dir}/MMLUPro
+      data_path: ${saebase_prepared_dir:${paths.data_dir},MMLUPro}
       prepare:
         n_generate: 300
         min_kept: 20
@@ -1104,14 +1148,14 @@ prompt_source:
         hf_name: TIGER-Lab/MMLU-Pro
     simple_copying:
       name: SimpleCopying
-      data_path: ${paths.data_dir}/SimpleCopying
+      data_path: ${saebase_prepared_dir:${paths.data_dir},SimpleCopying}
       prepare:
         n_generate: 300
         min_kept: 20
         seed: 0
     subject_verb_agreement:
       name: SubjectVerbAgreement
-      data_path: ${paths.data_dir}/SubjectVerbAgreement
+      data_path: ${saebase_prepared_dir:${paths.data_dir},SubjectVerbAgreement}
       prepare:
         n_generate: 300
         min_kept: 20
@@ -3006,7 +3050,7 @@ site_targets:
 
 [Open Full File](../conf/tasks/capture/task.yaml)
 
-<!-- SHA256: 6ae67a8ffd3a55a7bd6cf251f6fcb03a7328b81991cadbb2ab7dfd1ed43deb23 -->
+<!-- SHA256: 35ced6365b53760f01f18a9f4d50323263d77e34848ac734d6862834766c8f1d -->
 <pre># @package _global_
 # Each task is model/dataset independent; compose selections through Hydra.
 task:
@@ -3027,7 +3071,7 @@ task:
     neuronpedia:
       enabled: true
       allow_network: true
-      cache_dir: null  # Uses XDG_CACHE_HOME/saebase/neuronpedia or ~/.cache/saebase/neuronpedia.
+      cache_dir: null  # Uses assets/annotation_cache/neuronpedia_explanations/files under the checkout.
       timeout_seconds: 15
       total_timeout_seconds: 120
       max_download_bytes: 67108864

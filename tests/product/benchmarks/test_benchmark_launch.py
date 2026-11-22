@@ -104,6 +104,7 @@ def test_hydra_uses_one_master_and_explicit_component_choices(tmp_path, entry):
             "task=benchmark",
             "task.benchmark.benchmark_config=protocol.json",
             "experiment.sub_name=synthetic",
+            f"paths.root={tmp_path}",
         ],
         cwd=tmp_path,
         capture_output=True,

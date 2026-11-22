@@ -6,19 +6,19 @@ Maintains the same rating for the same subject and for the same characteristic i
 
 ## Scope
 
-The current single GPU Capture, Intervene, Generate, and Responsive Prechecks. Official mass stop and this round only runs a process of verification of authenticity and consistency. The document records a verification range that does not commit to all hardware, all incoming global mathematical proofs with limited probes.
+The current single GPU Capture, Intervene, Generate, and Responsive Prechecks. Official mass stop, and this round only runs a level of authenticity and consistency check. The document records a verification range that does not commit to all hardware, all incoming global mathematical proofs with limited probes.
 
 ## Processes and responsibilities
 
 1. Runtime selects `runtime.numerics` before any model is loaded or CUDA calculation, judging the continuation of the current calculation version after it has been written into the configuration. The same policy, however, has to be recalculated for the different historical run of the version. The same work process maintains a numerical policy to switch to the new process.
-2. `models/numerics.py` Harmonize the GPU calculation policy to call the reused upstream algorithm; HF's Attention uses Torch's ready-to-math backend to fix the calculation path; and model adapters use the policy at the loading front. Tasks do not set the environment or create new reasoning services separately.
+2. `models/numerics.py` Harmonize the GPU calculation policy to call the reused upstream algorithm; the HF's Attention uses the Torch ready-to-math backend to fix the calculation path; and the model adapter uses the strategy at the loading front. The tasks do not set the environment separately or create a new reasoning service.
 3. The task continues to use the interface of existing models, SAE, feature screening and standard answer scoring. The public cache and batch processing is in the model API, and algorithms and indicators are in the corresponding task.
 4. Runtime Load a model and SAE,Precheck Share with official missions. Precheck Reuse normal task execution path, and calculate the same input by article batch Compare, measure throughput and visibility, and then give the recommendation to the official execution..`vllm`The error required under the numerical policy is: 0;The reason for the failure to adopt the reservation cannot be counted as passing silently back on an article-by-article basis..
 5. The formal task follows the same strategy and retains control over each issue. The size of the watch can be reduced when there is a lack of visibility, but it is still subject to consistency check. The numerical strategy and upstream sources follow the results of operations, performance records, normalized identity and behavioral products; it cannot be mixed with the old value strategy's cache.
 
 ## Reuse Range
 
-Numerical settings, matrix multiplications and log-softmax achieves <27.1 from vLLLM.1, fixedcommittee `6e448d0ea9bf3d88d898b65449ca6dc2aec170ac`, source path `vllm/model_executor/layers/batch_invariant.py`. Softmax uses a newer fixed-line contract, `vllm/model_executor/determinism/batch_invariant.py` from commit `68e478651a20e3d23bf939912c38883d511ac3ee`. The access layer retains the syntax of FP16/BF16 for the FP32 accumulation and output type.
+Numerical settings, matrix multiplications and log-softmax achieves <27.1 from vLLM, fixedcommittee `6e448d0ea9bf3d88d898b65449ca6dc2aec170ac`, source path `vllm/model_executor/layers/batch_invariant.py`. Softmax uses a newer fixed-line contract, `vllm/model_executor/determinism/batch_invariant.py` from commit `68e478651a20e3d23bf939912c38883d511ac3ee`. Access layers retain the syntax of FP16/BF16FP32 accumulation and output type.
 
 The list of functions, licences and sources is stored at `third_party/accelerator_kernels/`. The original matrix profile specifies IEEE FP32, using an upstream tile configuration suitable for the memory sharing of this card; these adaptive items are included in the list of sources. The GPU calculation code is provided upstream and the project only maintains access, life cycle and actual mission validation.
 
@@ -45,7 +45,7 @@ The CPU thread control is performed by `base/runtime/environment.py`: the thread
 
 The performance records also preserve the actual Torch route number, are loaded with the BLAS route pool and associated environmental settings. Fixed project settings and automatic watch search the respective records to avoid double counting of the benefits from the existing combination of optimization to the current CPU. Four Capture and Intervene/Generate excursions have been used for 4 threads and observation, and this time they are used as normal entry defaults.
 
-Default access review: GPT2/GSM8K for regular Runtume generation using default 8token, Top10 is more complete; automatic precheck of PASS, official mission directly re-inspection catch 10, rating and discrete output control error 0. The matrix also completes one question I, with original input, answers, candidates and all of the 1,024 ratings on a line-by-line basis with the previous V4 product. The actual line Torch/BLAS is 4. original running path and check result (archived reference)] [Executive record](../../../maintenance/batch_invariance/execution.md)]
+Default access review: Common Runtume GPT2/GSM8K generation using default 8token, Top10 compared to full completion; automatic precheck of PASS, official mission directly re-inspection catch 10, rating and discrete output control error 0. Matrix I is also completed and original input, answer, candidate and all 1024 ratings are identical to the previous V4 product item by item. Actual Torch/BLAS line is 4. original run path and check result] [Executive record](../../../maintenance/batch_invariance/execution.md)]
 
 ## Validation and products
 
@@ -57,8 +57,8 @@ The Qwen GPU numerical identity is upgraded to `saebase.vllm_batch_invariant.qwe
 
 The original answer rating is now `SiteReplay`/`AnswerReplay`, which is used for the HF model. It is the same as for the TL model, and shares the cache by article and by batch. Each issue is maintained in a full frontal comparison, avoiding a comparison of only two same optimisations. The bat policy is used to double the length of the full sequence by two barrels and by the number of control states, eliminating multiple searches on the exact answer length; the precheck of the same loaded model/SAE and the Capture model sharing strategy.
 
-The originals of the old 54 failed issues were fully passed by batch1/2/8/16 controls; one of them was identical to the article-by-article results under batch2/8/16/32/64. The original evidence of speed, software and formal precheck (archived reference)
+The originals of the old 54 failed issues were fully passed by batch1/2/8/16 controls; one of them was identical to the article-by-article results under batch2/8/16/32/64. The original evidence of speed, software and formal precheck
 
-Each group of v4 real probes uses the original model/SAE/Class, GSM8K3 questions, four Captures and Intervene/Generate; preheat one, measure two, Generate generates two tokens. I calculates the 1024 state of the candidate and independently doubles the 1024 state of each model from the saved product; the rating control is higher than the batt64. The return of different lengths/orders and tails, probability cumulative accuracy, and continuous segregation is saved separately. The original record of batch consistency with result (archived reference)]
+Each group of v4 real probes uses the original model/SAE/Class, GSM8K3 questions, four Captures and Intervene/Generate; preheat one, measure two, Generate generates two tokens. I calculates the 1024 state of the candidate and independently doubles the 1024 state of each model from the saved product; the rating control is higher than the batt64. The return of different lengths/orders and tails, probability cumulative accuracy, and continuous segregation is saved separately. The original record of batch consistency with result]
 
 Distinction in reading performance reports: Public stages such as throughput, full time per item, first search cost and model loading, which are rated on an article-by-article basis against a batch rating under the strategy.

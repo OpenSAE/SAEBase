@@ -5,17 +5,13 @@ from __future__ import annotations
 import importlib.util
 import math
 import os
-import sys
 from pathlib import Path
 
 import numpy as np
 import pytest
 
-ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(ROOT / "saebase" / "research_lab"))
-
-from backend.core import digest, has_complete_identity, load_sites  # noqa: E402
-from backend.methods import run_rss, run_sar  # noqa: E402
+from saebase.research_lab.backend.core import digest, has_complete_identity, load_sites
+from saebase.research_lab.backend.experimental_design.methods import run_rss, run_sar
 
 
 def _original(path: Path, name: str):

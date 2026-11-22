@@ -10,7 +10,7 @@ Used to understand the actual environment in the experimental records, or to col
 
 ## Run independently
 
-Select Python 3.11 or 3.12 from the project root directory to execute `python -m pip install -e .`. Select the model backend and the preparation weights required for the task. The data directory can be selected by the item `paths.data_dir` parameter, running the record-keeping current interpreter, relying version and source. [Quick Start](../code/translated/README.md#-quick_start)]
+Select Python 3.11 or 3.12 from the project root directory to execute `python -m pip install -e .`. Select the model backend and the preparation weights needed to load the task. The data directory can be selected by the item `paths.data_dir` parameter, running the record-keeping current interpreter, relying version and source. [Quick Start](../code/translated/README.md#-quick start)]
 
 After installation, the configuration can be synthesized from the project root directory using the following commands, and the synthetic data example can generate an evaluation plan. Both commands rely on basic installation.
 
@@ -25,7 +25,7 @@ The first should list the selected data set, model and catch parameters. The sec
 
 After access, you can bind the engine Python and the data and call the original entrance to SAEBASE via `rh projects run`.
 
-If you need to collect the machine and process environment separately, you can run `rh utils probe --output <snapshot_path>`. When you have two snapshots, you can use `rh utils compare <old_snapshot> <new_snapshot>` to check for changes in the conditions of dependence and equipment.
+If you need to collect the machine and process environment separately, you can run `rh utils probe --output <snapshot_path>`. When you have two snapshots, you can use `rh utils compare <previous_snapshot> <new_snapshot>` to check for changes in the conditions of dependence and equipment.
 
 When operational conditions are missing, the specific dependencies, equipment or interpreter and its effects are processed within the delegated authority; environmental facts have been established by the re-use of the responsible module for the follow-up mission.
 

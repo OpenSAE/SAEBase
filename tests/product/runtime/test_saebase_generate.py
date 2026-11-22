@@ -12,9 +12,9 @@ from tasks.generate.serving import generate, packed_row, resolve_backend, sampli
 REPO = Path(__file__).resolve().parents[3]
 TASKS = REPO / "tasks"
 
-LEGACY_HF_OR_VLLM_IMPORT = {
-    "generate/backend/engine.py",
-    "generate/backend/vllm.py",
+GENERATION_IMPLEMENTATIONS = {
+    "generate/serving/engine.py",
+    "generate/serving/serving_engine.py",
 }
 
 BYPASS_PATTERNS = (
@@ -138,7 +138,7 @@ def test_new_tasks_do_not_bypass_saebase_generate():
     offenders: list[str] = []
     for path in sorted(TASKS.rglob("*.py")):
         rel = path.relative_to(TASKS).as_posix()
-        if rel in LEGACY_HF_OR_VLLM_IMPORT:
+        if rel in GENERATION_IMPLEMENTATIONS:
             continue
         text = path.read_text(encoding="utf-8")
         for pat in BYPASS_PATTERNS:

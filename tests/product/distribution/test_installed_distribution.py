@@ -29,7 +29,7 @@ def test_wheel_and_sdist_preserve_offline_task_interfaces(tmp_path):
         "HF_DATASETS_OFFLINE": "1",
     }
     # Reuse a dirty build output, as happens after deleting a source module.
-    stale = ROOT / "build/lib/tasks/generate/vllm_backend/generate.py"
+    stale = ROOT / ".build/package/lib/tasks/generate/vllm_backend/generate.py"
     stale.parent.mkdir(parents=True, exist_ok=True)
     stale.write_text("RETIRED_BUILD_SENTINEL = True\n")
     dist = tmp_path / "dist"
@@ -48,6 +48,7 @@ def test_wheel_and_sdist_preserve_offline_task_interfaces(tmp_path):
         timeout=180,
     )
     assert built.returncode == 0, built.stdout[-3000:] + built.stderr[-3000:]
+    assert not stale.exists(), "The wheel build must remove retired module output"
     assert not legacy.exists(), (
         "Backend output must stay inside the temporary distribution directory"
     )

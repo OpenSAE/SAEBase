@@ -7,14 +7,15 @@ import sys
 
 
 class AliasLoader(Loader):
-    def __init__(self, canonical):
-        self.canonical = canonical
+    def __init__(self, canonical_spec):
+        self.canonical_spec = canonical_spec
 
     def create_module(self, spec):
-        return import_module(self.canonical)
+        return import_module(self.canonical_spec.name)
 
     def exec_module(self, module):
         """The canonical module's loader has already executed its source."""
+        module.__spec__ = self.canonical_spec
 
 
 class ModuleAliases(MetaPathFinder):
@@ -29,7 +30,7 @@ class ModuleAliases(MetaPathFinder):
         if spec is None:
             return None
         return spec_from_loader(
-            fullname, AliasLoader(canonical),
+            fullname, AliasLoader(spec),
             is_package=spec.submodule_search_locations is not None,
         )
 

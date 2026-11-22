@@ -10,7 +10,7 @@ This applies to the maintenance of workflows, the selection of the scope of insp
 
 ## Maintenance of inspection function
 
-When you add or modify an inspection, you first determine what, what or what work the developer needs to locate after receiving the result, and then select the object and the content of the inspection. Reasons, documents and recommendations for processing are provided from the module that is the subject of the inspection, and they are retained in the aggregation process. Check the scene to read the results from the actual call access and use this information to process the problem and select the circumstances that apply to this change.
+When you add or modify an inspection, you first determine what, what or what work the developer needs to locate after receiving the result, and then select the subject and the content of the inspection. Reasons, documents and recommendations for processing are provided from the module in charge of the inspection, and they are retained in the aggregation process. Check the scene to read the results from the actual call access and use this information to process the problem and select the circumstances applicable to this change.
 
 ## Daily inspections
 

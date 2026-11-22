@@ -12,6 +12,8 @@ import json
 from pathlib import Path
 from typing import Any, Iterable
 
+from saebase.datasets.artifacts import _in_prepared_assets, resolve_prepared_path
+
 
 @dataclass
 class SampleSelection:
@@ -55,10 +57,21 @@ def selection_path(cfg, model_key):
 
         source = Path(to_absolute_path(str(cfg.prompt_file))).expanduser().resolve()
         specification["prompt_file"] = str(source)
-        specification["source_sha256"] = hashlib.sha256(source.read_bytes()).hexdigest()
+        specification["source_sha256"] = hashlib.sha256(resolve_prepared_path(source).read_bytes()).hexdigest()
     key = hashlib.sha256(json.dumps(specification, sort_keys=True).encode()).hexdigest()[:24]
-    root = Path(str(cfg.data_path)).expanduser()
-    return root / (model_key if str(cfg.name) == "IOI" else "_shared") / "selections" / key
+    root = resolve_prepared_path(Path(str(cfg.data_path)))
+    if _in_prepared_assets(root):
+        owner = model_key if str(cfg.name) == "IOI" else "shared"
+        return root / owner / "selections" / f"cohort_{key}"
+    if str(cfg.name) == "IOI":
+        return root / model_key / "selections" / key
+    selection = root / "shared" / "selections" / key
+    legacy = root / "_shared" / "selections" / key
+    if selection.exists():
+        return selection
+    if legacy.exists() or root.parts[-4:-1] != ("data", "prompts", "prepared"):
+        return legacy
+    return selection
 
 
 def read_selection(cfg, model_key):

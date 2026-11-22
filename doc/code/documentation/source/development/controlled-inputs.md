@@ -4,7 +4,7 @@ SAEBase can prepare a complete binary input experiment, collect its model activa
 
 ## Maintain controlled input function
 
-The input and outcome are determined by how the target mission uses the state and the relation of the sample. The preservation design is accompanied by a list-reading, positioning and associated cache. If the coverage is inadequate, the sample is duplicated or the identity is inconsistent, the specific design and conditions are indicated, the known facts and treatment methods are retained; the matching is confirmed by actually re-establishing the input grid and handing it over to the original method.
+The input and outcome are determined by how the target mission uses the state and the relation of the sample. The preservation design is accompanied by a list-reading, positioning and associated cache. If the coverage is insufficient, the sample is duplicated or the identity is inconsistent, the specific design and conditions are indicated, the known facts and treatment methods are retained; the matching is confirmed by actually re-establishing the input grid and handing it over to the original method.
 
 ## Offline example
 

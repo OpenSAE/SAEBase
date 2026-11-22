@@ -19,7 +19,7 @@ from typing import Any
 
 from .core import canonical_json, dataset_catalog
 from .ingest import _atomic_bytes
-from .readouts import input_anchor
+from .experimental_design.readouts import input_anchor
 
 SCHEMA = "opensae.rss.variant_proposals.v1"
 SETTINGS = ("local_format", "instruction_wrapper", "context_wrapper")

@@ -418,8 +418,12 @@ def _matrix_context(path: Path, mode: str) -> tuple[Path, str]:
 def export_matrices(selections, output):
     """Create a dataset snapshot from selected capture matrices and saved explanations."""
     from saebase.runtime.experiment_paths import capture_method_role, member_directory
+    from saebase.runtime.experiment_results import historical_run_path
 
-    matrices = [(mode, Path(path), *_matrix_context(Path(path), mode)) for mode, path in selections]
+    matrices = []
+    for mode, path in selections:
+        source = historical_run_path(path)
+        matrices.append((mode, source, *_matrix_context(source, mode)))
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
     types = schemas()

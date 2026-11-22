@@ -94,7 +94,7 @@ def render(case):
         lines += ["", "Not Under Current Parameter RSS Features."]
     lines += [
         "",
-        "## Table B:Characteristics of the variant",
+        "## Table B:The specific features of the variant.",
         "",
         "Before the absolute changes in the variants 100 Name, take change > 1e-5 and ≥ Characteristics of maximum five-fold variation of the other four variants; exclusion RSS Selection, up to three for each variant.",
         "",

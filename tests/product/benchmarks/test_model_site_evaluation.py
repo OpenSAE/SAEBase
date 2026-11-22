@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import tomllib
+from importlib import import_module
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -15,7 +16,10 @@ def test_package_metadata_matches_public_api_version():
     assert data["project"]["version"] == __version__
     assert data["project"]["name"] == "opensae-saebase"
     assert data["project"]["license"] == "Apache-2.0"
-    assert data["project"]["scripts"]["saebase"] == "saebase.cli:main"
+    from saebase.cli import main
+
+    module, entry = data["project"]["scripts"]["saebase"].split(":")
+    assert getattr(import_module(module), entry) is main
 
 
 def test_public_distribution_has_required_files():
@@ -29,7 +33,7 @@ def test_public_distribution_has_required_files():
         "doc/code/distribution/source/manifest.in",
         "doc/code/documentation/source/development/PROVENANCE.md",
         "doc/code/documentation/source/development/RELEASE_CHECKLIST.md",
-        "conf/__init__.py",
+        "base/configuration/__init__.py",
         "conf/config.yaml",
     ):
         assert (ROOT / rel).is_file(), rel

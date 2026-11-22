@@ -15,7 +15,7 @@ import re
 from pathlib import Path
 from typing import Any
 
-from .core import PLATFORM, canonical_json, read_json
+from saebase.research_lab.backend.core import PLATFORM, canonical_json, read_json
 
 LOCK_PATH = PLATFORM / "data" / "source_lock.json"
 SCHEMA = "opensae.corpus_source_lock.v1"

@@ -29,8 +29,9 @@ def test_relative_link_checker_detects_bad_paths(tmp_path):
     guide = tmp_path / "README.md"
     guide.write_text("[tutorial](doc/code/documentation/source/development/missing.md)\n", encoding="utf-8")
     assert missing_links(guide, tmp_path) == ["README.md:1: doc/code/documentation/source/development/missing.md"]
-    (tmp_path / "doc" / "code/development").mkdir(parents=True)
-    (tmp_path / "doc" / "code/development" / "missing.md").write_text(
+    development = tmp_path / "doc/code/documentation/source/development"
+    development.mkdir(parents=True)
+    (development / "missing.md").write_text(
         "# Present\n", encoding="utf-8"
     )
     assert missing_links(guide, tmp_path) == []

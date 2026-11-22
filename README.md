@@ -1,6 +1,6 @@
 # 🧱 SAEBase: SAE Research Tools and Agent Workflows
 
-🌍 Languages: [English](README.md) | [中文](doc/code/translated/README.md) &nbsp; [![CI](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml)
+🌍 Languages: [English](README.md) | [Chinese](doc/code/translated/README.md) &nbsp; [![CI](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSAE/SAEBase/actions/workflows/ci.yml)
 
 **Software version:** [v0.8.0 — Research Components and Experiment Workflows](doc/code/documentation/source/development/releases/v0.8.0.md) · [Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) · [Python API](doc/code/documentation/source/development/python-api.md)
 
@@ -50,7 +50,7 @@ cd SAEBase
 python -m pip install -e .
 
 python scripts/examples/first_experiment.py --dry-run
-python scripts/examples/first_experiment.py --output runs/first-experiment
+python scripts/examples/first_experiment.py --output tmp/first_experiment
 ```
 
 The first command previews the planned evaluation of two synthetic SAEs. The second runs the evaluation and writes `report.html`, `summary.csv`, and a reliability report. It prints the output paths so you can open the HTML report in a browser.

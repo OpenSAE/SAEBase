@@ -7,7 +7,7 @@ versioned and are explicitly linked to the unchanged benchmark metric manifest.
 
 ## Maintenance of statistical analysis and reporting
 
-First, you determine the comparisons and sample groups to be judged by the user, and then select estimates, input measurements and outputs. Record the relationship between the sample unit, selection and set-up, seed and original measurements; explain the actual impact and subsequent information when the sample is insufficient, identity is inconsistent or no definition is estimated. Read the stored analysis and complete the corresponding comparison and confirm that the chart and the values follow the same statistical meaning.
+First, the comparison and sample grouping to be determined by the user, then the estimation, input measurement and output are selected. Record the relationship between the sample unit, selection and set-up, seeds and original measurements; explain the actual impact and subsequent information when the sample is insufficient, identity is inconsistent or no definition is estimated. Read the stored analysis and complete the corresponding comparison, confirming that the chart and the values follow the same statistical meaning.
 
 ## Evaluation stability and paired confidence intervals
 

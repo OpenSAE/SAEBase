@@ -79,7 +79,7 @@ def project_info(root: Path = ROOT) -> tuple[str, str, dict[str, str]]:
         raise ValueError(f"expected a stable semantic version x.y.z, got {version!r}")
     if project["name"] != "opensae-saebase":
         raise ValueError("unexpected Python project name")
-    declared = _static_version((root / "saebase" / "__init__.py").read_text(encoding="utf-8"))
+    declared = _static_version((root / "base/application/__init__.py").read_text(encoding="utf-8"))
     if declared != version:
         raise ValueError("pyproject.toml and saebase.__version__ disagree")
     changelog = (root / "doc/code/documentation/source/development/CHANGELOG.md").read_text(encoding="utf-8")
@@ -143,7 +143,7 @@ def inspect_distributions(
             raise ValueError("no installed console scripts")
         if dict(parser.items("console_scripts")) != entrypoints:
             raise ValueError("installed console scripts differ from source project")
-        if "base/application/cli.py" not in names or "conf/config.yaml" not in names:
+        if "saebase/commands.py" not in names or "conf/config.yaml" not in names:
             raise ValueError("wheel lacks public API or runtime Hydra configuration")
 
     with tarfile.open(sdist, "r:gz") as archive:

@@ -45,7 +45,7 @@ Data are prepared using `saebase-prepare-prompts` for environmental queries `sae
 
 Project maintenance uses the following four entry points:
 
-- `python scripts/quality.py`: Format and static check of selected codes; `select --base <commit> --head <commit>` Select to continue integration check.
+- `python scripts/quality.py`: Format and static check for selected codes; `select --base <commit> --head <commit>` Select to continue integration check.
 - `python scripts/documentation.py --check`: Document link; `support --check` or `support --write` to read the assessment evidence and check or update the supporting form.
 - `python scripts/distribution.py contents|install|roundtrip <directory>`: Separately check distribution, installation outside the warehouse and re-establishment of the source package.
 - `python scripts/release.py --help`: Version source, conditions for publication and asset register.

@@ -226,7 +226,8 @@ def test_answer_sar_reuses_prompt_capture_and_original_estimator(
                 .mean()
             )
             assert measured == pytest.approx(float(expected))
-    assert result["completion"]["status"] == "complete"
+    assert result["completion"]["counts"]["completed"] == 1, result["completion"]
+    assert result["completion"]["counts"]["blocked"] == 1, result["completion"]
 
 
 def test_hf_backend_full_teacher_forced_output_preserves_single_position_api():

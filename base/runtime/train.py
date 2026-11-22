@@ -7,6 +7,7 @@ composed configuration, or select ``task=train`` and supply its training plan.
 from __future__ import annotations
 
 from conf import configuration_root
+from contextlib import chdir
 from pathlib import Path
 from typing import Optional
 
@@ -55,11 +56,7 @@ def main(cfg: DictConfig) -> Optional[float]:
 
 def execute_run(cfg: DictConfig, folder: Path):
     """One shared lifecycle for CLI and integration tests, with records before failure exits."""
-    import traceback
-    from saebase.runner import run_task
-    from saebase.seed import apply_seed
-    from saebase.runtime.experiment_paths import configured_experiment_name, prepare_run, run_session
-    from saebase.runtime.experiment_results import record_run
+    from saebase.runtime.experiment_paths import configured_experiment_name, run_session, start_execution
     from models.numerics import bind_configuration
 
     cfg.experiment.sub_name = configured_experiment_name(cfg)
@@ -69,29 +66,43 @@ def execute_run(cfg: DictConfig, folder: Path):
 
     resolve_config_devices(cfg)
     with run_session(cfg, folder):
-        prepare_run(cfg, folder)
-        if cfg.get("runtime", {}).get("mode") == "resume":
-            from saebase.runtime.experiment_results import inspect_run, read_run
-            from saebase.results import EvaluationResult
+        execution = start_execution(cfg, folder)
+        if execution != folder:
+            execution.mkdir(parents=True)
+        with chdir(execution):
+            return _execute_prepared(cfg, execution, task)
 
-            if inspect_run(folder, expected_cfg=cfg)["action"] == "skip":
-                return EvaluationResult(**read_run(folder)["result"])
-        apply_seed(int(cfg.seed))
-        try:
-            outcome = run_task(cfg, task=task)
-        except Exception as exc:
-            record_run(
-                folder,
-                cfg,
-                error={
-                    "type": type(exc).__name__,
-                    "message": str(exc),
-                    "traceback": traceback.format_exc(),
-                },
-            )
-            raise
-        record_run(folder, cfg, result=outcome)
-        return outcome
+
+def _execute_prepared(cfg, folder, task):
+    import traceback
+    from saebase.runner import run_task
+    from saebase.seed import apply_seed
+    from saebase.runtime.experiment_paths import prepare_run
+    from saebase.runtime.experiment_results import record_run
+
+    prepare_run(cfg, folder)
+    if cfg.get("runtime", {}).get("mode") == "resume":
+        from saebase.runtime.experiment_results import inspect_run, read_run
+        from saebase.results import EvaluationResult
+
+        if inspect_run(folder, expected_cfg=cfg)["action"] == "skip":
+            return EvaluationResult(**read_run(folder)["result"])
+    apply_seed(int(cfg.seed))
+    try:
+        outcome = run_task(cfg, task=task)
+    except Exception as exc:
+        record_run(
+            folder,
+            cfg,
+            error={
+                "type": type(exc).__name__,
+                "message": str(exc),
+                "traceback": traceback.format_exc(),
+            },
+        )
+        raise
+    record_run(folder, cfg, result=outcome)
+    return outcome
 
 
 if __name__ == "__main__":

@@ -7,19 +7,13 @@ is skipped, while the localization-native lane installs the pinned source.
 
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
 import numpy as np
 import pytest
 
 sae_localize = pytest.importorskip("sae_localize")
 from sae_localize import exact_scope_curve, omission_errors  # noqa: E402
 
-ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(ROOT / "saebase" / "research_lab"))
-
-from backend.controlled_designs import (  # noqa: E402
+from saebase.research_lab.backend.experimental_design.controlled_designs import (  # noqa: E402
     make_candidate,
     synthetic_reference_codes,
     to_saebase_design,

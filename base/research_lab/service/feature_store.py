@@ -13,7 +13,6 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable
 
-from . import explore
 from .core import (
     InvalidEvidence,
     canonical_json,
@@ -402,6 +401,8 @@ def _sha(path: Path) -> str:
 
 
 def _read_traces(folder: Path) -> list[tuple[Path, str, dict[str, Any]]]:
+    from . import explore
+
     if not folder.is_dir() or folder.is_symlink():
         raise ValueError("A real private source directory is required")
     found: list[tuple[Path, str, dict[str, Any]]] = []

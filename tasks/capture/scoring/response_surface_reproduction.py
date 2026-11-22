@@ -24,9 +24,8 @@ from saebase.seed import apply_seed
 from tasks.capture.answer import ContextTailScorer, answer_patch
 from saebase.runtime.sae_operations import pair_state_fingerprints
 
-from tasks.capture.scoring.reproduction_paths import RESULTS, question_directory
+from tasks.capture.scoring.reproduction_paths import PROJECT_ROOT, RESULTS, question_directory
 
-ROOT = Path(__file__).resolve().parents[3] / "scripts/response_surface"
 OUTPUT = RESULTS
 PROTOCOL = "sar.top10.exhaustive.full_context_tail.v1"
 
@@ -139,8 +138,7 @@ class TailScorer:
 
 def reference_run(dataset):
     from saebase.runtime.experiment_paths import member_directory
-
-    return member_directory(ROOT.parents[1], dataset, "llama31_8b", "capture", "reference_additivity")
+    return member_directory(PROJECT_ROOT, dataset, "llama31_8b", "capture", "reference_additivity")
 
 
 def source_arrays(question):
@@ -150,7 +148,7 @@ def source_arrays(question):
     if hashlib.sha256(content).hexdigest() != question["artifact"]["sha256"]:
         raise ValueError(f"Source checksum mismatch: {path}")
     if not local.exists():
-        local.parent.mkdir(exist_ok=True)
+        local.parent.mkdir(parents=True, exist_ok=True)
         local.write_bytes(content)
     with np.load(path, allow_pickle=False) as arrays:
         return {key: arrays[key].copy() for key in arrays.files}
@@ -337,7 +335,7 @@ def main():
     for question in pending:
         log("question", key=question["key"])
         measure_question(pair, scorer, question)
-        from scripts.response_surface.build_exhaustive_report import main as build_report
+        from tasks.capture.scoring.response_surface_report import main as build_report
 
         build_report()
     log("all_complete", questions=len(questions))

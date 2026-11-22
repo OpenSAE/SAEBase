@@ -6,9 +6,9 @@ import hashlib
 from pathlib import Path
 from typing import Any
 
-from .core import canonical_json
-from .ingest import _raw_jsonl
-from .transforms import build_variants
+from saebase.research_lab.backend.core import canonical_json
+from saebase.research_lab.backend.ingest import _raw_jsonl
+from saebase.research_lab.backend.transforms import build_variants
 
 
 def summarize_variant_proposals(frozen_root: Path, source_ids: list[str]) -> dict[str, Any]:

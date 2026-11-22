@@ -10,7 +10,7 @@ For the understanding of experiments, models and thin-codifier terminology, and 
 
 Knowledge Tree only organises slurling characterization studies of language models. Current coverage includes models and SAE assets, Prompt data, feature capture, teacher intervention, generation, causal circuits, automatic interpretation, baseline reliability and SAE training.
 
-The issue of the study is maintained by stable ID, independent status, and real source-code evidence. Code Tree is based on Python AST; Context Tree uses [glossary.json](../code/atlas_site/source/knowledge/glossary.json) common terminology. Achieving presence only indicates that the interface has a verifiable source basis and that the validity of the experiment needs to be independently demonstrated.
+The issue of the study is maintained by stable ID, independent status, and real source-code evidence. Code Tree is based on Python AST; Context Tree uses [glossary.json](../code/atlas_site/source/knowledge/glossary.json) common terminology. Achieving presence only indicates that the interface has a verifiable source basis, and the validity of the experiment needs to be independently demonstrated.
 
 [SAE Methodological note](foundations/sae_methods.md)(It's an explanation for the characterization experiment. SAE Method, e.g., to see how the diluted code indicates that the model is activated)
 

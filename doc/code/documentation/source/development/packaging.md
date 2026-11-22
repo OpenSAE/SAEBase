@@ -10,7 +10,7 @@ For the construction, installation, maintenance and allocation of Python package
 
 ## Include
 
-Root models, tsks and conf are installed as existing structures. Data achieves keeping at the root level dabasets, places the namespace of saebase. datasets, and the source code uses the same physics. Third party Hugging Face datasets remains independent.
+Root models, tsks and conf are installed as existing structures. Data achieves keeping at the root level dabasets, places the namespace of saebase. datasets, and the source code uses the same physics. Third party Hugging Face datasets remain independent.
 
 The installation package contains the current scientific realization, configuration and necessary resources. It does not contain weights, directories of the operation of the machine or an archive of historical measurements. Web of Research Lab relies on an optional installation through Lab. The research core does not rely on ResearchHarness.
 

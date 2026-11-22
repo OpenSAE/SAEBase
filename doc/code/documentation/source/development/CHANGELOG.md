@@ -4,9 +4,10 @@
 
 ## 0.8.0 — Research Components and Experiment Workflows
 
-- Organize the shared runtime, datasets, models, research tasks, and configuration by responsibility.
-- Ship task prechecks, the Research Lab, and the CPU quick-start with the current source layout.
-- Publish the current project structure and installation instructions.
+- Organize the shared runtime, datasets, models, and research tasks around one configuration entry point.
+- Record configuration-only invocations separately and support reading both new records and relocated historical runs.
+- Resolve prepared datasets, model answer caches, and feature annotations from their project-owned locations, including compatibility with earlier paths.
+- Update SAR and RSS reproduction workflows and keep editable and wheel installs aligned with the source layout.
 
 ## 0.7.0 — Component Workflows and Reusable Experiments
 

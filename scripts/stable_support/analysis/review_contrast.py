@@ -4,11 +4,11 @@ import argparse
 import json
 from pathlib import Path
 import re
-import sys
+
+from saebase.runtime.experiment_results import historical_run_path
+from tasks.capture.rss_mode import feature_row
 
 ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(ROOT))
-from tasks.capture.rss_mode import feature_row
 
 # These patterns only navigate post-selection explanations, never select RSS features.
 PATTERNS = [
@@ -20,7 +20,7 @@ PATTERNS = [
 ]
 
 
-def navigation(root):
+def navigation(root, output):
     cases = []
     for path in sorted(root.glob("case_*/rss_case.json")):
         c = json.loads(path.read_text())
@@ -48,20 +48,27 @@ def navigation(root):
         "patterns": PATTERNS,
         "cases": cases,
     }
-    (root / "explanation_review.json").write_text(
+    output.mkdir(parents=True, exist_ok=True)
+    (output / "explanation_review.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     )
     return cases
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--original", type=Path, required=True)
     parser.add_argument("--alternative", type=Path, required=True)
-    args = parser.parse_args()
-    original, alternative = args.original.resolve(), args.alternative.resolve()
-    navigation(original)
-    navigation(alternative)
+    parser.add_argument("--output", type=Path, help="Write a separate report and explanation reviews")
+    args = parser.parse_args(argv)
+    original = historical_run_path(args.original)
+    alternative = historical_run_path(args.alternative)
+    archive = ROOT / "assets/history_experiment/local_runs/files"
+    if args.output is None and any(path.is_relative_to(archive) for path in (original, alternative)):
+        parser.error("--output is required when reviewing archived cases")
+    output = args.output.resolve() if args.output else original
+    navigation(original, output / "original" if args.output else original)
+    navigation(alternative, output / "alternative" if args.output else alternative)
     c = json.loads((alternative / "case_04/rss_case.json").read_text())
     lines = [
         "# Second round: a comparison of the same real case",
@@ -127,9 +134,9 @@ def main():
         "",
         f"[Original SAE All cases]({original / 'index.md'}) · [Feature Splitting SAE All cases]({alternative / 'index.md'}) · [All of this RSS _Other Organiser]({alternative / 'case_04/rss_case.md'})",
     ]
-    report_path = original / "contrast_report.md"
+    report_path = output / "contrast_report.md"
     report_path.write_text("\n".join(lines) + "\n")
-    (original / "case_selection.json").write_text(
+    (output / "case_selection.json").write_text(
         json.dumps(
             {
                 "status": "acceptance_not_met",
@@ -145,13 +152,14 @@ def main():
         )
         + "\n"
     )
-    for directory in (original, alternative):
-        index = directory / "index.md"
-        text = index.read_text()
-        marker = f"[Read first: Results and gaps in the current round]({report_path})"
-        if marker not in text:
-            text = text.replace("\n\n", "\n\n" + marker + "\n\n", 1)
-        index.write_text(text)
+    if args.output is None:
+        for directory in (original, alternative):
+            index = directory / "index.md"
+            text = index.read_text()
+            marker = f"[Read first: Results and gaps in the current round]({report_path})"
+            if marker not in text:
+                text = text.replace("\n\n", "\n\n" + marker + "\n\n", 1)
+            index.write_text(text)
     print(report_path)
 
 

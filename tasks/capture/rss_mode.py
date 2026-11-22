@@ -183,7 +183,7 @@ def markdown(result):
         "",
         "## Table B Candidate: Activation focused on one variant and recurrence < 0.8",
         "",
-        "All unselected features are sorted by the absolute change of the variant, requiring this variant to be added > tau The candidate needs to judge the semantics based on the interpretation..",
+        "All unselected features are sorted by the absolute change of the variant, and this variant is required to increase > tau The candidate needs to judge the semantics based on the interpretation..",
         "",
     ]
     for group in result["context_candidates"]:

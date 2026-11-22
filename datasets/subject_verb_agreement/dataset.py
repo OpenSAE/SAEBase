@@ -42,9 +42,9 @@ TEMPLATE = "The {subj} {prep} the {attr}"
 
 
 def default_data_dir() -> str:
-    from saebase.datasets.artifacts import DEFAULT_DATA_ROOT
+    from saebase.datasets.artifacts import DEFAULT_DATA_ROOT, prepared_dataset_root
 
-    return str(DEFAULT_DATA_ROOT / "SubjectVerbAgreement")
+    return str(prepared_dataset_root(DEFAULT_DATA_ROOT, "SubjectVerbAgreement"))
 
 
 def sva_json_path(data_dir: str | None = None) -> Path:

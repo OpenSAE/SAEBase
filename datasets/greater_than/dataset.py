@@ -31,9 +31,9 @@ TEMPLATE = "The {noun} lasted from the year {century}{YY:02d} to the year {centu
 
 
 def default_data_dir() -> str:
-    from saebase.datasets.artifacts import DEFAULT_DATA_ROOT
+    from saebase.datasets.artifacts import DEFAULT_DATA_ROOT, prepared_dataset_root
 
-    return str(DEFAULT_DATA_ROOT / "GreaterThan")
+    return str(prepared_dataset_root(DEFAULT_DATA_ROOT, "GreaterThan"))
 
 
 def greater_than_json_path(data_dir: str | None = None) -> Path:

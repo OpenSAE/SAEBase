@@ -46,9 +46,9 @@ _DEFAULT_SOURCE_CANDIDATES = (
 
 
 def default_data_dir() -> str:
-    from saebase.datasets.artifacts import DEFAULT_DATA_ROOT
+    from saebase.datasets.artifacts import DEFAULT_DATA_ROOT, prepared_dataset_root
 
-    return str(DEFAULT_DATA_ROOT / "MMLUPro")
+    return str(prepared_dataset_root(DEFAULT_DATA_ROOT, "MMLUPro"))
 
 
 def default_source_dir() -> Path | None:
