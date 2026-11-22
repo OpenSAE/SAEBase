@@ -1,12 +1,12 @@
 # Repository Guide
 
-## Purpose
+## Purpose and Main Functions
 
-Description of source code, configuration, examples, information and physical location of the maintenance portal.
+Shows where to find source code, configurations, examples, reference material, and maintenance entry points.
 
 ## Scope
 
-For positioning components and selecting the corresponding use or development instructions.
+Use this guide to locate components and choose the relevant usage or development documentation.
 
 SAEBase separates runnable examples, research code, published evidence and engineering utilities so you can start with a task rather than a development milestone.
 
@@ -14,15 +14,15 @@ SAEBase separates runnable examples, research code, published evidence and engin
 
 | Location | Purpose | Start here |
 | --- | --- | --- |
-| [`scripts/examples/`](../../../../../scripts/examples) | Two full runable presentations | [First experiment.](first-experiment.md) · [External component](extensions.md) |
-| [`tests/fixtures/`](../../../../../tests/fixtures) | Synthesis components shared with offline inspection and demonstration | [Testing and development](../../../../../.github/CONTRIBUTING.md) |
+| [`scripts/examples/`](../../../../../scripts/examples) | Two complete runnable demonstrations | [First experiment](first-experiment.md) · [External components](extensions.md) |
+| [`tests/fixtures/`](../../../../../tests/fixtures) | Synthetic components shared by offline checks and demonstrations | [Testing and development](../../../../../.github/CONTRIBUTING.md) |
 | [`saebase/`](../../../../../base) | Python APIs for loading, measuring, editing and reporting | [API guide](python-api.md) |
 | [`models/`](../../../../../models) and [`conf/`](../../../../../conf) | Model adapters, SAE profiles and experiment configurations | [Model support](model-support.md) |
 | [`saebase/research_lab/`](../../../../../base/research_lab/README.md) | Browser-based exploration of recorded measurements | [Research Lab](../../../../../base/research_lab/README.md) |
 | [`doc/code/documentation/source/assets/`](../assets/) | Branding and workflow figures used in documentation | [Workflow diagram](../assets/figures/saebase_workflow.svg) |
 | [`doc/code/documentation/source/development/`](index.md) | Tutorials, API details, scientific protocols and verified reports | [Documentation](index.md) |
-| [`scripts/`](../../../../../.github/CONTRIBUTING.md) | Software release, distribution, document and code check access | [Script guide](../../../../../.github/CONTRIBUTING.md) |
-| [Project maintenance portal](../../../../../AGENTS.md) | Choose to maintain online or offline, locate shared skills and in-house resources | [Offline manual](../../../../../AGENTS.md) |
+| [`scripts/`](../../../../../.github/CONTRIBUTING.md) | Entry points for software release, distribution, documentation, and code checks | [Script guide](../../../../../.github/CONTRIBUTING.md) |
+| [Project maintenance entry point](../../../../../AGENTS.md) | Select online or offline maintenance and locate shared skills and local resources | [Offline manual](../../../../../.researchharness/offline/operations.md) |
 
 ## Reproducibility
 

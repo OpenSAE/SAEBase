@@ -1,22 +1,95 @@
-# SAEBase contributor and agent guidance
+# SAEBase Working Instructions
 
-## Purpose
+## Purpose and Main Functions
 
-This guide explains how to develop SAEBase and verify changes through its public research workflows.
+Explain the responsibilities and development practices of the research software and help assistants complete user tasks.
 
 ## Scope
 
-Use this guide when maintaining SAEBase source code, configuration, documentation or tests. Start with the README and use the entry point that researchers normally call.
+These instructions apply to reading, developing, and maintaining SAEBase. Start with the project README, dependency declarations, and official commands, then read the source code and local instructions relevant to the task. Shared skills are available after connecting the project to ResearchHarness.
 
-## Develop and verify changes
+## Task Authorization
 
-- Locate the user-facing command, the component that owns the behavior and the reader of its output. Use focused regression tests and representative inputs.
-- Keep model and SAE identities, data splits, experiment provenance, metrics and numerical settings explicit. Use synthetic fixtures for offline tests and obtain task-specific approval for model downloads, training, data transfer and publishing.
-- Organize shared runtime and public Python interfaces under `base/`. Put dataset readers in `datasets/`, model adapters in `models/` and independent research tasks in `tasks/`. Ownership-matched configuration lives under `conf/`.
-- Run examples from `scripts/examples/`. Keep synthetic fixtures under `tests/fixtures/` and software tests under `tests/`. Update relevant documentation when a public command, parameter, dependency or result format changes.
-- Run `python -m scripts.documentation conf --write` after changes to public configuration. Run `python -m pytest -q tests/test_configuration.py` to verify the reference.
-- Use Ruff 0.15.22 and the repository's `scripts/quality.py` workflow. Keep review scope limited to the changes under discussion.
+- Perform local operations under the authorization granted for the current task and the identity actually running them. Reading and discussion are limited to reading and drafting. Development and maintenance follow the scope set by the user. Project code reviews, formal plans, and collaboration approvals follow the project's GitHub workflow.
+- Model downloads, full training runs, real data transfers, remote pushes, releases, and replacement of the production Atlas require the user's authorization for the respective operation.
 
-## Local maintenance
+## Work Toward the Intended Outcome
 
-SAEBase installs and runs independently on Python 3.11 or 3.12. ResearchHarness is optional and provides shared maintenance guidance and resource bindings where configured. Use the README and [project documentation](doc/README.md) for standalone development. Save research runs under `experiment/` and use their manifests to retrieve configurations and results.
+- Base engineering changes on this repository's actual entry points, configuration, and checks. After connecting to ResearchHarness, consult the central engineering protocol for shared conventions on layout, preflight checks, and delivery of results. See `src/project/maintained/saebase/README.md` for how this project implements those conventions.
+
+- Establish the outcome the user needs and the conditions for completion. Locate the existing implementation and its direct callers, then investigate, make engineering decisions, and act within the existing authorization. Implement straightforward tasks directly. For complex tasks, describe the dependencies and files involved in the actual deliverable. When a human decision is needed, present the facts established, the specific choices, and their effects.
+- Carry authorized routine implementation through to completion. Choose local engineering approaches based on the agreed goals, practical benefits, and maintenance costs. When a new decision concerns the meaning of a metric, a research use, sample selection, or compute investment, explain the concrete differences, practical effects, and recommendation in light of existing decisions. Agree on the choice with the user before proceeding with the affected work.
+- For substantial changes in how research results are used or what a feature offers, show representative questions, feature comparisons, or report excerpts early so the user can assess their practical value. Use existing results or authorized small-scale experiments, then adjust the implementation and presentation in response to feedback. Conduct additional experiments within the current task's authorization.
+- When designing a new feature or a change, first identify how its result will be used and what a specific caller or downstream task needs to accomplish with it. Then determine the checks, return values, and storage. For information that needs to persist, also design how it will be found and read, how artifacts will be located, and how the information will be processed later. Implement models, data, tasks, and shared support according to their respective purposes. Prefer existing records and interfaces.
+- Completion includes the outcome in actual use. On success, users can obtain and use the required content. When a failure, blockage, or partial completion is relevant to the feature, downstream work can continue from the recorded facts, effects, and suggested actions. If the cause is still under investigation, retain the known facts and the next diagnostic method.
+- Read the material relevant to the current question. Distinguish documented definitions, actual code behavior, observed runtime behavior, and inferences. Record sources and versions as needed for the task. Record the respective sources of historical results and synthetic samples.
+- Fix the actual failure first. Base new preventive measures on a concrete path in the current code, a practical consequence, and a proportionate cost.
+- Assign each kind of fact to a module responsible for establishing it, then reuse the result in downstream callers. Concentrate routine checks at key points such as inputs and shared interfaces.
+- Incorporate solutions found through temporary investigation into the production code responsible for the behavior. Remove temporary checks whose purpose is complete and redundant decisions. Report the practical effects and follow-up actions.
+- Deliver fixes through the entry points users normally use. Define the scope of completion from the current task.
+- For ongoing development and maintenance, keep an execution record at `doc/code/maintenance/<maintenance-topic>/execution.md` and prefer appending to the existing record for the same topic. Put dates and execution identifiers in the body and register the entry in the [maintenance index](doc/maintenance.md). Start the record with the background, goals, and overall approach. Append important actions and decisions in chronological order. At the end, summarize the effects, the AI assistant's assessment, and follow-up recommendations. When pausing, record where to resume. Reference result files through their existing paths.
+
+## Directories and Responsibilities
+
+- `datasets/`, `models/`, and `tasks/` hold research components. `base/application/registry.py` and `base/application/runner.py` handle shared registration and dispatch.
+- `base/interfaces/` provides common model and SAE operations. `base/runtime/` maintains shared configuration, run paths, and records. Reuse existing interfaces and design cross-component capabilities around actual callers' needs.
+- `scripts/examples/` holds complete runnable demonstrations, `tests/fixtures/` holds synthetic components, and `doc/code/documentation/source/development/` holds tutorials.
+- `conf/` holds configuration. `scripts/` holds entry points for software releases, distribution, documentation, and code checks. `tests/` holds product tests. Put application logic in the module that owns it and have scripts and tools call the official implementation.
+- `doc/knowledge/` holds research knowledge and terminology. `doc/code/` holds architecture and source code material, `doc/code/documentation/source/development/` holds development documentation, and `doc/code/maintenance/` holds maintenance execution records. `experiment/` is dedicated to research experiments and their execution records.
+- `AGENTS.md` holds engineering rules, directory responsibilities, and the maintenance mode entry point.
+- ResearchHarness provides shared skills, local resource bindings, and registration of structural artifacts. SAEBase owns its research source code, runtime entry points, and experiment results.
+- Handle `saebase/research_lab/` under a new maintenance task explicitly requested by the user. Routine Dataset, Model, and Task development focuses on the components currently in use.
+
+## Configuration Maintenance
+
+Configuration paths under `conf/` follow the first two levels of the responsible source code's relative directory path. Keep a single file for each configuration branch and represent deeper responsibilities as named sections in that file. The project root configuration `conf/config.yaml` is the exception. Additions, edits, migrations, removals, and deployments of configuration must pass `tests/test_configuration.py`. The commit workflow automatically runs `python -m scripts.documentation conf --write` to synchronize `doc/conf.md`. Continuous integration and release steps verify the synchronized result. Update the corresponding documentation when parameter meanings, behavior, or conditions of use change.
+
+## Checks and Research Results
+
+Concentrate routine checks at a few key points and reuse their guarantees in downstream operations. Use temporary checks for specific problems. Once the cause is understood, incorporate the solution into the production code so similar problems are handled automatically, then remove temporary checks whose purpose is complete.
+
+Handle new test scripts and supporting code according to their ongoing use. Incorporate material with lasting value into the production implementation or long-term tests. Remove material whose temporary purpose is complete. Clean up temporary inputs and test caches generated for this task. Retained checks should let downstream work use existing guarantees directly and reduce repeated decisions and manual intervention.
+
+Keep the scope of checks proportionate to the change. For a local change, select checks that verify the functional outcome. Use existing results when they answer the question. Add or rerun tests to address the specific problem at hand. Use project-wide checks for existing continuous integration, release preparation, or tasks that explicitly require a project-wide review.
+
+Python uses Ruff `0.15.22`. Before committing, stage only the changes for the current task. Use `python scripts/quality.py --fix` for new files. For existing files, use `--include-modified` within an explicit scope. When writing Python through the GitHub API, use the same tool with `--stdin --filename <exact-path>` to check the actual content. Continuous integration performs read-only checks.
+
+Keep the provenance of model and SAE identities, weights, data splits, metrics, numerical precision, and historical results clear. Explain any changes to their meaning and perform the relevant checks. Record the distinct facts and evidence established by software checks, real experiments, and independent acceptance reviews.
+
+## Writing and Communication
+
+In online maintenance mode, use the maintenance mode entry point below to find the shared ResearchHarness maintenance guidance.
+
+Name SAEBase features, stages, errors, and reports according to their practical purpose. Preserve the original meaning of model names, mathematical notation, and identifiers in historical formats. Use Chinese for Markdown and user-facing instructions, and preserve the original spelling of code and standard technical terms.
+
+
+
+## Documentation Synchronization
+
+Use the [project documentation](doc/README.md) to find the pages affected by the current change. Update the documentation when commands, public parameters, dependencies, result interfaces, or metrics change. Refer to the configuration and existing artifacts for the relevant run in experiment reports. When reviewing a feature, check the actual entry points, configuration, and results described in the documentation. At delivery, explain what changed, what was checked, and the effect on existing usage.
+
+<!-- researchharness:search -->
+## Locating and Searching
+
+When locating a project, entry point, or configuration, check known registrations and explicit paths first. To broaden the search, first list the top-level contents and then select specific directories. By default, exclude local workspace artifacts, historical snapshots, experiment artifacts, and caches from recursive content searches. When their contents are needed, explicitly specify the directory or file and limit the amount of output.
+<!-- /researchharness:search -->
+
+<!-- researchharness:mode -->
+## Maintenance Mode Control
+
+### Purpose and Main Functions
+
+Use the project switch to select one set of maintenance instructions and structural checks.
+
+### Scope
+
+This section applies to project maintenance requests, verification of online integration status, and offline structural checks.
+
+At the start of maintenance, first read the project's `.researchharness/mode.toml`. Its `enabled` setting is the project's sole maintenance mode switch. Follow the user's selection. Obtain the user's authorization to change the switch.
+
+- **`enabled = false`, offline maintenance.** Follow only the [in-project offline operations manual](.researchharness/offline/operations.md). The manual covers decision-making, implementation, and closeout for various operations. Use it for routine maintenance when central integration is disabled. Use the project's own source code, commands, tests, and data locations. The mode selected by the switch takes effect.
+- **`enabled = true`, online maintenance.** First run `python -IS .researchharness/maintain.py status`. Once it successfully reports `online`, read the central instructions it returns and follow them to use the operations manuals, original skills, and checks in the ResearchHarness repository. If the status command fails, pause maintenance that depends on the central repository and explain the cause. The user can then restore integration or choose offline maintenance.
+- **Missing or invalid switch.** Stop maintenance and identify the issue with the switch. Continue after it is fixed or an explicit selection is made.
+
+When authorized, run `python -IS .researchharness/maintain.py check` from the project root in either mode. This command runs only the structural checks for the selected mode. Use the independent entry points in the README for normal installation, training, preflight checks, and reading results.
+<!-- /researchharness:mode -->

@@ -59,7 +59,7 @@ The downloaded original runs can also be inspected using the native benchmark an
 
 ## Provenance and compatibility
 
-Existing asset filenames, source schema IDs, and archive tags retain their original identifiers for reproducibility. The [original archive index](https://github.com/OpenSAE/SAEBase/blob/ed52342b706d8ad6c0e04cbe2108e69cc0dc9348/conf/coverage/stage_d_evidence/final/raw_run_archive_index.json), [verification ledger](https://github.com/OpenSAE/SAEBase/blob/ed52342b706d8ad6c0e04cbe2108e69cc0dc9348/conf/coverage/stage_d_evidence/final/stage_d_final_matrix.json), and [file checksum manifest](https://github.com/OpenSAE/SAEBase/blob/ed52342b706d8ad6c0e04cbe2108e69cc0dc9348/conf/coverage/stage_d_evidence/final/checksums.sha256) provide the underlying records.
+Existing asset filenames, source schema IDs, and archive tags retain their original identifiers for reproducibility. The [original archive index](../../../../../assets/history_experiment/benchmark_evidence/files/stage_d_evidence/final/raw_run_archive_index.json), [verification ledger](../../../../../assets/history_experiment/benchmark_evidence/files/stage_d_evidence/final/stage_d_final_matrix.json), and [file checksum manifest](../../../../../assets/history_experiment/benchmark_evidence/files/stage_d_evidence/final/checksums.sha256) provide the underlying records.
 
 No third-party pretrained model or SAE weights are included. Access and redistribution terms remain with their original publishers.
 

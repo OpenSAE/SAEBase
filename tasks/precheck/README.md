@@ -1,25 +1,25 @@
-# Precheck Resource Preparedness and Physical Inspection
+# Precheck Resource Preparation and Execution
 
-## Purpose
+## Purpose and Main Functions
 
-Prepare and check selected data, models, SAEs and mission conditions, providing implementation judgement and specific reasons.
+Prepare and check the selected data, models, SAEs, and task conditions, then report whether execution can proceed and give concrete reasons.
 
 ## Scope
 
-Automatic check for Precheck or official tasks that are clearly selected; resource actions are processed according to current request and configuration.
+Use this guide for an explicitly selected Precheck or an automatic check for a production task. Resource actions follow the current request and configuration.
 
-Precheck uses the sole master control `conf/config.yaml` of SAEBase to reuse the existing Dataset, Model, SAE and scientific interfaces. No new downloads, tasks management or registry have been added.
+Precheck uses SAEBase's single master configuration, `conf/config.yaml`, and reuses the existing Dataset, Model, SAE, and research operation interfaces. It introduces no download task, management task, or registry.
 
-## Implementation process
+## Execution Flow
 
-`task.execute=false` or `--cfg job` keep the configuration for no installation, download or calculation. After setting `task.execute=true`:
+`task.execute=false` and `--cfg job` are for configuration inspection. They perform no installation, download, or computation. After setting `task.execute=true`:
 
-1. Parsing accurate models, SAEs, layers and inspection targets.
-2. Try to install the missing analytical dependencies, fix the installed numeric stack versions of the Torch, NumPy and others, and validate the import in the new process.
-3. Prefer local complete caches; attempt to download the selected model and the required SAE file when a file is missing, recording the repository version and cache position. A SAE check does not download all layers of the warehouse.
-4. When no visible hint is given, complete the data by selecting the dataset preparation interface, reusing the existing generation, coding, filtering and best rules.
-5. Checks data products and reruns the selected SAE or task check. Resource preparation is not equal to physical check passed.
-6. Maintain preparation records, original logs, inspection results and product audits.
+1. Resolve the exact model, SAE, layer, and check target.
+2. Attempt to install missing analysis dependencies. Keep installed versions of Torch, NumPy, and other parts of the model's numerical stack fixed. Verify imports in a new process.
+3. Check for a complete local cache first. When files are missing, attempt to download the selected model and the required SAE files. Record the repository revision and cache location. Checking one SAE does not download all layers in the repository.
+4. When no explicit prompt is provided, use the selected Dataset's preparation interface to supply the data. Reuse its existing generation, encoding, filtering, and manifest rules.
+5. Check the data artifacts, then run the selected SAE or task check. Preparing resources alone does not establish that the check passed.
+6. Save the preparation record, original logs, check results, and artifact audit.
 
 ```bash
 saebase task=precheck task.execute=true \
@@ -27,35 +27,35 @@ saebase task=precheck task.execute=true \
   runtime.device=cpu experiment.sub_name=basic
 ```
 
-Dataset and Model are still selected from General Control `dataset=...`, `model=...`. `task.precheck.mode` Supports `sae`, `task`, `all`. The list of tasks is to follow all seven scientific tasks when available; benchmarks, Circuits, explain, Train must provide actual parameters, and Precheck does not generate a fictional plan.
+Select the Dataset and Model using the master configuration's `dataset=...` and `model=...`. Supported values for `task.precheck.mode` are `sae`, `task`, and `all`. An empty task check list selects all seven research tasks. Benchmark, circuits, explain, and train require actual parameters when they need a native plan. Precheck does not fabricate plans.
 
-## Default Preparatory Policy
+## Default Preparation Policy
 
-- `auto_setup`,`allow_network`,`allow_install`,`allow_download` Default on. Visible network closure or preparation can still be used for offline diagnostics.
-- Models and SAE's missing file download budget default 16 GiB; prep 1,800 seconds and data ready 1,800 seconds. Physical check still uses `max_seconds`, `max_samples`, `max_tokens`.
-- Default data ready to be generated 32 candidates for at least 1 retention. It is the budget for the preparation of the minimum inspection data that is clearly recorded, without changing the original dataset filter conditions, and does not represent a full assessment of data or scientific acceptance.
-- Complete data are directly validated and reused; data are ready to be submitted with locks and temporary directories, and incomplete products are not covered.
-- The equipment is specified by `runtime.device` and the physical inspection schedule is specified by `task.precheck.task_configs`. Delete `allow_compute`, `allow_gpu`, `allow_native` the second confirmation switch; the execution request will not wait for manual confirmation after download.
-- The actual budgetary requirements, such as a maximum of two steps for primary training, are retained.
+- `auto_setup`, `allow_network`, `allow_install`, and `allow_download` are enabled by default. You can explicitly disable network access or preparation for offline diagnosis.
+- The default download budget for missing model and SAE files is 16 GiB. Preparation has a timeout of 1800 seconds, and data preparation has a separate 1800-second timeout. Actual checks still use `max_seconds`, `max_samples`, and `max_tokens`.
+- By default, data preparation generates 32 candidates and requires at least 1 to be retained. This is the recorded minimum data preparation budget for a check. The Dataset's filters still apply, and this budget does not define a full evaluation dataset or establish research acceptance.
+- Validate and reuse existing complete data. Data preparation uses a lock and commits from a temporary directory. Existing incomplete artifacts are preserved.
+- Set the device with `runtime.device` and provide the actual check plan in `task.precheck.task_configs`. The secondary confirmation switches `allow_compute`, `allow_gpu`, and `allow_native` have been removed. An execution request proceeds after download without another manual confirmation.
+- Native training checks retain actual budget limits, including a maximum of two steps. Missing input plans or unavailable hardware are reported with specific reasons.
 
-## Record & Failed
+## Records and Failures
 
-The result is saved in the current Runtime directory:
+Results are saved in the current Runtime run directory:
 
-- `metadata/precheck_result.json`: Preparation phase and actual inspection results.
-- `metadata/precheck_audit.json`: Report document integrity check.
-- `tmp/precheck_jobs/<stage>/metadata/`: Request and subprocess back. The official mission automatically prechecks are stored at `metadata/automatic_precheck/` for the first time, and then retry to write to its separate subdirectories `attempts/`. Each time a list is executed, this return is indicated. The shared model or SAE loading failure will also write back.
-- `tmp/precheck_jobs/<stage>/logs/`: Full standard output, error output, and installation, import and download events.
+- `metadata/precheck_result.json`: Preparation stages and actual check results.
+- `metadata/precheck_audit.json`: Report-file integrity check.
+- `tmp/precheck_jobs/<stage>/metadata/`: Requests and subprocess receipts. The first automatic precheck for a production task is saved under `metadata/automatic_precheck/`. Retries are written to separate `attempts/` subdirectories. Each execution's manifest points to its own receipt. A failure to load a shared model or SAE also produces a receipt.
+- `tmp/precheck_jobs/<stage>/logs/`: Complete standard output, standard error, and installation, import, and download events.
 
-Read the request range, phase and actual object, and then read the corresponding results and logs. The specific causes of the result and the recommendations for processing are used to supplement dependency, resources or input, and the completed content is reused as per the mission agreement.
+Start with the request scope, stage, and actual check target, then read the corresponding result and log. Use the concrete reasons and suggested actions to supply missing dependencies, resources, or inputs. Reuse completed work according to the owning task's contract. When developing checks and their records, also design how those records will be read and used after the run.
 
-BLOCKED 's reasons are recorded for failure in preparation for installation, source access, downloading, data preparation, budget shortfalls, etc. The software implementation error is still maintained as FAIL, which is not disguised as an environmental problem.
+Failures during installation, source access, download, data preparation, or budget allocation record the specific BLOCKED reason. Software execution errors remain FAIL. A timeout stops the entire worker process group so that installation and native compute subprocesses do not remain in the background.
 
-These records demonstrate where the software is going; they do not automatically demonstrate model performance or independent scientific acceptance. Offline tests use clearly marked synthetic responses and models, which do not replace real chain operations.
+These records establish how far the software executed. Establishing model performance or independent research acceptance requires separate evidence. Offline tests use explicitly marked synthetic responses and models and do not substitute for running the real workflow.
 
-## Performance precheck and auto-modification
+## Performance Precheck and Automatic Tuning
 
-`task.precheck.mode=performance` Yeah. `task.precheck.check_tasks=[capture,intervene,generate]` The real task assigned to perform small-scale performance tests. Capture Default check `whiten`,`non_whiten`,`g_s`,`I`,Available `+task.precheck.capture_modes=[g_s,I]` Zooms out. One-time pre-check selects one model, one. SAE and layers; multiple resources run separately.
+With `task.precheck.mode=performance`, run a small performance trial on the real tasks selected by `task.precheck.check_tasks=[capture,intervene,generate]`. Capture checks `whiten`, `non_whiten`, `g_s`, and `I` by default. Narrow the scope with `+task.precheck.capture_modes=[g_s,I]`. Each performance precheck selects one model, one SAE, and one layer. Run multiple resource combinations separately.
 
 ```bash
 python -m saebase.runtime.train model=gpt2small dataset=gsm8k \
@@ -64,45 +64,45 @@ python -m saebase.runtime.train model=gpt2small dataset=gsm8k \
   '+task.precheck.capture_modes=[g_s,I]' experiment.sub_name=performance_probe
 ```
 
-The actual `capture`, `intervene`, `generate` defaults on `task.performance.enabled=true`, and the official Runme autopretest will run a matching performance probe and recommend a watch to task. Set for false to keep the cursor to work without performance adjustments; the GPU numerics policy is still determined by runtime. Numerics. The configuration check (`--cfg job`/ `execute=false`) does not perform the probe. Qwen3.5 direct commands need to use a dedicated interpreter in `conf/base/runtime/runtime.yaml`; the matrix entry is automatically selected through Runtime.
+The actual `capture`, `intervene`, and `generate` tasks default to `task.performance.enabled=true`. The production Runtime's automatic precheck runs the relevant performance probe first and passes the recommended batch size to the task. Setting it to false retains scalar execution and disables performance tuning. runtime.numerics still determines the GPU numerical policy. Configuration inspection (`--cfg job` / `execute=false`) runs no probes. Direct Qwen3.5 commands need the dedicated interpreter in `conf/base/runtime/runtime.yaml`. The matrix entry point selects it automatically through Runtime.
 
-The public budget is covered by `base/runtime/performance.py`, by default:
+`base/runtime/performance.py` owns the shared budget. The defaults are:
 
-| Parameters (at challenge.performance) | Default value | Purpose |
+| Parameter (under task.performance) | Default | Purpose |
 | --- | --- | --- |
-| enabled | True (standard task configuration) | Enable automatic pre-checking and reporting of performance |
-| batch_size | auto | automatic selection;or you can specify positive integers |
-| batch_sizes | [1,2,4,8,16,32,64] | Check candidates and add the actual unit ceiling |
-| probe_samples | 3 | Number of performance probes;no changes to the number of Datasets produced batches |
-| probe_states | 64 | Status controls for Capture batch searches; the actual probe I still fully calculates 1024 states |
-| warmup / repeats | 1 / 3 | The baseline and candidate are preheated and measured several times. |
-| max_seconds | 120 | Soft time budget for each candidate search; forwards are completed for ongoing implementation |
-| memory_fraction | 0.9 | Current Process Peak Reserved Visible Upper limit for total display of devices |
-| atol / rtol | native: 1e-6 / 0；vllm: 0 / 0 | Numerical examination threshold for the answer average log probability |
-| logit_atol | native: 1e-4；vllm: 0 | Intervention/generation of floating point indicator thresholds; generating token, ranking, string, etc. discrete output must be fully consistent |
+| enabled | true (standard task configuration) | Enable automatic performance precheck and reporting |
+| batch_size | auto | Select automatically or specify a positive integer |
+| batch_sizes | [1,2,4,8,16,32,64] | Measure these candidates and include the actual unit-count limit |
+| probe_samples | 3 | Questions in the performance probe. The production batch's Dataset size stays unchanged |
+| probe_states | 64 | Control states for the Capture batch search. A real I probe still computes all 1024 states |
+| warmup / repeats | 1 / 3 | Warm up and measure both the baseline and the candidates repeatedly |
+| max_seconds | 120 | Soft time budget for each candidate search. In-progress forward passes finish |
+| memory_fraction | 0.9 | Maximum ratio of peak process-reserved GPU memory to total device memory |
+| atol / rtol | native: 1e-6 / 0, vllm: 0 / 0 | Numerical tolerances for mean answer log probability |
+| logit_atol | native: 1e-4, vllm: 0 | Floating-point tolerance for intervention and generation metrics. Discrete outputs such as generated tokens, rankings, and strings must match exactly |
 
-The budget that is not included in YAML is covered by Hydra `+task.performance.<field>=...`. `task.precheck.task_configs` is transferable to the actual task configuration, such as zero-generated `generate: {generate: {intervention: ablate, value: 0, max_new_tokens: 8, reuse_prompt_observations: true}}`. A comparison of the same parameters should be used for the task to be run.
+For budgets omitted from YAML, use a Hydra override of the form `+task.performance.<field>=...`. `task.precheck.task_configs` can provide the real task configuration, such as `generate: {generate: {intervention: ablate, value: 0, max_new_tokens: 8, reuse_prompt_observations: true}}` for generation with ablation. Compare with the same parameters as the task that will run.
 
-Optimizing ** the same input, and ** the same workload, selecting the highest candidate for a numerical check, retaining the remaining amount, and measuring the highest; keeping the original configuration under automatic mode if the candidate is slower than the original configuration. OOM records and stops searching for a larger watch, and actually runs OOM reduces the bat and performs a numerical check. The result is to give the best actual value in the budget and candidate, without a commitment to the best of the whole. Repeats the parameters by model, task, and length; decisions without net gain will also slow down. Normal Runtime automatically pre-screens these recommendations to missions that follow, without having to place all the mandatory lengths in the same bat. Capture continues to check the representative control of each subject and feature tasks; this is a set of physical controls, not proof of all possible inputs.
+Tuning compares **the same input and the same workload** and selects the highest measured throughput among candidates that pass numerical checks and leave GPU memory headroom. In automatic mode, keep the original configuration if the candidate is slower. An out-of-memory error is recorded and ends the search for larger batches. If it occurs during the actual run, reduce the batch size and perform the numerical checks. The result is the best measured option under the given budget and candidate set. Reuse parameters by model, task, and length band. Decisions with no net benefit are also cached. The normal Runtime automatic precheck hands the recommendations to the immediately following task and allows different batch sizes for different lengths. Per-question Capture checks and representative controls for feature tasks still run. These measured controls do not establish numerical equivalence for every possible input.
 
-Major engineering optimization:
+Main engineering optimizations:
 
-- TL pre/ back position and first half model cache for HF decoder; HF stops at the selected layer when preparing the cache, avoiding useless tail layer and full wordout.
-- Capture status is a genuine batch, same original code status is reset, the decode baseline is reused, and the four quartiles are interactively ranked. Decoding is still line-by-line to original SAE, keeping the order of operations and LN statistics.
-- Public observation and inspection of intervene check reuse, tail-layer re-laying, and batch processing of feature conditions.
-- Generate's public baseline generation, batch processing of progenital feature conditions; butch1 is the same as larger battling. Each generating track retains its full prefix and original random seeds, and reuses do not contain obsolete editing after KV.
-- Inference_mode, keep only the desired logits slices and avoid the view of the cache vectors to keep the entire Sequence xvocab space; models and SAE reuse and checkpoint verification leases are shared within the same pre-check range.
+- Cache the first portion of the model at TL residual pre/post sites and in the HF decoder. During HF cache preparation, stop at the selected layer to avoid unnecessary tail layers and full-vocabulary outputs.
+- Batch actual Capture states, deduplicate identical native code states, reuse invariant decoding baselines, and vectorize ranking of the four-state interactions. Decoding still calls the native SAE row by row to preserve operation order and LN statistics.
+- Reuse shared observations and identity checks during Intervene, replay the tail layers, and batch feature conditions.
+- Share baseline generation and batch native feature conditions during Generate. Batch size 1 and larger batches use the same implementation. Each generation trace retains its own complete prefix and original random seed. Reuse excludes stale edited KV caches.
+- Use inference_mode and retain only the necessary logits slices so views of cached vectors do not hold the entire sequence×vocab tensor in memory. Model and SAE reuse and checkpoint verification leases are shared within the same precheck scope.
 
-`reports/performance_precheck.md` is the performance precheck master report, JSON saves the stage distribution of the probes, logs the sample by sample, and the reasons for all candidates ' insinuation/surveillance/in error/rejection. Each task saves the actual running time at `reports/performance.json`, `performance.md`. The report provides average, standard deviation, minimum/maximum, P50/P90/P95/P99, distinguishing the amortization time between Question, material comparison and answer state; the phase is embedded and cannot be directly associated.
+`reports/performance_precheck.md` is the overall performance precheck report. The JSON records stage distributions, per-sample records, and throughput, memory use, error, and rejection reasons for every candidate. Each task records actual elapsed times in `reports/performance.json` and `performance.md`. Reports give the mean, standard deviation, minimum, maximum, and P50/P90/P95/P99. They distinguish amortized time per question, feature comparison, and answer state. Stages can nest, so their times cannot be added directly.
 
-The benefits are calculated on the basis of the original configuration of the same probes and the median preheat of the candidate, the candidate cache preparation being included in the stowage comparison, the search, the true execution of the entire state and the sharing of separate records of pre-processing. The report also shows the amount of time spent on each item after the first modulation, the amount spent and the number of units expected to be returned. The fractions of a few probes are only descriptive statistics; they are not full results of the 500 questions or the overall confidence interval. There is no item-by-item digestion optimization only for the benefit of the portfolio, and no repetition of the same benefit is attributed to multiple optimizations.
+Measure gains using the post-warmup medians for the original baseline and candidate on the same probe. Include candidate cache preparation in throughput comparisons. Record search, actual execution of all I states, and shared preprocessing separately. Reports give per-question times with and without initial tuning, search overhead, and the estimated number of units to break even. Quantiles from a small number of probes are descriptive statistics and do not represent the full 500-question results or population confidence intervals. When there is no per-optimization ablation, report the combined gain without attributing the same benefit to more than one optimization.
 
-This real-real-performance probe of the four main models, its original source and its comparative calibre are presented in the Performance Performance Assessment Report.
+See the [measured performance report](../../assets/history_experiment/maintenance_evidence/files/task_performance/performance_report.md) for real performance probes on the four main models, original sources, and comparison criteria.
 
-Standard operating usage`runtime.numerics=vllm`,Unified reuse before loading the model vLLM Stabilization strategies, strict comparison of scoring and output, and the difference must be 0;Do not count silent regression values as pass. History value paths`runtime.numerics=native`,You can't mix the same work process.[Consistency and acceleration of batch ratings](../../doc/code/documentation/source/development/batch-invariant-execution.md).
+Standard runs use `runtime.numerics=vllm` and apply the shared stable vLLM execution policy before loading the model. Scores and outputs are compared strictly, with a required difference of 0. A silent fallback to scalar execution does not count as a pass. The historical numerical path uses `runtime.numerics=native`. A worker process cannot mix the two policies. See [batch scoring invariance and acceleration](../../doc/code/documentation/source/development/batch-invariant-execution.md) for the design and provenance.
 
-The normal Runtme portal loads only one model and SAE, automatically pre-checks with the official mission and directly consumes the recommendation. The calculation version writes into the configuration before the running judgement; the version is recalculated and the same version continues to be restored according to the mission completion strategy. The performance precheck of I also takes all 1024 states from a saved feature, recalculates independently and requests the same item by item.
+The normal Runtime entry point loads the model and SAE once. The automatic precheck and production task share them, and the task consumes the recommendation directly. Record the compute version in the configuration before deciding whether to resume. Recompute if the version changes. For a matching version, resume according to the task's completion strategy. The I performance precheck also reads all 1024 states from a saved question artifact, independently recomputes them using a different batch size, and requires an exact match for every state.
 
-Standard Project Settings have been fixed to `runtime.cpu_threads=4`, with unified control over the Torch and BLAS threads and additional parallels to the cutter; Intervene/Generate Default to open observation re-uses. Normal Runtime, pre-check and matrixworker uses the same settings to save the actual values with the results and performance reports. The precision of calculation, stabilization of the Attention, existing compilation paths, significant surplus and single model sequences are validated, as specified in [project default](../../doc/code/documentation/source/development/batch-invariant-execution.md#project defaults)].
+The standard settings use `runtime.cpu_threads=4` to control both Torch and BLAS threads and disable the tokenizer's additional parallelism. Intervene and Generate reuse observations by default. The normal Runtime, precheck, and matrix workers use the same settings. Actual values are saved with results and performance reports. Compute precision, stable attention, the existing compilation path, GPU memory headroom, and sequential scheduling of one model at a time follow earlier validation. See [engineering defaults](../../doc/code/documentation/source/development/batch-invariant-execution.md#%E5%B7%A5%E7%A8%8B%E9%BB%98%E8%AE%A4%E5%80%BC) for the specific choices.
 
-Release unused partitioner caches before the visible candidate measurement, reset and measure peaks; 90% of the display caps continue to include the reserved space that is really needed for this job. This treatment avoids prefixing or larger cascading, resulting in all candidates being wrongly rejected. The candidate records include `reserved_before_cleanup_bytes` and `memory_measurement_policy` to identify the measured calculus; numerical consistency conditions remain the original value.
+Before measuring a candidate's GPU memory use, release unused allocator cache, then reset and measure the peak. The 90% GPU memory limit still includes the reserved memory actually needed for the current workload. This prevents leftover cache from an earlier question or larger batch from incorrectly rejecting all candidates. Candidate records include `reserved_before_cleanup_bytes` and `memory_measurement_policy` to identify the measurement policy. Numerical consistency requirements retain their original values.

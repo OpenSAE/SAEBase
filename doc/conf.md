@@ -1,124 +1,122 @@
 # SAEBase Configuration Parameters
 
-## Purpose
+## Purpose and Main Functions
 
-Indicates where data, models and tasks are selected, and how changes to a given set will change a run. `conf/` Actual documentation and correspondence module organization.
+Shows where to select data, models, and tasks, and how changing a setting affects a run. Entries follow the files in `conf/` and their corresponding modules.
 
 ## Scope
 
-To select the current formulation in SAEBase, overwrite this parameter, access the task's specific settings, and interpret the historical results according to the configuration in effect at the time.
+Use this reference to select and override a recipe in SAEBase, find task-specific settings, and interpret historical results using the configuration in effect at the time.
 
-## Profile Navigator
+## Configuration File Navigation
 
-Up to two-tier directories under `conf/`, one file for each configuration branch. For example, the default values, batches and filter rules for capture tasks are `conf/tasks/capture/task.yaml` and can be viewed `task`, `matrix` and `sar_filter_policy`, respectively.
+The `conf/` directory has at most two nested directory levels and one file per configuration branch. For example, `conf/tasks/capture/task.yaml` holds Capture defaults, batch settings, and filter rules under `task`, `matrix`, and `sar_filter_policy`, respectively.
 
-Generates by the actual configuration directory. The use and parameters of each file are viewed in the body section.
+The table is generated from the actual configuration directory. See the corresponding sections below for each file’s purpose and parameters.
 
 <!-- BEGIN CONFIG_NAVIGATION -->
 
 | Configure Paths | When? |
 | --- | --- |
-| [`conf/config.yaml`](../conf/config.yaml) | [Configure Entry and Entry Order](#1-configure-entry-and-entry-order-confconfigyaml),See default combinations, devices and running methods. |
-| [`conf/datasets/`](../conf/datasets/) | [Data sets and hints](#2-data-sets-and-hints-confdatasets),selects how to prepare the research input and hint. |
-| [`conf/models/`](../conf/models/) | [Model](#3-model-confmodels),selects the base model and default SAE. |
-| [`conf/tasks/`](../conf/tasks/) | [Task Configuration](#4-task-configuration-conftasks),selects the task, uses its configuration and looks at the task formulation. |
-| [`conf/base/`](../conf/base/) | [Public interface and running](#5-public-interface-and-running-confbase),access to SAE interfaces, operating environments, default test names and data roots. |
+| [`conf/config.yaml`](../conf/config.yaml) | [Configuration Entry Point and Precedence](#1-configuration-entry-point-and-precedence-confconfigyaml),View the default component combination, device, and execution mode. |
+| [`conf/datasets/`](../conf/datasets/) | [Datasets and Prompts](#2-datasets-and-prompts-confdatasets),Select the research inputs and how prompts are prepared. |
+| [`conf/models/`](../conf/models/) | [Models](#3-models-confmodels),Select the base model with the default SAE. |
+| [`conf/tasks/`](../conf/tasks/) | [Task Configuration](#4-task-configuration-conftasks),Select the task, use its configuration, and check the task formulation. |
+| [`conf/base/`](../conf/base/) | [Public interface and running](#5-public-interface-and-running-confbase),Access SAE interface, operating environment, default test name and data root. |
 
 <!-- END CONFIG_NAVIGATION -->
 
-## 1 Configure Entry and Entry Order `conf/config.yaml`
+## 1 Configuration Entry Point and Precedence `conf/config.yaml`
 
-**Purpose.** See default combinations, devices and running methods.
+**Purpose.** View the default component combination, device, and execution mode.
 
-View the synthetic configuration from the root of the project `saebase task=capture --cfg job`. The main configuration selects each component group, the component formulation provides the corresponding default, and commands the line to overwrite the current operation. View the configuration using `--cfg job` and select the actual operation by the corresponding entry when performing the task. The historical results use the original running list and configuration snapshot. [Main configuration](../conf/config.yaml)] [Application registration](../base/configuration/__init__.py)] [Experience report](experiment.md)]
+From the project root, run `saebase task=capture --cfg job` to inspect the composed configuration. The master configuration selects component groups, component recipes provide defaults, and the command line overrides them for this run. Use `--cfg job` to inspect configuration and the corresponding entry point to run the intended operation. For historical results, use the original run manifest and configuration snapshot. [Master configuration](../conf/config.yaml) · [Configuration registration](../base/configuration/__init__.py) · [Experiment reports](experiment.md)
 
-The main formulation defaults `dataset=ioi`, `model=openresearch_gemma2_2b_base` and `task=capture`. For example, you want `dataset=bbh` for data and `task.capture.mode=non_whiten` for the capture method.
+The master recipe defaults to `dataset=ioi`, `model=openresearch_gemma2_2b_base`, and `task=capture`. Use `dataset=bbh` to change the dataset or `task.capture.mode=non_whiten` to change the capture method. The selected data and model must have matching prepared artifacts.
 
-For configuration-only runs with registered components, each invocation gets a separate record. See the [experiment records guide](experiment.md) for the manifest and result readers.
+### 1.1 Execution Mode, Device, and Numerical Policy
 
-### 1.1 Operating methods, equipment and numerical strategies
-
-| Settings | Default value | Behaviour |
+|  Settings |  Default value |  Behaviour |
 | --- | --- | --- |
-| `seed` | `42` | The main running random feed must be named after a non-negative integer and participate in the running directory. `dataset.sampling_seed`. |
-| `runtime.mode` | `null` | New at `new` when omitted. You can select `resume` or `overwrite` in a visible way, and you can check the original list and the running identity. |
-| `runtime.numerics` | `vllm` | `native` uses the primary calculator policy. |
-| `runtime.device` | `auto` | Shared implementation equipment, automatic mode preference for available CUDAs and CPUs. |
-| `runtime.cpu_threads` | `4` | The linear budget used for calculations such as Torch must be positive integer at a value. |
+| `seed` | `42` | The main run’s random seed must be a nonnegative integer and is used to name the run directory. Fixed question sampling uses `dataset.sampling_seed` separately. |
+| `runtime.mode` | `null` | Defaults to `new` when omitted. Select `resume` or `overwrite` explicitly. Resuming checks the original manifest and run identity. |
+| `runtime.numerics` | `vllm` | Limits numerical differences caused by changing batch size. `native` uses the native computation policy. |
+| `runtime.device` | `auto` | Shared execution device. Automatic selection prefers available CUDA, then CPU. |
+| `runtime.cpu_threads` | `4` | Thread budget for Torch and other computation. An explicit value must be a positive integer. |
 
-The directories are run by data set, model, task, experimental purpose and optional cross-role organization. The shared directories are repeated for the same purpose, and the results are maintained by the execution record. The historical results are read by the original list and path. [configuration check](../base/runtime/configuration/config_validate.py)] [run paths and running](../base/runtime/experiment_paths.py)]
+Run directories are organized by dataset, model, task, experiment purpose, and optional comparison role. Repeated executions for the same purpose share a directory, with results saved per execution. Historical results use their original manifests and paths. [Configuration checks](../base/runtime/configuration/config_validate.py) · [Run paths and resuming](../base/runtime/experiment_paths.py)
 
-## 2 Data sets and hints `conf/datasets/`
+## 2 Datasets and Prompts `conf/datasets/`
 
-**Purpose.** selects how to prepare the research input and hint.
+**Purpose.** Select the research inputs and how prompts are prepared.
 
 [Open Profile Directory](../conf/datasets/)
 
-### 2.1 Data and tip recipe `conf/datasets/catalog.yaml`
+### 2.1 Dataset and Prompt Recipes `conf/datasets/catalog.yaml`
 
-Configure the preparation of inputs and tips in `dataset` and `prompt_source`, respectively. [Open formulation](../conf/datasets/catalog.yaml)]
+Configure research inputs and prompt preparation in the `dataset` and `prompt_source` sections, respectively. [Open recipe](../conf/datasets/catalog.yaml)
 
-#### 2.1.1 Data set presets
+#### 2.1.1 Dataset preset
 
-`dataset=<preset_name>` selects the source of the sample. The data set name, default sample and upstream sub-configuration are brought into the preset. The data set description includes samples, labels and applicable tasks, such as comparing BBH's reasoning with IOI's human name projection. [Data set formulation](../conf/datasets/catalog.yaml)] [Data set description](datasets.md)]
+`dataset=<preset_name>` selects the sample source. The preset supplies the dataset name, default sampling, and upstream subconfiguration. See the dataset guide for samples, labels, and applicable tasks, such as BBH reasoning versus IOI name prediction. [Dataset recipe](../conf/datasets/catalog.yaml) · [Dataset guide](datasets.md)
 
-| To change what? | Settings and Impacts |
+| To change what? |  Settings and Impacts |
 | --- | --- |
-| How many questions are taken from the data that are ready? | `dataset.sample_count`, default changes with the data set. BBH defaults 500. Changes the number of questions will change the assessment coverage. |
-| Question fixed. | `dataset.sampling_seed`, BBH presets 42. With data versions, presets and sample numbers, the reusable selection conditions are determined. |
-| Use raw training and testing separation | `dataset.use_original_split`.BBH Preset as `false`,The project uses a fixed sample record by mission. `true` , the data module retains the upstream division. Capture The fixed sample path follows the registered theme group, MMLU-Pro If you need to set up a separate set, check the task entry and the valid sample list.. |
-| Read a specific hint or cache | `dataset.prompt_file` Default Empty, `dataset.data_path` Default is generated by the data root and data set name. Checks the model, terminator and input record when specifying the file or path. |
+| How many questions to take from prepared data | `dataset.sample_count` defaults by dataset. The BBH preset uses 500. Changing this count changes evaluation coverage. |
+| Fix which questions are sampled | `dataset.sampling_seed`. The BBH preset uses 42. The seed, data version, preset, and sample count together define when a question selection can be reused. |
+| Use the original training and test splits | `dataset.use_original_split`. The BBH preset is `false`, and the project uses fixed sampling records for the task. When `true`, the data module preserves the upstream splits. Fixed sampling in Capture uses the registered cohorts. For MMLU-Pro, it samples from merged source splits and retains each question’s original split label. If you need an independent holdout set, first verify the task entry point and effective sample manifest. |
+| Read a particular prompt or cache | `dataset.prompt_file` is empty by default. `dataset.data_path` defaults to a path derived from the data root and dataset name. When specifying a file or path, check the model, tokenizer, and input record. |
 
-#### 2.1.2 Hint preparation presets
+#### 2.1.2 Prompt Preparation Presets
 
-The preparatory process for using this directory can specify the upstream library, data disaggregation and budget generation. When reading the preparatory product for the experiment, the data set is usually selected; to change the subject(s) to be prepared, the source(s) of the corresponding reminder(s). For example, `prompt_source.prepare.n_generate` determines the number of initial candidates, `min_kept` determines how many qualified questions should be left, and the actual number retained is affected by model and word filtering. `categories`, `balance_per_category`, `max_prompt_tokens` and `n_shot` changes the selection or hints only in the formula that supports these settings. [data catalogue](../conf/datasets/catalog.yaml)] [indicator of origin](../conf/datasets/catalog.yaml)] [data registration](../datasets/plugins.py)]
+This catalog’s preparation workflow can select the upstream question bank, split, and generation budget. Usually, select a dataset when running an experiment that consumes prepared artifacts. To change the questions produced by preparation, consult the relevant prompt source. For example, `prompt_source.prepare.n_generate` sets the initial candidate count and `min_kept` sets the minimum number of acceptable questions to retain. Model and tokenizer filters affect the actual count. `categories`, `balance_per_category`, `max_prompt_tokens`, and `n_shot` only affect question selection or prompt content in recipes that support them. [Data catalog](../conf/datasets/catalog.yaml) · [Prompt source catalog](../conf/datasets/catalog.yaml) · [Dataset registration](../datasets/plugins.py)
 
-## 3 Model `conf/models/`
+## 3 Models `conf/models/`
 
-**Purpose.** selects the base model and default SAE.
+**Purpose.** Select the base model with the default SAE.
 
 [Open Profile Directory](../conf/models/)
 
-### 3.1 Model pre-set `conf/models/catalog.yaml`
+### 3.1 Model preset `conf/models/catalog.yaml`
 
-Select the model with `model=<preset_name>`. The model formula maintains the base weight, matching SAE, default check points and layers. The tasks to support a visible location can be covered by `task.sae_key` and `task.layer`. Both are omitted, and are analysed according to the default rules of the current task and model. In exchange for the model, SAE or layer, the feature number and the identity entered after preparation are reconfirmed.
+Select the model with `model=<preset_name>`. The model recipe records base weights, compatible SAEs, default checkpoints, and layers. Tasks that support explicit selection can override these with `task.sae_key` and `task.layer`. If both are omitted, SAEBase resolves them using the current task and model defaults. After changing the model, SAE, or layer, verify the identities of the feature IDs and prepared inputs again.
 
-The normal task is to select the implementation device by `runtime.device`. The `model.device` and `task.device` in the old formulation are still read and are reported in error when multiple visible values are in conflict. SAE uses the planned equipment at the back end of the training, with a specific evaluation to assign the equipment to its agreement. [model formula](../conf/models/catalog.yaml)] [Equipment parsing](../models/language_model/loading_policy.py)] [Model and weight description](models.md)]
+Ordinary tasks use `runtime.device` to select the execution device. Older recipes can still specify `model.device` and `task.device`. Conflicting explicit values raise an error. SAE training backends use the training plan’s device, and specialized evaluations can specify a device in their protocol. [Model recipe](../conf/models/catalog.yaml) · [Device resolution](../models/language_model/loading_policy.py) · [Models and weights](models.md)
 
 ## 4 Task Configuration `conf/tasks/`
 
-**Purpose.** selects the task, uses its configuration and looks at the task formulation.
+**Purpose.** Select the task, use its configuration, and check the task formulation.
 
 [Open Profile Directory](../conf/tasks/)
 
-### 4.1 Shared Configuration
+### 4.1 Common Configuration
 
-#### 4.1.1 Mission entrance and resource selection
+#### 4.1.1 Task Entry and Resource Selection
 
-| Parameters | Formula Value | Purpose and conditions |
+| parameter |  Formula Value |  Purpose and conditions |
 | --- | --- | --- |
 | `task.extensions` | `[]` | A visible list of installed extensions used by the current task. Empty lists are not loaded for extensions. |
 | `task.execute` | `false` | In the task of supporting the field, switch between planned inspections and actual implementation. |
-| `task.sae_key` | `null` | Captures, interventions, etc. can be used to overwrite default SAE. Prechecks select the checker with `task.precheck.sae_list`. |
-| `task.layer` | `null` | Captures, interventions, etc. can be used to select a model layer and verify it with the selected SAE. Prechecking determines a layer from the object and model formulation. |
-| `task.prompt` | `""` | Provides a visible text. This is the basis for the capture to analyse the specified hint, precheck the selected data set. |
+| `task.sae_key` | `null` |  Captures, interventions, etc. can be used to overwrite default SAE. Prechecks select the checker with `task.precheck.sae_list`. |
+| `task.layer` | `null` |  Captures, interventions, etc. can be used to select a model layer and verify it with the selected SAE. Prechecking determines a layer from the object and model formulation. |
+| `task.prompt` | `""` |  Provides a visible text. This is the basis for the capture to analyse the specified hint, precheck the selected data set. |
 
-The task formulation states its own `task.name`, which is used for distribution on the running layer. The user selects the command to switch the task through a formula such as `task=capture`. Resource location and task validation are determined by the appropriate entry. For example, when the original protocol selects its own resource, set it at the agreed location. SAE [mission resource resolution and validation](../base/runtime/sae_operations.py)]
+Each task recipe declares its `task.name`, which the runtime uses for dispatch. Select a task using a recipe override such as `task=capture`. The relevant entry point resolves resources and validates the task. For example, when a native protocol chooses its own resources, set the SAE in the protocol’s configuration. [Task resource resolution and validation](../base/runtime/sae_operations.py)
 
-#### 4.1.2 Shared performance parameters
+#### 4.1.2 Common Performance Parameters
 
-Capture, intervention, generation and precheck are stated in their respective documents `task.performance`.The following parameters can be used to adjust the number of candidates, to check the cost and consistency of the results. For example, when the number of candidates is increased, the value difference and the visible limit are checked. GPU Operation with `vllm` Numerical policy, which fixes the zero tolerance difference. `runtime.numerics=native` Available for value comparison `+task.performance.atol`,`+task.performance.logit_atol` and `+task.performance.rtol` Override the general output absolute error, the model output fraction absolute error and the relative error, respectively, and use them when omitted `0.000001`,`0.0001` and `0`.
+Capture, Intervene, Generate, and Precheck declare `task.performance` in their respective files. Use the parameters below to adjust candidate batch sizes, check cost, and result consistency. For example, when increasing candidate size, also check numerical differences and GPU memory limits. GPU execution defaults to the `vllm` numerical policy, which fixes tolerances at zero. For numerical comparisons with `runtime.numerics=native`, use `+task.performance.atol`, `+task.performance.logit_atol`, and `+task.performance.rtol` to override general output absolute error, model output score absolute error, and relative error, respectively. The defaults are `0.000001`, `0.0001`, and `0`.
 
-| Parameters | Default value | Purpose and conditions |
+| parameter |  Default value |  Purpose and conditions |
 | --- | --- | --- |
-| `task.performance.enabled` | `true` | Enables the performance check for the corresponding task. |
-| `task.performance.batch_size` | `auto` | Enables the project to select the actual execution batch according to its performance. |
-| `task.performance.batch_sizes` | `[1, 2, 4, 8, 16, 32, 64]` | Lists the number of candidates to be compared. |
+| `task.performance.enabled` | `true` |  Enables the performance check for the corresponding task. |
+| `task.performance.batch_size` | `auto` |  Enables the project to select the actual execution batch according to its performance. |
+| `task.performance.batch_sizes` | `[1, 2, 4, 8, 16, 32, 64]` |  Lists the number of candidates to be compared. |
 | `task.performance.warmup` | `1` | The number of preheats per candidate. |
-| `task.performance.repeats` | `3` | Number of repeats of official count times per candidate. |
-| `task.performance.probe_samples` | `3` | Number of samples used in the survey. |
-| `task.performance.probe_states` | `64` | Survey the number of states used. |
-| `task.performance.max_seconds` | `120` | Performance check time budget, in seconds. |
+| `task.performance.repeats` | `3` |  Number of repeats of official count times per candidate. |
+| `task.performance.probe_samples` | `3` |  Number of samples used in the survey. |
+| `task.performance.probe_states` | `64` |  Survey the number of states used. |
+| `task.performance.max_seconds` | `120` |  Performance check time budget, in seconds. |
 | `task.performance.memory_fraction` | `0.9` | Visible budget ratio for performance probes. |
 
 ### 4.2 Benchmark `conf/tasks/benchmark/`
@@ -127,60 +125,60 @@ Capture, intervention, generation and precheck are stated in their respective do
 
 #### 4.2.1 Benchmark `conf/tasks/benchmark/task.yaml`
 
-To select the assessment protocol and read out. For example, use the activated health check mode to read the statistics of the specified model on several prepared alerts. [Baseline task configuration](../conf/tasks/benchmark/task.yaml)]
+Select the evaluation protocol and readout. For example, activation health mode reports statistics for the specified model using a few prepared prompts. [Benchmark task configuration](../conf/tasks/benchmark/task.yaml)
 
-| Parameters | Default value | Purpose and conditions |
+| parameter |  Default value |  Purpose and conditions |
 | --- | --- | --- |
-| `task.benchmark.evaluation` | `null` | Specifies the specific assessment method. When `activation_health` is selected, add matching data hint sources, SAE and assessment protocols, such as `+prompt_source=ioi +sae=gemma2_2b_pt_l25_canonical +evaluation=activation_health`. |
-| `task.benchmark.benchmark_config` | `""` | Specifies the baseline protocol that contains the method, input and scope. The built-in protocol is selected by `file_path#presets.name`, and the external independent agreement uses the file path. |
-| `task.benchmark.protocol` | `null` | Provide indicators and methodological parameters, and model and data still use the corresponding component selection. |
-| `task.resume` | `true` | Supports the re-use of saved results on mission terms. |
+| `task.benchmark.evaluation` | `null` |  Specifies a special assessment method. When `activation_health` is selected, add matching data hint sources, SAE and evaluation protocols, such as `+prompt_source=ioi +sae=gemma2_2b_pt_l25_canonical +evaluation=activation_health`. |
+| `task.benchmark.benchmark_config` | `""` |  Specifies the baseline protocol that contains the method, input and scope. The built-in protocol is selected by `file_path#presets.name`, and the external independent agreement uses a file path. |
+| `task.benchmark.protocol` | `null` |  Provide indicators and methodological parameters, and model and data still use the corresponding component selection. |
+| `task.resume` | `true` |  Supports the re-use of saved results on mission terms. |
 
-##### 4.2.1.1 Model comparison `presets.model_comparison`
+##### 4.2.1.1 model comparison `presets.model_comparison`
 
-Provides for models, SAEs, bits and co-inputs that are involved in the comparison. The indicators for re-establishing errors, explanations, and output changes are used to compare candidates for the SAE. In expanding the comparison, check `targets`, `metrics` and measure the budget. [Model compare formula](../conf/tasks/benchmark/task.yaml)]
+Provides for models, SAEs, bits and co-inputs to participate in comparisons. Rebuild indicators such as errors, explanations and output changes to compare candidates for SAEs. In expanding the comparison, check `targets`, `metrics` and measure the budget. [Model comparison formula](../conf/tasks/benchmark/task.yaml)
 
-##### 4.2.1.2 Model comparison with GPT-2 `presets.model_comparison_gpt2`
+##### 4.2.1.2 Ham GPT-2  Model comparison `presets.model_comparison_gpt2`
 
-Save Organisation GPT-2 A comparative combination and corresponding indicators. GPT-2 For comparison of participation in this document `targets` and `metrics` Reference.[GPT-2 Compare Formula](../conf/tasks/benchmark/task.yaml)
+Saves a group of comparisons containing GPT-2 and corresponding indicators. When reviewing GPT-2 participation comparisons, reference is made to `targets` and `metrics` in this document. [GPT-2 Comparison Formula](../conf/tasks/benchmark/task.yaml)
 
-##### 4.2.1.3 Pythia small-scale baseline `presets.pythia_benchmark_smoke`
+##### 4.2.1.3 Pythia's small-scale baseline `presets.pythia_benchmark_smoke`
 
-Fixed Pythia-70M level 3, a SAE and a small sample to check the process from the reading of the sample to the output reconstruction and intervention indicators. View the plan with `saebase-benchmark --config conf/tasks/benchmark/task.yaml#presets.pythia_benchmark_smoke --dry-run`. [Small formulation](../conf/tasks/benchmark/task.yaml)]
+Fixed Pythia-70M layer 3, a SAE and a small sample to check the process from the sample reading to the output reconstruction and intervention indicators. View the plan with `saebase-benchmark --config conf/tasks/benchmark/task.yaml#presets.pythia_benchmark_smoke --dry-run`. [Small formulations](../conf/tasks/benchmark/task.yaml)
 
-##### 4.2.1.4 Pythia Group Baseline `presets.pythia_grouped_benchmark`
+##### 4.2.1.4 Pythia Group Benchmark `presets.pythia_grouped_benchmark`
 
-Use the same Pythia model and bits to produce results by an independent prompt group for subsequent review of reliability by group. For example, when comparing group results, confirm the hint grouping and measuring upper limit from here. [group formula](../conf/tasks/benchmark/task.yaml)]
+Use the same Pythia model and bits to produce results by an independent prompt group for subsequent review of reliability by group. For example, if you need to compare the group results, confirm here the hint grouping and measuring caps. [Grouping Formula](../conf/tasks/benchmark/task.yaml)
 
-##### 4.2.1.5 Activate health check-ups `evaluation`
+##### 4.2.1.5 Activation Health Check `evaluation`
 
-Use a prepared hint to calculate the activation and reconstruction statistics. Select `task.benchmark.evaluation=activation_health` while selecting the corresponding source, model, and SAE. For example, use 5 hints to see if the activation is normal and adjust the subject matter to the study range. [activate the health formulation](../conf/tasks/benchmark/task.yaml)] [read to achieve](../tasks/benchmark/metrics/health.py)]
+Use prepared hints to calculate and rebuild statistics.  Selection `task.benchmark.evaluation=activation_health` and select the source, model and SAE.  Like first. 5 A hint to see if the activation is normal and then adjust the number of questions to the scope of the study. [Activate Health Formula](../conf/tasks/benchmark/task.yaml) · [Read Achieved](../tasks/benchmark/metrics/health.py)
 
-| Parameters | Default value | Purpose |
+| parameter |  Default value | Purpose |
 | --- | --- | --- |
-| `evaluation.n_prompts` | `5` | Limit the number of ready alerts to check. |
-| `evaluation.device` | `cuda` | Specifies the model for this specific evaluation and the SAE execution device. |
-| `evaluation.require_prepared_prompts` | `true` | Request to read the tips that are ready and check the source. |
+| `evaluation.n_prompts` | `5` |  Limit the number of ready alerts to check. |
+| `evaluation.device` | `cuda` |  Specifies the model for this specific evaluation and the SAE execution device. |
+| `evaluation.require_prepared_prompts` | `true` |  Request to read the tips that are ready and check the source. |
 
 ##### 4.2.1.6 Review against data `presets.m4_ground_truth`
 
-Record the number of seeds, sample sizes, confidence levels and re-samplings used in the review. A review of the history check the 128 re-samplings and 95% confidence levels used at the time. [Creview the formula](../conf/tasks/benchmark/task.yaml)]
+Record the number of seeds, sample sizes, confidence levels and re-samplings used in the review. A review of the history check the 128 sub-samples used at the time with the 95% confidence level. [Review the formulation against the formula](../conf/tasks/benchmark/task.yaml)
 
-##### 4.2.1.7 Pythia Reliability Review `presets.pythia_reliability_audit`
+##### 4.2.1.7 Pythia Reliability review `presets.pythia_reliability_audit`
 
-Read for `saebase-audit --config` to check the sensitivity of the benchmark indicator to sampling and random seeds. For example, a change `sample_sizes` can compare stability at different sample sizes. [Pythia Reliability Review](../conf/tasks/benchmark/task.yaml)]
+Read `saebase-audit --config` to check the sensitivity of the benchmark indicator to sampling and random seeds. For example, changes `sample_sizes` can compare stability at different sample sizes. [Pythia Reliability Review](../conf/tasks/benchmark/task.yaml)
 
 ##### 4.2.1.8 Models and SAE Overrides Directory `site_catalog`
 
-For benchmarking and SAE pre-testing, registration models, SAEs, layers, and resource sources. For example, a list of layers above the target can be used to check the planned spot. [override directory](../conf/tasks/benchmark/task.yaml)] [bits configuration read](../tasks/benchmark/sites/catalog.py)] [SAE pre-check](../tasks/precheck/sae_checks.py)]
+Benchmark site checks and SAE prechecks read this catalog. It registers models, SAEs, layers, and resource sources. Before running the site matrix, for example, consult a target’s layer list to see which sites are scheduled for checks. [Coverage catalog](../conf/tasks/benchmark/task.yaml) · [Site configuration reader](../tasks/benchmark/sites/catalog.py) · [SAE precheck](../tasks/precheck/sae_checks.py)
 
-##### 4.2.1.9 Specialized acceptance input
+##### 4.2.1.9 Specific acceptance input
 
-The bit-checking module keeps a fixed sample of the batch with the code for the same input group for the income header. It is used to check the source of the input when assessing the two points. [Special assessment input](../assets/dataset_cohorts/stage_d/files/stage_d_population.jsonl)]
+The site-check module stores the fixed evaluation sample cohort and the code for the input groups used by the reliability audit. Use these to verify the input provenance when comparing two sites. [Specialized evaluation inputs](../assets/dataset_cohorts/stage_d/files/stage_d_population.jsonl)
 
 ##### 4.2.1.10 Specific acceptance target `site_targets`
 
-Saves the combination and order of the specific acceptances used, including models, SAEs, layers, hook names and the identity of the check point. Checks whether a given point is used in the batch. [Special acceptance target](../conf/tasks/benchmark/task.yaml)]
+Saves the combination and order of the specific acceptances used, including the model, SAE, layer, hook name and check point identity. Checks if a given point is used in the batch. [Specialized acceptance and inspection target](../conf/tasks/benchmark/task.yaml)
 
 ### 4.3 Capture `conf/tasks/capture/`
 
@@ -188,167 +186,167 @@ Saves the combination and order of the specific acceptances used, including mode
 
 #### 4.3.1 Capture `conf/tasks/capture/task.yaml`
 
-For example, on the same subject, you can first select a candidate for a standardized activation and then check this pool for answer behaviour. [According configuration](../conf/tasks/capture/task.yaml)]
+Use Capture to observe feature activations, select candidates, or measure joint effects. For example, find candidates by standardized activation on a fixed question batch, then measure how the candidate set changes answer behavior. [Capture configuration](../conf/tasks/capture/task.yaml)
 
-##### 4.3.1.1 Method selection and output
+##### 4.3.1.1 Method Selection and Output
 
-Select by `task.capture.mode`.
+Select the method by `task.capture.mode`.
 
 The method determines the basis to be used to select the characteristic or measure the contribution. Other settings control the range and output of the observation.
 
-| Parameters | Default value | Purpose and conditions |
+| parameter |  Default value |  Purpose and conditions |
 | --- | --- | --- |
-| `task.capture.mode` | `whiten` | `non_whiten` Sort by original activation, `whiten` Sort by standardized activation, `g_s` Rating by answer behaviour, `sar` Returns with sample, `I` Round-up, `rss` Look for response characteristics for the same target in different contexts. |
-| `task.capture.sample_ids` | `null` | Only designated observation topics are dealt with, and complete reference groups are retained. |
-| `task.capture.output_scope` | `last_token` | Observe the last word. `all_tokens` Saves the word-by-temporal slender coding to match `task.capture.selection.candidate_count=all`. |
-| `task.capture.max_tokens` | `128` | Limiting the number of words recorded to `all_tokens` only. |
+| `task.capture.mode` | `whiten` | `non_whiten` ranks raw activations, `whiten` ranks standardized activations, `g_s` scores answer behavior, `sar` uses sampled regression, `I` evaluates interactions exhaustively, and `rss` finds features responding to the same target in different contexts. |
+| `task.capture.sample_ids` | `null` |  Only designated observation topics are dealt with, and complete reference groups are retained. |
+| `task.capture.output_scope` | `last_token` | Observe the final token. `all_tokens` saves native sparse codes for each token and is used with `task.capture.selection.candidate_count=all`. |
+| `task.capture.max_tokens` | `128` |  Limits the number of words recorded to `all_tokens` only. |
 | `task.capture.max_active_per_token` | `256` | The maximum number of active features for each word record is used for word-by-word results. |
 | `task.capture.whiten_chunk_size` | `256` | The number of words in each batch for the calculation of standardized statistics. |
-| `task.capture.output.feature_count` | `null` | Controls the output characteristics or characteristics to the quantity. The output is 10 when the new formulation of g_s is omitted; the rest follows the range of candidates. |
-| `task.capture.model_answer.max_new_tokens` | `256` | All Capture saves the response of the model to the original input; this value limits the new creation of the characters. |
-| `task.capture.model_answer.batch_size` | `8` | The original response uses the upstream generation method of the loaded model, input the same length and re-use KV Cache. |
+| `task.capture.output.feature_count` | `null` | Controls how many features or feature pairs to output. The new g_s recipe outputs 10 if this value is omitted. Other modes follow the candidate scope. |
+| `task.capture.model_answer.max_new_tokens` | `256` |  All Capture saves the response of the model to the original input; this value limits the new creation of the characters. |
+| `task.capture.model_answer.batch_size` | `8` | Original answers use the loaded model’s upstream generation method. Inputs of the same length are grouped and reuse the KV cache. |
 
-##### 4.3.1.2 Shared candidate screening
+##### 4.3.1.2 Common candidate filter
 
-The number of candidate pools is determined by `task.capture.selection.candidate_count` and the number of final outputs by `task.capture.output.feature_count`.
+Several capture methods share these filters. `task.capture.selection.candidate_count` sets the candidate pool size, and `task.capture.output.feature_count` sets the final output count.
 
-`non_whiten`,`whiten`,`g_s`,`I` and `sar` Default common candidate pool. Use terminologies and reference topics to filter and exclude Neuronpedia Primary active density is greater than 1% . Save only the non-zero character of the final word and the reference standard difference is greater than zero, in absolute terms z-score Most taken 20 . Use the actual number when the candidate is below the upper limit and zero is omitted from the presentation, I or SAR Record undefined and cause when less than two.
+`non_whiten`, `whiten`, `g_s`, `I`, and `sar` share a candidate pool by default. Apply semantic and reference-question frequency filters and exclude features whose native activation density in Neuronpedia is strictly greater than 1%. Keep only features with nonzero native activation at the question’s final token and positive reference standard deviation, then take up to 20 by absolute z-score. When fewer qualify, use the actual count. Reports omit questions with zero candidates. With fewer than two candidates, I or SAR records an undefined result and its reason.
 
-| Parameters | Default value | Purpose and conditions |
+| parameter |  Default value |  Purpose and conditions |
 | --- | --- | --- |
-| `task.capture.selection.candidate_policy` | `active_whiten` | When the candidate is a positive integer, the same group of candidates is selected by each capture method from the feature that actually activates the subject and is filtered in absolute fractions after bleaching. `legacy` The number of candidates is the following: `all` To continue to apply the full-scope rules of the counterpart model. |
-| `task.capture.selection.candidate_count` | `20` | When you set a positive integer number, you screen the candidate for the re-cantonment limit. `all` uses the full range of features and the relevant mode is still subject to calculation. |
-| `task.capture.selection.feature_filter.enabled` | `true` | Enables the characterization filter for a mode with a numerical ceiling. |
-| `task.capture.selection.feature_filter.min_native_nonzero_fraction` | `0.01` | The non-zero-activation threshold for the Neuronpedia language is 0 to 1. |
-| `task.capture.selection.feature_filter.density_strict` | `true` | `true` excludes characteristics whose density is strict above the threshold. `false` also excludes characteristics that correspond to the threshold. |
-| `task.capture.selection.cohort_filter.enabled` | `true` | Enables the frequency filtering of reference questions for models with numerical ceilings. |
-| `task.capture.selection.cohort_filter.reference_sample_count` | `100` | Sets the number of reference questions shared by five models for standardized statistics and frequency screening. |
-| `task.capture.selection.cohort_filter.zscore_threshold` | `1.0` | When the end-word standardization of a reference is activated beyond that value, the high-frequency judgement of the feature is taken into account. |
+| `task.capture.selection.candidate_policy` | `active_whiten` | When the candidate count is a positive integer, all Capture methods select the same features by absolute whitened score from those that activate on the question and pass filtering. `legacy` retains each method’s earlier candidate strategy. `all` preserves the full-scope rules of the selected mode. |
+| `task.capture.selection.candidate_count` | `20` |  When you set a positive integer number, you screen the candidate for the re-extract limit. `all` Use the full range of features, and the relevant mode is still subject to calculation. |
+| `task.capture.selection.feature_filter.enabled` | `true` |  Enables the characterization filter for a mode with a numerical ceiling. |
+| `task.capture.selection.feature_filter.min_native_nonzero_fraction` | `0.01` | Neuronpedia The non-zero-activation ratio threshold in the text is 0  Present. 1. |
+| `task.capture.selection.feature_filter.density_strict` | `true` | `true` excludes features with density strictly above the threshold. `false` also excludes features at exactly the threshold. |
+| `task.capture.selection.cohort_filter.enabled` | `true` |  Enables the frequency filtering of reference questions for models with numerical ceilings. |
+| `task.capture.selection.cohort_filter.reference_sample_count` | `100` |  Sets the number of reference questions shared by five models for standardized statistics and frequency screening. |
+| `task.capture.selection.cohort_filter.zscore_threshold` | `1.0` |  When the end-word standardization of a reference is activated beyond that value, the high-frequency judgement of the feature is taken into account. |
 | `task.capture.selection.cohort_filter.min_question_fraction` | `0.5` | The proportion of the reference question that meets the above conditions triggers the frequency filter at least for this value. |
-| `task.capture.selection.feature_selection` | `whiten` | When using the `legacy` candidate strategy, select the candidate ranking basis for `g_s`, `sar`, and `I`. |
+| `task.capture.selection.feature_selection` | `whiten` |  Use `legacy`  When you're running for a strategy, `g_s`,`sar`,`I`  Select Selection Sort By. |
 
-##### 4.3.1.3 Shared answer rating
+##### 4.3.1.3 Common answer rating
 
-The set is also used when the SAR returns to select the full answer rating.
+Single-feature behavioral scoring and exhaustive interaction use the full reference answer. SAR regression reuses these settings when full-answer scoring is selected.
 
-| Parameters | Default value | Purpose and conditions |
+| parameter |  Default value |  Purpose and conditions |
 | --- | --- | --- |
-| `task.capture.answer.backend` | `full_context_tail` | Select the front-end method for scoring the answer, and use the end layer of the full context to calculate the path. The same calibration is used for comparison. |
-| `task.capture.answer.reference_text` | `null` | Provides a standard text of the answer for a visible hint. The data set is executed using a sample answer. |
+| `task.capture.answer.backend` | `full_context_tail` |  Select the front-end method for scoring the answer, and use the end layer of the full context to calculate the path. The same calibration is used for comparison. |
+| `task.capture.answer.reference_text` | `null` |  Provides a standard text of the answer for a visible hint. The data set is executed using a sample answer. |
 
-###### Whiten primary range
+###### Initial Whiten Candidate Scope
 
-| Parameters | Default value | Purpose and conditions |
+| parameter |  Default value |  Purpose and conditions |
 | --- | --- | --- |
-| `task.capture.g_s.candidate_count` | `100` | Only `g_s` use `legacy` Sets when you are a candidate for a strategy. Whiten Primary range, must have a positive integer. |
+| `task.capture.g_s.candidate_count` | `100` | Applies only when `g_s` uses the `legacy` candidate policy. Sets the initial Whiten candidate scope and must be a positive integer. |
 
-Under the default candidate strategy, `g_s` is ranked in the common pool by Zero-Equal Characters. The output is controlled by `task.capture.output.feature_count`. When the old policy is used, the g(S) candidate ceiling covers the shared ceiling, and the numerical result is read by the original identity.
+With the default candidate policy, `g_s` zeros features individually in the shared pool and ranks them by reference-answer score after removal. `task.capture.output.feature_count` sets the output count. The legacy policy lets the dedicated g(S) candidate limit override the shared limit. Read existing numerical results under their original identity.
 
-##### 4.3.1.4 Intensive interaction
+##### 4.3.1.4 Exhaustive Interaction
 
-Use this section of parameters after `task.capture.mode=I` selection. Only if the candidate is selected with a single characteristic behaviour and the candidate is insufficient is the candidate deficit rule applied.
+Use these parameters for `task.capture.mode=I`. The candidate-shortfall rule applies only when candidates are selected through single-feature behavior scoring and too few candidates qualify.
 
-| Parameters | Default value | Purpose and conditions |
+| parameter |  Default value |  Purpose and conditions |
 | --- | --- | --- |
-| `task.capture.i.feature_selection` | `whiten` | When using the `legacy` candidate strategy, choose `whiten`, `native_activation` or `g_s` and may also inherit `selection.feature_selection` with an empty value. |
-| `task.capture.i.g_s_shortfall` | `available` | When using the `legacy` policy and selecting a candidate by g(S), `available` uses the current number and `relax_filters` allows for a relaxed screening. |
-| `task.capture.i.max_exhaustive_features` | `16` | If you have reached the ceiling, you will have to adjust the pool ceiling or overstretch the budget. |
+| `task.capture.i.feature_selection` | `whiten` |  When using the `legacy` candidate strategy, choose `whiten`, `native_activation` or `g_s` and the empty value may be used to inherit `selection.feature_selection`. |
+| `task.capture.i.g_s_shortfall` | `available` |  When using the `legacy` policy and selecting a candidate by g(S), `available` uses the current number and `relax_filters` allows for relaxed screening. |
+| `task.capture.i.max_exhaustive_features` | `16` | The shared candidate policy checks the actual candidate count for the question after filtering. If it exceeds the limit, adjust the shared candidate limit or the exhaustive computation budget. |
 
-##### 4.3.1.5 SAR Return
+##### 4.3.1.5 SAR Regression
 
-Select `task.capture.mode=sar` to use the parameter in this section. The sub-task is a stand-alone and pairing contribution by sampling the characteristics. Specifies the character number and location only when comparing the output fractions of a single word.
+Use these parameters for `task.capture.mode=sar`. The subtask uses sampling to fit individual and pairwise feature contributions. Explicit token IDs and positions apply only when comparing individual token output scores.
 
-| Parameters | Default value | Purpose and conditions |
+| parameter |  Default value |  Purpose and conditions |
 | --- | --- | --- |
-| `task.capture.sar.source` | `null` | Returns a trusted local original `sar.py` or a directory used by `sar`. |
-| `task.capture.sar.M` | `384` | Number of feature subsets of sample regression assessment. |
-| `task.capture.sar.n_fit` | `256` | The number of sub-sets to be distributed for return shall be divided into totals and assessments. |
+| `task.capture.sar.source` | `null` |  Return `sar`  Valid local originals used `sar.py`  Or where it is.. |
+| `task.capture.sar.M` | `384` |  Number of feature subsets of sample regression assessment. |
+| `task.capture.sar.n_fit` | `256` | Number of subsets assigned to regression fitting. Coordinate it with the total and the evaluation split. |
 | `task.capture.sar.p` | `0.5` | The probability of selection of a single feature when a subset of the characteristics is generated in the sample. |
 | `task.capture.sar.top_pairs` | `0` | The corresponding amount is reported in pairs when positive numbers are set. |
-| `task.capture.sar.pair_ranking` | `signed` | Return `sar` Pair-to-Pair Rules.`I` Sort using measured interactive ingens. |
-| `task.capture.sar.readout` | `answer_mean_logprob` | Defaults to use the mean word logarithmic probability of a reference answer. The regression path also supports `logit_difference`. |
-| `task.capture.sar.readout_position` | `-1` | Select the word position for the rating to read. Negative one is the last position. |
+| `task.capture.sar.pair_ranking` | `signed` |  Returns the two-to-one sorting rule of `sar`. `I` uses the order of the measured interactive ingenuity. |
+| `task.capture.sar.readout` | `answer_mean_logprob` |  Default to use the mean word logarithmic probability for reference answers. The regression path also supports `logit_difference`. |
+| `task.capture.sar.readout_position` | `-1` |  Select the word position for the rating to read. Negative one is the last position. |
 | `task.capture.sar.target_token_id` | `null` | The target number to be used by the visible hint in the word scoring is matched with the terminologist. |
 | `task.capture.sar.reference_token_id` | `null` | The cross-character number used for the word fraction difference is to match the terminologist. |
-| `task.capture.sar.require_affine_decode` | `true` | Requires the SAE used for the corresponding calculation to meet the conditions of the imitation decode. |
+| `task.capture.sar.require_affine_decode` | `true` |  Requires the SAE used for the corresponding calculation to meet the conditions of the imitation decode. |
 
-The catch description applies to selection, sorting or checking features. For example, a `task.capture.output.feature_count=1` feature can only be reported from the same candidate pool, and the original screening range is maintained. [A capture method, scoring and example](../tasks/capture/README.md)]
+The catch description applies to selection, sorting or checking features. For example, a `task.capture.output.feature_count=1` feature can only be reported from the same candidate pool and the original screening range is maintained. [Capture usage, scoring and examples](../tasks/capture/README.md)
 
-##### 4.3.1.6 Context comparison of RSS
+##### 4.3.1.6 RSS Context Contrast
 
-The following table is used when `task.capture.mode=rss` is selected. This method includes a different context for the same target text and selects repeated and stable changes in direction.
+The following table is used when `task.capture.mode=rss` is selected. This method adds a different context to the same target text and selects repeated and stable changes in direction.
 
-| Parameters | Default value | Purpose and conditions |
+| parameter |  Default value |  Purpose and conditions |
 | --- | --- | --- |
-| `task.capture.rss.source` | `null` | Specifies that a trusted local original RSS is achieved. |
-| `task.capture.rss.contexts` | `[]` | Specifies at least two non-empty contexts, each of which forms an input to the same target text. |
+| `task.capture.rss.source` | `null` |  Specifies that a trusted local original RSS is achieved. |
+| `task.capture.rss.contexts` | `[]` | Specify at least two nonempty contexts. Each context is combined with the same target text to form one input. |
 | `task.capture.rss.M` | `400` | The maximum number of characteristics to enter the candidate pool by absolute change on average. |
 | `task.capture.rss.K` | `20` | The maximum number of features that are ultimately retained after filtering. |
 | `task.capture.rss.rho` | `0.8` | The lowest proportion of the changes that can be counted. |
-| `task.capture.rss.kappa` | `0.8` | In the changed context, the lowest proportion of the main direction of change. |
-| `task.capture.rss.tau` | `0.00001` | Absolute changes are included only if they are more strict than this threshold. |
-| `task.capture.rss.report.dominance_ratio` | `5.0` | The characteristics selected for RSS are determined by the algorithm setting. |
+| `task.capture.rss.kappa` | `0.8` | Minimum proportion of changed contexts that exhibit the dominant direction of change. |
+| `task.capture.rss.tau` | `0.00001` |  Absolute changes are included only if they are more strict than this threshold. |
+| `task.capture.rss.report.dominance_ratio` | `5.0` | Affects only the candidates displayed in the report. List a variant only if its change reaches the specified multiple of the changes for the other variants. Algorithm settings determine which features RSS selects. |
 
-##### 4.3.1.7 characterization notes
+##### 4.3.1.7 Feature Annotations
 
-Captures can be accompanied by a source and description for the selected feature. `task.capture.neuronpedia.allow_network=false` Limiting access sources.
+Capture can attach provenance and explanations to selected features. If a cache already exists, use `task.capture.neuronpedia.allow_network=false` to limit where annotations are read.
 
-| Parameters | Default value | Purpose and conditions |
+| parameter |  Default value |  Purpose and conditions |
 | --- | --- | --- |
-| `task.capture.neuronpedia.enabled` | `true` | Enables feature comment information. |
-| `task.capture.neuronpedia.allow_network` | `true` | Controls can be accessed online for comments. |
-| `task.capture.neuronpedia.cache_dir` | `null` | Visible specifies the cache path. Use the environment specified cache position when you leave space. |
+| `task.capture.neuronpedia.enabled` | `true` |  Enables feature comment information. |
+| `task.capture.neuronpedia.allow_network` | `true` |  Controls can be accessed online for comments. |
+| `task.capture.neuronpedia.cache_dir` | `null` |  Displays the cache path. Use the item `assets/annotation_cache/neuronpedia_explanations/files/` when you leave space. |
 | `task.capture.neuronpedia.timeout_seconds` | `15` | The number of extra-hour seconds for a single visit. |
 | `task.capture.neuronpedia.total_timeout_seconds` | `120` | The total number of hours and seconds of all relevant accesses. |
-| `task.capture.neuronpedia.max_download_bytes` | `67108864` | Download volume cap, 64 MiB. |
-| `task.capture.neuronpedia.max_uncompressed_bytes` | `268435456` | Maximum size of post-enhanced information, 256 MiB. |
+| `task.capture.neuronpedia.max_download_bytes` | `67108864` |  Download volume cap, 64 MiB. |
+| `task.capture.neuronpedia.max_uncompressed_bytes` | `268435456` |  Maximum volume of expanded information, 256 MiB. |
 
 ##### 4.3.1.8 Migration of old capture commands
 
-Capture previously declared special field entry `task.capture`,For example: `task.mode=whiten` Replace with `task.capture.mode=whiten`.The following table shows the entry points where grouping or field names have been changed at the same time:.
+Capture previously declared special field entry `task.capture`, For example: `task.mode=whiten`  Replace with `task.capture.mode=whiten`. The following table shows the entry points where grouping or field names have been changed at the same time:.
 
-| Keys in the old command | Keys currently in use |
+|  Keys in the old command |  Keys currently in use |
 | --- | --- |
 | `task.filter` | `task.capture.selection.candidate_count` |
-| Captured `task.capture_count` or `task.top_feature_num` | `task.capture.output.feature_count` |
-| `task.sar.feature_filter.*`、`task.sar.cohort_filter.*`、`task.sar.feature_selection` | Corresponding fields are under `task.capture.selection`. |
-| `task.sar.answer`、`task.sar.answer_backend` | For `task.capture.answer.reference_text` and `task.capture.answer.backend`, respectively. |
+|  Captured `task.capture_count` or `task.top_feature_num` | `task.capture.output.feature_count` |
+| `task.sar.feature_filter.*`、`task.sar.cohort_filter.*`、`task.sar.feature_selection` |  Corresponding fields are under `task.capture.selection`. |
+| `task.sar.answer`、`task.sar.answer_backend` |  Use `task.capture.answer.reference_text` and `task.capture.answer.backend`, respectively. |
 | `task.sar.i_feature_selection`、`task.sar.i_g_s_shortfall`、`task.sar.max_exhaustive_features` | For `task.capture.i.feature_selection`, `task.capture.i.g_s_shortfall` and `task.capture.i.max_exhaustive_features`, respectively. |
-| SAR returns the special `task.sar.*` | Corresponding fields are under `task.capture.sar`. |
-| `task.rss.*` | Corresponding fields are shown in `task.capture.rss` at `task.capture.rss.report.dominance_ratio` scale. |
+|  SAR returns the special `task.sar.*` |  Corresponding fields are under `task.capture.sar`. |
+| `task.rss.*` |  Corresponding fields are shown in `task.capture.rss` with `task.capture.rss.report.dominance_ratio` scale. |
 
-The old keys of the history snapshot are mapd while reading. The original rigorous running is still checking the source version and configuration on the list.
+When reading historical snapshots, SAEBase maps the old keys. For strict reproduction of the original run, consult the source version and configuration in the manifest.
 
 ##### 4.3.1.9 Capture Batch `matrix`
 
-For example, to treat the whole batch only BBH, the `matrix.datasets` of the formula can be changed to `[bbh]`. [capture matrix formula](../conf/tasks/capture/task.yaml)] [capture matrix portal](../tasks/capture/matrix.py)]
+The Capture matrix entry point reads this recipe to combine models, SAEs, layers, and datasets. It executes each combination through the production Capture task. For example, to process only BBH, set the recipe’s `matrix.datasets` to `[bbh]`. [Capture matrix recipe](../conf/tasks/capture/task.yaml) · [Capture matrix entry point](../tasks/capture/matrix.py)
 
-| Parameters | Formula values or omitted behaviour | Purpose |
+| parameter |  Formula values or omitted behaviour | Purpose |
 | --- | --- | --- |
-| `matrix.models` | Models, SAEs and Layers in Files | Specifies where you want to capture the model. |
-| `matrix.datasets` | List of data sets in the file | Specifies the data sets on which each model runs. |
-| `matrix.seed` | `42` | Sets the random torrent for this batch to be executed. |
-| `matrix.model_timeout_seconds` | `86400` | Limits the total length of the individual model sub-process in seconds. |
-| `matrix.dataset_overrides` | Use the formulations of the data sets when omitted | Harmonized coverage of the data set for this instalment, e.g. by setting a common maximum number of samples. |
+| `matrix.models` | List of models, SAEs, and layers in the file | Select the model sites at which to capture. |
+| `matrix.datasets` |  List of data sets in the file |  Specifies the data sets on which each model runs. |
+| `matrix.seed` | `42` |  Sets the random torrent for this batch to be executed. |
+| `matrix.model_timeout_seconds` | `86400` |  Limits the total length of the individual model sub-process in seconds. |
+| `matrix.dataset_overrides` |  Use the formulations of the data sets when omitted |  Harmonized coverage of the data set for this instalment, e.g. by setting a common maximum number of samples. |
 
-##### 4.3.1.10 SAR feature screening `sar_filter_policy`
+##### 4.3.1.10 SAR Feature Filters `sar_filter_policy`
 
-Captures a filter file within a project to define a landmark, functional word and other syntax mode. If you need to explain why a feature is sifted, you can check the type of hit in the rule. [The catch selection rule](../conf/tasks/capture/task.yaml)]
+Capture uses a project filter rule file for punctuation, function words, and other syntactic patterns. To explain why a feature was excluded, check the type of rule it matched. [Capture filter rules](../conf/tasks/capture/task.yaml)
 
-### 4.4 Circuits `conf/tasks/circuits/`
+### 4.4 Circuit `conf/tasks/circuits/`
 
 [Open Profile Directory](../conf/tasks/circuits/)
 
 #### 4.4.1 Circuit `conf/tasks/circuits/task.yaml`
 
-For example, when comparing different price equivalents, you should fix a transcoder configuration that matches the model. [wire](../conf/tasks/circuits/task.yaml)]
+Trace selected relationships between a specified prompt and the model output. For example, when comparing equivalent prompts, first fix the transcoder configuration that matches the model. [Circuit configuration](../conf/tasks/circuits/task.yaml)
 
-| Parameters | Default value | Purpose and conditions |
+| parameter |  Default value |  Purpose and conditions |
 | --- | --- | --- |
 | `task.circuits.approved` | `false` | The approved switch to which the circuit execution path is read is set according to the actual authorization. |
-| `task.circuits.transcoder_set` | `gemma` | Select the transcoder set that matches the model. |
-| `task.circuits.slug` | `gemma2b-trace` | Short names are provided for tracking products. |
-| `task.timeout_seconds` | `1800` | Tracks the number of extra-hour seconds of the operation. |
+| `task.circuits.transcoder_set` | `gemma` |  Select the transcoder set that matches the model. |
+| `task.circuits.slug` | `gemma2b-trace` |  Short names are provided for tracking products. |
+| `task.timeout_seconds` | `1800` |  Tracks the number of extra-hour seconds of the operation. |
 
 ### 4.5 Explanation `conf/tasks/explain/`
 
@@ -356,21 +354,21 @@ For example, when comparing different price equivalents, you should fix a transc
 
 #### 4.5.1 Explanation `conf/tasks/explain/task.yaml`
 
-For example, the material is found to be used to generate the explanation and another to be used to check whether the explanation is applicable. [Interprets](../conf/tasks/explain/task.yaml)]
+It is used to provide an explanation from an example of an appearance of characteristics, and then to verify it by reserving material. For example, it is found that the material is used to generate an explanation and another to check whether the explanation is applicable. [Explain Configuration](../conf/tasks/explain/task.yaml)
 
-| Parameters | Default value | Purpose and conditions |
+| parameter |  Default value |  Purpose and conditions |
 | --- | --- | --- |
-| `task.explain.approved` | `false` | Explains the approved switch to be read by the execution path, as actually authorized. |
-| `task.explain.discovery_file` | `""` | Sample documents were found to provide a basis for the generation of the explanation. |
-| `task.explain.heldout_file` | `""` | Samples are set aside for independent reconciliation of explanations. |
-| `task.explain.site_id` | `""` | Indicates the model bits that need to be explained. |
-| `task.explain.feature_id` | `0` | Specify the characterization number of the bit. |
-| `task.explain.generator_model` | `""` | Generates model identification for interpretation. |
-| `task.explain.generator_method` | `""` | Records the method name for the result. The actual generator is selected by `task.explain.generator` or the Python caller. |
-| `task.explain.authorized_budget_usd` | `0.0` | Approved budget this time, in United States dollars. |
-| `task.explain.estimated_cost_usd` | `0.0` | Projected cost before implementation, in United States dollars. |
+| `task.explain.approved` | `false` |  Explains the approved switch to be read by the execution path, as actually authorized. |
+| `task.explain.discovery_file` | `""` |  Sample documents were found to provide a basis for the generation of the explanation. |
+| `task.explain.heldout_file` | `""` |  Samples are set aside for independent reconciliation of explanations. |
+| `task.explain.site_id` | `""` |  Indicates the model bits that need to be explained. |
+| `task.explain.feature_id` | `0` |  Specify the characterization number of the bit. |
+| `task.explain.generator_model` | `""` |  Generates model identification for interpretation. |
+| `task.explain.generator_method` | `""` |  Records the method name for the result. The actual generator is selected by `task.explain.generator` or the Python caller. |
+| `task.explain.authorized_budget_usd` | `0.0` |  Approved budget this time, in United States dollars. |
+| `task.explain.estimated_cost_usd` | `0.0` |  Projected cost before implementation, in United States dollars. |
 | `task.explain.generator` | `""` | The empty value retains the Python call entrance with the visible name generator `saebase_generate`. |
-| `task.explain.generator_max_new_tokens` | `24` | An explanation of the number of words that generate the maximum output. |
+| `task.explain.generator_max_new_tokens` | `24` |  An explanation of the number of words that generate the maximum output. |
 
 ### 4.6 Generate `conf/tasks/generate/`
 
@@ -378,24 +376,24 @@ For example, the material is found to be used to generate the explanation and an
 
 #### 4.6.1 Generate `conf/tasks/generate/task.yaml`
 
-For example, keep the same hint and temperature and compare the text generated by different additions. [Generating](../conf/tasks/generate/task.yaml) configuration]
+To observe the actual continuation of the model after the feature modification. For example, the same hint and temperature are maintained, comparing the text generated by different additions. [Generate Profile](../conf/tasks/generate/task.yaml)
 
-| Parameters | Default value | Purpose and conditions |
+| parameter |  Default value |  Purpose and conditions |
 | --- | --- | --- |
-| `task.generate.intervention` | `add` | Select how to modify the selected feature, by default adding a value. |
-| `task.generate.value` | `1.0` | Default increase range, as explained by the selected change. |
-| `task.generate.max_new_tokens` | `8` | Maximum number of newly generated characters. |
-| `task.generate.temperature` | `0.0` | Adjusts the fraction scale of the decoded sample. The default is zero temperature behaviour. |
-| `task.generate.stop_at_context_limit` | `true` | Discontinue and record the reasons when the original context limits are met. |
-| `task.generate.conditions` | `null` | Provide for multiple groups of primary intervention conditions, compared with the same generation mission. |
-| `task.generate.feature_id` | `0` | . The number corresponds to this SAE and the model layer. |
-| `task.generate.feature_selection` | `configured` | Use the specified feature by default. `capture_top` Select the catch ranking feature to read the saved catch result or to calculate it on site. You can also select a candidate from the last content word `last_active_content_token`. |
+| `task.generate.intervention` | `add` |  Select how to modify the selected feature, by default adding a value. |
+| `task.generate.value` | `1.0` |  Default increase range, as explained by the selected change. |
+| `task.generate.max_new_tokens` | `8` |  Maximum number of newly generated characters. |
+| `task.generate.temperature` | `0.0` |  Adjusts the fraction scale of the decoded sample. The default is zero temperature behaviour. |
+| `task.generate.stop_at_context_limit` | `true` |  Discontinue and record the reasons when the original context limits are met. |
+| `task.generate.conditions` | `null` |  Provide for multiple groups of primary intervention conditions, compared with the same generation mission. |
+| `task.generate.feature_id` | `0` |. The number corresponds to this SAE and the model layer. |
+| `task.generate.feature_selection` | `configured` |  Use the specified feature by default. `capture_top` Selects the catch ranking feature to read the saved capture result or to calculate it on site. You can also select a candidate from the last content word `last_active_content_token`. |
 | `task.generate.top_feature_num` | `10` | The maximum number of features to be removed and changed on a case-by-case basis when a ranking selection strategy is used. |
-| `task.generate.feature_ranking` | `whiten` | Select to sort by standard value or original activation, e. g. `non_whiten`. |
-| `task.generate.capture_source` | `null` | Provides the already available catch results. Checks the tips, weights, bits and ranking conditions when using the reuse. |
+| `task.generate.feature_ranking` | `whiten` |  Select to sort by standardized values or original activation, e. g. `non_whiten`. |
+| `task.generate.capture_source` | `null` |  Provides the already available catch results. Checks the tips, weights, bits and ranking conditions when using the reuse. |
 | `task.generate.whiten_chunk_size` | `256` | The word series used to calculate the statistics required for standardization. |
-| `task.resume` | `true` | Allows the task to be reused to meet the running condition. The processing of existing directories is still determined by `runtime.mode`. |
-| `task.generate.inline_results` | `true` | Default to write details to the result. Read the task details file on close. |
+| `task.resume` | `true` |  Allows the task to revert to the result that the running condition is met. The processing of existing directories is still determined by `runtime.mode`. |
+| `task.generate.inline_results` | `true` |  Default to write details to the result. Read the task details file on close. |
 | `task.generate.continue_on_error` | `false` | The remaining sub-items could be continued after the failure of the separate sub-items and the missing items could be addressed on a results-based basis. |
 | `task.generate.reuse_prompt_observations` | `true` | Reuse a calculated observation when the full prefix of the same prompt matches. |
 
@@ -405,162 +403,162 @@ For example, keep the same hint and temperature and compare the text generated b
 
 #### 4.7.1 Intervention `conf/tasks/intervene/task.yaml`
 
-For example, you can read the score of the baseline and the zero condition separately using the same input and feature. [The intervention configuration](../conf/tasks/intervene/task.yaml)]
+To measure how the answer rating changes after a change in the given feature. For example, the score of the baseline and the zero condition is read separately using the same input and feature. [Intervention Configuration](../conf/tasks/intervene/task.yaml)
 
-| Parameters | Default value | Purpose and conditions |
+| parameter |  Default value |  Purpose and conditions |
 | --- | --- | --- |
 | `task.intervene.value` | `0.0` | The value of the individual intervention. The default is used to observe the result of setting the feature to zero. |
-| `task.intervene.verify_identity` | `true` | Check to see if you read the same as the original calculation. |
-| `task.intervene.protocol` | `null` | (c) The introduction of clear batch intervention conditions, budgets and comparative settings. |
-| `task.intervene.feature_id` | `0` | . The number corresponds to this SAE and the model layer. |
-| `task.intervene.feature_selection` | `configured` | Default uses the specified feature. `capture_top` Selects the catch ranking feature to read the saved catch result or to calculate it on site. |
+| `task.intervene.verify_identity` | `true` |  Check to see if you read the same as the original calculation. |
+| `task.intervene.protocol` | `null` | (c) The introduction of clear bulk intervention conditions, budgets and comparative settings. |
+| `task.intervene.feature_id` | `0` |. The number corresponds to this SAE and the model layer. |
+| `task.intervene.feature_selection` | `configured` |  Default uses the specified feature. `capture_top` Selects the catch ranking feature to read the saved catch result or to calculate it on site. |
 | `task.intervene.top_feature_num` | `10` | The maximum number of features to be removed and changed on a case-by-case basis when a ranking selection strategy is used. |
-| `task.intervene.feature_ranking` | `whiten` | Select to sort by standard value or original activation, e. g. `non_whiten`. |
-| `task.intervene.capture_source` | `null` | Provides the already available catch results. Checks the tips, weights, bits and ranking conditions when using the reuse. |
+| `task.intervene.feature_ranking` | `whiten` |  Select to sort by standardized values or original activation, e. g. `non_whiten`. |
+| `task.intervene.capture_source` | `null` |  Provides the already available catch results. Checks the tips, weights, bits and ranking conditions when using the reuse. |
 | `task.intervene.whiten_chunk_size` | `256` | The word series used to calculate the statistics required for standardization. |
-| `task.resume` | `true` | Allows the task to be reused to meet the running condition. The processing of existing directories is still determined by `runtime.mode`. |
-| `task.intervene.inline_results` | `true` | Default to write details to the result. Read the task details file on close. |
+| `task.resume` | `true` |  Allows the task to revert to the result that the running condition is met. The processing of existing directories is still determined by `runtime.mode`. |
+| `task.intervene.inline_results` | `true` |  Default to write details to the result. Read the task details file on close. |
 | `task.intervene.continue_on_error` | `false` | The remaining sub-items could be continued after the failure of the separate sub-items and the missing items could be addressed on a results-based basis. |
 | `task.intervene.reuse_prompt_observations` | `true` | Reuse a calculated observation when the full prefix of the same prompt matches. |
 
-##### 4.7.1.1 Interventions and generation of batches `matrix`
+##### 4.7.1.1 Intervention and Generation Batch `matrix`
 
-It selects candidate characteristics for each model and data set and runs the assigned tasks. For example, to measure only the effects of the intervention, `matrix.tasks` is assigned to `[intervene]`. [intervention and generation matrix formula](../conf/tasks/intervene/task.yaml)] [intervention and generation batch portal](../tasks/intervene/matrix.py)
+The intervention and generation batch entry point reads this recipe. It selects candidate features for each model and dataset and runs the specified tasks. For example, to measure only intervention effects, set `matrix.tasks` to `[intervene]`. [Intervention and generation matrix recipe](../conf/tasks/intervene/task.yaml) · [Intervention and generation batch entry point](../tasks/intervene/matrix.py)
 
-| Parameters | Formula Value | Purpose |
+| parameter |  Formula Value | Purpose |
 | --- | --- | --- |
-| `matrix.models`、`matrix.datasets` | List of model bits and data sets in files | Defines the group of experiments for this batch. |
-| `matrix.seed` | `42` | Sets the random torrent for this batch to be executed. |
-| `matrix.model_timeout_seconds` | `86400` | Limits the total length of the individual model sub-process in seconds. |
-| `matrix.tasks` | `[intervene, generate]` | Select the operational intervention, generation or both. |
-| `matrix.feature_ranking` | `whiten` | Lists the candidate characteristics with a standardized activation value. |
-| `matrix.feature_count` | `10` | Specifies the number of candidates for each entry that you want to intervene on a case-by-case basis. |
-| `matrix.intervention_value` | `0.0` | Sets the intervention value for the batch. |
-| `matrix.capture_source_tag` | `cohort_ranking` | Specifies the catch batch that you can try to reuse. The portal still checks if the actual results match this input. |
-| `matrix.generation.intervention` | `ablate` | Decides how to modify the features to be used in their continuation. |
-| `matrix.generation.max_new_tokens` | `8` | Limits the maximum number of new characters to continue. |
-| `matrix.generation.temperature` | `0.0` | Sets the decoded temperature that is generated. |
-| `matrix.max_passes` | `2` | Limit the number of batches. |
-| `matrix.tag` | `whiten_feature_effects` | Name the experiment and locate the batch report. |
+| `matrix.models`、`matrix.datasets` |  List of model bits and data sets in files |  Defines the group of experiments for this batch. |
+| `matrix.seed` | `42` |  Sets the random torrent for this batch to be executed. |
+| `matrix.model_timeout_seconds` | `86400` |  Limits the total length of the individual model sub-process in seconds. |
+| `matrix.tasks` | `[intervene, generate]` |  Select the operational intervention, generation or both. |
+| `matrix.feature_ranking` | `whiten` |  Lists the candidate characteristics with a standardized activation value. |
+| `matrix.feature_count` | `10` |  Specifies the number of candidates for each entry that you want to intervene on a case-by-case basis. |
+| `matrix.intervention_value` | `0.0` |  Sets the intervention value for the batch. |
+| `matrix.capture_source_tag` | `cohort_ranking` |  Specifies the catch batch that you can try to reuse. The portal still checks if the actual results match this input. |
+| `matrix.generation.intervention` | `ablate` |  Decides how to modify the features to be used in their continuation. |
+| `matrix.generation.max_new_tokens` | `8` |  Limits the maximum number of new characters to continue. |
+| `matrix.generation.temperature` | `0.0` |  Sets the decoded temperature that is generated. |
+| `matrix.max_passes` | `2` |  Limit the number of batches. |
+| `matrix.tag` | `whiten_feature_effects` |  Name the experiment and locate the batch report. |
 
-##### 4.7.1.2 Pythia characterization intervention `presets.pythia_feature_edits`
+##### 4.7.1.2 Pythia  Feature intervention `presets.pythia_feature_edits`
 
-For `saebase-intervene --config` Read. Protocol declaration model, SAE,The word number of the sample, how to modify it, and how to measure the budget. `conditions` It's a way to clearly set out the conditions for comparison..[Pythia Intervention formulation](../conf/tasks/intervene/task.yaml)
+For reading at `saebase-intervene --config`. The protocol states the model, SAE, the word number of the sample, how to modify it and how to measure the budget. For example, changes to `conditions` clearly indicate the conditions for comparison when you enter a more consistent operation, a zero feature and a proportional scaling. [Pythia Intervention Formula](../conf/tasks/intervene/task.yaml)
 
-### 4.8 precheck `conf/tasks/precheck/`
+### 4.8 Precheck `conf/tasks/precheck/`
 
 [Open Profile Directory](../conf/tasks/precheck/)
 
-#### 4.8.1 precheck `conf/tasks/precheck/task.yaml`
+#### 4.8.1 Precheck `conf/tasks/precheck/task.yaml`
 
-For the purpose of confirming the combination and the conditions of implementation. For example, only one SAE will be checked first, and the selective energy model will compare the volume of the actual task. [precheck configuration](../conf/tasks/precheck/task.yaml)]
+Use this recipe to identify supported combinations and execution conditions. For example, check one SAE first, then choose an executable model and compare batch sizes for the actual task. [Precheck configuration](../conf/tasks/precheck/task.yaml)
 
-| Parameters | Default value | Purpose and conditions |
+| parameter |  Default value |  Purpose and conditions |
 | --- | --- | --- |
-| `task.precheck.mode` | `sae` | Inspection SAE.The other range is `task`,`all`,`performance`. |
-| `task.precheck.resource_only` | `false` | Search only SAE resources for real times, skip the language model. |
-| `task.precheck.worker_mode` | `isolated` | The default quarantine is performed. `in_process` is used to provide an external timeout for a credible batch. |
-| `task.precheck.sae_list` | `default` | Use the model default SAE, with the option `all` or the visible list. |
-| `task.precheck.check_tasks` | `[]` | Specifies the list of tasks to be checked, to be filled in according to the checkable tasks registered under this item. |
+| `task.precheck.mode` | `sae` |  Inspection SAE. The other range is `task`,`all`,`performance`. |
+| `task.precheck.resource_only` | `false` |  Search only SAE resources for real times, skip the language model. |
+| `task.precheck.worker_mode` | `isolated` | The default quarantine is executed. `in_process` is used for a credible external timeout batch. |
+| `task.precheck.sae_list` | `default` |  Use the model default SAE, with `all` options or a visible list. |
+| `task.precheck.check_tasks` | `[]` |  Specifies the list of tasks to be checked, to be filled in according to the checkable tasks registered under this item. |
 | `task.precheck.auto_setup` | `true` | The preparation process is accessible when the required resources are lacking. |
 | `task.precheck.allow_network` | `true` | The preparation process has access to the network. |
 | `task.precheck.allow_install` | `true` | (c) Whether the preparation process can be installed without a lack of reliance. |
 | `task.precheck.allow_download` | `true` | Whether the preparatory process can download the resources that are lacking. |
-| `task.precheck.max_download_bytes` | `17179869184` | Missing document download budget, 16 GiB. |
-| `task.precheck.prepare_timeout_seconds` | `1800` | Resource readiness time limit, in seconds. |
-| `task.precheck.dataset_prepare_timeout_seconds` | `1800` | Data set preparation time limit, in seconds. |
+| `task.precheck.max_download_bytes` | `17179869184` |  Missing file download budget, 16 GiB. |
+| `task.precheck.prepare_timeout_seconds` | `1800` |  Resource readiness time limit, in seconds. |
+| `task.precheck.dataset_prepare_timeout_seconds` | `1800` |  Data set preparation time limit, in seconds. |
 | `task.precheck.check_sample_count` | `32` | A true input of the candidates for the survey is independent of the official number of questions in the data set. |
-| `task.precheck.sampling_seed` | `42` | Select the random seed that you want to explore the sample. |
-| `task.precheck.max_seconds` | `120` | Check the time budget, in seconds. |
-| `task.precheck.max_samples` | `2` | Maximum sample size for small-scale inspection. |
+| `task.precheck.sampling_seed` | `42` |  Select the random seed that you want to explore the sample. |
+| `task.precheck.max_seconds` | `120` |  Check the time budget, in seconds. |
+| `task.precheck.max_samples` | `2` |  Maximum sample size for small-scale inspection. |
 | `task.precheck.max_tokens` | `32` | The word limit for small-scale checks. |
-| `task.precheck.task_configs` | `{}` | Each target receives the full task profile under `task`. For example, by `+task.precheck.task_configs.capture.capture.mode=whiten` specify the catch check. |
+| `task.precheck.task_configs` | `{}` | Supply per-target overrides for task and performance checks. Each target receives the content under `task` in the full task configuration. For example, choose the Capture method with `+task.precheck.task_configs.capture.capture.mode=whiten`. |
 
-The performance precheck default compares the captured whiteing, original activation, single characterizations and quantities in four ways. The `+task.precheck.capture_modes=[g_s,I]` can be used when narrowing the scope. The pre-checking instructions are used to explain the range of checks selected and to respond. For example, the candidate batch, time-consuming and numerical match in the performance report can be seen before the official capture. [Preview operation and report description](../tasks/precheck/README.md)]
+By default, the performance precheck compares whitened activation, native activation, single-feature scoring, and exhaustive interaction for Capture. Narrow the scope with `+task.precheck.capture_modes=[g_s,I]`. The precheck guide explains how to select the scope and read receipts. For example, before running Capture, consult the performance report for candidate batch sizes, duration, and numerical consistency. [Precheck usage and reports](../tasks/precheck/README.md)
 
 ##### 4.8.1.1 SAE common settings and name protocols `sae_checks`
 
-When you want to adjust the size of an agreement, equipment or sample, you find the actual preset. [Baseline formula catalogue](../conf/tasks/precheck/task.yaml)]
+Registers named protocols and shared defaults for small checks, such as a default maximum of 24 measurements. To adjust a protocol’s prompts, device, or sample size, first locate the active preset. [Benchmark recipe catalog](../conf/tasks/precheck/task.yaml)
 
-### 4.9 SAE Training `conf/tasks/train/`
+### 4.9 SAE  Training `conf/tasks/train/`
 
 [Open Profile Directory](../conf/tasks/train/)
 
-#### 4.9.1 SAE Training `conf/tasks/train/task.yaml`
+#### 4.9.1 SAE  Training `conf/tasks/train/task.yaml`
 
-For example, when you change the range of data involved in training, check the training plan and record the product with a new experiment name. [SAE training mission configuration](../conf/tasks/train/task.yaml)]
+Train a sparse autoencoder on activations from a specified model site. To change the training data scope, for example, check the training plan and use a new experiment name for the artifacts. [SAE training task configuration](../conf/tasks/train/task.yaml)
 
-| Parameters | Default value | Purpose and conditions |
+| parameter |  Default value |  Purpose and conditions |
 | --- | --- | --- |
-| `task.train.approved` | `false` | SAE training path reads the approved switch, as actually authorized. |
-| `task.train.train_plan` | `null` | Provides a clear SAE training plan and determines training input, objectives and budget. |
-| `task.train.allow_large` | `false` | Controls allow training beyond the conventional boundaries. |
-| `task.timeout_seconds` | `1800` | SAE training operation timeout seconds. |
+| `task.train.approved` | `false` |  SAE training path reads the approved switch, as actually authorized. |
+| `task.train.train_plan` | `null` |  Provides a clear SAE training plan and determines training input, objectives and budget. |
+| `task.train.allow_large` | `false` |  Controls allow training beyond the conventional boundaries. |
+| `task.timeout_seconds` | `1800` |  SAE training operation timeout seconds. |
 
-##### 4.9.1.1 Training programme `task.train.train_plan`
+##### 4.9.1.1 Training program `task.train.train_plan`
 
-A plan defines the data, objectives and budget for this training. For example, a Top-K SAE is trained to determine the exact snapshots and reading points of the underlying model and data set, and then to determine the width of the encoder, the maximum length of each input, and the number of steps. The model and data set selected by the command line is used to run the grouping and to train to actually read the snapshots specified in the table below.
+A plan defines the data, objectives and budget for this training. For example, a Top-K SAE is trained to determine the exact snapshots and reading points of the underlying model and data set, and then to determine the width of the encoder, the maximum length of each input, and the number of steps. The model and data set selected by the command line is used to run the grouping and to train to actually read the snapshots specified in the following table.
 
-| Parameters | Use and Defaults |
+| parameter |  Use and Defaults |
 | --- | --- |
-| `task.train.train_plan.backend` | It will be filled out. Select `saelens` or `sparsify`. The backend determines the structure and how to run the support. |
+| `task.train.train_plan.backend` | It will be filled, select `saelens` or `sparsify`. The backend determines the structure and how to run the support. |
 | `task.train.train_plan.model_path`、`task.train.train_plan.model_revision` | It is necessary to fill in the location of the underlying model and the fixed submission version. |
 | `task.train.train_plan.dataset_path`、`task.train.train_plan.dataset_revision` | It is necessary to fill in the location of the training data and the fixed submission version. |
-| `task.train.train_plan.hookpoint` | Always fill in, specify the internal bits of the active model. |
+| `task.train.train_plan.hookpoint` |  Always fill in, specify the internal bits of the active model. |
 | `task.train.train_plan.architecture` | It will be filled out in the structure supported by the selected backend. Sparsify accepts `topk` and `transcoder`. |
 | `task.train.train_plan.d_in`、`task.train.train_plan.d_sae`、`task.train.train_plan.k` | To fill, specify the number of active dimensions, the number of characteristics expressed in thinness and the Top-K thinness, respectively. |
 | `task.train.train_plan.max_examples`、`task.train.train_plan.steps`、`task.train.train_plan.batch_size`、`task.train.train_plan.ctx_len` | It will be necessary to specify the maximum size of the sample, the number of training steps, the lot and the length of the input context. |
 | `task.train.train_plan.run_name` | You're gonna have to fill in, train in the running name for the back end. |
 | `task.train.train_plan.device`、`task.train.train_plan.distributed_gpus` | The backend defaults to use CUDA and a graphic card. Only adjusts the device or parallel number when supported by the selected backend. |
-| `task.train.train_plan.resume_checkpoint` | Default empty, specify the existing check points that you want to read to continue training. |
+| `task.train.train_plan.resume_checkpoint` |  Default empty, specify the existing check points that you want to read to continue training. |
 | `task.train.train_plan.model_dtype`、`task.train.train_plan.sae_dtype` | The default is `float32`. Select the numerical precision of the basic model and SAELens training, respectively. |
-| `task.train.train_plan.store_batch_size_prompts`、`task.train.train_plan.n_batches_in_buffer` | Default empty, determined by the backend. Applys to the amount of prompts and buffers that are activated through SAELENS control. |
+| `task.train.train_plan.store_batch_size_prompts`、`task.train.train_plan.n_batches_in_buffer` |  Default empty, determined by the backend. Applys to the amount of prompts and buffers that are activated through SAELENS control. |
 
-[Definition of training programme](../tasks/train/execution/training.py)Indicate which structures and budget combinations are available. Sparsify Plan selection Top-K When the structure is in place, the required snapshot, bits and graphic settings can be checked at the definition point.
+[Definition of training programme](../tasks/train/execution/training.py) Description of which structures and budget combinations are available. For example, if the Top-K structure is selected for Sparsify, the required snapshots, bits and graphics settings can be checked in the definition desk.
 
 ## 5 Public interface and running `conf/base/`
 
-**Purpose.** access to SAE interfaces, operating environments, default test names and data roots.
+**Purpose.** Access SAE interface, operating environment, default test name and data root.
 
 [Open Profile Directory](../conf/base/)
 
-### 5 SAE interface formulation `conf/base/interfaces/`
+### 5 SAE Interface Recipes `conf/base/interfaces/`
 
 [Open Profile Directory](../conf/base/interfaces/)
 
-#### 5.1.1 Encoder preset `conf/base/interfaces/sae_profiles.yaml`
+#### 5.1.1 encoder preset `conf/base/interfaces/sae_profiles.yaml`
 
-The SAE formula saves the encoder weight source, compatible model, and layer definition, etc... When checking which encoder results a given feature results from, check the corresponding presets from here. For example, check whether the Gemma 2 default encoder model and 25 layers are consistent with the results list. [SAE] formulation](../conf/base/interfaces/sae_profiles.yaml)
+SAE recipes define the encoder weight source, compatible models, and layers. Check the corresponding preset to identify the encoder that produced a feature result. For example, verify whether the default Gemma 2 encoder’s model and layer 25 match the result manifest. [SAE recipe](../conf/base/interfaces/sae_profiles.yaml)
 
-`model=openresearch_gemma2_2b_base` Select Basic Model `google/gemma-2-2b`,Formula statement loads as required. Matchable SAE It's written in... `sae_profiles`,Default Selection `gemma2_2b_pt_l25_canonical`,Default Read No. 25 Layer. The model formulation lists the weights and the default selections allowed for the mix., SAE Formula to read the level of the specific encoder and the prepared hint requirements. Replace `model=qwen35_4b` , the default encoder is changed to `qwen35_4b_matryoshka_l15_65k`,I don't think so. 15 Layer by SAE Formula declaration.
+`model=openresearch_gemma2_2b_base` Select the base model `google/gemma-2-2b` and the formula statement is loaded as necessary. The matching SAE is written at `sae_profiles`, the default `gemma2_2b_pt_l25_canonical` and the default reading of the 25 layer. The model formulation lists the permissible mix weights and the default selections, the SAE formulation provides reading of the specific encoder layer and the prepared alert requirements. In `model=qwen35_4b`, the default encoder is changed to `qwen35_4b_matryoshka_l15_65k` and the 15 layer is declared by the SAE formula.
 
-### 6 Public Operations Configuration `conf/base/runtime/`
+### 6 Public running configuration `conf/base/runtime/`
 
 [Open Profile Directory](../conf/base/runtime/)
 
 #### 6 Public run formulation `conf/base/runtime/runtime.yaml`
 
-The same file management interpreter, experimental name and data root. [Opens the running formula](../conf/base/runtime/runtime.yaml)]
+Same document management interpreter, experimental naming and data root. [Open the running formula](../conf/base/runtime/runtime.yaml)
 
-##### 6.1.1.1 Current and modelled environment `environments`
+##### 6.1.1.1 Current and Model Environments `environments`
 
-This file saves the default interpreter, the critical dependent version, and the environment that the model needs. When you switch to another environment, check the target model and the dependencies from this file, and then the actual interpreter and the software version from the running inventory. The results are based on the actual implementation environment. [Environmental configuration](../conf/base/runtime/runtime.yaml)] [Environmental document](environment/README.md)]
+This file saves the machine's default interpreter, the critical dependent version, and the environment that the model needs. When you switch to another environment, check the target model with the dependent one and then the actual interpreter and the software version from the running list. The results are based on the actual implementation environment. [Environment Configuration](../conf/base/runtime/runtime.yaml) · [Environment Document](environment/README.md)
 
 ##### 6.1.1.2 Experiment name and default value `experiment`
 
-The `experiment` section saves the test name and single run mark. The same experiment keeps a double measurement in an independent running directory.
+The `experiment` section saves the experiment name and the single running identifier. The same experiment keeps a double measurement in the independent running directory.
 
-| Parameters | Default value | Purpose |
+| parameter |  Default value | Purpose |
 | --- | --- | --- |
 | `experiment.sub_name` | `null` | The main method not yet expressed under the task is omitted, e.g. `whiten` under the catch task. The purpose or key condition of the explicit name writing study, e.g. `answer_stability`. Seeds, dates and regular parameters are recorded in the running record. |
-| `experiment.run_id` | `null` | Optional performer, e. g. `noise_control`. The common directory is used for the same purpose. The old configuration and the product are stored in the directory `executions/`. Runs on the current execution configuration. |
+| `experiment.run_id` | `null` |  Optional executing roles, such as `noise_control`. The common directory is used for the same purpose. The old configuration and product are stored in the directory `executions/`. Runs on the current execution configuration. |
 [Experiment Default](../conf/base/runtime/runtime.yaml)
 
-##### 6.1.1.3 Root and data directories `paths`
+##### 6.1.1.3 Root and Data Catalogue `paths`
 
-In paragraph `paths`, `paths.root` defaults for the startup directory, `paths.data_dir` defaults for `data/` below it. The data on the external disk can be marked to set the data root. The output is still organized according to the current path to run the project. [Process formulation](../conf/base/runtime/runtime.yaml)]
+When SAEbase is signed for internal start-up, `paths.root` is used by default. When other directories start to edit the installation, the source code is used by default. When a normal installation is used and a task is performed outside the sign-up, the working area is specified by `paths.root`. Relative to the working area path, `paths.data_dir` is shown by default to the working area `data/prompts/prepared/` and the external data can be specified separately. The scientific output enters the working area `experiment/`. [Path formulation](../conf/base/runtime/runtime.yaml)
 
-## Current value in profile
+## Current Values in Configuration Files
 
 The following are automatically updated from the actual configuration file. The usage of the documents and the meaning of the parameters are shown in the corresponding subsection.
 
@@ -3720,6 +3718,6 @@ task:
 
 <!-- END CONFIG_VALUES -->
 
-## Historical acceptance information
+## Historical Acceptance Evidence
 
-Read the summary to determine the version and coverage, then look at the evidence by model, SAE, and layer. Release tools and models support the document to read the original records. [Assisting](https://github.com/OpenSAE/SAEBase/blob/ed52342b706d8ad6c0e04cbe2108e69cc0dc9348/conf/coverage/stage_d_evidence/final/stage_d_summary.md)] [CPU] model search](../assets/history_experiment/benchmark_evidence/files/stage_b_cpu_verified.json) [CPU SAE place check](https://github.com/OpenSAE/SAEBase/blob/ed52342b706d8ad6c0e04cbe2108e69cc0dc9348/conf/coverage/stage_c_cpu_verified.json)]
+Start with the summary to identify the version and coverage, then consult the evidence for the model, SAE, and layer. The release tools and model support documentation use the original records. [Acceptance summary](../assets/history_experiment/benchmark_evidence/files/stage_d_evidence/final/stage_d_summary.md) · [CPU model probes](../assets/history_experiment/benchmark_evidence/files/stage_b_cpu_verified.json) · [CPU SAE site checks](../assets/history_experiment/benchmark_evidence/files/stage_c_cpu_verified.json)
