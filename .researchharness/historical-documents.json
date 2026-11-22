@@ -1,0 +1,101 @@
+{
+  "schema": "saebase.historical_documents.v1",
+  "files": [
+    {
+      "path": "doc/code/documentation/source/development/gpu-acceptance-20261027.md",
+      "original_path": "harness/github/development_doc/gpu-acceptance-20261027.md",
+      "sha256": "4061666dfbdf5c8536a8a0558d06af6be79c428320f069c9ec4aa5b069a5daed",
+      "archive_id": "saebase-5a2ec9fd0ed36ee7",
+      "archived_path": "src/project/saebase/history/saebase-5a2ec9fd0ed36ee7/files/harness/github/development_doc/gpu-acceptance-20261027.md",
+      "authorization": "HISTORICAL_ONLY"
+    },
+    {
+      "path": "doc/code/documentation/source/development/performance/workplan11_final_results.md",
+      "original_path": "harness/github/development_doc/performance/workplan11_final_results.md",
+      "sha256": "7118a78786d99770b94db6a32403c2abf878abdb1c4de0e50f85b26752672723",
+      "archive_id": "saebase-5a2ec9fd0ed36ee7",
+      "archived_path": "src/project/saebase/history/saebase-5a2ec9fd0ed36ee7/files/harness/github/development_doc/performance/workplan11_final_results.md",
+      "authorization": "HISTORICAL_ONLY"
+    },
+    {
+      "path": "doc/code/documentation/source/development/releases/v0.2.0.md",
+      "original_path": "harness/github/development_doc/releases/v0.2.0.md",
+      "sha256": "3e0df515450ded84a9b1f05d65ea70c1ab8a2f794824d3037cfc94bde0b922a1",
+      "archive_id": "saebase-5a2ec9fd0ed36ee7",
+      "archived_path": "src/project/saebase/history/saebase-5a2ec9fd0ed36ee7/files/harness/github/development_doc/releases/v0.2.0.md",
+      "authorization": "HISTORICAL_ONLY"
+    },
+    {
+      "path": "doc/code/documentation/source/development/releases/v0.3.0.md",
+      "original_path": "harness/github/development_doc/releases/v0.3.0.md",
+      "sha256": "70afda5b84fd63c7391595c9bb28a452355b3d85142cb71f696639c59dcd422b",
+      "archive_id": "saebase-5a2ec9fd0ed36ee7",
+      "archived_path": "src/project/saebase/history/saebase-5a2ec9fd0ed36ee7/files/harness/github/development_doc/releases/v0.3.0.md",
+      "authorization": "HISTORICAL_ONLY"
+    },
+    {
+      "path": "doc/code/documentation/source/development/releases/v0.4.0.md",
+      "original_path": "harness/github/development_doc/releases/v0.4.0.md",
+      "sha256": "ba83e7382b3c42a8d0c75ee2aa87c64cd6a59805ad7e326419984393bd5cc3c6",
+      "archive_id": "saebase-5a2ec9fd0ed36ee7",
+      "archived_path": "src/project/saebase/history/saebase-5a2ec9fd0ed36ee7/files/harness/github/development_doc/releases/v0.4.0.md",
+      "authorization": "HISTORICAL_ONLY"
+    },
+    {
+      "path": "doc/code/documentation/source/development/releases/v0.5.0.md",
+      "original_path": "harness/github/development_doc/releases/v0.5.0.md",
+      "sha256": "d1115740e5ef6fc1ddd6f000163bea333ec93feef6beac3b6c1fd185f9dbd172",
+      "archive_id": "saebase-5a2ec9fd0ed36ee7",
+      "archived_path": "src/project/saebase/history/saebase-5a2ec9fd0ed36ee7/files/harness/github/development_doc/releases/v0.5.0.md",
+      "authorization": "HISTORICAL_ONLY"
+    },
+    {
+      "path": "doc/code/documentation/source/development/releases/v0.6.0.md",
+      "original_path": "harness/github/development_doc/releases/v0.6.0.md",
+      "sha256": "5c1b38314e62bdd739361f465f1b9bd00ba51ff4b9cab5ed1aa8e00b8f829f35",
+      "archive_id": "saebase-5a2ec9fd0ed36ee7",
+      "archived_path": "src/project/saebase/history/saebase-5a2ec9fd0ed36ee7/files/harness/github/development_doc/releases/v0.6.0.md",
+      "authorization": "HISTORICAL_ONLY"
+    },
+    {
+      "path": "doc/code/documentation/source/development/releases/v0.6.5.md",
+      "original_path": "harness/github/development_doc/releases/v0.6.5.md",
+      "sha256": "694649e9707bae0d997d3c1aa5c2fb4216413756f536ce66150256b0cea97256",
+      "archive_id": "saebase-5a2ec9fd0ed36ee7",
+      "archived_path": "src/project/saebase/history/saebase-5a2ec9fd0ed36ee7/files/harness/github/development_doc/releases/v0.6.5.md",
+      "authorization": "HISTORICAL_ONLY"
+    },
+    {
+      "path": "doc/code/documentation/source/development/research-lab/corpus-cpu-source-lock.md",
+      "original_path": "harness/github/development_doc/research-lab/corpus-cpu-source-lock.md",
+      "sha256": "464973b01a83d06f737166a847052cd8c3b5e11dbe61ffd82a35174483c3502d",
+      "archive_id": "saebase-5a2ec9fd0ed36ee7",
+      "archived_path": "src/project/saebase/history/saebase-5a2ec9fd0ed36ee7/files/harness/github/development_doc/research-lab/corpus-cpu-source-lock.md",
+      "authorization": "HISTORICAL_ONLY"
+    },
+    {
+      "path": "doc/code/documentation/source/development/research-lab/release-acceptance.md",
+      "original_path": "harness/github/development_doc/research-lab/release-acceptance.md",
+      "sha256": "c398714cc7186ecfc8eead018d6f1369afeb52e56dd2bcf8e368fddbd87b7be8",
+      "archive_id": "saebase-5a2ec9fd0ed36ee7",
+      "archived_path": "src/project/saebase/history/saebase-5a2ec9fd0ed36ee7/files/harness/github/development_doc/research-lab/release-acceptance.md",
+      "authorization": "HISTORICAL_ONLY"
+    },
+    {
+      "path": "doc/code/documentation/source/development/research-lab/results-20261020.md",
+      "original_path": "harness/github/development_doc/research-lab/results-20261020.md",
+      "sha256": "c11488ebc3a6aced7920bfadac4564124a5ac45cb9cd795788aebf0f4c7cd2ab",
+      "archive_id": "saebase-5a2ec9fd0ed36ee7",
+      "archived_path": "src/project/saebase/history/saebase-5a2ec9fd0ed36ee7/files/harness/github/development_doc/research-lab/results-20261020.md",
+      "authorization": "HISTORICAL_ONLY"
+    },
+    {
+      "path": "doc/code/documentation/source/development/wp15_local_commands.md",
+      "original_path": "harness/github/development_doc/wp15_local_commands.md",
+      "sha256": "490d4b2d841821f030c20c3aaa57b56004693fec1ac082b8897457fb5bc73862",
+      "archive_id": "saebase-5a2ec9fd0ed36ee7",
+      "archived_path": "src/project/saebase/history/saebase-5a2ec9fd0ed36ee7/files/harness/github/development_doc/wp15_local_commands.md",
+      "authorization": "HISTORICAL_ONLY"
+    }
+  ]
+}

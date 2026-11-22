@@ -65,6 +65,8 @@ experiments/
 /.github/
 
 # Public repository contents
-/.*/
+.*/
+!/.agents/
+!/.researchharness/
 /assets/*
 !/assets/research_lab/
