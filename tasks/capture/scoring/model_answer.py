@@ -14,6 +14,8 @@ import time
 
 import torch
 
+from conf import launch_directory
+
 from tasks.capture.selection import undefined_reason
 
 
@@ -84,9 +86,8 @@ def answers(cfg, pair, prompts):
         eos = [eos] if isinstance(eos, int) else list(eos or [])
         limit = getattr(getattr(raw, "cfg", None), "n_ctx", None)
         cache_root = (
-            Path(cfg.get("paths", {}).get("root", Path.cwd())).resolve()
-            / "assets/answer_cache/model_answers/files"
-        )
+            launch_directory() / (cfg.get("paths", {}).get("root") or "")
+        ).resolve() / "assets/answer_cache/model_answers/files"
         base = {
             "protocol": "saebase.capture.model_answer.v1",
             "model_sha256": model_sha,
@@ -317,7 +318,12 @@ def refresh(folder, *, pair=None):
     """Supplement saved Capture answers without recomputing a feature or coalition."""
     from omegaconf import OmegaConf
     from tasks.capture.annotations import read_samples
-    from saebase.runtime.sae_operations import _pair, _prompt, loaded_pair_session, pair_state_fingerprints
+    from saebase.runtime.sae_operations import (
+        _pair,
+        _prompt,
+        loaded_pair_session,
+        pair_state_fingerprints,
+    )
     from saebase.datasets.selection import read_selection
     from saebase.runtime.experiment_results import write_json
     from saebase.results import completion_summary

@@ -6,7 +6,8 @@ from saebase.runtime.configuration.task_options import task_value
 
 from typing import Any
 import os
-from pathlib import Path
+
+from conf import launch_directory
 
 from tasks.capture.configuration import capture_section
 from saebase.runtime.sae_operations import _pair, _prompt, _fingerprint_prompt
@@ -74,7 +75,7 @@ def neuronpedia_settings(cfg) -> dict:
     }
     if values["cache_dir"] is None:
         values["cache_dir"] = str(
-            Path(cfg.get("paths", {}).get("root", Path.cwd())).resolve()
+            (launch_directory() / (cfg.get("paths", {}).get("root") or "")).resolve()
             / "assets/annotation_cache/neuronpedia_explanations/files"
         )
     for key in ("enabled", "allow_network"):
