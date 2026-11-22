@@ -9,7 +9,7 @@ import pytest
 import torch
 from torch import nn
 
-from tasks.benchmark.methods.sae_benchmark_runner import ComparisonPoint, compare_sae_points
+from tasks.benchmark.methods.saebench_runner import ComparisonPoint, compare_sae_points
 from tasks.circuits.attribution.circuits import (
     GraphEdge,
     GraphNode,

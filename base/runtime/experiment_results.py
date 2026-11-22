@@ -44,6 +44,21 @@ def _configuration(cfg: Any) -> dict[str, Any]:
 write_json = _atomic
 
 
+def historical_run_path(folder: str | Path) -> Path:
+    """Locate a moved experiment path when its published location has no entry."""
+    root = Path(folder).resolve()
+    if root.exists():
+        return root
+    for parent in (root, *root.parents):
+        if parent.name != "experiment":
+            continue
+        archive = parent.parent / "assets/history_experiment/local_runs/files/experiment"
+        saved = archive / root.relative_to(parent)
+        if saved.exists():
+            return saved
+    return root
+
+
 def _source() -> dict[str, Any]:
     root = configuration_root().parent
     if not (root / ".git").exists():
@@ -78,10 +93,16 @@ def _result_paths(payload: dict, root: Path, *, reading=False) -> dict:
 
     def reference(raw):
         path = Path(raw)
+        if reading and path.is_absolute():
+            path = historical_run_path(path)
         if reading:
             # Earlier runs used absolute result paths or placed automatic precheck under tmp/.
             local = None
-            if path == Path("tmp/automatic_precheck/metadata/precheck_result.json"):
+            previous_precheck = Path("tmp/automatic_precheck/metadata/precheck_result.json")
+            if (
+                path.parts[-len(previous_precheck.parts):] == previous_precheck.parts
+                and (not path.is_absolute() or not path.exists())
+            ):
                 local = root / "metadata/automatic_precheck/metadata/precheck_result.json"
             elif (
                 path.is_absolute()
@@ -162,6 +183,21 @@ def record_run(folder: str | Path, cfg: Any, *, result=None, error: dict | None 
     }
     metadata = root / "metadata"
     metadata.mkdir(parents=True, exist_ok=True)
+    if previous.get("effective_config"):
+        config["component_paths"] = previous["configuration"]["component_paths"]
+        status = manifest["status"]
+        manifest["task_status"] = status
+        completed = status in {"configured_only", "executed"} and not manifest["exit_code"]
+        manifest["status"] = "succeeded" if completed else "failed"
+        summary_path = root / "reports/task_result.json"
+        _atomic(
+            summary_path, {"task": manifest["task"], "status": status, "exit_code": manifest["exit_code"]}
+        )
+        manifest["outputs"] = {"task_result": summary_path.relative_to(root).as_posix()}
+        manifest["configuration_sha256"] = configuration_identity(config)
+        if config != previous["configuration"]:
+            manifest["effective_config"] = "metadata/final_configuration.json"
+            _atomic(root / manifest["effective_config"], config)
     if not (metadata / "config.yaml").exists():
         (metadata / "config.yaml").write_text(
             OmegaConf.to_yaml(OmegaConf.create(config), resolve=True)
@@ -195,11 +231,18 @@ def archive_execution(folder: Path, artifacts: list[Path]) -> Path:
     return target
 
 
+def _execution_folders(root):
+    return [
+        path for path in sorted((root / "executions").glob("*"))
+        if (path / "metadata/manifest.json").is_file()
+    ]
+
+
 def list_executions(folder: str | Path) -> list[dict]:
     """List saved configurations and artifact locations at one named experiment."""
     import tarfile
 
-    root = Path(folder)
+    root = historical_run_path(folder)
     results = []
     for path in sorted((root / "executions").glob("*.tar")):
         with tarfile.open(path, "r") as archive:
@@ -210,16 +253,25 @@ def list_executions(folder: str | Path) -> list[dict]:
     manifest = root / "metadata/manifest.json"
     if manifest.is_file():
         results.append({**json.loads(manifest.read_text()), "storage": str(root), "current": True})
+    executions = _execution_folders(root)
+    for execution in executions:
+        record = json.loads((execution / "metadata/manifest.json").read_text())
+        record["status"] = record.get("task_status", record["status"])
+        results.append({**record, "storage": str(execution), "current": execution == executions[-1]})
     return results
 
 
 def read_run(folder: str | Path) -> dict:
     """Read a run; its referenced task ledgers remain responsible for their own integrity."""
 
-    root = Path(folder)
+    root = historical_run_path(folder)
+    if not (root / "metadata/manifest.json").is_file() and (executions := _execution_folders(root)):
+        root = executions[-1]
     manifest = json.loads((root / "metadata" / "manifest.json").read_text())
     if manifest.get("schema") != "saebase.experiment":
         raise ValueError("Unsupported experiment manifest")
+    if "task_status" in manifest:
+        manifest["status"] = manifest["task_status"]
     parameters = manifest.get("configuration", {}).get("task", {})
     try:
         from saebase.registry import get_task_plugin
@@ -277,6 +329,7 @@ def inspect_run(folder: str | Path, *, expected_cfg=None) -> dict:
                     }
                 value.pop("experiment", None)
                 value.pop("exp_run_leaf", None)
+                value.pop("component_paths", None)
                 task_config = value.get("task", {})
                 if task_config.get("path") == task_config.get("name"):
                     task_config.pop("path", None)
@@ -362,7 +415,13 @@ def list_runs(root: str | Path, *, errors: list[dict] | None = None, **filters: 
     if set(filters) - allowed:
         raise ValueError(f"Unknown result filters: {sorted(set(filters) - allowed)}")
     result = []
-    for path in sorted(Path(root).rglob("metadata/manifest.json")):
+    root = historical_run_path(root)
+    saved = root.parent / "assets/history_experiment/local_runs/files/experiment"
+    roots = [root, saved] if root.name == "experiment" and saved.is_dir() else [root]
+    restored = set()
+    for path in (path for directory in roots for path in sorted(directory.rglob("metadata/manifest.json"))):
+        if path in restored:
+            continue
         try:
             item = read_run(path.parent.parent)
         except (OSError, ValueError, KeyError, TypeError) as exc:
@@ -377,6 +436,8 @@ def list_runs(root: str | Path, *, errors: list[dict] | None = None, **filters: 
             else:
                 warnings.warn(f"Unreadable run {path}: {exc}", RuntimeWarning, stacklevel=2)
             continue
+        if item.get("archived_manifest"):
+            restored.add((root.parent / item["archived_manifest"]).resolve())
         if all(item.get(key) == value for key, value in filters.items()):
             result.append(item)
     return result

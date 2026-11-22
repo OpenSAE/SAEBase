@@ -187,7 +187,7 @@ def main():
     lines += [
         "## Scope of semantic relations",
         "",
-        "F12293 with F9190 The public label focuses on food, preparation and cooking in general., F20700 Focus on cooking instructions and operating procedures. SAE Characteristics continue to change systematically in both groups. This is a label-level relationship that can be directly discussed in this case; there is no assessment of the quality of the answer, nor does it equate an increase with a better or more abstract one..",
+        "F12293 with F9190 The public label focuses on food, preparation and cooking in general., F20700 Focus on cooking instructions and operating procedures. SAE Characteristics continue to change systematically in both groups. This is a label-level relationship that can be discussed directly in this case; there is no assessment of the quality of the answer, nor does it equate the rise with a better or more abstract one..",
         "",
         "B-V4 It’s... F3044 In the same group B♪ New measurements, not with ♪A Could not close temporary folder: %s. B Group the rest of the background except for the match, A All background of the group, no direct semantics confirmed..",
         "",

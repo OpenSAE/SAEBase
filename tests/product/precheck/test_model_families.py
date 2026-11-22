@@ -29,7 +29,8 @@ def norm(value):
 @pytest.mark.parametrize("local", [False, True])
 def test_all_model_loading_behavior(key, local, monkeypatch):
     monkeypatch.setattr(Path, "is_file", lambda self: local)
-    series = importlib.reload(importlib.import_module(MAPPING[key]["series"] + ".specs"))
+    series = importlib.import_module(MAPPING[key]["series"] + ".specs")
+    series = importlib.reload(importlib.import_module(series.__name__))
     module = getattr(series, key)
 
     def capture(backend):

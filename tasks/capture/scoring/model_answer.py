@@ -84,7 +84,8 @@ def answers(cfg, pair, prompts):
         eos = [eos] if isinstance(eos, int) else list(eos or [])
         limit = getattr(getattr(raw, "cfg", None), "n_ctx", None)
         cache_root = (
-            Path(cfg.get("paths", {}).get("root", Path.cwd())) / "data/_shared/model_answers"
+            Path(cfg.get("paths", {}).get("root", Path.cwd())).resolve()
+            / "assets/answer_cache/model_answers/files"
         )
         base = {
             "protocol": "saebase.capture.model_answer.v1",

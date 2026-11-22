@@ -130,7 +130,7 @@ def test_published_real_stage_b_and_c_ledgers_are_consistent():
     import json
     import re
 
-    root = Path(__file__).resolve().parents[3] / "doc" / "evidence"
+    root = Path(__file__).resolve().parents[3] / "assets/history_experiment/benchmark_evidence/files"
     catalog = load_coverage(CATALOG)
     stage_c = json.loads((root / "stage_c_cpu_verified.json").read_text())
     expected = {(e.sae_key, layer) for e in catalog.entries for layer in e.cpu_probe_layers}

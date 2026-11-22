@@ -4,6 +4,10 @@
 
 Description of the purpose, selection, output and limitation of the data set.
 
+## Data sources and reusable resources
+
+The original scientific data set is placed in the working area `data/`. [Prepare alerts and fixed question sets](../assets/dataset_preparation/prompt_sets/README.md), [model answers](../assets/answer_cache/model_answers/README.md) and [Neuronpedia label](../assets/annotation_cache/neuronpedia_explanations/README.md)] are generated and read from the corresponding preparatory or operational entry.
+
 ## Scope
 
 For the selection of actual operations, the interpretation of results and the maintenance of project descriptions.
@@ -14,7 +18,7 @@ SAEBASE assigns samples of questions and answers, language behavior and security
 
 ## Shared Parameters
 
-Controls a fixed sample `dataset.sample_count` and `dataset.sampling_seed`. `dataset.use_original_split` decides whether to follow the input split. Full take-up values can be found in [parameter](conf.md) (for configuration files, default values and overlay rules, how the model's operating equipment is set). [Data configation directory](../conf/datasets/catalog.yaml)]
+Controls a fixed sample `dataset.sample_count` and `dataset.sampling_seed`. `dataset.use_original_split` decides whether to follow the input split. Full take-up values can be found in [parameter](conf.md) (for profile files, default values and overlay rules, how the model's operating equipment is set). [Data configation directory](../conf/datasets/catalog.yaml)]
 
 ## Component
 
@@ -32,7 +36,7 @@ This adaptation is clearly supported by `capture`, `intervene`, `generate`, and 
 
 **Multiple difficult-to-excise tasks**.BIG-Bench Hard . The sub-task covers different types of questions, such as date extrapolation or logical reasoning. SAEBase Compared feature capture methods on a fixed title.
 
-The ** item is used for **. Select with `dataset=bbh`. Presets 500 entries by torrent `42`. Configure the selected records as training or assessment input for this task. Data preparation is followed by text jobs to read tips and reference targets.
+The ** item is used for **. Select with `dataset=bbh`. Presets 500 entries by torrent `42`. Configure the selected records as training or assessment input for this task. The text job is used to read the hint and reference target after the data are prepared.
 
 This adaptation is clearly supported by `capture`, `intervene`, `generate`, and `precheck`.
 
@@ -50,7 +54,7 @@ The ** project is used as **. Select with `dataset=counterfact`. Presets 500 ent
 
 ** year size comparison **. The input is an unwritten range of years, and the model needs to be continued with the next two numbers larger than the first year. Read out that the comparison is greater than the candidate with no greater than the threshold and is prepared to create a pool of candidates by the current model word.
 
-**Project usage**.Here. `dataset=greater_than` Select. Defines the number of actual retentions by using input record labels, depending on the data preparation and the model selected. The text job reading tips and reference targets after data preparation. When the fraction does not meet the requirements of the grouping, the availability of the sample and the comparable range between the different models changes.
+**Project usage**.Here. `dataset=greater_than` Select. Defines the number of actual retentions using input record labels, depending on the data preparation and the model selected. The text jobs read the hints and reference targets after data preparation. When the term does not meet the requirements of the grouping, the availability of the sample changes and the comparable range between the different models..
 
 [Project fit](../datasets/greater_than/) · [Upstream information](https://arxiv.org/abs/2305.00586)
 
@@ -114,7 +118,7 @@ The ** item is used for **. Select with `dataset=ioi`. Presets the 500 by torren
 
 ** Language Model Properties decomposition **. Enter both the entity and the attribute, for example, the two properties corresponding to the city.
 
-The ** project is used as **. Select with `dataset=ravel`. Presets the 500 by torrent `42`. Configure the selected records as training or assessment inputs for this task. The text-reading tips and reference targets after the data are prepared. In order to describe both the target properties and the maintenance properties, a change in the single target fraction cannot explain the level of decomposition.
+The ** project is used as **. Select with `dataset=ravel`. Presets the 500 by torrent `42`. Configure the selected records as training or assessment inputs for this task. The text-reading tips and reference targets after the data are prepared. In order to describe both the target properties and the maintenance properties, changes in the single target fraction cannot explain the level of decomposition.
 
 This adaptation is clearly supported by `capture`, `intervene`, `generate`, and `precheck`.
 
@@ -122,7 +126,7 @@ This adaptation is clearly supported by `capture`, `intervene`, `generate`, and 
 
 ### SimpleCopying（`simple_copying`）
 
-** Short series copy **. Projectes B using the A, B and A Sequence Indices model. When preparing, compares the word fractions of the model for the correct continuation and interference items.
+** Short series copy **. Projectes B using the A, B and A Sequence Indices model.
 
 ** Items are used **. Select by `dataset=simple_copying`. Splits the input record label, with the actual number of retentions depending on the data preparation and the model selected. Data preparation is followed by text jobs reading the hints and reference targets. This is checked in the controlled short context mode and cannot be directly extrapolated to a long document for reproduction.
 
@@ -155,7 +159,7 @@ The following sources are provided by a register of indicative sources. The cove
 
 ### MedQA
 
-The results describe the behaviour of the model under the corresponding test and scoring rules. [local hint formulation](../conf/datasets/catalog.yaml)]
+The results describe the behaviour of the model under the corresponding test and rating rules. [local hint formula](../conf/datasets/catalog.yaml)]
 
 ### MATH500
 

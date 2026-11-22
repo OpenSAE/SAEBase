@@ -19,7 +19,7 @@ from omegaconf import OmegaConf
 from saebase.api.metadata import SAEIdentity
 from saebase.api.neuronpedia import annotate_features
 from saebase.results import completion_summary
-from saebase.runtime.experiment_results import write_json
+from saebase.runtime.experiment_results import historical_run_path, write_json
 from tasks.capture.operation import neuronpedia_settings
 from tasks.capture.selection import undefined_reason
 
@@ -175,7 +175,7 @@ def refresh_annotations(folder: str | Path) -> dict:
 
 def read_samples(folder: str | Path):
     """Yield saved capture rows with their latest published explanations."""
-    root = Path(folder)
+    root = historical_run_path(folder)
     supplement = root / "reports/capture_explanations.json"
     enrichment = json.loads(supplement.read_text()) if supplement.exists() else {}
     descriptions = enrichment.get("features", {})

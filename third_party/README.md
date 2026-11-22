@@ -6,4 +6,4 @@ Record CUDA Accelerating third-party compatibility at the back end. `accelerator
 
 ## Scope
 
-For the back end of the load and reasoning of the model to be called as required, and the release package to maintain the original module path.
+The back end of the model for loading and reasoning is called as required, and the release package maintains the original module path.

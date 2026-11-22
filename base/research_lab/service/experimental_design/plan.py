@@ -15,7 +15,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .core import (
+from saebase.research_lab.backend.core import (
     PLATFORM,
     canonical_json,
     data_root,
@@ -26,7 +26,7 @@ from .core import (
     load_sites,
     read_json,
 )
-from .ingest import _atomic_bytes
+from saebase.research_lab.backend.ingest import _atomic_bytes
 
 COVERAGE_PATH = PLATFORM / "data" / "coverage.json"
 SCHEMA = "opensae.compute_plan.v1"

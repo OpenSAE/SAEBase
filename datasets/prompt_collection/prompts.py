@@ -11,6 +11,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from saebase.datasets.artifacts import prepared_dataset_root, resolve_prepared_path
+
 LEGACY_FILENAMES = {
     "HotpotQA": (),
     "RAVEL": (),
@@ -41,11 +43,11 @@ def prompt_file(dataset_cfg: Any, *, model_key: str | None = None) -> Path:
     name = str(dataset_cfg.name)
     if name not in LEGACY_FILENAMES:
         raise ValueError(f"Unknown NLP prompt dataset: {name}")
-    root = Path(str(dataset_cfg.get("data_path", "") or "")).expanduser()
+    root = resolve_prepared_path(Path(str(dataset_cfg.get("data_path", "") or "")))
     override = str(dataset_cfg.get("prompt_file", "") or "").strip()
     if override:
         path = Path(override).expanduser()
-        path = path if path.is_absolute() else root / path
+        path = resolve_prepared_path(path if path.is_absolute() else root / path)
         if not path.is_file():
             raise FileNotFoundError(f"{name} requires prepared prompt file {path}")
         return path
@@ -121,7 +123,7 @@ def read_measurement_samples(dataset_cfg: Any) -> list[dict[str, Any]]:
     if samples is not None and source:
         raise ValueError("Select dataset.samples or dataset.sample_file, not both")
     if source:
-        path = Path(to_absolute_path(str(source))).expanduser().resolve()
+        path = resolve_prepared_path(Path(to_absolute_path(str(source))))
         if path.suffix == ".jsonl":
             samples = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
         else:
@@ -198,11 +200,12 @@ def prepare_selected_dataset(
         raise ValueError(f"Dataset {cfg.dataset.name} has no preparation method")
     root = Path(str(cfg.paths.data_dir)).expanduser().resolve()
     dataset_root = (
-        Path(str(cfg.dataset.get("data_path") or root / str(cfg.dataset.name)))
+        Path(str(cfg.dataset.get("data_path") or prepared_dataset_root(root, str(cfg.dataset.name))))
         .expanduser()
         .absolute()
     )
-    if dataset_root.name != str(cfg.dataset.name):
+    dataset_root = resolve_prepared_path(dataset_root)
+    if dataset_root != prepared_dataset_root(dataset_root.parent, str(cfg.dataset.name)):
         raise ValueError("Prepared dataset.data_path must end with the selected Dataset name")
     destination = artifact_dir(str(cfg.dataset.name), model_key, data_root=dataset_root.parent)
     destination.parent.mkdir(parents=True, exist_ok=True)

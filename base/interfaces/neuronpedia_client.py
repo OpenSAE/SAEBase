@@ -274,6 +274,20 @@ def _download(expected: dict, options: dict) -> dict:
     }
 
 
+def _cache_file(cache_dir: str, source_id: str, filename: str) -> Path:
+    from hydra.utils import to_absolute_path
+
+    root = Path(to_absolute_path(str(Path(cache_dir).expanduser())))
+    if root.parts[-4:] == ("assets", "annotation_cache", "neuronpedia_explanations", "files"):
+        model, sae = source_id.split("/", 1)
+        model = model.replace("-", "_")
+        sae = sae.replace("-", "_")
+        if not sae[0].isalpha():
+            sae = f"sae_{sae}"
+        return root / model / sae / filename
+    return root / source_id / filename
+
+
 def feature_activation_densities(pair, options: dict) -> dict:
     """Read native nonzero fractions from the exact SAE's public feature exports.
 
@@ -281,13 +295,12 @@ def feature_activation_densities(pair, options: dict) -> dict:
     Neuronpedia corpus, independently of a capture run's selected prompts.
     """
     import math
-    from hydra.utils import to_absolute_path
     from saebase.runtime.experiment_results import write_json
 
     expected = _source(pair)
     if expected is None:
         raise ValueError("No Neuronpedia source for native feature activation densities")
-    path = Path(to_absolute_path(options["cache_dir"])) / expected["id"] / "densities.json"
+    path = _cache_file(options["cache_dir"], expected["id"], "densities.json")
 
     def validate(payload):
         if payload["neuronpedia_id"] != expected["id"]:
@@ -412,7 +425,6 @@ def feature_activation_densities(pair, options: dict) -> dict:
 
 def annotate_features(pair, feature_ids: list[int], options: dict) -> tuple[dict, dict[int, dict]]:
     """Return source-provided hypotheses and explicit lookup outcomes for every ID."""
-    from hydra.utils import to_absolute_path
     from saebase.runtime.experiment_results import write_json
 
     ids = sorted(set(feature_ids))
@@ -437,11 +449,7 @@ def annotate_features(pair, feature_ids: list[int], options: dict) -> tuple[dict
             )
         info["neuronpedia_id"] = expected["id"]
         info["export_base_url"] = f"{EXPORT_ROOT}/v1/{expected['id']}/"
-        path = (
-            Path(to_absolute_path(str(Path(options["cache_dir"]).expanduser())))
-            / expected["id"]
-            / "explanations.json"
-        )
+        path = _cache_file(options["cache_dir"], expected["id"], "explanations.json")
         info["cache_path"] = str(path)
         payload = None
         export_digest = None

@@ -55,7 +55,8 @@ def test_error_record_preserves_the_failure(tmp_path):
     assert result["error"]["type"] == "ValueError"
 
 
-def test_read_run_resolves_known_historical_artifacts_in_current_run(tmp_path):
+@pytest.mark.parametrize("absolute_precheck", [False, True])
+def test_read_run_resolves_known_historical_artifacts_in_current_run(tmp_path, absolute_precheck):
     import json
 
     cfg = config()
@@ -66,9 +67,12 @@ def test_read_run_resolves_known_historical_artifacts_in_current_run(tmp_path):
     saved = json.loads(manifest.read_text())
     old_result = "/old/experiment/local/custom/benchmark/prior/metadata/benchmark_result.json"
     saved["result"]["summary"]["result_path"] = old_result
+    old_precheck = "tmp/automatic_precheck/metadata/precheck_result.json"
+    if absolute_precheck:
+        old_precheck = f"/old/experiment/local/custom/benchmark/prior/{old_precheck}"
     saved["result"]["artifact_paths"] = {
         "result": old_result,
-        "precheck": "tmp/automatic_precheck/metadata/precheck_result.json",
+        "precheck": old_precheck,
     }
     manifest.write_text(json.dumps(saved))
     current_result = tmp_path / "metadata/benchmark_result.json"
@@ -81,6 +85,32 @@ def test_read_run_resolves_known_historical_artifacts_in_current_run(tmp_path):
     assert found["summary"]["result_path"] == str(current_result)
     assert found["artifact_paths"] == {"result": str(current_result), "precheck": str(receipt)}
     assert json.loads(manifest.read_text()) == saved
+
+
+def test_query_reads_archived_runs_and_prefers_the_restored_record(tmp_path):
+    import json
+    import shutil
+
+    experiment = tmp_path / "experiment"
+    original = experiment / "local/custom/capture/cohort_ranking"
+    archive = tmp_path / "assets/history_experiment/local_runs/files/experiment"
+    saved = archive / original.relative_to(experiment)
+    cfg = config()
+    result = EvaluationResult.from_payload("capture", cfg, {"status": "executed"})
+    record_run(saved, cfg, result=result)
+    assert read_run(original)["path"] == str(saved)
+
+    restored = experiment / "local/custom/capture/cohort_ranking/executions/20261122T000000Z-test"
+    shutil.copytree(saved, restored)
+    manifest = restored / "metadata/manifest.json"
+    restored_record = json.loads(manifest.read_text())
+    restored_record["archived_manifest"] = str((saved / "metadata/manifest.json").relative_to(tmp_path))
+    restored_record["task_status"] = "executed"
+    restored_record["status"] = "succeeded"
+    manifest.write_text(json.dumps(restored_record))
+
+    records = list_runs(experiment, status="executed")
+    assert [item["path"] for item in records] == [str(restored)]
 
 
 def test_metric_comparison_checks_the_task_owned_ledger(tmp_path):

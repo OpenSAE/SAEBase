@@ -97,7 +97,8 @@ def _default_workspace_root() -> Path:
 
 
 # Prompt and experimental outputs share a workspace root, not a Python package root.
-DEFAULT_DATA_ROOT = _default_workspace_root() / "data"
+PREPARED_ASSET = Path("assets/dataset_preparation/prompt_sets/files")
+DEFAULT_DATA_ROOT = _default_workspace_root() / PREPARED_ASSET
 DEFAULT_EXPERIMENT_ROOT = _default_workspace_root() / "experiment"
 
 
@@ -110,6 +111,48 @@ def canonicalize_behavior(name: str) -> str:
 
 def default_data_root() -> Path:
     return DEFAULT_DATA_ROOT
+
+
+def _in_prepared_assets(path: Path) -> bool:
+    base = PREPARED_ASSET.parts
+    return any(path.parts[index:index + len(base)] == base for index in range(len(path.parts)))
+
+
+def prepared_dataset_root(root: str | Path, name: str) -> Path:
+    directory = Path(root)
+    return directory / (name.lower() if _in_prepared_assets(directory) else name)
+
+
+def resolve_prepared_path(path: Path) -> Path:
+    """Resolve existing paths and relocate older saved paths to the prompt assets."""
+    expanded = path.expanduser()
+    if expanded.exists() or expanded.is_symlink():
+        return expanded
+    absolute = expanded.resolve()
+    prepared = default_data_root()
+    project = _default_workspace_root()
+    for old_root in (
+        project / "data/prompts/prepared",
+        project.parent / "data/saebase/prompts/prepared",
+        project / "data",
+        prepared,
+    ):
+        if not absolute.is_relative_to(old_root):
+            continue
+        parts = list(absolute.relative_to(old_root).parts)
+        if parts and parts[0] in BEHAVIOR_DIRS.values():
+            parts[0] = parts[0].lower()
+        if len(parts) > 1 and parts[0] == "sources":
+            parts[1] = parts[1].lower()
+        parts = ["shared" if part == "_shared" else part for part in parts]
+        if "selections" in parts:
+            index = parts.index("selections") + 1
+            if index < len(parts) and not parts[index].startswith("cohort_"):
+                parts[index] = f"cohort_{parts[index]}"
+        relocated = prepared.joinpath(*parts)
+        if relocated.exists() or old_root == prepared:
+            return relocated
+    return expanded
 
 
 def default_experiment_root() -> Path:
@@ -134,7 +177,7 @@ def artifact_dir(
     """``{data_root}/{Behavior}/{model_key}/v1``."""
     beh = canonicalize_behavior(behavior)
     root = Path(data_root) if data_root is not None else default_data_root()
-    return root / BEHAVIOR_DIRS[beh] / str(model_key) / version
+    return prepared_dataset_root(root, BEHAVIOR_DIRS[beh]) / str(model_key) / version
 
 
 def prompts_path(

@@ -28,7 +28,7 @@ Select with `model=gemma1b`. Preset weighting is `google/gemma-3-1b-pt`. Enterin
 
 ### 1.2 `gemma1b_it`
 
-Gemma 3 ' s one billion-volume version, suitable for a smaller-scale modulation of pre-training against commands, is the directive ' s gratuity and weights, with a distinction between the presentation format and suitability of the instructions when comparing the base version.
+Gemma 3 ' s one billion-volume version, suitable for a smaller-scale modulation against pre-training and commands, is the directive ' s gratuity and weights, with a distinction between the presentation format and suitability of the basic version.
 
 Select with `model=gemma1b_it`. Pre-set weights are marked `google/gemma-3-1b-it`. Enter the sequence after the text and the fraction, which is mainly read to activate as the middle of the extension fraction and the selected position. Default SAE is `gemma1b_it_l25_native_big`. The meaning of the same name or feature number depends on the actual weight and SAE.
 
@@ -46,7 +46,7 @@ Select with `model=gemma270m`. Pre-set weights are marked `gemma-3-270m`. Enter 
 
 Gemma 3's 12 billion-quantitative version, which is used for larger-scale feature comparisons, should be tested by a physical model. This is a command shift of weight and weight, with a distinction between a hint format and suitability when comparing the base version.
 
-Select with `model=gemma3_12b_it`. Pre-weighted weights are `google/gemma-3-12b-it`. Entering is a sequence of text and after-words, which is primarily read to activate as the middle of the extension fraction and the selected location. Default SAE is `gemma3_12b_it_scope_resid`. Pre-set layer is `gemma3_12b_it_scope_resid` Layer 24. The meaning of the same name or feature number depends on the actual weight and SAE.
+Select with `model=gemma3_12b_it`. Pre-weighted weights are `google/gemma-3-12b-it`. Entering is the sequence of text and after-words, which is primarily read to activate as the middle of the extension fraction and the selected position. Default SAE is `gemma3_12b_it_scope_resid`. Pre-set layer is `gemma3_12b_it_scope_resid` Layer 24. The meaning of the same name or feature number depends on the actual weight and SAE.
 
 [Project preset](../conf/models/catalog.yaml) · [Source of weights](https://huggingface.co/google/gemma-3-12b-it)
 
@@ -86,7 +86,7 @@ Select with `model=gemma3_4b_it`. Pre-set weights are marked `google/gemma-3-4b-
 
 Gemma 3's 4 billion-quantitative version for cross-structure and layer comparison in the project, with base pre-training weights as the subject of the experiment.
 
-Select with `model=gemma3_4b_pt`. Preset weights are `google/gemma-3-4b-pt`. Entering is the sequence after the text and the fraction, which is primarily read to activate as the middle of the extension fraction and the selected position. Default SAE is `gemma3_4b_pt_scope_resid`. Preset layer is `gemma3_4b_pt_scope_resid` Layer 17. The meaning of the same name or feature number depends on the actual weight and SAE.
+Select with `model=gemma3_4b_pt`. Preset weighting is `google/gemma-3-4b-pt`. Entering is the sequence of text and after-words, which is mainly read to activate as the middle of the renewal fraction and the selected position. Default SAE is `gemma3_4b_pt_scope_resid`. Preset layer is `gemma3_4b_pt_scope_resid` 17. The meaning of the same name or feature number depends on the actual weight and SAE.
 
 [Project preset](../conf/models/catalog.yaml) · [Source of weights](https://huggingface.co/google/gemma-3-4b-pt)
 
@@ -94,7 +94,7 @@ Select with `model=gemma3_4b_pt`. Preset weights are `google/gemma-3-4b-pt`. Ent
 
 ### 2.1 `gemma2_2b_base`
 
-Gemma 2 ' s 2 billion-quantitative Transformer is one of the language models commonly used in the project, with a base pre-training weight as the subject of the experiment.
+Gemma 2 ' s 2 billion-quantitative Transformer is one of the language models commonly used in the project, with the base pre-training weight as the subject of the experiment.
 
 Select with `model=gemma2_2b_base`. Preset weights are marked with `google/gemma-2-2b`. Entering is the sequence of text and after-words, which is primarily active as the middle of the extension fraction and the selected position. Default SAE is `gemma2_2b_pt_l25_canonical`. Preset layer is `gemma2_2b_pt_l25_canonical` 25th Layer. You can also choose `gemma2_2b_it_matryoshka_l12_32k`, `gemma2_2b_it_scope_resid_l12`. The meaning of the same name or feature number depends on the actual weight and SAE.
 
@@ -126,7 +126,7 @@ Select with `model=gemma2_9b_pt`. Pre-set weights are marked `google/gemma-2-9b`
 
 ### 2.5 `openresearch_gemma2_2b_base`
 
-The Gemma 2 2B base model for the OpenResearch research process is pre-set. The project registers it separately from other Gemma weights to track compatibility and run records.
+The Gemma 2 2B basic model for the OpenResearch research process is preset. The project registers it separately from other Gemma weights to track compatibility and run records.
 
 Select with `model=openresearch_gemma2_2b_base`. Base weights are solved by the corresponding adaptor to the item. Enter the sequence after the text and the semiword, which is mainly active as the middle of the extension fraction and the selected position. Default SAE is `gemma2_2b_pt_l25_canonical`. Preset layer is `gemma2_2b_pt_l25_canonical` 25. You can also select `gemma2_2b_it_matryoshka_l12_32k`, `gemma2_2b_it_scope_resid_l12`. The meaning of the same name or feature number depends on the actual weight and SAE.
 
@@ -148,7 +148,7 @@ Select with `model=gpt2small`. Pre-weighted weights are `gpt2-small`. Entering i
 
 Llama 3.1's 8 billion-volume self-regression Transformer can be used for question-and-answer behaviour and SAE intervention.
 
-Select with `model=llama31_8b`. Pre-weighted weights are `meta-llama/Llama-3.1-8B`. Entering is a sequence of text and after-words, which is mainly read to activate as the middle of the extension fraction and the selected position. Default SAE is `llama31_8b_lxr_8x`. Pre-set layer is `llama31_8b_lxr_8x` Layer 21. The meaning of the same name or feature number depends on the actual weight and SAE.
+Select with `model=llama31_8b`. Preset weighting is `meta-llama/Llama-3.1-8B`. Entering is the sequence of text and after-words, which is primarily active as the middle of the extension fraction and the selected position. Default SAE is `llama31_8b_lxr_8x`. Preset layer is `llama31_8b_lxr_8x` Layer 21. The meaning of the same name or feature number depends on the actual weight and SAE.
 
 [Project preset](../conf/models/catalog.yaml) · [Source of weights](https://huggingface.co/meta-llama/Llama-3.1-8B)
 
@@ -164,7 +164,7 @@ Select with `model=llama31_8b_instruct`. Pre-set weights are `meta-llama/Llama-3
 
 ### 5.1 `mistral7b_instruct`
 
-The V0.1 command version of Mistral 7B, which is used for text behaviour and SAE analysis, is determined by the model adaptor. This is the command that adjusts the weight of the weight, with a distinction between the hint format and suitability when comparing the base version.
+The V0.1 command version of Mistral 7B, used for text behavior and SAE analysis, is determined by the model adapter at a level determined by the model 's adaptor. This is the command which adjusts the weight of the weight, with a distinction between the hint format and suitability when comparing the base version.
 
 Select with `model=mistral7b_instruct`. Pre-set weights are marked `mistralai/Mistral-7B-Instruct-v0.1`. Enter the sequence after the text and the fraction, which is mainly read to activate as the middle of the extension fraction and the selected position. Default SAE is `mistral7b_instruct_tc_l16_131k`. The meaning of the same name or feature number depends on the actual weight and SAE.
 
@@ -182,7 +182,7 @@ Select with `model=pythia410m`. Pre-set weights are marked `pythia-410m-deduped`
 
 ### 6.2 `pythia70m`
 
-Seven million of Pythia ' s 7 million go-trained data versions are suitable for low-cost entry and small-scale interventions.
+Seven million of Pythia's go-to-training data versions are suitable for low-cost entry and small-scale interventions.
 
 Select with `model=pythia70m`. Pre-set weights are `pythia-70m-deduped`. Enter the sequence after text and division, which is primarily read to activate between the continuation fraction and the selected position. Default SAE is `pythia70m_resid_sm`. You can also choose `pythia70m_saebench_gated_l3`. The meaning of the same name or feature number depends on the actual weight and SAE.
 
@@ -234,7 +234,7 @@ Select with `model=qwen35_4b`. Pre-set weights are marked `Qwen/Qwen3.5-4B`. Ent
 
 Qwen3.5's 9 billion-quantitative base version, configured for a stand-alone residual feature experiment.
 
-Select with `model=qwen35_9b`. Preset weights are marked with `Qwen/Qwen3.5-9B-Base`. Entering is the sequence of text and after-words, which is mainly read to activate as the middle of the extension fraction and the selected position. Default SAE is `qwen35_9b_resid_w64k`. Preset layer is `qwen35_9b_resid_w64k` Level 16. The meaning of the same name or feature number depends on the actual weight and SAE.
+Select with `model=qwen35_9b`. Preset weights are marked with `Qwen/Qwen3.5-9B-Base`. Entering is the sequence of text and after-words, which is mainly read to activate as the middle of the extension fraction and the selected position. Default SAE is `qwen35_9b_resid_w64k`. Preset layer is `qwen35_9b_resid_w64k` Layer 16. The meaning of the same name or feature number depends on the actual weight and SAE.
 
 [Project preset](../conf/models/catalog.yaml) · [Source of weights](https://huggingface.co/Qwen/Qwen3.5-9B-Base)
 
@@ -258,7 +258,7 @@ Select with `model=qwen3_1_7b_base`. Preset weights are marked with `Qwen/Qwen3-
 
 Qwen3 selects the 8 billion-quantitative base version of the project according to the independent residual SSE.
 
-Select with `model=qwen3_8b`. Preset weights are marked `Qwen/Qwen3-8B-Base`. Entering is the sequence of text and after-words, which is mainly read to activate as the middle of the extension fraction and the selected position. Default SAE is `qwen3_8b_resid_w64k`. Preset layer is `qwen3_8b_resid_w64k` Layer 18. The meaning of the same name or feature number depends on the actual weight and SAE.
+Select with `model=qwen3_8b`. Preset weights are marked with `Qwen/Qwen3-8B-Base`. Entering is the sequence after text and semiwords, which is primarily read to activate as the middle of the extension fraction and the selected position. Default SAE is `qwen3_8b_resid_w64k`. Preset layer is `qwen3_8b_resid_w64k` Layer 18. The meaning of the same name or feature number depends on the actual weight and SAE.
 
 [Project preset](../conf/models/catalog.yaml) · [Source of weights](https://huggingface.co/Qwen/Qwen3-8B-Base)
 

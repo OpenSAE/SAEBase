@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+from importlib import import_module
 from pathlib import Path
 from types import ModuleType
 
@@ -11,7 +12,7 @@ _EXPECTED = {"sar": ("coalitions", "sar"), "rss": ("rss", "held_out_rate")}
 
 
 def load_paper_module(path: str | Path, *, paper: str) -> ModuleType:
-    """Load an explicitly supplied ``sar.py`` or ``rss.py`` file.
+    """Load an explicitly supplied paper estimator or SAEBase's preserved SAR source.
 
     Does not modify ``sys.path`` or shadow installed packages. The file is
     trusted local Python code supplied by the caller, not downloaded by SAEBase.
@@ -21,6 +22,11 @@ def load_paper_module(path: str | Path, *, paper: str) -> ModuleType:
     source = Path(path).expanduser().resolve()
     if source.is_dir():
         source = source / f"{paper}.py"
+    if paper == "sar" and source.name == "reference_response_surface.py":
+        bundled = "tasks.capture.scoring.reference_response_surface"
+        spec = importlib.util.find_spec(bundled)
+        if spec is not None and spec.origin is not None and source == Path(spec.origin).resolve():
+            return import_module(bundled)
     if not source.is_file() or source.name != f"{paper}.py":
         raise FileNotFoundError(
             f"Provide a local {paper}.py from the {paper.upper()} repository; got {source}"

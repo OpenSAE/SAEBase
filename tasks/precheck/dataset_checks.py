@@ -32,6 +32,7 @@ def check_dataset_artifact(
         from saebase.registry import get_dataset_plugin
 
         get_dataset_plugin(dataset_key)
+        from saebase.datasets.artifacts import resolve_prepared_path
         from saebase.datasets.prompts import prompt_file, read_prompts
 
         dataset_cfg = (
@@ -46,7 +47,7 @@ def check_dataset_artifact(
             )
         )
         path = prompt_file(dataset_cfg, model_key=model_key)
-        selected_root = Path(str(dataset_cfg.get("data_path", data_root))).resolve()
+        selected_root = resolve_prepared_path(Path(str(dataset_cfg.get("data_path", data_root)))).resolve()
         if path.is_symlink() or (
             not dataset_cfg.get("prompt_file") and not path.resolve().is_relative_to(selected_root)
         ):

@@ -35,7 +35,7 @@ It does not write files or download model weights.
 Run the same experiment and keep the results:
 
 ~~~bash
-python scripts/examples/first_experiment.py --output runs/first-experiment
+python scripts/examples/first_experiment.py --output tmp/first_experiment
 ~~~
 
 The command prints JSON with the exact paths. Open the `report_html`
@@ -65,7 +65,7 @@ model/SAE weights, not real pretrained checkpoints.
 The directory structure is:
 
 ~~~text
-runs/first-experiment/
+tmp/first_experiment/
   <run_id>/
     resolved_config.json
     provenance.json

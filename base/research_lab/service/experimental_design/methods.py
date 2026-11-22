@@ -16,8 +16,8 @@ import math
 from pathlib import Path
 from typing import Any
 
-from .core import canonical_json, digest, load_sites, has_complete_identity
-from .ingest import _atomic_bytes, _raw_jsonl
+from saebase.research_lab.backend.core import canonical_json, digest, load_sites, has_complete_identity
+from saebase.research_lab.backend.ingest import _atomic_bytes, _raw_jsonl
 
 
 def _original(source: Path, expected_sha: str, filename: str):

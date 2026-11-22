@@ -165,7 +165,7 @@ See [Input Localization Benchmarking](localization-benchmark.md) for configurati
 
 ```bash
 saebase-benchmark --config conf/tasks/benchmark/task.yaml#presets.pythia_benchmark_smoke --dry-run
-python scripts/examples/first_experiment.py --output runs/first-experiment
+python scripts/examples/first_experiment.py --output tmp/first_experiment
 ```
 
 It is planned to give the model to SAE, the task of the indicator and the budget for measurement. The demonstration will use a synthetic model to complete the actual calculation, preserve readable indicators, reports and statistical analysis.

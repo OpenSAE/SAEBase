@@ -10,12 +10,54 @@ from pathlib import Path
 import yaml
 from omegaconf import OmegaConf
 
+
+def workspace_at(directory: Path) -> bool:
+    """Recognize a source workspace independently of the launch directory."""
+    return (
+        (directory / "pyproject.toml").is_file()
+        and (directory / "base/application/commands.py").is_file()
+        and (directory / "conf/config.yaml").is_file()
+    )
+
+
 def configuration_root() -> Path:
     """Locate physical recipes in a checkout and data files in distributions."""
     source = Path(__file__).resolve().parents[2]
-    if (source / "pyproject.toml").is_file() and (source / "conf/config.yaml").is_file():
+    if workspace_at(source):
         return source / "conf"
     return Path(__file__).absolute().parent
+
+
+def launch_directory() -> Path:
+    """Return the caller's directory before Hydra changes into the run directory."""
+    from hydra.core.hydra_config import HydraConfig
+    from hydra.utils import get_original_cwd
+
+    return Path(get_original_cwd() if HydraConfig.initialized() else Path.cwd()).resolve()
+
+
+def default_workspace() -> str | None:
+    """Prefer the caller's SAEBase checkout, then the checkout supplying the package."""
+    launch = launch_directory()
+    for directory in (launch, *launch.parents, configuration_root().parent):
+        if workspace_at(directory):
+            return str(directory)
+    return None
+
+
+def _default_data_directory(root: str | None) -> str | None:
+    return str(((launch_directory() / root).resolve() / "assets/dataset_preparation/prompt_sets/files").resolve()) if root is not None else None
+
+
+def _prepared_dataset_dir(root: str, name: str) -> str:
+    from saebase.datasets.artifacts import prepared_dataset_root
+
+    return str(prepared_dataset_root(root, name))
+
+
+OmegaConf.register_new_resolver("saebase_prepared_dir", _prepared_dataset_dir, replace=True)
+OmegaConf.register_new_resolver("saebase_workspace", default_workspace, replace=True)
+OmegaConf.register_new_resolver("saebase_data_dir", _default_data_directory, replace=True)
 
 
 CATALOG_PATHS = {

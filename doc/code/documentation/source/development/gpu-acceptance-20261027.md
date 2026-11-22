@@ -38,7 +38,7 @@ The public entry point is executed after the `train.log` of Hydra has been rewri
 - Max. 14325, activate 1711050702148438.
 - Reconstruct L2 514.810302734375
 
-On the first round of unreformed log paths, the empty `train.log` will be entered in the catalogue of experiments by Hydra, `guard_existing_run`, followed by `FileExistsError`. Log: `logs/capture_unmodified_entry.log`. At that time, it was bypassed by `hydra.job_logging.handlers.file.filename`. D1 has removed this bypass, as shown below.
+On the first round of unreformed log paths, the empty `train.log` will be entered in the catalogue of experiments by Hydra, `guard_existing_run`, followed by `FileExistsError`. Log: `logs/capture_unmodified_entry.log`. At that time, it was bypassed by `hydra.job_logging.handlers.file.filename`. D1 has removed this bypass, see rechecking below.
 
 ### Intervene: Through
 
@@ -103,7 +103,7 @@ Budget: Layer 0, `blocks.0.hook_resid_post`, `d_sae=64`, `k=8`, Topk, step 2, Ba
 
 Gemma-2-2B of float32 is OOM on 12GB (approximately 11.46 GiB). `LanguageModelSAERunnerConfig.dtype` will not pass to HookedTransformer. In the first round, the model is loaded into fixed float16. D2 is changed to visible `model_dtype` and `sae_dtype`, and the default is float32; the 12GB must be uploaded to `model_dtype=float16`. `save_to_disk` language is `load_from_disk`. The snapshot directory name is shown to `google/gemma-2-2b`.
 
-Results: `experiment/IOI/gemma2_2b_base/train/gpuacc_smoke_42/native_sae_training/checkpoint/inference/sae_weights.safetensors` (1189416 bytes). `SAE.load_from_disk` Got `TopKSAE`, `d_in=2304`, `d_sae=64`, `W_enc` Shape `[2304, 64]`. Randomly entered encode absolute value and 0.5275761485099792, reformed MSE 1.014569345474243. Record: `extra/train_reload.json`. Timed 1578 seconds. This is a smoke, not a layer 25.
+Results: `experiment/IOI/gemma2_2b_base/train/gpuacc_smoke_42/native_sae_training/checkpoint/inference/sae_weights.safetensors` (1189416 bytes). `SAE.load_from_disk` Got `TopKSAE`, `d_in=2304`, `d_sae=64`, `W_enc` Shape `[2304, 64]`. Randomly entered encode absolute value and 0.5275761485099792, reconstruct MSE 1.014569345474243. Record: `extra/train_reload.json`. Timed 1578 seconds. This is a smoke-smoke, not a layer 25.
 
 ## vLM Generation
 
@@ -111,11 +111,11 @@ Main environment `vllm` Just about. 30 One. Python File, Missing `logging_utils`
 
 Using `/workspace/SAEReasoning/.venv` already installed vLLLM 0.27.1 and toch 2.13.0+cu130, `PYTHONPATH` points to this SAEBASe check-out, calling `tasks.generate.backend.generate`. Gemma-2 rejects fload16 (value unstable) and replaces bflota16. `max_model_len=256`, `gpu_memory_utilization=0.80`, feed42. Scripts must be real: vLLM subprocesses will not be found `/workspace/<stdin>` from stdin.
 
-The result `extra/vllm_generate.json`:8 new token `[476, 3413, 576, 82777, 235265, 1165, 603, 476]`, text ` a city of contrasts. It is a`. Same as the non-direction baseline of the Generate mission token. vLLM prompt is 5, no HookedTransformer BOS id 2.
+The result `extra/vllm_generate.json`:8 new token `[476, 3413, 576, 82777, 235265, 1165, 603, 476]`, text ` a city of contrasts. It is a`. Same as the non-direction baseline of the Generate mission token. The length of the vLLM prompt is 5, with no Hooked Transformer BOS id 2.
 
 ## Data
 
-`saebase.datasets` is exactly the same as IOI, GreaterThan, SimpleCopying, SubprojectVerbAgreement, generated under `saebase.datasets.NLP`. `extra/dataset_prompt_identity.json`. The source file diff is mainly a line replacement for the IOI name list and produces the same result.
+`saebase.datasets` is exactly the same as IOI, GreaterThan, SimpleCopying, SubprojectVerbAgreement, generated under `saebase.datasets.NLP`. `extra/dataset_prompt_identity.json`. The source file diff is mainly a line change for the IOI name list and produces the same result.
 
 CounterFact Normalize in `azhx/counterfact` Revision `c01c413f856ee38f5c080c9fc5e87aff478e2ff9` Before 20 Lines are consistent. 19728 Okay..
 
@@ -129,9 +129,9 @@ rcline remote `research-5090`, type b2. Do `copy` (not sync) with `harness/trans
 
 ## CLI and Atlas
 
-The source code `saebase --help` has complete parameters, and `--list` lists the task `sae` and Gemma-2-2B models. `python -m saebase.runtime.train --cfg job --help` lists the dataset, model, task (including Capture to train).
+The source code `saebase --help` has complete parameters, and `--list` lists the task `sae` and Gemma-2-2B models. `python -m saebase.runtime.train --cfg job --help` lists the daset, model, task (including capture to train).
 
-V0.5.0 wheel released does not contain abundled research runtime. `wheel/opensae_saebase-0.5.0-py3-none-any.whl` re-engineered by this branch consists of `saebase/runtime/train.py`, `conf/sae_research.yaml` and `datasets/plugins.py`. `scripts/distribution.py` returns after installation outside the checkout directory, three CLIs, package resources and external working directory are OK and implemented `python -m saebase.runtime.train --cfg job --help`. PyPI, public `saebase` command name has not been changed.
+V0.5.0 wheel released does not contain abundled research runtime. `wheel/opensae_saebase-0.5.0-py3-none-any.whl` re-engineered by this branch consists of `saebase/runtime/train.py`, `conf/sae_research.yaml` and `datasets/plugins.py`. `scripts/distribution.py` returns after installation outside the checkout directory, three CLIs, package resources and external working directory are OK and implemented `python -m saebase.runtime.train --cfg job --help`. PyPI, public `saebase` commands have not been uploaded.
 
 Atlas: `harness.code.build` and `harness.visualization.export` write to the receipt and inspection directory `atlas/` without changing the harness page in the warehouse. `build_pages --check` returns 0 to the existing warehouse page. Export count: core 26, knowledge 29, code 1857, environment 15, const.64. These are the export of existing capabilities and do not mark nodes as verified.
 
@@ -144,7 +144,7 @@ Atlas: `harness.code.build` and `harness.visualization.export` write to the rece
 `f7dca13` contains the first round of two on-the-job repairs and the first draft of this report:
 
 1. `tasks/train/backend/training.py`: The snapshot catalogue map is an official model id; local `save_to_disk`/ JSON language.
-2. `tasks/circuits/operation.py`: Transfer the task profile offload, dtype, bat, feature caps and lazy encoder to the existing curcuit-tracer package. Default not to fill in must remain the same as before, `task.approved`.
+2. `tasks/circuits/operation.py`: Transfer the task profile offload, dtype, bat, feature caps and lazy encoder to the existing curcuit-tracer package. Default not to fill in must still be true. `task.approved`
 
 This round amends the Hydra default log, the training dtype contract, the order of verification of the Circuits parameters, the Explain white list generator, and the wheel pack range. The corresponding tests are `tests/test_hydra_first_run.py`, `tests/test_train_plan_contract.py`, `tests/test_circuits_passthrough.py`, `tests/test_explain_generator.py`.
 

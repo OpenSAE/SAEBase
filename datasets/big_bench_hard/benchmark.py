@@ -95,9 +95,9 @@ print(len(rows), file=sys.stderr)
 
 
 def default_data_dir() -> str:
-    from saebase.datasets.artifacts import DEFAULT_DATA_ROOT
+    from saebase.datasets.artifacts import DEFAULT_DATA_ROOT, prepared_dataset_root
 
-    return str(DEFAULT_DATA_ROOT / "BBH")
+    return str(prepared_dataset_root(DEFAULT_DATA_ROOT, "BBH"))
 
 
 def _local_jsonl(root: Path) -> list[dict[str, Any]]:

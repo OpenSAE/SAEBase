@@ -60,7 +60,7 @@ def prepare(args):
     verify_runtime(context="sae_prepare_prompts", mode="analysis")
 
     from omegaconf import OmegaConf
-    from saebase.datasets.artifacts import default_data_root
+    from saebase.datasets.artifacts import default_data_root, prepared_dataset_root
     from saebase.datasets.prompts import prepare_selected_dataset
 
     from models.hooked_lm_common import print_vram_gb
@@ -73,7 +73,7 @@ def prepare(args):
             "model": {"name": args.model_key, "device": args.device},
             "dataset": {
                 "name": behavior,
-                "data_path": str(data_root / behavior),
+                "data_path": str(prepared_dataset_root(data_root, behavior)),
                 "prompt_file": "",
             },
             "paths": {"data_dir": str(data_root)},
@@ -87,7 +87,7 @@ def prepare(args):
     for alias in group_names("dataset"):
         selected = load_group("dataset", alias).dataset
         if selected.name == behavior and "sample_count" in selected:
-            cfg.dataset = OmegaConf.merge(selected, {"data_path": str(data_root / behavior)})
+            cfg.dataset = OmegaConf.merge(selected, {"data_path": str(prepared_dataset_root(data_root, behavior))})
             if args.sample_count is not None:
                 cfg.dataset.sample_count = args.sample_count
             cfg.dataset.sampling_seed = args.seed

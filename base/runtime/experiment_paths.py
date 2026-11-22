@@ -17,7 +17,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from conf import configuration_location, configuration_root, read_configuration
+from conf import (
+    configuration_location,
+    configuration_root,
+    launch_directory,
+    read_configuration,
+    workspace_at,
+)
 from saebase.runtime.configuration.task_options import task_owner, task_value
 
 PART = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$")
@@ -56,14 +62,15 @@ def task_components(cfg) -> list[str]:
 
 
 def project_root(cfg) -> Path:
-    from hydra.core.hydra_config import HydraConfig
-    from hydra.utils import get_original_cwd
     from omegaconf import OmegaConf
 
     settings = OmegaConf.to_container(cfg.paths, resolve=False) if OmegaConf.is_config(cfg.paths) else cfg.paths
     if settings["root"] == "${hydra:runtime.cwd}":
-        return Path(get_original_cwd() if HydraConfig.initialized() else Path.cwd()).resolve()
-    return Path(str(cfg.paths.root)).resolve()
+        return launch_directory()
+    root = cfg.paths.root
+    if root is None:
+        raise ValueError("Set paths.root to a workspace directory before running an SAEBase task")
+    return (launch_directory() / Path(root)).resolve()
 
 
 def task_root(cfg) -> Path:
@@ -165,12 +172,64 @@ def hydra_run_path(level: str, *, _root_) -> str:
     raise ValueError("Run path level must be task or leaf")
 
 
+def registered_preview(cfg):
+    """Identify a configuration-only execution in the project-owned experiment tree."""
+    root = project_root(cfg)
+    if (
+        cfg.task.get("execute", False)
+        or cfg.get("runtime", {}).get("mode") not in {None, "new"}
+        or cfg.experiment.get("overwrite")
+        or not workspace_at(root)
+        or len(task_components(cfg)) != 1
+    ):
+        return None
+    from models.plugins import MODEL_MODULES
+    from saebase.datasets import dataset_source_module
+
+    components = run_components(cfg)
+    task = str(cfg.task.name)
+    model_owner = MODEL_MODULES.get(components["model"])
+    if model_owner is None or not (root / "tasks" / task).is_dir():
+        return None
+    try:
+        dataset = dataset_source_module(components["dataset"]).rsplit(".", 1)[-1]
+    except KeyError:
+        return None
+    model = "/".join(model_owner.split(".")[1:-1])
+    if not (root / "datasets" / dataset).is_dir() or not (root / "models" / model).is_dir():
+        return None
+    name = configured_experiment_name(cfg) or "configuration_preview"
+    role = cfg.experiment.get("run_id")
+    if name == "i":
+        name = "exhaustive_interaction"
+    if role == "i":
+        role = "exhaustive_interaction"
+    if any(not re.fullmatch(r"[a-z]+(?:_[a-z]+){0,2}", value) for value in (name, role) if value):
+        return None
+    path = root / "experiment" / dataset / model / task / name
+    if role:
+        path /= role
+    return path, {"dataset": dataset, "model": model, "task": task}, name, role
+
+
+def start_execution(cfg, folder: Path) -> Path:
+    """Assign the invocation a fresh execution directory after taking the study lock."""
+    if registered_preview(cfg) is None:
+        return folder
+    if (folder / "executions").is_symlink():
+        raise ValueError("Execution directory must belong to the experiment")
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
+    return folder / "executions" / f"{stamp}-{uuid4().hex[:12]}"
+
+
 def run_leaf(cfg) -> Path:
     name = configured_experiment_name(cfg)
     role = cfg.experiment.get("run_id")
     if role is not None:
         hierarchy = Path(*task_components(cfg))
         experiment_name(role, hierarchy / name if name else hierarchy, field="experiment.run_id")
+    if registered := registered_preview(cfg):
+        return registered[0]
     return experiment_directory(task_root(cfg), name, role)
 
 
@@ -180,6 +239,12 @@ def check_run_location(cfg, cwd: str | Path) -> Path:
     expected = run_leaf(cfg).resolve(strict=False)
     actual = Path(cwd).resolve(strict=False)
     if expected == actual:
+        return actual
+    if (
+        registered_preview(cfg)
+        and actual.parent == expected / "executions"
+        and re.fullmatch(r"[0-9]{8}T[0-9]{6}\.[0-9]{6}Z-[0-9a-f]{12}", actual.name)
+    ):
         return actual
     raise ValueError(f"Hydra output location mismatch: expected {expected}, got {actual}")
 
@@ -336,7 +401,9 @@ def run_session(cfg, cwd: str | Path):
 
 def create_layout(cfg, cwd: str | Path, *, note: str = "") -> dict:
     folder = check_run_location(cfg, cwd)
-    for sub in ARTIFACT_DIRS:
+    registered = registered_preview(cfg)
+    categories = ("artifacts", "reports", "logs", "metadata", "tmp") if registered else ARTIFACT_DIRS
+    for sub in categories:
         (folder / sub).mkdir(parents=True, exist_ok=True)
     from omegaconf import OmegaConf
 
@@ -364,6 +431,22 @@ def create_layout(cfg, cwd: str | Path, *, note: str = "") -> dict:
         "artifacts": ARTIFACT_DIRS,
         "evaluation_caveat": "Check the task-specific dataset split note; validation may not be independent of test.",
     }
+    if registered:
+        _, paths, study, role = registered
+        from saebase.runtime.experiment_results import write_json
+
+        configuration["component_paths"] = paths
+        metadata.update(
+            run_id=folder.name,
+            subname=study,
+            effective_config="metadata/effective_config.json",
+            configuration_sha256=configuration_identity(configuration),
+            outputs={},
+            artifacts={name: name for name in categories},
+        )
+        if role:
+            metadata["role"] = role
+        write_json(folder / metadata["effective_config"], configuration)
     dest = folder / "metadata" / "manifest.json"
     tmp = dest.with_suffix(".json.tmp")
     tmp.write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

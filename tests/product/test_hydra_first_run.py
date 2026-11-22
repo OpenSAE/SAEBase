@@ -18,7 +18,7 @@ def _run(cwd: Path, *overrides: str) -> subprocess.CompletedProcess[str]:
     env["PYTHONPATH"] = str(ROOT)
     env["HYDRA_FULL_ERROR"] = "1"
     return subprocess.run(
-        [sys.executable, "-m", "saebase.runtime.train", *overrides],
+        [sys.executable, "-m", "saebase.runtime.train", f"paths.root={cwd}", *overrides],
         cwd=cwd,
         env=env,
         capture_output=True,
@@ -39,6 +39,30 @@ def test_clean_default_entry_creates_leaf_without_log_redirect(tmp_path: Path):
     assert (leaf / "metadata" / "manifest.json").is_file()
     assert not (leaf / "train.log").exists()
     assert "hydra.job_logging" not in " ".join(result.args)
+
+
+def test_project_preview_records_distinct_executions(tmp_path):
+    from saebase.runtime.experiment_results import list_executions, read_run
+
+    for filename in ("pyproject.toml", "conf/config.yaml", "base/application/commands.py"):
+        path = tmp_path / filename
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.touch()
+    for name in ("datasets/indirect_object_identification", "models/gemma/gemma2", "tasks/capture"):
+        (tmp_path / name).mkdir(parents=True)
+    for seed in (41, 42):
+        result = _run(tmp_path, "experiment.sub_name=configuration_contract", f"seed={seed}")
+        assert result.returncode == 0, result.stderr
+    study = tmp_path / "experiment/indirect_object_identification/gemma/gemma2/capture/configuration_contract"
+    records = list_executions(study)
+    assert [record["seed"] for record in records] == [41, 42]
+    execution = Path(records[-1]["storage"])
+    manifest = json.loads((execution / "metadata/manifest.json").read_text())
+    assert manifest["status"] == "succeeded"
+    assert manifest["run_id"] == execution.name
+    assert manifest["configuration"] == json.loads((execution / manifest["effective_config"]).read_text())
+    assert (execution / manifest["outputs"]["task_result"]).is_file()
+    assert read_run(study)["status"] == "configured_only"
 
 
 def test_same_purpose_preserves_repeated_executions(tmp_path: Path):

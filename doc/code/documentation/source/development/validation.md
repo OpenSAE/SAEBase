@@ -10,7 +10,7 @@ Entering and completing tasks requires the official interface and protocol defin
 
 ## Check according to use selection
 
-This is developed using a functional scene that will answer this question. First, you determine the actions that the results support, and then generate, read and use it from the actual entry; the contents that need to be saved are reread after the original execution. The relevant incomplete scenes include the actual object, the known cause, the impact and the next step, by which the caller fixes the conditions, continues the task or uses the results already achieved.
+Use a functional scene that answers this question. First determine the actions that the results support, and then generate, read and use it from the actual entry; the contents that need to be saved are reread after the original execution. Related incomplete scenes include the actual object, the known cause, the impact and the next step, by which the caller fixes the conditions, continues the task or uses the results already achieved.
 
 Full offline testing, installation and packing checks are used by [publishing validation](../../../../../.github/workflows/release-validation.yml) and missions that clearly require an overall inspection. Models and GPU experiments select resources and budgets according to the corresponding tasks.
 

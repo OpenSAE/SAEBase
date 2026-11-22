@@ -17,7 +17,7 @@ from typing import Any
 
 from huggingface_hub import HfApi, hf_hub_download
 
-from saebase.datasets.artifacts import default_data_root
+from saebase.datasets.artifacts import default_data_root, prepared_dataset_root
 from saebase.datasets.artifacts import assert_available
 
 # A concrete split and configuration, not a second component registry.
@@ -135,7 +135,7 @@ def source_records(
     """Cache selected raw records with immutable upstream revision and content hash."""
     if type(limit) is not int or not 1 <= limit <= 10000:
         raise ValueError("Source limit must be 1..10000")
-    directory = (source_root or default_data_root() / "sources") / name / f"prefix_{limit}"
+    directory = prepared_dataset_root(source_root or default_data_root() / "sources", name) / f"prefix_{limit}"
     source, manifest = directory / "records.json", directory / "source.json"
     if source.is_file() and manifest.is_file():
         data = source.read_bytes()
@@ -238,7 +238,7 @@ def prepare_public_dataset(
             break
     if definition is None:
         raise ValueError(f"Missing Dataset configuration: {name}")
-    cfg = OmegaConf.merge(definition, {"data_path": str(root / name), "sampling_seed": seed})
+    cfg = OmegaConf.merge(definition, {"data_path": str(prepared_dataset_root(root, name)), "sampling_seed": seed})
     select_dataset(cfg, model_key=model_key)
     return selection_path(cfg, model_key)
 

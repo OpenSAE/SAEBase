@@ -18,11 +18,11 @@ tasks.generate.serving.generate()          From Current Interpreter vLLM
 tasks.generate.serving.nnsight_worker      Alternating. python -m tasks.generate.serving.nnsight_worker
 ```
 
-HuggingFace packed decode Only the caller is visible `SAE_GENERATE_BACKEND=hf` Do it yourself. `generate_hf_packed`.`generate()` It's gonna be a mistake at this switch..
+HuggingFace packed decode Only caller displays. `SAE_GENERATE_BACKEND=hf` Do it yourself. `generate_hf_packed`.`generate()` It's gonna be a mistake at this switch..
 
 ## Install
 
-Standard SAE analysis relies on `requirements.txt` in the root directory. GPU generation and NNsight is optional to install by `generation`:
+Standard SAE analysis relies on `requirements.txt` in the root directory. GPU generation and NNsight is optional to install `generation`:
 
 ```bash
 python -m pip install -e '.[generation]'

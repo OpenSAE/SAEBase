@@ -6,7 +6,7 @@ Positioning instructions, parameters, research basis and run records.
 
 ## Scope
 
-Use this index to find project documentation. Start with the [project README](../README.md) for installation and working examples.
+For reading and maintenance of the project; installation and normal commands can be found in [project description](../README.md)](checking existing functionality and normal commands from the project entrance, e.g., viewing of directly usable workflows).
 
 ## Contents and description
 
@@ -15,18 +15,17 @@ Use this index to find project documentation. Start with the [project README](..
 | [`.agents/`](agents.md) | Description of the project ' s working methods and access settings to start collaborative maintenance, for example, to find out how the assistant obtained shared skills. |
 | [`.github/`](agents.md) | Warehouse workflow and collaborative configuration. |
 | [`.researchharness/`](agents.md) | Project access information. |
-| `assets/` | Reusable cohort specifications, reproduction inputs, and Research Lab resources. |
+| `assets/` | The original historical experiment is compared with the analytical information available to check the primary active density and threshold of SAR. |
 | [`conf/`](conf.md) | Checks the configuration file, default values and overwhelming rules, and how the model's operating device is set. |
-| [`data/`](datasets.md) | The selection of IOI topics for data selection and disaggregation is available. |
+| [Workspace data](datasets.md) | The selection of IOI topics for data selection and disaggregation is available. |
 | [`datasets/`](datasets.md) | Data sets and inputs. |
 | [`doc/`](README.md) | Project document index. |
 | [`experiment/`](experiment.md) | The resources used to compare results and limitations based on real-life checks can be found for BBH capture precheck. |
 | [`models/`](models.md) | The default SAE and analysis layer for selecting models and weights can be found for Llama 3.1 8B. |
 | [`base/`](base.md) | Read and write public operations, environment and results. |
-| [`saebase/`](base.md) | Python public entrance, distribution of components and API. |
 | [`scripts/`](../scripts/README.md) | It is used to find directly run engineering tools, such as positioning data preparation or export scripts. |
 | [`tasks/`](tasks.md) | For the selection of operations and access to their products, it is possible to see how the results of the capture can be used as a candidate for intervention. |
-| [`tests/`](../tests/README.md) | For the selection of physical inspections, such as re-entry checks at public entry points. |
+| [`tests/`](../tests/README.md) | For the selection of physical checks, such as re-entry checks at public entry points. |
 | [`tmp/`](experiment.md) | Local temporary documentation; official operational positioning and results are presented in the pilot report. |
 
 [Scientific concepts and terminology](knowledge/README.md)(Explanation of terminology and research concepts used at the station) · [Implementation environment](environment/README.md) · [Source Structure](code/README.md)(Positioning of official access points and responsible modules along the source-code structure)

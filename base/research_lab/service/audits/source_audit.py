@@ -19,9 +19,9 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
-from .acquire import acquire
-from .core import canonical_json, dataset_catalog
-from .ingest import _atomic_bytes, _raw_jsonl, freeze_dataset
+from saebase.research_lab.backend.acquire import acquire
+from saebase.research_lab.backend.core import canonical_json, dataset_catalog
+from saebase.research_lab.backend.ingest import _atomic_bytes, _raw_jsonl, freeze_dataset
 from .near_duplicates import scan_near_duplicates
 from .variant_audit import summarize_variant_proposals
 

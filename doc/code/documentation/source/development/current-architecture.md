@@ -26,7 +26,7 @@ Read, develop and maintain the current SAEBase scientific function; complete the
 | Models and SAE | `models/<family>/<series>/specs.py`, model configuration and SAE information | Declaration of method of loading, location of application and ability; description of registration data separately from authenticity |
 | Method of intervention | `tasks/intervene/` | Provide clear input and output, generate and evaluate the use of its interface |
 | Indicators and statistics | `tasks/benchmark/` | Use of indicator definitions, original methodological sources and sample units |
-| Scientific research process | `operation.py` for Task | The combination is capable of retaining the method-specific parameters and products |
+| Scientific research process | Corresponds to `operation.py` for Task | The combination is capable of retaining the method-specific parameters and products |
 
 ```mermaid
 flowchart TD
@@ -50,7 +50,7 @@ The training parameters are checked by a training mission and the health assessm
 
 The output uses `experiment/<dataset>/<model>/<task>/<run-name>/` to include metadata, metrics, checkpoints, tables, figures, logs, reports and tmp. Metadata saves the profile, running information and product directories after the resolution; fails to record the unusual type, description and call information. In the result `diagnostics` saves the specific cause, task impact and next recommendation, prechecks the restoration description that already exists and goes directly into the result. Operating internal product references are saved on a relative path and are read to be parsed on the basis of the current running directory.
 
-`saebase.runtime.experiment_results` Provides `list_runs`, `read_run`, `compare_runs` and `find_reusable_runs`. When searching, access to `errors=[]` collects unreadable records and suggestions for their handling. The rest of the readable operations continue to return; if this parameter is not passed, indicate an unusual record by warning. Indicators read a summary check of the callback mission; compare their models, SAEs, configurations and protocols and do not generate a cross-indicator total score. Run-level reuse requests full content identification of callers; existing activated caches, measurement books and training resumes responsibility for their respective verifications.
+`saebase.runtime.experiment_results` Provides `list_runs`, `read_run`, `compare_runs` and `find_reusable_runs`. When searching, you can access `errors=[]` to collect unread records and their recommendations for processing, while the rest of the readable operations continue to return; if you do not pass this parameter, you will note the unusual records by warning. Indicators will read a summary check of the callback tasks; you will not generate a cross-indicator total score by comparing their models, SAE, configurations and protocols.
 
 ## Functional responsibilities and expanded compacts
 
@@ -62,9 +62,9 @@ The output uses `experiment/<dataset>/<model>/<task>/<run-name>/` to include met
 | Runtime | Operational intent, catalogue, cross-reference, source and record of failure | Without explaining specific indicators, and without deciding on the mission's success, |
 | CLI and Research Lab | Enter conversion and results presentation | Read a summary of the completion of the assignment without extrapolating success from the existence of the reporting document |
 
-The new task will succeed to the existing `TaskModule` to achieve `run`; it will need to be achieved `validate_cfg` at an earlier check. The method will only parse parameters and read visible input, without downloading weights or starting calculations. Runtime will call it before preparing a running directory. The task will achieve `compare_results`; default returns explicitly without supporting comparison. The new task will be registered through the existing Registry and will not require a change in Runtime's scientific branch.
+The new task will succeed to the existing `TaskModule` to achieve `run`; `validate_cfg` will need to be achieved in advance. This method will only parse parameters and read visible input, without downloading weights or starting calculations. Runtime calls it before preparing a running directory. The task will achieve `compare_results`; default returns explicitly does not support comparison. The new task will be registered through the existing Registry and does not require changes to Runtime's scientific branch.
 
-`saebase.runtime.sae_operations.resolve_sae` is responsible for uncalculated models, SAE, layers, Hook and competency selection, `load_selection` loading and checking back identity. Pre-check and perform shared behaviour. Multi-layer SAE requires `default_layers` in a visible or model configuration, so a single layer of resources can use the only level. Select the result to record the default source; register information is expressed separately from the actual weight.
+`saebase.runtime.sae_operations.resolve_sae` is responsible for uncalculated models, SAE, layers, Hook and competency selection, `load_selection` loading and checking back identity. Pre-check and perform shared behaviour. Multi-layer SAE requires `default_layers` in a visible or model configuration, and single-layer resources can use the only level. Select the result to record the default source; register information is expressed separately from actual weights.
 
 External providers through existing outreach and visible entry point Access. capture,intervene with SAE precheck capabilities to check their actual needs; generation, wiring, interpretation and training continue to require their respective primary suitability. `task.extensions` Name reconstruction provider; not serializing any plant object or automatically discovering all plugins.
 
@@ -84,7 +84,7 @@ Model plugin `construct` retains a light description; `load_model(cfg)` is used 
 | --- | --- | --- |
 | capture | `operation.capture_top_feature_num` Quantity, hint, location and equipment for consumption characteristics of the capture interface | Enter the actual weight, encoded input, method and location of the identity record |
 | intervene | `evaluate_edit` Consumable signature number, replacement value and inspection switch | Device, tip and SAE choose to be consumed by a public resource interface |
-| generate | `Condition`, `GenerationSpec` Consumption mode of intervention, length, temperature and seeds | Still requesting to generate backend, generic capture objects are not equivalent to supporting generation |
+| generate | `Condition`, `GenerationSpec` Consumption mode, length, temperature and seeds | Still requesting to generate backend, generic capture objects are not equivalent to supporting generation |
 | benchmark | Task Parsing Indicators, Conditions and Agreements, Backend or Comparison executes their own assessments | Comply with global models and data selection; start a separate record of torrents and protocol seeds |
 | circuits | Native trackr consumption tips, transcoder, slug, timeout and primary options | `task.device` is the start-up and pre-check information; the actual equipment strategy is determined by the original trackr |
 | explain | Interpretation consumption self-discovery, retention, location and budget; selected consumption generation parameters | Common `prompt` does not replace sample files; customable equipment is the responsibility of the provider |
@@ -103,7 +103,7 @@ Benchmark matches only the same model with SAE; cross-resource comparison requir
 
 ## Authenticate attribution
 
-`tests/product/runtime/test_execution_lifecycle.py` Use composite provider to verify parameters, selection, status, failure record, restoration, cross-repeat and identity search. `test_capture_configuration.py` Verify the actual number of features and refuse before loading; `test_installed_distribution.py` Use existing build backend offline to build, install, and verify configuration and mission access outside the warehouse. These documents are product re-entry, re-use existing interfaces and testing, and do not introduce production dependence.
+`tests/product/runtime/test_execution_lifecycle.py` Use composite provider to verify parameters, selection, status, failure record, restoration, cross-repeat and identity search. `test_capture_configuration.py` Verify the actual number of features and reject them before loading; `test_installed_distribution.py` Use existing build backend offline to build, install, and validate configuration and mission access outside the warehouse. These documents are re-entry of the product, re-use existing interfaces and testing, and do not introduce production dependence.
 
 When finding capture codes by purpose and returning, the task rating and result generation is at `tasks/capture/scoring/` and `tasks/capture/outputs/`, respectively. SAE loads and adapts the code at `base/interfaces/sae_adapters/`, separates the language audit from the experimental design at the back end of the research platform. The original Python import path continues to use the same accomplishment. The product test is published by duty organization `tests/product/`, corresponding to the current path for continuous integration. RSS separates the input and analysis scripts; the historical SAR title by data set organization, and formally reads the tool to follow the original title identification.
 
@@ -117,7 +117,7 @@ saebase model=pythia70m dataset=ioi task=benchmark \
   task.benchmark.benchmark_config=/absolute/path/to/evaluation.json
 ```
 
-The only `conf/config.yaml` is used for both commands. The default is only to check the configuration; the actual execution still requires `task.execute=true` and the corresponding resources and authorization. Users select only scientific components and parameters and not another startup master control. The dedicated Benchmark startup configuration and other parallel master controls have been deleted, and no aliases have been retained.
+The only `conf/config.yaml` is used for both commands. The default is only to check the configuration; the actual execution will still require `task.execute=true` and the corresponding resources and authorization. Users will select only scientific components and parameters and not another startup master control. The dedicated Benchmark startup configuration and other parallel master controls have been deleted, and no aliases have been kept to start.
 
 The distribution target for `saebase` is public Runtime, `python -m saebase.runtime.train`, using the same entry. Activity-health tools only call the master control after converting the parameters of the evaluation method and no longer take the SAEBASE command. Independent indicators, auditing, etc. are functional callers and cannot act as project managers.
 
@@ -127,14 +127,14 @@ The exclusive verification of the mission is held by `TaskModule.validate_cfg` a
 
 The directories for all tasks are generated by Runtume based on global input: `experiment/<dataset.name>/<model.name>/<task.name>/<experiment_name>/<run_id>/`. Multimodels choose to be visible in the global `model.members`, each of which is real `name`; and do not set `model.name` at the same time. Multimodels run jointly at `experiment/batches/<task>/<experiment_name>/<run_id>/`, and the members' real identifiers are stored in the configuration and protocol. Benchmark now states that the multiple models are supported; other tasks receive model pools that are clearly rejected, and Runmine does not automatically expand the collection into other tasks.
 
-`task.benchmark.protocol` Only indicators, conditions, torrents, etc. are accepted. The single SAE selects the existing resource resolution, and the data is read from the global `dataset.samples` or `dataset.sample_file` token, target, location and split; the Dataset reader does not generate token or extrapolation. The parameter file does not cover quietly the global sample provided at the same time. Activity-health remains the assessment method for Benchmark, which can be configured with the same master control configuration as the SAE, PromptSource, evaluation component.
+`task.benchmark.protocol` Only indicators, conditions, torrents, etc. are accepted. The single SAE selects the existing resource resolution, and the data is read from the global `dataset.samples` or `dataset.sample_file` token, target, location and split; the Dataset reader does not generate token or extrapolation. The parameter file does not quietly cover the global sample provided at the same time. Action-health remains the assessment method for Benchmark, which can be configured with the same master control configuration.
 
 `tests/product/benchmarks/test_benchmark_launch.py` Validates single master control, co-input for eight lateral tasks, non-variable global selection, argument conflict and model pooling capacity; installation check confirmed wheel/sdist contains only one top-level master control. Full synthesis Benchmark executes and resumes return while checking Runner assigns Benchmark only.
 
 
 ## Capture feature selection and combination measurement
 
-Capture uses `task.top_feature_num` to specify the number of features to be returned. `non_whiten` Sorts according to the absolute value of primary activation, `whiten` Sorts according to the selected z-score for Dataset all prompt-token, and `sar` selects the characteristics by primary activation and measures the assigned amount of the item behavior after the subset intervention.
+Capture uses `task.top_feature_num` to specify the number of features to be returned. `non_whiten` Sorts according to the absolute value of the primary activation, `whiten` Sorts according to the selected z-score for the Dataset all prompt-token, and `sar` selects the characteristics by the primary activation and measures the assigned amount of the action after the subset intervention.
 
 SAR combination measurements are classified at `tasks/capture/` and are directly reusable the original estimater provided by the public Capture, edit, Patch API and the user; Benchmark reuses this measurement function without calling CaptureTask or Runner for subtasks. Sample labels are derived from Dataset or visible SAR behavior parameters and original subsets are saved with Capture products. Details of configuration and interface migration are shown at `interface-migration.md`.
 
@@ -151,13 +151,13 @@ Normal Batch Use `python -m tasks.capture.matrix`,Waiting GPU Use when free `scr
 
 Data are prepared to be called by `datasets/prompt_collection/prepare.py` and by `saebase.datasets.prepare` and existing commands. Real models and SAE pairings are referred to `tasks/precheck/sae_checks.py` and values are referred to `base/interfaces/reference.py`. The real weights of storage and intervention are returned to existing product tests, respectively, and the original comparison records are enabled and maintained by a visible command.
 
-The two short assessments are performed by the same process of `tasks/benchmark/operation.py`, with parameters stored at `conf/tasks/precheck/task.yaml`, selected by the existing evaluation command. The verification, reading and package organization for which evidence has been saved is `tasks/benchmark/results/archive.py`.
+The two short assessments are performed by the same process `tasks/benchmark/operation.py`, with parameters stored at `conf/tasks/precheck/task.yaml`, selected by the existing evaluation command. The verification, reading and package organization for which evidence has been saved is `tasks/benchmark/results/archive.py`.
 
 The project release, distribution, document and code checks are provided by `scripts/release.py`, `distribution.py`, `documentation.py`, `quality.py`.
 
 ## Example with the current layout of Benchmark
 
-Full runable demonstrations are stored at `scripts/examples/first_experiment.py` and `external_providers.py`; synthetic models, SAE and controlled expressions are stored at `tests/fixtures/synthetic.py`. Short calls and operational explanations are assigned to the corresponding tutorials, and full storage, intervention and controlled input are performed for existing product testing.
+Full runable presentations are saved at `scripts/examples/first_experiment.py` and `external_providers.py`; synthetic models, SAE and controlled expressions are stored at `tests/fixtures/synthetic.py`. Short calls and operational explanations are assigned to the corresponding tutorials, and complete testing of existing products is done for storage, intervention and controlled input.
 
 Benchmark root layer preservation tasks, operations and commands are distributed, organized internally according to the actual process:
 
@@ -168,7 +168,7 @@ Benchmark root layer preservation tasks, operations and commands are distributed
 | `methods/` | SAR, RSS, Localization and Native SAEBEnch access |
 | `reliability/` | Sample group re-sampling, statistical comparison against known scientific research |
 | `comparison/` | Multi-model, multi-SAE assessment organization |
-| `sites/` | Bit selection, numeric check, batch movement and recovery of records |
+| `sites/` | Bit selection, numeric check, batch movement and recovery records |
 | `results/` | Measuring books, statistical reports, curve reading, evidence reconciliation and information packages |
 
 SAR continues to use Capture's official scientific work; the method of access is used to convert this capability to the observations required for evaluation. The Localization calculation and the controlled grid integration method have saved the cross-references of curves and grids for reading. Declarations, checks, execution and records in the bits directory have specific callers.

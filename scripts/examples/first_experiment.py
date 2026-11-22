@@ -166,7 +166,7 @@ def main() -> int:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("runs/first-experiment"),
+        default=Path("tmp/first_experiment"),
         help="Directory for persistent benchmark and cache artifacts",
     )
     parser.add_argument(

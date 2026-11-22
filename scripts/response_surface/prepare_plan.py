@@ -1,18 +1,40 @@
 """Freeze the existing five-dataset, fifty-question SAR inputs for enumeration."""
 
-import json
 import hashlib
+import json
+from pathlib import Path
+import shutil
 
-
+from saebase.runtime.experiment_results import historical_run_path
+from tasks.capture.scoring.reproduction_paths import PROJECT_ROOT, question_directory
 from tasks.capture.scoring.response_surface_reproduction import OUTPUT, reference_run, source_arrays, write_json
 
 
 def main():
-    OUTPUT.mkdir(exist_ok=True)
+    OUTPUT.mkdir(parents=True, exist_ok=True)
+    translations = OUTPUT / "feature_explanations_zh.json"
+    if not translations.exists():
+        shutil.copyfile(Path(__file__).with_name(translations.name), translations)
+    plan = OUTPUT / "plan.json"
+    if plan.is_file():
+        print(f"Using the existing response surface plan at {plan}")
+        return
+
+    archive = PROJECT_ROOT / "assets/history_experiment/response_surface/files"
+    if (archive / "plan.json").is_file():
+        for name in ("by_dataset", "reference"):
+            shutil.copytree(archive / name, OUTPUT / name, dirs_exist_ok=True)
+        shutil.copyfile(archive / "reference_sources.json", OUTPUT / "reference_sources.json")
+        temporary_plan = OUTPUT / "plan.tmp.json"
+        shutil.copyfile(archive / "plan.json", temporary_plan)
+        temporary_plan.replace(plan)
+        print(f"Restored the frozen response surface plan and measurements to {OUTPUT}")
+        return
+
     questions = []
     references = []
     for dataset in ("GSM8K", "MMLUPro", "ARCChallenge", "TruthfulQA", "BBH"):
-        run = reference_run(dataset)
+        run = historical_run_path(reference_run(dataset))
         report = json.loads((run / "reports/question_features_pairs_zh.json").read_text())
         reference = OUTPUT / "reference" / dataset
         reference.mkdir(parents=True, exist_ok=True)
@@ -60,12 +82,19 @@ def main():
                 "native_input_identity": record["input_identity"],
                 "key": f"{dataset}-{number:02d}",
             }
+            local = question_directory(OUTPUT, question["key"]) / "source_sar.npz"
+            if not local.exists():
+                input_file = run / question["artifact"]["path"]
+                content = input_file.read_bytes()
+                if hashlib.sha256(content).hexdigest() != question["artifact"]["sha256"]:
+                    raise ValueError(f"Source checksum mismatch: {input_file}")
+                local.parent.mkdir(parents=True, exist_ok=True)
+                local.write_bytes(content)
             source_arrays(question)
             questions.append(question)
-    OUTPUT.mkdir(exist_ok=True)
     write_json(OUTPUT / "reference_sources.json", references)
     write_json(
-        OUTPUT / "plan.json",
+        plan,
         {
             "model": "llama31_8b",
             "sae": "llama31_8b_lxr_8x",

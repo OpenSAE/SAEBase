@@ -14,7 +14,7 @@ When you develop a storage or cache check function, you first determine which sa
 
 ```bash
 python -m pip install -e '.[dev]'
-python scripts/examples/first_experiment.py --output runs/first-experiment
+python scripts/examples/first_experiment.py --output tmp/first_experiment
 python -m pytest -q tests/test_m1_store.py
 ```
 

@@ -8,7 +8,7 @@ Run from the SAEBase root directory:
 python scripts/stable_support/run_case_study.py
 ```
 
-The default runs all 24 open demo products, output to `experiment/authored_contexts/<UTCtime>/`. `--output <new_directory>` Specifies the saving position, `--device cpu` using CPU, `--limit 1` to see only the first case. The directory must not yet exist to preserve the old result.
+The default runs all 24 open demo prompts, output to `experiment/authored_contexts/<UTC_timestamp>/`. `--output <new_directory>` Specifies the saving position, `--device cpu` with CPU, `--limit 1` to see only the first case. The directory must not yet exist to preserve the old result.
 
 - `index.md`: All case entry points.
 - `case_XX/rss_case.md`: RSS and variant-specific tables, with five real change values and a Neuronpedia link.
@@ -21,7 +21,7 @@ The model uses `HookedTransformer.from_pretrained_no_processing("gpt2", center_w
 
 RSS directly uses open warehouse `rss.py`, default `M=400, K=20, rho=kappa=0.8, tau=1e-5`. `inputs/source.json` Saves upstream file identity, `LICENSE` is upstream Apache 2.0 license. Prompts `inputs.py` and FACTS are from the same warehouse `assets/demo/demo.py`.
 
-Variant-specific rules: Take the > 1e-5 and at least five times the maximum absolute change of the four other variants from 100 before the absolute change in the variant, and exclude RSS support by up to three times each variant. Keep empty sets when no eligible feature exists. The five times rule is used only for the case presentation.
+Variant-specific rules: Remove the feature > 1e-5 from 100 before the absolute change in the variant and at least five times the maximum absolute change for the other four variants, excluding RSS support, with a maximum of three for each variant. Keep an empty set when there are no eligible features. The five-fold rule is used only for the case presentation.
 
 The table is output-based, and Neuronpedia explains keeping the original English text. The semantic attribution of the target or new context needs to be judged by the result. All cases are saved; activating the pre-set, explaining the acquisition failure, can also continue to see the real changes.
 
@@ -41,7 +41,8 @@ Read the report from the current round with the results already available:
 ```bash
 python scripts/stable_support/analysis/review_contrast.py \
   --original experiment/authored_contexts/gpt2small/capture/rss/distinct_contexts \
-  --alternative experiment/authored_contexts/gpt2small/capture/rss/feature_splitting
+  --alternative experiment/authored_contexts/gpt2small/capture/rss/feature_splitting \
+  --output /tmp/rss_contrast_review
 ```
 
 The keyword `explanation_review.json` is used only for navigation reading; the RSS selection is determined entirely by the original selector on the basis of activation. The `case_selection.json` record shows what is actually being done and what is missing. The report does not treat the expected interpretation match as an observation.
@@ -50,7 +51,7 @@ The keyword `explanation_review.json` is used only for navigation reading; the R
 
 The final true homogeneity results are shown at `experiment/authored_contexts/llama31_8b/capture/rss/banana_recipe_adaptation/case_report.md`, showing three goal-related, two-way changes in RSS characteristics, and five RSS-excluded features, each of which corresponds to the new background, recurrence = 0.2. Full input and 8 display rows are saved `selected_case.json`; all codes, 20 RSS support and all numerical candidates remain.
 
-This case has a fixed request of `Adapt a banana bread recipe to this setting.`, adding basketball, space, classical music, chess, and African elephant background. The goal is to rewrite the formulation according to the settling, which is a background-related request and should not be described as the first round of unrelated experiments.
+This case is based on `Adapt a banana bread recipe to this setting.`, with new basketball, space, classical music, chess, and African elephant background. The goal is to recast the formulation according to setting, which is a background-related request and should not be described as the first round of unrelated experiments.
 
 Recurring (`--output` for new directories):
 
@@ -81,11 +82,11 @@ python scripts/stable_support/build_qualitative_batch.py experiment/authored_con
 
 `batch_candidates.py` Exports unselected features of the full dictionary RSS statistics and all five-fold value conditions from the complete codes, saves the specific exclusion reasons, and reads the explanation after determination of the ID. It retains the candidate for recurrence who is qualified but excluded for other conditions, so that it can be judged on a case-by-case basis in accordance with the requirements of this instalment. `build_qualitative_batch.py` consolidates the original input, the true features and clearly documented AI reading judgement into a table and eight comparative summaries for each case. The original 20 RSS and all the values are stored in each case at `all_candidates.md` and JSON, where the gap is clearly shown when there is a lack of a clear semantic match.
 
-Eight cases of this instalment have actually been implemented, 48 entries have been captured at the end of the period (token ID 13) and 146 different characterizations have been obtained. Cases have not yet been identified under fixed input that fully meet the three conditions for display. C02 has game scores, space matches, C06 has space; the rest is 0. C06, C01, C02 as a priority manual review lead, and it is ultimately decided whether to use the author to review the results, and this time no final rebuttal has been drafted.
+Eight cases of this instalment have actually been implemented, 48 entries have been captured at the end of the period (token ID 13) and 146 different characterizations have been obtained. Cases have not yet been identified under fixed input that fully meet the three conditions for display. C02 has game scores, space matches, C06 has space; the rest is 0. C06, C01, C02 is the preferred manual review trail, and it is ultimately decided whether to use the author to review the results and this time no final rebuttal has been drafted.
 
 ## E1-E4 diagnostic case
 
-The full input of the four diagnostic experiments (retention of line break in the annex) is at `diagnostic_inputs.json`. The results are compared to the four groups at `experiment/authored_contexts/llama31_8b/capture/rss/misleading_context_diagnostics`, `comparison.md`, each of the E1-E4 directories is `case_report.md`, with a complete presentation of all 20 RSS:clean values, five deltas, recurrence, direction, original interpretation and URLs, followed by a discussion of up to three candidate relationships.
+The full input of the four diagnostic experiments (retain a line break inside the annex) is at `diagnostic_inputs.json`. The results are compared to the four groups at `experiment/authored_contexts/llama31_8b/capture/rss/misleading_context_diagnostics`, `comparison.md`, each of the E1-E4 directories is `case_report.md`, with a complete display of all 20 RSS:clean values, five deltas, recurrence, direction, original interpretation and URLs, followed by a discussion of up to three candidate relationships.
 
 ```bash
 python scripts/stable_support/run_diagnostics.py --output experiment/authored_contexts/llama31_8b/capture/rss/diagnostics_rerun
@@ -98,7 +99,7 @@ Four reports for this cycle, ZIP: `experiment/authored_contexts/llama31_8b/captu
 
 ## Strict semantics maintained: six input and double line separations fixed
 
-Enter: `semantic_preservation_inputs.json`, from the complete new scheme provided by the user. Target sentence and five short prefixes are fixed; each varant is strictly prefix + two line breaks + the original target sentence.
+Enter: `semantic_preservation_inputs.json`, from the complete new scheme provided by the user. Target sentence and five short prefixes are fixed; each variant is strictly prefixed + two line breaks + the original target sentence.
 
 ```bash
 python scripts/stable_support/run_semantic_preservation.py --output experiment/authored_contexts/llama31_8b/capture/rss/semantic_preservation_rerun
@@ -107,7 +108,7 @@ python scripts/stable_support/build_semantic_preservation.py experiment/authored
 
 The current actual results are at `experiment/authored_contexts/llama31_8b/capture/rss/semantic_preservation/` and the directory contains the seven requested documents: main report, original result JSON, full codes/delta, all 20 RSS forms, strict background list, config.yaml and Run.json. `rss_case.md` has only one consolidated table and none of the matching items is clearly empty; ZIP is in the parent directory and contains only three Markdown reports.
 
-The background value candidate is strictly from the original RSS HP 400 pool, requiring this variant to change >tau, the remaining four ⁇ delta ⁇ ⁇ tau; not to use the previous five-fold rule or the off-pool candidate. The original explanation was obtained after the value selection. None of the current ten candidates supported the desired background synonym, and the RSS selection was only F8961 with a broad food label and a two-way combination with no clear cooking characteristics. Qualitative judgement is recorded at `semantic_preservation_review.json`, without modifying the input to pursue the expected result.
+Background value candidate strictly from the original RSS h Front 400 Ike, ask Ben. variant It's changing.>tau,The other four.|delta|<=tau;No previous five-fold rule or off-site candidate. The original explanation is obtained after the value set. None of the current ten candidates supports the desired background syntax., RSS Select Only F8961 A two-way combination of broad food labels with no clear cooking characteristics. Qualitative judgement is recorded in `semantic_preservation_review.json`,Do not modify input to pursue expected results.
 
 ## A rich, independent, factual version
 
@@ -121,7 +122,7 @@ python scripts/stable_support/build_semantic_preservation.py experiment/authored
   --review assets/reproduction_inputs/stable_support/files/semantic_preservation_rich_review.json
 ```
 
-The actual new measurements are kept at `experiment/authored_contexts/llama31_8b/capture/rss/semantic_preservation/rich_context` and the old version remains the same. The new RSS selections only have broad food-related recommended labels and continue to decline; there are no clear two-way groups for cooking. Strict background candidates [4,1,1,3,6], 14 have been identified with explanations that do not clearly match the background, and F19953 has no open explanation and is not known. The full 20 RSS, 15 candidates, 34 of 35 IDs have original interpretations and 1 missing, all active and aligned records are kept.
+The actual new measurements are kept at `experiment/authored_contexts/llama31_8b/capture/rss/semantic_preservation/rich_context` and the old version remains the same. The new RSS selections only have broad food-related recommended labels and continue to decline; there are no clear two-way groups for cooking. Strict background candidates [4,1,1,3,6], 14 have been identified with explanations that do not clearly match the background, and F19953 has no open explanation and is not known. Full 20 RSS, 15 candidates, 34 of 35 IDs have original interpretations and 1 missing, all active and aligned records are kept.
 
 ## Short target issue A/B independent comparison
 

@@ -18,7 +18,7 @@ task:
     neuronpedia:
       enabled: true
       allow_network: true
-      cache_dir: null  # Uses XDG_CACHE_HOME/saebase/neuronpedia or ~/.cache/saebase/neuronpedia.
+      cache_dir: null  # Uses assets/annotation_cache/neuronpedia_explanations/files under the checkout.
       timeout_seconds: 15
       total_timeout_seconds: 120
       max_download_bytes: 67108864

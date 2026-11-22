@@ -72,6 +72,6 @@ It does not duplicate or silently execute upstream SAEBench estimators. Numerica
 
 ## Method access and complete process
 
-The scientific calculation of SAR is maintained by Capture. Benchmark access selects the mode of input and reading of the freeze. RSS selects the sample and leaves the sample to be collected separately and then calls the original method. The Localization reads the full controlled input grid, saves curves and design identities, and can be read again from the coded cache. SAEEBENCH execution and results are imported to retain upstream protocols and sources.
+The scientific calculation of SAR is maintained by Capture. Benchmark access selects the mode of input and reading of the freeze. RSS selects the sample and leaves the sample to be collected separately and then calls the original method. The Localization reads the full controlled input grid, saves the curve and design identity, and can be read again from the coded cache. SAEEBENCH execution and results are imported to retain upstream protocols and sources.
 
 Corresponds to realization at `tasks/benchmark/methods/`. Reordering and cacheing of the controlled grid is checked at `tests/product/test_controlled_inputs.py` and full Localization assessments, statistics and results are reviewed at `tests/product/test_input_localization.py`.

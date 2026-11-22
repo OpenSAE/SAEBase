@@ -28,7 +28,7 @@ Select with `task=precheck`. Use a range of checks to determine the availability
 
 Captures a layer from the input hint and encodes by SAE. You can save end words active, word-sorted, integratorized or behaviour-changed character selection. The result is a candidate, a value and the selected reference group.
 
-All Capture mode defaults that the original model continues to be greedy of the same input, saves it at `model_answer` and is available downstream with the feature results; answers fail to preserve the feature and record the missing item. Generates a default of 256 for length, a default of 8 for batch, with parameters `task.capture.model_answer.max_new_tokens` and `task.capture.model_answer.batch_size`. Results are available to call `CaptureTask.refresh_model_answers()` only. [Model answers and additional interface](../tasks/capture/README.md#each-capture-includes_original_model_reply)].
+All Capture mode defaults that the original model continues to be greedy of the same input, saves it at `model_answer` and is available downstream with the feature results; answers fail to preserve the feature and record the missing item. Generates a default of 256 for length, a default of 8 for batch, with parameters `task.capture.model_answer.max_new_tokens` and `task.capture.model_answer.batch_size`. Results are available to call `CaptureTask.refresh_model_answers()` only. [Model answers and additional interface](../tasks/capture/README.md#each-capture-built-inmodeloriginal_answer)].
 
 Select with `task=capture`. The ranking is influenced by data, layers, reference groups and filters. High-activation and high-activity influences are explained separately. [Task configuration](../conf/tasks/capture/task.yaml)] [achievement](../tasks/capture/task.py)]
 
@@ -36,11 +36,11 @@ Select with `task=capture`. The ranking is influenced by data, layers, reference
 
 Changes SAE to the selected characteristics and conditions of intervention indicate that the score is compared with the target answer after the intervention. It can be entered in the capture candidate, executed independently of multiple candidates and preserved the conditions.
 
-Select with `task=intervene`. Check first the numerical policy, feature selection and baseline. The fraction change under the same conditions reflects the effect of the operation on the model's reading. [Task configuration](../conf/tasks/intervene/task.yaml) > > >](../tasks/intervene/task.py)]
+Select with `task=intervene`. Check first the numerical policy, feature selection and baseline. The fraction changes under the same conditions reflect the effect of the operation on the model's reading. [Task configuration](../conf/tasks/intervene/task.yaml)] [Achieving](../tasks/intervene/task.py)]
 
 ### `generate`
 
-The text of the given reminder is generated word by word, and you can add value to the selected SAE feature during the process of generation. The report saves the text, each condition, and the reason for termination.
+The text of a given reminder is generated word-by-word, with a value-added change to the selected SAE feature during the generation. The report saves the generated text, each condition, and the reason for termination.
 
 Select with `task=generate`. Generates the upper limit, temperature, the length of the context and the selected position to decide the output together, and the conditions for comparison should be retroactive. [Target configuration](../conf/tasks/generate/task.yaml)] [Achieving](../tasks/generate/task.py)]
 
@@ -97,7 +97,7 @@ An estimation of the symbolic interaction of the specified feature is to be read
 
 ### `rss`
 
-Compares the characteristics of the same target text in multiple contexts, selecting the characteristics by range, frequency and direction consistency. Captures using a visible hint, at least two context and end-word complete feature. [A capture usage instruction](../tasks/capture/README.md) (for setting the selection and rating for capture, e.g. comparing the number of candidates with the actual output)
+Compares the characteristics of the same target text in multiple contexts, selecting the characteristics by range, recurrence frequency and orientation consistency. Captures using a visible hint, at least two context and end-word complete feature. [Crowd-use instruction](../tasks/capture/README.md) (for setting the selection and rating for capture, e.g. comparing the number of candidates with the actual output)
 
 ## precheck
 

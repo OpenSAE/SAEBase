@@ -16,7 +16,7 @@ from typing import Any, Mapping, Sequence
 import torch
 from torch import nn
 
-from .scope2_native import _validate_source
+from .scope_native import _validate_source
 
 
 @dataclass(frozen=True)

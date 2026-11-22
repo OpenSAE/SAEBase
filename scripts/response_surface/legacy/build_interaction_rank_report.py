@@ -1,4 +1,4 @@
-"""Purpose: To be measured by experience interaction Collapse Five Data Sets 50 Qualified. pair,It shows both probability and increase on a case-by-case basis..
+"""Purpose: To be measured by experience interaction Collapse Five Data Sets 50 Qualified. pair,It shows both probability and growth on a case-by-case basis..
 Scope of application: read-only available SAR measurements; retaining original problems and fixed background, eliminating additional 5 Threshold of percentage point increase.
 """
 
@@ -66,7 +66,7 @@ lines = [
     "",
     "Llama 3.1 8B Base,SAE L21;Research the originals of the five data sets. SAR Measurements, everything. Top10 All 45 Yeah..",
     "",
-    "3 baseline average token Average probability>50%,Closeness is the worst use this time.≤5 Percentage; 11 Higher than the three baseline peaks, measured I>0.Cancel Extra 5 Raises the threshold by a percentage point. I Biggest candidate, then cross the theme. I descending order;not ranking by probability increase.",
+    "3 baseline average token Average probability>50%,Closeness is the worst use this time.≤5 Percentage; 11 Higher than the three baseline peaks, measured I>0.Cancel Extra 5 Raises the threshold in percentage points. I Biggest candidate, then cross the theme. I descending order;not ranking by probability increase.",
     "",
     "I=g11−g10−g01+g00.Four. g From a fixed background where other characteristics are fully consistent. token Probability=100×exp(g),Joint probability=100×exp(Tg),does not contain EOS.The last row by this line 11 Less the top three values in this line, using unrounded values. All data are measured in the original experiment and no second-stage model is used to predict.",
     "",

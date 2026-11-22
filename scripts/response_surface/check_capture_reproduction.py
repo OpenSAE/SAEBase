@@ -1,6 +1,8 @@
 """Check formal Capture selection against the existing fifty real measurements."""
 
+import argparse
 import json
+from pathlib import Path
 
 import numpy as np
 from omegaconf import OmegaConf
@@ -12,7 +14,10 @@ from tasks.capture.selection import candidate_ids, prepare_filter
 from tasks.capture.whitening import Normalization
 
 
-def main():
+def main(argv=None):
+    parser = argparse.ArgumentParser(__doc__)
+    parser.add_argument("--output", type=Path, help="Write the verification JSON to this location")
+    args = parser.parse_args(argv)
     root = RESULTS
     plan = json.loads((root / "plan.json").read_text())
     expected = {q["key"]: q for q in json.loads((root / "report.json").read_text())["questions"]}
@@ -84,19 +89,20 @@ def main():
                 "I": best["interaction"],
             }
         )
-    target = root / "capture_reproduction.json"
-    target.write_text(
-        json.dumps(
-            {
-                "status": "passed",
-                "validation_kind": "formal selection on previously measured real coalitions; no new model inference",
-                "question_count": len(verified),
-                "questions": verified,
-            },
-            ensure_ascii=False,
-            indent=2,
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(
+            json.dumps(
+                {
+                    "status": "passed",
+                    "validation_kind": "formal selection on previously measured real coalitions; no new model inference",
+                    "question_count": len(verified),
+                    "questions": verified,
+                },
+                ensure_ascii=False,
+                indent=2,
+            ) + "\n"
         )
-    )
     print(f"Formal Capture matches all four selections on {len(verified)} real questions")
 
 

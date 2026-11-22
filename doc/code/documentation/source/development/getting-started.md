@@ -18,7 +18,7 @@ This example creates a small local model and SAE, captures a selected token's ac
 
 ```bash
 python scripts/examples/first_experiment.py --dry-run
-python scripts/examples/first_experiment.py --output runs/first-experiment
+python scripts/examples/first_experiment.py --output tmp/first_experiment
 ```
 
 This evaluates two synthetic SAEs, reuses cached activations, measures feature interventions and produces a reliability audit. The command prints the exact paths of the HTML report, CSV summary and JSON results. Run it again to inspect the persisted results without repeating valid completed measurements.

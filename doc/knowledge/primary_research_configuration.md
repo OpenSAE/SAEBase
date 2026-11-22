@@ -53,16 +53,16 @@ History capture uses two models, `non_whiten`, `whiten`, seeds 42, each data set
 
 ## Configure and Basis of Results
 
-Interventions can be `task.intervene.feature_selection=capture_top task.intervene.top_feature_num=10` to generate an independent experiment for each of the ten features selected by `task.generate.feature_selection=capture_top task.generate.top_feature_num=10`; Capture default `task.mode=whiten`; tasks following the selected feature default `task.feature_ranking=whiten`, or may be specified in a visible way by re-numbering `non_whiten`, `task.capture_source` with existing Capture. Parameters and examples can be found in [mission interface description](../code/maintenance/task_log.md#top-n-single_feature_intervention_and_generation)).
+Interventions can be `task.intervene.feature_selection=capture_top task.intervene.top_feature_num=10` to generate an independent experiment for each of the ten features selected by `task.generate.feature_selection=capture_top task.generate.top_feature_num=10`; Capture default `task.mode=whiten`; tasks following the selected feature default `task.feature_ranking=whiten`, or may be specified in a visible way by re-numbering `non_whiten`, `task.capture_source` with existing Capture. Parameters and examples can be found in [mission interface description](../code/maintenance/task_log.md#top-n-Single-feature intervention and generation)).
 
 - [Historical model and dataset matrix](../../conf/tasks/capture/task.yaml).of which Llama It's... L16 is the historical configuration;current default L21 See [Model Directory](../../conf/models/catalog.yaml) and [SAE Contents](../../conf/base/interfaces/sae_profiles.yaml).See data set presets [Catalogue of data sets](../../conf/datasets/catalog.yaml).
-- [History capture Explain Overriding Records](../../experiment/batches/capture/top10_explanation_coverage/coverage.json).
-- [Five new QA Batch Configuration of Data Sets](../../experiment/batches/capture/sar_qa_comparison/matrix.yaml)and[Full result](../../experiment/batches/capture/sar_qa_comparison/five_datasets_full_report_zh.md).
-- [HotpotQA It's... 100 Subject reference, 10 Question SAR Full result](../../experiment/HotpotQA/llama31_8b/capture/reference_additivity/reports/full_questions_singles_pairs_zh.md).
+- History capture Explain Overriding Records.
+- Five new QA Batch Configuration of Data SetsandFull result.
+- HotpotQA It's... 100 Subject reference, 10 Question SAR Full result.
 
 ## Current full intervention batch
 
-2026-11-15 Starts the full intevene / complete batch of the configuration: ten models, twelve data sets, each whten Top10 stand-alone zero, primerate up to eight new token; Llama uses the current L21. See the [full batch](../../conf/tasks/intervene/task.yaml), [real time progress and result portal](../../experiment/batches/intervene/whiten_feature_effects/reports/session/matrix/progress_zh.md). Backstage tmux session is `primary-feature-tasks-20261115`; progress and complete running directory is based on real-time status files.
+2026-11-15 Starts the full intevene / complete batch of the configuration: ten models, twelve data sets, each whten Top10 stand-alone zero, primerate up to eight new token; Llama uses the current L21. See the [full batch](../../conf/tasks/intervene/task.yaml), real time progress and result portal. Backstage tmux session is `primary-feature-tasks-20261115`; progress and complete running directory is based on real-time status files.
 
 ## 500 Capture batches of five natural QAs in history (suspended)
 
@@ -70,11 +70,11 @@ For the previous two models, Capture batches for 100 questions, the user replace
 
 - The order of the data set: `gsm8k`, `mmlu_pro`, `arc_challenge`, `truthfulqa`, `bbh`; each taking 500 questions, if not all.
 - Model order: `llama31_8b`/ `llama31_8b_lxr_8x`/L21; `qwen35_4b`/ `qwen35_4b_matryoshka_l15_65k`/L15; `gpt2small`/ `gpt2small_res_jb_l8`/L8; `gemma3_4b_pt`/ `gemma3_4b_pt_scope_resid`/L17.
-- Individual datasets, models executed sequentially `whiten`,`non_whiten`,`g_s`,`I`;Here. `I` Yes. 1024 We're out of shape. Come back. `sar` Not in this instalment.
+- Each data set, model executes `whiten`, `non_whiten`, `g_s`, `I` in order; here `I` is over 1024 and returns `sar` not in this instalment.
 - 500 questions per group, screening reference 500; `filter=10`, `capture_count=10`,seed=42; complete all Precheck and then start tmux.
 - The calculation follows the existing Capture; the fixed title is shared between the model and the mode. The actual cover is maintained when the public explanation is missing.
 
-[Batch Formula](../../scripts/capture_recipes/natural_qa_full_cohort.yaml) · [Formula Use](../../scripts/capture_recipes/README.md) · [Progress and results before pause](../../experiment/batches/capture/qa_capture_pilot/full_cohort_pilot/reports/session/progress_zh.md).
+[Batch Formula](../../scripts/capture_recipes/natural_qa_full_cohort.yaml) · [Formula Use](../../scripts/capture_recipes/README.md) · Progress and results before pause.
 
 
 ## 2026-11-18100 Capture and Directional Backup Records (completed)
@@ -83,23 +83,23 @@ Current scope of implementation is five data sets×100 Question×Four Models×Fo
 
 The public model ' s numerical strategy has been completed to stabilize the average, repeated with vLLLM, with the original model formula, SAE position and definition of the answer rating; the different bats continue to be selected by Precheck and require full consistency in the rating. The current identity is `saebase.vllm_batch_invariant.mean.v6`, Qwen also maintains a stable GDN cumulation with `saebase.vllm_batch_invariant.qwen_gdn_scan.mean.v6`. The user ' s most recent request is to continue to save time: the successful results of the old v4/v5 have been used, and only five BBH pre-screens have failed (500 implementations) and five items, totalling 505 times; the new result is used v6, each original version and source is retained, and the original result is not marked as v6.
 
-[Current Batch Configuration](../../experiment/batches/capture/normalization_fix/matrix.yaml),[Formal repairs and acceptance instructions](../../experiment/batches/capture/normalization_fix/Formal rehabilitation statement.md),[Current batch progress](../../experiment/batches/capture/qa_capture_comparison/stable_mean/reports/session/progress_zh.md).
+Current Batch Configuration,[Formal repairs and acceptance instructions](../../experiment/batches/capture/normalization_fix/Formal rehabilitation statement.md),Current batch progress.
 
-Current run-off entrance: [Leave list only](../../experiment/batches/capture/normalization_fix/repair_manifest.json), [State of play-off](../../experiment/batches/capture/bbh_capture_repair/reports/session/status.json)].
+Current run-off entrance: Leave list only, State of play-off].
 
 
 ## Current 500 Capture amplification (reference 100)
 
 Each data set has been expanded from 100 to 500 questions, with no change: four models/SAE/levels, four Capture, filler=10, Capture_count=10, Seed=42, and 100 questions for standardization and frequency screening reference groups. Five data sets are available for 500 questions, and the original 100 questions are aligned with the answers, with 8,000 previously completed, and only 400 questions x 5 data sets x 4 models x 4 configurations = 32000.
 
-[Configure](../../experiment/batches/capture/qa_expansion/expansion_inputs/matrix.yaml),[Repeat title and new scope](../../experiment/batches/capture/qa_expansion/expansion_inputs/expansion_manifest.json),[Start statement](../../experiment/batches/capture/qa_expansion/expansion_inputs/Capability Operations Description.md),[Real time progress](../../experiment/batches/capture/qa_expansion/reports/session/progress_zh.md).Use after startup of precheck tmux Session saebase-capture500-expand-20261118;By Data Set→Model→Configure Execution.
+Configure,Repeat title and new scope,[Start statement](../../experiment/batches/capture/qa_expansion/expansion_inputs/Capability Operations Description.md),Real time progress.Use after startup of precheck tmux Session saebase-capture500-expand-20261118;By Data Set→Model→Configure Execution.
 
 
 ## MMLLU-Pro / Llama: I by g(S)
 
 This time only the data set/model is currently 500 questions and the original results of the three other configurations are followed; reference 100 questions, L21, filter10/capture_count10 and soe 42 remain unchanged. I adds the selection parameter `task.sar.i_feature_selection=g_s`, scoring a maximum of 10 from all non-zero features after filtering to the standard answers after a separate zero. Users clearly choose to relax the filter full at less than 10, using `task.sar.i_g_s_shortfall=relax_filters`: first-frequency filtering, followed by semantic/density filtering, if necessary, to record the actual rules. I filtering uses a standard answer, which is recorded in the behavioral identity.
 
-[Four Configuration Contrast Sources](../../experiment/MMLUPro/llama31_8b/capture/score_ranked_interactions/launch_evidence/reports/session/comparison_sources.json),[New I Run progress](../../experiment/MMLUPro/llama31_8b/capture/score_ranked_interactions/launch_evidence/reports/session/progress_zh.md).tmux:saebase-mmlu-i-gs.
+Four Configuration Contrast Sources,New I Run progress.tmux:saebase-mmlu-i-gs.
 
 
 ## MMLLU-Pro / Llama:g(S) from Whiten 100 candidate Top10
@@ -108,14 +108,14 @@ Current 500 Question, Llama 3.1 8B,L21,References 100 and seed42 Hold on. Just..
 
 ## Current MMLU-Pro / Llama: I Unified with SAR
 
-2026-11-19 Users rephrase: I and SAR have been semantically filtered to exclude 50% of the original non-zero-activation ratio and ⁇ 50% of the reference > > ⁇ 1 ⁇ , and have taken 10 candidates in absolute ⁇ -score; I no longer opts for g(S) and does not relax the filter. The density orientation is clearly confirmed by the user, following the original rule that excludes universal activation features. I public default selection is changed to whiten, and historical g_s configurations retain their original meaning. This time using the 100th question selected by soeed 42 from the 500 questions, the reference question is the same as 100. I run out of 1024, SAR uses a full I rating of 384 sets, 256 is set in line with the original paper sample of 128, recalculated with a common proposed function, and the additional model is zero; the source group Hashi retains the reordering of the active and filtering records directly from the Non-whiten round, and g (S) uses the Whiten 100 candidate to avoid historical standardization.
+2026-11-19 User re-profiling: Both I and SAR used semantic filters to exclude 50% of the original non-zero-activation ratio and ⁇ 50% of the reference > ⁇ 1 ⁇ and to select 10 candidates in absolute ⁇ -score; I no longer applied g(S) as a candidate and did not relax the filter. The density orientation was clearly confirmed by the user, following the original rule that excluded universal activation features. I publicly agreed to change to whiten, the historical g_s configuration retained its original meaning. This time using the 100th question selected by soeed 42 from 500 questions, the reference question was the same as 100. I ran a 1024 state, SAR used Whiten100 from the same full I rating as the original sample 384 group, 256 proposed to be set aside, recalculated with a common proposed function, and the additional model was zero; the source group Hashi preserved.
 
-[Implementation record](../code/maintenance/sar_method_comparison/execution.md) · [Configure and Original Evidence Archive](../../assets/history_experiment/maintenance_evidence/files/sar_method_comparison.tar.gz) · [Saved Status](../../assets/history_experiment/maintenance_evidence/files/sar_method_comparison/status.json).
+[Implementation record](../code/maintenance/sar_method_comparison/execution.md) · Configure and Original Evidence Archive · Saved Status.
 
 ## Current MMLU-Pro / Llama: SAR uses 32 Whiten candidates
 
-Users then requested that only SAR be reruned and the number of candidates be changed to 32. The title remains the 100 above, with reference to 100 questions, and the rating of filters, models, SAEs, layers, seeds and standard answers remains unchanged. 32 candidates have 496 pairs, 529 regression parameters; the current round uses 1536 sample combinations, of which 1024 are proposed, 512 are set aside, p = 0.5, and output pair numbers are maintained at 10.
+Users then requested that only SAR be reruned and the number of candidates be changed to 32. The title remains the 100 above, with reference to 100 questions, and the rating of filters, models, SAEs, layers, seeds and standard answers remains unchanged. 32 candidates have 496 pairs, 529 regression parameters; the current round uses 1536 sample combinations, of which 1024 are proposed, 512 are set aside, p = 0.5, output pair numbers are maintained at 10.
 
-[Implementation record](../code/maintenance/sar_candidate_count/execution.md) · [effective configuration](../../assets/history_experiment/maintenance_evidence/files/sar_candidate_count/config.yaml) · [Saved Status](../../assets/history_experiment/maintenance_evidence/files/sar_candidate_count/status.json).The official product and completion list is located at [SAR 32 Can not open message](../../experiment/MMLUPro/llama31_8b/capture/sar/top32_candidates/).
+[Implementation record](../code/maintenance/sar_candidate_count/execution.md) · effective configuration · Saved Status.The official product and completion list is located at SAR 32 Can not open message.
 
-[Original Start Script and Pre-Check Evidence](../../assets/history_experiment/maintenance_evidence/files/whiten_candidate_scores.tar.gz) · [Four Configuration Sources](../../experiment/MMLUPro/llama31_8b/capture/whiten_score_candidates/launch_evidence/reports/session/comparison_sources.json) · [Run Status](../../experiment/MMLUPro/llama31_8b/capture/whiten_score_candidates/launch_evidence/reports/session/status.json).Saves the official result on `experiment/MMLUPro/llama31_8b/capture/whiten_score_candidates`.
+Original Start Script and Pre-Check Evidence · Four Configuration Sources · Run Status.Saves the official result on `experiment/MMLUPro/llama31_8b/capture/whiten_score_candidates`.

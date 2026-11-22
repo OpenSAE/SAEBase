@@ -6,7 +6,7 @@ Keeps records of operations, realizations or observations when original Research
 
 ## Scope
 
-The current call and development uses [the current architecture](current-architecture.md), [tool portal](../../../../../.github/CONTRIBUTING.md) and the corresponding mission statement; the original command is read as the corresponding source version of the record.
+The current call and development uses [the current architecture](current-architecture.md), [tool portal](../../../.github/CONTRIBUTING.md) and the corresponding mission statement; the original command is read as the corresponding source version of the record.
 
 ## Original record
 

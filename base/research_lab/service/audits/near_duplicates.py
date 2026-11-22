@@ -13,7 +13,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-from .ingest import _raw_jsonl
+from saebase.research_lab.backend.ingest import _raw_jsonl
 
 
 def _shingles(text: str, *, width: int = 5) -> set[tuple[str, ...]]:

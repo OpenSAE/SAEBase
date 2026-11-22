@@ -1,7 +1,7 @@
 # Work Plan 11 — generated-token steering on one RTX 5070
 
 These measurements are a different set of protocols from the 25×7 block-suffix
-result in workplan11_results.md (archived reference). That 1.276× figure
+result in [workplan11_results.md](workplan11_results.md). That 1.276× figure
 stays the BatchEngine result. Nothing below replaces it, and none of these
 paths is the scientific default.
 

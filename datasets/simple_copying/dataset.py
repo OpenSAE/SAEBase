@@ -58,9 +58,9 @@ TEMPLATE = "{a} {b} {a}"
 
 
 def default_data_dir() -> str:
-    from saebase.datasets.artifacts import DEFAULT_DATA_ROOT
+    from saebase.datasets.artifacts import DEFAULT_DATA_ROOT, prepared_dataset_root
 
-    return str(DEFAULT_DATA_ROOT / "SimpleCopying")
+    return str(prepared_dataset_root(DEFAULT_DATA_ROOT, "SimpleCopying"))
 
 
 def copying_json_path(data_dir: str | None = None) -> Path:

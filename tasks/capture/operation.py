@@ -74,7 +74,8 @@ def neuronpedia_settings(cfg) -> dict:
     }
     if values["cache_dir"] is None:
         values["cache_dir"] = str(
-            Path(os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache") / "saebase/neuronpedia"
+            Path(cfg.get("paths", {}).get("root", Path.cwd())).resolve()
+            / "assets/annotation_cache/neuronpedia_explanations/files"
         )
     for key in ("enabled", "allow_network"):
         if type(values[key]) is not bool:

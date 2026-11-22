@@ -293,10 +293,10 @@ def test_canonical_datasets_tree_and_hf_import_coexist():
     assert (root / "datasets" / "plugins.py").is_file()
     assert not (root / "research_datasets").exists()
     assert not (root / "dlbase").exists()
-    assert (root / "datasets" / "artifacts.py").exists()
+    assert (root / "datasets" / "prompt_collection" / "artifacts.py").is_file()
     from saebase.datasets.artifacts import DEFAULT_DATA_ROOT, DEFAULT_EXPERIMENT_ROOT
 
-    assert DEFAULT_DATA_ROOT == root / "data"
+    assert DEFAULT_DATA_ROOT == root / "assets/dataset_preparation/prompt_sets/files"
     assert DEFAULT_EXPERIMENT_ROOT == root / "experiment"
 
 

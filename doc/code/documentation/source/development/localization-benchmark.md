@@ -4,7 +4,7 @@ SAEBase uses the original [SAE Input Localization](https://github.com/OpenSAE/SA
 
 ## Maintain localization results
 
-The selected researcher will read the input range, curve or comparison, then arrange the design list, activate the grid and the estimater output. The result is to retain the actual factor, the state order, the characteristic and the source measurement relationship. The entry or estimate of the condition is insufficient to explain the object and the next step, and then save it and get the curve and complete the corresponding analysis by the original reading.
+The selected researcher is to read the input range, curve or comparison, then arrange the design list, activate the grid and the estimater output. The result is to retain the actual factor, the state order, the characteristic and the source measurement relationship.
 
 ## Run the executable example
 

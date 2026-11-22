@@ -1,13 +1,14 @@
 """Locate measurements and exports from the historical fifty-question SAR run.
 
-The active SAR scripts use this module for per-question reads and resumable writes.
+The response surface task uses this module for staged inputs and resumable writes.
 The flat lookup keeps earlier standalone copies of the measurements readable.
 """
 
 from pathlib import Path
 
 
-RESULTS = Path(__file__).resolve().parents[3] / "assets/history_experiment/response_surface/files"
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+RESULTS = PROJECT_ROOT / "experiment/prompt_collection/llama/llama31/capture/response_surface/artifacts"
 _DATASET_DIRECTORIES = {
     "ARCChallenge": "arc_challenge",
     "BBH": "bbh",
