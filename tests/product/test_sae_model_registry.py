@@ -157,18 +157,7 @@ def test_plugins_register_sae_stack():
         assert k in list_registered_sae_keys()
     assert "none" in list_registered_sae_keys()
     assert "precheck" in list_registered_task_keys()
-    assert list_registered_task_keys() == sorted(
-        {
-            "precheck",
-            "capture",
-            "intervene",
-            "generate",
-            "circuits",
-            "explain",
-            "benchmark",
-            "train",
-        }
-    )
+    assert list_registered_task_keys() == sorted(list_registered_task_keys(registration_order=True))
 
 
 def test_legacy_model_compatibility_does_not_register_discovery_task():

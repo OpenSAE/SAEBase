@@ -569,7 +569,7 @@ The following are automatically updated from the actual configuration file. The 
 
 [Open Full File](../base/configuration/__init__.py)
 
-<!-- SHA256: 85e92e4d642a16cb905ddbe058ff4d064dd4b1a6a26f653ad23710542cdb9303 -->
+<!-- SHA256: 6d86039b3e00d854a2a5f955e13f6c7e0748e10beb7c99b3fdc992a3d1b7c996 -->
 <pre>&quot;&quot;&quot;Named component configurations for source and installed SAEBase.
 
 Catalogs keep shared defaults once. Hydra owns selection and composition;
@@ -597,7 +597,13 @@ def configuration_root() -&gt; Path:
     source = Path(__file__).resolve().parents[2]
     if workspace_at(source):
         return source / &quot;conf&quot;
-    return Path(__file__).absolute().parent
+    package = Path(__file__).absolute().parent
+    image = package.parent
+    if image.name.startswith(&quot;__editable__.&quot;) and image.parent.name == &quot;.build&quot;:
+        source = image.parent.parent
+        if workspace_at(source):
+            return source / &quot;conf&quot;
+    return package
 
 
 def launch_directory() -&gt; Path:
@@ -618,7 +624,16 @@ def default_workspace() -&gt; str | None:
 
 
 def _default_data_directory(root: str | None) -&gt; str | None:
-    return str(((launch_directory() / root).resolve() / &quot;assets/dataset_preparation/prompt_sets/files&quot;).resolve()) if root is not None else None
+    return (
+        str(
+            (
+                (launch_directory() / root).resolve()
+                / &quot;assets/dataset_preparation/prompt_sets/files&quot;
+            ).resolve()
+        )
+        if root is not None
+        else None
+    )
 
 
 def _prepared_dataset_dir(root: str, name: str) -&gt; str:
@@ -645,7 +660,11 @@ def configuration_location(source: str | Path) -&gt; tuple[Path, str]:
     &quot;&quot;&quot;Split a physical configuration path and an optional named section.&quot;&quot;&quot;
     path = Path(source)
     filename, separator, section = str(path).rpartition(&quot;#&quot;)
-    if separator and Path(filename).suffix.lower() in {&quot;.json&quot;, &quot;.yml&quot;, &quot;.yaml&quot;} and not path.is_file():
+    if (
+        separator
+        and Path(filename).suffix.lower() in {&quot;.json&quot;, &quot;.yml&quot;, &quot;.yaml&quot;}
+        and not path.is_file()
+    ):
         if not section or any(not part.isidentifier() for part in section.split(&quot;.&quot;)):
             raise ValueError(f&quot;Invalid configuration section: {source}&quot;)
         return Path(filename), section
@@ -1166,7 +1185,7 @@ prompt_source:
 
 [Open Full File](../conf/models/catalog.yaml)
 
-<!-- SHA256: ae5a13cb67294c2ee501661fe8e2a1572b945e992287e5351f6f77b4d798224d -->
+<!-- SHA256: d5a68aee68c9f0628aca522af0dac175abae2171f11cd21936ff917244182df9 -->
 <pre># Purpose and main function: to save the model ’ s public default and name preset.
 # Scope: Hydra Component selection, and conf.load_group Direct Read.
 defaults:
@@ -1345,20 +1364,26 @@ presets:
   pythia410m:
     name: pythia410m
     pretrained_name: pythia-410m-deduped
+    hub_repo_id: EleutherAI/pythia-410m-deduped
     family: pythia
     sae_profiles:
     - pythia410m_mlp_topk
     default_saes:
     - pythia410m_mlp_topk
+    default_layers:
+      pythia410m_mlp_topk: 4
   pythia70m:
     name: pythia70m
     pretrained_name: pythia-70m-deduped
+    hub_repo_id: EleutherAI/pythia-70m-deduped
     family: pythia
     sae_profiles:
     - pythia70m_resid_sm
     - pythia70m_saebench_gated_l3
     default_saes:
     - pythia70m_resid_sm
+    default_layers:
+      pythia70m_resid_sm: 3
   qwen25_3b:
     name: qwen25_3b
     pretrained_name: Qwen/Qwen2.5-3B

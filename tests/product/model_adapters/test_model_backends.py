@@ -79,13 +79,20 @@ def test_tl4_bridge_uses_explict_legacy_alias_mode(monkeypatch, raw):
 
     package = ModuleType("transformer_lens")
     package.__path__ = []
+
+    def removed_attribute(name):
+        if name == "HookedTransformer":
+            raise ImportError("HookedTransformer was removed in TransformerLens 4")
+        raise AttributeError(name)
+
+    package.__getattr__ = removed_attribute
     submodule = ModuleType("transformer_lens.model_bridge")
     submodule.TransformerBridge = Bridge
     monkeypatch.setitem(sys.modules, "transformer_lens", package)
     monkeypatch.setitem(sys.modules, "transformer_lens.model_bridge", submodule)
     monkeypatch.setattr(
         "models.hf_compat.import_transformer_lens",
-        lambda: SimpleNamespace(),
+        lambda: package,
     )
     hf_model = SimpleNamespace(config=SimpleNamespace(n_positions=1024))
     model, engine = boot_transformerlens(

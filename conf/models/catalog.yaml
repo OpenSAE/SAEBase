@@ -176,20 +176,26 @@ presets:
   pythia410m:
     name: pythia410m
     pretrained_name: pythia-410m-deduped
+    hub_repo_id: EleutherAI/pythia-410m-deduped
     family: pythia
     sae_profiles:
     - pythia410m_mlp_topk
     default_saes:
     - pythia410m_mlp_topk
+    default_layers:
+      pythia410m_mlp_topk: 4
   pythia70m:
     name: pythia70m
     pretrained_name: pythia-70m-deduped
+    hub_repo_id: EleutherAI/pythia-70m-deduped
     family: pythia
     sae_profiles:
     - pythia70m_resid_sm
     - pythia70m_saebench_gated_l3
     default_saes:
     - pythia70m_resid_sm
+    default_layers:
+      pythia70m_resid_sm: 3
   qwen25_3b:
     name: qwen25_3b
     pretrained_name: Qwen/Qwen2.5-3B

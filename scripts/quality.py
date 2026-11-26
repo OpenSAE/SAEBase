@@ -8,10 +8,11 @@ import os
 import re
 import subprocess
 import sys
+import tomllib
 from pathlib import Path, PurePosixPath
 from typing import Iterable
 
-RUFF_VERSION = "0.15.22"
+INSTALL_CONFIG = Path(__file__).resolve().parents[1] / "pyproject.toml"
 
 FROZEN_PREFIX = "harness/tests/wp21/fixtures/"
 
@@ -39,18 +40,34 @@ def added_python_files(base_sha: str | None = None, *, include_modified: bool = 
     )
 
 
+def required_ruff_version() -> str:
+    """Read the exact Ruff pin used by the project's quality install extra."""
+    with INSTALL_CONFIG.open("rb") as stream:
+        config = tomllib.load(stream)
+    quality = config.get("project", {}).get("optional-dependencies", {}).get("quality", ())
+    pins = [
+        match[1]
+        for requirement in quality
+        if (match := re.fullmatch(r"ruff\s*==\s*([0-9]+(?:\.[0-9]+)*)", requirement))
+    ]
+    if len(pins) != 1:
+        raise RuntimeError(f"Declare one exact Ruff version in the quality extra in {INSTALL_CONFIG}.")
+    return pins[0]
+
+
 def verify_ruff_version() -> None:
-    """Match the exact Ruff binary used by lightweight GitHub CI."""
+    """Match the installed Ruff binary to the quality extra."""
+    expected_version = required_ruff_version()
     try:
         result = subprocess.run(["ruff", "--version"], check=True, capture_output=True, text=True)
     except (OSError, subprocess.CalledProcessError) as exc:
         raise RuntimeError(
-            f"Ruff unavailable; install: python -m pip install ruff=={RUFF_VERSION}"
+            f"Ruff unavailable; install: python -m pip install ruff=={expected_version}"
         ) from exc
-    if not re.fullmatch(rf"ruff {re.escape(RUFF_VERSION)}", result.stdout.strip()):
+    if not re.fullmatch(rf"ruff {re.escape(expected_version)}", result.stdout.strip()):
         raise RuntimeError(
-            f"Expected ruff {RUFF_VERSION}, found {result.stdout.strip()!r}. "
-            f"Install: python -m pip install ruff=={RUFF_VERSION}"
+            f"Expected ruff {expected_version}, found {result.stdout.strip()!r}. "
+            f"Install: python -m pip install ruff=={expected_version}"
         )
 
 

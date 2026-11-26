@@ -21,9 +21,9 @@ python scripts/examples/first_experiment.py --dry-run
 
 The first should list the selected data set, model and catch parameters. The second should list the synthetic prompt group, the model and the thin self-codator combination, and the planned number of times. The equipment, the dependent version and the performance status of the real check point can be checked against the corresponding experiment at `metadata/manifest.json`. [The experimental report](../experiment.md)]
 
-## Optional ResearchHarness access
+## Optional EverResearch maintenance
 
-After access, you can bind the engine Python and the data and call the original entrance to SAEBASE via `rh projects run`.
+From the project root, run `rh projects setup-maintenance . --online` to connect this checkout and `python -IS .everresearch/maintain.py status` to confirm the active guide. Use `python -IS .everresearch/maintain.py check` to check its structure. Use `rh projects resources saebase` to see its bound interpreter and data directories.
 
 If you need to collect the machine and process environment separately, you can run `rh utils probe --output <snapshot_path>`. When you have two snapshots, you can use `rh utils compare <previous_snapshot> <new_snapshot>` to check for changes in the conditions of dependence and equipment.
 

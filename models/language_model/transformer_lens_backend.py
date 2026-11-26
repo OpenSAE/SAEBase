@@ -19,7 +19,11 @@ def _context_window(model_name: str, hf_model: Any | None) -> int:
         config = hf_model.config
     else:
         from transformers import AutoConfig
-        from transformer_lens.loading_from_pretrained import get_official_model_name
+
+        try:
+            from transformer_lens.supported_models import get_official_model_name
+        except ImportError:
+            from transformer_lens.loading_from_pretrained import get_official_model_name
 
         config = AutoConfig.from_pretrained(get_official_model_name(model_name))
     window = execution_context_window(config)
@@ -48,7 +52,8 @@ def boot_transformerlens(
 
     tl = import_transformer_lens()
     window = _context_window(model_name, hf_model)
-    legacy = getattr(tl, "HookedTransformer", None)
+    # TransformerLens 4 exports a removal notice through module __getattr__.
+    legacy = vars(tl).get("HookedTransformer")
     if legacy is not None:
         loader = legacy.from_pretrained_no_processing if no_processing else legacy.from_pretrained
         kwargs: dict[str, Any] = {"device": device, "n_ctx": window}

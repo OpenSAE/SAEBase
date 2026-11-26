@@ -42,7 +42,7 @@ SAEBase 将预训练模型、SAE 字典、激活测量、受控特征干预、�
 
 ### 1. 安装并运行完整示例
 
-需要 Python 3.11 或 3.12。SAEBase 可独立安装和运行。ResearchHarness 是可选支持，提供共享维护技能、本机资源绑定和结构成果审阅。下面两个示例均可在 CPU 上运行，无须下载预训练模型。
+需要 Python 3.11 或 3.12。SAEBase 可独立安装和运行。EverResearch 提供可选的共享维护指南、本机资源绑定和结构审阅。下面两个示例均可在 CPU 上运行，无须下载预训练模型。
 
 ```bash
 git clone https://github.com/OpenSAE/SAEBase.git
@@ -101,6 +101,23 @@ print(float(effect.logit_delta.float().norm()))
 
 在编程 Agent 环境中打开源码仓库，从 [AGENTS.md](../../../AGENTS.md) 了解组件职责与开发方法。SAEBase 科研核心独立安装运行。
 
+从 [EverResearch 0.8.1 发布页](https://github.com/OpenSAE/EverResearch/releases/tag/v0.8.1)安装配套 CLI。
+
+```bash
+uv tool install 'https://github.com/OpenSAE/EverResearch/releases/download/v0.8.1/ever_research-0.8.1-py3-none-any.whl'
+rh --version
+```
+
+安装 EverResearch 命令后，在项目根目录连接并检查维护模式和结构。
+
+```bash
+rh projects setup-maintenance . --online
+python -IS .everresearch/maintain.py status
+python -IS .everresearch/maintain.py check
+```
+
+省略 `--online` 可创建独立维护配置。开发 Python 代码时，运行 `python -m pip install -e ".[dev,quality]"` 安装开发和质量检查工具，再用 `python scripts/quality.py --include-modified` 检查暂存的 Python 改动。
+
 ## 🔬 研究工作流
 
 SAEBase 将模型测量与后续统计分析分开，方便按需要组合。
@@ -138,7 +155,7 @@ SAEBase 为重复模型评测和特征干预提供可选加速功能。具体实
 
 查看源码：[SAEBase API](../../../base/) · [Models](../../../models/) · [Datasets](../../../datasets/) · [Tasks](../../../tasks/) · [配置](../../../conf/) · [仓库目录指南](../documentation/source/development/repository-guide.md)。
 
-[参与贡献](../../../.github/CONTRIBUTING.md) · [更新记录](../documentation/source/development/CHANGELOG.md) · [引用信息](../../../CITATION.cff) · [Apache-2.0 许可证](../../../LICENSE) · [安全说明](../../../.github/SECURITY.md)
+[参与贡献](../documentation/source/development/code-quality.md) · [更新记录](../documentation/source/development/CHANGELOG.md) · [引用信息](../../../CITATION.cff) · [Apache-2.0 许可证](../../../LICENSE)
 
 ---
 

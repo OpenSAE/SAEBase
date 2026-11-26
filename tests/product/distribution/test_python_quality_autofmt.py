@@ -75,13 +75,22 @@ def test_check_mode_never_writes(monkeypatch):
     assert all(args != ["ruff", "format", "new.py"] for args in commands)
 
 
-def test_fails_closed_on_version_drift(monkeypatch):
+def test_fails_closed_on_version_drift(monkeypatch, tmp_path):
+    config = tmp_path / "pyproject.toml"
+    config.write_text('[project.optional-dependencies]\nquality = ["ruff==0.21.4"]\n')
+    monkeypatch.setattr(quality, "INSTALL_CONFIG", config)
     def run(args, **_):
         return subprocess.CompletedProcess(args, 0, stdout="ruff 0.17.3\n")
 
     monkeypatch.setattr(quality.subprocess, "run", run)
-    with pytest.raises(RuntimeError, match="ruff==0.15.22"):
+    with pytest.raises(RuntimeError, match="ruff==0.21.4"):
         quality.verify_ruff_version()
+
+    monkeypatch.setattr(
+        quality.subprocess, "run",
+        lambda args, **_: subprocess.CompletedProcess(args, 0, stdout="ruff 0.21.4\n"),
+    )
+    quality.verify_ruff_version()
 
 
 def test_no_files_needs_no_ruff_binary(monkeypatch):
