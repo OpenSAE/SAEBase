@@ -171,40 +171,6 @@ def test_sae_download_scope_excludes_other_layers():
     ) == ["layer20.sae.pt"]
 
 
-def test_repository_can_be_partial_when_the_selected_model_is_complete(monkeypatch, tmp_path, hub):
-    class PartialSnapshot(FileNotFoundError):
-        snapshot_path = str(tmp_path)
-
-    def snapshot(**kwargs):
-        assert kwargs["local_files_only"]
-        raise PartialSnapshot
-
-    monkeypatch.setattr(hub, "snapshot_download", snapshot)
-    for filename in ("config.json", "tokenizer.json", "model-00001-of-00002.safetensors"):
-        (tmp_path / filename).write_text("{}")
-    request = [{"kind": "model", "repo_id": "synthetic/model"}]
-
-    def prepare():
-        return assets.prepare_environment(required_modules=(), assets=request, allow_network=False)
-
-    assert prepare()["status"] == "BLOCKED"
-    (tmp_path / "model.safetensors.index.json").write_text(
-        json.dumps(
-            {
-                "weight_map": {
-                    "a": "model-00001-of-00002.safetensors",
-                    "b": "model-00002-of-00002.safetensors",
-                }
-            }
-        )
-    )
-    assert prepare()["status"] == "BLOCKED"
-    (tmp_path / "model-00002-of-00002.safetensors").write_bytes(b"toy")
-    result = prepare()
-    assert result["status"] == "READY"
-    assert result["prepared_assets"][0]["source"] == "cache"
-
-
 def config(tmp_path):
     prompt = tmp_path / "selected.json"
     prompt.write_text(json.dumps([{"prompt": "Synthetic selected dataset input"}]))

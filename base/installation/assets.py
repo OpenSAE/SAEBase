@@ -99,10 +99,6 @@ def _cache_complete(path: Path, item: dict) -> bool:
             "tokenizer" in name or name.endswith(("vocab.json", ".model")) for name in selected
         ):
             return False
-        for suffix in (".safetensors", ".bin"):
-            shards = [name for name in selected if "-of-" in name and name.endswith(suffix)]
-            if shards and not any(name.endswith(f"{suffix}.index.json") for name in selected):
-                return False
         for name in selected:
             if name.endswith(".index.json"):
                 manifest = json.loads((path / name).read_text())
@@ -115,18 +111,6 @@ def _cache_complete(path: Path, item: dict) -> bool:
         if not any(name.endswith((".npz", ".safetensors", ".pt", ".pth")) for name in selected):
             return False
     return all((path / name).is_file() for name in selected)
-
-
-def _cached_snapshot(repo: str, revision: str | None) -> Path | None:
-    from huggingface_hub import snapshot_download
-
-    try:
-        return Path(snapshot_download(repo_id=repo, revision=revision, local_files_only=True))
-    except (OSError, ValueError) as exc:
-        # Recent Hub clients report full-repository completeness. SAEBase may
-        # only need the model files or one selected SAE folder from this revision.
-        snapshot = getattr(exc, "snapshot_path", None)
-        return Path(snapshot) if snapshot else None
 
 
 def prepare_environment(
@@ -276,6 +260,7 @@ def prepare_environment(
 
         remaining = max_download_bytes
         for requested in assets:
+            cached = None
             try:
                 item = _resolve_asset(requested)
             except Exception as exc:
@@ -283,9 +268,11 @@ def prepare_environment(
                     "BLOCKED", "BLOCKED_CONFIGURATION", f"Cannot resolve exact resource: {exc}"
                 )
             repo, revision = item["repo_id"], item.get("revision")
-            cached = _cached_snapshot(repo, revision)
             try:
-                if cached is not None and _cache_complete(cached, item):
+                cached = Path(
+                    snapshot_download(repo_id=repo, revision=revision, local_files_only=True)
+                )
+                if _cache_complete(cached, item):
                     prepared.append(
                         {
                             **item,
@@ -326,7 +313,14 @@ def prepare_environment(
                 # A SHA-pinned download need not create a mutable refs/main entry.
                 # Reuse its exact snapshot even when the initial branch lookup missed it.
                 if cached is None or cached.name != info.sha:
-                    cached = _cached_snapshot(repo, info.sha)
+                    try:
+                        cached = Path(
+                            snapshot_download(
+                                repo_id=repo, revision=info.sha, local_files_only=True
+                            )
+                        )
+                    except (OSError, ValueError):
+                        cached = None
                 # Charge only missing selected files, not every checkpoint in the repository.
                 needed = sum(
                     sizes[name]

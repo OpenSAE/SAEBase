@@ -4,9 +4,13 @@
 
 Explain the responsibilities and development practices of the research software and help assistants complete user tasks.
 
+## GitHub Publishing
+
+Before starting any GitHub publishing task, read and follow [maintain-github](https://github.com/OpenSAE/EverResearch/blob/main/.agents/skills/maintain-github/SKILL.md). It defines how to confirm scope and authorization, prepare an independent copy, and verify the result. This requirement applies to every kind of GitHub publishing task, including pushes, pull requests, tags, releases, and updates that trigger publication or deployment.
+
 ## Scope
 
-These instructions apply to reading, developing, and maintaining SAEBase. Start with the project README, dependency declarations, and official commands, then read the source code and local instructions relevant to the task. Shared skills are available after connecting the project to EverResearch.
+These instructions apply to reading, developing, and maintaining SAEBase. Start with the project README, dependency declarations, and official commands, then read the source code and local instructions relevant to the task. Shared skills are available after connecting the project to ResearchHarness.
 
 ## Task Authorization
 
@@ -15,7 +19,7 @@ These instructions apply to reading, developing, and maintaining SAEBase. Start 
 
 ## Work Toward the Intended Outcome
 
-- Base engineering changes on this repository's actual entry points, configuration, and checks. After connecting to EverResearch, use the guide reported by `python -IS .everresearch/maintain.py status` for shared conventions on layout, prechecks, and delivery of results.
+- Base engineering changes on this repository's actual entry points, configuration, and checks. After connecting to EverResearch, consult the central engineering protocol for shared conventions on layout, preflight checks, and delivery of results. See `src/project/maintained/saebase/README.md` for how this project implements those conventions.
 
 - Establish the outcome the user needs and the conditions for completion. Locate the existing implementation and its direct callers, then investigate, make engineering decisions, and act within the existing authorization. Implement straightforward tasks directly. For complex tasks, describe the dependencies and files involved in the actual deliverable. When a human decision is needed, present the facts established, the specific choices, and their effects.
 - Carry authorized routine implementation through to completion. Choose local engineering approaches based on the agreed goals, practical benefits, and maintenance costs. When a new decision concerns the meaning of a metric, a research use, sample selection, or compute investment, explain the concrete differences, practical effects, and recommendation in light of existing decisions. Agree on the choice with the user before proceeding with the affected work.
@@ -37,7 +41,7 @@ These instructions apply to reading, developing, and maintaining SAEBase. Start 
 - `conf/` holds configuration. `scripts/` holds entry points for software releases, distribution, documentation, and code checks. `tests/` holds product tests. Put application logic in the module that owns it and have scripts and tools call the official implementation.
 - `doc/knowledge/` holds research knowledge and terminology. `doc/code/` holds architecture and source code material, `doc/code/documentation/source/development/` holds development documentation, and `doc/code/maintenance/` holds maintenance execution records. `experiment/` is dedicated to research experiments and their execution records.
 - `AGENTS.md` holds engineering rules, directory responsibilities, and the maintenance mode entry point.
-- EverResearch provides shared skills, local resource bindings, and registration of structural artifacts. SAEBase owns its research source code, runtime entry points, and experiment results.
+- ResearchHarness provides shared skills, local resource bindings, and registration of structural artifacts. SAEBase owns its research source code, runtime entry points, and experiment results.
 - Handle `saebase/research_lab/` under a new maintenance task explicitly requested by the user. Routine Dataset, Model, and Task development focuses on the components currently in use.
 
 ## Configuration Maintenance
@@ -58,7 +62,7 @@ Keep the provenance of model and SAE identities, weights, data splits, metrics, 
 
 ## Writing and Communication
 
-In online maintenance mode, use the maintenance mode entry point below to find the shared EverResearch maintenance guidance.
+In online maintenance mode, use the maintenance mode entry point below to find the shared ResearchHarness maintenance guidance.
 
 Name SAEBase features, stages, errors, and reports according to their practical purpose. Preserve the original meaning of model names, mathematical notation, and identifiers in historical formats. Use Chinese for Markdown and user-facing instructions, and preserve the original spelling of code and standard technical terms.
 
@@ -79,9 +83,9 @@ Start with known registrations and explicit paths when locating a project, comma
 
 Use the project instructions above for ordinary work and read-only inspection. EverResearch is an optional maintenance tool.
 
-- **First use.** If `.everresearch/mode.toml` is missing and the user has authorized EverResearch setup, run `rh projects setup-maintenance . --online` for online maintenance or `rh projects setup-maintenance .` for a standalone checkout. An older `mode.json` requires a current mode selection as well.
-- **Offline maintenance.** With `enabled = false`, use the [offline guide](.everresearch/offline/operations.md).
-- **Online maintenance.** With `enabled = true`, run `python -IS .everresearch/maintain.py status` and follow the relevant section of the reported guide. If the connection fails, report the error and pause work that needs the central guide.
+- **First use.** If `.researchharness/mode.toml` is missing and the user has authorized EverResearch setup, run `rh projects setup-maintenance . --online` for online maintenance or `rh projects setup-maintenance .` for a standalone checkout. An older `mode.json` requires a current mode selection as well.
+- **Offline maintenance.** With `enabled = false`, use the [offline guide](.researchharness/offline/operations.md).
+- **Online maintenance.** With `enabled = true`, run `python -IS .researchharness/maintain.py status` and follow the relevant section of the reported guide. If the connection fails, report the error and pause work that needs the central guide.
 
-For an authorized structure check, run `python -IS .everresearch/maintain.py check` from the project root. Use the project's own entry points to install, run tasks, and read their results.
+For an authorized structure check, run `python -IS .researchharness/maintain.py check` from the project root. Use the project's own entry points to install, run tasks, and read their results.
 <!-- /researchharness:mode -->

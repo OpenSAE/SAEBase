@@ -212,9 +212,20 @@ def test_unbundled_task_and_invalid_layer_fail_early(tmp_path):
 
 
 def test_run_config_consistency(tmp_path):
+    from saebase.registry import list_registered_task_keys
     from saebase.runtime import missing_packages
     from saebase.runtime.configuration.config_validate import validate_hydra_cfg
 
+    assert set(list_registered_task_keys()) == {
+        "precheck",
+        "capture",
+        "intervene",
+        "generate",
+        "circuits",
+        "explain",
+        "benchmark",
+        "train",
+    }
     configured = fake_cfg(tmp_path)
     configured.task.name = "benchmark"
     validate_hydra_cfg(configured)

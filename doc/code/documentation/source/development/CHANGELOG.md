@@ -1,11 +1,6 @@
 # Changelog
 
-## 0.8.1
-
-- Support EverResearch 0.8.1 and its current project maintenance entry.
-- Resolve Pythia models and their default SAE layers, keep TransformerLens 4 loading usable, and check cached model weight files.
-- Discover tasks added after editable installation and use their registry entries for automatic precheck.
-- Read the Ruff version from the installation configuration.
+## Unreleased
 
 ## 0.8.0 — Research Components and Experiment Workflows
 

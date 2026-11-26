@@ -42,7 +42,7 @@ The [Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) lets you brows
 
 ### 1. Install and run a complete example
 
-Use Python 3.11 or 3.12. SAEBase installs and runs on its own. EverResearch is optional and provides shared maintenance guidance, local resource bindings, and structure review. The first examples run on CPU without downloading model checkpoints.
+Use Python 3.11 or 3.12. SAEBase installs and runs on its own. EverResearch is optional and provides shared maintenance skills, local resource bindings, and structure review. The first examples run on CPU without downloading model checkpoints.
 
 ```bash
 git clone https://github.com/OpenSAE/SAEBase.git
@@ -99,24 +99,16 @@ This removes two selected feature contributions and reports the change in next-t
 
 ### 3. Work with a coding agent
 
-Open the source checkout in your coding-agent environment and start with [AGENTS.md](AGENTS.md) for component responsibilities and development guidance. SAEBase's core Python software runs independently.
-
-Install the verified EverResearch CLI from the [0.8.1 release](https://github.com/OpenSAE/EverResearch/releases/tag/v0.8.1).
+Open the checkout in your coding-agent environment and start with [AGENTS.md](AGENTS.md). To use EverResearch's shared maintenance tools, run these commands at the SAEBase root. The first command installs the [EverResearch revision verified with this checkout](https://github.com/OpenSAE/EverResearch/commit/fb8a5da65fdf206789b68f3031582fb6b9c7320d) in a separate tool environment.
 
 ```bash
-uv tool install 'https://github.com/OpenSAE/EverResearch/releases/download/v0.8.1/ever_research-0.8.1-py3-none-any.whl'
+uv tool install 'ever-research @ git+https://github.com/OpenSAE/EverResearch.git@fb8a5da65fdf206789b68f3031582fb6b9c7320d'
 rh --version
-```
-
-With the EverResearch command installed, connect this checkout from its root and verify the selected mode and structure.
-
-```bash
 rh projects setup-maintenance . --online
-python -IS .everresearch/maintain.py status
-python -IS .everresearch/maintain.py check
+python -IS .researchharness/maintain.py status
 ```
 
-Omit `--online` to create a standalone maintenance setup. For Python contributions, install the development and quality tools with `python -m pip install -e ".[dev,quality]"`. Run `python scripts/quality.py --include-modified` to check staged Python changes.
+The connection is local to this checkout. For contribution checks, include the quality dependencies when installing SAEBase. For example, use `python -m pip install -e ".[analysis,quality]"` for model analysis and the pinned Ruff version.
 
 ## 🔬 Research Workflows
 
@@ -157,7 +149,7 @@ SAEBase includes optional optimizations for repeated model evaluations and featu
 
 Explore the code: [SAEBase API](base/) · [Models](models/) · [Datasets](datasets/) · [Tasks](tasks/) · [Configuration](conf/) · [Repository Guide](doc/code/documentation/source/development/repository-guide.md).
 
-[Contributing](doc/code/documentation/source/development/code-quality.md) · [Changelog](doc/code/documentation/source/development/CHANGELOG.md) · [Citation](CITATION.cff) · [Apache-2.0 License](LICENSE)
+[Contributing](.github/CONTRIBUTING.md) · [Changelog](doc/code/documentation/source/development/CHANGELOG.md) · [Citation](CITATION.cff) · [Apache-2.0 License](LICENSE) · [Security](.github/SECURITY.md)
 
 ---
 

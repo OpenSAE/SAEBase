@@ -1,0 +1,24 @@
+# Purpose: withdraw the OpenSAE v0.8.1 release and matching tag.
+# Scope: one authorized rollback in OpenSAE/SAEBase on main.
+name: Withdraw v0.8.1
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/withdraw-release-081.yml']
+permissions:
+  contents: write
+jobs:
+  withdraw:
+    if: github.repository == 'OpenSAE/SAEBase'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Verify the exact tag and withdraw its release
+        run: |
+          set -euo pipefail
+          sha=$(gh api "repos/$GH_REPO/git/ref/tags/v0.8.1" --jq .object.sha)
+          test "$sha" = "58d5454ca160c5ec444ae6590c33c0c8191d325e"
+          gh release delete v0.8.1 --repo "$GH_REPO" --cleanup-tag --yes

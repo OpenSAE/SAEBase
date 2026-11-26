@@ -77,11 +77,3 @@ experiments/
 /assets/*
 !/assets/research_lab/
 /.researchharness/.initial-setup.lock
-
-# EverResearch maintenance files
-/.everresearch/mode.toml
-/.everresearch/maintain.py
-/.everresearch/offline/
-/.everresearch/online/
-/.everresearch/backups/
-/.everresearch/.initial-setup.lock
