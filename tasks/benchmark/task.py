@@ -13,6 +13,7 @@ from saebase.runtime.sae_operations import SAEOperationTask
 
 class BenchmarkTask(SAEOperationTask):
     OPERATION = "benchmark"
+    precheck_prepares_only = True
     supports_multiple_models = True
 
     def supports_run_resume(self, cfg) -> bool:
@@ -43,7 +44,9 @@ class BenchmarkTask(SAEOperationTask):
             from tasks.benchmark.metrics.health import run_activation_health
 
             return run_activation_health(cfg)
-        configured = task_value(cfg.task, "benchmark_config") or task_value(cfg.task, "protocol") is not None
+        configured = (
+            task_value(cfg.task, "benchmark_config") or task_value(cfg.task, "protocol") is not None
+        )
         if configured and not cfg.task.get("execute", False):
             from saebase.runtime.experiment_paths import run_components
             from tasks.benchmark.operation import configured_benchmark, resolved_protocol

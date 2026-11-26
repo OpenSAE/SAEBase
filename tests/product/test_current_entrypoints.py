@@ -56,20 +56,18 @@ def test_components_share_the_public_registry():
     ensure_plugins_loaded()
     ensure_plugins_loaded()
     assert set(list_registered_model_keys()) == set(MODEL_KEYS)
-    assert set(list_registered_task_keys()) == {
-        "precheck",
-        "capture",
-        "intervene",
-        "generate",
-        "circuits",
-        "explain",
-        "benchmark",
-        "train",
-    }
+    from saebase.registry import get_task_plugin
+
+    registered = set(list_registered_task_keys())
+    shipped = {path.parent.name for path in (ROOT / "tasks").glob("*/task.py")}
+    assert registered == shipped
+    assert all(get_task_plugin(name).task_class().name == name for name in registered)
     assert "pythia70m_resid_sm" in list_registered_sae_keys()
 
 
-def test_source_manifest_keeps_evidence_in_git_but_out_of_distribution():
+def test_source_manifest_excludes_local_research_evidence():
     manifest = (ROOT / "doc/code/distribution/source/manifest.in").read_text(encoding="utf-8")
-    assert "recursive-exclude assets/history_experiment/benchmark_evidence/files/stage_d_evidence *" in manifest
-    assert (ROOT / "assets/history_experiment/benchmark_evidence/files/stage_d_evidence/final/stage_d_final_matrix.json").is_file()
+    assert (
+        "recursive-exclude assets/history_experiment/benchmark_evidence/files/stage_d_evidence *"
+        in manifest
+    )

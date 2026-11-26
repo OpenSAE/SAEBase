@@ -7,6 +7,7 @@ from saebase.runtime.sae_operations import SAEOperationTask, execute_task
 
 class ExplainTask(SAEOperationTask):
     OPERATION = "explain"
+    precheck_prepares_only = True
 
     def __init__(self, generator=None, predictor=None):
         self.generator = generator

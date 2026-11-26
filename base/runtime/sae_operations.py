@@ -21,16 +21,6 @@ from dataclasses import dataclass
 from saebase.registry import TaskModule
 from saebase.results import EvaluationResult
 
-TASK_NAMES = (
-    "capture",
-    "intervene",
-    "generate",
-    "circuits",
-    "explain",
-    "benchmark",
-    "train",
-)
-
 
 def input_path(value: Any) -> Path:
     """Resolve input paths against the original launch directory under Hydra."""
@@ -92,9 +82,12 @@ def validate_task_cfg(cfg: Any) -> None:
     """Delegate method rules to their owner; this module only shares resource operations."""
     from importlib import import_module
 
+    from saebase.registry import get_task_plugin
+
     load_requested_extensions(cfg)
+    get_task_plugin(str(cfg.task.name))
     validate_fields(cfg, booleans=("execute",))
-    import_module(RUNNER_MODULES[str(cfg.task.name)]).validate_cfg(cfg)
+    import_module(f"tasks.{cfg.task.name}.operation").validate_cfg(cfg)
 
 
 def _task(cfg: Any, key: str, default: Any = None) -> Any:
@@ -259,10 +252,11 @@ def load_selection(selection: SelectedSAE, device: str):
 
 
 def _require_context(cfg: Any, operation: str) -> None:
-    from saebase.registry import get_dataset_plugin, get_model_plugin
+    from saebase.registry import get_dataset_plugin, get_model_plugin, get_task_plugin
 
-    if operation not in TASK_NAMES or str(cfg.task.name) != operation:
+    if operation == "precheck" or str(cfg.task.name) != operation:
         raise ValueError("Task name must match its registered operation")
+    get_task_plugin(operation)
     if operation == "benchmark" and (
         _task(cfg, "benchmark_config") or _task(cfg, "protocol") is not None
     ):
@@ -335,18 +329,6 @@ def _maybe_save(operation: str, payload: dict[str, Any], cfg=None) -> dict[str, 
     return {**payload, "result_path": f"metadata/{operation}_result.json"}
 
 
-# Each task owns its concrete execution implementation; SAEBase stays generic.
-RUNNER_MODULES = {
-    "capture": "tasks.capture.operation",
-    "intervene": "tasks.intervene.operation",
-    "generate": "tasks.generate.operation",
-    "circuits": "tasks.circuits.operation",
-    "explain": "tasks.explain.operation",
-    "benchmark": "tasks.benchmark.operation",
-    "train": "tasks.train.operation",
-}
-
-
 def execute_task(
     operation: str,
     cfg: Any,
@@ -369,7 +351,7 @@ def execute_task(
             "dataset_key": str(cfg.dataset.name),
             "description": "Set task.execute=true and supply required runtime inputs to execute.",
         }
-    module = import_module(RUNNER_MODULES[operation])
+    module = import_module(f"tasks.{operation}.operation")
     if operation == "explain":
         result = module.execute(cfg, generator=generator, predictor=predictor)
     else:
@@ -408,4 +390,5 @@ class SAEOperationTask(TaskModule):
         """Prepare native protocol inputs without executing the research task."""
         from importlib import import_module
 
-        return import_module(RUNNER_MODULES[self.OPERATION]).prepare_execution(cfg)
+        module = import_module(f"tasks.{self.OPERATION}.operation")
+        return getattr(module, "prepare_execution", super().prepare_execution)(cfg)

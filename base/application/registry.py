@@ -37,6 +37,7 @@ class TaskModule(ABC):
         return manifest
 
     supports_multiple_models = False
+    precheck_prepares_only = False
 
     def supports_run_resume(self, cfg: DictConfig) -> bool:
         """Declare a task-owned recovery protocol; directory existence is insufficient."""
@@ -281,9 +282,9 @@ def list_registered_sae_keys() -> list[str]:
     return sorted(set(_SAE_REGISTRY) | set(SAE_KEYS) | set(DEFAULT_SAE_FOR_MODEL) | {"none"})
 
 
-def list_registered_task_keys() -> list[str]:
+def list_registered_task_keys(*, registration_order: bool = False) -> list[str]:
     _ensure_plugins()
-    return sorted(_TASK_REGISTRY.keys())
+    return list(_TASK_REGISTRY) if registration_order else sorted(_TASK_REGISTRY)
 
 
 def register_dataset(

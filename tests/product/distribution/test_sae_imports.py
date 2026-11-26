@@ -6,7 +6,6 @@ import ast
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-TASK_NAMES = ("capture", "intervene", "generate", "circuits", "explain", "benchmark", "train")
 FORBIDDEN_TOP = {"dlbase", "torchvision", "cv2"}
 
 
@@ -29,8 +28,6 @@ def test_package_layout():
     assert (ROOT / "datasets" / "plugins.py").is_file()
     assert (ROOT / "base" / "application" / "registry.py").is_file()
     assert (ROOT / "base" / "runtime" / "train.py").is_file()
-    for name in TASK_NAMES:
-        assert (ROOT / "tasks" / name / "task.py").is_file(), name
     assert not (ROOT / "tasks" / "sae").exists()
     assert (ROOT / "datasets" / "prompt_collection" / "artifacts.py").is_file()
     for retired in (
@@ -65,7 +62,7 @@ def test_no_forbidden_imports_in_active_packages():
 
 
 def test_sae_plugin_importable():
-    from saebase.registry import get_task_plugin
+    from saebase.registry import get_task_plugin, list_registered_task_keys
     from tasks.benchmark.task import BenchmarkTask
 
     task = BenchmarkTask()
@@ -73,5 +70,5 @@ def test_sae_plugin_importable():
     from tasks.precheck.task import PrecheckTask
 
     assert get_task_plugin("precheck").task_class is PrecheckTask
-    for name in TASK_NAMES:
+    for name in list_registered_task_keys():
         assert get_task_plugin(name).task_class is not None

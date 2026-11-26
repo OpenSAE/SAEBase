@@ -2,7 +2,7 @@
 
 ## Purpose and scope of application
 
-Describes the common selection, output and results of five end-word capture modes. The running entrance is `saebase task=capture`, configured at `conf/tasks/capture/task.yaml`, and the results are read at `CaptureTask.read_samples` and `export_report`.
+Compare the five ways to rank features active at the final prompt token. Run `saebase task=capture` with the settings in `conf/tasks/capture/task.yaml`. Use `CaptureTask.read_samples` to read the saved observations or `export_report` to export a report.
 
 ## Parameters
 
@@ -25,7 +25,7 @@ The semantic/density rule is repeated at `tasks/capture/sar_filter.py`; mean/std
 
 The g(S) and I mode defaults the standard answers to test forcing without EOS; the change is the activation of the last token of the original prompt at the selected SAE position and the retention of the original refactor's defects. The lower layer of the `answer_backend=full_context_tail` cache complete sequence is activated, the tail layer is calculated using the same cascading/sequence shape and checked with the original whole front; the back end of the tail layer interface is not supported with the complete forward.
 
-Use of the original SAR sample regression method `mode=sar` requires a visible and credible sar.py; its pair coefficient is two indicators, as is the count of four quartz I. The default upper limit of 16 for the number of candidates, the too large pool of candidates will clearly report errors prior to the measurement, and the return prediction cannot be used as an all-time basis. `filter=all` The same ceiling is applied to the large SAE ' s count of SARs.
+For `mode=sar`, the original SAR regression requires the external `sar.py` implementation. Pair scores come from the fitted quadratic surrogate's pair coefficients. The default candidate limit is 16, including when the filter selects every feature. Capture rejects larger pools before measuring responses.
 
 Captures set the candidate pool separately from the output number. Interventions and the generation of filter and output configurations that can be fed into the capture are used to reuse the same candidate selection. History configurations are read from their original number fields. `task.capture.output_scope=all_tokens` Saves word-by-word trails, uses `task.capture.selection.candidate_count=all` and controls the number of features saved by `task.capture.max_active_per_token`.
 

@@ -24,7 +24,7 @@ from omegaconf import DictConfig, OmegaConf
 from saebase.results import EvaluationResult
 from tasks.precheck.report import blocked, error_result, summarize
 from tasks.precheck.sae_checks import select_sites
-from saebase.runtime.sae_operations import TASK_NAMES
+from saebase.registry import get_task_plugin, list_registered_task_keys
 
 
 def _budget(cfg: DictConfig) -> tuple[int, int, int]:
@@ -45,9 +45,12 @@ def _selected_tasks(cfg: DictConfig, mode: str) -> list[str]:
     if mode == "sae":
         return []
     given = list(task_value(cfg.task, "check_tasks", []))
-    tasks = [str(name) for name in given] if given else list(TASK_NAMES)
-    if len(set(tasks)) != len(tasks) or any(name not in TASK_NAMES for name in tasks):
-        raise ValueError(f"check_tasks must be unique members of {list(TASK_NAMES)}")
+    available = [
+        name for name in list_registered_task_keys(registration_order=True) if name != "precheck"
+    ]
+    tasks = [str(name) for name in given] if given else available
+    if len(set(tasks)) != len(tasks) or any(name not in available for name in tasks):
+        raise ValueError(f"check_tasks must be unique members of {available}")
     return tasks
 
 
@@ -295,7 +298,7 @@ def _task_config(cfg: DictConfig, name: str, max_seconds: int, max_tokens: int) 
         if specified > max_tokens:
             raise ValueError("Task generation exceeds max_tokens budget")
         target.task.generate.max_new_tokens = specified
-    if name in ("benchmark", "circuits", "train", "explain") and not task:
+    if get_task_plugin(name).task_class.precheck_prepares_only and not task:
         raise ValueError(
             f"Task {name} needs an explicit, bounded task.precheck.task_configs.{name} plan "
             "before a real smoke; Precheck must not run an unbounded default protocol"
@@ -332,7 +335,10 @@ def _run_precheck(cfg: DictConfig) -> EvaluationResult:
 
     resolve_config_devices(cfg)
     mode = str(task_value(cfg.task, "mode", "sae"))
-    capture_overrides = {"name": "capture", **task_value(cfg.task, "task_configs", {}).get("capture", {})}
+    capture_overrides = {
+        "name": "capture",
+        **task_value(cfg.task, "task_configs", {}).get("capture", {}),
+    }
     rows: list[dict[str, Any]] = []
     preparation: list[dict[str, Any]] = []
     from saebase.runtime.experiment_paths import run_components
@@ -395,7 +401,9 @@ def _run_precheck(cfg: DictConfig) -> EvaluationResult:
                     allow_network=bool(task_value(cfg.task, "allow_network", True)),
                     allow_install=bool(task_value(cfg.task, "allow_install", True)),
                     allow_download=bool(task_value(cfg.task, "allow_download", True)),
-                    max_download_bytes=int(task_value(cfg.task, "max_download_bytes", 16 * 1024**3)),
+                    max_download_bytes=int(
+                        task_value(cfg.task, "max_download_bytes", 16 * 1024**3)
+                    ),
                     install_timeout_seconds=max(
                         1, int(task_value(cfg.task, "prepare_timeout_seconds", 1800)) - 30
                     ),
@@ -403,8 +411,7 @@ def _run_precheck(cfg: DictConfig) -> EvaluationResult:
                 if (
                     ("capture" in tasks or task_value(cfg.task, "target_operation") == "capture")
                     and not is_external
-                    and task_value(capture_overrides, "neuronpedia", {})
-                    .get("enabled", True)
+                    and task_value(capture_overrides, "neuronpedia", {}).get("enabled", True)
                 ):
                     parameters["required_modules"] = [
                         *parameters["required_modules"],
@@ -428,8 +435,7 @@ def _run_precheck(cfg: DictConfig) -> EvaluationResult:
         device = str(cfg.task.get("device", "cpu"))
         whiten_basis = (
             task_value(cfg.task, "target_operation") == "capture"
-            and task_value(capture_overrides, "mode", "non_whiten")
-            == "whiten"
+            and task_value(capture_overrides, "mode", "non_whiten") == "whiten"
         )
         needs_dataset = (
             cfg.dataset.get("samples") is None
@@ -444,7 +450,9 @@ def _run_precheck(cfg: DictConfig) -> EvaluationResult:
                     "kind": "prepare_dataset",
                     "config": OmegaConf.to_container(dataset_cfg, resolve=True),
                     "n_generate": int(
-                        cfg.dataset.get("sample_count", task_value(cfg.task, "dataset_n_generate", 32))
+                        cfg.dataset.get(
+                            "sample_count", task_value(cfg.task, "dataset_n_generate", 32)
+                        )
                     ),
                     "min_kept": int(task_value(cfg.task, "dataset_min_kept", 1)),
                 },
@@ -490,7 +498,9 @@ def _run_precheck(cfg: DictConfig) -> EvaluationResult:
                 prompt = probes[0]["prompt"]
             for index, site in enumerate(sites):
                 request = {
-                    "kind": "sae_checkpoint" if task_value(cfg.task, "resource_only", False) else "sae",
+                    "kind": "sae_checkpoint"
+                    if task_value(cfg.task, "resource_only", False)
+                    else "sae",
                     "operation": str(task_value(cfg.task, "target_operation", "precheck")),
                     "model_key": model_key,
                     "sae_key": site["sae_key"],
@@ -506,7 +516,9 @@ def _run_precheck(cfg: DictConfig) -> EvaluationResult:
 
                     annotation_cfg = OmegaConf.create({"task": capture_overrides})
                     request["annotation_options"] = neuronpedia_settings(annotation_cfg)
-                    request["capture_mode"] = str(task_value(annotation_cfg.task, "mode", "non_whiten"))
+                    request["capture_mode"] = str(
+                        task_value(annotation_cfg.task, "mode", "non_whiten")
+                    )
                     request["whiten_chunk_size"] = int(
                         task_value(annotation_cfg.task, "whiten_chunk_size", 256)
                     )
@@ -523,7 +535,7 @@ def _run_precheck(cfg: DictConfig) -> EvaluationResult:
                     task_cfg = _task_config(cfg, name, max_seconds, max_tokens)
                     request = {
                         "kind": "task_preparation"
-                        if name in {"benchmark", "circuits", "explain", "train"}
+                        if get_task_plugin(name).task_class.precheck_prepares_only
                         or cfg.dataset.get("samples") is not None
                         else "task",
                         "operation": name,

@@ -53,8 +53,14 @@ experiments/
 # Instance-local central workspace binding
 .researchharness/central.json
 
-# Connection records maintained online on-line.
+# Local EverResearch setup and connection files.
 /.researchharness/online/
+/.researchharness/mode.toml
+/.researchharness/mode.json
+/.researchharness/maintain.py
+/.researchharness/offline/
+/.researchharness/backups/
+/.researchharness/.initial-setup.lock
 
 /tmp/
 
@@ -70,3 +76,4 @@ experiments/
 !/.researchharness/
 /assets/*
 !/assets/research_lab/
+/.researchharness/.initial-setup.lock

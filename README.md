@@ -42,7 +42,7 @@ The [Research Lab](https://huggingface.co/spaces/OpenSAE/SAEBase) lets you brows
 
 ### 1. Install and run a complete example
 
-Use Python 3.11 or 3.12. SAEBase installs and runs on its own. ResearchHarness is optional and provides shared maintenance skills, local resource bindings, and structure review. The first examples run on CPU without downloading model checkpoints.
+Use Python 3.11 or 3.12. SAEBase installs and runs on its own. EverResearch is optional and provides shared maintenance skills, local resource bindings, and structure review. The first examples run on CPU without downloading model checkpoints.
 
 ```bash
 git clone https://github.com/OpenSAE/SAEBase.git
@@ -99,7 +99,16 @@ This removes two selected feature contributions and reports the change in next-t
 
 ### 3. Work with a coding agent
 
-Open the source checkout in your coding-agent environment and start with [AGENTS.md](AGENTS.md) for component responsibilities and development guidance. SAEBase's core Python software runs independently.
+Open the checkout in your coding-agent environment and start with [AGENTS.md](AGENTS.md). To use EverResearch's shared maintenance tools, run these commands at the SAEBase root. The first command installs the [EverResearch revision verified with this checkout](https://github.com/OpenSAE/EverResearch/commit/fb8a5da65fdf206789b68f3031582fb6b9c7320d) in a separate tool environment.
+
+```bash
+uv tool install 'ever-research @ git+https://github.com/OpenSAE/EverResearch.git@fb8a5da65fdf206789b68f3031582fb6b9c7320d'
+rh --version
+rh projects setup-maintenance . --online
+python -IS .researchharness/maintain.py status
+```
+
+The connection is local to this checkout. For contribution checks, include the quality dependencies when installing SAEBase. For example, use `python -m pip install -e ".[analysis,quality]"` for model analysis and the pinned Ruff version.
 
 ## 🔬 Research Workflows
 

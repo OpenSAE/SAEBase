@@ -15,7 +15,7 @@ These instructions apply to reading, developing, and maintaining SAEBase. Start 
 
 ## Work Toward the Intended Outcome
 
-- Base engineering changes on this repository's actual entry points, configuration, and checks. After connecting to ResearchHarness, consult the central engineering protocol for shared conventions on layout, preflight checks, and delivery of results. See `src/project/maintained/saebase/README.md` for how this project implements those conventions.
+- Base engineering changes on this repository's actual entry points, configuration, and checks. After connecting to EverResearch, consult the central engineering protocol for shared conventions on layout, preflight checks, and delivery of results. See `src/project/maintained/saebase/README.md` for how this project implements those conventions.
 
 - Establish the outcome the user needs and the conditions for completion. Locate the existing implementation and its direct callers, then investigate, make engineering decisions, and act within the existing authorization. Implement straightforward tasks directly. For complex tasks, describe the dependencies and files involved in the actual deliverable. When a human decision is needed, present the facts established, the specific choices, and their effects.
 - Carry authorized routine implementation through to completion. Choose local engineering approaches based on the agreed goals, practical benefits, and maintenance costs. When a new decision concerns the meaning of a metric, a research use, sample selection, or compute investment, explain the concrete differences, practical effects, and recommendation in light of existing decisions. Agree on the choice with the user before proceeding with the affected work.
@@ -69,27 +69,19 @@ Name SAEBase features, stages, errors, and reports according to their practical 
 Use the [project documentation](doc/README.md) to find the pages affected by the current change. Update the documentation when commands, public parameters, dependencies, result interfaces, or metrics change. Refer to the configuration and existing artifacts for the relevant run in experiment reports. When reviewing a feature, check the actual entry points, configuration, and results described in the documentation. At delivery, explain what changed, what was checked, and the effect on existing usage.
 
 <!-- researchharness:search -->
-## Locating and Searching
+## Locate projects and files
 
-When locating a project, entry point, or configuration, check known registrations and explicit paths first. To broaden the search, first list the top-level contents and then select specific directories. By default, exclude local workspace artifacts, historical snapshots, experiment artifacts, and caches from recursive content searches. When their contents are needed, explicitly specify the directory or file and limit the amount of output.
+Start with known registrations and explicit paths when locating a project, command, or configuration. When you need a broader search, list the immediate directories first and pick specific paths. Limit routine recursive searches to active source material. Search local workspace output, historical snapshots, experiment results, or caches by explicitly naming the required files or directories and limiting the output.
 <!-- /researchharness:search -->
 
 <!-- researchharness:mode -->
-## Maintenance Mode Control
+## Maintain this checkout
 
-### Purpose and Main Functions
+Use the project instructions above for ordinary work and read-only inspection. EverResearch is an optional maintenance tool.
 
-Use the project switch to select one set of maintenance instructions and structural checks.
+- **First use.** If `.researchharness/mode.toml` is missing and the user has authorized EverResearch setup, run `rh projects setup-maintenance . --online` for online maintenance or `rh projects setup-maintenance .` for a standalone checkout. An older `mode.json` requires a current mode selection as well.
+- **Offline maintenance.** With `enabled = false`, use the [offline guide](.researchharness/offline/operations.md).
+- **Online maintenance.** With `enabled = true`, run `python -IS .researchharness/maintain.py status` and follow the relevant section of the reported guide. If the connection fails, report the error and pause work that needs the central guide.
 
-### Scope
-
-This section applies to project maintenance requests, verification of online integration status, and offline structural checks.
-
-At the start of maintenance, first read the project's `.researchharness/mode.toml`. Its `enabled` setting is the project's sole maintenance mode switch. Follow the user's selection. Obtain the user's authorization to change the switch.
-
-- **`enabled = false`, offline maintenance.** Follow only the [in-project offline operations manual](.researchharness/offline/operations.md). The manual covers decision-making, implementation, and closeout for various operations. Use it for routine maintenance when central integration is disabled. Use the project's own source code, commands, tests, and data locations. The mode selected by the switch takes effect.
-- **`enabled = true`, online maintenance.** First run `python -IS .researchharness/maintain.py status`. Once it successfully reports `online`, read the central instructions it returns and follow them to use the operations manuals, original skills, and checks in the ResearchHarness repository. If the status command fails, pause maintenance that depends on the central repository and explain the cause. The user can then restore integration or choose offline maintenance.
-- **Missing or invalid switch.** Stop maintenance and identify the issue with the switch. Continue after it is fixed or an explicit selection is made.
-
-When authorized, run `python -IS .researchharness/maintain.py check` from the project root in either mode. This command runs only the structural checks for the selected mode. Use the independent entry points in the README for normal installation, training, preflight checks, and reading results.
+For an authorized structure check, run `python -IS .researchharness/maintain.py check` from the project root. Use the project's own entry points to install, run tasks, and read their results.
 <!-- /researchharness:mode -->

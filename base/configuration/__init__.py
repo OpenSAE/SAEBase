@@ -25,7 +25,13 @@ def configuration_root() -> Path:
     source = Path(__file__).resolve().parents[2]
     if workspace_at(source):
         return source / "conf"
-    return Path(__file__).absolute().parent
+    package = Path(__file__).absolute().parent
+    image = package.parent
+    if image.name.startswith("__editable__.") and image.parent.name == ".build":
+        source = image.parent.parent
+        if workspace_at(source):
+            return source / "conf"
+    return package
 
 
 def launch_directory() -> Path:
@@ -46,7 +52,16 @@ def default_workspace() -> str | None:
 
 
 def _default_data_directory(root: str | None) -> str | None:
-    return str(((launch_directory() / root).resolve() / "assets/dataset_preparation/prompt_sets/files").resolve()) if root is not None else None
+    return (
+        str(
+            (
+                (launch_directory() / root).resolve()
+                / "assets/dataset_preparation/prompt_sets/files"
+            ).resolve()
+        )
+        if root is not None
+        else None
+    )
 
 
 def _prepared_dataset_dir(root: str, name: str) -> str:
@@ -73,7 +88,11 @@ def configuration_location(source: str | Path) -> tuple[Path, str]:
     """Split a physical configuration path and an optional named section."""
     path = Path(source)
     filename, separator, section = str(path).rpartition("#")
-    if separator and Path(filename).suffix.lower() in {".json", ".yml", ".yaml"} and not path.is_file():
+    if (
+        separator
+        and Path(filename).suffix.lower() in {".json", ".yml", ".yaml"}
+        and not path.is_file()
+    ):
         if not section or any(not part.isidentifier() for part in section.split(".")):
             raise ValueError(f"Invalid configuration section: {source}")
         return Path(filename), section

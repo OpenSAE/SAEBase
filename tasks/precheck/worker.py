@@ -344,11 +344,20 @@ def check(request: dict[str, Any]) -> dict[str, Any]:
             result = task.prepare_execution(cfg)
             result = {**result, "task": request["operation"], "scientific_computation": "NOT_RUN"}
         elif kind == "task":
-            from saebase.runtime.sae_operations import execute_task
+            from saebase.registry import get_task_plugin
 
             name = str(request["operation"])
             cfg = OmegaConf.create(request["config"])
-            result = execute_task(name, cfg)
+            task = get_task_plugin(name).task_class()
+            task.validate_cfg(cfg)
+            outcome = task.run_validated(cfg)
+            if outcome.task != name:
+                raise RuntimeError(f"{name} returned a result for {outcome.task}")
+            result = dict(outcome.summary)
+            result.setdefault("operation", outcome.task)
+            result.setdefault("status", outcome.status)
+            if outcome.completion:
+                result.setdefault("completion", outcome.completion)
             _validate_task(name, result)
             completion = result.get("completion", {})
             if completion and completion.get("status") != "complete":

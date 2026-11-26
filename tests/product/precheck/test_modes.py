@@ -156,3 +156,19 @@ def test_task_mode_setup_includes_owning_model_sae_checkpoint():
     repositories = {item["repo_id"] for item in _assets(cfg, [], ["capture"])}
     assert "Qwen/Qwen3.5-2B" in repositories
     assert "Qwen/SAE-Res-Qwen3.5-2B-Base-W32K-L0_50" in repositories
+
+
+def test_precheck_accepts_new_registered_task(monkeypatch):
+    from saebase import registry
+    from tasks.capture.task import CaptureTask
+
+    registry.list_registered_task_keys()
+    monkeypatch.setattr(registry, "_TASK_REGISTRY", registry._TASK_REGISTRY.copy())
+    registry.register_task("example_task", CaptureTask)
+    cfg = OmegaConf.create({"task": {"check_tasks": ["example_task"]}})
+    assert _selected_tasks(cfg, "task") == ["example_task"]
+
+    cfg.task.check_tasks = []
+    available = _selected_tasks(cfg, "all")
+    assert "example_task" in available
+    assert "precheck" not in available
